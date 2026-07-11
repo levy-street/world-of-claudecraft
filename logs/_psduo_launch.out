@@ -1,0 +1,82 @@
+[07:42:50] using pre-fetched token for pala1
+[07:42:50] using pre-fetched token for sham2
+[07:42:52] in world: pontius (paladin L1) pid=1616
+[07:42:52] ⏳ staggering Shims's join by 86s
+[07:44:20] in world: shims (shaman L1) pid=1618
+[07:44:20] leader = Pontius (paladin); tank = Pontius
+[07:44:22] 🧠 brain loaded live: multibox_brain.mjs (hot-reload on save)
+[07:44:22] [grind] camp:278y @(2,-2) Pontiu:L1 95/95  Shims:L1 68/68 · 0.0k/m 0xp/h
+[07:44:37] [grind] camp:23y @(16,46) · tanking Forest Wolf Pontiu:L1 91/95  Shims:L1 68/68 · 15.9k/m 23915xp/h
+[07:44:52] [grind] camp:18y @(17,67) · tanking Forest Wolf Pontiu:L1 83/95  Shims:L1 68/68 · 19.9k/m 32788xp/h
+[07:45:07] [grind] camp:13y @(8,73) · tanking Forest Wolf Pontiu:L1 95/95  Shims:L1 64/68 · 18.6k/m 29807xp/h
+[07:45:22] [grind] camp:26y @(26,58) · pulling Forest Wolf Pontiu:L1 77/95  Shims:L1 68/68 · 17.9k/m 29307xp/h
+[07:45:38] [grind] camp:37y @(37,57) · tanking Wild Boar Pontiu:L1 68/95  Shims:L1 68/68 · 14.4k/m 23439xp/h
+[07:45:53] [grind] camp:35y @(28,84) · tanking Forest Wolf Pontiu:L1 68/95  Shims:L1 68/68 · 13.3k/m 22166xp/h
+[07:46:08] [grind] camp:4y @(2,59) · tanking Forest Wolf Pontiu:L1 82/95  Shims:L1 68/68 · 12.5k/m 20974xp/h
+[07:46:23] [grind] camp:4y @(4,62) · tanking Forest Wolf Pontiu:L1 66/95  Shims:L1 63/68 · 12.9k/m 23069xp/h
+[07:46:38] [grind] camp:57y @(13,22) · pathing to the grind camp (66, 2) Pontiu:L2 132/132  Shims:L2 103/103 · 12.4k/m 22048xp/h
+[07:46:53] [grind] camp:36y @(31,8) · tanking Wild Boar Pontiu:L2 81/132  Shims:L2 103/103 · 11.2k/m 19846xp/h
+[07:47:08] [grind] camp:34y @(32,6) · letting the party recover before the next pull Pontiu:L2 55/132  Shims:L2 82/103 · 10.5k/m 19435xp/h
+[07:47:23] [grind] camp:27y @(41,12) · tanking Wild Boar Pontiu:L2 44/132  Shims:L2 103/103 · 10.3k/m 19092xp/h
+[07:47:38] [grind] camp:15y @(60,15) · letting the party recover before the next pull Pontiu:L2 28/132  Shims:L2 103/103 · 9.5k/m 17624xp/h
+[07:47:53] [grind] camp:15y @(75,13) · tanking Wild Boar Pontiu:L2 28/132  Shims:L2 101/103 · 9.1k/m 16364xp/h
+[07:48:08] [grind] camp:34y @(74,35) · tanking Wild Boar Pontiu:L2 50/132  Shims:L2 103/103 · 8.5k/m 15275xp/h
+[07:48:23] [grind] camp:34y @(60,35) · tanking Wild Boar Pontiu:L2 68/132  Shims:L2 81/103 · 8.0k/m 14322xp/h
+[07:48:38] [grind] camp:43y @(24,-8) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 96/103 · 7.5k/m 13481xp/h
+[07:48:53] [grind] camp:39y @(28,-5) · pulling Wild Boar Pontiu:L2 88/132  Shims:L2 101/103 · 7.5k/m 13583xp/h
+[07:49:08] [grind] camp:34y @(32,3) · tanking Wild Boar Pontiu:L2 37/132  Shims:L2 103/103 · 7.1k/m 12868xp/h
+[07:49:23] [grind] camp:44y @(22,-5) · pathing to the grind camp (66, 2) Pontiu:L2 75/132  Shims:L2 103/103 · 7.0k/m 12991xp/h
+[07:49:38] [grind] camp:38y @(28,1) · tanking Wild Boar Pontiu:L2 31/132  Shims:L2 103/103 · 6.6k/m 12369xp/h
+[07:49:53] [grind] camp:46y @(25,-19) · pathing to the grind camp (66, 2) Pontiu:L2 67/132  Shims:L2 103/103 · 6.3k/m 11808xp/h
+[07:50:08] [grind] camp:27y @(39,2) · tanking Wild Boar Pontiu:L2 57/132  Shims:L2 103/103 · 6.1k/m 11294xp/h
+[07:50:23] [grind] camp:87y @(-5,-48) · pathing to the grind camp (66, 2) Pontiu:L2 34/132  Shims:L2 103/103 · 6.0k/m 11462xp/h
+[07:50:39] [grind] camp:30y @(36,0) · tanking Wild Boar Pontiu:L2 38/132  Shims:L2 103/103 · 5.7k/m 11004xp/h
+[07:50:54] [grind] camp:39y @(51,-34) · pathing to the grind camp (66, 2) Pontiu:L2 56/132  Shims:L2 103/103 · 5.5k/m 10579xp/h
+[07:51:09] [grind] camp:19y @(72,-16) · tanking Wild Boar Pontiu:L2 33/132  Shims:L2 103/103 · 5.5k/m 10683xp/h
+[07:51:24] [grind] camp:43y @(85,-36) · letting the party recover before the next pull Pontiu:L2 46/132  Shims:L2 103/103 · 5.3k/m 10300xp/h
+[07:51:39] [grind] camp:44y @(74,-41) · tanking Vale Bandit Pontiu:L2 105/132  Shims:L2 103/103 · 5.1k/m 9944xp/h
+[07:51:54] [grind] camp:39y @(78,-35) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 85/103 · 4.9k/m 9613xp/h
+[07:52:09] [grind] camp:17y @(59,-13) · tanking Wild Boar Pontiu:L2 109/132  Shims:L2 101/103 · 5.0k/m 9735xp/h
+[07:52:24] [grind] camp:17y @(59,-13) · letting the party recover before the next pull Pontiu:L2 60/132  Shims:L2 103/103 · 5.0k/m 9909xp/h
+[07:52:39] [grind] camp:17y @(59,-13) · letting the party recover before the next pull Pontiu:L2 106/132  Shims:L2 103/103 · 5.1k/m 10014xp/h
+[07:52:54] [grind] camp:16y @(58,-12) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 103/103 · 4.9k/m 9719xp/h
+[07:53:09] [grind] camp:27y @(39,-2) · tanking Wild Boar Pontiu:L2 120/132  Shims:L2 94/103 · 4.9k/m 9441xp/h
+[07:53:24] [grind] camp:24y @(46,15) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 103/103 · 5.0k/m 9604xp/h
+[07:53:39] [grind] camp:38y @(30,16) · pulling Wild Boar Pontiu:L2 132/132  Shims:L2 103/103 · 4.8k/m 9344xp/h
+[07:53:54] [grind] camp:43y @(26,16) · pathing to the grind camp (66, 2) Pontiu:L2 130/132  Shims:L2 95/103 · 4.9k/m 9501xp/h
+[07:54:10] [grind] camp:30y @(70,-28) · searching for the next pack Pontiu:L2 119/132  Shims:L2 103/103 · 5.0k/m 9601xp/h
+[07:54:25] [grind] camp:35y @(88,-24) · tanking Wild Boar Pontiu:L2 79/132  Shims:L2 103/103 · 5.0k/m 9695xp/h
+[07:54:40] [grind] camp:35y @(92,-21) · tanking Wild Boar Pontiu:L2 37/132  Shims:L2 103/103 · 5.0k/m 9784xp/h
+[07:54:55] [grind] camp:79y @(-13,8) · pathing to the grind camp (66, 2) Pontiu:L2 132/132  Shims:L2 84/103 · 4.8k/m 9550xp/h
+[07:55:10] [grind] camp:88y @(17,74) · pathing to the grind camp (66, 2) Pontiu:L2 116/132  Shims:L2 13/103 · 4.7k/m 9328xp/h
+[07:55:25] [grind] camp:40y @(57,41) · letting the party recover before the next pull Pontiu:L2 17/132  Shims:L2 37/103 · 4.6k/m 9116xp/h
+[07:55:40] [grind] camp:29y @(37,2) · tanking Wild Boar Pontiu:L2 113/132  Shims:L2 93/103 · 4.5k/m 8913xp/h
+[07:55:55] [grind] camp:32y @(35,-3) · pulling Wild Boar Pontiu:L2 116/132  Shims:L2 101/103 · 4.5k/m 8720xp/h
+[07:56:10] [grind] camp:28y @(40,13) · tanking Wild Boar Pontiu:L2 88/132  Shims:L2 103/103 · 4.6k/m 8860xp/h
+[07:56:25] [grind] camp:43y @(70,45) · searching for the next pack Pontiu:L2 132/132  Shims:L2 103/103 · 4.5k/m 8675xp/h
+[07:56:40] [grind] camp:44y @(50,43) · pathing to the grind camp (66, 2) Pontiu:L2 120/132  Shims:L2 103/103 · 4.4k/m 8498xp/h
+[07:56:55] [grind] camp:30y @(81,28) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 75/103 · 4.3k/m 8328xp/h
+[07:57:10] [grind] camp:26y @(65,28) · tanking Wild Boar Pontiu:L2 89/132  Shims:L2 103/103 · 4.4k/m 8464xp/h
+[07:57:25] [grind] camp:28y @(53,26) · letting the party recover before the next pull Pontiu:L2 132/132  Shims:L2 103/103 · 4.4k/m 8559xp/h
+[07:57:40] [grind] camp:27y @(58,28) · tanking Wild Boar Pontiu:L2 132/132  Shims:L2 89/103 · 4.4k/m 8687xp/h
+[07:57:56] [grind] camp:28y @(55,28) · tanking Wild Boar Pontiu:L2 132/132  Shims:L2 103/103 · 4.4k/m 8774xp/h
+[07:58:11] [grind] camp:25y @(58,26) · tanking Wild Boar Pontiu:L2 75/132  Shims:L2 101/103 · 4.5k/m 8892xp/h
+[07:58:26] [grind] camp:25y @(58,26) · letting the party recover before the next pull Pontiu:L2 42/132  Shims:L2 103/103 · 4.6k/m 9246xp/h
+[07:58:41] [grind] camp:47y @(113,8) · tanking Wild Boar Pontiu:L2 46/132  Shims:L2 89/103 · 4.5k/m 9084xp/h
+[07:58:56] [grind] camp:41y @(107,-5) · letting the party recover before the next pull Pontiu:L2 43/132  Shims:L2 35/103 · 4.4k/m 8927xp/h
+[07:59:11] [grind] camp:43y @(103,24) · letting the party recover before the next pull Pontiu:L2 56/132  Shims:L2 89/103 · 4.3k/m 8775xp/h
+[07:59:26] [grind] camp:35y @(94,22) · tanking Wild Boar Pontiu:L2 111/132  Shims:L2 94/103 · 4.2k/m 8629xp/h
+[07:59:41] [grind] camp:46y @(61,48) · pathing to the grind camp (66, 2) Pontiu:L2 89/132  Shims:L2 103/103 · 4.3k/m 8739xp/h
+[07:59:56] [grind] camp:80y @(-13,-9) · tanking Wild Boar Pontiu:L2 132/132  Shims:L2 103/103 · 4.2k/m 8598xp/h
+[08:00:11] [grind] camp:83y @(-11,33) · pathing to the grind camp (66, 2) Pontiu:L2 132/132  Shims:L2 103/103 · 4.2k/m 8461xp/h
+[08:00:26] [grind] camp:34y @(46,30) · tanking Wild Boar Pontiu:L2 116/132  Shims:L2 103/103 · 4.1k/m 8329xp/h
+[08:00:41] [grind] camp:34y @(32,1) · tanking Wild Boar Pontiu:L2 92/132  Shims:L2 103/103 · 4.2k/m 8437xp/h
+[08:00:56] [grind] camp:55y @(12,-11) · tanking Wild Boar Pontiu:L2 32/132  Shims:L2 103/103 · 4.2k/m 8541xp/h
+[08:01:11] [grind] camp:46y @(40,-36) · pathing to the grind camp (66, 2) Pontiu:L2 86/132  Shims:L2 103/103 · 4.2k/m 8413xp/h
+[08:01:26] [grind] camp:44y @(61,-42) · pathing to the grind camp (66, 2) Pontiu:L2 132/132  Shims:L2 103/103 · 4.1k/m 8290xp/h
+[08:01:41] [grind] camp:44y @(57,-41) · searching for the next pack Pontiu:L2 132/132  Shims:L2 103/103 · 4.0k/m 8170xp/h
+[08:01:56] [grind] camp:25y @(43,-8) · tanking Wild Boar Pontiu:L2 99/132  Shims:L2 103/103 · 4.1k/m 8272xp/h
+[08:02:11] [grind] camp:39y @(27,-2) · letting the party recover before the next pull Pontiu:L2 72/132  Shims:L2 103/103 · 4.1k/m 8371xp/h
+[08:02:26] [grind] camp:31y @(35,3) · tanking Wild Boar Pontiu:L2 93/132  Shims:L2 103/103 · 4.0k/m 8255xp/h
+[08:02:42] [grind] camp:25y @(53,-43) · tanking Wild Boar Pontiu:L3 146/169  Shims:L2 103/103 · 4.0k/m 8348xp/h
+[08:02:57] [grind] camp:25y @(53,-43) · tanking Vale Bandit Pontiu:L3 90/169  Shims:L2 103/103 · 4.0k/m 8429xp/h

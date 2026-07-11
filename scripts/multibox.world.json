@@ -1,0 +1,729 @@
+{
+  "server": "https://worldofclaudecraft.com",
+  "runSeconds": 7200,
+  "joinStagger": {
+    "min": 20,
+    "max": 30
+  },
+  "panicOnPlayer": "papa ours",
+  "questing": {
+    "hubs": [
+      {
+        "maxLevel": 99,
+        "givers": [
+          {
+            "x": 3,
+            "z": 304
+          },
+          {
+            "x": -8,
+            "z": 296
+          },
+          {
+            "x": -4,
+            "z": 308
+          },
+          {
+            "x": 10,
+            "z": 295
+          },
+          {
+            "x": 6,
+            "z": 312
+          }
+        ],
+        "quests": [
+          {
+            "id": "q_wolves",
+            "minLevel": 1,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 2,
+              "z": 62,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_greyjaw",
+            "minLevel": 4,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 0,
+              "z": 95,
+              "r": 12
+            }
+          },
+          {
+            "id": "q_boars",
+            "minLevel": 1,
+            "giver": {
+              "x": -7,
+              "z": 3
+            },
+            "spot": {
+              "x": 66,
+              "z": 2,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_mogger_tracks",
+            "minLevel": 6,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 66,
+              "z": 2,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_spiders",
+            "minLevel": 2,
+            "giver": {
+              "x": 11,
+              "z": -3
+            },
+            "spot": {
+              "x": -60,
+              "z": 5,
+              "r": 24
+            }
+          },
+          {
+            "id": "q_murlocs",
+            "minLevel": 3,
+            "giver": {
+              "x": -16,
+              "z": 6
+            },
+            "spot": {
+              "x": -75,
+              "z": 57,
+              "r": 18
+            }
+          },
+          {
+            "id": "q_mine",
+            "minLevel": 4,
+            "giver": {
+              "x": -4,
+              "z": -14
+            },
+            "spot": {
+              "x": -82,
+              "z": -62,
+              "r": 22
+            }
+          },
+          {
+            "id": "q_bones",
+            "minLevel": 5,
+            "giver": {
+              "x": -14,
+              "z": -10
+            },
+            "spot": {
+              "x": 80,
+              "z": 78,
+              "r": 22
+            }
+          },
+          {
+            "id": "q_silence_the_call",
+            "minLevel": 5,
+            "giver": {
+              "x": -14,
+              "z": -10
+            },
+            "spot": {
+              "x": 80,
+              "z": 78,
+              "r": 22
+            }
+          },
+          {
+            "id": "q_supplies",
+            "minLevel": 3,
+            "giver": {
+              "x": -7,
+              "z": 3
+            },
+            "spot": {
+              "x": 65,
+              "z": -65,
+              "r": 24
+            }
+          },
+          {
+            "id": "q_bandits",
+            "minLevel": 3,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 75,
+              "z": -72,
+              "r": 26
+            }
+          },
+          {
+            "id": "q_ringleader",
+            "minLevel": 6,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 92,
+              "z": -92,
+              "r": 8
+            }
+          },
+          {
+            "id": "q_mogger",
+            "minLevel": 6,
+            "giver": {
+              "x": 4,
+              "z": 6
+            },
+            "spot": {
+              "x": 118,
+              "z": -26,
+              "r": 8
+            }
+          },
+          {
+            "id": "q_prowlers",
+            "minLevel": 7,
+            "giver": {
+              "x": 3,
+              "z": 304
+            },
+            "spot": {
+              "x": -40,
+              "z": 230,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_prowler_pelts",
+            "minLevel": 7,
+            "giver": {
+              "x": -4,
+              "z": 308
+            },
+            "spot": {
+              "x": -40,
+              "z": 230,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_deepfen",
+            "minLevel": 8,
+            "giver": {
+              "x": 3,
+              "z": 304
+            },
+            "spot": {
+              "x": -82,
+              "z": 273,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_deepfen_purge",
+            "minLevel": 8,
+            "giver": {
+              "x": 3,
+              "z": 304
+            },
+            "spot": {
+              "x": -82,
+              "z": 273,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_idols",
+            "minLevel": 8,
+            "giver": {
+              "x": -8,
+              "z": 296
+            },
+            "spot": {
+              "x": -82,
+              "z": 273,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_widows",
+            "minLevel": 8,
+            "giver": {
+              "x": 10,
+              "z": 295
+            },
+            "spot": {
+              "x": 70,
+              "z": 300,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_drowned",
+            "minLevel": 9,
+            "giver": {
+              "x": -8,
+              "z": 296
+            },
+            "spot": {
+              "x": 90,
+              "z": 420,
+              "r": 32
+            }
+          },
+          {
+            "id": "q_drowned_censers",
+            "minLevel": 9,
+            "giver": {
+              "x": -8,
+              "z": 296
+            },
+            "spot": {
+              "x": 90,
+              "z": 420,
+              "r": 32
+            }
+          },
+          {
+            "id": "q_no_rest",
+            "minLevel": 9,
+            "giver": {
+              "x": -8,
+              "z": 296
+            },
+            "spot": {
+              "x": 90,
+              "z": 420,
+              "r": 32
+            }
+          },
+          {
+            "id": "q_trolls",
+            "minLevel": 10,
+            "giver": {
+              "x": 3,
+              "z": 304
+            },
+            "spot": {
+              "x": -80,
+              "z": 420,
+              "r": 35
+            }
+          },
+          {
+            "id": "q_troll_fetishes",
+            "minLevel": 10,
+            "giver": {
+              "x": 6,
+              "z": 312
+            },
+            "spot": {
+              "x": -80,
+              "z": 420,
+              "r": 35
+            }
+          },
+          {
+            "id": "q_cult_camp",
+            "minLevel": 11,
+            "giver": {
+              "x": 6,
+              "z": 312
+            },
+            "spot": {
+              "x": 15,
+              "z": 470,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_summoners",
+            "minLevel": 11,
+            "giver": {
+              "x": -8,
+              "z": 296
+            },
+            "spot": {
+              "x": 15,
+              "z": 470,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_grubjaw",
+            "minLevel": 12,
+            "giver": {
+              "x": -4,
+              "z": 308
+            },
+            "spot": {
+              "x": -120,
+              "z": 480,
+              "r": 24
+            }
+          },
+          {
+            "id": "q_stalkers",
+            "minLevel": 13,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -50,
+              "z": 590,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_stalker_pelts",
+            "minLevel": 13,
+            "giver": {
+              "x": -5,
+              "z": 668
+            },
+            "spot": {
+              "x": -50,
+              "z": 590,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_kobold_tunnels",
+            "minLevel": 14,
+            "giver": {
+              "x": 12,
+              "z": 655
+            },
+            "spot": {
+              "x": 75,
+              "z": 625,
+              "r": 24
+            }
+          },
+          {
+            "id": "q_glowing_wax",
+            "minLevel": 14,
+            "giver": {
+              "x": -5,
+              "z": 668
+            },
+            "spot": {
+              "x": 75,
+              "z": 625,
+              "r": 24
+            }
+          },
+          {
+            "id": "q_ogre_edges",
+            "minLevel": 15,
+            "giver": {
+              "x": 7,
+              "z": 670
+            },
+            "spot": {
+              "x": -90,
+              "z": 700,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_ogre_totems",
+            "minLevel": 15,
+            "giver": {
+              "x": 7,
+              "z": 670
+            },
+            "spot": {
+              "x": -90,
+              "z": 700,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_ogre_bounty",
+            "minLevel": 15,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -90,
+              "z": 700,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_elementals",
+            "minLevel": 16,
+            "giver": {
+              "x": 12,
+              "z": 655
+            },
+            "spot": {
+              "x": 110,
+              "z": 760,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_shard_cores",
+            "minLevel": 16,
+            "giver": {
+              "x": 12,
+              "z": 655
+            },
+            "spot": {
+              "x": 110,
+              "z": 760,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_breaking_the_seal",
+            "minLevel": 16,
+            "giver": {
+              "x": -10,
+              "z": 656
+            },
+            "spot": {
+              "x": 110,
+              "z": 760,
+              "r": 28
+            }
+          },
+          {
+            "id": "q_zealots",
+            "minLevel": 17,
+            "giver": {
+              "x": -10,
+              "z": 656
+            },
+            "spot": {
+              "x": 40,
+              "z": 832,
+              "r": 26
+            }
+          },
+          {
+            "id": "q_cult_orders",
+            "minLevel": 17,
+            "giver": {
+              "x": -10,
+              "z": 656
+            },
+            "spot": {
+              "x": 40,
+              "z": 832,
+              "r": 26
+            }
+          },
+          {
+            "id": "q_voice_below",
+            "minLevel": 18,
+            "giver": {
+              "x": -10,
+              "z": 656
+            },
+            "spot": {
+              "x": 40,
+              "z": 843,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_necromancers",
+            "minLevel": 18,
+            "giver": {
+              "x": -10,
+              "z": 656
+            },
+            "spot": {
+              "x": 40,
+              "z": 855,
+              "r": 20
+            }
+          },
+          {
+            "id": "q_revenants",
+            "minLevel": 18,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -40,
+              "z": 830,
+              "r": 26
+            }
+          },
+          {
+            "id": "q_revenant_vanguard",
+            "minLevel": 18,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -40,
+              "z": 830,
+              "r": 26
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "grind": {
+    "goHome": true,
+    "home": {
+      "x": 0,
+      "z": 62
+    },
+    "homeRadius": 40,
+    "ladder": [
+      {
+        "level": 1,
+        "label": "Forest Wolves (L1-2)",
+        "home": {
+          "x": 0,
+          "z": 62
+        },
+        "radius": 40
+      },
+      {
+        "level": 2,
+        "label": "Wild Boars (L2-3)",
+        "home": {
+          "x": 66,
+          "z": 2
+        },
+        "radius": 45
+      },
+      {
+        "level": 3,
+        "label": "Vale Bandits (L3-5)",
+        "home": {
+          "x": 65,
+          "z": -65
+        },
+        "radius": 28
+      },
+      {
+        "level": 5,
+        "label": "Restless Bones (L5-7)",
+        "home": {
+          "x": 80,
+          "z": 78
+        },
+        "radius": 28
+      },
+      {
+        "level": 7,
+        "label": "Mirefen Camps (Prowlers/Deepfen, L7-9)",
+        "home": {
+          "x": -66,
+          "z": 268
+        },
+        "radius": 60
+      },
+      {
+        "level": 13,
+        "label": "Ridge Stalkers (L13-14)",
+        "home": {
+          "x": -50,
+          "z": 590
+        },
+        "radius": 30
+      },
+      {
+        "level": 14,
+        "label": "Deeprock Tunnelers (L14-15)",
+        "home": {
+          "x": 75,
+          "z": 625
+        },
+        "radius": 24
+      },
+      {
+        "level": 15,
+        "label": "Thornpeak Ogres (L15-16)",
+        "home": {
+          "x": -90,
+          "z": 700
+        },
+        "radius": 30
+      },
+      {
+        "level": 17,
+        "label": "Stormcrag Elementals (L17-18)",
+        "home": {
+          "x": 122,
+          "z": 777
+        },
+        "radius": 40
+      },
+      {
+        "level": 18,
+        "label": "Boneclad Revenants (L18-19)",
+        "home": {
+          "x": -40,
+          "z": 830
+        },
+        "radius": 24
+      }
+    ]
+  },
+  "accounts": {
+    "ryze2": {
+      "passEnv": "RYZE2_PASS"
+    },
+    "ryze3": {
+      "passEnv": "RYZE3_PASS"
+    },
+    "ryze4": {
+      "passEnv": "RYZE4_PASS"
+    },
+    "ryze5": {
+      "passEnv": "RYZE5_PASS"
+    },
+    "pala1": {
+      "passEnv": "PALA1_PASS"
+    },
+    "sham2": {
+      "passEnv": "SHAM2_PASS"
+    },
+    "ryze": {
+      "passEnv": "RYZE_PASS"
+    }
+  },
+  "control": {
+    "logout": "logout",
+    "from": [
+      "swifter",
+      "ryze"
+    ]
+  }
+}

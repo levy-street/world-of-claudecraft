@@ -12,9 +12,8 @@ export interface PointerLockEngageInput {
   /** The "Lock cursor while rotating" setting (default on). */
   lockOnRotate: boolean;
   /**
-   * Browser fullscreen. In fullscreen Chrome shows an unavoidable
-   * "press and hold Esc" prompt for pointer lock, so we leave fullscreen
-   * camera drags as ordinary mouse drags.
+   * Browser fullscreen. Kept in the input shape so callers/tests can assert
+   * that fullscreen follows the same lock path as windowed play.
    */
   isFullscreen: boolean;
   /** Whether the canvas already holds the pointer lock. */
@@ -24,10 +23,10 @@ export interface PointerLockEngageInput {
 /**
  * True when a newly-active camera drag should request pointer lock. Applies to
  * both camera modes (classic right-drag and OSRS-style Mouse Camera): the only
- * reason to skip is the setting being off, fullscreen, or an existing lock.
+ * reasons to skip are the setting being off or the canvas already holding lock.
  */
 export function shouldEngagePointerLock(input: PointerLockEngageInput): boolean {
-  return input.lockOnRotate && !input.isFullscreen && !input.alreadyLocked;
+  return input.lockOnRotate && !input.alreadyLocked;
 }
 
 export interface PointerLockReleaseInput {

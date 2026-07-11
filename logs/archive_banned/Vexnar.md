@@ -1,0 +1,185 @@
+# Vexnar — mage
+_the haughty mage. Journal opened 2026-06-16T09:01:02.626Z._
+
+- `09:01:03` Entered the world at level 4.
+- `09:01:11` 📊 hp 93/93 · res 382/402 · 0 kills
+- `09:01:12` ✨ cast frost armor.
+- `09:01:12` ✨ cast arcane intellect.
+- `09:01:56` ✨ cast frost armor.
+- `09:01:56` ✨ cast arcane intellect.
+- `09:01:57` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:01:59` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:02:01` ⚔️ Killed **Forest Wolf**. Reduced to ash.
+- `09:02:02` 💰 You loot 7c.
+- `09:02:02` 💰 You receive: Cracked Wolf Fang.
+- `09:02:11` 📊 hp 93/93 · res 402/402 · 3 kills
+- `09:02:14` ⚔️ Killed **Forest Wolf**. Was that meant to threaten me?
+- `09:02:15` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:02:16` ⚔️ Killed **Forest Wolf**. Reduced to ash.
+- `09:02:24` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:02:24` 💰 You loot 5c.
+- `09:02:24` 💰 You receive: Cracked Wolf Fang.
+- `09:02:26` ⚔️ Killed **Forest Wolf**. Was that meant to threaten me?
+- `09:02:32` 💰 You receive 75c.
+- `09:02:32` ✅ completed quest **q_wolves**
+- `09:02:41` ✨ cast frost armor.
+- `09:02:41` ✨ cast arcane intellect.
+- `09:03:10` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:03:11` 📊 hp 93/93 · res 402/402 · 9 kills
+- `09:03:19` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:03:24` ⚔️ Killed **Wild Boar**. Reduced to ash.
+- `09:03:26` ✨ cast frost armor.
+- `09:03:26` ✨ cast arcane intellect.
+- `09:03:28` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:03:51` ⚔️ Killed **Restless Bones**. Was that meant to threaten me?
+- `09:04:11` 📊 hp 93/93 · res 402/402 · 13 kills
+- `09:04:11` ✨ cast frost armor.
+- `09:04:11` ✨ cast arcane intellect.
+- `09:04:56` ✨ cast frost armor.
+- `09:04:56` ✨ cast arcane intellect.
+- `09:05:00` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:05:11` 📊 hp 93/93 · res 402/402 · 14 kills
+- `09:05:16` ⚔️ Killed **Vale Bandit**. Trivial.
+- `09:05:20` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:05:27` ⚔️ Killed **Wild Boar**. Reduced to ash.
+- `09:06:11` 📈 +426 XP in 5m · run total 426 · L4 1707/4407
+- `09:06:11` 📊 hp 93/93 · res 402/402 · 17 kills
+- `09:06:23` ✨ cast frost armor.
+- `09:06:23` ✨ cast arcane intellect.
+- `09:06:32` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:06:36` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:06:47` ⚔️ Killed **Vale Bandit**. Reduced to ash.
+- `09:06:57` ⚔️ Killed **Vale Bandit**. Was that meant to threaten me?
+- `09:06:58` ⚔️ Killed **Vale Bandit**. Reduced to ash.
+- `09:07:04` ⚔️ Killed **Wild Boar**. Trivial.
+- `09:07:11` 📊 hp 93/93 · res 353/402 · 23 kills
+- `09:07:45` ✨ cast frost armor.
+- `09:07:46` ✨ cast arcane intellect.
+- `09:07:59` ⚔️ Killed **Wild Boar**. Reduced to ash.
+- `09:08:02` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:08:11` 📊 hp 93/93 · res 353/402 · 25 kills
+- `09:08:23` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:09:02` ✨ cast frost armor.
+- `09:09:02` ✨ cast arcane intellect.
+- `09:09:11` 📊 hp 93/93 · res 402/402 · 26 kills
+- `09:09:18` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:09:21` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:09:23` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:09:26` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:10:08` ✨ cast frost armor.
+- `09:10:08` ✨ cast arcane intellect.
+- `09:10:11` 📊 hp 93/93 · res 382/402 · 30 kills
+- `09:10:16` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:10:21` ⚔️ Killed **Mudfin Skulker**. Reduced to ash.
+- `09:10:24` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:10:28` ⚔️ Killed **Forest Wolf**. Was that meant to threaten me?
+- `09:10:35` ⚔️ Killed **Forest Wolf**. Was that meant to threaten me?
+- `09:10:44` ⚔️ Killed **Forest Wolf**. Reduced to ash.
+- `09:10:44` 💰 You loot 7c.
+- `09:11:11` 📈 +159 XP in 5m · run total 585 · L4 1866/4566
+- `09:11:11` 📊 hp 93/93 · res 402/402 · 36 kills
+- `09:11:36` ✨ cast frost armor.
+- `09:11:36` ✨ cast arcane intellect.
+- `09:11:43` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:11:58` ⚔️ Killed **Mudfin Skulker**. Was that meant to threaten me?
+- `09:12:04` ⚔️ Killed **Mudfin Skulker**. Reduced to ash.
+- `09:12:11` 📊 hp 93/93 · res 378/402 · 39 kills
+- `09:13:04` ✨ cast frost armor.
+- `09:13:04` ✨ cast arcane intellect.
+- `09:13:11` 📊 hp 93/93 · res 395/402 · 39 kills
+- `09:13:15` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:13:25` ⚔️ Killed **Sableweb Hatchling**. Trivial.
+- `09:13:29` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:13:33` ⚔️ Killed **Sableweb Hatchling**. Trivial.
+- `09:13:36` ⚔️ Killed **Sableweb Hatchling**. Trivial.
+- `09:13:40` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:13:43` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:13:43` 💧 drinking to restore mana.
+- `09:14:11` 📊 hp 93/93 · res 308/402 · 46 kills
+- `09:14:31` ✨ cast frost armor.
+- `09:14:32` ✨ cast arcane intellect.
+- `09:14:42` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:14:46` ⚔️ Killed **Forest Wolf**. Trivial.
+- `09:14:54` ⚔️ Killed **Wild Boar**. Trivial.
+- `09:15:08` ⚔️ Killed **Wild Boar**. Was that meant to threaten me?
+- `09:15:11` 📊 hp 85/93 · res 253/402 · 50 kills
+- `09:15:13` ⚔️ Killed **Restless Bones**. Trivial.
+- `09:15:14` 💰 You loot 42c.
+- `09:15:14` 💰 You receive: Bone Fragments.
+- `09:16:01` ✨ cast frost armor.
+- `09:16:01` ✨ cast arcane intellect.
+- `09:16:09` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:16:11` 📈 +210 XP in 5m · run total 795 · L4 2076/4776
+- `09:16:11` 📊 hp 89/96 · res 370/402 · 52 kills
+- `09:16:24` ⚔️ Killed **Sableweb Hatchling**. Trivial.
+- `09:17:09` ✨ cast frost armor.
+- `09:17:09` ✨ cast arcane intellect.
+- `09:17:11` 📊 hp 96/96 · res 382/402 · 53 kills
+- `09:17:22` ⬆️ **Reached level 5.** My arcane mastery deepens.
+- `09:17:22` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:17:23` 💰 You loot 9c.
+- `09:17:23` 💰 You receive: Webwood Silk Gland.
+- `09:17:45` ⚔️ Killed **Mudfin Skulker**. Reduced to ash.
+- `09:18:08` ✨ cast frost armor.
+- `09:18:08` ✨ cast arcane intellect.
+- `09:18:12` 📊 hp 118/118 · res 451/471 · 55 kills
+- `09:18:19` ⚔️ Killed **Forest Wolf**. Was that meant to threaten me?
+- `09:19:02` ✨ cast frost armor.
+- `09:19:02` ✨ cast arcane intellect.
+- `09:19:12` 📊 hp 118/118 · res 471/471 · 56 kills
+- `09:19:52` ✨ cast frost armor.
+- `09:19:52` ✨ cast arcane intellect.
+- `09:20:04` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:20:12` 📊 hp 118/118 · res 471/471 · 57 kills
+- `09:20:56` ✨ cast frost armor.
+- `09:20:56` ✨ cast arcane intellect.
+- `09:21:05` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:21:11` 📈 +78 XP in 5m · run total 873 · L5 54/4854
+- `09:21:12` 📊 hp 118/118 · res 431/471 · 58 kills
+- `09:22:03` ✨ cast frost armor.
+- `09:22:03` ✨ cast arcane intellect.
+- `09:22:12` 📊 hp 110/118 · res 441/471 · 58 kills
+- `09:22:12` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:22:59` ✨ cast frost armor.
+- `09:22:59` ✨ cast arcane intellect.
+- `09:23:04` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:23:08` ⚔️ Killed **Webwood Lurker**. Reduced to ash.
+- `09:23:12` 📊 hp 118/118 · res 376/471 · 61 kills
+- `09:23:53` ✨ cast frost armor.
+- `09:23:53` ✨ cast arcane intellect.
+- `09:24:01` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:24:07` ⚔️ Killed **Webwood Lurker**. Was that meant to threaten me?
+- `09:24:12` 📊 hp 114/118 · res 416/471 · 63 kills
+- `09:24:50` ✨ cast frost armor.
+- `09:24:50` ✨ cast arcane intellect.
+- `09:25:02` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:25:02` 💰 You loot 18c.
+- `09:25:02` 💰 You receive: Twitching Spider Leg.
+- `09:25:12` 📊 hp 118/118 · res 436/471 · 64 kills
+- `09:25:16` 🩸 Down to 20 HP — bracing.
+- `09:25:25` 💚 Patched up (36/118).
+- `09:25:46` ✨ cast frost armor.
+- `09:25:46` ✨ cast arcane intellect.
+- `09:26:11` 📈 +57 XP in 5m · run total 930 · L5 111/4911
+- `09:26:12` 📊 hp 88/118 · res 441/471 · 64 kills
+- `09:26:25` 🩸 Down to 2 HP — bracing.
+- `09:26:37` 💚 Patched up (34/118).
+- `09:26:43` ✨ cast frost armor.
+- `09:26:43` ✨ cast arcane intellect.
+- `09:26:56` ⚔️ Killed **Webwood Lurker**. Trivial.
+- `09:27:12` 📊 hp 118/118 · res 471/471 · 65 kills
+- `09:27:43` ✨ cast frost armor.
+- `09:27:43` ✨ cast arcane intellect.
+- `09:27:46` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:50` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:54` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:58` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:02` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:06` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:10` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:15` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:19` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:23` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:27` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:31` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:35` 🔌 connection dropped — reconnecting in 3s…

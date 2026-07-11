@@ -1,0 +1,6 @@
+{
+  "_doc": "Self-hosted DRY-RUN of the agentic hunter. Overrides server -> localhost and a short run; inherits brainPath=scripts/agent/agent_brain.mjs from the ryzehunts party. Start the local server first (npm run build:server; PORT=8787 ALLOW_DEV_COMMANDS=1 node dist-server/server.cjs) and register the account.",
+  "extends": "multibox.ryzehunts.json",
+  "server": "http://localhost:8787",
+  "runSeconds": 55
+}

@@ -1,0 +1,27 @@
+{
+  "extends": "multibox.world.json",
+  "tag": "\ud83d\udfe9L",
+  "leader": "ryzetank",
+  "bots": [
+    {
+      "user": "ryze2",
+      "character": "ryzehunts",
+      "class": "hunter"
+    },
+    {
+      "user": "ryze3",
+      "character": "ryzeheal",
+      "class": "priest"
+    },
+    {
+      "user": "ryze4",
+      "character": "ryzetank",
+      "class": "warrior"
+    },
+    {
+      "user": "ryze5",
+      "character": "ryzemage",
+      "class": "mage"
+    }
+  ]
+}

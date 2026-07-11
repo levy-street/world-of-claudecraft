@@ -642,6 +642,43 @@ describe('game.* side effects preserved', () => {
     expect(rt.muteAccountChat).toHaveBeenCalledWith(5, '2030-01-01', 'spam');
   });
 
+  it('bans an account from Daily Rewards with the moderator reason', async () => {
+    const setDailyRewardsBan = vi.fn(async () => {});
+    authedAdminDb({ setDailyRewardsBan });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ban', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { reason: 'automated play' },
+    });
+    expect(r.status).toBe(200);
+    expect(setDailyRewardsBan).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      banned: true,
+      reason: 'automated play',
+    });
+  });
+
+  it('bans an account IP from Daily Rewards with the moderator reason', async () => {
+    const setDailyRewardsIpBan = vi.fn(async () => {});
+    authedAdminDb({ setDailyRewardsIpBan });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ip-ban', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { ip: '203.0.113.4', reason: 'multi-account abuse' },
+    });
+    expect(r.status).toBe(200);
+    expect(setDailyRewardsIpBan).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      ip: '203.0.113.4',
+      banned: true,
+      reason: 'multi-account abuse',
+    });
+  });
+
   it('force-rename disconnects the character owner', async () => {
     authedAdminDb({ forceCharacterRename: async () => ({ accountId: 88 }) });
     const rt = installAdminRuntime();
@@ -1082,6 +1119,22 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     expect(r.body).toEqual({
       success: true,
       data: { rows: [{ accountId: 1, openReports: 2 }] },
+      error: null,
+    });
+  });
+
+  it('moderation/history scopes tab reads to the current admin account', async () => {
+    const listModerationActions = vi.fn(async () => ({ rows: [], total: 0, page: 2, limit: 100 }));
+    authedAdminDb({ listModerationActions });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/moderation/history', {
+      headers: { authorization: BEARER },
+      url: '/admin/api/moderation/history?tab=notes&page=2&limit=100',
+    });
+    expect(listModerationActions).toHaveBeenCalledWith('notes', ADMIN_ACCOUNT_ID, 2, 100);
+    expect(r.body).toEqual({
+      success: true,
+      data: { rows: [], total: 0, page: 2, limit: 100 },
       error: null,
     });
   });

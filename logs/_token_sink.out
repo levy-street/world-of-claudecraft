@@ -1,0 +1,14 @@
+token sink listening on http://localhost:9988 -> multibox.tokens.json
+captured token for _probe (1 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, _probe]
+captured token for pala1 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2]
+captured token for sham2 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2]
+captured token for ryze5 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2]
+captured token for ryze (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for ryze3 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for ryze4 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+token sink listening on http://localhost:9988 -> multibox.tokens.json
+captured token for ryze5 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for ryze3 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for sham2 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for pala1 (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]
+captured token for ryze (64 chars) -> multibox.tokens.json  [have: ryze4, ryze3, ryze5, pala1, sham2, ryze]

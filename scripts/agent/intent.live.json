@@ -1,0 +1,16 @@
+{
+  "mode": "retreat",
+  "reason": "Low health and blinded with bandits too close; create distance before resting",
+  "anchor": {
+    "x": 29,
+    "z": -45
+  },
+  "radius": 25,
+  "targetId": 77,
+  "lvlCeil": 1,
+  "fleeHp": 0.45,
+  "restHp": 0.75,
+  "pull": false,
+  "_at": 1782727993733,
+  "_model": "codex"
+}

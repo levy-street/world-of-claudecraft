@@ -1,0 +1,15 @@
+{
+  "_doc": "LOCAL autonomous SONZAI hunter -- played by the CODEX CLI planner (your ChatGPT-login subscription, no API key) wearing a Sonzai soul (scripts/agent/soul.sonzai.md, loaded via AGENT_SOUL_FILE). Hierarchical: the planner emits one strategic INTENT every ~20s; the proven rule executor (scripts/agent/agent_brain.mjs) flies the hunter at 20Hz. Runs on YOUR local server (http://localhost:8787) -- no prod realm, no detection. SETUP: npm run db:up && npm run server, then scripts/hunter_agents.sh codex (registers + creates the hunter + loads the soul + launches). MANUAL LAUNCH: CXHUNTER_PASS=... AGENT_PROVIDER=codex AGENT_PLAN=1 AGENT_SOUL_FILE=scripts/agent/soul.sonzai.md node scripts/multibox.mjs scripts/multibox.hunter.codex.json . AGENT_PLAN unset => pure reactive rules; AGENT_SOUL_FILE unset => no persona.",
+  "extends": "multibox.world.json",
+  "tag": "SZ",
+  "server": "http://localhost:8787",
+  "leader": "Sonzai",
+  "brainPath": "scripts/agent/agent_brain.mjs",
+  "runSeconds": 36000,
+  "accounts": { "cxhunter": { "passEnv": "CXHUNTER_PASS" } },
+  "bots": [
+    { "user": "cxhunter", "character": "Sonzai", "class": "hunter" }
+  ],
+  "combat": { "planEverySec": 20, "lvlCeil": 1, "fleeHp": 0.4, "restHp": 0.6 },
+  "grind": { "goHome": false }
+}

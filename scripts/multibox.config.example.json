@@ -1,0 +1,15 @@
+{
+  "server": "https://worldofclaudecraft.com",
+  "runSeconds": 1800,
+  "leader": "swifter",
+  "accounts": {
+    "ryze": { "passEnv": "RYZE_PASS" }
+  },
+  "bots": [
+    { "user": "ryze", "character": "swifter" },
+    { "user": "ryze", "character": "ryze" },
+    { "user": "ryze", "character": "Mossback", "class": "priest" },
+    { "user": "ryze", "character": "Ironhide", "class": "warrior" },
+    { "user": "ryze", "character": "Emberwyn", "class": "mage" }
+  ]
+}

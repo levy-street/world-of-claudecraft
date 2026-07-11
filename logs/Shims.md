@@ -1,0 +1,616 @@
+# shims — shaman
+_the elemental hybrid. Journal opened 2026-06-29T04:02:29.681Z._
+
+- `04:02:30` Entered the world at level 20.
+- `04:02:46` 🏰 Crossed the threshold into Gravewyrm Sanctum.
+- `04:02:46` 📊 Shims 1123/1123 hp mana 95% · 0 kills
+- `04:02:46` 🛡️ GEAR: feet:gravewyrm_stalkers_treads, legs:deathlord_legguards, chest:deathlord_warplate, waist:boundstone_girdle, gloves:gravewyrm_gauntlets, helmet:boundstone_helm, mainhand:mistcallers_edge, shoulder:gravewyrm_mantle
+- `04:02:46` 📈 STATS: ap=164 crit=0.11450000000000002 weapon={"min":14,"max":23,"speed":2.3} · {"str":65,"agi":49,"sta":97,"int":56,"spi":56,"armor":1312}
+- `04:02:56` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:02:57` 🎯 targeting pontius(pid6016) 67% for heal
+- `04:02:57` 🙏 heal → pontius 846/1258 (67%) [TANK] · 1 cast
+- `04:03:06` 💰 You loot 80c.
+- `04:03:06` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:03:09` 🎯 targeting swifter(pid6020) 69% for heal
+- `04:03:09` 🙏 heal → swifter 890/1295 (69%) [ally] · 6 cast
+- `04:03:16` 📊 Shims 1243/1243 hp mana 92% · 0 kills
+- `04:03:26` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:03:36` 📊 Shims 1243/1243 hp mana 83% · 0 kills
+- `04:03:38` 🙏 heal → swifter 792/1295 (61%) [ally] · 15 cast
+- `04:03:43` 🎯 targeting pontius(pid6016) 67% for heal
+- `04:03:44` 🙏 heal → pontius 844/1258 (67%) [TANK] · 17 cast
+- `04:03:46` 📈 +80 XP in 1m · run total 80 · L20 0/242376
+- `04:03:46` 📊 Shims 1243/1243 hp mana 93% · 0 kills
+- `04:03:53` 💰 You loot 82c.
+- `04:03:57` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:05` 🎯 targeting swifter(pid6020) 67% for heal
+- `04:04:07` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:17` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:27` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:37` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:46` 📈 +80 XP in 1m · run total 160 · L20 0/242456
+- `04:04:47` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:04:55` 🎯 targeting ryzeheal(pid6017) 30% for heal
+- `04:04:56` 🙏 heal → ryzeheal 185/607 (30%) [ally] · 26 cast
+- `04:04:57` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:05` 🙏 heal → ryzeheal 317/607 (52%) [ally] · 30 cast
+- `04:05:07` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:17` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:19` 💰 You loot 1s 20c.
+- `04:05:27` 📊 Shims 1145/1243 hp mana 100% · 0 kills
+- `04:05:34` 🎯 targeting pontius(pid6016) 64% for heal
+- `04:05:34` 🙏 heal → pontius 878/1378 (64%) [TANK] · 33 cast
+- `04:05:37` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:42` 💰 You loot 69c.
+- `04:05:46` 📈 +303 XP in 1m · run total 463 · L20 0/242759
+- `04:05:47` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:58` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:05:58` 💰 You loot 78c.
+- `04:06:02` 🙏 heal → pontius 568/1378 (41%) [TANK] · 45 cast
+- `04:06:08` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:06:18` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:06:28` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:06:38` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:06:46` 📈 +80 XP in 1m · run total 543 · L20 0/242839
+- `04:06:48` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:06:58` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:08` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:18` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:28` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:38` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:07:48` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:07:59` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:09` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:19` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:29` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:39` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:08:49` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:08:59` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:09` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:19` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:29` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:39` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:09:49` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:09:59` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:10:09` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:10:19` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:10:30` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:10:40` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:10:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:10:50` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:00` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:10` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:20` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:30` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:40` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:11:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:11:50` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:00` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:10` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:20` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:31` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:41` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:12:46` ✨ cast lightning shield.
+- `04:12:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:12:51` 📊 Shims 1172/1243 hp mana 95% · 0 kills
+- `04:12:58` 🎯 targeting swifter(pid6020) 70% for heal
+- `04:12:58` 🙏 heal → swifter 906/1295 (70%) [ally] · 52 cast
+- `04:13:01` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:13:11` 📊 Shims 1243/1243 hp mana 83% · 0 kills
+- `04:13:21` 📊 Shims 1243/1243 hp mana 88% · 0 kills
+- `04:13:26` 🙏 heal → swifter 857/1295 (66%) [ally] · 60 cast
+- `04:13:31` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:13:37` 🎯 targeting pontius(pid6016) 56% for heal
+- `04:13:37` 🙏 heal → pontius 773/1378 (56%) [TANK] · 65 cast
+- `04:13:40` 🎯 targeting swifter(pid6020) 51% for heal
+- `04:13:40` 🙏 heal → swifter 660/1295 (51%) [ally] · 66 cast
+- `04:13:41` 📊 Shims 1243/1243 hp mana 92% · 0 kills
+- `04:13:46` 📈 +0 XP in 1m · run total 543 · L20 0/242839
+- `04:13:51` 📊 Shims 1243/1243 hp mana 99% · 0 kills
+- `04:13:52` 🎯 targeting pontius(pid6016) 44% for heal
+- `04:13:52` 🙏 heal → pontius 610/1378 (44%) [TANK] · 71 cast
+- `04:13:55` 🎯 targeting swifter(pid6020) 43% for heal
+- `04:13:55` 🙏 heal → swifter 558/1295 (43%) [ally] · 72 cast
+- `04:13:58` 🎯 targeting pontius(pid6016) 46% for heal
+- `04:13:58` 🙏 heal → pontius 640/1378 (46%) [TANK] · 73 cast
+- `04:14:01` 📊 Shims 1243/1243 hp mana 75% · 0 kills
+- `04:14:01` 🎯 targeting swifter(pid6020) 52% for heal
+- `04:14:01` 🙏 heal → swifter 668/1295 (52%) [ally] · 74 cast
+- `04:14:04` 🙏 heal → swifter 602/1295 (46%) [ally] · 75 cast
+- `04:14:11` 📊 Shims 1243/1243 hp mana 82% · 0 kills
+- `04:14:21` 📊 Shims 1243/1243 hp mana 95% · 0 kills
+- `04:14:33` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:14:38` 🙏 heal → swifter 830/1295 (64%) [ally] · 90 cast
+- `04:14:43` 📊 Shims 1243/1243 hp mana 99% · 0 kills
+- `04:14:46` 📈 +80 XP in 1m · run total 623 · L20 0/242919
+- `04:14:53` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:15:00` 🎯 targeting ryzeheal(pid6017) 63% for heal
+- `04:15:00` 🙏 heal → ryzeheal 381/607 (63%) [ally] · 94 cast
+- `04:15:03` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:15:13` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:15:23` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:15:25` 🙏 heal → ryzeheal 286/607 (47%) [ally] · 105 cast
+- `04:15:33` 📊 Shims 1243/1243 hp mana 92% · 0 kills
+- `04:15:43` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:15:47` 📈 +80 XP in 1m · run total 703 · L20 0/242999
+- `04:15:54` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:04` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:34` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:44` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:16:47` 📈 +0 XP in 1m · run total 703 · L20 0/242999
+- `04:16:54` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:06` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:16` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:17` 🎯 targeting pontius(pid6016) 69% for heal
+- `04:17:18` 🙏 heal → pontius 952/1378 (69%) [TANK] · 107 cast
+- `04:17:24` 💰 You loot 14s 65c.
+- `04:17:24` 🎲 GREED on Boneplate Vest
+- `04:17:24` 🎲 GREED on Korgath's Chainwraps
+- `04:17:24` 💰 pontius wins Boneplate Vest (38)
+- `04:17:24` 💰 pontius wins Korgath's Chainwraps (77)
+- `04:17:26` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:36` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:46` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:17:47` 📈 +94 XP in 1m · run total 797 · L20 0/243093
+- `04:17:56` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:06` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:16` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:26` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:36` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:47` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:18:47` 📈 +0 XP in 1m · run total 797 · L20 0/243093
+- `04:18:57` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:07` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:17` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:27` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:37` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:47` 📈 +0 XP in 1m · run total 797 · L20 0/243093
+- `04:19:47` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:19:57` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:07` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:17` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:27` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:37` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:47` 📈 +0 XP in 1m · run total 797 · L20 0/243093
+- `04:20:47` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:20:57` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:07` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:17` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:26` 💰 You loot 1s 3c.
+- `04:21:27` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:38` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:42` 💰 You loot 63c.
+- `04:21:47` 📈 +174 XP in 1m · run total 971 · L20 0/243267
+- `04:21:48` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:21:58` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:22:08` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:22:18` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:22:23` 🎯 targeting ryzeheal(pid6017) 49% for heal
+- `04:22:24` 🙏 heal → ryzeheal 295/607 (49%) [ally] · 114 cast
+- `04:22:28` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:22:38` 📊 Shims 1078/1243 hp mana 100% · 0 kills
+- `04:22:42` 💰 You loot 1s 56c.
+- `04:22:46` 🎯 targeting pontius(pid6016) 21% for heal
+- `04:22:46` 🙏 heal → pontius 284/1378 (21%) [TANK] · 117 cast
+- `04:22:47` 📈 +96 XP in 1m · run total 1067 · L20 0/243363
+- `04:22:48` 📊 Shims 412/1243 hp mana 100% · 0 kills
+- `04:22:49` 🩸 Down to 257 HP — bracing.
+- `04:22:51` 🎯 targeting shims(pid6019) 21% for heal
+- `04:22:51` 🙏 heal → shims 257/1243 (21%) [SELF] · 119 cast
+- `04:22:54` ☠️ I fell in battle near (2105, 852). Releasing spirit.
+- `04:22:54` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:22:54` 💚 Patched up (1123/1123).
+- `04:22:54` 🔄 Back on my feet.
+- `04:23:33` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:23:43` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:23:45` ✨ cast lightning shield.
+- `04:23:47` 🎯 targeting swifter(pid6020) 65% for heal
+- `04:23:47` 📈 +0 XP in 1m · run total 1067 · L20 0/243363
+- `04:23:47` 🙏 heal → swifter 884/1295 (68%) [ally] · 120 cast
+- `04:23:53` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:03` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:13` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:14` 💰 You loot 89c.
+- `04:24:23` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:31` 🙏 heal → swifter 95/1295 (7%) [ally] · 135 cast
+- `04:24:33` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:43` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:24:47` 📈 +80 XP in 1m · run total 1147 · L20 0/243443
+- `04:24:53` 📊 Shims 930/1123 hp mana 100% · 0 kills
+- `04:25:03` 📊 Shims 511/1123 hp mana 100% · 0 kills
+- `04:25:04` 🎯 targeting shims(pid6019) 41% for heal
+- `04:25:04` 🙏 heal → shims 459/1123 (41%) [SELF] · 138 cast
+- `04:25:08` 🩸 Down to 277 HP — bracing.
+- `04:25:13` 📊 Shims 40/1123 hp mana 100% · 0 kills
+- `04:25:14` ☠️ I fell in battle near (2100, 839). Releasing spirit.
+- `04:25:15` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:25:15` 💚 Patched up (1123/1123).
+- `04:25:15` 🔄 Back on my feet.
+- `04:25:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:25:52` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:26:02` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:26:06` 🎯 targeting pontius(pid6016) 23% for heal
+- `04:26:07` 🙏 heal → pontius 322/1378 (23%) [TANK] · 143 cast
+- `04:26:13` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:26:23` 📊 Shims 888/1123 hp mana 100% · 0 kills
+- `04:26:33` 📊 Shims 728/1123 hp mana 100% · 0 kills
+- `04:26:43` 📊 Shims 883/1123 hp mana 100% · 0 kills
+- `04:26:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:26:53` 📊 Shims 1038/1123 hp mana 100% · 0 kills
+- `04:27:03` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:27:13` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:27:23` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:27:33` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:27:43` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:27:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:27:53` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:28:03` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:28:13` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:28:23` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:28:33` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:28:42` ✨ cast lightning shield.
+- `04:28:44` 📊 Shims 1243/1243 hp mana 95% · 0 kills
+- `04:28:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:28:54` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:04` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:34` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:44` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:29:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:29:54` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:04` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:34` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:45` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:30:47` 📈 +0 XP in 1m · run total 1147 · L20 0/243443
+- `04:30:55` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:31:05` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:31:15` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:31:25` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:31:35` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:31:45` 📊 Shims 1190/1243 hp mana 100% · 0 kills
+- `04:31:47` 📈 +105 XP in 1m · run total 1252 · L20 0/243548
+- `04:31:55` 📊 Shims 886/1243 hp mana 100% · 0 kills
+- `04:32:02` 🎯 targeting shims(pid6019) 35% for heal
+- `04:32:02` 🙏 heal → shims 434/1243 (35%) [SELF] · 150 cast
+- `04:32:05` 📊 Shims 326/1243 hp mana 100% · 0 kills
+- `04:32:06` 🩸 Down to 258 HP — bracing.
+- `04:32:12` ☠️ I fell in battle near (2094, 846). Releasing spirit.
+- `04:32:12` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:32:12` 💚 Patched up (1123/1123).
+- `04:32:12` 🔄 Back on my feet.
+- `04:32:47` 📈 +0 XP in 1m · run total 1252 · L20 0/243548
+- `04:32:50` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:33:00` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:33:06` 🎯 targeting ryzeheal(pid6017) 67% for heal
+- `04:33:06` 🙏 heal → ryzeheal 404/607 (67%) [ally] · 155 cast
+- `04:33:11` 📊 Shims 1123/1123 hp mana 92% · 0 kills
+- `04:33:21` 📊 Shims 1066/1123 hp mana 99% · 0 kills
+- `04:33:24` 🎯 targeting pontius(pid6016) 66% for heal
+- `04:33:25` 🙏 heal → pontius 846/1378 (61%) [TANK] · 157 cast
+- `04:33:31` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:33:41` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:33:47` 📈 +0 XP in 1m · run total 1252 · L20 0/243548
+- `04:33:51` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:34:01` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:34:11` 📊 Shims 921/1123 hp mana 100% · 0 kills
+- `04:34:21` 📊 Shims 621/1123 hp mana 100% · 0 kills
+- `04:34:24` 🎯 targeting shims(pid6019) 45% for heal
+- `04:34:25` 🙏 heal → shims 505/1123 (45%) [SELF] · 161 cast
+- `04:34:31` 📊 Shims 322/1123 hp mana 100% · 0 kills
+- `04:34:33` 🩸 Down to 269 HP — bracing.
+- `04:34:33` 🙏 heal → shims 269/1123 (24%) [SELF] · 165 cast
+- `04:34:41` 📊 Shims 101/1123 hp mana 100% · 0 kills
+- `04:34:42` 💚 Patched up (286/1123).
+- `04:34:48` 📈 +0 XP in 1m · run total 1252 · L20 0/243548
+- `04:34:51` 📊 Shims 786/1123 hp mana 100% · 0 kills
+- `04:34:56` ✨ cast lightning shield.
+- `04:35:02` 📊 Shims 1044/1243 hp mana 95% · 0 kills
+- `04:35:12` 📊 Shims 1219/1243 hp mana 100% · 0 kills
+- `04:35:22` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:35:32` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:35:42` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:35:48` 📈 +0 XP in 1m · run total 1252 · L20 0/243548
+- `04:35:52` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:36:02` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:36:03` 🎯 targeting pontius(pid6016) 67% for heal
+- `04:36:04` 🙏 heal → pontius 797/1378 (58%) [TANK] · 172 cast
+- `04:36:12` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:36:20` 💰 You loot 9s 85c.
+- `04:36:20` 🎲 GREED on Revenant Silk Robe
+- `04:36:20` 🎲 GREED on Necromancer's Soulsteps
+- `04:36:21` 💰 pontius wins Revenant Silk Robe (62)
+- `04:36:21` 💰 pontius wins Necromancer's Soulsteps (29)
+- `04:36:22` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:36:22` 🙏 heal → pontius 540/1378 (39%) [TANK] · 180 cast
+- `04:36:32` 📊 Shims 1243/1243 hp mana 94% · 0 kills
+- `04:36:42` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:36:48` 📈 +292 XP in 1m · run total 1544 · L20 0/243840
+- `04:36:52` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:02` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:12` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:22` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:23` 💰 You loot 64c.
+- `04:37:23` 💰 You receive: Bone Fragments.
+- `04:37:32` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:42` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:37:48` 📈 +80 XP in 1m · run total 1624 · L20 0/243920
+- `04:37:52` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:02` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:12` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:22` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:32` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:43` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:38:44` 💰 You loot 1s.
+- `04:38:48` 📈 +94 XP in 1m · run total 1718 · L20 0/244014
+- `04:38:53` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:03` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:13` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:23` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:33` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:43` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:39:48` 📈 +0 XP in 1m · run total 1718 · L20 0/244014
+- `04:39:53` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:03` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:13` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:23` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:33` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:43` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:40:48` 📈 +0 XP in 1m · run total 1718 · L20 0/244014
+- `04:40:53` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:03` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:13` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:23` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:33` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:43` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:41:48` 📈 +0 XP in 1m · run total 1718 · L20 0/244014
+- `04:41:53` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:42:03` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:42:09` 💰 You loot 74c.
+- `04:42:12` 💰 You loot 73c.
+- `04:42:13` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:42:23` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:42:33` 📊 Shims 1238/1243 hp mana 100% · 0 kills
+- `04:42:43` 📊 Shims 1211/1243 hp mana 100% · 0 kills
+- `04:42:48` 📈 +160 XP in 1m · run total 1878 · L20 0/244174
+- `04:42:52` 🎯 targeting swifter(pid6020) 55% for heal
+- `04:42:52` 🙏 heal → swifter 714/1295 (55%) [ally] · 191 cast
+- `04:42:53` 📊 Shims 1201/1243 hp mana 100% · 0 kills
+- `04:42:57` 🎯 targeting pontius(pid6016) 58% for heal
+- `04:42:57` 🙏 heal → pontius 797/1378 (58%) [TANK] · 193 cast
+- `04:43:02` 🙏 heal → pontius 690/1378 (50%) [TANK] · 195 cast
+- `04:43:03` 📊 Shims 1212/1243 hp mana 100% · 0 kills
+- `04:43:11` 🎯 targeting swifter(pid6020) 39% for heal
+- `04:43:12` 🙏 heal → swifter 441/1295 (34%) [ally] · 199 cast
+- `04:43:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:43:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:43:25` 🎯 targeting pontius(pid6016) 21% for heal
+- `04:43:26` 🙏 heal → pontius 291/1378 (21%) [TANK] · 204 cast
+- `04:43:34` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:43:44` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:43:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:43:54` 📊 Shims 1205/1243 hp mana 100% · 0 kills
+- `04:44:04` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:34` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:44` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:44:48` 💰 You loot 84c.
+- `04:44:54` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:44:56` ✨ cast lightning shield.
+- `04:45:04` 📊 Shims 1243/1243 hp mana 97% · 0 kills
+- `04:45:14` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:45:24` 📊 Shims 1243/1243 hp mana 100% · 0 kills
+- `04:45:34` 📊 Shims 1062/1243 hp mana 100% · 0 kills
+- `04:45:44` 📊 Shims 771/1243 hp mana 100% · 0 kills
+- `04:45:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:45:52` 🎯 targeting shims(pid6019) 42% for heal
+- `04:45:53` 🙏 heal → shims 523/1243 (42%) [SELF] · 209 cast
+- `04:45:54` 📊 Shims 523/1243 hp mana 100% · 0 kills
+- `04:45:55` 🙏 heal → shims 452/1243 (36%) [SELF] · 210 cast
+- `04:46:00` 🩸 Down to 281 HP — bracing.
+- `04:46:04` 📊 Shims 194/1243 hp mana 100% · 0 kills
+- `04:46:11` ☠️ I fell in battle near (2108, 887). Releasing spirit.
+- `04:46:11` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:46:11` 💚 Patched up (1123/1123).
+- `04:46:11` 🔄 Back on my feet.
+- `04:46:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:46:49` 📊 Shims 1090/1123 hp mana 100% · 0 kills
+- `04:46:59` 📊 Shims 1121/1123 hp mana 100% · 0 kills
+- `04:47:04` 🎯 targeting pontius(pid6016) 53% for heal
+- `04:47:04` 🙏 heal → pontius 663/1258 (53%) [TANK] · 218 cast
+- `04:47:09` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:47:19` 📊 Shims 1085/1123 hp mana 75% · 0 kills
+- `04:47:29` 📊 Shims 1091/1123 hp mana 71% · 0 kills
+- `04:47:38` 🙏 heal → pontius 835/1258 (66%) [TANK] · 225 cast
+- `04:47:41` 📊 Shims 1123/1123 hp mana 68% · 0 kills
+- `04:47:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:47:51` 📊 Shims 1088/1123 hp mana 51% · 0 kills
+- `04:48:02` 📊 Shims 1088/1123 hp mana 55% · 0 kills
+- `04:48:12` 📊 Shims 1118/1123 hp mana 60% · 0 kills
+- `04:48:22` 📊 Shims 1082/1123 hp mana 49% · 0 kills
+- `04:48:32` 📊 Shims 1092/1123 hp mana 40% · 0 kills
+- `04:48:43` 📊 Shims 1087/1123 hp mana 31% · 0 kills
+- `04:48:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:48:53` 📊 Shims 1087/1123 hp mana 22% · 0 kills
+- `04:49:03` 📊 Shims 1087/1123 hp mana 33% · 0 kills
+- `04:49:13` 📊 Shims 1080/1123 hp mana 23% · 0 kills
+- `04:49:23` 📊 Shims 1080/1123 hp mana 17% · 0 kills
+- `04:49:33` 📊 Shims 1110/1123 hp mana 17% · 0 kills
+- `04:49:43` 📊 Shims 1080/1123 hp mana 13% · 0 kills
+- `04:49:48` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:49:51` 🙏 heal → pontius 850/1258 (68%) [TANK] · 240 cast
+- `04:49:54` 📊 Shims 1079/1123 hp mana 1% · 0 kills
+- `04:50:04` 📊 Shims 1079/1123 hp mana 9% · 0 kills
+- `04:50:16` 📊 Shims 1069/1123 hp mana 11% · 0 kills
+- `04:50:26` 📊 Shims 1063/1123 hp mana 10% · 0 kills
+- `04:50:36` 📊 Shims 1053/1123 hp mana 9% · 0 kills
+- `04:50:46` 📊 Shims 1078/1123 hp mana 8% · 0 kills
+- `04:50:46` 🙏 heal → pontius 720/1258 (57%) [TANK] · 255 cast
+- `04:50:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:50:56` 📊 Shims 1043/1123 hp mana 7% · 0 kills
+- `04:51:06` 📊 Shims 1032/1123 hp mana 6% · 0 kills
+- `04:51:16` 📊 Shims 1027/1123 hp mana 6% · 0 kills
+- `04:51:26` 📊 Shims 1052/1123 hp mana 5% · 0 kills
+- `04:51:36` 📊 Shims 1074/1123 hp mana 4% · 0 kills
+- `04:51:46` 📊 Shims 1089/1123 hp mana 6% · 0 kills
+- `04:51:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:51:50` 🙏 heal → pontius 839/1258 (67%) [TANK] · 270 cast
+- `04:51:57` 📊 Shims 1115/1123 hp mana 5% · 0 kills
+- `04:52:09` 📊 Shims 1081/1123 hp mana 15% · 0 kills
+- `04:52:19` 📊 Shims 1085/1123 hp mana 3% · 0 kills
+- `04:52:29` 📊 Shims 1122/1123 hp mana 11% · 0 kills
+- `04:52:39` 📊 Shims 1123/1123 hp mana 7% · 0 kills
+- `04:52:45` 🙏 heal → pontius 871/1258 (69%) [TANK] · 285 cast
+- `04:52:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:52:49` 📊 Shims 1092/1123 hp mana 6% · 0 kills
+- `04:52:59` 📊 Shims 1083/1123 hp mana 3% · 0 kills
+- `04:53:09` 📊 Shims 1121/1123 hp mana 5% · 0 kills
+- `04:53:21` 📊 Shims 1092/1123 hp mana 4% · 0 kills
+- `04:53:21` 🙏 heal → pontius 578/1258 (46%) [TANK] · 300 cast
+- `04:53:32` 📊 Shims 1083/1123 hp mana 12% · 0 kills
+- `04:53:42` 📊 Shims 1117/1123 hp mana 8% · 0 kills
+- `04:53:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:53:52` 📊 Shims 1082/1123 hp mana 5% · 0 kills
+- `04:53:55` 🙏 heal → pontius 337/1258 (27%) [TANK] · 315 cast
+- `04:54:02` 📊 Shims 1087/1123 hp mana 4% · 0 kills
+- `04:54:12` 📊 Shims 1085/1123 hp mana 3% · 0 kills
+- `04:54:25` 📊 Shims 1083/1123 hp mana 13% · 0 kills
+- `04:54:31` 🙏 heal → pontius 199/1258 (16%) [TANK] · 330 cast
+- `04:54:37` 📊 Shims 1073/1123 hp mana 4% · 0 kills
+- `04:54:47` 📊 Shims 990/1123 hp mana 9% · 0 kills
+- `04:54:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:54:57` 📊 Shims 732/1123 hp mana 22% · 0 kills
+- `04:55:02` 🎯 targeting shims(pid6019) 44% for heal
+- `04:55:02` 🙏 heal → shims 496/1123 (44%) [SELF] · 335 cast
+- `04:55:07` 📊 Shims 413/1123 hp mana 34% · 0 kills
+- `04:55:10` 🩸 Down to 234 HP — bracing.
+- `04:55:17` 📊 Shims 89/1123 hp mana 47% · 0 kills
+- `04:55:18` ☠️ I fell in battle near (2079, 871). Releasing spirit.
+- `04:55:18` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:55:18` 💚 Patched up (1123/1123).
+- `04:55:18` 🔄 Back on my feet.
+- `04:55:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:55:57` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:56:07` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:56:17` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:56:27` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:56:37` 📊 Shims 1057/1123 hp mana 100% · 0 kills
+- `04:56:45` 🎯 targeting pontius(pid6016) 69% for heal
+- `04:56:46` 🙏 heal → pontius 864/1258 (69%) [TANK] · 342 cast
+- `04:56:47` 📊 Shims 1089/1123 hp mana 100% · 0 kills
+- `04:56:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:56:53` 🙏 heal → pontius 469/1258 (37%) [TANK] · 345 cast
+- `04:56:57` 📊 Shims 1086/1123 hp mana 100% · 0 kills
+- `04:57:07` 📊 Shims 1000/1123 hp mana 100% · 0 kills
+- `04:57:17` 📊 Shims 628/1123 hp mana 100% · 0 kills
+- `04:57:21` 🎯 targeting shims(pid6019) 44% for heal
+- `04:57:21` 🙏 heal → shims 444/1123 (40%) [SELF] · 348 cast
+- `04:57:25` 🩸 Down to 269 HP — bracing.
+- `04:57:27` 📊 Shims 192/1123 hp mana 100% · 0 kills
+- `04:57:32` ☠️ I fell in battle near (2079, 853). Releasing spirit.
+- `04:57:32` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:57:32` 💚 Patched up (1123/1123).
+- `04:57:32` 🔄 Back on my feet.
+- `04:57:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:58:10` 📊 Shims 1090/1123 hp mana 100% · 0 kills
+- `04:58:20` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:58:30` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:58:40` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:58:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:58:50` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:59:00` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:59:05` ✨ cast lightning shield.
+- `04:59:10` 📊 Shims 1123/1123 hp mana 95% · 0 kills
+- `04:59:20` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:59:30` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:59:40` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `04:59:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `04:59:50` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:00:00` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:00:10` 📊 Shims 1083/1123 hp mana 100% · 0 kills
+- `05:00:21` 📊 Shims 1081/1123 hp mana 100% · 0 kills
+- `05:00:23` 🎯 targeting pontius(pid6016) 68% for heal
+- `05:00:23` 🙏 heal → pontius 859/1258 (68%) [TANK] · 353 cast
+- `05:00:31` 📊 Shims 1118/1123 hp mana 100% · 0 kills
+- `05:00:41` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:00:49` 📈 +0 XP in 1m · run total 1878 · L20 0/244174
+- `05:00:51` 📊 Shims 1115/1123 hp mana 100% · 0 kills
+- `05:01:01` 📊 Shims 862/1123 hp mana 100% · 0 kills
+- `05:01:11` 📊 Shims 575/1123 hp mana 100% · 0 kills
+- `05:01:14` 🎯 targeting shims(pid6019) 40% for heal
+- `05:01:15` 🙏 heal → shims 449/1123 (40%) [SELF] · 360 cast
+- `05:01:21` 📊 Shims 292/1123 hp mana 100% · 0 kills
+- `05:01:23` 🩸 Down to 235 HP — bracing.
+- `05:01:31` ☠️ I fell in battle near (2093, 869). Releasing spirit.
+- `05:01:31` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `05:01:31` 💚 Patched up (1123/1123).
+- `05:01:31` 🔄 Back on my feet.
+- `05:01:49` 📈 +246 XP in 1m · run total 2124 · L20 0/244420
+- `05:02:09` 📊 Shims 947/983 hp mana 100% · 0 kills
+- `05:02:19` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:02:24` ✨ cast lightning shield.
+- `05:02:29` 📊 Shims 1123/1123 hp mana 95% · 0 kills
+- `05:02:39` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:02:49` 📊 Shims 1123/1123 hp mana 100% · 0 kills
+- `05:02:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:02:59` 📊 Shims 1115/1123 hp mana 100% · 0 kills
+- `05:03:09` 📊 Shims 1064/1123 hp mana 100% · 0 kills
+- `05:03:19` 📊 Shims 1057/1123 hp mana 100% · 0 kills
+- `05:03:28` 🎯 targeting pontius(pid6016) 65% for heal
+- `05:03:28` 🙏 heal → pontius 815/1258 (65%) [TANK] · 368 cast
+- `05:03:31` 📊 Shims 1088/1123 hp mana 92% · 0 kills
+- `05:03:41` 📊 Shims 1043/1123 hp mana 86% · 0 kills
+- `05:03:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:03:51` 📊 Shims 1037/1123 hp mana 74% · 0 kills
+- `05:04:01` 📊 Shims 1027/1123 hp mana 81% · 0 kills
+- `05:04:11` 📊 Shims 1059/1123 hp mana 72% · 0 kills
+- `05:04:21` 🙏 heal → pontius 825/1258 (66%) [TANK] · 375 cast
+- `05:04:21` 📊 Shims 1022/1123 hp mana 66% · 0 kills
+- `05:04:31` 📊 Shims 1018/1123 hp mana 60% · 0 kills
+- `05:04:41` 📊 Shims 1012/1123 hp mana 62% · 0 kills
+- `05:04:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:04:53` 📊 Shims 1006/1123 hp mana 75% · 0 kills
+- `05:05:04` 📊 Shims 1003/1123 hp mana 49% · 0 kills
+- `05:05:14` 📊 Shims 1002/1123 hp mana 49% · 0 kills
+- `05:05:24` 📊 Shims 1029/1123 hp mana 40% · 0 kills
+- `05:05:36` 📊 Shims 1049/1123 hp mana 55% · 0 kills
+- `05:05:46` 📊 Shims 1081/1123 hp mana 38% · 0 kills
+- `05:05:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:05:56` 📊 Shims 1117/1123 hp mana 40% · 0 kills
+- `05:06:06` 📊 Shims 1082/1123 hp mana 32% · 0 kills
+- `05:06:16` 📊 Shims 1087/1123 hp mana 36% · 0 kills
+- `05:06:26` 📊 Shims 1091/1123 hp mana 30% · 0 kills
+- `05:06:36` 📊 Shims 1117/1123 hp mana 40% · 0 kills
+- `05:06:45` 🙏 heal → pontius 870/1258 (69%) [TANK] · 390 cast
+- `05:06:48` 📊 Shims 1091/1123 hp mana 26% · 0 kills
+- `05:06:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:06:58` 📊 Shims 1086/1123 hp mana 22% · 0 kills
+- `05:07:08` 📊 Shims 1123/1123 hp mana 13% · 0 kills
+- `05:07:18` 📊 Shims 1088/1123 hp mana 5% · 0 kills
+- `05:07:28` 📊 Shims 1091/1123 hp mana 17% · 0 kills
+- `05:07:38` 📊 Shims 1081/1123 hp mana 19% · 0 kills
+- `05:07:48` 📊 Shims 1119/1123 hp mana 21% · 0 kills
+- `05:07:49` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:07:58` 📊 Shims 1091/1123 hp mana 26% · 0 kills
+- `05:08:08` 📊 Shims 1086/1123 hp mana 30% · 0 kills
+- `05:08:18` 📊 Shims 1085/1123 hp mana 24% · 0 kills
+- `05:08:28` 📊 Shims 1081/1123 hp mana 12% · 0 kills
+- `05:08:38` 📊 Shims 1075/1123 hp mana 4% · 0 kills
+- `05:08:48` 📊 Shims 1075/1123 hp mana 6% · 0 kills
+- `05:08:50` 📈 +0 XP in 1m · run total 2124 · L20 0/244420
+- `05:08:55` 🙏 heal → pontius 846/1258 (67%) [TANK] · 405 cast
+- `05:08:58` 📊 Shims 1071/1123 hp mana 5% · 0 kills
+- `05:09:11` 📊 Shims 1059/1123 hp mana 6% · 0 kills
+- `05:09:21` 📊 Shims 1055/1123 hp mana 3% · 0 kills
+- `05:09:31` 📊 Shims 896/1123 hp mana 11% · 0 kills
+- `05:09:41` 📊 Shims 742/1123 hp mana 23% · 0 kills
+- `05:09:50` 📈 +0 XP in 1m · run total 2124 · L20 0/244420

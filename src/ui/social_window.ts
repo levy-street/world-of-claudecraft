@@ -6,16 +6,21 @@
 // injected deps. The pure row + signature decisions live in social_view.ts; this
 // is the thin DOM consumer per the unit_portrait / talents_window template.
 //
-// Visibility is the '.open' CLASS on #social-window (not style.display), matching
-// the window-manager (closeManagedWindow / topmostOpenWindow read '.open').
+// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
+// with a close control, the friends/guild/ignore/raid modes on the frame's TAB
+// RAIL, and a scrollable body holding the per-tab list + notice + add-row footer.
+// Like the vendor / options windows the frame mounts on an INNER container
+// (ensureFrame), so the shared #social-window root stays a pristine .window.panel.
+// Visibility is STILL the '.open' CLASS on #social-window (not style.display),
+// matching the window-manager (closeManagedWindow / topmostOpenWindow read '.open').
 //
 // LISTENER CHURN (social is NOT purely cold): the panel repaints on the
 // slow-HUD divider (refreshIfChanged), so re-attaching a click handler to every
 // row each tick would churn handlers. Instead the row actions use ONE delegated
 // click listener on the persistent `.soc-body` container, wired once per full
 // render; a content refresh only swaps the body's innerHTML, so no per-row handler
-// is re-attached. The chrome (close/tabs/footer/typeahead) is wired on a full
-// render and survives a content refresh untouched.
+// is re-attached. The frame chrome (close + tab rail) is stamped cold once and
+// reused; the footer/typeahead re-wire on a full render and survive a content refresh.
 //
 // No raw hex / magic numbers: the status dots are CSS-classed (no
 // color literal here) and the two typeahead timings are named constants.
@@ -23,7 +28,6 @@
 import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
@@ -38,12 +42,30 @@ import {
   socialStructSig,
 } from './social_view';
 import { svgIcon } from './ui_icons';
+import { renderWindowFrame, type WindowFrameParts } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
 
 // Typeahead timings (named, not bare literals): debounce a keystroke
 // before searching, and clear the suggestion list shortly after blur so a pending
 // mousedown on a suggestion can still fire first.
 const SUGGEST_DEBOUNCE_MS = 160;
 const SUGGEST_BLUR_CLEAR_MS = 150;
+
+// A closable frame whose four modes ride the shared TAB RAIL (friends / guild /
+// ignore / raid); the per-tab list + notice + add-row footer render into the
+// scrolling body. Every key is reused from the existing social catalog (the close
+// aria reuses hud.options.returnToGame, byte-faithful to the pre-frame window).
+const SOCIAL_FRAME: WindowFrameDescriptor = {
+  id: 'social-window',
+  titleKey: 'hud.social.title',
+  closeLabelKey: 'hud.options.returnToGame',
+  tabs: [
+    { id: 'friends', labelKey: 'hud.social.friendsTab' },
+    { id: 'guild', labelKey: 'hud.social.guildTab' },
+    { id: 'ignore', labelKey: 'hud.social.ignoreTab' },
+    { id: 'raid', labelKey: 'hud.social.raidTab' },
+  ],
+};
 
 /**
  * Hud-supplied glue. The social window renders no item rows (it uses CSS-classed
@@ -191,41 +213,115 @@ export class SocialWindow {
     return JSON.stringify({ social: w.socialInfo, party: w.partyInfo });
   }
 
-  // Full rebuild: title, tabs, body, notice, and the tab's footer (with its
-  // typeahead). Used on open, tab switch, and guild-membership changes.
+  // Stamp the shared window frame cold at first open, then reuse it. The frame
+  // mounts on an inner container so the #social-window root stays a pristine
+  // .window.panel; an intact mounted frame (its body present) is the reuse marker.
+  // The tab-rail roving handler is wired once, at cold-mount time.
+  private ensureFrame(): WindowFrameParts {
+    const el = this.deps.root();
+    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
+    const body = mounted?.querySelector<HTMLElement>('.window-body');
+    if (mounted && body) {
+      return {
+        root: mounted,
+        body,
+        footer: mounted.querySelector<HTMLElement>('.window-footer'),
+        tabButtons: Array.from(mounted.querySelectorAll<HTMLButtonElement>('[data-window-tab]')),
+      };
+    }
+    const mount = document.createElement('div');
+    const parts = renderWindowFrame(
+      mount,
+      SOCIAL_FRAME,
+      { onClose: () => this.close(), onTabChange: (id) => this.onTabChange(id) },
+      this.tab,
+    );
+    el.replaceChildren(mount);
+    this.wireTabRoving(parts.tabButtons);
+    return parts;
+  }
+
+  // A frame tab-rail click (or a roving keyboard move that clicks it) lands here:
+  // the frame builder already re-pointed aria-selected / the body panel id, so this
+  // just commits the tab and repaints. Mirrors the pre-frame switchTab.
+  private onTabChange(tabId: string): void {
+    this.tab = tabId as SocialTab;
+    this.notice = null;
+    this.lastStruct = this.structSig();
+    this.render();
+  }
+
+  // Roving Arrow/Home/End across the frame's tab rail (the builder wires click +
+  // aria; it does NOT wire keyboard). A roving move clicks the target so the
+  // builder's own aria/panel update + onTabChange fire, then follows focus.
+  private wireTabRoving(tabButtons: HTMLButtonElement[]): void {
+    tabButtons.forEach((tab, i) => {
+      tab.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        const next = rovingTarget(ke.key, i, tabButtons.length, 'horizontal');
+        if (next !== null) {
+          ke.preventDefault();
+          const target = tabButtons[next];
+          if (target && target !== tab) {
+            target.click();
+            target.focus();
+          }
+          return;
+        }
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
+          tab.click();
+          tab.focus();
+        }
+      });
+    });
+  }
+
+  // Sync the tab rail's aria-selected + roving tabindex + the body's panel id to
+  // this.tab. Covers the open / reopen / programmatic (selectRaidTab, convert)
+  // paths the frame's own click handler does not; a click-driven switch already
+  // matches, so this is idempotent there.
+  private syncTabState(tabButtons: HTMLButtonElement[], body: HTMLElement): void {
+    for (const b of tabButtons) {
+      const sel = b.dataset.windowTab === this.tab;
+      b.setAttribute('aria-selected', String(sel));
+      b.tabIndex = sel ? 0 : -1;
+      if (sel) {
+        const panelId = b.getAttribute('aria-controls');
+        if (panelId) body.id = panelId;
+      }
+    }
+  }
+
+  // Full rebuild: title/realm, body list, notice, and the tab's add-row footer
+  // (with its typeahead). Used on open, tab switch, and guild-membership changes.
   private render(): void {
     const el = this.deps.root();
     if (!el.classList.contains('open')) return;
-    // WCAG 2.2 AA: name the focus-trapped root so AT users entering the trap
-    // land on a labeled dialog (the sibling cold windows all set this).
-    markDialogRoot(el, { label: t('hud.social.title') });
+    const { root: frame, body, tabButtons } = this.ensureFrame();
+    this.syncTabState(tabButtons, body);
     const w = this.deps.world();
     const tab = this.tab;
     const online = w.socialInfo !== null;
     const realmTag =
       online && w.realm ? ` <span class="soc-realm-tag">- ${esc(w.realm)}</span>` : '';
-    el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
-      // WAI-ARIA tabs: a real role=tablist / role=tab / role=tabpanel with a
-      // roving tabindex (0 on the active tab, -1 on the rest) and aria-selected, mirroring
-      // talents_window. The `on` class still styles the active tab (byte-faithful to
-      // .soc-tab.on in components.css); aria-selected runs parallel to it. The old
-      // toggle-button pressed-state attribute is dropped (a tab is selected, not pressed).
-      // The roving Arrow/Home/End handler is wired in wireChrome.
-      `<div class="soc-tabs" role="tablist" aria-label="${esc(t('hud.social.title'))}">` +
-      `<button type="button" class="soc-tab ${tab === 'friends' ? 'on' : ''}" data-tab="friends" role="tab" aria-selected="${tab === 'friends' ? 'true' : 'false'}" tabindex="${tab === 'friends' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.friendsTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'guild' ? 'on' : ''}" data-tab="guild" role="tab" aria-selected="${tab === 'guild' ? 'true' : 'false'}" tabindex="${tab === 'guild' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.guildTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'ignore' ? 'on' : ''}" data-tab="ignore" role="tab" aria-selected="${tab === 'ignore' ? 'true' : 'false'}" tabindex="${tab === 'ignore' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.ignoreTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'raid' ? 'on' : ''}" data-tab="raid" role="tab" aria-selected="${tab === 'raid' ? 'true' : 'false'}" tabindex="${tab === 'raid' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.raidTab'))}</button>` +
-      `</div>` +
-      `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +
+    // The frame builder resolves the title key WITHOUT interpolation; the social
+    // title carries the realm tag, so paint it here onto the frame's title.
+    const titleEl = frame.querySelector<HTMLElement>('.window-title');
+    if (titleEl) titleEl.innerHTML = `${esc(t('hud.social.title'))}${realmTag}`;
+    // The per-tab list + notice + add-row footer render into the frame body (the
+    // active tab's tabpanel). The old inline soc-tabs strip is gone (the frame rail
+    // replaces it); .soc-body keeps its class (refreshList queries it) but no longer
+    // needs its own id/role, which the frame's .window-body tabpanel now carries.
+    body.innerHTML =
+      `<div class="soc-body"></div>` +
       `<div class="soc-notice"></div>` +
       (tab === 'raid' ? '' : online ? this.footer() : '');
-    this.wireChrome(el);
+    this.wireFooterAndSuggest(el);
     // Delegate every row action to ONE listener on the persistent body, so a
     // content refresh (innerHTML swap) never re-attaches per-row handlers.
-    const body = el.querySelector('.soc-body') as HTMLElement | null;
-    if (body) body.addEventListener('click', (e) => this.onBodyClick(e));
+    const socBody = el.querySelector('.soc-body') as HTMLElement | null;
+    if (socBody) socBody.addEventListener('click', (e) => this.onBodyClick(e));
     this.refreshList();
     this.renderNotice();
   }
@@ -494,48 +590,9 @@ export class SocialWindow {
       .querySelector(`input[data-field="${field}"]`) as HTMLInputElement | null;
   }
 
-  // Wire the parts that survive a content refresh: close, tabs, footer + search.
-  private wireChrome(el: HTMLElement): void {
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.toggle());
-    // WAI-ARIA tabs: click OR roving Arrow/Home/End select a tab; render() rebuilds the
-    // strip, so refocus the freshly active tab afterward (the roving-tabindex focus must
-    // follow the selection), exactly like talents_window. switchTab keeps the existing
-    // click behavior byte-identical.
-    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.soc-tab'));
-    const switchTab = (tabEl: HTMLElement): void => {
-      this.tab = tabEl.dataset.tab as SocialTab;
-      this.notice = null;
-      this.lastStruct = this.structSig();
-      this.render();
-    };
-    // render() rebuilds the strip, so refocus the freshly active tab after a keyboard
-    // move (the roving-tabindex focus must follow the selection). The click path stays
-    // byte-identical to the old handler (no programmatic focus move).
-    const focusActiveTab = (): void =>
-      (el.querySelector('.soc-tab.on') as HTMLElement | null)?.focus();
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => switchTab(tab));
-      tab.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
-        if (next !== null) {
-          ke.preventDefault();
-          const target = tabs[next];
-          if (target && target !== tab) {
-            switchTab(target);
-            focusActiveTab();
-          }
-          return;
-        }
-        // Enter / Space activate the focused tab (the explicit-activation affordance the
-        // WAI-ARIA tabs pattern expects alongside selection-follows-focus).
-        if (ke.key === 'Enter' || ke.key === ' ') {
-          ke.preventDefault();
-          switchTab(tab);
-          focusActiveTab();
-        }
-      });
-    });
+  // Wire the per-tab add-row footer + typeahead (re-attached on every full render;
+  // the close control and tab rail are the frame's, wired once at cold-mount time).
+  private wireFooterAndSuggest(el: HTMLElement): void {
     const w = this.deps.world();
     const field = (sel: string): string =>
       (el.querySelector(`input[data-field="${sel}"]`) as HTMLInputElement | null)?.value.trim() ??

@@ -1,0 +1,45 @@
+# ryzehunts — hunter
+_the steady ranger. Journal opened 2026-06-16T09:17:03.932Z._
+
+- `09:17:04` Entered the world at level 9.
+- `09:17:14` 📊 hp 350/350 · res 239/259 · 0 kills
+- `09:17:30` ✨ cast aspect of the hawk.
+- `09:17:42` ⚔️ Killed **Mire Prowler**. Down before it reached me.
+- `09:18:14` 📊 hp 350/350 · res 259/259 · 1 kills
+- `09:18:15` ✨ cast aspect of the hawk.
+- `09:19:01` ✨ cast aspect of the hawk.
+- `09:19:14` 📊 hp 350/350 · res 259/259 · 1 kills
+- `09:20:09` ✨ cast aspect of the hawk.
+- `09:20:14` 📊 hp 350/350 · res 239/259 · 1 kills
+- `09:20:54` ✨ cast aspect of the hawk.
+- `09:21:02` ⚔️ Killed **Deepfen Snapper**. Down before it reached me.
+- `09:21:14` 📊 hp 236/350 · res 259/259 · 2 kills
+- `09:21:20` ⚔️ Killed **Deepfen Snapper**. Clean shot, clean kill.
+- `09:21:39` ✨ cast aspect of the hawk.
+- `09:22:14` 📈 +72 XP in 5m · run total 72 · L9 1618/22718
+- `09:22:14` 📊 hp 350/350 · res 259/259 · 3 kills
+- `09:22:49` ✨ cast aspect of the hawk.
+- `09:23:03` ⚔️ Killed **Deepfen Snapper**. It never closed the distance.
+- `09:23:14` 📊 hp 326/350 · res 259/259 · 4 kills
+- `09:23:23` ⚔️ Killed **Deepfen Snapper**. Clean shot, clean kill.
+- `09:23:34` ✨ cast aspect of the hawk.
+- `09:23:42` ⚔️ Killed **Deepfen Snapper**. Down before it reached me.
+- `09:24:14` 📊 hp 350/350 · res 259/259 · 6 kills
+- `09:24:19` ✨ cast aspect of the hawk.
+- `09:25:05` ✨ cast aspect of the hawk.
+- `09:25:06` ⚔️ Killed **Deepfen Snapper**. Clean shot, clean kill.
+- `09:25:15` 📊 hp 350/350 · res 238/259 · 7 kills
+- `09:25:59` ⚔️ Killed **Deepfen Snapper**. Down before it reached me.
+- `09:26:05` 💰 You receive: Waterlogged Idol.
+- `09:26:15` 📊 hp 350/350 · res 259/259 · 8 kills
+- `09:26:15` ✨ cast aspect of the hawk.
+- `09:26:55` ✨ cast aspect of the hawk.
+- `09:27:08` ⚔️ Killed **Deepfen Snapper**. Down before it reached me.
+- `09:27:14` 📈 +150 XP in 5m · run total 222 · L9 1768/22868
+- `09:27:15` 📊 hp 327/350 · res 258/259 · 9 kills
+- `09:27:40` ✨ cast aspect of the hawk.
+- `09:28:15` 📊 hp 350/350 · res 259/259 · 9 kills
+- `09:28:25` ✨ cast aspect of the hawk.
+- `09:28:29` ⚔️ Killed **Deepfen Snapper**. Clean shot, clean kill.
+- `09:29:08` ⚔️ Killed **Deepfen Snapper**. Clean shot, clean kill.
+- `09:29:15` 📊 hp 326/350 · res 216/259 · 11 kills

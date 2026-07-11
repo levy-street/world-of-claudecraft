@@ -1,0 +1,70 @@
+{
+  "_doc": "4-man Gravewyrm Sanctum FARM. pala1/Pontius (paladin, the TANK + leader -- Protection: Righteous Fury aura + Consecration spam for threat, Seal/Judgement) + ryze3/ryzeheal (priest, the HEALER -- Renew + Lesser Heal; pure heals, healerDps OFF, shieldTank OFF -- shield is inefficient right now) + sham2/Shims (shaman ENHANCEMENT, melee DPS -- Stormstrike + Earth Shock) + ryze/swifter (hunter, ranged DPS + designated puller; its pet off-tanks loose adds) + ryzemage (mage, an OPERATOR-CONTROLLED GUEST -- combat.guests, NOT a bot: the leader invites it at the door and the muster HOLDS until it joins, so it is in the group BEFORE they zone in; the operator drives its Frostbolt + Conjure Water. It is the water source + a 4th DPS so Korzul dies before the paladin OOMs). NO warrior. The paladin is auto-picked as tank (first melee; shaman is in the orchestrator MELEE set so it closes for Stormstrike). They march to the Sanctum door (0,880), the hunter ranged-pulls one mob at a time, the paladin grabs threat (no taunt -> Consecration/Seal), single-pull chamber-by-chamber to the three bosses looting every corpse, then after KORZUL dies + loot is grabbed they RESET the instance (leave + reform = fresh instance) and farm again. The PALADIN (tank/leader) need-rolls everything; the other three greed. Run via scripts/_farm_supervisor.sh (CFG points here), or: node scripts/multibox.mjs scripts/multibox.gravewyrm4.json",
+  "extends": "multibox.world.json",
+  "tag": "☠️G4",
+  "leader": "Pontius",
+  "dungeonLevel": 20,
+  "dungeon": { "id": "gravewyrm_sanctum", "name": "Gravewyrm Sanctum", "door": { "x": 0, "z": 880 } },
+  "control": { "logout": "logout", "from": ["Pontius", "ryzeheal", "Shims", "swifter"] },
+  "joinStagger": { "min": 5, "max": 15 },
+  "bots": [
+    { "user": "pala1", "character": "Pontius", "class": "paladin" },
+    { "user": "ryze3", "character": "ryzeheal", "class": "priest" },
+    { "user": "sham2", "character": "Shims", "class": "shaman" },
+    { "user": "ryze", "character": "swifter", "class": "hunter" }
+  ],
+  "runSeconds": 36000,
+  "combat": {
+    "verbose": true,
+    "seekCrypt": true,
+    "dungeonRun": true,
+    "dungeonFarm": true,
+    "dungeonLevel": 20,
+
+    "dieFreely": false,
+    "pullWhenReady": true,
+    "readyHp": 0.9,
+    "readyMana": 0.6,
+
+    "advanceHp": 0.95,
+    "advanceMana": 0.6,
+    "advanceStep": 8,
+    "advanceMaxDepth": 175,
+
+    "pullRadius": 14,
+    "pullIsolation": 24,
+    "maxEngage": 1,
+    "regroupDist": 14,
+    "lvlFloor": -10,
+    "lvlCeil": 4,
+    "advanceClearRadius": 26,
+
+    "tankFleeHp": 0,
+    "fleeHp": 0.3,
+    "recoverHp": 0.95,
+
+    "shieldTank": false,
+
+    "healCrit": 0.45,
+    "healTank": 0.7,
+    "healLow": 0.6,
+    "healPanic": 0.45,
+    "healerDps": false,
+    "buffEvery": 120000,
+
+    "lootGrab": 10,
+    "lootWalk": 40,
+    "autoEquip": false,
+
+    "waterBrigade": true,
+    "drinkMana": 0.8,
+    "drinkSafeRadius": 26,
+
+    "guests": ["ryzemage"],
+    "guestWaitMs": 180000,
+
+    "farmLootMs": 25000
+  },
+  "grind": { "goHome": false },
+  "questing": { "hubs": [] }
+}

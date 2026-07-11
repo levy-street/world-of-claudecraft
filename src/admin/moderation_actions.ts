@@ -213,6 +213,66 @@ export function unbanAccount(accountId: number, note: string): Built {
   };
 }
 
+export function banDailyRewards(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmDailyRewardsBan'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionDailyRewardsBan') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-ban`,
+      body: { reason: note },
+      danger: true,
+    },
+  };
+}
+
+export function unbanDailyRewards(accountId: number, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  return {
+    pending: {
+      title: t('dialog.confirmDailyRewardsUnban'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionDailyRewardsUnban') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-unban`,
+      body: { reason: note },
+    },
+  };
+}
+
+export function moderateDailyRewardsIp(
+  accountId: number,
+  ip: string,
+  banned: boolean,
+  note: string,
+): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  const action = banned
+    ? t('dialog.actionDailyRewardsIpBan')
+    : t('dialog.actionDailyRewardsIpUnban');
+  return {
+    pending: {
+      title: banned ? t('dialog.confirmDailyRewardsIpBan') : t('dialog.confirmDailyRewardsIpUnban'),
+      rows: [
+        accountRow(accountId),
+        { label: t('blockedIps.colIp'), value: ip },
+        { label: t('dialog.action'), value: action },
+        reasonRow(note),
+        ...(banned ? [{ label: t('dialog.warning'), value: t('blockedIps.sharedIpWarning') }] : []),
+      ],
+      endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-ip-${banned ? 'ban' : 'unban'}`,
+      body: { ip, reason: note },
+      danger: banned,
+    },
+  };
+}
+
 // Ban one of an account's known IPs. No note is required (matches the old flow); the
 // shared-IP caveat is surfaced as a confirm row. duration is a block_expiry token
 // ('1d'|'7d'|'30d'|'' for forever); actionLabel is the clicked button's text.

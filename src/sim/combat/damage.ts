@@ -647,6 +647,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       });
     }
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    // Heroic daily lockout lands HERE, on the kill itself (credit or no credit),
+    // for the whole group that owns the claim: the marks award further down is
+    // credit- and participation-gated, so it must not carry the lockout.
+    ctx.grantHeroicKillLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =
@@ -783,7 +787,7 @@ export function grantXp(
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
     // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
     meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
-    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
     ctx.emit({ type: 'levelup', level: p.level, pid: p.id });

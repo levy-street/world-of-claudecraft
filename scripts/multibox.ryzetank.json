@@ -1,0 +1,169 @@
+{
+  "extends": "multibox.world.json",
+  "tag": "\ud83d\udde1\ufe0f",
+  "runSeconds": 28800,
+  "leader": "ryzetank",
+  "combat": {
+    "dieFreely": true,
+    "pullIsolation": 10,
+    "lvlCeil": 1,
+    "readyHp": 0,
+    "restHp": 0,
+    "pullManaFrac": 0,
+    "turnInBatch": 1,
+    "autoAbandon": true
+  },
+  "questing": {
+    "hubs": [
+      {
+        "maxLevel": 99,
+        "givers": [
+          {
+            "x": 4,
+            "z": 664
+          },
+          {
+            "x": -10,
+            "z": 656
+          },
+          {
+            "x": 7,
+            "z": 670
+          },
+          {
+            "x": -5,
+            "z": 668
+          },
+          {
+            "x": 12,
+            "z": 655
+          }
+        ],
+        "quests": [
+          {
+            "id": "q_stalkers",
+            "minLevel": 13,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -50,
+              "z": 590,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_stalker_pelts",
+            "minLevel": 13,
+            "giver": {
+              "x": -5,
+              "z": 668
+            },
+            "spot": {
+              "x": -50,
+              "z": 590,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_kobold_tunnels",
+            "minLevel": 14,
+            "giver": {
+              "x": 12,
+              "z": 655
+            },
+            "spot": {
+              "x": 75,
+              "z": 625,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_ogre_edges",
+            "minLevel": 15,
+            "giver": {
+              "x": 7,
+              "z": 670
+            },
+            "spot": {
+              "x": -90,
+              "z": 700,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_ogre_totems",
+            "minLevel": 15,
+            "giver": {
+              "x": 7,
+              "z": 670
+            },
+            "spot": {
+              "x": -130,
+              "z": 740,
+              "r": 30
+            }
+          },
+          {
+            "id": "q_ogre_bounty",
+            "minLevel": 15,
+            "giver": {
+              "x": 4,
+              "z": 664
+            },
+            "spot": {
+              "x": -90,
+              "z": 700,
+              "r": 30
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "bots": [
+    {
+      "user": "ryze4",
+      "character": "ryzetank",
+      "class": "warrior"
+    }
+  ],
+  "grind": {
+    "goHome": true,
+    "home": {
+      "x": -90,
+      "z": 700
+    },
+    "homeRadius": 30,
+    "ladder": [
+      {
+        "level": 13,
+        "label": "Ridge Stalkers (L13-14)",
+        "home": {
+          "x": -50,
+          "z": 590
+        },
+        "radius": 30
+      },
+      {
+        "level": 14,
+        "label": "Deeprock Tunnelers (L14-15)",
+        "home": {
+          "x": 75,
+          "z": 625
+        },
+        "radius": 30
+      },
+      {
+        "level": 15,
+        "label": "Thornpeak Ogres (L15-16)",
+        "home": {
+          "x": -90,
+          "z": 700
+        },
+        "radius": 30
+      }
+    ]
+  }
+}

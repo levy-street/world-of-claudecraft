@@ -1,0 +1,1196 @@
+# ryzemage — mage
+_the haughty mage. Journal opened 2026-06-28T13:22:52.899Z._
+
+- `13:22:54` Entered the world at level 20.
+- `13:23:58` 📈 +0 XP in 1m · run total 0 · L20 0/189900
+- `13:24:58` 📈 +0 XP in 1m · run total 0 · L20 0/189900
+- `13:25:07` 🏰 Crossed the threshold into Gravewyrm Sanctum.
+- `13:25:07` 📊 ryzemage 608/608 hp mana 100% · 0 kills
+- `13:25:07` 🛡️ GEAR: feet:marshstrider_boots, legs:stormshard_leggings, chest:necromancers_starshroud, mainhand:emberwood_staff
+- `13:25:07` 📈 STATS: ap=61 crit=0.11699999999999999 weapon={"min":20,"max":33,"speed":3} · {"str":10,"agi":14,"sta":52,"int":103,"spi":71,"armor":490}
+- `13:25:07` ✨ cast arcane intellect.
+- `13:25:18` 📊 ryzemage 608/608 hp mana 100% · 0 kills
+- `13:25:28` 📊 ryzemage 608/608 hp mana 100% · 0 kills
+- `13:25:39` 📊 ryzemage 548/608 hp mana 92% · 0 kills
+- `13:25:43` ⚔️ Killed **Sanctum Boneguard**. Reduced to ash.
+- `13:25:43` 💰 You loot 51c.
+- `13:25:51` 📊 ryzemage 548/608 hp mana 70% · 1 kills
+- `13:25:55` ⚔️ Killed **Sanctum Boneguard**. Was that meant to threaten me?
+- `13:25:55` 💰 You loot 80c.
+- `13:25:58` 📈 +140 XP in 1m · run total 140 · L20 0/190040
+- `13:26:01` 📊 ryzemage 566/608 hp mana 69% · 2 kills
+- `13:26:11` 📊 ryzemage 608/608 hp mana 78% · 2 kills
+- `13:26:21` 📊 ryzemage 608/608 hp mana 86% · 2 kills
+- `13:26:32` 📊 ryzemage 608/608 hp mana 94% · 2 kills
+- `13:26:42` 📊 ryzemage 608/608 hp mana 100% · 2 kills
+- `13:26:52` 📊 ryzemage 608/608 hp mana 100% · 2 kills
+- `13:26:58` 📈 +0 XP in 1m · run total 140 · L20 0/190040
+- `13:27:02` 📊 ryzemage 541/608 hp mana 93% · 2 kills
+- `13:27:06` ⚔️ Killed **Sanctum Boneguard**. Reduced to ash.
+- `13:27:07` 💰 You loot 39c.
+- `13:27:07` 🎲 GREED on Boundstone Helm
+- `13:27:08` 💰 ryzetank wins Boundstone Helm (71)
+- `13:27:12` 📊 ryzemage 559/608 hp mana 83% · 3 kills
+- `13:27:22` 📊 ryzemage 608/608 hp mana 92% · 3 kills
+- `13:27:32` 📊 ryzemage 608/608 hp mana 100% · 3 kills
+- `13:27:42` 📊 ryzemage 608/608 hp mana 96% · 3 kills
+- `13:27:53` 📊 ryzemage 460/608 hp mana 82% · 3 kills
+- `13:27:53` ⚔️ Killed **Sanctum Drakonid**. Trivial.
+- `13:27:54` 💰 You loot 94c.
+- `13:27:54` 🎲 GREED on Gravewyrm Gauntlets
+- `13:27:54` 💰 ryzetank wins Gravewyrm Gauntlets (82)
+- `13:27:58` 📈 +140 XP in 1m · run total 280 · L20 0/190180
+- `13:28:03` 📊 ryzemage 496/608 hp mana 87% · 4 kills
+- `13:28:13` 📊 ryzemage 586/608 hp mana 95% · 4 kills
+- `13:28:23` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:28:33` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:28:43` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:28:53` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:28:58` 📈 +0 XP in 1m · run total 280 · L20 0/190180
+- `13:29:03` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:13` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:23` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:33` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:43` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:53` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:29:58` 📈 +0 XP in 1m · run total 280 · L20 0/190180
+- `13:30:03` 📊 ryzemage 608/608 hp mana 100% · 4 kills
+- `13:30:13` 📊 ryzemage 536/608 hp mana 82% · 4 kills
+- `13:30:14` ⚔️ Killed **Sanctum Boneguard**. Trivial.
+- `13:30:14` 💰 You loot 52c.
+- `13:30:23` 📊 ryzemage 572/608 hp mana 87% · 5 kills
+- `13:30:33` 📊 ryzemage 608/608 hp mana 95% · 5 kills
+- `13:30:43` 📊 ryzemage 608/608 hp mana 100% · 5 kills
+- `13:30:53` 📊 ryzemage 608/608 hp mana 100% · 5 kills
+- `13:30:58` 📈 +70 XP in 1m · run total 350 · L20 0/190250
+- `13:31:03` 📊 ryzemage 608/608 hp mana 100% · 5 kills
+- `13:31:13` 📊 ryzemage 608/608 hp mana 100% · 5 kills
+- `13:31:24` 📊 ryzemage 608/608 hp mana 95% · 5 kills
+- `13:31:30` ⚔️ Killed **Sanctum Drakonid**. Was that meant to threaten me?
+- `13:31:34` 📊 ryzemage 540/608 hp mana 81% · 6 kills
+- `13:31:44` 📊 ryzemage 608/608 hp mana 89% · 6 kills
+- `13:31:54` 📊 ryzemage 608/608 hp mana 97% · 6 kills
+- `13:31:58` 📈 +70 XP in 1m · run total 420 · L20 0/190320
+- `13:32:04` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:14` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:24` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:35` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:45` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:55` 📊 ryzemage 608/608 hp mana 100% · 6 kills
+- `13:32:58` 📈 +0 XP in 1m · run total 420 · L20 0/190320
+- `13:33:05` 📊 ryzemage 516/608 hp mana 93% · 6 kills
+- `13:33:14` ⚔️ Killed **Sanctum Drakonid**. Trivial.
+- `13:33:14` 💰 You loot 91c.
+- `13:33:15` 📊 ryzemage 516/608 hp mana 82% · 7 kills
+- `13:33:25` ⚔️ Killed **Sanctum Boneguard**. Trivial.
+- `13:33:27` 📊 ryzemage 516/608 hp mana 68% · 8 kills
+- `13:33:27` 💰 You loot 53c.
+- `13:33:37` 📊 ryzemage 588/608 hp mana 74% · 8 kills
+- `13:33:47` 📊 ryzemage 608/608 hp mana 83% · 8 kills
+- `13:33:57` 📊 ryzemage 608/608 hp mana 91% · 8 kills
+- `13:33:58` 📈 +140 XP in 1m · run total 560 · L20 0/190460
+- `13:34:07` 📊 ryzemage 608/608 hp mana 99% · 8 kills
+- `13:34:17` 📊 ryzemage 608/608 hp mana 100% · 8 kills
+- `13:34:27` 📊 ryzemage 608/608 hp mana 100% · 8 kills
+- `13:34:37` 📊 ryzemage 608/608 hp mana 100% · 8 kills
+- `13:34:47` 📊 ryzemage 608/608 hp mana 100% · 8 kills
+- `13:34:57` 📊 ryzemage 608/608 hp mana 100% · 8 kills
+- `13:34:58` 📈 +0 XP in 1m · run total 560 · L20 0/190460
+- `13:35:09` 📊 ryzemage 525/608 hp mana 90% · 8 kills
+- `13:35:21` 📊 ryzemage 427/608 hp mana 76% · 8 kills
+- `13:35:28` ⚔️ Killed **Korgath the Bound**. Was that meant to threaten me?
+- `13:35:28` 💰 You loot 10s 51c.
+- `13:35:28` 🎲 GREED on Boneplate Vest
+- `13:35:28` 🎲 GREED on Korgath's Chainwraps
+- `13:35:28` 💰 ryzetank wins Boneplate Vest (84)
+- `13:35:28` 💰 ryzetank wins Korgath's Chainwraps (72)
+- `13:35:31` 📊 ryzemage 555/608 hp mana 66% · 9 kills
+- `13:35:41` 📊 ryzemage 608/608 hp mana 74% · 9 kills
+- `13:35:52` 📊 ryzemage 608/608 hp mana 83% · 9 kills
+- `13:35:58` 📈 +83 XP in 1m · run total 643 · L20 0/190543
+- `13:36:02` 📊 ryzemage 608/608 hp mana 91% · 9 kills
+- `13:36:12` 📊 ryzemage 608/608 hp mana 99% · 9 kills
+- `13:36:22` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:36:32` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:36:42` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:36:52` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:36:59` 📈 +0 XP in 1m · run total 643 · L20 0/190543
+- `13:37:02` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:12` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:22` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:32` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:42` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:52` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:37:59` 📈 +0 XP in 1m · run total 643 · L20 0/190543
+- `13:38:02` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:12` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:22` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:32` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:43` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:53` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:38:59` 📈 +0 XP in 1m · run total 643 · L20 0/190543
+- `13:39:03` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:13` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:23` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:33` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:43` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:53` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:39:59` 📈 +0 XP in 1m · run total 643 · L20 0/190543
+- `13:40:03` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:40:13` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:40:23` 📊 ryzemage 608/608 hp mana 100% · 9 kills
+- `13:40:33` 📊 ryzemage 608/608 hp mana 93% · 9 kills
+- `13:40:37` ⚔️ Killed **Sanctum Drakonid**. Trivial.
+- `13:40:37` 💰 You loot 73c.
+- `13:40:43` 📊 ryzemage 608/608 hp mana 83% · 10 kills
+- `13:40:53` 📊 ryzemage 537/608 hp mana 81% · 10 kills
+- `13:40:59` 📈 +70 XP in 1m · run total 713 · L20 0/190613
+- `13:40:59` ⚔️ Killed **Sanctum Boneguard**. Reduced to ash.
+- `13:40:59` 💰 You loot 67c.
+- `13:41:04` 📊 ryzemage 537/608 hp mana 70% · 11 kills
+- `13:41:14` 📊 ryzemage 608/608 hp mana 78% · 11 kills
+- `13:41:24` 📊 ryzemage 608/608 hp mana 87% · 11 kills
+- `13:41:34` 📊 ryzemage 608/608 hp mana 95% · 11 kills
+- `13:41:44` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:41:54` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:41:59` 📈 +70 XP in 1m · run total 783 · L20 0/190683
+- `13:42:04` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:14` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:24` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:34` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:44` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:54` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:42:59` 📈 +0 XP in 1m · run total 783 · L20 0/190683
+- `13:43:04` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:14` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:24` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:34` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:44` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:54` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:43:59` 📈 +0 XP in 1m · run total 783 · L20 0/190683
+- `13:44:04` 📊 ryzemage 608/608 hp mana 100% · 11 kills
+- `13:44:14` 📊 ryzemage 529/608 hp mana 96% · 11 kills
+- `13:44:25` 📊 ryzemage 529/608 hp mana 82% · 11 kills
+- `13:44:26` ⚔️ Killed **Sanctum Drakonid**. Reduced to ash.
+- `13:44:27` 💰 You loot 59c.
+- `13:44:35` 📊 ryzemage 583/608 hp mana 88% · 12 kills
+- `13:44:45` 📊 ryzemage 608/608 hp mana 90% · 12 kills
+- `13:44:53` ⚔️ Killed **Sanctum Boneguard**. Trivial.
+- `13:44:54` 💰 You loot 64c.
+- `13:44:55` 📊 ryzemage 608/608 hp mana 77% · 13 kills
+- `13:44:59` 📈 +140 XP in 1m · run total 923 · L20 0/190823
+- `13:45:05` 📊 ryzemage 608/608 hp mana 82% · 13 kills
+- `13:45:15` 📊 ryzemage 608/608 hp mana 90% · 13 kills
+- `13:45:25` 📊 ryzemage 608/608 hp mana 98% · 13 kills
+- `13:45:35` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:45:45` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:45:55` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:45:59` 📈 +0 XP in 1m · run total 923 · L20 0/190823
+- `13:46:05` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:15` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:25` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:35` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:45` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:55` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:46:59` 📈 +0 XP in 1m · run total 923 · L20 0/190823
+- `13:47:05` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:15` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:25` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:35` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:45` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:55` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:47:59` 📈 +0 XP in 1m · run total 923 · L20 0/190823
+- `13:48:05` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:15` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:25` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:35` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:45` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:55` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:48:59` 📈 +0 XP in 1m · run total 923 · L20 0/190823
+- `13:49:06` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:49:16` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:49:26` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:49:36` 📊 ryzemage 608/608 hp mana 100% · 13 kills
+- `13:49:46` 📊 ryzemage 532/608 hp mana 93% · 13 kills
+- `13:49:56` 📊 ryzemage 532/608 hp mana 77% · 13 kills
+- `13:49:59` 📈 +0 XP in 1m · run total 923 · L20 0/190823
+- `13:50:01` ⚔️ Killed **Raised Bonewalker**. Trivial.
+- `13:50:05` ⚔️ Killed **Raised Bonewalker**. Was that meant to threaten me?
+- `13:50:08` 📊 ryzemage 501/608 hp mana 67% · 15 kills
+- `13:50:08` ⚔️ Killed **Raised Bonewalker**. Trivial.
+- `13:50:10` ⚔️ Killed **Raised Bonewalker**. Trivial.
+- `13:50:15` ⚔️ Killed **Grand Necromancer Velkhar**. Reduced to ash.
+- `13:50:15` 💰 You loot 10s 14c.
+- `13:50:15` 🎲 GREED on Boneplate Vest
+- `13:50:15` 💰 ryzetank wins Boneplate Vest (2)
+- `13:50:18` 📊 ryzemage 501/608 hp mana 60% · 18 kills
+- `13:50:28` 📊 ryzemage 573/608 hp mana 69% · 18 kills
+- `13:50:38` 📊 ryzemage 608/608 hp mana 77% · 18 kills
+- `13:50:48` 📊 ryzemage 608/608 hp mana 85% · 18 kills
+- `13:50:58` 📊 ryzemage 608/608 hp mana 94% · 18 kills
+- `13:50:59` 📈 +257 XP in 1m · run total 1180 · L20 0/191080
+- `13:51:08` 📊 ryzemage 608/608 hp mana 100% · 18 kills
+- `13:51:18` 📊 ryzemage 608/608 hp mana 100% · 18 kills
+- `13:51:28` 📊 ryzemage 608/608 hp mana 100% · 18 kills
+- `13:51:38` 📊 ryzemage 608/608 hp mana 100% · 18 kills
+- `13:51:48` 📊 ryzemage 608/608 hp mana 100% · 18 kills
+- `13:51:58` 📊 ryzemage 517/608 hp mana 91% · 18 kills
+- `13:51:59` 📈 +0 XP in 1m · run total 1180 · L20 0/191080
+- `13:52:05` ⚔️ Killed **Sanctum Boneguard**. Trivial.
+- `13:52:06` 💰 You loot 38c.
+- `13:52:08` 📊 ryzemage 517/608 hp mana 81% · 19 kills
+- `13:52:18` 📊 ryzemage 589/608 hp mana 89% · 19 kills
+- `13:52:28` 📊 ryzemage 608/608 hp mana 97% · 19 kills
+- `13:52:38` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:52:48` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:52:58` ✨ cast frost armor.
+- `13:52:58` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:52:59` 📈 +70 XP in 1m · run total 1250 · L20 0/191150
+- `13:53:08` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:18` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:28` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:38` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:48` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:58` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:53:59` 📈 +0 XP in 1m · run total 1250 · L20 0/191150
+- `13:54:08` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:54:18` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:54:28` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:54:38` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:54:48` 📊 ryzemage 608/608 hp mana 100% · 19 kills
+- `13:54:58` 📊 ryzemage 528/608 hp mana 90% · 19 kills
+- `13:55:00` 📈 +0 XP in 1m · run total 1250 · L20 0/191150
+- `13:55:01` ⚔️ Killed **Sanctum Boneguard**. Was that meant to threaten me?
+- `13:55:02` 💰 You loot 70c.
+- `13:55:08` ✨ cast arcane intellect.
+- `13:55:08` 📊 ryzemage 546/608 hp mana 78% · 20 kills
+- `13:55:18` 📊 ryzemage 608/608 hp mana 83% · 20 kills
+- `13:55:28` 📊 ryzemage 608/608 hp mana 92% · 20 kills
+- `13:55:38` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:55:48` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:55:58` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:00` 📈 +70 XP in 1m · run total 1320 · L20 0/191220
+- `13:56:09` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:19` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:29` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:39` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:49` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:56:59` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:57:00` 📈 +0 XP in 1m · run total 1320 · L20 0/191220
+- `13:57:09` 📊 ryzemage 608/608 hp mana 100% · 20 kills
+- `13:57:20` 📊 ryzemage 608/608 hp mana 97% · 20 kills
+- `13:57:31` ⚔️ Killed **Sanctum Drakonid**. Was that meant to threaten me?
+- `13:57:31` 💰 You loot 80c.
+- `13:57:31` 📊 ryzemage 608/608 hp mana 83% · 21 kills
+- `13:57:41` 📊 ryzemage 608/608 hp mana 89% · 21 kills
+- `13:57:48` ⚔️ Killed **Sanctum Drakonid**. Trivial.
+- `13:57:49` 💰 You loot 84c.
+- `13:57:51` 📊 ryzemage 608/608 hp mana 98% · 22 kills
+- `13:58:00` 📈 +153 XP in 1m · run total 1473 · L20 0/191373
+- `13:58:01` 📊 ryzemage 608/608 hp mana 100% · 22 kills
+- `13:58:12` 📊 ryzemage 542/608 hp mana 82% · 22 kills
+- `13:58:24` 📊 ryzemage 500/608 hp mana 64% · 22 kills
+- `13:58:29` ⚔️ Killed **Korzul the Gravewyrm**. Was that meant to threaten me?
+- `13:58:30` 💰 You loot 76s 54c.
+- `13:58:30` 🎲 GREED on Revenant Silk Robe
+- `13:58:30` 🎲 GREED on Cultist Flayer
+- `13:58:30` 💰 ryzetank wins Revenant Silk Robe (12)
+- `13:58:30` 💰 ryzetank wins Cultist Flayer (13)
+- `13:59:00` 📈 +83 XP in 1m · run total 1556 · L20 0/191456
+- `13:59:45` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `13:59:55` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:00` 📈 +0 XP in 1m · run total 1556 · L20 0/191456
+- `14:00:05` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:15` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:25` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:35` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:45` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:00:55` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:01:00` 📈 +0 XP in 1m · run total 1556 · L20 0/191456
+- `14:01:05` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:01:15` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:01:25` 📊 ryzemage 608/608 hp mana 100% · 23 kills
+- `14:01:36` 📊 ryzemage 452/608 hp mana 90% · 23 kills
+- `14:01:38` ⚔️ Killed **Sanctum Drakonid**. Was that meant to threaten me?
+- `14:01:38` 💰 You loot 61c.
+- `14:01:46` 📊 ryzemage 452/608 hp mana 68% · 24 kills
+- `14:01:50` ⚔️ Killed **Sanctum Drakonid**. Was that meant to threaten me?
+- `14:01:51` 💰 You loot 84c.
+- `14:01:51` 🎲 GREED on Gravewyrm Gauntlets
+- `14:01:52` 💰 ryzetank wins Gravewyrm Gauntlets (82)
+- `14:01:56` 📊 ryzemage 452/608 hp mana 64% · 25 kills
+- `14:02:00` 📈 +140 XP in 1m · run total 1696 · L20 0/191596
+- `14:02:06` 📊 ryzemage 560/608 hp mana 74% · 25 kills
+- `14:02:16` 📊 ryzemage 608/608 hp mana 82% · 25 kills
+- `14:02:26` 📊 ryzemage 608/608 hp mana 91% · 25 kills
+- `14:02:36` 📊 ryzemage 608/608 hp mana 99% · 25 kills
+- `14:03:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:03:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:03:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:04:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:04:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:05:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:05:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:06:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:06:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:06:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:06:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:06:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:07:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:07:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:07:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:08:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:08:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:09:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:09:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:10:00` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:10:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:10:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:10:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:11:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:11:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:11:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:11:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:12:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:42` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:12:52` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:13:02` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:22` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:32` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:42` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:13:52` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:14:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:14:02` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:14:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:15:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:15:52` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:16:02` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:22` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:32` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:42` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:16:52` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:17:02` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:22` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:17:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:18:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:18:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:19:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:19:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:19:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:19:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:20:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:20:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:20:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:20:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:21:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:21:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:22:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:22:58` ✨ cast frost armor.
+- `14:23:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:23:01` 📊 ryzemage 608/608 hp mana 98% · 25 kills
+- `14:23:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:23:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:23:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:23:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:23:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:24:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:24:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:25:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:08` ✨ cast arcane intellect.
+- `14:25:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:25:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:26:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:26:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:27:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:27:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:01` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:28:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:28:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:29:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:30:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:30:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:30:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:31:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:31:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:32:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:32:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:33:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:33:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:33:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:33:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:33:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:33:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:34:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:35:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:35:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:35:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:35:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:35:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:36:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:36:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:37:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:37:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:37:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:37:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:37:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:38:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:38:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:38:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:39:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:39:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:02` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:40:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:40:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:41:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:41:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:42:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:42:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:42:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:43:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:43:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:43:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:43:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:43:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:43:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:44:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:44:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:45:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:45:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:45:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:45:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:45:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:45:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:46:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:46:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:47:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:47:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:48:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:48:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:49:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:49:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:50:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:50:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:50:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:50:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:50:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:50:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:50:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:51:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:51:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:52:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:52:59` ✨ cast frost armor.
+- `14:53:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:53:03` 📊 ryzemage 608/608 hp mana 98% · 25 kills
+- `14:53:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:53:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:53:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:53:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:54:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:54:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:55:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:55:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:55:09` ✨ cast arcane intellect.
+- `14:55:10` 📊 ryzemage 608/608 hp mana 97% · 25 kills
+- `14:55:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:55:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:55:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:55:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:56:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:56:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:57:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:57:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:57:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:57:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:57:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:57:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:58:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:58:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:03` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `14:59:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `14:59:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:00:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:00:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:01:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:01:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:01:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:01:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:01:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:01:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:02:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:02:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:03:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:03:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:04:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:04:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:05:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:05:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:06:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:06:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:07:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:07:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:07:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:07:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:07:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:07:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:07:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:08:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:08:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:09:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:09:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:10:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:11:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:11:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:11:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:11:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:11:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:11:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:11:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:12:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:12:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:13:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:13:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:13:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:13:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:14:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:14:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:14:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:14:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:04` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:15:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:15:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:16:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:16:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:17:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:17:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:18:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:18:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:19:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:19:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:19:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:19:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:19:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:19:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:20:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:20:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:21:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:21:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:22:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:23:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:23:00` ✨ cast frost armor.
+- `15:23:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:23:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:23:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:23:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:23:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:23:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:24:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:24:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:25:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:25:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:25:09` ✨ cast arcane intellect.
+- `15:25:11` 📊 ryzemage 608/608 hp mana 97% · 25 kills
+- `15:25:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:25:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:25:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:25:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:26:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:26:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:26:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:26:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:26:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:27:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:27:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:27:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:27:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:28:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:28:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:29:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:29:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:29:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:29:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:29:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:29:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:30:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:30:49` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:30:59` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:31:05` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:31:09` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:31:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:31:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:31:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:31:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:32:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:40` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:32:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:33:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:33:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:33:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:33:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:34:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:34:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:34:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:34:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:34:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:35:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:35:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:36:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:36:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:37:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:37:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:38:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:38:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:38:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:38:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:38:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:38:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:38:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:39:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:39:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:40:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:40:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:40:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:40:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:40:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:40:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:41:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:41:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:42:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:42:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:43:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:43:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:44:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:44:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:45:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:46:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:46:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:46:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:46:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:46:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:46:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:46:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:47:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:47:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:48:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:48:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:48:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:48:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:48:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:48:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:49:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:49:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:50:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:50:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:51:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:51:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:52:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:52:06` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:52:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:53:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:53:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:53:19` ✨ cast frost armor.
+- `15:53:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:53:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:53:49` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:53:59` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:54:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:54:09` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:54:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:54:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:54:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:54:50` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:55:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:55:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:55:09` ✨ cast arcane intellect.
+- `15:55:10` 📊 ryzemage 608/608 hp mana 97% · 25 kills
+- `15:55:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:56:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:56:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:56:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:56:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:56:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:57:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:57:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:58:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:58:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:58:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:58:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:59:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `15:59:38` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:59:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `15:59:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:00:09` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:49` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:00:59` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:01:09` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:49` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:01:59` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:02:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:03:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:03:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:03:22` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:03:32` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:03:42` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:03:52` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:02` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:04:12` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:22` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:32` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:42` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:04:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:05:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:05:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:06:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:07:00` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:07:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:07:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:07:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:07:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:07:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:07:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:08:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:31` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:08:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:09:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:09:07` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:10:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:10:08` 📊 ryzemage 286/468 hp mana 100% · 25 kills
+- `16:10:18` 📊 ryzemage 312/468 hp mana 100% · 25 kills
+- `16:10:28` 📊 ryzemage 495/608 hp mana 100% · 25 kills
+- `16:10:38` 📊 ryzemage 585/608 hp mana 100% · 25 kills
+- `16:10:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:10:58` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:11:08` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:18` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:28` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:49` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:11:59` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:12:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:12:09` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:12:19` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:12:29` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:12:39` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:13:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:13:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:13:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:14:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:14:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:15:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:43` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:15:53` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:16:03` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:16:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:16:13` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:16:23` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:16:33` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:17:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:17:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:17:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:17:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:18:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:18:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:19:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:35` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:45` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:19:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:20:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:20:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:20:15` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:20:25` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:21:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:21:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:21:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:21:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:21:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:22:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:26` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:22:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:23:06` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:23:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:23:16` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:23:19` ✨ cast frost armor.
+- `16:23:26` 📊 ryzemage 608/608 hp mana 99% · 25 kills
+- `16:23:36` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:23:46` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:24:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:24:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:24:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:25:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:25:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:25:10` ✨ cast arcane intellect.
+- `16:25:17` 📊 ryzemage 608/608 hp mana 98% · 25 kills
+- `16:25:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:25:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:25:47` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:25:57` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:26:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:26:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:26:17` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:26:27` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:26:37` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:26:48` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:27:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:27:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:28:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:28:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:29:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:29:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:30:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:30:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:30:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:30:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:30:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:30:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:31:08` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:31:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:31:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:09` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:32:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:32:54` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:04` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:09` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:33:14` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:24` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:33:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:34:05` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:34:09` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:35:09` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:35:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:35:20` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:35:30` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:35:41` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:35:51` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:01` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:09` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:36:11` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:21` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:44` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:36:55` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:37:07` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:37:12` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:37:34` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:37:56` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:38:10` 📊 ryzemage 608/608 hp mana 100% · 25 kills
+- `16:38:13` 📈 +0 XP in 1m · run total 1696 · L20 0/191596
+- `16:38:30` 🔌 connection dropped — reconnecting in 2.4s…
+- `16:38:33` 🔌 connection dropped — reconnecting in 4.4s…
+- `16:38:40` 🔌 connection dropped — reconnecting in 2.1s…
+- `16:38:43` 🔌 connection dropped — reconnecting in 4.7s…
+- `16:38:49` 🔌 connection dropped — reconnecting in 3.8s…
+- `16:38:54` 🔌 connection dropped — reconnecting in 5.0s…
+- `16:39:00` 🔌 connection dropped — reconnecting in 3.8s…
+- `16:39:06` 🔌 connection dropped — reconnecting in 2.4s…
+- `16:39:09` 🔌 connection dropped — reconnecting in 2.3s…
+- `16:39:13` 🔌 connection dropped — reconnecting in 2.8s…
+- `16:39:17` 🔌 connection dropped — reconnecting in 3.1s…
+- `16:39:21` 🔌 connection dropped — reconnecting in 4.2s…

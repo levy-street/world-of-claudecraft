@@ -1,0 +1,19 @@
+{
+  "runId": "baseline-hunter",
+  "policy": "scripts/agent/rl/reward_policy.hunter.json",
+  "steps": 4000,
+  "episodes": 0,
+  "totalReward": -130.12,
+  "final": {
+    "level": 2,
+    "xp": 562,
+    "hp": 89,
+    "kills": 19,
+    "deaths": 21,
+    "quests_done": 0,
+    "copper": 0,
+    "step": 4000
+  },
+  "at": 1781675881375,
+  "kind": "scripted-baseline"
+}

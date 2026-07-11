@@ -1,0 +1,156 @@
+# Tharok — hunter
+_the steady ranger. Journal opened 2026-06-16T09:01:04.087Z._
+
+- `09:01:05` Entered the world at level 4.
+- `09:01:11` 📊 hp 165/165 · res 130/150 · 0 kills
+- `09:01:12` ✨ cast aspect of the hawk.
+- `09:01:56` ✨ cast aspect of the hawk.
+- `09:01:57` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:01:59` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:02:01` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:02:11` 📊 hp 165/165 · res 150/150 · 3 kills
+- `09:02:14` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:02:15` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:02:16` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:02:24` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:02:26` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:02:32` 💰 You receive 75c.
+- `09:02:32` ✅ completed quest **q_wolves**
+- `09:02:41` ✨ cast aspect of the hawk.
+- `09:03:10` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:03:11` 📊 hp 165/165 · res 135/150 · 9 kills
+- `09:03:19` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:03:24` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:03:26` ✨ cast aspect of the hawk.
+- `09:03:28` ⚔️ Killed **Wild Boar**. Clean shot, clean kill.
+- `09:03:51` ⚔️ Killed **Restless Bones**. It never closed the distance.
+- `09:04:11` 📊 hp 165/165 · res 150/150 · 13 kills
+- `09:04:11` ✨ cast aspect of the hawk.
+- `09:04:56` ✨ cast aspect of the hawk.
+- `09:05:00` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:05:11` 📊 hp 165/165 · res 150/150 · 14 kills
+- `09:05:16` ⚔️ Killed **Vale Bandit**. Clean shot, clean kill.
+- `09:05:20` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:05:28` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:06:11` 📈 +426 XP in 5m · run total 426 · L4 2033/4733
+- `09:06:11` 📊 hp 165/165 · res 150/150 · 17 kills
+- `09:06:23` ✨ cast aspect of the hawk.
+- `09:06:32` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:06:36` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:06:47` ⚔️ Killed **Vale Bandit**. Down before it reached me.
+- `09:06:57` ⚔️ Killed **Vale Bandit**. Down before it reached me.
+- `09:06:58` ⚔️ Killed **Vale Bandit**. It never closed the distance.
+- `09:07:04` ⚔️ Killed **Wild Boar**. Clean shot, clean kill.
+- `09:07:11` 📊 hp 165/165 · res 120/150 · 23 kills
+- `09:07:45` ✨ cast aspect of the hawk.
+- `09:07:59` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:08:02` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:08:11` 📊 hp 165/165 · res 150/150 · 25 kills
+- `09:08:23` ⬆️ **Reached level 5.** Another notch on the bow.
+- `09:08:23` ⚔️ Killed **Webwood Lurker**. Down before it reached me.
+- `09:09:02` ✨ cast aspect of the hawk.
+- `09:09:11` 📊 hp 200/200 · res 169/169 · 26 kills
+- `09:09:18` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:09:21` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:09:23` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:09:26` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:09:44` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:10:08` ✨ cast aspect of the hawk.
+- `09:10:11` 📊 hp 200/200 · res 149/169 · 31 kills
+- `09:10:16` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:10:21` ⚔️ Killed **Mudfin Skulker**. Clean shot, clean kill.
+- `09:10:24` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:10:28` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:10:35` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:10:44` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:11:11` 📈 +130 XP in 5m · run total 556 · L5 63/4863
+- `09:11:11` 📊 hp 200/200 · res 169/169 · 37 kills
+- `09:11:36` ✨ cast aspect of the hawk.
+- `09:11:43` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:11:58` ⚔️ Killed **Mudfin Skulker**. Clean shot, clean kill.
+- `09:12:04` ⚔️ Killed **Mudfin Skulker**. It never closed the distance.
+- `09:12:11` 📊 hp 200/200 · res 169/169 · 40 kills
+- `09:13:04` ✨ cast aspect of the hawk.
+- `09:13:11` 📊 hp 200/200 · res 160/169 · 40 kills
+- `09:13:15` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:13:25` ⚔️ Killed **Sableweb Hatchling**. Clean shot, clean kill.
+- `09:13:29` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:13:32` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:13:33` ⚔️ Killed **Sableweb Hatchling**. It never closed the distance.
+- `09:13:34` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:13:36` ⚔️ Killed **Sableweb Hatchling**. It never closed the distance.
+- `09:13:40` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:13:43` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:14:11` 📊 hp 200/200 · res 169/169 · 49 kills
+- `09:14:31` ✨ cast aspect of the hawk.
+- `09:14:42` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:14:43` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:14:46` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:14:57` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:15:06` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:15:08` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:15:11` 📊 hp 230/230 · res 124/169 · 55 kills
+- `09:15:13` ⚔️ Killed **Restless Bones**. Down before it reached me.
+- `09:16:01` ✨ cast aspect of the hawk.
+- `09:16:09` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:16:11` 📈 +174 XP in 5m · run total 730 · L5 237/5037
+- `09:16:11` 📊 hp 230/230 · res 134/169 · 57 kills
+- `09:16:24` ⚔️ Killed **Sableweb Hatchling**. Down before it reached me.
+- `09:17:09` ✨ cast aspect of the hawk.
+- `09:17:11` 📊 hp 230/230 · res 149/169 · 58 kills
+- `09:17:22` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:17:23` 💰 You receive: Webwood Silk Gland.
+- `09:17:45` ⚔️ Killed **Mudfin Skulker**. Clean shot, clean kill.
+- `09:18:08` ✨ cast aspect of the hawk.
+- `09:18:12` 📊 hp 230/230 · res 149/169 · 60 kills
+- `09:18:19` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:18:32` 💰 You loot 22c.
+- `09:19:02` ✨ cast aspect of the hawk.
+- `09:19:12` 📊 hp 230/230 · res 169/169 · 61 kills
+- `09:19:52` ✨ cast aspect of the hawk.
+- `09:19:54` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:20:04` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:20:12` 📊 hp 230/230 · res 163/169 · 63 kills
+- `09:20:56` ✨ cast aspect of the hawk.
+- `09:21:05` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:21:11` 📈 +74 XP in 5m · run total 804 · L5 311/5111
+- `09:21:12` 📊 hp 230/230 · res 169/169 · 64 kills
+- `09:22:03` ✨ cast aspect of the hawk.
+- `09:22:12` 📊 hp 230/230 · res 169/169 · 64 kills
+- `09:22:12` ⚔️ Killed **Webwood Lurker**. Down before it reached me.
+- `09:22:59` ✨ cast aspect of the hawk.
+- `09:23:04` ⚔️ Killed **Webwood Lurker**. Down before it reached me.
+- `09:23:08` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:23:12` 📊 hp 230/230 · res 156/169 · 67 kills
+- `09:23:53` ✨ cast aspect of the hawk.
+- `09:24:01` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:24:07` ⚔️ Killed **Webwood Lurker**. Down before it reached me.
+- `09:24:12` 📊 hp 224/230 · res 165/169 · 69 kills
+- `09:24:50` ✨ cast aspect of the hawk.
+- `09:25:02` ⚔️ Killed **Webwood Lurker**. Clean shot, clean kill.
+- `09:25:12` 📊 hp 218/230 · res 161/169 · 70 kills
+- `09:25:46` ✨ cast aspect of the hawk.
+- `09:26:07` 🩸 Down to 52 HP — bracing.
+- `09:26:11` 📈 +57 XP in 5m · run total 861 · L5 368/5168
+- `09:26:12` 📊 hp 13/230 · res 169/169 · 70 kills
+- `09:26:14` ☠️ I fell in battle near (25, -17). Releasing spirit.
+- `09:26:15` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:26:15` 💚 Patched up (200/200).
+- `09:26:15` 🔄 Back on my feet.
+- `09:26:41` ✨ cast aspect of the hawk.
+- `09:26:56` ⚔️ Killed **Webwood Lurker**. It never closed the distance.
+- `09:27:12` 📊 hp 66/230 · res 169/169 · 71 kills
+- `09:27:43` ✨ cast aspect of the hawk.
+- `09:27:46` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:50` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:54` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:58` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:02` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:06` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:10` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:15` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:19` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:23` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:27` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:31` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:35` 🔌 connection dropped — reconnecting in 3s…

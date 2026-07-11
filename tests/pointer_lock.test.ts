@@ -1,28 +1,38 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { shouldEngagePointerLock, shouldReleasePointerLock } from '../src/game/pointer_lock';
 
 describe('shouldEngagePointerLock', () => {
   it('engages when a drag starts, the setting is on, not fullscreen, not yet locked', () => {
-    expect(shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: false })).toBe(true);
+    expect(
+      shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: false }),
+    ).toBe(true);
   });
 
   it('engages regardless of camera mode (the function takes no mode: both classic and Mouse Camera reach here)', () => {
     // Regression for the reported bug: in Mouse Camera mode the lock was never
     // requested, so the cursor escaped to the screen edge / second monitor.
     // The decision must not depend on the mode at all.
-    expect(shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: false })).toBe(true);
+    expect(
+      shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: false }),
+    ).toBe(true);
   });
 
   it('does not engage when the setting is off', () => {
-    expect(shouldEngagePointerLock({ lockOnRotate: false, isFullscreen: false, alreadyLocked: false })).toBe(false);
+    expect(
+      shouldEngagePointerLock({ lockOnRotate: false, isFullscreen: false, alreadyLocked: false }),
+    ).toBe(false);
   });
 
-  it('does not engage in fullscreen (Chrome shows its own unavoidable prompt)', () => {
-    expect(shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: true, alreadyLocked: false })).toBe(false);
+  it('engages in fullscreen so mouselook still gets relative mouse deltas', () => {
+    expect(
+      shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: true, alreadyLocked: false }),
+    ).toBe(true);
   });
 
   it('does not re-engage when already locked (avoids re-showing the browser banner mid-drag)', () => {
-    expect(shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: true })).toBe(false);
+    expect(
+      shouldEngagePointerLock({ lockOnRotate: true, isFullscreen: false, alreadyLocked: true }),
+    ).toBe(false);
   });
 });
 

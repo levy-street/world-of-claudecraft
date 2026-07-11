@@ -104,7 +104,7 @@ export function runEffects(
       const lost = p.auras[sf];
       p.auras.splice(sf, 1);
       ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
-      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     }
   }
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
@@ -800,6 +800,7 @@ export function runEffects(
                 targetMeta.cls,
                 targetMeta.equipment,
                 ctx.playerMods(targetMeta),
+                targetMeta.equipmentInstance,
               );
           }
         }
@@ -911,7 +912,13 @@ export function runEffects(
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
             ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
-            recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+            recalcPlayerStats(
+              p,
+              meta.cls,
+              meta.equipment,
+              ctx.playerMods(meta),
+              meta.equipmentInstance,
+            );
             break;
           }
         }
@@ -967,7 +974,13 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
-        recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+        recalcPlayerStats(
+          p,
+          meta.cls,
+          meta.equipment,
+          ctx.playerMods(meta),
+          meta.equipmentInstance,
+        );
         break;
       }
       case 'petBuff': {

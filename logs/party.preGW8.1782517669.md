@@ -1,0 +1,375 @@
+# Party log
+
+- `19:28:59` ☠️G4 ▶️ session start — Leader ryzetank (warrior), Tank ryzetank.
+- `19:28:59` ☠️G4 Party assembled: ryzetank (warrior), ryzeheal (priest), Pontius (paladin), Shims (shaman), swifter (hunter).
+- `19:29:02` ☠️G4 Party of 5 formed.
+- `19:29:02` ☠️G4 👁️ panic-watch armed for: papa ours (auto-kill on their login).
+- `19:29:03` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:29:03` ☠️G4 Whole party is level 20+ — marching to Gravewyrm Sanctum door at (0, 880).
+- `19:29:03` ☠️G4 📍 Reached the Gravewyrm Sanctum approach.
+- `19:29:03` ☠️G4 **ryzetank** died.
+- `19:29:03` ☠️G4 🗺️ L20: grind moves to **Boneclad Revenants (L18-19)**
+- `19:29:05` ☠️G4 **ryzeheal** died.
+- `19:29:41` ☠️G4 Zoned into Gravewyrm Sanctum. Elites ahead.
+- `19:29:53` ☠️G4 ⚔️ Party assembled inside — clearing single-pull from the entrance.
+- `19:29:54` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:29:54` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `19:34:03` ☠️G4 📊 PROGRESS kills=5 levels=[20,20,20,20,20] phase=dungeon elapsed=5m
+- `19:38:47` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:39:03` ☠️G4 📊 PROGRESS kills=5 levels=[20,20,20,20,20] phase=dungeon elapsed=10m
+- `19:39:09` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:41:32` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:41:38` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `19:41:40` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `19:42:01` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `19:42:01` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **1** mob(s) on the party
+- `19:42:17` ☠️G4 **ryzetank** died.
+- `19:42:51` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:42:53` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:42:54` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:42:56` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:42:57` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-746. Watch for a wipe.
+- `19:43:01` ☠️G4 **Shims** died.
+- `19:43:07` ☠️G4 **swifter** died.
+- `19:43:07` ☠️G4 🧭 ryzetank: holding for 2 to regroup (1 dead)
+- `19:43:14` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **1** mob(s) on the party
+- `19:43:15` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:43:21` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:43:40` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `19:43:58` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `19:44:01` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:44:03` ☠️G4 📊 PROGRESS kills=8 levels=[20,20,20,20,20] phase=dungeon elapsed=15m
+- `19:44:07` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-712. Watch for a wipe.
+- `19:44:07` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:44:07` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **3** mob(s) on the party
+- `19:44:13` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **3** mob(s) on the party
+- `19:44:14` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **3** mob(s) on the party
+- `19:44:15` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-712. Watch for a wipe.
+- `19:44:22` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:44:23` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-712. Watch for a wipe.
+- `19:44:26` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `19:44:27` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **3** mob(s) on the party
+- `19:44:31` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-712. Watch for a wipe.
+- `19:44:34` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **3** mob(s) on the party
+- `19:44:35` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `19:44:39` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-704. Watch for a wipe.
+- `19:44:47` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-697. Watch for a wipe.
+- `19:44:48` ☠️G4 🔱 Korgath the Bound: 98% HP.
+- `19:44:48` ☠️G4 **ryzeheal** died.
+- `19:44:48` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: swifter · **4** mob(s) on the party
+- `19:44:51` ☠️G4 **ryzetank** died.
+- `19:44:51` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: swifter · **3** mob(s) on the party
+- `19:45:00` ☠️G4 **swifter** died.
+- `19:45:15` ☠️G4 **Shims** died.
+- `19:45:22` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:45:23` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈837. Watch for a wipe.
+- `19:45:24` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **3** mob(s) on the party
+- `19:45:25` ☠️G4 **Pontius** died.
+- `19:45:26` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **4** mob(s) on the party
+- `19:45:26` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:45:27` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:45:27` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:45:29` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:45:38` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:45:48` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `19:46:01` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `19:46:11` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:46:23` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:46:33` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:46:42` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:46:52` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:47:01` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:47:14` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `19:47:17` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **1** mob(s) on the party
+- `19:47:27` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:47:27` ☠️G4 💎 **ryzetank** looted: Cracked Wyrm Scale
+- `19:47:35` ☠️G4 🧭 ryzetank: holding to heal/mana up before the next pull
+- `19:47:47` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:47:58` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `19:47:58` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:48:13` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:48:13` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `19:48:13` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:48:32` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:48:35` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `19:48:47` ☠️G4 🔱 Korgath the Bound: 86% HP.
+- `19:48:49` ☠️G4 **ryzetank** died.
+- `19:49:03` ☠️G4 📊 PROGRESS kills=15 levels=[20,20,20,20,20] phase=dungeon elapsed=20m
+- `19:49:23` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:49:24` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:49:27` ☠️G4 🔱 Engaging **Korgath the Bound** (1816/2171 HP).
+- `19:49:27` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:49:36` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `19:49:39` ☠️G4 🔱 Korgath the Bound: 84% HP.
+- `19:49:51` ☠️G4 🔱 Korgath the Bound: 54% HP.
+- `19:50:03` ☠️G4 🔱 Korgath the Bound: 23% HP.
+- `19:50:10` ☠️G4 **ryzetank** died.
+- `19:50:10` ☠️G4 🏆 **korgath** defeated! (loot logged above)
+- `19:50:41` ☠️G4 **swifter** died.
+- `19:50:44` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:50:46` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:50:48` ☠️G4 🔱 Engaging **Korgath the Bound** (88/2171 HP).
+- `19:50:48` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:50:58` ☠️G4 🧭 ryzetank: tanking Korgath the Bound
+- `19:51:00` ☠️G4 🔱 Korgath the Bound: 0% HP.
+- `19:51:01` ☠️G4 🎲 **ryzetank** rolls **NEED** on Nightwalk Jerkin
+- `19:51:01` ☠️G4 🎲 **ryzetank** rolls **NEED** on Zealotsbane Blade
+- `19:51:01` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Nightwalk Jerkin
+- `19:51:01` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Zealotsbane Blade
+- `19:51:01` ☠️G4 🎲 **Pontius** rolls **GREED** on Nightwalk Jerkin
+- `19:51:01` ☠️G4 🎲 **Pontius** rolls **GREED** on Zealotsbane Blade
+- `19:51:01` ☠️G4 🎲 **Shims** rolls **GREED** on Nightwalk Jerkin
+- `19:51:01` ☠️G4 🎲 **Shims** rolls **GREED** on Zealotsbane Blade
+- `19:51:02` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (65)
+- `19:51:02` ☠️G4 💎 **ryzetank** looted: Nightwalk Jerkin
+- `19:51:02` ☠️G4 🎲 ryzetank wins Zealotsbane Blade (14)
+- `19:51:02` ☠️G4 💎 **ryzetank** looted: Zealotsbane Blade
+- `19:51:02` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (65)
+- `19:51:02` ☠️G4 🎲 ryzetank wins Zealotsbane Blade (14)
+- `19:51:02` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (65)
+- `19:51:02` ☠️G4 🎲 ryzetank wins Zealotsbane Blade (14)
+- `19:51:02` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (65)
+- `19:51:02` ☠️G4 🎲 ryzetank wins Zealotsbane Blade (14)
+- `19:51:07` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `19:51:19` ☠️G4 🧭 ryzetank: holding to heal/mana up before the next pull
+- `19:51:35` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `19:51:35` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:51:38` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **2** mob(s) on the party
+- `19:52:02` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-668. Watch for a wipe.
+- `19:52:02` ☠️G4 **Shims** died.
+- `19:52:15` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:52:19` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: swifter · **1** mob(s) on the party
+- `19:52:22` ☠️G4 **ryzetank** died.
+- `19:52:54` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:52:57` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:52:59` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:52:59` ☠️G4 **swifter** died.
+- `19:52:59` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:53:00` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:53:00` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:53:10` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:53:18` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:53:32` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:53:47` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:53:57` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `19:54:00` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:54:01` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-653. Watch for a wipe.
+- `19:54:03` ☠️G4 📊 PROGRESS kills=20 levels=[20,20,20,20,20] phase=dungeon elapsed=25m
+- `19:54:04` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Pontius · **4** mob(s) on the party
+- `19:54:06` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `19:54:07` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **5** mob(s) on the party
+- `19:54:09` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-653. Watch for a wipe.
+- `19:54:12` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `19:54:13` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **5** mob(s) on the party
+- `19:54:14` ☠️G4 **ryzetank** died.
+- `19:54:14` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **5** mob(s) on the party
+- `19:54:21` ☠️G4 **ryzeheal** died.
+- `19:54:37` ☠️G4 **swifter** died.
+- `19:54:47` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:54:49` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:54:51` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈868. Watch for a wipe.
+- `19:54:53` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:55:10` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `19:55:12` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **1** mob(s) on the party
+- `19:55:29` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `19:55:29` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:59:03` ☠️G4 📊 PROGRESS kills=22 levels=[20,20,20,20,20] phase=dungeon elapsed=30m
+- `20:04:03` ☠️G4 📊 PROGRESS kills=22 levels=[20,20,20,20,20] phase=dungeon elapsed=35m
+- `20:05:59` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `20:06:19` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:06:28` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:06:40` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:06:42` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:06:56` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `20:06:58` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:06:58` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **2** mob(s) on the party
+- `20:07:10` ☠️G4 🔱 Grand Necromancer Velkhar: 90% HP.
+- `20:07:22` ☠️G4 🔱 Grand Necromancer Velkhar: 89% HP.
+- `20:07:34` ☠️G4 🔱 Grand Necromancer Velkhar: 89% HP.
+- `20:07:39` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:07:39` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `20:07:39` ☠️G4 **swifter** died.
+- `20:07:46` ☠️G4 🔱 Grand Necromancer Velkhar: 76% HP.
+- `20:07:55` ☠️G4 **ryzetank** died.
+- `20:08:09` ☠️G4 **ryzeheal** died.
+- `20:08:16` ☠️G4 ⚔️ Pull: **Glimmermere Wader** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:08:19` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `20:08:28` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:08:30` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:08:31` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `20:08:33` ☠️G4 **Shims** died.
+- `20:08:34` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:08:47` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `20:09:03` ☠️G4 📊 PROGRESS kills=26 levels=[20,20,20,20,20] phase=dungeon elapsed=40m
+- `20:09:12` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:09:22` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:09:32` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `20:09:36` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:09:36` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **1** mob(s) on the party
+- `20:09:48` ☠️G4 🔱 Grand Necromancer Velkhar: 96% HP.
+- `20:09:50` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `20:10:00` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-643. Watch for a wipe.
+- `20:10:00` ☠️G4 🔱 Grand Necromancer Velkhar: 63% HP.
+- `20:10:01` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:10:01` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:10:01` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:10:02` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:10:04` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **6** mob(s) on the party
+- `20:10:07` ☠️G4 **ryzetank** died.
+- `20:10:07` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **6** mob(s) on the party
+- `20:10:24` ☠️G4 **Shims** died.
+- `20:10:26` ☠️G4 **ryzeheal** died.
+- `20:10:38` ☠️G4 **swifter** died.
+- `20:10:41` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:10:45` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `20:10:47` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `20:11:03` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:11:16` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:11:27` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:11:36` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `20:11:45` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:11:54` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:12:00` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:12:12` ☠️G4 🔱 Grand Necromancer Velkhar: 73% HP.
+- `20:12:13` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-652. Watch for a wipe.
+- `20:12:15` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:12:15` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:12:15` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:12:16` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:12:19` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:12:21` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-652. Watch for a wipe.
+- `20:12:24` ☠️G4 🔱 Grand Necromancer Velkhar: 49% HP.
+- `20:12:25` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:12:30` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-652. Watch for a wipe.
+- `20:12:35` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `20:12:36` ☠️G4 **ryzetank** died.
+- `20:12:36` ☠️G4 🔱 Grand Necromancer Velkhar: 29% HP.
+- `20:13:09` ☠️G4 **ryzeheal** died.
+- `20:13:09` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:13:11` ☠️G4 **swifter** died.
+- `20:13:14` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:13:19` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (436/1971 HP).
+- `20:13:31` ☠️G4 🔱 Grand Necromancer Velkhar: 16% HP.
+- `20:13:34` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:13:35` ☠️G4 **Shims** died.
+- `20:13:35` ☠️G4 🏆 **velkhar** defeated! (loot logged above)
+- `20:13:47` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `20:14:03` ☠️G4 📊 PROGRESS kills=29 levels=[20,20,20,20,20] phase=dungeon elapsed=45m
+- `20:14:13` ☠️G4 🧭 ryzetank: holding to heal/mana up before the next pull
+- `20:14:26` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:14:37` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:14:48` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `20:14:52` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:15:00` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-645. Watch for a wipe.
+- `20:15:05` ☠️G4 🔱 Grand Necromancer Velkhar: 49% HP.
+- `20:15:08` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-645. Watch for a wipe.
+- `20:15:12` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:15:12` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **7** mob(s) on the party
+- `20:15:13` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **7** mob(s) on the party
+- `20:15:13` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **7** mob(s) on the party
+- `20:15:14` ☠️G4 **ryzetank** died.
+- `20:15:14` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **7** mob(s) on the party
+- `20:15:24` ☠️G4 **ryzeheal** died.
+- `20:15:43` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:44` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:47` ☠️G4 **swifter** died.
+- `20:15:48` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:50` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:51` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:53` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:15:54` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:16:02` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:16:11` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `20:16:25` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:16:36` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:16:42` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:16:50` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-648. Watch for a wipe.
+- `20:16:54` ☠️G4 🔱 Grand Necromancer Velkhar: 56% HP.
+- `20:16:56` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:16:56` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:16:56` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `20:16:58` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-651. Watch for a wipe.
+- `20:17:02` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzetank · **3** mob(s) on the party
+- `20:17:06` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzetank · **2** mob(s) on the party
+- `20:17:06` ☠️G4 🔱 Grand Necromancer Velkhar: 43% HP.
+- `20:17:08` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `20:17:13` ☠️G4 **ryzetank** died.
+- `20:17:47` ☠️G4 **swifter** died.
+- `20:17:56` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:17:58` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:18:02` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (518/1971 HP).
+- `20:18:07` ☠️G4 **ryzeheal** died.
+- `20:18:07` ☠️G4 🧭 ryzetank: holding for 4 to regroup (1 dead)
+- `20:18:25` ☠️G4 🧭 ryzetank: holding for 2 to regroup (0 dead)
+- `20:18:45` ☠️G4 🧭 ryzetank: holding to heal/mana up before the next pull
+- `20:18:56` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:19:03` ☠️G4 📊 PROGRESS kills=35 levels=[20,20,20,20,20] phase=dungeon elapsed=50m
+- `20:19:08` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:19:17` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:19:17` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `20:19:25` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-641. Watch for a wipe.
+- `20:19:29` ☠️G4 🔱 Grand Necromancer Velkhar: 51% HP.
+- `20:19:33` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-641. Watch for a wipe.
+- `20:19:35` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `20:19:36` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **8** mob(s) on the party
+- `20:19:37` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **9** mob(s) on the party
+- `20:19:37` ☠️G4 **ryzetank** died.
+- `20:19:37` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **9** mob(s) on the party
+- `20:19:38` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: Pontius · **9** mob(s) on the party
+- `20:19:49` ☠️G4 **ryzeheal** died.
+- `20:19:51` ☠️G4 **Shims** died.
+- `20:20:05` ☠️G4 **swifter** died.
+- `20:20:08` ☠️G4 **Pontius** died.
+- `20:20:11` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:20:16` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:20:27` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:20:45` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:20:59` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:21:08` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:21:17` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:21:18` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:21:26` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-642. Watch for a wipe.
+- `20:21:30` ☠️G4 🔱 Grand Necromancer Velkhar: 54% HP.
+- `20:21:34` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-642. Watch for a wipe.
+- `20:21:37` ☠️G4 🧭 ryzetank: tanking Raised Bonewalker
+- `20:21:37` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **8** mob(s) on the party
+- `20:21:38` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **9** mob(s) on the party
+- `20:21:38` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **9** mob(s) on the party
+- `20:21:40` ☠️G4 **ryzetank** died.
+- `20:21:40` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **9** mob(s) on the party
+- `20:21:42` ☠️G4 ⚔️ Pull: **Ridge Stalker** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:21:55` ☠️G4 **ryzeheal** died.
+- `20:22:02` ☠️G4 **Pontius** died.
+- `20:22:06` ☠️G4 **swifter** died.
+- `20:22:13` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:22:15` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:22:18` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:22:24` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:22:33` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:22:36` ☠️G4 🔱 Grand Necromancer Velkhar: 100% HP.
+- `20:22:42` ☠️G4 **Shims** died.
+- `20:22:42` ☠️G4 🧭 ryzetank: holding for 2 to regroup (1 dead)
+- `20:23:20` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:23:29` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:23:38` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:23:41` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:23:49` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-648. Watch for a wipe.
+- `20:23:53` ☠️G4 🔱 Grand Necromancer Velkhar: 52% HP.
+- `20:23:57` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-648. Watch for a wipe.
+- `20:24:02` ☠️G4 **ryzetank** died.
+- `20:24:03` ☠️G4 📊 PROGRESS kills=35 levels=[20,20,20,20,20] phase=dungeon elapsed=55m
+- `20:24:17` ☠️G4 **Shims** died.
+- `20:24:37` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `20:24:40` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `20:24:42` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `20:24:46` ☠️G4 **swifter** died.
+- `20:24:55` ☠️G4 🧭 ryzetank: holding for 3 to regroup (0 dead)
+- `20:25:15` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:25:24` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `20:25:34` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `20:25:44` ☠️G4 🔱 Engaging **Grand Necromancer Velkhar** (1971/1971 HP).
+- `20:25:44` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `20:25:55` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-643. Watch for a wipe.
+- `20:25:56` ☠️G4 🔱 Grand Necromancer Velkhar: 60% HP.
+- `20:25:58` ☠️G4 ☠️G4 🛑 multibox.stop seen — logging the party out.
+- `20:25:58` ☠️G4 Run complete — disconnecting.

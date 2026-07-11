@@ -1,0 +1,156 @@
+- `18:04:59` ☠️G4 FATAL: "ryzetank" is already in the world — log it out first.
+- `18:09:28` ☠️G4 ▶️ session start — Leader ryzetank (warrior), Tank ryzetank.
+- `18:09:28` ☠️G4 Party assembled: ryzetank (warrior), ryzeheal (priest), Pontius (paladin), Shims (shaman), swifter (hunter).
+- `18:09:31` ☠️G4 Party of 1 formed.
+- `18:09:31` ☠️G4 👁️ panic-watch armed for: papa ours (auto-kill on their login).
+- `18:09:32` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `18:09:32` ☠️G4 Whole party is level 20+ — marching to Gravewyrm Sanctum door at (0, 880).
+- `18:09:32` ☠️G4 [travel] camp(-66,268) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-137,610) d349y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d347y ▸— ·auto  |  Pontiu L20 hp75/m63 @(-108,698) d432y ▸— ·auto [3m]  |  Shims L20 hp98/m84 @(-108,699) d433y ▸— ·auto [5m]  |  swifte L20 hp100/m94 @(-6,832) d567y ▸— ·gcd [1m]
+- `18:09:32` ☠️G4 🗺️ L20: grind moves to **Boneclad Revenants (L18-19)**
+- `18:09:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (0), nythraxis_scourges_end (0)
+- `18:09:32` ☠️G4 🎯 **crushers**: 1
+- `18:09:32` ☠️G4 🎯 **tarn_waders**: 7
+- `18:09:32` ☠️G4 🎯 **kazzix**: 0
+- `18:09:32` ☠️G4 🎯 **elementals**: 0
+- `18:09:32` ☠️G4 🎯 **glowing_wax**: 0
+- `18:09:32` ☠️G4 🎯 **zealots**: 1
+- `18:09:32` ☠️G4 🎯 **revenant_vanguard**: 0
+- `18:09:32` ☠️G4 🎯 **nythraxis_scourges_end**: 0
+- `18:09:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:09:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:09:42` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-137,610) d241y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp71/m71 @(-108,698) d148y ▸— ·auto [5m]  |  Shims L20 hp100/m90 @(-108,699) d148y ▸— ·auto [5m]  |  swifte L20 hp100/m100 @(-39,776) d54y ▸— ·auto
+- `18:09:52` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-137,610) d241y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp71/m80 @(-108,698) d148y ▸— ·auto [5m]  |  Shims L20 hp100/m84 @(-110,684) d162y ▸— ·auto [3m]  |  swifte L20 hp100/m100 @(-69,726) d108y ▸— ·auto [6m]
+- `18:10:02` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-137,610) d241y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp71/m86 @(-108,698) d148y ▸— ·auto [5m]  |  Shims L20 hp100/m94 @(-115,674) d173y ▸— ·auto  |  swifte L20 hp100/m100 @(-85,699) d139y ▸— ·auto [5m]
+- `18:10:12` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-137,610) d241y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp68/m91 @(-108,698) d148y ▸— ·auto [5m]  |  Shims L20 hp100/m100 @(-115,674) d173y ▸— ·auto  |  swifte L20 hp100/m100 @(-98,677) d164y ▸— ·auto [3m]
+- `18:10:22` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h  ryzeta L20 hp100/m0 @(-129,625) d224y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp56/m97 @(-108,698) d148y ▸— ·auto [4m]  |  Shims L20 hp100/m100 @(-123,639) d208y ▸— ·auto  |  swifte L20 hp100/m100 @(-100,654) d186y ▸— ·auto [1m]
+- `18:10:28` ☠️G4 🧭 ryzetank: pulling Thornpeak Ogre
+- `18:10:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (0), nythraxis_scourges_end (0)
+- `18:10:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:10:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:10:32` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m9 @(-91,691) d149y ▸Thornpeak Ogre ·auto [3m]  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp42/m100 @(-85,679) d158y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(-95,687) d153y ▸— ·auto [3m]  |  swifte L20 hp100/m100 @(-105,671) d172y ▸Thornpeak Ogre ·auto
+- `18:10:42` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m9 @(-92,690) d150y ▸Thornpeak Ogre ·auto  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp37/m100 @(-87,720) d120y ▸— ·auto [5m]  |  Shims L20 hp100/m100 @(-93,677) d162y ▸— ·auto  |  swifte L20 hp100/m100 @(-120,678) d172y ▸Thornpeak Ogre ·auto [1m]
+- `18:10:52` ☠️G4 [travel] camp(-40,830) 0.0k/m 0xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m9 @(-79,719) d118y ▸Thornpeak Ogre ·auto [7m]  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp37/m100 @(-62,716) d117y ▸— ·auto [6m]  |  Shims L20 hp100/m100 @(-90,682) d156y ▸— ·auto [1m]  |  swifte L20 hp100/m91 @(-91,708) d132y ▸Thornpeak Ogre ·auto [3m]
+- `18:11:02` ☠️G4 🧭 ryzetank: pulling Thornpeak Ogre
+- `18:11:02` ☠️G4 [travel] camp(-40,830) 0.7k/m 1791xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m19 @(-75,723) d113y ▸Thornpeak Ogre ·gcd [7m]  |  ryzehe L20 hp100/m100 @(-138,608) d243y ▸— ·auto  |  Pontiu L20 hp34/m100 @(-82,730) d109y ▸— ·auto [6m]  |  Shims L20 hp100/m100 @(-91,721) d121y ▸— ·auto [5m]  |  swifte L20 hp100/m97 @(-108,688) d157y ▸Thornpeak Ogre ·auto [3m]
+- `18:11:07` ☠️G4 💎 **ryzetank** looted: Ogre Toe Ring
+- `18:11:12` ☠️G4 [travel] camp(-40,830) 2.4k/m 3222xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m9 @(-70,724) d110y ▸Thornpeak Ogre ·gcd [5m]  |  ryzehe L20 hp100/m100 @(-117,616) d227y ▸— ·auto  |  Pontiu L20 hp34/m100 @(-74,721) d115y ▸— ·auto [6m]  |  Shims L20 hp100/m100 @(-57,720) d111y ▸— ·auto [5m]  |  swifte L20 hp100/m89 @(-86,707) d131y ▸Thornpeak Ogre ·auto [1m]
+- `18:11:22` ☠️G4 [travel] camp(-40,830) 2.2k/m 2931xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m17 @(-67,716) d117y ▸Thornpeak Ogre ·auto [2m]  |  ryzehe L20 hp100/m100 @(-90,682) d156y ▸— ·auto [2m]  |  Pontiu L20 hp34/m100 @(-75,735) d101y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(-76,720) d116y ▸— ·auto [3m]  |  swifte L20 hp100/m77 @(-89,702) d137y ▸Thornpeak Ogre ·auto [5m]
+- `18:11:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (0), nythraxis_scourges_end (0)
+- `18:11:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:11:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:11:32` ☠️G4 [travel] camp(-40,830) 2.5k/m 4569xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m24 @(-67,716) d117y ▸Thornpeak Ogre ·auto [3m]  |  ryzehe L20 hp100/m100 @(-56,715) d116y ▸— ·auto [2m]  |  Pontiu L20 hp45/m100 @(-50,704) d126y ▸— ·auto [1m]  |  Shims L20 hp100/m100 @(-58,707) d124y ▸— ·auto [2m]  |  swifte L20 hp100/m72 @(-64,692) d140y ▸Thornpeak Ogre ·gcd [5m]
+- `18:11:35` ☠️G4 🧭 ryzetank: pulling Thornpeak Ogre
+- `18:11:42` ☠️G4 [travel] camp(-40,830) 4.1k/m 7196xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m1 @(-70,720) d114y ▸Thornpeak Ogre ·gcd [1m]  |  ryzehe L20 hp100/m100 @(-66,719) d114y ▸— ·auto [5m]  |  Pontiu L20 hp55/m100 @(-65,719) d113y ▸— ·auto [5m]  |  Shims L20 hp100/m100 @(-74,730) d106y ▸— ·auto [1m]  |  swifte L20 hp100/m52 @(-50,719) d111y ▸Thornpeak Ogre ·gcd [4m]
+- `18:11:45` ☠️G4 🧭 ryzetank: pulling Thornpeak Ogre
+- `18:11:52` ☠️G4 [travel] camp(-40,830) 3.8k/m 6684xp/h · pulling Thornpeak Ogre  ryzeta L20 hp100/m10 @(-54,723) d108y ▸Thornpeak Ogre ·auto [5m]  |  ryzehe L20 hp100/m100 @(-58,724) d108y ▸— ·auto [3m]  |  Pontiu L20 hp71/m100 @(-72,723) d111y ▸— ·auto  |  Shims L20 hp100/m100 @(-65,729) d104y ▸— ·auto [1m]  |  swifte L20 hp100/m40 @(-37,727) d103y ▸Thornpeak Ogre ·gcd [4m]
+- `18:11:55` ☠️G4 🧭 ryzetank: tanking Thornpeak Ogre
+- `18:12:02` ☠️G4 [travel] camp(-40,830) 3.6k/m 6238xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m6 @(-54,723) d108y ▸Thornpeak Ogre ·auto [2m]  |  ryzehe L20 hp100/m100 @(-55,730) d102y ▸— ·auto [3m]  |  Pontiu L20 hp76/m91 @(-49,734) d96y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(-56,726) d105y ▸— ·auto [1m]  |  swifte L20 hp100/m50 @(-26,729) d102y ▸Thornpeak Ogre ·auto [4m]
+- `18:12:12` ☠️G4 🧭 ryzetank: pulling Thornpeak Ogre
+- `18:12:12` ☠️G4 [travel] camp(-40,830) 3.7k/m 7261xp/h · pulling Thornpeak Ogre  ryzeta L20 hp100/m6 @(-54,723) d108y ▸Thornpeak Ogre ·auto [1m]  |  ryzehe L20 hp100/m100 @(-52,727) d104y ▸— ·auto [3m]  |  Pontiu L20 hp76/m91 @(-49,738) d93y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(-50,719) d112y ▸— ·auto [1m]  |  swifte L20 hp100/m62 @(-26,729) d102y ▸Thornpeak Ogre ·auto [2m]
+- `18:12:21` ☠️G4 🧭 ryzetank: tanking Thornpeak Ogre
+- `18:12:22` ☠️G4 [travel] camp(-40,830) 3.9k/m 7784xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m21 @(-50,722) d108y ▸Thornpeak Ogre ·auto [1m]  |  ryzehe L20 hp100/m100 @(-51,724) d106y ▸— ·auto [2m]  |  Pontiu L20 hp79/m91 @(-49,741) d90y ▸— ·auto  |  Shims L20 hp100/m100 @(-41,717) d113y ▸— ·auto [3m]  |  swifte L20 hp100/m71 @(-24,730) d102y ▸Thornpeak Ogre ·gcd [3m]
+- `18:12:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (0), nythraxis_scourges_end (0)
+- `18:12:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:12:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:12:33` ☠️G4 [travel] camp(-40,830) 4.3k/m 8607xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m9 @(-31,747) d83y ▸Thornpeak Ogre ·auto  |  ryzehe L20 hp100/m100 @(-52,721) d109y ▸— ·auto [2m]  |  Pontiu L20 hp79/m91 @(-50,745) d86y ▸— ·auto  |  Shims L20 hp100/m100 @(-37,740) d90y ▸— ·auto  |  swifte L20 hp100/m81 @(-6,733) d102y ▸Thornpeak Ogre ·auto [2m]
+- `18:12:43` ☠️G4 [travel] camp(-40,830) 4.1k/m 9004xp/h · tanking Thornpeak Ogre  ryzeta L20 hp100/m0 @(-15,817) d28y ▸Thornpeak Ogre ·auto  |  ryzehe L20 hp100/m100 @(-54,719) d112y ▸— ·auto [2m]  |  Pontiu L20 hp79/m91 @(-50,749) d82y ▸— ·auto  |  Shims L20 hp100/m100 @(-11,801) d41y ▸— ·auto  |  swifte L20 hp100/m96 @(-7,798) d46y ▸Thornpeak Ogre ·auto
+- `18:12:45` ☠️G4 📍 Reached the Gravewyrm Sanctum approach.
+- `18:12:46` ☠️G4 🧭 ryzetank: pulling Boneclad Revenant
+- `18:12:53` ☠️G4 [travel] camp(-40,830) 4.2k/m 8555xp/h · tanking Boneclad Revenant  ryzeta L20 hp97/m31 @(-9,851) d37y ▸Boneclad Revenant ·auto [3m]  |  ryzehe L20 hp100/m100 @(-52,720) d111y ▸— ·auto [2m]  |  Pontiu L20 hp79/m91 @(-51,752) d79y ▸— ·auto  |  Shims L20 hp100/m100 @(-6,835) d34y ▸— ·auto  |  swifte L20 hp100/m91 @(-6,840) d35y ▸Boneclad Revenant ·gcd
+- `18:12:53` ☠️G4 🎯 **revenant_vanguard**: 1
+- `18:12:53` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `18:12:59` ☠️G4 🧭 ryzetank: pulling Boneclad Revenant
+- `18:13:03` ☠️G4 [travel] camp(-40,830) 4.8k/m 11974xp/h · tanking Boneclad Revenant  ryzeta L20 hp79/m9 @(-10,852) d37y ▸Boneclad Revenant ·gcd [2m]  |  ryzehe L20 hp100/m100 @(-49,721) d109y ▸— ·auto [2m]  |  Pontiu L20 hp82/m94 @(-52,760) d71y ▸— ·auto  |  Shims L20 hp100/m100 @(-18,841) d25y ▸— ·auto [2m]  |  swifte L20 hp95/m71 @(-6,840) d35y ▸Boneclad Revenant ·auto [2m]
+- `18:13:13` ☠️G4 [travel] camp(-40,830) 4.6k/m 11427xp/h · tanking Boneclad Revenant  ryzeta L20 hp57/m14 @(-8,845) d35y ▸Boneclad Revenant ·auto [1m]  |  ryzehe L20 hp100/m100 @(-47,722) d108y ▸— ·auto [5m]  |  Pontiu L20 hp87/m100 @(-53,752) d79y ▸— ·auto  |  Shims L20 hp100/m100 @(-11,854) d38y ▸— ·auto [3m]  |  swifte L20 hp85/m83 @(4,812) d48y ▸Boneclad Revenant ·auto [1m]
+- `18:13:17` ☠️G4 🎯 **revenant_vanguard**: 3
+- `18:13:17` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `18:13:23` ☠️G4 [travel] camp(-40,830) 4.9k/m 12849xp/h · tanking Boneclad Revenant  ryzeta L20 hp46/m1 @(-7,846) d36y ▸Boneclad Revenant ·gcd [2m]  |  ryzehe L20 hp100/m100 @(-48,720) d111y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(-37,739) d91y ▸— ·auto [2m]  |  Shims L20 hp75/m100 @(-1,827) d39y ▸— ·auto [3m]  |  swifte L20 hp72/m84 @(-18,843) d26y ▸Boneclad Revenant ·auto [2m]
+- `18:13:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (3), nythraxis_scourges_end (0)
+- `18:13:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:13:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:13:32` ☠️G4 🎯 **revenant_vanguard**: 4
+- `18:13:33` ☠️G4 [travel] camp(-40,830) 5.0k/m 13824xp/h · tanking Boneclad Revenant  ryzeta L20 hp33/m10 @(-5,851) d41y ▸Boneclad Revenant ·auto [3m]  |  ryzehe L20 hp100/m100 @(-49,717) d113y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(-28,790) d42y ▸— ·auto  |  Shims L20 hp47/m100 @(-10,866) d47y ▸— ·auto [3m]  |  swifte L20 hp50/m81 @(-34,853) d23y ▸Boneclad Revenant ·auto [2m]
+- `18:13:39` ☠️G4 🧭 ryzetank: pulling Boneclad Revenant
+- `18:13:43` ☠️G4 [travel] camp(-40,830) 5.3k/m 14720xp/h · tanking Boneclad Revenant  ryzeta L20 hp17/m13 @(-14,850) d33y ▸Boneclad Revenant ·auto [4m]  |  ryzehe L20 hp100/m100 @(-50,715) d116y ▸— ·auto [1m]  |  Pontiu L20 hp100/m95 @(-10,839) d31y ▸— ·auto [2m]  |  Shims L20 hp38/m100 @(-16,837) d25y ▸— ·auto [2m]  |  swifte L20 hp24/m73 @(-34,875) d46y ▸Boneclad Revenant ·auto [1m]
+- `18:13:47` ☠️G4 **ryzetank** died.
+- `18:13:53` ☠️G4 [travel] camp(-40,830) 5.5k/m 14155xp/h · tanking Boneclad Revenant  ryzeta L20 hp100/m0 @(16,668) d171y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-48,717) d114y ▸— ·auto [1m]  |  Pontiu L20 hp100/m98 @(-3,849) d42y ▸— ·auto [2m]  |  Shims L20 hp25/m100 @(-5,837) d36y ▸— ·auto [3m]  |  swifte L20 hp0/m88 @(-34,875) d46y ▸Boneclad Revenant ·auto [1m]
+- `18:14:03` ☠️G4 [travel] camp(-40,830) 5.3k/m 13627xp/h · tanking Boneclad Revenant  ryzeta L20 hp100/m0 @(14,725) d118y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-46,718) d112y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(3,763) d80y ▸— ·auto  |  Shims L20 hp19/m100 @(0,765) d77y ▸— ·auto  |  swifte L20 hp16/m100 @(6,923) d104y ▸Boneclad Revenant ·auto
+- `18:14:13` ☠️G4 [travel] camp(-40,830) 5.1k/m 13142xp/h · tanking Boneclad Revenant  ryzeta L20 hp100/m0 @(9,778) d71y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-44,718) d112y ▸— ·auto [5m]  |  Pontiu L20 hp100/m100 @(15,766) d84y ▸— ·auto  |  Shims L20 hp36/m100 @(14,773) d78y ▸— ·auto  |  swifte L20 hp30/m100 @(15,969) d150y ▸Boneclad Revenant ·auto
+- `18:14:17` ☠️G4 🧭 ryzetank: pulling Wyrmcult Zealot
+- `18:14:23` ☠️G4 [travel] camp(-40,830) 4.9k/m 12686xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp97/m16 @(15,837) d56y ▸Wyrmcult Zealot ·auto [2m]  |  ryzehe L20 hp100/m100 @(-46,713) d117y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(11,826) d51y ▸— ·auto [1m]  |  Shims L20 hp50/m100 @(9,830) d49y ▸— ·auto [1m]  |  swifte L20 hp44/m100 @(14,900) d88y ▸Boneclad Revenant ·auto
+- `18:14:32` ☠️G4 📊 PROGRESS kills=24 levels=[20,20,20,20,20] phase=travel elapsed=5m
+- `18:14:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (4), nythraxis_scourges_end (0)
+- `18:14:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:14:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:14:33` ☠️G4 [travel] camp(-40,830) 4.8k/m 12260xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp87/m17 @(15,837) d56y ▸Wyrmcult Zealot ·auto [2m]  |  ryzehe L20 hp100/m100 @(-45,713) d117y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(6,825) d46y ▸— ·auto  |  Shims L20 hp63/m100 @(13,821) d53y ▸— ·auto  |  swifte L20 hp48/m100 @(15,857) d61y ▸Wyrmcult Zealot ·auto [5m]
+- `18:14:39` ☠️G4 🧭 ryzetank: pulling Wyrmcult Zealot
+- `18:14:43` ☠️G4 [travel] camp(-40,830) 4.6k/m 11865xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp66/m17 @(26,851) d69y ▸Wyrmcult Zealot ·auto [7m]  |  ryzehe L20 hp100/m100 @(-40,717) d113y ▸— ·auto [5m]  |  Pontiu L20 hp100/m100 @(21,843) d62y ▸— ·auto [4m]  |  Shims L20 hp77/m100 @(13,842) d55y ▸— ·auto [3m]  |  swifte L20 hp40/m96 @(-5,864) d49y ▸Wyrmcult Zealot ·auto [6m]
+- `18:14:49` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `18:14:53` ☠️G4 [travel] camp(-40,830) 4.5k/m 11496xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp19/m33 @(19,859) d66y ▸Wyrmcult Zealot ·auto [8m]  |  ryzehe L20 hp100/m100 @(-42,713) d117y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(13,856) d59y ▸— ·auto [8m]  |  Shims L20 hp55/m100 @(23,857) d68y ▸— ·auto [8m]  |  swifte L20 hp14/m100 @(-29,872) d43y ▸Wyrmcult Zealot ·auto [3m]
+- `18:14:57` ☠️G4 **ryzetank** died.
+- `18:14:59` ☠️G4 **swifter** died.
+- `18:15:03` ☠️G4 [travel] camp(-40,830) 4.3k/m 11145xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp100/m0 @(17,669) d171y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-41,711) d119y ▸— ·auto [1m]  |  Pontiu L20 hp82/m100 @(2079,747) d2120y ▸— ·auto [2m]  |  Shims L20 hp3/m100 @(2079,-227) d2367y ▸— ·auto [3m]  |  swifte L20 hp100/m100 @(15,651) d188y ▸— ·auto
+- `18:15:05` ☠️G4 **Shims** died.
+- `18:15:13` ☠️G4 [travel] camp(-40,830) 4.2k/m 10815xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp100/m0 @(14,724) d119y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-34,715) d115y ▸— ·auto [3m]  |  Pontiu L20 hp36/m100 @(2079,743) d2120y ▸— ·auto [2m]  |  Shims L20 hp100/m100 @(19,676) d165y ▸— ·auto  |  swifte L20 hp100/m100 @(17,696) d146y ▸— ·auto
+- `18:15:20` ☠️G4 **Pontius** died.
+- `18:15:23` ☠️G4 [travel] camp(-40,830) 4.1k/m 10507xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp100/m0 @(7,798) d57y ▸— ·auto  |  ryzehe L20 hp100/m100 @(-34,715) d115y ▸— ·auto [3m]  |  Pontiu L20 hp100/m100 @(13,663) d175y ▸— ·auto  |  Shims L20 hp100/m100 @(12,745) d99y ▸— ·auto  |  swifte L20 hp100/m100 @(10,765) d82y ▸— ·auto
+- `18:15:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (4), nythraxis_scourges_end (0)
+- `18:15:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:15:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:15:33` ☠️G4 [travel] camp(-40,830) 4.0k/m 10216xp/h · tanking Wyrmcult Zealot  ryzeta L20 hp100/m0 @(1,865) d54y ▸— ·auto [2m]  |  ryzehe L20 hp100/m100 @(-34,715) d115y ▸— ·auto  |  Pontiu L20 hp100/m100 @(16,702) d140y ▸— ·auto  |  Shims L20 hp100/m100 @(7,800) d56y ▸— ·auto  |  swifte L20 hp100/m100 @(6,816) d48y ▸— ·auto
+- `18:15:36` ☠️G4 Zoned into Gravewyrm Sanctum. Elites ahead.
+- `18:15:36` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `18:15:36` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `18:15:43` ☠️G4 [dungeon] camp(-40,830) 3.9k/m 9938xp/h · tanking Sanctum Boneguard  ryzeta L20 hp77/m18 @(2099,1265) d2183y ▸Sanctum Boneguard ·auto [4m]  |  ryzehe L20 hp100/m100 @(-17,721) d112y ▸— ·auto  |  Pontiu L20 hp100/m100 @(10,774) d75y ▸— ·auto  |  Shims L20 hp100/m100 @(2100,-245) d2395y ▸— ·auto [2m]  |  swifte L20 hp87/m100 @(-1,875) d59y ▸— ·auto [3m]
+- `18:15:48` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `18:15:54` ☠️G4 [dungeon] camp(-40,830) 3.8k/m 9675xp/h · tanking Sanctum Boneguard  ryzeta L20 hp23/m20 @(2099,1265) d2183y ▸Sanctum Boneguard ·auto [2m]  |  ryzehe L20 hp100/m100 @(3,807) d49y ▸— ·auto  |  Pontiu L20 hp100/m100 @(3,844) d45y ▸— ·auto  |  Shims L20 hp34/m100 @(2100,-175) d2364y ▸— ·auto [9m]  |  swifte L20 hp57/m100 @(-1,875) d59y ▸— ·auto [3m]
+- `18:15:57` ☠️G4 **Shims** died.
+- `18:15:57` ☠️G4 ⚠️ 6 deaths/10m — backing off to the safe camp + easier mobs for ~5 min.
+- `18:15:58` ☠️G4 **ryzetank** died.
+- `18:15:58` ☠️G4 🏆 **korgath** defeated.
+- `18:16:04` ☠️G4 [dungeon] camp(-40,830) 3.7k/m 9428xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(16,668) d171y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [3m]  |  Pontiu L20 hp100/m100 @(2079,753) d2120y ▸— ·auto  |  Shims L20 hp100/m100 @(18,669) d171y ▸— ·auto  |  swifte L20 hp38/m100 @(-1,875) d59y ▸— ·auto [3m]
+- `18:16:13` ☠️G4 **swifter** died.
+- `18:16:14` ☠️G4 [dungeon] camp(-40,830) 3.6k/m 9191xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(14,725) d119y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(2079,744) d2120y ▸— ·auto  |  Shims L20 hp100/m100 @(13,733) d111y ▸— ·auto  |  swifte L20 hp100/m100 @(15,647) d191y ▸— ·auto
+- `18:16:24` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `18:16:24` ☠️G4 [dungeon] camp(-40,830) 3.5k/m 8968xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(8,794) d60y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [4m]  |  Pontiu L20 hp100/m100 @(2079,754) d2120y ▸— ·auto  |  Shims L20 hp100/m100 @(7,802) d55y ▸— ·auto  |  swifte L20 hp100/m100 @(17,691) d150y ▸— ·auto
+- `18:16:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (4), nythraxis_scourges_end (0)
+- `18:16:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:16:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:16:34` ☠️G4 [dungeon] camp(-40,830) 3.4k/m 8755xp/h · tanking Sanctum Boneguard  ryzeta L20 hp97/m1 @(0,855) d47y ▸— ·auto [5m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [3m]  |  Pontiu L20 hp100/m100 @(2079,748) d2120y ▸— ·auto  |  Shims L20 hp94/m100 @(0,871) d57y ▸— ·auto [4m]  |  swifte L20 hp100/m100 @(13,717) d125y ▸— ·auto
+- `18:16:38` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `18:16:44` ☠️G4 [dungeon] camp(-40,830) 3.3k/m 8552xp/h · tanking Sanctum Boneguard  ryzeta L20 hp89/m15 @(2099,1258) d2182y ▸Sanctum Boneguard ·auto [2m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(2080,790) d2120y ▸— ·auto [1m]  |  Shims L20 hp78/m100 @(2079,-201) d2357y ▸— ·auto [2m]  |  swifte L20 hp100/m100 @(0,798) d51y ▸— ·auto
+- `18:16:50` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `18:16:54` ☠️G4 [dungeon] camp(-40,830) 3.3k/m 8358xp/h · tanking Sanctum Boneguard  ryzeta L20 hp60/m26 @(2099,1258) d2182y ▸Sanctum Boneguard ·auto [2m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [3m]  |  Pontiu L20 hp79/m100 @(2088,812) d2128y ▸— ·auto [3m]  |  Shims L20 hp8/m100 @(2084,-188) d2356y ▸— ·auto [3m]  |  swifte L20 hp97/m100 @(0,868) d55y ▸— ·auto [5m]
+- `18:16:56` ☠️G4 **Shims** died.
+- `18:17:02` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `18:17:04` ☠️G4 [dungeon] camp(-40,830) 3.2k/m 8173xp/h · tanking Sanctum Boneguard  ryzeta L20 hp19/m17 @(2099,1258) d2182y ▸Sanctum Boneguard ·auto [2m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [3m]  |  Pontiu L20 hp12/m100 @(2080,812) d2120y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(19,670) d171y ▸— ·auto  |  swifte L20 hp88/m100 @(0,876) d61y ▸— ·auto [3m]
+- `18:17:05` ☠️G4 **Pontius** died.
+- `18:17:09` ☠️G4 **ryzetank** died.
+- `18:17:14` ☠️G4 [dungeon] camp(-40,830) 3.1k/m 7996xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(15,667) d172y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(19,673) d168y ▸— ·auto  |  Shims L20 hp100/m100 @(10,738) d105y ▸— ·auto  |  swifte L20 hp65/m100 @(0,876) d61y ▸— ·auto [2m]
+- `18:17:24` ☠️G4 [dungeon] camp(-40,830) 3.1k/m 7826xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(23,706) d139y ▸— ·auto  |  ryzehe L20 hp89/m100 @(0,875) d60y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(9,742) d101y ▸— ·auto  |  Shims L20 hp100/m100 @(1,808) d46y ▸— ·auto  |  swifte L20 hp52/m100 @(0,876) d61y ▸— ·auto [2m]
+- `18:17:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (4), nythraxis_scourges_end (0)
+- `18:17:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:17:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:17:34` ☠️G4 [dungeon] camp(-40,830) 3.0k/m 7664xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(9,772) d76y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [3m]  |  Pontiu L20 hp100/m100 @(0,811) d45y ▸— ·auto  |  Shims L20 hp100/m100 @(2100,-246) d2395y ▸— ·auto [1m]  |  swifte L20 hp43/m100 @(0,876) d61y ▸— ·auto [3m]
+- `18:17:44` ☠️G4 [dungeon] camp(-40,830) 2.9k/m 7508xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(0,840) d41y ▸— ·auto [1m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [2m]  |  Pontiu L20 hp100/m100 @(2098,754) d2139y ▸— ·auto [1m]  |  Shims L20 hp76/m100 @(2079,-225) d2367y ▸— ·auto [2m]  |  swifte L20 hp33/m100 @(0,876) d61y ▸— ·auto [2m]
+- `18:17:49` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `18:17:49` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `18:17:54` ☠️G4 [dungeon] camp(-40,830) 2.9k/m 7358xp/h · tanking Sanctum Boneguard  ryzeta L20 hp83/m26 @(2094,1266) d2178y ▸Sanctum Boneguard ·auto [4m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(2079,792) d2120y ▸— ·auto  |  Shims L20 hp66/m100 @(2079,-188) d2351y ▸— ·auto [1m]  |  swifte L20 hp16/m100 @(0,876) d61y ▸— ·auto [1m]
+- `18:18:01` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `18:18:02` ☠️G4 **Shims** died.
+- `18:18:04` ☠️G4 [dungeon] camp(-40,830) 2.8k/m 7214xp/h · tanking Sanctum Boneguard  ryzeta L20 hp31/m5 @(2094,1266) d2178y ▸Sanctum Boneguard ·auto [4m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp91/m100 @(2089,812) d2129y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(17,651) d187y ▸— ·auto  |  swifte L20 hp47/m100 @(0,876) d61y ▸— ·auto [1m]
+- `18:18:08` ☠️G4 **ryzetank** died.
+- `18:18:14` ☠️G4 [dungeon] camp(-40,830) 2.8k/m 7076xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(16,668) d171y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp33/m100 @(2079,801) d2119y ▸— ·auto [3m]  |  Shims L20 hp100/m100 @(17,684) d157y ▸— ·auto  |  swifte L20 hp63/m100 @(0,876) d61y ▸— ·auto [1m]
+- `18:18:18` ☠️G4 **Pontius** died.
+- `18:18:24` ☠️G4 [dungeon] camp(-40,830) 2.7k/m 6941xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(12,720) d122y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(17,669) d171y ▸— ·auto  |  Shims L20 hp100/m100 @(7,761) d83y ▸— ·auto  |  swifte L20 hp79/m100 @(0,876) d61y ▸— ·auto [1m]
+- `18:18:32` ☠️G4 📋 ryzetank quests — doing: crushers (1), tarn_waders (7), kazzix (0), elementals (0), glowing_wax (0), zealots (1), revenant_vanguard (4), nythraxis_scourges_end (0)
+- `18:18:32` ☠️G4 📋 ryzeheal quests — doing: nythraxis_scourges_end (0)
+- `18:18:32` ☠️G4 📋 Shims quests — ready: elementals
+- `18:18:34` ☠️G4 [dungeon] camp(-40,830) 2.7k/m 6812xp/h · tanking Sanctum Boneguard  ryzeta L20 hp100/m0 @(3,789) d59y ▸— ·auto  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(11,726) d116y ▸— ·auto  |  Shims L20 hp100/m100 @(0,831) d40y ▸— ·auto [1m]  |  swifte L20 hp92/m100 @(0,876) d61y ▸— ·auto [1m]
+- `18:18:44` ☠️G4 [dungeon] camp(-40,830) 2.6k/m 6689xp/h · tanking Sanctum Boneguard  ryzeta L20 hp97/m1 @(0,858) d49y ▸— ·auto [4m]  |  ryzehe L20 hp100/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(2,795) d55y ▸— ·auto  |  Shims L20 hp86/m100 @(2082,-236) d2374y ▸— ·auto [2m]  |  swifte L20 hp100/m94 @(2082,-732) d2635y ▸— ·auto [1m]
+- `18:18:46` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `18:18:47` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `18:18:54` ☠️G4 [dungeon] camp(-40,830) 2.6k/m 6569xp/h · tanking Sanctum Boneguard  ryzeta L20 hp59/m28 @(2101,1264) d2185y ▸Sanctum Boneguard ·auto [4m]  |  ryzehe L20 hp77/m100 @(0,875) d60y ▸— ·auto [1m]  |  Pontiu L20 hp100/m100 @(0,864) d52y ▸— ·auto [5m]  |  Shims L20 hp62/m100 @(2079,-188) d2351y ▸— ·auto [2m]  |  swifte L20 hp100/m100 @(2079,-688) d2607y ▸— ·auto [1m]
+- `18:18:58` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `18:19:01` ☠️G4 ☠️G4 🛑 multibox.stop seen — logging the party out.
+- `18:19:01` ☠️G4 Run complete — disconnecting.

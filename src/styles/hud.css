@@ -29,6 +29,11 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
+    /* The painter's transform is translate3d(sx,sy) scale(distance)
+       translate(-50%,-100%); origin 0 0 keeps the plate's bottom-center anchor
+       exactly at (sx,sy) while the distance scale shrinks it toward that point
+       (the default 50% 50% origin would drift a scaled plate off its anchor). */
+    transform-origin: 0 0;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -67,14 +72,31 @@
     margin-right: 3px;
     filter: drop-shadow(0 1px 1px #000);
   }
-  /* significant-contributor name outline: a steady glow layered over whatever
+  /* significant-contributor name outline: a steady halo layered over whatever
      name color applies (Discord staff or default). The colour is supplied by the
      painter via --dev-outline (per-tier), so no hardcoded hue lives here. No
-     animation, so it is reduced-motion safe. */
+     animation, so it is reduced-motion safe.
+     A crisp 1px ring (eight zero-blur offsets, listed first so they paint nearest
+     the glyph) keeps the letterform edges sharp, with a single small faint blur
+     BEHIND it for the halo flair. The old all-blurred stack (0 0 4px / 0 0 2px,
+     a third of the 12px cap height) smeared the strokes and read as out-of-focus
+     text rather than a halo (issue 1639). */
   .np-name.np-sig-dev {
+    /* The ring is drawn in a SOFTENED tier color: color-mix keeps the per-tier
+       --dev-outline hue but lowers the alpha, so the outline reads as a subtle badge
+       rather than a heavy bold stroke (review of issue 1639). Still a zero-blur ring,
+       so the glyph edges stay sharp; no hardcoded hue (the mix reads --dev-outline). */
+    --dev-ring: color-mix(in srgb, var(--dev-outline) 60%, transparent);
     text-shadow:
-      0 0 4px var(--dev-outline),
-      0 0 2px var(--dev-outline),
+      1px 0 0 var(--dev-ring),
+      -1px 0 0 var(--dev-ring),
+      0 1px 0 var(--dev-ring),
+      0 -1px 0 var(--dev-ring),
+      1px 1px 0 var(--dev-ring),
+      -1px 1px 0 var(--dev-ring),
+      1px -1px 0 var(--dev-ring),
+      -1px -1px 0 var(--dev-ring),
+      0 0 3px var(--dev-ring),
       0 1px 1px #000;
   }
   .np-hpbar {
@@ -2738,8 +2760,8 @@
   /* FCT crit: at the low effect tier the floating combat text keeps the damage
      number, colour and bigger size but sheds the scale/pop (the heaviest FCT
      effect) by swapping the crit keyframes for the plain rise. The number is never
-     refused. This is the CSS floor; the per-element JS gate (fctDropNonCrit in
-     src/game/ui_tier_knobs.ts, consumed by the FCT painter). Inert above
+     refused (the painter spawns every floater on every tier; low sheds cost only via
+     the tighter live cap + shorter TTL in src/game/ui_tier_knobs.ts). Inert above
      the low tier. */
   :root[data-fx-level="low"] .fct.crit {
     animation-name: fct-rise;
@@ -4138,6 +4160,14 @@
   .trade-hint {
     font-size: 10.5px;
     color: #887c5c;
+    margin-top: 8px;
+  }
+  /* Primary action row (Accept / Cancel): one wrapper so the pair lays out as a
+     row on desktop (matching the old inline-button flow) and can ride sticky at
+     the window bottom on touch (hud.mobile.css). */
+  .trade-actions {
+    display: flex;
+    gap: 8px;
     margin-top: 8px;
   }
 

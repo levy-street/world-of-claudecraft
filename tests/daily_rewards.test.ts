@@ -35,12 +35,16 @@ import {
 import { buildDailyRewardsView } from '../src/ui/daily_rewards_view';
 
 class FakeDailyRewardDb implements DailyRewardDb {
+  banReason: string | null = null;
   score = 0;
   spin: { outcomeKey: string; points: number; createdAt: string } | null = null;
   tasks: DailyRewardTaskSeed[] = [];
   events: { kind: string; points: number; key: string; meta: Record<string, unknown> }[] = [];
 
   async ensureDay(): Promise<void> {}
+  async banForAccount(): Promise<{ reason: string } | null> {
+    return this.banReason === null ? null : { reason: this.banReason };
+  }
   async seedTasks(_day: string, tasks: DailyRewardTaskSeed[]): Promise<void> {
     this.tasks = tasks;
   }
@@ -231,6 +235,30 @@ describe('daily rewards', () => {
       wocUsdPrice: 0.5,
       usdValue: 25,
     });
+  });
+
+  it('locks banned accounts with the admin reason and prevents point awards', async () => {
+    const db = new FakeDailyRewardDb();
+    db.banReason = 'Automated play was detected.';
+    const service = new DailyRewardService(db);
+
+    const status = await service.status(1);
+    expect(status.eligibility).toMatchObject({
+      eligible: false,
+      reason: 'banned',
+      banReason: 'Automated play was detected.',
+    });
+
+    const spin = await service.spin(1);
+    expect(spin).toMatchObject({ status: 403 });
+    const awarded = await service.recordQuestCompletion(
+      1,
+      101,
+      'wolf_hunt',
+      new Date('2026-06-30T13:00:00.000Z'),
+    );
+    expect(awarded).toBe(0);
+    expect(db.events).toEqual([]);
   });
 
   it('uses live WOC and SOL prices from the payout service config', async () => {

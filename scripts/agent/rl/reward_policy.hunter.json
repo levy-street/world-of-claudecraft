@@ -1,0 +1,22 @@
+{
+  "_doc": "Hunter RL track. Hunter is ranged + a pet that holds aggro (Growl), so it survives better than the mage once a pet exists — weight death/damageTaken lighter than mage but still ranged-fragile early (no pet pre-L? tame). Reward kill+xp throughput (pet damage and pet kills credit the owner) while penalizing time. The env (headless/env_server.ts) applies these rewards server-side; train_agent.py / run_env.mjs pass them in env.reset(). curriculum stages run until untilLevel.",
+  "player_class": "hunter",
+  "frameSkip": 5,
+  "maxSteps": 8000,
+  "rewards": {
+    "xp": 0.012,
+    "damageDealt": 0.0025,
+    "damageTaken": -0.0025,
+    "kill": 0.32,
+    "death": -7,
+    "questDone": 5,
+    "questProgress": 0.5,
+    "levelUp": 3,
+    "timePenalty": -0.0008
+  },
+  "curriculum": [
+    { "stage": "survive", "untilLevel": 5, "rewards": { "death": -10, "damageTaken": -0.005 } },
+    { "stage": "throughput", "untilLevel": 12, "rewards": { "kill": 0.42, "xp": 0.015 } },
+    { "stage": "efficiency", "untilLevel": 20, "rewards": { "timePenalty": -0.0015 } }
+  ]
+}

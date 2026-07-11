@@ -1,0 +1,48 @@
+{
+  "extends": "multibox.world.json",
+  "tag": "🟪P",
+  "runSeconds": 28800,
+  "leader": "Pontius",
+  "combat": {
+    "fleeHp": 0.4,
+    "tankFleeHp": 0.25,
+    "lvlCeil": 2,
+    "pullManaFrac": 0.3,
+    "readyHp": 0.5,
+    "readyMana": 0.45,
+    "dieFreely": true,
+    "healerMelee": true,
+    "pullWhenReady": false,
+    "campRadiusMax": 24,
+    "forceLadder": true,
+    "questTripEvery": 300000,
+    "waterBrigade": true
+  },
+  "grind": {
+    "goHome": true,
+    "home": { "x": -50, "z": 590 },
+    "homeRadius": 28,
+    "ladder": [
+      { "level": 12, "label": "Broodmother widow cluster (L9-10)", "home": { "x": 96, "z": 344 }, "radius": 22 },
+      { "level": 13, "label": "Drowned Dead (L10-11, safe-level)", "home": { "x": 90, "z": 420 }, "radius": 22 },
+      { "level": 14, "minMember": 12, "label": "Ridge Stalkers (L14+, needs mage L12)", "home": { "x": -50, "z": 590 }, "radius": 28 }
+    ]
+  },
+  "bots": [
+    {
+      "user": "pala1",
+      "character": "Pontius",
+      "class": "paladin"
+    },
+    {
+      "user": "sham2",
+      "character": "Shims",
+      "class": "shaman"
+    },
+    {
+      "user": "ryze5",
+      "character": "ryzemage",
+      "class": "mage"
+    }
+  ]
+}

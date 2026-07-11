@@ -1,0 +1,12 @@
+{
+  "_doc": "Agentic-policy hunter crew. Executor = scripts/agent/agent_brain.mjs (proven reactive rules + LLM-planner intents). Account ryze2 / ryzehunts (hunter). Run: ANTHROPIC_API_KEY=... AGENT_PLAN=1 node scripts/multibox.mjs scripts/multibox.ryzehunts.json  (AGENT_PLAN unset => pure reactive, safe on live). To engage the agent executor, point multibox.mjs loadBrain() at brainPath below (1-line: read cfg.brainPath / BRAIN_PATH). See scripts/agent/README.md.",
+  "extends": "multibox.world.json",
+  "tag": "🟪H",
+  "leader": "ryzehunts",
+  "brainPath": "scripts/agent/agent_brain.mjs",
+  "runSeconds": 3600,
+  "bots": [
+    { "user": "ryze2", "character": "ryzehunts", "class": "hunter" }
+  ],
+  "combat": { "planEverySec": 8, "lvlCeil": 1, "fleeHp": 0.4, "restHp": 0.6 }
+}

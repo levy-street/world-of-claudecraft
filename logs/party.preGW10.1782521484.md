@@ -1,0 +1,122 @@
+# Party log
+
+- `00:45:00` ☠️G4 ▶️ session start — Leader ryzetank (warrior), Tank ryzetank.
+- `00:45:00` ☠️G4 Party assembled: ryzetank (warrior), ryzeheal (priest), Pontius (paladin), Shims (shaman), swifter (hunter).
+- `00:45:04` ☠️G4 Party of 1 formed.
+- `00:45:04` ☠️G4 👁️ panic-watch armed for: papa ours (auto-kill on their login).
+- `00:45:04` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `00:45:04` ☠️G4 Whole party is level 20+ — marching to Gravewyrm Sanctum door at (0, 880).
+- `00:45:04` ☠️G4 📍 Reached the Gravewyrm Sanctum approach.
+- `00:45:04` ☠️G4 🗺️ L20: grind moves to **Boneclad Revenants (L18-19)**
+- `00:45:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:45:06` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:45:08` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:45:08` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:45:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:45:10` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:45:12` ☠️G4 ✨ Pontius → blessing of might on shims
+- `00:45:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `00:45:14` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `00:45:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `00:46:44` ☠️G4 Zoned into Gravewyrm Sanctum. Elites ahead.
+- `00:46:44` ☠️G4 ⚔️ 5 inside — clearing single-pull from the entrance.
+- `00:46:44` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:46:44` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:46:52` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **1** mob(s) on the party
+- `00:47:01` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:47:01` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:47:01` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `00:47:16` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:47:18` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `00:47:18` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:47:21` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:47:27` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `00:47:30` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:47:31` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:47:34` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **2** mob(s) on the party
+- `00:47:36` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **2** mob(s) on the party
+- `00:47:37` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈789. Watch for a wipe.
+- `00:47:38` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **5** mob(s) on the party
+- `00:47:38` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **5** mob(s) on the party
+- `00:47:39` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `00:47:45` ☠️G4 ⚠️ **OVERPULL** — 7 mobs on the party (cap 1) at z≈788. Watch for a wipe.
+- `00:47:51` ☠️G4 🔱 Korgath the Bound: 100% HP.
+- `00:47:53` ☠️G4 ⚠️ **OVERPULL** — 6 mobs on the party (cap 1) at z≈788. Watch for a wipe.
+- `00:47:57` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `00:47:57` ☠️G4 🎲 **ryzetank** rolls **NEED** on Boundstone Helm
+- `00:47:57` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Boundstone Helm
+- `00:47:57` ☠️G4 🎲 **Shims** rolls **GREED** on Boundstone Helm
+- `00:48:03` ☠️G4 **Pontius** died.
+- `00:48:03` ☠️G4 🎲 **Pontius** rolls **GREED** on Boundstone Helm
+- `00:48:04` ☠️G4 **swifter** died.
+- `00:48:05` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:48:05` ☠️G4 🎲 **swifter** rolls **GREED** on Boundstone Helm
+- `00:48:05` ☠️G4 🎲 ryzetank wins Boundstone Helm (32)
+- `00:48:05` ☠️G4 💎 **ryzetank** looted: Boundstone Helm
+- `00:48:05` ☠️G4 🎲 ryzetank wins Boundstone Helm (32)
+- `00:48:05` ☠️G4 🎲 ryzetank wins Boundstone Helm (32)
+- `00:48:05` ☠️G4 🎲 ryzetank wins Boundstone Helm (32)
+- `00:48:05` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:48:05` ☠️G4 🎲 ryzetank wins Boundstone Helm (32)
+- `00:48:05` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:48:09` ☠️G4 ✨ Pontius → blessing of might on shims
+- `00:48:10` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `00:48:23` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `00:48:24` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `00:48:54` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `00:48:54` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `00:48:56` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `00:48:57` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **2** mob(s) on the party
+- `00:49:04` ☠️G4 💎 **Pontius** looted: Cracked Wyrm Scale
+- `00:49:23` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:49:25` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:49:27` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `00:49:27` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:49:28` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:49:40` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `00:49:40` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `00:49:41` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `00:49:41` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `00:49:48` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `00:50:00` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `00:50:02` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `00:50:04` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `00:50:04` ☠️G4 📊 PROGRESS kills=28 levels=[20,20,20,20,20] phase=dungeon elapsed=5m
+- `00:50:16` ☠️G4 🔱 Korgath the Bound: 54% HP.
+- `00:50:28` ☠️G4 🔱 Korgath the Bound: 15% HP.
+- `00:50:34` ☠️G4 🏆 **korgath** defeated! (loot logged above)
+- `00:50:34` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `00:50:34` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `00:50:34` ☠️G4 🎲 **ryzetank** rolls **NEED** on Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 **ryzetank** rolls **NEED** on Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 **Pontius** rolls **GREED** on Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 **Pontius** rolls **GREED** on Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 **Shims** rolls **GREED** on Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 **Shims** rolls **GREED** on Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 **swifter** rolls **GREED** on Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 **swifter** rolls **GREED** on Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (68)
+- `00:50:34` ☠️G4 💎 **ryzetank** looted: Nightwalk Jerkin
+- `00:50:34` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (66)
+- `00:50:34` ☠️G4 💎 **ryzetank** looted: Wyrmcult Grand Robe
+- `00:50:34` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (68)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (66)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (68)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (66)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (68)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (66)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Nightwalk Jerkin (68)
+- `00:50:34` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (66)
+- `00:50:48` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `00:50:57` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:50:57` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `00:50:58` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:51:13` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:51:14` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `00:51:15` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:51:16` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:51:18` ☠️G4 💎 **Shims** looted: Bone Fragments
+- `00:51:20` ☠️G4 ☠️G4 🛑 multibox.stop seen — logging the party out.
+- `00:51:20` ☠️G4 Run complete — disconnecting.

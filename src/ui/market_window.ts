@@ -211,6 +211,13 @@ export class MarketWindow {
     };
     const tab = (id: MarketTab) =>
       `<button type="button" class="mkt-tab${this.tab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
+    // Chrome-only AAA polish: the World Market is the original drag/resize
+    // reference, so its flex-column body/tabs/filters/#market-body structure,
+    // its .window-padding + flush sticky .panel-title header, and its resize
+    // wiring are all left intact. The titlebar adopts the AAA frame VISUALS (the
+    // display-font title + a bottom edge line) through scoped CSS on .panel-title
+    // (components.css), not a structural swap, so nothing about the reference
+    // window's geometry changes.
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('itemUi.market.title'))} <span class="panel-subtitle">${esc(t('itemUi.market.subtitle'))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.market.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="mkt-tabs">` +

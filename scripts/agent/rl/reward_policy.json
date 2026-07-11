@@ -1,0 +1,23 @@
+{
+  "_doc": "Reward + curriculum spec the agent edits, then hands to rl/train.mjs. Mirrors the reward dict in headless/env_server.ts; the trainer passes `rewards` into env.reset(). Curriculum stages run in order until each `untilLevel` is reached.",
+  "player_class": "warrior",
+  "_note_class": "headless env supports warrior|mage today; hunter (ryzehunts) needs obs/action wiring in src/sim/obs.ts before a LEARNED hunter executor — see README open questions.",
+  "frameSkip": 5,
+  "maxSteps": 8000,
+  "rewards": {
+    "xp": 0.01,
+    "damageDealt": 0.002,
+    "damageTaken": -0.0015,
+    "kill": 0.25,
+    "death": -6,
+    "questDone": 5,
+    "questProgress": 0.5,
+    "levelUp": 2.5,
+    "timePenalty": -0.0005
+  },
+  "curriculum": [
+    { "stage": "survive", "untilLevel": 4, "rewards": { "death": -10, "damageTaken": -0.004 } },
+    { "stage": "throughput", "untilLevel": 12, "rewards": { "kill": 0.35, "xp": 0.012 } },
+    { "stage": "efficiency", "untilLevel": 20, "rewards": { "timePenalty": -0.001 } }
+  ]
+}

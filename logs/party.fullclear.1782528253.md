@@ -1,0 +1,814 @@
+# Party log
+
+- `00:53:13` ☠️G4 ▶️ session start — Leader ryzetank (warrior), Tank ryzetank.
+- `00:53:13` ☠️G4 Party assembled: ryzetank (warrior), ryzeheal (priest), Pontius (paladin), Shims (shaman), swifter (hunter).
+- `00:53:16` ☠️G4 Party of 1 formed.
+- `00:53:16` ☠️G4 👁️ panic-watch armed for: papa ours (auto-kill on their login).
+- `00:53:17` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `00:53:17` ☠️G4 Whole party is level 20+ — marching to Gravewyrm Sanctum door at (0, 880).
+- `00:53:17` ☠️G4 📍 Reached the Gravewyrm Sanctum approach.
+- `00:53:17` ☠️G4 🗺️ L20: grind moves to **Boneclad Revenants (L18-19)**
+- `00:53:18` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:53:20` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:53:22` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:53:24` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `00:53:26` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `00:53:27` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:53:46` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:53:48` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:53:49` ☠️G4 ✨ Pontius → blessing of might on shims
+- `00:53:51` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `00:56:20` ☠️G4 Zoned into Gravewyrm Sanctum. Elites ahead.
+- `00:56:20` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:56:20` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:56:20` ☠️G4 ⚔️ 5 inside — clearing single-pull from the entrance.
+- `00:56:20` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:56:20` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:56:22` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:56:22` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:56:24` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:56:25` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:56:26` ☠️G4 ✨ Pontius → blessing of might on shims
+- `00:56:28` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:56:29` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `00:56:29` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `00:56:35` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `00:56:36` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `00:56:50` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈767. Watch for a wipe.
+- `00:56:57` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Pontius · **4** mob(s) on the party
+- `00:56:58` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈769. Watch for a wipe.
+- `00:57:02` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **4** mob(s) on the party
+- `00:57:06` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:06` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **4** mob(s) on the party
+- `00:57:14` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:22` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:30` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:38` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:46` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:52` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `00:57:53` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **4** mob(s) on the party
+- `00:57:54` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:57:56` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **3** mob(s) on the party
+- `00:58:02` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:10` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:17` ☠️G4 📊 PROGRESS kills=1 levels=[20,20,20,20,20] phase=dungeon elapsed=5m
+- `00:58:18` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:26` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:34` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:42` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:50` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:58:58` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:59:06` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:59:10` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **3** mob(s) on the party
+- `00:59:14` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:59:22` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈774. Watch for a wipe.
+- `00:59:24` ☠️G4 **swifter** died.
+- `00:59:27` ☠️G4 **ryzetank** died.
+- `00:59:37` ☠️G4 **ryzeheal** died.
+- `00:59:38` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `00:59:38` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `00:59:40` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `00:59:41` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `00:59:41` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `00:59:50` ☠️G4 **Pontius** died.
+- `00:59:55` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `00:59:57` ☠️G4 **Shims** died.
+- `00:59:57` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `00:59:58` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `00:59:58` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `00:59:59` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: swifter · **1** mob(s) on the party
+- `01:00:03` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:00:04` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:00:06` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `01:00:06` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:00:14` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `01:00:14` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈770. Watch for a wipe.
+- `01:00:22` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈770. Watch for a wipe.
+- `01:00:23` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `01:00:23` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **2** mob(s) on the party
+- `01:00:23` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `01:00:28` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `01:00:31` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈770. Watch for a wipe.
+- `01:00:40` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `01:00:40` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:00:42` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **2** mob(s) on the party
+- `01:01:29` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `01:01:29` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **1** mob(s) on the party
+- `01:01:43` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:01:44` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:01:44` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `01:01:46` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:01:46` ☠️G4 💎 **swifter** looted: Cracked Wyrm Scale
+- `01:01:48` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:01:50` ☠️G4 💎 **swifter** looted: Bone Fragments
+- `01:01:51` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:01:52` ☠️G4 🧭 ryzetank: letting the party recover before the next pull
+- `01:01:53` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:01:53` ☠️G4 🔱 **Engaging Korgath the Bound** (2171/2171 HP).
+- `01:01:53` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈793. Watch for a wipe.
+- `01:01:57` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:02:01` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈809. Watch for a wipe.
+- `01:02:03` ☠️G4 🔱 Korgath the Bound: **98%** HP.
+- `01:02:10` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈809. Watch for a wipe.
+- `01:02:13` ☠️G4 🔱 Korgath the Bound: **98%** HP.
+- `01:02:18` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈809. Watch for a wipe.
+- `01:02:23` ☠️G4 🔱 Korgath the Bound: **94%** HP.
+- `01:02:26` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈809. Watch for a wipe.
+- `01:02:33` ☠️G4 🔱 Korgath the Bound: **92%** HP.
+- `01:02:34` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈809. Watch for a wipe.
+- `01:02:43` ☠️G4 🔱 Korgath the Bound: **86%** HP.
+- `01:02:53` ☠️G4 🔱 Korgath the Bound: **71%** HP.
+- `01:03:03` ☠️G4 🔱 Korgath the Bound: **58%** HP.
+- `01:03:13` ☠️G4 🔱 Korgath the Bound: **43%** HP.
+- `01:03:17` ☠️G4 📊 PROGRESS kills=14 levels=[20,20,20,20,20] phase=dungeon elapsed=10m
+- `01:03:23` ☠️G4 🔱 Korgath the Bound: **30%** HP.
+- `01:03:33` ☠️G4 🔱 Korgath the Bound: **17%** HP.
+- `01:03:44` ☠️G4 🔱 Korgath the Bound: **2%** HP.
+- `01:03:45` ☠️G4 🏆 **KORGATH DEFEATED!** (loot logged above)
+- `01:03:45` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:03:46` ☠️G4 🎲 **ryzetank** rolls **NEED** on Boneplate Vest
+- `01:03:46` ☠️G4 🎲 **ryzetank** rolls **NEED** on Wyrmcult Grand Robe
+- `01:03:46` ☠️G4 🎲 **Pontius** rolls **GREED** on Boneplate Vest
+- `01:03:46` ☠️G4 🎲 **Pontius** rolls **GREED** on Wyrmcult Grand Robe
+- `01:03:46` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Boneplate Vest
+- `01:03:46` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Wyrmcult Grand Robe
+- `01:03:46` ☠️G4 🎲 **swifter** rolls **GREED** on Boneplate Vest
+- `01:03:46` ☠️G4 🎲 **swifter** rolls **GREED** on Wyrmcult Grand Robe
+- `01:03:47` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:03:58` ☠️G4 🎲 **Shims** rolls **GREED** on Boneplate Vest
+- `01:03:58` ☠️G4 🎲 **Shims** rolls **GREED** on Wyrmcult Grand Robe
+- `01:04:00` ☠️G4 🎲 ryzetank wins Boneplate Vest (7)
+- `01:04:00` ☠️G4 💎 **ryzetank** looted: Boneplate Vest
+- `01:04:00` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (22)
+- `01:04:00` ☠️G4 💎 **ryzetank** looted: Wyrmcult Grand Robe
+- `01:04:00` ☠️G4 🎲 ryzetank wins Boneplate Vest (7)
+- `01:04:00` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (22)
+- `01:04:00` ☠️G4 🎲 ryzetank wins Boneplate Vest (7)
+- `01:04:00` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (22)
+- `01:04:00` ☠️G4 🎲 ryzetank wins Boneplate Vest (7)
+- `01:04:00` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (22)
+- `01:04:02` ☠️G4 🎲 ryzetank wins Boneplate Vest (7)
+- `01:04:02` ☠️G4 🎲 ryzetank wins Wyrmcult Grand Robe (22)
+- `01:04:07` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:04:09` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:04:11` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:04:12` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:04:12` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:04:13` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:04:13` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:04:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:04:25` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `01:04:26` ☠️G4 💎 **ryzeheal** looted: Bone Fragments
+- `01:04:29` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:04:34` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `01:04:34` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **2** mob(s) on the party
+- `01:04:38` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈829. Watch for a wipe.
+- `01:04:44` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **4** mob(s) on the party
+- `01:04:45` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `01:04:46` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **4** mob(s) on the party
+- `01:04:46` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈829. Watch for a wipe.
+- `01:04:46` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: swifter · **4** mob(s) on the party
+- `01:04:49` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **4** mob(s) on the party
+- `01:04:54` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈829. Watch for a wipe.
+- `01:05:02` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈824. Watch for a wipe.
+- `01:05:06` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `01:05:06` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **3** mob(s) on the party
+- `01:05:06` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `01:05:07` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **2** mob(s) on the party
+- `01:05:12` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `01:05:19` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `01:05:26` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `01:05:27` ☠️G4 💎 **Pontius** looted: Cracked Wyrm Scale
+- `01:05:27` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:05:36` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈847. Watch for a wipe.
+- `01:05:36` ☠️G4 🔱 **Engaging Grand Necromancer Velkhar** (1971/1971 HP).
+- `01:05:44` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈853. Watch for a wipe.
+- `01:05:46` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `01:05:46` ☠️G4 🔱 Grand Necromancer Velkhar: **96%** HP.
+- `01:05:46` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **2** mob(s) on the party
+- `01:05:56` ☠️G4 🔱 Grand Necromancer Velkhar: **93%** HP.
+- `01:05:59` ☠️G4 🧭 ryzetank: tanking Grand Necromancer Velkhar
+- `01:06:06` ☠️G4 🔱 Grand Necromancer Velkhar: **89%** HP.
+- `01:06:06` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈853. Watch for a wipe.
+- `01:06:06` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `01:06:07` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `01:06:08` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **4** mob(s) on the party
+- `01:06:09` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: swifter · **4** mob(s) on the party
+- `01:06:14` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈855. Watch for a wipe.
+- `01:06:16` ☠️G4 🔱 Grand Necromancer Velkhar: **61%** HP.
+- `01:06:22` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈855. Watch for a wipe.
+- `01:06:26` ☠️G4 🔱 Grand Necromancer Velkhar: **51%** HP.
+- `01:06:30` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈855. Watch for a wipe.
+- `01:06:36` ☠️G4 🔱 Grand Necromancer Velkhar: **34%** HP.
+- `01:06:38` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈855. Watch for a wipe.
+- `01:06:41` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **5** mob(s) on the party
+- `01:06:42` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **5** mob(s) on the party
+- `01:06:46` ☠️G4 🔱 Grand Necromancer Velkhar: **29%** HP.
+- `01:06:47` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈854. Watch for a wipe.
+- `01:06:50` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `01:06:50` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: ryzeheal · **5** mob(s) on the party
+- `01:06:51` ☠️G4 ⚔️ Pull: **Raised Bonewalker** — tanking: swifter · **4** mob(s) on the party
+- `01:06:55` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈854. Watch for a wipe.
+- `01:06:57` ☠️G4 🔱 Grand Necromancer Velkhar: **24%** HP.
+- `01:07:07` ☠️G4 🔱 Grand Necromancer Velkhar: **9%** HP.
+- `01:07:17` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:07:27` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:07:30` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:07:30` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:07:37` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:07:39` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:07:40` ☠️G4 🎲 **ryzetank** rolls **NEED** on Boneplate Vest
+- `01:07:40` ☠️G4 🎲 **ryzetank** rolls **NEED** on Emberwood Staff
+- `01:07:40` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Boneplate Vest
+- `01:07:40` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Emberwood Staff
+- `01:07:40` ☠️G4 🎲 **Pontius** rolls **GREED** on Boneplate Vest
+- `01:07:40` ☠️G4 🎲 **Pontius** rolls **GREED** on Emberwood Staff
+- `01:07:40` ☠️G4 🎲 **Shims** rolls **GREED** on Boneplate Vest
+- `01:07:40` ☠️G4 🎲 **Shims** rolls **GREED** on Emberwood Staff
+- `01:07:47` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:07:56` ☠️G4 🧭 ryzetank: holding for 1 to regroup (0 dead)
+- `01:07:56` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:07:56` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:07:57` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:07:58` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:07:58` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:08:00` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:08:00` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:08:02` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:08:02` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `01:08:07` ☠️G4 🔱 Grand Necromancer Velkhar: **1%** HP.
+- `01:08:10` ☠️G4 🎲 ryzetank wins Boneplate Vest (33)
+- `01:08:10` ☠️G4 💎 **ryzetank** looted: Boneplate Vest
+- `01:08:10` ☠️G4 🎲 ryzetank wins Emberwood Staff (46)
+- `01:08:10` ☠️G4 💎 **ryzetank** looted: Emberwood Staff
+- `01:08:10` ☠️G4 🎲 ryzetank wins Boneplate Vest (33)
+- `01:08:10` ☠️G4 🎲 ryzetank wins Emberwood Staff (46)
+- `01:08:10` ☠️G4 🎲 ryzetank wins Boneplate Vest (33)
+- `01:08:10` ☠️G4 🎲 ryzetank wins Emberwood Staff (46)
+- `01:08:10` ☠️G4 🎲 ryzetank wins Boneplate Vest (33)
+- `01:08:10` ☠️G4 🎲 ryzetank wins Emberwood Staff (46)
+- `01:08:11` ☠️G4 🏆 **VELKHAR DEFEATED!** (loot logged above)
+- `01:08:14` ☠️G4 🎲 **swifter** rolls **GREED** on Boneplate Vest
+- `01:08:14` ☠️G4 🎲 **swifter** rolls **GREED** on Emberwood Staff
+- `01:08:17` ☠️G4 🎲 ryzetank wins Boneplate Vest (33)
+- `01:08:17` ☠️G4 🎲 ryzetank wins Emberwood Staff (46)
+- `01:08:17` ☠️G4 📊 PROGRESS kills=45 levels=[20,20,20,20,20] phase=dungeon elapsed=15m
+- `01:08:21` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `01:08:22` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:08:27` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `01:08:29` ☠️G4 🧭 ryzetank: pulling Sanctum Drakonid
+- `01:08:37` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `01:08:39` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: swifter · **2** mob(s) on the party
+- `01:08:43` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **2** mob(s) on the party
+- `01:08:43` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **2** mob(s) on the party
+- `01:08:55` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **1** mob(s) on the party
+- `01:08:55` ☠️G4 💎 **Pontius** looted: Cracked Wyrm Scale
+- `01:09:00` ☠️G4 🧭 ryzetank: advancing to the next pull
+- `01:09:02` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:09:04` ☠️G4 🔱 **Engaging Korzul the Gravewyrm** (3064/3064 HP).
+- `01:09:06` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈885. Watch for a wipe.
+- `01:09:14` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈885. Watch for a wipe.
+- `01:09:14` ☠️G4 🔱 Korzul the Gravewyrm: **94%** HP.
+- `01:09:21` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzetank · **2** mob(s) on the party
+- `01:09:21` ☠️G4 💎 **Pontius** looted: Cracked Wyrm Scale
+- `01:09:24` ☠️G4 🔱 Korzul the Gravewyrm: **93%** HP.
+- `01:09:34` ☠️G4 🔱 Korzul the Gravewyrm: **91%** HP.
+- `01:09:39` ☠️G4 🧭 ryzetank: tanking Korzul the Gravewyrm
+- `01:09:44` ☠️G4 🔱 Korzul the Gravewyrm: **82%** HP.
+- `01:09:54` ☠️G4 🔱 Korzul the Gravewyrm: **59%** HP.
+- `01:10:05` ☠️G4 🔱 Korzul the Gravewyrm: **40%** HP.
+- `01:10:15` ☠️G4 🔱 Korzul the Gravewyrm: **25%** HP.
+- `01:10:25` ☠️G4 🔱 Korzul the Gravewyrm: **3%** HP.
+- `01:10:25` ☠️G4 ☠️ **Korzul is DOWN!** Looting the Wyrm's Hollow, then resetting the instance.
+- `01:10:25` ☠️G4 🏆 **KORZUL DEFEATED!** (loot logged above)
+- `01:10:26` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:10:26` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:10:26` ☠️G4 🎲 **ryzetank** rolls **NEED** on Revenant Silk Robe
+- `01:10:26` ☠️G4 🎲 **ryzetank** rolls **NEED** on Necromancer's Starshroud
+- `01:10:26` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Revenant Silk Robe
+- `01:10:26` ☠️G4 🎲 **ryzeheal** rolls **GREED** on Necromancer's Starshroud
+- `01:10:26` ☠️G4 🎲 **Pontius** rolls **GREED** on Revenant Silk Robe
+- `01:10:26` ☠️G4 🎲 **Pontius** rolls **GREED** on Necromancer's Starshroud
+- `01:10:26` ☠️G4 🎲 **Shims** rolls **GREED** on Revenant Silk Robe
+- `01:10:26` ☠️G4 🎲 **Shims** rolls **GREED** on Necromancer's Starshroud
+- `01:10:26` ☠️G4 🎲 **swifter** rolls **GREED** on Revenant Silk Robe
+- `01:10:26` ☠️G4 🎲 **swifter** rolls **GREED** on Necromancer's Starshroud
+- `01:10:27` ☠️G4 🎲 ryzetank wins Revenant Silk Robe (89)
+- `01:10:27` ☠️G4 💎 **ryzetank** looted: Revenant Silk Robe
+- `01:10:27` ☠️G4 🎲 ryzetank wins Necromancer's Starshroud (78)
+- `01:10:27` ☠️G4 💎 **ryzetank** looted: Necromancer's Starshroud
+- `01:10:27` ☠️G4 🎲 ryzetank wins Revenant Silk Robe (89)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Necromancer's Starshroud (78)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Revenant Silk Robe (89)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Necromancer's Starshroud (78)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Revenant Silk Robe (89)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Necromancer's Starshroud (78)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Revenant Silk Robe (89)
+- `01:10:27` ☠️G4 🎲 ryzetank wins Necromancer's Starshroud (78)
+- `01:10:27` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:10:29` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:10:31` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:10:32` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:10:33` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:10:33` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:10:33` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:10:34` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:10:50` ☠️G4 🚪 Loot cleared — heading to the exit to reset the instance.
+- `01:10:54` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: Pontius · **1** mob(s) on the party
+- `01:11:02` ☠️G4 🔁 Out of the instance — disbanding + reforming the party (fresh party = fresh instance).
+- `01:11:54` ☠️G4 **Pontius** died.
+- `01:12:26` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:12:26` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:12:28` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:12:30` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:12:32` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:12:33` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:12:33` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:12:35` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:12:36` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:12:41` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:13:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=20m
+- `01:14:01` ☠️G4 **swifter** died.
+- `01:14:12` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:14:29` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:14:29` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:14:30` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **0** mob(s) on the party
+- `01:14:39` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:14:46` ☠️G4 **ryzeheal** died.
+- `01:14:47` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:14:47` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:14:48` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:14:49` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:14:49` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:14:51` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:14:52` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:15:34` ☠️G4 **Shims** died.
+- `01:16:56` ☠️G4 **ryzetank** died.
+- `01:16:57` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:16:57` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:16:59` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:16:59` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:17:01` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:17:01` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:17:03` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:17:03` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:17:04` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:17:04` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:18:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=25m
+- `01:18:58` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:18:58` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:19:00` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:19:00` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:19:02` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:19:02` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:19:04` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:19:04` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:19:06` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:19:06` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:20:58` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:20:58` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:21:00` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:21:00` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:21:02` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:21:02` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:21:04` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:21:05` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:21:07` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:21:07` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:22:58` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:22:58` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:23:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:23:01` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:23:03` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:23:03` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:23:05` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:23:05` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:23:08` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:23:08` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:23:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=30m
+- `01:24:59` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:24:59` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:25:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:25:01` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:25:03` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:25:03` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:25:05` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:25:06` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:25:08` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:25:08` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:26:59` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:26:59` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:27:02` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:27:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:27:04` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:27:05` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:27:06` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:27:07` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:27:10` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:27:10` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:28:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=35m
+- `01:29:00` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:29:00` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:29:03` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:29:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:29:05` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:29:05` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:29:07` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:29:07` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:29:10` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:29:10` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:31:00` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:31:00` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:31:03` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:31:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:31:05` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:31:06` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:31:07` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:31:08` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:31:11` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:31:11` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:31:20` ☠️G4 ⚔️ Pull: **Ridge Stalker** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:32:58` ☠️G4 ⚔️ Pull: **Deeprock Tunneler** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:33:00` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:33:01` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:33:04` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:33:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:33:06` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:33:06` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:33:08` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:33:08` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:33:11` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:33:11` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:33:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=40m
+- `01:35:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:35:01` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:35:04` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:35:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:35:06` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:35:07` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:35:08` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:35:09` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:35:11` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:35:11` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:37:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:37:01` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:37:05` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:37:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:37:07` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:37:07` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:37:09` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:37:09` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:37:12` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:37:12` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:38:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=45m
+- `01:39:02` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:39:02` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:39:05` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:39:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:39:07` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:39:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:39:09` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:39:10` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:39:12` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:39:12` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:41:02` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:41:02` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:41:05` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:41:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:41:08` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:41:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:41:10` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:41:10` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:41:13` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:41:13` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:43:02` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:43:03` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:43:06` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:43:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:43:08` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:43:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:43:10` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:43:11` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:43:13` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:43:13` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:43:17` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=50m
+- `01:45:00` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:45:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:45:03` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:45:06` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:45:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:45:09` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:45:09` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:45:11` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:45:11` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:45:13` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:45:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:47:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:47:03` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:47:07` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:47:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:47:09` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:47:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:47:12` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:47:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:47:14` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:47:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:48:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=55m
+- `01:49:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:49:04` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:49:07` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:49:08` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:49:10` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:49:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:49:12` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:49:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:49:14` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:49:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:51:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:51:04` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:51:07` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:51:08` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:51:10` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:51:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:51:13` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:51:13` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:51:15` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:51:15` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:53:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:53:05` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:53:08` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:53:08` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:53:11` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:53:12` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:53:14` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:53:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=60m
+- `01:53:19` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:53:20` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:53:34` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:55:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:55:05` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:55:08` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:55:09` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:55:11` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:55:12` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:55:14` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:55:20` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:55:20` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:55:34` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:56:42` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `01:57:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:57:06` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:57:09` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:57:09` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:57:12` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:57:13` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:57:15` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:57:20` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:57:21` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:57:34` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `01:58:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=65m
+- `01:59:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `01:59:06` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `01:59:09` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `01:59:10` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `01:59:12` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `01:59:13` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `01:59:15` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `01:59:21` ☠️G4 ✨ Pontius → blessing of might on shims
+- `01:59:21` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `01:59:35` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:01:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:01:06` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:01:09` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:01:10` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:01:13` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:01:14` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:01:16` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:01:21` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:01:21` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:01:22` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:01:35` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:03:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:03:07` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:03:10` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:03:11` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:03:13` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:03:14` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:03:16` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:03:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=70m
+- `02:03:21` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:03:22` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:03:38` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:05:08` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:05:10` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:05:14` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:05:22` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:05:39` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:05:48` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:05:50` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:05:51` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:05:53` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:05:55` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:06:02` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:07:08` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:07:11` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:07:15` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:07:22` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:07:39` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:07:48` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:07:50` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:07:52` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:07:54` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:07:57` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:08:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=75m
+- `02:09:09` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:09:11` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:09:15` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:09:23` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:09:40` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:09:48` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:09:51` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:09:53` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:09:55` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:09:57` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:11:09` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:11:11` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:11:16` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:11:23` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:11:40` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:11:49` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:11:51` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:11:53` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:11:55` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:11:55` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:11:58` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:13:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=80m
+- `02:13:25` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:13:36` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:13:37` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:13:39` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:13:41` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:13:49` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:13:51` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:13:54` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:13:56` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:13:59` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:15:25` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:15:36` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:15:38` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:15:40` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:15:43` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:15:50` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:15:52` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:15:55` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:15:57` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:15:59` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:17:05` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:17:25` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:17:37` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:17:39` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:17:41` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:17:43` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:17:50` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:17:52` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:17:55` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:17:58` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:18:00` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:18:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=85m
+- `02:18:44` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:19:26` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:19:37` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:19:39` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:19:41` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:19:43` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:19:50` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:19:53` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:19:56` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:19:58` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:20:00` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:21:26` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:21:38` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:21:40` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:21:43` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:21:45` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:21:51` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:21:53` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:21:56` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:21:58` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:22:01` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:23:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=90m
+- `02:23:27` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:23:38` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:23:42` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:23:46` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:23:50` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:24:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:24:04` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:24:07` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:24:09` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:24:11` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:24:24` ☠️G4 ⚔️ Pull: **Thornpeak Ogre** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:25:27` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:25:39` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:25:43` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:25:47` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:25:51` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:26:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:26:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:26:07` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:26:09` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:26:11` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:27:28` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:27:39` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:27:44` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:27:47` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:27:51` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:28:01` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:28:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:28:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:28:11` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:28:13` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:28:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=95m
+- `02:29:28` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:29:43` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:29:45` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:29:51` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:29:58` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:30:02` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:30:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:30:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:30:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:30:14` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:31:28` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:31:44` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:31:47` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:31:52` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:32:02` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:32:02` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:32:06` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:32:08` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:32:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:32:15` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:33:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=100m
+- `02:33:29` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:33:44` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:33:47` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:33:53` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:34:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:34:03` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:34:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:34:09` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:34:12` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:34:15` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:35:36` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:35:45` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:35:47` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:35:53` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:36:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:36:03` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:36:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:36:09` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:36:13` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:36:17` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:37:38` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:37:51` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:37:56` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:38:00` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:38:03` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:38:07` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:38:07` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:38:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:38:15` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:38:17` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:38:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=105m
+- `02:38:48` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `02:39:38` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:39:51` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:39:56` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:40:00` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:40:05` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:40:07` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:40:08` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:40:10` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:40:15` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:40:18` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:40:31` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `02:41:23` ☠️G4 ⚔️ Pull: **Ridge Stalker** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `02:41:47` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:41:51` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:42:00` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:42:05` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:42:08` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:43:18` ☠️G4 📊 PROGRESS kills=65 levels=[20,20,20,20,20] phase=dungeon elapsed=110m
+- `02:43:18` ☠️G4 ✨ ryzeheal → power word fortitude on ryzetank
+- `02:43:31` ☠️G4 ✨ ryzeheal → power word fortitude on ryzeheal
+- `02:43:33` ☠️G4 ✨ ryzeheal → power word fortitude on pontius
+- `02:43:35` ☠️G4 ✨ ryzeheal → power word fortitude on shims
+- `02:43:37` ☠️G4 ✨ ryzeheal → power word fortitude on swifter
+- `02:43:47` ☠️G4 ✨ Pontius → blessing of might on ryzetank
+- `02:43:52` ☠️G4 ✨ Pontius → blessing of might on ryzeheal
+- `02:44:00` ☠️G4 ✨ Pontius → blessing of might on pontius
+- `02:44:06` ☠️G4 ✨ Pontius → blessing of might on shims
+- `02:44:08` ☠️G4 ✨ Pontius → blessing of might on swifter
+- `02:44:09` ☠️G4 ☠️G4 🛑 multibox.stop seen — logging the party out.
+- `02:44:09` ☠️G4 Run complete — disconnecting.

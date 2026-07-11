@@ -131,6 +131,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   it('ENTITY_EXCLUDE membership is exactly the pinned set', () => {
     expect([...ENTITY_EXCLUDE].sort()).toEqual([
       'color',
+      'equippedInstances',
       'equippedItems',
       'guild',
       'holderBalance',

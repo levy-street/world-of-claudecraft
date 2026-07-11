@@ -1,0 +1,536 @@
+# swifter — hunter
+_the steady ranger. Journal opened 2026-06-29T04:02:41.312Z._
+
+- `04:02:42` Entered the world at level 20.
+- `04:02:46` 🏰 Crossed the threshold into Gravewyrm Sanctum.
+- `04:02:46` 📊 swifter 1175/1175 hp mana 94% · 0 kills
+- `04:02:46` 🛡️ GEAR: feet:wyrmshadow_treads, legs:wyrmshadow_legguards, chest:wyrmshadow_harness, waist:cragmaw_huntcord, gloves:gravewyrm_gauntlets, helmet:nighttalon_crown, mainhand:fang_of_korzul, shoulder:gravewyrm_mantle
+- `04:02:46` 📈 STATS: ap=353 crit=0.197 weapon={"min":19,"max":30,"speed":1.7,"dagger":true} · {"str":36,"agi":154,"sta":102,"int":32,"spi":33,"armor":1363}
+- `04:02:56` 📊 swifter 1074/1175 hp mana 82% · 0 kills
+- `04:03:05` ⚔️ Killed **Sanctum Boneguard**. It never closed the distance.
+- `04:03:06` 📊 swifter 856/1175 hp mana 64% · 1 kills
+- `04:03:06` 💰 You loot 80c.
+- `04:03:16` 📊 swifter 977/1295 hp mana 62% · 1 kills
+- `04:03:26` 📊 swifter 748/1295 hp mana 46% · 1 kills
+- `04:03:36` 📊 swifter 806/1295 hp mana 41% · 1 kills
+- `04:03:46` 📈 +80 XP in 1m · run total 80 · L20 0/322993
+- `04:03:46` 📊 swifter 742/1295 hp mana 56% · 1 kills
+- `04:03:53` ⚔️ Killed **Sanctum Boneguard**. It never closed the distance.
+- `04:03:53` 💰 You loot 81c.
+- `04:03:57` 📊 swifter 868/1295 hp mana 38% · 2 kills
+- `04:04:07` 📊 swifter 822/1295 hp mana 29% · 2 kills
+- `04:04:17` 📊 swifter 623/1295 hp mana 41% · 2 kills
+- `04:04:27` 📊 swifter 364/1295 hp mana 57% · 2 kills
+- `04:04:31` 🩸 Down to 308 HP — bracing.
+- `04:04:37` 📊 swifter 105/1295 hp mana 75% · 2 kills
+- `04:04:40` ☠️ I fell in battle near (2079, 812). Releasing spirit.
+- `04:04:41` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:04:41` 💚 Patched up (1175/1175).
+- `04:04:41` 🔄 Back on my feet.
+- `04:04:46` 📈 +80 XP in 1m · run total 160 · L20 0/323073
+- `04:05:18` 📊 swifter 1175/1175 hp mana 100% · 2 kills
+- `04:05:19` 💰 You receive: Bone Fragments.
+- `04:05:28` 📊 swifter 1112/1175 hp mana 88% · 2 kills
+- `04:05:38` 📊 swifter 1112/1175 hp mana 91% · 2 kills
+- `04:05:42` ⚔️ Killed **Sanctum Drakonid**. Down before it reached me.
+- `04:05:42` 💰 You loot 68c.
+- `04:05:46` 📈 +94 XP in 1m · run total 254 · L20 0/323167
+- `04:05:48` 📊 swifter 1112/1175 hp mana 73% · 3 kills
+- `04:05:55` ⚔️ Killed **Sanctum Boneguard**. Clean shot, clean kill.
+- `04:05:58` 💰 You loot 79c.
+- `04:05:59` 📊 swifter 1112/1175 hp mana 68% · 4 kills
+- `04:06:09` 📊 swifter 1175/1175 hp mana 83% · 4 kills
+- `04:06:19` 📊 swifter 1175/1175 hp mana 98% · 4 kills
+- `04:06:29` 📊 swifter 1175/1175 hp mana 100% · 4 kills
+- `04:06:39` 📊 swifter 1175/1175 hp mana 100% · 4 kills
+- `04:06:46` 📈 +80 XP in 1m · run total 334 · L20 0/323247
+- `04:06:49` 📊 swifter 1175/1175 hp mana 100% · 4 kills
+- `04:06:59` 📊 swifter 1175/1175 hp mana 100% · 4 kills
+- `04:07:09` 📊 swifter 1175/1175 hp mana 100% · 4 kills
+- `04:07:19` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:07:29` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:07:39` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:07:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:07:49` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:00` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:10` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:20` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:30` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:40` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:08:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:08:50` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:00` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:10` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:20` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:30` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:40` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:09:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:09:50` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:00` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:10` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:21` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:31` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:41` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:10:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:10:51` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:01` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:11` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:21` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:31` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:41` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:11:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:11:51` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:12:01` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:12:11` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:12:22` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:12:32` 📊 swifter 1295/1295 hp mana 100% · 4 kills
+- `04:12:42` 📊 swifter 1239/1295 hp mana 91% · 4 kills
+- `04:12:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:12:52` 📊 swifter 1083/1295 hp mana 91% · 4 kills
+- `04:13:02` 📊 swifter 790/1295 hp mana 76% · 4 kills
+- `04:13:12` 📊 swifter 913/1295 hp mana 78% · 4 kills
+- `04:13:22` 📊 swifter 865/1295 hp mana 87% · 4 kills
+- `04:13:32` 📊 swifter 805/1295 hp mana 97% · 4 kills
+- `04:13:42` 📊 swifter 660/1295 hp mana 100% · 4 kills
+- `04:13:46` 📈 +0 XP in 1m · run total 334 · L20 0/323247
+- `04:13:52` 📊 swifter 575/1295 hp mana 100% · 4 kills
+- `04:14:02` 📊 swifter 602/1295 hp mana 100% · 4 kills
+- `04:14:12` 📊 swifter 487/1295 hp mana 100% · 4 kills
+- `04:14:22` 📊 swifter 334/1295 hp mana 100% · 4 kills
+- `04:14:25` 🩸 Down to 282 HP — bracing.
+- `04:14:28` 💚 Patched up (471/1295).
+- `04:14:32` 📊 swifter 664/1295 hp mana 97% · 4 kills
+- `04:14:42` 📊 swifter 925/1295 hp mana 100% · 4 kills
+- `04:14:46` 📈 +80 XP in 1m · run total 414 · L20 0/323327
+- `04:14:52` 📊 swifter 1023/1295 hp mana 100% · 4 kills
+- `04:15:02` 📊 swifter 1149/1295 hp mana 85% · 4 kills
+- `04:15:09` ⚔️ Killed **Sanctum Drakonid**. Down before it reached me.
+- `04:15:12` 📊 swifter 1149/1295 hp mana 79% · 5 kills
+- `04:15:23` 📊 swifter 1293/1295 hp mana 91% · 5 kills
+- `04:15:33` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:15:43` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:15:47` 📈 +80 XP in 1m · run total 494 · L20 0/323407
+- `04:15:53` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:03` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:13` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:23` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:33` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:43` 📊 swifter 1295/1295 hp mana 100% · 5 kills
+- `04:16:47` 📈 +0 XP in 1m · run total 494 · L20 0/323407
+- `04:16:53` 📊 swifter 1295/1295 hp mana 94% · 5 kills
+- `04:17:06` 📊 swifter 1162/1295 hp mana 94% · 5 kills
+- `04:17:16` 📊 swifter 1162/1295 hp mana 91% · 5 kills
+- `04:17:23` ⚔️ Killed **Korgath the Bound**. It never closed the distance.
+- `04:17:24` 💰 You loot 14s 64c.
+- `04:17:24` 🎲 GREED on Boneplate Vest
+- `04:17:24` 🎲 GREED on Korgath's Chainwraps
+- `04:17:24` 💰 pontius wins Boneplate Vest (38)
+- `04:17:24` 💰 pontius wins Korgath's Chainwraps (77)
+- `04:17:26` 📊 swifter 1162/1295 hp mana 89% · 6 kills
+- `04:17:36` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:17:46` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:17:47` 📈 +94 XP in 1m · run total 588 · L20 0/323501
+- `04:17:56` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:06` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:16` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:26` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:36` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:47` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:18:47` 📈 +0 XP in 1m · run total 588 · L20 0/323501
+- `04:18:57` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:07` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:17` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:27` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:37` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:47` 📈 +0 XP in 1m · run total 588 · L20 0/323501
+- `04:19:47` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:19:57` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:07` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:17` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:27` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:37` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:47` 📈 +0 XP in 1m · run total 588 · L20 0/323501
+- `04:20:47` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:20:57` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:21:07` 📊 swifter 1295/1295 hp mana 100% · 6 kills
+- `04:21:17` 📊 swifter 1295/1295 hp mana 91% · 6 kills
+- `04:21:26` ⚔️ Killed **Sanctum Drakonid**. Clean shot, clean kill.
+- `04:21:26` 💰 You loot 1s 4c.
+- `04:21:27` 📊 swifter 1222/1295 hp mana 97% · 7 kills
+- `04:21:38` 📊 swifter 1222/1295 hp mana 73% · 7 kills
+- `04:21:41` ⚔️ Killed **Sanctum Boneguard**. It never closed the distance.
+- `04:21:42` 💰 You loot 63c.
+- `04:21:47` 📈 +174 XP in 1m · run total 762 · L20 0/323675
+- `04:21:48` 📊 swifter 1258/1295 hp mana 68% · 8 kills
+- `04:21:58` 📊 swifter 1295/1295 hp mana 83% · 8 kills
+- `04:22:08` 📊 swifter 1295/1295 hp mana 98% · 8 kills
+- `04:22:18` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:22:28` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:22:38` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:22:42` 💰 You loot 1s 56c.
+- `04:22:47` 📈 +96 XP in 1m · run total 858 · L20 0/323771
+- `04:22:48` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:22:58` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:23:08` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:23:18` 📊 swifter 1189/1295 hp mana 97% · 8 kills
+- `04:23:28` 📊 swifter 1080/1295 hp mana 93% · 8 kills
+- `04:23:38` 📊 swifter 969/1295 hp mana 93% · 8 kills
+- `04:23:47` 📈 +0 XP in 1m · run total 858 · L20 0/323771
+- `04:23:49` 📊 swifter 884/1295 hp mana 91% · 8 kills
+- `04:23:59` 📊 swifter 952/1295 hp mana 85% · 8 kills
+- `04:24:09` 📊 swifter 693/1295 hp mana 82% · 8 kills
+- `04:24:14` 💰 You loot 89c.
+- `04:24:19` 📊 swifter 381/1295 hp mana 97% · 8 kills
+- `04:24:20` 🩸 Down to 323 HP — bracing.
+- `04:24:29` 📊 swifter 155/1295 hp mana 100% · 8 kills
+- `04:24:36` ☠️ I fell in battle near (2079, 823). Releasing spirit.
+- `04:24:36` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:24:36` 💚 Patched up (1175/1175).
+- `04:24:36` 🔄 Back on my feet.
+- `04:24:47` 📈 +80 XP in 1m · run total 938 · L20 0/323851
+- `04:25:14` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:25:14` ✨ cast aspect of the hawk.
+- `04:25:24` 📊 swifter 1295/1295 hp mana 100% · 8 kills
+- `04:25:34` 📊 swifter 1147/1295 hp mana 82% · 8 kills
+- `04:25:37` ⚔️ Killed **Sanctum Boneguard**. Down before it reached me.
+- `04:25:37` 💰 You loot 1s 30c.
+- `04:25:44` 📊 swifter 1005/1295 hp mana 65% · 9 kills
+- `04:25:47` 📈 +96 XP in 1m · run total 1034 · L20 0/323947
+- `04:25:54` 📊 swifter 755/1295 hp mana 68% · 9 kills
+- `04:26:04` 📊 swifter 419/1295 hp mana 83% · 9 kills
+- `04:26:09` 🩸 Down to 300 HP — bracing.
+- `04:26:14` 📊 swifter 201/1295 hp mana 98% · 9 kills
+- `04:26:21` ☠️ I fell in battle near (2079, 862). Releasing spirit.
+- `04:26:22` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:26:22` 💚 Patched up (1175/1175).
+- `04:26:22` 🔄 Back on my feet.
+- `04:26:47` 📈 +0 XP in 1m · run total 1034 · L20 0/323947
+- `04:26:59` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:26:59` ✨ cast aspect of the hawk.
+- `04:27:09` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:27:20` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:27:30` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:27:40` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:27:47` 📈 +0 XP in 1m · run total 1034 · L20 0/323947
+- `04:27:50` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:00` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:10` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:20` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:30` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:40` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:28:47` 📈 +0 XP in 1m · run total 1034 · L20 0/323947
+- `04:28:50` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:00` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:10` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:20` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:30` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:41` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:29:47` 📈 +0 XP in 1m · run total 1034 · L20 0/323947
+- `04:29:51` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:01` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:11` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:21` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:31` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:41` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:30:47` 📈 +0 XP in 1m · run total 1034 · L20 0/323947
+- `04:30:51` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:31:01` 📊 swifter 1295/1295 hp mana 100% · 9 kills
+- `04:31:11` 📊 swifter 1107/1295 hp mana 79% · 9 kills
+- `04:31:14` ⚔️ Killed **Raised Bonewalker**. Down before it reached me.
+- `04:31:21` 📊 swifter 1077/1295 hp mana 59% · 10 kills
+- `04:31:29` ⚔️ Killed **Raised Bonewalker**. It never closed the distance.
+- `04:31:31` 📊 swifter 997/1295 hp mana 48% · 11 kills
+- `04:31:41` 📊 swifter 536/1295 hp mana 60% · 11 kills
+- `04:31:47` 🩸 Down to 263 HP — bracing.
+- `04:31:47` 📈 +105 XP in 1m · run total 1139 · L20 0/324052
+- `04:31:51` ☠️ I fell in battle near (2079, 823). Releasing spirit.
+- `04:31:51` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:31:51` 💚 Patched up (1175/1175).
+- `04:31:51` 🔄 Back on my feet.
+- `04:32:29` 📊 swifter 1175/1175 hp mana 100% · 11 kills
+- `04:32:39` 📊 swifter 1175/1175 hp mana 100% · 11 kills
+- `04:32:47` 📈 +0 XP in 1m · run total 1139 · L20 0/324052
+- `04:32:49` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:32:59` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:33:09` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:33:19` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:33:29` 📊 swifter 1158/1295 hp mana 89% · 11 kills
+- `04:33:39` 📊 swifter 982/1295 hp mana 74% · 11 kills
+- `04:33:47` 📈 +0 XP in 1m · run total 1139 · L20 0/324052
+- `04:33:49` 📊 swifter 765/1295 hp mana 75% · 11 kills
+- `04:33:59` 📊 swifter 386/1295 hp mana 90% · 11 kills
+- `04:34:01` 🩸 Down to 318 HP — bracing.
+- `04:34:05` ☠️ I fell in battle near (2079, 812). Releasing spirit.
+- `04:34:05` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:34:05` 💚 Patched up (1175/1175).
+- `04:34:05` 🔄 Back on my feet.
+- `04:34:43` 📊 swifter 1175/1175 hp mana 100% · 11 kills
+- `04:34:48` 📈 +0 XP in 1m · run total 1139 · L20 0/324052
+- `04:34:53` 📊 swifter 1175/1175 hp mana 100% · 11 kills
+- `04:35:03` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:35:13` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:35:23` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:35:33` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:35:43` 📊 swifter 1295/1295 hp mana 100% · 11 kills
+- `04:35:48` 📈 +0 XP in 1m · run total 1139 · L20 0/324052
+- `04:35:53` 📊 swifter 1222/1295 hp mana 91% · 11 kills
+- `04:36:03` 📊 swifter 1222/1295 hp mana 70% · 11 kills
+- `04:36:04` ⚔️ Killed **Raised Bonewalker**. Down before it reached me.
+- `04:36:13` 📊 swifter 1222/1295 hp mana 58% · 12 kills
+- `04:36:16` ⚔️ Killed **Raised Bonewalker**. Clean shot, clean kill.
+- `04:36:18` ⚔️ Killed **Raised Bonewalker**. Down before it reached me.
+- `04:36:18` ⚔️ Killed **Raised Bonewalker**. Clean shot, clean kill.
+- `04:36:20` 💰 You loot 9s 85c.
+- `04:36:20` 🎲 GREED on Revenant Silk Robe
+- `04:36:20` 🎲 GREED on Necromancer's Soulsteps
+- `04:36:21` 💰 pontius wins Revenant Silk Robe (62)
+- `04:36:21` 💰 pontius wins Necromancer's Soulsteps (29)
+- `04:36:23` 📊 swifter 1222/1295 hp mana 55% · 15 kills
+- `04:36:33` 📊 swifter 1295/1295 hp mana 71% · 15 kills
+- `04:36:43` 📊 swifter 1295/1295 hp mana 86% · 15 kills
+- `04:36:48` 📈 +292 XP in 1m · run total 1431 · L20 0/324344
+- `04:36:53` 📊 swifter 1295/1295 hp mana 100% · 15 kills
+- `04:37:04` 📊 swifter 1295/1295 hp mana 100% · 15 kills
+- `04:37:14` 📊 swifter 1295/1295 hp mana 82% · 15 kills
+- `04:37:22` ⚔️ Killed **Sanctum Boneguard**. It never closed the distance.
+- `04:37:23` 💰 You loot 64c.
+- `04:37:24` 📊 swifter 1295/1295 hp mana 76% · 16 kills
+- `04:37:34` 📊 swifter 1295/1295 hp mana 92% · 16 kills
+- `04:37:44` 📊 swifter 1295/1295 hp mana 100% · 16 kills
+- `04:37:48` 📈 +80 XP in 1m · run total 1511 · L20 0/324424
+- `04:37:54` 📊 swifter 1295/1295 hp mana 100% · 16 kills
+- `04:38:04` 📊 swifter 1295/1295 hp mana 100% · 16 kills
+- `04:38:14` 📊 swifter 1295/1295 hp mana 100% · 16 kills
+- `04:38:24` 📊 swifter 1295/1295 hp mana 100% · 16 kills
+- `04:38:34` 📊 swifter 1243/1295 hp mana 91% · 16 kills
+- `04:38:44` ⚔️ Killed **Sanctum Drakonid**. Down before it reached me.
+- `04:38:44` 💰 You loot 99c.
+- `04:38:44` 📊 swifter 1169/1295 hp mana 88% · 17 kills
+- `04:38:48` 📈 +94 XP in 1m · run total 1605 · L20 0/324518
+- `04:38:54` 📊 swifter 1277/1295 hp mana 97% · 17 kills
+- `04:39:04` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:39:14` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:39:24` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:39:34` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:39:44` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:39:48` 📈 +0 XP in 1m · run total 1605 · L20 0/324518
+- `04:39:54` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:04` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:15` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:25` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:35` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:45` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:40:48` 📈 +0 XP in 1m · run total 1605 · L20 0/324518
+- `04:40:55` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:05` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:15` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:25` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:35` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:45` 📊 swifter 1295/1295 hp mana 100% · 17 kills
+- `04:41:48` 📈 +0 XP in 1m · run total 1605 · L20 0/324518
+- `04:41:55` 📊 swifter 1167/1295 hp mana 79% · 17 kills
+- `04:42:05` 📊 swifter 1167/1295 hp mana 76% · 17 kills
+- `04:42:09` ⚔️ Killed **Sanctum Drakonid**. It never closed the distance.
+- `04:42:09` 💰 You loot 75c.
+- `04:42:11` ⚔️ Killed **Sanctum Drakonid**. Clean shot, clean kill.
+- `04:42:12` 💰 You loot 73c.
+- `04:42:15` 📊 swifter 1203/1295 hp mana 86% · 19 kills
+- `04:42:25` 📊 swifter 1295/1295 hp mana 100% · 19 kills
+- `04:42:35` 📊 swifter 1191/1295 hp mana 82% · 19 kills
+- `04:42:45` 📊 swifter 903/1295 hp mana 94% · 19 kills
+- `04:42:48` 📈 +160 XP in 1m · run total 1765 · L20 0/324678
+- `04:42:55` 📊 swifter 714/1295 hp mana 100% · 19 kills
+- `04:43:05` 📊 swifter 629/1295 hp mana 100% · 19 kills
+- `04:43:15` 📊 swifter 381/1295 hp mana 100% · 19 kills
+- `04:43:23` 🩸 Down to 314 HP — bracing.
+- `04:43:25` 📊 swifter 314/1295 hp mana 100% · 19 kills
+- `04:43:35` 📊 swifter 159/1295 hp mana 100% · 19 kills
+- `04:43:41` ☠️ I fell in battle near (2122, 823). Releasing spirit.
+- `04:43:41` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `04:43:41` 💚 Patched up (1175/1175).
+- `04:43:41` 🔄 Back on my feet.
+- `04:43:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:44:19` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:44:29` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:44:39` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:44:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:44:48` 💰 You loot 83c.
+- `04:44:49` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:44:59` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:09` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:19` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:29` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:39` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:45:49` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:45:59` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:09` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:19` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:29` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:39` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:46:49` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:46:59` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:47:09` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:47:19` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:47:29` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:47:39` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:47:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:47:49` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:40` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:48:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:48:50` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:40` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:49:48` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:49:50` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:40` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:50:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:50:50` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:40` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:51:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:51:50` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:40` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:52:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:52:50` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:00` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:10` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:20` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:30` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:41` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:53:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:53:51` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:01` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:11` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:21` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:31` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:41` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:54:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:54:51` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:01` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:11` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:21` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:31` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:41` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:55:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:55:51` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:01` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:11` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:21` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:31` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:41` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:56:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:56:51` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:57:01` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:57:11` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:57:21` 📊 swifter 1137/1175 hp mana 100% · 19 kills
+- `04:57:31` 📊 swifter 1171/1175 hp mana 100% · 19 kills
+- `04:57:41` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:57:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:57:51` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:01` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:12` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:22` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:32` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:42` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:58:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:58:52` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:02` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:12` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:22` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:32` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:42` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `04:59:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `04:59:52` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:00:02` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:00:12` 📊 swifter 1009/1175 hp mana 94% · 19 kills
+- `05:00:22` 📊 swifter 972/1175 hp mana 82% · 19 kills
+- `05:00:32` 📊 swifter 899/1175 hp mana 56% · 19 kills
+- `05:00:42` 📊 swifter 641/1175 hp mana 65% · 19 kills
+- `05:00:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:00:50` 🩸 Down to 273 HP — bracing.
+- `05:00:52` 📊 swifter 240/1175 hp mana 80% · 19 kills
+- `05:00:56` ☠️ I fell in battle near (2079, 869). Releasing spirit.
+- `05:00:56` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `05:00:56` 💚 Patched up (1175/1175).
+- `05:00:56` 🔄 Back on my feet.
+- `05:01:34` 📊 swifter 960/1035 hp mana 100% · 19 kills
+- `05:01:34` ✨ cast aspect of the hawk.
+- `05:01:44` 📊 swifter 1155/1175 hp mana 100% · 19 kills
+- `05:01:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:01:54` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:04` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:14` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:24` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:34` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:44` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:02:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:02:54` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:04` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:14` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:24` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:35` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:45` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:03:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:03:55` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:05` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:15` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:25` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:35` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:45` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:04:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:04:55` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:05` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:15` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:25` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:35` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:45` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:05:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:05:55` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:05` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:15` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:25` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:35` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:45` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:06:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:06:55` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:05` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:15` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:25` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:36` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:46` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:07:49` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:07:56` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:06` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:16` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:26` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:36` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:46` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:08:50` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:08:56` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:06` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:16` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:26` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:36` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:46` 📊 swifter 1175/1175 hp mana 100% · 19 kills
+- `05:09:50` 📈 +0 XP in 1m · run total 1765 · L20 0/324678
+- `05:09:56` 📊 swifter 1175/1175 hp mana 100% · 19 kills

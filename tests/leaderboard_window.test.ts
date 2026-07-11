@@ -18,9 +18,13 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
     expect(code).toContain('buildLeaderboardView(');
   });
 
-  it('gives the close control a real button with an aria-label', () => {
-    expect(code).toContain('class="x-btn" data-close aria-label=');
-    expect(code).toContain("t('hudChrome.leaderboard.close')");
+  it('routes the close through the shared window frame with the leaderboard close key', () => {
+    // The titlebar + close control now come from the shared window-frame builder
+    // (window_frame.ts), which resolves the aria-label from the descriptor's
+    // closeLabelKey; the builder wires the click to the injected onClose (this.close()).
+    expect(code).toContain('ensureWindowFrame(el, LEADERBOARD_FRAME');
+    expect(code).toContain("closeLabelKey: 'hudChrome.leaderboard.close'");
+    expect(code).toContain('onClose: () => this.close()');
   });
 
   it('marks the in-flight loading state as a live region (aria-busy + role=status)', () => {
@@ -33,12 +37,14 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
     expect(code).toContain("t('game.leaderboard.retry')");
   });
 
-  it('renders the dialog role + labelledby for the window', () => {
-    // the dialog identity is set via the shared markDialogRoot helper (role=dialog +
-    // aria-labelledby + aria-modal + tabindex); the helper's own writes are unit-tested in
-    // dialog_root.test.ts.
-    expect(code).toContain("markDialogRoot(el, { labelledBy: 'leaderboard-title' })");
-    expect(code).toContain('id="leaderboard-title"');
+  it('adopts the shared window-frame chrome (dialog role/aria live on the frame mount)', () => {
+    // The dialog identity + titlebar/body come from the shared frame builder now:
+    // window_frame.ts stamps role=dialog + aria-labelledby onto the inner mount
+    // from this descriptor, and the window supplies the realm subtitle into the
+    // resolved .window-title node (the builder cannot interpolate it).
+    expect(code).toContain("id: 'leaderboard-window'");
+    expect(code).toContain("titleKey: 'game.leaderboard.title'");
+    expect(code).toContain('titleEl.innerHTML = this.titleInnerHtml(world.realm)');
   });
 
   it('renders the pager controls as real buttons', () => {

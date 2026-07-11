@@ -1,0 +1,15 @@
+{
+  "_doc": "LOCAL autonomous hunter driven by CLEO (the Hermes agent on the muse-infinite VPS, exposed as an OpenAI-compatible /chat/completions endpoint). Hierarchical: Cleo emits one strategic INTENT every ~8s; the proven rule executor (scripts/agent/agent_brain.mjs) flies the hunter at 20Hz on YOUR local server. SETUP: npm run db:up && npm run server, then CLEO_BASE_URL=... CLEO_MODEL=... CLEO_API_KEY=... scripts/hunter_agents.sh cleo . MANUAL LAUNCH: CLHUNTER_PASS=... AGENT_PROVIDER=openai AGENT_PLAN=1 AGENT_BASE_URL=<cleo>/v1 AGENT_MODEL=<her model> AGENT_API_KEY=<token> AGENT_RESPONSE_FORMAT=0 node scripts/multibox.mjs scripts/multibox.hunter.cleo.json . Set AGENT_RESPONSE_FORMAT=0 if her server rejects response_format:json_object (the planner brace-extracts JSON from plain text too).",
+  "extends": "multibox.world.json",
+  "tag": "🏹CL",
+  "server": "http://localhost:8787",
+  "leader": "Cleo",
+  "brainPath": "scripts/agent/agent_brain.mjs",
+  "runSeconds": 36000,
+  "accounts": { "clhunter": { "passEnv": "CLHUNTER_PASS" } },
+  "bots": [
+    { "user": "clhunter", "character": "Cleo", "class": "hunter" }
+  ],
+  "combat": { "planEverySec": 8, "lvlCeil": 1, "fleeHp": 0.4, "restHp": 0.6 },
+  "grind": { "goHome": false }
+}

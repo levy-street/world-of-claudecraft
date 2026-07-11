@@ -252,9 +252,9 @@ function musicEditorSavePlugin() {
             for (const name of names) {
               const t = overrides[name];
               lines.push(
-                '  ' + name + ': {',
-                '    bpm: ' + t.bpm + ',',
-                '    bars: ' + t.bars + ',',
+                `  ${name}: {`,
+                `    bpm: ${t.bpm},`,
+                `    bars: ${t.bars},`,
                 '    events: [',
               );
               const sorted = [...t.events].sort((a, b) => a.beat - b.beat);
@@ -346,6 +346,17 @@ export default defineConfig({
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
       },
+      output: {
+        // three.js almost never changes between our releases and is the single
+        // heaviest dependency in the game/editor bundles; splitting it into its
+        // own chunk lets the browser fetch it in parallel with app code and
+        // reuse the browser cache across app-only redeploys (its content hash
+        // stays stable unless the three version itself bumps).
+        manualChunks(id: string): string | undefined {
+          if (id.includes('node_modules/three/')) return 'vendor-three';
+          return undefined;
+        },
+      },
     },
   },
   test: {
@@ -359,9 +370,9 @@ export default defineConfig({
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
     // Two kinds of exclusion, kept together:
-    // - .codex/.venv are local-only worktree/venv pollution a clean CI checkout never has;
-    //   excluding them keeps the local gate mirroring CI (otherwise stale .codex worktree
-    //   copies of test files run and falsely fail).
+    // - agent-runtime directories may contain local worktree copies, and their tracked
+    //   config or instruction files are not product test sources. Excluding them keeps a
+    //   stale local worktree from duplicating tests. .venv is local Python tooling.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
@@ -374,6 +385,7 @@ export default defineConfig({
       '**/dist/**',
       '**/.claude/**',
       '**/.codex/**',
+      '**/.agents/**',
       '**/.venv/**',
       'tmp/**',
       'tests/browser/**',

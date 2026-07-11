@@ -96,6 +96,20 @@ services:
       META_CAPI_ACCESS_TOKEN: ${META_CAPI_ACCESS_TOKEN:-}
       META_CAPI_TEST_EVENT_CODE: ${META_CAPI_TEST_EVENT_CODE:-}
       META_CAPI_API_VERSION: ${META_CAPI_API_VERSION:-}
+      # Runtime: outbound email (server/email/sender.ts). All empty → console
+      # transport (mail is logged, not sent). EMAIL_PROVIDER=ses selects AWS SES
+      # (needs EMAIL_SES_REGION or AWS_REGION plus EMAIL_FROM; credentials via the
+      # SDK default chain: IAM instance role, or the AWS_* keys below). Otherwise
+      # EMAIL_API_URL+EMAIL_API_KEY+EMAIL_FROM selects the generic HTTP transport.
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_BASE_URL: ${EMAIL_BASE_URL:-}
+      EMAIL_SES_REGION: ${EMAIL_SES_REGION:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      EMAIL_API_URL: ${EMAIL_API_URL:-}
+      EMAIL_API_KEY: ${EMAIL_API_KEY:-}
       # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"

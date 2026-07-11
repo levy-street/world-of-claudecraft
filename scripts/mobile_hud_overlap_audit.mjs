@@ -568,6 +568,7 @@ async function readChatBoxes(page) {
       tabs: box('chatlog-tabs'),
       frame: box('chatlog-frame'),
       input: box('chat-input'),
+      inputInsideLog: document.getElementById('chat-input')?.parentElement?.id === 'chatlog-wrap',
       dismiss: box('chat-dismiss'),
       inputFocused: document.activeElement === document.getElementById('chat-input'),
     };
@@ -1004,21 +1005,22 @@ try {
         }
       }
       // HARD (real-device chat-overlap fix): the RESTING chat log and composer must not
-      // overlap. The composer stacks ABOVE the log on mobile, so its bottom edge must
-      // clear the log wrap's top edge. Promoted from a NOTE now that the resting seats
-      // reserve the composer (the compact tier re-seats #chat-input to clear its higher
-      // wrap; landscape lifted the seat 233px -> 250px). This is the resting half of the
-      // owner's overlap report.
-      if (chat.log && chat.input) {
+      // overlap. Older mobile chat kept the composer outside #chatlog-wrap, so the whole
+      // wrap had to clear it. The centered flow-panel model moves the composer inside the
+      // wrap as its first child; in that model the load-bearing pair is the log frame vs
+      // the composer, because parent-vs-child overlap is expected.
+      const chatReadPair = chat.inputInsideLog ? chat.frame : chat.log;
+      const chatReadPairId = chat.inputInsideLog ? 'chatlog-frame' : 'chatlog-wrap';
+      if (chatReadPair && chat.input) {
         // Counted on MEASUREMENT, not on pass: the zero-floor below means "the
         // pair was never even measured", and a measured-but-failing pair already
         // fails loudly on its own.
         chatRestingPairsChecked++;
-        const gap = controlGap('chatlog-wrap', chat.log, 'chat-input', chat.input, CIRCLE_IDS);
+        const gap = controlGap(chatReadPairId, chatReadPair, 'chat-input', chat.input, CIRCLE_IDS);
         if (gap < MIN_GAP_INTERACTIVE) {
           fail(
-            `${prof.name}: resting chat log/composer gap ${gap.toFixed(1)}px < ${MIN_GAP_INTERACTIVE}px ` +
-              `(the composer must clear the log wrap by the readability floor while chat is open)`,
+            `${prof.name}: resting chat ${chatReadPairId}/composer gap ${gap.toFixed(1)}px ` +
+              `< ${MIN_GAP_INTERACTIVE}px (the composer must clear the readable log area)`,
           );
         }
         // Column order: the tab strip sits at the TOP of the wrap, above the log frame, so
@@ -1158,19 +1160,26 @@ try {
         'chat keyboard-dismiss: composer not measurable before/after keyboard open (docking check skipped)',
       );
     }
-    if (!beforeDismiss.dismiss) {
+    if (!beforeDismiss.dismiss && !beforeDismiss.inputInsideLog) {
       fail('chat keyboard-dismiss: #chat-dismiss chevron not visible while chat open');
     } else if (
-      beforeDismiss.dismiss.w < TOUCH_FLOOR - 0.5 ||
-      beforeDismiss.dismiss.h < TOUCH_FLOOR - 0.5
+      beforeDismiss.dismiss &&
+      (beforeDismiss.dismiss.w < TOUCH_FLOOR - 0.5 || beforeDismiss.dismiss.h < TOUCH_FLOOR - 0.5)
     ) {
       fail(
         `chat keyboard-dismiss: dismiss chevron below the ${TOUCH_FLOOR}px floor ` +
           `(${beforeDismiss.dismiss.w.toFixed(1)}x${beforeDismiss.dismiss.h.toFixed(1)})`,
       );
     }
-    // Tap the dismiss chevron: blurs the composer (real handler), drops the keyboard.
-    await page.evaluate(() => document.getElementById('chat-dismiss')?.click());
+    // Tap the dismiss chevron when the legacy docked-composer model exposes one.
+    // The centered flow-panel model hides it and relies on the OS keyboard hide key,
+    // so blur the composer to simulate that path while keeping chat open.
+    if (beforeDismiss.dismiss) {
+      await page.evaluate(() => document.getElementById('chat-dismiss')?.click());
+    } else {
+      note('chat keyboard-dismiss: flow-panel composer has no chevron; using blur path');
+      await page.evaluate(() => document.getElementById('chat-input')?.blur());
+    }
     // The real keyboard would then close; simulate that (visualViewport grows back).
     await simulateKeyboardClose(page);
     await sleep(200);
@@ -1295,8 +1304,10 @@ try {
           );
         }
       }
-      // Also gate the wrap (the whole log box) vs the composer, belt and suspenders.
-      {
+      // Also gate the wrap (the whole log box) vs the composer when they are siblings.
+      // In the flow-panel model the composer is inside the wrap, so the frame check
+      // above is the meaningful non-overlap assertion.
+      if (!c.inputInsideLog) {
         const gap = controlGap('chatlog-wrap', c.log, 'chat-input', c.input, CIRCLE_IDS);
         if (gap < MIN_GAP_INTERACTIVE) {
           fail(
@@ -1323,8 +1334,8 @@ try {
           );
         }
       }
-      // (3) HARD: the dismiss chevron sits INSIDE the composer's vertical band (an attached
-      // part of the composer row, not a detached button below/above it).
+      // (3) HARD: when present, the dismiss chevron sits INSIDE the composer's vertical
+      // band. The flow-panel model hides this button and uses the OS keyboard hide path.
       if (c.dismiss) {
         if (c.dismiss.top < c.input.top - 0.5 || c.dismiss.bottom > c.input.bottom + 0.5) {
           fail(
@@ -1333,7 +1344,7 @@ try {
               `composer top=${c.input.top.toFixed(1)} bottom=${c.input.bottom.toFixed(1)})`,
           );
         }
-      } else {
+      } else if (!c.inputInsideLog) {
         fail(`chat keyboard-open @${kp.w}: dismiss chevron not visible while typing`);
       }
       // (4) HARD: nothing in the docked column dips below the keyboard's top edge (which

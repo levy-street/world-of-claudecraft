@@ -186,6 +186,7 @@ describe('crit-damage masteries', () => {
       'mage',
       (sim as any).players.get(p.id).equipment,
       (sim as any).playerMods((sim as any).players.get(p.id)),
+      (sim as any).players.get(p.id).equipmentInstance,
     );
     expect(p.critDmgBonus).toBe(0);
   });

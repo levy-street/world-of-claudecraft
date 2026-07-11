@@ -1,0 +1,157 @@
+# Brogan — warrior
+_the brash tank. Journal opened 2026-06-16T09:00:59.858Z._
+
+- `09:01:00` Entered the world at level 4.
+- `09:01:11` 📊 hp 204/204 · res 0/100 · 0 kills
+- `09:01:11` ✨ cast battle shout.
+- `09:01:56` ✨ cast battle shout.
+- `09:01:58` 💰 You loot 6c.
+- `09:01:58` 💰 You receive: Cracked Wolf Fang.
+- `09:01:59` ⚔️ Killed **Forest Wolf**. Stay down.
+- `09:01:59` 💰 You loot 10c.
+- `09:01:59` 💰 You receive: Cracked Wolf Fang.
+- `09:02:11` 📊 hp 204/204 · res 0/100 · 1 kills
+- `09:02:14` ⚔️ Killed **Forest Wolf**. Next.
+- `09:02:15` 💰 You loot 11c.
+- `09:02:18` 💰 You loot 7c.
+- `09:02:24` ⚔️ Killed **Forest Wolf**. Next.
+- `09:02:26` ⚔️ Killed **Forest Wolf**. Stay down.
+- `09:02:32` 💰 You receive 75c.
+- `09:02:32` ✅ completed quest **q_wolves**
+- `09:02:41` ✨ cast battle shout.
+- `09:03:11` 📊 hp 204/204 · res 0/100 · 4 kills
+- `09:03:11` 💰 You loot 13c.
+- `09:03:11` 💰 You receive: Bristly Boar Hide.
+- `09:03:19` ⚔️ Killed **Wild Boar**. Next.
+- `09:03:20` 💰 You loot 17c.
+- `09:03:24` ⚔️ Killed **Wild Boar**. CRUSHED.
+- `09:03:25` 💰 You loot 9c.
+- `09:03:25` 💰 You receive: Bristly Boar Hide.
+- `09:03:26` ✨ cast battle shout.
+- `09:03:28` ⚔️ Killed **Wild Boar**. CRUSHED.
+- `09:03:29` 💰 You receive: Bristly Boar Hide.
+- `09:04:11` 📊 hp 204/204 · res 0/100 · 7 kills
+- `09:04:11` ✨ cast battle shout.
+- `09:04:56` ✨ cast battle shout.
+- `09:05:00` ⚔️ Killed **Wild Boar**. CRUSHED.
+- `09:05:00` 💰 You loot 10c.
+- `09:05:00` 💰 You receive: Bristly Boar Hide.
+- `09:05:11` 📊 hp 204/204 · res 0/100 · 8 kills
+- `09:05:20` ⚔️ Killed **Wild Boar**. Next.
+- `09:05:21` 💰 You loot 12c.
+- `09:05:21` 💰 You receive: Tough Jerky.
+- `09:05:27` ⚔️ Killed **Wild Boar**. Stay down.
+- `09:06:11` 📈 +426 XP in 5m · run total 426 · L4 2034/4734
+- `09:06:11` 📊 hp 204/204 · res 0/100 · 10 kills
+- `09:06:23` ✨ cast battle shout.
+- `09:06:32` ⚔️ Killed **Wild Boar**. CRUSHED.
+- `09:06:33` 💰 You loot 13c.
+- `09:06:38` 💰 You loot 8c.
+- `09:06:38` 💰 You receive: Tough Jerky.
+- `09:07:11` 📊 hp 204/204 · res 0/100 · 11 kills
+- `09:07:45` ✨ cast battle shout.
+- `09:07:59` ⚔️ Killed **Wild Boar**. Next.
+- `09:08:02` ⚔️ Killed **Wild Boar**. Stay down.
+- `09:08:03` 💰 You loot 11c.
+- `09:08:03` 💰 You receive: Bristly Boar Hide.
+- `09:08:03` 💰 You receive: Tough Jerky.
+- `09:08:03` 💰 You loot 8c.
+- `09:08:11` 📊 hp 204/204 · res 0/100 · 13 kills
+- `09:08:13` 💰 You receive 1s 20c.
+- `09:08:13` ⬆️ **Reached level 5.** Come at me now.
+- `09:08:13` ✅ completed quest **q_boars**
+- `09:08:23` ⚔️ Killed **Webwood Lurker**. CRUSHED.
+- `09:08:24` 💰 You loot 18c.
+- `09:08:24` 💰 You receive: Webwood Silk Gland.
+- `09:09:02` ✨ cast battle shout.
+- `09:09:11` 📊 hp 242/242 · res 0/100 · 14 kills
+- `09:09:18` ⚔️ Killed **Webwood Lurker**. CRUSHED.
+- `09:09:18` 💰 You receive: Webwood Silk Gland.
+- `09:09:21` ⚔️ Killed **Webwood Lurker**. CRUSHED.
+- `09:09:21` 💰 You receive: Webwood Silk Gland.
+- `09:09:23` ⚔️ Killed **Webwood Lurker**. Stay down.
+- `09:09:23` 💰 You loot 15c.
+- `09:09:26` ⚔️ Killed **Webwood Lurker**. Stay down.
+- `09:09:27` 💰 You loot 13c.
+- `09:09:27` 💰 You receive: Webwood Silk Gland.
+- `09:09:47` 💰 You receive 1s 40c.
+- `09:09:47` ✅ completed quest **q_spiders**
+- `09:10:08` ✨ cast battle shout.
+- `09:10:10` 💰 You loot 11c.
+- `09:10:10` 💰 You receive: Twitching Spider Leg.
+- `09:10:11` 📊 hp 242/242 · res 0/100 · 18 kills
+- `09:10:18` 💰 You loot 9c.
+- `09:10:38` 💰 You loot 5c.
+- `09:11:11` 📈 +896 XP in 5m · run total 1322 · L5 830/5630
+- `09:11:11` 📊 hp 242/242 · res 0/100 · 18 kills
+- `09:11:36` ✨ cast battle shout.
+- `09:11:58` ⚔️ Killed **Mudfin Skulker**. Next.
+- `09:12:04` ⚔️ Killed **Mudfin Skulker**. Stay down.
+- `09:12:11` 📊 hp 242/242 · res 4/100 · 20 kills
+- `09:13:04` ✨ cast battle shout.
+- `09:13:11` 📊 hp 242/242 · res 0/100 · 20 kills
+- `09:13:25` ⚔️ Killed **Sableweb Hatchling**. CRUSHED.
+- `09:13:29` ⚔️ Killed **Webwood Lurker**. Stay down.
+- `09:13:29` 💰 You loot 14c.
+- `09:13:29` 💰 You receive: Twitching Spider Leg.
+- `09:13:36` 💰 You loot 11c.
+- `09:13:36` 💰 You receive: Twitching Spider Leg.
+- `09:13:45` 💰 You loot 19c.
+- `09:13:45` 💰 You receive: Twitching Spider Leg.
+- `09:14:11` 📊 hp 242/242 · res 0/100 · 22 kills
+- `09:14:31` ✨ cast battle shout.
+- `09:14:47` 💰 You loot 11c.
+- `09:14:47` 💰 You receive: Cracked Wolf Fang.
+- `09:15:11` 📊 hp 242/242 · res 0/100 · 22 kills
+- `09:15:13` 💰 You loot 13c.
+- `09:15:13` 💰 You loot 8c.
+- `09:16:01` ✨ cast battle shout.
+- `09:16:11` 📈 +174 XP in 5m · run total 1496 · L5 1004/5804
+- `09:16:11` 📊 hp 242/242 · res 0/100 · 22 kills
+- `09:16:24` ⚔️ Killed **Sableweb Hatchling**. Next.
+- `09:17:09` ✨ cast battle shout.
+- `09:17:11` 📊 hp 242/242 · res 0/100 · 23 kills
+- `09:17:45` ⚔️ Killed **Mudfin Skulker**. CRUSHED.
+- `09:18:08` ✨ cast battle shout.
+- `09:18:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:19:02` ✨ cast battle shout.
+- `09:19:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:19:14` 💰 You loot 6c.
+- `09:19:14` 💰 You receive: Cracked Wolf Fang.
+- `09:19:52` ✨ cast battle shout.
+- `09:20:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:20:56` ✨ cast battle shout.
+- `09:21:00` 💰 You loot 20c.
+- `09:21:11` 📈 +74 XP in 5m · run total 1570 · L5 1078/5878
+- `09:21:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:22:03` ✨ cast battle shout.
+- `09:22:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:22:59` ✨ cast battle shout.
+- `09:23:01` 💰 You loot 18c.
+- `09:23:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:23:53` ✨ cast battle shout.
+- `09:23:55` 💰 You loot 14c.
+- `09:24:12` 📊 hp 226/242 · res 2/100 · 24 kills
+- `09:24:50` ✨ cast battle shout.
+- `09:24:58` 💰 You loot 18c.
+- `09:25:12` 📊 hp 211/242 · res 11/100 · 24 kills
+- `09:25:46` ✨ cast battle shout.
+- `09:26:11` 📈 +57 XP in 5m · run total 1627 · L5 1135/5935
+- `09:26:12` 📊 hp 242/242 · res 0/100 · 24 kills
+- `09:26:41` ✨ cast battle shout.
+- `09:26:56` ⚔️ Killed **Webwood Lurker**. CRUSHED.
+- `09:27:12` 📊 hp 242/242 · res 0/100 · 25 kills
+- `09:27:43` ✨ cast battle shout.
+- `09:27:46` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:50` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:55` 🔌 connection dropped — reconnecting in 3s…
+- `09:27:59` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:03` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:07` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:11` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:15` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:19` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:23` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:27` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:31` 🔌 connection dropped — reconnecting in 3s…
+- `09:28:35` 🔌 connection dropped — reconnecting in 3s…

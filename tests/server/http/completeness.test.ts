@@ -254,6 +254,10 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/auth/discord/callback' },
     { method: 'POST', path: '/api/auth/discord/login/new' },
     { method: 'POST', path: '/api/auth/discord/login/link' },
+    { method: 'POST', path: '/api/auth/discord/native/exchange' },
+    { method: 'POST', path: '/api/auth/apple' },
+    { method: 'POST', path: '/api/auth/apple/login/new' },
+    { method: 'POST', path: '/api/auth/apple/login/link' },
     { method: 'GET', path: '/api/discord' },
     { method: 'DELETE', path: '/api/discord' },
     { method: 'POST', path: '/api/discord/swag/claim' },
@@ -438,7 +442,17 @@ describe('registry completeness: admin surface (server/admin.ts)', () => {
   it('the literal moderation action routes win over the :action catch-all', () => {
     // The no-regex restructure only works if the specificity sort orders the literal
     // sibling routes ahead of :action; assert each resolves to its own path.
-    for (const literal of ['reactivate', 'chat-mute', 'lift-mute', 'note', 'reset-strikes']) {
+    for (const literal of [
+      'reactivate',
+      'chat-mute',
+      'daily-rewards-ban',
+      'daily-rewards-unban',
+      'daily-rewards-ip-ban',
+      'daily-rewards-ip-unban',
+      'lift-mute',
+      'note',
+      'reset-strikes',
+    ]) {
       const match = apiRegistry.resolve('POST', `/admin/api/moderation/accounts/5/${literal}`);
       expect(match.kind).toBe('matched');
       if (match.kind === 'matched') {

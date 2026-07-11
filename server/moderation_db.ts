@@ -18,6 +18,8 @@ export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 
 export const MODERATION_ACTIONS = [
   'kick',
   'kill',
+  'jail',
+  'unjail',
   'suspend',
   'unsuspend',
   'ban',
@@ -27,6 +29,10 @@ export const MODERATION_ACTIONS = [
   'note',
   'force_rename',
   'reset_password',
+  'daily_rewards_ban',
+  'daily_rewards_unban',
+  'daily_rewards_ip_ban',
+  'daily_rewards_ip_unban',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -554,10 +560,105 @@ export async function addAccountNote(input: {
   });
 }
 
+export async function setDailyRewardsBan(input: {
+  accountId: number;
+  adminAccountId: number;
+  banned: boolean;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (input.banned) {
+      await client.query(
+        `INSERT INTO daily_reward_bans (account_id, reason, admin_account_id)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (account_id) DO UPDATE
+           SET reason = EXCLUDED.reason,
+               admin_account_id = EXCLUDED.admin_account_id,
+               updated_at = now()`,
+        [input.accountId, reason, input.adminAccountId],
+      );
+    } else {
+      const removed = await client.query('DELETE FROM daily_reward_bans WHERE account_id = $1', [
+        input.accountId,
+      ]);
+      if ((removed.rowCount ?? 0) === 0)
+        throw new Error('account is not banned from daily rewards');
+    }
+    await recordModerationAction(
+      client,
+      input.banned ? 'daily_rewards_ban' : 'daily_rewards_unban',
+      {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason,
+      },
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function setDailyRewardsIpBan(input: {
+  accountId: number;
+  adminAccountId: number;
+  ip: unknown;
+  banned: boolean;
+  reason: unknown;
+}): Promise<void> {
+  const ip = cleanText(input.ip, 128);
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!ip) throw new Error('IP address is required');
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (input.banned) {
+      await client.query(
+        `INSERT INTO daily_reward_ip_bans (ip_address, reason, admin_account_id)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (ip_address) DO UPDATE
+           SET reason = EXCLUDED.reason,
+               admin_account_id = EXCLUDED.admin_account_id,
+               updated_at = now()`,
+        [ip, reason, input.adminAccountId],
+      );
+    } else {
+      const removed = await client.query('DELETE FROM daily_reward_ip_bans WHERE ip_address = $1', [
+        ip,
+      ]);
+      if ((removed.rowCount ?? 0) === 0)
+        throw new Error('IP address is not banned from daily rewards');
+    }
+    await recordModerationAction(
+      client,
+      input.banned ? 'daily_rewards_ip_ban' : 'daily_rewards_ip_unban',
+      {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason: `${reason} (IP: ${ip})`,
+      },
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill';
+  action: 'kick' | 'kill' | 'jail' | 'unjail';
   accountId: number;
   adminAccountId: number;
   reason: unknown;

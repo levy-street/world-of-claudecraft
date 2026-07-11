@@ -1,0 +1,117 @@
+# Party log
+
+- `19:10:46` ☠️G4 ▶️ session start — Leader ryzetank (warrior), Tank ryzetank.
+- `19:10:46` ☠️G4 Party assembled: ryzetank (warrior), ryzeheal (priest), Pontius (paladin), Shims (shaman), swifter (hunter).
+- `19:10:49` ☠️G4 Party of 5 formed.
+- `19:10:49` ☠️G4 👁️ panic-watch armed for: papa ours (auto-kill on their login).
+- `19:10:49` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:10:49` ☠️G4 Whole party is level 20+ — marching to Gravewyrm Sanctum door at (0, 880).
+- `19:10:49` ☠️G4 📍 Reached the Gravewyrm Sanctum approach.
+- `19:10:49` ☠️G4 **ryzetank** died.
+- `19:10:49` ☠️G4 🗺️ L20: grind moves to **Boneclad Revenants (L18-19)**
+- `19:11:28` ☠️G4 Zoned into Gravewyrm Sanctum. Elites ahead.
+- `19:11:28` ☠️G4 ⚔️ Party assembled inside — clearing single-pull from the entrance.
+- `19:11:28` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Pontius · **2** mob(s) on the party
+- `19:11:28` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `19:11:41` ☠️G4 **swifter** died.
+- `19:11:43` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:11:52` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **2** mob(s) on the party
+- `19:11:53` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:11:55` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:11:55` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:11:58` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **2** mob(s) on the party
+- `19:12:00` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:12:13` ☠️G4 **ryzetank** died.
+- `19:12:24` ☠️G4 **ryzeheal** died.
+- `19:12:37` ☠️G4 **Pontius** died.
+- `19:12:47` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:12:50` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:12:52` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **1** mob(s) on the party
+- `19:12:52` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `19:12:54` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1238. Watch for a wipe.
+- `19:12:59` ☠️G4 **Shims** died.
+- `19:13:02` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-1238. Watch for a wipe.
+- `19:13:10` ☠️G4 ⚠️ **OVERPULL** — 5 mobs on the party (cap 1) at z≈-1238. Watch for a wipe.
+- `19:13:13` ☠️G4 **swifter** died.
+- `19:13:16` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:13:21` ☠️G4 **ryzetank** died.
+- `19:13:21` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:13:34` ☠️G4 **ryzeheal** died.
+- `19:13:45` ☠️G4 **Pontius** died.
+- `19:13:54` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:13:57` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `19:13:59` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:14:01` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1246. Watch for a wipe.
+- `19:14:10` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-1246. Watch for a wipe.
+- `19:14:10` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Shims · **4** mob(s) on the party
+- `19:14:10` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `19:14:16` ☠️G4 **swifter** died.
+- `19:14:50` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **1** mob(s) on the party
+- `19:14:50` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:14:59` ☠️G4 **ryzetank** died.
+- `19:15:07` ☠️G4 ⚔️ Pull: **Deeprock Tunneler** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:15:33` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:15:37` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:15:38` ☠️G4 🧭 ryzetank: holding for 4 to regroup (0 dead)
+- `19:15:40` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1246. Watch for a wipe.
+- `19:15:45` ☠️G4 **swifter** died.
+- `19:15:46` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:15:46` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **6** mob(s) on the party
+- `19:15:46` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **6** mob(s) on the party
+- `19:15:47` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: Pontius · **6** mob(s) on the party
+- `19:15:47` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **6** mob(s) on the party
+- `19:15:47` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **6** mob(s) on the party
+- `19:15:48` ☠️G4 ⚠️ **OVERPULL** — 6 mobs on the party (cap 1) at z≈-1239. Watch for a wipe.
+- `19:15:49` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: ryzeheal · **6** mob(s) on the party
+- `19:15:49` ☠️G4 📊 PROGRESS kills=1 levels=[20,20,20,20,20] phase=dungeon elapsed=5m
+- `19:15:52` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **6** mob(s) on the party
+- `19:15:55` ☠️G4 **ryzeheal** died.
+- `19:15:56` ☠️G4 ⚠️ **OVERPULL** — 4 mobs on the party (cap 1) at z≈-1239. Watch for a wipe.
+- `19:15:58` ☠️G4 **ryzetank** died.
+- `19:15:59` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **4** mob(s) on the party
+- `19:16:10` ☠️G4 **Pontius** died.
+- `19:16:30` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈826. Watch for a wipe.
+- `19:16:30` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **2** mob(s) on the party
+- `19:16:32` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **2** mob(s) on the party
+- `19:16:34` ☠️G4 **Shims** died.
+- `19:16:34` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:16:35` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:16:35` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzeheal · **4** mob(s) on the party
+- `19:16:37` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:16:40` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzeheal · **2** mob(s) on the party
+- `19:16:56` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1238. Watch for a wipe.
+- `19:16:56` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **2** mob(s) on the party
+- `19:16:56` ☠️G4 💎 **ryzetank** looted: Bone Fragments
+- `19:17:03` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:17:03` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Pontius · **2** mob(s) on the party
+- `19:17:03` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: swifter · **2** mob(s) on the party
+- `19:17:16` ☠️G4 **ryzetank** died.
+- `19:17:37` ☠️G4 **swifter** died.
+- `19:17:47` ☠️G4 **Pontius** died.
+- `19:17:50` ☠️G4 ⚔️ Pull: **Wyrmcult Zealot** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:17:52` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `19:17:54` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **1** mob(s) on the party
+- `19:17:55` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1246. Watch for a wipe.
+- `19:17:55` ☠️G4 🔱 Engaging **Korgath the Bound** (2171/2171 HP).
+- `19:18:03` ☠️G4 **ryzeheal** died.
+- `19:18:05` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:18:05` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **2** mob(s) on the party
+- `19:18:27` ☠️G4 **ryzetank** died.
+- `19:18:56` ☠️G4 **swifter** died.
+- `19:19:07` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: (threat not set yet) · **0** mob(s) on the party
+- `19:19:09` ☠️G4 ⚔️ Pull: **Boneclad Revenant** — tanking: ryzetank · **1** mob(s) on the party
+- `19:19:12` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: (threat not set yet) · **1** mob(s) on the party
+- `19:19:12` ☠️G4 🧭 ryzetank: pulling Sanctum Boneguard
+- `19:19:13` ☠️G4 ⚠️ **OVERPULL** — 3 mobs on the party (cap 1) at z≈-1238. Watch for a wipe.
+- `19:19:19` ☠️G4 **ryzeheal** died.
+- `19:19:22` ☠️G4 🧭 ryzetank: tanking Sanctum Drakonid
+- `19:19:22` ☠️G4 ⚔️ Pull: **Sanctum Drakonid** — tanking: Shims · **2** mob(s) on the party
+- `19:19:35` ☠️G4 🧭 ryzetank: tanking Sanctum Boneguard
+- `19:19:35` ☠️G4 ⚔️ Pull: **Sanctum Boneguard** — tanking: ryzetank · **1** mob(s) on the party
+- `19:19:55` ☠️G4 🧭 ryzetank: looting the kills before advancing
+- `19:19:57` ☠️G4 💎 **Pontius** looted: Bone Fragments
+- `19:20:49` ☠️G4 📊 PROGRESS kills=7 levels=[20,20,20,20,20] phase=dungeon elapsed=10m
+- `19:25:50` ☠️G4 📊 PROGRESS kills=7 levels=[20,20,20,20,20] phase=dungeon elapsed=15m
+- `19:26:48` ☠️G4 🧠 behavior hot-reloaded — no relog.
+- `19:27:11` ☠️G4 ☠️G4 🛑 multibox.stop seen — logging the party out.
+- `19:27:11` ☠️G4 Run complete — disconnecting.

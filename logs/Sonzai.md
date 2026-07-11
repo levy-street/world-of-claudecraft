@@ -1,0 +1,371 @@
+# Sonzai — hunter
+_the steady ranger. Journal opened 2026-06-29T09:29:39.315Z._
+
+- `09:29:39` Entered the world at level 1.
+- `09:29:41` 📊 Sonzai 69/69 hp mana 100% · 0 kills
+- `09:29:41` 🛡️ GEAR: chest:footpad_jerkin, mainhand:rusty_hatchet
+- `09:29:41` 📈 STATS: ap=39 crit=0.0625 weapon={"min":2,"max":5,"speed":2.2} · {"str":14,"agi":25,"sta":19,"int":13,"spi":14,"armor":109}
+- `09:29:42` 📥 accepted quest **q_wolves**
+- `09:29:43` 📥 accepted quest **q_boars**
+- `09:30:06` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:30:30` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:30:39` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:30:41` 📈 +150 XP in 1m · run total 150 · L1 150/150
+- `09:30:41` 📋 Sonzai quests — doing: wolves (3), boars (0)
+- `09:30:41` 📊 Sonzai 69/69 hp mana 100% · 3 kills
+- `09:30:59` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:31:35` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:31:41` 📈 +100 XP in 1m · run total 250 · L1 250/250
+- `09:31:41` 📋 Sonzai quests — doing: wolves (5), boars (0)
+- `09:31:41` 📊 Sonzai 61/69 hp mana 100% · 5 kills
+- `09:32:09` 🩸 Down to 16 HP — bracing.
+- `09:32:14` ☠️ I fell in battle near (14, 73). Releasing spirit.
+- `09:32:14` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:32:14` 💚 Patched up (69/69).
+- `09:32:14` 🔄 Back on my feet.
+- `09:32:36` 🩸 Down to 14 HP — bracing.
+- `09:32:39` ☠️ I fell in battle near (39, 3). Releasing spirit.
+- `09:32:39` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:32:39` 💚 Patched up (69/69).
+- `09:32:39` 🔄 Back on my feet.
+- `09:32:41` 📈 +0 XP in 1m · run total 250 · L1 250/250
+- `09:32:41` 📋 Sonzai quests — doing: wolves (5), boars (0)
+- `09:32:41` 📊 Sonzai 69/69 hp mana 100% · 5 kills
+- `09:32:54` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:33:02` ⚔️ Killed **Forest Wolf**. Clean shot, clean kill.
+- `09:33:21` ⬆️ **Reached level 2.** Another notch on the bow.
+- `09:33:21` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:33:24` 📥 accepted quest **q_spiders**
+- `09:33:31` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:33:41` 📈 +190 XP in 1m · run total 440 · L2 40/440
+- `09:33:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0) · ready: wolves
+- `09:33:41` 📊 Sonzai 92/95 hp mana 100% · 9 kills
+- `09:33:51` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:34:19` 🩸 Down to 22 HP — bracing.
+- `09:34:23` ⚔️ Killed **Forest Wolf**. It never closed the distance.
+- `09:34:28` ☠️ I fell in battle near (0, 29). Releasing spirit.
+- `09:34:28` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:34:28` 💚 Patched up (95/95).
+- `09:34:28` 🔄 Back on my feet.
+- `09:34:32` 💰 You receive 75c.
+- `09:34:32` ✅ completed quest **q_wolves**
+- `09:34:41` 📈 +345 XP in 1m · run total 785 · L2 385/785
+- `09:34:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0)
+- `09:34:41` 📊 Sonzai 87/95 hp mana 100% · 11 kills
+- `09:35:10` 🩸 Down to 23 HP — bracing.
+- `09:35:15` ☠️ I fell in battle near (45, 9). Releasing spirit.
+- `09:35:15` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:35:15` 💚 Patched up (95/95).
+- `09:35:15` 🔄 Back on my feet.
+- `09:35:22` ⚔️ Killed **Forest Wolf**. Down before it reached me.
+- `09:35:41` 📈 +40 XP in 1m · run total 825 · L2 425/825
+- `09:35:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0)
+- `09:35:41` 📊 Sonzai 95/95 hp mana 100% · 12 kills
+- `09:36:31` 🩸 Down to 17 HP — bracing.
+- `09:36:35` ☠️ I fell in battle near (-32, -2). Releasing spirit.
+- `09:36:35` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:36:35` 💚 Patched up (95/95).
+- `09:36:35` 🔄 Back on my feet.
+- `09:36:41` 📈 +0 XP in 1m · run total 825 · L2 425/825
+- `09:36:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0)
+- `09:36:41` 📊 Sonzai 95/95 hp mana 100% · 12 kills
+- `09:37:12` 🩸 Down to 16 HP — bracing.
+- `09:37:27` ☠️ I fell in battle near (12, -15). Releasing spirit.
+- `09:37:27` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:37:27` 💚 Patched up (95/95).
+- `09:37:27` 🔄 Back on my feet.
+- `09:37:41` 📈 +0 XP in 1m · run total 825 · L2 425/825
+- `09:37:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0)
+- `09:37:41` 📊 Sonzai 95/95 hp mana 100% · 12 kills
+- `09:38:41` 📈 +0 XP in 1m · run total 825 · L2 425/825
+- `09:38:41` 📋 Sonzai quests — doing: boars (0), spiders (0/0)
+- `09:38:41` 📊 Sonzai 56/95 hp mana 100% · 12 kills
+- `09:39:12` 🩸 Down to 19 HP — bracing.
+- `09:39:13` ⚔️ Killed **Wild Boar**. Clean shot, clean kill.
+- `09:39:13` 💰 You loot 12c.
+- `09:39:13` 💰 You receive: Bristly Boar Hide.
+- `09:39:13` 💰 You receive: Tough Jerky.
+- `09:39:18` 💚 Patched up (25/95).
+- `09:39:42` 📈 +63 XP in 1m · run total 888 · L2 488/888
+- `09:39:42` 📋 Sonzai quests — doing: boars (1), spiders (0/0)
+- `09:39:42` 📊 Sonzai 95/95 hp mana 100% · 13 kills
+- `09:40:39` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:40:39` 💰 You loot 14c.
+- `09:40:39` 💰 You receive: Bristly Boar Hide.
+- `09:40:42` 📈 +63 XP in 1m · run total 951 · L2 551/951
+- `09:40:42` 📋 Sonzai quests — doing: boars (2), spiders (0/0)
+- `09:40:42` 📊 Sonzai 25/95 hp mana 100% · 14 kills
+- `09:41:42` 📈 +0 XP in 1m · run total 951 · L2 551/951
+- `09:41:42` 📋 Sonzai quests — doing: boars (2), spiders (0/0)
+- `09:41:42` 📊 Sonzai 82/95 hp mana 100% · 14 kills
+- `09:42:00` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:42:00` 💰 You loot 13c.
+- `09:42:00` 💰 You receive: Bristly Boar Hide.
+- `09:42:42` 📈 +63 XP in 1m · run total 1014 · L2 614/1014
+- `09:42:42` 📋 Sonzai quests — doing: boars (3), spiders (0/0)
+- `09:42:42` 📊 Sonzai 83/95 hp mana 100% · 15 kills
+- `09:43:00` 🩸 Down to 22 HP — bracing.
+- `09:43:09` ☠️ I fell in battle near (29, -34). Releasing spirit.
+- `09:43:09` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:43:09` 💚 Patched up (95/95).
+- `09:43:09` 🔄 Back on my feet.
+- `09:43:30` ⚔️ Killed **Wild Boar**. It never closed the distance.
+- `09:43:30` 💰 You loot 10c.
+- `09:43:30` 💰 You receive: Tough Jerky.
+- `09:43:42` 📈 +63 XP in 1m · run total 1077 · L2 677/1077
+- `09:43:42` 📋 Sonzai quests — doing: boars (3), spiders (0/0)
+- `09:43:42` 📊 Sonzai 84/95 hp mana 100% · 16 kills
+- `09:44:42` 📈 +0 XP in 1m · run total 1077 · L2 677/1077
+- `09:44:42` 📋 Sonzai quests — doing: boars (3), spiders (0/0)
+- `09:44:42` 📊 Sonzai 68/95 hp mana 100% · 16 kills
+- `09:45:08` 🩸 Down to 22 HP — bracing.
+- `09:45:09` ⚔️ Killed **Wild Boar**. Clean shot, clean kill.
+- `09:45:10` 💰 You loot 9c.
+- `09:45:10` 💰 You receive: Bristly Boar Hide.
+- `09:45:10` 💰 You receive: Tough Jerky.
+- `09:45:10` 💰 You receive: Trailworn Leggings.
+- `09:45:14` 💚 Patched up (28/95).
+- `09:45:42` 📈 +63 XP in 1m · run total 1140 · L2 740/1140
+- `09:45:42` 📋 Sonzai quests — doing: boars (4), spiders (0/0)
+- `09:45:42` 📊 Sonzai 95/95 hp mana 100% · 17 kills
+- `09:46:15` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `09:46:15` 💰 You loot 17c.
+- `09:46:15` 💰 You receive: Bristly Boar Hide.
+- `09:46:15` 💰 You receive: Tough Jerky.
+- `09:46:42` 📈 +63 XP in 1m · run total 1203 · L2 803/1203
+- `09:46:42` 📋 Sonzai quests — doing: spiders (0/0) · ready: boars
+- `09:46:42` 📊 Sonzai 95/95 hp mana 100% · 18 kills
+- `09:47:28` 🩸 Down to 17 HP — bracing.
+- `09:47:31` ☠️ I fell in battle near (29, -53). Releasing spirit.
+- `09:47:31` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:47:31` 💚 Patched up (95/95).
+- `09:47:31` 🔄 Back on my feet.
+- `09:47:33` 💰 You receive 1s 20c.
+- `09:47:33` ⬆️ **Reached level 3.** Another notch on the bow.
+- `09:47:33` ✅ completed quest **q_boars**
+- `09:47:35` 📥 accepted quest **q_murlocs**
+- `09:47:37` 📥 accepted quest **q_supplies**
+- `09:47:39` 📥 accepted quest **q_greyjaw**
+- `09:47:40` 📥 accepted quest **q_bandits**
+- `09:47:42` 📈 +350 XP in 1m · run total 1553 · L3 253/1553
+- `09:47:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (0)
+- `09:47:42` 📊 Sonzai 130/130 hp mana 100% · 18 kills
+- `09:48:40` 🩸 Down to 29 HP — bracing.
+- `09:48:42` ☠️ I fell in battle near (-64, 49). Releasing spirit.
+- `09:48:42` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:48:42` 💚 Patched up (130/130).
+- `09:48:42` 🔄 Back on my feet.
+- `09:48:42` 📈 +0 XP in 1m · run total 1553 · L3 253/1553
+- `09:48:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (0)
+- `09:48:42` 📊 Sonzai 130/130 hp mana 100% · 18 kills
+- `09:49:05` 🩸 Down to 17 HP — bracing.
+- `09:49:07` ☠️ I fell in battle near (73, -59). Releasing spirit.
+- `09:49:07` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:49:07` 💚 Patched up (130/130).
+- `09:49:07` 🔄 Back on my feet.
+- `09:49:28` 🩸 Down to 26 HP — bracing.
+- `09:49:31` ☠️ I fell in battle near (67, -62). Releasing spirit.
+- `09:49:31` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:49:31` 💚 Patched up (130/130).
+- `09:49:31` 🔄 Back on my feet.
+- `09:49:42` 📈 +0 XP in 1m · run total 1553 · L3 253/1553
+- `09:49:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (0)
+- `09:49:42` 📊 Sonzai 130/130 hp mana 100% · 18 kills
+- `09:49:52` 🩸 Down to 20 HP — bracing.
+- `09:49:54` ☠️ I fell in battle near (70, -71). Releasing spirit.
+- `09:49:54` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:49:54` 💚 Patched up (130/130).
+- `09:49:54` 🔄 Back on my feet.
+- `09:50:16` 🩸 Down to 27 HP — bracing.
+- `09:50:20` ☠️ I fell in battle near (72, -53). Releasing spirit.
+- `09:50:20` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:50:20` 💚 Patched up (130/130).
+- `09:50:20` 🔄 Back on my feet.
+- `09:50:37` 🩸 Down to 29 HP — bracing.
+- `09:50:39` ☠️ I fell in battle near (78, -58). Releasing spirit.
+- `09:50:39` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:50:39` 💚 Patched up (130/130).
+- `09:50:39` 🔄 Back on my feet.
+- `09:50:42` 📈 +0 XP in 1m · run total 1553 · L3 253/1553
+- `09:50:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (0)
+- `09:50:42` 📊 Sonzai 130/130 hp mana 100% · 18 kills
+- `09:51:07` 🩸 Down to 22 HP — bracing.
+- `09:51:09` ☠️ I fell in battle near (64, -64). Releasing spirit.
+- `09:51:09` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:51:09` 💚 Patched up (130/130).
+- `09:51:09` 🔄 Back on my feet.
+- `09:51:33` 🩸 Down to 15 HP — bracing.
+- `09:51:34` ☠️ I fell in battle near (82, -77). Releasing spirit.
+- `09:51:34` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:51:34` 💚 Patched up (130/130).
+- `09:51:34` 🔄 Back on my feet.
+- `09:51:42` 📈 +0 XP in 1m · run total 1553 · L3 253/1553
+- `09:51:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (0)
+- `09:51:42` 📊 Sonzai 122/130 hp mana 100% · 18 kills
+- `09:52:07` ⚔️ Killed **Vale Bandit**. Clean shot, clean kill.
+- `09:52:42` 📈 +60 XP in 1m · run total 1613 · L3 313/1613
+- `09:52:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (1)
+- `09:52:42` 📊 Sonzai 122/130 hp mana 100% · 19 kills
+- `09:52:52` ⚔️ Killed **Vale Bandit**. Clean shot, clean kill.
+- `09:53:02` 🩸 Down to 22 HP — bracing.
+- `09:53:08` ☠️ I fell in battle near (56, -44). Releasing spirit.
+- `09:53:08` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:53:08` 💚 Patched up (130/130).
+- `09:53:08` 🔄 Back on my feet.
+- `09:53:42` 📈 +60 XP in 1m · run total 1673 · L3 373/1673
+- `09:53:42` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:53:42` 📊 Sonzai 130/130 hp mana 100% · 20 kills
+- `09:54:37` 🩸 Down to 30 HP — bracing.
+- `09:54:39` ☠️ I fell in battle near (72, -88). Releasing spirit.
+- `09:54:39` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:54:39` 💚 Patched up (130/130).
+- `09:54:39` 🔄 Back on my feet.
+- `09:54:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:54:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:54:43` 📊 Sonzai 130/130 hp mana 100% · 20 kills
+- `09:55:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:55:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:55:43` 📊 Sonzai 98/130 hp mana 100% · 20 kills
+- `09:56:03` 🩸 Down to 27 HP — bracing.
+- `09:56:15` ☠️ I fell in battle near (40, -53). Releasing spirit.
+- `09:56:15` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:56:15` 💚 Patched up (130/130).
+- `09:56:15` 🔄 Back on my feet.
+- `09:56:43` 🩸 Down to 26 HP — bracing.
+- `09:56:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:56:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:56:43` 📊 Sonzai 26/130 hp mana 100% · 20 kills
+- `09:56:44` ☠️ I fell in battle near (84, -63). Releasing spirit.
+- `09:56:44` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:56:44` 💚 Patched up (130/130).
+- `09:56:44` 🔄 Back on my feet.
+- `09:57:11` 🩸 Down to 26 HP — bracing.
+- `09:57:16` ☠️ I fell in battle near (51, -84). Releasing spirit.
+- `09:57:16` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:57:16` 💚 Patched up (130/130).
+- `09:57:16` 🔄 Back on my feet.
+- `09:57:41` 🩸 Down to 25 HP — bracing.
+- `09:57:43` ☠️ I fell in battle near (66, -68). Releasing spirit.
+- `09:57:43` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:57:43` 💚 Patched up (130/130).
+- `09:57:43` 🔄 Back on my feet.
+- `09:57:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:57:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:57:43` 📊 Sonzai 130/130 hp mana 100% · 20 kills
+- `09:58:09` 🩸 Down to 27 HP — bracing.
+- `09:58:15` ☠️ I fell in battle near (59, -47). Releasing spirit.
+- `09:58:15` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:58:15` 💚 Patched up (130/130).
+- `09:58:15` 🔄 Back on my feet.
+- `09:58:41` 🩸 Down to 22 HP — bracing.
+- `09:58:43` ☠️ I fell in battle near (81, -75). Releasing spirit.
+- `09:58:43` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:58:43` 💚 Patched up (130/130).
+- `09:58:43` 🔄 Back on my feet.
+- `09:58:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:58:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:58:43` 📊 Sonzai 130/130 hp mana 100% · 20 kills
+- `09:59:32` 🩸 Down to 27 HP — bracing.
+- `09:59:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `09:59:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `09:59:43` 📊 Sonzai 11/130 hp mana 100% · 20 kills
+- `09:59:46` ☠️ I fell in battle near (43, -49). Releasing spirit.
+- `09:59:47` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `09:59:47` 💚 Patched up (130/130).
+- `09:59:47` 🔄 Back on my feet.
+- `10:00:40` 🩸 Down to 32 HP — bracing.
+- `10:00:43` 📈 +0 XP in 1m · run total 1673 · L3 373/1673
+- `10:00:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (2)
+- `10:00:43` 📊 Sonzai 32/130 hp mana 100% · 20 kills
+- `10:00:44` ⚔️ Killed **Vale Bandit**. Down before it reached me.
+- `10:00:55` ☠️ I fell in battle near (53, -73). Releasing spirit.
+- `10:00:55` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:00:55` 💚 Patched up (130/130).
+- `10:00:55` 🔄 Back on my feet.
+- `10:01:43` 📈 +60 XP in 1m · run total 1733 · L3 433/1733
+- `10:01:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (3)
+- `10:01:43` 📊 Sonzai 117/130 hp mana 100% · 21 kills
+- `10:02:43` 📈 +0 XP in 1m · run total 1733 · L3 433/1733
+- `10:02:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (3)
+- `10:02:43` 📊 Sonzai 72/130 hp mana 100% · 21 kills
+- `10:02:47` ⚔️ Killed **Wild Boar**. Down before it reached me.
+- `10:02:47` 💰 You loot 8c.
+- `10:02:59` ⚔️ Killed **Vale Bandit**. Down before it reached me.
+- `10:03:43` 📈 +104 XP in 1m · run total 1837 · L3 537/1837
+- `10:03:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (4)
+- `10:03:43` 📊 Sonzai 120/130 hp mana 100% · 23 kills
+- `10:04:12` 🩸 Down to 29 HP — bracing.
+- `10:04:24` ☠️ I fell in battle near (40, -53). Releasing spirit.
+- `10:04:25` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:04:25` 💚 Patched up (130/130).
+- `10:04:25` 🔄 Back on my feet.
+- `10:04:43` 📈 +0 XP in 1m · run total 1837 · L3 537/1837
+- `10:04:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (4)
+- `10:04:43` 📊 Sonzai 130/130 hp mana 100% · 23 kills
+- `10:05:18` 🩸 Down to 30 HP — bracing.
+- `10:05:19` ⚔️ Killed **Vale Bandit**. Clean shot, clean kill.
+- `10:05:19` 💰 You loot 31c.
+- `10:05:19` 💰 You receive: Linen Scrap.
+- `10:05:24` ☠️ I fell in battle near (45, -46). Releasing spirit.
+- `10:05:24` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:05:24` 💚 Patched up (130/130).
+- `10:05:24` 🔄 Back on my feet.
+- `10:05:43` 📈 +60 XP in 1m · run total 1897 · L3 597/1897
+- `10:05:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (5)
+- `10:05:43` 📊 Sonzai 130/130 hp mana 100% · 24 kills
+- `10:05:59` ⚔️ Killed **Vale Bandit**. It never closed the distance.
+- `10:06:11` 💰 You loot 27c.
+- `10:06:11` 💰 You receive: Red Bandana.
+- `10:06:43` 📈 +60 XP in 1m · run total 1957 · L3 657/1957
+- `10:06:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (6)
+- `10:06:43` 📊 Sonzai 97/130 hp mana 100% · 25 kills
+- `10:07:00` 🩸 Down to 25 HP — bracing.
+- `10:07:04` ☠️ I fell in battle near (33, -41). Releasing spirit.
+- `10:07:04` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:07:04` 💚 Patched up (130/130).
+- `10:07:04` 🔄 Back on my feet.
+- `10:07:43` 📈 +0 XP in 1m · run total 1957 · L3 657/1957
+- `10:07:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (6)
+- `10:07:43` 📊 Sonzai 63/130 hp mana 100% · 25 kills
+- `10:07:55` 🩸 Down to 25 HP — bracing.
+- `10:08:03` ☠️ I fell in battle near (30, -49). Releasing spirit.
+- `10:08:03` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:08:03` 💚 Patched up (130/130).
+- `10:08:03` 🔄 Back on my feet.
+- `10:08:43` 📈 +0 XP in 1m · run total 1957 · L3 657/1957
+- `10:08:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (6)
+- `10:08:43` 📊 Sonzai 115/130 hp mana 100% · 25 kills
+- `10:09:13` 🩸 Down to 20 HP — bracing.
+- `10:09:19` ☠️ I fell in battle near (42, -51). Releasing spirit.
+- `10:09:20` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:09:20` 💚 Patched up (130/130).
+- `10:09:20` 🔄 Back on my feet.
+- `10:09:43` 📈 +0 XP in 1m · run total 1957 · L3 657/1957
+- `10:09:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (6)
+- `10:09:43` 📊 Sonzai 130/130 hp mana 100% · 25 kills
+- `10:10:23` 🩸 Down to 27 HP — bracing.
+- `10:10:31` ☠️ I fell in battle near (42, -50). Releasing spirit.
+- `10:10:31` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:10:31` 💚 Patched up (130/130).
+- `10:10:31` 🔄 Back on my feet.
+- `10:10:43` 📈 +0 XP in 1m · run total 1957 · L3 657/1957
+- `10:10:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (6)
+- `10:10:43` 📊 Sonzai 130/130 hp mana 100% · 25 kills
+- `10:11:23` ⚔️ Killed **Vale Bandit**. Down before it reached me.
+- `10:11:38` 🩸 Down to 31 HP — bracing.
+- `10:11:42` ☠️ I fell in battle near (44, -39). Releasing spirit.
+- `10:11:43` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:11:43` 💚 Patched up (130/130).
+- `10:11:43` 🔄 Back on my feet.
+- `10:11:43` 📈 +60 XP in 1m · run total 2017 · L3 717/2017
+- `10:11:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (7)
+- `10:11:43` 📊 Sonzai 130/130 hp mana 100% · 26 kills
+- `10:12:43` 📈 +0 XP in 1m · run total 2017 · L3 717/2017
+- `10:12:43` 📋 Sonzai quests — doing: spiders (0/0), murlocs (0), supplies (0), greyjaw (0), bandits (7)
+- `10:12:43` 📊 Sonzai 110/130 hp mana 100% · 26 kills
+- `10:13:02` 🩸 Down to 30 HP — bracing.
+- `10:13:06` ⚔️ Killed **Vale Bandit**. Clean shot, clean kill.
+- `10:13:10` ☠️ I fell in battle near (29, -45). Releasing spirit.
+- `10:13:10` ☠️→✨ Resurrected at the graveyard and ran back to the body.
+- `10:13:10` 💚 Patched up (130/130).
+- `10:13:10` 🔄 Back on my feet.

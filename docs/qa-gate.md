@@ -1,100 +1,88 @@
 # The QA gate
 
-World of ClaudeCraft is built entirely with Claude Code, by many contributors. To keep the
-quality bar high without slowing the edit loop, the project enforces it in layers. Each layer
-does exactly one job, at the cheapest moment it can, and nothing heavier than necessary runs on
-the inner loop.
+World of ClaudeCraft uses multiple coding-agent runtimes, but one repository QA
+contract. Every layer does one job at the cheapest useful boundary. Claude Code and
+Codex have different entry points and share the same deterministic scripts and commands.
 
-## The layers
+## Layers
 
-| Layer | What it is | When it runs | Cost | Blocks? |
-|---|---|---|---|---|
-| Instant copy gate | `Stop` hook -> `.claude/hooks/qa-stop.sh` | end of every Claude Code turn | milliseconds | yes, on a hard-invariant hit |
-| Deterministic floor | `.githooks/pre-push` | once per `git push` | seconds | yes, on red |
-| Full local gate | `npm run gate` -> `scripts/gate.mjs` | on demand, before calling a change done | minutes | yes, on red |
-| Judgment review | `/qa` command + the `qa-checklist` agent + the domain reviewers | when you finish a unit of work | an agent run | no (advisory locally, enforced at PR review) |
+| Layer | What runs | When | Blocks? |
+|---|---|---|---|
+| Instant copy gate | `.claude/hooks/qa-stop.sh` through each runtime's Stop hook | End of an agent turn | Yes, on a hard-invariant hit |
+| Deterministic floor | `.githooks/pre-push` | Before a push | Yes |
+| Full local gate | `npm run gate` through `scripts/gate.mjs` | Before implementation is called ready | Yes |
+| Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
-### 1. Instant copy gate (every turn)
+### Instant copy gate
 
-`qa-stop.sh` scans only the lines the current turn ADDED, for hard invariants that are
-detectable in milliseconds: an em dash, en dash, or emoji; a stray `.only(` that would silently
-disable a test suite; a leftover `debugger`. On a hit it asks Claude to fix those exact lines
-before finishing; otherwise it is silent. It never runs `tsc`, `vitest`, `biome`, or any agent.
-A Stop hook fires every turn, so anything heavier here would tax every iteration, and a hook is
-a shell command that cannot spawn an agent anyway.
+The Stop gate scans only newly added lines for an em dash, en dash, emoji, focused
+`.only(` test, or leftover `debugger`. It takes milliseconds and never runs TypeScript,
+Vitest, Biome, browser work, or an agent. `.claude/settings.json` and
+`.codex/hooks.json` share the Claude implementation; the Codex adapter adds only new,
+untracked TOML and TypeScript declaration files that the older extension filter omits.
 
-### 2. Deterministic floor (every push)
+### Deterministic floor
 
-`.githooks/pre-push` runs the heavier deterministic checks once, at the push boundary
-(infrequent, so it does not slow editing): `tsc --noEmit`, the determinism/purity and
-i18n-matcher guard tests, `biome` scoped to the branch's changed files, and a copy-rule scan of
-the push diff. It blocks the push on any failure. Bypass in a genuine emergency with
-`git push --no-verify`. The `SessionStart` hook `.claude/hooks/ensure-hooks.sh` points this
-clone's `core.hooksPath` at `.githooks` so the floor actually runs (idempotent, and it never
-clobbers an existing hook setup).
+`.githooks/pre-push` runs the heavier fast checks at the push boundary: TypeScript,
+determinism and purity guards, i18n matcher guards, Biome on changed files, and copy
+checks over the push diff. The shared `.claude/hooks/ensure-hooks.sh` idempotently points
+`core.hooksPath` at `.githooks`; both agent runtimes call it at session start.
 
-### 2b. Full local gate (on demand)
+`git push --no-verify` remains an emergency bypass, not a substitute for reporting and
+fixing a red gate.
 
-`npm run gate` (`scripts/gate.mjs`) runs the CI checks locally: the pr-gate job's steps with
-the parallel lint job's changed-files biome pulled forward as an early fast-fail (i18n artifact
-generation plus the freshness diff, the malware scan, biome, the full test suite, `tsc`, the
-env/server/client builds). On a `release/**` branch it sets `I18N_RELEASE_TIER=1`, mirroring
-the release-gate job. It stops at the first failure and caps vitest workers at half the cores.
-The freshness step compares the regenerated i18n artifacts against the staged/committed copies,
-so stage them after an i18n change or the step fails (with a hint saying exactly that). It exists because ad-hoc shell chains get this wrong in two
-known ways: piping `npm test` through `tail` masks vitest's exit code (a red run can print
-"PASS"), and an unbounded full run saturates every core and flakes the heavy sim suites when
-other work shares the machine (failing files that then pass in isolation are load flakes, not
-regressions).
+### Full local gate
 
-### 3. Judgment review (when you finish a feature)
+`npm run gate` mirrors the CI contract: generated i18n freshness, malware scanning,
+changed-file formatting, the full test suite, typecheck, and env, server, and client
+builds. Release branches use the release i18n tier. It stops at the first failure and
+bounds Vitest workers to avoid load flakes on shared machines.
 
-Determinism, three-host parity, server authority, persistence safety, i18n correctness,
-render/UI seams, responsive/mobile, competitive fairness across graphics tiers and devices
-(no preset or device gives an information or timing advantage), content fidelity, and
-performance need reasoning, not a regex, so they are an agent, not a hook. Run `/qa` (or invoke the `qa-checklist` agent) when you
-finish a unit of work. It scales its depth to the size of the change, checks every invariant in
-play, names the domain reviewers to dispatch, and ends with an adversarial "what is missing"
-pass.
+Use this command instead of an ad hoc shell pipeline. Piping a test run can hide its exit
+status, and unconstrained full-suite parallelism can make healthy heavy sim tests flake.
 
-## The reviewer agents
+### Judgment review
 
-All read-only, all in `.claude/agents/`. When orchestrating them from a Workflow, run them
-free-text: forcing a StructuredOutput schema on a specialized reviewer can exhaust the
-retry cap and return null instead of a report.
+Reasoning is required for determinism, host parity, server authority, persistence,
+localization, rendering and UI seams, mobile behavior, graphics fairness, content
+fidelity, security, performance, and decisive coverage.
 
-- **`qa-checklist`** - the evergreen end-of-contribution gate (also reachable as `/qa`). The
-  default; it dispatches the others by domain.
-- **`architecture-reviewer`** - determinism, rng draw-order, tick-phase, and the `SimContext`
-  seam, for any `src/sim/` change.
-- **`cross-platform-sync`** - IWorld parity, the wire protocol, SimEvent and command coverage,
-  and the sim/server i18n matchers.
-- **`migration-safety`** - inline-DDL and JSONB persistence safety (additive/idempotent DDL,
-  back-compat, indexes, parameterized SQL, boot safety).
-- **`privacy-security-review`** - server authority / anti-cheat, dev-command gating, secrets,
-  auth (including OAuth, TOTP, and wallet linking), and account-data privacy.
-- **`test-coverage-auditor`** - test decisiveness and pin quality: every claimed behavior has an
-  assertion that would fail on regression, no constant-self-comparison pins, load-bearing
-  SQL/keys pinned to literals, every arm of an "either/all" claim exercised.
-- **`release-malware-audit`** - the release gate for deliberately planted malicious code
-  (triages `scripts/malware_scan.mjs`).
+- Claude Code uses `/qa`, `qa-checklist`, and `.claude/agents/`.
+- Codex uses `$woc-qa` and `.codex/agents/`.
 
-## Keeping the gate current
+The coordinator establishes one diff and runs commands once. It dispatches only relevant
+read-only reviewers, gives them the shared evidence, and verifies consequential findings
+before reporting readiness.
 
-The reviewer agents encode facts about the codebase (seams, file roles, invariants, the gates
-that enforce them). When the architecture changes, update the relevant agent in the same spirit
-as the code: anchor claims on stable things (file paths, symbol names, gate names), NOT on line
-numbers or line counts, which drift constantly. The `qa-checklist` agent is the place to add a
-new evergreen check; a new dedicated reviewer is only worth it when an invariant is large enough
-to need its own focused prompt and is not already covered by a standing test.
+## Reviewer coverage
 
-## Trust and safety
+| Concern | Claude role | Codex role |
+|---|---|---|
+| Simulation architecture | `architecture-reviewer` | `woc_sim_architecture` |
+| Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
+| Persistence and migrations | `migration-safety` | `woc_persistence` |
+| Privacy and security | `privacy-security-review` | `woc_security` |
+| Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
+| Frontend and graphics | QA checklist | `woc_frontend` |
+| Release malware | `release-malware-audit` | `woc_release_malware` |
 
-The hooks run shell on your machine with your permissions, so treat them like any other
-checked-in tooling. They are deliberately small and auditable (bash plus `git` and `perl`), read
-only `git diff` and `git config`, write nothing outside `core.hooksPath`, and make no network
-calls. Claude Code does not run project hooks until you confirm trust for the repo, and the hook
-set is snapshotted at startup. The repo's own `release-malware-audit` scanner also scans
-`.claude/**`. To opt out: `git push --no-verify` (one push), `git config --unset core.hooksPath`
-(disable the pre-push floor for your clone), or `"disableAllHooks": true` in your
-`.claude/settings.local.json` (which is not checked in). See `.claude/hooks/README.md`.
+These roles encode non-obvious review heuristics. Canonical architecture stays in root
+and local `CLAUDE.md` files.
+
+## Keep the gate current
+
+When architecture changes, update the applicable reviewer and tests in the same change.
+Anchor guidance on stable paths, symbols, seams, and gate names, not line counts. Add a
+new specialist only when a concern is large enough to need focused judgment and is not
+already protected by a deterministic test.
+
+## Trust
+
+Project hooks execute local shell with the user's permissions. Review changes before
+trusting them. Claude Code and Codex snapshot or trust hooks through their own runtime,
+so restart or use the runtime hook review command after updates. The scripts are small,
+local, and non-networked; CI and the release malware audit remain the enforcement layer.
+
+To disable the clone's pre-push floor, use `git config --unset core.hooksPath`. Claude
+Code can additionally use its local hook setting. Codex hook trust is managed with
+`/hooks`.
