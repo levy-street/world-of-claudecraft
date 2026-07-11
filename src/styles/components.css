@@ -7695,6 +7695,9 @@
   .tradingbots-pnl {
     color: var(--color-text-success);
   }
+  .tradingbots-pnl.tradingbots-loss {
+    color: var(--color-text-error);
+  }
   .tradingbots-param {
     display: flex;
     align-items: center;

@@ -132,7 +132,7 @@ function makeOps(
   } = {},
 ): TradingBotsFlowOps & OpsLog {
   const calls: OpsLog['calls'] = [];
-  const answer = <T>(name: string, value: T | Error | undefined, fallback: T): Promise<T> => {
+  const answer = <T>(value: T | Error | undefined, fallback: T): Promise<T> => {
     if (value instanceof Error) return Promise.reject(value);
     return Promise.resolve(value === undefined ? fallback : value);
   };
@@ -140,37 +140,37 @@ function makeOps(
     calls,
     subscribe(skuId, payWith, userPublicKey) {
       calls.push({ name: 'subscribe', args: [skuId, payWith, userPublicKey] });
-      return answer('subscribe', answers.subscribe, {
+      return answer(answers.subscribe, {
         paymentId: 'pay_1',
         paymentTransaction: 'dHgtcGF5',
       });
     },
     confirmSubscribe(paymentId, signature) {
       calls.push({ name: 'confirmSubscribe', args: [paymentId, signature] });
-      return answer('confirmSubscribe', answers.confirmSubscribe, {});
+      return answer(answers.confirmSubscribe, {});
     },
     deposit(solAmount, wocAmount, userPublicKey) {
       calls.push({ name: 'deposit', args: [solAmount, wocAmount, userPublicKey] });
-      return answer('deposit', answers.deposit, {
+      return answer(answers.deposit, {
         depositId: 'dep_1',
         depositTransaction: 'dHgtZGVw',
       });
     },
     confirmDeposit(depositId, signature) {
       calls.push({ name: 'confirmDeposit', args: [depositId, signature] });
-      return answer('confirmDeposit', answers.confirmDeposit, {});
+      return answer(answers.confirmDeposit, {});
     },
     withdraw(userPublicKey) {
       calls.push({ name: 'withdraw', args: [userPublicKey] });
-      return answer('withdraw', answers.withdraw, { withdrawTransaction: 'dHgtd2Q=' });
+      return answer(answers.withdraw, { withdrawTransaction: 'dHgtd2Q=' });
     },
     control(action, params) {
       calls.push({ name: 'control', args: [action, params] });
-      return answer('control', answers.control, {});
+      return answer(answers.control, {});
     },
     signAndSend(txBase64) {
       calls.push({ name: 'signAndSend', args: [txBase64] });
-      return answer('signAndSend', answers.signAndSend, 'sig_base58');
+      return answer(answers.signAndSend, 'sig_base58');
     },
   };
 }
@@ -203,14 +203,19 @@ describe('rentFlow', () => {
     expect(host.refreshes).toBe(1);
   });
 
-  it('a malformed WOC payment leg is an error, never signed', async () => {
-    const host = makeHost();
-    const ops = makeOps({ subscribe: { paymentId: 'pay_1' } });
-    await rentFlow(host, ops, 'grid', 'woc');
-    expect(host.op.phase).toBe('error');
-    expect(host.op.errorCode).toBe(ERR_SIGN_FAILED);
-    expect(ops.calls.map((c) => c.name)).toEqual(['subscribe']);
-    expect(host.refreshes).toBe(0);
+  it('a malformed WOC payment leg is an error, never signed (each field arm)', async () => {
+    // Both arms of the guard independently: a missing paymentTransaction must
+    // never reach the wallet, and a missing paymentId must never sign a real
+    // transaction whose confirm would then be unconfirmable.
+    for (const malformed of [{ paymentId: 'pay_1' }, { paymentTransaction: 'dGVzdA==' }] as const) {
+      const host = makeHost();
+      const ops = makeOps({ subscribe: malformed });
+      await rentFlow(host, ops, 'grid', 'woc');
+      expect(host.op.phase).toBe('error');
+      expect(host.op.errorCode).toBe(ERR_SIGN_FAILED);
+      expect(ops.calls.map((c) => c.name)).toEqual(['subscribe']);
+      expect(host.refreshes).toBe(0);
+    }
   });
 
   it('refuses a WOC rental with no connected wallet, zero endpoint calls', async () => {

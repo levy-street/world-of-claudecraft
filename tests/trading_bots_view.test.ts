@@ -22,6 +22,7 @@ import {
   isOpInFlight,
   isRentalExpired,
   isVaultEmpty,
+  mintDecimals,
   opConfirming,
   opDone,
   opFailed,
@@ -84,6 +85,13 @@ describe('catalog visibility', () => {
     expect(skuForId(CONFIG, 'experimental_v9')?.id).toBe('experimental_v9');
     expect(skuForId(CONFIG, 'missing')).toBeNull();
   });
+
+  it('mintDecimals resolves the WOC leg vs the SOL leg by exact mint match', () => {
+    expect(mintDecimals(CONFIG, CONFIG.wocMint)).toBe(6);
+    expect(mintDecimals(CONFIG, 'So11111111111111111111111111111111111111112')).toBe(9);
+    // A near-miss mint string is the SOL leg, never a fuzzy WOC match.
+    expect(mintDecimals(CONFIG, `${CONFIG.wocMint} `)).toBe(9);
+  });
 });
 
 describe('screen derivation', () => {
@@ -96,8 +104,9 @@ describe('screen derivation', () => {
     expect(screenForStatus({ ...STATUS, vault: null })).toBe('fund');
     expect(screenForStatus({ ...STATUS, vault: { sol: '0', woc: '0' } })).toBe('fund');
     expect(screenForStatus(STATUS)).toBe('dashboard');
-    // One funded leg is enough to leave the funding screen.
+    // Either funded leg alone is enough to leave the funding screen.
     expect(screenForStatus({ ...STATUS, vault: { sol: '0', woc: '1' } })).toBe('dashboard');
+    expect(screenForStatus({ ...STATUS, vault: { sol: '1', woc: '0' } })).toBe('dashboard');
   });
 
   it('treats a malformed vault leg as zero, never NaN', () => {

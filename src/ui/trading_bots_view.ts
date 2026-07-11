@@ -124,6 +124,16 @@ export function skuForId(config: TradingBotsConfig, id: string): TradingBotSku |
   return config.skus.find((sku) => sku.id === id) ?? null;
 }
 
+/**
+ * The display decimals for a trade-leg mint: the pinned $WOC mint renders at
+ * wocDecimals, anything else in the SOL/WOC pair context is the SOL leg. A
+ * swap of the two magnitudes would misrender every trade row, so this lives
+ * in the pure core where a test pins it.
+ */
+export function mintDecimals(config: TradingBotsConfig, mint: string): number {
+  return mint === config.wocMint ? config.wocDecimals : config.solDecimals;
+}
+
 // ---------------------------------------------------------------------------
 // Screen derivation. One aggregate read decides which of the three primary
 // screens the window shows; the transient subscribe/withdraw flows are op

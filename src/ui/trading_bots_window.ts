@@ -42,6 +42,7 @@ import {
   effectiveParams,
   isCoolingDown,
   isRentalExpired,
+  mintDecimals,
   rentalDaysLeft,
   resetOp,
   screenForStatus,
@@ -388,9 +389,12 @@ export class TradingBotsWindow {
               })
             : t(key)
           : spec.key;
+        // Number() coercion on the spec fields: they arrive from the service
+        // config relayed verbatim, so a non-numeric value must never reach an
+        // attribute position as markup (a number, NaN included, is inert).
         return (
           `<label class="tradingbots-param"><span>${esc(label)}</span>` +
-          `<input type="number" data-tb-param="${esc(spec.key)}" min="${spec.min}" max="${spec.max}" step="${spec.step}" value="${params[spec.key]}">` +
+          `<input type="number" data-tb-param="${esc(spec.key)}" min="${Number(spec.min)}" max="${Number(spec.max)}" step="${Number(spec.step)}" value="${Number(params[spec.key])}">` +
           `</label>`
         );
       })
@@ -402,7 +406,7 @@ export class TradingBotsWindow {
     const pnlPercent = pnl ? signedPercentText(pnl.bps) : null;
     const pnlLine =
       pnl && pnlAmount !== null && pnlPercent !== null
-        ? `<div class="tradingbots-line tradingbots-pnl">${esc(
+        ? `<div class="tradingbots-line tradingbots-pnl${pnl.bps < 0 ? ' tradingbots-loss' : ''}">${esc(
             t('hudChrome.tradingBots.pnlLine', {
               days: formatNumber(pnl.periodDays, { maximumFractionDigits: 0 }),
               amount: pnlAmount,
@@ -414,10 +418,8 @@ export class TradingBotsWindow {
       .slice(0, 5)
       .map((trade) => {
         const buy = trade.side === 'buy';
-        const inDecimals =
-          trade.inMint === config.wocMint ? config.wocDecimals : config.solDecimals;
-        const outDecimals =
-          trade.outMint === config.wocMint ? config.wocDecimals : config.solDecimals;
+        const inDecimals = mintDecimals(config, trade.inMint);
+        const outDecimals = mintDecimals(config, trade.outMint);
         const inText = formatBaseUnits(trade.inAmount, inDecimals, this.groupInt) ?? trade.inAmount;
         const outText =
           formatBaseUnits(trade.outAmount, outDecimals, this.groupInt) ?? trade.outAmount;
