@@ -199,11 +199,10 @@ export function isOnPitch(x: number, z: number): boolean {
 // pitch far from the one physical Sowfield, so many run at once without touching
 // the real match. Each copy is the SAME pitch geometry shifted by an ORIGIN
 // offset (the real Sowfield match uses {0,0}); match code adds match.origin to
-// every geometry read. Origins sit far past every instance band (x >= 4773 is a
-// delve, arena at 4200, dungeons from 900) and 400yd apart, so interest scoping
-// (~130yd) keeps each practice pitch fully private and clear of all other
-// entities. Practice players are clamped to their copy's pitch, so the region's
-// collider routing out there never matters.
+// every geometry read. Origins sit far past every gameplay instance band and
+// 400yd apart, so interest scoping (~130yd) keeps each practice pitch fully
+// private and clear of all other entities. Practice players are clamped to their
+// copy's pitch, so the region's collider routing out there never matters.
 export const VC_PRACTICE_SLOTS = 8; // max concurrent practice matches per realm
 const VC_PRACTICE_BASE_X = 30000;
 const VC_PRACTICE_SLOT_DZ = 400;

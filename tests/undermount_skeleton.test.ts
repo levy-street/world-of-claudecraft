@@ -7,7 +7,15 @@
 // cleared (permanent progress, not the daily lockout); wing 1 is always open.
 
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, MOBS } from '../src/sim/data';
+import {
+  arenaOrigin,
+  DUNGEONS,
+  delveOrigin,
+  dungeonAt,
+  instanceOrigin,
+  MOBS,
+  yumiMazeOrigin,
+} from '../src/sim/data';
 import {
   UNDERMOUNT_WINGS,
   undermountWing,
@@ -30,6 +38,18 @@ describe('Undermount wing chain metadata (pure)', () => {
   it('resolves a wing record by dungeonId and ignores non-wings', () => {
     expect(undermountWing('undermount_wing1')?.order).toBe(1);
     expect(undermountWing('hollow_crypt')).toBeUndefined();
+  });
+});
+
+describe('Undermount dungeon x-band', () => {
+  it('recognizes every wing and excludes the later instance bands', () => {
+    expect(dungeonAt(instanceOrigin(10, 0).x)?.id).toBe('undermount_wing1');
+    expect(dungeonAt(instanceOrigin(11, 0).x)?.id).toBe('undermount_wing2');
+    expect(dungeonAt(instanceOrigin(12, 0).x)?.id).toBe('undermount_wing3');
+    expect(dungeonAt(instanceOrigin(13, 0).x)?.id).toBe('undermount_wing4');
+    expect(dungeonAt(arenaOrigin(0).x)).toBeNull();
+    expect(dungeonAt(delveOrigin(0, 0).x)).toBeNull();
+    expect(dungeonAt(yumiMazeOrigin(0).x)).toBeNull();
   });
 });
 

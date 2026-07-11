@@ -9,7 +9,15 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, DUNGEON_LIST, QUESTS, WORLD_MAX_X, WORLD_MIN_X, ZONES } from '../src/sim/data';
+import {
+  CAMPS,
+  delveOrigin,
+  DUNGEON_LIST,
+  QUESTS,
+  WORLD_MAX_X,
+  WORLD_MIN_X,
+  ZONES,
+} from '../src/sim/data';
 import { isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
@@ -99,11 +107,12 @@ function makeOverworldWorld(
 
 function makeDelveWorld(shape: 'sim' | 'client'): IWorld {
   const simJunk = shape === 'sim' ? { hp: 100 } : {};
+  const origin = delveOrigin(0, 0);
   return {
-    player: { id: 1, kind: 'player', name: 'Me', pos: { x: 5000, z: 0 }, facing: 0, ...simJunk },
+    player: { id: 1, kind: 'player', name: 'Me', pos: origin, facing: 0, ...simJunk },
     entities: new Map(),
     socialInfo: null,
-    delveRun: { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } },
+    delveRun: { delveId: 'd', modules: ['m'], moduleIndex: 0, origin },
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
     questState: () => 'unavailable',

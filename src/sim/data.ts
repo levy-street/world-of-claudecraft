@@ -410,13 +410,22 @@ export function dungeonAt(x: number): DungeonDef | null {
 
 // ---------------------------------------------------------------------------
 // The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
-// far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at
-// x 900/1500/2100). Like dungeons, x beyond DUNGEON_X_THRESHOLD means flat
-// ground (world.groundHeight) and instance-local collision (sim/colliders.ts);
+// far-off flat-ground x-band, well past the dungeon bands. The highest dungeon
+// index is 13 at x 8700, and its east room edge reaches x 8928. Like dungeons,
+// positions past DUNGEON_X_THRESHOLD use flat ground (world.groundHeight) and
+// instance-local collision (sim/colliders.ts);
 // the band split below keeps arena positions from being read as a dungeon.
+// Note: relocating this band (the +5600 shift that made room for the Undermount
+// wings) moves its instances to a larger absolute x, which changes float rounding
+// in any absolute-coordinate math they run. Most instance parity goldens updated
+// by pure position translation; fiesta_powerups.json records a different but valid
+// deterministic playthrough (fiesta's ring and power-up grab checks use
+// absolute-coordinate Math.hypot, so a grab lands a tick off at the coarser ULP).
+// The match still finishes with a valid score and players never see world
+// coordinates, so this is not a gameplay-rule or player-visible change.
 // ---------------------------------------------------------------------------
 
-export const ARENA_X = 4200; // arena instances share this x; slots stack along z
+export const ARENA_X = 9600; // arena instances share this x; slots stack along z
 export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
@@ -455,18 +464,18 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above ARENA_X_MIN and ARENA_X (both 9600).
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
-// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
-// west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
-export const DELVE_X_MIN = 4800;
+// 10200 sits clear of the current layout: dungeons end at ARENA_X_MIN (9600) and
+// the arena pit is centred at ARENA_X (9600, about 22u in each x direction). The
+// delve band's west edge (DELVE_BAND_X_MIN = 10173) leaves a comfortable margin.
+export const DELVE_X_MIN = 10200;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider
 // side walls than the base crypt kit: the side-wall centre is at instance-local
 // |x| = DELVE_WALL_X (25, mirror of delve_layout.ts WALL_X) and the collider's
-// outer face sits 1u beyond that (|x| = 26), i.e. world-x = DELVE_X_MIN - 26 =
-// 4774 for slot 0. We set the band edge 1u further west again (4773) so
+// outer face sits 1u beyond that (|x| = 26), so world x = DELVE_X_MIN - 26 =
+// 10174 for slot 0. We set the band edge 1u further west again (10173) so
 // isDelvePos covers the ENTIRE room footprint, including the west wall face,
 // and the west half is never misclassified as arena. Still >500u clear of ARENA_X.
 const DELVE_WALL_X = 25; // mirror of delve_layout.ts WALL_X (delve side-wall centre)
@@ -496,19 +505,19 @@ export function delveAt(x: number): DelveDef | null {
 
 // ---------------------------------------------------------------------------
 // Protect Yumi! maze instances, the easternmost band. Delve rooms are centred
-// at DELVE_X_MIN + index*600 with a ~26u wall face, so an 8000 band edge
-// leaves headroom for delve indexes 0..5 (4800 + 5*600 + 26 = 7826 < 8000).
+// at DELVE_X_MIN + index*600 with a ~26u wall face, so a 13400 band edge leaves
+// headroom for delve indexes 0..5 (10200 + 5*600 + 26 = 13226 < 13400).
 // Like every far-east band: flat ground (world.groundHeight) and one shared
 // instance-local collider set (sim/yumi_maze_layout.ts via sim/colliders.ts).
 // ---------------------------------------------------------------------------
 
-export const YUMI_BAND_X_MIN = 8000; // x at/after this = a yumi maze instance
+export const YUMI_BAND_X_MIN = 13400; // x at/after this = a yumi maze instance
 // Two-sided cap: the Vale Cup practice pitches sit further east (x = 30000,
 // src/sim/vale_cup_layout.ts vcPracticeOrigin), so the maze band must not
-// claim everything past 8000 the way the delve band once claimed everything
-// past 4773. 12000 leaves generous maze headroom.
-export const YUMI_BAND_X_MAX = 12000;
-export const YUMI_MAZE_X = 8400; // maze instances share this x; slots stack along z
+// claim everything past 13400 the way the delve band once claimed everything
+// past 10173. 17400 leaves generous maze headroom.
+export const YUMI_BAND_X_MAX = 17400;
+export const YUMI_MAZE_X = 13800; // maze instances share this x; slots stack along z
 export const YUMI_MAZE_SLOT_COUNT = 4; // concurrent Protect Yumi matches
 const YUMI_MAZE_Z0 = -1250;
 const YUMI_MAZE_SLOT_SPACING = 200; // > the ~90u maze footprint so slots never overlap

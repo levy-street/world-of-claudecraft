@@ -279,10 +279,6 @@ const UNDERMOUNT_ENV_INTENSITY = 0.16;
 const UNDERMOUNT_RIM_BOOST = 1.8;
 const UNDERMOUNT_HEMI_SKY_COLOR = 0xffb060;
 const UNDERMOUNT_HEMI_GROUND_COLOR = 0x3a1206;
-const UNDERMOUNT_INSTANCE_HALF_WIDTH = 250;
-const UNDERMOUNT_INSTANCE_XS = DUNGEON_LIST.filter(
-  (dungeon) => dungeon.interior === 'undermount',
-).map((dungeon) => instanceOrigin(dungeon.index, 0).x);
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -3833,22 +3829,11 @@ export class Renderer {
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     const pz = this.sim.player.pos.z;
-    // Private Vale Cup practice instance: the pitch sits far out in an instance
-    // band (which would otherwise read as a delve), so give it its own futuristic
-    // skybox + matching fog instead of the delve murk. Detected by the match's
-    // non-zero pitch origin (the real Sowfield match is {0,0}).
+    // Private Vale Cup practice instance: the pitch sits beyond the capped
+    // instance bands, so give it its own futuristic skybox and matching fog.
+    // Detect it by the match's non-zero origin (the real Sowfield match is {0,0}).
     const po = this.sim.cupInfo?.match?.origin;
     const inPractice = !!po && (po.x !== 0 || po.z !== 0);
-    // Undermount origins sit inside the broad Delve and Yumi x-bands. Resolve
-    // their narrower dungeon bands first so those coarse checks do not claim them.
-    let inUndermountBand = false;
-    if (inside) {
-      for (const ox of UNDERMOUNT_INSTANCE_XS) {
-        if (Math.abs(px - ox) >= UNDERMOUNT_INSTANCE_HALF_WIDTH) continue;
-        inUndermountBand = true;
-        break;
-      }
-    }
     if (inPractice) {
       const idx = this.practiceSkyVariant();
       this.valeCupSky.setVariant(idx);
@@ -3857,9 +3842,9 @@ export class Renderer {
     } else {
       this.valeCupSky.mesh.visible = false;
     }
-    if (isDelvePos(px) && !inPractice && !inUndermountBand) {
+    if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
-    } else if (inside && isYumiMazePos(px) && !inUndermountBand) {
+    } else if (inside && isYumiMazePos(px)) {
       // build the Protect Yumi maze copy the player was matched into; the
       // update() call each frame lives in sync() (beacon anchors)
       for (let i = 0; i < YUMI_MAZE_SLOT_COUNT; i++) {
@@ -3904,14 +3889,10 @@ export class Renderer {
     }
     // the Drowned Temple reads as submerged: a teal murk instead of the
     // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inDelve = inside && !inUndermountBand && isDelvePos(px);
-    const inYumiMaze = inside && !inUndermountBand && isYumiMazePos(px);
+    const inDelve = inside && isDelvePos(px);
+    const inYumiMaze = inside && isYumiMazePos(px);
     const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px)
-        ? inUndermountBand
-          ? 'undermount'
-          : dungeonAt(px)?.interior
-        : null;
+      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     const inUndermount = interior === 'undermount';
@@ -3970,7 +3951,7 @@ export class Renderer {
       } else if (desired === 'practice') {
         // The private practice pitch under its futuristic sky: tint the fog to
         // the sky variant and push it well back so the pitch reads clear and lit
-        // (NOT the delve murk this instance band would otherwise get).
+        // without inheriting another instance ambience.
         fog.color.setHex(this.valeCupSky.fogFor(this.practiceSkyVariant()));
         fog.near = 60;
         fog.far = 420;

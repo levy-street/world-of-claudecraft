@@ -5,6 +5,7 @@
 // wire-roundtripped (ClientWorld-mirror-shaped) ArenaInfo stub.
 
 import { describe, expect, it } from 'vitest';
+import { YUMI_MAZE_X } from '../src/sim/data';
 import { type YumiLiveState, yumiMatchView } from '../src/ui/yumi_match_view';
 import type { ArenaInfo } from '../src/world_api';
 
@@ -19,8 +20,15 @@ function stubInfo(over: Partial<NonNullable<ArenaInfo['match']>['yumi']> = {}): 
     damageTakenMult: 1,
     down: false,
     respawnIn: 0,
-    yumiA: { entityId: 900, hp: 4200, maxHp: 5000, x: 8400, z: -1250, alive: true },
-    yumiB: { entityId: 901, hp: 3100, maxHp: 5000, x: 8420, z: -1240, alive: true },
+    yumiA: { entityId: 900, hp: 4200, maxHp: 5000, x: YUMI_MAZE_X, z: -1250, alive: true },
+    yumiB: {
+      entityId: 901,
+      hp: 3100,
+      maxHp: 5000,
+      x: YUMI_MAZE_X + 20,
+      z: -1240,
+      alive: true,
+    },
     teamA: [],
     teamB: [],
     ...over,

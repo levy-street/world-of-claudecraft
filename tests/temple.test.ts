@@ -39,7 +39,7 @@ describe('The Drowned Temple', () => {
     expect(t.suggestedPlayers).toBe(5);
     // it joins the map-derived dungeon list (the moongate draws itself there)
     expect(DUNGEON_LIST.some((d) => d.id === 'drowned_temple')).toBe(true);
-    // index-3 origin sits clear of the arena band (x >= 2800)
+    // Index 3 remains inside the dungeon band, below the arena origin.
     expect(instanceOrigin(3, 0).x).toBe(2700);
   });
 
