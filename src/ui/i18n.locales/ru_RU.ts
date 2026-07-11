@@ -6193,6 +6193,97 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.errSignFailed':
     'Транзакция не была отправлена. Возможно, она была отклонена в вашем кошельке.',
   'hudChrome.dexSwap.errNoWallet': 'Сначала подключите кошелек Solana.',
+  // The rentable trading bots (M16 non-Latin fill)
+  'apiError.trading_bots.disabled': 'Торговые боты сейчас недоступны.',
+  'apiError.trading_bots.unknown_sku': 'Этого бота нет в каталоге.',
+  'apiError.trading_bots.invalid_pay_currency': 'Эта валюта оплаты не поддерживается.',
+  'apiError.trading_bots.already_subscribed': 'Вы уже арендуете торгового бота.',
+  'apiError.trading_bots.subscription_required': 'Сначала арендуйте торгового бота.',
+  'apiError.trading_bots.subscription_expired':
+    'Аренда бота истекла. Продлите ее или выведите свои средства.',
+  'apiError.trading_bots.insufficient_claudium': 'Недостаточно Claudium.',
+  'apiError.trading_bots.invalid_amount': 'Введите корректное количество.',
+  'apiError.trading_bots.deposit_out_of_bounds':
+    'Этот депозит выходит за допустимые пределы для данного бота.',
+  'apiError.trading_bots.invalid_public_key': 'Сначала подключите кошелек Solana.',
+  'apiError.trading_bots.invalid_params': 'Такие настройки бота не допускаются.',
+  'apiError.trading_bots.payment_not_found': 'Платеж не найден. Начните заново.',
+  'apiError.trading_bots.payment_unverified':
+    'Платеж пока не удалось подтвердить. Повторите попытку чуть позже.',
+  'apiError.trading_bots.vault_busy': 'Хранилище бота занято. Повторите попытку чуть позже.',
+  'apiError.trading_bots.rate_limited':
+    'Слишком много запросов. Подождите немного и попробуйте снова.',
+  'apiError.trading_bots.upstream_error':
+    'Сервис торговых ботов недоступен. Повторите попытку позже.',
+  'hudChrome.tradingBots.title': 'Торговые боты',
+  'hudChrome.tradingBots.close': 'Закрыть торговых ботов',
+  'hudChrome.tradingBots.launcher': 'Боты',
+  'hudChrome.tradingBots.launcherAria': 'Арендовать торгового бота для SOL и $WOC',
+  'hudChrome.tradingBots.loading': 'Загрузка торговых ботов...',
+  'hudChrome.tradingBots.custody':
+    'Депозиты поступают в хранилище с лимитом, которым за вас управляет торговый сервис. Вывод возможен только на привязанный кошелек, и вывести средства можно в любой момент.',
+  'hudChrome.tradingBots.riskNote':
+    'Автоматическая торговля может приводить к убыткам. Плата за аренду не возвращается. Это не финансовый совет.',
+  'hudChrome.tradingBots.catalogIntro':
+    'Арендуйте бота на месяц, пополните его парой SOL и $WOC, и он будет торговать за вас на DEX.',
+  'hudChrome.tradingBots.skuGridName': 'Сеточный голем',
+  'hudChrome.tradingBots.skuGridBlurb':
+    'Расставляет попеременные заявки на покупку и продажу вокруг рыночной цены и зарабатывает на спреде, пока цена колеблется.',
+  'hudChrome.tradingBots.skuDcaName': 'Капельный дух',
+  'hudChrome.tradingBots.skuDcaBlurb':
+    'Планомерно обменивает SOL на $WOC по фиксированному расписанию, распределяя входы во времени.',
+  'hudChrome.tradingBots.skuMomentumName': 'Огонек импульса',
+  'hudChrome.tradingBots.skuMomentumBlurb':
+    'Смещает пару в сторону тренда и возвращает баланс, когда тренд ослабевает.',
+  'hudChrome.tradingBots.priceWoc': '{amount} $WOC в месяц',
+  'hudChrome.tradingBots.priceClaudium': '{amount} Claudium в месяц',
+  'hudChrome.tradingBots.rentButton': 'Арендовать',
+  'hudChrome.tradingBots.payWithLabel': 'Способ оплаты',
+  'hudChrome.tradingBots.payWoc': '$WOC',
+  'hudChrome.tradingBots.payClaudium': 'Claudium',
+  'hudChrome.tradingBots.claudiumBalance': 'Баланс Claudium: {amount}',
+  'hudChrome.tradingBots.approvePayment': 'Подтвердите оплату аренды в кошельке...',
+  'hudChrome.tradingBots.confirmingPayment': 'Подтверждение платежа в сети...',
+  'hudChrome.tradingBots.subscribedBody':
+    'Бот арендован. Пополните его хранилище, чтобы начать торговлю.',
+  'hudChrome.tradingBots.activeUntil': 'Действует до {date}',
+  'hudChrome.tradingBots.fundTitle': 'Пополнить хранилище',
+  'hudChrome.tradingBots.solAmountLabel': 'SOL для депозита',
+  'hudChrome.tradingBots.wocAmountLabel': '$WOC для депозита',
+  'hudChrome.tradingBots.depositBounds': 'От {min} до {max}',
+  'hudChrome.tradingBots.depositButton': 'Внести',
+  'hudChrome.tradingBots.approveDeposit': 'Подтвердите депозит в кошельке...',
+  'hudChrome.tradingBots.confirmingDeposit': 'Подтверждение депозита в сети...',
+  'hudChrome.tradingBots.amountInvalid': 'Введите корректное количество.',
+  'hudChrome.tradingBots.vaultLine': 'Хранилище: {sol} SOL, {woc} $WOC',
+  'hudChrome.tradingBots.stateRunning': 'Работает',
+  'hudChrome.tradingBots.statePaused': 'Приостановлен',
+  'hudChrome.tradingBots.startButton': 'Запустить',
+  'hudChrome.tradingBots.pauseButton': 'Пауза',
+  'hudChrome.tradingBots.paramsTitle': 'Настройки стратегии',
+  'hudChrome.tradingBots.paramGridSpacingBps': 'Шаг сетки ({percent}%)',
+  'hudChrome.tradingBots.paramOrderSizeBps': 'Размер заявки ({percent}%)',
+  'hudChrome.tradingBots.paramDcaIntervalMinutes': 'Интервал покупки (минуты)',
+  'hudChrome.tradingBots.paramMomentumLookbackMinutes': 'Окно тренда (минуты)',
+  'hudChrome.tradingBots.saveParams': 'Сохранить настройки',
+  'hudChrome.tradingBots.recentTrades': 'Недавние сделки',
+  'hudChrome.tradingBots.noTrades': 'Сделок пока нет.',
+  'hudChrome.tradingBots.tradeBuy': 'Покупка',
+  'hudChrome.tradingBots.tradeSell': 'Продажа',
+  'hudChrome.tradingBots.pnlLine': 'Прибыль и убыток ({days} дн.): {amount} $WOC ({percent}%)',
+  'hudChrome.tradingBots.withdrawButton': 'Вывести все',
+  'hudChrome.tradingBots.withdrawTitle': 'Вывод из хранилища',
+  'hudChrome.tradingBots.withdrawBody':
+    'Вывод приостанавливает бота и возвращает средства хранилища на ваш привязанный кошелек.',
+  'hudChrome.tradingBots.approveWithdraw': 'Подтвердите вывод в кошельке...',
+  'hudChrome.tradingBots.withdrawPending':
+    'Вывод отправлен. Баланс обновится после подтверждения сетью.',
+  'hudChrome.tradingBots.cooldown': 'Слишком много запросов. Повторите попытку через {seconds} с.',
+  'hudChrome.tradingBots.errWalletFeature':
+    'Подключенный кошелек не может отправлять транзакции из игры. Попробуйте другой кошелек Solana.',
+  'hudChrome.tradingBots.errSignFailed':
+    'Транзакция не была отправлена. Возможно, она была отклонена в вашем кошельке.',
+  'hudChrome.tradingBots.errNoWallet': 'Сначала подключите кошелек Solana.',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',

@@ -118,6 +118,24 @@ export const API_ERROR_KEYS = {
   'dex_swap.no_route': 'apiError.dex_swap.no_route',
   'dex_swap.rate_limited': 'apiError.dex_swap.rate_limited',
   'dex_swap.upstream_error': 'apiError.dex_swap.upstream_error',
+
+  // trading_bots: the rentable SOL/WOC trading-bot proxy (server/trading_bots.ts).
+  'trading_bots.disabled': 'apiError.trading_bots.disabled',
+  'trading_bots.unknown_sku': 'apiError.trading_bots.unknown_sku',
+  'trading_bots.invalid_pay_currency': 'apiError.trading_bots.invalid_pay_currency',
+  'trading_bots.already_subscribed': 'apiError.trading_bots.already_subscribed',
+  'trading_bots.subscription_required': 'apiError.trading_bots.subscription_required',
+  'trading_bots.subscription_expired': 'apiError.trading_bots.subscription_expired',
+  'trading_bots.insufficient_claudium': 'apiError.trading_bots.insufficient_claudium',
+  'trading_bots.invalid_amount': 'apiError.trading_bots.invalid_amount',
+  'trading_bots.deposit_out_of_bounds': 'apiError.trading_bots.deposit_out_of_bounds',
+  'trading_bots.invalid_public_key': 'apiError.trading_bots.invalid_public_key',
+  'trading_bots.invalid_params': 'apiError.trading_bots.invalid_params',
+  'trading_bots.payment_not_found': 'apiError.trading_bots.payment_not_found',
+  'trading_bots.payment_unverified': 'apiError.trading_bots.payment_unverified',
+  'trading_bots.vault_busy': 'apiError.trading_bots.vault_busy',
+  'trading_bots.rate_limited': 'apiError.trading_bots.rate_limited',
+  'trading_bots.upstream_error': 'apiError.trading_bots.upstream_error',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

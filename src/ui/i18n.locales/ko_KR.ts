@@ -6066,6 +6066,97 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.errSignFailed':
     '트랜잭션이 전송되지 않았습니다. 지갑에서 거절되었을 수 있습니다.',
   'hudChrome.dexSwap.errNoWallet': '먼저 Solana 지갑을 연결하세요.',
+  // The rentable trading bots (M16 non-Latin fill)
+  'apiError.trading_bots.disabled': '현재 트레이딩 봇을 이용할 수 없습니다.',
+  'apiError.trading_bots.unknown_sku': '해당 봇은 카탈로그에 없습니다.',
+  'apiError.trading_bots.invalid_pay_currency': '지원하지 않는 결제 통화입니다.',
+  'apiError.trading_bots.already_subscribed': '이미 트레이딩 봇을 대여 중입니다.',
+  'apiError.trading_bots.subscription_required': '먼저 트레이딩 봇을 대여하세요.',
+  'apiError.trading_bots.subscription_expired':
+    '봇 대여 기간이 만료되었습니다. 갱신하거나 자금을 출금하세요.',
+  'apiError.trading_bots.insufficient_claudium': 'Claudium이 부족합니다.',
+  'apiError.trading_bots.invalid_amount': '유효한 수량을 입력하세요.',
+  'apiError.trading_bots.deposit_out_of_bounds': '해당 입금액은 이 봇의 허용 범위를 벗어납니다.',
+  'apiError.trading_bots.invalid_public_key': '먼저 Solana 지갑을 연결하세요.',
+  'apiError.trading_bots.invalid_params': '허용되지 않는 봇 설정입니다.',
+  'apiError.trading_bots.payment_not_found':
+    '해당 결제를 찾을 수 없습니다. 처음부터 다시 시작하세요.',
+  'apiError.trading_bots.payment_unverified':
+    '해당 결제를 아직 확인하지 못했습니다. 잠시 후 다시 시도하세요.',
+  'apiError.trading_bots.vault_busy': '봇 금고가 사용 중입니다. 잠시 후 다시 시도하세요.',
+  'apiError.trading_bots.rate_limited': '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  'apiError.trading_bots.upstream_error':
+    '트레이딩 봇 서비스를 이용할 수 없습니다. 나중에 다시 시도하세요.',
+  'hudChrome.tradingBots.title': '트레이딩 봇',
+  'hudChrome.tradingBots.close': '트레이딩 봇 닫기',
+  'hudChrome.tradingBots.launcher': '봇',
+  'hudChrome.tradingBots.launcherAria': 'SOL과 $WOC 트레이딩 봇 대여',
+  'hudChrome.tradingBots.loading': '트레이딩 봇을 불러오는 중...',
+  'hudChrome.tradingBots.custody':
+    '입금액은 트레이딩 서비스가 대신 관리하는 한도 제한 금고에 보관됩니다. 출금은 연결된 지갑으로만 받을 수 있으며 언제든지 출금할 수 있습니다.',
+  'hudChrome.tradingBots.riskNote':
+    '자동 매매는 손실이 발생할 수 있습니다. 대여 요금은 환불되지 않습니다. 이는 투자 조언이 아닙니다.',
+  'hudChrome.tradingBots.catalogIntro':
+    '봇을 월 단위로 대여하고 SOL과 $WOC 페어로 자금을 넣으면 DEX에서 당신을 대신해 거래합니다.',
+  'hudChrome.tradingBots.skuGridName': '그리드 골렘',
+  'hudChrome.tradingBots.skuGridBlurb':
+    '시장 가격 위아래에 매수와 매도 주문을 번갈아 배치하여 가격이 오르내리는 동안 스프레드를 법니다.',
+  'hudChrome.tradingBots.skuDcaName': '물방울 정령',
+  'hudChrome.tradingBots.skuDcaBlurb':
+    '정해진 일정에 따라 SOL을 $WOC로 꾸준히 교환하여 매수 시점을 분산합니다.',
+  'hudChrome.tradingBots.skuMomentumName': '모멘텀 위습',
+  'hudChrome.tradingBots.skuMomentumBlurb':
+    '추세가 강한 쪽으로 페어를 기울이고 추세가 약해지면 원래 배분으로 되돌립니다.',
+  'hudChrome.tradingBots.priceWoc': '월 {amount} $WOC',
+  'hudChrome.tradingBots.priceClaudium': '월 {amount} Claudium',
+  'hudChrome.tradingBots.rentButton': '대여',
+  'hudChrome.tradingBots.payWithLabel': '결제 수단',
+  'hudChrome.tradingBots.payWoc': '$WOC',
+  'hudChrome.tradingBots.payClaudium': 'Claudium',
+  'hudChrome.tradingBots.claudiumBalance': 'Claudium 잔액: {amount}',
+  'hudChrome.tradingBots.approvePayment': '지갑에서 대여 결제를 승인하세요...',
+  'hudChrome.tradingBots.confirmingPayment': '네트워크에서 결제를 확인하는 중...',
+  'hudChrome.tradingBots.subscribedBody':
+    '봇을 대여했습니다. 금고에 자금을 넣으면 거래를 시작할 수 있습니다.',
+  'hudChrome.tradingBots.activeUntil': '{date}까지 유효',
+  'hudChrome.tradingBots.fundTitle': '금고에 자금 넣기',
+  'hudChrome.tradingBots.solAmountLabel': '입금할 SOL',
+  'hudChrome.tradingBots.wocAmountLabel': '입금할 $WOC',
+  'hudChrome.tradingBots.depositBounds': '{min}에서 {max} 사이',
+  'hudChrome.tradingBots.depositButton': '입금',
+  'hudChrome.tradingBots.approveDeposit': '지갑에서 입금을 승인하세요...',
+  'hudChrome.tradingBots.confirmingDeposit': '네트워크에서 입금을 확인하는 중...',
+  'hudChrome.tradingBots.amountInvalid': '유효한 수량을 입력하세요.',
+  'hudChrome.tradingBots.vaultLine': '금고: {sol} SOL, {woc} $WOC',
+  'hudChrome.tradingBots.stateRunning': '작동 중',
+  'hudChrome.tradingBots.statePaused': '일시 정지됨',
+  'hudChrome.tradingBots.startButton': '시작',
+  'hudChrome.tradingBots.pauseButton': '일시 정지',
+  'hudChrome.tradingBots.paramsTitle': '전략 설정',
+  'hudChrome.tradingBots.paramGridSpacingBps': '그리드 간격 ({percent}%)',
+  'hudChrome.tradingBots.paramOrderSizeBps': '주문 크기 ({percent}%)',
+  'hudChrome.tradingBots.paramDcaIntervalMinutes': '매수 간격 (분)',
+  'hudChrome.tradingBots.paramMomentumLookbackMinutes': '추세 조회 기간 (분)',
+  'hudChrome.tradingBots.saveParams': '설정 저장',
+  'hudChrome.tradingBots.recentTrades': '최근 거래',
+  'hudChrome.tradingBots.noTrades': '아직 거래가 없습니다.',
+  'hudChrome.tradingBots.tradeBuy': '매수',
+  'hudChrome.tradingBots.tradeSell': '매도',
+  'hudChrome.tradingBots.pnlLine': '손익 ({days}일): {amount} $WOC ({percent}%)',
+  'hudChrome.tradingBots.withdrawButton': '전액 출금',
+  'hudChrome.tradingBots.withdrawTitle': '금고에서 출금',
+  'hudChrome.tradingBots.withdrawBody':
+    '출금하면 봇이 정지되고 금고 잔액이 연결된 지갑으로 반환됩니다.',
+  'hudChrome.tradingBots.approveWithdraw': '지갑에서 출금을 승인하세요...',
+  'hudChrome.tradingBots.withdrawPending':
+    '출금이 진행 중입니다. 네트워크가 확인하면 잔액이 갱신됩니다.',
+  'hudChrome.tradingBots.cooldown':
+    '요청이 너무 많습니다. {seconds}초 후에 다시 시도할 수 있습니다.',
+  'hudChrome.tradingBots.errWalletFeature':
+    '연결된 지갑은 게임에서 트랜잭션을 보낼 수 없습니다. 다른 Solana 지갑을 사용해 보세요.',
+  'hudChrome.tradingBots.errSignFailed':
+    '트랜잭션이 전송되지 않았습니다. 지갑에서 거절되었을 수 있습니다.',
+  'hudChrome.tradingBots.errNoWallet': '먼저 Solana 지갑을 연결하세요.',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': '우편함',
   'hudChrome.mailbox.subtitle': '레이븐포스트',

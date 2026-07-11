@@ -181,4 +181,25 @@ export const apiErrorStrings = {
     rate_limited: 'Too many requests. Please wait a moment and try again.',
     upstream_error: 'The swap service is unavailable. Please try again.',
   },
+  // trading_bots: the rentable SOL/WOC trading-bot proxy (server/trading_bots.ts).
+  // Same construction as dex_swap: a new family born on the RouteDef pipeline,
+  // coded problem+json from day one, no legacy prose identity to mirror.
+  trading_bots: {
+    disabled: 'Trading bots are not available right now.',
+    unknown_sku: 'That bot is not in the catalog.',
+    invalid_pay_currency: 'That payment currency is not supported.',
+    already_subscribed: 'You already rent a trading bot.',
+    subscription_required: 'Rent a trading bot first.',
+    subscription_expired: 'Your bot rental has expired. Renew it or withdraw your funds.',
+    insufficient_claudium: 'Not enough Claudium.',
+    invalid_amount: 'Enter a valid amount.',
+    deposit_out_of_bounds: 'That deposit is outside the allowed range for this bot.',
+    invalid_public_key: 'Connect a Solana wallet first.',
+    invalid_params: 'Those bot settings are not allowed.',
+    payment_not_found: 'That payment could not be found. Start over.',
+    payment_unverified: 'That payment could not be verified yet. Try again shortly.',
+    vault_busy: 'The bot vault is busy. Try again shortly.',
+    rate_limited: 'Too many requests. Please wait a moment and try again.',
+    upstream_error: 'The trading bot service is unavailable. Please try again.',
+  },
 };

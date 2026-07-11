@@ -6041,7 +6041,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.dex_swap.quote_tampered':
     'その見積もりはこのスワップと一致しません。新しい見積もりを取得してください。',
   'apiError.dex_swap.no_route': '現在その数量で利用できる取引ルートがありません。',
-  'apiError.dex_swap.rate_limited': 'リクエストが多すぎます。しばらく待ってからもう一度お試しください。',
+  'apiError.dex_swap.rate_limited':
+    'リクエストが多すぎます。しばらく待ってからもう一度お試しください。',
   'apiError.dex_swap.upstream_error':
     'スワップサービスは利用できません。後でもう一度お試しください。',
   // The in-game Buy $WOC window (M16 non-Latin fill)
@@ -6080,6 +6081,98 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.errSignFailed':
     'トランザクションは送信されませんでした。ウォレットで拒否された可能性があります。',
   'hudChrome.dexSwap.errNoWallet': 'まずSolanaウォレットを接続してください。',
+  // The rentable trading bots (M16 non-Latin fill)
+  'apiError.trading_bots.disabled': 'トレーディングボットは現在利用できません。',
+  'apiError.trading_bots.unknown_sku': 'そのボットはカタログにありません。',
+  'apiError.trading_bots.invalid_pay_currency': 'その支払い通貨には対応していません。',
+  'apiError.trading_bots.already_subscribed': 'すでにトレーディングボットをレンタル中です。',
+  'apiError.trading_bots.subscription_required': 'まずトレーディングボットをレンタルしてください。',
+  'apiError.trading_bots.subscription_expired':
+    'ボットのレンタル期間が終了しました。更新するか資金を引き出してください。',
+  'apiError.trading_bots.insufficient_claudium': 'Claudiumが不足しています。',
+  'apiError.trading_bots.invalid_amount': '有効な数量を入力してください。',
+  'apiError.trading_bots.deposit_out_of_bounds': 'その入金額はこのボットで許可された範囲外です。',
+  'apiError.trading_bots.invalid_public_key': 'まずSolanaウォレットを接続してください。',
+  'apiError.trading_bots.invalid_params': 'そのボット設定は許可されていません。',
+  'apiError.trading_bots.payment_not_found':
+    'その支払いが見つかりませんでした。最初からやり直してください。',
+  'apiError.trading_bots.payment_unverified':
+    'その支払いはまだ確認できませんでした。しばらくしてからもう一度お試しください。',
+  'apiError.trading_bots.vault_busy':
+    'ボットの金庫は処理中です。しばらくしてからもう一度お試しください。',
+  'apiError.trading_bots.rate_limited':
+    'リクエストが多すぎます。しばらく待ってからもう一度お試しください。',
+  'apiError.trading_bots.upstream_error':
+    'トレーディングボットサービスは利用できません。後でもう一度お試しください。',
+  'hudChrome.tradingBots.title': 'トレーディングボット',
+  'hudChrome.tradingBots.close': 'トレーディングボットを閉じる',
+  'hudChrome.tradingBots.launcher': 'ボット',
+  'hudChrome.tradingBots.launcherAria': 'SOLと$WOCのトレーディングボットをレンタル',
+  'hudChrome.tradingBots.loading': 'トレーディングボットを読み込み中...',
+  'hudChrome.tradingBots.custody':
+    '入金はトレーディングサービスが管理する上限付き金庫に入ります。出金を受け取れるのは連携済みウォレットだけで、いつでも引き出せます。',
+  'hudChrome.tradingBots.riskNote':
+    '自動売買では損失が生じることがあります。レンタル料金は返金されません。これは投資助言ではありません。',
+  'hudChrome.tradingBots.catalogIntro':
+    'ボットを月単位でレンタルし、SOLと$WOCのペアで資金を入れると、DEXであなたの代わりに取引します。',
+  'hudChrome.tradingBots.skuGridName': 'グリッドゴーレム',
+  'hudChrome.tradingBots.skuGridBlurb':
+    '市場価格の上下に買い注文と売り注文を交互に置き、価格が揺れる間にスプレッドを稼ぎます。',
+  'hudChrome.tradingBots.skuDcaName': 'しずくの精',
+  'hudChrome.tradingBots.skuDcaBlurb':
+    '決まったスケジュールでSOLを$WOCへ着実に交換し、購入タイミングを分散します。',
+  'hudChrome.tradingBots.skuMomentumName': 'モメンタムウィスプ',
+  'hudChrome.tradingBots.skuMomentumBlurb':
+    'トレンドの強い側にペアを傾け、勢いが衰えると元の配分に戻します。',
+  'hudChrome.tradingBots.priceWoc': '月額 {amount} $WOC',
+  'hudChrome.tradingBots.priceClaudium': '月額 {amount} Claudium',
+  'hudChrome.tradingBots.rentButton': 'レンタル',
+  'hudChrome.tradingBots.payWithLabel': '支払い方法',
+  'hudChrome.tradingBots.payWoc': '$WOC',
+  'hudChrome.tradingBots.payClaudium': 'Claudium',
+  'hudChrome.tradingBots.claudiumBalance': 'Claudium残高：{amount}',
+  'hudChrome.tradingBots.approvePayment': 'ウォレットでレンタル料金の支払いを承認してください...',
+  'hudChrome.tradingBots.confirmingPayment': 'ネットワークで支払いを確認中...',
+  'hudChrome.tradingBots.subscribedBody':
+    'ボットをレンタルしました。金庫に資金を入れると取引が始められます。',
+  'hudChrome.tradingBots.activeUntil': '{date}まで有効',
+  'hudChrome.tradingBots.fundTitle': '金庫に資金を入れる',
+  'hudChrome.tradingBots.solAmountLabel': '入金するSOL',
+  'hudChrome.tradingBots.wocAmountLabel': '入金する$WOC',
+  'hudChrome.tradingBots.depositBounds': '{min}から{max}まで',
+  'hudChrome.tradingBots.depositButton': '入金',
+  'hudChrome.tradingBots.approveDeposit': 'ウォレットで入金を承認してください...',
+  'hudChrome.tradingBots.confirmingDeposit': 'ネットワークで入金を確認中...',
+  'hudChrome.tradingBots.amountInvalid': '有効な数量を入力してください。',
+  'hudChrome.tradingBots.vaultLine': '金庫：{sol} SOL、{woc} $WOC',
+  'hudChrome.tradingBots.stateRunning': '稼働中',
+  'hudChrome.tradingBots.statePaused': '停止中',
+  'hudChrome.tradingBots.startButton': '開始',
+  'hudChrome.tradingBots.pauseButton': '停止',
+  'hudChrome.tradingBots.paramsTitle': '戦略設定',
+  'hudChrome.tradingBots.paramGridSpacingBps': 'グリッド間隔（{percent}%）',
+  'hudChrome.tradingBots.paramOrderSizeBps': '注文サイズ（{percent}%）',
+  'hudChrome.tradingBots.paramDcaIntervalMinutes': '購入間隔（分）',
+  'hudChrome.tradingBots.paramMomentumLookbackMinutes': 'トレンド参照期間（分）',
+  'hudChrome.tradingBots.saveParams': '設定を保存',
+  'hudChrome.tradingBots.recentTrades': '最近の取引',
+  'hudChrome.tradingBots.noTrades': 'まだ取引はありません。',
+  'hudChrome.tradingBots.tradeBuy': '買い',
+  'hudChrome.tradingBots.tradeSell': '売り',
+  'hudChrome.tradingBots.pnlLine': '損益（{days}日）：{amount} $WOC（{percent}%）',
+  'hudChrome.tradingBots.withdrawButton': 'すべて出金',
+  'hudChrome.tradingBots.withdrawTitle': '金庫から出金',
+  'hudChrome.tradingBots.withdrawBody':
+    '出金するとボットが停止し、金庫の残高が連携済みウォレットに返されます。',
+  'hudChrome.tradingBots.approveWithdraw': 'ウォレットで出金を承認してください...',
+  'hudChrome.tradingBots.withdrawPending':
+    '出金を処理しています。ネットワークが確認すると残高が更新されます。',
+  'hudChrome.tradingBots.cooldown': 'リクエストが多すぎます。あと{seconds}秒で再試行できます。',
+  'hudChrome.tradingBots.errWalletFeature':
+    '接続中のウォレットはゲームからトランザクションを送信できません。別のSolanaウォレットをお試しください。',
+  'hudChrome.tradingBots.errSignFailed':
+    'トランザクションは送信されませんでした。ウォレットで拒否された可能性があります。',
+  'hudChrome.tradingBots.errNoWallet': 'まずSolanaウォレットを接続してください。',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
