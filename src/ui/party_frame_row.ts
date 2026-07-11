@@ -283,6 +283,23 @@ export function createPartyRow(
   };
 }
 
+/** The member-rows wrapper class. The wrapper nests every pooled member row one level
+ *  under #party-frames so the mobile collapse chip, the rows, the master-loot control,
+ *  and the Leave button stack as a simple column (chip alone on its own line), while the
+ *  rows themselves keep the 2-column auto-flow double-stack on the wrapper. */
+export const PARTY_ROWS_CLASS = 'party-rows';
+
+/** Build the persistent member-rows wrapper (created once, reused across rebuilds). On
+ *  mobile hud.mobile.css gives it the 2-column auto-flow grid #party-frames used to carry
+ *  (so 3-4 members double-stack); on desktop it is display:contents (transparent), so the
+ *  rows participate directly in the #party-frames flex column exactly as before the
+ *  wrapper existed. The pool re-parents the pooled rows into it without churning nodes. */
+export function createPartyRowsWrapper(doc: Document): HTMLElement {
+  const el = doc.createElement('div');
+  el.className = PARTY_ROWS_CLASS;
+  return el;
+}
+
 /** Build the persistent "Leave Party" button (created once, its click listener
  *  attached once). The pool keeps it last in the container and re-localizes its label
  *  through the elided setText each rebuild. */

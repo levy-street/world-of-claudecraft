@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "d14f06b5",
+      "state": "7d503e6f",
       "events": "d30fae8b",
       "rng": {
         "draws": 0,
@@ -55,6 +55,7 @@
           "copper": 100,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -62,6 +63,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -99,6 +101,7 @@
           "copper": 50,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -106,6 +109,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -232,7 +236,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "ee782f76",
+      "state": "77c9f080",
       "events": "4a18b9e0",
       "rng": {
         "draws": 0,
@@ -257,6 +261,7 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -264,6 +269,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -301,6 +307,7 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -308,6 +315,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -438,7 +446,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "ee782f76",
+      "state": "77c9f080",
       "events": "731b0526",
       "rng": {
         "draws": 0,
@@ -463,6 +471,7 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -470,6 +479,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -507,6 +517,7 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -514,6 +525,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -644,7 +656,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "ee782f76",
+      "state": "77c9f080",
       "events": "a4aaa6a1",
       "rng": {
         "draws": 0,
@@ -669,6 +681,7 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -676,6 +689,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -713,6 +727,7 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -720,6 +735,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -850,7 +866,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 407,
-      "state": "c214384d",
+      "state": "a2af7417",
       "events": "c54759e2",
       "rng": {
         "draws": 0,
@@ -875,6 +891,7 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -882,6 +899,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -919,6 +937,7 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -926,6 +945,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1056,7 +1076,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 407,
-      "state": "c214384d",
+      "state": "a2af7417",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1081,6 +1101,7 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1088,6 +1109,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1125,6 +1147,7 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1132,6 +1155,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "5ba4f051",
+      "state": "2266ab10",
       "events": "a6bdb9f3",
       "rng": {
         "draws": 3,
@@ -56,6 +56,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -63,6 +64,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -97,6 +99,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -104,6 +107,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -142,6 +146,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -149,6 +154,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -397,7 +403,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "d2c2f456",
+      "state": "b7bb6f57",
       "events": "ea631a91",
       "rng": {
         "draws": 6,
@@ -423,6 +429,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -430,6 +437,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -464,6 +472,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -471,6 +480,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -509,6 +519,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -516,6 +527,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -764,7 +776,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "7907ef9e",
+      "state": "0b24cf4b",
       "events": "ea631a91",
       "rng": {
         "draws": 9,
@@ -790,6 +802,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -797,6 +810,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -831,6 +845,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -838,6 +853,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -876,6 +892,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -883,6 +900,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1131,7 +1149,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "d8964619",
+      "state": "fe40b04a",
       "events": "ea631a91",
       "rng": {
         "draws": 12,
@@ -1157,6 +1175,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1164,6 +1183,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1198,6 +1218,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1205,6 +1226,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1243,6 +1265,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1250,6 +1273,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1498,7 +1522,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "a1265267",
+      "state": "0d1500b0",
       "events": "0085b1fd",
       "rng": {
         "draws": 15,
@@ -1509,7 +1533,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "339bffd0",
+      "state": "f0a6c37f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1520,7 +1544,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "339bffd0",
+      "state": "f0a6c37f",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1547,6 +1571,7 @@
             "damageTaken": 13
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1554,6 +1579,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1588,6 +1614,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1595,6 +1622,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1633,6 +1661,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1640,6 +1669,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

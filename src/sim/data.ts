@@ -105,6 +105,7 @@ import {
   ZONE3_ZONE,
 } from './content/zone3';
 import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
 // Delve affix/companion catalogs are consumed by the Sim delve engine; re-export
@@ -120,6 +121,7 @@ export {
 
 import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS } from './content/heroic_loot';
+import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
@@ -182,6 +184,11 @@ export const MOBS: Record<string, MobTemplate> = {
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
 };
+
+// Heroic upgraded drop variants: generated from the base item + mob loot tables and
+// merged into ITEMS in place, so a "Heroic X" copy is a first-class item everywhere.
+// Must run after both ITEMS and MOBS are assembled (it reads their loot tables).
+Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
@@ -337,7 +344,8 @@ export const BUILTIN_WORLD: WorldContent = {
   roads: ROADS,
   props: PROPS,
   playerStart: PLAYER_START,
-  // No terrainEdits: the built-in heightfield is the pure (x,z,seed) function.
+  blockers: JAIL_BLOCKERS,
+  terrainEdits: JAIL_TERRAIN_EDITS,
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;

@@ -26,16 +26,23 @@ import {
 export const PHONE_TOUCH_QUERY =
   '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 const DEADZONE = 0.22;
+// How far the move wheel's DRAWN position may lean from its resting spot
+// toward the thumb (px), so a touch anywhere in the (much larger) move zone
+// leans the visible wheel toward it without teleporting it clear across the
+// screen. Cosmetic only: never fed into the input math (see onMoveDown).
+const MOVE_JOYSTICK_FLOAT_RADIUS = 48;
 const CAMERA_SENSITIVITY = 0.8;
+export const MOVE_AUTORUN_REVEAL_THRESHOLD = 1.45;
+export const MOVE_AUTORUN_THRESHOLD = 2.05;
 // TODO: a dedicated deadzone/smoothing setting for swipe-look is deferred (plan
 // decision 7); touchLookSpeed already covers sensitivity for both the camera
 // joystick and swipe-look, so this constant stays a fixed tuning value for now.
 const SWIPE_LOOK_DEADZONE_PX = 6;
-// Pinch: each pixel the two fingers spread/close maps to this many yards of
-// camera distance. Tuned so a comfortable thumb-to-finger pinch sweeps roughly
-// the full 3..22yd zoom range in one gesture.
-const PINCH_ZOOM_SCALE = 0.04;
-
+// Ignore small two-finger jitter before treating the gesture as intentional
+// camera zoom. The sensitivity is deliberately lower than the old pinch path so
+// a comfortable spread/pinch changes camera distance gradually.
+const PINCH_ZOOM_DEADZONE_PX = 12;
+const PINCH_ZOOM_SENSITIVITY = 0.035;
 // Haptic feedback: short Vibration-API buzzes so touch actions feel physical.
 // On by default (own localStorage key, like music's ev_music_on); try/catch +
 // feature-detect guarded so it no-ops on desktop and under Vitest/jsdom.
@@ -109,8 +116,12 @@ export interface MobileControlCallbacks {
   onCycleTarget(): void;
   onJump(): void;
   onInteract(): void;
-  onAutorun(): boolean;
+  /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
+  /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
+  onChatOpen(): void;
+  /** Close chat entirely (hide the composer, drop the keyboard, recover the viewport). */
+  onChatClose(): void;
   onMenu(): void;
   onSocial(): void;
   /** Open the Discord entry (account panel when available, else the community invite). */
@@ -222,6 +233,14 @@ export function mapJoystickVector(x: number, y: number, deadzone = DEADZONE): To
   };
 }
 
+export function isMoveAutorunPush(y: number, threshold = MOVE_AUTORUN_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
+export function isMoveAutorunNear(y: number, threshold = MOVE_AUTORUN_REVEAL_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
 export class MobileControls {
   private active = false;
   private hapticsOn = loadHapticsEnabled();
@@ -248,11 +267,14 @@ export class MobileControls {
   private moveOriginY = 0;
   /** Rendered (transform-scaled) wheel radius: the input throw distance. */
   private moveRadius = 1;
+  private moveAutorunLocked = false;
   /** Layout (pre-transform) wheel radius: what style.left/top and the stick's
    *  translate use; the --joy-scale transform scales those visually. */
   private moveStickRadius = 1;
 
-  // two-finger pinch-to-zoom on the game view (phones have no scroll wheel)
+  // Track two-finger canvas gestures for guarded camera zoom and to suppress
+  // swipe-look while both fingers are down. Touches that begin on HUD chrome are
+  // owned by the router and never reach this canvas path.
   private pinchPointers = new Map<number, { x: number; y: number }>();
   private pinchPrevDist: number | null = null;
   private swipeLookPointer: number | null = null;
@@ -275,7 +297,7 @@ export class MobileControls {
   private moveStick = document.getElementById('mobile-move-stick') as HTMLElement | null;
   private cameraJoystick = document.getElementById('mobile-camera-joystick') as HTMLElement | null;
   private cameraStick = document.getElementById('mobile-camera-stick') as HTMLElement | null;
-  private autorunButton = document.getElementById('mobile-autorun') as HTMLElement | null;
+  private autorunTarget = document.getElementById('mobile-autorun-target') as HTMLElement | null;
 
   constructor(
     private input: Input,
@@ -319,8 +341,12 @@ export class MobileControls {
     // Idle-fade: dims the action row + minimap quick-access rail after a stretch
     // of no touch, brightens instantly on the next one. Body-scoped (CSS decides
     // which chrome selectors respond) so it works regardless of which control the
-    // player actually touches.
-    this.chromeFade = startChromeFade(document.body);
+    // player actually touches. The handle's lifecycle is owned by setActive (the
+    // above setActive call already armed it when in touch mode), so a flip to the
+    // desktop interface disposes it and un-dims the body instead of stranding the
+    // idle class. This document-level forwarder is bound once and reads
+    // this.chromeFade dynamically, guarding on this.active, so it is a no-op while
+    // the handle is null (desktop mode).
     document.addEventListener('pointerdown', () => {
       if (this.active) this.chromeFade?.touch();
     });
@@ -373,18 +399,6 @@ export class MobileControls {
         this.touchOwners.releaseAll();
       }
     });
-
-    if (this.autorunButton) {
-      // bindTouchTap, not 'click': a click never fires for a non-primary
-      // touch, and Autorun is tapped mid-steer by definition.
-      bindTouchTap(this.autorunButton, (e) => {
-        if (!this.active) return;
-        e.preventDefault();
-        triggerHaptic(HAPTIC_TAP, this.hapticsOn);
-        const on = this.callbacks.onAutorun();
-        this.autorunButton?.classList.toggle('active', on);
-      });
-    }
 
     this.canvas?.addEventListener('pointerdown', (e) => {
       this.onPinchDown(e);
@@ -469,11 +483,15 @@ export class MobileControls {
   }
 
   private setActive(active: boolean): void {
+    // Was the touch interface already active BEFORE this call? A redundant
+    // re-activation (active was already true, e.g. a PHONE_TOUCH_QUERY threshold
+    // crossing on a foldable resize while staying in touch) must NOT wipe an
+    // in-progress composer draft; only a genuine desktop->touch transition resets it.
+    const wasActive = this.active;
     this.active = active;
     document.body.classList.toggle('mobile-touch', active);
     if (!active) {
       this.root?.classList.remove('expanded');
-      this.autorunButton?.classList.remove('active');
       document.body.classList.remove(
         'mobile-more-open',
         'mobile-chat-open',
@@ -484,8 +502,28 @@ export class MobileControls {
       this.releaseCamera();
       this.releasePinch();
       this.touchOwners.releaseAll();
+      // Dispose the idle-fade so the chrome un-dims and the timer stops: without
+      // this a fade left in its dimmed state leaks past the flip to the desktop
+      // interface (dispose() clears the mobile-chrome-idle class).
+      this.chromeFade?.dispose();
+      this.chromeFade = null;
     } else {
-      document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
+      // Reset any composer left open ONLY on a real transition INTO touch (not on a
+      // redundant re-activation while already active, which would clear a draft the
+      // player is typing). This clears input.value, so gate it on !wasActive.
+      if (!wasActive) {
+        document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
+        const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
+        if (input) {
+          input.value = '';
+          input.style.display = 'none';
+          input.style.height = '';
+          input.style.overflowY = '';
+          input.blur();
+        }
+      }
+      // Arm the idle-fade once for this activation (idempotent via ??=).
+      this.chromeFade ??= startChromeFade(document.body);
     }
   }
 
@@ -593,67 +631,26 @@ export class MobileControls {
     button.addEventListener('pointerleave', cancel);
   }
 
-  /** Toggle the read-only chat-log peek. Opening it makes sure the composer (and
-   * keyboard) is dismissed; opening the composer elsewhere clears the peek. */
+  /** Toggle the read-only chat-log peek. Opening a peek closes the full chat first (so a
+   *  peek and the open panel are never both up); opening the panel elsewhere clears it. */
   private toggleLogPeek(): void {
     const peeking = document.body.classList.toggle('mobile-chatlog-peek');
     if (peeking && document.body.classList.contains('mobile-chat-open')) {
-      this.toggleChat();
+      this.callbacks.onChatClose();
     }
   }
 
-  /** The single top-left Chat button owns a simple two-state toggle (issue
-   * 1577 uiux-overlap: the separate in-log reply pill overlapped the chatbox,
-   * so it was removed; a later round tried a three-state open/read/reply
-   * cycle, since simplified back to two): hidden, or shown, with the log AND
-   * the composer appearing together immediately, composer focused. There is
-   * no separate read-only step to tap through first. */
+  /** The single top-left Chat button toggles the chat panel. Tapping it OPEN shows the
+   *  centered read view: the log plus the composer bar above it, keyboard DOWN (tapping
+   *  the composer bar raises the keyboard to type). Tapping it again CLOSES the panel;
+   *  if the keyboard is up, closing drops it too (closeChat blurs the composer). */
   private tapChat(): void {
-    // Two states only: hidden, or shown (log AND composer visible together,
-    // composer focused immediately). No separate read-only step in between.
-    const open = document.body.classList.contains('mobile-chat-open');
-    if (!open) {
-      this.enterChatReply();
-    } else {
-      this.toggleChat();
-    }
-  }
-
-  private toggleChat(): void {
-    document.body.classList.remove('mobile-chatlog-peek');
-    document.body.classList.toggle('mobile-chat-open');
     if (document.body.classList.contains('mobile-chat-open')) {
-      // Open the log in a read state, NOT the composer: the keyboard only rises
-      // once the player taps the Chat button again to enter reply mode.
-      // The composer stays hidden until enterChatReply focuses it.
+      this.callbacks.onChatClose();
     } else {
-      this.exitChatReply();
-    }
-  }
-
-  /** Enter reply mode: raise the keyboard and show the composer via the shared
-   *  onChat path. Reached by tapping the Chat button again while the log is
-   *  already open in its read state. */
-  private enterChatReply(): void {
-    if (!document.body.classList.contains('mobile-chat-open')) {
+      document.body.classList.remove('mobile-chatlog-peek');
       document.body.classList.add('mobile-chat-open');
-    }
-    document.body.classList.remove('mobile-chatlog-peek');
-    document.body.classList.add('mobile-chat-reply');
-    this.callbacks.onChat();
-  }
-
-  /** Leave reply mode and reset the composer back to its collapsed state. */
-  private exitChatReply(): void {
-    document.body.classList.remove('mobile-chat-reply');
-    const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
-    if (input) {
-      input.value = '';
-      input.style.display = 'none';
-      // clear the autosized height so the next open starts at one line
-      input.style.height = '';
-      input.style.overflowY = '';
-      input.blur();
+      this.callbacks.onChatOpen();
     }
   }
 
@@ -687,12 +684,19 @@ export class MobileControls {
     if (!this.active || this.joyPointer !== null || !this.moveJoystick) return;
     if (this.classifyTouch(e) !== 'movement') return;
     e.preventDefault();
+    // The wheel's RESTING center, read before any style.left/top override this
+    // touch may apply (releaseMove clears both back to the CSS-authored rest
+    // spot, so a fresh touchdown always reads it here). Used only to clamp
+    // where the wheel is DRAWN below; never fed into the input math.
+    const restRect = this.moveJoystick.getBoundingClientRect();
+    const restCenterX = restRect.left + restRect.width / 2;
+    const restCenterY = restRect.top + restRect.height / 2;
     this.joyPointer = e.pointerId;
     triggerHaptic(HAPTIC_JOYSTICK, this.hapticsOn);
-    // Spawn the joystick base CENTERED under the thumb (see the origin note
-    // above mapJoystickVector): the input origin IS the touch point, so a
-    // touchdown alone can never produce movement intent. layoutRadius is the
-    // untransformed box (what style.left/top position, with .floating's
+    // The input origin IS the raw touch point, unclamped (see the origin note
+    // above mapJoystickVector): a touchdown alone can never produce movement
+    // intent, or it re-creates the v0.22.0 #1229 drift regression. layoutRadius
+    // is the untransformed box (what style.left/top position, with .floating's
     // transform-origin: center keeping the scaled wheel centered on it);
     // renderedRadius includes the --joy-scale transform and drives the input
     // throw, so a resized wheel reaches full deflection exactly at its rim.
@@ -705,8 +709,25 @@ export class MobileControls {
     this.moveOriginY = e.clientY;
     this.moveRadius = renderedRadius;
     this.moveStickRadius = layoutRadius;
-    this.moveJoystick.style.left = `${(e.clientX - layoutRadius).toFixed(1)}px`;
-    this.moveJoystick.style.top = `${(e.clientY - layoutRadius).toFixed(1)}px`;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget('hidden');
+    // Autorun is a latch from the previous joystick drag; a fresh grab is a new
+    // movement intent, so it cancels the latch before steering.
+    if (this.input.autorun) this.input.setAutorun(false);
+    // The wheel's DRAWN position floats toward the thumb but is clamped to stay
+    // within MOVE_JOYSTICK_FLOAT_RADIUS of its resting spot, so a touch anywhere
+    // in the (much larger) move zone no longer teleports the visible wheel clear
+    // across the screen; it just leans toward the thumb within a small radius.
+    // Purely cosmetic: moveOriginX/Y above (the input math) is untouched.
+    const floatDx = e.clientX - restCenterX;
+    const floatDy = e.clientY - restCenterY;
+    const floatDist = Math.hypot(floatDx, floatDy);
+    const floatScale =
+      floatDist > MOVE_JOYSTICK_FLOAT_RADIUS ? MOVE_JOYSTICK_FLOAT_RADIUS / floatDist : 1;
+    const drawnCenterX = restCenterX + floatDx * floatScale;
+    const drawnCenterY = restCenterY + floatDy * floatScale;
+    this.moveJoystick.style.left = `${(drawnCenterX - layoutRadius).toFixed(1)}px`;
+    this.moveJoystick.style.top = `${(drawnCenterY - layoutRadius).toFixed(1)}px`;
     this.moveJoystick.classList.add('floating', 'active');
     try {
       (this.moveZone ?? this.moveJoystick).setPointerCapture(e.pointerId);
@@ -736,9 +757,28 @@ export class MobileControls {
     // radius while the input throw above used the rendered one.
     this.moveStick.style.transform = `translate(${(x * this.moveStickRadius * 0.46).toFixed(1)}px, ${(y * this.moveStickRadius * 0.46).toFixed(1)}px)`;
     const move = mapJoystickVector(x, y, this.moveDeadzone);
+    const inAutorunTarget = isMoveAutorunPush(rawY);
+    if (this.moveAutorunLocked && inAutorunTarget) {
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
+    if (this.moveAutorunLocked && !inAutorunTarget) {
+      this.moveAutorunLocked = false;
+      this.input.setAutorun(false);
+    }
+    if (inAutorunTarget) {
+      this.moveAutorunLocked = true;
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
     this.input.setTouchMove(move);
-    // setTouchMove cancels autorun on forward/back input — keep the button glow honest.
-    if (move.forward || move.back) this.autorunButton?.classList.remove('active');
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
+    if (moving && this.input.autorun) this.input.setAutorun(false);
+    this.syncMoveAutorunTarget(isMoveAutorunNear(rawY) ? 'near' : 'hidden');
   }
 
   private onMoveEnd(e: PointerEvent): void {
@@ -760,6 +800,8 @@ export class MobileControls {
       }
     }
     this.joyPointer = null;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(this.input.autorun ? 'locked' : 'hidden');
     this.input.clearTouchMove();
     if (this.moveStick) this.moveStick.style.transform = '';
     if (this.moveJoystick) {
@@ -767,6 +809,16 @@ export class MobileControls {
       this.moveJoystick.style.left = '';
       this.moveJoystick.style.top = '';
     }
+  }
+
+  private syncMoveAutorunTarget(state: 'hidden' | 'near' | 'locked'): void {
+    this.autorunTarget?.classList.toggle('near', state === 'near' || state === 'locked');
+    this.autorunTarget?.classList.toggle('locked', state === 'locked');
+  }
+
+  syncAutorun(on: boolean): void {
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(on ? 'locked' : 'hidden');
   }
 
   private onCameraDown(e: PointerEvent): void {
@@ -880,7 +932,8 @@ export class MobileControls {
   private onPinchMove(e: PointerEvent): void {
     if (!this.active || !this.pinchPointers.has(e.pointerId)) return;
     // A window opening mid-gesture ends the pinch immediately: menuOpen means
-    // every touch is now the modal's, so the gesture must stop zooming.
+    // every touch is now the modal's, so the gesture must stop suppressing camera
+    // swipes.
     if (document.body.classList.contains('mobile-window-open')) {
       this.releasePinch();
       return;
@@ -889,8 +942,11 @@ export class MobileControls {
     if (this.pinchPointers.size === 2 && this.pinchPrevDist !== null) {
       e.preventDefault();
       const cur = this.currentPinchDist();
-      this.input.zoomBy(pinchZoomDelta(this.pinchPrevDist, cur));
-      this.pinchPrevDist = cur;
+      const zoomDelta = pinchZoomDelta(this.pinchPrevDist, cur);
+      if (zoomDelta !== 0) {
+        this.input.zoomBy(zoomDelta);
+        this.pinchPrevDist = cur;
+      }
     }
   }
 
@@ -1012,15 +1068,15 @@ export function mapLookVector(x: number, y: number, deadzone = DEADZONE): { x: n
   return { x: x * CAMERA_SENSITIVITY, y: y * CAMERA_SENSITIVITY };
 }
 
-/**
- * Camera-distance delta for a pinch frame, in yards. Fingers spreading apart
- * (curDist > prevDist) zooms IN, i.e. returns a negative delta to shrink camDist;
- * pinching together zooms out. Matches the sign convention of the wheel handler.
- */
 export function pinchZoomDelta(
   prevDist: number,
   curDist: number,
-  scale = PINCH_ZOOM_SCALE,
+  sensitivity = PINCH_ZOOM_SENSITIVITY,
+  deadzonePx = PINCH_ZOOM_DEADZONE_PX,
 ): number {
-  return (prevDist - curDist) * scale;
+  const delta = curDist - prevDist;
+  const abs = Math.abs(delta);
+  if (abs <= deadzonePx) return 0;
+  const adjusted = abs - deadzonePx;
+  return -Math.sign(delta) * adjusted * sensitivity;
 }

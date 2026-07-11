@@ -24,8 +24,10 @@
 // (enforced by tests/architecture.test.ts).
 
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
+import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
+import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -149,6 +151,22 @@ export function rollLoot(
   let copper = 0;
   const items: LootSlot[] = [];
   const rolledGroups = new Set<string>();
+  // A heroic dungeon claim upgrades the mob's normal epic/rare drops to their
+  // "Heroic" variant in place (content/heroic_variants.ts). Resolved once and
+  // reused by the heroic-only append below. No rng is drawn here, so normal-run
+  // draw order and the parity goldens are untouched.
+  const heroicClaim =
+    ctx.instances.find(
+      (i) => i.partyKey !== null && i.difficulty === 'heroic' && i.mobIds.includes(mob.id),
+    ) !== undefined;
+  // Swap a base drop for its Heroic variant when the instance is heroic AND the
+  // swap is an upgrade (raid epics, already item level 29, are left as-is).
+  const heroicItem = (id: string): string => {
+    if (!heroicClaim) return id;
+    const variant = ITEMS[heroicVariantId(id)];
+    if (!variant) return id;
+    return (itemLevel(variant) ?? 0) > (itemLevel(ITEMS[id]) ?? 0) ? variant.id : id;
+  };
   for (const entry of template.loot) {
     // Exclusive groups: a single rng draw is partitioned by the group
     // entries' chances, so at most one matching entry drops.
@@ -162,7 +180,7 @@ export function rollLoot(
       for (const g of group) {
         cumulative += g.chance;
         if (roll < cumulative) {
-          if (g.itemId) items.push({ itemId: g.itemId, count: 1 });
+          if (g.itemId) items.push({ itemId: heroicItem(g.itemId), count: 1 });
           break;
         }
       }
@@ -183,7 +201,7 @@ export function rollLoot(
     if (!ctx.rng.chance(entry.chance)) continue;
     if (entry.copper)
       copper += ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
-    if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
+    if (entry.itemId) items.push({ itemId: heroicItem(entry.itemId), count: 1 });
   }
   // Heroic-only drops: when the mob's claimed instance is heroic and it has a
   // heroic drop table (the final bosses), roll those entries into the SAME
@@ -193,8 +211,7 @@ export function rollLoot(
   // table's, so sharing `rolledGroups` is safe.
   const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
   if (heroicEntries) {
-    const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-    if (inst?.difficulty === 'heroic') {
+    if (heroicClaim) {
       for (const entry of heroicEntries) {
         if (entry.rollGroup) {
           if (rolledGroups.has(entry.rollGroup)) continue;

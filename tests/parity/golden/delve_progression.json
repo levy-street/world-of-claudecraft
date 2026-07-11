@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "d150c678",
+      "state": "6e73f95b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,6 +41,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -48,6 +49,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -121,7 +123,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 427,
-      "state": "20b07210",
+      "state": "209c7679",
       "events": "5d953739",
       "rng": {
         "draws": 1,
@@ -132,7 +134,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 427,
-      "state": "fa4cd096",
+      "state": "c70675e7",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -157,6 +159,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -164,6 +167,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -236,7 +240,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 427,
-      "state": "689c4d14",
+      "state": "4106decb",
       "events": "330a0171",
       "rng": {
         "draws": 3,
@@ -264,6 +268,7 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {
             "date": "2099-06-25"
@@ -275,6 +280,7 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -347,7 +353,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 427,
-      "state": "6380e9c2",
+      "state": "a68f39b9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -375,6 +381,7 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {
             "date": "2099-06-25"
@@ -386,6 +393,7 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

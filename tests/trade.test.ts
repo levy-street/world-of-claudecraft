@@ -46,9 +46,14 @@ function makeTradeCtx() {
     hasPendingSocialInvite: (tp: number) =>
       partyInvites.has(tp) || tradeInvites.has(tp) || duelInvites.has(tp),
     countItem: (itemId: string, pid?: number) => bag(pid!).get(itemId) ?? 0,
+    // This fake bag store has no per-instance concept, so every held copy is
+    // fungible: countFungibleItem/removeFungibleItem mirror countItem/removeItem.
+    countFungibleItem: (itemId: string, pid?: number) => bag(pid!).get(itemId) ?? 0,
     addItem: (itemId: string, count: number, pid?: number) =>
       bag(pid!).set(itemId, (bag(pid!).get(itemId) ?? 0) + count),
     removeItem: (itemId: string, count: number, pid?: number) =>
+      bag(pid!).set(itemId, Math.max(0, (bag(pid!).get(itemId) ?? 0) - count)),
+    removeFungibleItem: (itemId: string, count: number, pid?: number) =>
       bag(pid!).set(itemId, Math.max(0, (bag(pid!).get(itemId) ?? 0) - count)),
   } as unknown as SimContext;
   function addPlayer(pid: number, name: string, x: number, copper: number) {

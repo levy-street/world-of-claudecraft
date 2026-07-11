@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CRAFTING_HUB_MIN_LEVEL, CRAFTING_HUB_POS } from '../src/sim/content/professions';
 import {
   COMBO_RECIPES,
   COMMON_RECIPES,
@@ -60,6 +61,14 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_thorium_mining_pick')!;
+    // #1297: TOOL_RECIPES are station-bound, so this recipe now also requires
+    // presence at the level-20 crafting hub (see professions_crafting_hub.test.ts
+    // for the gate's own dedicated coverage).
+    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
+    const entity = (sim as any).entities.get(pid);
+    entity.pos.x = CRAFTING_HUB_POS.x;
+    entity.pos.z = CRAFTING_HUB_POS.z;
+    entity.prevPos = { ...entity.pos };
     grantItem(sim, 'thorium_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
@@ -361,6 +370,10 @@ describe('tiered mastery gating (#1128)', () => {
   it('crafting two or more tiers below capability grants zero skill progress', () => {
     const sim = makeSim();
     const pid = sim.playerId;
+    // Set weaponcrafting as the active archetype so its empowerment ceiling (#1129/#1203) is
+    // unlimited: this isolates the raw tier-capability curve from the separate pre-archetype
+    // "uncapped-to-rare" (tier 2) ceiling that would otherwise also clamp a tier-3 raw skill.
+    sim.acceptArchetypeQuest('weaponcrafting');
     setSkill(sim, pid, 'weaponcrafting', 75); // tier-3 capability, recipe is tier-1
     grantItem(sim, 'bone_fragments', 1, pid);
 

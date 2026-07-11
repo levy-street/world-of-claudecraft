@@ -154,6 +154,12 @@ export const da_DK: EnTranslations = {
     "spectate": {
       "banner": "Tilskuer til {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
@@ -291,6 +297,7 @@ export const da_DK: EnTranslations = {
       "targetLabel": "Dit mål",
       "targetAnnounce": "Markér {name}",
       "partyLabel": "Dit følge",
+      "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -305,7 +312,6 @@ export const da_DK: EnTranslations = {
       "chat": "Spring til chat"
     },
     "mobile": {
-      "autorun": "Autoløb",
       "jump": "Hop",
       "leaderboard": "Rangliste",
       "dailyRewards": "Belønninger",
@@ -320,7 +326,9 @@ export const da_DK: EnTranslations = {
       "actionPageIndicator": "Side {page}",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
-      "spellbookPageLabel": "Side {page}"
+      "spellbookPageLabel": "Side {page}",
+      "hideKeyboard": "Skjul tastatur",
+      "chatPlaceholder": "Sig noget..."
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -394,7 +402,13 @@ export const da_DK: EnTranslations = {
       "targetFriendly": "Sigt mod nærmeste allierede",
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
-      "valecup": "Dalpokalen"
+      "valecup": "Dalpokalen",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -719,6 +733,8 @@ export const da_DK: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1014,18 +1030,18 @@ export const da_DK: EnTranslations = {
       },
       "allStatsPctReduce": "Reducerer alle attributter med {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Øger angrebskraft med {pct}%",
+        "armor": "Øger rustning med {pct}%",
+        "int": "Øger Intellekt med {pct}%",
+        "sta": "Øger Udholdenhed med {pct}%",
+        "allStats": "Øger alle attributter med {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Reducerer rustning med {pct}%",
+      "armorPctStacks": "Reducerer rustning med {pct}% ({stacks} stakke)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1063,6 +1079,26 @@ export const da_DK: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} rejser sig over Tornetop Højder!"
+    },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Glemt adgangskode?",
+      "forgotTitle": "Nulstil din adgangskode",
+      "forgotHint": "Indtast dit brugernavn, så sender vi et nulstillingslink til den registrerede e-mailadresse.",
+      "forgotUsername": "Brugernavn",
+      "forgotSubmit": "Send nulstillingslink",
+      "forgotSent": "Hvis en konto med det brugernavn har en registreret e-mailadresse, har vi sendt et nulstillingslink. Tjek din indbakke.",
+      "forgotBack": "Tilbage til log ind",
+      "resetTitle": "Vælg en ny adgangskode",
+      "resetNewPassword": "Ny adgangskode",
+      "resetConfirm": "Bekræft ny adgangskode",
+      "resetSubmit": "Opdater adgangskode",
+      "resetDone": "Din adgangskode er opdateret. Du kan nu logge ind.",
+      "resetMismatch": "Adgangskoderne stemmer ikke overens.",
+      "resetErrInvalid": "Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt."
     },
     "loot": {
       "chestTitle": "Kiste"
@@ -1293,6 +1329,8 @@ export const da_DK: EnTranslations = {
       "parcelsLabel": "Pakker",
       "parcelsHint": "Klik på en genstand i dine tasker for at vedhæfte den.",
       "removeParcelAria": "Fjern {item} fra brevet",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Send brev",
       "postageNote": "Porto: {amount}. Ravnen er undervejs i omtrent {seconds}s.",
       "arrivedBanner": "Ravnen er landet: post fra {name}.",
@@ -1431,6 +1469,7 @@ export const da_DK: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Ingen",
+      "hobbyLabel": "Fritid",
       "armorcrafting": "Rustningssmed",
       "weaponcrafting": "Våbensmed",
       "jewelcrafting": "Juveler",
@@ -1453,7 +1492,10 @@ export const da_DK: EnTranslations = {
       "craftedToast": "Udformet: {name}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
       "unknownRecipe": "Den opskrift findes ikke.",
-      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift."
+      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
+      "notAtHub": "Du skal være ved håndværksstationen og på det krævede niveau for at lave det.",
+      "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
+      "recipeNotLearned": "Du har ikke lært den opskrift endnu."
     }
   },
   "apiError": {
@@ -2226,8 +2268,8 @@ export const da_DK: EnTranslations = {
       "waveGoldBody": "Den midterste bølge: tveæggede kombinationer hvor din build begynder at tage form og synge.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sidste bølge: build-definerende, skærm-smeltende spidser der skal føles latterlige på den bedste måde.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Beskyt Yumi",
+      "yumiBody": "Beskyt Yumi er en holdbaseret måltilstand, der spilles i en labyrint: hver side vogter sin egen katfølgesvend, mens den jager modstanderens. Med jævne mellemrum blinker begge katte til nye hjørner af labyrinten, så kampen svinger mellem at forsvare, jage og kapløbet om at finde dem igen. Stil op som tre mod tre eller fem mod fem; at falde i kamp sætter dig kun på bænken et øjeblik.",
       "powerupsTitle": "Power-ups i ringen",
       "powerupsBody": "Glødende kugler falder også ned i arenaen midt i kampen, gratis for den der når dem først. De er bevidst overdrevne og varer kun et kort øjeblik: Speed Demon for et glimt af blændende fart, Colossus for at svulme op til en kluntet kæmpe, Moon Boots for et hoppende, lavtyngdekrafts-hop, og Berserker for et pludseligt udbrud af raseri.",
       "ladderHeading": "At klatre op ad rangstigen",
@@ -3658,42 +3700,42 @@ export const da_DK: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 mod 3",
+    "bracket5": "Yumi 5 mod 5",
+    "enterQueue": "Tilmeld dig Beskyt Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Du stiller dig i Beskyt Yumi-køen. Vogt din følgesvend…",
+      "leave": "Du forlader Beskyt Yumi-køen.",
+      "teamLeave": "Dit hold forlader Beskyt Yumi-køen."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Beskyt Yumi 3 mod 3 tillader en gruppe på op til tre.",
+      "partyTooBig5": "Beskyt Yumi 5 mod 5 tillader en gruppe på op til fem."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Beskyt Yumi! Forsvar din følgesvend, og jag deres."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BESKYT YUMI",
+      "getReady": "Gør dig klar…",
+      "teleportIn": "Yumierne flytter sig om {s}",
+      "suddenDeath": "PLUDSELIG DØD",
+      "yourYumi": "Din Yumi",
+      "enemyYumi": "Fjendens Yumi",
+      "aria": "Din Yumi på {mine} af {max} helbred, fjendens Yumi på {theirs}.",
+      "collapse": "Skjul Beskyt Yumi-bjælkerne",
+      "expand": "Vis Beskyt Yumi-bjælkerne"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "SLÅET NED!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLUDSELIG DØD! Yumierne holder stand!",
+      "teleport": "Yumierne teleporterer!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "SEJR! Yumi er i sikkerhed!",
+      "loss": "NEDERLAG! Din Yumi er faldet."
     }
   },
   "fiesta": {
@@ -4142,6 +4184,7 @@ export const da_DK: EnTranslations = {
       "mobileSocial": "Socialt",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Indstillinger",
       "mobileUse": "Brug",
       "mobileMeters": "Målere",
       "mobileMap": "Kort",
@@ -4690,6 +4733,7 @@ export const da_DK: EnTranslations = {
       "offGlobalCooldown": "Uden for den globale nedkøling",
       "friendlyTarget": "Venligt mål",
       "enemyTarget": "Fjendtligt mål",
+      "selfOnly": "Kun på dig selv",
       "damageRange": "{min} til {max}",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
     },
@@ -4999,7 +5043,7 @@ export const da_DK: EnTranslations = {
       "greedAria": "Grådighed efter {item}",
       "passAria": "Stå over {item}",
       "everyonePassed": "Alle stod over {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} har slået"
     }
   },
   "entities": {
@@ -5122,7 +5166,7 @@ export const da_DK: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsskær",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel."
       },
       "taunt": {
         "name": "Ægge",
@@ -5578,7 +5622,7 @@ export const da_DK: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hekselys",
-        "description": "Sænker målets rustning med 35 i 30 sek."
+        "description": "Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær."
       },
       "hibernate": {
         "name": "Slummer",
@@ -5809,6 +5853,9 @@ export const da_DK: EnTranslations = {
       "greyjaw_fang": {
         "name": "Gamle Gråkæbes Hugtand"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Forvitret Regnskabsside"
       },
@@ -5838,6 +5885,15 @@ export const da_DK: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Lærredslap"
+      },
+      "arcane_dust": {
+        "name": "Arkanstøv"
+      },
+      "arcane_essence": {
+        "name": "Arkanessens"
+      },
+      "arcane_shard": {
+        "name": "Arkanskår"
       },
       "fen_muster_order": {
         "name": "Kærbro Mønstringsordre"
@@ -7045,7 +7101,7 @@ export const da_DK: EnTranslations = {
         "name": "Diakon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Træningsdukke"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"
@@ -7480,6 +7536,16 @@ export const da_DK: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Ulve for Døren",
         "text": "Skovulvene bliver dristige og snapper efter rejsende på den nordlige vej. Tynd deres flok ud, {playerName}. Dræb 8 Skovulve, så kan Østbæk ånde lettere.",

@@ -154,6 +154,12 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "readyCheck": {
+      "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
+      "ready": "준비 완료",
+      "notReady": "준비 안 됨",
+      "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답."
+    },
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
@@ -291,6 +297,7 @@ export const ko_KR: EnTranslations = {
       "targetLabel": "내 대상",
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
+      "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
@@ -305,7 +312,6 @@ export const ko_KR: EnTranslations = {
       "chat": "채팅으로 건너뛰기"
     },
     "mobile": {
-      "autorun": "자동 달리기",
       "jump": "점프",
       "leaderboard": "순위",
       "dailyRewards": "보상",
@@ -320,7 +326,9 @@ export const ko_KR: EnTranslations = {
       "actionPageIndicator": "{page}페이지",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
-      "spellbookPageLabel": "페이지 {page}"
+      "spellbookPageLabel": "페이지 {page}",
+      "hideKeyboard": "키보드 숨기기",
+      "chatPlaceholder": "메시지 입력..."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -394,7 +402,13 @@ export const ko_KR: EnTranslations = {
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
-      "valecup": "베일 컵"
+      "valecup": "베일 컵",
+      "categoryPet": "펫",
+      "petAttack": "펫: 공격",
+      "petStop": "펫: 정지",
+      "petTaunt": "펫: 도발",
+      "petDefensive": "펫: 방어",
+      "petAggressive": "펫: 공격적"
     },
     "vcup": {
       "title": "베일 컵",
@@ -719,6 +733,8 @@ export const ko_KR: EnTranslations = {
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "귀속",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1064,6 +1080,26 @@ export const ko_KR: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
     },
+    "auth": {
+      "appleLoginCta": "Apple로 계속하기",
+      "appleError": "Apple로 로그인할 수 없습니다. 다시 시도해 주세요.",
+      "appleChoiceIntro": "새 계정을 만들거나 Apple을 기존 계정에 연결하세요.",
+      "appleChoiceExpired": "Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.",
+      "forgotPrompt": "비밀번호를 잊으셨나요?",
+      "forgotTitle": "비밀번호 재설정",
+      "forgotHint": "사용자 이름을 입력하면 등록된 이메일로 재설정 링크를 보내드립니다.",
+      "forgotUsername": "사용자 이름",
+      "forgotSubmit": "재설정 링크 보내기",
+      "forgotSent": "해당 사용자 이름의 계정에 등록된 이메일이 있으면 재설정 링크를 보냈습니다. 받은 편지함을 확인하세요.",
+      "forgotBack": "로그인으로 돌아가기",
+      "resetTitle": "새 비밀번호 설정",
+      "resetNewPassword": "새 비밀번호",
+      "resetConfirm": "새 비밀번호 확인",
+      "resetSubmit": "비밀번호 업데이트",
+      "resetDone": "비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.",
+      "resetMismatch": "비밀번호가 일치하지 않습니다.",
+      "resetErrInvalid": "이 재설정 링크가 유효하지 않거나 만료되었습니다. 새 링크를 요청하세요."
+    },
     "loot": {
       "chestTitle": "상자"
     },
@@ -1293,6 +1329,8 @@ export const ko_KR: EnTranslations = {
       "parcelsLabel": "소포",
       "parcelsHint": "가방의 아이템을 클릭하면 첨부됩니다.",
       "removeParcelAria": "편지에서 {item} 제거",
+      "parcelQtyDecreaseAria": "{item} 하나 적게 보내기",
+      "parcelQtyIncreaseAria": "{item} 하나 더 보내기",
       "sendButton": "편지 보내기",
       "postageNote": "우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.",
       "arrivedBanner": "까마귀가 도착했습니다: {name}의 우편.",
@@ -1431,6 +1469,7 @@ export const ko_KR: EnTranslations = {
     "archetypeTitle": {
       "label": "칭호",
       "none": "없음",
+      "hobbyLabel": "취미",
       "armorcrafting": "방어구 장인",
       "weaponcrafting": "무기 장인",
       "jewelcrafting": "보석 세공사",
@@ -1453,7 +1492,10 @@ export const ko_KR: EnTranslations = {
       "craftedToast": "제작 완료:{name}",
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
-      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다."
+      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
+      "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
+      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
+      "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
     }
   },
   "apiError": {
@@ -4142,6 +4184,7 @@ export const ko_KR: EnTranslations = {
       "mobileSocial": "소셜",
       "mobileArena": "투기장",
       "mobileMenu": "메뉴",
+      "mobileSettings": "설정",
       "mobileUse": "사용",
       "mobileMeters": "미터",
       "mobileMap": "지도",
@@ -4690,6 +4733,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
@@ -5122,7 +5166,7 @@ export const ko_KR: EnTranslations = {
       },
       "sunder_armor": {
         "name": "방어구 절단",
-        "description": "대상의 방어구를 가르고 적용마다 2%만큼 감소시킵니다. 최대 5번 중첩됩니다(최대 중첩 시 10%). 많은 위협 수준을 생성합니다."
+        "description": "대상의 방어구를 가르고 적용마다 {damage}%만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다."
       },
       "taunt": {
         "name": "부추김",
@@ -5578,7 +5622,7 @@ export const ko_KR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "마녀불빛",
-        "description": "대상의 방어도를 30초 동안 35만큼 감소시킵니다."
+        "description": "대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다. 방어구 절단과 중첩되지 않습니다."
       },
       "hibernate": {
         "name": "깊은 잠",
@@ -5809,6 +5853,9 @@ export const ko_KR: EnTranslations = {
       "greyjaw_fang": {
         "name": "늙은 그레이죠의 송곳니"
       },
+      "chunk_of_ore": {
+        "name": "광석 조각"
+      },
       "weathered_ledger_page": {
         "name": "풍화된 장부 페이지"
       },
@@ -5838,6 +5885,15 @@ export const ko_KR: EnTranslations = {
       },
       "linen_scrap": {
         "name": "아마포 조각"
+      },
+      "arcane_dust": {
+        "name": "비전 가루"
+      },
+      "arcane_essence": {
+        "name": "비전 정수"
+      },
+      "arcane_shard": {
+        "name": "비전 파편"
       },
       "fen_muster_order": {
         "name": "펜브리지 소집 명령서"
@@ -6982,7 +7038,7 @@ export const ko_KR: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "유미"
       },
       "forest_wolf": {
         "name": "숲늑대"
@@ -7480,6 +7536,16 @@ export const ko_KR: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "검 말고도 할 수 있는 일",
+        "text": "이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.",
+        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.",
+        "objectives": {
+          "0": {
+            "label": "광석 조각"
+          }
+        }
+      },
       "q_wolves": {
         "title": "문 앞의 늑대들",
         "text": "숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.",

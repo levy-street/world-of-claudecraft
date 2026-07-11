@@ -151,9 +151,17 @@ export interface RespecTierConfig {
 /**
  * The three payment tiers from the design doc: time-only (free, slow),
  * time-plus-partial (faster, small cost), and instant (no wait, full cost).
- * Placeholder values pending the #1148 tuning pass; the shape (duration
- * strictly decreasing, cost strictly increasing, tier by tier) is the
- * contract this module and its tests hold constant.
+ * #1148 tuning pass: the design doc's own Open Questions section ("Gathering
+ * focus: skill tree vs additive radar, focus granularity, and the re-spec
+ * cost curves") still lists the exact re-spec cost curve as genuinely open,
+ * so there is no real number to replace these with yet. Per #1148's
+ * acceptance criteria, these are kept as-is and CONFIRMED (not re-guessed) as
+ * the working values: the shape (duration strictly decreasing, cost strictly
+ * increasing, tier by tier) is the contract this module and its tests hold
+ * constant, and the magnitudes are a modest, round progression (free-and-slow
+ * at one minute per point, to instant at a small flat coin+material cost)
+ * consistent with the #1301 gold-sink pass's own "modest, non-punitive"
+ * tuning rule.
  */
 export const RESPEC_TIER_CONFIG: Readonly<Record<RespecPaymentTier, RespecTierConfig>> = {
   time: { durationMsPerPoint: 60_000, coinPerPoint: 0, materialsPerPoint: 0 },

@@ -355,7 +355,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       sourceId: p.id,
       school: 'holy',
     });
-    recalcPlayerStats(p, 'warrior', sim.equipment);
+    recalcPlayerStats(p, 'warrior', sim.equipment, undefined, {});
     const input = inputWithGear(sim, 'warrior');
     const sta = buildStatTooltip('sta', input);
     const buffLine = sta.sources.find((s) => s.kind === 'buff');
@@ -397,7 +397,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       sourceId: p.id,
       school: 'physical',
     });
-    recalcPlayerStats(p, 'druid', sim.equipment);
+    recalcPlayerStats(p, 'druid', sim.equipment, undefined, {});
     const armor = buildStatTooltip('armor', inputWithGear(sim, 'druid'));
     // recalc adds armor from Agility BEFORE Cat Form raises Agility (max(2, floor(lvl/2))),
     // so the "From Agility" line must exclude that bonus - and the lines still reconcile.

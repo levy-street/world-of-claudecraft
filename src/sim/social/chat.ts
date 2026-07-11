@@ -317,6 +317,14 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/ready" (alias "/readycheck"): the party/raid leader starts a ready check. Every
+  // other member's client plays a sound and shows a yes/no prompt; validation (in a
+  // party, leader-only, none already running) is delegated to readyCheckStart.
+  if (/^\/ready(?:check)?\s*$/i.test(raw)) {
+    ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
   // "/unfollow" stops an active follow
   if (/^\/unfollow(?:\s|$)/i.test(raw)) {
     if (r.e.followTargetId === null) ctx.error(r.meta.entityId, 'You are not following anyone.');
@@ -420,6 +428,26 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     if (h || m) parts.push(`${m}m`);
     parts.push(`${s}s`);
     ctx.error(r.meta.entityId, `Time played this session: ${parts.join(' ')}.`);
+    return null;
+  }
+
+  // "/playtime": report this character's LIFETIME played time, accumulated
+  // across every session and persisted server-side (see PlayerMeta.
+  // totalPlayedSeconds + serializeCharacter). Unlike /played (session-only,
+  // resets on relog), this figure only ever grows while the character is
+  // actually in the world.
+  if (/^\/playtime(?:\s|$)/i.test(raw)) {
+    const secs = Math.max(0, Math.floor(r.meta.totalPlayedSeconds + (ctx.time - r.meta.joinedAt)));
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    const parts: string[] = [];
+    if (d) parts.push(`${d}d`);
+    if (d || h) parts.push(`${h}h`);
+    if (d || h || m) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    ctx.error(r.meta.entityId, `Total time played: ${parts.join(' ')}.`);
     return null;
   }
 
@@ -1065,8 +1093,8 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',

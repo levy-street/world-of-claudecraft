@@ -14,8 +14,8 @@
     "summonDemon -> summonPet (warlock summon_imp) + selfBuff form switch (druid)",
     "weaponStrike awardCombo latch + finisher combo-spend reset"
   ],
-  "draws": 453,
-  "drawDigest": "7e3f8a61",
+  "draws": 454,
+  "drawDigest": "b431b368",
   "frames": [
     {
       "tick": 0,
@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 412,
-      "state": "29c448d4",
+      "state": "b1a12e00",
       "events": "cb3e7eb4",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 412,
-      "state": "609b3c1a",
+      "state": "e11f4a96",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 412,
-      "state": "8f474950",
+      "state": "aac7bbfc",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "1808dc64",
+      "state": "2d7a3150",
       "events": "83db7fc1",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 412,
-      "state": "b3a77c81",
+      "state": "2fc8e6f5",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 412,
-      "state": "6d887e4f",
+      "state": "ac86c49b",
       "events": "1d430444",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 412,
-      "state": "5d972839",
+      "state": "95deaf4d",
       "events": "b3b75a1c",
       "rng": {
         "draws": 4,
@@ -125,6 +125,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -132,6 +133,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -165,6 +167,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -172,6 +175,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -209,6 +213,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -216,6 +221,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -249,6 +255,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -256,6 +263,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -293,6 +301,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -300,6 +309,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -337,6 +347,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -344,6 +355,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -749,7 +761,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 412,
-      "state": "3a7127ad",
+      "state": "2af1cbb1",
       "events": "fbe8fc0f",
       "rng": {
         "draws": 4,
@@ -760,7 +772,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "f1aafea7",
+      "state": "636a2bf3",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -771,7 +783,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 412,
-      "state": "0562f9d9",
+      "state": "a06fb8ed",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -782,7 +794,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 412,
-      "state": "1290d63c",
+      "state": "1db96748",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -793,7 +805,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 412,
-      "state": "c9cb7c0a",
+      "state": "37f534c6",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -804,7 +816,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "8f268773",
+      "state": "d31906ef",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -815,7 +827,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 412,
-      "state": "a4856ba2",
+      "state": "674147fe",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -826,7 +838,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 412,
-      "state": "1f378a0f",
+      "state": "664a775b",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -837,7 +849,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 412,
-      "state": "05a3717c",
+      "state": "0f3ec188",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -848,7 +860,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 412,
-      "state": "16d77fc5",
+      "state": "57acc669",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -859,7 +871,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 412,
-      "state": "a81700b3",
+      "state": "4713862f",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -870,7 +882,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 412,
-      "state": "59fb8c0a",
+      "state": "448444c6",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -881,7 +893,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 412,
-      "state": "75aa65e6",
+      "state": "676f4f72",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -892,7 +904,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 412,
-      "state": "a13123c3",
+      "state": "c6e4f7ff",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -903,7 +915,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 412,
-      "state": "27bb80fc",
+      "state": "bc3ad908",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -914,7 +926,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 412,
-      "state": "c4e0a5dc",
+      "state": "00d71868",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -925,7 +937,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 412,
-      "state": "2143d87d",
+      "state": "81a0e181",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -936,44 +948,44 @@
       "tick": 120,
       "time": 6,
       "nextId": 412,
-      "state": "22197308",
+      "state": "22642f34",
       "events": "741638a5",
       "rng": {
-        "draws": 387,
-        "digest": "3641d84b"
+        "draws": 388,
+        "digest": "743acafa"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "88364bcd",
+      "state": "c6a5e551",
       "events": "741638a5",
       "rng": {
-        "draws": 407,
-        "digest": "ead701dc"
+        "draws": 408,
+        "digest": "41ddc1f5"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
       "nextId": 412,
-      "state": "191d450a",
+      "state": "96506dc6",
       "events": "741638a5",
       "rng": {
-        "draws": 434,
-        "digest": "1760a481"
+        "draws": 435,
+        "digest": "45a3ceff"
       }
     },
     {
       "tick": 133,
       "time": 6.65,
       "nextId": 413,
-      "state": "4f8ffa75",
+      "state": "b428e8d9",
       "events": "e66f2234",
       "rng": {
-        "draws": 444,
-        "digest": "5fca1565"
+        "draws": 445,
+        "digest": "357c3bc7"
       },
       "label": "warlock-summon",
       "players": [
@@ -993,6 +1005,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1000,6 +1013,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1033,6 +1047,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1040,6 +1055,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1077,6 +1093,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1084,6 +1101,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1117,6 +1135,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1124,6 +1143,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1161,6 +1181,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1168,6 +1189,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1205,6 +1227,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -1212,6 +1235,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1617,11 +1641,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 414,
-      "state": "8dc482d6",
+      "state": "0461bde2",
       "events": "6b5ea059",
       "rng": {
-        "draws": 445,
-        "digest": "357c3bc7"
+        "draws": 446,
+        "digest": "5d825c89"
       },
       "label": "warrior-sunder",
       "players": [
@@ -1641,6 +1665,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1648,6 +1673,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1681,6 +1707,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1688,6 +1715,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1725,6 +1753,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1732,6 +1761,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1765,6 +1795,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1772,6 +1803,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1809,6 +1841,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1816,6 +1849,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1853,6 +1887,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -1860,6 +1895,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2334,11 +2370,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 416,
-      "state": "42ff4dca",
-      "events": "8c5072f1",
+      "state": "0343da18",
+      "events": "fd923b80",
       "rng": {
-        "draws": 447,
-        "digest": "f185f2b2"
+        "draws": 448,
+        "digest": "7a0cf6db"
       },
       "label": "mage-arcane-explosion",
       "players": [
@@ -2358,6 +2394,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -2365,6 +2402,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2397,9 +2435,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 70
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -2407,6 +2446,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2444,6 +2484,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -2451,6 +2492,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2484,6 +2526,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -2491,6 +2534,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2528,6 +2572,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -2535,6 +2580,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2572,6 +2618,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -2579,6 +2626,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3057,7 +3105,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499964,
           "id": 414,
           "inCombat": true,
           "kind": "mob",
@@ -3092,7 +3140,7 @@
           "threat": [
             [
               406,
-              34
+              37
             ]
           ],
           "weapon": {
@@ -3111,7 +3159,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499964,
+          "hp": 499966,
           "id": 415,
           "inCombat": true,
           "kind": "mob",
@@ -3146,7 +3194,7 @@
           "threat": [
             [
               406,
-              37
+              35
             ]
           ],
           "weapon": {
@@ -3161,11 +3209,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 417,
-      "state": "437ac818",
-      "events": "96c6a170",
+      "state": "ef0244c4",
+      "events": "763d6802",
       "rng": {
-        "draws": 452,
-        "digest": "3fa39086"
+        "draws": 453,
+        "digest": "7e3f8a61"
       },
       "label": "rogue-combo-finishers",
       "players": [
@@ -3185,6 +3233,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -3192,6 +3241,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3224,9 +3274,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 70
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -3234,6 +3285,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3270,9 +3322,10 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 112
+            "damageDealt": 114
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -3280,6 +3333,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3313,6 +3367,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -3320,6 +3375,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3357,6 +3413,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -3364,6 +3421,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3401,6 +3459,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -3408,6 +3467,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3894,7 +3954,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499964,
           "id": 414,
           "inCombat": true,
           "kind": "mob",
@@ -3929,7 +3989,7 @@
           "threat": [
             [
               406,
-              34
+              37
             ]
           ],
           "weapon": {
@@ -3948,7 +4008,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499964,
+          "hp": 499966,
           "id": 415,
           "inCombat": true,
           "kind": "mob",
@@ -3983,7 +4043,7 @@
           "threat": [
             [
               406,
-              37
+              35
             ]
           ],
           "weapon": {
@@ -4013,7 +4073,7 @@
           "fallStartY": -3.065499,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499888,
+          "hp": 499886,
           "id": 416,
           "inCombat": true,
           "kind": "mob",
@@ -4048,7 +4108,7 @@
           "threat": [
             [
               407,
-              113
+              115
             ]
           ],
           "weapon": {
@@ -4063,11 +4123,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 418,
-      "state": "beda3b80",
+      "state": "8883bb58",
       "events": "3544bf86",
       "rng": {
-        "draws": 453,
-        "digest": "7e3f8a61"
+        "draws": 454,
+        "digest": "b431b368"
       },
       "label": "paladin-judge-consecrate",
       "players": [
@@ -4087,6 +4147,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -4094,6 +4155,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4126,9 +4188,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 70
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -4136,6 +4199,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4172,9 +4236,10 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 112
+            "damageDealt": 114
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -4182,6 +4247,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4217,6 +4283,7 @@
             "damageDealt": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -4224,6 +4291,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4261,6 +4329,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -4268,6 +4337,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4305,6 +4375,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -4312,6 +4383,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4823,7 +4895,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499964,
           "id": 414,
           "inCombat": true,
           "kind": "mob",
@@ -4858,7 +4930,7 @@
           "threat": [
             [
               406,
-              34
+              37
             ]
           ],
           "weapon": {
@@ -4877,7 +4949,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499964,
+          "hp": 499966,
           "id": 415,
           "inCombat": true,
           "kind": "mob",
@@ -4912,7 +4984,7 @@
           "threat": [
             [
               406,
-              37
+              35
             ]
           ],
           "weapon": {
@@ -4942,7 +5014,7 @@
           "fallStartY": -3.065499,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499888,
+          "hp": 499886,
           "id": 416,
           "inCombat": true,
           "kind": "mob",
@@ -4977,7 +5049,7 @@
           "threat": [
             [
               407,
-              113
+              115
             ]
           ],
           "weapon": {
@@ -5043,11 +5115,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "d54b0d9a",
+      "state": "7237fe5e",
       "events": "0dacb00e",
       "rng": {
-        "draws": 453,
-        "digest": "7e3f8a61"
+        "draws": 454,
+        "digest": "b431b368"
       },
       "label": "druid-moonfire-forms",
       "players": [
@@ -5067,6 +5139,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -5074,6 +5147,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5106,9 +5180,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 70
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -5116,6 +5191,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5152,9 +5228,10 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 112
+            "damageDealt": 114
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -5162,6 +5239,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5197,6 +5275,7 @@
             "damageDealt": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -5204,6 +5283,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5241,6 +5321,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -5248,6 +5329,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5285,6 +5367,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -5292,6 +5375,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5816,7 +5900,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499964,
           "id": 414,
           "inCombat": true,
           "kind": "mob",
@@ -5851,7 +5935,7 @@
           "threat": [
             [
               406,
-              34
+              37
             ]
           ],
           "weapon": {
@@ -5870,7 +5954,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499964,
+          "hp": 499966,
           "id": 415,
           "inCombat": true,
           "kind": "mob",
@@ -5905,7 +5989,7 @@
           "threat": [
             [
               406,
-              37
+              35
             ]
           ],
           "weapon": {
@@ -5935,7 +6019,7 @@
           "fallStartY": -3.065499,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499888,
+          "hp": 499886,
           "id": 416,
           "inCombat": true,
           "kind": "mob",
@@ -5970,7 +6054,7 @@
           "threat": [
             [
               407,
-              113
+              115
             ]
           ],
           "weapon": {
@@ -6077,11 +6161,11 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "d54b0d9a",
+      "state": "7237fe5e",
       "events": "741638a5",
       "rng": {
-        "draws": 453,
-        "digest": "7e3f8a61"
+        "draws": 454,
+        "digest": "b431b368"
       },
       "label": "final",
       "players": [
@@ -6101,6 +6185,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -6108,6 +6193,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6140,9 +6226,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 69
+            "damageDealt": 70
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -6150,6 +6237,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6186,9 +6274,10 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 112
+            "damageDealt": 114
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -6196,6 +6285,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6231,6 +6321,7 @@
             "damageDealt": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -6238,6 +6329,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6275,6 +6367,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -6282,6 +6375,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6319,6 +6413,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -6326,6 +6421,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6850,7 +6946,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499964,
           "id": 414,
           "inCombat": true,
           "kind": "mob",
@@ -6885,7 +6981,7 @@
           "threat": [
             [
               406,
-              34
+              37
             ]
           ],
           "weapon": {
@@ -6904,7 +7000,7 @@
           "fallStartY": -3.247367,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499964,
+          "hp": 499966,
           "id": 415,
           "inCombat": true,
           "kind": "mob",
@@ -6939,7 +7035,7 @@
           "threat": [
             [
               406,
-              37
+              35
             ]
           ],
           "weapon": {
@@ -6969,7 +7065,7 @@
           "fallStartY": -3.065499,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499888,
+          "hp": 499886,
           "id": 416,
           "inCombat": true,
           "kind": "mob",
@@ -7004,7 +7100,7 @@
           "threat": [
             [
               407,
-              113
+              115
             ]
           ],
           "weapon": {

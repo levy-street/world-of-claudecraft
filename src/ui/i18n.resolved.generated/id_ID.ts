@@ -154,6 +154,12 @@ export const id_ID: EnTranslations = {
     "spectate": {
       "banner": "Menonton {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
@@ -291,6 +297,7 @@ export const id_ID: EnTranslations = {
       "targetLabel": "Sasaran Anda",
       "targetAnnounce": "Tandai {name}",
       "partyLabel": "Kelompok Anda",
+      "partyChip": "Kelompok",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "d",
       "durationUnitMinutes": "m",
@@ -305,7 +312,6 @@ export const id_ID: EnTranslations = {
       "chat": "Lewati ke Obrolan"
     },
     "mobile": {
-      "autorun": "Lari Otomatis",
       "jump": "Lompat",
       "leaderboard": "Peringkat",
       "dailyRewards": "Hadiah",
@@ -320,7 +326,9 @@ export const id_ID: EnTranslations = {
       "actionPageIndicator": "Hal. {page}",
       "targetCycle": "Tukar sasaran",
       "targetCycleShort": "Target",
-      "spellbookPageLabel": "Halaman {page}"
+      "spellbookPageLabel": "Halaman {page}",
+      "hideKeyboard": "Sembunyikan papan ketik",
+      "chatPlaceholder": "Katakan sesuatu..."
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -394,7 +402,13 @@ export const id_ID: EnTranslations = {
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
-      "valecup": "Piala Lembah"
+      "valecup": "Piala Lembah",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -719,6 +733,8 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1014,18 +1030,18 @@ export const id_ID: EnTranslations = {
       },
       "allStatsPctReduce": "Mengurangi semua atribut sebesar {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Meningkatkan daya serang sebesar {pct}%",
+        "armor": "Meningkatkan zirah sebesar {pct}%",
+        "int": "Meningkatkan Kecerdasan sebesar {pct}%",
+        "sta": "Meningkatkan Stamina sebesar {pct}%",
+        "allStats": "Meningkatkan semua atribut sebesar {pct}%"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Mengurangi zirah sebesar {pct}%",
+      "armorPctStacks": "Mengurangi zirah sebesar {pct}% ({stacks} tumpukan)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -1063,6 +1079,26 @@ export const id_ID: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+    },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Lupa kata sandi?",
+      "forgotTitle": "Atur ulang kata sandimu",
+      "forgotHint": "Masukkan nama penggunamu dan kami akan mengirim tautan pengaturan ulang ke alamat email yang terdaftar.",
+      "forgotUsername": "Nama pengguna",
+      "forgotSubmit": "Kirim tautan pengaturan ulang",
+      "forgotSent": "Jika akun dengan nama pengguna itu memiliki email terdaftar, kami telah mengirim tautan pengaturan ulang. Periksa kotak masukmu.",
+      "forgotBack": "Kembali ke masuk",
+      "resetTitle": "Pilih kata sandi baru",
+      "resetNewPassword": "Kata sandi baru",
+      "resetConfirm": "Konfirmasi kata sandi baru",
+      "resetSubmit": "Perbarui kata sandi",
+      "resetDone": "Kata sandimu telah diperbarui. Sekarang kamu bisa masuk.",
+      "resetMismatch": "Kata sandi tidak cocok.",
+      "resetErrInvalid": "Tautan pengaturan ulang ini tidak valid atau sudah kedaluwarsa. Minta yang baru."
     },
     "loot": {
       "chestTitle": "Peti"
@@ -1293,6 +1329,8 @@ export const id_ID: EnTranslations = {
       "parcelsLabel": "Bingkisan",
       "parcelsHint": "Klik barang di tasmu untuk melampirkannya.",
       "removeParcelAria": "Keluarkan {item} dari surat",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",
@@ -1431,6 +1469,7 @@ export const id_ID: EnTranslations = {
     "archetypeTitle": {
       "label": "Gelar",
       "none": "Tidak Ada",
+      "hobbyLabel": "Hobi",
       "armorcrafting": "Pandai Zirah",
       "weaponcrafting": "Pandai Senjata",
       "jewelcrafting": "Perajin Permata",
@@ -1453,7 +1492,10 @@ export const id_ID: EnTranslations = {
       "craftedToast": "Dibuat: {name}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
-      "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu."
+      "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
+      "notAtHub": "Kamu harus berada di pusat kerajinan, pada level yang disyaratkan, untuk membuat itu.",
+      "throttled": "Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.",
+      "recipeNotLearned": "Kamu belum mempelajari resep itu."
     }
   },
   "apiError": {
@@ -2226,8 +2268,8 @@ export const id_ID: EnTranslations = {
       "waveGoldBody": "Gelombang tengah: kombo bermata dua tempat rakitanmu mulai terbentuk dan berpadu.",
       "wavePrismaticTitle": "Prismatik",
       "wavePrismaticBody": "Gelombang terakhir: lonjakan penentu-rakitan yang melelehkan layar, dirancang terasa konyol dengan cara terbaik.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Lindungi Yumi",
+      "yumiBody": "Lindungi Yumi adalah mode objektif tim yang dimainkan di dalam labirin: masing-masing pihak menjaga peliharaan kucingnya sendiri sambil memburu milik lawan. Sesekali kedua kucing berkelebat ke sudut-sudut baru labirin, sehingga pertarungan berayun antara bertahan, memburu, dan berpacu untuk menemukannya lagi. Masuk antrean sebagai tiga lawan tiga atau lima lawan lima; tumbang dalam pertempuran hanya membuatmu absen sejenak.",
       "powerupsTitle": "Penguat di dalam arena",
       "powerupsBody": "Bola bercahaya juga jatuh ke arena di tengah pertarungan, bebas bagi siapa pun yang meraihnya lebih dulu. Sengaja dibuat berlebihan dan hanya bertahan sebentar: Speed Demon untuk laju membutakan sekejap, Colossus untuk membengkak menjadi raksasa lamban, Moon Boots untuk lompatan memantul gravitasi rendah, dan Berserker untuk lonjakan amarah mendadak.",
       "ladderHeading": "Menaiki tangga peringkat",
@@ -3658,42 +3700,42 @@ export const id_ID: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 lawan 3",
+    "bracket5": "Yumi 5 lawan 5",
+    "enterQueue": "Ikut Lindungi Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Kau bergabung ke antrean Lindungi Yumi. Jagalah peliharaanmu…",
+      "leave": "Kau keluar dari antrean Lindungi Yumi.",
+      "teamLeave": "Timmu keluar dari antrean Lindungi Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Lindungi Yumi 3 lawan 3 hanya membolehkan party hingga tiga orang.",
+      "partyTooBig5": "Lindungi Yumi 5 lawan 5 hanya membolehkan party hingga lima orang."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Lindungi Yumi! Bela peliharaanmu dan buru milik lawan."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "LINDUNGI YUMI",
+      "getReady": "Bersiaplah…",
+      "teleportIn": "Yumi bergerak dalam {s}",
+      "suddenDeath": "KEMATIAN MENDADAK",
+      "yourYumi": "Yumi-mu",
+      "enemyYumi": "Yumi Musuh",
+      "aria": "Yumi-mu pada {mine} dari {max} kesehatan, Yumi musuh pada {theirs}.",
+      "collapse": "Ciutkan bilah Lindungi Yumi",
+      "expand": "Bentangkan bilah Lindungi Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "TUMBANG!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "KEMATIAN MENDADAK! Para Yumi bertahan di posisinya!",
+      "teleport": "Para Yumi berteleportasi!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "KEMENANGAN! Yumi selamat!",
+      "loss": "KEKALAHAN! Yumi-mu telah tumbang."
     }
   },
   "fiesta": {
@@ -4142,6 +4184,7 @@ export const id_ID: EnTranslations = {
       "mobileSocial": "Sosial",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Pengaturan",
       "mobileUse": "Pakai",
       "mobileMeters": "Meter",
       "mobileMap": "Peta",
@@ -4690,6 +4733,7 @@ export const id_ID: EnTranslations = {
       "offGlobalCooldown": "Di luar jeda global",
       "friendlyTarget": "Target kawan",
       "enemyTarget": "Target musuh",
+      "selfOnly": "Hanya diri sendiri",
       "damageRange": "{min} hingga {max}",
       "finisherDamage": "{base} ditambah {perCombo} per poin kombo"
     },
@@ -4999,7 +5043,7 @@ export const id_ID: EnTranslations = {
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
       "everyonePassed": "Semua orang melewatkan {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} sudah melempar dadu"
     }
   },
   "entities": {
@@ -5122,7 +5166,7 @@ export const id_ID: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Robek Zirah",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Merobek zirah target, menguranginya sebesar {damage}% per penerapan. Menumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah besar."
       },
       "taunt": {
         "name": "Hasutan",
@@ -5578,7 +5622,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Mengurangi zirah target sebesar 35 selama 30 detik."
+        "description": "Mengurangi zirah target sebesar {damage}% selama 40 detik. Tidak menumpuk dengan Robek Zirah."
       },
       "hibernate": {
         "name": "Lelap",
@@ -5809,6 +5853,9 @@ export const id_ID: EnTranslations = {
       "greyjaw_fang": {
         "name": "Taring Greyjaw Tua"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Halaman Buku Besar Lapuk"
       },
@@ -5838,6 +5885,15 @@ export const id_ID: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Potongan Linen"
+      },
+      "arcane_dust": {
+        "name": "Debu Arkana"
+      },
+      "arcane_essence": {
+        "name": "Esensi Arkana"
+      },
+      "arcane_shard": {
+        "name": "Pecahan Arkana"
       },
       "fen_muster_order": {
         "name": "Perintah Mobilisasi Fenbridge"
@@ -7045,7 +7101,7 @@ export const id_ID: EnTranslations = {
         "name": "Diaken Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Boneka Latihan"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -7480,6 +7536,16 @@ export const id_ID: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Serigala di Ambang Pintu",
         "text": "Serigala hutan kian berani, menerkam para pengelana di jalan utara. Kurangi jumlah mereka, {playerName}. Bunuh 8 Serigala Hutan dan Eastbrook akan bernapas lebih lega.",

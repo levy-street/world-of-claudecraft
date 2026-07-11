@@ -414,8 +414,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'warrior_shout',
     effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 120, party: true }],
-    description:
-      'A shout that increases the attack power of all party members by $b% for 2 min.',
+    description: 'A shout that increases the attack power of all party members by $b% for 2 min.',
   },
   commanding_shout: {
     id: 'commanding_shout',
@@ -1557,7 +1556,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Mending Light',
     class: 'paladin',
     learnLevel: 1,
-    cost: 35,
+    cost: 25,
     castTime: 2.5,
     cooldown: 0,
     range: 30,
@@ -1566,9 +1565,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 42, max: 51 }],
     ranks: [
-      { rank: 2, level: 8, cost: 60, effects: [{ type: 'heal', min: 76, max: 90 }] },
-      { rank: 3, level: 14, cost: 95, effects: [{ type: 'heal', min: 122, max: 144 }] },
-      { rank: 4, level: 20, cost: 140, effects: [{ type: 'heal', min: 190, max: 222 }] },
+      { rank: 2, level: 8, cost: 50, effects: [{ type: 'heal', min: 76, max: 90 }] },
+      { rank: 3, level: 14, cost: 70, effects: [{ type: 'heal', min: 122, max: 144 }] },
+      { rank: 4, level: 20, cost: 115, effects: [{ type: 'heal', min: 190, max: 222 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -3364,8 +3363,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'faerieFire', duration: 40 }],
-    description:
-      "Decreases the target's armor by $d% for 40 sec. Does not stack with Sunder Armor.",
+    description: "Decreases the target's armor by $d% for 40 sec. Does not stack with Armor Shear.",
   },
   hibernate: {
     id: 'hibernate',

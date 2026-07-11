@@ -847,13 +847,16 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
     e.ccDr.clear();
   }
   const meta = ctx.players.get(e.id);
-  if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  if (meta)
+    recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
   e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
   e.targetId = null;
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  e.queuedCastAbility = null;
+  e.queuedCastAim = null;
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;

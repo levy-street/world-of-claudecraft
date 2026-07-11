@@ -148,21 +148,68 @@ describe('SelfMotionPredictor', () => {
     expect(lab.srv.player.pos.z).toBeCloseTo(-40, 3);
   });
 
-  it('does not lead into a blocker and then reconcile back while forward is held', () => {
-    const lab = new Lab(120, FRAME_MS, { start: { x: 0, z: -0.15 }, facing: 0 });
+  // Running into a blocker is the case the predictor must NOT "correct": the
+  // display stops at the wall a full echo before the server does, and that is
+  // right. Stripping the lead against the lagging anchor teleports the avatar
+  // backward by RUN_SPEED x echo on the contact frame. A normal forward step at
+  // 60 fps is RUN_SPEED/60 = 0.117 yd, so any backward frame step of that order
+  // reads as a snap; the leash + divergence servo alone keep it sub-centimeter.
+  it.each([100, 200, 300])('does not snap the pose backward on contact at %ims echo', (lagMs) => {
+    const lab = new Lab(lagMs, FRAME_MS, { start: { x: 0, z: -6 }, facing: 0 });
     lab.frame();
-    const before = lab.frame();
-    if (!before.pose) throw new Error('no initial pose');
-
+    lab.frame();
     lab.setInput(mi({ forward: true }));
-    let farthestLead = 0;
-    for (let i = 0; i < 6; i++) {
+
+    let prevZ: number | null = null;
+    let worstBackwardStep = 0;
+    for (let i = 0; i < 240; i++) {
       const r = lab.frame();
       if (!r.pose) throw new Error('predictor disabled unexpectedly');
-      farthestLead = Math.max(farthestLead, r.pose.z - before.pose.z);
+      if (prevZ !== null) worstBackwardStep = Math.min(worstBackwardStep, r.pose.z - prevZ);
+      prevZ = r.pose.z;
     }
 
-    expect(farthestLead).toBeLessThan(0.03);
+    // The blocked-intent lead removal produced -0.30/-0.99/-1.69 yd here.
+    expect(worstBackwardStep).toBeGreaterThan(-0.05);
+    // and the pose still settles onto the wall the server stopped at.
+    expect(prevZ ?? Number.NaN).toBeCloseTo(lab.srv.player.pos.z, 1);
+  });
+
+  it('never renders the pose through a blocker it is running into', () => {
+    const lab = new Lab(200, FRAME_MS, { start: { x: 0, z: -6 }, facing: 0 });
+    lab.frame();
+    lab.frame();
+    lab.setInput(mi({ forward: true }));
+
+    let farthest = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < 240; i++) {
+      const r = lab.frame();
+      if (!r.pose) throw new Error('predictor disabled unexpectedly');
+      farthest = Math.max(farthest, r.pose.z);
+    }
+
+    // The predictor runs the same swept static collision as the server, so it
+    // cannot walk into the wall; only the divergence servo can nudge it a few
+    // centimetres past the resting face.
+    expect(farthest).toBeLessThan(lab.srv.player.pos.z + 0.1);
+  });
+
+  it('holds a settled pose while forward is held against a wall', () => {
+    const lab = new Lab(120, FRAME_MS, { start: { x: 0, z: -0.15 }, facing: 0 });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 60; i++) lab.frame(); // run in and settle
+
+    let prev = lab.frame().pose;
+    if (!prev) throw new Error('predictor disabled unexpectedly');
+    let worstJitter = 0;
+    for (let i = 0; i < 120; i++) {
+      const r = lab.frame();
+      if (!r.pose) throw new Error('predictor disabled unexpectedly');
+      worstJitter = Math.max(worstJitter, Math.hypot(r.pose.x - prev.x, r.pose.z - prev.z));
+      prev = r.pose;
+    }
+
+    expect(worstJitter).toBeLessThan(0.01);
   });
 
   it('keeps the horizontal error inside the latency leash for the whole run', () => {

@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "d150c678",
+      "state": "6e73f95b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,6 +42,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -49,6 +50,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -122,7 +124,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "f6da3a8f",
+      "state": "9c80f652",
       "events": "f03ad5da",
       "rng": {
         "draws": 54,
@@ -133,7 +135,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "aa7bb4a0",
+      "state": "9d01699d",
       "events": "2705da35",
       "rng": {
         "draws": 95,
@@ -144,7 +146,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "c65c45e4",
+      "state": "73404261",
       "events": "68a7c7c5",
       "rng": {
         "draws": 224,
@@ -155,7 +157,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "4252e4a6",
+      "state": "d6ac627b",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -182,6 +184,7 @@
             "damageTaken": 1497
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -189,6 +192,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -604,7 +608,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 412,
-      "state": "b4c0a54b",
+      "state": "8501352e",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -631,6 +635,7 @@
             "damageTaken": 1497
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -638,6 +643,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

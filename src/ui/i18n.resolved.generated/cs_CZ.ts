@@ -154,6 +154,12 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
@@ -291,6 +297,7 @@ export const cs_CZ: EnTranslations = {
       "targetLabel": "Tvoje značka",
       "targetAnnounce": "Označit {name}",
       "partyLabel": "Tvoje družina",
+      "partyChip": "Skupina",
       "partyGroup": "Skupina {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
@@ -305,7 +312,6 @@ export const cs_CZ: EnTranslations = {
       "chat": "Přeskočit na chat"
     },
     "mobile": {
-      "autorun": "Automatický běh",
       "jump": "Skok",
       "leaderboard": "Žebříčky",
       "dailyRewards": "Odměny",
@@ -320,7 +326,9 @@ export const cs_CZ: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "Přepnout cíl",
       "targetCycleShort": "Cíl",
-      "spellbookPageLabel": "Strana {page}"
+      "spellbookPageLabel": "Strana {page}",
+      "hideKeyboard": "Skrýt klávesnici",
+      "chatPlaceholder": "Něco napiš..."
     },
     "tutorial": {
       "moveBodyTouch": "Pohybuj se páčkou pohybu a tažením po obrazovce se rozhlížej. Udělej pár kroků a začni.",
@@ -394,7 +402,13 @@ export const cs_CZ: EnTranslations = {
       "targetFriendly": "Zacílit nejbližšího spojence",
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
-      "valecup": "Pohár údolí"
+      "valecup": "Pohár údolí",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -719,6 +733,8 @@ export const cs_CZ: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1014,18 +1030,18 @@ export const cs_CZ: EnTranslations = {
       },
       "allStatsPctReduce": "Snižuje všechny vlastnosti o {pct} %",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Zvyšuje sílu útoku o {pct} %",
+        "armor": "Zvyšuje brnění o {pct} %",
+        "int": "Zvyšuje Intelekt o {pct} %",
+        "sta": "Zvyšuje Výdrž o {pct} %",
+        "allStats": "Zvyšuje všechny atributy o {pct} %"
       },
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Snižuje brnění o {pct} %",
+      "armorPctStacks": "Snižuje brnění o {pct} % ({stacks} stacků)",
       "mortalWound": "Snižuje přijaté léčení o {pct} %",
       "vulnerability": "Zvyšuje obdržené poškození o {pct} %",
       "physVuln": "Zvyšuje obdržené fyzické poškození o {pct} %",
@@ -1063,6 +1079,26 @@ export const cs_CZ: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} povstává nad Thornpeak Heights!"
+    },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Zapomenuté heslo?",
+      "forgotTitle": "Obnovení hesla",
+      "forgotHint": "Zadejte své uživatelské jméno a na uloženou e-mailovou adresu pošleme odkaz pro obnovení.",
+      "forgotUsername": "Uživatelské jméno",
+      "forgotSubmit": "Poslat odkaz pro obnovení",
+      "forgotSent": "Pokud má účet s tímto uživatelským jménem uloženou e-mailovou adresu, poslali jsme odkaz pro obnovení. Zkontrolujte svou schránku.",
+      "forgotBack": "Zpět na přihlášení",
+      "resetTitle": "Zvolte nové heslo",
+      "resetNewPassword": "Nové heslo",
+      "resetConfirm": "Potvrďte nové heslo",
+      "resetSubmit": "Aktualizovat heslo",
+      "resetDone": "Vaše heslo bylo aktualizováno. Nyní se můžete přihlásit.",
+      "resetMismatch": "Hesla se neshodují.",
+      "resetErrInvalid": "Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový."
     },
     "loot": {
       "chestTitle": "Truhla"
@@ -1293,6 +1329,8 @@ export const cs_CZ: EnTranslations = {
       "parcelsLabel": "Balíky",
       "parcelsHint": "Klikni na předmět v batozích a přilož ho.",
       "removeParcelAria": "Odebrat {item} z dopisu",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",
@@ -1431,6 +1469,7 @@ export const cs_CZ: EnTranslations = {
     "archetypeTitle": {
       "label": "Titul",
       "none": "Žádný",
+      "hobbyLabel": "Koníček",
       "armorcrafting": "Zbrojíř",
       "weaponcrafting": "Kovář zbraní",
       "jewelcrafting": "Klenotník",
@@ -1453,7 +1492,10 @@ export const cs_CZ: EnTranslations = {
       "craftedToast": "Vyrobeno: {name}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
-      "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept."
+      "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
+      "notAtHub": "Abys to mohl vyrobit, musíš být v řemeslném centru a mít potřebnou úroveň.",
+      "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
+      "recipeNotLearned": "Tento recept ses ještě nenaučil."
     }
   },
   "apiError": {
@@ -2226,8 +2268,8 @@ export const cs_CZ: EnTranslations = {
       "waveGoldBody": "Prostřední vlna: dvousečné kombinace, kde se build začíná tvarovat a zpívat.",
       "wavePrismaticTitle": "Prizmatická",
       "wavePrismaticBody": "Závěrečná vlna: build určující, obrazovku tavící špičky, které mají působit směšně tím nejlepším způsobem.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Ochraňte Yumi",
+      "yumiBody": "Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.",
       "powerupsTitle": "Power-upy v ringu",
       "powerupsBody": "Do arény během boje padají také zářící orby, volné pro toho, kdo k nim doběhne první. Záměrně přehánějí a trvají jen krátce: Rychlostní démon pro záblesk oslepujícího tempa, Kolos pro nabobtnání v těžkopádného obra, Měsíční boty pro skákavý skok s nízkou gravitací a Berserker pro náhlý příval zuřivosti.",
       "ladderHeading": "Stoupání po žebříku",
@@ -3658,42 +3700,42 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 na 3",
+    "bracket5": "Yumi 5 na 5",
+    "enterQueue": "Zapoj se do Ochraňte Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Vstupuješ do fronty Ochraňte Yumi. Hlídej svého společníka…",
+      "leave": "Opouštíš frontu Ochraňte Yumi.",
+      "teamLeave": "Tvůj tým opouští frontu Ochraňte Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Ochraňte Yumi 3 na 3 umožňuje skupinu až o třech členech.",
+      "partyTooBig5": "Ochraňte Yumi 5 na 5 umožňuje skupinu až o pěti členech."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Ochraňte Yumi! Braň svého společníka a lov toho jejich."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "OCHRAŇTE YUMI",
+      "getReady": "Připrav se…",
+      "teleportIn": "Yumi se přesunou za {s}",
+      "suddenDeath": "NÁHLÁ SMRT",
+      "yourYumi": "Tvoje Yumi",
+      "enemyYumi": "Nepřátelská Yumi",
+      "aria": "Tvoje Yumi má {mine} z {max} zdraví, nepřátelská Yumi {theirs}.",
+      "collapse": "Sbalit lišty Ochraňte Yumi",
+      "expand": "Rozbalit lišty Ochraňte Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "K ZEMI!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "NÁHLÁ SMRT! Yumi drží pozice!",
+      "teleport": "Yumi se teleportují!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "VÍTĚZSTVÍ! Yumi je v bezpečí!",
+      "loss": "PORÁŽKA! Tvoje Yumi padla."
     }
   },
   "fiesta": {
@@ -4142,6 +4184,7 @@ export const cs_CZ: EnTranslations = {
       "mobileSocial": "Sociální",
       "mobileArena": "Aréna",
       "mobileMenu": "Menu",
+      "mobileSettings": "Nastavení",
       "mobileUse": "Použít",
       "mobileMeters": "Měřiče",
       "mobileMap": "Mapa",
@@ -4690,6 +4733,7 @@ export const cs_CZ: EnTranslations = {
       "offGlobalCooldown": "Mimo globální dobu obnovy",
       "friendlyTarget": "Přátelský cíl",
       "enemyTarget": "Nepřátelský cíl",
+      "selfOnly": "Pouze na sebe",
       "damageRange": "{min} až {max}",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
     },
@@ -4999,7 +5043,7 @@ export const cs_CZ: EnTranslations = {
       "greedAria": "Chamtivost pro {item}",
       "passAria": "Vzdát se nároku na {item}",
       "everyonePassed": "Všichni se vzdali nároku na {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} hodilo"
     }
   },
   "entities": {
@@ -5578,7 +5622,7 @@ export const cs_CZ: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Čarodějné světlo",
-        "description": "Sníží zbroj cíle o 35 na 30 s."
+        "description": "Sníží zbroj cíle o {damage}% na 40 s. Nesčítá se se Seřezáním zbroje."
       },
       "hibernate": {
         "name": "Dřímota",
@@ -5809,6 +5853,9 @@ export const cs_CZ: EnTranslations = {
       "greyjaw_fang": {
         "name": "Tesák starého Šedočelista"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Ošlehaná stránka účetní knihy"
       },
@@ -5838,6 +5885,15 @@ export const cs_CZ: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Lněný útržek"
+      },
+      "arcane_dust": {
+        "name": "Arkánní prach"
+      },
+      "arcane_essence": {
+        "name": "Arkánní esence"
+      },
+      "arcane_shard": {
+        "name": "Arkánní střep"
       },
       "fen_muster_order": {
         "name": "Fenbridgeský svolávací rozkaz"
@@ -6266,22 +6322,22 @@ export const cs_CZ: EnTranslations = {
         "name": "Slunečnoplátečný srp"
       },
       "thorium_ore": {
-        "name": "Thorium Ore"
+        "name": "Thoriová ruda"
       },
       "arcanite_bar": {
-        "name": "Arcanite Bar"
+        "name": "Arkanitový prut"
       },
       "ashwood_log": {
-        "name": "Ashwood Log"
+        "name": "Jasanová kláda"
       },
       "elderwood_log": {
-        "name": "Elderwood Log"
+        "name": "Bezová kláda"
       },
       "goldleaf_herb": {
-        "name": "Goldleaf Herb"
+        "name": "Zlatolist"
       },
       "sunpetal_herb": {
-        "name": "Sunpetal Herb"
+        "name": "Sluncokvět"
       },
       "bristleback_maul": {
         "name": "Gallowglassské kladivo"
@@ -7045,7 +7101,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Diákon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Cvičný panák"
       },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
@@ -7480,6 +7536,16 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Vlci u dveří",
         "text": "Lesní vlci jsou čím dál drzejší a chňapají po cestovatelích na severní cestě. Prořeď jejich počty, {playerName}. Zabij 8 lesních vlků a Eastbrook si oddechne.",

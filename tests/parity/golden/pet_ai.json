@@ -10,14 +10,14 @@
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
   ],
-  "draws": 773,
-  "drawDigest": "97dd94f3",
+  "draws": 771,
+  "drawDigest": "7163258d",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9843961e",
+      "state": "d5a08679",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,6 +42,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -49,6 +50,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -128,7 +130,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "acd912d1",
+      "state": "98539300",
       "events": "036cadcd",
       "rng": {
         "draws": 14,
@@ -139,7 +141,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 410,
-      "state": "059ed1fb",
+      "state": "d189ad82",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -150,7 +152,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 410,
-      "state": "5c137cea",
+      "state": "ced46b47",
       "events": "ac0e0d97",
       "rng": {
         "draws": 109,
@@ -161,7 +163,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 410,
-      "state": "70393c22",
+      "state": "a27a550f",
       "events": "741638a5",
       "rng": {
         "draws": 187,
@@ -172,7 +174,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 410,
-      "state": "9875e0e1",
+      "state": "834a9b10",
       "events": "cac4bb75",
       "rng": {
         "draws": 306,
@@ -183,22 +185,22 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "022e90fc",
+      "state": "3fd8be81",
       "events": "741638a5",
       "rng": {
-        "draws": 427,
-        "digest": "ff24a9c2"
+        "draws": 426,
+        "digest": "dc1fbd7c"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "5cd87a49",
+      "state": "134f2dc8",
       "events": "741638a5",
       "rng": {
-        "draws": 427,
-        "digest": "ff24a9c2"
+        "draws": 426,
+        "digest": "dc1fbd7c"
       },
       "label": "heel",
       "players": [
@@ -221,6 +223,7 @@
             "damageDealt": 20
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -228,6 +231,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -526,44 +530,44 @@
       "tick": 140,
       "time": 7,
       "nextId": 410,
-      "state": "5f290452",
+      "state": "4aa9d2bf",
       "events": "741638a5",
       "rng": {
-        "draws": 520,
-        "digest": "de3da796"
+        "draws": 517,
+        "digest": "9df7f4ef"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 410,
-      "state": "1b65871b",
+      "state": "a836ab22",
       "events": "741638a5",
       "rng": {
-        "draws": 641,
-        "digest": "92cd096f"
+        "draws": 638,
+        "digest": "d23eadc6"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 410,
-      "state": "42adb4af",
+      "state": "3a160066",
       "events": "741638a5",
       "rng": {
-        "draws": 773,
-        "digest": "97dd94f3"
+        "draws": 771,
+        "digest": "7163258d"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 410,
-      "state": "42adb4af",
+      "state": "3a160066",
       "events": "741638a5",
       "rng": {
-        "draws": 773,
-        "digest": "97dd94f3"
+        "draws": 771,
+        "digest": "7163258d"
       },
       "label": "final",
       "players": [
@@ -586,6 +590,7 @@
             "damageDealt": 20
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -593,6 +598,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

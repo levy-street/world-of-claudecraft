@@ -138,6 +138,7 @@ interface FakeEl {
   setAttribute(k: string, v: string): void;
   getAttribute(k: string): string | null;
   addEventListener(type: string, fn: (ev: unknown) => void): void;
+  insertAdjacentHTML(pos: string, html: string): void;
   append(...kids: FakeEl[]): void;
   appendChild(kid: FakeEl): FakeEl;
   insertBefore(node: FakeEl, ref: FakeEl | null): FakeEl;
@@ -164,6 +165,9 @@ function fakeEl(tag: string): FakeEl {
       el.listeners[type] ??= [];
       el.listeners[type].push(fn);
     },
+    // The chip builder prepends its chevron SVG via insertAdjacentHTML; the pool tests
+    // never inspect the chevron markup, so a no-op keeps the fake DOM minimal.
+    insertAdjacentHTML(_pos: string, _html: string) {},
     append(...kids: FakeEl[]) {
       for (const k of kids) el.appendChild(k);
     },
@@ -316,6 +320,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   let painter: PartyFramesPainter;
   let targeted: number[];
   let leftParty: number;
+  let toggles: number;
 
   beforeEach(() => {
     container = fakeEl('div');
@@ -323,6 +328,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls = facet.calls;
     targeted = [];
     leftParty = 0;
+    toggles = 0;
     painter = new PartyFramesPainter(
       facet.writers,
       container as unknown as HTMLElement,
@@ -334,13 +340,24 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           leftParty++;
         },
         leaveLabel: () => 'Leave Party',
+        chipLabel: () => 'Party',
+        onToggleCollapse: () => {
+          toggles++;
+        },
         partyAuras: auraDeps,
       },
       fakeDoc,
     );
   });
 
-  const rows = () => container.childNodes.filter((c) => c.tagName === 'DIV');
+  // The member rows nest one level down in the .party-rows wrapper now (the container's
+  // only DIV child is the wrapper itself). Resolve the wrapper, then its member-row DIVs.
+  const wrapperOf = () =>
+    container.childNodes.find((c) => String(c.className).includes('party-rows'));
+  const rows = () => {
+    const w = wrapperOf();
+    return w ? w.childNodes.filter((c) => c.tagName === 'DIV') : [];
+  };
 
   it('attaches click/contextmenu/keydown ONCE per pooled row across rebuilds (no dup listeners)', () => {
     painter.sync([member({ pid: 2, name: 'Alice' })], 1, false);
@@ -406,8 +423,8 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
   it('orders rows in member order with the leave button last', () => {
     painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
     const kids = container.childNodes;
-    expect(kids.filter((c) => c.tagName === 'DIV')).toHaveLength(3);
-    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave button last
+    expect(rows()).toHaveLength(3); // three member rows inside the wrapper
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave button last (container child)
   });
 
   it('reconciles DOM order on reorder + partial-membership churn, reusing the SAME nodes, leave last', () => {
@@ -548,5 +565,161 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     const leave = container.childNodes.find((c) => c.tagName === 'BUTTON');
     leave?.fire('click', {});
     expect(leftParty).toBe(1);
+  });
+
+  // ---- The mobile collapse chip (setCollapse). ----
+
+  // The chip's id (from party_chip.ts) so a test can find it in the container.
+  const chipId = 'party-chip';
+  const findChip = () => container.childNodes.find((c) => c.id === chipId);
+
+  it('builds no chip and toggles no class off mobile (desktop party frames unchanged)', () => {
+    painter.setCollapse(true, false, true, false);
+    expect(findChip()).toBeUndefined();
+    // The container gains neither collapse class off mobile.
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'has-party-chip' && c.args[1]),
+    ).toBe(false);
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded' && c.args[1]),
+    ).toBe(false);
+  });
+
+  it('builds no chip when not in a party, even on mobile', () => {
+    painter.setCollapse(false, true, true, false);
+    expect(findChip()).toBeUndefined();
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'has-party-chip' && c.args[1]),
+    ).toBe(false);
+  });
+
+  it('shows the chip in a party on mobile, collapsed by default (aria-expanded false, no expanded class)', () => {
+    painter.setCollapse(true, true, true, false);
+    const el = findChip();
+    expect(el).toBeTruthy();
+    // The chip is the container's FIRST child (the collapse header above the stack).
+    expect(container.childNodes[0]).toBe(el);
+    // Labeled via the elided setText, aria-expanded false (collapsed), and the container
+    // carries has-party-chip but NOT party-expanded.
+    expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Party')).toBe(true);
+    expect(
+      calls.some(
+        (c) => c.m === 'setAttr' && c.args[0] === 'aria-expanded' && c.args[1] === 'false',
+      ),
+    ).toBe(true);
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'has-party-chip' && c.args[1]),
+    ).toBe(true);
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded' && c.args[1]),
+    ).toBe(false);
+  });
+
+  it('expands (aria-expanded true + party-expanded class) when the persisted flag is not collapsed', () => {
+    painter.setCollapse(true, true, false, false);
+    expect(
+      calls.some((c) => c.m === 'setAttr' && c.args[0] === 'aria-expanded' && c.args[1] === 'true'),
+    ).toBe(true);
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded' && c.args[1]),
+    ).toBe(true);
+  });
+
+  it('the chip click fires onToggleCollapse (the persisted USER toggle)', () => {
+    painter.setCollapse(true, true, true, false);
+    const el = findChip();
+    el?.fire('click', {});
+    expect(toggles).toBe(1);
+  });
+
+  it('keeps the chip first even after a member sync (chip, then rows wrapper, leave last)', () => {
+    painter.setCollapse(true, true, false, false);
+    painter.sync([member({ pid: 2 }), member({ pid: 3 })], 1, false);
+    const kids = container.childNodes;
+    expect(kids[0].id).toBe(chipId);
+    expect(rows()).toHaveLength(2); // the two member rows live inside the wrapper
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON'); // leave last
+  });
+
+  it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {
+    // The pre-restructure grid put the chip in column 1 and auto-flowed a member frame
+    // into the cell beside it (column 2 row 1). With the rows nested in the .party-rows
+    // wrapper, the chip is a lone container child: its ONLY direct-child siblings are the
+    // wrapper and the Leave button, and every member frame sits INSIDE the wrapper.
+    painter.setCollapse(true, true, false, false); // mobile, expanded
+    painter.sync([member({ pid: 2 }), member({ pid: 3 }), member({ pid: 4 })], 1, false);
+    const kids = container.childNodes;
+    expect(kids[0].id).toBe(chipId); // chip first
+    const wrap = wrapperOf() as FakeEl;
+    expect(wrap).toBeTruthy();
+    // No member frame is a DIRECT child of the container (none flows beside the chip).
+    expect(container.childNodes.some((c) => String(c.className).includes('party-frame'))).toBe(
+      false,
+    );
+    // All three member rows nest inside the wrapper; the chip is not among them.
+    expect(rows()).toHaveLength(3);
+    expect(wrap.childNodes.some((c) => c.id === chipId)).toBe(false);
+    // Leave button is the container's last child, after the rows wrapper.
+    expect(kids[kids.length - 1].tagName).toBe('BUTTON');
+    expect(container.childNodes.indexOf(wrap)).toBeLessThan(kids.length - 1);
+  });
+
+  it('yields entirely while mobile chat is open: chip removed, no expanded class', () => {
+    // Expanded first (the player's choice), then chat opens: the chip and the frames
+    // must both hide so the chat overlay owns the top-left.
+    painter.setCollapse(true, true, false, false);
+    expect(findChip()).toBeTruthy();
+    calls.length = 0;
+    painter.setCollapse(true, true, false, true);
+    expect(findChip()).toBeUndefined();
+    // Neither collapse class is on while chat yields (frames hidden, chip gone).
+    expect(
+      calls.filter((c) => c.m === 'toggleClass' && c.args[0] === 'has-party-chip').at(-1)?.args[1],
+    ).toBe(false);
+    expect(
+      calls.filter((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded').at(-1)?.args[1],
+    ).toBe(false);
+  });
+
+  it('restores the player expanded state when chat closes (the persisted choice is untouched)', () => {
+    // Player expanded, chat opens (yield), chat closes: the frames re-expand from the
+    // SAME collapsed=false input, proving the yield never overwrote the persisted choice.
+    painter.setCollapse(true, true, false, true); // chat open: yielded
+    expect(findChip()).toBeUndefined();
+    calls.length = 0;
+    painter.setCollapse(true, true, false, false); // chat closed: restore
+    expect(findChip()).toBeTruthy();
+    expect(
+      calls.filter((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded').at(-1)?.args[1],
+    ).toBe(true);
+  });
+
+  it('drops the chip + collapse classes when the party disbands (clear)', () => {
+    painter.setCollapse(true, true, true, false);
+    expect(findChip()).toBeTruthy();
+    painter.clear();
+    expect(findChip()).toBeUndefined();
+    // clear toggles both collapse classes OFF so a future desktop stack is unstyled.
+    expect(
+      calls.filter((c) => c.m === 'toggleClass' && c.args[0] === 'has-party-chip').at(-1)?.args[1],
+    ).toBe(false);
+    expect(
+      calls.filter((c) => c.m === 'toggleClass' && c.args[0] === 'party-expanded').at(-1)?.args[1],
+    ).toBe(false);
+  });
+
+  it('removes the chip when the HUD switches from mobile to desktop mid-party', () => {
+    painter.setCollapse(true, true, true, false);
+    expect(findChip()).toBeTruthy();
+    // Same party, now desktop: the chip is dropped and the collapse classes clear.
+    painter.setCollapse(true, false, true, false);
+    expect(findChip()).toBeUndefined();
+  });
+
+  it('relocalize() re-emits the chip caption while it is shown (language switch)', () => {
+    painter.setCollapse(true, true, true, false);
+    calls.length = 0;
+    painter.relocalize();
+    expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Party')).toBe(true);
   });
 });

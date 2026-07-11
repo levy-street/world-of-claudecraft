@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { archetypeTitleText } from '../src/ui/char_window';
+import { archetypeTitleText, hobbyCraftText } from '../src/ui/char_window';
 
 // The character window painter is a DOM module; driving the live DOM + events is
 // the opt-in browser suite. This is the no-DOM-suite
@@ -119,5 +119,25 @@ describe('archetypeTitleText (#1130): id-to-key view model', () => {
   it('resolves every craft id to a distinct title (no accidental key collision)', () => {
     const titles = CRAFT_RING.map((craft) => archetypeTitleText(craft.id));
     expect(new Set(titles).size).toBe(titles.length);
+  });
+});
+
+describe('hobbyCraftText (#1294): id-to-key view model', () => {
+  // A hobby id IS a craft id on the ring, rendered through the same per-craft
+  // name table as the archetype title (see src/ui/char_window.ts).
+  it('falls back to the "no hobby yet" copy for null', () => {
+    expect(hobbyCraftText(null)).toBe('None');
+  });
+
+  it('falls back to the "no hobby yet" copy for an unrecognized craft id', () => {
+    expect(hobbyCraftText('not_a_real_craft')).toBe('None');
+  });
+
+  it('resolves a known craft id to its named title (never the fallback), for every ring craft', () => {
+    for (const craft of CRAFT_RING) {
+      const text = hobbyCraftText(craft.id);
+      expect(text).toBe(archetypeTitleText(craft.id));
+      expect(text).not.toBe('None');
+    }
   });
 });

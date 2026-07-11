@@ -62,6 +62,17 @@ export interface BattlefieldXpObservation {
   itemId: string;
   instance: BattlefieldXpInstance | undefined;
   observerName: string;
+  // The observer's active archetype (#1129/#1203: professions/archetype.ts
+  // `archetypeStateFor`), or null before the acceptance quest. Threads the
+  // manifesto's "active specialty only" gate below.
+  observerActiveArchetype: string | null;
+  // The observer's second major, ring-adjacent to `observerActiveArchetype`
+  // (archetype.ts `pairedMajor`), or null/omitted exactly when that is. Under
+  // #1129's actual pair model BOTH majors are the active specialty, so this
+  // gate checks either, not just the title-quest craft. Optional (defaults to
+  // null) so a pre-pair-model caller that only tracks the single title craft
+  // still compiles and behaves exactly as it did before the pair model.
+  observerPairedMajor?: string | null;
 }
 
 /** Resolve one Battlefield Experience observation into a skill-progress
@@ -76,26 +87,38 @@ export interface BattlefieldXpObservation {
  *    issue; this PR never grants anything but the self-observation trickle.
  *  - the item was not produced by any known recipe (no craft to attribute
  *    to, e.g. a non-crafted drop that was somehow signed): 0.
+ *  - the recipe's craft is not the observer's active archetype (the
+ *    manifesto's anti alt/breadth lever, see the gate comment below): 0.
  *  Only ever mutates skill via gainCraftSkill (never a drain primitive). */
 export function battlefieldExperienceTrickle(
   craftSkills: CraftSkills,
   observation: BattlefieldXpObservation,
 ): number {
-  const { itemId, instance, observerName } = observation;
+  const {
+    itemId,
+    instance,
+    observerName,
+    observerActiveArchetype,
+    observerPairedMajor = null,
+  } = observation;
   const rarity = instance?.rolled?.quality as MaterialRarity | undefined;
   if (!rarity || !isSignableMaterialRarity(rarity)) return 0;
   if (!instance?.signer || instance.signer !== observerName) return 0;
   const recipe = recipeForResultItem(itemId);
   if (!recipe) return 0;
-  // TODO(#1149/#1205): the manifesto scopes Battlefield Experience to the
-  // observer's ACTIVE archetype/specialty only ("a potion drunk or meal
-  // eaten feeds nothing unless alchemy or cooking is your specialty"), the
-  // anti alt/breadth lever. That active-specialty state lives on #1205's
-  // branch and is not available here; whichever of this module / #1205
-  // merges second must add a gate here (recipe.professionId must be one of
-  // the observer's currently-active/empowered crafts) before this trickle
-  // fires for a non-specialty craft. Not gating today is a known gap, not a
-  // design decision: no such gate exists ANYWHERE in this stack yet.
+  // #1149/#1205 "active specialty only" gate: the manifesto scopes
+  // Battlefield Experience to the observer's ACTIVE specialty only ("a potion
+  // drunk or meal eaten feeds nothing unless alchemy or cooking is your
+  // specialty"), the anti alt/breadth lever. This is deliberately a narrower,
+  // BINARY "is this THE specialty" check, not the three-tier common/rare/
+  // unlimited ceiling `craftCeiling` (archetype.ts) composes for ordinary
+  // crafting: no archetype set, or the recipe's craft is neither of the
+  // observer's two majors (including their hobby, which is NOT a major),
+  // grants nothing here. Under #1129's pair model the active specialty is
+  // BOTH majors, so either match qualifies.
+  const isActiveSpecialty =
+    recipe.professionId === observerActiveArchetype || recipe.professionId === observerPairedMajor;
+  if (!isActiveSpecialty) return 0;
   gainCraftSkill(craftSkills, recipe.professionId, BATTLEFIELD_XP_TRICKLE);
   return BATTLEFIELD_XP_TRICKLE;
 }

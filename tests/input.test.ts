@@ -57,6 +57,7 @@ function makeInput() {
     onTab: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
+    onPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -87,6 +88,29 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+describe('Input camera zoom', () => {
+  it('zooms the camera with the mouse wheel on desktop', () => {
+    const { canvasListeners, input } = makeInput();
+    const preventDefault = vi.fn();
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBeCloseTo(13.4);
+  });
+
+  it('ignores canvas wheel zoom while the mobile touch HUD is active', () => {
+    const { canvasListeners, input, setMobileTouch } = makeInput();
+    const preventDefault = vi.fn();
+    setMobileTouch(true);
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBe(12);
+  });
+});
+
 describe('Input autorun', () => {
   it('toggleAutorun flips state and feeds forward into readMoveInput', () => {
     const { input } = makeInput();
@@ -95,6 +119,14 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.toggleAutorun()).toBe(false);
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('setAutorun idempotently syncs external analog latches', () => {
+    const { input } = makeInput();
+    expect(input.setAutorun(true)).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.setAutorun(false)).toBe(false);
     expect(input.readMoveInput().forward).toBe(false);
   });
 
@@ -174,6 +206,35 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.debugState().keys).toEqual([]);
+  });
+});
+
+describe('Input pet bar chords', () => {
+  it('dispatches onPet for the default Ctrl+Digit pet chords and cancels the browser default', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const cases: Array<[string, string]> = [
+      ['Digit1', 'attack'],
+      ['Digit2', 'stop'],
+      ['Digit3', 'taunt'],
+      ['Digit4', 'defensive'],
+      ['Digit5', 'aggressive'],
+    ];
+    for (const [code, action] of cases) {
+      const preventDefault = vi.fn();
+      windowListeners.get('keydown')!({ code, ctrlKey: true, repeat: false, preventDefault });
+      expect(cb.onPet).toHaveBeenCalledWith(action);
+      // The chord carries Ctrl, so the browser accelerator default is cancelled.
+      expect(preventDefault).toHaveBeenCalled();
+    }
+  });
+
+  it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onPet).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0); // Digit1 -> action bar slot 0
   });
 });
 

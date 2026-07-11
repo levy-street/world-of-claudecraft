@@ -154,6 +154,12 @@ export const ru_RU: EnTranslations = {
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} начал проверку готовности. Вы готовы?",
+      "ready": "Готов",
+      "notReady": "Не готов",
+      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа."
+    },
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
@@ -291,6 +297,7 @@ export const ru_RU: EnTranslations = {
       "targetLabel": "Ваша цель",
       "targetAnnounce": "Цель: {name}",
       "partyLabel": "Ваша группа",
+      "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
       "durationUnitMinutes": "м",
@@ -305,7 +312,6 @@ export const ru_RU: EnTranslations = {
       "chat": "Перейти к чату"
     },
     "mobile": {
-      "autorun": "Автобег",
       "jump": "Прыжок",
       "leaderboard": "Рейтинг",
       "dailyRewards": "Награды",
@@ -320,7 +326,9 @@ export const ru_RU: EnTranslations = {
       "actionPageIndicator": "Стр. {page}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
-      "spellbookPageLabel": "Страница {page}"
+      "spellbookPageLabel": "Страница {page}",
+      "hideKeyboard": "Скрыть клавиатуру",
+      "chatPlaceholder": "Напишите сообщение..."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -394,7 +402,13 @@ export const ru_RU: EnTranslations = {
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
-      "valecup": "Кубок Долины"
+      "valecup": "Кубок Долины",
+      "categoryPet": "Питомец",
+      "petAttack": "Питомец: атака",
+      "petStop": "Питомец: стоп",
+      "petTaunt": "Питомец: провокация",
+      "petDefensive": "Питомец: защита",
+      "petAggressive": "Питомец: агрессия"
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -719,6 +733,8 @@ export const ru_RU: EnTranslations = {
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1064,6 +1080,26 @@ export const ru_RU: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} поднимается над Терновыми высотами!"
     },
+    "auth": {
+      "appleLoginCta": "Продолжить с Apple",
+      "appleError": "Не удалось войти через Apple. Попробуйте ещё раз.",
+      "appleChoiceIntro": "Создайте новую учётную запись или привяжите Apple к существующей.",
+      "appleChoiceExpired": "Вход через Apple истёк. Войдите через Apple ещё раз.",
+      "forgotPrompt": "Забыли пароль?",
+      "forgotTitle": "Сброс пароля",
+      "forgotHint": "Введите имя пользователя, и мы отправим ссылку для сброса на указанный адрес электронной почты.",
+      "forgotUsername": "Имя пользователя",
+      "forgotSubmit": "Отправить ссылку для сброса",
+      "forgotSent": "Если для этого имени пользователя есть аккаунт с указанной почтой, мы отправили ссылку для сброса. Проверьте свой почтовый ящик.",
+      "forgotBack": "Вернуться ко входу",
+      "resetTitle": "Выберите новый пароль",
+      "resetNewPassword": "Новый пароль",
+      "resetConfirm": "Подтвердите новый пароль",
+      "resetSubmit": "Обновить пароль",
+      "resetDone": "Ваш пароль обновлён. Теперь вы можете войти.",
+      "resetMismatch": "Пароли не совпадают.",
+      "resetErrInvalid": "Эта ссылка для сброса недействительна или истекла. Запросите новую."
+    },
     "loot": {
       "chestTitle": "Сундук"
     },
@@ -1293,6 +1329,8 @@ export const ru_RU: EnTranslations = {
       "parcelsLabel": "Посылки",
       "parcelsHint": "Нажмите на предмет в сумке, чтобы приложить его.",
       "removeParcelAria": "Убрать {item} из письма",
+      "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
+      "parcelQtyIncreaseAria": "Отправить на один {item} больше",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",
@@ -1431,6 +1469,7 @@ export const ru_RU: EnTranslations = {
     "archetypeTitle": {
       "label": "Титул",
       "none": "Нет",
+      "hobbyLabel": "Хобби",
       "armorcrafting": "Бронник",
       "weaponcrafting": "Оружейник",
       "jewelcrafting": "Ювелир",
@@ -1453,7 +1492,10 @@ export const ru_RU: EnTranslations = {
       "craftedToast": "Создано: {name}",
       "insufficientMaterials": "У вас недостаточно материалов.",
       "unknownRecipe": "Такого рецепта не существует.",
-      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта."
+      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
+      "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
+      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
+      "recipeNotLearned": "Вы еще не изучили этот рецепт."
     }
   },
   "apiError": {
@@ -4142,6 +4184,7 @@ export const ru_RU: EnTranslations = {
       "mobileSocial": "Общение",
       "mobileArena": "Арена",
       "mobileMenu": "Меню",
+      "mobileSettings": "Настройки",
       "mobileUse": "Использовать",
       "mobileMeters": "Счетчики",
       "mobileMap": "Карта",
@@ -4690,6 +4733,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
     },
@@ -5122,7 +5166,7 @@ export const ru_RU: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Срез брони",
-        "description": "Раскалывает броню цели, снижая ее на 2% за применение. Суммируется до 5 раз (10% при полном стаке). Создает большое количество угрозы."
+        "description": "Раскалывает броню цели, снижая ее на {damage}% за применение. Суммируется до 5 раз. Создает большое количество угрозы."
       },
       "taunt": {
         "name": "Подстрекательство",
@@ -5578,7 +5622,7 @@ export const ru_RU: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ведьмин огонь",
-        "description": "Снижает броню цели на 35 на 30 сек."
+        "description": "Снижает броню цели на {damage}% на 40 сек. Не суммируется со Срезом брони."
       },
       "hibernate": {
         "name": "Дремота",
@@ -5809,6 +5853,9 @@ export const ru_RU: EnTranslations = {
       "greyjaw_fang": {
         "name": "Клык старого Серочелюста"
       },
+      "chunk_of_ore": {
+        "name": "Кусок руды"
+      },
       "weathered_ledger_page": {
         "name": "Выветренная страница книги учета"
       },
@@ -5838,6 +5885,15 @@ export const ru_RU: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Лоскут льна"
+      },
+      "arcane_dust": {
+        "name": "Тайная пыль"
+      },
+      "arcane_essence": {
+        "name": "Тайная эссенция"
+      },
+      "arcane_shard": {
+        "name": "Тайный осколок"
       },
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"
@@ -6982,7 +7038,7 @@ export const ru_RU: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "Юми"
       },
       "forest_wolf": {
         "name": "Лесной волк"
@@ -7480,6 +7536,16 @@ export const ru_RU: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Ремесло для каждой руки",
+        "text": "Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.",
+        "completion": "Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.",
+        "objectives": {
+          "0": {
+            "label": "Кусок руды"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Волки у дверей",
         "text": "Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.",

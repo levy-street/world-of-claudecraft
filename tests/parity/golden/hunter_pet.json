@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9843961e",
+      "state": "d5a08679",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,6 +40,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -47,6 +48,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -126,7 +128,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "b105f333",
+      "state": "c19c538a",
       "events": "43ab1dd4",
       "rng": {
         "draws": 9,
@@ -137,7 +139,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "26fd9600",
+      "state": "30800b25",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -148,7 +150,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "8a7b0ebb",
+      "state": "475b5b42",
       "events": "d6d42245",
       "rng": {
         "draws": 100,
@@ -159,7 +161,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "3b7ec288",
+      "state": "cbc2bbfd",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -170,7 +172,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "55fa087c",
+      "state": "29ec7201",
       "events": "1b963611",
       "rng": {
         "draws": 298,
@@ -181,7 +183,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "1b98bcbf",
+      "state": "0ef1d3f6",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -192,7 +194,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "1b98bcbf",
+      "state": "0ef1d3f6",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -219,6 +221,7 @@
             "damageDealt": 48
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -226,6 +229,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

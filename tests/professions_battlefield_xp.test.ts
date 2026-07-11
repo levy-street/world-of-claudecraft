@@ -13,13 +13,21 @@ function makeSim(seed = 42) {
 // #1149 Battlefield Experience: self-observation (the wielder is also the
 // crafter) trickle, the "simplest, implement/test first" slice per the
 // issue's own spec. No radius/party logic is exercised or expected here.
+// Every case below sets observerActiveArchetype to 'alchemy' (the craft
+// minor_healing_potion's recipe belongs to) unless it is specifically
+// exercising the #1149/#1205 active-specialty gate itself.
 describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
   it('grants the trickle to the signer craft when the observer is the signer and rarity is rare+', () => {
+    // Pinned to a literal so a re-tune of the trickle amount cannot pass
+    // silently (every other assertion in this file compares against the
+    // imported constant, which alone would never redden on a value change).
+    expect(BATTLEFIELD_XP_TRICKLE).toBe(0.25);
     const skills = emptyCraftSkills();
     const amount = battlefieldExperienceTrickle(skills, {
       itemId: 'minor_healing_potion', // recipe_minor_healing_potion -> alchemy
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
     expect(amount).toBe(BATTLEFIELD_XP_TRICKLE);
     expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
@@ -32,6 +40,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
         itemId: 'minor_healing_potion',
         instance: { signer: 'Aria', rolled: { quality } },
         observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
       });
       expect(amount).toBe(BATTLEFIELD_XP_TRICKLE);
       expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
@@ -45,6 +54,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
         itemId: 'minor_healing_potion',
         instance: { signer: 'Aria', rolled: { quality } },
         observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
       });
       expect(amount).toBe(0);
       expect(skills.alchemy).toBe(0);
@@ -58,6 +68,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
         itemId: 'minor_healing_potion',
         instance: undefined,
         observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
       }),
     ).toBe(0);
     expect(
@@ -65,6 +76,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
         itemId: 'minor_healing_potion',
         instance: { signer: 'Aria' }, // no rolled quality at all
         observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
       }),
     ).toBe(0);
     expect(skills.alchemy).toBe(0);
@@ -76,6 +88,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Someone Else', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
     expect(amount).toBe(0);
     expect(skills.alchemy).toBe(0);
@@ -87,6 +100,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
       itemId: 'not_a_real_item',
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
     expect(amount).toBe(0);
   });
@@ -97,11 +111,72 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
     for (const [craftId, value] of Object.entries(skills)) {
       if (craftId === 'alchemy') expect(value).toBe(BATTLEFIELD_XP_TRICKLE);
       else expect(value).toBe(0);
     }
+  });
+});
+
+// #1149/#1205: the manifesto's "active specialty only" anti alt/breadth
+// lever, a BINARY gate (unlike the three-tier common/rare/unlimited
+// archetype.ts craftCeiling ordinary crafting composes): the trickle only
+// ever fires when the recipe's craft IS the observer's currently-active
+// archetype.
+describe('battlefieldExperienceTrickle active-specialty gate (#1149/#1205)', () => {
+  it('grants zero before any archetype has ever been chosen (observerActiveArchetype null)', () => {
+    const skills = emptyCraftSkills();
+    const amount = battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion',
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: null,
+    });
+    expect(amount).toBe(0);
+    expect(skills.alchemy).toBe(0);
+  });
+
+  it('grants zero when the recipe craft is a DIFFERENT active archetype (an alt breadth build)', () => {
+    const skills = emptyCraftSkills();
+    const amount = battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion', // -> alchemy
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: 'weaponcrafting', // not alchemy
+    });
+    expect(amount).toBe(0);
+    expect(skills.alchemy).toBe(0);
+  });
+
+  it('grants zero when the recipe craft is only the observer HOBBY, not their active archetype', () => {
+    const skills = emptyCraftSkills();
+    // The narrower binary gate never falls back to the three-tier hobby
+    // ceiling: a hobby craft is not "the" specialty.
+    const amount = battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion', // -> alchemy
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: 'tailoring', // alchemy's opposite on CRAFT_RING
+    });
+    expect(amount).toBe(0);
+    expect(skills.alchemy).toBe(0);
+  });
+
+  // #1638 review: #1129's active archetype is an adjacent PAIR (the two
+  // majors), so this gate must check both, not just the title-quest craft.
+  it('grants the trickle when the recipe craft is the SECOND (paired) major, not just the title craft', () => {
+    const skills = emptyCraftSkills();
+    const amount = battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion', // -> alchemy
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: 'engineering', // title craft is the OTHER major
+      observerPairedMajor: 'alchemy', // alchemy is the second major, adjacent to engineering
+    });
+    expect(amount).toBe(BATTLEFIELD_XP_TRICKLE);
+    expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
   });
 });
 
@@ -119,6 +194,7 @@ describe('battlefieldExperienceTrickle additive-only guarantee (#1149)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
 
     expect(gainSpy).toHaveBeenCalledTimes(1);
@@ -139,6 +215,23 @@ describe('battlefieldExperienceTrickle additive-only guarantee (#1149)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Aria', rolled: { quality: 'uncommon' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
+    });
+
+    expect(gainSpy).not.toHaveBeenCalled();
+    gainSpy.mockRestore();
+  });
+
+  it('makes no mutating call at all when the active-specialty gate rejects the observation', async () => {
+    const wheel = await import('../src/sim/professions/wheel');
+    const gainSpy = vi.spyOn(wheel, 'gainCraftSkill');
+    const skills = emptyCraftSkills();
+
+    battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion',
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: null,
     });
 
     expect(gainSpy).not.toHaveBeenCalled();
@@ -148,13 +241,16 @@ describe('battlefieldExperienceTrickle additive-only guarantee (#1149)', () => {
 
 // End-to-end wiring through the real potion-drunk tracked event (items.ts
 // useItem), the one hook this PR wires (self-observation only): a
-// rare-or-better self-signed potion drunk by its own crafter trickles into
-// that craft's skill; a plain potion drunk by anyone changes nothing.
+// rare-or-better self-signed potion drunk by its own crafter, WHO HAS
+// ALCHEMY AS THEIR ACTIVE ARCHETYPE, trickles into that craft's skill; a
+// plain potion, a non-signer, or a signer without alchemy as their active
+// archetype all change nothing.
 describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
-  it('a self-signed rare potion drunk by its own signer trickles alchemy skill', () => {
+  it('a self-signed rare potion drunk by its own signer, with alchemy as their active archetype, trickles alchemy skill', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
+    meta.archetype.activeArchetype = 'alchemy';
     sim.addItemInstance(
       'minor_healing_potion',
       { signer: meta.name, rolled: { quality: 'rare' } },
@@ -168,10 +264,29 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
     expect(meta.craftSkills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
   });
 
+  it('a self-signed rare potion drunk by its own signer grants nothing without alchemy as the active archetype', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    expect(meta.archetype.activeArchetype).toBeNull(); // fresh character, no archetype chosen
+    sim.addItemInstance(
+      'minor_healing_potion',
+      { signer: meta.name, rolled: { quality: 'rare' } },
+      pid,
+    );
+    const entity = (sim as any).entities.get(pid);
+    entity.hp = 1;
+
+    sim.useItem('minor_healing_potion', pid);
+
+    expect(meta.craftSkills.alchemy).toBe(0);
+  });
+
   it('a plain (unsigned) potion drunk grants no Battlefield Experience trickle', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
+    meta.archetype.activeArchetype = 'alchemy';
     sim.addItem('minor_healing_potion', 1, pid);
     const entity = (sim as any).entities.get(pid);
     entity.hp = 1;
@@ -185,6 +300,7 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
+    meta.archetype.activeArchetype = 'alchemy';
     sim.addItemInstance(
       'minor_healing_potion',
       { signer: 'Someone Else', rolled: { quality: 'rare' } },
@@ -208,6 +324,7 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
+    meta.archetype.activeArchetype = 'alchemy';
     // Signed rare copy added first (earlier slot).
     sim.addItemInstance(
       'minor_healing_potion',
@@ -244,6 +361,7 @@ describe('re-signed instance credits the NEW signer (#1149)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
     });
     expect(firstAmount).toBe(BATTLEFIELD_XP_TRICKLE);
 
@@ -254,6 +372,7 @@ describe('re-signed instance credits the NEW signer (#1149)', () => {
       itemId: 'minor_healing_potion',
       instance: { signer: 'Bram', rolled: { quality: 'rare' } },
       observerName: 'Bram',
+      observerActiveArchetype: 'alchemy',
     });
     expect(secondAmount).toBe(BATTLEFIELD_XP_TRICKLE);
 

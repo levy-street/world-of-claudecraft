@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "29a52065",
+      "state": "2a501e8a",
       "events": "1fb00b9d",
       "rng": {
         "draws": 4,
@@ -58,6 +58,7 @@
             "damageTaken": 56
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -65,6 +66,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -184,7 +186,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "4484703b",
+      "state": "dfbe5158",
       "events": "6f63b2c8",
       "rng": {
         "draws": 8,
@@ -210,6 +212,7 @@
             "damageTaken": 194
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -217,6 +220,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -391,7 +395,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "f42cad6c",
+      "state": "f2310fdf",
       "events": "42cb10c5",
       "rng": {
         "draws": 13,
@@ -417,6 +421,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -424,6 +429,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -654,7 +660,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "a24697d2",
+      "state": "e3225f25",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -680,6 +686,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -687,6 +694,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -965,7 +973,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "1f0f1c81",
+      "state": "abae32c6",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -991,6 +999,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -998,6 +1007,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1318,7 +1328,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "ee3d39ac",
+      "state": "6658de1f",
       "events": "c96afe7d",
       "rng": {
         "draws": 16,
@@ -1344,6 +1354,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1351,6 +1362,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1716,7 +1728,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "9768c8dd",
+      "state": "83d3cb12",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1742,6 +1754,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1749,6 +1762,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2115,7 +2129,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "9768c8dd",
+      "state": "83d3cb12",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2141,6 +2155,7 @@
             "damageTaken": 309
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -2148,6 +2163,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

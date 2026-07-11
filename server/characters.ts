@@ -62,6 +62,7 @@ import {
   scopeAllowsMutation,
 } from './db';
 import { ctxAccountId } from './http/context';
+import { gameMetricsCounters } from './http/game_signals';
 import { withBody } from './http/middleware/body';
 import {
   CHARACTER_CREATE_POLICY,
@@ -376,6 +377,7 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
       rt.initialCharacterState(cls, name, skin),
     );
   const respondCreated = (c: CharacterRow): void => {
+    gameMetricsCounters().characterCreated();
     json(ctx.res, 200, {
       id: c.id,
       name: c.name,

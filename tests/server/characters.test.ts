@@ -28,6 +28,11 @@ import {
 } from '../../server/characters';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { compose } from '../../server/http/compose';
+import {
+  type GameMetricsCounters,
+  noopGameMetricsCounters,
+  setGameMetricsCounters,
+} from '../../server/http/game_signals';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
@@ -211,6 +216,7 @@ afterEach(() => {
   resetCharactersRuntimeForTests();
   resetCharacterMutationRateLimits();
   resetRateLimitClock();
+  setGameMetricsCounters(noopGameMetricsCounters);
   vi.restoreAllMocks();
 });
 
@@ -469,6 +475,41 @@ describe('create handler', () => {
       skin: 2,
       forceRename: false,
     });
+  });
+
+  it('increments the characters-created counter on the created path', async () => {
+    let created = 0;
+    const counters: GameMetricsCounters = {
+      ...noopGameMetricsCounters,
+      characterCreated: () => {
+        created++;
+      },
+    };
+    setGameMetricsCounters(counters);
+    setCharactersDbForTests({ createCharacterCapped: async () => charRow({ id: 11 }) });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(created).toBe(1);
+  });
+
+  it('does not increment the characters-created counter when creation is rejected', async () => {
+    let created = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      characterCreated: () => {
+        created++;
+      },
+    });
+    setCharactersDbForTests({ createCharacterCapped: async () => null });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(400);
+    expect(created).toBe(0);
   });
 
   it('400s an invalid name (normalizeCharName -> null)', async () => {

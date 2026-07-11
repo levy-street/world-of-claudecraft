@@ -59,4 +59,21 @@ describe('startChromeFade', () => {
     expect(target.classes.has(CHROME_FADE_IDLE_CLASS)).toBe(false);
     vi.useRealTimers();
   });
+
+  it('dispose() un-dims an already-dimmed target', () => {
+    const timers = fakeTimers();
+    const target = fakeTarget();
+    const handle = startChromeFade(target, timers, 500);
+    // Let the idle threshold elapse so the target is actually dimmed.
+    vi.advanceTimersByTime(500);
+    expect(target.classes.has(CHROME_FADE_IDLE_CLASS)).toBe(true);
+    // Disposing mid-fade must remove the idle class, not strand it (the leak
+    // across interface-mode switches this guards).
+    handle.dispose();
+    expect(target.classes.has(CHROME_FADE_IDLE_CLASS)).toBe(false);
+    // And it stays gone: no timer re-arms it.
+    vi.advanceTimersByTime(5000);
+    expect(target.classes.has(CHROME_FADE_IDLE_CLASS)).toBe(false);
+    vi.useRealTimers();
+  });
 });

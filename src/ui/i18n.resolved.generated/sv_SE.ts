@@ -154,6 +154,12 @@ export const sv_SE: EnTranslations = {
     "spectate": {
       "banner": "Åskådar {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
@@ -291,6 +297,7 @@ export const sv_SE: EnTranslations = {
       "targetLabel": "Ditt mål",
       "targetAnnounce": "Markera {name}",
       "partyLabel": "Ditt följe",
+      "partyChip": "Grupp",
       "partyGroup": "Grupp {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -305,7 +312,6 @@ export const sv_SE: EnTranslations = {
       "chat": "Hoppa till chatt"
     },
     "mobile": {
-      "autorun": "Autospring",
       "jump": "Hoppa",
       "leaderboard": "Ranking",
       "dailyRewards": "Belöningar",
@@ -320,7 +326,9 @@ export const sv_SE: EnTranslations = {
       "actionPageIndicator": "Sida {page}",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
-      "spellbookPageLabel": "Sida {page}"
+      "spellbookPageLabel": "Sida {page}",
+      "hideKeyboard": "Dölj tangentbordet",
+      "chatPlaceholder": "Säg något..."
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -394,7 +402,13 @@ export const sv_SE: EnTranslations = {
       "targetFriendly": "Måltavla närmaste vänlig",
       "targetFriendlyNext": "Växla vänligt mål",
       "discord": "Discord",
-      "valecup": "Dalcupen"
+      "valecup": "Dalcupen",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -719,6 +733,8 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1014,18 +1030,18 @@ export const sv_SE: EnTranslations = {
       },
       "allStatsPctReduce": "Minskar alla attribut med {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Ökar attackkraften med {pct}%",
+        "armor": "Ökar rustningen med {pct}%",
+        "int": "Ökar Intellekt med {pct}%",
+        "sta": "Ökar Uthållighet med {pct}%",
+        "allStats": "Ökar alla attribut med {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Minskar rustningen med {pct}%",
+      "armorPctStacks": "Minskar rustningen med {pct}% ({stacks} stackar)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1063,6 +1079,26 @@ export const sv_SE: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} reser sig över Törntoppshöjderna!"
+    },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Glömt lösenordet?",
+      "forgotTitle": "Återställ ditt lösenord",
+      "forgotHint": "Ange ditt användarnamn så skickar vi en återställningslänk till den registrerade e-postadressen.",
+      "forgotUsername": "Användarnamn",
+      "forgotSubmit": "Skicka återställningslänk",
+      "forgotSent": "Om ett konto med det användarnamnet har en registrerad e-postadress har vi skickat en återställningslänk. Kolla din inkorg.",
+      "forgotBack": "Tillbaka till inloggning",
+      "resetTitle": "Välj ett nytt lösenord",
+      "resetNewPassword": "Nytt lösenord",
+      "resetConfirm": "Bekräfta nytt lösenord",
+      "resetSubmit": "Uppdatera lösenord",
+      "resetDone": "Ditt lösenord har uppdaterats. Du kan nu logga in.",
+      "resetMismatch": "Lösenorden stämmer inte överens.",
+      "resetErrInvalid": "Den här återställningslänken är ogiltig eller har gått ut. Begär en ny."
     },
     "loot": {
       "chestTitle": "Kista"
@@ -1293,6 +1329,8 @@ export const sv_SE: EnTranslations = {
       "parcelsLabel": "Paket",
       "parcelsHint": "Klicka på ett föremål i dina väskor för att bifoga det.",
       "removeParcelAria": "Ta bort {item} från brevet",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Skicka brev",
       "postageNote": "Porto: {amount}. Korpen flyger i ungefär {seconds}s.",
       "arrivedBanner": "Korpen har landat: post från {name}.",
@@ -1431,6 +1469,7 @@ export const sv_SE: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Ingen",
+      "hobbyLabel": "Fritidssyssla",
       "armorcrafting": "Rustningssmed",
       "weaponcrafting": "Vapensmed",
       "jewelcrafting": "Juvelerare",
@@ -1453,7 +1492,10 @@ export const sv_SE: EnTranslations = {
       "craftedToast": "Tillverkad: {name}",
       "insufficientMaterials": "Du har inte materialet för det.",
       "unknownRecipe": "Det receptet finns inte.",
-      "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver."
+      "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
+      "notAtHub": "Du måste vara vid hantverksplatsen, på rätt nivå, för att tillverka det.",
+      "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.",
+      "recipeNotLearned": "Du har inte lärt dig det receptet än."
     }
   },
   "apiError": {
@@ -2226,8 +2268,8 @@ export const sv_SE: EnTranslations = {
       "waveGoldBody": "Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Skydda Yumi",
+      "yumiBody": "Skydda Yumi är ett lagbaserat målläge som spelas i en labyrint: varje sida vaktar sin egen kattföljeslagare samtidigt som den jagar den andra. Med jämna mellanrum blinkar båda katterna till nya hörn av labyrinten, så striden pendlar mellan att försvara, jaga och kappas om att hitta dem igen. Köa som tre mot tre eller fem mot fem; att falla i strid sätter dig bara på bänken en kort stund.",
       "powerupsTitle": "Kraftuppladdningar i ringen",
       "powerupsBody": "Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.",
       "ladderHeading": "Klättra på rankingstegen",
@@ -3658,42 +3700,42 @@ export const sv_SE: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 mot 3",
+    "bracket5": "Yumi 5 mot 5",
+    "enterQueue": "Gå med i Skydda Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Du går med i kön till Skydda Yumi. Vakta din följeslagare…",
+      "leave": "Du lämnar kön till Skydda Yumi.",
+      "teamLeave": "Ditt lag lämnar kön till Skydda Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Skydda Yumi 3 mot 3 tillåter ett sällskap på upp till tre.",
+      "partyTooBig5": "Skydda Yumi 5 mot 5 tillåter ett sällskap på upp till fem."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Skydda Yumi! Försvara din följeslagare och jaga deras."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "SKYDDA YUMI",
+      "getReady": "Gör dig redo…",
+      "teleportIn": "Yumierna flyttar om {s}",
+      "suddenDeath": "PLÖTSLIG DÖD",
+      "yourYumi": "Din Yumi",
+      "enemyYumi": "Fiendens Yumi",
+      "aria": "Din Yumi på {mine} av {max} hälsa, fiendens Yumi på {theirs}.",
+      "collapse": "Dölj Skydda Yumi-staplarna",
+      "expand": "Visa Skydda Yumi-staplarna"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "NEDSLAGEN!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLÖTSLIG DÖD! Yumierna håller ställningarna!",
+      "teleport": "Yumierna teleporterar!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "SEGER! Yumi är trygg!",
+      "loss": "NEDERLAG! Din Yumi har fallit."
     }
   },
   "fiesta": {
@@ -4142,6 +4184,7 @@ export const sv_SE: EnTranslations = {
       "mobileSocial": "Socialt",
       "mobileArena": "Arena",
       "mobileMenu": "Meny",
+      "mobileSettings": "Inställningar",
       "mobileUse": "Använd",
       "mobileMeters": "Mätare",
       "mobileMap": "Karta",
@@ -4690,6 +4733,7 @@ export const sv_SE: EnTranslations = {
       "offGlobalCooldown": "Utanför den globala nedkylningen",
       "friendlyTarget": "Vänligt mål",
       "enemyTarget": "Fiendemål",
+      "selfOnly": "Endast dig själv",
       "damageRange": "{min} till {max}",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
     },
@@ -4999,7 +5043,7 @@ export const sv_SE: EnTranslations = {
       "greedAria": "Girighet för {item}",
       "passAria": "Avstå från {item}",
       "everyonePassed": "Alla avstod från {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} har rullat"
     }
   },
   "entities": {
@@ -5122,7 +5166,7 @@ export const sv_SE: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsklipp",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot."
       },
       "taunt": {
         "name": "Egga",
@@ -5578,7 +5622,7 @@ export const sv_SE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Häxljus",
-        "description": "Sänker målets rustning med 35 i 30 sek."
+        "description": "Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp."
       },
       "hibernate": {
         "name": "Slummer",
@@ -5809,6 +5853,9 @@ export const sv_SE: EnTranslations = {
       "greyjaw_fang": {
         "name": "Gamle Gråkäftens huggtand"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Väderbiten liggarsida"
       },
@@ -5838,6 +5885,15 @@ export const sv_SE: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Linnetrasa"
+      },
+      "arcane_dust": {
+        "name": "Arkanstoft"
+      },
+      "arcane_essence": {
+        "name": "Arkanessens"
+      },
+      "arcane_shard": {
+        "name": "Arkanskärva"
       },
       "fen_muster_order": {
         "name": "Kärrbros mönstringsorder"
@@ -7045,7 +7101,7 @@ export const sv_SE: EnTranslations = {
         "name": "Diakon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Träningsdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -7480,6 +7536,16 @@ export const sv_SE: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Vargar vid dörren",
         "text": "Skogsvargarna blir djärva och nafsar efter resenärer på norra vägen. Decimera dem, {playerName}. Dräp 8 skogsvargar så andas Östbäck lättare.",

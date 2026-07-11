@@ -331,16 +331,10 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
     expect(z2.questAreas[0].radius).toBeCloseTo(z1.questAreas[0].radius * 2, 5);
   });
 
-  it('numbers areas by the quest log acceptance order and drops untracked quests', () => {
+  it('numbers areas by the quest log acceptance order', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim', activeLog()), 1));
     // single-quest log: every area carries badge number 1
     for (const a of model.questAreas) expect(a.numbers).toEqual([1]);
-    // untracking the quest removes its areas entirely
-    const untracked = buildOverworldMapModel({
-      ...input(makeOverworldWorld('sim', activeLog()), 1),
-      untrackedQuestIds: new Set([quest.id]),
-    });
-    expect(untracked.questAreas).toEqual([]);
   });
 
   it('hit-tests a hovered point to the objective identities under it (deduped)', () => {

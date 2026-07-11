@@ -16,6 +16,7 @@ import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
+import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
   cleanseFriendlyNpcAuras,
   isRejectedFriendlyNpcAura,
@@ -117,6 +118,7 @@ import {
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
+import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -147,6 +149,7 @@ import { formatMoney } from './format_money';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
+import type { JailState } from './jail';
 import {
   type DevLeaderboardPage,
   type GuildLeaderboardPage,
@@ -211,11 +214,23 @@ import {
   archetypeStateFor,
   archetypeTitleFor,
   emptyArchetypeState,
+  hobbyCraftFor,
   normalizeArchetypeState,
   requiredAmendsProgress,
   switchArchetype as switchArchetypeImpl,
 } from './professions/archetype';
-import { type CraftResult, craftItem as craftItemImpl } from './professions/crafting';
+import {
+  type AcquireRecipeResult,
+  acquireRecipe as acquireRecipeImpl,
+  type CraftResult,
+  craftItem as craftItemImpl,
+} from './professions/crafting';
+import {
+  type ApplyEnchantResult,
+  applyEnchant as applyEnchantImpl,
+  type DisenchantResult,
+  disenchantItem as disenchantItemImpl,
+} from './professions/enchanting';
 import * as professionsFocus from './professions/focus';
 import {
   drainGatheringGrants,
@@ -226,6 +241,7 @@ import {
   isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
+import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
   craftSkillsFor,
@@ -257,6 +273,7 @@ import {
   releasePlayerSpirit,
   resurrectAtCorpse,
   resurrectAtSpiritHealer,
+  revivePlayerAt,
   spawnOverworldSpiritHealers,
 } from './spirit';
 import {
@@ -282,6 +299,7 @@ import {
   awardHeroicMarks as awardHeroicMarksImpl,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  grantHeroicKillLockout as grantHeroicKillLockoutImpl,
   instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
   instanceOriginOf as instanceOriginOfImpl,
@@ -327,6 +345,7 @@ import {
 } from './social/fiesta';
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
+import * as readyCheckMod from './social/ready_check';
 import * as valeCupMod from './social/vale_cup';
 import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
@@ -352,6 +371,7 @@ import {
   armorReduction,
   type CrowdControlDrCategory,
   cloneInvSlot,
+  cloneItemInstancePayload,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DelveDef,
   type DelveModuleDef,
@@ -389,6 +409,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type ReadyCheck,
   type RiteIntensity,
   RUN_SPEED,
   type SetProc,
@@ -397,8 +418,8 @@ import {
   type SkinCatalog,
   type SkinRank,
   type SportRole,
-  steadyAngleTo,
   SUNDER_ARMOR_PCT_PER_STACK,
+  steadyAngleTo,
   swingMissChance,
   type VcBracket,
   type VcNationId,
@@ -705,6 +726,11 @@ export interface InstanceSlot {
   objectIds: number[];
   exitId: number | null;
   emptyFor: number;
+  // Players whose heroic daily lockout FIRST landed with THIS claim's final-boss
+  // kill (instances/dungeons lockToHeroicClaim). The heroic door's cleared-run
+  // exception admits only these: a player locked by an earlier run can never
+  // treat someone else's cleared claim as their own loot run.
+  clearedBy: Set<number>;
 }
 
 export interface ResolvedAbility {
@@ -796,6 +822,10 @@ export interface PlayerMeta {
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
+  // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
+  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts).
+  // Sparse: a slot with a plain (unenchanted) piece has no entry.
+  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -825,6 +855,18 @@ export interface PlayerMeta {
   // toast/log line off, without deciding the outcome itself. Null until the
   // player's first craft attempt.
   lastCraftResult: CraftResult | null;
+  // Outcome of this player's most recent salvageItem command (#1300), same
+  // session-only shape as lastCraftResult above. Null until the player's
+  // first salvage attempt. Not yet wired onto the IWorld/wire surface (same
+  // documented not-yet-wired status archetype identity carried before its
+  // wire-up): a future issue extends IWorldProfessions + ClientWorld +
+  // server/game.ts the way craft_item/harvest_node already are.
+  lastSalvageResult: SalvageResult | null;
+  // Outcome of this player's most recent disenchantItem/applyEnchant command
+  // (Enchanting profession), same session-only, not-yet-wired-onto-IWorld
+  // status as lastSalvageResult above.
+  lastDisenchantResult: DisenchantResult | null;
+  lastEnchantResult: ApplyEnchantResult | null;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -833,6 +875,11 @@ export interface PlayerMeta {
   // sim.time when this character entered the world; powers /played. Session-only
   // (sim.time resets to 0 each server boot), so it reports time this session.
   joinedAt: number;
+  // Seconds played across every session BEFORE this one (loaded from the save;
+  // powers /playtime). Combined with `this.time - joinedAt` for the running
+  // lifetime total; folded into a new persisted baseline by serializeCharacter
+  // on save, so it only ever advances while the character is actually in the world.
+  totalPlayedSeconds: number;
   // Tick of the player's last deliberate action (movement, ability cast, or pet
   // command). Session-only, never persisted. Powers the anti-AFK gate on
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
@@ -907,6 +954,16 @@ export interface PlayerMeta {
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
   craftSkills: Record<string, number>;
+  // Recipe acquisition (#1299): the set of recipe ids this player has learned
+  // via trainer/drop/quest. A recipe with no `acquisition` list is
+  // grandfathered (see professions/crafting.ts isRecipeKnown) and never needs
+  // to appear here. Persisted in CharacterState as a plain string array.
+  knownRecipes: Set<string>;
+  // Craft output throttle (#1301): a rolling window of successful crafts,
+  // any recipe. Session-only (like nodeHarvestReadyAt above), never
+  // persisted: a fresh login gets a fresh window rather than carrying a
+  // logout-time cooldown across sessions.
+  craftThrottle: { windowStart: number; count: number };
   // Active-archetype state and quest-gated switching (#1129, superseded scope: see
   // professions/archetype.ts). Never touches craftSkills. Persisted in CharacterState.
   archetype: ArchetypeState;
@@ -959,6 +1016,12 @@ export interface CharacterState {
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
+  // Lifetime played time in seconds (unfloored, for drift-free accumulation; only
+  // the display floors), accumulated across every prior session (this session's
+  // elapsed time is folded in at save; see PlayerMeta.totalPlayedSeconds and
+  // /playtime in social/chat.ts). Optional so pre-/playtime saves load cleanly
+  // (defaults to 0).
+  totalPlayedSeconds?: number;
   // Gathering profession proficiency (JSONB; optional so pre-professions saves
   // load cleanly, defaulting every profession to 0). `professions` is the legacy
   // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
@@ -976,6 +1039,10 @@ export interface CharacterState {
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
+  // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
+  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts).
+  // Optional so pre-Enchanting saves load cleanly (defaults to no enchants).
+  equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   inventory: InvSlot[];
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
@@ -1036,6 +1103,7 @@ export interface CharacterState {
   // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
   // none). Persisted so the penalty cannot be shed by logging out and back in.
   resSickness?: number | null;
+  jail?: JailState;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
@@ -1062,6 +1130,9 @@ export interface CharacterState {
   // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
   // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
   craftSkills?: Record<string, number>;
+  // Recipe acquisition (#1299; JSONB, additive back-compat: absent on older
+  // saves loads as an empty set, i.e. no learned non-grandfathered recipes).
+  knownRecipes?: string[];
   townFocus?: Record<string, number>;
   // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
   // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
@@ -1136,6 +1207,9 @@ export class Sim {
   // behind SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates
   // (partyOf + the eight command methods) so IWorld + foreign call sites resolve.
   private party!: PartyMachine;
+  // Active party/raid ready checks, keyed by party id (social/ready_check.ts). Swept
+  // in the end-of-tick block by updateReadyChecks. Exposed to the seam as ctx.readyChecks.
+  readyChecks = new Map<number, ReadyCheck>();
   // Player target selection + the party-scoped raid-marker store (T1): owns
   // partyMarkers and the tab/nearest/friendly selectors, moved off Sim behind
   // SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates (the nine
@@ -1332,11 +1406,21 @@ export class Sim {
         }
         const ang = this.rng.range(0, Math.PI * 2);
         const r = Math.sqrt(this.rng.next()) * camp.radius;
-        const safe = this.findSafePos(
+        // Keep camp mobs out of every dungeon door's clear ring so approaching or
+        // zoning out of a dungeon never lands the player in a pack's aggro radius.
+        // Pure geometry on the already-rolled point: it draws no rng, so the spawn
+        // loop's own draw order is untouched (mob positions do shift, which moves
+        // their later idle-wander draws, but that is downstream in the drive phase).
+        const cleared = projectOutsideDungeonDoors(
           camp.center.x + Math.sin(ang) * r,
           camp.center.z + Math.cos(ang) * r,
-          minHeight,
         );
+        // findSafePos's inward spiral can walk a shore-side ring-edge point back
+        // toward land, i.e. back INTO the ring; re-project the safe point so the
+        // "never inside a door ring" guarantee holds for every seed, not just the
+        // shipped one. Still pure and rng-free.
+        const grounded = this.findSafePos(cleared.x, cleared.z, minHeight);
+        const safe = projectOutsideDungeonDoors(grounded.x, grounded.z);
         const pos = this.groundPos(safe.x, safe.z);
         const level = this.rng.int(template.minLevel, template.maxLevel);
         const mob = createMob(this.nextId++, template, level, pos);
@@ -1385,6 +1469,7 @@ export class Sim {
             objectIds: [],
             exitId: null,
             emptyFor: 0,
+            clearedBy: new Set(),
           });
         }
         continue;
@@ -1411,6 +1496,7 @@ export class Sim {
           objectIds: [],
           exitId: null,
           emptyFor: 0,
+          clearedBy: new Set(),
         });
       }
     }
@@ -1657,6 +1743,7 @@ export class Sim {
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      equipmentInstance: {},
       xp: 0,
       lifetimeXp: 0,
       prestigeRank: 0,
@@ -1666,12 +1753,16 @@ export class Sim {
       pendingGatherGrants: [],
       nodeHarvestReadyAt: {},
       lastCraftResult: null,
+      lastSalvageResult: null,
+      lastDisenchantResult: null,
+      lastEnchantResult: null,
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
+      totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
       lastActiveTick: this.tickCount,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
@@ -1700,6 +1791,8 @@ export class Sim {
       away: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
+      knownRecipes: new Set(),
+      craftThrottle: { windowStart: 0, count: 0 },
       marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
       archetype: emptyArchetypeState(),
@@ -1745,6 +1838,12 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
+      meta.equipmentInstance = Object.fromEntries(
+        Object.entries(s.equipmentInstance ?? {}).map(([slot, inst]) => [
+          slot,
+          cloneItemInstancePayload(inst),
+        ]),
+      );
       meta.inventory = s.inventory.map(cloneInvSlot);
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
@@ -1805,6 +1904,7 @@ export class Sim {
         }
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
+      if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype);
       meta.mailWelcomed = s.mailWelcomed === true;
       meta.delveMarks = s.delveMarks ?? 0;
@@ -1837,7 +1937,7 @@ export class Sim {
     // resolver below consume it (they only ever read these flat numbers).
     meta.talentMods = computeTalentModifiers(cls, meta.talents);
     this.refreshKnownAbilities(meta, false);
-    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
       player.hp = Math.max(1, Math.min(player.maxHp, savedState.hp));
       player.resource =
@@ -2024,6 +2124,10 @@ export class Sim {
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
+      // Fold this session's elapsed time into the persisted baseline (see
+      // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
+      // same way without waiting for a save.
+      totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
       professions: { ...meta.gatheringProficiency },
       gatheringProficiency: { ...meta.gatheringProficiency },
       copper: meta.copper,
@@ -2047,6 +2151,12 @@ export class Sim {
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
+      equipmentInstance: Object.fromEntries(
+        Object.entries(meta.equipmentInstance).map(([slot, inst]) => [
+          slot,
+          cloneItemInstancePayload(inst),
+        ]),
+      ),
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
       bank: {
@@ -2104,6 +2214,7 @@ export class Sim {
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
       craftSkills: { ...meta.craftSkills },
+      knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
@@ -2632,6 +2743,9 @@ export class Sim {
       get partyInvites() {
         return sim.party.partyInvites;
       },
+      get readyChecks() {
+        return sim.readyChecks;
+      },
       get chatTokens() {
         return sim.chatTokens;
       },
@@ -2749,8 +2863,11 @@ export class Sim {
       // B1 bags capacity pre-check (stays on Sim next to the inventory hub).
       canAddItem: sim.canAddItem.bind(sim),
       removeFungibleItem: sim.removeFungibleItem.bind(sim),
+      countEnchantableItem: sim.countEnchantableItem.bind(sim),
+      removeEnchantableItem: sim.removeEnchantableItem.bind(sim),
       partyOf: sim.partyOf.bind(sim),
       partyInvite: (targetPid: number, pid?: number) => sim.party.partyInvite(targetPid, pid),
+      readyCheckStart: (pid?: number) => sim.readyCheckStart(pid),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
       // dropPartyMarkers flips to the T1 marker store (targeting); lazy arrow since
       // sim.targeting is built after ctx. The T1 selectors consume isHostileTo/
@@ -2780,6 +2897,9 @@ export class Sim {
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
+      // Kill-site heroic daily lockout (instances/dungeons): C1's death hub calls it
+      // for every mob death, credit or no credit; late-bound arrow, no Sim facade.
+      grantHeroicKillLockout: (mob) => grantHeroicKillLockoutImpl(sim.ctx, mob),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -3027,6 +3147,14 @@ export class Sim {
     if (r) r.e.gm = enabled;
   }
 
+  // Mark a player as moderation-jailed: prisoners are mutually hostile (the
+  // jail brawl arm in isHostileTo). Server-side only: set on jail/unjail and
+  // at join restore; the offline Sim never calls it.
+  setJailed(enabled: boolean, pid?: number): void {
+    const r = this.resolve(pid);
+    if (r) r.e.jailed = enabled;
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
@@ -3036,7 +3164,13 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, this.playerMods(r.meta));
+    recalcPlayerStats(
+      r.e,
+      r.meta.cls,
+      r.meta.equipment,
+      this.playerMods(r.meta),
+      r.meta.equipmentInstance,
+    );
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
@@ -3250,6 +3384,7 @@ export class Sim {
     this.updateArena();
     lap?.('arena');
     this.updateTradesAndInvites();
+    this.updateReadyChecks();
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
@@ -3728,7 +3863,7 @@ export class Sim {
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
     if (auraAffectsStats(removed)) {
-      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta));
+      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
     }
   }
 
@@ -3812,10 +3947,7 @@ export class Sim {
       aura.sourceId !== target.id
     )
       return;
-    const existing = target.auras.findIndex(
-      (a) => a.id === aura.id && a.sourceId === aura.sourceId,
-    );
-    if (existing >= 0) {
+    for (const existing of auraReplacementConflicts(target.auras, aura)) {
       this.applyNonPlayerStatAura(target, target.auras[existing], -1);
       target.auras.splice(existing, 1);
     }
@@ -3827,7 +3959,14 @@ export class Sim {
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, this.playerMods(meta));
+      if (meta)
+        recalcPlayerStats(
+          target,
+          meta.cls,
+          meta.equipment,
+          this.playerMods(meta),
+          meta.equipmentInstance,
+        );
     }
   }
 
@@ -4475,7 +4614,8 @@ export class Sim {
   // module never reaches into the Sim players map directly.
   private recalcPlayer(target: Entity): void {
     const meta = this.players.get(target.id);
-    if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods);
+    if (meta)
+      recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
   }
 
   private updateRangedPetAttack(
@@ -4687,12 +4827,13 @@ export class Sim {
       if (tmpl.yells?.enrage)
         emitMobYell(this.ctx, mob, tmpl.yells.enrage, tmpl.battleYells?.range);
       this.emit({ type: 'aura', targetId: mob.id, name: 'Enrage', gained: true });
-      this.emit({
-        type: 'log',
-        text: `${mob.name} becomes enraged!`,
-        color: '#ff6666',
-        entityId: mob.id,
-      });
+      if (!tmpl.quietMechanics)
+        this.emit({
+          type: 'log',
+          text: `${mob.name} becomes enraged!`,
+          color: '#ff6666',
+          entityId: mob.id,
+        });
       this.emit({
         type: 'spellfx',
         sourceId: mob.id,
@@ -4813,12 +4954,13 @@ export class Sim {
         if (allies.length > 0) {
           const school = tmpl.rally.school ?? 'physical';
           this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-          this.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${tmpl.rally.name}!`,
-            color: '#ffcc33',
-            entityId: mob.id,
-          });
+          if (!tmpl.quietMechanics)
+            this.emit({
+              type: 'log',
+              text: `${mob.name} unleashes ${tmpl.rally.name}!`,
+              color: '#ffcc33',
+              entityId: mob.id,
+            });
           for (const ally of allies) {
             this.applyAura(ally, {
               id: `rally_${mob.templateId}`,
@@ -5103,6 +5245,62 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
+  // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
+  // stack counts, and so does an instanced copy that carries NO rolled.stats
+  // (e.g. crafting.ts's single-copy rare+ grant, which instances every
+  // rare-or-better craft for its signer/rolled-quality payload but does not
+  // itself apply an enchant). Only a copy that already has rolled.stats (i.e.
+  // is already enchanted) is excluded, so disenchant/apply-enchant never
+  // consumes an already-enchanted copy but DOES accept crafted gear, unlike
+  // the fungible-only gate this replaces for enchanting.ts specifically.
+  countEnchantableItem(itemId: string, pid?: number): number {
+    const r = this.resolve(pid);
+    if (!r) return 0;
+    let n = 0;
+    for (const s of r.meta.inventory) {
+      if (s.itemId !== itemId) continue;
+      if (s.instance?.rolled?.stats) continue;
+      n += s.count;
+    }
+    return n;
+  }
+
+  // Removal counterpart to countEnchantableItem above: prefers plain fungible
+  // stacks (matching removeFungibleItem's ordering within that subset) and only
+  // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
+  // Never removes a copy that already carries rolled.stats. Returns the
+  // `instance` payload of every instanced slot actually consumed (matching
+  // removeItem's return contract) so a caller applying an enchant can merge a
+  // crafted copy's signer/rolled.quality into the freshly-enchanted instance
+  // instead of silently dropping them (#1712 round-3 review).
+  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
+    const consumedInstances: ItemInstancePayload[] = [];
+    const r = this.resolve(pid);
+    if (!r) return consumedInstances;
+    const { meta } = r;
+    // Pass 1: plain fungible stacks only, same order removeFungibleItem uses.
+    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || s.instance) continue;
+      const take = Math.min(s.count, count);
+      s.count -= take;
+      count -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
+    }
+    // Pass 2: instanced copies without rolled.stats.
+    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
+      const s = meta.inventory[i];
+      if (s.itemId !== itemId || !s.instance || s.instance.rolled?.stats) continue;
+      consumedInstances.push(s.instance);
+      const take = Math.min(s.count, count);
+      s.count -= take;
+      count -= take;
+      if (s.count <= 0) meta.inventory.splice(i, 1);
+    }
+    this.ctx.onInventoryChangedForQuests(meta);
+    return consumedInstances;
+  }
+
   // True when `count` copies of the item fit the player's pooled bag budget
   // (existing stacks top up first). The capacity gate every blocking command
   // path (buy, loot, pickup, fish, conjure, collect, trade, turn-in) pre-checks.
@@ -5311,6 +5509,60 @@ export class Sim {
   // recent craft-result, or null before their first craft attempt this session.
   get lastCraftResult(): CraftResult | null {
     return this.players.get(this.primaryId)?.lastCraftResult ?? null;
+  }
+
+  // Recipe acquisition command (#1299): a thin delegate onto
+  // src/sim/professions/crafting.ts acquireRecipe, resolved on the
+  // deterministic tick the command arrives on. Not yet wired onto the
+  // IWorld/wire surface (see the AcquireRecipeResult return: callers today
+  // are tests and future trainer/loot/quest-reward integrations), same
+  // documented not-yet-wired status the active-archetype identity carried
+  // before its own wire-up.
+  acquireRecipe(
+    recipeId: string,
+    source: 'trainer' | 'drop' | 'quest',
+    pid?: number,
+  ): AcquireRecipeResult {
+    return acquireRecipeImpl(this.ctx, pid ?? this.primaryId, recipeId, source);
+  }
+
+  // Salvage/disenchant command (#1300): a thin delegate onto
+  // src/sim/professions/salvage.ts, resolved on the deterministic tick the
+  // command arrives on, same shape as craftItem above. Stashes the outcome
+  // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
+  salvageItem(itemId: string, pid?: number): void {
+    const result = salvageItemImpl(this.ctx, itemId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (meta) meta.lastSalvageResult = result;
+  }
+
+  // The local viewer's most recent salvage-result, or null before their
+  // first salvage attempt this session. Same not-yet-wired-onto-IWorld
+  // status as the salvageItem command above.
+  get lastSalvageResult(): SalvageResult | null {
+    return this.players.get(this.primaryId)?.lastSalvageResult ?? null;
+  }
+
+  // Enchanting profession commands: same thin-delegate/stash-result/not-yet-
+  // wired-onto-IWorld shape as salvageItem/lastSalvageResult above.
+  disenchantItem(itemId: string, pid?: number): void {
+    const result = disenchantItemImpl(this.ctx, itemId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (meta) meta.lastDisenchantResult = result;
+  }
+
+  get lastDisenchantResult(): DisenchantResult | null {
+    return this.players.get(this.primaryId)?.lastDisenchantResult ?? null;
+  }
+
+  applyEnchant(itemId: string, enchantId: string, pid?: number): void {
+    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (meta) meta.lastEnchantResult = result;
+  }
+
+  get lastEnchantResult(): ApplyEnchantResult | null {
+    return this.players.get(this.primaryId)?.lastEnchantResult ?? null;
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
@@ -5540,6 +5792,10 @@ export class Sim {
     resurrectAtSpiritHealer(this.ctx, pid);
   }
 
+  revivePlayerAt(pid: number, pos: Vec3, hpFrac = 1): void {
+    revivePlayerAt(this.ctx, pid, pos, hpFrac);
+  }
+
   // chatAllowed / handleDevChat / whisperMessageForName / resolveWhisperTarget
   // moved to social/chat.ts (G2). The chat() router below dispatches to them via
   // chatMod.*(this.ctx, ...); they had no callers outside chat().
@@ -5605,6 +5861,18 @@ export class Sim {
       ) {
         return true;
       }
+      // The jail brawl: prisoners are hostile to each other, always (pets
+      // resolve to their owner via pvpController above, so a prisoner's pet
+      // fights too). A visiting moderator is never jailed, so no prisoner
+      // action can ever target them; GM invulnerability (dealDamage) is the
+      // backstop. isFriendlyTo mirrors this, so prisoners cannot cross-heal.
+      if (attackerPlayer.jailed && target.jailed) return true;
+      // One-way warden arm: a GM (the visiting moderator; enterJailVisit sets
+      // the flag) MAY strike prisoners. Deliberately asymmetric: the reverse
+      // direction stays non-hostile, and any reflected/proc damage still
+      // bounces off GM invulnerability. Audited punishment stays /kill; this
+      // is for roughing up the cellblock.
+      if (attackerPlayer.gm && target.jailed) return true;
       // The Vale Cup: opposing fighters are hostile only while play is live so
       // the harvest-truce Shoulder can land on them (targeting also opens during
       // the countdown via targeting.ts; damage between seated fighters is
@@ -5654,6 +5922,21 @@ export class Sim {
 
   partyInvite(targetPid: number, pid?: number): void {
     this.party.partyInvite(targetPid, pid);
+  }
+
+  // Ready check (social/ready_check.ts). readyCheckStart is leader-gated and reached
+  // by the chat "/ready" command through ctx; readyCheckRespond is the yes/no answer
+  // (IWorld surface + server dispatch), defaulting to the primary player.
+  readyCheckStart(pid?: number): void {
+    readyCheckMod.readyCheckStart(this.ctx, pid);
+  }
+
+  readyCheckRespond(ready: boolean, pid?: number): void {
+    readyCheckMod.readyCheckRespond(this.ctx, ready, pid);
+  }
+
+  updateReadyChecks(): void {
+    readyCheckMod.updateReadyChecks(this.ctx);
   }
 
   partyAccept(pid?: number): void {
@@ -5771,7 +6054,14 @@ export class Sim {
     }
     if (statsDirty && target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, this.playerMods(meta));
+      if (meta)
+        recalcPlayerStats(
+          target,
+          meta.cls,
+          meta.equipment,
+          this.playerMods(meta),
+          meta.equipmentInstance,
+        );
     }
   }
 
@@ -7049,6 +7339,18 @@ export class Sim {
 
   get archetypeTitle(): string | null {
     return this.archetypeTitleFor(this.primaryId);
+  }
+
+  /** The hobby craft granted by the CURRENTLY-ACTIVE archetype (#1294): the
+   *  opposite craft on CRAFT_RING, empowered up to rare. See
+   *  professions/archetype.ts getHobbyCraft for the "no hobby before an
+   *  archetype is chosen" rule. */
+  hobbyCraftFor(pid: number): string | null {
+    return hobbyCraftFor(this.ctx, pid);
+  }
+
+  get hobbyCraft(): string | null {
+    return this.hobbyCraftFor(this.primaryId);
   }
 
   /** Stub entry point for the zone-1 acceptance quest's completion (see

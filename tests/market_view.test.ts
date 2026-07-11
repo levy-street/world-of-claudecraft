@@ -195,9 +195,10 @@ describe('market_view: sell states', () => {
     expect(buildMarketSell('worn_sword', 0)).toEqual({ state: 'pick-empty' });
   });
 
-  it('refuses quest items and no-list items', () => {
+  it('refuses quest, no-list, and soulbound items', () => {
     expect(buildMarketSell('boar_hide', 1)).toEqual({ state: 'cannot-market' }); // quest item
     expect(buildMarketSell('alien_armor_plate', 1)).toEqual({ state: 'cannot-market' }); // noMarketList
+    expect(buildMarketSell('heroic_mark', 1)).toEqual({ state: 'cannot-market' }); // soulbound
   });
 
   it('builds the price form with a suggested ask split into coins', () => {

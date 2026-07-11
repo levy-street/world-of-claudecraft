@@ -8,6 +8,7 @@ import {
   levelDistribution,
   listAccounts,
   listCharacters,
+  listModerationActions,
   listSharedIps,
   onlineHistory,
   overviewCounts,
@@ -173,6 +174,7 @@ function cleanTier(value: unknown): WordTier | null {
 
 type SharedIpSort = 'accounts' | 'last_seen';
 type SharedIpSortDirection = 'asc' | 'desc';
+type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
 function sharedIpSortParams(params: URLSearchParams): {
   sort: SharedIpSort;
@@ -201,6 +203,11 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
         : b.lastSeenAt.localeCompare(a.lastSeenAt);
     return primary * multiplier || secondary || a.ip.localeCompare(b.ip);
   });
+}
+
+function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
+  const tab = params.get('tab');
+  return tab === 'mine' || tab === 'notes' ? tab : 'all';
 }
 
 function getBlockedIpsForAccount(
@@ -808,6 +815,13 @@ export async function handleAdminApi(
     if (path === '/admin/api/moderation/queue') {
       return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
     }
+    if (path === '/admin/api/moderation/history') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      return ok(
+        res,
+        await listModerationActions(moderationHistoryTab(url.searchParams), accountId, page, limit),
+      );
+    }
     if (path === '/admin/api/bug-reports') {
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await listBugReports(limit, (page - 1) * limit);
@@ -1009,6 +1023,7 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listModerationActions,
     listSharedIps,
     onlineHistory,
     overviewCounts,
@@ -1594,6 +1609,20 @@ async function moderationQueueHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows: await adminDb().moderationQueue(useAdminRuntime().liveAccountIds()) });
 }
 
+/** GET /admin/api/moderation/history: latest audit actions, optionally scoped to caller. */
+async function moderationHistoryHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  ok(
+    ctx.res,
+    await adminDb().listModerationActions(
+      moderationHistoryTab(ctx.url.searchParams),
+      ctxAccountId(ctx),
+      page,
+      limit,
+    ),
+  );
+}
+
 /** GET /admin/api/moderation/accounts/:id: full moderation detail for one account. */
 async function moderationAccountDetailHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
@@ -2066,6 +2095,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: moderationQueueHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/moderation/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: moderationHistoryHandler,
   },
   {
     method: 'GET',

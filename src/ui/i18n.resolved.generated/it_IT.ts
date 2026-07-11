@@ -154,6 +154,12 @@ export const it_IT: EnTranslations = {
     "spectate": {
       "banner": "Stai osservando {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
@@ -291,6 +297,7 @@ export const it_IT: EnTranslations = {
       "targetLabel": "Il tuo bersaglio",
       "targetAnnounce": "Bersaglio: {name}",
       "partyLabel": "Il tuo gruppo",
+      "partyChip": "Gruppo",
       "partyGroup": "Gruppo {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -305,7 +312,6 @@ export const it_IT: EnTranslations = {
       "chat": "Vai alla chat"
     },
     "mobile": {
-      "autorun": "Corsa automatica",
       "jump": "Salta",
       "leaderboard": "Classifica",
       "dailyRewards": "Ricompense",
@@ -320,7 +326,9 @@ export const it_IT: EnTranslations = {
       "actionPageIndicator": "Pag. {page}",
       "targetCycle": "Scambia bersaglio",
       "targetCycleShort": "Bersaglio",
-      "spellbookPageLabel": "Pagina {page}"
+      "spellbookPageLabel": "Pagina {page}",
+      "hideKeyboard": "Nascondi tastiera",
+      "chatPlaceholder": "Scrivi qualcosa..."
     },
     "tutorial": {
       "moveBodyTouch": "Usa il joystick di movimento per muoverti e trascina lo schermo per guardarti intorno. Fai qualche passo per iniziare.",
@@ -394,7 +402,13 @@ export const it_IT: EnTranslations = {
       "targetFriendly": "Bersaglia l'amico più vicino",
       "targetFriendlyNext": "Scorri i bersagli amici",
       "discord": "Discord",
-      "valecup": "Coppa della Valle"
+      "valecup": "Coppa della Valle",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -719,6 +733,8 @@ export const it_IT: EnTranslations = {
     "tips": {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il mondo."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1014,18 +1030,18 @@ export const it_IT: EnTranslations = {
       },
       "allStatsPctReduce": "Riduce tutti gli attributi del {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Aumenta la potenza di attacco del {pct}%",
+        "armor": "Aumenta l'armatura del {pct}%",
+        "int": "Aumenta l'intelletto del {pct}%",
+        "sta": "Aumenta la tempra del {pct}%",
+        "allStats": "Aumenta tutti gli attributi del {pct}%"
       },
       "dodge": "Aumenta la probabilità di schivata del {pct}%",
       "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
       "armorFlat": "Riduce l'armatura di {value}",
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Riduce l'armatura del {pct}%",
+      "armorPctStacks": "Riduce l'armatura del {pct}% ({stacks} accumuli)",
       "mortalWound": "Riduce le cure ricevute del {pct}%",
       "vulnerability": "Aumenta i danni subiti del {pct}%",
       "physVuln": "Aumenta i danni fisici subiti del {pct}%",
@@ -1063,6 +1079,26 @@ export const it_IT: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} si erge sulle Alture di Thornpeak!"
+    },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Password dimenticata?",
+      "forgotTitle": "Reimposta la password",
+      "forgotHint": "Inserisci il tuo nome utente e invieremo un link di reimpostazione all’indirizzo e-mail registrato.",
+      "forgotUsername": "Nome utente",
+      "forgotSubmit": "Invia link di reimpostazione",
+      "forgotSent": "Se un account con quel nome utente ha un indirizzo e-mail registrato, abbiamo inviato un link di reimpostazione. Controlla la tua casella di posta.",
+      "forgotBack": "Torna all’accesso",
+      "resetTitle": "Scegli una nuova password",
+      "resetNewPassword": "Nuova password",
+      "resetConfirm": "Conferma la nuova password",
+      "resetSubmit": "Aggiorna password",
+      "resetDone": "La tua password è stata aggiornata. Ora puoi accedere.",
+      "resetMismatch": "Le password non coincidono.",
+      "resetErrInvalid": "Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo."
     },
     "loot": {
       "chestTitle": "Scrigno"
@@ -1293,6 +1329,8 @@ export const it_IT: EnTranslations = {
       "parcelsLabel": "Pacchi",
       "parcelsHint": "Clicca un oggetto nelle tue borse per allegarlo.",
       "removeParcelAria": "Rimuovi {item} dalla lettera",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Invia lettera",
       "postageNote": "Affrancatura: {amount}. Il corvo vola per circa {seconds}s.",
       "arrivedBanner": "Il corvo è atterrato: posta da {name}.",
@@ -1431,6 +1469,7 @@ export const it_IT: EnTranslations = {
     "archetypeTitle": {
       "label": "Titolo",
       "none": "Nessuno",
+      "hobbyLabel": "Passatempo",
       "armorcrafting": "Armaiolo",
       "weaponcrafting": "Fabbro d'armi",
       "jewelcrafting": "Gioielliere",
@@ -1453,7 +1492,10 @@ export const it_IT: EnTranslations = {
       "craftedToast": "Realizzato: {name}",
       "insufficientMaterials": "Non hai i materiali per quello.",
       "unknownRecipe": "Quella ricetta non esiste.",
-      "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta."
+      "comboRequirementUnmet": "Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.",
+      "notAtHub": "Devi trovarti alla postazione artigiana, al livello richiesto, per fabbricarlo.",
+      "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova.",
+      "recipeNotLearned": "Non hai ancora imparato quella ricetta."
     }
   },
   "apiError": {
@@ -2226,8 +2268,8 @@ export const it_IT: EnTranslations = {
       "waveGoldBody": "L'ondata intermedia: combo a doppio taglio in cui la tua build inizia a prendere forma e a cantare.",
       "wavePrismaticTitle": "Prismatico",
       "wavePrismaticBody": "L'ondata finale: picchi che definiscono la build e fanno sciogliere lo schermo, pensati per sembrare assurdi nel migliore dei modi.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Proteggi Yumi",
+      "yumiBody": "Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.",
       "powerupsTitle": "Potenziamenti nell'arena",
       "powerupsBody": "Durante lo scontro nell'arena cadono anche sfere luminose, libere per chiunque le raggiunga per primo. Sono volutamente sopra le righe e durano solo un istante: Demone della Velocità per un lampo di ritmo accecante, Colosso per gonfiarti in un gigante ingombrante, Stivali Lunari per un balzo rimbalzante a bassa gravità, e Berserker per un'improvvisa ondata di furia.",
       "ladderHeading": "Scalare la classifica",
@@ -3658,42 +3700,42 @@ export const it_IT: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3c3",
+    "bracket5": "Yumi 5c5",
+    "enterQueue": "Unisciti a Proteggi Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Ti unisci alla coda di Proteggi Yumi. Proteggi il tuo famiglio…",
+      "leave": "Lasci la coda di Proteggi Yumi.",
+      "teamLeave": "La tua squadra lascia la coda di Proteggi Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Proteggi Yumi 3c3 ammette un gruppo di massimo tre giocatori.",
+      "partyTooBig5": "Proteggi Yumi 5c5 ammette un gruppo di massimo cinque giocatori."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Proteggi Yumi! Difendi il tuo famiglio e dai la caccia a quello nemico."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "PROTEGGI YUMI",
+      "getReady": "Preparati…",
+      "teleportIn": "Gli Yumi si spostano tra {s}",
+      "suddenDeath": "MORTE IMPROVVISA",
+      "yourYumi": "Il tuo Yumi",
+      "enemyYumi": "Yumi nemico",
+      "aria": "Il tuo Yumi a {mine} di {max} salute, Yumi nemico a {theirs}.",
+      "collapse": "Comprimi le barre di Proteggi Yumi",
+      "expand": "Espandi le barre di Proteggi Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "ABBATTUTO!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "MORTE IMPROVVISA! Gli Yumi tengono la posizione!",
+      "teleport": "Gli Yumi si teletrasportano!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "VITTORIA! Yumi è al sicuro!",
+      "loss": "SCONFITTA! Il tuo Yumi è caduto."
     }
   },
   "fiesta": {
@@ -4142,6 +4184,7 @@ export const it_IT: EnTranslations = {
       "mobileSocial": "Sociale",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Impostazioni",
       "mobileUse": "Usa",
       "mobileMeters": "Misuratori",
       "mobileMap": "Mappa",
@@ -4690,6 +4733,7 @@ export const it_IT: EnTranslations = {
       "offGlobalCooldown": "Fuori dal recupero globale",
       "friendlyTarget": "Bersaglio amico",
       "enemyTarget": "Bersaglio nemico",
+      "selfOnly": "Solo su di sé",
       "damageRange": "{min} a {max}",
       "finisherDamage": "{base} più {perCombo} per punto combo"
     },
@@ -4999,7 +5043,7 @@ export const it_IT: EnTranslations = {
       "greedAria": "Brama per {item}",
       "passAria": "Passa su {item}",
       "everyonePassed": "Tutti hanno passato su {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} hanno tirato"
     }
   },
   "entities": {
@@ -5122,7 +5166,7 @@ export const it_IT: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Trancia Armatura",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia."
       },
       "taunt": {
         "name": "Aizzare",
@@ -5578,7 +5622,7 @@ export const it_IT: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luce Stregata",
-        "description": "Riduce l'armatura del bersaglio di 35 per 30 sec."
+        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura."
       },
       "hibernate": {
         "name": "Sopore",
@@ -5809,6 +5853,9 @@ export const it_IT: EnTranslations = {
       "greyjaw_fang": {
         "name": "Zanna del vecchio Greyjaw"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Pagina di registro logora"
       },
@@ -5838,6 +5885,15 @@ export const it_IT: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Ritaglio di lino"
+      },
+      "arcane_dust": {
+        "name": "Arcane Dust"
+      },
+      "arcane_essence": {
+        "name": "Arcane Essence"
+      },
+      "arcane_shard": {
+        "name": "Arcane Shard"
       },
       "fen_muster_order": {
         "name": "Ordine di raduno di Fenbridge"
@@ -7045,7 +7101,7 @@ export const it_IT: EnTranslations = {
         "name": "Diacono Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Manichino d'allenamento"
       },
       "ridge_stalker": {
         "name": "Braccatore della cresta"
@@ -7480,6 +7536,16 @@ export const it_IT: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Lupi alla porta",
         "text": "I lupi della foresta assaltano la strada del nord, {playerName}. Uccidine 8 prima che un altro carro sparisca tra i pini.",

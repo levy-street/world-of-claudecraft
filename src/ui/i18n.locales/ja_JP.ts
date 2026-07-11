@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Appleで続ける',
+  'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
+  'hudChrome.auth.appleChoiceIntro':
+    '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',
+  'hudChrome.auth.appleChoiceExpired':
+    'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
   'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
@@ -32,6 +38,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '宛先',
   'itemUi.kind.bag': 'バッグ',
   'itemUi.tooltip.bagSlots': '{slots}スロットのバッグ',
+  'hudChrome.auth.forgotPrompt': 'パスワードをお忘れですか？',
+  'hudChrome.auth.forgotTitle': 'パスワードをリセット',
+  'hudChrome.auth.forgotHint':
+    'ユーザー名を入力してください。登録されているメールアドレスにリセットリンクをお送りします。',
+  'hudChrome.auth.forgotUsername': 'ユーザー名',
+  'hudChrome.auth.forgotSubmit': 'リセットリンクを送信',
+  'hudChrome.auth.forgotSent':
+    'そのユーザー名のアカウントにメールアドレスが登録されている場合、リセットリンクを送信しました。受信トレイをご確認ください。',
+  'hudChrome.auth.forgotBack': 'ログインに戻る',
+  'hudChrome.auth.resetTitle': '新しいパスワードを設定',
+  'hudChrome.auth.resetNewPassword': '新しいパスワード',
+  'hudChrome.auth.resetConfirm': '新しいパスワード（確認）',
+  'hudChrome.auth.resetSubmit': 'パスワードを更新',
+  'hudChrome.auth.resetDone': 'パスワードを更新しました。ログインできます。',
+  'hudChrome.auth.resetMismatch': 'パスワードが一致しません。',
+  'hudChrome.auth.resetErrInvalid':
+    'このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': '最終ログイン: {when}',
   'hudChrome.social.lastSeenNever': 'なし',
   'hudChrome.dailyRewards.title': 'デイリー報酬',
@@ -88,6 +112,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'WOCの価格を取得できないため、報酬は一時的にロックされています。',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
+  'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
+  'hudChrome.readyCheck.ready': '準備完了',
+  'hudChrome.readyCheck.notReady': '準備未完了',
+  'hudChrome.readyCheck.result':
+    '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
@@ -117,6 +146,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '時',
   'hudChrome.unitFrame.durationUnitDays': '日',
   'hudChrome.unitFrame.partyLabel': 'あなたのパーティ',
+  'hudChrome.unitFrame.partyChip': 'パーティ',
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
   'hudChrome.unitFrame.targetAnnounce': 'ターゲット：{name}',
   'hudChrome.unitFrame.targetLabel': 'あなたのターゲット',
@@ -1036,6 +1066,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'ソーシャル',
   'hud.core.mobileArena': 'アリーナ',
   'hud.core.mobileMenu': 'メニュー',
+  'hud.core.mobileSettings': '設定',
   'hud.core.mobileUse': '使用',
   'hud.core.mobileMeters': 'メーター',
   'hud.core.mobileMap': 'マップ',
@@ -1510,6 +1541,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'グローバルクールダウン外',
   'abilityUi.tooltip.friendlyTarget': '味方対象',
   'abilityUi.tooltip.enemyTarget': '敵対象',
+  'abilityUi.tooltip.selfOnly': '自分のみ',
   'abilityUi.tooltip.damageRange': '{min}から{max}',
   'abilityUi.tooltip.finisherDamage': '{base}にコンボポイントごと{perCombo}',
   'abilityUi.resources.mana': 'マナ',
@@ -1817,7 +1849,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
   'entities.abilities.sunder_armor.name': '装甲切断',
   'entities.abilities.sunder_armor.description':
-    '対象のアーマーを破壊し、1回ごとに 2% 低下させます。最大5回まで重なります（最大で10%）。大量の脅威を生成します。',
+    '対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。',
   'entities.abilities.taunt.name': '挑発',
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
@@ -2152,7 +2184,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '脳震盪',
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
-  'entities.abilities.faerie_fire.description': '対象のアーマーを30秒間35低下させます。',
+  'entities.abilities.faerie_fire.description':
+    '対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
@@ -2289,6 +2322,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': 'セイブルウェブの絹腺',
   'entities.items.supply_crate.name': '盗まれた補給箱',
   'entities.items.greyjaw_fang.name': '老グレイジョーの牙',
+  'entities.items.chunk_of_ore.name': '鉱石のかけら',
   'entities.items.weathered_ledger_page.name': '風化した帳簿のページ',
   'entities.items.morthen_grimoire.name': 'モーセンの魔導書',
   'entities.items.wolf_fang.name': '割れた狼の牙',
@@ -2303,6 +2337,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '脂ぎった獣脂の塊',
   'entities.items.spider_leg.name': 'ぴくつく蜘蛛の脚',
   'entities.items.bone_fragments.name': '骨の破片',
+  'entities.items.arcane_dust.name': '秘術の粉塵',
+  'entities.items.arcane_essence.name': '秘術の精髄',
+  'entities.items.arcane_shard.name': '秘術のかけら',
   'entities.items.linen_scrap.name': 'リネンの切れ端',
   'entities.items.fen_muster_order.name': 'フェンブリッジ召集令',
   'entities.items.mire_prowler_pelt.name': '沼の徘徊者の毛皮',
@@ -2664,6 +2701,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '潮見の番人',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
+  'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
+  'entities.quests.q_prof_intro.text':
+    'イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。',
+  'entities.quests.q_prof_intro.completion':
+    'どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。',
+  'entities.quests.q_prof_intro.objectives.0.label': '鉱石のかけら',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -3583,7 +3626,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.mobile.actionPageToggle': '行動ページ切替',
   'hudChrome.mobile.actionRing': '戦闘アクション',
-  'hudChrome.mobile.autorun': 'オートラン',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',
   'hudChrome.mobile.hotbarPage': 'スキル',
@@ -5244,6 +5286,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
   'entities.itemSets.wyrmshadow.bonus4':
     '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
+  'hudChrome.itemSoulbound': '魂縛',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -6068,6 +6111,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '小包',
   'hudChrome.mailbox.parcelsHint': 'バッグ内のアイテムをクリックして添付します。',
   'hudChrome.mailbox.removeParcelAria': '手紙から{item}を取り除く',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '{item}を1つ減らして送る',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '{item}を1つ増やして送る',
   'hudChrome.mailbox.sendButton': '手紙を送る',
   'hudChrome.mailbox.postageNote': '郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。',
   'hudChrome.mailbox.arrivedBanner': 'ワタリガラスが到着：{name}からの手紙。',
@@ -6155,6 +6200,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '薬草学',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
+  'hudChrome.archetypeTitle.hobbyLabel': '趣味',
   'hudChrome.archetypeTitle.armorcrafting': '防具鍛冶師',
   'hudChrome.archetypeTitle.weaponcrafting': '武器鍛冶師',
   'hudChrome.archetypeTitle.jewelcrafting': '宝石職人',
@@ -6195,9 +6241,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
+  'hudChrome.crafting.notAtHub': 'それを製作するには、必要なレベルで製作拠点にいる必要があります。',
+  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
+  'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.mobile.actionPageIndicator': '{page}ページ',
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
+  'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
+  'hudChrome.mobile.chatPlaceholder': '発言する...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
+  'hudChrome.keybinds.categoryPet': 'ペット',
+  'hudChrome.keybinds.petAttack': 'ペット：攻撃',
+  'hudChrome.keybinds.petStop': 'ペット：停止',
+  'hudChrome.keybinds.petTaunt': 'ペット：挑発',
+  'hudChrome.keybinds.petDefensive': 'ペット：防御',
+  'hudChrome.keybinds.petAggressive': 'ペット：攻撃的',
   'hudChrome.vcup.title': 'ヴェイルカップ',
   'hudChrome.vcup.close': 'ヴェイルカップウィンドウを閉じる',
   'hudChrome.vcup.offlineNote': '対戦簿は閉じられている。ヴェイルカップは現在利用できない。',
@@ -6441,4 +6499,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。',
   'hudChrome.bank.bonusSectionAria': 'ボーナス銀行スロットと獲得方法',
+  'entities.mobs.yumi_cat.name': 'ユミ',
 };

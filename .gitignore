@@ -31,7 +31,14 @@ pr-shots/
 pr.diff
 .devpid
 .codex-research/
-.codex/
+# Codex local state stays ignored; shared project configuration and agents are tracked.
+.codex/*
+!.codex/config.toml
+!.codex/hooks.json
+!.codex/agents/
+!.codex/agents/*.toml
+!.codex/hooks/
+!.codex/hooks/*.sh
 .playwright-mcp/
 # Vitest Browser Mode failure screenshots + attachments (opt-in test:browser suite)
 tests/browser/__screenshots__/

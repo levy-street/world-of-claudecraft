@@ -3207,6 +3207,83 @@
       width: 38px;
       height: 38px;
     }
+    #offline-select.cs-wow .class-details-panel {
+      bottom: 190px;
+    }
+    #offline-select.cs-wow .mini-class-row {
+      bottom: 82px;
+    }
+
+    @media (max-width: 1040px), (max-height: 520px) {
+      #offline-select.cs-wow .auth-title {
+        top: 12px;
+        font-size: 20px;
+      }
+      #offline-select.cs-wow .auth-label {
+        top: 48px;
+      }
+      #offline-select.cs-wow .char-input-group {
+        top: 70px;
+        width: 220px;
+        max-width: 220px;
+      }
+      #offline-select.cs-wow .skin-row {
+        left: 18px;
+        gap: 8px;
+      }
+      #offline-select.cs-wow .skin-swatch {
+        width: 50px;
+        height: 50px;
+      }
+      #offline-select.cs-wow .class-details-panel {
+        top: 108px;
+        right: 26px;
+        bottom: 154px;
+        width: min(310px, calc(100vw - 622px));
+        min-width: 280px;
+        padding: 12px;
+        font-size: 12px;
+      }
+      #offline-select.cs-wow .class-details-name {
+        font-size: 20px;
+      }
+      #offline-select.cs-wow .class-details-role,
+      #offline-select.cs-wow .details-stat-bar-row,
+      #offline-select.cs-wow .details-gear-row,
+      #offline-select.cs-wow .details-spell-item,
+      #offline-select.cs-wow .details-spell-text strong {
+        font-size: 12px;
+      }
+      #offline-select.cs-wow .class-details-lore {
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      #offline-select.cs-wow .mini-class-row {
+        bottom: 64px;
+        gap: 8px;
+      }
+      #offline-select.cs-wow .mini-class {
+        width: 70px;
+        gap: 4px;
+      }
+      #offline-select.cs-wow .mini-class .mini-class-portrait {
+        width: 48px;
+        height: 48px;
+      }
+      #offline-select.cs-wow .mini-class .mini-class-label {
+        font-size: 11px;
+      }
+      #offline-select.cs-wow #btn-start-offline {
+        right: 26px;
+        bottom: 22px;
+        min-width: 160px;
+      }
+      #offline-select.cs-wow #btn-offline-back {
+        left: 26px;
+        bottom: 22px;
+        min-width: 130px;
+      }
+    }
   }
 
   /* ---------- Skin picker (alternate body textures) ---------- */
@@ -3426,6 +3503,7 @@
     align-items: end;
   }
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-apple,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
@@ -3472,6 +3550,7 @@
     align-items: end;
   }
   body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-apple,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
@@ -4931,6 +5010,10 @@
     justify-content: center;
     text-align: center;
   }
+  body.mobile-touch #charcreate-panel .mini-class {
+    font-size: 10.5px;
+    line-height: 1.05;
+  }
 
   /* ===================================================================
      Character-select & create screens (v2), full-height roster, no heavy
@@ -5923,12 +6006,25 @@
       align-items: stretch;
     }
     body.mobile-touch #charselect-panel .cs-list-col,
-    body.mobile-touch #charselect-panel .cs-detail-col,
+    body.mobile-touch #charselect-panel .cs-detail-col {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      padding: 10px;
+    }
+    /* charcreate's columns hold a single tall flow (name input, 9-class grid,
+       appearance swatches, Back/Create actions) with no inner scroll container
+       of its own, unlike charselect (whose #char-list and #charselect-class-details
+       children scroll). Under the panel's min(560px, ...) height clamp that flow
+       exceeds the column height on short landscape phones and, with overflow:hidden,
+       clipped the Create button off with no way to reach it. Let the columns
+       themselves scroll (min-height:0 so the flex/grid child can shrink below its
+       content) so every field and the actions stay reachable. */
     body.mobile-touch #charcreate-panel .cs-create-col,
     body.mobile-touch #charcreate-panel .cs-detail-col {
       min-height: 0;
       height: 100%;
-      overflow: hidden;
+      overflow-y: auto;
       padding: 10px;
     }
     body.mobile-touch #charselect-panel .cs-list-col {
@@ -6141,7 +6237,15 @@
     }
     body.mobile-touch #charcreate-panel .mini-class {
       min-height: 38px;
-      padding: 6px 8px;
+      padding: 5px 4px;
+      gap: 5px;
+      font-size: 10px;
+      line-height: 1.05;
+    }
+    body.mobile-touch #charcreate-panel .mini-class-portrait {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
     }
     body.mobile-touch #charcreate-panel .cs-create-col .skin-row {
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -6204,7 +6308,18 @@
     body.mobile-touch #offline-select .charselect-col-right {
       min-height: 0;
       height: 100%;
-      overflow: hidden;
+      /* The left column's flow (name, 9-class grid, appearance swatches,
+         Enter World/Back) does not always fit the panel's height clamp on the
+         shortest landscape phones. .skin-row is the one child below with an
+         explicit min-height:0 (it needs to collapse to 0 when empty), so
+         under overflow:hidden the shrink algorithm pushed ALL the missing
+         space onto it instead of the roster/actions, collapsing its box to a
+         sliver while its overflow:visible portrait swatches kept their full
+         size and visually spilled onto the Enter World/Back row beneath
+         (unclickable and unreadable, blocking character creation entirely).
+         Scroll instead of clipping, matching the charcreate-panel columns
+         above: every row keeps its natural size and reachable actions. */
+      overflow-y: auto;
     }
     body.mobile-touch #offline-select .char-create {
       display: flex;
@@ -6212,6 +6327,9 @@
       height: 100%;
       min-height: 0;
       gap: 3px;
+    }
+    body.mobile-touch #offline-select .char-create > * {
+      flex-shrink: 0;
     }
     body.mobile-touch #offline-select .auth-label {
       font-size: 11px;

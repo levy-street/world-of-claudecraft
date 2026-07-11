@@ -22,6 +22,13 @@ import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
+import {
+  circleOf,
+  circleRectGap,
+  controlGap as controlGapLib,
+  edgeGap,
+  PROFILES,
+} from './lib/overlap_geometry.mjs';
 
 const URL = process.env.URL || 'http://localhost:5173/';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -46,16 +53,6 @@ const CONTROL_IDS = [
 const NEIGHBOR_IDS = ['minimap-wrap', 'side-buttons'];
 const TOUCH_FLOOR = 40;
 const MIN_GAP = 4; // px edge distance between any two interactive controls
-
-const PROFILES = [
-  { name: 'iphone-13-landscape', w: 844, h: 390, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'iphone-pro-max-landscape', w: 932, h: 430, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'pixel-7-landscape', w: 915, h: 412, dsf: 2.625, tier: 'hud-mobile-compact' },
-  { name: 'galaxy-s8-landscape', w: 740, h: 360, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'small-laptop-720p', w: 1280, h: 720, dsf: 1, tier: 'hud-mobile-standard' },
-  { name: 'tablet-4-3', w: 1024, h: 768, dsf: 2, tier: 'hud-mobile-tablet' },
-  { name: 'fhd-1080p', w: 1920, h: 1080, dsf: 1, tier: 'hud-mobile-tablet' },
-];
 
 const failures = [];
 const fail = (msg) => {
@@ -99,17 +96,12 @@ function collectRects(page) {
   );
 }
 
-// Edge distance between two rects: positive = separated, negative = overlap depth.
-function edgeGap(a, b) {
-  const dx = Math.max(a.left - b.right, b.left - a.right);
-  const dy = Math.max(a.top - b.bottom, b.top - a.bottom);
-  return Math.max(dx, dy);
-}
-
 // The ring controls are true circles (border-radius: 50% also clips pointer
 // hit-testing), so the mis-tap distance between two of them is centre distance
 // minus both radii, NOT bounding-box separation (adjacent arc boxes overlap at
-// the corners by design while the circles keep a >=10px gap).
+// the corners by design while the circles keep a >=10px gap). edgeGap/circleOf/
+// circleRectGap/controlGap now live in ./lib/overlap_geometry.mjs; controlGap
+// there takes the circle-id set as a parameter, so bind this module's set here.
 const CIRCLE_IDS = new Set([
   'mobile-action-attack',
   'mobile-target-cycle',
@@ -126,31 +118,8 @@ const CIRCLE_IDS = new Set([
   'slot-4',
 ]);
 
-function circleOf(r) {
-  return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r: Math.min(r.w, r.h) / 2 };
-}
-
-// Distance from a circle's edge to a rect's edge (negative = overlap depth).
-function circleRectGap(c, rect) {
-  const px = Math.min(Math.max(c.x, rect.left), rect.right);
-  const py = Math.min(Math.max(c.y, rect.top), rect.bottom);
-  const inside = px === c.x && py === c.y;
-  const d = Math.hypot(c.x - px, c.y - py);
-  return inside ? -c.r : d - c.r;
-}
-
-function controlGap(idA, a, idB, b) {
-  const aCircle = CIRCLE_IDS.has(idA);
-  const bCircle = CIRCLE_IDS.has(idB);
-  if (aCircle && bCircle) {
-    const ca = circleOf(a);
-    const cb = circleOf(b);
-    return Math.hypot(ca.x - cb.x, ca.y - cb.y) - ca.r - cb.r;
-  }
-  if (aCircle) return circleRectGap(circleOf(a), b);
-  if (bCircle) return circleRectGap(circleOf(b), a);
-  return edgeGap(a, b);
-}
+// Thin wrapper binding this module's CIRCLE_IDS to the shared lib controlGap.
+const controlGap = (idA, a, idB, b) => controlGapLib(idA, a, idB, b, CIRCLE_IDS);
 
 function checkGeometry(tag, g, { tier, minimapClear = true } = {}) {
   const entries = Object.entries(g.controls).filter(([, r]) => r);
