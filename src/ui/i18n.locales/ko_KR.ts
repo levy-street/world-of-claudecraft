@@ -6691,4 +6691,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.name': '공허의 만찬',
   'entities.abilities.voidfeast.description':
     '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 집어삼키고 최대 생명력의 6%를 회복합니다.',
+  'entities.abilities.spellsteal.name': '주문 도둑',
+  'entities.abilities.spellsteal.description': '적에게서 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
 };

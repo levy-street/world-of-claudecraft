@@ -6828,4 +6828,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.name': 'Пир Бездны',
   'entities.abilities.voidfeast.description':
     'Пожирает магический эффект (полезный у врага или вредный у союзника) и исцеляет вас на 6% максимального здоровья.',
+  'entities.abilities.spellsteal.name': 'Кража заклинаний',
+  'entities.abilities.spellsteal.description': 'Похищает у врага полезный магический эффект и переносит его на вас.',
 };

@@ -6356,4 +6356,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.name': '虛空盛宴',
   'entities.abilities.voidfeast.description':
     '吞噬一個魔法效果（敵人的增益或友方的減益），並治療自身相當於最大生命值6%的生命。',
+  'entities.abilities.spellsteal.name': '竊法',
+  'entities.abilities.spellsteal.description': '從敵人身上竊取一個有益的魔法效果，轉移到自己身上。',
 };

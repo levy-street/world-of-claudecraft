@@ -5997,6 +5997,10 @@ export const tr_TR: EnTranslations = {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
       "bear_charge": {
         "name": "Bruin Hücumu",
         "description": "Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu."

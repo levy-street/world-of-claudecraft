@@ -1376,9 +1376,10 @@ export type AbilityEffect =
   | { type: 'interrupt'; lockout: number }
   // Dispel: strip up to `count` MAGIC (non-physical) auras, direction chosen by the
   // target relation: harmful debuffs off a friendly target/self, or beneficial buffs off
-  // a hostile target. Used by Cleansing Verdict (paladin), Dispel Magic (priest), and
-  // Devour Magic (warlock).
-  | { type: 'dispel'; count: number }
+  // a hostile target. With `steal`, a beneficial buff stripped off an enemy is re-applied
+  // to the caster (Spellsteal). Used by Cleansing Verdict (paladin), Voidfeast (warlock),
+  // and Spellsteal (mage).
+  | { type: 'dispel'; count: number; steal?: boolean }
   // Channel-tick rider: each application extends the caster's named DoT on the
   // target by `seconds`, up to `maxBonus` total added per DoT application.
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }

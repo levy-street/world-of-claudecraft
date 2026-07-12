@@ -414,14 +414,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'counterplay',
-      decision: 'spell lockout vs Icebind-to-Rimelance vs Bewitch-to-Darts',
+      decision: 'spellsteal vs Icebind-to-Rimelance vs Bewitch-to-Darts',
       options: [
         {
-          id: 'mag_r8_counterspell',
-          name: 'Spellbreak',
-          description: 'Grants Spellbreak.',
-          icon: 'counterspell',
-          effect: { grant: { ability: 'counterspell' } },
+          id: 'mag_r8_spellsteal',
+          name: 'Spellsteal',
+          description: 'Grants Spellsteal: steal a beneficial magic buff from an enemy onto yourself.',
+          icon: 'spellsteal',
+          effect: { grant: { ability: 'spellsteal' } },
         },
         {
           id: 'mag_r8_ice_nova',

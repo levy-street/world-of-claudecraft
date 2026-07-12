@@ -5997,6 +5997,10 @@ export const vi_VN: EnTranslations = {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
       "bear_charge": {
         "name": "Cú Lao Bruin",
         "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form."

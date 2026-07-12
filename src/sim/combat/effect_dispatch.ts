@@ -694,6 +694,11 @@ export function runEffects(
           if (offensive ? harmful : !harmful) continue;
           target.auras.splice(i, 1);
           ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+          // Spellsteal: a beneficial buff taken off an enemy is re-applied to the caster,
+          // its remaining duration carried over (re-homed to the caster as the source).
+          if (eff.steal && offensive) {
+            ctx.applyAura(p, { ...a, sourceId: p.id });
+          }
           dispelled++;
         }
         // A stripped stat aura (a buff/debuff carrying stat mods) must re-derive stats.

@@ -6700,4 +6700,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.name': '虚無の饗宴',
   'entities.abilities.voidfeast.description':
     '魔法効果（敵の有益な効果、または味方の有害な効果）を1つ喰らい、最大HPの6%回復する。',
+  'entities.abilities.spellsteal.name': '呪文奪取',
+  'entities.abilities.spellsteal.description': '敵から有益な魔法効果を1つ奪い、自分に移す。',
 };

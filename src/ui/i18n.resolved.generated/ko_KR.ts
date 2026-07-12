@@ -5997,6 +5997,10 @@ export const ko_KR: EnTranslations = {
         "name": "공허의 만찬",
         "description": "마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 집어삼키고 최대 생명력의 6%를 회복합니다."
       },
+      "spellsteal": {
+        "name": "주문 도둑",
+        "description": "적에게서 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다."
+      },
       "bear_charge": {
         "name": "큰곰 돌진",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."

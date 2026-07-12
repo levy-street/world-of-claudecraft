@@ -118,12 +118,41 @@ describe('choice-row dispel spells', () => {
     expect(p.hp).toBeGreaterThan(hpBefore); // caster healed
   });
 
+  it("Spellsteal takes an enemy's magic buff and transfers it to the caster", () => {
+    const sim = new Sim({ seed: 3, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const p = sim.entities.get(sim.playerId) as Entity;
+    const enemy = createMob(
+      (sim as unknown as { nextId: number }).nextId++,
+      MOBS.ridge_stalker,
+      20,
+      {
+        x: p.pos.x,
+        y: p.pos.y,
+        z: p.pos.z + 2,
+      },
+    );
+    enemy.hostile = true;
+    enemy.auras.push(magicBuff(enemy.id));
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(enemy);
+
+    resolve(sim, enemy, 'spellsteal');
+
+    expect(enemy.auras.some((a) => a.id === 'test_blessing')).toBe(false); // stripped off enemy
+    const stolen = p.auras.find((a) => a.id === 'test_blessing');
+    expect(stolen).toBeTruthy(); // re-applied to the caster
+    expect(stolen?.sourceId).toBe(p.id); // now owned by the mage
+  });
+
   it('the paladin and warlock level-8 rows offer the dispel spell, not an interrupt', () => {
     const pal = CHOICE_ROWS.paladin.rows.find((r) => r.level === 8);
     const wlk = CHOICE_ROWS.warlock.rows.find((r) => r.level === 8);
+    const mag = CHOICE_ROWS.mage.rows.find((r) => r.level === 8);
     expect(pal?.options.some((o) => o.effect.grant?.ability === 'cleansing_verdict')).toBe(true);
     expect(pal?.options.some((o) => o.effect.grant?.ability === 'rebuke')).toBe(false);
     expect(wlk?.options.some((o) => o.effect.grant?.ability === 'voidfeast')).toBe(true);
     expect(wlk?.options.some((o) => o.effect.grant?.ability === 'spell_lock')).toBe(false);
+    expect(mag?.options.some((o) => o.effect.grant?.ability === 'spellsteal')).toBe(true);
+    expect(mag?.options.some((o) => o.effect.grant?.ability === 'counterspell')).toBe(false);
   });
 });

@@ -1596,6 +1596,11 @@ const classAbilityNamesEn = {
         'Voidfeast',
         'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health.',
       ],
+      [
+        'spellsteal',
+        'Spellsteal',
+        'Steals a beneficial magic effect from an enemy, transferring it to yourself.',
+      ],
     ]),
   },
 };

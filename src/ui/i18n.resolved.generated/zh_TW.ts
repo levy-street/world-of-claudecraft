@@ -5997,6 +5997,10 @@ export const zh_TW: EnTranslations = {
         "name": "虛空盛宴",
         "description": "吞噬一個魔法效果（敵人的增益或友方的減益），並治療自身相當於最大生命值6%的生命。"
       },
+      "spellsteal": {
+        "name": "竊法",
+        "description": "從敵人身上竊取一個有益的魔法效果，轉移到自己身上。"
+      },
       "bear_charge": {
         "name": "巨熊衝鋒",
         "description": "向敵人衝鋒，產生 9 點怒氣並將其昏迷 1 秒。射程 8-25 公尺。僅限巨熊形態。"

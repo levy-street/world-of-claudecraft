@@ -5997,6 +5997,10 @@ export const id_ID: EnTranslations = {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
       "bear_charge": {
         "name": "Terjangan Bruin",
         "description": "Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin."

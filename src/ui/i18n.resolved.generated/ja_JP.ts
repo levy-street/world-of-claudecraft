@@ -5997,6 +5997,10 @@ export const ja_JP: EnTranslations = {
         "name": "虚無の饗宴",
         "description": "魔法効果（敵の有益な効果、または味方の有害な効果）を1つ喰らい、最大HPの6%回復する。"
       },
+      "spellsteal": {
+        "name": "呪文奪取",
+        "description": "敵から有益な魔法効果を1つ奪い、自分に移す。"
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"

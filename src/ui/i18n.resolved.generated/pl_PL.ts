@@ -5997,6 +5997,10 @@ export const pl_PL: EnTranslations = {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
       "bear_charge": {
         "name": "Szarża Bruina",
         "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina."

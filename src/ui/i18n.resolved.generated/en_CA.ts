@@ -5997,6 +5997,10 @@ export const en_CA: EnTranslations = {
         "name": "Voidfeast",
         "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
       "bear_charge": {
         "name": "Bruin Rush",
         "description": "Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only."
