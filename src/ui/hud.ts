@@ -432,6 +432,8 @@ export interface OptionsHooks {
   // structurally), so the Controller options panel can read & rebind buttons
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
+  canCustomizeMobileHud?(): boolean;
+  openMobileHudEditor?(): void;
 }
 
 export interface ThemeHooks {
@@ -3884,6 +3886,8 @@ export class Hud {
       this.chatClock = clock;
       localStorage.setItem('chatClock', clock);
     },
+    canCustomizeMobileHud: () => this.optionsHooks?.canCustomizeMobileHud?.() ?? false,
+    openMobileHudEditor: () => this.optionsHooks?.openMobileHudEditor?.(),
   });
   // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
   // window.ts painter). It owns the page index + focus opener and the one
@@ -5386,6 +5390,11 @@ export class Hud {
   private shootRangeForSlot(slot: number): number {
     if (slot === 0) return this.sim.known[0]?.def.range ?? MELEE_RANGE;
     return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
+  }
+
+  /** Current local hold state for client-only HUD context selection. */
+  isValeCupShootCharging(): boolean {
+    return this.shootChargeSlot !== null;
   }
 
   // The held-charge fraction 0..1 (time held / SHOOT_CHARGE_MS).
@@ -10572,9 +10581,11 @@ export class Hud {
   showBanner(text: string): void {
     this.bannerEl.textContent = text;
     this.bannerEl.style.opacity = '1';
+    document.body.classList.add('mobile-center-message-visible');
     clearTimeout(this.bannerTimer);
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
+      document.body.classList.remove('mobile-center-message-visible');
     }, 2600);
   }
 

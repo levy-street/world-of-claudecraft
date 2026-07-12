@@ -54,7 +54,13 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
-import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
+import {
+  applyMobileHudLayout,
+  MobileHudCustomLayoutDomApplier,
+  MobileHudCustomLayoutState,
+  MobileHudFallbackWarningState,
+  readMobileHudViewportGeometry,
+} from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
@@ -138,6 +144,7 @@ import {
   RUN_SPEED,
   type WorldContent,
 } from './sim/types';
+import { isAtSowfield } from './sim/vale_cup_layout';
 import { zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
 import {
@@ -195,6 +202,20 @@ import {
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import {
+  isMobileHudSurfaceAvailable,
+  MOBILE_HUD_CONTEXTS,
+  type MobileHudRuntimeSnapshot,
+  resolveMobileHudContext,
+} from './ui/mobile_hud_context';
+import { MobileHudEditor } from './ui/mobile_hud_editor';
+import {
+  mirrorMobileHudPlacement,
+  resolveMobileHudSurfaceGeometry,
+} from './ui/mobile_hud_editor_core';
+import type { MobileHudContextId } from './ui/mobile_hud_editor_types';
+import { LocalMobileHudLayoutStorage, loadMobileHudLayout } from './ui/mobile_hud_layout_store';
+import { MOBILE_HUD_REGISTRY } from './ui/mobile_hud_registry';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
@@ -461,9 +482,12 @@ function syncBuildInfo(): void {
   el.title = t('meta.builtOn', { date: __APP_BUILD_DATE__ });
 }
 
+let syncMobileHudCustomLayout: (() => void) | null = null;
+
 function syncAppViewport(): void {
   syncAppViewportShared();
   applyMobileHudLayout();
+  syncMobileHudCustomLayout?.();
   applyMobileKeyboardViewport();
 }
 
@@ -522,6 +546,8 @@ window.addEventListener('orientationchange', () => {
   window.setTimeout(syncAppViewport, 800);
 });
 window.visualViewport?.addEventListener('resize', syncAppViewport);
+const syncMobileHudViewportOffset = (): void => syncMobileHudCustomLayout?.();
+window.visualViewport?.addEventListener('scroll', syncMobileHudViewportOffset);
 document.addEventListener('fullscreenchange', syncAppViewport);
 
 function requestMobileFullscreenLandscape(): void {
@@ -1222,7 +1248,10 @@ async function startGame(
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
       canUseGameKeys: () =>
-        !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
+        !mobileHudEditor.isOpen &&
+        !hud.isModalOpen() &&
+        !hud.promptModalOpen() &&
+        chatInput.style.display !== 'block',
     },
     keybinds,
   );
@@ -1230,7 +1259,10 @@ async function startGame(
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys:
-      !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
+      !mobileHudEditor.isOpen &&
+      !hud.isModalOpen() &&
+      !hud.promptModalOpen() &&
+      chatInput.style.display !== 'block',
     modalOpen: hud.isModalOpen(),
     chatOpen: chatInput.style.display === 'block',
     gameInputReady,
@@ -1296,7 +1328,10 @@ async function startGame(
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
   const canUseGameKeysNow = () =>
-    !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block';
+    !mobileHudEditor.isOpen &&
+    !hud.isModalOpen() &&
+    !hud.promptModalOpen() &&
+    chatInput.style.display !== 'block';
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
       if (hud.cancelGroundAim()) return;
@@ -1375,9 +1410,217 @@ async function startGame(
     isPointerMode: () => hud.isWindowOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
+    isInputBlocked: () => mobileHudEditor.isOpen,
   });
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
+
+  const mobileHudStorage = new LocalMobileHudLayoutStorage();
+  const loadedMobileHudLayout = await loadMobileHudLayout({
+    storage: mobileHudStorage,
+    registry: MOBILE_HUD_REGISTRY,
+    isSurfaceAvailable: (surfaceId) =>
+      isMobileHudSurfaceAvailable(surfaceId, world.cfg.playerClass),
+  });
+  const mobileHudLayoutState = new MobileHudCustomLayoutState(MOBILE_HUD_REGISTRY);
+  mobileHudLayoutState.setValidatedDocument(loadedMobileHudLayout.document);
+  const mobileHudLayoutApplier = new MobileHudCustomLayoutDomApplier(
+    document,
+    MOBILE_HUD_REGISTRY,
+    mobileHudLayoutState,
+  );
+  const mobileHudFallbackWarnings = new MobileHudFallbackWarningState();
+  let mobileHudMeasurement = readMobileHudViewportGeometry();
+  let mobileHudLayoutLastApply: ReturnType<MobileHudCustomLayoutDomApplier['apply']> = {
+    fallback: false,
+    failures: [],
+  };
+  const mobileHudEditorEligible = (): boolean =>
+    document.body.classList.contains('mobile-touch') && window.innerWidth > window.innerHeight;
+  const mobileHudProfileId = () =>
+    document.body.classList.contains('hud-mobile-tablet')
+      ? ('tablet' as const)
+      : ('phone' as const);
+  const mobileHudRuntimeSnapshotState: MobileHudRuntimeSnapshot = {
+    valeCupPlayerState: 'none',
+    valeCupShootCharging: false,
+    arenaMode: 'none',
+    arenaPlayerDown: false,
+    arenaFiestaOfferVisible: false,
+    arenaFiestaPending: false,
+    arenaYumiReturning: false,
+    valeCupSpectatorBetting: false,
+    delveActive: false,
+    valeCupIndicatorVisible: false,
+  };
+  const mobileHudRuntimeSnapshot = (): MobileHudRuntimeSnapshot => {
+    const arenaMatch = world.arenaInfo?.match ?? null;
+    const fiesta = arenaMatch?.fiesta ?? null;
+    const yumi = arenaMatch?.yumi ?? null;
+    const cup = world.cupInfo;
+    const cupMatch = cup?.match ?? null;
+    const atSowfield = isAtSowfield(world.player.pos.x, world.player.pos.z);
+    const arenaMode = !arenaMatch
+      ? 'none'
+      : arenaMatch.format === 'fiesta'
+        ? 'fiesta'
+        : arenaMatch.format === 'yumi3' || arenaMatch.format === 'yumi5'
+          ? 'yumi'
+          : 'standard';
+    const valeCupPlayerState = !cupMatch
+      ? 'none'
+      : cupMatch.phase === 'briefing'
+        ? 'briefing'
+        : 'match';
+    mobileHudRuntimeSnapshotState.valeCupPlayerState = valeCupPlayerState;
+    mobileHudRuntimeSnapshotState.valeCupShootCharging = hud.isValeCupShootCharging();
+    mobileHudRuntimeSnapshotState.arenaMode = arenaMode;
+    mobileHudRuntimeSnapshotState.arenaPlayerDown = fiesta?.down === true || yumi?.down === true;
+    mobileHudRuntimeSnapshotState.arenaFiestaOfferVisible =
+      fiesta?.offer !== null && fiesta?.offer !== undefined;
+    mobileHudRuntimeSnapshotState.arenaFiestaPending =
+      (fiesta?.augmentPending ?? 0) > 0 && fiesta?.offer == null && fiesta?.down !== true;
+    mobileHudRuntimeSnapshotState.arenaYumiReturning =
+      arenaMode === 'yumi' && arenaMatch?.state === 'over';
+    mobileHudRuntimeSnapshotState.valeCupSpectatorBetting =
+      cup?.spectate?.phase === 'briefing' || cup?.spectate?.phase === 'countdown';
+    mobileHudRuntimeSnapshotState.delveActive = world.delveRun !== null;
+    mobileHudRuntimeSnapshotState.valeCupIndicatorVisible =
+      cupMatch === null &&
+      ((cup?.queued === true && cup.bracket !== null) || (cup?.live !== null && atSowfield));
+    return mobileHudRuntimeSnapshotState;
+  };
+  const mobileHudContextId = () => resolveMobileHudContext(mobileHudRuntimeSnapshot());
+  const mobileHudSceneId = () =>
+    MOBILE_HUD_CONTEXTS.find((context) => context.id === mobileHudContextId())?.sceneId ?? 'world';
+  let lastAppliedMobileHudContextId: MobileHudContextId | null = null;
+  const refreshMobileHudMeasurement = (): void => {
+    mobileHudMeasurement = readMobileHudViewportGeometry();
+  };
+  const applyMobileHudCustomLayout = (): void => {
+    const contextId = mobileHudContextId();
+    lastAppliedMobileHudContextId = contextId;
+    mobileHudLayoutLastApply = mobileHudLayoutApplier.apply({
+      profileId: mobileHudProfileId(),
+      contextId,
+      handedness: settings.get('leftHandedTouch') ? 'left' : 'right',
+      measurement: mobileHudMeasurement,
+      eligible: mobileHudEditorEligible(),
+      isSurfaceAvailable: (surfaceId) =>
+        isMobileHudSurfaceAvailable(surfaceId, world.cfg.playerClass),
+    });
+    if (
+      mobileHudLayoutState.activeDocument().enabled &&
+      !mobileHudLayoutState.previewActive &&
+      mobileHudFallbackWarnings.shouldWarn(mobileHudLayoutLastApply)
+    ) {
+      const profile = t(
+        mobileHudProfileId() === 'tablet'
+          ? 'hudChrome.mobileHudEditor.profileTablet'
+          : 'hudChrome.mobileHudEditor.profilePhone',
+      );
+      hud.showError(t('hudChrome.mobileHudEditor.runtimeFallback', { profile }));
+    }
+  };
+  const syncMobileHudRuntimeContext = (): void => {
+    if (mobileHudContextId() !== lastAppliedMobileHudContextId) applyMobileHudCustomLayout();
+  };
+  const mobileHudLayoutAuditSnapshot = () => {
+    const profileId = mobileHudProfileId();
+    const contextId = mobileHudContextId();
+    const handedness = settings.get('leftHandedTouch') ? ('left' as const) : ('right' as const);
+    const activeDocument = mobileHudLayoutState.activeDocument();
+    const placements = mobileHudLayoutLastApply.fallback
+      ? (MOBILE_HUD_REGISTRY.defaults[profileId] ?? {})
+      : (activeDocument.profiles[profileId] ?? {});
+    const surfaces = MOBILE_HUD_REGISTRY.descriptors.flatMap((descriptor) => {
+      if (
+        descriptor.class !== 'movable' ||
+        !descriptor.binding ||
+        !descriptor.validateIn.includes(contextId)
+      ) {
+        return [];
+      }
+      const canonical = placements[descriptor.id];
+      if (!canonical) return [];
+      const placement =
+        handedness === 'left'
+          ? mirrorMobileHudPlacement(canonical, descriptor.mirrorPolicy)
+          : canonical;
+      const resolved = resolveMobileHudSurfaceGeometry(
+        descriptor,
+        profileId,
+        placement,
+        mobileHudMeasurement.geometry,
+        contextId,
+      );
+      return [
+        {
+          id: descriptor.id,
+          coordinateHost: descriptor.coordinateHost,
+          rootSelector: descriptor.binding.rootSelector,
+          canonicalRect: resolved.canonicalRect,
+        },
+      ];
+    });
+    return {
+      profileId,
+      contextId,
+      handedness,
+      measurement: mobileHudMeasurement,
+      enabled: activeDocument.enabled,
+      fallback: mobileHudLayoutLastApply.fallback,
+      surfaces,
+    };
+  };
+  const mobileHudEditorFocusManager = new FocusManager();
+  const mobileHudEditor = new MobileHudEditor({
+    document,
+    registry: MOBILE_HUD_REGISTRY,
+    canOpen: mobileHudEditorEligible,
+    getDocument: () => mobileHudLayoutState.activeDocument(),
+    getProfileId: mobileHudProfileId,
+    getSceneId: mobileHudSceneId,
+    getContextId: mobileHudContextId,
+    getGeometry: () => mobileHudMeasurement.geometry,
+    getHandedness: () => (settings.get('leftHandedTouch') ? 'left' : 'right'),
+    isSurfaceAvailable: (surfaceId) =>
+      isMobileHudSurfaceAvailable(surfaceId, world.cfg.playerClass),
+    beginPreview: (document) => {
+      mobileHudLayoutState.beginPreview(document);
+      applyMobileHudCustomLayout();
+    },
+    updatePreview: (document) => {
+      mobileHudLayoutState.updatePreview(document);
+      applyMobileHudCustomLayout();
+    },
+    endPreview: () => {
+      mobileHudLayoutState.endPreview();
+      applyMobileHudCustomLayout();
+    },
+    focusManager: mobileHudEditorFocusManager,
+    storage: mobileHudStorage,
+    commitValidatedDocument: (document) => {
+      mobileHudLayoutState.setValidatedDocument(document);
+      applyMobileHudCustomLayout();
+    },
+    confirmDiscard: (copy) => window.confirm(`${copy.title}\n\n${copy.body}`),
+    translate: (key, values) => t(key, values),
+    onOpenChange: (open) => {
+      input.setHudEditorActive(open);
+      mobileControls.setHudEditorActive(open);
+      if (open) {
+        input.setAutorun(false);
+        mobileControls.syncAutorun(false);
+      }
+    },
+  });
+  syncMobileHudCustomLayout = () => {
+    refreshMobileHudMeasurement();
+    applyMobileHudCustomLayout();
+    mobileHudEditor.refreshGeometry();
+  };
+  applyMobileHudCustomLayout();
 
   // Customizable performance overlay (master toggle: showFps, kept for back-compat
   // with the old FPS switch). The pure metrics + view core lives in
@@ -1455,6 +1698,7 @@ async function startGame(
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);
+      applyMobileHudCustomLayout();
       return;
     }
     if (key === 'mobileCameraJoystick') {
@@ -1666,6 +1910,8 @@ async function startGame(
         break;
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
+        refreshMobileHudMeasurement();
+        applyMobileHudCustomLayout();
         break;
       case 'playerFrameScale':
         document.documentElement.style.setProperty('--player-frame-scale', String(v));
@@ -1696,6 +1942,8 @@ async function startGame(
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
+    canCustomizeMobileHud: () => mobileHudEditorEligible(),
+    openMobileHudEditor: () => mobileHudEditor.open(),
     logout: () => {
       // Signal the server to leave immediately, skipping the linkdead grace, so
       // the character is not held in-world after a deliberate logout.
@@ -2349,7 +2597,9 @@ async function startGame(
     // freeze movement while the game menu is up so WASD doesn't walk the
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
-    input.setSuspendMovement(!gameInputReady || hud.isModalOpen() || intro !== null);
+    input.setSuspendMovement(
+      !gameInputReady || mobileHudEditor.isOpen || hud.isModalOpen() || intro !== null,
+    );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);
@@ -2458,6 +2708,7 @@ async function startGame(
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
       perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'offline' }));
+      syncMobileHudRuntimeContext();
       perf.tick(now);
       return;
     }
@@ -2612,6 +2863,7 @@ async function startGame(
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
     perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'online' }));
+    syncMobileHudRuntimeContext();
     perf.tick(now);
   }
   const controller = {
@@ -2761,6 +3013,14 @@ async function startGame(
           controller,
           perf,
           gamepad,
+          mobileHudEditor,
+          mobileHudLayoutDiagnostics: () => ({
+            profileFallbacks: loadedMobileHudLayout.profileFallbacks,
+            decodeFailure: loadedMobileHudLayout.decodeFailure ?? null,
+            previewActive: mobileHudLayoutState.previewActive,
+            lastApply: mobileHudLayoutLastApply,
+            audit: mobileHudLayoutAuditSnapshot(),
+          }),
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
@@ -8101,35 +8361,43 @@ function wireStartScreens(): void {
   });
 
   // Initialize 3D character preview once assets are ready
-  assetsReady().then(() => {
-    const activePanelId = ['#charselect-panel', '#offline-select'].find(
-      (id) => !$(id).hasAttribute('hidden'),
-    );
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
-    const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-    if (container && canvas) {
-      characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
-        characterPreview.setAppearance(charselectAppearance(charselectSelected));
-      } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+  assetsReady()
+    .then(() => {
+      // ALL THREE play panels are init candidates, #charcreate-panel included: on
+      // a slow connection (a phone with a cold cache) assets finish AFTER the
+      // player has already registered and landed on the create panel, and the old
+      // two-panel list resolved to the hidden charselect container, so the canvas
+      // never reached #charcreate-preview-container and the create preview
+      // rendered nothing. show()'s own updatePreviewContainer call cannot repair
+      // it either: it no-ops until this constructor has run.
+      const activePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
+        (id) => !$(id).hasAttribute('hidden'),
+      );
+      const container = $('#online-preview-container');
+      const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
+      if (container && canvas) {
+        characterPreview = new CharacterPreview(container, canvas);
+        if (activePanelId) {
+          // The full panel wiring: re-homes the canvas into the active panel's
+          // container, applies the roster appearance or the selected class chip
+          // (+ skins), and runs the deferred size sync.
+          updatePreviewContainer(activePanelId);
+        } else if (charselectSelected) {
+          // Token auto-login selected a roster character before assets finished
+          // but no play panel is up yet: seed its real appearance for the reveal.
+          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+        } else {
+          characterPreview.setClass('warrior');
+        }
       }
-    }
-    decorateClassChips();
-  });
+      decorateClassChips();
+    })
+    .catch((err) => {
+      // assetsReady rejects when ANY preload failed (a flaky connection on a
+      // phone's cold first load): degrade to a missing preview instead of an
+      // unhandled rejection. Dev-channel only; the panels stay fully usable.
+      console.warn('character preview init skipped: asset preload failed', err);
+    });
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,

@@ -2,6 +2,7 @@
 
 | Plan | Status | Product spec | Summary |
 |---|---|---|---|
+| [Mobile Custom HUD Layout Editor](2026-07-11-mobile-custom-hud-layout-editor.md) | Ready for TDD | [Mobile Custom HUD Layout Editor](../specs/2026-07-11-mobile-custom-hud-layout-editor.md) | Add a scene-aware landscape touch editor with two responsive profiles, mirrored handedness, complete collision validation, protected ghosts, and versioned local persistence. |
 | [Mobile Touch HUD Layout](2026-07-10-mobile-touch-hud-layout.md) | Complete and verified; PR #1724 and `release/v0.24.0` integrated | [Mobile Touch HUD Layout PRD](../prd/mobile-compact-landscape-hud.md) | Replace the radial touch action ring with a compact two-row pad, reserve camera space, and reflow the complete mobile HUD. |
 | [Mobile Spellbook Slot Picker and Dynamic Action Pages](2026-07-11-mobile-spellbook-slot-picker.md) | Ready for implementation | [Mobile Touch HUD Layout PRD](../prd/mobile-compact-landscape-hud.md) | Extend touch to two through four effective five-slot pages and add exact inline Spellbook assignment without changing desktop hotbar behavior. |
 | [Mobile Bag Item Actions](2026-07-11-mobile-bag-item-actions.md) | Complete and verified | [Mobile Bag Item Actions](../specs/2026-07-11-mobile-bag-item-actions.md) | Replace immediate mobile bag actions with item-specific menus and per-character Consumables assignments. |

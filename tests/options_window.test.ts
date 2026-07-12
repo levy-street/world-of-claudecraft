@@ -10,6 +10,31 @@ import { describe, expect, it } from 'vitest';
 const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
+describe('options_window: mobile HUD editor action', () => {
+  it('gates the shared action row and closes Options before opening the editor', () => {
+    expect(painter).toContain('canCustomizeMobileHud(): boolean;');
+    expect(painter).toContain('openMobileHudEditor(): void;');
+    expect(painter).toContain("case 'action':");
+    expect(painter).toContain(
+      '{ mobileHudEditor: useTouchInterface() && this.deps.canCustomizeMobileHud() },',
+    );
+    const action = painter.slice(
+      painter.indexOf('private mobileHudEditorActionRow'),
+      painter.indexOf('\n  private ', painter.indexOf('private mobileHudEditorActionRow') + 1),
+    );
+    expect(action.indexOf('this.close();')).toBeGreaterThanOrEqual(0);
+    expect(action.indexOf('this.deps.openMobileHudEditor();')).toBeGreaterThan(
+      action.indexOf('this.close();'),
+    );
+    expect(action).toContain("button.dataset.mobileHudAction = 'open-editor';");
+  });
+
+  it('routes the Hud hooks without creating a settings key', () => {
+    expect(hudTs).toContain('canCustomizeMobileHud: () =>');
+    expect(hudTs).toContain('openMobileHudEditor: () =>');
+  });
+});
+
 describe('options_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet)', () => {
     const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
@@ -86,7 +111,8 @@ describe('options_window: control-primitive dispatch wiring', () => {
       painter.indexOf('private renderInterface(): void'),
       painter.indexOf('// On/off toggle for chat timestamps.'),
     );
-    expect(renderInterface).toContain('buildInterfaceControls(this.settingsSource(hooks), {');
+    expect(renderInterface).toContain('buildInterfaceControls(');
+    expect(renderInterface).toContain('this.settingsSource(hooks),');
     expect(renderInterface).toContain('touch: useTouchInterface()');
     expect(renderInterface).toContain('nativeShell: isNativeAppShell()');
   });

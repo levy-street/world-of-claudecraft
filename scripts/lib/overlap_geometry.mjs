@@ -68,3 +68,58 @@ export function controlGap(idA, a, idB, b, circleIds) {
   if (bCircle) return circleRectGap(circleOf(b), a);
   return edgeGap(a, b);
 }
+
+export const MOBILE_HUD_GEOMETRY_EPSILON = 0.5;
+
+export function visualRectFromAuthorRect(rect, uiScale, visualOffset = { x: 0, y: 0 }) {
+  if (!Number.isFinite(uiScale) || uiScale <= 0) {
+    throw new Error('UI Scale must be a positive finite number');
+  }
+  return {
+    left: visualOffset.x + rect.left * uiScale,
+    top: visualOffset.y + rect.top * uiScale,
+    right: visualOffset.x + rect.right * uiScale,
+    bottom: visualOffset.y + rect.bottom * uiScale,
+    w: rect.w * uiScale,
+    h: rect.h * uiScale,
+  };
+}
+
+export function compareRects(actual, expected, epsilon = MOBILE_HUD_GEOMETRY_EPSILON) {
+  const deltas = Object.fromEntries(
+    ['left', 'top', 'right', 'bottom', 'w', 'h'].map((key) => [
+      key,
+      Math.abs(actual[key] - expected[key]),
+    ]),
+  );
+  return {
+    matches: Object.values(deltas).every((delta) => delta <= epsilon),
+    epsilon,
+    deltas,
+  };
+}
+
+export function firstOverlappingPair(entries, epsilon = MOBILE_HUD_GEOMETRY_EPSILON) {
+  for (let index = 0; index < entries.length; index += 1) {
+    for (let otherIndex = index + 1; otherIndex < entries.length; otherIndex += 1) {
+      const current = entries[index];
+      const other = entries[otherIndex];
+      const overlapWidth =
+        Math.min(current.rect.right, other.rect.right) -
+        Math.max(current.rect.left, other.rect.left);
+      const overlapHeight =
+        Math.min(current.rect.bottom, other.rect.bottom) -
+        Math.max(current.rect.top, other.rect.top);
+      if (overlapWidth > epsilon && overlapHeight > epsilon) {
+        return {
+          reason: 'overlap',
+          surfaceIds: [current.id, other.id],
+          contextId: current.contextId ?? other.contextId ?? null,
+          overlapWidth,
+          overlapHeight,
+        };
+      }
+    }
+  }
+  return null;
+}

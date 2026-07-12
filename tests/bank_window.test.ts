@@ -596,7 +596,7 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     const gateSites = mainSrc.match(/!hud\.promptModalOpen\(\)/g) ?? [];
     expect(gateSites.length).toBeGreaterThanOrEqual(3);
     expect(mainSrc).toMatch(
-      /canUseGameKeys: \(\) =>\s*!hud\.isModalOpen\(\) && !hud\.promptModalOpen\(\) && chatInput\.style\.display !== 'block'/,
+      /canUseGameKeys: \(\) =>\s*!mobileHudEditor\.isOpen &&\s*!hud\.isModalOpen\(\) &&\s*!hud\.promptModalOpen\(\) &&\s*chatInput\.style\.display !== 'block'/,
     );
   });
 

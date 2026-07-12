@@ -176,6 +176,12 @@ const UI_PURE_CORES = [
   'src/ui/bag_item_actions_view.ts',
   'src/ui/consumable_bar_preferences_core.ts',
   'src/ui/mobile_hud_layout.ts',
+  'src/ui/mobile_hud_editor_types.ts',
+  'src/ui/mobile_hud_context.ts',
+  'src/ui/mobile_hud_registry.ts',
+  'src/ui/mobile_hud_registry_builder.ts',
+  'src/ui/mobile_hud_registry_defaults.ts',
+  'src/ui/mobile_hud_editor_core.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
@@ -240,10 +246,36 @@ const BARE_NAMED = [
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/mobile_hud_layout.ts',
+  'src/ui/mobile_hud_editor_types.ts',
+  'src/ui/mobile_hud_context.ts',
+  'src/ui/mobile_hud_registry.ts',
+  'src/ui/mobile_hud_registry_builder.ts',
+  'src/ui/mobile_hud_registry_defaults.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
 ].map((rel) => join(repoRoot, rel));
+
+const MOBILE_HUD_EDITOR_PURE_MODULES = [
+  'src/ui/mobile_hud_editor_types.ts',
+  'src/ui/mobile_hud_context.ts',
+  'src/ui/mobile_hud_registry.ts',
+  'src/ui/mobile_hud_registry_builder.ts',
+  'src/ui/mobile_hud_registry_defaults.ts',
+  'src/ui/mobile_hud_editor_core.ts',
+].map((rel) => join(repoRoot, rel));
+
+const MOBILE_HUD_EDITOR_PURE_MAX_LINES = 1000;
+
+function forbiddenMobileHudEditorImport(spec: string): string | null {
+  const generic = forbiddenUiCoreImport(spec);
+  if (generic) return generic;
+  const layer = spec.match(/(?:^|\/)(sim|server)(?:\/|$)/);
+  if (layer) return layer[1];
+  if (/(?:^|\/)world_api(?:\/|$)/.test(spec)) return 'IWorld';
+  if (/(?:^|\/)[a-z0-9_]*wire[a-z0-9_]*(?:\/|$)/.test(spec)) return 'wire';
+  return null;
+}
 
 function importSpecs(src: string): string[] {
   const specs: string[] = [];
@@ -520,6 +552,50 @@ describe('src/ui pure-core invariants', () => {
     expect(forbiddenUiCoreImport('../sim/data')).toBeNull();
     expect(forbiddenUiCoreImport('./market_filters')).toBeNull();
     expect(forbiddenUiCoreImport('./entity_i18n')).toBeNull();
+  });
+});
+
+describe('mobile HUD editor pure-module boundary', () => {
+  it('registers the complete version-one decision layer', () => {
+    expect(MOBILE_HUD_EDITOR_PURE_MODULES.map((file) => relative(repoRoot, file))).toEqual([
+      'src/ui/mobile_hud_editor_types.ts',
+      'src/ui/mobile_hud_context.ts',
+      'src/ui/mobile_hud_registry.ts',
+      'src/ui/mobile_hud_registry_builder.ts',
+      'src/ui/mobile_hud_registry_defaults.ts',
+      'src/ui/mobile_hud_editor_core.ts',
+    ]);
+    expect(MOBILE_HUD_EDITOR_PURE_MODULES.every((file) => existsSync(file))).toBe(true);
+  });
+
+  it('imports no IWorld, sim, server, wire, or host-owned client layer', () => {
+    const violations = scanImports(MOBILE_HUD_EDITOR_PURE_MODULES, forbiddenMobileHudEditorImport);
+    expect(
+      violations,
+      `mobile HUD editor decision modules must stay client-only and host-agnostic:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('keeps each pure module below the extraction threshold', () => {
+    const oversized = MOBILE_HUD_EDITOR_PURE_MODULES.flatMap((file) => {
+      const lines = readFileSync(file, 'utf8').split('\n').length;
+      return lines > MOBILE_HUD_EDITOR_PURE_MAX_LINES
+        ? [`${relative(repoRoot, file)} (${lines} lines)`]
+        : [];
+    });
+    expect(
+      oversized,
+      `mobile HUD editor pure modules must stay at or below ${MOBILE_HUD_EDITOR_PURE_MAX_LINES} lines; extract a focused sibling core:\n${oversized.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('keeps the stricter import matcher effective', () => {
+    expect(forbiddenMobileHudEditorImport('../world_api')).toBe('IWorld');
+    expect(forbiddenMobileHudEditorImport('../sim/types')).toBe('sim');
+    expect(forbiddenMobileHudEditorImport('../server/realm')).toBe('server');
+    expect(forbiddenMobileHudEditorImport('../net/wire_protocol')).toBe('net');
+    expect(forbiddenMobileHudEditorImport('./hud_wire_state')).toBe('wire');
+    expect(forbiddenMobileHudEditorImport('./mobile_hud_context')).toBeNull();
   });
 });
 

@@ -115,8 +115,14 @@
   body.mobile-touch.game-active #ui {
     z-index: 80;
   }
+  body.mobile-touch.game-active.mobile-center-message-visible #ui {
+    z-index: 1000;
+  }
   body.mobile-touch.mobile-more-open #mobile-controls {
     z-index: 140;
+  }
+  body.mobile-touch.mobile-consumables-open:not(.mobile-window-open) #mobile-controls {
+    z-index: 84;
   }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,
@@ -854,6 +860,9 @@
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
     display: grid;
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables {
+    z-index: 100;
   }
   body.mobile-touch .mobile-consumable-slot {
     position: relative;
@@ -3961,7 +3970,9 @@
   body.mobile-touch.hud-mobile-compact #minimap-wrap {
     /* Keep compact phones slightly tighter than the landscape baseline while
        still making the minimap materially larger than the old 0.44 scale. */
-    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+    transform: scale(
+      var(--mobile-minimap-layout-scale, calc(0.57 * var(--mobile-chrome-scale, 1)))
+    );
   }
   /* A short landscape phone (the compact tier's primary trigger) has too little
      vertical room for a full chat log AND the action pad at once; drop the log
@@ -4112,7 +4123,9 @@
     left: max(6px, env(safe-area-inset-left));
     right: auto;
     top: max(6px, env(safe-area-inset-top));
-    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+    transform: scale(
+      var(--mobile-minimap-layout-scale, calc(0.57 * var(--mobile-chrome-scale, 1)))
+    );
     transform-origin: left top;
   }
   body.mobile-touch #target-frame,
@@ -4565,4 +4578,829 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
+
+  /* ---------- mobile custom HUD layout ---------- */
+  body.mobile-touch.mobile-hud-custom-active {
+    --mobile-hud-view-joystick-offset-x: 62px;
+    --mobile-hud-view-joystick-offset-y: 2px;
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-hud-custom-active {
+    --mobile-hud-view-joystick-offset-x: 69px;
+    --mobile-hud-view-joystick-offset-y: 9px;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="0"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a1-x);
+    top: var(--mobile-hud-action-a1-y);
+    width: var(--mobile-hud-action-a1-width);
+    height: var(--mobile-hud-action-a1-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a1-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="1"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a2-x);
+    top: var(--mobile-hud-action-a2-y);
+    width: var(--mobile-hud-action-a2-width);
+    height: var(--mobile-hud-action-a2-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a2-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="2"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a3-x);
+    top: var(--mobile-hud-action-a3-y);
+    width: var(--mobile-hud-action-a3-width);
+    height: var(--mobile-hud-action-a3-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a3-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="3"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a4-x);
+    top: var(--mobile-hud-action-a4-y);
+    width: var(--mobile-hud-action-a4-width);
+    height: var(--mobile-hud-action-a4-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a4-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="4"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a5-x);
+    top: var(--mobile-hud-action-a5-y);
+    width: var(--mobile-hud-action-a5-width);
+    height: var(--mobile-hud-action-a5-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a5-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-attack {
+    position: fixed;
+    left: var(--mobile-hud-action-attack-x);
+    top: var(--mobile-hud-action-attack-y);
+    width: var(--mobile-hud-action-attack-width);
+    height: var(--mobile-hud-action-attack-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-attack-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-target-cycle {
+    position: fixed;
+    left: var(--mobile-hud-action-target-x);
+    top: var(--mobile-hud-action-target-y);
+    width: var(--mobile-hud-action-target-width);
+    height: var(--mobile-hud-action-target-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-target-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-jump {
+    position: fixed;
+    left: var(--mobile-hud-action-jump_use-x);
+    top: var(--mobile-hud-action-jump_use-y);
+    width: var(--mobile-hud-action-jump_use-width);
+    height: var(--mobile-hud-action-jump_use-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-jump_use-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-page-toggle {
+    position: fixed;
+    left: var(--mobile-hud-action-page-x);
+    top: var(--mobile-hud-action-page-y);
+    width: var(--mobile-hud-action-page-width);
+    height: var(--mobile-hud-action-page-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-page-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls {
+    left: var(--mobile-hud-menu-top-x);
+    right: auto;
+    top: var(--mobile-hud-menu-top-y);
+    bottom: auto;
+    width: var(--mobile-hud-menu-top-width);
+    height: var(--mobile-hud-menu-top-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-menu-top-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-wrap {
+    --mobile-minimap-layout-scale: 1;
+    left: var(--mobile-hud-minimap-cluster-x);
+    top: var(--mobile-hud-minimap-cluster-y);
+    width: var(--mobile-hud-minimap-cluster-width);
+    height: var(--mobile-hud-minimap-cluster-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-minimap-cluster-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-disc,
+  body.mobile-touch.mobile-hud-custom-active #minimap {
+    width: 98px;
+    height: 98px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #zone-label {
+    position: absolute;
+    bottom: 100%;
+    width: 100%;
+    margin-bottom: 3px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #player-frame {
+    left: var(--mobile-hud-frame-player-x);
+    right: auto;
+    top: var(--mobile-hud-frame-player-y);
+    bottom: auto;
+    width: var(--mobile-hud-frame-player-width);
+    height: var(--mobile-hud-frame-player-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-player-scale);
+    transform-origin: left top;
+  }
+  /* Custom HUD scaling owns the complete Player/Target geometry. The desktop
+     frame-size sliders zoom their children, which would otherwise compound with
+     the custom root scale and make validation smaller than the painted frame. */
+  body.mobile-touch.mobile-hud-custom-active #player-frame > :not(.tf-move-btn),
+  body.mobile-touch.mobile-hud-custom-active #target-frame > :not(.tf-move-btn) {
+    zoom: 1;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar,
+  body.mobile-touch.mobile-hud-custom-active #swingbar {
+    left: var(--mobile-hud-frame-player-x);
+    right: auto;
+    bottom: auto;
+    width: var(--mobile-hud-frame-player-width);
+    min-width: 0;
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-player-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar {
+    top: calc(var(--mobile-hud-frame-player-y) - 8px);
+  }
+  body.mobile-touch.mobile-hud-custom-active #swingbar {
+    top: calc(var(--mobile-hud-frame-player-y) - 16px);
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame {
+    left: var(--mobile-hud-frame-target-x);
+    right: auto;
+    top: var(--mobile-hud-frame-target-y);
+    bottom: auto;
+    width: var(--mobile-hud-frame-target-width);
+    height: var(--mobile-hud-frame-target-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-target-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    left: var(--mobile-hud-auras-player_buffs-x);
+    right: auto;
+    top: var(--mobile-hud-auras-player_buffs-y);
+    bottom: auto;
+    width: var(--mobile-hud-auras-player_buffs-width);
+    height: var(--mobile-hud-auras-player_buffs-height);
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-auras-player_buffs-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar {
+    left: var(--mobile-hud-auras-player_debuffs-x);
+    right: auto;
+    top: var(--mobile-hud-auras-player_debuffs-y);
+    bottom: auto;
+    width: var(--mobile-hud-auras-player_debuffs-width);
+    height: var(--mobile-hud-auras-player_debuffs-height);
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-auras-player_debuffs-scale);
+    transform-origin: left top;
+    flex-direction: var(--mobile-hud-auras-player_debuffs-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    flex-direction: var(--mobile-hud-auras-player_buffs-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-move-zone {
+    left: var(--mobile-hud-control-movement-x);
+    right: auto;
+    top: var(--mobile-hud-control-movement-y);
+    bottom: auto;
+    width: var(--mobile-hud-control-movement-width);
+    min-width: 112px;
+    max-width: none;
+    height: var(--mobile-hud-control-movement-height);
+    min-height: 112px;
+    max-height: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-control-movement-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-move-joystick:not(.floating) {
+    --mobile-joystick-layout-scale: 1;
+    left: calc(var(--mobile-hud-control-movement-x) + 8px);
+    right: auto;
+    top: calc(
+      var(--mobile-hud-control-movement-y) +
+      var(--mobile-hud-control-movement-height) -
+      118px
+    );
+    bottom: auto;
+    transform: none;
+    scale: var(--mobile-hud-control-movement-scale);
+    transform-origin: center;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-camera-joystick {
+    --mobile-joystick-layout-scale: 1;
+    left: calc(var(--mobile-hud-control-view-x) + var(--mobile-hud-view-joystick-offset-x));
+    right: auto;
+    top: calc(var(--mobile-hud-control-view-y) + var(--mobile-hud-view-joystick-offset-y));
+    bottom: auto;
+    width: var(--mobile-camera-joystick-size);
+    min-width: 82px;
+    max-width: var(--mobile-hud-control-view-width);
+    height: var(--mobile-camera-joystick-size);
+    min-height: 82px;
+    max-height: var(--mobile-hud-control-view-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-control-view-scale);
+    transform-origin: center;
+  }
+  body.mobile-touch.mobile-hud-custom-active:not(.mobile-camera-joystick-on)
+    #mobile-camera-joystick {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables {
+    left: var(--mobile-hud-utility-consumables-x);
+    right: auto;
+    top: var(--mobile-hud-utility-consumables-y);
+    bottom: auto;
+    width: var(--mobile-hud-utility-consumables-width);
+    height: var(--mobile-hud-utility-consumables-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-utility-consumables-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables-toggle {
+    position: absolute;
+    left: var(--mobile-hud-utility-consumables-toggle-left);
+    right: var(--mobile-hud-utility-consumables-toggle-right);
+    top: var(--mobile-hud-utility-consumables-toggle-top);
+    bottom: var(--mobile-hud-utility-consumables-toggle-bottom);
+    min-width: 48px;
+    min-height: 48px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables-row {
+    left: var(--mobile-hud-utility-consumables-row-left);
+    right: var(--mobile-hud-utility-consumables-row-right);
+    top: var(--mobile-hud-utility-consumables-row-top);
+    bottom: var(--mobile-hud-utility-consumables-row-bottom);
+    grid-template-columns: var(--mobile-hud-utility-consumables-grid-columns);
+    grid-template-rows: var(--mobile-hud-utility-consumables-grid-rows);
+    direction: var(--mobile-hud-utility-consumables-item-direction);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls,
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-buttons {
+    flex-direction: var(--mobile-hud-menu-top-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-buttons {
+    display: flex;
+    width: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames {
+    position: fixed;
+    left: var(--mobile-hud-party-x);
+    right: auto;
+    top: var(--mobile-hud-party-y);
+    bottom: auto;
+    width: var(--mobile-hud-party-width);
+    height: var(--mobile-hud-party-height);
+    display: flex;
+    flex-direction: var(--mobile-hud-party-flow);
+    gap: 4px;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-party-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-rows {
+    display: flex;
+    flex-direction: var(--mobile-hud-party-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-frame,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-chip,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-leave {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar {
+    left: var(--mobile-hud-pet-commands-x);
+    right: auto;
+    top: var(--mobile-hud-pet-commands-y);
+    bottom: auto;
+    width: var(--mobile-hud-pet-commands-width);
+    height: var(--mobile-hud-pet-commands-height);
+    flex-direction: var(--mobile-hud-pet-commands-flow);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-pet-commands-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar .petbar-group {
+    flex-direction: var(--mobile-hud-pet-commands-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar .pet-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(
+      #arena-status,
+      #fiesta-score,
+      #fiesta-pending,
+      #yumi-hud,
+      #vcup-indicator,
+      #vcup-match-hud,
+      #vcup-charge,
+      #delve-tracker
+    ) {
+    right: auto;
+    bottom: auto;
+    transform: none;
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #arena-status {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-generic-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-generic-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-generic-width);
+    height: var(--mobile-hud-status-arena-generic-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-generic-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #fiesta-score {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-fiesta_score-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-fiesta_score-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-fiesta_score-width);
+    height: var(--mobile-hud-status-arena-fiesta_score-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-fiesta_score-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #fiesta-pending {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-fiesta_pending-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-fiesta_pending-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-fiesta_pending-width);
+    height: var(--mobile-hud-status-arena-fiesta_pending-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-fiesta_pending-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-yumi-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-yumi-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-yumi-width);
+    height: var(--mobile-hud-status-arena-yumi-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-yumi-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-indicator {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-indicator-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-indicator-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-indicator-width);
+    height: var(--mobile-hud-status-vale_cup-indicator-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-indicator-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-match-hud {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-match-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-match-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-match-width);
+    height: var(--mobile-hud-status-vale_cup-match-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-match-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-charge {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-charge-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-charge-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-charge-width);
+    height: var(--mobile-hud-status-vale_cup-charge-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-charge-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker {
+    position: fixed;
+    left: var(--mobile-hud-tracker-delve-x);
+    right: auto;
+    top: var(--mobile-hud-tracker-delve-y);
+    bottom: auto;
+    width: var(--mobile-hud-tracker-delve-width);
+    height: var(--mobile-hud-tracker-delve-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-tracker-delve-scale);
+    pointer-events: none;
+    z-index: 100;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker * {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    [data-mobile-hud-overlap-policy="informational-overlay"] {
+    z-index: 100;
+    pointer-events: none !important;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    [data-mobile-hud-overlap-policy="informational-overlay"]
+    * {
+    pointer-events: none !important;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud {
+    z-index: 100;
+  }
+  /* ---------- mobile custom HUD layout end ---------- */
+
+  /* ---------- mobile custom HUD editor ---------- */
+  @media (orientation: landscape) {
+    body.mobile-touch.game-active.mobile-hud-editor-open.mobile-center-message-visible #ui {
+      z-index: 80;
+    }
+    body.mobile-touch.mobile-hud-editor-open #banner {
+      position: fixed;
+      z-index: 1001;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      grid-template: minmax(0, 1fr) auto / minmax(0, 1fr);
+      color: #fff8dc;
+      pointer-events: auto;
+      touch-action: auto;
+      isolation: isolate;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-stage {
+      position: relative;
+      grid-area: 1 / 1 / 3 / 2;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      touch-action: none;
+      background: transparent;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-preview {
+      position: absolute;
+      inset: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 0;
+      border-radius: 12px;
+      outline: 1px solid #d1ba6d70;
+      outline-offset: -1px;
+      background: transparent;
+    }
+    body.mobile-touch.mobile-hud-editor-open [data-mobile-hud-editor-visual] {
+      opacity: 0.45 !important;
+      pointer-events: none !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      #mobile-camera-joystick[data-mobile-hud-editor-visual="control.view"] {
+      display: block !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      [data-mobile-hud-editor-visual][data-mobile-hud-editor-state="selected"] {
+      opacity: 1 !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      [data-mobile-hud-editor-visual][data-mobile-hud-editor-hidden="true"] {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-selectors {
+      min-width: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-contexts {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 8px;
+      background: #171923f2;
+      color: #fff7d4;
+      padding: 4px 32px 4px 8px;
+      font-size: 16px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy {
+      position: absolute;
+      box-sizing: border-box;
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #fff7d4;
+      pointer-events: auto;
+      touch-action: none;
+      cursor: move;
+      z-index: 2;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-frame {
+      position: absolute;
+      box-sizing: border-box;
+      display: grid;
+      grid-template: auto minmax(0, 1fr) auto / auto minmax(0, 1fr);
+      gap: 3px 5px;
+      padding: 0;
+      border: 1px dashed transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      pointer-events: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-overlap-policy="informational-overlay"] {
+      z-index: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="movable"] {
+      min-width: 48px;
+      min-height: 48px;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      :is(.mobile-hud-editor-contexts, .mobile-hud-editor-dock, .mobile-hud-editor-inspector)
+      button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"] {
+      color: #cbeaff;
+      pointer-events: none;
+      cursor: default;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"]
+      .mobile-hud-editor-proxy-frame {
+      border-style: dotted;
+      border-color: #8fc7e8a8;
+      background: #36596d38;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-placeholder="when-empty"][data-mobile-hud-live-visual="false"]
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      background: #2f281b70;
+      box-shadow: inset 0 0 12px #0007;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy.is-selected {
+      outline: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-selected
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      outline: 3px solid var(--gold, #e3c66a);
+      outline-offset: -3px;
+      box-shadow: 0 0 14px #e3c66a55;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"].is-selected
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      outline: 3px solid var(--gold, #e3c66a);
+      outline-offset: 2px;
+      box-shadow: 0 0 18px #e3c66a70;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-invalid
+      .mobile-hud-editor-proxy-frame {
+      border-color: var(--color-border-invalid, #ff8f85);
+      outline: 3px solid var(--color-border-invalid, #ff8f85);
+      outline-offset: -3px;
+      box-shadow: 0 0 0 2px #260c0ccc;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy:focus-visible {
+      outline: 3px solid var(--focus-ring-color);
+      outline-offset: 3px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-icon {
+      grid-area: 1 / 1;
+      width: 18px;
+      height: 18px;
+      align-self: center;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-label {
+      grid-area: 1 / 2;
+      min-width: 0;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      :is(.mobile-hud-editor-proxy.is-selected, .mobile-hud-editor-proxy.is-invalid)
+      .mobile-hud-editor-proxy-label {
+      opacity: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-live-visual="true"]
+      .mobile-hud-editor-proxy-label {
+      opacity: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-placeholder="when-empty"][data-mobile-hud-live-visual="false"]
+      .mobile-hud-editor-proxy-label {
+      opacity: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-error {
+      grid-area: 3 / 1 / 4 / 3;
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      color: #ffd0cc;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy:not(.is-invalid)
+      .mobile-hud-editor-proxy-error {
+      display: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-preview.is-failing-preview {
+      outline-color: var(--color-border-invalid, #ff8f85);
+      box-shadow: 0 0 0 2px #ff8f8559;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-dock {
+      position: fixed;
+      left: 50%;
+      top: calc(50% - 16px);
+      z-index: 4;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 6px;
+      width: min(
+        330px,
+        calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      padding: 8px;
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 12px;
+      background: var(--mobile-glass-bg, linear-gradient(160deg, #201d13eb, #0b0a08f0));
+      box-shadow: 0 5px 20px #000b;
+      -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+      backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+      translate: -50% -50%;
+      overflow: auto;
+      touch-action: pan-y;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-drag-handle {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border: 1px dashed #f4dc858f;
+      border-radius: 8px;
+      cursor: move;
+      touch-action: none;
+      background: radial-gradient(circle, #f4dc85 1.5px, transparent 2px) center / 7px 7px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-actions {
+      grid-column: 2;
+      display: flex;
+      gap: 4px;
+      justify-content: end;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-selectors {
+      grid-column: 1 / -1;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-inspector {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 44px 44px minmax(0, 1fr) minmax(0, 1fr);
+      gap: 6px;
+      min-width: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-status {
+      grid-column: 1 / -1;
+      display: none;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 40px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-status.is-invalid {
+      display: block;
+      border: 1px solid var(--color-border-invalid, #ff8f85);
+      background: #3c1111e6;
+      color: #ffd0cc;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor button,
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor [role="button"] {
+      min-width: 40px;
+      min-height: 40px;
+      touch-action: manipulation;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor
+      button:not(.mobile-hud-editor-proxy) {
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 8px;
+      background: #171923e8;
+      color: #fff7d4;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor
+      [data-mobile-hud-action="save"]:disabled {
+      opacity: 0.4;
+      filter: saturate(0.3);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-world-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-world-vale_cup_indicator
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-standard
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-pending
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-respawn
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-offer
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-respawn_offer
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-respawn
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-returning
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-briefing
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-match
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-match-charge
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-spectator-betting
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-instance-delve
+      .mobile-hud-editor-preview {
+      --mobile-hud-editor-context-active: 1;
+    }
+  }
+  /* ---------- mobile custom HUD editor end ---------- */
 }

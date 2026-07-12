@@ -31,6 +31,8 @@ export interface WindowResizeDeps {
   pinWindow(el: HTMLElement, rect: DOMRect): void;
   /** Coarse-pointer probe; defaults to a matchMedia check. */
   isCoarsePointer?(): boolean;
+  /** Touch-layout probe (body.mobile-touch); reserved for touch-specific sizing. */
+  isTouchLayout?(): boolean;
 }
 
 // Windows whose body is not reflowable content: fixed-size boards/popups and

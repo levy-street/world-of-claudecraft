@@ -3617,6 +3617,7 @@
     font-family: var(--title-font);
     letter-spacing: 1px;
     white-space: nowrap;
+    z-index: 1000;
   }
   /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
      stacked at the top-center, above the zone banner's slot, the classic

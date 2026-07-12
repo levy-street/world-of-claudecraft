@@ -93,13 +93,23 @@ export interface MusicToggleControl {
   labelKey: TranslationKey;
 }
 
+/** A keyless action row: a button that runs a painter-owned action instead of
+ *  reading or writing a setting (no reset participation, no settings key). The
+ *  only action today is the touch-landscape mobile HUD layout editor launcher. */
+export interface ActionControl {
+  control: 'action';
+  actionId: 'mobileHudEditor';
+  labelKey: TranslationKey;
+}
+
 export type OptionsControl =
   | SliderControl
   | ToggleControl
   | BoolToggleControl
   | ChoiceControl
   | NoteControl
-  | MusicToggleControl;
+  | MusicToggleControl
+  | ActionControl;
 
 // ---------------------------------------------------------------------------
 // Pure dispatch-value functions (the dispatch matrix's load-bearing contract)
@@ -363,8 +373,22 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 export function buildInterfaceControls(
   s: OptionsSettingsSource,
   env: OptionsEnv = { touch: false, nativeShell: false },
+  opts?: { mobileHudEditor?: boolean },
 ): OptionsControl[] {
   const controls: OptionsControl[] = [
+    // The mobile HUD layout editor launcher, first so touch players find it
+    // without scrolling. Only offered when the editor can actually open
+    // (touch interface + landscape-capable viewport); the painter routes the
+    // tap through its deps and closes the menu so the editor owns the screen.
+    ...(opts?.mobileHudEditor
+      ? [
+          {
+            control: 'action',
+            actionId: 'mobileHudEditor',
+            labelKey: 'hudChrome.mobileHudEditor.launcher',
+          } as const satisfies ActionControl,
+        ]
+      : []),
     // uiScale commits on release: applying it live rescales the whole UI (the
     // options window included), which shoves the slider under the cursor and makes
     // the value hard to land (issue 1558).

@@ -13,6 +13,7 @@
  *
  *   onPointerDown(e) {
  *     const owner = getTouchOwner(e, {
+ *       editorOpen: document.body.classList.contains('mobile-hud-editor-open'),
  *       menuOpen: document.body.classList.contains('mobile-window-open'),
  *       isMovementZone: (t) => t === this.moveZone || t === this.moveJoystick,
  *       isCombatButton: (t) => isInteractiveHudElement(t),
@@ -24,7 +25,7 @@
  *   }
  *
  *   onPointerMove(e) {
- *     const owner = ledger.get(e.pointerId); // 'movement' | 'combatButton' | 'camera' | 'menu' | 'ignored' | undefined
+ *     const owner = ledger.get(e.pointerId); // 'editor' | 'movement' | 'combatButton' | 'camera' | 'menu' | 'ignored' | undefined
  *     // a touch that started on a button (owner === 'combatButton') must NEVER
  *     // fall through to the camera-drag handler, even if it drifts over the canvas.
  *   }
@@ -47,8 +48,8 @@
  * ---------------------------------------------------------------------------
  */
 
-/** Who owns a touch, in router priority order (modal/menu highest, camera lowest). */
-export type TouchOwner = 'movement' | 'combatButton' | 'camera' | 'menu' | 'ignored';
+/** Who owns a touch, in router priority order (editor highest, camera lowest). */
+export type TouchOwner = 'editor' | 'movement' | 'combatButton' | 'camera' | 'menu' | 'ignored';
 
 /**
  * The minimal structural shape this module needs from a DOM target: enough to
@@ -61,6 +62,8 @@ export interface TouchRouterTarget {
 }
 
 export interface TouchRouterContext {
+  /** True while the full-screen mobile HUD editor owns all touch input. */
+  editorOpen: boolean;
   /** True whenever any mobile window/panel is open (`body.mobile-window-open`). */
   menuOpen: boolean;
   /** True when the event target landed on the movement joystick zone. */
@@ -131,13 +134,14 @@ export function isCameraDragAllowedAt(
 
 /**
  * Classify a touch/pointer-down event into a single owner. Priority order
- * (highest first): an open modal/menu claims every touch as `'menu'` (so
- * nothing leaks through to gameplay while a window is up); then the movement
+ * (highest first): the HUD editor claims every touch as `'editor'`; then an
+ * open modal/menu claims every touch as `'menu'`; then the movement
  * joystick zone; then combat/ring buttons; then camera drag on open gameplay
  * space. Anything matching none of these is `'ignored'`.
  */
 export function getTouchOwner(ev: TouchRouterEvent, ctx: TouchRouterContext): TouchOwner {
   const target = ev.target;
+  if (ctx.editorOpen) return 'editor';
   if (ctx.menuOpen) return 'menu';
   if (ctx.isMovementZone(target)) return 'movement';
   if (ctx.isCombatButton(target)) return 'combatButton';

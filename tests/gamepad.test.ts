@@ -66,6 +66,73 @@ describe('GamepadManager', () => {
   });
 });
 
+describe('GamepadManager explicit input block', () => {
+  it('neutralizes held state before pointer/world paths and requires fresh edges after unblock', () => {
+    let blocked = true;
+    let pad = {
+      ...gamepadWithPressed(GP.A, GP.B, GP.X),
+      axes: [0.8, -0.8, 0.7, -0.7],
+    } as unknown as Gamepad;
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const clearGamepadMove = vi.fn();
+    const setGamepadMove = vi.fn();
+    const applyGamepadLook = vi.fn();
+    const triggerGamepadJump = vi.fn();
+    const toggleAutorun = vi.fn();
+    const onAction = vi.fn();
+    const onInputEdge = vi.fn();
+    const input = {
+      clearGamepadMove,
+      setGamepadMove,
+      applyGamepadLook,
+      triggerGamepadJump,
+      toggleAutorun,
+    } as unknown as Input;
+    const bindings = new GamepadBindings();
+    bindings.bind(GP.A, 'jump');
+    bindings.bind(GP.B, 'autorun');
+    bindings.bind(GP.X, 'target');
+    const manager = new GamepadManager(input, bindings, {
+      onAction,
+      onInputEdge,
+      isInputBlocked: () => blocked,
+      isPointerMode: () => {
+        expect(blocked).toBe(false);
+        return false;
+      },
+    });
+    (manager as unknown as { index: number | null }).index = 0;
+    const cursor = { style: { display: 'block' } };
+    Object.assign(manager as unknown as object, { cursorEl: cursor, cursorInit: true });
+
+    manager.poll(1 / 60);
+
+    expect(clearGamepadMove).toHaveBeenCalledTimes(1);
+    expect(cursor.style.display).toBe('none');
+    expect(setGamepadMove).not.toHaveBeenCalled();
+    expect(applyGamepadLook).not.toHaveBeenCalled();
+    expect(triggerGamepadJump).not.toHaveBeenCalled();
+    expect(toggleAutorun).not.toHaveBeenCalled();
+    expect(onAction).not.toHaveBeenCalled();
+    expect(onInputEdge).not.toHaveBeenCalled();
+
+    blocked = false;
+    manager.poll(1 / 60);
+    expect(triggerGamepadJump).not.toHaveBeenCalled();
+    expect(toggleAutorun).not.toHaveBeenCalled();
+    expect(onAction).not.toHaveBeenCalled();
+
+    pad = gamepadWithPressed();
+    manager.poll(1 / 60);
+    pad = gamepadWithPressed(GP.A);
+    manager.poll(1 / 60);
+    expect(triggerGamepadJump).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('GamepadManager window focus', () => {
   afterEach(() => vi.unstubAllGlobals());
 

@@ -3,6 +3,7 @@ import {
   COMPACT_MAX_HEIGHT_PX,
   COMPACT_MAX_WIDTH_PX,
   type MobileHudLayoutInput,
+  mobileHudProfileForTier,
   resolveMobileHudLayout,
   TABLET_MIN_DIMENSION_PX,
   TABLET_MIN_WIDTH_PX,
@@ -67,6 +68,32 @@ describe('resolveMobileHudLayout: the six target viewports', () => {
   it('390x844 (portrait phone) resolves to compact (narrow width; portrait media blocks still apply in CSS)', () => {
     const layout = resolveMobileHudLayout(input({ width: 390, height: 844 }));
     expect(layout.tier).toBe('compact');
+  });
+});
+
+describe('mobileHudProfileForTier', () => {
+  it('maps compact and standard to phone and tablet to tablet', () => {
+    expect(mobileHudProfileForTier('compact')).toBe('phone');
+    expect(mobileHudProfileForTier('standard')).toBe('phone');
+    expect(mobileHudProfileForTier('tablet')).toBe('tablet');
+  });
+
+  it('maps every canonical viewport without changing desktop or portrait layout output', () => {
+    for (const [width, height, profile] of [
+      [740, 360, 'phone'],
+      [844, 390, 'phone'],
+      [932, 430, 'phone'],
+      [1280, 720, 'phone'],
+      [1024, 768, 'tablet'],
+    ] as const) {
+      expect(mobileHudProfileForTier(resolveMobileHudLayout(input({ width, height })).tier)).toBe(
+        profile,
+      );
+    }
+    expect(resolveMobileHudLayout(input({ touchMode: false })).classes).toEqual([]);
+    expect(resolveMobileHudLayout(input({ width: 390, height: 844 })).classes).toEqual([
+      'hud-mobile-compact',
+    ]);
   });
 });
 
