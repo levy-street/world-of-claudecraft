@@ -75,6 +75,35 @@ export function saveHapticsEnabled(
   }
 }
 
+// The top-left menu-button cluster (Chat/Social/Quests/Settings/More) ships
+// COLLAPSED behind an arrow chip, because its round icons crowd the play field
+// (live PR #1736 feedback). Only a player who taps it open is remembered as
+// expanded across sessions; the absent/any-other value is the collapsed default.
+// Own localStorage key, like music's ev_music_on and the haptics flag above.
+export const MENU_EXPANDED_STORE_KEY = 'woc_menu_expanded';
+
+export function loadMenuExpanded(
+  storage: Pick<Storage, 'getItem'> | null = safeLocalStorage(),
+): boolean {
+  if (!storage) return false;
+  try {
+    return storage.getItem(MENU_EXPANDED_STORE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function saveMenuExpanded(
+  on: boolean,
+  storage: Pick<Storage, 'setItem'> | null = safeLocalStorage(),
+): void {
+  try {
+    storage?.setItem(MENU_EXPANDED_STORE_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 /** Fire a haptic pulse when enabled and the Vibration API exists. Returns whether it fired. */
 export function triggerHaptic(
   pattern: number | number[],
@@ -244,6 +273,10 @@ export function isMoveAutorunNear(y: number, threshold = MOVE_AUTORUN_REVEAL_THR
 export class MobileControls {
   private active = false;
   private hapticsOn = loadHapticsEnabled();
+  // Whether the top-left menu-button cluster is expanded; persisted, default
+  // collapsed. Applied to <body> on start() so the CSS reveal matches the
+  // stored preference before the first tap.
+  private menuExpanded = loadMenuExpanded();
   private joyPointer: number | null = null;
   private lookPointer: number | null = null;
   // Camera joystick is opt-in (settings.mobileCameraJoystick, def false): hidden
@@ -285,6 +318,13 @@ export class MobileControls {
   private swipeLookActive = false;
   private swipeLookDownAt = 0;
   private lastSwipeTapAt = 0;
+  // Set when a pinch degrades to one finger and that finger is adopted as a
+  // fresh swipe-look (see onPinchEnd). The adopted finger's tracked position
+  // may be stale (pinch pointers hold no capture, so moves over HUD chrome are
+  // lost), so the first move only resyncs the origin instead of applying a
+  // spurious jump delta; and a pinch remnant is never a recenter "tap".
+  private swipeLookResync = false;
+  private swipeLookAdopted = false;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
@@ -377,25 +417,35 @@ export class MobileControls {
       this.onMoveMove(e);
       this.onCameraMove(e);
     });
+    // The pinch/swipe ends are forwarded at window level too: pinch pointers
+    // hold no pointer capture, so a finger that drifts over HUD chrome delivers
+    // its pointerup/pointercancel THERE, never to the canvas. Without this
+    // forwarding that pointer stayed in pinchPointers forever and every later
+    // single-finger touch was misread as a pinch against the stale phantom
+    // point (the "camera locked after zooming once" bug: drags only zoomed).
     window.addEventListener('pointerup', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('pointercancel', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('blur', () => {
       this.releaseMove();
       this.releaseCamera();
-      this.releaseSwipeLook();
+      this.releasePinch();
       this.touchOwners.releaseAll();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.releaseMove();
         this.releaseCamera();
-        this.releaseSwipeLook();
+        this.releasePinch();
         this.touchOwners.releaseAll();
       }
     });
@@ -464,21 +514,16 @@ export class MobileControls {
       musicBtn?.classList.toggle('mm-muted', !on);
     });
     this.bindHapticsToggle('mobile-haptics');
+    this.bindMenuCollapseToggle('mobile-menu-collapse-toggle');
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
       this.root?.classList.toggle('expanded', open);
       document.body.classList.toggle('mobile-more-open', open);
-      if (open) {
-        const modal = document.getElementById('mobile-extra-controls');
-        if (modal) {
-          modal.style.left = '50%';
-          modal.style.top = '50%';
-          modal.style.right = 'auto';
-          modal.style.bottom = 'auto';
-          modal.style.transform = 'translate(-50%, -50%)';
-          delete modal.dataset.windowMoved;
-        }
-      }
+      // No inline positioning here: the drawer is centered by the stylesheet
+      // (hud.mobile.css). The old inline left/top/transform write raced the Hud
+      // window observer, whose show-time mobile clear wiped it on the FIRST
+      // open of a session and dropped the drawer onto the (then broken)
+      // stylesheet transform, so the first open landed half off-screen.
     });
   }
 
@@ -595,6 +640,43 @@ export class MobileControls {
       label.textContent = this.hapticsOn
         ? t('hudChrome.mobile.haptics')
         : t('hudChrome.mobile.hapticsOff');
+  }
+
+  /** The menu-cluster collapse handle: an always-visible arrow chip that shows or
+   *  hides the five top-left menu buttons (Chat/Social/Quests/Settings/More).
+   *  Like the haptics toggle it is a STATEFUL, persisted toggle reflected via
+   *  aria-expanded, so it bypasses bindButton (no More-tray auto-close, no
+   *  callback). It touches ONLY the mobile-menu-open body class the CSS reveal
+   *  keys off, so the consumables bar and the action ring stay put. */
+  private bindMenuCollapseToggle(id: string): void {
+    const button = document.getElementById(id);
+    if (!button) return;
+    // Apply the persisted state up front so the arrow and <body> agree before the
+    // first tap (the static markup ships collapsed; a stored expand re-opens it).
+    this.syncMenuCollapseToggle(button);
+    bindTouchTap(button, (e) => {
+      if (!this.active) return;
+      e.preventDefault();
+      triggerHaptic(HAPTIC_TAP, this.hapticsOn);
+      this.menuExpanded = !this.menuExpanded;
+      saveMenuExpanded(this.menuExpanded);
+      this.syncMenuCollapseToggle(button);
+      button.blur();
+    });
+  }
+
+  /** Reflect the collapse state: the mobile-menu-open body class the CSS reveal
+   *  keys off, the arrow's aria-expanded, and its show/hide accessible name (both
+   *  the aria-label and the title come from t(), matching guide/chrome.ts's menu
+   *  toggle). */
+  private syncMenuCollapseToggle(button: HTMLElement): void {
+    document.body.classList.toggle('mobile-menu-open', this.menuExpanded);
+    button.setAttribute('aria-expanded', this.menuExpanded ? 'true' : 'false');
+    const label = this.menuExpanded
+      ? t('hudChrome.mobile.hideMenuButtons')
+      : t('hudChrome.mobile.showMenuButtons');
+    button.setAttribute('aria-label', label);
+    button.setAttribute('title', label);
   }
 
   /** The Chat button taps to open the keyboard composer, but a long press toggles
@@ -951,8 +1033,46 @@ export class MobileControls {
   }
 
   private onPinchEnd(e: PointerEvent): void {
-    this.pinchPointers.delete(e.pointerId);
+    // Idempotent: the canvas handler and the window-level forwarder both call
+    // this for a canvas pointerup, so only the first delete does any work.
+    if (!this.pinchPointers.delete(e.pointerId)) return;
+    // Re-baseline from the SURVIVING pair on a 3->2 transition: the old baseline
+    // was measured between the original first two pointers (currentPinchDist
+    // reads insertion order), so keeping it across a different surviving pair
+    // applied one discontinuous zoom step on the next move.
     if (this.pinchPointers.size < 2) this.pinchPrevDist = null;
+    else this.pinchPrevDist = this.currentPinchDist();
+    // A pinch degrading to exactly one remaining finger hands that finger back
+    // to camera drag (swipe-look), so the player can keep rotating without a
+    // re-touch. Pinch pointers only ever come from canvas pointerdowns, so the
+    // remaining finger is a legitimate camera-surface touch.
+    if (
+      this.pinchPointers.size !== 1 ||
+      !this.active ||
+      this.swipeLookPointer !== null ||
+      this.lookPointer !== null ||
+      document.body.classList.contains('mobile-window-open')
+    )
+      return;
+    const remainingId = this.pinchPointers.keys().next().value;
+    if (remainingId === undefined) return;
+    const pos = this.pinchPointers.get(remainingId);
+    if (!pos) return;
+    this.touchOwners.set(remainingId, 'camera');
+    this.swipeLookPointer = remainingId;
+    this.swipeLookStartX = pos.x;
+    this.swipeLookStartY = pos.y;
+    this.swipeLookLastX = pos.x;
+    this.swipeLookLastY = pos.y;
+    this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
+    this.swipeLookResync = true;
+    this.swipeLookAdopted = true;
+    try {
+      this.canvas?.setPointerCapture(remainingId);
+    } catch {
+      /* synthetic test event */
+    }
   }
 
   private releasePinch(): void {
@@ -1008,6 +1128,17 @@ export class MobileControls {
       this.releaseSwipeLook();
       return;
     }
+    // First move after a pinch-degrade adoption: the tracked position may be
+    // stale, so resync the origin to the live finger instead of applying the
+    // gap as a camera jump.
+    if (this.swipeLookResync) {
+      this.swipeLookResync = false;
+      this.swipeLookStartX = e.clientX;
+      this.swipeLookStartY = e.clientY;
+      this.swipeLookLastX = e.clientX;
+      this.swipeLookLastY = e.clientY;
+      return;
+    }
     const totalDx = e.clientX - this.swipeLookStartX;
     const totalDy = e.clientY - this.swipeLookStartY;
     if (!this.swipeLookActive) {
@@ -1034,7 +1165,12 @@ export class MobileControls {
     // never crossed the swipe deadzone (never became a drag); two of those in
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
-    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    // A pinch remnant adopted mid-gesture is never a "tap": without this guard
+    // two quick pinch releases could fire a surprise camera recenter.
+    const quickTap =
+      !this.swipeLookAdopted &&
+      !this.swipeLookActive &&
+      now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;
@@ -1060,6 +1196,8 @@ export class MobileControls {
       this.input.setTouchLookVector({ x: 0, y: 0 });
     }
     this.swipeLookActive = false;
+    this.swipeLookResync = false;
+    this.swipeLookAdopted = false;
   }
 }
 

@@ -18,7 +18,9 @@ export interface BindAction {
   label: string;
   category: string;
   kind: BindKind;
-  defaults: string[]; // 1 or 2 codes; index 0 = primary, 1 = secondary
+  defaults: string[]; // 0, 1, or 2 codes; index 0 = primary, 1 = secondary
+  // (0 codes = intentionally unbound by default, e.g. strafeLeft/strafeRight,
+  // which the classic keyboard-turner rebinds; see the default-layout note below).
   // When true this action is exempt from the classic-style "one code per action"
   // uniqueness sweep: its code may deliberately overlap another action's. Used
   // by Attack Move, whose default (A) intentionally shadows Turn Left while the
@@ -30,33 +32,41 @@ export interface BindAction {
 // slot 0 is Attack, 1..11 the primary ability bar, 12..22 the secondary bar.
 export const ACTION_BAR_SLOTS = 23;
 
-const SLOT_DEFAULTS = [
-  'Digit1',
-  'Digit2',
-  'Digit3',
-  'Digit4',
-  'Digit5',
-  'Digit6',
-  'Digit7',
-  'Digit8',
-  'Digit9',
-  'Digit0',
-  'Minus',
-  'Equal',
-  // Secondary bar (slots 12..22): defaults to the numpad so it never collides
-  // with the primary number row. Fully rebindable like any other slot, and
-  // laptops without a numpad can simply assign their own keys.
-  'Numpad1',
-  'Numpad2',
-  'Numpad3',
-  'Numpad4',
-  'Numpad5',
-  'Numpad6',
-  'Numpad7',
-  'Numpad8',
-  'Numpad9',
-  'Numpad0',
-  'NumpadDecimal',
+// Per-slot default codes (index 0 = primary, 1 = secondary). Slots 0..9 keep the
+// bare number row. Slots 10/11 ('Action Bar 11'/'Action Bar 12') put Q/E on the
+// primary so players see Q/E on those buttons (Q/E are the ergonomic spell keys
+// freed up from strafeLeft/strafeRight), and keep Minus/Equal as secondaries so
+// nothing is lost. The secondary bar (slots 12..22) primaries stay on the numpad
+// (never colliding with the primary number row); slots 12..21 also carry
+// 'Shift+Digit1'..'Shift+Digit0' as secondaries so the whole page is reachable
+// without a numpad. Shift+<digit> is a DISTINCT edge chord from the bare <digit>
+// (edge actions match the full combo), so it never evicts an action-bar primary.
+// (The Shift chords cover all ten digits, not just a subset, so the secondary
+// page has no dead keys.) SLOTS_PER_ACTION = 2 fits each row exactly.
+const SLOT_DEFAULTS: string[][] = [
+  ['Digit1'],
+  ['Digit2'],
+  ['Digit3'],
+  ['Digit4'],
+  ['Digit5'],
+  ['Digit6'],
+  ['Digit7'],
+  ['Digit8'],
+  ['Digit9'],
+  ['Digit0'],
+  ['KeyQ', 'Minus'],
+  ['KeyE', 'Equal'],
+  ['Numpad1', 'Shift+Digit1'],
+  ['Numpad2', 'Shift+Digit2'],
+  ['Numpad3', 'Shift+Digit3'],
+  ['Numpad4', 'Shift+Digit4'],
+  ['Numpad5', 'Shift+Digit5'],
+  ['Numpad6', 'Shift+Digit6'],
+  ['Numpad7', 'Shift+Digit7'],
+  ['Numpad8', 'Shift+Digit8'],
+  ['Numpad9', 'Shift+Digit9'],
+  ['Numpad0', 'Shift+Digit0'],
+  ['NumpadDecimal'],
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
@@ -89,19 +99,22 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['KeyD', 'ArrowRight'],
   },
+  // Strafe ships UNBOUND by default: Q/E are reserved for the spell action bar
+  // (slots 10/11), so the classic keyboard-turner binds their own strafe keys.
+  // The Keybinds pane's unbound banner truthfully lists these until rebound.
   {
     id: 'strafeLeft',
     label: 'Strafe Left',
     category: 'Movement',
     kind: 'held',
-    defaults: ['KeyQ'],
+    defaults: [],
   },
   {
     id: 'strafeRight',
     label: 'Strafe Right',
     category: 'Movement',
     kind: 'held',
-    defaults: ['KeyE'],
+    defaults: [],
   },
   { id: 'jump', label: 'Jump', category: 'Movement', kind: 'held', defaults: ['Space'] },
   {
@@ -165,7 +178,10 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyV'],
   },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
-  { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyH'] },
+  // Damage Meters moves off KeyH (the one free ergonomic letter is KeyZ), so it
+  // no longer collides with Target Nearest Friendly (which keeps KeyH). A fresh
+  // profile therefore shows no keyboard duplicate from this pair.
+  { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyZ'] },
   {
     id: 'social',
     label: 'Friends & Guild',
@@ -250,12 +266,12 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   // Action bar (slot 0 = Attack)
   ...SLOT_DEFAULTS.map(
-    (code, i): BindAction => ({
+    (codes, i): BindAction => ({
       id: `slot${i}`,
       label: i === 0 ? 'Attack' : i <= 11 ? `Action Bar ${i + 1}` : `Secondary Bar ${i - 11}`,
       category: 'Action Bar',
       kind: 'edge',
-      defaults: [code],
+      defaults: codes,
     }),
   ),
 ];

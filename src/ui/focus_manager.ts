@@ -37,8 +37,9 @@ import { nextFocusIndex } from './focus_order';
  * was previously spelled inline in Hud.focusFirstInteractive); never re-spelled.
  *
  * Focus-FIRST-on-open is a derivation of this set, not a second selector: focusFirst()
- * skips the [data-close] X so opening a window lands on a meaningful control rather than
- * the dismiss affordance, falling back to the X only when it is the sole focusable.
+ * skips the close X (either marker, see CLOSE_CONTROL_SELECTOR) so opening a window
+ * lands on a meaningful control rather than the dismiss affordance, falling back to
+ * the X only when it is the sole focusable.
  *
  * tabindex="-1" is excluded from EVERY clause, not just the bare [tabindex] one: an element
  * with tabindex="-1" is programmatically focusable but deliberately OUT of the Tab sequence
@@ -48,6 +49,13 @@ import { nextFocusIndex } from './focus_order';
  */
 export const FOCUSABLE_SELECTOR =
   'button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Both dismiss-affordance markers focusFirst skips: the legacy windows mark
+ * their X with [data-close], the shared AAA window-frame builder
+ * (window_frame.ts) stamps [data-window-close] on its close control.
+ */
+const CLOSE_CONTROL_SELECTOR = '[data-close], [data-window-close]';
 
 export interface FocusTrapOptions {
   /**
@@ -86,6 +94,17 @@ export class FocusManager {
   private listening = false;
 
   /**
+   * Whether a focus trap is currently installed. This is the explicit gate the gamepad
+   * menu-input mode reads (spec section 5): the pad emits menu intents and consumes its
+   * handled edges only while a trap owns focus, so world input never double-fires. A pure
+   * O(1) read of the trap stack with NO effect on trap mechanics; a trap leaked without
+   * release() is self-healed on the next Tab by the existing onKeyDown path.
+   */
+  hasActiveTrap(): boolean {
+    return this.stack.length > 0;
+  }
+
+  /**
    * The currently focused element worth returning to later (the old
    * currentFocusableElement idiom): a connected, rendered, non-body element.
    */
@@ -113,23 +132,63 @@ export class FocusManager {
 
   /**
    * Focus the first interactive element in root (or the preferredSelector match),
-   * matching the old Hud.focusFirstInteractive.
+   * matching the old Hud.focusFirstInteractive. Candidates are filtered to
+   * RENDERED elements (the getClientRects check focusablesIn already applies):
+   * focus() on a display:none element silently no-ops, so a hidden preferred or
+   * first match would otherwise leave focus stranded on the opener.
    */
   focusFirst(root: HTMLElement, preferredSelector?: string): void {
     window.setTimeout(() => {
       if (preferredSelector) {
-        const preferred = root.querySelector<HTMLElement>(preferredSelector);
+        const preferred = [...root.querySelectorAll<HTMLElement>(preferredSelector)].find((el) =>
+          this.canFocus(el),
+        );
         if (preferred) {
           preferred.focus();
           return;
         }
       }
-      const focusables = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
-      // Skip the close (X) button on open so focus lands on a meaningful control, not the
-      // dismiss affordance; fall back to it only when it is the sole focusable element.
-      const target = focusables.find((el) => !el.matches('[data-close]')) ?? focusables[0];
+      const focusables = this.focusablesIn(root);
+      // Skip the close (X) button on open so focus lands on a meaningful control, not
+      // the dismiss affordance; fall back to it only when it is the sole focusable
+      // element. Both close markers count: the legacy windows carry [data-close], the
+      // shared window-frame builder stamps [data-window-close] on its X.
+      const target = focusables.find((el) => !el.matches(CLOSE_CONTROL_SELECTOR)) ?? focusables[0];
       (target ?? root).focus();
     }, 0);
+  }
+
+  /**
+   * The root of the topmost live trap, or null when no trap is installed (a
+   * closed-without-release trap is skipped, mirroring the onKeyDown self-heal
+   * without mutating the stack). The generic gamepad menu fallback reads this
+   * to step focus inside whatever dialog currently owns the pad.
+   */
+  activeTrapRoot(): HTMLElement | null {
+    for (let i = this.stack.length - 1; i >= 0; i--) {
+      const root = this.stack[i].root();
+      if (this.canFocus(root)) return root;
+    }
+    return null;
+  }
+
+  /**
+   * Move focus one step through the active trap root's visible focusables,
+   * clamped at the ends (no wrap), entering at the first element when focus is
+   * not on any of them: the generic row step the gamepad menu fallback uses for
+   * every trapped dialog without a bespoke controller model (mirrors
+   * OptionsWindow.stepRowFocus).
+   */
+  stepTrapFocus(dir: -1 | 1): void {
+    const root = this.activeTrapRoot();
+    if (!root) return;
+    const focusables = this.focusablesIn(root);
+    if (focusables.length === 0) return;
+    const active = document.activeElement;
+    const current = active instanceof HTMLElement ? focusables.indexOf(active) : -1;
+    const base = current < 0 ? (dir > 0 ? -1 : 0) : current;
+    const next = Math.max(0, Math.min(focusables.length - 1, base + dir));
+    focusables[next].focus();
   }
 
   /**

@@ -13,9 +13,11 @@
 // painter owns no cross-window state of its own. The HUD keeps toggleBags() +
 // onInventoryChanged() as the coordinator and calls render() to repaint.
 //
-// No raw hex: the item-quality color comes from the shared
-// QUALITY_COLOR map, and the unranked fallback is the --color-quality-default token
-// (not a literal white hex).
+// Chrome is the shared AAA window frame (window_frame.ts) mounted on an inner
+// container so the #bags root stays pristine for the docking CSS; the slot grid uses
+// the .item-cell grammar (rarity via data-quality from the quality tokens, no raw
+// hex in the painter), the filter is a .filter-row / .chip / .search-field header,
+// and empty states use .empty-state.
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
@@ -50,12 +52,27 @@ import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
-import { svgIcon } from './ui_icons';
+import { renderWindowFrame } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
+
+// A closable frame WITH the sticky footer: the bag bar, filter header, and slot
+// grid render into the scrollable body, and the player's money lives in the
+// pinned .window-footer (the classic bags anatomy). It used to sit as the last
+// child of the scrollable body, where the touch sheet pushed it below the fold
+// and the coin readout was effectively invisible on mobile (live maintainer
+// feedback). Reuses the existing bag title + close keys. Instance-parameterized
+// on the '#bags' id (title id 'bags-title').
+const BAGS_FRAME: WindowFrameDescriptor = {
+  id: 'bags',
+  titleKey: 'itemUi.bags.title',
+  closeLabelKey: 'itemUi.bags.close',
+  footer: true,
+};
 
 // Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
 // id never couples to class ordering (was prompt.classList[last]).
@@ -72,11 +89,6 @@ const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt, .bank-
 export function dismissBagPrompts(): void {
   for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
 }
-
-// The unranked quality fallback as a CSS custom property. The shared
-// QUALITY_COLOR map carries the real per-quality hex; this token covers the rare
-// item with no quality field, so no raw hex lives in the painter.
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -206,6 +218,25 @@ export class BagsWindow {
     this.deps.onClosed();
   }
 
+  // The window close control (wired to the shared frame's onClose). On touch the
+  // vendor / bank clusters hide their LEFT panel's own close, so this bags close is
+  // the whole cluster's single close control: it closes the companion window too
+  // (mirroring closeVendor's / onBankClosed's teardown), never leaving a half-screen
+  // orphan. Desktop and standalone touch fall through to the plain close().
+  private handleClose(): void {
+    if (document.body.classList.contains('mobile-touch')) {
+      if (this.deps.vendorOpen()) {
+        this.deps.closeVendor();
+        return;
+      }
+      if (this.deps.isBankOpen()) {
+        this.deps.closeBank();
+        return;
+      }
+    }
+    this.close();
+  }
+
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
@@ -213,37 +244,30 @@ export class BagsWindow {
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
-    el.appendChild(this.buildBagBar());
+    // Stamp the shared AAA window frame onto an INNER mount, leaving the #bags root
+    // pristine (never a builder class / role / aria): the root stays the docking
+    // anchor the cluster CSS targets by id, and .window:has(> .window-frame) makes it
+    // the clipping flex column the frame fills. The bag bar, filter header, and slot
+    // grid render into the scrollable body; the money readout is pinned in the
+    // frame's sticky footer so it stays visible however far the grid scrolls.
+    const mount = document.createElement('div');
+    const { body, footer } = renderWindowFrame(mount, BAGS_FRAME, {
+      onClose: () => this.handleClose(),
+    });
+    body.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
-    if (world.inventory.length > 0) el.appendChild(this.buildFilterBar());
+    if (world.inventory.length > 0) body.appendChild(this.buildFilterBar());
     const grid = document.createElement('div');
     grid.className = 'bag-grid';
     this.fillGrid(grid);
-    el.appendChild(grid);
-    grid.scrollTop = prevScrollTop;
+    body.appendChild(grid);
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
     moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.moneyHtml(world.copper)}`;
-    el.appendChild(moneyRow);
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
-      // this bags x-btn is the whole cluster's single close control: it closes the
-      // companion window too (mirroring closeVendor's / onBankClosed's teardown),
-      // never leaving a half-screen orphan.
-      if (document.body.classList.contains('mobile-touch')) {
-        if (this.deps.vendorOpen()) {
-          this.deps.closeVendor();
-          return;
-        }
-        if (this.deps.isBankOpen()) {
-          this.deps.closeBank();
-          return;
-        }
-      }
-      this.close();
-    });
+    (footer ?? body).appendChild(moneyRow);
+    el.replaceChildren(mount);
+    grid.scrollTop = prevScrollTop;
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -355,13 +379,13 @@ export class BagsWindow {
     bar.className = 'bag-filter-bar';
 
     const chips = document.createElement('div');
-    chips.className = 'bag-chips';
+    chips.className = 'filter-row';
     chips.setAttribute('role', 'group');
     chips.setAttribute('aria-label', t('hudChrome.bags.filterGroupAria'));
     for (const category of BAG_CATEGORIES) {
       const chip = document.createElement('button');
       chip.type = 'button';
-      chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
+      chip.className = 'chip';
       chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
@@ -378,6 +402,8 @@ export class BagsWindow {
     const tools = document.createElement('div');
     tools.className = 'bag-tools';
 
+    const searchField = document.createElement('div');
+    searchField.className = 'search-field';
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'bag-search';
@@ -389,7 +415,8 @@ export class BagsWindow {
       this.persistFilter();
       this.refreshGrid();
     });
-    tools.appendChild(search);
+    searchField.appendChild(search);
+    tools.appendChild(searchField);
 
     const sort = document.createElement('select');
     sort.className = 'bag-sort';
@@ -420,11 +447,11 @@ export class BagsWindow {
     const world = this.deps.world();
     const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
     if (model.state === 'empty') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
+      grid.innerHTML = `<div class="empty-state">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
     }
     if (model.state === 'noMatch') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
+      grid.innerHTML = `<div class="empty-state">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
     for (const s of model.visible) {
@@ -432,10 +459,12 @@ export class BagsWindow {
       if (!item) continue;
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
-      const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
+      // AAA item-cell grammar: rarity border from the quality tokens via
+      // data-quality (no painter-set colour prop), the stack count in the corner,
+      // and the shared focus ring (components.css .window-frame .item-cell).
+      row.className = 'item-cell';
+      row.setAttribute('data-quality', bagQualityKey(item));
       const itemName = itemDisplayName(item);
-      row.style.setProperty('--bag-slot-quality', qColor);
       row.setAttribute(
         'aria-label',
         t('itemUi.bags.itemAria', {
@@ -443,7 +472,7 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      row.innerHTML = `${this.deps.itemIcon(item)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item)}${s.count > 1 ? `<span class="item-cell-count">${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}</span>` : ''}`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
@@ -605,10 +634,11 @@ export class BagsWindow {
       grid.appendChild(row);
     }
     // Free-slot squares (unfiltered view only): the classic empty sockets that
-    // make the remaining capacity visible at a glance. Decorative, not focusable.
+    // make the remaining capacity visible at a glance. Decorative, not focusable
+    // (an .is-empty item-cell with no data-quality and no tab stop).
     for (let i = 0; i < model.emptyCells; i++) {
       const cell = document.createElement('div');
-      cell.className = 'bag-item empty';
+      cell.className = 'item-cell is-empty';
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
@@ -718,7 +748,7 @@ export class BagsWindow {
       // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
       // fixed at dispatch, so this listener still runs after the detach; only THEN
       // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
+      // the freshly re-landed focus (Enter ghost-clicking [data-window-close] and closing
       // the whole window).
       if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
         ke.stopPropagation();
@@ -788,7 +818,7 @@ export class BagsWindow {
       // detaching the opener slot, so land on the always-present window close button
       // rather than letting focus fall to <body>. dismiss() cleared inert first, so this
       // focus is not dropped into a still-inert subtree.
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);
     cancel.addEventListener('click', dismissAndReturn);
@@ -902,7 +932,7 @@ export class BagsWindow {
       const count = resolveDepositSubmit(live, captured, Number(input.value) || 0, maxCount);
       if (count === null) {
         dismiss();
-        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
         return;
       }
       this.deps.world().bankDeposit(index, count);
@@ -912,7 +942,7 @@ export class BagsWindow {
       // always-present close button rather than dropping it to <body>. dismiss()
       // cleared inert first, so this focus is not lost into a still-inert subtree.
       this.render();
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);
     cancel.addEventListener('click', dismissAndReturn);

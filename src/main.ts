@@ -12,7 +12,13 @@ import {
   readBrowserEnv,
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  newCameraReleaseHold,
+  stepCameraReleaseHold,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveShouldWalk,
@@ -1368,6 +1374,11 @@ async function startGame(
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
     isPointerMode: () => hud.isWindowOpen(),
+    // A focus trap (the Esc menu, other modals) switches the pad into deterministic
+    // menu-navigation mode, checked before pointer mode so the Esc menu uses real
+    // navigation instead of the virtual cursor.
+    isMenuMode: () => hud.isFocusTrapped(),
+    onMenuIntent: (intent) => hud.handleMenuGamepadIntent(intent),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
   });
@@ -1744,6 +1755,9 @@ async function startGame(
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
+      // Live connection state, so the options footer shows the button-legend strip
+      // only while a pad is present.
+      connected: () => gamepad.isConnected(),
     },
   });
   if (online) {
@@ -2162,7 +2176,15 @@ async function startGame(
   // channel, passed through on the one engage-edge frame so the server still
   // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
-  function updateCamera(frameDt: number, interpFacing: number): void {
+  // Release hold for camera-owned headings (touch swipe-look, the camera
+  // joystick, right-mouse mouselook, Mouse Camera movement): after the drag
+  // releases, the render-interpolated facing spends up to a tick offline (a
+  // round trip online) replaying facing commits the camera itself authored.
+  // Feeding that echo back through the rigid follow term overshoots the
+  // released heading and the settle then drags it back: the visible release
+  // bounce. The hold keeps follow disengaged until the echo converges.
+  const cameraReleaseHold = newCameraReleaseHold();
+  function updateCamera(frameDt: number, interpFacing: number, echoMs = 0): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
     // When click-to-move ends, the player's facing snaps from the (camera-lagging)
@@ -2172,15 +2194,25 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    const mouselook = input.isMouselookActive();
+    const mouseCameraDriven = input.isMouseCameraMode() && cameraMoveActive();
+    const releaseHold = stepCameraReleaseHold(cameraReleaseHold, {
+      cameraOwned: mouselook || mouseCameraDriven,
+      camYaw: input.camYaw,
+      interpFacing,
+      frameDt,
+      echoMs,
+      manualTurn: mi.turnLeft || mi.turnRight,
+    });
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
       frameDt,
       lastInterpFacing,
-      mouselook: input.isMouselookActive(),
+      mouselook,
       moving: cameraFollowShouldSettle(mi, clickMoving),
       clickMoving,
-      cameraDriven: input.isMouseCameraMode() && cameraMoveActive(),
+      cameraDriven: mouseCameraDriven || releaseHold,
       orbiting: input.leftDown && input.isCameraDragActive(),
     });
     input.camYaw = next.camYaw;
@@ -2621,12 +2653,16 @@ async function startGame(
           alpha,
           frameDt,
         };
-    perf.trace('camera.follow', () => updateCamera(frameDt, kbFacing ?? interpServerFacing), {
-      mode: 'online',
-      alpha,
-      frameDtMs: frameDt * 1000,
-      lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
-    });
+    perf.trace(
+      'camera.follow',
+      () => updateCamera(frameDt, kbFacing ?? interpServerFacing, onlineInputEchoMs),
+      {
+        mode: 'online',
+        alpha,
+        frameDtMs: frameDt * 1000,
+        lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
+      },
+    );
     introCameraTick(now);
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
@@ -8149,35 +8185,43 @@ function wireStartScreens(): void {
   });
 
   // Initialize 3D character preview once assets are ready
-  assetsReady().then(() => {
-    const activePanelId = ['#charselect-panel', '#offline-select'].find(
-      (id) => !$(id).hasAttribute('hidden'),
-    );
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
-    const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-    if (container && canvas) {
-      characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
-        characterPreview.setAppearance(charselectAppearance(charselectSelected));
-      } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+  assetsReady()
+    .then(() => {
+      // ALL THREE play panels are init candidates, #charcreate-panel included: on
+      // a slow connection (a phone with a cold cache) assets finish AFTER the
+      // player has already registered and landed on the create panel, and the old
+      // two-panel list resolved to the hidden charselect container, so the canvas
+      // never reached #charcreate-preview-container and the create preview
+      // rendered nothing. show()'s own updatePreviewContainer call cannot repair
+      // it either: it no-ops until this constructor has run.
+      const activePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
+        (id) => !$(id).hasAttribute('hidden'),
+      );
+      const container = $('#online-preview-container');
+      const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
+      if (container && canvas) {
+        characterPreview = new CharacterPreview(container, canvas);
+        if (activePanelId) {
+          // The full panel wiring: re-homes the canvas into the active panel's
+          // container, applies the roster appearance or the selected class chip
+          // (+ skins), and runs the deferred size sync.
+          updatePreviewContainer(activePanelId);
+        } else if (charselectSelected) {
+          // Token auto-login selected a roster character before assets finished
+          // but no play panel is up yet: seed its real appearance for the reveal.
+          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+        } else {
+          characterPreview.setClass('warrior');
+        }
       }
-    }
-    decorateClassChips();
-  });
+      decorateClassChips();
+    })
+    .catch((err) => {
+      // assetsReady rejects when ANY preload failed (a flaky connection on a
+      // phone's cold first load): degrade to a missing preview instead of an
+      // unhandled rejection. Dev-channel only; the panels stay fully usable.
+      console.warn('character preview init skipped: asset preload failed', err);
+    });
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,

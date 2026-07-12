@@ -3,11 +3,19 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   NAMEPLATE_ANCHOR_LIFT,
+  NAMEPLATE_ENEMY_RANGE,
+  NAMEPLATE_ENEMY_RANGE_SQ,
+  NAMEPLATE_FADE_BAND,
   NAMEPLATE_RANGE,
   NAMEPLATE_RANGE_SQ,
+  NAMEPLATE_SCALE_FLOOR,
+  NAMEPLATE_SCALE_FULL_RANGE,
   NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT,
   NAMEPLATE_URGENT_RANGE,
+  nameplateFadeForDistance,
+  nameplateMaxRange,
   nameplatePlanInto,
+  nameplateScaleForDistance,
   newNameplatePlan,
 } from '../src/render/nameplate_view';
 
@@ -22,7 +30,8 @@ import {
 const PLAYER_ID = 1;
 
 // A minimal entity-view the core reads (everything else on Entity is ignored).
-// Default: a live wild wolf at the origin, far enough to matter per case.
+// Default: a live HOSTILE wild wolf at the origin (the enemy-plate case), far
+// enough to matter per case.
 function ent(overrides: Record<string, unknown> = {}): any {
   return {
     id: 2,
@@ -30,6 +39,7 @@ function ent(overrides: Record<string, unknown> = {}): any {
     pos: { x: 0, y: 0, z: 0 },
     dead: false,
     lootable: false,
+    hostile: true,
     templateId: 'wolf',
     dungeonId: null,
     scale: 1,
@@ -78,11 +88,37 @@ describe('nameplate_view - visibility', () => {
     expect(plan(me, viewer({ id: PLAYER_ID }), 2, true, true).hidden).toBe(false);
   });
 
-  it('hides any entity beyond NAMEPLATE_RANGE and shows it just inside', () => {
-    // NAMEPLATE_RANGE is the radius; just past it on z is hidden, just inside shows.
-    expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_RANGE + 1 } })).hidden).toBe(true);
-    expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_RANGE - 1 } })).hidden).toBe(false);
-    // boundary is squared distance vs NAMEPLATE_RANGE_SQ
+  it('cuts a live hostile mob (enemy plate) at NAMEPLATE_ENEMY_RANGE', () => {
+    // the radius on z: just past it is hidden, just inside shows.
+    expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_ENEMY_RANGE + 1 } })).hidden).toBe(true);
+    expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_ENEMY_RANGE - 1 } })).hidden).toBe(false);
+    // regression pin: the old shared 55yd radius no longer applies to enemies
+    // (distant enemy camps must not clutter a mobile-landscape screen).
+    expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_RANGE - 1 } })).hidden).toBe(true);
+    // the enemy radius sits well under the current shared/navigation radius
+    expect(NAMEPLATE_ENEMY_RANGE).toBeLessThan(NAMEPLATE_RANGE);
+    expect(NAMEPLATE_ENEMY_RANGE * NAMEPLATE_ENEMY_RANGE).toBe(NAMEPLATE_ENEMY_RANGE_SQ);
+  });
+
+  it('keeps non-enemy plates (players, npcs, friendly mobs, loot corpses) at NAMEPLATE_RANGE', () => {
+    const justInside = { x: 0, y: 0, z: NAMEPLATE_RANGE - 1 };
+    const justPast = { x: 0, y: 0, z: NAMEPLATE_RANGE + 1 };
+    // players and npcs are navigation/social aids: the wide radius is unchanged
+    expect(plan(ent({ id: 3, kind: 'player', hostile: false, pos: justInside })).hidden).toBe(
+      false,
+    );
+    expect(plan(ent({ id: 3, kind: 'player', hostile: false, pos: justPast })).hidden).toBe(true);
+    expect(plan(ent({ kind: 'npc', hostile: false, pos: justInside })).hidden).toBe(false);
+    // a friendly (non-hostile) mob is not an enemy plate
+    expect(plan(ent({ hostile: false, pos: justInside })).hidden).toBe(false);
+    // a lootable ENEMY corpse keeps the wide radius: its '$' plate is a loot
+    // beacon, not combat clutter
+    expect(plan(ent({ dead: true, lootable: true, pos: justInside })).hidden).toBe(false);
+    // the helper itself: enemy vs everything else
+    expect(nameplateMaxRange(ent())).toBe(NAMEPLATE_ENEMY_RANGE);
+    expect(nameplateMaxRange(ent({ hostile: false }))).toBe(NAMEPLATE_RANGE);
+    expect(nameplateMaxRange(ent({ dead: true, lootable: true }))).toBe(NAMEPLATE_RANGE);
+    expect(nameplateMaxRange(ent({ id: 3, kind: 'player', hostile: false }))).toBe(NAMEPLATE_RANGE);
     expect(NAMEPLATE_RANGE * NAMEPLATE_RANGE).toBe(NAMEPLATE_RANGE_SQ);
   });
 
@@ -189,6 +225,109 @@ describe('nameplate_view - anchor lift (projection input)', () => {
     expect(plan(meEmote, viewer({ id: PLAYER_ID }), 2, true, true).anchorYOffset).toBe(
       2 + NAMEPLATE_ANCHOR_LIFT,
     );
+  });
+});
+
+describe('nameplate_view - distance scale + fade (folded into the plate transform)', () => {
+  it('holds full scale up close and reaches the floor exactly at the cutoff', () => {
+    expect(nameplateScaleForDistance(0, NAMEPLATE_ENEMY_RANGE)).toBe(1);
+    expect(nameplateScaleForDistance(NAMEPLATE_SCALE_FULL_RANGE, NAMEPLATE_ENEMY_RANGE)).toBe(1);
+    expect(nameplateScaleForDistance(NAMEPLATE_ENEMY_RANGE, NAMEPLATE_ENEMY_RANGE)).toBeCloseTo(
+      NAMEPLATE_SCALE_FLOOR,
+      12,
+    );
+    expect(nameplateScaleForDistance(NAMEPLATE_RANGE, NAMEPLATE_RANGE)).toBeCloseTo(
+      NAMEPLATE_SCALE_FLOOR,
+      12,
+    );
+    // clamped past the cutoff: never shrinks below the legibility floor
+    expect(
+      nameplateScaleForDistance(NAMEPLATE_ENEMY_RANGE + 20, NAMEPLATE_ENEMY_RANGE),
+    ).toBeCloseTo(NAMEPLATE_SCALE_FLOOR, 12);
+  });
+
+  it('eases smoothly (smoothstep) and shrinks monotonically toward the floor', () => {
+    const mid =
+      NAMEPLATE_SCALE_FULL_RANGE + (NAMEPLATE_ENEMY_RANGE - NAMEPLATE_SCALE_FULL_RANGE) / 2;
+    expect(nameplateScaleForDistance(mid, NAMEPLATE_ENEMY_RANGE)).toBeCloseTo(
+      1 - (1 - NAMEPLATE_SCALE_FLOOR) / 2,
+      12,
+    );
+    let prev = 1;
+    for (let d = 0; d <= NAMEPLATE_ENEMY_RANGE; d += 1) {
+      const s = nameplateScaleForDistance(d, NAMEPLATE_ENEMY_RANGE);
+      expect(s).toBeLessThanOrEqual(prev + 1e-12);
+      expect(s).toBeGreaterThanOrEqual(NAMEPLATE_SCALE_FLOOR - 1e-12);
+      prev = s;
+    }
+  });
+
+  it('fades only inside the last NAMEPLATE_FADE_BAND yards, hitting 0 at the cutoff', () => {
+    expect(nameplateFadeForDistance(0, NAMEPLATE_ENEMY_RANGE)).toBe(1);
+    expect(
+      nameplateFadeForDistance(NAMEPLATE_ENEMY_RANGE - NAMEPLATE_FADE_BAND, NAMEPLATE_ENEMY_RANGE),
+    ).toBe(1);
+    expect(
+      nameplateFadeForDistance(
+        NAMEPLATE_ENEMY_RANGE - NAMEPLATE_FADE_BAND / 2,
+        NAMEPLATE_ENEMY_RANGE,
+      ),
+    ).toBeCloseTo(0.5, 12);
+    expect(nameplateFadeForDistance(NAMEPLATE_ENEMY_RANGE, NAMEPLATE_ENEMY_RANGE)).toBe(0);
+    expect(nameplateFadeForDistance(NAMEPLATE_ENEMY_RANGE + 3, NAMEPLATE_ENEMY_RANGE)).toBe(0);
+  });
+
+  it('pins the tuned values: enemy cutoff 40yd, wide 55yd, full-scale 15yd, floor 0.7, band 5yd', () => {
+    // literal pins so a silent retune reddens here (the mobile-clutter fix
+    // depends on these exact values)
+    expect(NAMEPLATE_ENEMY_RANGE).toBe(40);
+    expect(NAMEPLATE_RANGE).toBe(55);
+    expect(NAMEPLATE_SCALE_FULL_RANGE).toBe(15);
+    expect(NAMEPLATE_SCALE_FLOOR).toBe(0.7);
+    expect(NAMEPLATE_FADE_BAND).toBe(5);
+  });
+
+  it('the plan carries scale/fade for a visible plate and resets them on a hidden one', () => {
+    const out = newNameplatePlan();
+    // deep in the fade band: shrunk near the floor and mostly faded
+    const nearCutoff = nameplatePlanInto(
+      out,
+      ent({ pos: { x: 0, y: 0, z: NAMEPLATE_ENEMY_RANGE - 1 } }),
+      viewer(),
+      2,
+      true,
+      false,
+    );
+    expect(nearCutoff.hidden).toBe(false);
+    expect(nearCutoff.scale).toBeLessThan(0.75);
+    expect(nearCutoff.scale).toBeGreaterThanOrEqual(NAMEPLATE_SCALE_FLOOR);
+    expect(nearCutoff.fade).toBeCloseTo(1 / NAMEPLATE_FADE_BAND, 12);
+    // close plate: full scale, no fade
+    const close = plan(ent({ pos: { x: 0, y: 0, z: 5 } }));
+    expect(close.scale).toBe(1);
+    expect(close.fade).toBe(1);
+    // REUSED plan: a hidden entity must reset the cosmetic fields, not leak the
+    // previous entity's shrunken values through the shared out-param
+    const hidden = nameplatePlanInto(
+      out,
+      ent({ pos: { x: 0, y: 0, z: NAMEPLATE_ENEMY_RANGE + 10 } }),
+      viewer(),
+      2,
+      true,
+      false,
+    );
+    expect(hidden.hidden).toBe(true);
+    expect(hidden.scale).toBe(1);
+    expect(hidden.fade).toBe(1);
+  });
+
+  it('a non-enemy plate normalizes its falloff to the wide radius (larger at the same distance)', () => {
+    const z = NAMEPLATE_ENEMY_RANGE - 1;
+    const enemy = plan(ent({ pos: { x: 0, y: 0, z } }));
+    const friend = plan(ent({ id: 3, kind: 'player', hostile: false, pos: { x: 0, y: 0, z } }));
+    expect(friend.scale).toBeGreaterThan(enemy.scale);
+    // the wide radius's fade band starts at 50yd, so a 39yd player never fades
+    expect(friend.fade).toBe(1);
   });
 });
 

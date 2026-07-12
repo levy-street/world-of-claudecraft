@@ -240,13 +240,13 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 | Input | Action |
 |---|---|
-| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
+| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held); dedicated strafe keys are unbound by default and rebindable |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
-| `1`-`9`, `0`, `-`, `=` | action bar |
+| `1`-`9`, `0`, `Q`, `E` | action bar (`-`/`=` as alternates; the secondary bar sits on the numpad or `Shift+1` to `Shift+0`) |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `G` | character, spellbook, quest log, world map, bags, arena |
-| `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
+| `V` / `Z` / `R` / `Esc` | nameplates, damage meters, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 

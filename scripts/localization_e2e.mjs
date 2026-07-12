@@ -65,21 +65,21 @@ const FOCUS_SELECTORS = [
   '#btn-start-offline',
   '#actionbar .action-btn:not(.empty)',
   '#options-menu .btn',
-  '#options-menu .x-btn',
+  '#options-menu .window-close',
   '#spellbook .spell-row',
   '#quest-dialog .qd-list-item',
   '#quest-log-window .ql-item',
-  '#vendor-window .vendor-item',
+  '#vendor-window .vendor-row',
   '#market-window .mkt-tab',
   '#market-window .mkt-btn',
   '#market-window .mkt-list-btn',
-  '#social-window .soc-tab',
+  '#social-window [data-window-tab]',
   '#social-window .soc-x',
   '#social-window .soc-name.soc-link',
   '#trade-window .trade-item.mine',
   '#trade-window .btn',
   '#trade-copper',
-  '#bags .bag-item',
+  '#bags .item-cell',
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -358,13 +358,14 @@ async function assertNoClippedText(page, label) {
       'select',
       'textarea',
       '.panel-title',
+      '.window-title',
       '.qd-text',
       '.qd-obj',
       '.ql-item',
       '.spell-name',
       '.spell-sub',
-      '.vendor-item',
-      '.bag-item',
+      '.vendor-row',
+      '.item-cell',
       '.mkt-row',
       '.mkt-note',
       '#error-msg',
@@ -606,13 +607,14 @@ async function assertContrast(page, label) {
       'select',
       'textarea',
       '.panel-title',
+      '.window-title',
       '.qd-text',
       '.qd-obj',
       '.ql-item',
       '.spell-name',
       '.spell-sub',
-      '.vendor-item',
-      '.bag-item',
+      '.vendor-row',
+      '.item-cell',
       '.mkt-row',
       '.mkt-note',
       '#chatlog div',
@@ -961,11 +963,11 @@ async function runHudOptions(page, locale, viewport) {
     window.__game.hud.closeAll();
     window.__game.hud.toggleOptionsMenu();
   });
-  await page.waitForSelector('#options-menu .opt-btn', { timeout: WAIT_TIMEOUT });
+  await page.waitForSelector('#options-menu .window-title', { timeout: WAIT_TIMEOUT });
   await assertNonEnglishNotFallback(
     page,
     locale,
-    '#options-menu .panel-title span',
+    '#options-menu .window-title',
     'Game Menu',
     `options ${locale} ${viewport.name}`,
   );
@@ -984,7 +986,7 @@ async function runSpellbookAndActions(page, locale, viewport) {
   await assertNonEnglishNotFallback(
     page,
     locale,
-    '#spellbook .panel-title span',
+    '#spellbook .window-title',
     'Spellbook',
     `spellbook ${locale} ${viewport.name}`,
   );
@@ -1039,7 +1041,7 @@ async function runQuestSurfaces(page, scene, locale, viewport) {
   await assertNonEnglishNotFallback(
     page,
     locale,
-    '#quest-log-title',
+    '#quest-log-window .window-title',
     'Quest Log',
     `quest log ${locale} ${viewport.name}`,
   );
@@ -1054,8 +1056,8 @@ async function runItemVendorMarket(page, scene, locale, viewport) {
     window.__game.hud.closeAll();
     window.__game.hud.openVendor(npcId);
   }, scene.vendorNpcId);
-  await page.waitForSelector('#vendor-window .vendor-item', { timeout: WAIT_TIMEOUT });
-  await page.waitForSelector('#bags .bag-item', { timeout: WAIT_TIMEOUT });
+  await page.waitForSelector('#vendor-window .vendor-row', { timeout: WAIT_TIMEOUT });
+  await page.waitForSelector('#bags .item-cell', { timeout: WAIT_TIMEOUT });
   await assertAuditBasics(page, `inventory and vendor ${locale} ${viewport.name}`, {
     mobile: viewport.isMobile,
   });
@@ -1082,7 +1084,7 @@ async function runItemVendorMarket(page, scene, locale, viewport) {
     },
     { timeout: WAIT_TIMEOUT },
   );
-  await page.evaluate(() => document.querySelector('#bags .bag-item')?.click());
+  await page.evaluate(() => document.querySelector('#bags .item-cell')?.click());
   await page.waitForSelector('#mkt-c', { timeout: WAIT_TIMEOUT });
   await page.evaluate(() => {
     for (const id of ['mkt-g', 'mkt-s', 'mkt-c']) {
@@ -1155,11 +1157,11 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     g.hud.closeAll();
     g.hud.toggleSocial();
   });
-  await page.waitForSelector('#social-window.open .soc-tab', { timeout: WAIT_TIMEOUT });
+  await page.waitForSelector('#social-window.open [data-window-tab]', { timeout: WAIT_TIMEOUT });
   await assertNonEnglishNotFallback(
     page,
     locale,
-    '#social-window .panel-title span',
+    '#social-window .window-title',
     'Social',
     `social ${locale} ${viewport.name}`,
   );
@@ -1172,7 +1174,7 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     ['Eastbrook Vale'],
     `social friends ${locale} ${viewport.name}`,
   );
-  await page.click('#social-window .soc-tab[data-tab="guild"]');
+  await page.click('#social-window [data-window-tab="guild"]');
   await assertAuditBasics(page, `social guild ${locale} ${viewport.name}`, {
     mobile: viewport.isMobile,
   });
@@ -1182,7 +1184,7 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     ['Eastbrook Vale', 'Mirefen Marsh'],
     `social guild ${locale} ${viewport.name}`,
   );
-  await page.click('#social-window .soc-tab[data-tab="ignore"]');
+  await page.click('#social-window [data-window-tab="ignore"]');
   await assertAuditBasics(page, `social ignore ${locale} ${viewport.name}`, {
     mobile: viewport.isMobile,
   });

@@ -18,16 +18,22 @@ const indexHtml = readFileSync(new URL('../index.html', import.meta.url), 'utf8'
 const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8');
 
 describe('bank_window: no magic values', () => {
-  it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
+  it('carries no literal hex color in TS (the item-cell grammar resolves rarity in CSS)', () => {
     const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
-  it('uses the --color-quality-default token for the unranked-quality fallback', () => {
-    expect(painter).toContain('var(--color-quality-default)');
+  it('drives the slot rarity from data-quality (the item-cell grammar), no colour in TS', () => {
+    // The AAA .item-cell grammar resolves the rarity border from the quality tokens
+    // via data-quality (the view core already resolved slot.qualityKey), so the
+    // painter no longer sets a colour custom property; QUALITY_COLOR / the bank slot
+    // quality prop leave the painter entirely.
+    expect(painter).toContain("cell.setAttribute('data-quality', slot.qualityKey)");
+    expect(painter).not.toContain('--bank-slot-quality');
+    expect(painter).not.toContain('QUALITY_COLOR');
   });
 
-  it('defines --color-quality-default in the design-token sheet', () => {
+  it('defines --color-quality-default in the design-token sheet (the item-cell default)', () => {
     expect(tokens).toContain('--color-quality-default:');
   });
 
@@ -85,8 +91,14 @@ describe('bank_window: load-bearing behaviors preserved', () => {
     expect(renderBody).toContain('hadFocus');
   });
 
-  it('marks the window as a dialog root for the accessible name', () => {
-    expect(painter).toContain('markDialogRoot(');
+  it('is a dialog via the shared window frame (role + aria-labelledby on the inner mount)', () => {
+    // The frame builder (window_frame.ts) stamps role="dialog" + aria-labelledby on
+    // the mounted .window-frame from the BANK_FRAME descriptor, so the window no
+    // longer sets a separate markDialogRoot on the #bank-window root (which would
+    // nest a second dialog); the frame IS the dialog.
+    expect(painter).toContain('renderWindowFrame(mount, BANK_FRAME');
+    expect(painter).toContain("id: 'bank-window',");
+    expect(painter).not.toContain('markDialogRoot(');
   });
 });
 
@@ -128,9 +140,11 @@ describe('bank_window: modal prompt a11y contract', () => {
   it('confirm lands focus on the always-present close button; cancel returns to the opener', () => {
     // Three landings: buy confirm, quantity submit, and the render() re-land. The
     // rebuild detaches the opener node, so falling to <body> is the WCAG 2.4.3 bug.
+    // The frame close carries data-window-close (window_frame.ts), the landing hook.
     const landings =
-      painter.match(/querySelector\('\[data-close\]'\) as HTMLElement \| null\)\?\.focus\(\)/g) ??
-      [];
+      painter.match(
+        /querySelector\('\[data-window-close\]'\) as HTMLElement \| null\)\?\.focus\(\)/g,
+      ) ?? [];
     expect(landings.length).toBeGreaterThanOrEqual(3);
     expect(painter).toMatch(
       /const dismissAndReturn = \(\): void => \{\s*dismiss\(\);\s*opener\?\.focus\(\);/,
@@ -249,8 +263,10 @@ describe('bank_window: static window element is wired in both game entries', () 
 
 describe('bank_window: search / sort / deposit-all', () => {
   it('mounts the toolbar between the capacity counter and the grid, always in bank state', () => {
+    // The frame's scrollable body holds the capacity, toolbar, status, and grid in
+    // order (appended to `body`, the .window-body of the inner frame mount).
     const capIdx = painter.indexOf("capacity.setAttribute('aria-label'");
-    const barIdx = painter.indexOf('el.appendChild(this.buildFilterBar(model.empty));');
+    const barIdx = painter.indexOf('body.appendChild(this.buildFilterBar(model.empty));');
     const gridIdx = painter.indexOf("grid.className = 'bank-grid';");
     expect(capIdx).toBeGreaterThan(0);
     expect(barIdx).toBeGreaterThan(capIdx);
@@ -264,7 +280,7 @@ describe('bank_window: search / sort / deposit-all', () => {
     // `if (!bankEmpty)` block, the deposit append at 4 spaces OUTSIDE it (unconditional).
     expect(painter).toMatch(/private buildFilterBar\(bankEmpty: boolean\)/);
     expect(painter).toContain('if (!bankEmpty) {');
-    expect(painter).toContain('\n      tools.appendChild(search);'); // 6 spaces: gated
+    expect(painter).toContain('\n      tools.appendChild(searchField);'); // 6 spaces: gated
     expect(painter).toContain('\n    tools.appendChild(deposit);'); // 4 spaces: unconditional
     expect(painter).toContain('bank-deposit-all');
   });
@@ -494,9 +510,13 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     expect(block).toContain('bottom: max(10px, env(safe-area-inset-bottom))');
   });
 
-  it('hides the bank x-btn under the pairing (the bags x-btn closes the whole cluster)', () => {
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch\.bank-open #bank-window \.panel-title \.x-btn \{\s*display: none;/,
+  it('hides the bank close under the pairing (the bags close closes the whole cluster)', () => {
+    // The frame close is .window-close (window_frame.ts); the live hide lives in
+    // components.css (the AAA banner section), re-providing the legacy
+    // .panel-title .x-btn hud.mobile.css rule for the grammar close, which no longer
+    // matches now that the frame replaced the .panel-title chrome.
+    expect(components).toMatch(
+      /body\.mobile-touch\.bank-open #bank-window \.window-close \{\s*display: none;/,
     );
   });
 
@@ -551,6 +571,19 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     // exempted exactly as the vendor cluster is, or the mobile pairing silently regresses.
     expect(hud).toMatch(
       /classList\.contains\('bank-open'\)\s*&&\s*\(el\.id === 'bank-window' \|\| el\.id === 'bags'\)\s*\)\s*return;/,
+    );
+  });
+
+  it('never cascade-pins the bags companion on vendor open (vendor-then-bank dock intact)', () => {
+    // openVendor auto-opens #bags; the vendor itself floats and cascades like the
+    // Market, but if placeNewWindow also cascades the COMPANION it bakes an inline
+    // left/top onto #bags that survives closeVendor (nothing on the bank path
+    // clears it) and beats the bank's body.bank-open dock rule (inline wins over
+    // any layered rule), so the common hub flow vendor-then-bank leaves #bags
+    // detached from the bank pairing. The bags half must stay exempt while
+    // vendor-open, exactly as the bank cluster arm below it.
+    expect(hud).toMatch(
+      /classList\.contains\('vendor-open'\)\s*&&\s*el\.id === 'bags'\)\s*return;/,
     );
   });
 
@@ -627,8 +660,9 @@ describe('bank_window: bonus-slot breakdown footer', () => {
     const gridIdx = renderBody.indexOf('scroll.appendChild(grid);');
     const bonusIdx = renderBody.indexOf('this.buildBonusSection(model.bonus)');
     const bonusAppendIdx = renderBody.indexOf('scroll.appendChild(bonus);');
-    const scrollIdx = renderBody.indexOf('el.appendChild(scroll);');
-    const buyIdx = renderBody.indexOf('el.appendChild(this.buildBuyRow(model.buy));');
+    // The scroll region goes into the frame body; the buy row into the sticky footer.
+    const scrollIdx = renderBody.indexOf('body.appendChild(scroll);');
+    const buyIdx = renderBody.indexOf('footer.appendChild(this.buildBuyRow(model.buy));');
     expect(gridIdx).toBeGreaterThan(0);
     expect(bonusIdx).toBeGreaterThan(gridIdx);
     expect(bonusAppendIdx).toBeGreaterThan(bonusIdx);

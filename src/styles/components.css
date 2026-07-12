@@ -14,9 +14,27 @@
 
 @layer components {
   /* ---------- delve board ---------- */
+  /* Opened as display:flex by openDelveBoard so the window is a bounded flex
+     column: the chrome (title, delve name, marks, requirement lines, DELVE/SHOP
+     tab rail) is fixed and .delve-board-body is the one scroll region, so content
+     reflows on a corner resize (grow fills, shrink scrolls the body, chrome
+     stays) instead of the root growing past content-height. Mirrors the shared
+     .window-frame model (the frame windows get this from .window-body); the
+     hud-mobile layer re-asserts overflow-y:auto on the root exactly as it does
+     for the framed windows. */
   #delve-board {
     width: 360px;
     --window-pad: 14px;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #delve-board > *:not(.delve-board-body) {
+    flex: none;
+  }
+  #delve-board .delve-board-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
   }
   #delve-board .delve-board-name {
     font-family: var(--title-font);
@@ -132,12 +150,14 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: -2px;
   }
+  /* No own max-height/scroll: the shop list flows and the .delve-board-body
+     scroll region owns the single scroll, so the list follows the window size
+     (grows to fill a taller window, scrolls in a shorter one) instead of being
+     pinned to a fixed 320px height. */
   #delve-board .delve-shop-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-height: 320px;
-    overflow-y: auto;
   }
   #delve-board .delve-shop-row {
     display: flex;
@@ -2013,242 +2033,358 @@
   }
 
   /* ---------- talents ---------- */
-  /* talents & specializations panel */
+  /* Talents & specializations: the classic tiered-choices layout on the shared
+     AAA frame (titlebar + the CHOICES / SPECIALIZATION tab rail come from
+     window_frame.ts). Tier rows key on their unlock level (the left rail); each
+     row is a three-column grid of talent cards. Tokens only. */
   #talents-window {
-    width: min(600px, calc(100vw - 24px));
+    width: min(900px, calc(100vw - 24px));
   }
-  .tal-tabs {
-    display: flex;
-    gap: 6px;
-    margin: 8px 0 6px;
+  /* Full-height model: the talents window uses its whole height (no dead band
+     below the build panels on a tall or resized window). The root keeps the
+     painter's display:block open toggle but gets a definite default height (an
+     inline height from the resize grip overrides it); the frame fills it as a
+     flex column, the body is a non-scrolling flex column, #tal-body is the ONE
+     scroller (flex-fills), and .tal-foot rides the bottom as a full-width band. */
+  #talents-window:has(> .window-frame) {
+    height: min(780px, calc(100vh - 96px));
   }
-  .tal-tab {
-    position: relative;
-    flex: 1;
+  #talents-window > .window-frame {
+    height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    text-align: center;
-    min-height: 34px;
-    padding: 6px 8px;
-    font-size: 12px;
-    font-family: var(--title-font);
+    flex-direction: column;
+  }
+  #talents-window #tal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  /* Wide windows: the content keeps a sane centered reading column, so three
+     cards never stretch across a 1900px window. width:100% (with border-box)
+     keeps the capped flex/block children stretching below the cap; the auto
+     inline margins center them above it. */
+  #talents-window .tal-status,
+  #talents-window .tal-tiers,
+  #talents-window .tal-help,
+  #talents-window .tal-specs,
+  #talents-window .tal-mastery,
+  #talents-window .tal-foot {
+    width: 100%;
+    max-width: 1160px;
+    margin-inline: auto;
+    box-sizing: border-box;
+  }
+  /* Titlebar: the class name rides beside the static "Talents" title; the auto
+     right margin keeps the close control pinned to the edge. */
+  #talents-window .window-titlebar .tal-class-sub {
+    margin-right: auto;
     color: var(--color-text-muted);
-    background: #1c1609;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .tal-tab.active {
-    color: #fff7dc;
-    background: #3a2d10;
-    border-color: #ffd100;
-    box-shadow:
-      inset 0 0 0 1px #ffd10055,
-      0 0 8px #b8902a55;
-  }
-  .tal-tab.active::after {
-    content: "";
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: -1px;
-    height: 2px;
-    background: #ffd100;
-    border-radius: 2px;
-  }
-  .tal-tab .tt-pts {
-    min-width: 20px;
-    height: 18px;
+  /* Tab rail: the per-tab spent-points pip. */
+  #talents-window .tab .tt-pts {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
-    color: #f4df9f;
-    background: #0f0b06;
-    border: 1px solid #5f4b1a;
+    min-width: 20px;
+    height: 18px;
+    margin-left: var(--spacing-xs);
+    padding: 0 4px;
+    font-size: var(--text-xs);
+    font-family: var(--font-ui);
+    color: var(--gold-dim);
+    background: var(--color-bg-dark);
+    border: 1px solid var(--color-border-default);
     border-radius: 9px;
-    font-family: var(--body-font);
   }
-  .tal-head {
+  /* Status strip: staged choices (left), chosen specialization (right). */
+  .tal-status {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 12px;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-sm);
+    padding: 0 2px var(--spacing-sm);
+    border-bottom: 1px solid var(--panel-edge);
+    font-size: var(--text-sm);
     color: var(--color-text-muted);
-    margin: 2px 2px 6px;
   }
-  .tal-head b {
+  .tal-status b {
     color: var(--gold);
   }
-  #tal-body {
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 0 8px 8px;
-    margin: 0 -8px;
-  }
-  .tal-tree {
-    position: relative;
-    margin: 6px auto;
-  }
-  .tal-arrows {
-    position: absolute;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .tal-node {
-    position: absolute;
-    width: 46px;
-    height: 46px;
+  /* The body is the size container for the tier grid: the card columns collapse
+     on narrow widths (the mobile sheet, a resized-down window) via container
+     queries below. Flex column + overflow hidden complete the full-height
+     model above (#tal-body is the one scroller). */
+  #talents-window .window-body {
+    container-type: inline-size;
     display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  /* Tier rows: an unlock-level rail plus that tier's cards. Inside the
+     flex-filled #tal-body the tier list grows into the free height and
+     space-between distributes it BETWEEN tiers, so a tall window reads as a
+     full panel instead of a top-packed strip with a dead band. */
+  .tal-tiers {
+    display: grid;
+    gap: var(--spacing-md);
+    align-content: space-between;
+    flex: 1 0 auto;
+    margin: var(--spacing-xs) 0;
+  }
+  .tal-tier {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: var(--spacing-sm);
+  }
+  .tal-tier-rail {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2px;
+    padding: var(--spacing-xs);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background: var(--color-panel-l2-base);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .tal-tier-caption {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .tal-tier-num {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    line-height: 1;
+    color: var(--gold);
+  }
+  .tal-tier-lock {
+    width: 14px;
+    height: 14px;
+    margin-top: 3px;
+  }
+  /* A level-locked tier (the point budget cannot open it yet) dims as a row. */
+  .tal-tier.level-locked .tal-tier-num {
+    color: var(--color-text-muted);
+  }
+  .tal-tier.level-locked .tal-tier-cards {
+    opacity: 0.75;
+  }
+  .tal-tier-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+  }
+  /* Column identity from the content col, so a two-card row keeps its gap. */
+  .tal-card.tal-col-0 {
+    grid-column: 1;
+  }
+  .tal-card.tal-col-1 {
+    grid-column: 2;
+  }
+  .tal-card.tal-col-2 {
+    grid-column: 3;
+  }
+  /* Talent card: icon + name, state-coded border and fill. Every card sits
+     EXPLICITLY on its tier's single grid row (never auto-placement), so the
+     cards of one tier always align in one horizontal band with the level rail;
+     empty cells stay empty. The narrow container query below releases the pin
+     (grid-row: auto) when the tier collapses to a one-column stack. */
+  .tal-tier-cards > .tal-card {
+    grid-row: 1;
+  }
+  .tal-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-height: 68px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-talent-arrow-dim);
+    border-radius: var(--radius-sm);
+    background: var(--color-panel-l2-base);
+    color: var(--color-text-light);
     cursor: var(--cursor-point);
-    background: #15110a;
-    border: 2px solid #5a4a22;
-    color: #e8dcb0;
     user-select: none;
     box-sizing: border-box;
-    z-index: 1;
   }
-  .tal-node .tal-icon {
-    position: absolute;
-    inset: 2px;
-    display: block;
-    background-color: #15110a;
+  .tal-card .tal-icon {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-dark);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: 1;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-bg-dark) 60%, transparent);
   }
-  .tal-node.circle {
+  /* Shape identity survives the card layout: passives keep a circular icon and
+     choice (octagon) cards keep their silhouette; actives stay square. */
+  .tal-card.circle .tal-icon {
     border-radius: 50%;
   }
-  .tal-node.circle .tal-icon {
-    border-radius: 50%;
-  }
-  .tal-node.square {
-    border-radius: 7px;
-  }
-  .tal-node.square .tal-icon {
-    border-radius: 5px;
-  }
-  .tal-node.octagon {
-    border-radius: 8px;
-  }
-  .tal-node.octagon .tal-icon {
-    inset: 3px;
-    border-radius: 6px;
+  .tal-card.octagon .tal-icon {
     clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
   }
-  .tal-node.avail {
-    border-color: #b98b27;
-    box-shadow:
-      0 0 0 1px #0b0804,
-      0 0 7px #9a772855;
+  .tal-card-text {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
   }
-  .tal-node.avail::after {
+  .tal-card-name {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    letter-spacing: 0.2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-card-sub {
+    font-size: var(--text-sm);
+    color: var(--gold-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* States: selectable (accent border + "+"), selected (gold border + fill +
+     check), maxed (star + glow), locked (dimmed), dormant (warning). */
+  .tal-card.avail {
+    border-color: var(--color-primary-dim);
+  }
+  .tal-card.avail:hover {
+    border-color: var(--color-primary);
+  }
+  .tal-card.avail::after {
     content: "+";
     position: absolute;
-    left: -6px;
+    right: -6px;
     top: -7px;
     min-width: 15px;
     height: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #120d04;
-    background: #f5c843;
-    border: 1px solid #332403;
+    color: var(--color-bg-dark);
+    background: var(--gold);
+    border: 1px solid var(--panel-edge);
     border-radius: 50%;
-    font: 700 12px / 1 var(--body-font);
-    z-index: 3;
+    font: 700 12px / 1 var(--font-ui);
+    z-index: 1;
   }
-  .tal-node.filled {
-    border-color: #f5c843;
-    color: #fff;
-    background: #2c2410;
-    box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 10px #b8902a99;
+  .tal-card.filled,
+  .tal-card.maxed {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 9%, var(--color-panel-l2-base));
+    box-shadow: inset 0 0 0 1px var(--color-primary-glow);
   }
-  .tal-node.filled::after,
-  .tal-node.maxed::after {
+  .tal-card.filled::after,
+  .tal-card.maxed::after {
     content: "✓";
     position: absolute;
-    left: -6px;
+    right: -6px;
     top: -7px;
     min-width: 16px;
     height: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border: 1px solid #332403;
+    color: var(--color-bg-dark);
+    background: var(--gold);
+    border: 1px solid var(--panel-edge);
     border-radius: 50%;
-    font: 700 11px / 1 var(--body-font);
-    z-index: 3;
+    font: 700 11px / 1 var(--font-ui);
+    z-index: 1;
   }
-  .tal-node.maxed {
-    border-color: #ffe27a;
+  .tal-card.maxed {
     box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 13px #ffd100cc;
+      inset 0 0 0 1px var(--color-primary-glow),
+      0 0 8px var(--color-primary-glow);
   }
-  .tal-node.maxed::after {
+  .tal-card.maxed::after {
     content: "★";
     font-size: 10px;
   }
-  .tal-node.locked {
+  .tal-card.locked {
     opacity: 0.48;
-    filter: grayscale(0.75) brightness(0.72);
+    filter: grayscale(0.75) brightness(0.8);
     cursor: not-allowed;
   }
-  .tal-node.dormant {
-    border-color: #ff6d5a;
-    box-shadow:
-      inset 0 0 0 2px #2a0905,
-      0 0 10px #c0392bcc;
+  .tal-card.dormant {
+    border-color: var(--color-talent-dormant);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-talent-dormant) 40%, transparent);
   }
-  .tal-node.dormant::after {
+  .tal-card.dormant::after {
     content: "!";
     position: absolute;
-    left: -6px;
+    right: -6px;
     top: -7px;
     min-width: 16px;
     height: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff6e8;
-    /* literal, NOT --color-debuff: the value matches but a dormant-node warning badge is not a
-       combat debuff, and its sibling .tal-node.dormant border / shadow reds are literals too,
-       so keep the hand-tuned dormant-red palette cohesive. */
-    background: #c0392b;
-    border: 1px solid #3a0803;
+    color: var(--color-text-light);
+    background: var(--color-talent-dormant);
+    border: 1px solid var(--panel-edge);
     border-radius: 50%;
-    font: 800 11px / 1 var(--body-font);
-    z-index: 3;
+    font: 800 11px / 1 var(--font-ui);
+    z-index: 1;
   }
+  /* Rank badge (multi-rank talents): bottom-right of the card. */
   .tal-rank {
     position: absolute;
-    right: -6px;
+    right: 6px;
     bottom: -7px;
     min-width: 20px;
-    text-align: center;
-    font-size: 10px;
-    color: #fff6d5;
-    background: #171006;
-    border: 1px solid #ffd100;
-    border-radius: 8px;
     padding: 0 4px;
+    text-align: center;
+    font-size: var(--text-xs);
     line-height: 14px;
-    z-index: 4;
-    box-shadow: 0 1px 4px #000a;
+    color: var(--color-text-light);
+    background: var(--color-bg-dark);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    z-index: 1;
+  }
+  /* Narrow container (the mobile sheet, a resized-down window): each tier
+     stacks its cards in one column (column AND row identity yield to the flow;
+     the row release matters, or the one-row pin would overlap the stack), the
+     cards drop to compact sizing, and the build panels stack. */
+  @container (max-width: 700px) {
+    .tal-tier {
+      grid-template-columns: 48px minmax(0, 1fr);
+    }
+    .tal-tier-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .tal-tier-cards > .tal-card {
+      grid-column: auto;
+      grid-row: auto;
+      min-height: 56px;
+      padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    .tal-card .tal-icon {
+      width: 44px;
+      height: 44px;
+    }
+    .tal-card-name {
+      font-size: var(--text-sm);
+    }
+    .tal-foot {
+      grid-template-columns: 1fr;
+    }
   }
   .tal-specs {
     display: flex;
@@ -2334,35 +2470,31 @@
     color: var(--gold);
   }
   .tal-help {
-    margin: -2px 2px 6px;
-    font-size: 11px;
+    margin: var(--spacing-sm) 2px 0;
+    font-size: var(--text-xs);
     line-height: 1.35;
-    color: #a99b76;
+    color: var(--color-text-muted);
   }
+  /* Bottom band: the CURRENT BUILD / CREATE BUILD panels, side by side. */
   .tal-foot {
     display: grid;
     grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.9fr);
-    gap: 8px;
-    margin-top: 10px;
-    border-top: 1px solid #463a1c;
-    padding-top: 8px;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    border-top: 1px solid var(--panel-edge);
+    padding-top: var(--spacing-sm);
   }
   .tal-build-card {
     display: grid;
-    gap: 6px;
+    gap: var(--spacing-xs);
     align-content: start;
-    padding: 7px;
-    border: 1px solid #3f341a;
-    border-radius: 6px;
-    background: #120e08;
-    box-shadow: inset 0 0 0 1px #0008;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background: var(--color-panel-l2-base);
   }
   .tal-build-current {
-    background: #171208;
-    border-color: #59461d;
-  }
-  .tal-build-create {
-    background: #10120d;
+    border-color: var(--color-border-default);
   }
   .tal-build-head {
     display: flex;
@@ -2371,55 +2503,28 @@
     justify-content: space-between;
     min-width: 0;
     color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
   }
   .tal-build-head .ui-dd {
     min-width: 132px;
     flex: 1 1 150px;
-    font-family: var(--body-font);
+    font-family: var(--font-ui);
   }
   .tal-build-actions {
     display: flex;
-    gap: 6px;
+    gap: var(--spacing-xs);
     align-items: center;
     flex-wrap: wrap;
   }
+  .tal-build-actions .btn {
+    padding: 0 var(--spacing-sm);
+    font-size: var(--text-xs);
+  }
   .tal-build-help {
-    font-size: 11px;
+    font-size: var(--text-xs);
     line-height: 1.35;
-    color: #a99b76;
-  }
-  .tal-foot .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .tal-foot .btn.tal-primary {
-    border-color: #8f7025;
-    color: #ffe6a8;
-    background: linear-gradient(#7a5f21, #4d3810);
-  }
-  .tal-foot .btn.tal-secondary {
     color: var(--color-text-muted);
-    border-color: #4b3d1d;
-    background: #171208;
-  }
-  .tal-foot .btn[disabled] {
-    opacity: 0.45;
-    pointer-events: none;
-    cursor: not-allowed;
-  }
-  .tal-foot select,
-  .tal-foot input {
-    background: #14100a;
-    color: #e8dcb0;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    font-size: 11px;
-    padding: 4px;
-  }
-  .tal-spacer {
-    flex: 1;
   }
   .tal-empty {
     font-size: 12px;
@@ -2442,13 +2547,10 @@
     font-size: 14px;
   }
   @media (max-width: 460px) {
-    .tal-head {
+    .tal-status {
       align-items: flex-start;
       gap: 4px;
       flex-direction: column;
-    }
-    .tal-foot {
-      grid-template-columns: 1fr;
     }
     .tal-specs {
       gap: 6px;
@@ -2466,6 +2568,93 @@
     .tal-spec .ts-role {
       font-size: 9px;
     }
+  }
+
+  /* ---------- character + talents + crafting AAA frame ---------- */
+  /* The three heavy management windows (#char-window, #talents-window,
+     #crafting-window) adopt the shared .window-frame chrome (vendor_window.ts is
+     the committed reference). Unlike the vendor's bounded flex column, these keep
+     their legacy display:block root-scroll model: hud.ts reads
+     `style.display === 'block'` to detect each window's open state, so the block
+     value must survive. The frame mounts on an INNER container, so the shared
+     roots stay pristine `.window.panel` and their id-scoped viewport clamp +
+     resize grip + mobile inset rules keep matching. Tokens only. */
+  #char-window:has(> .window-frame),
+  #talents-window:has(> .window-frame),
+  #crafting-window:has(> .window-frame) {
+    /* Neutralize the legacy .panel chrome while a frame is mounted; the inner
+       .window-frame draws its own border, edge line, and background. */
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  /* char / crafting / valecup adopt the shared full-height flex model (like
+     talents), so every resizable window behaves the same: a definite root height
+     (the standard .window viewport cap; an explicit resize height overrides it
+     inline) plus a flex-column frame means the inner .window-body scrolls WITHIN
+     the frame instead of the whole root scrolling. That keeps the scrollbar
+     inside the frame chrome (not on the outer window edge) and the SE resize grip
+     pinned at the frame's visible corner, matching every other framed window.
+     Replaces the old block-scroll override that let the root grow and scroll
+     (scrollbar outside the frame, grip scrolled below the fold). valecup's own
+     :has block below is aligned to overflow:hidden for the same reason. */
+  #char-window:has(> .window-frame),
+  #crafting-window:has(> .window-frame),
+  #valecup-window:has(> .window-frame) {
+    height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
+    overflow: hidden;
+  }
+  #char-window > .window-frame,
+  #crafting-window > .window-frame,
+  #valecup-window > .window-frame {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  /* The resize gap fill (a root sized taller than its content must not show the
+     world through the transparent root) is now the ONE shared rule on every
+     direct-frame window: `.window:has(> .window-frame) > .window-frame`, in the
+     window-frame section below. char/talents/crafting used to carry it per-id. */
+  /* Pin the titlebar while the root scrolls (fixed-header AAA chrome). */
+  #char-window > .window-frame .window-titlebar,
+  #talents-window > .window-frame .window-titlebar,
+  #crafting-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  /* Character: the class identity strip (portrait + name + subtitles) was the
+     sticky .panel-title header; now the first body row under the frame titlebar. */
+  #char-window .window-body > .char-identity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  /* Restore the child flex rules the legacy .panel-title.char-title-portrait header
+     carried (shell.css): the portrait stays a fixed square and the text column
+     shrinks (min-width:0), so a long player name is bounded by the column instead
+     of pushing the portrait or overflowing the banner. Without these the renamed
+     .char-identity banner let long names break the row. */
+  #char-window .window-body > .char-identity > .char-title-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #char-window .window-body > .char-identity > .portrait-chip {
+    flex: 0 0 auto;
+  }
+  /* Talents: the class name rides in the titlebar beside the static "Talents"
+     title (.tal-class-sub, styled in the talents section above). */
+  /* Crafting: the recipe rows adopt the shared .vendor-row / .item-cell grammar
+     (styled in the vendor AAA section above); the reagent requirement line rides
+     inside the row name as a muted sub-line (was the legacy .vi-sub). */
+  #crafting-window .window-body .vendor-row .craft-reagents {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
   }
 
   /* ---------- modals and dropdown ---------- */
@@ -2895,93 +3084,325 @@
   }
 
   /* ---------- vendor ---------- */
-  /* vendor */
+  /* The legacy .vendor-item / .vi-name / .vi-price / .vi-sub / .vendor-section-title
+     / .vendor-empty / .vendor-sell-junk / .vendor-hint family was REMOVED: every
+     vendor surface now uses the AAA grammar below (.window-frame + .list-rows /
+     .vendor-row / .item-cell). The copper vendor (vendor_window.ts, whose sell-junk
+     row and hint are .vendor-row / .vendor-note) and the Heroic Quartermaster
+     (heroic_vendor_window.ts) both migrated, and crafting_window.ts builds
+     .vendor-row rows, so nothing emits the old classes. */
   #vendor-window {
     width: 400px;
+    /* Cap the floating desktop vendor 20% shorter than the generic .window 0.85
+       clamp (0.85 * 0.8 = 0.68). The window is top-anchored (top:10vh, no vertical
+       centering) so the trim comes off the BOTTOM, keeping the top in place and
+       clearing the player HP/HUD bar it used to overlap on live feedback. The
+       mobile 50/50 dock caps height in the later hud-mobile layer, so this desktop
+       clamp never reaches touch. */
+    max-height: calc(var(--app-vh, 100vh) * 0.68 / var(--window-scale) - 24px);
   }
-  .vendor-item {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-    padding: 5px;
+
+  /* Redesigned vendor: adopts the shared .window-frame chrome plus the
+     .list-rows / .item-cell grammar (spec 6.1 to 6.3). The frame mounts on an
+     INNER container
+     (vendor_window.ts ensureFrame), so the shared #vendor-window root never
+     carries builder classes or aria; the root overrides below are scoped with
+     :has(> .window-frame) (part of the documented engine floor, .browserslistrc),
+     which tracks the mounted frame exactly: the Heroic Quartermaster, the root's
+     second tenant, wipes the mount via innerHTML and instantly gets the legacy
+     .window.panel shell back, whatever the open/close sequence. Tokens only. */
+  #vendor-window:has(> .window-frame) {
+    /* Neutralize the legacy .panel chrome while the copper frame is mounted;
+       the inner .window-frame draws its own border, edge line, and background. */
+    padding: 0;
+    background: transparent;
     border: 0;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
+    outline: 0;
+    box-shadow: none;
+  }
+  /* State-driven visibility for the floating copper vendor. The painter never
+     writes an inline display on open (a baked value goes stale when
+     body.mobile-touch flips mid-session: Interface Mode, foldable rotation), so
+     the OPEN state (body.vendor-open, set by hud.openVendor) shows the window
+     here as the flex column the frame grammar bounds (titlebar/footer pinned,
+     body scrolls). On the touch HUD the 50/50 dock
+     (body.mobile-touch.vendor-open #vendor-window, hud.mobile.css) overrides
+     this to display:block by layer order, so a platform flip re-resolves the
+     display live with no re-render. closeVendor's inline display:none beats
+     both while closed, and the heroic tenant wipes the frame, so :has never
+     matches it (tenant isolation preserved). */
+  body.vendor-open #vendor-window:has(> .window-frame) {
+    display: flex;
+  }
+  #vendor-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  .window-frame .vendor-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 0;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: inherit;
-    font-family: var(--ui-font);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
     text-align: left;
-  }
-  .vendor-item:hover {
-    background: #ffffff10;
-  }
-  .vendor-item .vi-name {
-    font-size: 12px;
-    flex: 1;
-  }
-  .vendor-item .vi-price {
-    font-size: 11px;
-    color: #ddd;
-  }
-  .vendor-item .vi-sub {
-    display: block;
-    font-size: 10px;
-    color: #887c5c;
-  }
-  .vendor-item:disabled {
-    opacity: 0.45;
-    cursor: default;
-  }
-  .vendor-item:disabled:hover {
-    background: transparent;
-  }
-  .vendor-sell-junk {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    min-height: 40px;
-    margin-top: 8px;
-    padding: 8px;
-    border: 1px solid #6a5320;
-    border-radius: 4px;
     cursor: var(--cursor-point);
-    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
-    color: #ffe6a8;
-    font-family: var(--title-font);
-    font-size: 12px;
+    transition: background-color var(--dur-fast) var(--transition-ease);
   }
-  .vendor-sell-junk .vi-name {
-    flex: 0 1 auto;
+  .window-frame .vendor-row:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
   }
-  .vendor-sell-junk:hover:not(:disabled) {
-    filter: brightness(1.12);
-  }
-  .vendor-sell-junk:disabled {
-    opacity: 0.5;
+  .window-frame .vendor-row:disabled {
+    opacity: 0.4;
     cursor: default;
   }
-  .vendor-section-title {
-    margin-top: 8px;
-    padding-top: 7px;
-    border-top: 1px solid #463a1c;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
+  .window-frame .vendor-row .item-cell {
+    flex: none;
   }
-  .vendor-empty {
-    padding: 5px;
-    font-size: 11px;
-    color: #887c5c;
+  .window-frame .vendor-row .item-cell .item-icon {
+    width: 36px;
+    height: 36px;
   }
-  .vendor-hint {
-    font-size: 11px;
-    color: #c8b888;
-    margin-top: 8px;
-    border-top: 1px solid #463a1c;
-    padding-top: 6px;
+  .window-frame .vendor-row .vendor-row-name {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .window-frame .vendor-row .vendor-row-price {
+    flex: none;
+    color: var(--color-text-muted);
+  }
+  .window-frame .vendor-section {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--panel-edge);
+    color: var(--color-primary);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+  }
+  .window-frame .vendor-note {
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--panel-edge);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  .window-frame .window-footer .vendor-sell {
+    width: 100%;
+    justify-content: space-between;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-frame .vendor-row {
+      transition: none;
+    }
+  }
+
+  /* ---------- shop parity: standalone tabbed vendor + heroic grip ---------- */
+  /* Market-parity redesign (traders work like the Merchant): the copper vendor is
+     now a standalone Browse / Sell / Buyback tabbed window that no longer
+     force-docks Bags. hud.openVendor stopped setting body.vendor-open, so the
+     display can no longer key on it; show the window whenever its copper frame is
+     mounted. closeVendor's inline display:none still wins over this while closed,
+     and the heroic tenant mounts a .heroic-shop wrapper (not a direct-child
+     .window-frame), so this never matches it (shared-root tenant isolation holds).
+     The older body.vendor-open display + mobile 50/50 dock rules stay in the sheet
+     but never fire now, so they no longer reserve the docked half on mobile. */
+  #vendor-window:has(> .window-frame) {
+    display: flex;
+  }
+  /* The bulk sell-junk action moved from the (now removed) sticky footer into the
+     Sell tab body; keep it full-width with the label/proceeds split like a footer
+     action, with room below before the sellable rows. The compound .btn.vendor-sell
+     (0,3,0) is load-bearing: the later same-layer '.window-frame .btn' reset
+     (0,2,0) declares 'margin: 0', which used to win the cascade tie by source
+     order and flatten this gap to zero. */
+  .window-frame .btn.vendor-sell {
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+  }
+  /* The Heroic Quartermaster's frame nests one level under .heroic-shop, so the
+     old direct-child frame grip could never reach it and needed a bespoke restate.
+     The grip is now the .window root ::after pseudo (layout.css), which is
+     nesting-agnostic, so the heroic shop gets the SE grip for free like every
+     other resizable window. No per-tenant grip rule needed. */
+
+  /* ---------- bags + bank AAA frame ---------- */
+  /* Batch 1 of the all-windows AAA pass: the bags (#bags) and bank (#bank-window)
+     grids adopt the shared .window-frame chrome (window_frame.ts) plus the
+     .item-cell / .filter-row / .chip / .search-field / .empty-state grammar (spec
+     6.1 to 8), mirroring the vendor pilot. The frame mounts on an INNER container
+     (bags_window.ts / bank_window.ts), so each shared root stays pristine
+     .window.panel: the cluster docks (body.vendor-open / body.bank-open, the mobile
+     50/50 pairing) key on the root by id and are untouched, and the root overrides
+     below are scoped with :has(> .window-frame). The legacy grid/toolbar containers
+     (.bag-grid / .bank-grid / .bank-scroll / .bag-filter-bar / .bag-tools / .money /
+     .bank-capacity / .bank-buy-row / .bank-bonus*) keep their classes so the docking
+     and mobile rules that reference them stay live. Tokens only, no raw hex. */
+
+  /* Neutralize the legacy .panel chrome under the mounted frame (the vendor
+     :has(> .window-frame) precedent): the inner .window-frame draws its own border,
+     edge line, and background, so the root must not double them. The docking
+     geometry (left / width / transform / max-height in the bags + bank sections
+     below, and the mobile pairing) lives on the root and is untouched. */
+  #bags:has(> .window-frame),
+  #bank-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+
+  /* The body is a flex column so the slot grid (bags) / .bank-scroll region (bank)
+     is the ONE internal scroll region between the pinned bag bar / filter header /
+     capacity above and the money row (bags) / sticky footer (bank) below, exactly as
+     the pre-frame column did. The existing #bags/.bank-* flex:none/flex:1 rules in
+     the sections below still match (they are descendant selectors), so only the
+     column context moves from the root to .window-body. */
+  #bags > .window-frame > .window-body,
+  #bank-window > .window-frame > .window-body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Slot cells: the fixed 44px .item-cell grammar becomes a fluid square that fills
+     the auto-fill grid track (the classic bag look), the item icon fills the cell,
+     and the free-slot pad is a muted decorative cell. The rarity border + count
+     corner + focus ring come from the shared .item-cell grammar via data-quality. */
+  .window-frame .bag-grid .item-cell,
+  .window-frame .bank-grid .item-cell {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    /* SC 2.5.8: the --slot-cell column floor keeps every cell >= 40x40 on touch too. */
+    min-height: var(--touch-min);
+    padding: 0;
+    overflow: hidden;
+    font-family: var(--font-ui);
+  }
+  .window-frame .bag-grid .item-cell .item-icon,
+  .window-frame .bank-grid .item-cell .item-icon {
+    position: absolute;
+    inset: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    border: 0;
+    border-radius: var(--radius-sm);
+  }
+  .window-frame .bag-grid .item-cell:not(.is-empty):hover,
+  .window-frame .bank-grid .item-cell:not(.is-empty):hover {
+    filter: brightness(1.2);
+  }
+  .window-frame .bag-grid .item-cell.is-empty,
+  .window-frame .bank-grid .item-cell.is-empty {
+    cursor: default;
+    opacity: 0.5;
+  }
+  /* The empty / no-match line spans the whole grid rather than sitting in cell 1. */
+  .window-frame .bag-grid .empty-state,
+  .window-frame .bank-grid .empty-state {
+    grid-column: 1 / -1;
+  }
+
+  /* Search field fills the tools row (no leading icon in this set, so the grammar's
+     icon/clear padding is normalized back to a plain field). */
+  #bags .bag-tools .search-field,
+  #bank-window .bag-tools .search-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #bags .bag-tools .search-field input,
+  #bank-window .bag-tools .search-field input {
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
+  }
+
+  /* The buy-slots expansion row is the bank's sticky-footer bottom action: the
+     footer supplies the top border and padding, so drop the row's own separators and
+     let it fill the footer width (its .bank-buy-btn is already width:100%). */
+  #bank-window .window-footer .bank-buy-row {
+    flex: 1 1 auto;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  /* The transient "banker too far" away state builds the frame (footer included)
+     but appends no buy row; hide the empty footer bar so it never shows as a bare
+     strip in that brief pre-grace-close flash. */
+  #bank-window .window-footer:empty {
+    display: none;
+  }
+
+  /* Touch: the grammar's own tap floors apply (spec 6.1; the 44px item-cell already
+     clears 40x40 via the column floor above, so only the 24px chip needs raising).
+     This components rule governs on touch because the hud-mobile layer carries no
+     .chip / .filter-row rule to outrank it. */
+  body.mobile-touch .window-frame .chip {
+    min-height: var(--touch-min);
+  }
+  /* Touch: the slot grids re-track to the --touch-cell floor and REFLOW to fewer
+     columns (live user feedback: the item icons read too small to tap inside the
+     50/50 bank / market docks). The cells are fluid aspect-ratio squares, so the
+     wider track is what grows them, and the icon inside already fills the cell.
+     Cell size stays fixed at the floor; the COLUMN COUNT is what yields. The
+     desktop base rules now share the same 56px value via --slot-cell, so these
+     re-tracks are value-no-ops, but they stay as the INDEPENDENT touch tap-size
+     guarantee (they keep holding if the desktop floor diverges) and the dock
+     geometry (the 50/50 split rules in hud.mobile.css) is untouched. :is(), not a
+     two-selector list: the bank_window.test.ts scroll-contract slices anchor on
+     this file's first bank-grid rule OPENER, which must stay the base rule in the
+     bank section below (this block must not spell that opener out, even here). */
+  body.mobile-touch :is(.bag-grid, .bank-grid) {
+    grid-template-columns: repeat(auto-fill, minmax(var(--touch-cell), 1fr));
+  }
+  body.mobile-touch .window-frame .bag-grid .item-cell,
+  body.mobile-touch .window-frame .bank-grid .item-cell {
+    min-height: var(--touch-cell);
+  }
+  /* The bag-bar sockets (backpack + 4 equip slots) grow to the same touch floor so
+     every icon target in the window reads one size; the bar wraps so the capacity
+     counter drops to its own line instead of overflowing the narrowest dock halves
+     (five 56px sockets + the counter no longer always fit half of a 740px phone). */
+  body.mobile-touch .bag-socket {
+    width: var(--touch-cell);
+    height: var(--touch-cell);
+  }
+  body.mobile-touch .bag-bar {
+    flex-wrap: wrap;
+  }
+  /* Short landscape phones: keep the bank-cluster chip filter-row ONE horizontally
+     scrollable row so a two-row wrap never squeezes the docked grid to a sliver
+     (the behavior the legacy .bag-chips rule protected, re-provided for the grammar
+     container; standalone bags and the vendor cluster keep the family wrap).
+     HOME NOTE (task 11): these bags/bank body.mobile-touch rules deliberately STAY
+     in components.css (the tidier home) rather than re-home into hud.mobile.css: the
+     hud-mobile layer carries no competing .chip/.filter-row rule, so layer order
+     makes them correct where they sit, grouped with the bags/bank grammar they
+     modify, and a lateral move would only add churn/regression risk. */
+  body.mobile-touch #bank-window .window-frame .filter-row,
+  body.mobile-touch.bank-open #bags .window-frame .filter-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #bank-window .window-frame .filter-row .chip,
+  body.mobile-touch.bank-open #bags .window-frame .filter-row .chip {
+    flex: 0 0 auto;
+  }
+  /* The bank's own close hides under the 50/50 pairing (the visible bags close is
+     the cluster's single close control, bags_window.ts), re-providing the legacy
+     .panel-title .x-btn hide for the grammar close. */
+  body.mobile-touch.bank-open #bank-window .window-close {
+    display: none;
   }
 
   /* ---------- bags ---------- */
@@ -3018,15 +3439,29 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  /* The money readout lives in the frame's PINNED footer (it used to be the
+     scrollable body's last child, where the touch sheet pushed it below the
+     fold and the 11px-dot readout was effectively invisible on a phone). It
+     fills the footer row and steps up from the 12px .money base to a proper
+     coin-purse readout. */
   #bags .money {
     flex: none;
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 100%;
+    margin-top: 0;
+    font-size: var(--text-md);
+    font-variant-numeric: tabular-nums;
   }
   /* coins stay right-aligned whether or not the $WOC chip is present */
   #bags .money .money-inline {
     margin-left: auto;
+  }
+  #bags .money .coin {
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
   }
   .woc-balance {
     display: inline-flex;
@@ -3055,7 +3490,7 @@
      badge in the bottom-right corner, and free capacity paints as empty sockets. */
   .bag-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));
     gap: 4px;
     padding: 2px;
     align-content: start;
@@ -3063,7 +3498,7 @@
   .bag-item {
     position: relative;
     aspect-ratio: 1;
-    /* SC 2.5.8: the 42px column floor keeps every cell >= 40x40 on touch too. */
+    /* SC 2.5.8: the --slot-cell column floor keeps every cell >= 40x40 on touch too. */
     min-width: 0;
     min-height: 40px;
     padding: 0;
@@ -3121,17 +3556,24 @@
     border-color: #2f281a;
     box-shadow: inset 0 2px 6px #000d;
   }
-  /* The bag bar: backpack + the 4 equip sockets + the used/total counter. */
+  /* The bag bar: backpack + the 4 equip sockets + the used/total counter. Wraps
+     on EVERY host (was touch-only): at the 56px --slot-cell socket size five
+     sockets + gaps already fill the default 310px window's content box, so
+     without the wrap the capacity counter clipped under the body's
+     overflow:hidden; wrapped, it drops to its own line exactly like touch. */
   .bag-bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 4px;
     margin: 4px 0 2px;
   }
   .bag-socket {
     position: relative;
-    width: 40px;
-    height: 40px;
+    /* Matches the item grid's --slot-cell floor so the bag bar and the cells
+       below it read one size (the touch rule re-states this via --touch-cell). */
+    width: var(--slot-cell);
+    height: var(--slot-cell);
     flex: none;
     padding: 0;
     border: 1px solid #4a3d26;
@@ -3374,7 +3816,7 @@
   }
   .bank-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));
     gap: 4px;
     padding: 2px;
     align-content: start;
@@ -3382,7 +3824,7 @@
   .bank-item {
     position: relative;
     aspect-ratio: 1;
-    /* SC 2.5.8: the 42px column floor keeps every cell >= 40x40 on touch too. */
+    /* SC 2.5.8: the --slot-cell column floor keeps every cell >= 40x40 on touch too. */
     min-width: 0;
     min-height: 40px;
     padding: 0;
@@ -3557,6 +3999,86 @@
     width: 320px;
     max-height: calc(var(--app-vh, 100vh) * 0.72 / var(--window-scale) - 24px);
     transform: translateX(var(--bank-dock-gap));
+  }
+
+  /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
+  /* The quest log, mailbox, social panel, and spellbook adopt the shared
+     window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
+     frame on an INNER container, so the shared .window.panel root keeps its
+     drag/resize/position machinery and the frame draws its own chrome; these
+     overrides neutralize the legacy .panel shell while a frame is mounted and let
+     the frame bound the window as a height-clamped flex column (titlebar/footer
+     pinned, .window-body scrolls). Tokens only, no literal colours; batch 1
+     anchors its own section after the vendor AAA block to keep merges clean. */
+
+  /* Neutralize the legacy .panel chrome while a frame is mounted (the inner
+     .window-frame draws its own border, edge line, and background). The
+     :has(> .window-frame) selector tracks the mounted frame exactly. The painter
+     opens the window with an inline display:flex, so the global
+     .window:has(> .window-frame) rule (flex-direction:column; overflow:hidden)
+     bounds the frame as a height-clamped flex column; closed windows keep
+     display:none. */
+  #quest-log-window:has(> .window-frame),
+  #spellbook:has(> .window-frame),
+  #mailbox-window:has(> .window-frame),
+  #social-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  /* Social keeps the '.open' class as its visibility switch (never inline display);
+     the frame grammar bounds it as a flex column the same way. The per-tab list,
+     notice, and add-row footer flow inside the scrolling .window-body, matching the
+     pre-frame whole-panel scroll. */
+
+  /* Quest log: the two panes (list + measure-capped detail) fill the scrolling
+     body. The frame body owns the outer scroll; the list scrolls with it and the
+     detail caps its own reading measure. */
+  #quest-log-window {
+    width: 520px;
+  }
+  #quest-log-window .window-body .ql-cols {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+    min-height: 0;
+  }
+  #quest-log-window .window-body .ql-detail {
+    max-height: none;
+    max-width: 46ch;
+  }
+  #quest-log-window .window-footer .btn {
+    min-width: 0;
+  }
+  /* An empty log renders no footer action: collapse the bar (spellbook parity). */
+  #quest-log-window .window-footer:empty {
+    display: none;
+  }
+
+  /* Spellbook: the class kit list fills the scrolling body; the reset-bar action
+     (form-bar classes only) sits in the footer, which collapses when empty so
+     single-bar classes show no bare sticky bar. Drag-to-actionbar rows keep the
+     existing .spell-row grammar from the spellbook section. */
+  #spellbook .window-body .spell-list {
+    min-height: 0;
+  }
+  #spellbook .window-footer:empty {
+    display: none;
+  }
+  #spellbook .window-footer .spellbook-reset {
+    white-space: nowrap;
+  }
+
+  /* Mailbox: the frame body is a flex column so the in-body inbox/send tabs stay
+     pinned above the #mailbox-body pane, which owns the inner scroll (the pre-frame
+     behavior). The reading pane / send form scroll inside #mailbox-body as before. */
+  #mailbox-window .window-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
   }
 
   /* ---------- social ---------- */
@@ -4159,6 +4681,125 @@
     font-size: 11px;
     color: #d8cba0;
     margin-top: 4px;
+  }
+
+  /* ---------- AAA window-frame adoption: light special windows (batch 5) ---------- */
+  /* Light windows adopting the shared .window-frame chrome (spec 6.1 to 6.3):
+     town_focus, loot_settings, rite, vale_cup and arena (framed) plus
+     corpse_harvest (a grammar-aligned picker inside the loot popup, styled with
+     its own rules in its section). Each framed root keeps display:block (its Hud
+     open/close and isOpen checks stay unchanged), so the layout is the ROOT-SCROLL
+     model: neutralize the legacy .panel chrome under :has(> .window-frame) (the
+     documented engine floor, .browserslistrc), re-enable the root's own vertical
+     scroll (the frame base sets overflow:hidden for the flex model), and pin the
+     titlebar sticky so it holds while the root scrolls. The inner .window-frame
+     draws its own border, edge line, and background. Tokens only; the per-window
+     body content classes keep their existing sections. */
+
+  /* town-focus: budget + stepper rows in the body, Save in the sticky footer. */
+  #town-focus-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #town-focus-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  #town-focus-window .window-footer .town-focus-save {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* loot-settings: a plain form. The root stays the static dialog (index.html +
+     the Hud focus trap), so the frame is chrome only; its body content classes
+     (.ls-body, .ls-row, selects) keep their existing hud.css rules. */
+  #loot-settings-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #loot-settings-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
+  /* rite: the Drowned Reliquary difficulty popup (a centered fixed .window that
+     stays draggable via the titlebar). The display-font title is the ceremony
+     moment; the blurb, guide, and ante grid keep their lp-ante-* / rite-guide
+     rules from the lockpick section. */
+  #delve-rite-panel:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #delve-rite-panel > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
+  /* vale-cup: the event hub. The root stays the dialog (markDialogRoot on open),
+     so the frame is chrome only; the vcup-* body sections keep their rules in the
+     Vale Cup section below. */
+  #valecup-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    /* overflow: hidden (not the old overflow-y: auto): valecup joins the shared
+       full-height flex model above, so its .window-body scrolls internally and
+       the root never scrolls (scrollbar stays inside the frame, grip stays put). */
+    overflow: hidden;
+  }
+  #valecup-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
+  /* arena: the Ashen Coliseum scoreboard (the documented DOM-rendered exception,
+     team-color tokens kept). The root stays the dialog (markDialogRoot on open),
+     so the frame is chrome only; the arena-* body sections keep their rules in the
+     Ashen Coliseum section above. */
+  #arena-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #arena-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  /* The bracket tag rides next to the display-font title inside the titlebar. */
+  #arena-window > .window-frame .window-title .arena-bracket-tag {
+    margin-left: var(--spacing-sm);
+    vertical-align: middle;
   }
 
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
@@ -5720,6 +6361,110 @@
     gap: 8px;
     align-items: center;
   }
+
+  /* ---------- AAA window-frame adoption: tables + transactional (batch 3) ----------
+     The World Market chrome polish plus the shared .window-frame chrome
+     (window_frame.ts) for the leaderboard, calendar, daily rewards, and the
+     Heroic Quartermaster. Each single-tenant window mounts the frame on a
+     direct-child inner container (window_frame_mount.ts), so its .window.panel
+     root stays chrome-neutral (neutralized below with :has(> .window-frame), the
+     documented engine floor) and the inner frame draws the titlebar / body. Two
+     scroll models, each preserving the window's existing behavior:
+       - calendar is a bounded flex column (its .cal-day-pane keeps the scroll);
+       - leaderboard + daily keep their ROOT scroll (display stays block, so the
+         frame body is content-height and the root scrolls under a sticky
+         titlebar), leaving the .lb-body / .dr-body inner scroll unchanged.
+     The Heroic Quartermaster co-tenants #vendor-window with the copper vendor,
+     whose vendor_window.ts reuses a DIRECT-CHILD frame; heroic's frame nests one
+     level deeper inside a .heroic-shop wrapper so copper's reuse rule never
+     matches it and the shared root stays pristine either way. Tokens only. */
+
+  /* Market: chrome-only. The reference drag/resize window keeps its structure and
+     its flush sticky .panel-title; only the title font + a bottom edge line adopt
+     the AAA titlebar look (a full frame wrap would fight its .window-padding /
+     flush-header geometry, so this is the titlebar-restyle boundary). */
+  #market-window .panel-title {
+    min-height: var(--window-titlebar-h);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  #market-window .panel-title > span:first-child {
+    font-family: var(--font-display);
+    color: var(--window-title-color);
+  }
+
+  /* Leaderboard + Daily Rewards: root-scroll frame windows. Neutralize the legacy
+     .panel chrome (the inner frame draws its own), re-enable the vertical root
+     scroll the global .window:has(> .window-frame) rule turns off, and pin the
+     titlebar so it stays put while the board / reward body scrolls under it. */
+  #leaderboard-window:has(> .window-frame),
+  #daily-rewards-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+    overflow-y: auto;
+  }
+  #leaderboard-window > .window-frame .window-titlebar,
+  #daily-rewards-window > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+
+  /* Calendar: a bounded flex column. Neutralize the legacy .panel chrome; the
+     frame body is a flex column so the month nav + grid stay fixed and the
+     .cal-day-pane owns the scroll (its existing flex:1 / overflow-y:auto). */
+  #calendar-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+  }
+  #calendar-window > .window-frame > .window-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Heroic Quartermaster: the co-tenant frame nests inside .heroic-shop, so the
+     neutralize + sticky-titlebar rules key on that wrapper. The root scrolls
+     (display stays block), so the titlebar is pinned sticky like the copper
+     vendor's docked titlebar. */
+  #vendor-window:has(> .heroic-shop) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    outline: 0;
+  }
+  #vendor-window > .heroic-shop > .window-frame .window-titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    background: var(--panel-l1-bg);
+  }
+  /* Resize gap fill for the heroic tenant: its frame nests under .heroic-shop, so
+     the shared `.window:has(> .window-frame) > .window-frame` rule (a direct-child
+     selector) cannot reach it. Fill the two-level chain the same way the flex
+     model does: the wrapper fills the resized root and the frame flex-grows to
+     fill the wrapper, so a root sized taller than the shop never shows the world
+     through the transparent root. Inert before a resize (min-height:100% resolves
+     to 0 against the content-driven root); root-scroll is preserved because the
+     wrapper grows to content when the shop is taller than the root. */
+  #vendor-window > .heroic-shop {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+  #vendor-window > .heroic-shop > .window-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
   #map-canvas {
     /* Authored display size matching the 560x560 backing store (index.html /
        play.html). Without a CSS length the canvas box is a replaced intrinsic size,
@@ -5742,10 +6487,506 @@
     touch-action: none;
   }
   /* ---------- options / game menu (Esc) ---------- */
+  /* The Warden's Codex desktop chrome: #options-menu adopts the shared
+     .window-frame grammar at XL size. It DRAGS by its titlebar and RESIZES by the
+     corner band like every grammar window (maintainer direction supersedes the P2
+     fixed-window ruling); the XL width/height below is the DEFAULT, overridden by
+     an inline size once resized. The frame body hosts the shell search strip
+     (fixed) then a recessed rail + detail two-pane; the rail and detail are the two
+     independent scrollers. Tokens only; the .opt-* names are net-new. */
   #options-menu {
-    width: 420px;
+    width: min(1200px, calc(var(--app-vw, 100vw) * 0.92));
+    height: min(800px, calc(var(--app-vh, 100vh) * 0.88));
     z-index: 40;
   }
+  #options-menu:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    overflow: hidden;
+  }
+  /* The frame body never scrolls itself: it stacks the fixed search strip over
+     the two-pane grid, whose rail + detail own the scrolling. */
+  #options-menu .window-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    /* Query container so the rail's icon-collapse reacts to the WINDOW width, not
+       the viewport: the Codex now drags/resizes, so a narrow window must collapse
+       the rail even on a wide desktop (maintainer drag/resize direction). */
+    container-type: inline-size;
+    container-name: opt-shell;
+  }
+  /* Shell search strip: first body tab stop, reuses the shared .search-field. */
+  .opt-search {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  .opt-search .search-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .opt-scopes {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex: none;
+  }
+  .opt-scope {
+    height: var(--control-h-compact);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+  }
+  .opt-scope[aria-pressed="true"] {
+    color: var(--color-bg-dark);
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .opt-scope:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  /* Body grid: recessed rail (L2 base under the L1 gradient) + detail pane. */
+  .opt-body {
+    display: grid;
+    grid-template-columns: var(--opt-rail-w) 1fr;
+    /* Bind the single implicit row to the grid's own height (minmax(0,1fr), never
+       the default auto): an auto row sizes to its tallest content, so a long detail
+       pane grew the row past the frame and the rail/detail scrollbars then spanned
+       that overgrown height, scrolling the user out of bounds (live feedback on the
+       wide-rail mobile settings). A bounded row makes the panes scroll internally. */
+    grid-template-rows: minmax(0, 1fr);
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+  .opt-rail {
+    overflow-y: auto;
+    /* min-height:0 defeats the grid item's default min-height:auto, so the pane can
+       shrink below its content and its overflow-y actually creates a scrollport. */
+    min-height: 0;
+    background-color: var(--color-panel-l2-base);
+    background-image: var(--panel-l1-bg);
+    border-inline-end: 1px solid var(--panel-edge);
+    padding: var(--spacing-sm) 0;
+  }
+  .opt-detail {
+    overflow-y: auto;
+    min-height: 0;
+    padding: var(--spacing-lg);
+  }
+  .opt-detail-inner {
+    max-width: 40rem;
+  }
+  /* Rail groups + category tabs. */
+  .opt-rail-group {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--gold-dim);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-xs);
+  }
+  .opt-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    min-height: var(--touch-min);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 0;
+    border-inline-start: 3px solid transparent;
+    background: transparent;
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    text-align: start;
+    cursor: var(--cursor-point);
+  }
+  .opt-tab:hover {
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+  }
+  .opt-tab.is-active {
+    border-inline-start-color: var(--color-primary);
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+  .opt-tab-icon {
+    flex: none;
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+  }
+  .opt-tab-icon .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .opt-tab-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .opt-tab-count {
+    flex: none;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--color-primary-glow);
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    line-height: 18px;
+    text-align: center;
+  }
+  /* Aggregate conflict dot: pinned to the tab corner so it survives the icon-only
+     collapse (the label/count are visually hidden under 900px, this stays). */
+  .opt-tab-dot {
+    position: absolute;
+    top: 5px;
+    inset-inline-end: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-notify-warning);
+  }
+  /* Controller duplicate chip sits left of the remap dropdown in the row control. */
+  .opt-dup-chip {
+    flex: none;
+  }
+  /* Detail: category header (display gold) + muted subhead, then sections. */
+  .opt-cat-head {
+    font-family: var(--font-display);
+    font-size: var(--text-title);
+    color: var(--color-gold);
+  }
+  .opt-cat-sub {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 2px 0 var(--spacing-md);
+  }
+  .opt-section {
+    margin-top: var(--spacing-lg);
+  }
+  .opt-section:first-of-type {
+    margin-top: 0;
+  }
+  .opt-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: 32px;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--gold-dim);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  .opt-section-reset {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: var(--cursor-point);
+  }
+  .opt-section-reset:hover {
+    color: var(--color-text-light);
+  }
+  /* Row grammar: borderless rows, section hairlines only (spec section 4). */
+  .opt-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--spacing-md);
+    min-height: var(--touch-min);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+  }
+  .opt-row:hover {
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+  }
+  /* The authoritative focus / controller-cursor cue (spec section 4): a token inset
+     border on the inline-start edge (zero layout shift) plus the hover tint. Set by
+     the focus model on focusin, NOT derived from :focus-visible (programmatic and
+     controller focus do not reliably light it), so it is always visible. */
+  .opt-row.is-active-row {
+    box-shadow: inset 2px 0 0 var(--focus-ring-color);
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+  }
+  .opt-row-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    color: var(--color-text-light);
+  }
+  .opt-row-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+  }
+  .opt-note {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+  /* Slider: reuse the shared --range-fill gold-track paint; tabular readout. */
+  .opt-slider {
+    width: 180px;
+    max-width: 45vw;
+    accent-color: var(--gold);
+    cursor: var(--cursor-point);
+  }
+  .opt-slider-val {
+    min-width: 48px;
+    text-align: end;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Switch: replaces the text ON/OFF button (role=switch, aria-checked). */
+  .opt-switch {
+    position: relative;
+    flex: none;
+    width: 44px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: 12px;
+    background: var(--color-bg-input);
+    cursor: var(--cursor-point);
+    transition:
+      background-color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  .opt-switch::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+    transition:
+      transform calc(var(--dur-fast) * var(--motion-scale)) var(--transition-ease),
+      background-color var(--dur-fast) var(--transition-ease);
+  }
+  .opt-switch[aria-checked="true"] {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .opt-switch[aria-checked="true"]::before {
+    transform: translateX(20px);
+    background: var(--color-bg-dark);
+  }
+  /* Segmented control: role=radiogroup of role=radio buttons (4-or-fewer). */
+  .opt-seg {
+    display: inline-flex;
+    flex: none;
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .opt-seg-btn {
+    height: var(--control-h-compact);
+    padding: 0 var(--spacing-sm);
+    border: 0;
+    border-inline-start: 1px solid var(--panel-edge);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+  }
+  .opt-seg-btn:first-child {
+    border-inline-start: 0;
+  }
+  .opt-seg-btn.is-selected {
+    background: var(--color-primary);
+    color: var(--color-bg-dark);
+  }
+  /* Dropdown controls inside option rows (the controller remap rows, the
+     language picker): the trigger already wears the .window-frame .btn AAA
+     reset, but the flyout menu still wore the legacy hud skin (hard #1a140a,
+     gold border, 5px radius). Re-token it to the Codex panel grammar, matching
+     the .opt-switch / .opt-seg treatment above. Tokens only. */
+  #options-menu .ui-dd-menu {
+    background: var(--color-panel-l2-base);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+  }
+  #options-menu .ui-dd-item {
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+  }
+  #options-menu .ui-dd-item.sel {
+    color: var(--color-primary);
+  }
+  /* Overview landing: quick actions, pin mirrors, the reload alert, status. */
+  .opt-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+  .opt-pin-home {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .opt-alert {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-urgency-warn) 12%, transparent);
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+  .opt-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--panel-edge);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  /* All-scope search results (basic P2 version). */
+  .opt-result-group {
+    margin-top: var(--spacing-md);
+  }
+  .opt-result-crumb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .opt-goto {
+    border: 0;
+    background: transparent;
+    color: var(--color-accent);
+    font-size: var(--text-xs);
+    cursor: var(--cursor-point);
+  }
+  /* Subhead line for a category-level search result (a synonym hit with no rows). */
+  .opt-result-sub {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-xs);
+  }
+  .opt-empty {
+    padding: var(--spacing-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  /* Footer: reset-all on the inline start, the rest on the inline end. */
+  #options-menu .window-footer {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .opt-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  /* Controller button-legend strip: full-width row above the footer actions,
+     shown only while a pad is connected (spec section 5). */
+  .opt-legend {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs) var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .opt-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  .opt-legend-glyph {
+    padding: 0 var(--spacing-xs);
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Steady token focus ring on every custom control (never animated away). */
+  #options-menu .opt-tab:focus-visible,
+  #options-menu .opt-switch:focus-visible,
+  #options-menu .opt-seg-btn:focus-visible,
+  #options-menu .opt-scope:focus-visible,
+  #options-menu .opt-section-reset:focus-visible,
+  #options-menu .opt-goto:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .opt-switch,
+    .opt-switch::before {
+      transition: none;
+    }
+  }
+  /* Under 900px effective WINDOW width: collapse the rail to an icon strip (labels
+     + counts + group headers become the tab's title tooltip). A container query on
+     the window body so it reacts to a resized/dragged window, not just the viewport
+     (the conflict dot stays visible: it is not in this hidden set). */
+  @container opt-shell (max-width: 900px) {
+    #options-menu .opt-body {
+      grid-template-columns: 56px 1fr;
+    }
+    #options-menu .opt-tab {
+      justify-content: center;
+      padding-inline: var(--spacing-xs);
+    }
+    #options-menu .opt-tab-label,
+    #options-menu .opt-tab-count,
+    #options-menu .opt-rail-group {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+  /* Mobile (P5): under body.mobile-touch the two-pane grid is not rendered at all;
+     the dedicated full-screen back-stack shell (options_mobile_shell.ts) replaces
+     it, styled in the hud-mobile layer (.opt-mshell-*, which outranks components).
+     The reused .opt-* row/control grammar above is shared by both surfaces. */
   .opt-list {
     display: flex;
     flex-direction: column;
@@ -5851,10 +7092,47 @@
     color: #ffd9a0;
     border-color: #4a3d1d;
   }
+  /* Capturing cap (spec section 6): a gold border that breathes at fx medium+, and
+     a steady gold border (no animation) at low fx / under reduced motion. */
+  @keyframes kb-capture-breathe {
+    0%,
+    100% {
+      box-shadow: 0 0 4px var(--color-primary-glow);
+    }
+    50% {
+      box-shadow: 0 0 10px var(--gold);
+    }
+  }
   .kb-key.capturing {
     border-color: var(--gold);
-    color: #fff;
-    box-shadow: 0 0 8px #ffd100aa;
+    color: var(--color-text-light);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+    animation: kb-capture-breathe calc(1.6s * var(--motion-scale, 1)) ease-in-out infinite;
+  }
+  :root[data-fx-level="low"] .kb-key.capturing {
+    animation: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kb-key.capturing {
+      animation: none;
+    }
+  }
+  /* On-screen Cancel affordance next to the capturing cap (touch has no Escape).
+     The compound .window-frame .btn.kb-cancel (0,3,0) is load-bearing: the button
+     renders inside the options window's frame, where the later
+     '.window-frame .btn { margin: 0 }' reset (0,2,0) outranked the old bare
+     .kb-cancel (0,1,0) and welded Cancel to the capturing cap (the same cascade
+     disease the sell-junk gap fix documents). */
+  .window-frame .btn.kb-cancel,
+  .kb-cancel {
+    margin-inline-start: var(--spacing-xs);
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  /* Transient "key removed" badge on a just-displaced bind row. */
+  .kb-evicted {
+    margin-inline-start: var(--spacing-xs);
+    flex: none;
   }
   .kb-note {
     font-size: 11px;
@@ -7702,6 +8980,761 @@
   @media (prefers-reduced-motion: reduce) {
     .dc-voice-dot.is-speaking {
       animation: none;
+    }
+  }
+
+  /* ---------- AAA grammar: panels and window chrome ---------- */
+  /* The shared component grammar for the AAA redesign (docs/design/
+     ui-ux-redesign-spec.md sections 6.1 and 8). Additive: nothing consumes it
+     yet (the window frame builder src/ui/window_frame.ts stamps these classes,
+     and Task 3 wires the first window). Tokens only, no literal colours.
+
+     Collision policy: the frame chrome + depth panels below are NEW class names
+     (no existing selector), so they are global. The CONTENT grammar further
+     down is SCOPED under .window-frame so nothing outside a redesigned window
+     restyles (strictly additive; no element carries the class yet). Two
+     collision cases, resolved by how CSS cascades (LAYER ORDER outranks
+     specificity; the barrel order is tokens, base, layout, components, hud,
+     shell, hud-mobile):
+     - Same-layer colliders (.btn here in components.css; .bar / .bar-fill in
+       hud.css, which also targets @layer components): scoping is enough, the
+       .window-frame descendant selector wins on specificity within the layer.
+     - Later-layer colliders (.btn-primary / .btn-danger / .badge live in
+       shell.css, @layer shell, which OUTRANKS components regardless of
+       specificity): those names are not reused at all; the grammar uses the
+       modifier forms .btn.is-primary / .btn.is-danger and the prefixed
+       .ui-badge (the .ui-icon naming precedent) instead. */
+
+  /* Three panel depths sharing one visual language (spec 9.2). */
+  .panel-l0 {
+    background: var(--color-panel-l0-bg);
+    border: 1px solid var(--color-panel-l0-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  .panel-l1 {
+    background: var(--panel-l1-bg);
+    border: 1px solid var(--window-border);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  /* L2 must never composite the world through it: the gradient rides a fully
+     solid base (spec 9.2), so no translucency reaches the 3D canvas. */
+  .panel-l2 {
+    background-color: var(--color-panel-l2-base);
+    background-image: var(--panel-l1-bg);
+    border: 1px solid var(--color-border-focus);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+
+  /* Shared header row (40px, display-font title, right-aligned control cluster). */
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: var(--window-titlebar-h);
+    padding: 0 var(--spacing-md);
+  }
+
+  /* The window frame: an L1 panel with a framed border, an inner edge line, and
+     a decorative corner ornament at fx medium and up. */
+  .window-frame {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* Solid base UNDER the panel gradient: --panel-l1-bg is a ~0.95-alpha gradient,
+       so on its own the 3D world bleeds through a framed window, worst across the
+       empty area of a window resized taller than its content (live feedback: the
+       menu bottoms read as see-through). The gradient stays the visible surface
+       (subtle vertical shading) but now sits on an opaque --panel-base, so nothing
+       shows through. UNCONDITIONAL: no mode may thin a framed window (an earlier
+       frosted-panels exception dropped this base to transparent and the leak came
+       straight back for players with that setting persisted on). Frosted panels
+       keeps its backdrop blur on the non-frame chrome (chat, legacy .panel),
+       where translucency is intentional. */
+    background-color: var(--panel-base);
+    background-image: var(--panel-l1-bg);
+    border: 1px solid var(--window-border);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+  }
+  /* The resize grip is now ONE ::after pseudo on the .window root (layout.css),
+     drawn above the frame body and any sticky footer, so a framed window needs no
+     grip layer in its own background: the base .window-frame `background:
+     var(--panel-l1-bg)` above is the whole story. This also retires the old
+     multi-layer frame-background grip (a grip gradient layered over the panel
+     gradient), whose per-layer size/position lists leaked into a 12x12 dot on
+     touch (PR #1736 round 3): a single-layer background can no longer truncate. */
+  /* Move / resize / viewport-fit parity with the World Market for every
+     grammar-built window: the host .window (shown as display:flex, the Market
+     precedent) becomes a clipping flex column, and the frame fills it as the
+     height-bounded flex column. Its .window-body (flex:1, min-height:0,
+     overflow-y:auto) then scrolls internally between the pinned titlebar and
+     footer, so the window fits the viewport (the shared .window max-height in
+     layout.css) with no double scrollbar and never overflows. Scope note:
+     flex-direction only binds a flex host, but overflow:hidden binds ANY
+     frame-hosting window regardless of display (load-bearing: the clip is what
+     prevents an outer scrollbar), so a window that mounts a frame must either
+     be shown as a flex column (the vendor: the body.vendor-open display rule in
+     its section) or override the overflow itself (the touch dock re-asserts
+     overflow-y:auto in the hud-mobile layer). Windows without a mounted frame
+     are untouched. */
+  .window:has(> .window-frame) {
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .window > .window-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  /* Resize gap fill, ONE rule for every direct-frame window so it can never
+     diverge across the batch (char/talents/crafting once had it per-id; the
+     sibling root-scroll windows, arena/vale_cup/loot_settings/town_focus/rite/
+     leaderboard/daily_rewards, did not, so a resize taller than their content
+     showed the 3D world through the transparent root). The root-scroll windows
+     keep display:block and grow their root height on a resize (window_resize.ts
+     writes el.style.height on the .window root, an explicit definite height); the
+     frame fills that height so nothing shows below short content. Inert for the
+     flex-model windows and before any resize: their .window carries only a
+     max-height (no explicit height), so the percentage resolves to 0 and the
+     min-height:0 shrink above stays intact; once a resize sets an explicit height
+     the frame already fills as flex:1, so this is a no-op change for them. */
+  .window:has(> .window-frame) > .window-frame {
+    min-height: 100%;
+  }
+  /* Corner ornaments: pure decoration (spec 6.1), zero layout impact
+     (position: absolute, pointer-events: none), rendered only at fx medium and
+     up (the low tier drops them via the gate below). */
+  .window-frame::before,
+  .window-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: var(--window-ornament-size);
+    height: var(--window-ornament-size);
+    pointer-events: none;
+    border-top: 1px solid var(--color-primary-dim);
+  }
+  .window-frame::before {
+    left: 0;
+    border-left: 1px solid var(--color-primary-dim);
+    border-top-left-radius: var(--radius-md);
+  }
+  .window-frame::after {
+    right: 0;
+    border-right: 1px solid var(--color-primary-dim);
+    border-top-right-radius: var(--radius-md);
+  }
+  /* Low fx tier: no ornaments (decoration only, spec 10.3). */
+  :root[data-fx-level="low"] .window-frame::before,
+  :root[data-fx-level="low"] .window-frame::after {
+    display: none;
+  }
+
+  /* Titlebar: 40px desktop; the title is the one display-font moment here. */
+  .window-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-height: var(--window-titlebar-h);
+    padding: 0 var(--spacing-sm) 0 var(--spacing-md);
+    border-bottom: 1px solid var(--panel-edge);
+    flex: none;
+  }
+  .window-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    letter-spacing: 0.4px;
+    color: var(--window-title-color);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Close: a 40px minimum hit area (via padding) even though the glyph is
+     smaller, colour/border only on hover (no transform), tokenized throughout. */
+  .window-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding: var(--spacing-sm);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-close .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .window-close:hover {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-close {
+      transition: none;
+    }
+  }
+
+  .window-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+  }
+  /* Sticky footer action row for transactional windows (spec 6.1). */
+  .window-footer {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    flex: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-top: 1px solid var(--panel-edge);
+    background: var(--color-panel-l2-base);
+  }
+
+  /* Tab rail: 36px tall, a gold underline on the active tab, horizontal scroll
+     rather than wrapping (spec 8). */
+  .tab-rail {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: stretch;
+    flex: none;
+    padding: 0 var(--spacing-sm);
+    border-bottom: 1px solid var(--panel-edge);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .tab-rail::-webkit-scrollbar {
+    height: 0;
+  }
+  .tab {
+    flex: 0 0 auto;
+    height: var(--control-h);
+    padding: 0 var(--spacing-md);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  .tab:hover {
+    color: var(--color-text-light);
+  }
+  .tab[aria-selected="true"] {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tab {
+      transition: none;
+    }
+  }
+
+  /* ---------- AAA grammar: controls, data, and states ---------- */
+  /* Scoped under .window-frame (see the collision policy above): the class names
+     here already exist globally, so scoping keeps this strictly additive until a
+     window opts into the redesigned frame. Tokens only. */
+
+  /* Buttons: 36px, hover brightens the BORDER (never a transform scale, per the
+     motion-sickness invariant), active adds an inset shade, disabled drops to
+     0.4 opacity, loading preserves width so the row never shifts.
+     The legacy same-layer .btn skin (the quest-dialog block earlier in this
+     file) leaks every property this block does not declare, so the resets here
+     are load-bearing: margin (10px/8px), outline (1px solid black), text-shadow,
+     the base box-shadow, the hover brightness filter, the :active translateY,
+     and the disabled grayscale filter are each neutralized explicitly. */
+  .window-frame .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    height: var(--control-h);
+    padding: 0 var(--spacing-md);
+    margin: 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    text-shadow: none;
+    box-shadow: none;
+    filter: none;
+    cursor: var(--cursor-point);
+    transition:
+      border-color var(--dur-fast) var(--transition-ease),
+      background-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .btn:hover:not(:disabled) {
+    border-color: var(--color-border-focus);
+    filter: none;
+    box-shadow: none;
+  }
+  .window-frame .btn:active:not(:disabled) {
+    box-shadow: inset 0 2px 6px color-mix(in srgb, var(--color-bg-dark) 70%, transparent);
+    transform: none;
+  }
+  .window-frame .btn:disabled,
+  .window-frame .btn[aria-disabled="true"] {
+    opacity: 0.4;
+    filter: none;
+    box-shadow: none;
+    cursor: default;
+  }
+  /* Loading: the label is hidden but its width is preserved (min-width), so the
+     button does not collapse while a spinner shows. */
+  .window-frame .btn.is-loading {
+    color: transparent;
+    pointer-events: none;
+    min-width: var(--control-h);
+  }
+  .window-frame .btn.is-primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-bg-dark);
+    font-family: var(--font-display);
+  }
+  .window-frame .btn.is-primary:hover:not(:disabled) {
+    border-color: var(--color-text-light);
+  }
+  .window-frame .btn-ghost {
+    background: transparent;
+  }
+  .window-frame .btn.is-danger {
+    border-color: var(--color-border-invalid);
+    color: var(--color-text-error);
+  }
+  .window-frame .btn.is-danger:hover:not(:disabled) {
+    border-color: var(--color-text-error);
+  }
+
+  /* Icon button: control-height square with a badge slot top-right. */
+  .window-frame .icon-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-h);
+    height: var(--control-h);
+    padding: 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+    transition: border-color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .icon-btn:hover:not(:disabled) {
+    border-color: var(--color-border-focus);
+  }
+  .window-frame .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .window-frame .icon-btn .ui-badge {
+    position: absolute;
+    top: calc(-1 * var(--spacing-xs));
+    right: calc(-1 * var(--spacing-xs));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-frame .btn,
+    .window-frame .icon-btn {
+      transition: none;
+    }
+  }
+
+  /* Fields: label above, validation line below coloured by the validity tokens;
+     aria-invalid drives the input border. */
+  .window-frame .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  .window-frame .field > label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .window-frame .field input,
+  .window-frame .field textarea,
+  .window-frame .field select {
+    height: var(--control-h);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+  }
+  .window-frame .field textarea {
+    height: auto;
+    padding: var(--spacing-sm);
+  }
+  .window-frame .field input[aria-invalid="true"] {
+    border-color: var(--color-border-invalid);
+  }
+  .window-frame .field-line {
+    font-size: var(--text-xs);
+    min-height: var(--text-md);
+  }
+  .window-frame .field-line.is-invalid {
+    color: var(--color-border-invalid);
+  }
+  .window-frame .field-line.is-valid {
+    color: var(--color-border-valid);
+  }
+
+  /* Search field: a field with a leading icon slot and a trailing clear button. */
+  .window-frame .search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .window-frame .search-field .search-icon {
+    position: absolute;
+    left: var(--spacing-sm);
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+  .window-frame .search-field input {
+    width: 100%;
+    height: var(--control-h);
+    padding: 0 calc(var(--spacing-md) + var(--control-h)) 0
+      calc(var(--spacing-md) + var(--spacing-sm));
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+  }
+  .window-frame .search-field .search-clear {
+    position: absolute;
+    right: var(--spacing-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-h);
+    height: var(--control-h);
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+
+  /* Filter row of chip toggles. */
+  .window-frame .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+  .window-frame .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    height: 24px;
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    cursor: var(--cursor-point);
+    /* No transform on hover/focus, ever (spec 8; motion-sickness invariant). */
+    transition:
+      border-color var(--dur-fast) var(--transition-ease),
+      color var(--dur-fast) var(--transition-ease);
+  }
+  .window-frame .chip:hover {
+    border-color: var(--color-border-focus);
+  }
+  .window-frame .chip[aria-pressed="true"] {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .window-frame .chip {
+      transition: none;
+    }
+  }
+
+  /* Card: an L1 mini surface with 12px padding. */
+  .window-frame .card {
+    padding: 12px;
+    border: 1px solid var(--window-border);
+    border-radius: var(--radius-md);
+    background: var(--panel-l1-bg);
+  }
+
+  /* Data table: sticky header, 32px rows, zebra via a panel-depth tint. */
+  .window-frame .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  .window-frame .data-table th,
+  .window-frame .data-table td {
+    height: 32px;
+    padding: 0 var(--spacing-sm);
+    text-align: left;
+  }
+  .window-frame .data-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-panel-l2-base);
+    color: var(--color-primary);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    border-bottom: 1px solid var(--panel-edge);
+  }
+  .window-frame .data-table tbody tr:nth-child(odd) {
+    background: color-mix(in srgb, var(--color-text-light) 4%, transparent);
+  }
+
+  /* Vertical list of rows for a master pane. */
+  .window-frame .list-rows {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Item cell: 44px, a rarity border from the quality tokens (via data-quality),
+     a count corner, focusable. */
+  .window-frame .item-cell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-quality-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    cursor: var(--cursor-point);
+  }
+  .window-frame .item-cell[data-quality="poor"] {
+    border-color: var(--color-quality-poor);
+  }
+  .window-frame .item-cell[data-quality="common"] {
+    border-color: var(--color-quality-common);
+  }
+  .window-frame .item-cell[data-quality="uncommon"] {
+    border-color: var(--color-quality-uncommon);
+  }
+  .window-frame .item-cell[data-quality="rare"] {
+    border-color: var(--color-quality-rare);
+  }
+  .window-frame .item-cell[data-quality="epic"] {
+    border-color: var(--color-quality-epic);
+  }
+  .window-frame .item-cell[data-quality="legendary"] {
+    border-color: var(--color-quality-legendary);
+  }
+  .window-frame .item-cell .item-cell-count {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    padding: 0 2px;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    background: color-mix(in srgb, var(--color-bg-dark) 78%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Progress / resource bars: a track with a fill, resource variants coloured by
+     the existing resource tokens. margin-top resets the legacy same-layer .bar
+     skin's 3px (hud.css targets this layer too); spacing comes from the parent
+     layout, never a baked bar margin. */
+  .window-frame .bar {
+    position: relative;
+    height: 14px;
+    margin-top: 0;
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    overflow: hidden;
+  }
+  .window-frame .bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+  }
+  .window-frame .bar.hp .bar-fill {
+    background: var(--color-hp);
+  }
+  .window-frame .bar.mana .bar-fill {
+    background: var(--color-mana);
+  }
+  .window-frame .bar.rage .bar-fill {
+    background: var(--color-rage);
+  }
+  .window-frame .bar.energy .bar-fill {
+    background: var(--color-energy);
+  }
+
+  /* Badge: a 16px count pill with priority variants from the notification
+     tokens. Named .ui-badge (the .ui-icon precedent), not .badge: the legacy
+     .badge lives in shell.css (@layer shell), which outranks this layer. */
+  .window-frame .ui-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 var(--spacing-xs);
+    border: 1px solid var(--color-notify-info);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+    line-height: 1;
+  }
+  .window-frame .ui-badge.badge-success {
+    border-color: var(--color-notify-success);
+  }
+  .window-frame .ui-badge.badge-warning {
+    border-color: var(--color-notify-warning);
+  }
+  .window-frame .ui-badge.badge-critical {
+    border-color: var(--color-notify-critical);
+  }
+
+  /* Shared window states (spec 6.1): one visual each across every window. */
+  .window-frame .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+  .window-frame .loading-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  .window-frame .loading-state .skeleton-row {
+    height: var(--control-h);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-muted) 18%, transparent);
+  }
+  .window-frame .error-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-notify-critical);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-notify-critical) 14%, transparent);
+    color: var(--color-text-error);
+    font-size: var(--text-sm);
+  }
+
+  /* ---------- AAA grammar: focus ring ---------- */
+  /* One shared, steady (never transitioned) focus ring for every new interactive
+     class, drawn from the focus-ring tokens (spec 9.8). */
+  .window-frame .btn:focus-visible,
+  .window-frame .btn-ghost:focus-visible,
+  .window-frame .icon-btn:focus-visible,
+  .window-frame .chip:focus-visible,
+  .window-frame .card:focus-visible,
+  .window-frame .item-cell:focus-visible,
+  .window-frame .field input:focus-visible,
+  .window-frame .field textarea:focus-visible,
+  .window-frame .field select:focus-visible,
+  .window-frame .search-field input:focus-visible,
+  .window-frame .search-clear:focus-visible,
+  .window-frame .data-table [tabindex]:focus-visible,
+  .window-close:focus-visible,
+  .tab:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  /* The legacy same-layer .btn:focus-visible ring (the quest-dialog block) is
+     !important, and within one layer an !important declaration beats any normal
+     one regardless of specificity, so the token ring above would lose on framed
+     buttons. Re-assert it (and drop the legacy glow box-shadow) with !important
+     at higher specificity, which wins among important declarations. Tokens only. */
+  .window-frame .btn:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+    outline-offset: var(--focus-ring-offset) !important;
+    box-shadow: none !important;
+  }
+  /* Forced colours: keep the frame / panel borders and the focus ring alive via
+     system colours (mirrors the base.css forced-colors section; the global
+     :focus-visible Highlight net there already covers these controls, so this
+     block only needs to preserve the panel edges the forced palette would drop). */
+  @media (forced-colors: active) {
+    .window-frame,
+    .panel-l0,
+    .panel-l1,
+    .panel-l2,
+    .window-frame .card,
+    .window-frame .item-cell,
+    .window-frame .error-banner {
+      border: 1px solid CanvasText;
+    }
+    .tab[aria-selected="true"] {
+      border-bottom-color: Highlight;
+    }
+    /* The selected segment conveys selection by gold fill + dark text, both of
+       which the forced palette drops; an inset system-colour outline keeps it
+       visually distinct for sighted users (aria-checked already exposes it to AT).
+       outline (not border) so there is zero layout shift inside the .opt-seg. */
+    .opt-seg-btn.is-selected {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    /* The switch conveys on/off only via the track fill (--color-primary) and the
+       borderless ::before thumb background, both of which the forced palette strips
+       to Canvas: the thumb goes Canvas-on-Canvas (invisible, so its left/right
+       position cannot be read) and the checked/unchecked tracks look identical.
+       Give the thumb a solid system-colour fill so it stays visible (its left=off /
+       right=on travel is then the non-colour cue) and the checked track a Highlight
+       border to reinforce it. aria-checked already exposes the state to AT. Mirrors
+       the .opt-seg-btn.is-selected treatment above. */
+    .opt-switch::before {
+      background: CanvasText;
+    }
+    .opt-switch[aria-checked="true"] {
+      border-color: Highlight;
+    }
+    .opt-switch[aria-checked="true"]::before {
+      background: Highlight;
+    }
+    /* The conflict dot conveys state by color, which the forced palette drops; keep
+       it visible via a system-colour fill (it pairs with the banner text + the tab's
+       aria-label, so AT already has the non-colour cue). */
+    .opt-tab-dot {
+      background: Mark;
     }
   }
 }

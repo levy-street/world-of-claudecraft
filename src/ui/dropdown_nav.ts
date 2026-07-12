@@ -40,6 +40,9 @@ export function dropdownKeyNav(
     }
   }
 
+  // Typeahead is handled by the consumer (it needs the option labels); this core
+  // only owns the structural navigation keys.
+
   // Expanded.
   switch (key) {
     case 'ArrowDown':
@@ -65,4 +68,29 @@ export function dropdownKeyNav(
     default:
       return { kind: 'none' };
   }
+}
+
+/** Listboxes with this many options or more get first-letter typeahead (WAI-ARIA
+ *  listbox convention; research-brief). Below it, arrow navigation is enough. */
+export const TYPEAHEAD_MIN_OPTIONS = 7;
+
+/**
+ * First-letter typeahead target for an open listbox: the index of the next option
+ * (cyclically AFTER `from`) whose label starts with `char` (case-insensitive), or null
+ * when none match. `from` is the focused option index (-1 for none); starting the scan
+ * after it lets a repeated keypress cycle through same-initial options. Pure and DOM-free.
+ */
+export function typeaheadTarget(
+  labels: readonly string[],
+  from: number,
+  char: string,
+): number | null {
+  const c = char.toLowerCase();
+  const n = labels.length;
+  if (c.length !== 1 || n === 0) return null;
+  for (let step = 1; step <= n; step++) {
+    const i = (((from + step) % n) + n) % n;
+    if ((labels[i] ?? '').trim().toLowerCase().startsWith(c)) return i;
+  }
+  return null;
 }

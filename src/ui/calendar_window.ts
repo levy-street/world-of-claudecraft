@@ -17,10 +17,20 @@ import {
   monthOfIso,
   shiftMonth,
 } from './calendar_view';
-import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, type TranslationKey, t } from './i18n';
 import { svgIcon } from './ui_icons';
+import { ensureWindowFrame } from './window_frame_mount';
+import type { WindowFrameDescriptor } from './window_frame_view';
+
+// A closable, tab-less, footer-less frame: the month grid and the day detail pane
+// render inside one scrollable body (the day pane keeps its own flex scroll). The
+// title + close keys are reused from the existing calendar catalog.
+const CALENDAR_FRAME: WindowFrameDescriptor = {
+  id: 'calendar-window',
+  titleKey: 'hudChrome.calendar.title',
+  closeLabelKey: 'hudChrome.calendar.close',
+};
 
 // System-event title/note keys by id (typed map so t() stays key-checked).
 const SYSTEM_EVENT_TEXT: Record<string, { title: TranslationKey; note: TranslationKey }> = {
@@ -159,16 +169,17 @@ export class CalendarWindow {
 
   render(): void {
     const el = this.deps.root();
-    markDialogRoot(el, { label: t('hudChrome.calendar.title') });
+    // The shared frame owns the titlebar + close (built cold on first open,
+    // reused after); this repaints only the scrollable body (month nav + grid +
+    // day pane) so the month/day navigation keeps its full-rebuild behavior.
+    const { body } = ensureWindowFrame(el, CALENDAR_FRAME, { onClose: () => this.close() });
     const view = buildCalendarMonth({
       year: this.year,
       month: this.month,
       todayIso: this.todayIso(),
       guildEvents: this.guildEvents(),
     });
-    const header =
-      `<div class="panel-title"><span>${esc(t('hudChrome.calendar.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.calendar.close'))}">${svgIcon('close')}</button></div>` +
+    const nav =
       `<div class="cal-nav">` +
       `<button type="button" class="cal-nav-btn" data-cal-nav="-1" aria-label="${esc(t('hudChrome.calendar.prevMonth'))}">${svgIcon('prev')}</button>` +
       `<span class="cal-month-title">${esc(this.monthTitle())}</span>` +
@@ -208,12 +219,11 @@ export class CalendarWindow {
         );
       })
       .join('');
-    el.innerHTML =
-      header +
+    body.innerHTML =
+      nav +
       `<div class="cal-grid" role="grid">${heads}${cells}</div>` +
       `<div class="cal-day-pane" id="cal-day-pane"></div>`;
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    el.querySelectorAll<HTMLButtonElement>('[data-cal-nav]').forEach((btn) => {
+    body.querySelectorAll<HTMLButtonElement>('[data-cal-nav]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const next = shiftMonth(this.year, this.month, Number(btn.dataset.calNav));
         this.year = next.year;
@@ -224,7 +234,7 @@ export class CalendarWindow {
         (el.querySelector(`[data-cal-nav="${btn.dataset.calNav}"]`) as HTMLElement | null)?.focus();
       });
     });
-    el.querySelectorAll<HTMLButtonElement>('[data-cal-day]').forEach((btn) => {
+    body.querySelectorAll<HTMLButtonElement>('[data-cal-day]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.selectedIso = btn.dataset.calDay ?? null;
         this.lastSig = '';

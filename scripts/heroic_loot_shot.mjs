@@ -78,7 +78,7 @@ async function hoverShot(match, shot, { need, avoid } = {}) {
   const hoverRow = (nm, idx) =>
     page.evaluate(
       ({ nm, idx }) => {
-        const rows = [...document.querySelectorAll('#bags .bag-item')].filter((r) =>
+        const rows = [...document.querySelectorAll('#bags .item-cell')].filter((r) =>
           (r.getAttribute('aria-label') || '').includes(nm),
         );
         const row = rows[idx];

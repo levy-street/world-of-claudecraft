@@ -2611,6 +2611,15 @@
       border-radius: 0;
       background: linear-gradient(180deg, #0008 0%, #0002 18%, #0002 78%, #000c 100%);
       box-shadow: none;
+      /* The offline panel is the one cs-wow panel that is ALSO .auth-panel-premium,
+         which sets backdrop-filter: blur(12px); the online create/roster panels
+         (.charselect-screen, no premium chrome) never had it. This full-screen
+         takeover neutralizes the premium background/border/shadow but must also
+         drop the blur, or the offline character screen frosts the live 3D scene
+         behind it while the online screens show it sharp (the whole point of the
+         cs-wow full-bleed showcase). */
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
       overflow: hidden;
     }
     /* The online panels' card layout is a grid, and grid-placement on an
