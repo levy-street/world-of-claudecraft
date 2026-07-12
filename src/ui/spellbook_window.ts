@@ -193,6 +193,10 @@ export class SpellbookWindow {
   private rerenderPreservingView(): void {
     const root = this.deps.root();
     const scrollTop = root.scrollTop;
+    // On touch the LIST is the scroll container (the mobile sheet keeps the
+    // window itself overflow hidden), so its offset must survive the rebuild
+    // too; the root offset stays for the desktop scroll-on-window model.
+    const listScrollTop = root.querySelector<HTMLElement>('.spell-list')?.scrollTop ?? 0;
     const active = document.activeElement as HTMLElement | null;
     let refocus: string | null = null;
     if (active && root.contains(active)) {
@@ -217,6 +221,8 @@ export class SpellbookWindow {
     refocus ??= '[data-close]';
     this.render();
     root.scrollTop = scrollTop;
+    const list = root.querySelector<HTMLElement>('.spell-list');
+    if (list) list.scrollTop = listScrollTop;
     // The focus restore is bookkeeping, not a fresh description request: gate
     // the tooltip's focusin path while the synchronous focus() call runs.
     this.suppressDescriptionOnRefocus = true;

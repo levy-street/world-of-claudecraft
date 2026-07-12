@@ -2483,6 +2483,25 @@
     max-height: none;
     container-type: inline-size;
   }
+  /* The window itself must not scroll on touch: rows used to slide under the
+     floating title plate and clip only at the frame's inner edge (visibly
+     crossing the beveled gold hairline), and the plate itself crept 8px up
+     once the shared sticky offset engaged. The open sheet is a flex column
+     (title, status, picker, list) whose LIST is the one scroll container, so
+     rows clip at the list box inside the window padding and the title never
+     moves. Gated on the hud's open stamp, since an ungated display would
+     override the closed state's inline display:none. */
+  body.mobile-touch #spellbook[data-window-open="1"] {
+    display: flex !important;
+    flex-direction: column;
+    overflow-y: hidden;
+  }
+  body.mobile-touch #spellbook .spell-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   body.mobile-touch.vendor-open #vendor-window,
   body.mobile-touch.vendor-open #bags {
     position: fixed;
@@ -2797,7 +2816,12 @@
     /* A floating plate INSIDE the frame, not an edge-to-edge bar: the shared
        negative inline margins reach the border box and paint over the beveled
        inner gold hairline on both sides. Content width plus all-corner radius
-       keeps the frame decoration fully visible around it. */
+       keeps the frame decoration fully visible around it. Static in the flex
+       column (not sticky): the shared sticky offset moved the plate 8px up
+       once the old window scroll engaged. */
+    position: relative;
+    top: 0;
+    flex: 0 0 auto;
     margin-top: 0;
     margin-inline: 0;
     border-radius: 4px;

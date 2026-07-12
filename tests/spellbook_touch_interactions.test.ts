@@ -293,6 +293,25 @@ describe('SpellbookWindow touch description controls', () => {
     expect(tooltip.style.display).toBe('none');
   });
 
+  it('preserves the spell list scroll across the removal rerender', () => {
+    // On touch the LIST is the scroll container (the mobile sheet is overflow
+    // hidden), so the rerender must restore its offset, not just the root's.
+    const list = required(root.querySelector<HTMLElement>('.spell-list'), 'spell list');
+    list.scrollTop = 132;
+    const remove = required(
+      root.querySelector<HTMLButtonElement>('.spell-hotbar-remove'),
+      'remove button',
+    );
+    activateControl(remove, 20);
+    expect(removeFromBar).toHaveBeenCalledTimes(1);
+    const rerendered = required(
+      root.querySelector<HTMLElement>('.spell-list'),
+      'rerendered spell list',
+    );
+    expect(rerendered).not.toBe(list);
+    expect(rerendered.scrollTop).toBe(132);
+  });
+
   it('keeps the description clear of the +/x column by passing its left boundary', () => {
     const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
     const controls = required(

@@ -269,6 +269,24 @@ describe('spellbook_window: inline mobile slot picker', () => {
     );
   });
 
+  it('keeps the whole mobile sheet static while only the spell list scrolls', () => {
+    // The window is not the scroll container on touch: rows must clip at the
+    // list box inside the window padding (never crossing the frame hairline),
+    // and the title plate must not creep up on scroll (the shared sticky
+    // offset). The flex state is gated on the hud's data-window-open stamp.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook\[data-window-open="1"\]\s*\{[^}]*display:\s*flex\s*!important;[^}]*flex-direction:\s*column;[^}]*overflow-y:\s*hidden/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook \.spell-list\s*\{[^}]*min-height:\s*0;[^}]*flex:\s*1 1 auto;[^}]*overflow-y:\s*auto/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook > \.panel-title\s*\{[^}]*position:\s*relative;[^}]*top:\s*0;[^}]*flex:\s*0 0 auto/s,
+    );
+    expect(code).toContain("querySelector<HTMLElement>('.spell-list')?.scrollTop ?? 0");
+    expect(hud).toContain("el.dataset.windowOpen = '1'");
+  });
+
   it('keeps the header a floating plate inside the frame, X aligned with rows', () => {
     // No negative inline margins: the plate must not paint over the beveled
     // inner hairline on either side. With the plate at --window-pad, a 4px
