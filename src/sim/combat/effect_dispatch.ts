@@ -169,6 +169,7 @@ export function runEffects(
   const canAreaEcho = hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects);
   let spentSureCrit = false;
   let spentAreaEcho = false;
+  let lastDirectDamage = 0;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -242,6 +243,7 @@ export function runEffects(
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         const finalDamage = Math.round(dmg);
+        lastDirectDamage = finalDamage;
         ctx.dealDamage(
           p,
           target,
@@ -900,7 +902,10 @@ export function runEffects(
             e.type === 'aoeDamage' ||
             e.type === 'aoeRoot',
         );
-        const dotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        const dotTotal =
+          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+        const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
         // suppresses the rider on a DoT that trails its own direct nuke.
@@ -1265,32 +1270,65 @@ export function runEffects(
         break;
       }
       case 'aoeRoot': {
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-        });
+        const center = p.castAim ?? p.pos;
+        if (p.castAim) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: center.x,
+            z: center.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+        } else {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'nova',
+          });
+        }
         const aoeRootSp = directHitBonus(
           abilityScalingPower(p, ability),
           ability,
           res.castTime,
           true,
         );
-        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
           ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
           if (!m.dead && ctx.isHostileTo(p, m)) {
-            ctx.applyRootAura(
-              p,
-              m,
-              ability.name,
-              `${ability.id}_root`,
-              eff.duration,
-              ability.school,
-            );
+            if (eff.stun) {
+              const remaining = ctx.diminishedCrowdControlDuration(
+                p,
+                m,
+                'controlledStun',
+                eff.duration,
+              );
+              if (remaining !== null) {
+                ctx.applyAura(m, {
+                  id: `${ability.id}_freeze`,
+                  name: ability.name,
+                  kind: 'stun',
+                  remaining,
+                  duration: remaining,
+                  value: 0,
+                  sourceId: p.id,
+                  school: ability.school,
+                });
+              }
+            } else {
+              ctx.applyRootAura(
+                p,
+                m,
+                ability.name,
+                `${ability.id}_root`,
+                eff.duration,
+                ability.school,
+              );
+            }
           }
         }
         break;

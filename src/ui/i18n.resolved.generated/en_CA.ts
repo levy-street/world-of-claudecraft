@@ -5674,8 +5674,8 @@ export const en_CA: EnTranslations = {
         "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Dreamthorn",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. You gain 15% damage and attack speed for 15 sec. (Fieldcraft signature)"
       },
       "arcane_power": {
         "name": "Aether Surge",
@@ -5711,7 +5711,7 @@ export const en_CA: EnTranslations = {
       },
       "shadowform": {
         "name": "Gloamveil Form",
-        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "description": "Assume Gloamveil Form, increasing your Shadow damage by 15 until you shift back. Cast again to return to normal form. Casting a healing spell cancels Gloamveil Form. (Shadow signature)"
       },
       "elemental_mastery": {
         "name": "Primal Mastery",
@@ -5767,7 +5767,7 @@ export const en_CA: EnTranslations = {
       },
       "aspect_of_the_wild": {
         "name": "Wildfang Rally",
-        "description": "Inspires you and party members within 30 yd, increasing attack power by 45 for 5 min. (Hunter talent)"
+        "description": "Inspires you and party members within 30 yd, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "avatar": {
         "name": "Siegeborn",
@@ -5855,7 +5855,7 @@ export const en_CA: EnTranslations = {
       },
       "deterrence": {
         "name": "Bristleguard",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
         "name": "Lightward",
@@ -5875,7 +5875,7 @@ export const en_CA: EnTranslations = {
       },
       "frost_trap": {
         "name": "Rime Snare",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
         "name": "Wraith Strike",
@@ -6022,8 +6022,8 @@ export const en_CA: EnTranslations = {
         "description": "A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only."
       },
       "revive_pet": {
-        "name": "Revive Pet",
-        "description": "Revives your dead pet and returns it to your side."
+        "name": "Patch Up",
+        "description": "Patches up your companion, restoring 240 health over 12 sec if it is alive. If it is dead, revives it at 35% health."
       }
     },
     "items": {
@@ -8903,7 +8903,7 @@ export const en_CA: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 12 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",

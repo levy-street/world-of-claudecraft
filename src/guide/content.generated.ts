@@ -408,7 +408,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "revive_pet",
-        "name": "Revive Pet"
+        "name": "Patch Up"
       },
       {
         "id": "aspect_of_the_monkey",

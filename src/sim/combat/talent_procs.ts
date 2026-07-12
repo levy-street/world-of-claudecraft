@@ -82,18 +82,27 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
   switch (r.kind) {
     case 'empowerNext':
       // Refresh-not-stack: one pending empowerment per proc id.
-      if (!p.auras.some((a) => a.id === def.id)) {
-        ctx.applyAura(p, {
-          id: def.id,
-          name: def.name,
-          kind: r.aura,
-          remaining: r.duration,
-          duration: r.duration,
-          value: r.costPct !== undefined ? 1 - r.costPct : 0,
-          sourceId: p.id,
-          school: def.school ?? 'holy',
-          empowerAbilities: r.abilities,
-        });
+      {
+        const existing = p.auras.find((a) => a.id === def.id && a.sourceId === p.id);
+        if (existing) {
+          existing.kind = r.aura;
+          existing.remaining = r.duration;
+          existing.duration = r.duration;
+          existing.value = r.costPct !== undefined ? 1 - r.costPct : 0;
+          existing.empowerAbilities = r.abilities;
+        } else {
+          ctx.applyAura(p, {
+            id: def.id,
+            name: def.name,
+            kind: r.aura,
+            remaining: r.duration,
+            duration: r.duration,
+            value: r.costPct !== undefined ? 1 - r.costPct : 0,
+            sourceId: p.id,
+            school: def.school ?? 'holy',
+            empowerAbilities: r.abilities,
+          });
+        }
         // The arming moment: a visible surge so the player feels the rhythm hit.
         ctx.emit({
           type: 'spellfx',

@@ -726,6 +726,7 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  damagePushbackImmune?: boolean; // talent-granted immunity to cast/channel damage pushback
   bonusCharges?: number;
 }
 
@@ -3760,6 +3761,8 @@ export class Sim {
   }
 
   private pushbackCast(p: Entity): void {
+    const active = p.castingAbility ? this.resolvedAbility(p.castingAbility, p.id) : undefined;
+    if (active?.damagePushbackImmune) return;
     pushbackCastImpl(p);
   }
 

@@ -8486,10 +8486,10 @@ const ALL_CLASS_CHOICE_TITLE_NAMES = new Set([
   'Twin Fletching',
   'Guisecraft',
   'Pinning Barb',
-  'Full-Draw Rhythm',
+  'Rattling Ambush',
   'Viperfletch',
   'Bloodbond',
-  'Afterfall',
+  'Steady Rain',
   'Redline Draw',
   "Knife's Dividend",
   'Dusk Dividend',
@@ -8581,10 +8581,10 @@ const ALL_CLASS_CHOICE_CJK_TITLES: Partial<Record<SupportedLanguage, Record<stri
     'Twin Fletching': '双羽箭术',
     Guisecraft: '化形秘术',
     'Pinning Barb': '钉身倒刺',
-    'Full-Draw Rhythm': '满弦律动',
+    'Rattling Ambush': '震荡伏击',
     Viperfletch: '蝰羽箭艺',
     Bloodbond: '血契羁绊',
-    Afterfall: '箭落余势',
+    'Steady Rain': '稳落箭雨',
     'Redline Draw': '赤弦极限',
     "Knife's Dividend": '刀口分赃',
     'Dusk Dividend': '暮影分赃',
@@ -8674,10 +8674,10 @@ const ALL_CLASS_CHOICE_CJK_TITLES: Partial<Record<SupportedLanguage, Record<stri
     'Twin Fletching': '雙羽箭術',
     Guisecraft: '化形祕術',
     'Pinning Barb': '釘身倒刺',
-    'Full-Draw Rhythm': '滿弦律動',
+    'Rattling Ambush': '震盪伏擊',
     Viperfletch: '蝰羽箭藝',
     Bloodbond: '血契羈絆',
-    Afterfall: '箭落餘勢',
+    'Steady Rain': '穩落箭雨',
     'Redline Draw': '赤弦極限',
     "Knife's Dividend": '刀口分贓',
     'Dusk Dividend': '暮影分贓',
@@ -8767,10 +8767,10 @@ const ALL_CLASS_CHOICE_CJK_TITLES: Partial<Record<SupportedLanguage, Record<stri
     'Twin Fletching': '双矢の仕立て',
     Guisecraft: '獣装の妙技',
     'Pinning Barb': '縫い留めの棘',
-    'Full-Draw Rhythm': '引き絞りの律動',
+    'Rattling Ambush': '震矢の奇襲',
     Viperfletch: '毒蛇の矢羽',
     Bloodbond: '血の絆',
-    Afterfall: '矢雨の余韻',
+    'Steady Rain': '揺るがぬ矢雨',
     'Redline Draw': '死線の引き絞り',
     "Knife's Dividend": '刃の配当',
     'Dusk Dividend': '宵闇の配当',
@@ -8860,10 +8860,10 @@ const ALL_CLASS_CHOICE_CJK_TITLES: Partial<Record<SupportedLanguage, Record<stri
     'Twin Fletching': '쌍화살깃',
     Guisecraft: '야수 형상술',
     'Pinning Barb': '옭아매는 가시',
-    'Full-Draw Rhythm': '만작의 율동',
+    'Rattling Ambush': '충격의 기습',
     Viperfletch: '독사의 화살깃',
     Bloodbond: '피의 결속',
-    Afterfall: '화살비의 여운',
+    'Steady Rain': '흔들림 없는 화살비',
     'Redline Draw': '한계의 만작',
     "Knife's Dividend": '칼날의 배당',
     'Dusk Dividend': '황혼의 배당',
@@ -9127,7 +9127,7 @@ export function grantAbilityValues(id: string): InterpolationValues {
   if (allyAttackPowerEff?.amount !== undefined) {
     values.buff = formatNumber(allyAttackPowerEff.amount, lang);
   }
-  if (allyHasteEff?.mult !== undefined) {
+  if (allyHasteEff?.mult !== undefined && values.buff === undefined) {
     values.buff = percentText(allyHasteEff.mult - 1, lang);
   }
   for (const eff of effs) {

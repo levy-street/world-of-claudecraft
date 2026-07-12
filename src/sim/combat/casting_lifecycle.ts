@@ -927,13 +927,28 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       );
       return;
     }
-    if (!pet.dead) {
-      ctx.error(p.id, 'Your pet is already alive.');
-      return;
-    }
     spendResource(p, billableCost());
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
-    ctx.revivePet(p.id);
+    if (pet.dead) {
+      ctx.revivePet(p.id);
+    } else {
+      const hot = res.effects.find((effect) => effect.type === 'hot');
+      if (hot) {
+        ctx.applyAura(pet, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'hot',
+          remaining: hot.duration,
+          duration: hot.duration,
+          value: Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))),
+          tickInterval: hot.interval,
+          tickTimer: hot.interval,
+          sourceId: p.id,
+          school: ability.school,
+        });
+      }
+    }
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, pet);
     return;
   }
 

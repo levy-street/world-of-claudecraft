@@ -162,9 +162,8 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 4,
     effect: {
-      // Leather crits land more often (the 3-piece adds crit AND haste), so
-      // its bleed ticks lighter than the plate one: more applications, same
-      // sustained value, peaking at 18 damage per 2s at 3 stacks.
+      // The 4-piece is an apex reward. At full stacks it deals 36 damage per
+      // 2 sec, enough to remain visible against level-20 health pools.
       proc: {
         id: 'set_ragged_gash',
         name: 'Ragged Gash',
@@ -172,14 +171,14 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
         chance: 1,
         applyTo: 'target',
         aura: 'dot',
-        value: 6, // per tick, per stack
+        value: 12, // per tick, per stack
         tickInterval: 2,
         duration: 12,
         maxStacks: 3,
         school: 'physical',
       },
     },
-    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 12 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [

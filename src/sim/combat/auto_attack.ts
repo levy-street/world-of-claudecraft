@@ -49,7 +49,7 @@ import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
-import { onMeleeSwing } from './talent_procs';
+import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
@@ -195,6 +195,11 @@ export function rangedSwing(
     school,
     fx: 'projectile',
   });
+  // Auto Shot is a completed ranged shot for cadence talents such as Lean
+  // Quiver. Wand bolts are caster attacks and never advance hunter rhythms.
+  if (!ranged.wand && attacker.kind === 'player') {
+    onCastCompleted(ctx, attacker, 'auto_shot', target);
+  }
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
   scheduleProjectile(ctx, attacker, target, (atk, tgt) => {

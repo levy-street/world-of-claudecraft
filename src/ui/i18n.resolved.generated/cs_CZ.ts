@@ -5674,8 +5674,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Dreamthorn",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. You gain 15% damage and attack speed for 15 sec. (Fieldcraft signature)"
       },
       "arcane_power": {
         "name": "Aether Surge",
@@ -5711,7 +5711,7 @@ export const cs_CZ: EnTranslations = {
       },
       "shadowform": {
         "name": "Gloamveil Form",
-        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "description": "Assume Gloamveil Form, increasing your Shadow damage by 15 until you shift back. Cast again to return to normal form. Casting a healing spell cancels Gloamveil Form. (Shadow signature)"
       },
       "elemental_mastery": {
         "name": "Primal Mastery",

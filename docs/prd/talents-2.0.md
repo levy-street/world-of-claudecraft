@@ -344,7 +344,7 @@ demotions: no existing character loses an ability they have today.
 | paladin/retribution | judgement | Repentance (single-target incapacitate) |
 | hunter/beast_mastery | tame_beast | Bestial Wrath (pet enrage active) |
 | hunter/marksmanship | aimed_shot | Trueshot Aura (party ranged AP aura) |
-| hunter/survival | wing_clip | Wyvern Sting (sleep sting) |
+| hunter/survival | wing_clip | Dreamthorn (sleep sting plus hunter burst window) |
 | mage/arcane | arcane_missiles | Arcane Power (+20% spell dmg active) |
 | mage/fire | scorch | Combustion (next fire spells crit) |
 | mage/frost | ice_barrier | Cone of Cold (instant frost cone AoE) |
@@ -371,9 +371,9 @@ Implementation notes (owner directives, keep these cheap):
   The tint/translucency treatment is ONE render feature (form -> tint map in
   src/render/, reading form state through IWorld) shared by Shadowform,
   Moonkin Form, and reusable later (Metamorphosis, Avenging Wrath glows).
-- **Wyvern Sting**: reuses the existing gouge mechanic, i.e. the
-  `incapacitate` aura kind (src/sim/combat/cc.ts:18), applied at range.
-  No new CC machinery.
+- **Dreamthorn**: reuses the existing `incapacitate` aura kind at range.
+  It also grants the hunter 15% damage and attack speed for 15 sec, so
+  Fieldcraft keeps a useful burst window even when the control breaks.
 - **Cold Blood**: just 100% crit on the next attack (the P3 guaranteed-crit
   variant forces the existing crit roll to certainty). Nothing fancier.
 - **Feral Charge**: just the charge mechanic. NOTE: druids already have
@@ -621,23 +621,27 @@ flash_of_light, exorcism, consecration, righteous_fury, retribution_aura)
 **Hunter** (kit: raptor_strike, aspect_of_the_hawk/monkey/cheetah,
 serpent_sting, arcane_shot, concussive_shot, mongoose_bite, wing_clip,
 aimed_shot, rapid_fire, tame/dismiss/revive pet)
-- L5: Improved Serpent Sting [mod] (+30%) / Quick Shots [mod]
-  (Arcane Shot cd -40%) / Aspect Mastery [mod] (Hawk and Monkey +40%)
-- L8: Counter Shot [grant NEW, P1] (interrupt shot, 4s lockout, 20s cd; the
-  operator's original example) / Frost Trap [grant NEW] (ground trap, roots
-  3s) / Improved Concussive [mod] (Concussive Shot cd -40%)
-- L11: Mend Pet [grant NEW] (channel pet heal; reuses the warlock demon-heal
-  channel machinery) / Efficiency [mod] (shots cost -15%) /
-  Feign Death [grant NEW] (threat wipe, 30s cd)
-- L14: Multi-Shot [grant NEW] (hits up to 3 targets) / Sniper Training [mod]
-  (Aimed Shot cast -30%, dmg +10%) / Serpent's Venom [P5]
-  (Arcane Shot also applies a short sting DoT)
-- L17: Deterrence [grant NEW] (+50% dodge 10s, 2min cd) / Master Tamer [mod]
-  (Tame Beast and Revive Pet cast -50%) / Thick Hide [stats]
-  (armor +10%, dodge +2%, the plain pick)
-- L20: Improved Volley [mod] (Volley damage +30%, cost -20%; Volley is
-  baseline via PR #1064) / Rapid Killing [mod] (Rapid Fire cd -50%, effect
-  +25%) / Aspect of the Wild [grant NEW] (party nature-flavored AP aura)
+- L5: Venom Relay makes the next Fell Shot free after every Venom Barb /
+  Twin Fletching stores 2 Fell Shot uses / Guisecraft makes the next shot
+  cost 50% less after changing into any of the 3 hunter guises.
+- L8: Hushing Shot is a ranged interrupt / Rime Snare freezes enemies at a
+  chosen area for 3 sec, preventing movement and actions / Pinning Barb cuts
+  Rattling Shot cooldown by 40% and adds a 2 sec root.
+- L11: Patch Up heals a living pet for 50% more; baseline Patch Up heals the
+  hunter's pet or revives it if dead / Lean Quiver counts ranged abilities and
+  Auto Shot, restoring 20 mana and arming an instant Long Draw every third shot /
+  Deathless Will shields for 200 after a 30% maximum-health hit, 30 sec ICD.
+- L14: Splitshot deals 62 to 74 Physical damage in an 8 yd chosen area, 8 sec
+  cooldown / Rattling Ambush finishes Fell Shot's cooldown and makes the next
+  Fell Shot free after Rattling Shot / Viperfletch adds 50% of the actual Fell
+  Shot hit as Nature damage over 3 one-second ticks.
+- L17: Bristleguard grants 50 percentage points of dodge for 10 sec / Bloodbond
+  redirects 20% of incoming damage to a living pet / Calloused Hide makes the
+  next Long Draw instant after taking a 15% maximum-health hit, 15 sec ICD.
+- L20: Steady Rain increases Arrowfall damage by 50% and prevents damage from
+  shortening its channel / Redline Draw reduces Fevered Draw cooldown by 15 sec
+  every third ranged shot / Wildfang Rally grants nearby allies 45 attack power
+  and 5% attack speed for 5 min.
 
 **Rogue** (kit: sinister_strike, eviscerate, backstab, gouge, evasion,
 slice_and_dice, sprint, kidney_shot, ambush, stealth, garrote, cheap_shot,

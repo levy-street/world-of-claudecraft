@@ -199,4 +199,19 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     expect(zone?.pos.x).toBeCloseTo(16, 1);
     expect(zone?.pos.z).toBeCloseTo(0, 1);
   });
+
+  it('Rime Snare freezes enemies at the aimed point instead of around the hunter', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: null, rows: { 8: 'hun_r8_frost_trap' } })).toBe(true);
+    place(sim, sim.playerId, 700, 0);
+    sim.player.resource = sim.player.maxResource;
+    const atAim = spawnWolfAt(sim, 718, 0);
+    const atCaster = spawnWolfAt(sim, 702, 0);
+
+    sim.castAbility('frost_trap', sim.playerId, { x: 718, z: 0 });
+
+    expect(atAim.auras.some((a) => a.kind === 'stun')).toBe(true);
+    expect(atCaster.auras.some((a) => a.kind === 'stun')).toBe(false);
+  });
 });

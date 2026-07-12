@@ -73,6 +73,12 @@ export function abilityDisplayDescription(
       spellPower: spellPower ? formatAbilityNumber(spellPower.value) : '',
     },
   });
+  // Patch Up has two modes and its legacy translations predate tooltip tokens.
+  // Replace the authored rank-1 heal only when present, keeping the displayed
+  // number tied to the resolved HoT after Improved Patch Up is applied.
+  if (res.def.id === 'revive_pet') {
+    description = description.replace(/\b240\b/, abilityOverTimeText(res, scaling));
+  }
   // weaponStrike prose carries its base weapon coefficient as a literal
   // percentage. Talent and mastery damage modifiers scale the resolved
   // weaponMult, so replace that one authored percentage with the live value.

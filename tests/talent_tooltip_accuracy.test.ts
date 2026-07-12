@@ -50,6 +50,7 @@ const PCT_FIELDS = new Set([
   'bloodbathPct',
   'bloodbathMaxPct',
   'dmgPct',
+  'directPct',
   'costPct',
   'cooldownPct',
   'castPct',

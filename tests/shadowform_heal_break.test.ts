@@ -1,6 +1,7 @@
 // Casting a healing spell drops a Shadow priest out of Shadowform: the form
 // amplifies Shadow damage but forbids healing (classic Shadowform rule).
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
 
 function makePriest(): { sim: Sim; p: any } {
@@ -15,6 +16,9 @@ function makePriest(): { sim: Sim; p: any } {
 const inShadowform = (p: any) => p.auras.some((a: any) => a.kind === 'form_shadow');
 
 describe('Shadowform breaks on healing', () => {
+  it('Gloamveil Form tells the player that healing cancels it', () => {
+    expect(ABILITIES.shadowform.description).toMatch(/healing spell cancels Gloamveil Form/i);
+  });
   it('entering Shadowform adds the form aura', () => {
     const { sim, p } = makePriest();
     sim.castAbility('shadowform', p.id);

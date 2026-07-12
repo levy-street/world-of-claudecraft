@@ -1424,6 +1424,9 @@ export type AbilityEffect =
       interval: number;
       leechPct?: number;
       school?: Aura['school'];
+      // A direct-hit rider whose total snapshots this fraction of the preceding
+      // directDamage result, including scaling and critical damage.
+      directPct?: number;
     }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
@@ -1454,7 +1457,15 @@ export type AbilityEffect =
   | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
-  | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  | {
+      type: 'aoeRoot';
+      duration: number;
+      radius: number;
+      min: number;
+      max: number;
+      // A true freeze prevents actions as well as movement.
+      stun?: boolean;
+    }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
   // initial vertical speed); sportDash is a targetless directional lunge along

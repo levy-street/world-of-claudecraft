@@ -36,6 +36,7 @@ const mageDamagingFireSpellAbilityIds = [
 ];
 
 const hunterRangedShotAbilityIds = [
+  'auto_shot',
   'serpent_sting',
   'arcane_shot',
   'concussive_shot',
@@ -870,19 +871,26 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'shot_cadence',
-      decision: 'Venom Barb reset vs banked Fell Shots vs guise-fed shot discount',
+      decision: 'Venom Barb handoff vs banked Fell Shots vs guise-fed shot discount',
       options: [
         {
           id: 'hun_r5_improved_serpent_sting',
           name: 'Venom Relay',
-          description: "Venom Barb finishes Fell Shot's cooldown.",
+          description: 'Venom Barb makes your next Fell Shot within 8 sec free.',
           icon: 'serpent_sting',
           effect: {
             proc: {
               id: 'hun_venom_relay',
               name: 'Venom Relay',
               trigger: { on: 'castNth', n: 1, abilities: ['serpent_sting'] },
-              responses: [{ kind: 'cooldownRefund', ability: 'arcane_shot', seconds: 'reset' }],
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
@@ -906,7 +914,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
               trigger: {
                 on: 'castNth',
                 n: 1,
-                abilities: ['aspect_of_the_hawk', 'aspect_of_the_monkey'],
+                abilities: ['aspect_of_the_hawk', 'aspect_of_the_monkey', 'aspect_of_the_cheetah'],
               },
               responses: [
                 {
@@ -966,9 +974,9 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r11_mend_pet',
           name: 'Patch Up',
-          description: 'Grants Patch Up.',
+          description: 'Patch Up heals a living pet for 50% more.',
           icon: 'mend_pet',
-          effect: { grant: { ability: 'mend_pet' } },
+          effect: { ability: [{ ability: 'revive_pet', dmgPct: 0.5 }] },
         },
         {
           id: 'hun_r11_efficiency',
@@ -1001,14 +1009,14 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r11_survival_instincts',
           name: 'Deathless Will',
           description:
-            'Taking a hit for at least 30% of your maximum health grants a shield absorbing 80 damage for 8 sec. 30 sec internal cooldown.',
+            'Taking a hit for at least 30% of your maximum health grants a shield absorbing 200 damage for 8 sec. 30 sec internal cooldown.',
           icon: 'aspect_of_the_monkey',
           effect: {
             proc: {
               id: 'hun_deathless_will',
               name: 'Deathless Will',
               trigger: { on: 'bigHitTaken', hpFrac: 0.3, icd: 30 },
-              responses: [{ kind: 'absorb', amount: 80, duration: 8, name: 'Deathless Will' }],
+              responses: [{ kind: 'absorb', amount: 200, duration: 8, name: 'Deathless Will' }],
             },
           },
         },
@@ -1028,15 +1036,17 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r14_sniper_training',
-          name: 'Full-Draw Rhythm',
-          description: 'Long Draw makes your next Fell Shot within 8 sec free.',
+          name: 'Rattling Ambush',
+          description:
+            "Rattling Shot finishes Fell Shot's cooldown and makes your next Fell Shot within 8 sec free.",
           icon: 'aimed_shot',
           effect: {
             proc: {
               id: 'hun_full_draw_rhythm',
-              name: 'Full-Draw Rhythm',
-              trigger: { on: 'castNth', n: 1, abilities: ['aimed_shot'] },
+              name: 'Rattling Ambush',
+              trigger: { on: 'castNth', n: 1, abilities: ['concussive_shot'] },
               responses: [
+                { kind: 'cooldownRefund', ability: 'arcane_shot', seconds: 'reset' },
                 {
                   kind: 'empowerNext',
                   aura: 'next_cast_free',
@@ -1051,14 +1061,21 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r14_serpents_venom',
           name: 'Viperfletch',
           description:
-            'Fell Shot also envenoms the target for 24 Nature damage over 6 sec, ticking every 2 sec.',
+            'Fell Shot also envenoms the target for 50% of its damage over 3 sec, ticking every 1 sec.',
           icon: 'serpent_sting',
           effect: {
             ability: [
               {
                 ability: 'arcane_shot',
                 addEffects: [
-                  { type: 'dot', total: 24, duration: 6, interval: 2, school: 'nature' },
+                  {
+                    type: 'dot',
+                    total: 0,
+                    directPct: 0.5,
+                    duration: 3,
+                    interval: 1,
+                    school: 'nature',
+                  },
                 ],
               },
             ],
@@ -1112,27 +1129,16 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'apex_hunt',
-      decision: 'Arrowfall follow-up vs shot-fed burst uptime vs party attack rally',
+      decision: 'steadfast Arrowfall vs shot-fed burst uptime vs party attack rally',
       options: [
         {
           id: 'hun_r20_improved_volley',
-          name: 'Afterfall',
-          description: 'Arrowfall makes your next Fell Shot or Splitshot within 8 sec free.',
+          name: 'Steady Rain',
+          description:
+            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
           icon: 'volley',
           effect: {
-            proc: {
-              id: 'hun_improved_volley',
-              name: 'Afterfall',
-              trigger: { on: 'castNth', n: 1, abilities: ['volley'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['arcane_shot', 'multi_shot'],
-                  duration: 8,
-                },
-              ],
-            },
+            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
           },
         },
         {

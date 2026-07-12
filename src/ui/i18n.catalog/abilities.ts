@@ -1224,8 +1224,8 @@ const classAbilityNamesEn = {
       ],
       [
         'wyvern_sting',
-        'Wyvern Sting',
-        'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+        'Dreamthorn',
+        'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. You gain 15% damage and attack speed for 15 sec. (Fieldcraft signature)',
       ],
       [
         'arcane_power',
@@ -1270,7 +1270,7 @@ const classAbilityNamesEn = {
       [
         'shadowform',
         'Gloamveil Form',
-        'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Assume Gloamveil Form, increasing your Shadow damage by 15 until you shift back. Cast again to return to normal form. Casting a healing spell cancels Gloamveil Form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
@@ -1340,7 +1340,7 @@ const classAbilityNamesEn = {
       [
         'aspect_of_the_wild',
         'Wildfang Rally',
-        'Inspires you and party members within 30 yd, increasing attack power by 45 for 5 min. (Hunter talent)',
+        'Inspires you and party members within 30 yd, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)',
       ],
       [
         'avatar',
@@ -1438,7 +1438,7 @@ const classAbilityNamesEn = {
       [
         'deterrence',
         'Bristleguard',
-        'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
+        'Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)',
       ],
       [
         'divine_shield',
@@ -1455,7 +1455,7 @@ const classAbilityNamesEn = {
       [
         'frost_trap',
         'Rime Snare',
-        'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
+        'Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)',
       ],
       [
         'ghostly_strike',

@@ -78,6 +78,7 @@ export interface AbilityModEffect {
   // DoT rather than any DoT from the caster.
   dmgPctVsDottedAbility?: string;
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
+  damagePushbackImmune?: boolean; // damage cannot delay a cast or shorten a channel
   bonusCharges?: number; // extra stored uses for cooldown abilities (1 = two total charges)
   addEffects?: AbilityEffect[];
 }
@@ -185,6 +186,7 @@ export interface ResolvedAbilityMod {
   castPct: number;
   buffPct: number;
   castWhileMoving: boolean;
+  damagePushbackImmune?: boolean;
   bonusCharges?: number;
   addEffects: AbilityEffect[];
 }
@@ -389,6 +391,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    damagePushbackImmune: false,
     bonusCharges: 0,
     addEffects: [],
   };
@@ -481,6 +484,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     cur.buffPct += (am.buffPct ?? 0) * mult;
     cur.bonusCharges = (cur.bonusCharges ?? 0) + (am.bonusCharges ?? 0) * mult;
     if (am.castWhileMoving) cur.castWhileMoving = true;
+    if (am.damagePushbackImmune) cur.damagePushbackImmune = true;
     // Added effects are rank-1 semantics, not multiplied by talent rank.
     if (am.addEffects) cur.addEffects.push(...am.addEffects);
   }

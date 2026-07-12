@@ -1775,7 +1775,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   revive_pet: {
     id: 'revive_pet',
-    name: 'Revive Pet',
+    name: 'Patch Up',
     class: 'hunter',
     learnLevel: 10,
     cost: 45,
@@ -1784,8 +1784,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [],
-    description: 'Revives your dead pet and returns it to your side.',
+    effects: [{ type: 'hot', total: 240, duration: 12, interval: 3 }],
+    description:
+      'Patch up your companion, restoring 240 health over 12 sec if it is alive. If it is dead, revive it at 35% health.',
   },
   raptor_strike: {
     id: 'raptor_strike',
@@ -3661,7 +3662,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   wyvern_sting: {
     id: 'wyvern_sting',
-    name: 'Wyvern Sting',
+    name: 'Dreamthorn',
     class: 'hunter',
     learnLevel: 10,
     cost: 35,
@@ -3672,9 +3673,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'incapacitate', duration: 4 }],
+    effects: [
+      { type: 'incapacitate', duration: 4 },
+      { type: 'selfBuff', kind: 'buff_dmg_done', value: 0.15, duration: 15 },
+      { type: 'selfBuff', kind: 'buff_haste', value: 1.15, duration: 15 },
+    ],
     description:
-      'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+      'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. You gain 15% damage and attack speed for 15 sec. (Fieldcraft signature)',
   },
   arcane_power: {
     id: 'arcane_power',
@@ -3823,7 +3828,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
     description:
-      'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+      'Assume Gloamveil Form, increasing your Shadow damage by 15 until you shift back. Cast again to return to normal form. Casting a healing spell cancels Gloamveil Form. (Shadow signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',
@@ -3928,9 +3933,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyAttackPower', amount: 45, duration: 300, radius: 30 }],
+    effects: [
+      { type: 'aoeAllyAttackPower', amount: 45, duration: 300, radius: 30 },
+      { type: 'aoeAllyHaste', mult: 1.05, duration: 300, radius: 30 },
+    ],
     description:
-      'Inspires allies within 30 yd with wild strength, increasing attack power by 45 for 5 min. (Hunter talent)',
+      'Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)',
   },
   avatar: {
     id: 'avatar',
@@ -4278,7 +4286,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.5, duration: 10 }],
-    description: 'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
+    description: 'Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)',
   },
   aura_surge: {
     id: 'aura_surge',
@@ -4367,8 +4375,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'frost',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'aoeRoot', duration: 3, radius: 8, min: 0, max: 0 }],
-    description: 'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
+    effects: [{ type: 'aoeRoot', duration: 3, radius: 8, min: 0, max: 0, stun: true }],
+    description:
+      'Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)',
   },
   ghostly_strike: {
     id: 'ghostly_strike',
@@ -4601,14 +4610,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 55,
     castTime: 0,
-    cooldown: 10,
+    cooldown: 8,
     range: 35,
     minRange: 8,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 42, max: 54, radius: 8 }],
+    effects: [{ type: 'aoeDamage', min: 62, max: 74, radius: 8 }],
     description:
       'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. (Hunter talent)',
   },
@@ -4902,6 +4911,7 @@ export interface KnownAbility {
   threatFlat: number;
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  damagePushbackImmune?: boolean;
   bonusCharges?: number;
 }
 
@@ -4955,7 +4965,9 @@ function scaleEffect(
         max: Math.round(eff.max * dmgMult + flat),
       };
     case 'dot':
-      return { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+      return eff.directPct
+        ? { ...eff }
+        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
     case 'aoeDamage':
       return {
         ...eff,
@@ -5061,6 +5073,7 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
+    if (am.damagePushbackImmune) entry.damagePushbackImmune = true;
     if (am.bonusCharges) entry.bonusCharges = (entry.bonusCharges ?? 0) + am.bonusCharges;
     // buffPct strengthens a buff-like effect. Count-like aura values round to whole
     // points; rate and multiplier values keep their fractions.

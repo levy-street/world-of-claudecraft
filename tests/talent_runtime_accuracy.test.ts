@@ -264,7 +264,7 @@ describe('talent runtime accuracy', () => {
     expect(run('shadow_word_pain')).toBeGreaterThan(noDot * 1.2);
   });
 
-  it("Serpent's Venom applies Nature damage even though Fell Shot is Arcane", () => {
+  it('Viperfletch deals 50% of the actual Fell Shot hit over three one-second ticks', () => {
     const sim = new Sim({ seed: 17, playerClass: 'hunter', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: null, rows: { 14: 'hun_r14_serpents_venom' } })).toBe(true);
@@ -272,9 +272,15 @@ describe('talent runtime accuracy', () => {
     const meta = sim.ctx.players.get(sim.playerId);
     const resolved = sim.resolvedAbility('arcane_shot');
     if (!meta || !resolved) throw new Error('missing hunter state');
+    sim.player.critChance = 0;
+    const before = target.hp;
     runEffects(sim.ctx, sim.player, meta, target, resolved);
+    const directDamage = before - target.hp;
     const venom = target.auras.find((a) => a.kind === 'dot' && a.id === 'arcane_shot');
     expect(venom?.school).toBe('nature');
+    expect(venom?.tickInterval).toBe(1);
+    expect(venom?.duration).toBe(3);
+    expect(venom?.value).toBe(Math.max(1, Math.round((directDamage * 0.5) / 3)));
   });
 
   it('Cinder Jolt detonation counts the pending next tick in remaining damage', () => {

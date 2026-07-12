@@ -137,7 +137,7 @@ describe('weaponCrit set procs from real swings', () => {
     }
     const aura = mob.auras.find((a) => a.id === 'set_ragged_gash');
     expect(aura?.kind).toBe('dot');
-    expect(aura?.value).toBe(6);
+    expect(aura?.value).toBe(12);
     expect(aura?.school).toBe('physical');
     expect(aura?.sourceId).toBe(p.id);
   });
