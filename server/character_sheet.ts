@@ -59,6 +59,8 @@ export interface SheetStats {
   int: number;
   spi: number;
   armor: number;
+  pvpOffense: number;
+  pvpDefense: number;
 }
 export interface SheetVitals {
   hp: number;

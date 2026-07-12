@@ -679,13 +679,29 @@ export const en: EnTranslations = {
       "highContrast": "High Contrast",
       "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
       "names": {
         "spellPower": "Spell Power",
         "critRating": "Crit Rating",
-        "hasteRating": "Haste Rating"
+        "hasteRating": "Haste Rating",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Increases your attack power, so your weapon strikes land harder.",
         "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
@@ -699,7 +715,8 @@ export const en: EnTranslations = {
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
         "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
-        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Attack Power",
@@ -6352,6 +6369,126 @@ export const en: EnTranslations = {
       "sunpetal_herb": {
         "name": "Sunpetal Herb"
       },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
+      },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"
       },
@@ -7491,6 +7628,11 @@ export const en: EnTranslations = {
         "name": "Quartermaster Vex",
         "title": "Heroic Quartermaster",
         "greeting": "Proof of the heroic depths buys the finest rings and pendants in Highwatch. Show me your marks."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Loremaster Caddis",

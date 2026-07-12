@@ -679,13 +679,29 @@ export const en_XA: EnTranslations = {
       "highContrast": "[Ĥíĝĥ Çóñţŕášţ]",
       "highContrastAria": "[Ţóĝĝļé ĥíĝĥ-çóñţŕášţ ƀáçķĝŕóúñð: ðíšáƀļéš ţĥé ɱóʋíñĝ ţŕáíļéŕ šó šţáŕţ-šçŕééñ ţéẋţ šţáýš ļéĝíƀļé]"
     },
+    "warfare": {
+      "honorAmount": "[{amount} Ĥóñóŕ]",
+      "dualPrice": "[{money} + {honor}]",
+      "balance": "[Ĥóñóŕ: {amount}]",
+      "honorFloat": "[+{amount} Ĥóñóŕ]",
+      "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
+      "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
+      "reasons": {
+        "arenaWin": "[Áŕéñá ʋíçţóŕý]",
+        "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
+        "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
+        "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]"
+      }
+    },
     "statInfo": {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
       "names": {
         "spellPower": "[Šþéļļ Þóŵéŕ]",
         "critRating": "[Çŕíţ Ŕáţíñĝ]",
-        "hasteRating": "[Ĥášţé Ŕáţíñĝ]"
+        "hasteRating": "[Ĥášţé Ŕáţíñĝ]",
+        "warfare": "[Ŵáŕƒáŕé]"
       },
+      "warfareValue": "[+{increase}% ðéáļţ / -{reduction}% ţáķéñ]",
       "desc": {
         "str": "[Íñçŕéášéš ýóúŕ áţţáçķ þóŵéŕ, šó ýóúŕ ŵéáþóñ šţŕíķéš ļáñð ĥáŕðéŕ.]",
         "agi": "[Šĥáŕþéñš ýóúŕ ŕéƒļéẋéš áñð áíɱ, íɱþŕóʋíñĝ šéʋéŕáļ óƒ ýóúŕ çóɱƀáţ šţáţš.]",
@@ -699,7 +715,8 @@ export const en_XA: EnTranslations = {
         "critChance": "[Ýóúŕ çĥáñçé ƒóŕ áñ áţţáçķ ţó šţŕíķé çŕíţíçáļļý, ðéáļíñĝ ðóúƀļé ðáɱáĝé.]",
         "dodge": "[Ýóúŕ çĥáñçé ţó çóɱþļéţéļý áʋóíð áñ íñçóɱíñĝ ɱéļéé áţţáçķ, ţáķíñĝ ñó ðáɱáĝé.]",
         "critRating": "[Çŕíţ ŕáţíñĝ ƒŕóɱ ýóúŕ ĝéáŕ áñð šéţ ƀóñúšéš, ŕáíšíñĝ ýóúŕ çŕíţíçáļ šţŕíķé çĥáñçé. Áƀóúţ 10 ŕáţíñĝ ĝŕáñţš 1% çŕíţ.]",
-        "hasteRating": "[Ĥášţé ŕáţíñĝ ƒŕóɱ ýóúŕ ĝéáŕ áñð šéţ ƀóñúšéš, šþééðíñĝ úþ ýóúŕ áţţáçķš áñð šþéļļçášţíñĝ. Áƀóúţ 10 ŕáţíñĝ ĝŕáñţš 1% ĥášţé.]"
+        "hasteRating": "[Ĥášţé ŕáţíñĝ ƒŕóɱ ýóúŕ ĝéáŕ áñð šéţ ƀóñúšéš, šþééðíñĝ úþ ýóúŕ áţţáçķš áñð šþéļļçášţíñĝ. Áƀóúţ 10 ŕáţíñĝ ĝŕáñţš 1% ĥášţé.]",
+        "warfare": "[Íñçŕéášéš ðáɱáĝé ðéáļţ ţó þļáýéŕš ƀý {increase}% áñð ŕéðúçéš ðáɱáĝé ţáķéñ ƒŕóɱ þļáýéŕš ƀý {reduction}%.]"
       },
       "effects": {
         "attackPower": "[+{value} Áţţáçķ Þóŵéŕ]",
@@ -6352,6 +6369,126 @@ export const en_XA: EnTranslations = {
       "sunpetal_herb": {
         "name": "[Šúñþéţáļ Ĥéŕƀ]"
       },
+      "furyforged_warhelm": {
+        "name": "[Ƒúŕýƒóŕĝéð Ŵáŕĥéļɱ]"
+      },
+      "furyforged_warspaulders": {
+        "name": "[Ƒúŕýƒóŕĝéð Ŵáŕšþáúļðéŕš]"
+      },
+      "furyforged_warplate": {
+        "name": "[Ƒúŕýƒóŕĝéð Ŵáŕþļáţé]"
+      },
+      "furyforged_girdle": {
+        "name": "[Ƒúŕýƒóŕĝéð Ĝíŕðļé]"
+      },
+      "furyforged_legguards": {
+        "name": "[Ƒúŕýƒóŕĝéð Ļéĝĝúáŕðš]"
+      },
+      "furyforged_gauntlets": {
+        "name": "[Ƒúŕýƒóŕĝéð Ĝáúñţļéţš]"
+      },
+      "furyforged_sabatons": {
+        "name": "[Ƒúŕýƒóŕĝéð Šáƀáţóñš]"
+      },
+      "stormbound_crown": {
+        "name": "[Šţóŕɱƀóúñð Çŕóŵñ]"
+      },
+      "stormbound_spaulders": {
+        "name": "[Šţóŕɱƀóúñð Šþáúļðéŕš]"
+      },
+      "stormbound_hauberk": {
+        "name": "[Šţóŕɱƀóúñð Ĥáúƀéŕķ]"
+      },
+      "stormbound_waistguard": {
+        "name": "[Šţóŕɱƀóúñð Ŵáíšţĝúáŕð]"
+      },
+      "stormbound_legmail": {
+        "name": "[Šţóŕɱƀóúñð Ļéĝɱáíļ]"
+      },
+      "stormbound_handguards": {
+        "name": "[Šţóŕɱƀóúñð Ĥáñðĝúáŕðš]"
+      },
+      "stormbound_greaves": {
+        "name": "[Šţóŕɱƀóúñð Ĝŕéáʋéš]"
+      },
+      "ashstalker_cowl": {
+        "name": "[Ášĥšţáļķéŕ Çóŵļ]"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "[Ášĥšţáļķéŕ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "ashstalker_harness": {
+        "name": "[Ášĥšţáļķéŕ Ĥáŕñéšš]"
+      },
+      "ashstalker_waistband": {
+        "name": "[Ášĥšţáļķéŕ Ŵáíšţƀáñð]"
+      },
+      "ashstalker_legguards": {
+        "name": "[Ášĥšţáļķéŕ Ļéĝĝúáŕðš]"
+      },
+      "ashstalker_grips": {
+        "name": "[Ášĥšţáļķéŕ Ĝŕíþš]"
+      },
+      "ashstalker_treads": {
+        "name": "[Ášĥšţáļķéŕ Ţŕéáðš]"
+      },
+      "cinderweave_cowl": {
+        "name": "[Çíñðéŕŵéáʋé Çóŵļ]"
+      },
+      "cinderweave_mantle": {
+        "name": "[Çíñðéŕŵéáʋé Ɱáñţļé]"
+      },
+      "cinderweave_raiment": {
+        "name": "[Çíñðéŕŵéáʋé Ŕáíɱéñţ]"
+      },
+      "cinderweave_cord": {
+        "name": "[Çíñðéŕŵéáʋé Çóŕð]"
+      },
+      "cinderweave_legwraps": {
+        "name": "[Çíñðéŕŵéáʋé Ļéĝŵŕáþš]"
+      },
+      "cinderweave_handwraps": {
+        "name": "[Çíñðéŕŵéáʋé Ĥáñðŵŕáþš]"
+      },
+      "cinderweave_slippers": {
+        "name": "[Çíñðéŕŵéáʋé Šļíþþéŕš]"
+      },
+      "final_oath_medallion": {
+        "name": "[Ɱéðáļļíóñ óƒ ţĥé Ƒíñáļ Óáţĥ]"
+      },
+      "razorwind_torque": {
+        "name": "[Ŕážóŕŵíñð Ţóŕɋúé]"
+      },
+      "cinder_sigil_pendant": {
+        "name": "[Çíñðéŕ-Šíĝíļ Þéñðáñţ]"
+      },
+      "iron_vow_band": {
+        "name": "[Íŕóñ Ʋóŵ Ɓáñð]"
+      },
+      "unbroken_circle": {
+        "name": "[Ţĥé Úñƀŕóķéñ Çíŕçļé]"
+      },
+      "fleetblood_band": {
+        "name": "[Ƒļééţƀļóóð Ɓáñð]"
+      },
+      "last_step_signet": {
+        "name": "[Ļášţ-Šţéþ Šíĝñéţ]"
+      },
+      "ashen_focus_ring": {
+        "name": "[Ášĥéñ Ƒóçúš Ŕíñĝ]"
+      },
+      "spellbreakers_seal": {
+        "name": "[Šþéļļƀŕéáķéŕ'š Šéáļ]"
+      },
+      "final_argument_greatblade": {
+        "name": "[Ƒíñáļ Áŕĝúɱéñţ Ĝŕéáţƀļáðé]"
+      },
+      "first_blood_razor": {
+        "name": "[Ƒíŕšţ-Ɓļóóð Ŕážóŕ]"
+      },
+      "emberglass_warstaff": {
+        "name": "[Éɱƀéŕĝļášš Ŵáŕšţáƒƒ]"
+      },
       "bristleback_maul": {
         "name": "[Ĝáļļóŵĝļášš Ĥáɱɱéŕ]"
       },
@@ -7491,6 +7628,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ɋúáŕţéŕɱášţéŕ Ʋéẋ]",
         "title": "[Ĥéŕóíç Ɋúáŕţéŕɱášţéŕ]",
         "greeting": "[Þŕóóƒ óƒ ţĥé ĥéŕóíç ðéþţĥš ƀúýš ţĥé ƒíñéšţ ŕíñĝš áñð þéñðáñţš íñ Ĥíĝĥŵáţçĥ. Šĥóŵ ɱé ýóúŕ ɱáŕķš.]"
+      },
+      "fury": {
+        "name": "[ƑÚŔÝ]",
+        "title": "[Ĥóñóŕ Ɋúáŕţéŕɱášţéŕ]",
+        "greeting": "[Ţĥé šáñðš ŕéɱéɱƀéŕ éʋéŕý ʋíçţóŕý. Šþéñð ýóúŕ ĥóñóŕ ŵéļļ.]"
       },
       "loremaster_caddis": {
         "name": "[Ļóŕéɱášţéŕ Çáððíš]",

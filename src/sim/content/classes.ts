@@ -1,4 +1,4 @@
-import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { AbilityDef, AbilityEffect, CoreStats, PlayerClass, WeaponInfo } from '../types';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -11,8 +11,8 @@ import { SPORT_ABILITIES } from './vale_cup';
 export interface ClassDef {
   id: PlayerClass;
   name: string;
-  baseStats: Stats;
-  statsPerLevel: Stats;
+  baseStats: CoreStats;
+  statsPerLevel: CoreStats;
   baseHp: number; // class hp before stamina at level 1
   hpPerLevel: number;
   baseMana: number;

@@ -887,7 +887,16 @@ function blankEntity(id: number): Entity {
     overheadEmoteId: null,
     overheadEmoteUntil: 0,
     overheadEmoteSeq: 0,
-    stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
+    stats: {
+      str: 0,
+      agi: 0,
+      sta: 0,
+      int: 0,
+      spi: 0,
+      armor: 0,
+      pvpOffense: 0,
+      pvpDefense: 0,
+    },
     weapon: { min: 1, max: 2, speed: 2 },
     attackPower: 0,
     rangedPower: 0,
@@ -1052,6 +1061,8 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  honor = 0;
+  lifetimeHonor = 0;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
   // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
   // explicit null clears it, same as `s.arena`). ---
@@ -1861,7 +1872,12 @@ export class ClientWorld implements IWorld {
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
       e.queuedOnSwing = s.queued ?? null;
-      e.stats = s.stats ?? e.stats;
+      // A rolling deploy can pair this client with an older server whose stats
+      // object predates WARFARE. Preserve numeric PvP fields instead of letting
+      // an old six-field object turn the character-sheet percentages into NaN.
+      if (s.stats !== undefined) {
+        e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
+      }
       e.attackPower = s.ap ?? 0;
       e.rangedPower = s.rp ?? 0;
       e.spellPower = s.sp ?? 0;
@@ -1960,6 +1976,8 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.honor !== undefined) this.honor = s.honor ?? 0;
+      if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;

@@ -679,13 +679,29 @@ export const ru_RU: EnTranslations = {
       "highContrast": "Высокая контрастность",
       "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым"
     },
+    "warfare": {
+      "honorAmount": "{amount} очк. чести",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Честь: {amount}",
+      "honorFloat": "+{amount} чести",
+      "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
+      "notEnoughHonor": "Недостаточно чести.",
+      "reasons": {
+        "arenaWin": "Победа на арене",
+        "fiestaKill": "Устранение на Фиесте",
+        "fiestaComplete": "Завершение Фиесты",
+        "fiestaWin": "Победа на Фиесте"
+      }
+    },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
       "names": {
         "spellPower": "Сила заклинаний",
         "critRating": "Рейтинг крит. удара",
-        "hasteRating": "Рейтинг ускорения"
+        "hasteRating": "Рейтинг ускорения",
+        "warfare": "Боевая мощь"
       },
+      "warfareValue": "+{increase}% к урону / -{reduction}% получаемого",
       "desc": {
         "str": "Увеличивает силу атаки, благодаря чему удары вашим оружием бьют сильнее.",
         "agi": "Обостряет реакцию и меткость, улучшая сразу несколько ваших боевых характеристик.",
@@ -699,7 +715,8 @@ export const ru_RU: EnTranslations = {
         "critChance": "Ваш шанс нанести критический удар, наносящий двойной урон.",
         "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
         "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
-        "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения."
+        "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения.",
+        "warfare": "Увеличивает урон по игрокам на {increase}% и снижает получаемый от игроков урон на {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} к силе атаки",
@@ -6352,6 +6369,126 @@ export const ru_RU: EnTranslations = {
       "sunpetal_herb": {
         "name": "Трава солнцелепест"
       },
+      "furyforged_warhelm": {
+        "name": "Боевой шлем яростной ковки"
+      },
+      "furyforged_warspaulders": {
+        "name": "Боевые наплечники яростной ковки"
+      },
+      "furyforged_warplate": {
+        "name": "Боевой панцирь яростной ковки"
+      },
+      "furyforged_girdle": {
+        "name": "Пояс яростной ковки"
+      },
+      "furyforged_legguards": {
+        "name": "Набедренники яростной ковки"
+      },
+      "furyforged_gauntlets": {
+        "name": "Рукавицы яростной ковки"
+      },
+      "furyforged_sabatons": {
+        "name": "Сабатоны яростной ковки"
+      },
+      "stormbound_crown": {
+        "name": "Корона, скованная бурей"
+      },
+      "stormbound_spaulders": {
+        "name": "Наплечники, скованные бурей"
+      },
+      "stormbound_hauberk": {
+        "name": "Хауберк, скованный бурей"
+      },
+      "stormbound_waistguard": {
+        "name": "Набедренник, скованный бурей"
+      },
+      "stormbound_legmail": {
+        "name": "Кольчужные поножи, скованные бурей"
+      },
+      "stormbound_handguards": {
+        "name": "Наручи, скованные бурей"
+      },
+      "stormbound_greaves": {
+        "name": "Наголенники, скованные бурей"
+      },
+      "ashstalker_cowl": {
+        "name": "Капюшон пеплохода"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Наплечники пеплохода"
+      },
+      "ashstalker_harness": {
+        "name": "Портупея пеплохода"
+      },
+      "ashstalker_waistband": {
+        "name": "Кушак пеплохода"
+      },
+      "ashstalker_legguards": {
+        "name": "Набедренники пеплохода"
+      },
+      "ashstalker_grips": {
+        "name": "Перчатки пеплохода"
+      },
+      "ashstalker_treads": {
+        "name": "Башмаки пеплохода"
+      },
+      "cinderweave_cowl": {
+        "name": "Капюшон жароткача"
+      },
+      "cinderweave_mantle": {
+        "name": "Оплечье жароткача"
+      },
+      "cinderweave_raiment": {
+        "name": "Облачение жароткача"
+      },
+      "cinderweave_cord": {
+        "name": "Шнурованный пояс жароткача"
+      },
+      "cinderweave_legwraps": {
+        "name": "Обмотки жароткача"
+      },
+      "cinderweave_handwraps": {
+        "name": "Повязки жароткача"
+      },
+      "cinderweave_slippers": {
+        "name": "Туфли жароткача"
+      },
+      "final_oath_medallion": {
+        "name": "Медальон последней клятвы"
+      },
+      "razorwind_torque": {
+        "name": "Шейная гривна режущего ветра"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Подвеска с печатью углей"
+      },
+      "iron_vow_band": {
+        "name": "Кольцо железной клятвы"
+      },
+      "unbroken_circle": {
+        "name": "Несокрушимый круг"
+      },
+      "fleetblood_band": {
+        "name": "Кольцо стремительной крови"
+      },
+      "last_step_signet": {
+        "name": "Печатка последнего шага"
+      },
+      "ashen_focus_ring": {
+        "name": "Кольцо пепельного средоточия"
+      },
+      "spellbreakers_seal": {
+        "name": "Печать разрушителя чар"
+      },
+      "final_argument_greatblade": {
+        "name": "Великий клинок последнего довода"
+      },
+      "first_blood_razor": {
+        "name": "Бритва первой крови"
+      },
+      "emberglass_warstaff": {
+        "name": "Боевой посох из огненного стекла"
+      },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"
       },
@@ -7491,6 +7628,11 @@ export const ru_RU: EnTranslations = {
         "name": "Интендант Векс",
         "title": "Героический интендант",
         "greeting": "Знаки героических глубин покупают лучшие кольца и кулоны Хайвотча. Покажи мне свои знаки."
+      },
+      "fury": {
+        "name": "Фьюри",
+        "title": "Интендант чести",
+        "greeting": "Пески поля боя помнят каждую победу. Распорядись своей честью достойно."
       },
       "loremaster_caddis": {
         "name": "Хранитель знаний Каддис",

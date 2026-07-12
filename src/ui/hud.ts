@@ -75,6 +75,7 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HonorReason,
   InvSlot,
   ItemSlot,
   LootRollChoice,
@@ -358,7 +359,12 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
+import {
+  type StatTooltipI18n,
+  statCellHtml,
+  statNameKey,
+  statTooltipHtml,
+} from './stat_tooltip_view';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
@@ -599,6 +605,12 @@ const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
   badInput: 'hudChrome.calendar.result.badInput',
   calendarFull: 'hudChrome.calendar.result.calendarFull',
   eventGone: 'hudChrome.calendar.result.eventGone',
+};
+const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
+  arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
+  fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
+  fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -4334,6 +4346,15 @@ export class Hud {
         }
       }
     }
+    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
+    if (warfareRating > 0) {
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(warfareRating),
+          stat: t(statNameKey('warfare') as TranslationKey),
+        }),
+      )}</div>`;
+    }
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -4480,7 +4501,9 @@ export class Hud {
           minimumFractionDigits: d.decimals,
           maximumFractionDigits: d.decimals,
         });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(t(`itemUi.stats.${d.stat}` as TranslationKey))}</div>`;
+        return `<div class="${cls}">${sign}${magnitude} ${esc(
+          t(statNameKey(d.stat) as TranslationKey),
+        )}</div>`;
       })
       .join('');
     let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
@@ -8641,6 +8664,28 @@ export class Hud {
           }
           break;
         }
+        case 'honor': {
+          const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const honorShape = fctSpawnShape({ type: 'honor' });
+          if (honorShape) {
+            this.fctPainter.spawn(
+              {
+                ...honorShape,
+                text: t('hudChrome.warfare.honorFloat', { amount }),
+                target: sim.player,
+              },
+              now,
+            );
+          }
+          this.combatLog(
+            t('hudChrome.warfare.honorGain', {
+              amount,
+              reason: t(HONOR_REASON_KEYS[ev.reason]),
+            }),
+            '#ffd100',
+          );
+          break;
+        }
         case 'levelup': {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
@@ -9844,6 +9889,7 @@ export class Hud {
       "This quest can't be shared.": 'hudChrome.questShare.notShareable',
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
+      'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',
@@ -11367,7 +11413,10 @@ export class Hud {
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
-      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS),
+      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
+        copper: this.sim.copper,
+        honor: this.sim.honor,
+      }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),

@@ -21,6 +21,7 @@
 
 import { HEROIC_BOSS_LOOT, HEROIC_LOOT_SOURCE_LEVEL } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
+import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
@@ -37,7 +38,7 @@ import {
   SLOT_STAT_MULT,
   STAT_PER_ILVL,
 } from './item_budget';
-import type { ItemDef, ItemSlot, Stats } from './types';
+import type { ItemDef } from './types';
 
 export {
   HEROIC_VARIANT_SOURCE_LEVEL,
@@ -147,6 +148,9 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // bosses), so the stock reads that source level: the epic pieces land at item
   // level 26 (20 + the epic bump) and get budget-enforced like any drop.
   for (const offer of HEROIC_VENDOR_STOCK) bump(offer.itemId, HEROIC_VENDOR_SOURCE_LEVEL, false);
+  // FURY's WARFARE stock is level-22 PvP content. The epic quality bump puts
+  // every piece at item level 28, including vendor-only necks and rings.
+  for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
   // epic pieces read item level 31 (25 + the epic bump). Flat across the five
   // bosses BY DESIGN (raid=false even for Nythraxis): the heroic set is one

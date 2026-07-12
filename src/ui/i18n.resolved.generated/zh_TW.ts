@@ -679,13 +679,29 @@ export const zh_TW: EnTranslations = {
       "highContrast": "高對比度",
       "highContrastAria": "切換高對比度背景：關閉動態預告片，使開始畫面文字保持清晰"
     },
+    "warfare": {
+      "honorAmount": "{amount} 點榮譽",
+      "dualPrice": "{money} + {honor}",
+      "balance": "榮譽：{amount}",
+      "honorFloat": "+{amount} 榮譽",
+      "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
+      "notEnoughHonor": "榮譽不足。",
+      "reasons": {
+        "arenaWin": "競技場勝利",
+        "fiestaKill": "嘉年華擊倒",
+        "fiestaComplete": "完成嘉年華",
+        "fiestaWin": "嘉年華勝利"
+      }
+    },
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
       "names": {
         "spellPower": "法術強度",
         "critRating": "暴擊等級",
-        "hasteRating": "急速等級"
+        "hasteRating": "急速等級",
+        "warfare": "戰爭"
       },
+      "warfareValue": "造成傷害 +{increase}% / 承受傷害 -{reduction}%",
       "desc": {
         "str": "提升你的攻擊強度，使你的武器攻擊更具威力。",
         "agi": "磨練你的反應與準度，提升多項戰鬥屬性。",
@@ -699,7 +715,8 @@ export const zh_TW: EnTranslations = {
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
-        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。"
+        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
+        "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。"
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",
@@ -6352,6 +6369,126 @@ export const zh_TW: EnTranslations = {
       "sunpetal_herb": {
         "name": "陽瓣草"
       },
+      "furyforged_warhelm": {
+        "name": "怒鑄戰盔"
+      },
+      "furyforged_warspaulders": {
+        "name": "怒鑄戰肩"
+      },
+      "furyforged_warplate": {
+        "name": "怒鑄戰甲"
+      },
+      "furyforged_girdle": {
+        "name": "怒鑄腰帶"
+      },
+      "furyforged_legguards": {
+        "name": "怒鑄護腿"
+      },
+      "furyforged_gauntlets": {
+        "name": "怒鑄護手"
+      },
+      "furyforged_sabatons": {
+        "name": "怒鑄戰靴"
+      },
+      "stormbound_crown": {
+        "name": "縛雷王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "縛雷肩甲"
+      },
+      "stormbound_hauberk": {
+        "name": "縛雷鎖甲"
+      },
+      "stormbound_waistguard": {
+        "name": "縛雷護腰"
+      },
+      "stormbound_legmail": {
+        "name": "縛雷腿甲"
+      },
+      "stormbound_handguards": {
+        "name": "縛雷護手"
+      },
+      "stormbound_greaves": {
+        "name": "縛雷脛甲"
+      },
+      "ashstalker_cowl": {
+        "name": "獵燼兜帽"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "獵燼護肩"
+      },
+      "ashstalker_harness": {
+        "name": "獵燼胸甲"
+      },
+      "ashstalker_waistband": {
+        "name": "獵燼腰帶"
+      },
+      "ashstalker_legguards": {
+        "name": "獵燼護腿"
+      },
+      "ashstalker_grips": {
+        "name": "獵燼護手"
+      },
+      "ashstalker_treads": {
+        "name": "獵燼軟靴"
+      },
+      "cinderweave_cowl": {
+        "name": "織燼兜帽"
+      },
+      "cinderweave_mantle": {
+        "name": "織燼披肩"
+      },
+      "cinderweave_raiment": {
+        "name": "織燼法衣"
+      },
+      "cinderweave_cord": {
+        "name": "織燼腰繩"
+      },
+      "cinderweave_legwraps": {
+        "name": "織燼裹腿"
+      },
+      "cinderweave_handwraps": {
+        "name": "織燼裹手"
+      },
+      "cinderweave_slippers": {
+        "name": "織燼便鞋"
+      },
+      "final_oath_medallion": {
+        "name": "最終誓約勳章"
+      },
+      "razorwind_torque": {
+        "name": "剃風頸環"
+      },
+      "cinder_sigil_pendant": {
+        "name": "燼印墜飾"
+      },
+      "iron_vow_band": {
+        "name": "鐵誓指環"
+      },
+      "unbroken_circle": {
+        "name": "不破之環"
+      },
+      "fleetblood_band": {
+        "name": "疾血指環"
+      },
+      "last_step_signet": {
+        "name": "末步徽戒"
+      },
+      "ashen_focus_ring": {
+        "name": "灰燼專注戒指"
+      },
+      "spellbreakers_seal": {
+        "name": "破法者之印"
+      },
+      "final_argument_greatblade": {
+        "name": "最終論斷巨刃"
+      },
+      "first_blood_razor": {
+        "name": "初血剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "燼晶戰杖"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"
       },
@@ -7491,6 +7628,11 @@ export const zh_TW: EnTranslations = {
         "name": "軍需官維克斯",
         "title": "英雄軍需官",
         "greeting": "英雄深淵的憑證能換來高崖望最上等的戒指和吊墜。把你的徽記拿給我看。"
+      },
+      "fury": {
+        "name": "怒焰",
+        "title": "榮譽軍需官",
+        "greeting": "戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。"
       },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",

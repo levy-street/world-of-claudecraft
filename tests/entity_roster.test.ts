@@ -127,6 +127,7 @@ function makeCtx() {
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
+    grantHonor: vi.fn(() => 0),
     error: vi.fn(),
     clearEntityMarker,
     pulseGroundAoE,

@@ -19,6 +19,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 // name). Keep in sync with SimContextCallbacks.
 const CALLBACK_KEYS = [
   'emit',
+  'grantHonor',
   'error',
   'dealDamage',
   'handleDeath',
@@ -283,6 +284,7 @@ function makeFakeHost() {
     bankerIds: [],
     vcup: createVcState(),
     emit: vi.fn(),
+    grantHonor: vi.fn(() => 0),
     error: vi.fn(),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),

@@ -45,6 +45,18 @@ export function hasteFractionFromRating(rating: number): number {
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
 }
+
+export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
+
+// Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
+// by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
+// the soft daily taper independently of who was faced.
+export interface HonorArenaDailyState {
+  date: string;
+  winsByOpponent: Record<string, number>;
+  fiestaCompletionsByOpponent: Record<string, number>;
+  totalWins: number;
+}
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, the classic-era value.
 export const POTION_COOLDOWN = 120; // seconds
@@ -296,7 +308,16 @@ export interface Stats {
   int: number;
   spi: number;
   armor: number;
+  // Fractions derived from PvP ratings on equipped gear. They affect hostile
+  // player-vs-player damage only; PvE never reads them.
+  pvpOffense: number;
+  pvpDefense: number;
 }
+
+// The six class/item attributes authored in content. WARFARE fractions are
+// derived from ratings at runtime and are never authored as base growth or
+// direct item stats.
+export type CoreStats = Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>;
 
 export interface WeaponInfo {
   min: number;
@@ -377,7 +398,7 @@ interface BaseItemDef {
   name: string;
   slot?: ItemSlot;
   weapon?: WeaponInfo;
-  stats?: Partial<Stats>;
+  stats?: Partial<CoreStats>;
   // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
@@ -385,6 +406,13 @@ interface BaseItemDef {
   // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
+  // combat clamps them again at the PvP caps before applying damage.
+  pvpOffenseRating?: number;
+  pvpDefenseRating?: number;
+  // Honor price for a Quartermaster purchase. An honor-only item omits
+  // buyValue; both fields may coexist when a vendor charges both currencies.
+  priceHonor?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -393,10 +421,10 @@ interface BaseItemDef {
   noDiscard?: boolean;
   noMarketList?: boolean;
   // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
-  // listed on the World Market, or destroyed (right-click discard). Currency-like
-  // reward tokens (heroic_mark) use this so they can only be spent at their vendor,
-  // never handed off or thrown away. Enforced in social/trade.ts, mail/post_office.ts,
-  // market.ts, and items.ts (discardItem/sellItem/sellAllJunk).
+  // listed on the World Market, or sold. Destruction is controlled separately by
+  // noDiscard so bound equipment can still be cleaned out while currency-like
+  // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
+  // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
@@ -2086,6 +2114,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
+  | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
   // level past the cap, and unlocking a cosmetic lifetime-XP milestone

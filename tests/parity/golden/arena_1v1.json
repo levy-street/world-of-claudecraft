@@ -73,8 +73,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 407,
-      "state": "16bbc2c5",
-      "events": "57e1d7bf",
+      "state": "7c36d793",
+      "events": "1385ce8e",
       "rng": {
         "draws": 384,
         "digest": "9a9a7293"
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 407,
-      "state": "2542bea5",
+      "state": "06a935b3",
       "events": "741638a5",
       "rng": {
         "draws": 483,
@@ -120,12 +120,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 100,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "1v1:[\"name:bet\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 100,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {

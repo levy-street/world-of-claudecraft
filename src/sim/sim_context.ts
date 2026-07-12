@@ -43,6 +43,7 @@ import type {
   DungeonDifficulty,
   Entity,
   ErrorReason,
+  HonorReason,
   ItemInstancePayload,
   PlayerClass,
   QuestProgress,
@@ -189,6 +190,8 @@ export interface SimContextPrimitives {
 export interface SimContextCallbacks {
   // Event sink (core). Routes to `Sim.emit`.
   emit(ev: SimEvent): void;
+  // Single currency grant path for ranked Arena and Fiesta rewards.
+  grantHonor(meta: PlayerMeta, amount: number, reason: HonorReason): number;
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
   error(pid: number, text: string, reason?: ErrorReason): void;
@@ -857,6 +860,7 @@ export function createSimContext(host: SimContextHost): SimContext {
       return host.vcup;
     },
     emit: host.emit,
+    grantHonor: host.grantHonor,
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
