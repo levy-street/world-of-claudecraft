@@ -136,9 +136,14 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(hud).toContain('if (directFocusOnly && event.target !== el) return;');
   });
 
-  it('dismisses stale descriptions before any touch control action', () => {
+  it('keeps the whole touch controls strip a description dead zone', () => {
+    // Both the pointerdown AND the bubbling synthesized click stop at the strip,
+    // so a tap on or around the Add/assignment/Remove buttons can never reach
+    // the row's touch-tap description trigger (the real-device regression).
     expect(code).toContain("controls.addEventListener('pointerdown', dismissDescription)");
-    expect(code).toContain("controls.addEventListener('click', dismissDescription, true)");
+    expect(code).toContain("controls.addEventListener('click', dismissDescription)");
+    expect(code).not.toContain("controls.addEventListener('click', dismissDescription, true)");
+    expect(code).toContain('event.stopPropagation();');
     expect(code).toContain('this.deps.hideTooltip()');
   });
 

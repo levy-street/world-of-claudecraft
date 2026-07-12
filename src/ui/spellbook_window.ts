@@ -427,12 +427,19 @@ export class SpellbookWindow {
   private appendTouchControls(el: HTMLElement, row: SpellbookRow, name: string): void {
     const controls = document.createElement('div');
     controls.className = 'spell-touch-controls';
+    // The whole controls strip is a description dead zone: a tap ON one of its
+    // buttons or AROUND them must never open the row description. Stopping only
+    // the pointerdown is not enough on a phone: the row's touch-tap never
+    // records the swallowed pointer, but the browser still synthesizes a click
+    // that bubbles through the strip into the row, which reads it as a fresh
+    // mouse activation. Stop BOTH here (click in the bubble phase, so the
+    // Add/assignment/Remove handlers underneath keep firing first).
     const dismissDescription = (event: Event) => {
       this.deps.hideTooltip();
-      if (event.type === 'pointerdown') event.stopPropagation();
+      event.stopPropagation();
     };
     controls.addEventListener('pointerdown', dismissDescription);
-    controls.addEventListener('click', dismissDescription, true);
+    controls.addEventListener('click', dismissDescription);
     if (row.assignment.kind === 'unassigned') {
       const add = document.createElement('button');
       add.type = 'button';

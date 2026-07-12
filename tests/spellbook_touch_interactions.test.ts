@@ -183,4 +183,31 @@ describe('SpellbookWindow touch description controls', () => {
     expect(tooltip.style.display).toBe('none');
     expect(abilityTooltip).toHaveBeenCalledTimes(1);
   });
+
+  it('never shows a description for a tap on or around the touch controls strip', () => {
+    // A fat-finger tap can land INSIDE .spell-touch-controls but beside its
+    // buttons. The strip swallows the pointerdown, so the row's touch-tap
+    // never records the pointer, but the browser still synthesizes a click
+    // that bubbles through the strip into the row, which used to read it as
+    // a fresh mouse activation and open the description. The whole strip is
+    // a description dead zone: on it, around it, never a description.
+    const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
+    const controls = required(
+      row.querySelector<HTMLElement>('.spell-touch-controls'),
+      'touch controls strip',
+    );
+    activateControl(controls, 7);
+    expect(tooltip.style.display).toBe('none');
+    expect(abilityTooltip).not.toHaveBeenCalled();
+
+    // The buttons inside the strip keep working: X still unassigns exactly once.
+    const remove = required(
+      row.querySelector<HTMLButtonElement>('.spell-hotbar-remove'),
+      'remove button',
+    );
+    activateControl(remove, 8);
+    expect(removeFromBar).toHaveBeenCalledTimes(1);
+    expect(tooltip.style.display).toBe('none');
+    expect(abilityTooltip).not.toHaveBeenCalled();
+  });
 });
