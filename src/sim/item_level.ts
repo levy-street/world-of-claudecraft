@@ -19,7 +19,12 @@
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
 
-import { HEROIC_BOSS_LOOT, HEROIC_LOOT_SOURCE_LEVEL } from './content/heroic_loot';
+import {
+  ABYSS_JEWELRY_IDS,
+  HEROIC_ABYSS_JEWELRY_SOURCE_LEVEL,
+  HEROIC_BOSS_LOOT,
+  HEROIC_LOOT_SOURCE_LEVEL,
+} from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
@@ -153,7 +158,13 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // shared tier, per the drop-table spec.
   for (const entries of Object.values(HEROIC_BOSS_LOOT)) {
     for (const entry of entries) {
-      if (entry.itemId) bump(entry.itemId, HEROIC_LOOT_SOURCE_LEVEL, false);
+      if (!entry.itemId) continue;
+      // The Molten Abyss neck/rings register a tier below the standard heroic gear so
+      // they land at item level 25 (under the item-level-26 marks-vendor jewelry).
+      const src = ABYSS_JEWELRY_IDS.has(entry.itemId)
+        ? HEROIC_ABYSS_JEWELRY_SOURCE_LEVEL
+        : HEROIC_LOOT_SOURCE_LEVEL;
+      bump(entry.itemId, src, false);
     }
   }
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"

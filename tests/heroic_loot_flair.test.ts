@@ -104,6 +104,8 @@ describe('heroic loot flair: weapon dps tracks item level', () => {
     'scepter_of_the_deathless_court',
     'deathless_greatblade',
     'stormcallers_focus',
+    'moltencore_maul',
+    'brand_of_the_first_flame',
   ];
 
   it('every heroic (item level 31) set weapon sits on the dps curve', () => {
