@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "de8b8c61",
+      "state": "9ceacf37",
       "events": "64d309dc",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "a7e4e324",
+      "state": "36c2f5da",
       "events": "90b217f1",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "a9672bda",
+      "state": "88faf56c",
       "events": "d13b86f9",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "926b80a9",
+      "state": "2404171f",
       "events": "669c1069",
       "rng": {
         "draws": 230,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "cc273c2c",
+      "state": "f03de54c",
       "events": "33e0a756",
       "rng": {
         "draws": 384,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 409,
-      "state": "015b5575",
+      "state": "1bc93af5",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 409,
-      "state": "c2f2b7e2",
+      "state": "0ac2a51e",
       "events": "384ae6a8",
       "rng": {
         "draws": 608,
@@ -225,7 +225,7 @@
           "talents": {
             "rows": {
               "5": "mag_r5_firestarter",
-              "8": "mag_r8_counterspell",
+              "8": "mag_r8_spellsteal",
               "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
@@ -359,7 +359,7 @@
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",
-              "8": "hun_r8_counter_shot",
+              "8": "hun_r8_startle_shot",
               "11": "hun_r11_mend_pet",
               "14": "hun_r14_multi_shot",
               "17": "hun_r17_deterrence",
