@@ -671,7 +671,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
         dmg *= spellDamageMultFromAuras(src);
-        if (crit) dmg *= 1.5;
+        // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
+        // spell crit-damage channel of the mastery like every other spell crit.
+        if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
         noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {

@@ -3562,7 +3562,10 @@ const DRUID_CLASS: TalentNode[] = [
     'class',
     undefined,
     2,
-    { ability: [{ ability: 'mark_of_the_wild', dmgPct: 0.2 }], stats: { armorPct: 0.03 } },
+    // Wildward (Mark of the Wild) is a stat buff, so its per-rank strengthening rides
+    // buffPct (the dedicated buff-scaling channel), not dmgPct: a damage-power mod no
+    // longer scales a percent buff (that corruption was fixed), so dmgPct here is a no-op.
+    { ability: [{ ability: 'mark_of_the_wild', buffPct: 0.2 }], stats: { armorPct: 0.03 } },
     '+',
     'Improved Wildward',
     'Increases armor by 3% per rank. Increases Wildward damage by 20% per rank.',

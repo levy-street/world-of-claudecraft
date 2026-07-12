@@ -1,12 +1,19 @@
 // Mastery-application mechanism fixes from the codex pass over #1543:
 //  - a global damage mult must not corrupt a utility rate/multiplier buff (F1)
 //  - Demonology's redirected pet damage must not re-apply the source's output mods (F7)
+// Plus the second-pass follow-ups (codex review of the fixes themselves):
+//  - a flat DAMAGE-magnitude buff (thorns) must still scale, only rates are exempt
+//  - a buff-strengthening talent must ride buffPct, not the (now buff-exempt) dmgPct
 import { describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import type { ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { abilityScalingPower } from '../src/sim/spell_scaling';
 import type { AbilityDef, Aura, Entity } from '../src/sim/types';
+import { abilityDamageBonus } from '../src/ui/ability_damage';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
   it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
@@ -19,6 +26,41 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const gw = sim.resolvedAbility('ghost_wolf', sim.playerId);
     const buff = gw?.effects.find((e) => e.type === 'selfBuff');
     expect(buff && 'value' in buff ? buff.value : null).toBe(1.4);
+  });
+
+  it('a flat DAMAGE buff (Retribution Aura thorns) still scales with the ret mastery', () => {
+    // thorns is flat reflect DAMAGE, so a damage-power mastery must still scale it (it is
+    // in SCALABLE_BUFF_KINDS). The rate-buff fix must not have swept it up as a rate.
+    const base = abilitiesKnownAt('paladin', 20, undefined).find(
+      (a) => a.def.id === 'retribution_aura',
+    );
+    const baseThorns = base?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
+    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(5);
+
+    const retMods = computeTalentModifiers(
+      'paladin',
+      { spec: 'retribution', ranks: {}, choices: {} },
+      20,
+    );
+    const ret = abilitiesKnownAt('paladin', 20, retMods).find(
+      (a) => a.def.id === 'retribution_aura',
+    );
+    const retThorns = ret?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
+    // 5 * 1.2 (ret meleeDmgPct 0.2) = 6, not 5 (the pre-fix regression left it at 5).
+    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
+  });
+
+  it('Improved Wildward strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
+    // The talent buffs a percent stat buff; with damage mods no longer scaling percent
+    // buffs, it must ride buffPct. 2 ranks (buffPct 0.4) scale the +5% buff to +7%.
+    const mods = computeTalentModifiers(
+      'druid',
+      { spec: null, ranks: { dru_imp_mark: 2 }, choices: {} },
+      20,
+    );
+    const motw = abilitiesKnownAt('druid', 20, mods).find((a) => a.def.id === 'mark_of_the_wild');
+    const buff = motw?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'buff_stats_pct');
+    expect(buff && 'value' in buff ? buff.value : null).toBe(7);
   });
 });
 
@@ -53,6 +95,76 @@ describe('Gloamveil Form spell power is Shadow-school only (F6)', () => {
     const holySpell = { school: 'holy' } as AbilityDef;
     expect(abilityScalingPower(p, shadowSpell)).toBe(p.spellPower + 15);
     expect(abilityScalingPower(p, holySpell)).toBe(p.spellPower);
+  });
+
+  it('the tooltip damage estimate carries the shadow bonus (AbilityScaling wiring)', () => {
+    // The HUD derives shadowSpellPowerBonus from the synced form aura and passes it in
+    // AbilityScaling, so the shadow-spell tooltip estimate reflects Gloamveil on both
+    // hosts. A shadow direct nuke's estimated bonus must rise with the shadow SP.
+    const res = {
+      def: { school: 'shadow' },
+      castTime: 1.5,
+      effects: [{ type: 'directDamage', min: 50, max: 50 }],
+    } as unknown as ResolvedAbility;
+    const eff = res.effects[0];
+    const base = { spellPower: 200, rangedPower: 0, attackPower: 0 };
+    const withBonus = { ...base, shadowSpellPowerBonus: 15 };
+    expect(abilityDamageBonus(res, eff, withBonus)).toBeGreaterThan(
+      abilityDamageBonus(res, eff, base),
+    );
+  });
+});
+
+describe('channeled spell crits take the spell crit-damage mastery', () => {
+  it("a Fire mage's Aether Darts channel crits harder than a specless mage's (same rolls)", () => {
+    // Drive the channeled directDamage tick path (casting_lifecycle) with a guaranteed
+    // crit. Two identical mages on the same seed: only the Fire spec's +50% spell crit
+    // damage differs, so its total channel damage must exceed the specless baseline.
+    const drive = (spec: 'fire' | null): number => {
+      const sim = new Sim({ seed: 9, playerClass: 'mage', autoEquip: true });
+      sim.setPlayerLevel(20);
+      if (spec) expect(sim.setSpec(spec)).toBe(true);
+      const p = sim.entities.get(sim.playerId) as Entity;
+      p.facing = 0;
+      p.maxHp = p.hp = 5_000_000; // survive the dummy's melee during the channel
+      p.castPushbackReduction = 1; // pushback-immune so the channel runs all 3 ticks
+      p.resource = p.maxResource;
+      // Force every tick to crit via an aura (survives the recalc-on-cast that would
+      // reset a raw stat override). spellCrit reads this bonus live, so >1 = always crit.
+      p.auras.push({
+        kind: 'buff_spellcrit',
+        name: 'test-forced-crit',
+        value: 5,
+        remaining: 60,
+        duration: 60,
+        sourceId: p.id,
+        school: 'arcane',
+      } as Aura);
+      const dummy = createMob(
+        (sim as unknown as { nextId: number }).nextId++,
+        MOBS.ridge_stalker,
+        20,
+        {
+          x: p.pos.x,
+          y: p.pos.y,
+          z: p.pos.z + 3, // close, so caster-to-target line of sight is clear on any seed
+        },
+      );
+      dummy.maxHp = dummy.hp = 5_000_000;
+      dummy.hostile = true;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      sim.targetEntity(dummy.id, sim.playerId);
+      sim.castAbility('arcane_missiles', sim.playerId);
+      // The channel is 3 ticks over 3 s (about 60 sim ticks); drive well past it.
+      for (let i = 0; i < 20 * 5; i++) sim.tick();
+      return dummy.maxHp - dummy.hp;
+    };
+    const fire = drive('fire');
+    const plain = drive(null);
+    expect(fire).toBeGreaterThan(0);
+    expect(plain).toBeGreaterThan(0);
+    // Fire crits at 1.5 + 0.5 = 2.0x, specless at 1.5x, over the same rolls.
+    expect(fire).toBeGreaterThan(plain);
   });
 });
 

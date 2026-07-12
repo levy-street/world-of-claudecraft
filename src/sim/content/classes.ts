@@ -3955,6 +3955,9 @@ const SCALABLE_BUFF_KINDS = new Set<AuraKind>([
   'buff_spi',
   'buff_sta',
   'buff_spellpower',
+  // Thorns is flat reflect DAMAGE (Retribution Aura, thornshield), so it scales with a
+  // damage-power mod exactly like the other flat magnitudes above.
+  'thorns',
 ]);
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
