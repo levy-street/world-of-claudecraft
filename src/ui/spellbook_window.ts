@@ -99,6 +99,10 @@ export class SpellbookWindow {
   private pickerPage = 0;
   private pickerBarToken = '';
   private pickerOpener: HTMLElement | null = null;
+  // The touch selection highlight: the row whose description was last shown or
+  // whose slot picker is open. Tracked by ability id so it survives the
+  // re-renders the picker and the hotbar refresh trigger.
+  private selectedAbilityId: string | null = null;
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
@@ -139,6 +143,7 @@ export class SpellbookWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
+    this.markSelectedRow(null);
     this.clearPickerState();
     el.classList.remove('spell-slot-picker-open');
   }
@@ -314,6 +319,7 @@ export class SpellbookWindow {
     // Ability id on the row so a talent-driven rerenderPreservingView() can restore
     // scroll focus to the same row after it rebuilds the list.
     el.dataset.abilityId = row.abilityId;
+    if (row.abilityId === this.selectedAbilityId) el.classList.add('is-selected');
     const locked = !known;
     const summary = known ? this.deps.abilitySummary(known) : '';
     const name = this.abilityName(def);
@@ -342,6 +348,7 @@ export class SpellbookWindow {
         );
         bindTouchTap(el, () => {
           if (this.pickerAbilityId !== null) return;
+          this.markSelectedRow(row.abilityId);
           showDescription();
         });
         list.appendChild(el);
@@ -493,8 +500,21 @@ export class SpellbookWindow {
     el.appendChild(controls);
   }
 
+  // Move the touch selection highlight: exactly one row carries .is-selected,
+  // the one whose description or slot picker the player last activated.
+  private markSelectedRow(abilityId: string | null): void {
+    this.selectedAbilityId = abilityId;
+    for (const row of this.deps.root().querySelectorAll<HTMLElement>('.spell-row')) {
+      row.classList.toggle(
+        'is-selected',
+        abilityId !== null && row.dataset.abilityId === abilityId,
+      );
+    }
+  }
+
   private openPicker(abilityId: string, opener: HTMLElement): void {
     this.deps.hideTooltip();
+    this.markSelectedRow(abilityId);
     this.pickerAbilityId = abilityId;
     this.pickerBarToken = this.deps.barToken?.() ?? '';
     this.pickerOpener = opener;

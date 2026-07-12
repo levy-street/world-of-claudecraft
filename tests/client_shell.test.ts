@@ -550,7 +550,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #party-frames #party-leave .ui-icon {\n      box-sizing: content-box;\n      width: 12px;\n      height: 12px;\n      padding: 7px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame,\n    body.mobile-touch.mobile-left-handed #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      top: calc(max(6px, env(safe-area-inset-top)) + 48px);\n      transform: translateX(-50%)',
+      'body.mobile-touch #target-frame {\n      left: auto;\n      right: calc(max(12px, env(safe-area-inset-right)) + var(--mobile-direct-menu-width) + 12px);\n      top: max(8px, env(safe-area-inset-top));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #target-frame {\n      right: auto;\n      left: calc(max(12px, env(safe-area-inset-left)) + var(--mobile-direct-menu-width) + 12px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar {\n      left: auto;\n      right: max(18px, env(safe-area-inset-right));\n      top: auto;\n      bottom: calc(136px + env(safe-area-inset-bottom));',
@@ -575,7 +578,7 @@ describe('client HTML shell', () => {
   it('keeps the landscape target subordinate and compacts pet and view controls', () => {
     expect(hudMobileCss).toContain('--mobile-target-frame-ratio: 0.9;');
     expect(hudMobileCss).toContain(
-      'translateX(-50%)\n        scale(\n          calc(\n            var(--mobile-player-frame-scale, 0.9) *\n            var(--mobile-target-frame-ratio, 0.9) *\n            var(--mobile-chrome-scale, 1)\n          )\n        );',
+      'transform: scale(\n        calc(\n          var(--mobile-player-frame-scale, 0.9) *\n          var(--mobile-target-frame-ratio, 0.9) *\n          var(--mobile-chrome-scale, 1)\n        )\n      );',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar .petbar-group {\n      gap: 0;\n      padding: 0;\n      border: 0;\n      outline: 0;\n      background: transparent;\n      box-shadow: none;',

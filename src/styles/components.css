@@ -1182,6 +1182,11 @@
     outline-offset: 2px;
     background: var(--color-primary-glow);
   }
+  /* Touch selection: the row whose description or slot picker is active keeps a
+     steady dark seat (focus-visible never fires for a finger tap). */
+  .spell-row.is-selected {
+    background: var(--color-bg-dark);
+  }
   .spell-row.locked .spell-icon {
     filter: grayscale(1) brightness(0.5);
   }

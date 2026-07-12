@@ -184,6 +184,25 @@ describe('SpellbookWindow touch description controls', () => {
     expect(abilityTooltip).toHaveBeenCalledTimes(1);
   });
 
+  it('highlights the active row for a description tap and follows the picker', () => {
+    const rows = root.querySelectorAll<HTMLElement>('.spell-row');
+    // Tapping a row for its description marks that row selected.
+    tap(rows[0], 9);
+    expect(rows[0].classList.contains('is-selected')).toBe(true);
+    expect(rows[1].classList.contains('is-selected')).toBe(false);
+
+    // Opening the slot picker from the OTHER row moves the highlight there,
+    // and it survives the picker re-render.
+    const chip = required(
+      rows[1].querySelector<HTMLButtonElement>('.spell-assignment-chip'),
+      'assignment chip',
+    );
+    activateControl(chip, 10);
+    const rerendered = root.querySelectorAll<HTMLElement>('.spell-row');
+    expect(rerendered[1].classList.contains('is-selected')).toBe(true);
+    expect(rerendered[0].classList.contains('is-selected')).toBe(false);
+  });
+
   it('never shows a description for a tap on or around the touch controls strip', () => {
     // A fat-finger tap can land INSIDE .spell-touch-controls but beside its
     // buttons. The strip swallows the pointerdown, so the row's touch-tap

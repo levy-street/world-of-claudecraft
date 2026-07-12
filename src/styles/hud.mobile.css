@@ -4317,20 +4317,27 @@
       transform: none;
       transform-origin: right top;
     }
-    body.mobile-touch #target-frame,
+    /* The landscape target frame sits on the top row right beside the Chat
+       button (the direct-menu cluster is right-anchored), so the target reads
+       in the same glance as the navigation chrome and the top center stays
+       free for the protected center messages. */
+    body.mobile-touch #target-frame {
+      left: auto;
+      right: calc(max(12px, env(safe-area-inset-right)) + var(--mobile-direct-menu-width) + 12px);
+      top: max(8px, env(safe-area-inset-top));
+      transform: scale(
+        calc(
+          var(--mobile-player-frame-scale, 0.9) *
+          var(--mobile-target-frame-ratio, 0.9) *
+          var(--mobile-chrome-scale, 1)
+        )
+      );
+      transform-origin: right top;
+    }
     body.mobile-touch.mobile-left-handed #target-frame {
-      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
       right: auto;
-      top: calc(max(6px, env(safe-area-inset-top)) + 48px);
-      transform: translateX(-50%)
-        scale(
-          calc(
-            var(--mobile-player-frame-scale, 0.9) *
-            var(--mobile-target-frame-ratio, 0.9) *
-            var(--mobile-chrome-scale, 1)
-          )
-        );
-      transform-origin: center top;
+      left: calc(max(12px, env(safe-area-inset-left)) + var(--mobile-direct-menu-width) + 12px);
+      transform-origin: left top;
     }
     body.mobile-touch #party-chip {
       grid-area: chip;
