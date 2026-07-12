@@ -6574,4 +6574,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
+  // Baseline class interrupts.
+  'entities.abilities.pummel.name': '턱 강타',
+  'entities.abilities.pummel.description':
+    '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
+  'entities.abilities.kick.name': '발차기',
+  'entities.abilities.kick.description':
+    '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
+  'entities.abilities.counterspell.name': '주문 분쇄',
+  'entities.abilities.counterspell.description':
+    '대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다.',
+  'entities.abilities.counter_shot.name': '침묵의 사격',
+  'entities.abilities.counter_shot.description':
+    '빠른 사격으로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다.',
+  'entities.abilities.rebuke.name': '질책',
+  'entities.abilities.rebuke.description':
+    '대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다.',
+  'entities.abilities.skull_bash.name': '박치기',
+  'entities.abilities.skull_bash.description':
+    '돌진 박치기로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다.',
+  'entities.abilities.spell_lock.name': '재갈 물리기',
+  'entities.abilities.spell_lock.description':
+    '시전 중인 대상을 침묵시키고 5초 동안 해당 계열의 주문을 봉쇄합니다.',
 };

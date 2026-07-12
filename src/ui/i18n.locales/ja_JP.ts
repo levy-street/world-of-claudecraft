@@ -6589,4 +6589,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
+  // Baseline class interrupts.
+  'entities.abilities.pummel.name': '顎砕き',
+  'entities.abilities.pummel.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.kick.name': 'ブーツ',
+  'entities.abilities.kick.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.counterspell.name': 'スペルブレイク',
+  'entities.abilities.counterspell.description':
+    '対象の呪文を打ち消し、6秒間その系統の呪文を封じる。',
+  'entities.abilities.counter_shot.name': '沈黙の一射',
+  'entities.abilities.counter_shot.description':
+    '素早い一射で対象の詠唱を中断し、4秒間その系統を封じる。',
+  'entities.abilities.rebuke.name': '叱咤',
+  'entities.abilities.rebuke.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.skull_bash.name': '頭突き',
+  'entities.abilities.skull_bash.description':
+    '突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。',
+  'entities.abilities.spell_lock.name': '猿轡',
+  'entities.abilities.spell_lock.description':
+    '詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。',
 };

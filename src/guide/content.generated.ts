@@ -199,6 +199,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "taunt",
         "name": "Goad"
+      },
+      {
+        "id": "pummel",
+        "name": "Jawcrack"
       }
     ],
     "model": "player_warrior",
@@ -311,6 +315,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "retribution_aura",
         "name": "Requital Aura"
+      },
+      {
+        "id": "rebuke",
+        "name": "Reproach"
       }
     ],
     "model": "player_paladin",
@@ -429,6 +437,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "volley",
         "name": "Volley"
+      },
+      {
+        "id": "counter_shot",
+        "name": "Hushing Shot"
       }
     ],
     "model": "player_hunter",
@@ -571,6 +583,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "stealth",
         "name": "Duskveil"
+      },
+      {
+        "id": "kick",
+        "name": "Boot"
       }
     ],
     "model": "player_rogue",
@@ -893,6 +909,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "flamestrike",
         "name": "Flamestrike"
+      },
+      {
+        "id": "counterspell",
+        "name": "Spellbreak"
       }
     ],
     "model": "player_mage",
@@ -1023,6 +1043,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rain_of_fire",
         "name": "Rain of Fire"
+      },
+      {
+        "id": "spell_lock",
+        "name": "Gag Order"
       }
     ],
     "model": "player_warlock",
@@ -1212,6 +1236,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hurricane",
         "name": "Hurricane"
+      },
+      {
+        "id": "skull_bash",
+        "name": "Headbutt"
       }
     ],
     "model": "player_druid",

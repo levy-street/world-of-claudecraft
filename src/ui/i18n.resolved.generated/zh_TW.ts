@@ -5801,6 +5801,34 @@ export const zh_TW: EnTranslations = {
         "name": "召喚怨魂裔",
         "description": "將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"
       },
+      "pummel": {
+        "name": "碎顎擊",
+        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+      },
+      "kick": {
+        "name": "飛踢",
+        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+      },
+      "counterspell": {
+        "name": "破法",
+        "description": "反制目標的施法，並在6秒內封鎖該法術學派。"
+      },
+      "counter_shot": {
+        "name": "靜默射擊",
+        "description": "一記快射，打斷目標的施法，並在4秒內封鎖該學派。"
+      },
+      "rebuke": {
+        "name": "譴喝",
+        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+      },
+      "skull_bash": {
+        "name": "頭槌",
+        "description": "猛然頭槌，打斷目標的施法，並在4秒內封鎖該學派。"
+      },
+      "spell_lock": {
+        "name": "封口令",
+        "description": "在施法中沉默目標，並在5秒內封鎖該法術學派。"
+      },
       "bear_charge": {
         "name": "巨熊衝鋒",
         "description": "向敵人衝鋒，產生 9 點怒氣並將其昏迷 1 秒。射程 8-25 公尺。僅限巨熊形態。"

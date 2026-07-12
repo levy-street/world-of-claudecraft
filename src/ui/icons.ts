@@ -2238,6 +2238,14 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
+  // Baseline class interrupts (physical spell-kicks).
+  pummel: r('fury', 'steel', ['fist'], ['motion']),
+  kick: r('leather', 'steel', ['boot'], ['motion']),
+  counterspell: r('arcane', 'steel', ['fist', { p: 'sunburst', ...TR }]),
+  counter_shot: r('nature', 'gold', ['sword', { p: 'sunburst', ...TR }]),
+  rebuke: r('holy', 'gold', ['fist'], ['glow']),
+  skull_bash: r('earth', 'earthBrown', ['paw'], ['motion']),
+  spell_lock: r('shadow', 'steel', ['fist'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),

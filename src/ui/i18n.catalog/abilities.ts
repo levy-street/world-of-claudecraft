@@ -1332,6 +1332,42 @@ const classAbilityNamesEn = {
         'Summon Wraithborn',
         'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
+      // Baseline class interrupts.
+      [
+        'pummel',
+        'Jawcrack',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'kick',
+        'Boot',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'counterspell',
+        'Spellbreak',
+        "Counters the target's spellcast and prevents casting from that school for 6 sec.",
+      ],
+      [
+        'counter_shot',
+        'Hushing Shot',
+        "A snap shot that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'rebuke',
+        'Reproach',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'skull_bash',
+        'Headbutt',
+        "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'spell_lock',
+        'Gag Order',
+        'Silences the target mid-cast and prevents casting from that school for 5 sec.',
+      ],
     ]),
   },
 };
