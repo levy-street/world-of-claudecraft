@@ -1505,7 +1505,14 @@ async function startGame(
       contextId,
       handedness: settings.get('leftHandedTouch') ? 'left' : 'right',
       measurement: mobileHudMeasurement,
-      eligible: mobileHudEditorEligible(),
+      // The custom layer is strictly opt-in on this branch: the hand-tuned
+      // stylesheet layout stays authoritative until the player saves a custom
+      // layout (enabled) or is live-editing (preview). Without this gate the
+      // applier re-seats every surface to the registry defaults, which were
+      // authored against the editor branch layout, not this one.
+      eligible:
+        mobileHudEditorEligible() &&
+        (mobileHudLayoutState.activeDocument().enabled || mobileHudLayoutState.previewActive),
       isSurfaceAvailable: (surfaceId) =>
         isMobileHudSurfaceAvailable(surfaceId, world.cfg.playerClass),
     });
