@@ -15,7 +15,11 @@ export function applyMobileKeyboardViewport(win: Window = window): void {
     doc.body.classList.remove(KEYBOARD_OPEN_CLASS);
     return;
   }
-  const state = keyboardViewportState(win.innerHeight, vv.height);
+  const stableMobileGameViewport =
+    doc.body.classList.contains('game-active') && doc.body.classList.contains('mobile-touch');
+  const stableRootHeight = stableMobileGameViewport ? doc.body.getBoundingClientRect().height : 0;
+  const referenceHeight = stableRootHeight > 0 ? stableRootHeight : win.innerHeight;
+  const state = keyboardViewportState(referenceHeight, vv.height);
   doc.body.classList.toggle(KEYBOARD_OPEN_CLASS, state.open);
   doc.body.style.setProperty('--mobile-keyboard-visible-vh', `${state.visibleHeight}px`);
 }

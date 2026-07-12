@@ -2,12 +2,10 @@
 // chest upgrade and a weapon into the bags, and hovers each to capture the
 // "Currently equipped" comparison block with stat deltas.
 //   node scripts/item_compare_visual.mjs    (needs `npm run dev` on :5173)
-
-import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import fs from 'node:fs';
 
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
-
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 fs.mkdirSync('tmp', { recursive: true });
 
@@ -31,13 +29,9 @@ await new Promise((r) => setTimeout(r, 2500));
 // Drop an upgrade chest, a weapon, and a sidegrade into the bags.
 const inv = await page.evaluate(() => {
   const sim = window.__game.sim;
-  sim.addItem('militia_vest', 1, sim.player.id); // uncommon chest upgrade vs Recruit's Tunic
+  sim.addItem('militia_vest', 1, sim.player.id);   // uncommon chest upgrade vs Recruit's Tunic
   sim.addItem('eastbrook_chain_vest', 1, sim.player.id);
-  return {
-    equippedChest: sim.equipment.chest,
-    equippedMain: sim.equipment.mainhand,
-    inv: sim.inventory.map((s) => s.itemId),
-  };
+  return { equippedChest: sim.equipment.chest, equippedMain: sim.equipment.mainhand, inv: sim.inventory.map((s) => s.itemId) };
 });
 console.log('inventory set:', JSON.stringify(inv));
 
@@ -52,25 +46,17 @@ async function hoverItem(name, shot) {
     const row = rows.find((r) => r.textContent.includes(nm));
     if (!row) return false;
     const b = row.getBoundingClientRect();
-    const x = b.x + b.width / 2,
-      y = b.y + b.height / 2;
+    const x = b.x + b.width / 2, y = b.y + b.height / 2;
     for (const type of ['mouseenter', 'mouseover', 'mousemove']) {
       row.dispatchEvent(new MouseEvent(type, { bubbles: true, clientX: x, clientY: y }));
     }
     return true;
   }, name);
-  if (!ok) {
-    console.log('row not found:', name);
-    return;
-  }
+  if (!ok) { console.log('row not found:', name); return; }
   await new Promise((r) => setTimeout(r, 250));
   const tip = await page.evaluate(() => {
     const tt = document.querySelector('#tooltip');
-    return {
-      shown: tt && tt.style.display === 'block',
-      hasCmp: !!tt?.querySelector('.tt-cmp'),
-      text: tt?.innerText?.replace(/\n/g, ' | '),
-    };
+    return { shown: tt && tt.style.display === 'block', hasCmp: !!tt?.querySelector('.tt-cmp'), text: tt?.innerText?.replace(/\n/g, ' | ') };
   });
   console.log(`tooltip[${name}]:`, JSON.stringify(tip));
   await page.screenshot({ path: shot });
@@ -83,12 +69,7 @@ async function hoverItem(name, shot) {
   const pad = 6;
   await page.screenshot({
     path: shot.replace('.png', '_crop.png'),
-    clip: {
-      x: Math.max(0, box.x - pad),
-      y: Math.max(0, box.y - pad),
-      width: box.w + pad * 2,
-      height: box.h + pad * 2,
-    },
+    clip: { x: Math.max(0, box.x - pad), y: Math.max(0, box.y - pad), width: box.w + pad * 2, height: box.h + pad * 2 },
   });
 }
 

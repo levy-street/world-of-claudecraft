@@ -17,7 +17,8 @@
 //
 // Phase 4 of the mobile combat HUD rework adds an optional `mobilePage` per row:
 // which mobile action-ring page (Phase 1, mobile_action_page_view.ts) the row's
-// bar slot falls on, so the touch-only painter can label it ("Page 1"/"Page 2").
+// bar slot falls on, so the touch-only painter can label it ("Page 1" through
+// "Page 3").
 // The page math is NOT duplicated here: sourceSlotsForMobilePage is imported
 // from mobile_action_page_view.ts and this module only looks up which page's
 // slot set contains the row's barSlot.
@@ -25,7 +26,112 @@
 import { ABILITIES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { PlayerClass } from '../sim/types';
-import { MOBILE_ACTION_PAGE_COUNT, sourceSlotsForMobilePage } from './mobile_action_page_view';
+import type { HotbarAction } from './hotbar';
+import { sourceSlotsForMobilePage } from './mobile_action_page_view';
+
+export type MobileSpellbookAssignment =
+  | { kind: 'unassigned' }
+  | { kind: 'mobile'; sourceSlot: number; page: number; position: number }
+  | { kind: 'desktop'; sourceSlot: 21 | 22 };
+
+export interface MobileSpellbookPickerTab {
+  page: number;
+  selected: boolean;
+  tabIndex: 0 | -1;
+}
+
+export interface MobileSpellbookPickerDestination {
+  sourceSlot: number;
+  page: number;
+  position: number;
+  occupant: HotbarAction;
+  current: boolean;
+}
+
+export interface MobileSpellbookPickerView {
+  abilityId: string;
+  barToken: string;
+  selectedPage: number;
+  assignment: MobileSpellbookAssignment;
+  tabs: MobileSpellbookPickerTab[];
+  destinations: MobileSpellbookPickerDestination[];
+  focusDestinationIndex: number;
+}
+
+export interface MobileSpellbookPickerInput {
+  actions: readonly HotbarAction[];
+  abilityId: string;
+  selectedPage: number;
+  barToken: string;
+}
+
+export function mobileSpellbookAssignment(
+  actions: readonly HotbarAction[],
+  abilityId: string,
+): MobileSpellbookAssignment {
+  const index = actions.findIndex(
+    (action) => action?.type === 'ability' && action.id === abilityId,
+  );
+  if (index < 0) return { kind: 'unassigned' };
+  const sourceSlot = index + 1;
+  if (sourceSlot <= 20) {
+    return {
+      kind: 'mobile',
+      sourceSlot,
+      page: Math.floor(index / 5),
+      position: (index % 5) + 1,
+    };
+  }
+  if (sourceSlot === 21 || sourceSlot === 22) return { kind: 'desktop', sourceSlot };
+  return { kind: 'unassigned' };
+}
+
+export function buildMobileSpellbookPicker(
+  input: MobileSpellbookPickerInput,
+): MobileSpellbookPickerView {
+  const selectedPage = Math.min(3, Math.max(0, Math.trunc(input.selectedPage)));
+  const assignment = mobileSpellbookAssignment(input.actions, input.abilityId);
+  const tabs = Array.from(
+    { length: 4 },
+    (_, page): MobileSpellbookPickerTab => ({
+      page,
+      selected: page === selectedPage,
+      tabIndex: page === selectedPage ? 0 : -1,
+    }),
+  );
+  const destinations = sourceSlotsForMobilePage(selectedPage).map(
+    (sourceSlot, index): MobileSpellbookPickerDestination => ({
+      sourceSlot,
+      page: selectedPage,
+      position: index + 1,
+      occupant: input.actions[sourceSlot - 1] ?? null,
+      current: assignment.kind === 'mobile' && assignment.sourceSlot === sourceSlot,
+    }),
+  );
+  const currentIndex = destinations.findIndex((destination) => destination.current);
+  const emptyIndex = destinations.findIndex((destination) => destination.occupant === null);
+  return {
+    abilityId: input.abilityId,
+    barToken: input.barToken,
+    selectedPage,
+    assignment,
+    tabs,
+    destinations,
+    focusDestinationIndex: currentIndex >= 0 ? currentIndex : emptyIndex >= 0 ? emptyIndex : 0,
+  };
+}
+
+export function nextMobileSpellbookPickerPage(currentPage: number, key: string): number {
+  if (key === 'Home') return 0;
+  if (key === 'End') return 3;
+  if (key === 'ArrowLeft') return (currentPage + 3) % 4;
+  if (key === 'ArrowRight') return (currentPage + 1) % 4;
+  return currentPage;
+}
+
+export function isSpellbookBarTokenCurrent(openingToken: string, currentToken: string): boolean {
+  return openingToken === currentToken;
+}
 
 /** One spell row: the class kit entry plus its learned / bar state. */
 export interface SpellbookRow {
@@ -40,9 +146,11 @@ export interface SpellbookRow {
   onBar: boolean;
   /** Learned, off the bar, but the bar is full, so the add control is disabled. */
   toggleDisabled: boolean;
+  /** Exact assignment used by touch chips and the inline picker. */
+  assignment: MobileSpellbookAssignment;
   /** The mobile action-ring page (0-indexed) this row's bar slot falls on, or
    *  null when the row is off-bar or its slot is outside the ring's reachable
-   *  span (slot 0 / the attack toggle, slot 11, or the secondary bar). Touch-only
+   *  span (slot 0 / the attack toggle or source slots 16-22). Touch-only
    *  presentation; desktop rendering ignores this field. */
   mobilePage: number | null;
 }
@@ -76,6 +184,8 @@ export interface SpellbookInput {
    *  mobilePage: null, so callers that don't care about mobile paging (or run
    *  before this data is wired) see no behavior change. */
   abilityIdByBarSlot?: readonly (string | null)[];
+  /** Touch uses an exact destination picker, so Add remains available on a full bar. */
+  touchPresentation?: boolean;
 }
 
 /**
@@ -90,14 +200,17 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
   const rows: SpellbookRow[] = input.abilities.map((abilityId) => {
     const known = input.known.find((k) => k.def.id === abilityId) ?? null;
     const onBar = known !== null && barIds.has(abilityId);
+    const assignment = assignmentFromAbilitySlots(abilityId, input.abilityIdByBarSlot);
     return {
       abilityId,
       known,
       learnLevel: ABILITIES[abilityId]?.learnLevel ?? 0,
       rank: known?.rank ?? 0,
       onBar,
-      toggleDisabled: known !== null && !onBar && !input.hasFreeSlot,
-      mobilePage: onBar ? mobilePageForAbility(abilityId, input.abilityIdByBarSlot) : null,
+      toggleDisabled:
+        known !== null && !onBar && !input.hasFreeSlot && input.touchPresentation !== true,
+      assignment: onBar ? assignment : { kind: 'unassigned' },
+      mobilePage: onBar && assignment.kind === 'mobile' ? assignment.page : null,
     };
   });
   return {
@@ -108,22 +221,22 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
   };
 }
 
-/**
- * The mobile action-ring page (0-indexed) whose source slots
- * (sourceSlotsForMobilePage) contain this ability's bar slot, or null when the
- * slot lookup is missing, the ability isn't on the bar, or its slot sits outside
- * every page's span (slot 0's attack toggle, slot 11, or the secondary bar).
- */
-function mobilePageForAbility(
+function assignmentFromAbilitySlots(
   abilityId: string,
   abilityIdByBarSlot: readonly (string | null)[] | undefined,
-): number | null {
-  if (!abilityIdByBarSlot) return null;
-  const slotIndex = abilityIdByBarSlot.indexOf(abilityId);
-  if (slotIndex === -1) return null;
-  const barSlot = slotIndex + 1; // index 0 = barSlot 1
-  for (let page = 0; page < MOBILE_ACTION_PAGE_COUNT; page++) {
-    if (sourceSlotsForMobilePage(page).includes(barSlot)) return page;
+): MobileSpellbookAssignment {
+  if (!abilityIdByBarSlot) return { kind: 'unassigned' };
+  const index = abilityIdByBarSlot.indexOf(abilityId);
+  if (index < 0) return { kind: 'unassigned' };
+  const sourceSlot = index + 1;
+  if (sourceSlot <= 20) {
+    return {
+      kind: 'mobile',
+      sourceSlot,
+      page: Math.floor(index / 5),
+      position: (index % 5) + 1,
+    };
   }
-  return null;
+  if (sourceSlot === 21 || sourceSlot === 22) return { kind: 'desktop', sourceSlot };
+  return { kind: 'unassigned' };
 }

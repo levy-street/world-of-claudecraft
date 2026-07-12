@@ -155,12 +155,10 @@ export const fr_CA: EnTranslations = {
       "banner": "Vous observez {name}"
     },
     "readyCheck": {
-      "prompt": "{name} a lancé une vérification de disponibilité. Êtes-vous prêt ?",
-      "ready": "Prêt",
-      "notReady": "Pas prêt",
-      "result": "Vérification de disponibilité : {ready} prêts, {notReady} pas prêts, {noResponse} sans réponse.",
-      "notInPartyError": "Vous devez être dans un groupe pour lancer une vérification de disponibilité.",
-      "inProgressError": "Une vérification de disponibilité est déjà en cours."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
@@ -241,7 +239,7 @@ export const fr_CA: EnTranslations = {
         "no_wallet": "Connectez un portefeuille contenant au moins 20 USD en WOC.",
         "under_minimum": "Le portefeuille est en dessous du minimum de 20 USD en WOC.",
         "price_unavailable": "Le cours du WOC est indisponible, les récompenses sont temporairement verrouillées.",
-        "banned": "Vous êtes exclu des Récompenses quotidiennes. Motif : {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const fr_CA: EnTranslations = {
       "leaderboard": "Classement",
       "dailyRewards": "Récompenses",
       "nameplates": "Noms",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
       "toggleHaptics": "Activer/désactiver les vibrations",
@@ -406,12 +406,12 @@ export const fr_CA: EnTranslations = {
       "targetFriendlyNext": "Changer de cible alliée",
       "discord": "Discord",
       "valecup": "Coupe du Val",
-      "categoryPet": "Familier",
-      "petAttack": "Familier : attaquer",
-      "petStop": "Familier : arrêter",
-      "petTaunt": "Familier : provoquer",
-      "petDefensive": "Familier : défensif",
-      "petAggressive": "Familier : agressif"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "La Coupe du Val",
@@ -564,6 +564,10 @@ export const fr_CA: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto choisit les commandes Desktop ou Touch selon votre appareil. Choisissez Desktop pour forcer le clavier et la souris (utile sur une tablette avec clavier), ou Touch pour les commandes à l'écran.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Sons de pas",
       "clickFeedback": "Repère de clic",
       "lockCursorOnRotate": "Verrouiller le curseur pendant la rotation",
@@ -736,8 +740,8 @@ export const fr_CA: EnTranslations = {
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
-    "itemHeroicTag": "[HÉROÏQUE]",
-    "itemSoulbound": "Lié à l’âme",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const fr_CA: EnTranslations = {
       "backpack": "Sac à dos",
       "bagSocketAria": "{name} : {slots}",
       "socketEmpty": "Emplacement de sac vide",
-      "unequipHint": "Cliquez pour retirer ce sac"
+      "unequipHint": "Cliquez pour retirer ce sac",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -1084,10 +1107,10 @@ export const fr_CA: EnTranslations = {
       "spawn": "{name} se dresse sur les Hauteurs de Thornpeak !"
     },
     "auth": {
-      "appleLoginCta": "Continuer avec Apple",
-      "appleError": "Impossible de se connecter avec Apple. Veuillez réessayer.",
-      "appleChoiceIntro": "Créez un nouveau compte ou associez Apple à un compte existant.",
-      "appleChoiceExpired": "Cette connexion avec Apple a expiré. Veuillez vous reconnecter avec Apple.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Mot de passe oublié ?",
       "forgotTitle": "Réinitialiser votre mot de passe",
       "forgotHint": "Saisissez votre nom d’utilisateur et nous enverrons un lien de réinitialisation à l’adresse e-mail enregistrée.",
@@ -1108,7 +1131,18 @@ export const fr_CA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
-      "removeFromBarAria": "Retirer {name} de la barre d'action"
+      "removeFromBarAria": "Retirer {name} de la barre d'action",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const fr_CA: EnTranslations = {
       "label": "Réinitialiser la position des cadres"
     },
     "itemTooltip": {
-      "requiresLevel": "Niveau requis : {level}"
+      "requiresLevel": "Niveau requis : {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const fr_CA: EnTranslations = {
       "parcelsLabel": "Colis",
       "parcelsHint": "Cliquez sur un objet dans vos sacs pour le joindre.",
       "removeParcelAria": "Retirer {item} de la lettre",
-      "parcelQtyDecreaseAria": "Envoyer un {item} de moins",
-      "parcelQtyIncreaseAria": "Envoyer un {item} de plus",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Envoyer la lettre",
       "postageNote": "Affranchissement : {amount}. Le corbeau vole environ {seconds}s.",
       "arrivedBanner": "Le corbeau s'est posé : du courrier de {name}.",
@@ -3940,14 +3975,14 @@ export const fr_CA: EnTranslations = {
     "reconnecting": "Connexion perdue. Reconnexion...",
     "connectionRejected": "Le serveur a fermé la connexion.",
     "tips": {
-      "classes": "Conseil : chacune des 9 classes se joue différemment. Essayez-en plusieurs avant de faire votre choix.",
-      "talents": "Conseil : vous pouvez réinitialiser vos talents dès que vous êtes hors combat, un premier choix ne vous enferme donc jamais.",
-      "dungeons": "Conseil : tentez un donjon en difficulté héroïque lorsque votre équipement dépasse la difficulté normale afin de livrer un combat plus exigeant et plus gratifiant.",
-      "market": "Conseil : le Marché mondial vous permet d’acheter et de vendre auprès des joueurs de tout le royaume.",
-      "guilds": "Conseil : rejoindre une guilde vous donne accès à un canal de discussion privé et à une liste commune de ses membres.",
-      "professions": "Conseil : vous pouvez apprendre des métiers de récolte et d’artisanat en parallèle de votre classe de combat.",
-      "loadouts": "Conseil : enregistrez plusieurs configurations de talents pour changer de spécialisation sans dépenser vos points deux fois.",
-      "pvp": "Conseil : défiez un autre joueur en duel amical ou rejoignez la file de l’arène du Colisée cendré pour mettre votre configuration à l’épreuve."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const fr_CA: EnTranslations = {
     "androidStandaloneDetail": "Vous êtes en mode application plein écran. Gardez l'appareil en paysage.",
     "androidInstallDetail": "Pour le plein écran sur Android, installez cette page ou ajoutez-la à l'écran d'accueil.",
     "androidInstallStep": "Dans Chrome, touchez le menu, puis Installer l'application ou Ajouter à l'écran d'accueil.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Ouvrez World of ClaudeCraft depuis la nouvelle icône.",
     "otherStandaloneDetail": "Gardez votre appareil en plein écran paysage.",
     "otherInstallDetail": "Installez ou ajoutez cette page à votre écran d'accueil pour la meilleure expérience mobile plein écran."
@@ -5867,7 +5903,7 @@ export const fr_CA: EnTranslations = {
         "name": "Croc du vieux Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Morceau de minerai"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Page de registre usée"
@@ -5900,13 +5936,13 @@ export const fr_CA: EnTranslations = {
         "name": "Chute de lin"
       },
       "arcane_dust": {
-        "name": "Poussière arcanique"
+        "name": "Arcane Dust"
       },
       "arcane_essence": {
-        "name": "Essence arcanique"
+        "name": "Arcane Essence"
       },
       "arcane_shard": {
-        "name": "Éclat arcanique"
+        "name": "Arcane Shard"
       },
       "fen_muster_order": {
         "name": "Ordre de rassemblement de Fenbridge"
@@ -7550,12 +7586,12 @@ export const fr_CA: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Un métier pour chaque main",
-        "text": "À Eastbrook, tout le monde exerce un métier en plus de manier l’épée, {playerName}. Des filons de minerai sont dispersés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même, attention, je saurai faire la différence.",
-        "completion": "Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Morceau de minerai"
+            "label": "Chunk of Ore"
           }
         }
       },

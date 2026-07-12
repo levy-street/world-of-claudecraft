@@ -155,12 +155,10 @@ export const nl_NL: EnTranslations = {
       "banner": "Toeschouwer bij {name}"
     },
     "readyCheck": {
-      "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
-      "ready": "Gereed",
-      "notReady": "Niet gereed",
-      "result": "Gereedheidscontrole: {ready} gereed, {notReady} niet gereed, {noResponse} geen antwoord.",
-      "notInPartyError": "Je moet in een groep zitten om een gereedheidscontrole te starten.",
-      "inProgressError": "Er is al een gereedheidscontrole bezig."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
@@ -241,7 +239,7 @@ export const nl_NL: EnTranslations = {
         "no_wallet": "Verbind een portemonnee met minstens $20 USD aan WOC.",
         "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
         "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld.",
-        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const nl_NL: EnTranslations = {
       "leaderboard": "Ranglijst",
       "dailyRewards": "Beloningen",
       "nameplates": "Namen",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
       "toggleHaptics": "Haptiek aan/uit",
@@ -406,12 +406,12 @@ export const nl_NL: EnTranslations = {
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "discord": "Discord",
       "valecup": "Dalbeker",
-      "categoryPet": "Huisdier",
-      "petAttack": "Huisdier: Aanvallen",
-      "petStop": "Huisdier: Stoppen",
-      "petTaunt": "Huisdier: Uitdagen",
-      "petDefensive": "Huisdier: Verdedigend",
-      "petAggressive": "Huisdier: Agressief"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "De Dalbeker",
@@ -564,6 +564,10 @@ export const nl_NL: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Aanraking",
       "interfaceModeNote": "Automatisch kiest desktop- of aanraakbesturing op basis van je apparaat. Kies Desktop om toetsenbord en muis af te dwingen (handig op een tablet met toetsenbord), of Aanraking voor de besturing op het scherm.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Voetstapgeluiden",
       "clickFeedback": "Klikmarkering",
       "lockCursorOnRotate": "Aanwijzer vergrendelen tijdens draaien",
@@ -736,8 +740,8 @@ export const nl_NL: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
-    "itemHeroicTag": "[HELDHAFTIG]",
-    "itemSoulbound": "Zielsgebonden",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const nl_NL: EnTranslations = {
       "backpack": "Rugzak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Leeg tasvak",
-      "unequipHint": "Klik om deze tas af te doen"
+      "unequipHint": "Klik om deze tas af te doen",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -1084,10 +1107,10 @@ export const nl_NL: EnTranslations = {
       "spawn": "{name} verrijst boven Doorntop-Hoogten!"
     },
     "auth": {
-      "appleLoginCta": "Ga verder met Apple",
-      "appleError": "Aanmelden met Apple is mislukt. Probeer het opnieuw.",
-      "appleChoiceIntro": "Maak een nieuw account of koppel Apple aan een bestaand account.",
-      "appleChoiceExpired": "Deze aanmelding bij Apple is verlopen. Meld je opnieuw aan met Apple.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Wachtwoord vergeten?",
       "forgotTitle": "Wachtwoord opnieuw instellen",
       "forgotHint": "Voer je gebruikersnaam in en we sturen een herstellink naar het geregistreerde e-mailadres.",
@@ -1108,7 +1131,18 @@ export const nl_NL: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
-      "removeFromBarAria": "{name} verwijderen van actiebalk"
+      "removeFromBarAria": "{name} verwijderen van actiebalk",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const nl_NL: EnTranslations = {
       "label": "Frameposities herstellen"
     },
     "itemTooltip": {
-      "requiresLevel": "Vereist niveau {level}"
+      "requiresLevel": "Vereist niveau {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const nl_NL: EnTranslations = {
       "parcelsLabel": "Pakketten",
       "parcelsHint": "Klik op een voorwerp in je tassen om het bij te voegen.",
       "removeParcelAria": "Verwijder {item} uit de brief",
-      "parcelQtyDecreaseAria": "Eén {item} minder versturen",
-      "parcelQtyIncreaseAria": "Eén {item} meer versturen",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Brief versturen",
       "postageNote": "Porto: {amount}. De raaf vliegt ongeveer {seconds}s.",
       "arrivedBanner": "De raaf is geland: post van {name}.",
@@ -3940,14 +3975,14 @@ export const nl_NL: EnTranslations = {
     "reconnecting": "Verbinding verbroken. Opnieuw verbinding maken...",
     "connectionRejected": "De server heeft de verbinding gesloten.",
     "tips": {
-      "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
-      "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
-      "dungeons": "Tip: probeer een kerker op heldhaftige moeilijkheid wanneer je uitrusting te goed is geworden voor normaal, voor een zwaarder en lonender gevecht.",
-      "market": "Tip: op de Wereldmarkt kun je kopen en verkopen met spelers uit het hele rijk.",
-      "guilds": "Tip: als je lid wordt van een gilde, krijg je een eigen chatkanaal en een gedeelde lijst met je gildeleden.",
-      "professions": "Tip: verzamel- en ambachtsberoepen kunnen naast je gevechtsklasse worden geleerd.",
-      "loadouts": "Tip: sla meer dan één talentuitrusting op om tussen builds te wisselen zonder punten dubbel uit te geven.",
-      "pvp": "Tip: daag een andere speler uit voor een vriendschappelijk duel, of sluit je aan bij de wachtrij voor de arena van het Asgrauwe Colosseum om je build te testen."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const nl_NL: EnTranslations = {
     "androidStandaloneDetail": "Je bent in de volledig-scherm-appmodus. Houd het apparaat in liggende stand.",
     "androidInstallDetail": "Voor volledig scherm op Android moet je deze pagina eerst installeren of aan je beginscherm toevoegen.",
     "androidInstallStep": "Tik in Chrome op het menu en daarna op App installeren of Toevoegen aan beginscherm.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Open World of ClaudeCraft vanaf het nieuwe pictogram.",
     "otherStandaloneDetail": "Houd je apparaat in liggend volledig scherm.",
     "otherInstallDetail": "Installeer of voeg deze pagina toe aan je beginscherm voor de beste mobiele ervaring met volledig scherm."
@@ -5867,7 +5903,7 @@ export const nl_NL: EnTranslations = {
         "name": "Tand van Oude Grijskaak"
       },
       "chunk_of_ore": {
-        "name": "Brok erts"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Verweerd Grootboekblad"
@@ -7550,12 +7586,12 @@ export const nl_NL: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Een ambacht voor iedere hand",
-        "text": "Iedereen in Oostbeek beoefent naast het zwaard een ambacht, {playerName}. Er liggen ertsaders rond de stad, dus zwaai met een pikhouweel en breng me 5 brokken. Delf ze zelf, hoor; ik merk het verschil.",
-        "completion": "Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Brok erts"
+            "label": "Chunk of Ore"
           }
         }
       },

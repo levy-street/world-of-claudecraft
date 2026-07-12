@@ -40,7 +40,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
-import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { declutterNameplates, type NameplateAnchor } from './nameplate_declutter';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -82,14 +82,11 @@ export class NameplatePainter {
   private readonly tmpV2 = new THREE.Vector3();
   // one plan, rewritten per entity by the pure core (allocation-light hot path).
   private readonly plan: NameplatePlan = newNameplatePlan();
-  // This frame's projected anchors, fed through the declutter pass below so
+  // reused every frame (truncated via length = 0, not reallocated): this
+  // frame's projected anchors, fed through the declutter pass below so
   // overlapping nameplates (e.g. two nearby same-named mobs) stack apart
-  // instead of rendering on top of each other. The anchor OBJECTS are pooled
-  // too, not just the array: at crowd size this loop runs for every visible
-  // plate every frame, and a fresh {id,sx,sy} per plate was steady GC churn
-  // proportional to the player count. `anchorCount` is the live prefix length.
+  // instead of rendering on top of each other.
   private readonly anchorScratch: NameplateAnchor[] = [];
-  private anchorCount = 0;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -112,7 +109,7 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
-    this.anchorCount = 0;
+    this.anchorScratch.length = 0;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -134,21 +131,17 @@ export class NameplatePainter {
       }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      // Record the anchor; the transform is written once, after declutter has
-      // had its say, so a plate never builds two transform strings per frame.
-      const slot = this.anchorScratch[this.anchorCount];
-      if (slot) {
-        slot.id = id;
-        slot.sx = sx;
-        slot.sy = sy;
-      } else {
-        this.anchorScratch.push({ id, sx, sy });
-      }
-      this.anchorCount++;
+      this.anchorScratch.push({ id, sx, sy });
       if (v.nameplateDisplay !== '') {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
+      const transform = nameplateScreenTransform(sx, sy);
+      if (transform !== v.nameplateTransform) {
+        v.nameplate.style.transform = transform;
+        v.nameplateTransform = transform;
+      }
+
       if (!fullPass && !plan.urgent) continue;
       const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
@@ -316,11 +309,9 @@ export class NameplatePainter {
     // Second pass: re-anchor any nameplates that collided during projection
     // (e.g. two nearby same-named mobs) so they stack apart instead of
     // rendering fully on top of each other. A no-op for the common case
-    // where nothing overlapped. This is also where EVERY visible plate gets
-    // its one transform write of the frame.
-    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
-    for (let i = 0; i < this.anchorCount; i++) {
-      const anchor = this.anchorScratch[i];
+    // where nothing overlapped.
+    const declutteredAnchors = declutterNameplates(this.anchorScratch);
+    for (const anchor of declutteredAnchors) {
       const v = this.views.get(anchor.id);
       if (v?.nameplateDisplay !== '') continue;
       const transform = nameplateScreenTransform(anchor.sx, anchor.sy);

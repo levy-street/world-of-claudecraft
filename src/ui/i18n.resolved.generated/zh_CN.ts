@@ -158,9 +158,7 @@ export const zh_CN: EnTranslations = {
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",
       "notReady": "未准备",
-      "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。",
-      "notInPartyError": "你必须加入队伍才能发起就绪确认。",
-      "inProgressError": "就绪确认已在进行中。"
+      "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。"
     },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
@@ -319,6 +317,8 @@ export const zh_CN: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "奖励",
       "nameplates": "姓名板",
+      "nameplatesOff": "名称关闭",
+      "musicOff": "音乐关闭",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈",
@@ -564,6 +564,10 @@ export const zh_CN: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "触控",
       "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
+      "mobileActionPages": "最少动作页数",
+      "mobileActionPagesTwo": "2 页",
+      "mobileActionPagesThree": "3 页",
+      "mobileActionPagesFour": "4 页",
       "footstepSounds": "脚步声",
       "clickFeedback": "点击标记",
       "lockCursorOnRotate": "旋转时锁定光标",
@@ -736,7 +740,7 @@ export const zh_CN: EnTranslations = {
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
-    "itemHeroicTag": "[英雄]",
+    "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "灵魂绑定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -988,7 +992,26 @@ export const zh_CN: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
-      "unequipHint": "点击移除此背包"
+      "unequipHint": "点击移除此背包",
+      "itemActionsTitle": "{item}操作",
+      "itemActionEquip": "装备",
+      "itemActionEquipBag": "装备背包",
+      "itemActionUse": "使用",
+      "itemActionConsume": "食用",
+      "itemActionLinkToChat": "链接到聊天",
+      "itemActionDestroy": "摧毁",
+      "itemActionDetails": "物品详情",
+      "itemActionAssignTitle": "分配到消耗品栏",
+      "itemActionAssignSlot": "分配到栏位{slot}",
+      "itemActionRemoveSlot": "从栏位{slot}移除",
+      "itemActionSlotCurrent": "栏位{slot}：{item}",
+      "itemActionSlotEmpty": "栏位{slot}：空",
+      "itemActionResetAutomatic": "恢复自动排列",
+      "itemActionClose": "关闭物品操作",
+      "itemActionAssigned": "已将{item}分配到栏位{slot}。",
+      "itemActionRemoved": "已将{item}从栏位{slot}移除。",
+      "itemActionInvalid": "该物品无法分配。",
+      "itemActionFailed": "无法完成该操作。"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -1108,7 +1131,18 @@ export const zh_CN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
-      "removeFromBarAria": "从动作条移除{name}"
+      "removeFromBarAria": "从动作条移除{name}",
+      "add": "添加",
+      "remove": "移除",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "桌面端",
+      "moveAssignmentAria": "将 {name} 从 {slot} 移动",
+      "pickerPages": "动作页",
+      "pickerDestinations": "动作栏位",
+      "destinationAria": "第{page}页，A{position}，{state}",
+      "empty": "空",
+      "closePicker": "关闭栏位",
+      "assignedStatus": "{name} 已分配到第{page}页 A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const zh_CN: EnTranslations = {
       "label": "重置框体位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等级 {level}"
+      "requiresLevel": "需要等级 {level}",
+      "duration": "持续时间：{duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const zh_CN: EnTranslations = {
     "androidStandaloneDetail": "你正在全屏应用模式中。请保持横屏。",
     "androidInstallDetail": "若要在 Android 上全屏，请先安装此页面或将其添加到主屏幕。",
     "androidInstallStep": "在 Chrome 中点击菜单，然后选择安装应用或添加到主屏幕。",
+    "androidSamsungInstallStep": "在 Samsung Internet 中点击菜单，然后选择安装应用或添加到主屏幕。",
     "androidOpenStep": "从新图标打开 World of ClaudeCraft。",
     "otherStandaloneDetail": "请保持设备处于横屏全屏。",
     "otherInstallDetail": "安装此页面或将其添加到主屏幕，以获得最佳移动端全屏体验。"
@@ -7552,7 +7588,7 @@ export const zh_CN: EnTranslations = {
       "q_prof_intro": {
         "title": "人人都有一技之长",
         "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
-        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，靠这些都能正经谋生。",
+        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，这里面都有正经买卖等着你。",
         "objectives": {
           "0": {
             "label": "矿石块"

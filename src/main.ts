@@ -13,7 +13,7 @@ import {
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
-import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
+import { composerBlurViewportAction } from './game/chat_keyboard_dismiss';
 import {
   clickMoveShouldWalk,
   clickMoveStep,
@@ -32,6 +32,7 @@ import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
   HoverPickGate,
@@ -549,12 +550,12 @@ function requestMobileFullscreenLandscape(): void {
   }
 }
 
-function mobilePlatform(): 'ios' | 'android' | 'other' {
+function mobilePlatform(): 'ios' | 'android-samsung' | 'android' | 'other' {
   const ua = navigator.userAgent;
   const platform = navigator.platform;
   if (/iPad|iPhone|iPod/.test(ua) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1))
     return 'ios';
-  if (/Android/.test(ua)) return 'android';
+  if (/Android/.test(ua)) return /SamsungBrowser\//.test(ua) ? 'android-samsung' : 'android';
   return 'other';
 }
 
@@ -567,25 +568,26 @@ function isStandaloneDisplay(): boolean {
 
 function mobilePreflightCopy(): { detail: string; steps: string[] } {
   const standalone = isStandaloneDisplay();
-  const base = [t('mobilePreflight.baseLandscape'), t('mobilePreflight.basePerformance')];
-  if (mobilePlatform() === 'ios') {
+  const platform = mobilePlatform();
+  const base = [t('mobilePreflight.baseLandscape')];
+  if (platform === 'ios') {
     return {
       detail: standalone
         ? t('mobilePreflight.iosStandaloneDetail')
         : t('mobilePreflight.iosInstallDetail'),
-      steps: standalone
-        ? base
-        : [t('mobilePreflight.iosShareStep'), t('mobilePreflight.iosOpenStep'), ...base],
+      steps: [t('mobilePreflight.iosShareStep'), t('mobilePreflight.iosOpenStep'), ...base],
     };
   }
-  if (mobilePlatform() === 'android') {
+  if (platform === 'android' || platform === 'android-samsung') {
+    const installStep =
+      platform === 'android-samsung'
+        ? t('mobilePreflight.androidSamsungInstallStep')
+        : t('mobilePreflight.androidInstallStep');
     return {
       detail: standalone
         ? t('mobilePreflight.androidStandaloneDetail')
         : t('mobilePreflight.androidInstallDetail'),
-      steps: standalone
-        ? base
-        : [t('mobilePreflight.androidInstallStep'), t('mobilePreflight.androidOpenStep'), ...base],
+      steps: standalone ? base : [installStep, t('mobilePreflight.androidOpenStep'), ...base],
     };
   }
   return {
@@ -961,7 +963,7 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds);
+    hud = new Hud(world, renderer, keybinds, keybindScope);
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -1015,16 +1017,6 @@ async function startGame(
   };
   const recoverFromMobileKeyboard = (): void => {
     document.body.classList.remove('mobile-chat-open');
-    syncAppViewport();
-    window.scrollTo(0, 0);
-    window.setTimeout(() => {
-      syncAppViewport();
-      window.scrollTo(0, 0);
-    }, 120);
-    window.setTimeout(() => {
-      syncAppViewport();
-      window.scrollTo(0, 0);
-    }, 450);
   };
   const closeChat = (): void => {
     chatCmdMenu.hide();
@@ -1058,6 +1050,13 @@ async function startGame(
     autosizeChatInput();
     chatInput.focus();
   }
+  hud.onOpenChatComposer = () => {
+    if (document.body.classList.contains('mobile-touch')) {
+      document.body.classList.add('mobile-chat-open');
+      document.body.classList.remove('mobile-chatlog-peek');
+    }
+    openChat();
+  };
   // Mobile read view: tapping the Chat button opens the centered panel with the composer
   // bar VISIBLE but NOT focused (no keyboard). Tapping the composer focuses it and raises
   // the keyboard (native + the focus handler). Same as openChat minus the focus.
@@ -1125,12 +1124,13 @@ async function startGame(
     }
   });
   chatInput.addEventListener('blur', () => {
-    // Recover the mobile-chat viewport ONLY when the composer is already hidden (the
-    // close path: closeChat hides then blurs). A keyboard dismiss (the OS hide-keyboard
-    // key) blurs while the composer is still shown, so this is false and chat stays open
-    // in its centered READ view, reflowed by the keyboard_viewport applier off the
-    // visualViewport resize. Only the Chat button closes chat.
-    if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();
+    // The hidden-composer path closes chat. A still-visible composer means the OS
+    // keyboard was dismissed, so chat stays open and the browser owns its transition.
+    const action = composerBlurViewportAction(
+      chatInput.style.display,
+      document.body.classList.contains('mobile-touch'),
+    );
+    if (action === 'recover') recoverFromMobileKeyboard();
   });
   // The mobile keyboard-dismiss chevron (hidden on mobile in the current model; kept wired
   // for parity): blur the composer to drop the keyboard and return to the read view,
@@ -1247,7 +1247,7 @@ async function startGame(
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => {
-      if (!tryNearbyInteraction(world, hud, false)) input.triggerTouchJump();
+      if (!interactNearby(false)) input.triggerTouchJump();
     },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
@@ -1275,9 +1275,9 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
   });
   mobileControls.start();
-  // reflect the current music state on the touch toggle (it may already be off
-  // from a prior session, persisted in localStorage)
-  document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
+  // Reflect the externally-owned condition state in the More tray. Music may
+  // already be off from a prior session; nameplates start from the renderer.
+  mobileControls.syncTrayConditions(renderer.showNameplates, music.enabled);
 
   // Gamepad: a separate remappable button profile drives the same dispatch the
   // keyboard/touch paths use. Edge-button actions route through this dispatcher;
@@ -1782,8 +1782,16 @@ async function startGame(
         }),
     });
   }
+  function interactNearby(showError: boolean): boolean {
+    return stopAutorunForInteraction(
+      tryNearbyInteraction(world, hud, showError),
+      input,
+      mobileControls,
+    );
+  }
+
   function interactKey(): void {
-    tryNearbyInteraction(world, hud, true);
+    interactNearby(true);
   }
 
   function attackNearest(): void {
@@ -1894,7 +1902,11 @@ async function startGame(
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    stopAutorunForInteraction(
+      handlePickedEntity(world, hud, id, button, x, y),
+      input,
+      mobileControls,
+    );
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the

@@ -200,6 +200,8 @@ async function applyHudState(page, descriptor) {
       'mobile-chat-open',
       'mobile-chat-reply',
     );
+    document.documentElement.style.setProperty('--ui-scale', String(state.uiScale ?? 1));
+    document.documentElement.style.setProperty('--tooltip-scale', String(state.tooltipScale ?? 1));
 
     const controls = document.getElementById('mobile-controls');
     controls?.style.setProperty('--btn-scale', String(state.buttonScale));
@@ -233,9 +235,9 @@ async function applyHudState(page, descriptor) {
   }
 }
 
-async function collectLayout(page) {
+async function collectLayout(page, inspection = {}) {
   return page.evaluate(
-    async (actionIds, allMenuIds) => {
+    async (actionIds, allMenuIds, tooltipInspection) => {
       const grab = (element) => {
         if (!element) return null;
         const style = getComputedStyle(element);
@@ -360,6 +362,20 @@ async function collectLayout(page) {
           border: Number.parseFloat(pseudo.borderTopWidth),
         };
       };
+      const attackButton = document.getElementById('mobile-action-attack');
+      const attackWasQueued = attackButton?.classList.contains('queued') ?? false;
+      attackButton?.classList.add('queued');
+      const attackQueuedBefore = attackButton ? getComputedStyle(attackButton, '::before') : null;
+      const attackQueuedAfter = attackButton ? getComputedStyle(attackButton, '::after') : null;
+      const attackQueuedVisual =
+        attackQueuedBefore && attackQueuedAfter
+          ? {
+              shadow: attackQueuedBefore.boxShadow,
+              borderColor: attackQueuedBefore.borderTopColor,
+              afterContent: attackQueuedAfter.content,
+            }
+          : null;
+      if (!attackWasQueued) attackButton?.classList.remove('queued');
       const ids = [
         ...actionIds,
         ...allMenuIds,
@@ -370,6 +386,30 @@ async function collectLayout(page) {
       const duplicateCounts = Object.fromEntries(
         ids.map((id) => [id, document.querySelectorAll(`#${id}`).length]),
       );
+
+      if (tooltipInspection.mobTooltip) {
+        const game = window.__game;
+        const mob = [...(game?.sim?.entities?.values?.() ?? [])].find(
+          (entity) => entity.kind === 'mob' && entity.hostile && !entity.dead,
+        );
+        if (game?.hud && mob) {
+          game.hud.showMobHoverTooltip(mob, new Set());
+          if (tooltipInspection.longTooltip) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip?.insertAdjacentHTML(
+              'beforeend',
+              Array.from(
+                { length: 16 },
+                (_, index) =>
+                  `<div class="tt-quest-obj">Quest objective ${index + 1}: 123 / 999</div>`,
+              ).join(''),
+            );
+          }
+          game.hud.positionVisibleMobileMobTooltip();
+        }
+      }
+      const tooltipElement = document.getElementById('tooltip');
+      const tooltipStyle = tooltipElement ? getComputedStyle(tooltipElement) : null;
 
       return {
         controls,
@@ -396,6 +436,15 @@ async function collectLayout(page) {
           attack: face(document.getElementById('mobile-action-attack')),
           page: face(document.getElementById('mobile-action-page-toggle')),
         },
+        attackQueuedVisual,
+        tooltip: grab(tooltipElement),
+        tooltipState: tooltipElement
+          ? {
+              mob: tooltipElement.classList.contains('mob-tooltip'),
+              clipped: tooltipElement.classList.contains('mob-tooltip-clipped'),
+              maxHeight: Number.parseFloat(tooltipStyle?.maxHeight ?? ''),
+            }
+          : null,
         map: grab(document.getElementById('minimap-wrap')),
         menu: grab(document.getElementById('mobile-combat-controls')),
         target: grab(document.getElementById('target-frame')),
@@ -426,6 +475,7 @@ async function collectLayout(page) {
     },
     ACTION_IDS,
     ALL_MENU_IDS,
+    inspection,
   );
 }
 
@@ -436,6 +486,25 @@ function checkIncreasing(tag, geometry, ids) {
       fail(`${tag}: ${ids.join(' -> ')} is not ordered left-to-right`);
       return;
     }
+  }
+}
+
+function checkSameRow(tag, geometry, ids) {
+  const centers = ids.map((id) => ({ id, point: center(geometry.controls[id]) }));
+  const expectedY = centers[0].point.y;
+  for (const { point } of centers.slice(1)) {
+    if (Math.abs(point.y - expectedY) > EPSILON) {
+      fail(`${tag}: ${ids.join(' + ')} do not share one row`);
+      return;
+    }
+  }
+}
+
+function checkVerticalPair(tag, geometry, upperId, lowerId, label) {
+  const upper = center(geometry.controls[upperId]);
+  const lower = center(geometry.controls[lowerId]);
+  if (Math.abs(upper.x - lower.x) > EPSILON || upper.y >= lower.y) {
+    fail(`${tag}: ${label} is not a top-to-bottom column`);
   }
 }
 
@@ -592,55 +661,42 @@ function checkLayout(tag, geometry, profile, state) {
   }
 
   if (state.leftHanded) {
-    checkIncreasing(tag, geometry, [
-      'mobile-target-cycle',
-      'mobile-action-attack',
-      'slot-1',
-      'slot-0',
-    ]);
+    checkIncreasing(tag, geometry, ['mobile-target-cycle', 'slot-4', 'slot-1', 'slot-0']);
     checkIncreasing(tag, geometry, [
       'mobile-jump',
-      'slot-4',
+      'mobile-action-attack',
       'slot-3',
       'slot-2',
       'mobile-action-page-toggle',
     ]);
   } else {
-    checkIncreasing(tag, geometry, [
-      'slot-0',
-      'slot-1',
-      'mobile-action-attack',
-      'mobile-target-cycle',
-    ]);
+    checkIncreasing(tag, geometry, ['slot-0', 'slot-1', 'slot-4', 'mobile-target-cycle']);
     checkIncreasing(tag, geometry, [
       'mobile-action-page-toggle',
       'slot-2',
       'slot-3',
-      'slot-4',
+      'mobile-action-attack',
       'mobile-jump',
     ]);
   }
-
-  const targetCenter = center(geometry.controls['mobile-target-cycle']);
-  const jumpCenter = center(geometry.controls['mobile-jump']);
-  if (Math.abs(targetCenter.x - jumpCenter.x) > EPSILON || targetCenter.y >= jumpCenter.y) {
-    fail(`${tag}: Target is not directly above Jump/Use`);
-  }
+  checkSameRow(tag, geometry, ['slot-0', 'slot-1', 'slot-4', 'mobile-target-cycle']);
+  checkSameRow(tag, geometry, [
+    'mobile-action-page-toggle',
+    'slot-2',
+    'slot-3',
+    'mobile-action-attack',
+    'mobile-jump',
+  ]);
+  checkVerticalPair(tag, geometry, 'slot-4', 'mobile-action-attack', 'A5/Attack');
+  checkVerticalPair(tag, geometry, 'mobile-target-cycle', 'mobile-jump', 'Target/Jump/Use');
 
   const { action, target, jump, attack, page } = geometry.faces;
   if (![action, target, jump, attack, page].every(Boolean)) {
     fail(`${tag}: rendered action-face styles are unavailable`);
   } else {
-    if (
-      !(
-        jump.w > action.w &&
-        Math.abs(action.w - target.w) <= EPSILON &&
-        target.w > attack.w &&
-        attack.w > page.w
-      )
-    ) {
+    if (!(jump.w > target.w && target.w > action.w && action.w > attack.w && attack.w > page.w)) {
       fail(
-        `${tag}: rendered face hierarchy is not Jump > abilities/Target > Attack > Page (${JSON.stringify(geometry.faces)})`,
+        `${tag}: rendered face hierarchy is not Jump > Target > abilities > Attack > Page (${JSON.stringify(geometry.faces)})`,
       );
     }
     if (attack.opacity >= target.opacity - 0.01) {
@@ -650,6 +706,16 @@ function checkLayout(tag, geometry, profile, state) {
     }
     if ([action, target, jump, attack, page].some((face) => face.border < 1)) {
       fail(`${tag}: a rendered action face lost its visible border`);
+    }
+  }
+  if (!geometry.attackQueuedVisual) {
+    fail(`${tag}: queued Attack visual is unavailable`);
+  } else {
+    if (!geometry.attackQueuedVisual.shadow.includes('12px')) {
+      fail(`${tag}: queued Attack lost its persistent face glow`);
+    }
+    if (geometry.attackQueuedVisual.afterContent !== 'none') {
+      fail(`${tag}: queued Attack renders a detached ::after status marker`);
     }
   }
 
@@ -665,6 +731,64 @@ function checkLayout(tag, geometry, profile, state) {
   if (profile.tier === 'hud-mobile-compact' && profile.w > profile.h && geometry.map) {
     if (geometry.map.w < 80 - EPSILON || geometry.map.w > 85 + EPSILON) {
       fail(`${tag}: compact map width ${geometry.map.w.toFixed(1)}px is outside 80-85px`);
+    }
+  }
+  if (state.mobTooltip) {
+    if (!geometry.tooltip || !geometry.tooltipState?.mob || !geometry.map) {
+      fail(`${tag}: transient mob tooltip is not measurable`);
+    } else {
+      const minimapGap = geometry.tooltip.top - geometry.map.bottom;
+      if (Math.abs(minimapGap - 8) > 1) {
+        fail(
+          `${tag}: mob tooltip begins ${minimapGap.toFixed(1)}px below the minimap, expected 8px`,
+        );
+      }
+      const desiredTooltipLeft = state.leftHanded
+        ? geometry.map.right - geometry.tooltip.w
+        : geometry.map.left;
+      const expectedTooltipLeft = Math.max(
+        8,
+        Math.min(geometry.viewport.w - geometry.tooltip.w - 8, desiredTooltipLeft),
+      );
+      const handedAlignment = geometry.tooltip.left - expectedTooltipLeft;
+      if (Math.abs(handedAlignment) > 1) {
+        fail(
+          `${tag}: mob tooltip handed-edge offset ${handedAlignment.toFixed(1)}px ` +
+            `(map=${JSON.stringify(geometry.map)}, tooltip=${JSON.stringify(geometry.tooltip)})`,
+        );
+      }
+      if (
+        geometry.tooltip.left < 8 - EPSILON ||
+        geometry.tooltip.right > geometry.viewport.w - 8 + EPSILON ||
+        geometry.tooltip.bottom > geometry.viewport.h - 8 + EPSILON
+      ) {
+        fail(`${tag}: mob tooltip leaves its 8px viewport bounds`);
+      }
+      const tooltipObstacles = [
+        ['party-frames', geometry.party],
+        ['target-frame', geometry.target],
+        ['move-joystick', geometry.moveJoystick],
+        ['player-frame', geometry.playerFrame],
+        ['camera-start', geometry.camera],
+        ['consumables-toggle', geometry.controls['mobile-consumables-toggle']],
+        ...Array.from({ length: 6 }, (_, index) => [
+          `consumable-${index}`,
+          geometry.controls[`consumable-${index}`],
+        ]),
+      ];
+      for (const [id, obstacle] of tooltipObstacles) {
+        if (!obstacle) continue;
+        const gap = edgeGap(geometry.tooltip, obstacle);
+        if (gap < MIN_GAP - EPSILON) {
+          fail(
+            `${tag}: mob tooltip vs #${id} gap ${gap.toFixed(1)}px ` +
+              `(tooltip=${JSON.stringify(geometry.tooltip)}, obstacle=${JSON.stringify(obstacle)})`,
+          );
+        }
+      }
+      if (state.longTooltip && !geometry.tooltipState.clipped) {
+        fail(`${tag}: deterministic long mob tooltip was not clipped`);
+      }
     }
   }
 
@@ -742,8 +866,10 @@ function checkLayout(tag, geometry, profile, state) {
     const targetScale = geometry.target.w / geometry.target.layoutW;
     const playerScale = geometry.playerFrame.w / geometry.playerFrame.layoutW;
     const renderedTierRatio = targetScale / playerScale;
-    if (Math.abs(renderedTierRatio - 0.8) > 0.015) {
-      fail(`${tag}: rendered Target tier ratio ${renderedTierRatio.toFixed(3)}, expected 0.800`);
+    if (renderedTierRatio < 0.86 - EPSILON / 100 || renderedTierRatio > 0.9 + EPSILON / 100) {
+      fail(
+        `${tag}: rendered Target tier ratio ${renderedTierRatio.toFixed(3)} is outside 0.86-0.90`,
+      );
     }
   }
   if (state.cameraJoystick) {
@@ -772,19 +898,22 @@ function checkLayout(tag, geometry, profile, state) {
     const offset = Math.abs(center(geometry.playerFrame).x - expectedCenter);
     if (offset > 1.5) fail(`${tag}: player frame is ${offset.toFixed(1)}px off safe center`);
     const expectedScale = {
-      'hud-mobile-compact': 0.62,
-      'hud-mobile-standard': 0.9,
-      'hud-mobile-tablet': 1,
+      'hud-mobile-compact': 0.72,
+      'hud-mobile-standard': 1,
+      'hud-mobile-tablet': 1.1,
     }[profile.tier];
     if (Math.abs(geometry.scales.playerFrame - expectedScale) > 0.01) {
       fail(`${tag}: player-frame scale ${geometry.scales.playerFrame}, expected ${expectedScale}`);
     }
     const minimumWidth = {
-      'hud-mobile-compact': 150,
-      'hud-mobile-standard': 220,
-      'hud-mobile-tablet': 245,
+      'hud-mobile-compact': 180,
+      'hud-mobile-standard': 250,
+      'hud-mobile-tablet': 275,
     }[profile.tier];
-    if (geometry.playerFrame.w < minimumWidth - EPSILON) {
+    if (
+      Math.abs((state.uiScale ?? 1) - 1) < 0.01 &&
+      geometry.playerFrame.w < minimumWidth - EPSILON
+    ) {
       fail(
         `${tag}: player frame width ${geometry.playerFrame.w.toFixed(1)}px is below the ${minimumWidth}px ${profile.tier} floor`,
       );
@@ -832,10 +961,10 @@ function checkLayout(tag, geometry, profile, state) {
       const ys = slots.map((rect) => center(rect).y);
       const toggle = geometry.controls['mobile-consumables-toggle'];
       if (profile.tier === 'hud-mobile-compact') {
-        if (coordinateBucketCount(xs) !== 2 || coordinateBucketCount(ys) !== 3) {
-          fail(`${tag}: compact Consumables do not render as a 2 x 3 grid`);
+        if (coordinateBucketCount(xs) !== 3 || coordinateBucketCount(ys) !== 2) {
+          fail(`${tag}: compact Consumables do not render as a 3 x 2 grid`);
         }
-        const expectedToggleBottom = geometry.viewport.h - safeArea.bottom - 16;
+        const expectedToggleBottom = geometry.viewport.h - safeArea.bottom - 68;
         if (Math.abs(toggle.bottom - expectedToggleBottom) > EPSILON) {
           fail(`${tag}: compact Consumables toggle left its low thumb-side seat`);
         }
@@ -872,9 +1001,14 @@ function checkLayout(tag, geometry, profile, state) {
             fail(`${tag}: compact Consumables do not fill rightward before wrapping up`);
           }
         }
-        const wrapRows = [slots[0], slots[2], slots[4]].map((rect) => center(rect).y);
-        if (wrapRows[1] >= wrapRows[0] - EPSILON || wrapRows[2] >= wrapRows[1] - EPSILON) {
-          fail(`${tag}: later compact Consumables rows do not wrap upward in item order`);
+        const lowerRow = slots.slice(0, 3).map((rect) => center(rect).y);
+        const upperRow = slots.slice(3).map((rect) => center(rect).y);
+        if (
+          coordinateBucketCount(lowerRow) !== 1 ||
+          coordinateBucketCount(upperRow) !== 1 ||
+          upperRow[0] >= lowerRow[0] - EPSILON
+        ) {
+          fail(`${tag}: items 1-3 are not below items 4-6 in compact Consumables`);
         }
         for (const [chromeId, chrome] of [
           ['player-frame', geometry.playerFrame],
@@ -967,6 +1101,109 @@ function checkLayout(tag, geometry, profile, state) {
   }
 }
 
+async function verifyMobTooltipInvalidation(page, tag) {
+  const result = await page.evaluate(async () => {
+    const game = window.__game;
+    const hud = game?.hud;
+    const mob = [...(game?.sim?.entities?.values?.() ?? [])].find(
+      (entity) => entity.kind === 'mob' && entity.hostile && !entity.dead,
+    );
+    const tooltip = document.getElementById('tooltip');
+    const map = document.getElementById('minimap-wrap');
+    if (!hud || !mob || !tooltip || !map) return null;
+    const originalClear = hud.clearMobHoverTooltip;
+    const settle = () =>
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const read = () => {
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const mapRect = map.getBoundingClientRect();
+      return {
+        tooltip: {
+          left: tooltipRect.left,
+          right: tooltipRect.right,
+          top: tooltipRect.top,
+          bottom: tooltipRect.bottom,
+          w: tooltipRect.width,
+          layoutW: tooltip.offsetWidth,
+          inlineLeft: tooltip.style.left,
+        },
+        map: {
+          left: mapRect.left,
+          right: mapRect.right,
+          bottom: mapRect.bottom,
+        },
+        clipped: tooltip.classList.contains('mob-tooltip-clipped'),
+        fontSize: Number.parseFloat(getComputedStyle(tooltip).fontSize),
+        innerWidth: window.innerWidth,
+        uiZoom: getComputedStyle(document.getElementById('ui')).zoom,
+      };
+    };
+    hud.clearMobHoverTooltip = () => {};
+    try {
+      document.body.classList.remove('mobile-left-handed', 'mobile-consumables-open');
+      document.documentElement.style.setProperty('--ui-scale', '1');
+      document.documentElement.style.setProperty('--tooltip-scale', '1');
+      hud.lastMobTooltipId = null;
+      hud.showMobHoverTooltip(mob, new Set());
+      tooltip.insertAdjacentHTML(
+        'beforeend',
+        Array.from(
+          { length: 16 },
+          (_, index) => `<div class="tt-quest-obj">Stable objective ${index + 1}: 1 / 999</div>`,
+        ).join(''),
+      );
+      hud.positionVisibleMobileMobTooltip();
+      const right = read();
+
+      document.body.classList.add('mobile-left-handed');
+      await settle();
+      const left = read();
+
+      document.documentElement.style.setProperty('--tooltip-scale', '1.5');
+      await settle();
+      const scaled = read();
+      return { right, left, scaled };
+    } finally {
+      hud.clearMobHoverTooltip = originalClear;
+      document.body.classList.remove('mobile-left-handed', 'mobile-consumables-open');
+      document.documentElement.style.setProperty('--ui-scale', '1');
+      document.documentElement.style.setProperty('--tooltip-scale', '1');
+      originalClear.call(hud);
+    }
+  });
+  if (!result) {
+    fail(`${tag}: same-content mob tooltip invalidation fixture is unavailable`);
+    return;
+  }
+  const expectedRightLeft = Math.max(8, result.right.map.left);
+  const expectedLeftLeft = Math.max(
+    8,
+    Math.min(740 - result.left.tooltip.w - 8, result.left.map.right - result.left.tooltip.w),
+  );
+  const expectedScaledLeft = Math.max(
+    8,
+    Math.min(740 - result.scaled.tooltip.w - 8, result.scaled.map.right - result.scaled.tooltip.w),
+  );
+  if (Math.abs(result.right.tooltip.left - expectedRightLeft) > 1) {
+    fail(`${tag}: initial right-handed mob tooltip placement is wrong`);
+  }
+  if (Math.abs(result.left.tooltip.left - expectedLeftLeft) > 1) {
+    fail(`${tag}: unchanged mob tooltip did not mirror after handedness changed`);
+  }
+  if (
+    Math.abs(result.scaled.tooltip.left - expectedScaledLeft) > 1 ||
+    result.scaled.fontSize <= result.left.fontSize
+  ) {
+    fail(
+      `${tag}: unchanged mob tooltip did not reposition after tooltip scale changed ` +
+        JSON.stringify({ left: result.left, scaled: result.scaled }),
+    );
+  }
+  if (!result.right.clipped || !result.left.clipped || !result.scaled.clipped) {
+    fail(`${tag}: long same-content mob tooltip lost its clipped state during invalidation`);
+  }
+}
+
 async function verifyCompactMoreFlow(page, tag) {
   await page.click('#mobile-more');
   const opened = await page
@@ -1050,6 +1287,366 @@ async function verifyCompactMoreFlow(page, tag) {
     );
   if (!settingsOpened) fail(`${tag}: compact More Settings action did not open Options`);
   await page.evaluate(() => window.__game.hud.closeAll?.());
+}
+
+async function verifyMobileActionPageFlow(page, tag) {
+  await page.evaluate(() => {
+    const hud = window.__game?.hud;
+    if (hud?.hotbarActions) {
+      hud.hotbarActions[15] = { type: 'ability', id: 'heroic_strike' };
+      hud.mobileActionPage = 0;
+      hud.update(0.05);
+    }
+  });
+  await sleep(100);
+  const pages = [];
+  for (let step = 0; step < 5; step++) {
+    pages.push(
+      await page.$eval('.mobile-action-page-indicator', (indicator) => {
+        const match = indicator.textContent?.match(/\d+/);
+        return match ? Number(match[0]) : Number.NaN;
+      }),
+    );
+    if (step < 4) {
+      const previous = pages[pages.length - 1];
+      await page.$eval('#mobile-action-page-toggle', (button) => button.click());
+      await page.waitForFunction(
+        (last) => {
+          const text = document.querySelector('.mobile-action-page-indicator')?.textContent ?? '';
+          const match = text.match(/\d+/);
+          return !!match && Number(match[0]) !== last;
+        },
+        { timeout: 2000 },
+        previous,
+      );
+    }
+  }
+  const firstCycle = [...pages.slice(0, 4)].sort((left, right) => left - right);
+  if (firstCycle.join(',') !== '1,2,3,4' || pages[4] !== pages[0]) {
+    fail(`${tag}: mobile action pages cycled as ${pages.join(' -> ')} instead of 1 -> 2 -> 3 -> 4`);
+  }
+}
+
+async function verifySpellbookPickerFlow(page, tag) {
+  const abilityId = await page.evaluate(() => {
+    const game = window.__game;
+    const ability = game.sim.known[0]?.def.id;
+    if (!ability) return null;
+    game.hud.hotbarActions = Array.from({ length: 22 }, () => null);
+    game.hud.hotbarActions[0] = { type: 'ability', id: ability };
+    game.hud.mobileActionPage = 0;
+    game.hud.toggleSpellbook();
+    return ability;
+  });
+  if (!abilityId) {
+    fail(`${tag}: no learned ability available for Spellbook picker flow`);
+    return;
+  }
+  await page.waitForSelector(`#spellbook .spell-assignment-chip[data-ability-id="${abilityId}"]`);
+  await page.$eval(`#spellbook .spell-row[data-ability-id="${abilityId}"]`, (row) => row.focus());
+  const closedPickerDescription = await page
+    .waitForFunction(
+      () => {
+        const tooltip = document.getElementById('tooltip');
+        return (
+          !!tooltip &&
+          getComputedStyle(tooltip).display !== 'none' &&
+          tooltip.getBoundingClientRect().height > 0
+        );
+      },
+      { timeout: 2000 },
+    )
+    .then(
+      () => true,
+      () => false,
+    );
+  if (!closedPickerDescription)
+    fail(`${tag}: Spellbook description is unavailable with picker closed`);
+  await page.evaluate(() => window.__game.hud.hideTooltip());
+  for (let pageIndex = 0; pageIndex < 4; pageIndex++) {
+    if (pageIndex === 3) {
+      await page.evaluate((targetIndex) => {
+        window.__game.hud.hotbarActions[targetIndex] = {
+          type: 'item',
+          id: 'minor_healing_potion',
+        };
+      }, pageIndex * 5);
+    }
+    await page.$eval(
+      `#spellbook .spell-assignment-chip[data-ability-id="${abilityId}"]`,
+      (button) => button.click(),
+    );
+    await page.waitForSelector('#spellbook .spell-slot-picker');
+    await page.$$eval(
+      '#spellbook .spell-slot-picker [role="tab"]',
+      (tabs, index) => {
+        tabs[index]?.click();
+      },
+      pageIndex,
+    );
+    await page.waitForFunction(
+      (index) =>
+        document
+          .querySelectorAll('#spellbook .spell-slot-picker [role="tab"]')
+          [index]?.getAttribute('aria-selected') === 'true',
+      { timeout: 2000 },
+      pageIndex,
+    );
+    await page.$eval('#spellbook .spell-slot-destination', (button) => button.click());
+    await page.waitForSelector('#spellbook .spell-slot-picker', { hidden: true });
+    const result = await page.evaluate(
+      ({ id, targetIndex }) => ({
+        target: window.__game.hud.hotbarActions[targetIndex],
+        copies: window.__game.hud.hotbarActions.filter(
+          (action) => action?.type === 'ability' && action.id === id,
+        ).length,
+        page: window.__game.hud.mobileActionPage,
+      }),
+      { id: abilityId, targetIndex: pageIndex * 5 },
+    );
+    if (result.target?.id !== abilityId || result.copies !== 1 || result.page !== pageIndex) {
+      fail(`${tag}: picker assignment failed on page ${pageIndex + 1}: ${JSON.stringify(result)}`);
+    }
+  }
+
+  const actionChrome = await page.evaluate(() => {
+    const read = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return {
+        chrome: {
+          borderWidth: style.borderWidth,
+          borderRadius: style.borderRadius,
+          backgroundImage: style.backgroundImage,
+        },
+        text: element.textContent?.trim() ?? '',
+        hasIcon: Boolean(element.querySelector('.ui-icon')),
+        hasEquippedCheck: Boolean(element.querySelector('.spell-equipped-check')),
+        width: rect.width,
+        height: rect.height,
+      };
+    };
+    const spellbook = document.getElementById('spellbook');
+    const spellbookStyle = spellbook ? getComputedStyle(spellbook) : null;
+    return {
+      add: read('#spellbook .spell-hotbar-add'),
+      remove: read('#spellbook .spell-hotbar-remove'),
+      chip: read('#spellbook .spell-assignment-chip'),
+      paddingTop: spellbookStyle?.paddingTop ?? '',
+      paddingBottom: spellbookStyle?.paddingBottom ?? '',
+    };
+  });
+  if (
+    !actionChrome.add ||
+    !actionChrome.remove ||
+    !actionChrome.chip ||
+    JSON.stringify(actionChrome.add.chrome) !== JSON.stringify(actionChrome.remove.chrome) ||
+    JSON.stringify(actionChrome.add.chrome) !== JSON.stringify(actionChrome.chip.chrome)
+  ) {
+    fail(`${tag}: Spellbook Add/Remove/chip chrome differs: ${JSON.stringify(actionChrome)}`);
+  }
+  if (
+    actionChrome.add?.text !== '+' ||
+    !actionChrome.remove?.hasIcon ||
+    actionChrome.chip?.hasEquippedCheck ||
+    actionChrome.remove?.width !== 40 ||
+    actionChrome.remove?.height !== 40
+  ) {
+    fail(`${tag}: Spellbook compact touch symbols differ: ${JSON.stringify(actionChrome)}`);
+  }
+  if (actionChrome.paddingTop !== '8px' || actionChrome.paddingBottom !== '8px') {
+    fail(`${tag}: Spellbook edge padding differs: ${JSON.stringify(actionChrome)}`);
+  }
+
+  const fullBarAbility = await page.evaluate(() => {
+    const game = window.__game;
+    const id = game.sim.known.find((known) => known.def.id !== game.hud.hotbarActions[15]?.id)?.def
+      .id;
+    if (!id) return null;
+    game.hud.hotbarActions = Array.from({ length: 22 }, () => ({
+      type: 'item',
+      id: 'minor_healing_potion',
+    }));
+    game.hud.update(0.05);
+    return id;
+  });
+  if (!fullBarAbility) fail(`${tag}: no second learned ability available for full-bar Add`);
+  else {
+    await page.waitForSelector(`#spellbook .spell-hotbar-add[data-ability-id="${fullBarAbility}"]`);
+    await page.$eval('#spellbook', (spellbook) => {
+      spellbook.scrollTop = spellbook.scrollHeight;
+    });
+    await page.tap(`#spellbook .spell-hotbar-add[data-ability-id="${fullBarAbility}"]`);
+    await page.waitForSelector('#spellbook .spell-slot-picker');
+    const tooltipVisible = await page.$eval(
+      '#tooltip',
+      (tooltip) =>
+        getComputedStyle(tooltip).display !== 'none' && tooltip.getBoundingClientRect().height > 0,
+    );
+    if (tooltipVisible) fail(`${tag}: ability description tooltip opened after touch Add`);
+    const visibleDescriptions = await page.$$eval(
+      '#spellbook .spell-row .spell-sub',
+      (rows) =>
+        rows.filter((row) => {
+          const style = getComputedStyle(row);
+          const rect = row.getBoundingClientRect();
+          return style.display !== 'none' && style.visibility !== 'hidden' && rect.height > 0;
+        }).length,
+    );
+    if (visibleDescriptions !== 0) {
+      fail(
+        `${tag}: ${visibleDescriptions} Spellbook description(s) remain visible while picker is open`,
+      );
+    }
+    const stickyStack = await page.evaluate(() => {
+      const spellbook = document.getElementById('spellbook');
+      const title = spellbook?.querySelector('.panel-title');
+      const picker = spellbook?.querySelector('.spell-slot-picker');
+      if (!spellbook || !title || !picker) return null;
+      const windowRect = spellbook.getBoundingClientRect();
+      const titleRect = title.getBoundingClientRect();
+      const pickerRect = picker.getBoundingClientRect();
+      return {
+        windowTop: windowRect.top,
+        titleBottom: titleRect.bottom,
+        pickerTop: pickerRect.top,
+        firstControlTop:
+          picker.querySelector('button')?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY,
+        pickerBottom: pickerRect.bottom,
+        windowBottom: windowRect.bottom,
+        rootScrollTop: spellbook.scrollTop,
+        viewportBottom: window.innerHeight,
+        closeTop:
+          spellbook.querySelector('[data-close]')?.getBoundingClientRect().top ??
+          Number.NEGATIVE_INFINITY,
+      };
+    });
+    if (!stickyStack) fail(`${tag}: Spellbook sticky stack geometry is missing`);
+    else {
+      if (stickyStack.pickerTop + EPSILON < stickyStack.titleBottom) {
+        fail(
+          `${tag}: Spellbook picker starts at ${stickyStack.pickerTop}, under title bottom ${stickyStack.titleBottom}`,
+        );
+      }
+      if (stickyStack.pickerTop - stickyStack.titleBottom > 1 + EPSILON) {
+        fail(
+          `${tag}: Spellbook title/picker gap is ${stickyStack.pickerTop - stickyStack.titleBottom}px`,
+        );
+      }
+      if (stickyStack.firstControlTop - stickyStack.pickerTop > 2 + EPSILON) {
+        fail(
+          `${tag}: Spellbook picker retains ${stickyStack.firstControlTop - stickyStack.pickerTop}px top padding`,
+        );
+      }
+      if (stickyStack.closeTop - stickyStack.windowTop < 4 - EPSILON) {
+        fail(
+          `${tag}: Spellbook close control is only ${stickyStack.closeTop - stickyStack.windowTop}px below the window top`,
+        );
+      }
+      if (stickyStack.pickerBottom > stickyStack.windowBottom + EPSILON) {
+        fail(
+          `${tag}: Spellbook picker bottom ${stickyStack.pickerBottom} exceeds window bottom ${stickyStack.windowBottom}`,
+        );
+      }
+      if (stickyStack.viewportBottom - stickyStack.windowBottom > 6 + EPSILON) {
+        fail(
+          `${tag}: Spellbook still reserves ${stickyStack.viewportBottom - stickyStack.windowBottom}px below the window`,
+        );
+      }
+      const afterListScroll = await page.evaluate(() => {
+        const spellbook = document.getElementById('spellbook');
+        const list = spellbook?.querySelector('.spell-list');
+        const picker = spellbook?.querySelector('.spell-slot-picker');
+        if (!spellbook || !list || !picker) return null;
+        list.scrollTop = list.scrollHeight;
+        return new Promise((resolve) =>
+          requestAnimationFrame(() =>
+            resolve({
+              pickerTop: picker.getBoundingClientRect().top,
+              rootScrollTop: spellbook.scrollTop,
+              listScrollTop: list.scrollTop,
+            }),
+          ),
+        );
+      });
+      if (
+        !afterListScroll ||
+        Math.abs(afterListScroll.pickerTop - stickyStack.pickerTop) > EPSILON ||
+        afterListScroll.rootScrollTop !== 0 ||
+        afterListScroll.listScrollTop <= 0
+      ) {
+        fail(
+          `${tag}: Spellbook picker moved while its list scrolled: ${JSON.stringify({ before: stickyStack, after: afterListScroll })}`,
+        );
+      }
+      const verticalResize = await page.evaluate(() => {
+        const spellbook = document.getElementById('spellbook');
+        if (!spellbook) return null;
+        const before = spellbook.getBoundingClientRect().height;
+        spellbook.style.height = `${Math.max(180, spellbook.offsetHeight - 24)}px`;
+        const after = spellbook.getBoundingClientRect().height;
+        spellbook.style.height = '';
+        return { before, after };
+      });
+      if (!verticalResize || verticalResize.before - verticalResize.after < 10) {
+        fail(
+          `${tag}: Spellbook inline vertical resize is blocked: ${JSON.stringify(verticalResize)}`,
+        );
+      }
+      const narrowPicker = await page.evaluate(() => {
+        const spellbook = document.getElementById('spellbook');
+        const picker = spellbook?.querySelector('.spell-slot-picker');
+        if (!spellbook || !picker) return null;
+        spellbook.style.width = '360px';
+        const groups = [
+          picker.querySelector('.spell-slot-picker-tabs'),
+          picker.querySelector('.spell-slot-picker-destinations'),
+          picker.querySelector('.spell-slot-picker-close'),
+        ];
+        const controls = [...picker.querySelectorAll('button')];
+        const result = {
+          groupTops: groups.map((group) => group?.getBoundingClientRect().top ?? null),
+          controlWidths: controls.map((control) => control.getBoundingClientRect().width),
+          clientWidth: picker.clientWidth,
+          scrollWidth: picker.scrollWidth,
+          scrollLeft: 0,
+          visibleOccupiedLabels: [
+            ...picker.querySelectorAll('.spell-slot-destination.has-occupant .spell-slot-label'),
+          ].filter((label) => getComputedStyle(label).display !== 'none').length,
+          overflowingOccupiedControls: [
+            ...picker.querySelectorAll('.spell-slot-destination.has-occupant'),
+          ].filter(
+            (control) =>
+              control.scrollHeight > control.clientHeight + 1 ||
+              control.scrollWidth > control.clientWidth + 1,
+          ).length,
+        };
+        picker.scrollLeft = picker.scrollWidth;
+        result.scrollLeft = picker.scrollLeft;
+        spellbook.style.width = '';
+        return result;
+      });
+      if (
+        !narrowPicker ||
+        narrowPicker.groupTops.some(
+          (top) => top === null || Math.abs(top - narrowPicker.groupTops[0]) > EPSILON,
+        ) ||
+        narrowPicker.controlWidths.some((width) => width < 40 - EPSILON || width > 48 + EPSILON) ||
+        narrowPicker.scrollWidth <= narrowPicker.clientWidth ||
+        narrowPicker.scrollLeft <= 0 ||
+        narrowPicker.visibleOccupiedLabels !== 0 ||
+        narrowPicker.overflowingOccupiedControls !== 0
+      ) {
+        fail(
+          `${tag}: narrow Spellbook picker is not a responsive one-row scroller: ${JSON.stringify(narrowPicker)}`,
+        );
+      }
+    }
+    await page.evaluate(() => window.__game.hud.closeAll());
+  }
+  await page.evaluate(() => window.__game.hud.closeAll());
 }
 
 async function verifyJoystickAutorunFlow(page, tag, pointerBase) {
@@ -1340,6 +1937,10 @@ try {
     partyExpanded: false,
     petActive: false,
     safeArea: SAFE_AREA_VECTORS.none,
+    mobTooltip: true,
+    longTooltip: false,
+    uiScale: 1,
+    tooltipScale: 1,
   };
 
   const profiles = QUICK ? PROFILES.slice(0, 1) : PROFILES;
@@ -1349,13 +1950,17 @@ try {
     for (const leftHanded of [false, true]) {
       const state = { ...defaultState, leftHanded };
       await applyHudState(page, state);
-      const geometry = await collectLayout(page);
+      const geometry = await collectLayout(page, state);
       const tag = `${profile.name}/${leftHanded ? 'left' : 'right'}`;
       checkLayout(tag, geometry, profile, state);
       if (!leftHanded && PROFILE_SHOTS) {
         await page.screenshot({ path: `${SHOT_DIR}/${profile.name}.png` });
       }
       console.log(`checked ${tag}`);
+    }
+    if (profile.w === 740 && profile.h === 360) {
+      await verifyMobTooltipInvalidation(page, `${profile.name}/tooltip-invalidation`);
+      console.log(`checked ${profile.name}/tooltip-invalidation`);
     }
   }
 
@@ -1380,7 +1985,7 @@ try {
       await applyHudState(page, state);
       checkLayout(
         `galaxy-s8/min/${leftHanded ? 'left' : 'right'}`,
-        await collectLayout(page),
+        await collectLayout(page, state),
         compact,
         state,
       );
@@ -1395,7 +2000,7 @@ try {
       };
       await applyHudState(page, state);
       const tag = `galaxy-s8/consumables-scale-${buttonScale}`;
-      checkLayout(tag, await collectLayout(page), compact, state);
+      checkLayout(tag, await collectLayout(page, state), compact, state);
       console.log(`checked ${tag}`);
     }
 
@@ -1422,7 +2027,7 @@ try {
       await applyHudState(page, state);
       checkLayout(
         `galaxy-s8/max/${leftHanded ? 'left' : 'right'}`,
-        await collectLayout(page),
+        await collectLayout(page, state),
         compact,
         state,
       );
@@ -1441,7 +2046,7 @@ try {
       const tag = `galaxy-s8/movement-inset/${leftHanded ? 'left' : 'right'}`;
       await applySafeArea(page, cdp, state.safeArea, tag);
       await applyHudState(page, state);
-      checkLayout(tag, await collectLayout(page), compact, state);
+      checkLayout(tag, await collectLayout(page, state), compact, state);
     }
 
     const expandedProfiles = [
@@ -1463,7 +2068,7 @@ try {
         };
         await applyHudState(page, state);
         const tag = `${profile.name}/party-consumables-open/${leftHanded ? 'left' : 'right'}`;
-        checkLayout(tag, await collectLayout(page), profile, state);
+        checkLayout(tag, await collectLayout(page, state), profile, state);
       }
     }
 
@@ -1474,6 +2079,8 @@ try {
       const pointerBase = leftHanded ? 1200 : 900;
       await applySafeArea(page, cdp, state.safeArea, `${tag}/reset`);
       await applyHudState(page, state);
+      await verifyMobileActionPageFlow(page, tag);
+      if (!leftHanded) await verifySpellbookPickerFlow(page, tag);
       await verifyJoystickAutorunFlow(page, tag, pointerBase);
       await verifyCompactMoreFlow(page, tag);
       await applyHudState(page, state);
@@ -1483,7 +2090,7 @@ try {
     const resetState = { ...defaultState };
     await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, 'safe-area-reset/before');
     await applyHudState(page, resetState);
-    const beforeReset = await collectLayout(page);
+    const beforeReset = await collectLayout(page, resetState);
     await applySafeArea(page, cdp, SAFE_AREA_VECTORS.landscapeNotchRight, 'safe-area-reset/notch');
     await applyHudState(page, {
       ...resetState,
@@ -1491,7 +2098,7 @@ try {
     });
     await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, 'safe-area-reset/after');
     await applyHudState(page, resetState);
-    const afterReset = await collectLayout(page);
+    const afterReset = await collectLayout(page, resetState);
     for (const key of ['map', 'menu', 'moveJoystick', 'playerFrame']) {
       const before = beforeReset[key];
       const after = afterReset[key];

@@ -19,6 +19,50 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('keeps the quest-log footer inside the sheet while only its content panes scroll', () => {
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #quest-log-window\s*\{[^}]*--mobile-quest-log-content-offset:\s*168px;[^}]*overflow:\s*hidden;/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #quest-log-window \.ql-cols\s*\{[^}]*height:\s*min\([^;]+var\(--mobile-quest-log-content-offset\)[^;]+;[^}]*min-height:\s*0;/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #quest-log-window \.ql-list\s*\{[^}]*min-height:\s*0;[^}]*overflow-y:\s*auto;/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #quest-log-window \.ql-detail\s*\{[^}]*height:\s*100%;[^}]*max-height:\s*none;/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #quest-log-window \.ql-detail-body\s*\{[^}]*flex:\s*1 1 auto;/s,
+    );
+  });
+
+  it('reserves a shared scroll-end gap on every major mobile window scroll surface', () => {
+    const block =
+      mobileCss.match(/body\.mobile-touch \.window\s+:is\([\s\S]*?\)\s*\{[^}]*\}/)?.[0] ?? '';
+    expect(block).not.toBe('');
+    for (const selector of [
+      '.bag-grid',
+      '.bank-scroll',
+      '.soc-body',
+      '.ql-list',
+      '.ql-detail-body',
+      '.spell-list',
+      '.lb-body',
+      '.dr-body',
+      '.delve-shop-list',
+      '#market-body',
+      '#mailbox-body',
+      '.mail-reading-body',
+      '.cal-day-pane',
+      '#discord-window .dc-body',
+    ]) {
+      expect(block).toContain(selector);
+    }
+    expect(block).toContain('padding-bottom: var(--mobile-scroll-end-space);');
+    expect(block).toContain('scroll-padding-bottom: var(--mobile-scroll-end-space);');
+  });
+
   it('does not keep the old cramped mobile 100vw minus 170px window width', () => {
     expect(mobileCss).not.toContain('calc(100vw - 170px)');
     expect(mobileCss).toContain(

@@ -30,6 +30,14 @@ class FakeBody {
       this.styleProps.set(name, value);
     },
   };
+  stableWidth = 0;
+  stableHeight = 0;
+  getBoundingClientRect(): DOMRect {
+    return {
+      width: this.stableWidth,
+      height: this.stableHeight,
+    } as DOMRect;
+  }
 }
 
 class FakeElement {
@@ -71,13 +79,12 @@ function menuDocument() {
   const combat = new FakeElement('mobile-combat-controls');
   const extra = new FakeElement('mobile-extra-grid');
   const chat = new FakeElement('mobile-chat');
+  const bags = new FakeElement('mobile-bags');
   const social = new FakeElement('mobile-social');
   const quest = new FakeElement('mobile-quest');
   const menu = new FakeElement('mobile-menu');
   const more = new FakeElement('mobile-more');
-  const bags = new FakeElement('mobile-bags');
-  combat.append(chat, social, quest, menu, more);
-  extra.append(bags);
+  combat.append(chat, bags, social, quest, menu, more);
   const elements = new Map(
     [combat, extra, chat, social, quest, menu, more, bags].map((el) => [el.id, el]),
   );
@@ -137,6 +144,19 @@ describe('applyMobileHudLayout', () => {
     expect(body.classList.contains('hud-mobile-compact')).toBe(true);
   });
 
+  it('keeps the active game tier on the stable root size while browser chrome resizes', () => {
+    setInterfaceMode('touch');
+    const body = new FakeBody();
+    body.classList.add('game-active', 'mobile-touch');
+    body.stableWidth = 1280;
+    body.stableHeight = 500;
+
+    applyMobileHudLayout(fakeWin(1280, 460, body));
+
+    expect(body.classList.contains('hud-mobile-standard')).toBe(true);
+    expect(body.classList.contains('hud-mobile-compact')).toBe(false);
+  });
+
   it('mirrors mobile-window-open / mobile-chat-open into hud-menu-open / hud-chat-open', () => {
     setInterfaceMode('touch');
     const body = new FakeBody();
@@ -190,14 +210,11 @@ describe('syncMobileMenuPlacement', () => {
 
     expect(combat.children.map((el) => el.id)).toEqual([
       'mobile-chat',
+      'mobile-bags',
       'mobile-quest',
       'mobile-more',
     ]);
-    expect(extra.children.map((el) => el.id)).toEqual([
-      'mobile-social',
-      'mobile-menu',
-      'mobile-bags',
-    ]);
+    expect(extra.children.map((el) => el.id)).toEqual(['mobile-social', 'mobile-menu']);
     expect(extra.children[0]).toBe(social);
     expect(extra.children[1]).toBe(menu);
   });
@@ -212,12 +229,13 @@ describe('syncMobileMenuPlacement', () => {
 
     expect(combat.children.map((el) => el.id)).toEqual([
       'mobile-chat',
+      'mobile-bags',
       'mobile-social',
       'mobile-quest',
       'mobile-menu',
       'mobile-more',
     ]);
-    expect(extra.children.map((el) => el.id)).toEqual(['mobile-bags']);
+    expect(extra.children.map((el) => el.id)).toEqual([]);
   });
 
   it('moves focus to More before compact placement hides a focused direct action', () => {

@@ -155,12 +155,10 @@ export const pl_PL: EnTranslations = {
       "banner": "Obserwujesz {name}"
     },
     "readyCheck": {
-      "prompt": "{name} rozpoczyna sprawdzenie gotowości. Czy wszystko gotowe?",
-      "ready": "Gotowość",
-      "notReady": "Brak gotowości",
-      "result": "Sprawdzenie gotowości: {ready} gotowych, {notReady} niegotowych, {noResponse} bez odpowiedzi.",
-      "notInPartyError": "Aby rozpocząć sprawdzenie gotowości, musisz należeć do grupy.",
-      "inProgressError": "Sprawdzenie gotowości już trwa."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
@@ -241,7 +239,7 @@ export const pl_PL: EnTranslations = {
         "no_wallet": "Podłącz portfel z co najmniej 20 USD w WOC.",
         "under_minimum": "Portfel jest poniżej minimum 20 USD w WOC.",
         "price_unavailable": "Cena WOC jest niedostępna, nagrody są tymczasowo zablokowane.",
-        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const pl_PL: EnTranslations = {
       "leaderboard": "Rankingi",
       "dailyRewards": "Nagrody",
       "nameplates": "Nazwy",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
       "toggleHaptics": "Przełącz wibracje",
@@ -406,12 +406,12 @@ export const pl_PL: EnTranslations = {
       "targetFriendlyNext": "Przełączaj przyjazny cel",
       "discord": "Discord",
       "valecup": "Puchar Doliny",
-      "categoryPet": "Zwierzę",
-      "petAttack": "Zwierzę: Atak",
-      "petStop": "Zwierzę: Zatrzymaj",
-      "petTaunt": "Zwierzę: Prowokacja",
-      "petDefensive": "Zwierzę: Obronne",
-      "petAggressive": "Zwierzę: Agresywne"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -564,6 +564,10 @@ export const pl_PL: EnTranslations = {
       "interfaceModeDesktop": "Komputer",
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Tryb Auto dobiera sterowanie komputerowe lub dotykowe na podstawie urządzenia. Wybierz Komputer, aby wymusić klawiaturę i mysz (przydatne na tablecie z klawiaturą), lub Dotyk, aby korzystać ze sterowania ekranowego.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Dźwięki kroków",
       "clickFeedback": "Znacznik kliknięcia",
       "lockCursorOnRotate": "Blokuj kursor podczas obracania",
@@ -736,8 +740,8 @@ export const pl_PL: EnTranslations = {
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
-    "itemHeroicTag": "[HEROICZNY]",
-    "itemSoulbound": "Związany z duszą",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const pl_PL: EnTranslations = {
       "backpack": "Plecak",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Puste gniazdo na torbę",
-      "unequipHint": "Kliknij, aby zdjąć tę torbę"
+      "unequipHint": "Kliknij, aby zdjąć tę torbę",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Twój rajd został z powrotem przekształcony w drużynę.",
@@ -1084,10 +1107,10 @@ export const pl_PL: EnTranslations = {
       "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
     },
     "auth": {
-      "appleLoginCta": "Kontynuuj przez Apple",
-      "appleError": "Nie udało się zalogować przez Apple. Spróbuj ponownie.",
-      "appleChoiceIntro": "Utwórz nowe konto albo połącz Apple z istniejącym kontem.",
-      "appleChoiceExpired": "To logowanie przez Apple wygasło. Zaloguj się ponownie przez Apple.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Nie pamiętasz hasła?",
       "forgotTitle": "Zresetuj hasło",
       "forgotHint": "Podaj nazwę użytkownika, a wyślemy link do resetowania na zapisany adres e-mail.",
@@ -1108,7 +1131,18 @@ export const pl_PL: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Dodaj {name} do paska akcji",
-      "removeFromBarAria": "Usuń {name} z paska akcji"
+      "removeFromBarAria": "Usuń {name} z paska akcji",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const pl_PL: EnTranslations = {
       "label": "Resetuj pozycje ramek"
     },
     "itemTooltip": {
-      "requiresLevel": "Wymaga poziomu {level}"
+      "requiresLevel": "Wymaga poziomu {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const pl_PL: EnTranslations = {
       "parcelsLabel": "Paczki",
       "parcelsHint": "Kliknij przedmiot w torbach, aby go załączyć.",
       "removeParcelAria": "Usuń {item} z listu",
-      "parcelQtyDecreaseAria": "Wyślij o jedną sztukę {item} mniej",
-      "parcelQtyIncreaseAria": "Wyślij o jedną sztukę {item} więcej",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Wyślij list",
       "postageNote": "Opłata pocztowa: {amount}. Kruk leci około {seconds} s.",
       "arrivedBanner": "Kruk wylądował: poczta od {name}.",
@@ -3940,14 +3975,14 @@ export const pl_PL: EnTranslations = {
     "reconnecting": "Połączenie utracone. Ponowne łączenie...",
     "connectionRejected": "Serwer zamknął połączenie.",
     "tips": {
-      "classes": "Wskazówka: każdą z 9 klas gra się inaczej. Wypróbuj kilka, zanim zdecydujesz się na jedną.",
-      "talents": "Wskazówka: poza walką możesz w każdej chwili wyzerować talenty, więc wczesny wybór nigdy nie jest pułapką.",
-      "dungeons": "Wskazówka: gdy twój ekwipunek stanie się zbyt dobry na zwykły poziom lochu, spróbuj poziomu heroicznego, aby stoczyć trudniejszą i bardziej opłacalną walkę.",
-      "market": "Wskazówka: na Rynku Świata możesz kupować i sprzedawać z graczami z całego królestwa.",
-      "guilds": "Wskazówka: dołączenie do gildii daje ci prywatny kanał czatu i wspólną listę członków gildii.",
-      "professions": "Wskazówka: profesje zbierackie i rzemieślnicze można szkolić równolegle z klasą bojową.",
-      "loadouts": "Wskazówka: zapisz więcej niż jeden zestaw talentów, aby przełączać się między konfiguracjami bez ponownego wydawania punktów.",
-      "pvp": "Wskazówka: wyzwij innego gracza na przyjazny pojedynek lub dołącz do kolejki na arenę Popielnego Koloseum, aby przetestować swoją konfigurację."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const pl_PL: EnTranslations = {
     "androidStandaloneDetail": "Jesteś w trybie pełnoekranowej aplikacji. Trzymaj urządzenie w orientacji poziomej.",
     "androidInstallDetail": "Aby uzyskać tryb pełnoekranowy na Androidzie, najpierw zainstaluj tę stronę lub dodaj ją do ekranu głównego.",
     "androidInstallStep": "W Chrome dotknij menu, a następnie Zainstaluj aplikację lub Dodaj do ekranu głównego.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Otwórz World of ClaudeCraft z nowej ikony.",
     "otherStandaloneDetail": "Trzymaj urządzenie w poziomym trybie pełnoekranowym.",
     "otherInstallDetail": "Zainstaluj lub dodaj tę stronę do ekranu głównego, aby uzyskać najlepsze pełnoekranowe wrażenia na urządzeniu mobilnym."
@@ -5867,7 +5903,7 @@ export const pl_PL: EnTranslations = {
         "name": "Kieł Starego Szaroszczękiego"
       },
       "chunk_of_ore": {
-        "name": "Kawałek rudy"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Zniszczona strona księgi"
@@ -7550,12 +7586,12 @@ export const pl_PL: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Fach dla każdej dłoni",
-        "text": "Każdy w Eastbrook para się jakimś fachem oprócz władania mieczem, {playerName}. Wokół miasta pełno żył rudy, więc chwyć za kilof i przynieś mi 5 kawałków. Wydobądź je własnoręcznie; poznam różnicę.",
-        "completion": "Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Kawałek rudy"
+            "label": "Chunk of Ore"
           }
         }
       },

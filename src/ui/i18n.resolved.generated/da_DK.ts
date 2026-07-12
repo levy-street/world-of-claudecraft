@@ -155,12 +155,10 @@ export const da_DK: EnTranslations = {
       "banner": "Tilskuer til {name}"
     },
     "readyCheck": {
-      "prompt": "{name} har startet et klar-tjek. Er du klar?",
-      "ready": "Klar",
-      "notReady": "Ikke klar",
-      "result": "Klar-tjek: {ready} klar, {notReady} ikke klar, {noResponse} uden svar.",
-      "notInPartyError": "Du skal være i en gruppe for at starte et klar-tjek.",
-      "inProgressError": "Et klar-tjek er allerede i gang."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
@@ -241,7 +239,7 @@ export const da_DK: EnTranslations = {
         "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
         "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
-        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const da_DK: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Belønninger",
       "nameplates": "Navne",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
       "toggleHaptics": "Slå haptik til/fra",
@@ -406,12 +406,12 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
       "valecup": "Dalpokalen",
-      "categoryPet": "Kæledyr",
-      "petAttack": "Kæledyr: Angrib",
-      "petStop": "Kæledyr: Stop",
-      "petTaunt": "Kæledyr: Hån",
-      "petDefensive": "Kæledyr: Defensiv",
-      "petAggressive": "Kæledyr: Aggressiv"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -564,6 +564,10 @@ export const da_DK: EnTranslations = {
       "interfaceModeDesktop": "Skrivebord",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto vælger skrivebords- eller touchstyring ud fra din enhed. Vælg Skrivebord for at tvinge tastatur og mus (nyttigt på en tablet med tastatur), eller Touch for skærmstyringen.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Fodtrinslyde",
       "clickFeedback": "Klikmarkør",
       "lockCursorOnRotate": "Lås markør under drejning",
@@ -736,8 +740,8 @@ export const da_DK: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
-    "itemHeroicTag": "[HEROISK]",
-    "itemSoulbound": "Sjælebundet",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const da_DK: EnTranslations = {
       "backpack": "Rygsæk",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom taskeplads",
-      "unequipHint": "Klik for at fjerne denne taske"
+      "unequipHint": "Klik for at fjerne denne taske",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -1084,10 +1107,10 @@ export const da_DK: EnTranslations = {
       "spawn": "{name} rejser sig over Tornetop Højder!"
     },
     "auth": {
-      "appleLoginCta": "Fortsæt med Apple",
-      "appleError": "Kunne ikke logge ind med Apple. Prøv igen.",
-      "appleChoiceIntro": "Opret en ny konto, eller knyt Apple til en konto, du allerede har.",
-      "appleChoiceExpired": "Dette Apple-login er udløbet. Log ind med Apple igen.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Glemt adgangskode?",
       "forgotTitle": "Nulstil din adgangskode",
       "forgotHint": "Indtast dit brugernavn, så sender vi et nulstillingslink til den registrerede e-mailadresse.",
@@ -1108,7 +1131,18 @@ export const da_DK: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
-      "removeFromBarAria": "Fjern {name} fra handlingslinjen"
+      "removeFromBarAria": "Fjern {name} fra handlingslinjen",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const da_DK: EnTranslations = {
       "label": "Nulstil rammepositioner"
     },
     "itemTooltip": {
-      "requiresLevel": "Kræver niveau {level}"
+      "requiresLevel": "Kræver niveau {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const da_DK: EnTranslations = {
       "parcelsLabel": "Pakker",
       "parcelsHint": "Klik på en genstand i dine tasker for at vedhæfte den.",
       "removeParcelAria": "Fjern {item} fra brevet",
-      "parcelQtyDecreaseAria": "Send én {item} mindre",
-      "parcelQtyIncreaseAria": "Send én {item} mere",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Send brev",
       "postageNote": "Porto: {amount}. Ravnen er undervejs i omtrent {seconds}s.",
       "arrivedBanner": "Ravnen er landet: post fra {name}.",
@@ -3940,14 +3975,14 @@ export const da_DK: EnTranslations = {
     "reconnecting": "Forbindelse mistet. Genopretter forbindelse...",
     "connectionRejected": "Serveren lukkede forbindelsen.",
     "tips": {
-      "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
-      "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
-      "dungeons": "Tip: Prøv en grotte på heroisk sværhedsgrad, når dit udstyr er blevet for godt til normal, og få en hårdere og mere givende kamp.",
-      "market": "Tip: På Verdensmarkedet kan du købe og sælge med spillere fra hele riget.",
-      "guilds": "Tip: Når du slutter dig til et laug, får du en privat chatkanal og en fælles liste over dine laugskammerater.",
-      "professions": "Tip: Indsamlings- og håndværksfag kan trænes sideløbende med din kampklasse.",
-      "loadouts": "Tip: Gem mere end én talentopsætning, så du kan skifte mellem varianter uden at bruge point to gange.",
-      "pvp": "Tip: Udfordr en anden spiller til en venskabelig duel, eller stil dig i kø til arenaen i Det Askegrå Colosseum for at afprøve din opbygning."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const da_DK: EnTranslations = {
     "androidStandaloneDetail": "Du er i fuldskærms-apptilstand. Hold enheden i liggende format.",
     "androidInstallDetail": "For fuldskærm på Android skal du først installere denne side eller føje den til din startskærm.",
     "androidInstallStep": "I Chrome skal du trykke på menuen og derefter Installér app eller Føj til startskærm.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Åbn World of ClaudeCraft fra det nye ikon.",
     "otherStandaloneDetail": "Hold din enhed i liggende fuldskærm.",
     "otherInstallDetail": "Installér eller føj denne side til din startskærm for den bedste mobile fuldskærmsoplevelse."
@@ -5867,7 +5903,7 @@ export const da_DK: EnTranslations = {
         "name": "Gamle Gråkæbes Hugtand"
       },
       "chunk_of_ore": {
-        "name": "Malmklump"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Forvitret Regnskabsside"
@@ -7550,12 +7586,12 @@ export const da_DK: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Et håndværk til hver hånd",
-        "text": "Alle i Østbæk har et håndværk ved siden af sværdet, {playerName}. Der ligger malmårer rundt om byen, så sving en hakke og bring mig 5 klumper. Bryd dem selv, vel at mærke; jeg kan kende forskel.",
-        "completion": "Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Malmklump"
+            "label": "Chunk of Ore"
           }
         }
       },

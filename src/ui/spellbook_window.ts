@@ -24,10 +24,16 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
+import { encodeHotbarAction, HOTBAR_ACTION_MIME, type HotbarAction } from './hotbar';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
-import { buildSpellbookView, type SpellbookRow } from './spellbook_view';
+import {
+  buildMobileSpellbookPicker,
+  buildSpellbookView,
+  nextMobileSpellbookPickerPage,
+  type SpellbookRow,
+} from './spellbook_view';
+import { bindTouchTap } from './touch_tap';
 import { svgIcon } from './ui_icons';
 
 /**
@@ -43,7 +49,12 @@ export interface SpellbookWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   hideTooltip(): void;
-  attachTooltip(el: HTMLElement, html: () => string): void;
+  attachTooltip(
+    el: HTMLElement,
+    html: () => string,
+    enabled?: () => boolean,
+    directFocusOnly?: boolean,
+  ): () => void;
   /** describeAbilitySummary(known, player.resourceType), localized Hud-side. */
   abilitySummary(known: ResolvedAbility): string;
   /** The full ability tooltip markup (Hud-owned). */
@@ -65,6 +76,15 @@ export interface SpellbookWindowDeps {
   resetFormBar(): void;
   setDragAction(action: { type: 'ability'; id: string } | null): void;
   clearActionDropTargets(): void;
+  isTouch?(): boolean;
+  hotbarActions?(): readonly HotbarAction[];
+  barToken?(): string;
+  itemName?(itemId: string): string;
+  assignMobileSlot?(request: { abilityId: string; targetIndex: number; barToken: string }): {
+    changed: boolean;
+    stale: boolean;
+  };
+  setMobileActionPage?(page: number): void;
 }
 
 export class SpellbookWindow {
@@ -74,6 +94,11 @@ export class SpellbookWindow {
   // world.known with new numbers; comparing this per frame lets tickOpen rebuild
   // the row summaries so their cost/cast/cooldown never go stale (tooltip parity).
   private lastKnownSig = '';
+  private lastBarSig = '';
+  private pickerAbilityId: string | null = null;
+  private pickerPage = 0;
+  private pickerBarToken = '';
+  private pickerOpener: HTMLElement | null = null;
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
@@ -114,6 +139,18 @@ export class SpellbookWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
+    this.clearPickerState();
+    el.classList.remove('spell-slot-picker-open');
+  }
+
+  closePicker(): boolean {
+    if (!this.pickerAbilityId) return false;
+    const root = this.deps.root();
+    root.querySelector('[data-spell-slot-picker]')?.remove();
+    root.classList.remove('spell-slot-picker-open');
+    this.clearPickerState();
+    this.focusPickerOpener();
+    return true;
   }
 
   // Per-frame entry while the window is open. Rebuilds the whole list only when a
@@ -143,20 +180,32 @@ export class SpellbookWindow {
       const id = active.dataset.abilityId;
       if (id && active.classList.contains('spell-hotbar-toggle'))
         refocus = `.spell-hotbar-toggle[data-ability-id="${id}"]`;
+      else if (id && active.classList.contains('spell-assignment-chip'))
+        refocus = `.spell-assignment-chip[data-ability-id="${id}"], .spell-hotbar-add[data-ability-id="${id}"]`;
+      else if (id && active.classList.contains('spell-hotbar-remove'))
+        refocus = `.spell-hotbar-remove[data-ability-id="${id}"], .spell-hotbar-add[data-ability-id="${id}"]`;
+      else if (id && active.classList.contains('spell-hotbar-add'))
+        refocus = `.spell-hotbar-add[data-ability-id="${id}"], .spell-assignment-chip[data-ability-id="${id}"]`;
+      else if (active.classList.contains('spell-slot-destination'))
+        refocus = `.spell-slot-destination[data-source-slot="${active.dataset.sourceSlot}"]`;
+      else if (active.getAttribute('role') === 'tab')
+        refocus = `[role="tab"][data-picker-page="${active.dataset.pickerPage}"]`;
       else if (id && active.classList.contains('spell-row'))
         refocus = `.spell-row[data-ability-id="${id}"]`;
       else if (active.hasAttribute('data-reset-bar')) refocus = '[data-reset-bar]';
       else if (active.hasAttribute('data-close')) refocus = '[data-close]';
     }
+    refocus ??= '[data-close]';
     this.render();
     root.scrollTop = scrollTop;
-    if (refocus) (root.querySelector(refocus) as HTMLElement | null)?.focus();
+    (root.querySelector(refocus) as HTMLElement | null)?.focus();
   }
 
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
     this.lastKnownSig = SpellbookWindow.knownSig(world.known);
+    this.lastBarSig = this.barSignature();
     const classId = world.cfg.playerClass;
     const cls = CLASSES[classId];
     const view = buildSpellbookView({
@@ -167,6 +216,7 @@ export class SpellbookWindow {
       abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),
       hasFreeSlot: this.deps.hasFreeSlot(),
       hasFormBars: this.deps.hasFormBars(),
+      touchPresentation: this.isTouch(),
     });
     const className = classDisplayName(view.classId);
     markDialogRoot(el, { label: t('abilityUi.spellbook.title') });
@@ -176,11 +226,17 @@ export class SpellbookWindow {
       ? `<button type="button" class="x-btn spellbook-reset" data-reset-bar aria-label="${esc(t('abilityUi.spellbook.resetBarAria'))}">${esc(t('abilityUi.spellbook.resetBar'))}</button>`
       : '';
     el.innerHTML = `<div class="panel-title"><span>${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(t('abilityUi.spellbook.classSubtitle', { className }))}</span></span><div class="panel-title-actions">${resetBtnHtml}<button type="button" class="x-btn" data-close aria-label="${esc(t('abilityUi.spellbook.close'))}">${svgIcon('close')}</button></div></div>`;
+    const status = document.createElement('div');
+    status.className = 'spell-assignment-status';
+    status.setAttribute('aria-live', 'polite');
+    status.setAttribute('aria-atomic', 'true');
+    el.appendChild(status);
     const list = document.createElement('div');
     list.className = 'spell-list';
     list.setAttribute('role', 'list');
     el.appendChild(list);
     for (const row of view.rows) this.appendRow(list, row);
+    if (this.pickerAbilityId) this.renderPicker();
     if (view.empty) {
       const empty = document.createElement('div');
       empty.className = 'spell-sub';
@@ -203,6 +259,10 @@ export class SpellbookWindow {
   // keybind use) without a full rebuild. Mirrors the inline refreshSpellbookHotbar
   // controls but scoped to this window's root.
   refreshHotbarControls(): void {
+    if (this.isTouch() && this.lastBarSig !== this.barSignature()) {
+      this.rerenderPreservingView();
+      return;
+    }
     const barIds = new Set(this.deps.barAbilityIds());
     const hasFree = this.deps.hasFreeSlot();
     this.deps
@@ -240,7 +300,7 @@ export class SpellbookWindow {
               ),
             );
         }
-        btn.disabled = !onBar && !hasFree;
+        btn.disabled = !this.isTouch() && !onBar && !hasFree;
       });
   }
 
@@ -272,6 +332,21 @@ export class SpellbookWindow {
         <div class="spell-text"><div class="spell-name">${esc(name)}${known && known.rank > 1 ? ` <span class="spell-rank">${esc(t('abilityUi.tooltip.rank', { rank: this.formatAbilityNumber(known.rank) }))}</span>` : ''}</div>
         <div class="spell-sub">${locked ? esc(t('abilityUi.spellbook.trainableAtLevel', { level: learnLevel })) : esc(summary)}</div></div>`;
     if (known) {
+      if (this.isTouch()) {
+        this.appendTouchControls(el, row, name);
+        const showDescription = this.deps.attachTooltip(
+          el,
+          () => this.deps.abilityTooltip(known),
+          () => this.pickerAbilityId === null,
+          true,
+        );
+        bindTouchTap(el, () => {
+          if (this.pickerAbilityId !== null) return;
+          showDescription();
+        });
+        list.appendChild(el);
+        return;
+      }
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = `spell-hotbar-toggle${row.onBar ? ' remove' : ''}`;
@@ -330,10 +405,15 @@ export class SpellbookWindow {
       // a talent allocated while the spellbook is open reassigns world.known with a
       // new cost/damage, and this row's tooltip must reflect it even before the next
       // tickOpen rebuild lands.
-      this.deps.attachTooltip(el, () => {
-        const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
-        return this.deps.abilityTooltip(live);
-      });
+      this.deps.attachTooltip(
+        el,
+        () => {
+          const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
+          return this.deps.abilityTooltip(live);
+        },
+        undefined,
+        true,
+      );
     } else {
       this.deps.attachTooltip(
         el,
@@ -342,6 +422,228 @@ export class SpellbookWindow {
       );
     }
     list.appendChild(el);
+  }
+
+  private appendTouchControls(el: HTMLElement, row: SpellbookRow, name: string): void {
+    const controls = document.createElement('div');
+    controls.className = 'spell-touch-controls';
+    const dismissDescription = (event: Event) => {
+      this.deps.hideTooltip();
+      if (event.type === 'pointerdown') event.stopPropagation();
+    };
+    controls.addEventListener('pointerdown', dismissDescription);
+    controls.addEventListener('click', dismissDescription, true);
+    if (row.assignment.kind === 'unassigned') {
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'spell-hotbar-toggle spell-hotbar-add';
+      add.dataset.abilityId = row.abilityId;
+      add.textContent = '+';
+      add.setAttribute('aria-label', t('hudChrome.spellbook.addToBarAria', { name }));
+      add.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.openPicker(row.abilityId, add);
+      });
+      controls.appendChild(add);
+    } else {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'spell-assignment-chip';
+      chip.dataset.abilityId = row.abilityId;
+      const label =
+        row.assignment.kind === 'mobile'
+          ? t('hudChrome.spellbook.mobileChip', {
+              page: this.formatAbilityNumber(row.assignment.page + 1),
+              position: this.formatAbilityNumber(row.assignment.position),
+            })
+          : t('hudChrome.spellbook.desktopChip');
+      chip.textContent = label;
+      chip.setAttribute(
+        'aria-label',
+        t('hudChrome.spellbook.moveAssignmentAria', { name, slot: label }),
+      );
+      chip.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.pickerAbilityId === row.abilityId) this.closePicker();
+        else this.openPicker(row.abilityId, chip);
+      });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'spell-hotbar-remove';
+      remove.dataset.abilityId = row.abilityId;
+      remove.innerHTML = svgIcon('close');
+      remove.setAttribute('aria-label', t('hudChrome.spellbook.removeFromBarAria', { name }));
+      remove.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.deps.removeFromBar(row.abilityId)) audio.click();
+        this.refreshHotbarControls();
+      });
+      controls.append(chip, remove);
+    }
+    el.appendChild(controls);
+  }
+
+  private openPicker(abilityId: string, opener: HTMLElement): void {
+    this.deps.hideTooltip();
+    this.pickerAbilityId = abilityId;
+    this.pickerBarToken = this.deps.barToken?.() ?? '';
+    this.pickerOpener = opener;
+    const actions = this.deps.hotbarActions?.() ?? [];
+    const assignment = buildMobileSpellbookPicker({
+      actions,
+      abilityId,
+      selectedPage: this.pickerPage,
+      barToken: this.pickerBarToken,
+    }).assignment;
+    if (assignment.kind === 'mobile') this.pickerPage = assignment.page;
+    this.renderPicker();
+  }
+
+  private renderPicker(): void {
+    const root = this.deps.root();
+    root.querySelector('[data-spell-slot-picker]')?.remove();
+    if (!this.pickerAbilityId) return;
+    root.classList.add('spell-slot-picker-open');
+    root.scrollTop = 0;
+    const picker = buildMobileSpellbookPicker({
+      actions: this.deps.hotbarActions?.() ?? [],
+      abilityId: this.pickerAbilityId,
+      selectedPage: this.pickerPage,
+      barToken: this.pickerBarToken,
+    });
+    const panel = document.createElement('section');
+    panel.className = 'spell-slot-picker';
+    panel.dataset.spellSlotPicker = '';
+    const tabs = document.createElement('div');
+    tabs.className = 'spell-slot-picker-tabs';
+    tabs.setAttribute('role', 'tablist');
+    tabs.setAttribute('aria-label', t('hudChrome.spellbook.pickerPages'));
+    for (const tab of picker.tabs) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', tab.selected ? 'true' : 'false');
+      button.dataset.pickerPage = String(tab.page);
+      button.tabIndex = tab.tabIndex;
+      button.textContent = this.formatAbilityNumber(tab.page + 1);
+      button.addEventListener('click', () => this.selectPickerPage(tab.page));
+      button.addEventListener('keydown', (event) => {
+        const page = nextMobileSpellbookPickerPage(tab.page, event.key);
+        if (page === tab.page) return;
+        event.preventDefault();
+        this.selectPickerPage(page);
+      });
+      tabs.appendChild(button);
+    }
+    const group = document.createElement('div');
+    group.className = 'spell-slot-picker-destinations';
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', t('hudChrome.spellbook.pickerDestinations'));
+    for (const destination of picker.destinations) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'spell-slot-destination';
+      button.classList.toggle('has-occupant', !!destination.occupant);
+      button.dataset.sourceSlot = String(destination.sourceSlot);
+      if (destination.current) button.setAttribute('aria-current', 'true');
+      const actionName = this.destinationActionName(destination.occupant);
+      button.setAttribute(
+        'aria-label',
+        t('hudChrome.spellbook.destinationAria', {
+          page: this.formatAbilityNumber(destination.page + 1),
+          position: this.formatAbilityNumber(destination.position),
+          state: actionName ?? t('hudChrome.spellbook.empty'),
+        }),
+      );
+      button.innerHTML = destination.occupant
+        ? `<span class="spell-slot-icon" style="background-image:url(${iconDataUrl(destination.occupant.type, destination.occupant.id)})"></span><span class="spell-slot-label">A${esc(this.formatAbilityNumber(destination.position))}</span>`
+        : `<span class="spell-slot-label">A${esc(this.formatAbilityNumber(destination.position))}</span>`;
+      const assign = () => this.assignPickerDestination(destination.sourceSlot - 1);
+      button.addEventListener('click', assign);
+      button.addEventListener('keydown', (event) => {
+        const key = event.key;
+        if (key === 'Enter' || key === ' ') {
+          event.preventDefault();
+          assign();
+        }
+      });
+      group.appendChild(button);
+    }
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'spell-slot-picker-close';
+    close.setAttribute('aria-label', t('hudChrome.spellbook.closePicker'));
+    close.innerHTML = svgIcon('close');
+    close.addEventListener('click', () => this.closePicker());
+    panel.append(tabs, group, close);
+    root.querySelector('.panel-title')?.after(panel);
+    const destinations = panel.querySelectorAll<HTMLButtonElement>('.spell-slot-destination');
+    destinations[picker.focusDestinationIndex]?.focus();
+  }
+
+  private selectPickerPage(page: number): void {
+    this.pickerPage = page;
+    this.renderPicker();
+    this.deps.root().querySelectorAll<HTMLButtonElement>('[role="tab"]')[page]?.focus();
+  }
+
+  private assignPickerDestination(targetIndex: number): void {
+    if (!this.pickerAbilityId) return;
+    const abilityId = this.pickerAbilityId;
+    const result = this.deps.assignMobileSlot?.({
+      abilityId,
+      targetIndex,
+      barToken: this.pickerBarToken,
+    });
+    if (!result || result.stale) return;
+    let announcement = '';
+    if (result.changed) {
+      this.deps.setMobileActionPage?.(Math.floor(targetIndex / 5));
+      announcement = t('hudChrome.spellbook.assignedStatus', {
+        name: this.abilityName(ABILITIES[abilityId]),
+        page: this.formatAbilityNumber(Math.floor(targetIndex / 5) + 1),
+        position: this.formatAbilityNumber((targetIndex % 5) + 1),
+      });
+      audio.click();
+    }
+    this.closePicker();
+    this.rerenderPreservingView();
+    const status = this.deps.root().querySelector<HTMLElement>('.spell-assignment-status');
+    if (status) status.textContent = announcement;
+    this.deps
+      .root()
+      .querySelector<HTMLElement>(`.spell-assignment-chip[data-ability-id="${abilityId}"]`)
+      ?.focus();
+  }
+
+  private destinationActionName(action: HotbarAction): string | null {
+    if (!action) return null;
+    if (action.type === 'ability') return this.abilityName(ABILITIES[action.id]);
+    return this.deps.itemName?.(action.id) ?? action.id;
+  }
+
+  private barSignature(): string {
+    return (this.deps.hotbarActions?.() ?? [])
+      .map((action) => (action ? `${action.type}:${action.id}` : ''))
+      .join('|');
+  }
+
+  private isTouch(): boolean {
+    return this.deps.isTouch?.() ?? document.body.classList.contains('mobile-touch');
+  }
+
+  private clearPickerState(): void {
+    this.pickerAbilityId = null;
+    this.pickerPage = 0;
+    this.pickerBarToken = '';
+  }
+
+  private focusPickerOpener(): void {
+    this.pickerOpener?.focus();
+    this.pickerOpener = null;
   }
 
   // Reproduced from the exported hotbar encoder so cross-window drag state stays on

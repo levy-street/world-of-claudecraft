@@ -158,9 +158,7 @@ export const ja_JP: EnTranslations = {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",
       "notReady": "準備未完了",
-      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。",
-      "notInPartyError": "準備確認を開始するにはパーティーに参加している必要があります。",
-      "inProgressError": "準備確認はすでに進行中です。"
+      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。"
     },
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
@@ -319,6 +317,8 @@ export const ja_JP: EnTranslations = {
       "leaderboard": "ランキング",
       "dailyRewards": "報酬",
       "nameplates": "ネームプレート",
+      "nameplatesOff": "名前オフ",
+      "musicOff": "音楽オフ",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
@@ -564,6 +564,10 @@ export const ja_JP: EnTranslations = {
       "interfaceModeDesktop": "デスクトップ",
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
+      "mobileActionPages": "最小アクションページ数",
+      "mobileActionPagesTwo": "2ページ",
+      "mobileActionPagesThree": "3ページ",
+      "mobileActionPagesFour": "4ページ",
       "footstepSounds": "足音",
       "clickFeedback": "クリックマーカー",
       "lockCursorOnRotate": "回転中はカーソルを固定",
@@ -736,7 +740,7 @@ export const ja_JP: EnTranslations = {
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
-    "itemHeroicTag": "[ヒロイック]",
+    "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -988,7 +992,26 @@ export const ja_JP: EnTranslations = {
       "backpack": "バックパック",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "空のバッグスロット",
-      "unequipHint": "クリックしてこのバッグを外す"
+      "unequipHint": "クリックしてこのバッグを外す",
+      "itemActionsTitle": "{item}の操作",
+      "itemActionEquip": "装備",
+      "itemActionEquipBag": "バッグを装備",
+      "itemActionUse": "使用",
+      "itemActionConsume": "消費",
+      "itemActionLinkToChat": "チャットにリンク",
+      "itemActionDestroy": "破棄",
+      "itemActionDetails": "アイテム詳細",
+      "itemActionAssignTitle": "消耗品に登録",
+      "itemActionAssignSlot": "スロット{slot}に登録",
+      "itemActionRemoveSlot": "スロット{slot}から解除",
+      "itemActionSlotCurrent": "スロット{slot}: {item}",
+      "itemActionSlotEmpty": "スロット{slot}: 空き",
+      "itemActionResetAutomatic": "自動配置に戻す",
+      "itemActionClose": "アイテム操作を閉じる",
+      "itemActionAssigned": "{item}をスロット{slot}に登録しました。",
+      "itemActionRemoved": "{item}をスロット{slot}から解除しました。",
+      "itemActionInvalid": "このアイテムは登録できません。",
+      "itemActionFailed": "操作を完了できませんでした。"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -1108,7 +1131,18 @@ export const ja_JP: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
-      "removeFromBarAria": "{name}をアクションバーから削除"
+      "removeFromBarAria": "{name}をアクションバーから削除",
+      "add": "追加",
+      "remove": "解除",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "デスクトップ",
+      "moveAssignmentAria": "{name}を{slot}から移動",
+      "pickerPages": "アクションページ",
+      "pickerDestinations": "アクションスロット",
+      "destinationAria": "{page}ページ、A{position}、{state}",
+      "empty": "空き",
+      "closePicker": "スロットを閉じる",
+      "assignedStatus": "{name}を{page}ページのA{position}に割り当てました"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
-      "requiresLevel": "必要レベル {level}"
+      "requiresLevel": "必要レベル {level}",
+      "duration": "持続時間: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const ja_JP: EnTranslations = {
     "androidStandaloneDetail": "全画面アプリモードです。端末を横向きに保ってください。",
     "androidInstallDetail": "Androidで全画面にするには、このページをインストールするかホーム画面に追加してください。",
     "androidInstallStep": "Chromeでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。",
+    "androidSamsungInstallStep": "Samsung Internetでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。",
     "androidOpenStep": "新しいアイコンからWorld of ClaudeCraftを開きます。",
     "otherStandaloneDetail": "端末を横向き全画面に保ってください。",
     "otherInstallDetail": "最高のモバイル全画面体験のため、このページをインストールするかホーム画面に追加してください。"

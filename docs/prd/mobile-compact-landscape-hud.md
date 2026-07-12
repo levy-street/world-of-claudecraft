@@ -5,10 +5,16 @@
 | **Status** | Approved |
 | **Owner** | TBD |
 | **Created** | 2026-07-10 |
+| **Updated** | 2026-07-11 |
 | **Source** | Mobile layout discussion following PR #1731 |
 | **Implementation branch** | `mobile-layout-adjustments` |
 | **Final integration prerequisite** | Satisfied by [PR #1724: joystick autorun lock](https://github.com/levy-street/world-of-claudecraft/pull/1724), release merge `083856d8c` |
 | **Primary surface** | Touch HUD, with compact landscape as the strict reference tier |
+
+> Follow-up: [Mobile HUD Readability Adjustments](../specs/2026-07-11-mobile-hud-readability-adjustments.md)
+> supersedes this document's compact 2 x 3 Consumables drawer and old player/Target scale
+> constants. Current landscape behavior is 3 x 2 Consumables on every tier, player scales
+> `0.72`, `1`, and `1.1`, Target ratio `0.9`, and the transient mob description below the minimap.
 
 ## 1. Summary
 
@@ -28,6 +34,12 @@ tertiary control.
 The design is compact-landscape-first, but defines one stable topology for all touch tiers.
 Standard and tablet landscape, safe-area, and left-handed layouts may change dimensions and
 offsets, but they must preserve the same control relationships and input semantics.
+
+The action-page model also gives touch players intentional control over where a learned ability
+is placed. A touch-only Spellbook picker assigns abilities to stable mobile source slots instead
+of silently taking the first free position. Mobile exposes up to four five-slot action pages,
+keeps Attack fixed, and keeps the automatic six-item Consumables drawer separate from persisted
+hotbar mapping.
 
 ### 1.1 Landscape-only scope amendment
 
@@ -112,20 +124,28 @@ auto-attack semantics make that pattern inappropriate here.
 - Preserve a stable topology across responsive tiers and mirror it for left-handed play.
 - Keep all gameplay controls usable while the movement joystick is held by another touch.
 - Preserve parity between `index.html` and `play.html`.
+- Let touch players choose the exact mobile slot for a learned ability and immediately see where
+  an equipped ability is assigned.
+- Keep assigned source slots reachable without forcing empty higher pages into the default page
+  cycle.
 
 ### Non-goals
 
 - No combat balance or simulation changes.
 - No removal of explicit Attack.
 - No new auto-target-on-ability behavior.
-- No expansion beyond the existing mobile source slots 1 through 10.
-- No mobile access to desktop source slot 11 or secondary slots 12 through 22 in this scope.
+- No expansion beyond mobile source slots 1 through 20.
+- No mobile access to the remaining desktop source slots 21 and 22 in this scope.
 - No player-authored freeform HUD editor.
 - No desktop HUD layout changes.
 - No portrait gameplay layout work or portrait QA; a separate PR owns disabling that orientation.
 - No reimplementation or fallback standalone Autorun button. PR #1724 owns Autorun inside the
   joystick and must land first.
 - No redesign of minimap contents, party data, target data, or Consumables ordering.
+- No fifth sparse mobile action page, reduction of the six-item Consumables drawer, or treatment
+  of Consumables as persisted hotbar slots.
+- No server, database, wire-format, talent-loadout, or 22-slot hotbar storage migration.
+- No desktop Spellbook picker or desktop drag-and-drop behavior change.
 
 ## 5. Chosen approach
 
@@ -143,8 +163,8 @@ The closed resting layout is:
 |                                      |         swipe-look           | |
 |                                      +------------------------------+ |
 |                                      [PET ATK][TAUNT][HEAL][STANCE]  |
-| [MOVE + AUTORUN] [CONS]       [PLAYER]       [A1][A2][ATK][TARGET]  |
-|                                           [1/2][A3][A4][A5][JUMP/USE]|
+| [MOVE + AUTORUN] [CONS]       [PLAYER]       [A1][A2][A5][TARGET]  |
+|                                             [1][A3][A4][ATK][JUMP/USE]|
 +-----------------------------------------------------------------------+
 ```
 
@@ -152,9 +172,8 @@ When Consumables is open on compact landscape, the toggle stays low beside movem
 toward the player frame first and only then wrap upward:
 
 ```text
-                         [C5][C6]
-                         [C3][C4]
- [MOVE + AUTORUN] [CONS][C1][C2]   [PLAYER]
+                         [C4][C5][C6]
+ [MOVE + AUTORUN] [CONS][C1][C2][C3]   [PLAYER]
 ```
 
 The open grid is transient. It must not move the joystick, player frame, action pad, map,
@@ -165,20 +184,23 @@ target frame, party controls, or camera start zone.
 The fixed visual order is:
 
 ```text
-       [A1] [A2] [Attack] [Target]
-[1/2]  [A3] [A4] [A5]     [Jump/Use]
+       [A1] [A2] [A5]     [Target]
+[1]    [A3] [A4] [Attack] [Jump/Use]
 ```
 
 The first page maps A1 through A5 to source slots 1 through 5. The second page maps the same
-five visual seats to source slots 6 through 10. The page button remains outside the mapped
-ability slots.
+five visual seats to source slots 6 through 10. The third page maps them to source slots 11
+through 15. The fourth page maps them to source slots 16 through 20. The page button remains
+outside the mapped ability slots. Desktop source slots 21 and 22 remain desktop-only overflow.
 
 Rationale:
 
-- A1 through A5 retain natural reading and source-slot order.
+- A1 through A4 form the compact ability core. A5 occupies the former Attack seat without
+  changing source-slot mapping or the pad footprint.
 - Target sits directly above Jump/Use, forming the context-action column nearest the action
   thumb.
-- Attack remains inside the pad but is visually quieter than abilities, Target, and Jump/Use.
+- Attack stays in its original column but moves to the lower row and remains visually quieter
+  than abilities, Target, and Jump/Use.
 - Page switching is the least frequent pad action and sits left of A3, farthest from the action
   thumb.
 - The shallow two-row footprint leaves a single camera surface above it instead of scattering
@@ -193,7 +215,7 @@ For compact landscape at default interface scale:
 | A1 through A5 | Standard ability face | 48 x 48px |
 | Attack | Smaller or lower-contrast icon inside a standard target | 48 x 48px |
 | Target | Standard secondary face | 48 x 48px |
-| Page 1/2 | Visually compact, subdued page indicator | 48 x 48px |
+| Page indicator (1, 2, 3, or 4) | Visually compact and subdued | 48 x 48px |
 | Jump/Use | Largest and highest-emphasis action | 56 x 56px |
 | Consumables toggle and slots | Compact 40px utility face | 48 x 48px |
 | Compact top menu buttons | Standard menu face | 48 x 48px |
@@ -205,6 +227,27 @@ a 4px rendered edge gap.
 Standard and tablet tiers may increase visible sizes and gaps. They must not change the
 relative order or semantics.
 
+### 5.4 Intentional mobile slot assignment
+
+On touch, a learned Spellbook row uses one of three states:
+
+- An unassigned ability exposes an Add control that opens an inline slot picker.
+- An ability in source slots 1 through 20 exposes a check icon, localized `{page} - A{position}`
+  chip, and a separate Remove control. The chip reopens the picker for relocation.
+- An ability in source slots 21 or 22 exposes a check icon, localized Desktop chip, and a
+  separate Remove control. The Desktop chip opens the mobile picker so the ability can be moved
+  into source slots 1 through 20.
+
+The picker stays inside the existing Spellbook rather than opening a nested modal. It presents
+page tabs 1 through 4 and exactly five slots for the selected page. Each slot shows its stable
+page position, current icon or empty state, and an accessible name for its current action.
+
+Selecting a destination immediately assigns the chosen ability. An occupied ability or item
+shortcut is overwritten without confirmation because only the shortcut changes. If the chosen
+ability already exists elsewhere, its old position becomes empty before the destination is
+written. This picker-specific move-and-overwrite behavior intentionally differs from desktop
+drag-and-drop swapping.
+
 ## 6. Functional requirements
 
 ### 6.1 Attack
@@ -213,8 +256,9 @@ relative order or semantics.
 - **FR-1.2** With no live attack target, Attack preserves the existing acquire-nearest path.
 - **FR-1.3** With a live target or active auto-attack, Attack preserves the existing toggle
   behavior.
-- **FR-1.4** Active auto-attack has a clear persistent visual state that remains visible under
-  the player's finger and in forced-colors mode.
+- **FR-1.4** Active auto-attack has a clear persistent outline/glow on the Attack face that
+  remains visible under the player's finger and in forced-colors mode, without a separate
+  corner status marker.
 - **FR-1.5** Attack never becomes the largest control in any touch tier.
 
 ### 6.2 Jump and contextual interaction
@@ -239,13 +283,28 @@ relative order or semantics.
 ### 6.4 Ability paging and drag behavior
 
 - **FR-4.1** Five ability buttons remain visible on each page.
-- **FR-4.2** The explicit page control cycles between source slots 1 through 5 and 6 through 10.
-- **FR-4.3** The page indicator shows the current page and page count and exposes the existing
+- **FR-4.2** The explicit page control cycles through the contiguous effective page range:
+  source slots 1 through 5, 6 through 10, 11 through 15, and 16 through 20.
+- **FR-4.3** The compact page indicator shows the current page number and exposes the existing
   localized accessible label.
 - **FR-4.4** Page switching is tap-only. No swipe gesture may claim open gameplay canvas or the
   whole action-pad container.
 - **FR-4.5** Existing long-press drag, cooldown, count, unusable, out-of-range, queued, and used
-  feedback remains intact on both pages.
+  feedback remains intact on all four pages.
+- **FR-4.6** The persisted touch preference is a minimum page count from 2 through 4, defaulting
+  to 2. Options presents the three discrete values under localized Minimum Mobile Action Pages
+  copy rather than as a continuous slider. It is a presentation setting and never resizes or
+  migrates the persisted 22-slot bar.
+- **FR-4.6a** Settings normalization accepts only finite numeric input. Missing, non-numeric,
+  string, and non-finite stored values resolve to default 2. Finite numeric values are rounded
+  to the nearest integer and then clamped to 2 through 4 before use or persistence.
+- **FR-4.7** The effective page count is the greater of the configured minimum and the highest
+  occupied page among source slots 1 through 20, capped at 4. Both ability and item shortcuts
+  count as occupied actions.
+- **FR-4.8** Effective pages remain contiguous. An occupied page 4 makes pages 1 through 4
+  reachable even when page 3 is empty. A populated higher page is never hidden by Options.
+- **FR-4.9** When the effective count shrinks after a removal, form switch, or loadout change,
+  the current page clamps to the last effective page before the next paint or input dispatch.
 
 ### 6.5 Camera start zone
 
@@ -316,10 +375,9 @@ relative order or semantics.
   face at every Button Size value.
 - **FR-8.2** Opening the toggle snapshots up to six distinct carried items using the existing
   order: potion, elixir, food, drink. Duplicate stacks remain one visible slot.
-- **FR-8.3** On compact landscape phones, the toggle remains low immediately inward of the
-  movement capture zone. Open items fill rightward toward the player frame in a two-column row,
-  then wrap upward for up to three rows. Standard and tablet landscape retain the 3 x 2 grid
-  growing upward and inward.
+- **FR-8.3** On every landscape tier, open items use at most three columns and two rows beside
+  the toggle. On compact, items 1 through 3 occupy the lower row and items 4 through 6 wrap
+  upward. Standard and tablet retain the same 3 x 2 topology.
 - **FR-8.4** Empty slots collapse. Counts, usability, and potion cooldown continue updating
   live while item positions remain stable until the drawer is reopened.
 - **FR-8.5** Long press continues to inspect an item instead of consuming it.
@@ -331,10 +389,65 @@ relative order or semantics.
 
 - **FR-9.1** The player frame remains at the bottom and is centered within the safe viewport
   width rather than the full physical width.
-- **FR-9.2** The complete player frame scales by responsive tier: 0.62 on compact phones, 0.9 on
-  standard touch screens, and 1.0 on tablets, before the shared mobile chrome scale is applied.
+- **FR-9.2** The complete player frame scales by responsive tier: 0.72 on compact phones, 1 on
+  standard touch screens, and 1.1 on tablets, before the shared mobile chrome scale is applied.
+  Target uses 0.9 of the active player tier.
 - **FR-9.3** Cast and swing bars use the same responsive scale and safe center as the player
   frame.
+
+### 6.10 Mobile Spellbook slot picker
+
+- **FR-10.1** The picker is touch-only. Desktop keeps the existing Add, Remove, and native
+  drag-and-drop interactions unchanged.
+- **FR-10.2** An unassigned learned ability opens the picker through its Add control. A mobile-
+  assigned ability opens it through its equipped chip. A source-slot 21 or 22 ability opens it
+  through its Desktop chip.
+- **FR-10.3** The picker always exposes page tabs 1 through 4, independent of the current
+  effective action-page count, and shows five 48 x 48px destination targets for the selected
+  page with at least 4px gaps.
+- **FR-10.4** An unassigned ability opens on the current HUD page. A mobile-assigned ability
+  opens on its assigned page. A Desktop-marked ability opens on the current HUD page.
+- **FR-10.5** Selecting an empty or occupied destination immediately moves the ability there,
+  overwrites the destination shortcut without confirmation, clears any previous occurrence of
+  the ability, persists the active form bar, closes the picker, and switches the HUD to the
+  selected page.
+- **FR-10.6** Selecting the ability's existing destination is a successful no-op: no hotbar
+  mutation occurs for canonical input, but the picker closes and the HUD switches to that page.
+  The runtime invariant permits at most one occurrence of an ability. If corrupt legacy input
+  contains duplicates, the picker transform retains the selected destination and clears every
+  other occurrence before persisting.
+- **FR-10.7** The equipped chip updates immediately after Add, Remove, picker assignment,
+  desktop drag-and-drop, form switch, loadout change, or bar reset. It never waits for the
+  Spellbook to close and reopen.
+- **FR-10.8** The separate Remove control immediately removes the equipped ability without a
+  confirmation dialog and keeps the picker closed.
+- **FR-10.9** The picker closes through its explicit close control, Escape through the existing
+  unified `closeAll` dispatcher, or by activating the same opener chip again. A pointer outside
+  the Spellbook does not close it. This contribution adds no browser-history, native-shell, or
+  platform Back handler.
+- **FR-10.10** Closing returns focus to the opener when it still exists. Successful assignment
+  returns focus to the updated equipped chip for that ability.
+- **FR-10.11** Cross-page relocation uses the picker. Existing long-press drag remains scoped to
+  the current visible action page.
+- **FR-10.12** The page-count preference is global to the device. Effective count and equipped
+  state derive from the active character, class, form, and loadout bar.
+- **FR-10.13** Slots 21 and 22 remain fully functional on desktop and are represented on touch as
+  Desktop-equipped abilities rather than falsely appearing unassigned.
+- **FR-10.14** Any whole-bar replacement, including active-form switch, talent-loadout apply, or
+  bar reset, cancels and closes the picker before replacing the bar. The refreshed Spellbook
+  restores focus to the same ability's new row control when it still exists, otherwise to the
+  Spellbook close control. Individual slot mutations that do not replace the bar refresh the
+  open picker in place.
+- **FR-10.15** The picker captures the active character and form identity at open. Assignment
+  validates that identity immediately before mutation and cancels instead of writing if it has
+  changed.
+- **FR-10.16** On touch, Add remains enabled for every learned off-bar ability even when all 22
+  hotbar slots are occupied, because the picker can overwrite a destination. Desktop preserves
+  its current full-bar disabled Add behavior.
+- **FR-10.17** Existing automatic placement of newly learned abilities remains unchanged. If it
+  lands in source slots 1 through 20, effective pages expand as required. If it lands in slot 21
+  or 22, the Spellbook shows Desktop state. Only manual touch Spellbook Add changes from
+  first-free placement to explicit destination selection.
 
 ## 7. Responsive and handedness behavior
 
@@ -343,8 +456,8 @@ relative order or semantics.
 - Reference profiles: 740x360, 844x390, 915x412, and 932x430.
 - Uses the exact two-row action order in section 5.2.
 - Uses the three-action compact menu.
-- Keeps the Consumables toggle low beside movement and fills its 2 x 3 drawer toward the player
-  frame before wrapping upward.
+- Keeps the complete Consumables group beside movement and fills a 3 x 2 drawer toward the player
+  frame, with items 1 through 3 in the lower row.
 - Enforces the camera rectangle in FR-5.2.
 
 ### Standard and tablet landscape
@@ -386,6 +499,11 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
 - Preserve one element each for Attack, Target, Jump/Use, page switching, and every ability
   slot. Do not solve compact menu relocation with duplicate IDs.
 - Keep touch handlers on the existing multi-touch-safe `bindTouchTap` path.
+- Keep the picker inside the existing Spellbook DOM and focus scope. Do not add a second modal,
+  duplicate action-ring nodes, or a second hotbar state owner.
+- Route picker Escape handling through the existing unified `closeAll` dispatcher with picker-
+  before-Spellbook precedence. Do not add a second document key handler, browser-history entry,
+  or native Back listener.
 
 ### Presentation
 
@@ -399,7 +517,9 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
 
 ### Existing pure and painter seams
 
-- Keep page arithmetic in `src/ui/mobile_action_page_view.ts`.
+- Keep maximum page arithmetic, source-slot mapping, effective-page resolution, and current-page
+  clamping in `src/ui/mobile_action_page_view.ts` or a sibling pure core. Spellbook and Hud must
+  not duplicate page math.
 - Keep ability and item state in the shared action-bar view and painter family.
 - Keep dynamic Jump/Use and page accessible copy in `src/ui/mobile_action_ring_painter.ts`, or
   rename the module if the ring name becomes materially misleading without changing its pure
@@ -409,13 +529,29 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   `src/game/mobile_controls.ts`.
 - Keep responsive tier resolution in `src/ui/mobile_hud_layout.ts`.
 - Keep Consumables ordering in `src/ui/consumable_bar_view.ts`.
+- Extend `src/ui/spellbook_view.ts` with an exact mobile assignment model containing source slot,
+  page, and A-position, or Desktop state. Keep `src/ui/spellbook_window.ts` as the thin DOM owner
+  and route mutations through injected Hud callbacks.
+- Add a separately named pure hotbar transform for picker move-and-overwrite semantics. Do not
+  change or silently reuse the existing desktop swap transform.
+- Document the load-bearing numbering invariant beside the shared constants and transforms:
+  Attack is slot 0, persisted generic hotbar entries are source slots 1 through 22, mobile pages
+  map 1 through 20, slots 21 and 22 are desktop overflow, and automatic Consumables are not
+  hotbar pages.
 
 ### Settings and state
 
 - Existing left-handed, button-size, joystick-size, camera-joystick, haptics, and touch-opacity
   settings remain supported.
-- Page and Consumables open state remain session state unless a separate requirement adds
-  persistence.
+- The minimum mobile action-page setting persists through the existing `woc_settings` store as a
+  numeric range from 2 through 4 with default 2. The current page, picker open state, picker tab,
+  and Consumables open state remain session state.
+- Existing hotbar storage remains a 22-entry array per character, class, and form. The minimum
+  page setting changes presentation only. No stored bar entry is moved, truncated, or deleted
+  when the preference changes.
+- Whole-bar mutation entry points close the picker before replacing `hotbarActions`. Picker
+  assignment carries and validates an opening character/form token so a stale callback cannot
+  write into a newly active bar.
 - No graphics or performance tier may hide actionable information or change hitboxes.
 
 ## 9. Accessibility and feedback
@@ -424,6 +560,20 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   provided.
 - Jump/Use must update visible label, title, and accessible name together.
 - Page copy must announce the page number and count.
+- Picker page navigation uses one `tablist` with four `tab` controls, `aria-selected`, and roving
+  `tabindex`. Left/Right arrows move and activate the adjacent page; Home/End activate the first
+  or last page. The five destinations are ordinary buttons inside a localized `group`, not radio
+  controls. Tab reaches each destination, and Enter or Space performs assignment.
+- Each destination exposes its page, A-position, occupied or empty state, and current action
+  name. The ability's current destination also exposes `aria-current="true"`.
+- Equipped state uses a check icon plus localized text. Current assignment uses icon, text, and
+  selected-state semantics rather than color alone. Player-visible copy never uses raw glyphs as
+  its only label.
+- Opening, canceling, assigning, and removing preserve the Spellbook focus contract. Keyboard
+  users can reach every picker page and slot even though the feature is touch-gated.
+- Opening focuses the current destination when one exists, otherwise the first empty destination
+  on the opening page, otherwise A1. Successful assignment updates a localized polite status
+  announcement with ability name, page, and A-position before focus returns to the updated chip.
 - Attack active state must not rely on color alone.
 - All controls require visible press feedback. Existing audio and haptic behavior remains.
 - `prefers-reduced-motion` removes nonessential transitions without changing layout or state.
@@ -434,6 +584,9 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
 
 - No new per-frame layout reads such as `getBoundingClientRect` in HUD update paths.
 - Dynamic painters keep write-elision and allocation-light state.
+- Assignment-chip refresh must not rebuild the whole Spellbook or perform layout reads every
+  frame. It uses event-driven refresh or stable-key write elision when hotbar state changes.
+- Effective-page resolution is deterministic O(20) or better and allocates no per-frame arrays.
 - Layout tier and handedness changes may recompute CSS state on viewport or settings changes,
   not every frame.
 - Camera eligibility remains a constant-time target classification.
@@ -447,6 +600,19 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   removal of standalone Autorun, and the new non-radial CSS topology.
 - Update `tests/mobile_action_ring_painter.test.ts` for Jump/Use, page indicator, and Attack
   state presentation as applicable.
+- Extend `tests/mobile_action_page_view.test.ts` for four-page mapping, configured minimum,
+  content-aware effective count, contiguous pages, current-page clamping, and normalization of
+  missing, string, non-finite, fractional, and out-of-range setting values.
+- Extend `tests/spellbook_view.test.ts` for exact P/A/Desktop assignment state across source
+  slots 1 through 22, including item occupancy and form-shaped inputs.
+- Extend the hotbar pure-core suite for picker overwrite, old-source clearing, occupied ability
+  and item replacement, no duplicates, canonical same-slot no-op, corrupt duplicate cleanup, and
+  input immutability.
+- Extend `tests/spellbook_window.test.ts` for touch-only picker ownership, equipped and Desktop
+  chips, immediate refresh, full 22-slot Add availability, whole-bar replacement cancellation,
+  stale form-token rejection, localized accessible state, and focus return.
+- Extend settings and Options view tests for the persisted 2 through 4 minimum-page setting and
+  touch-only presentation.
 - Preserve and extend `tests/mobile_controls.test.ts`, `tests/touch_router.test.ts`, and
   `tests/interactions.test.ts` for multi-touch ownership and contextual actions.
 - Preserve `tests/consumable_bar_view.test.ts` ordering, cap, and stable snapshot behavior.
@@ -463,6 +629,14 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   gameplay controls remain at least 48 x 48px; compact pet commands retain their explicit
   40 x 40px hit target from FR-6.6.
 - Assert no interactive element or wrapper intercepts the camera-start rectangle.
+- Add a real-page picker flow that assigns an ability to every page, overwrites an occupied
+  ability and item, moves an already-equipped ability without swapping, verifies immediate chip
+  state, and confirms the HUD opens the selected page.
+- Add a full 22-slot touch flow proving Add still opens the picker, plus form switch, loadout
+  apply, and reset flows proving an open picker cancels before whole-bar replacement.
+- Add compact 740x360 picker geometry with page tabs, all five destinations, focus-visible state,
+  arrow-key tab navigation, slot keyboard activation, polite assignment announcement, and no
+  overlap or clipping inside the scrollable Spellbook.
 
 Canonical viewports:
 
@@ -505,6 +679,8 @@ Commit before and after screenshots under `docs/screenshots/` for at least:
 - 844x390 compact landscape with a target and party.
 - Left-handed compact landscape with an active pet.
 - 1024x768 tablet landscape.
+- 740x360 compact landscape with the Spellbook picker open on an occupied page, including the
+  equipped chip, all page tabs, five destinations, and explicit close control.
 
 ### Contribution gate
 
@@ -521,7 +697,8 @@ The feature is complete when all of the following are true:
 2. Attack remains explicit, visually tertiary, and behaviorally unchanged.
 3. Jump/Use changes context without moving and works while movement is held.
 4. Target remains directly available and behaviorally unchanged.
-5. Page 1 maps source slots 1 through 5 and page 2 maps 6 through 10.
+5. Page 1 maps source slots 1 through 5, page 2 maps 6 through 10, page 3 maps 11 through 15,
+   and page 4 maps 16 through 20.
 6. The page button sits left of A3 and does not create a camera gesture.
 7. Every canonical landscape camera-start rectangle meets FR-5.2 and is
    camera-draggable at every point in the required 3 x 3 sample grid.
@@ -531,9 +708,8 @@ The feature is complete when all of the following are true:
    through More.
 10. The implementation base contains the integrated joystick Autorun behavior from PR #1724
     and contains no standalone Autorun markup, handler, or layout seat.
-11. Consumables remains automatic and opens as a stable responsive drawer beside the joystick:
-    compact keeps the toggle low and fills a 2 x 3 drawer toward the player frame before wrapping
-    upward; larger landscape tiers retain 3 x 2.
+11. Consumables remains automatic and opens as a stable 3 x 2 responsive drawer beside the
+    joystick on compact, standard, and tablet landscape tiers.
 12. Side-owned controls mirror completely with identical semantics; Party follows the map while
     Target and the player frame remain centered within the safe width.
 13. Every primary gameplay touch target remains at least 48 x 48px at minimum user scale; pet
@@ -542,6 +718,27 @@ The feature is complete when all of the following are true:
 15. `index.html` and `play.html` remain structurally equivalent for touch controls.
 16. Desktop layout and behavior remain unchanged.
 17. Required screenshots are committed and the contribution gate passes.
+18. Touch Options persists a minimum page count from 2 through 4, default 2, while occupied
+    higher pages always remain reachable and page numbering stays contiguous.
+19. The inline Spellbook picker exposes all four pages and assigns a learned ability to any of
+    the 20 mobile source slots without requiring an empty destination.
+20. Assignment overwrites the destination shortcut without confirmation, clears the ability's
+    previous source, never duplicates it, persists the active form bar, and opens the selected
+    HUD page.
+21. An equipped mobile ability shows a check icon and correct localized P/A chip immediately;
+    an ability in source slot 21 or 22 shows a check icon and localized Desktop chip.
+22. The separate Remove control remains available, and picker cancel, same-slot selection,
+    keyboard navigation, and focus return follow FR-10.
+23. The automatic six-item Consumables drawer, fixed Attack control, desktop 22-slot bar,
+    desktop Spellbook controls, and desktop drag-and-drop remain behaviorally unchanged.
+24. Effective page count recomputes safely after item or ability changes, form switches, loadout
+    changes, resets, and removals without hiding an occupied mobile page.
+25. Touch Add remains available with all 22 hotbar slots occupied, while desktop retains its
+    existing full-bar disabled Add behavior.
+26. Whole-bar replacement closes the picker before mutation, stale form callbacks cannot write,
+    and deterministic focus fallback remains inside the refreshed Spellbook.
+27. Setting normalization, canonical same-slot no-op, corrupt duplicate cleanup, tablist keyboard
+    behavior, and localized assignment announcement match FR-4.6a and FR-10.
 
 ## 13. Phasing and dependency order
 
@@ -554,8 +751,13 @@ The feature is complete when all of the following are true:
 5. Move Consumables and implement its responsive compact drawer toward the player frame, with the
    3 x 2 larger-tier drawer retained.
 6. Add tier, left-handed, scale, safe-area, camera-zone, and overlap validation for landscape.
-7. Integrate PR #1724 before final readiness and resolve only its remaining joystick behavior.
-8. Capture visual evidence and run the full contribution gate.
+7. Extend the page pure core to four maximum pages plus configured-minimum and occupied-page
+   effective-count resolution.
+8. Add the touch Options setting, exact Spellbook assignment model, pure picker placement
+   transform, and inline picker presentation.
+9. Add focused unit, accessibility, interaction, persistence, and compact picker geometry tests.
+10. Integrate PR #1724 before final readiness and resolve only its remaining joystick behavior.
+11. Capture visual evidence and run the full contribution gate.
 
 ## 14. Risks and mitigations
 
@@ -569,6 +771,12 @@ The feature is complete when all of the following are true:
 | Consumables beside movement is hard to use while steering | Preserve multi-touch operation and keep it a transient utility drawer; do not move it into the camera zone. |
 | Left-handed mode receives partial mirroring | Mirror map, Party, menu, camera zone, Consumables, pad, and joystick while keeping Target and player chrome safe-centered. |
 | Dependency PR changes while this work is in progress | Re-verify PR #1724 after rebase and keep standalone Autorun explicitly out of scope. |
+| A strict page preference hides an assigned action | Treat the preference as a minimum and derive the effective count from the highest occupied mobile page. |
+| Page 4 is occupied while page 3 is empty | Keep effective pages contiguous rather than skipping page numbers during combat. |
+| Picker movement accidentally swaps shortcuts | Use a separately named pure move-and-overwrite transform and test old-source clearing explicitly. |
+| Equipped chips become stale while Spellbook stays open | Refresh from exact hotbar assignment after every mutation with event-driven or write-elided state. |
+| Picker overflows the 740x360 Spellbook | Show one five-slot page at a time inside the existing scroll and enforce 48px targets in browser geometry. |
+| A whole-bar replacement races an open picker assignment | Close before replacement and validate the captured character/form identity immediately before every picker write. |
 
 ## 15. Rejected alternatives
 
@@ -605,9 +813,46 @@ beside the movement control and remains transient.
 
 Rejected as unnecessary scope. Stable responsive defaults and handedness mirroring come first.
 
+### Count the Consumables drawer as a fourth action page
+
+Rejected because action slots are stable persisted assignments while Consumables are a dynamic
+inventory-derived list. Treating them as one mapping would make desktop and mobile slot identity
+diverge and would shrink the existing six-item drawer only to manufacture a visual total.
+
+### Add a fifth page for source slots 21 and 22
+
+Rejected because a two-slot final page adds combat paging cost and an inconsistent layout for
+little benefit. Slots 21 and 22 remain desktop-only overflow with honest Spellbook state.
+
+### Make Options a strict page-count cap
+
+Rejected because desktop arrangements, loadouts, form bars, and item shortcuts can populate a
+higher mobile page. A strict cap would strand assigned actions. The persisted value is a minimum,
+and occupied pages always expand the effective count.
+
+### Keep manual Spellbook first-free placement on touch
+
+Rejected for manual Spellbook Add because first-free scans all 22 persisted slots, gives the
+player no control over page or A-position, cannot replace a shortcut when the bar is full, and
+can place an ability into desktop-only overflow. Manual touch Add uses explicit destination
+selection. Existing automatic placement when a new ability is learned remains unchanged under
+FR-10.17.
+
+### Confirm before overwriting an occupied shortcut
+
+Rejected because assignment changes only a reversible shortcut, not the learned ability or
+owned item. Slot contents and names stay visible in the picker, so an extra confirmation adds
+friction without protecting destructive state.
+
+### Show all 20 destinations at once
+
+Rejected because the dense grid competes with Spellbook content on 740x360. Four page tabs and
+five destinations preserve the action-pad mental model and the 48px target floor.
+
 ## 16. Open questions
 
 No unresolved product decisions remain. Exact standard and tablet pixel values may be tuned
 within the constraints above during implementation. Any change to action order, camera-zone
-minimums, explicit Attack behavior, menu inventory, target/party topology, or Consumables
-placement requires product review and a PRD update before implementation.
+minimums, explicit Attack behavior, menu inventory, target/party topology, Consumables
+placement, mobile source-slot range, picker overwrite semantics, or effective-page rules
+requires product review and a PRD update before implementation.

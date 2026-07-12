@@ -2,53 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.',
-  'loading.tips.dungeons':
-    'İpucu: normal zorluk için fazla güçlü hale geldiğinde, daha çetin ve daha ödüllendirici bir mücadele için zindanı kahramanca zorlukta dene.',
-  'loading.tips.guilds':
-    'İpucu: bir loncaya katılmak sana özel bir sohbet kanalı ve lonca arkadaşlarınla ortak bir üye listesi verir.',
-  'loading.tips.loadouts':
-    'İpucu: puanları iki kez harcamadan farklı dizilimler arasında geçmek için birden fazla yetenek düzeni kaydet.',
-  'loading.tips.market':
-    'İpucu: Dünya Pazarı, dünya genelindeki oyuncularla alım satım yapmanı sağlar.',
-  'loading.tips.professions':
-    'İpucu: toplama ve üretim mesleklerini savaş sınıfının yanında geliştirebilirsin.',
-  'loading.tips.pvp':
-    'İpucu: dizilimini sınamak için başka bir oyuncuya dostça düello teklif et veya Kül Koliseumu arenası sırasına gir.',
-  'loading.tips.talents':
-    'İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.',
-  'entities.items.chunk_of_ore.name': 'Maden Parçası',
-  'entities.quests.q_prof_intro.completion':
-    'Gördün mü? Çantanda maden, ellerinde nasır. Yollarda gezerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosuna ve yakındaki üretim tezgahına göz at. İstersen bunların hepsinde iyi bir geçim var.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Maden Parçası',
-  'entities.quests.q_prof_intro.text':
-    "Doğudere'de herkes kılıcın yanında bir zanaatla uğraşır, {playerName}. Kasabanın etrafına dağılmış maden damarları var; git kazmanı salla ve bana 5 parça getir. Kendin çıkar, unutma; farkı anlarım.",
-  'entities.quests.q_prof_intro.title': 'Her Ele Bir Zanaat',
-  'hudChrome.auth.appleChoiceExpired':
-    'Bu Apple oturum açma işleminin süresi doldu. Lütfen Apple ile yeniden oturum aç.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Yeni bir hesap oluştur veya Apple hesabını mevcut hesabına bağla.',
-  'hudChrome.auth.appleError': 'Apple ile oturum açılamadı. Lütfen tekrar dene.',
-  'hudChrome.auth.appleLoginCta': 'Apple ile Devam Et',
-  'hudChrome.dailyRewards.reason.banned': 'Günlük Ödüllerden yasaklandın. Gerekçe: {reason}',
-  'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
-  'hudChrome.itemSoulbound': 'Ruha Bağlı',
-  'hudChrome.keybinds.categoryPet': 'Yoldaş',
-  'hudChrome.keybinds.petAggressive': 'Yoldaş: Saldırgan',
-  'hudChrome.keybinds.petAttack': 'Yoldaş: Saldır',
-  'hudChrome.keybinds.petDefensive': 'Yoldaş: Savunmacı',
-  'hudChrome.keybinds.petStop': 'Yoldaş: Dur',
-  'hudChrome.keybinds.petTaunt': 'Yoldaş: Kışkırt',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir adet daha az {item} gönder',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir adet daha fazla {item} gönder',
-  'hudChrome.readyCheck.notReady': 'Hazır Değil',
-  'hudChrome.readyCheck.prompt': '{name} bir hazır kontrolü başlattı. Hazır mısın?',
-  'hudChrome.readyCheck.ready': 'Hazır',
-  'hudChrome.readyCheck.result':
-    'Hazır kontrolü: {ready} hazır, {notReady} hazır değil, {noResponse} yanıt vermedi.',
-  'hudChrome.readyCheck.notInPartyError': 'Hazır kontrolü başlatmak için bir grupta olmalısın.',
-  'hudChrome.readyCheck.inProgressError': 'Bir hazır kontrolü zaten sürüyor.',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',

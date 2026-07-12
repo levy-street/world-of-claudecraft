@@ -155,12 +155,10 @@ export const es_ES: EnTranslations = {
       "banner": "Observando a {name}"
     },
     "readyCheck": {
-      "prompt": "{name} ha iniciado una comprobación de disponibilidad. ¿Estás listo?",
-      "ready": "Listo",
-      "notReady": "No está listo",
-      "result": "Comprobación de disponibilidad: {ready} listos, {notReady} no listos y {noResponse} sin respuesta.",
-      "notInPartyError": "Debes estar en un grupo para iniciar una comprobación de disponibilidad.",
-      "inProgressError": "Ya hay una comprobación de disponibilidad en curso."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Resucitar en el cadáver",
@@ -241,7 +239,7 @@ export const es_ES: EnTranslations = {
         "no_wallet": "Conecta una cartera con al menos $20 USD en WOC.",
         "under_minimum": "La cartera está por debajo del mínimo de $20 USD en WOC.",
         "price_unavailable": "El precio de WOC no está disponible; las recompensas están bloqueadas temporalmente.",
-        "banned": "Tienes prohibido participar en las Recompensas diarias. Motivo: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const es_ES: EnTranslations = {
       "leaderboard": "Clasificación",
       "dailyRewards": "Recompensas",
       "nameplates": "Nombres",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Vibración",
       "hapticsOff": "Vibración desactivada",
       "toggleHaptics": "Alternar vibración",
@@ -406,12 +406,12 @@ export const es_ES: EnTranslations = {
       "targetFriendlyNext": "Objetivo amistoso siguiente",
       "discord": "Discord",
       "valecup": "Copa del Valle",
-      "categoryPet": "Mascota",
-      "petAttack": "Mascota: atacar",
-      "petStop": "Mascota: detenerse",
-      "petTaunt": "Mascota: provocar",
-      "petDefensive": "Mascota: defensiva",
-      "petAggressive": "Mascota: agresiva"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -564,6 +564,10 @@ export const es_ES: EnTranslations = {
       "interfaceModeDesktop": "Escritorio",
       "interfaceModeTouch": "Táctil",
       "interfaceModeNote": "Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Sonidos de pasos",
       "clickFeedback": "Marcador de clic",
       "lockCursorOnRotate": "Bloquear cursor al rotar",
@@ -736,8 +740,8 @@ export const es_ES: EnTranslations = {
     "tips": {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del mundo."
     },
-    "itemHeroicTag": "[HEROICO]",
-    "itemSoulbound": "Ligado al alma",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const es_ES: EnTranslations = {
       "backpack": "Mochila",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Espacio de bolsa vacío",
-      "unequipHint": "Haz clic para quitar esta bolsa"
+      "unequipHint": "Haz clic para quitar esta bolsa",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Tu banda ha vuelto a convertirse en grupo.",
@@ -1084,10 +1107,10 @@ export const es_ES: EnTranslations = {
       "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
     },
     "auth": {
-      "appleLoginCta": "Continuar con Apple",
-      "appleError": "No se pudo iniciar sesión con Apple. Inténtalo de nuevo.",
-      "appleChoiceIntro": "Crea una cuenta nueva o vincula Apple a una que ya tengas.",
-      "appleChoiceExpired": "Ese inicio de sesión con Apple ha caducado. Vuelve a iniciar sesión con Apple.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "¿Olvidaste tu contraseña?",
       "forgotTitle": "Restablece tu contraseña",
       "forgotHint": "Introduce tu nombre de usuario y enviaremos un enlace de restablecimiento al correo registrado.",
@@ -1108,7 +1131,18 @@ export const es_ES: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Añadir {name} a la barra de acción",
-      "removeFromBarAria": "Quitar {name} de la barra de acción"
+      "removeFromBarAria": "Quitar {name} de la barra de acción",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const es_ES: EnTranslations = {
       "label": "Restablecer posición de los marcos"
     },
     "itemTooltip": {
-      "requiresLevel": "Requiere nivel {level}"
+      "requiresLevel": "Requiere nivel {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const es_ES: EnTranslations = {
       "parcelsLabel": "Paquetes",
       "parcelsHint": "Haz clic en un objeto de tus bolsas para adjuntarlo.",
       "removeParcelAria": "Quitar {item} de la carta",
-      "parcelQtyDecreaseAria": "Enviar un {item} menos",
-      "parcelQtyIncreaseAria": "Enviar un {item} más",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Enviar carta",
       "postageNote": "Franqueo: {amount}. El cuervo vuela durante unos {seconds}s.",
       "arrivedBanner": "El cuervo ha aterrizado: correo de {name}.",
@@ -3940,14 +3975,14 @@ export const es_ES: EnTranslations = {
     "reconnecting": "Conexión perdida. Reconectando...",
     "connectionRejected": "El servidor cerró la conexión.",
     "tips": {
-      "classes": "Consejo: cada una de las 9 clases se juega de forma distinta. Prueba varias antes de decidirte por una.",
-      "talents": "Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.",
-      "dungeons": "Consejo: prueba una mazmorra en dificultad heroica cuando tu equipo supere la dificultad normal para disfrutar de un combate más exigente y con mejores recompensas.",
-      "market": "Consejo: el Mercado Mundial te permite comprar y vender con jugadores de cualquier parte del reino.",
-      "guilds": "Consejo: unirte a una hermandad te da un canal de chat privado y una lista compartida de tus compañeros.",
-      "professions": "Consejo: puedes aprender profesiones de recolección y artesanía junto con tu clase de combate.",
-      "loadouts": "Consejo: guarda más de una configuración de talentos para cambiar de estilo sin gastar los puntos dos veces.",
-      "pvp": "Consejo: desafía a otro jugador a un duelo amistoso o entra en la cola de la arena del Coliseo Cinéreo para poner a prueba tu configuración."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const es_ES: EnTranslations = {
     "androidStandaloneDetail": "Estás en modo de app a pantalla completa. Mantén el dispositivo en horizontal.",
     "androidInstallDetail": "Para pantalla completa en Android, instala esta página o añádela a la pantalla de inicio primero.",
     "androidInstallStep": "En Chrome, toca el menú y luego Instalar app o Añadir a pantalla de inicio.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Abre World of ClaudeCraft desde el nuevo icono.",
     "otherStandaloneDetail": "Mantén el dispositivo en pantalla completa horizontal.",
     "otherInstallDetail": "Instala o añade esta página a la pantalla de inicio para la mejor experiencia móvil a pantalla completa."
@@ -5867,7 +5903,7 @@ export const es_ES: EnTranslations = {
         "name": "Colmillo del viejo Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Trozo de mineral"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Página de libro mayor ajada"
@@ -5900,13 +5936,13 @@ export const es_ES: EnTranslations = {
         "name": "Retal de lino"
       },
       "arcane_dust": {
-        "name": "Polvo arcano"
+        "name": "Arcane Dust"
       },
       "arcane_essence": {
-        "name": "Esencia arcana"
+        "name": "Arcane Essence"
       },
       "arcane_shard": {
-        "name": "Fragmento arcano"
+        "name": "Arcane Shard"
       },
       "fen_muster_order": {
         "name": "Orden de alistamiento de Fenbridge"
@@ -7550,12 +7586,12 @@ export const es_ES: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Un oficio para cada mano",
-        "text": "Cada habitante de Eastbrook ejerce un oficio además de la espada, {playerName}. Hay vetas de mineral dispersas por el pueblo, así que toma un pico y tráeme 5 trozos. Extráelos tú mismo, ¿eh? Sabré si no lo haces.",
-        "completion": "¿Lo ves? Mineral en la mochila y callos en las manos. Sigue minando, talando y recogiendo hierbas mientras recorres los caminos. Cuando vuelvas al pueblo, no pierdas de vista el tablón de Enfoque del pueblo junto al mercado ni el banco de artesanía cercano. En esos oficios te espera una vida honrada, si la quieres.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Trozo de mineral"
+            "label": "Chunk of Ore"
           }
         }
       },

@@ -158,9 +158,7 @@ export const ru_RU: EnTranslations = {
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",
       "notReady": "Не готов",
-      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.",
-      "notInPartyError": "Чтобы начать проверку готовности, вы должны состоять в группе.",
-      "inProgressError": "Проверка готовности уже идёт."
+      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа."
     },
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
@@ -319,6 +317,8 @@ export const ru_RU: EnTranslations = {
       "leaderboard": "Рейтинг",
       "dailyRewards": "Награды",
       "nameplates": "Имена",
+      "nameplatesOff": "Имена выкл.",
+      "musicOff": "Музыка выкл.",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
       "toggleHaptics": "Вкл/выкл вибрацию",
@@ -564,6 +564,10 @@ export const ru_RU: EnTranslations = {
       "interfaceModeDesktop": "Компьютер",
       "interfaceModeTouch": "Сенсорный",
       "interfaceModeNote": "В режиме «Авто» управление для компьютера или сенсорное выбирается по вашему устройству. Выберите «Компьютер», чтобы включить клавиатуру и мышь (удобно на планшете с клавиатурой), или «Сенсорный» для экранного управления.",
+      "mobileActionPages": "Минимум страниц действий",
+      "mobileActionPagesTwo": "2 страницы",
+      "mobileActionPagesThree": "3 страницы",
+      "mobileActionPagesFour": "4 страницы",
       "footstepSounds": "Звуки шагов",
       "clickFeedback": "Метка клика",
       "lockCursorOnRotate": "Блокировать курсор при вращении",
@@ -736,7 +740,7 @@ export const ru_RU: EnTranslations = {
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
-    "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
+    "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -988,7 +992,26 @@ export const ru_RU: EnTranslations = {
       "backpack": "Рюкзак",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Пустая ячейка для сумки",
-      "unequipHint": "Нажмите, чтобы снять эту сумку"
+      "unequipHint": "Нажмите, чтобы снять эту сумку",
+      "itemActionsTitle": "Действия: {item}",
+      "itemActionEquip": "Надеть",
+      "itemActionEquipBag": "Надеть сумку",
+      "itemActionUse": "Использовать",
+      "itemActionConsume": "Употребить",
+      "itemActionLinkToChat": "Ссылка в чат",
+      "itemActionDestroy": "Уничтожить",
+      "itemActionDetails": "Сведения о предмете",
+      "itemActionAssignTitle": "Назначить в расходники",
+      "itemActionAssignSlot": "Назначить в ячейку {slot}",
+      "itemActionRemoveSlot": "Убрать из ячейки {slot}",
+      "itemActionSlotCurrent": "Ячейка {slot}: {item}",
+      "itemActionSlotEmpty": "Ячейка {slot}: пусто",
+      "itemActionResetAutomatic": "Вернуть авторазмещение",
+      "itemActionClose": "Закрыть действия предмета",
+      "itemActionAssigned": "{item} назначен в ячейку {slot}.",
+      "itemActionRemoved": "{item} убран из ячейки {slot}.",
+      "itemActionInvalid": "Этот предмет нельзя назначить.",
+      "itemActionFailed": "Не удалось выполнить действие."
     },
     "raidConvert": {
       "toPartyDone": "Ваш рейд снова преобразован в группу.",
@@ -1108,7 +1131,18 @@ export const ru_RU: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",
-      "removeFromBarAria": "Убрать {name} с панели действий"
+      "removeFromBarAria": "Убрать {name} с панели действий",
+      "add": "Добавить",
+      "remove": "Убрать",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Компьютер",
+      "moveAssignmentAria": "Переместить {name} из {slot}",
+      "pickerPages": "Страницы действий",
+      "pickerDestinations": "Ячейки действий",
+      "destinationAria": "Страница {page}, A{position}, {state}",
+      "empty": "Пусто",
+      "closePicker": "Закрыть ячейки",
+      "assignedStatus": "{name} назначено на страницу {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const ru_RU: EnTranslations = {
       "label": "Сбросить положение рамок"
     },
     "itemTooltip": {
-      "requiresLevel": "Требуется уровень {level}"
+      "requiresLevel": "Требуется уровень {level}",
+      "duration": "Длительность: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const ru_RU: EnTranslations = {
     "androidStandaloneDetail": "Вы в полноэкранном режиме приложения. Держите устройство горизонтально.",
     "androidInstallDetail": "Для полноэкранного режима на Android установите эту страницу или добавьте ее на главный экран.",
     "androidInstallStep": "В Chrome откройте меню, затем выберите Установить приложение или Добавить на главный экран.",
+    "androidSamsungInstallStep": "В Samsung Internet откройте меню, затем выберите Установить приложение или Добавить на главный экран.",
     "androidOpenStep": "Откройте World of ClaudeCraft через новый значок.",
     "otherStandaloneDetail": "Держите устройство в полноэкранном альбомном режиме.",
     "otherInstallDetail": "Установите эту страницу или добавьте ее на главный экран для лучшего мобильного полноэкранного опыта."

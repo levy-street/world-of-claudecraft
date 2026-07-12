@@ -356,6 +356,9 @@ class FakeElement extends EventTarget {
   // Textarea-ish props so #chat-input can back exitChatReply (value clear + blur) in
   // the fake DOM; harmless no-op defaults for every other element.
   value = '';
+  textContent = '';
+  label: FakeElement | null = null;
+  attributes = new Map<string, string>();
   blur(): void {}
   private captured = new Set<number>();
   /** Selectors this element (or a simulated ancestor) matches, for closest();
@@ -388,11 +391,17 @@ class FakeElement extends EventTarget {
     return this.matchedSelectors.includes(selector) ? this : null;
   }
 
-  querySelector(): Element | null {
-    return null;
+  querySelector(selector: string): Element | null {
+    return selector === '.mobile-label' ? (this.label as unknown as Element | null) : null;
   }
 
-  setAttribute(): void {}
+  setAttribute(name: string, value: string): void {
+    this.attributes.set(name, value);
+  }
+
+  getAttribute(name: string): string | null {
+    return this.attributes.get(name) ?? null;
+  }
 }
 
 class FakeMediaQueryList extends EventTarget {
@@ -406,6 +415,7 @@ const previousGlobals = {
 };
 
 afterEach(() => {
+  vi.useRealTimers();
   Object.defineProperty(globalThis, 'document', {
     value: previousGlobals.document,
     configurable: true,
@@ -429,12 +439,20 @@ function installMobileControlDom(): {
   jumpButton: FakeElement;
   moreButton: FakeElement;
   moreModal: FakeElement;
+  nameplatesButton: FakeElement;
+  musicButton: FakeElement;
   emoteButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
+  const nameplatesButton = new FakeElement();
+  nameplatesButton.label = new FakeElement();
+  nameplatesButton.matchedSelectors = ['#mobile-extra-controls'];
+  const musicButton = new FakeElement();
+  musicButton.label = new FakeElement();
+  musicButton.matchedSelectors = ['#mobile-extra-controls'];
   const elements = new Map<string, FakeElement>([
     [
       'game-canvas',
@@ -453,6 +471,8 @@ function installMobileControlDom(): {
     ['mobile-jump', new FakeElement()],
     ['mobile-more', new FakeElement()],
     ['mobile-extra-controls', new FakeElement()],
+    ['mobile-nameplates', nameplatesButton],
+    ['mobile-music', musicButton],
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
@@ -491,6 +511,8 @@ function installMobileControlDom(): {
     jumpButton: elements.get('mobile-jump')!,
     moreButton: elements.get('mobile-more')!,
     moreModal: elements.get('mobile-extra-controls')!,
+    nameplatesButton,
+    musicButton,
     emoteButton: elements.get('mobile-emote')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
@@ -517,7 +539,6 @@ function mobileCallbacks() {
   return {
     onCycleTarget: noop,
     onJump: noop,
-    onInteract: noop,
     onChat: noop,
     onChatOpen: noop,
     onChatClose: noop,
@@ -703,6 +724,48 @@ describe('MobileControls pointer lifecycle', () => {
 
     controls.syncAutorun(false);
 
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
+  it('ends an active joystick drag when an external interaction clears autorun', () => {
+    const { autorunTarget, moveZone } = installMobileControlDom();
+    let autorunOn = false;
+    let clearCount = 0;
+    const input = {
+      get autorun() {
+        return autorunOn;
+      },
+      setTouchMove: () => {},
+      clearTouchMove: () => {
+        clearCount += 1;
+      },
+      setAutorun: (on: boolean) => {
+        autorunOn = on;
+        return autorunOn;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    const controls = new MobileControls(input, mobileCallbacks());
+    controls.start();
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 17, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 17, clientX: 100, clientY: -5 }),
+    );
+    expect(autorunOn).toBe(true);
+
+    input.setAutorun(false);
+    controls.syncAutorun(false);
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 17, clientX: 100, clientY: -5 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(clearCount).toBeGreaterThan(0);
     expect(autorunTarget.classList.contains('near')).toBe(false);
     expect(autorunTarget.classList.contains('locked')).toBe(false);
   });
@@ -1126,6 +1189,7 @@ describe('MobileControls pointer lifecycle', () => {
 
   it('keeps the More drawer centered when opened', () => {
     const { moreButton, moreModal } = installMobileControlDom();
+    moreModal.style.display = 'none';
     const input = {
       setTouchMove: () => {},
       clearTouchMove: () => {},
@@ -1136,11 +1200,36 @@ describe('MobileControls pointer lifecycle', () => {
 
     moreButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
+    expect(moreModal.style.display).toBe('');
     expect(moreModal.style.left).toBe('50%');
     expect(moreModal.style.top).toBe('50%');
     expect(moreModal.style.right).toBe('auto');
     expect(moreModal.style.bottom).toBe('auto');
     expect(moreModal.style.transform).toBe('translate(-50%, -50%)');
+  });
+
+  it.each([
+    ['Names', 'nameplatesButton', 'onNameplates'],
+    ['Music', 'musicButton', 'onMusic'],
+  ] as const)('keeps More open and shows %s Off when its condition is disabled', (_, buttonKey, cbKey) => {
+    const dom = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    const callbacks = { ...mobileCallbacks(), [cbKey]: () => false };
+    new MobileControls(input, callbacks).start();
+    document.body.classList.add('mobile-more-open');
+
+    const button = dom[buttonKey];
+    button.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(document.body.classList.contains('mobile-more-open')).toBe(true);
+    expect(button.classList.contains('is-on')).toBe(false);
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(button.label?.textContent).toContain('Off');
   });
 
   it('fires the Jump callback immediately on pointerdown without double-firing the generated click', () => {
@@ -1166,6 +1255,91 @@ describe('MobileControls pointer lifecycle', () => {
 
     jumpButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
     expect(jumps).toBe(1);
+  });
+
+  it('keeps movement owned while a second touch triggers Jump or context Use', () => {
+    const { moveZone, jumpButton, windowTarget } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    let actions = 0;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {
+        lastMove = null;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onJump: () => {
+        actions += 1;
+      },
+    }).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 60,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 50,
+      }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 60,
+        pointerType: 'touch',
+        clientX: 160,
+        clientY: 50,
+      }),
+    );
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+
+    jumpButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 61, pointerType: 'touch' }));
+
+    expect(actions).toBe(1);
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+
+    windowTarget.dispatchEvent(pointerEvent('pointerup', { pointerId: 60, pointerType: 'touch' }));
+    expect(lastMove).toBeNull();
+  });
+
+  it('does not repeat a press-first Jump action after a long hold', () => {
+    vi.useFakeTimers();
+    const { jumpButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let actions = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onJump: () => {
+        actions += 1;
+      },
+    }).start();
+
+    jumpButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 33, pointerType: 'touch' }));
+    vi.advanceTimersByTime(1000);
+    jumpButton.dispatchEvent(pointerEvent('pointerup', { pointerId: 33, pointerType: 'touch' }));
+    jumpButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(actions).toBe(1);
   });
 
   it('rotates the camera from a single-finger swipe on the game canvas', () => {

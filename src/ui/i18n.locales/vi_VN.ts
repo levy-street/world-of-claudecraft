@@ -2,54 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.',
-  'loading.tips.dungeons':
-    'Mẹo: khi trang bị đã vượt mức thường, hãy thử hầm ngục ở độ khó anh hùng để có trận chiến khó hơn và phần thưởng hậu hĩnh hơn.',
-  'loading.tips.guilds':
-    'Mẹo: gia nhập bang hội cho bạn một kênh trò chuyện riêng và danh sách chung các thành viên trong bang.',
-  'loading.tips.loadouts':
-    'Mẹo: lưu nhiều hơn một bộ tài năng để chuyển đổi giữa các lối xây dựng mà không phải dùng điểm hai lần.',
-  'loading.tips.market':
-    'Mẹo: Chợ Thế Giới cho phép bạn mua bán với người chơi trên toàn thế giới.',
-  'loading.tips.professions':
-    'Mẹo: có thể rèn luyện nghề thu thập và chế tác song song với lớp chiến đấu của bạn.',
-  'loading.tips.pvp':
-    'Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn.',
-  'loading.tips.talents':
-    'Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.',
-  'entities.items.chunk_of_ore.name': 'Khối Quặng',
-  'entities.quests.q_prof_intro.completion':
-    'Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Khối Quặng',
-  'entities.quests.q_prof_intro.text':
-    'Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.',
-  'entities.quests.q_prof_intro.title': 'Nghề Cho Mọi Đôi Tay',
-  'hudChrome.auth.appleChoiceExpired':
-    'Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.',
-  'hudChrome.auth.appleError': 'Không thể đăng nhập bằng Apple. Vui lòng thử lại.',
-  'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
-  'hudChrome.dailyRewards.reason.banned':
-    'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
-  'hudChrome.itemHeroicTag': '[ANH HÙNG]',
-  'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
-  'hudChrome.keybinds.categoryPet': 'Thú Cưng',
-  'hudChrome.keybinds.petAggressive': 'Thú Cưng: Hung Hăng',
-  'hudChrome.keybinds.petAttack': 'Thú Cưng: Tấn Công',
-  'hudChrome.keybinds.petDefensive': 'Thú Cưng: Phòng Thủ',
-  'hudChrome.keybinds.petStop': 'Thú Cưng: Dừng',
-  'hudChrome.keybinds.petTaunt': 'Thú Cưng: Khiêu Khích',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
-  'hudChrome.readyCheck.notReady': 'Chưa Sẵn Sàng',
-  'hudChrome.readyCheck.prompt': '{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?',
-  'hudChrome.readyCheck.ready': 'Sẵn Sàng',
-  'hudChrome.readyCheck.result':
-    'Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.',
-  'hudChrome.readyCheck.notInPartyError': 'Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.',
-  'hudChrome.readyCheck.inProgressError': 'Một lượt kiểm tra sẵn sàng đang diễn ra.',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',

@@ -360,8 +360,11 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 // chat-window-reset rows below it are bespoke and live in the painter.
 // ---------------------------------------------------------------------------
 
-export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
-  return [
+export function buildInterfaceControls(
+  s: OptionsSettingsSource,
+  env: OptionsEnv = { touch: false, nativeShell: false },
+): OptionsControl[] {
+  const controls: OptionsControl[] = [
     // uiScale commits on release: applying it live rescales the whole UI (the
     // options window included), which shoves the slider under the cursor and makes
     // the value hard to land (issue 1558).
@@ -391,6 +394,18 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
     boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
   ];
+  if (env.touch) {
+    controls.splice(
+      3,
+      0,
+      choice(s, 'mobileActionPageMinimum', 'hudChrome.options.mobileActionPages', [
+        { value: 2, labelKey: 'hudChrome.options.mobileActionPagesTwo' },
+        { value: 3, labelKey: 'hudChrome.options.mobileActionPagesThree' },
+        { value: 4, labelKey: 'hudChrome.options.mobileActionPagesFour' },
+      ]),
+    );
+  }
+  return controls;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 // Mobile target-size pass: under a real landscape phone viewport (the
-// in-game view is landscape-only on web mobile), every TOUCH control must render >=40x40px,
-// the PREFERRED mobile floor, not merely the >=24px absolute desktop floor.
+// in-game view is landscape-only on web mobile), every primary gameplay control
+// must render at least 48x48px, not merely the >=24px absolute desktop floor.
 // This measures REAL rendered geometry (getBoundingClientRect under the real style barrel +
 // the body.mobile-touch.game-active state), never a CSS-text assertion, mirroring the V16
 // mobile_button_size / mobile_joystick_size harnesses but with an actual numeric floor the
@@ -8,10 +8,12 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+import { BagItemActionMenu } from '../../src/ui/bag_item_action_menu';
 import { cleanup } from './_harness';
 
-const TOUCH_FLOOR = 40;
-// getBoundingClientRect can land a hair under an exact 40px declaration on sub-pixel
+const TOUCH_FLOOR = 48;
+const LEGACY_TOUCH_FLOOR = 40;
+// getBoundingClientRect can land a hair under an exact declaration on sub-pixel
 // rounding; allow half a pixel so the gate tests the real floor, not rounding noise.
 const EPSILON = 0.5;
 
@@ -20,11 +22,13 @@ beforeEach(async () => {
   // landscape media query drives the in-game landscape rules in hud.mobile.css.
   await page.viewport(844, 390);
   document.body.className = 'mobile-touch game-active';
+  document.body.style.setProperty('--btn-scale', '0.8');
 });
 
 afterEach(() => {
   cleanup();
   document.body.className = '';
+  document.body.style.removeProperty('--btn-scale');
 });
 
 function measure(el: HTMLElement): { w: number; h: number } {
@@ -32,10 +36,18 @@ function measure(el: HTMLElement): { w: number; h: number } {
   return { w: r.width, h: r.height };
 }
 
-function expectAtLeastFloor(el: HTMLElement, label: string): void {
+function expectAtLeastFloor(el: HTMLElement, label: string, floor = TOUCH_FLOOR): void {
   const { w, h } = measure(el);
-  expect(w, `${label} width ${w} < ${TOUCH_FLOOR}`).toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
-  expect(h, `${label} height ${h} < ${TOUCH_FLOOR}`).toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
+  expect(w, `${label} width ${w} < ${floor}`).toBeGreaterThanOrEqual(floor - EPSILON);
+  expect(h, `${label} height ${h} < ${floor}`).toBeGreaterThanOrEqual(floor - EPSILON);
+}
+
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+function roundedBuckets(values: readonly number[]): number[] {
+  return [...new Set(values.map((value) => Math.round(value)))].sort((a, b) => a - b);
 }
 
 function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
@@ -48,80 +60,190 @@ function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
   return node;
 }
 
-describe('mobile target-size: in-game touch controls are >=40x40 in landscape', () => {
-  it('mobile action-ring controls (slot, attack, page toggle, Target swap, Use)', () => {
-    // The paged action ring replaced the desktop #actionbar on touch (which is
-    // display:none under body.mobile-touch); its sizes resolve from the
-    // --mobile-ring-* variables on the ring container, so the buttons must be
-    // measured inside it, mirroring the real index.html/play.html markup (the
-    // Target swap and Use helpers live in the ring's crescent hollow, not the
-    // left utility cluster).
+describe('mobile target-size: primary in-game touch controls are >=48x48 in landscape', () => {
+  it('mobile action-ring controls (slot, attack, page toggle, Target swap, Jump)', () => {
+    // Mount the approved logical order. CSS turns this stable source order into
+    // the two-row pad without scaling any interactive ancestor.
     const ring = el('div', { id: 'mobile-action-ring' });
-    const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
+    const a1 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '0' });
+    const a2 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
+    const a5 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '4' });
     const attack = el('button', { id: 'mobile-action-attack' });
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
-    const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, targetCycle, interact, toggle);
+    const a3 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
+    const a4 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '3' });
+    const jump = el('button', { id: 'mobile-jump' });
+    ring.append(a1, a2, a5, targetCycle, toggle, a3, a4, attack, jump);
     document.body.appendChild(ring);
-    expectAtLeastFloor(slot, '.mobile-action-slot');
+    expectAtLeastFloor(a1, '.mobile-action-slot');
     expectAtLeastFloor(attack, '#mobile-action-attack');
     expectAtLeastFloor(targetCycle, '#mobile-target-cycle');
-    expectAtLeastFloor(interact, '#mobile-interact');
+    expectAtLeastFloor(jump, '#mobile-jump');
     expectAtLeastFloor(toggle, '#mobile-action-page-toggle');
+    const actionFace = getComputedStyle(a1, '::before');
+    const targetFace = getComputedStyle(targetCycle, '::before');
+    const jumpFace = getComputedStyle(jump, '::before');
+    expect(parseFloat(targetFace.width)).toBeGreaterThan(parseFloat(actionFace.width));
+    expect(parseFloat(targetFace.width)).toBeLessThan(parseFloat(jumpFace.width));
+    expect(new DOMMatrixReadOnly(targetFace.transform).f).toBeLessThan(
+      new DOMMatrixReadOnly(actionFace.transform).f,
+    );
   });
 
   it('the compact-tier ring keeps every control at the floor (smallest sizes)', () => {
-    // hud-mobile-compact re-tunes every --mobile-ring-* var downward for short
-    // landscape phones, then the 0.85 mobile-chrome-scale shrinks them further; the
-    // smallest (toggle 46 * 0.85 = 39.1) is clamped back up to the 40px floor via
-    // max(40px, ...), and Target/Use (50 * 0.85 = 42.5) still clear it.
+    // The compact tier changes placement, never the 48px hitbox floor.
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const ring = el('div', { id: 'mobile-action-ring' });
     const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
     const attack = el('button', { id: 'mobile-action-attack' });
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
-    const interact = el('button', { id: 'mobile-interact' });
+    const jump = el('button', { id: 'mobile-jump' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, targetCycle, interact, toggle);
+    ring.append(slot, attack, targetCycle, jump, toggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, 'compact .mobile-action-slot');
     expectAtLeastFloor(attack, 'compact #mobile-action-attack');
     expectAtLeastFloor(targetCycle, 'compact #mobile-target-cycle');
-    expectAtLeastFloor(interact, 'compact #mobile-interact');
+    expectAtLeastFloor(jump, 'compact #mobile-jump');
     expectAtLeastFloor(toggle, 'compact #mobile-action-page-toggle');
   });
 
-  it('the left utility cluster (Autorun/Jump) and the Chat/More pair', () => {
-    const cluster = el('div', { id: 'mobile-utility-cluster' });
-    const autorun = el('button', { id: 'mobile-autorun', class: 'mobile-btn' });
-    const jump = el('button', { id: 'mobile-jump', class: 'mobile-btn' });
-    cluster.append(autorun, jump);
+  it('the compact direct menu keeps Chat, Quests, and More at the floor', () => {
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const combat = el('div', { id: 'mobile-combat-controls' });
     const chat = el('button', { id: 'mobile-chat', class: 'mobile-btn' });
+    const quest = el('button', { id: 'mobile-quest', class: 'mobile-btn' });
     const more = el('button', { id: 'mobile-more', class: 'mobile-btn' });
-    combat.append(chat, more);
-    document.body.append(cluster, combat);
-    expectAtLeastFloor(autorun, '#mobile-autorun');
-    expectAtLeastFloor(jump, '#mobile-jump');
+    combat.append(chat, quest, more);
+    document.body.append(combat);
     expectAtLeastFloor(chat, '#mobile-chat');
+    expectAtLeastFloor(quest, '#mobile-quest');
     expectAtLeastFloor(more, '#mobile-more');
   });
 
+  it('the Consumables toggle and populated 3 x 2 slots stay at the floor', () => {
+    document.body.classList.add('mobile-consumables-open');
+    const consumables = el('div', { id: 'mobile-consumables' });
+    const toggle = el('button', { id: 'mobile-consumables-toggle' });
+    const row = el('div', { id: 'mobile-consumables-row' });
+    const slots = Array.from({ length: 6 }, (_, index) =>
+      el('button', {
+        class: 'mobile-consumable-slot',
+        'data-consumable-index': String(index),
+      }),
+    );
+    row.append(...slots);
+    consumables.append(toggle, row);
+    document.body.append(consumables);
+    expectAtLeastFloor(toggle, '#mobile-consumables-toggle');
+    for (const [index, slot] of slots.entries()) {
+      expectAtLeastFloor(slot, `.mobile-consumable-slot[${index}]`);
+    }
+  });
+
+  it('compact Consumables render beside the toggle in two ordered rows and mirror', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact mobile-consumables-open';
+    const consumables = el('div', { id: 'mobile-consumables' });
+    const toggle = el('button', { id: 'mobile-consumables-toggle' });
+    const row = el('div', { id: 'mobile-consumables-row' });
+    const slots = Array.from({ length: 6 }, (_, index) =>
+      el('button', {
+        class: 'mobile-consumable-slot',
+        'data-consumable-index': String(index),
+      }),
+    );
+    row.append(...slots);
+    consumables.append(toggle, row);
+    document.body.appendChild(consumables);
+    await nextFrame();
+
+    const rightHanded = slots.map((slot) => slot.getBoundingClientRect());
+    expect(roundedBuckets(rightHanded.map((rect) => rect.top))).toHaveLength(2);
+    expect(roundedBuckets(rightHanded.map((rect) => rect.left))).toHaveLength(3);
+    expect(rightHanded.slice(0, 3).every((rect) => rect.top > rightHanded[3].top)).toBe(true);
+    expect(rightHanded[0].left).toBeLessThan(rightHanded[1].left);
+    expect(rightHanded[1].left).toBeLessThan(rightHanded[2].left);
+
+    slots[5].style.display = 'none';
+    await nextFrame();
+    const partial = slots.slice(0, 5).map((slot) => slot.getBoundingClientRect());
+    expect(roundedBuckets(partial.map((rect) => rect.top))).toHaveLength(2);
+    expect(partial[3].left).toBeCloseTo(partial[0].left, 0);
+    expect(partial[4].left).toBeCloseTo(partial[1].left, 0);
+
+    slots[5].style.display = '';
+    document.body.classList.add('mobile-left-handed');
+    await nextFrame();
+    const leftHanded = slots.map((slot) => slot.getBoundingClientRect());
+    expect(roundedBuckets(leftHanded.map((rect) => rect.top))).toHaveLength(2);
+    expect(roundedBuckets(leftHanded.map((rect) => rect.left))).toHaveLength(3);
+    expect(leftHanded.slice(0, 3).every((rect) => rect.top > leftHanded[3].top)).toBe(true);
+    expect(leftHanded[0].left).toBeGreaterThan(leftHanded[1].left);
+    expect(leftHanded[1].left).toBeGreaterThan(leftHanded[2].left);
+  });
+
+  it('player, Target, cast, and swing geometry grows monotonically by landscape tier', async () => {
+    const tiers = [
+      { className: 'hud-mobile-compact', width: 740, minimumPlayerWidth: 180 },
+      { className: 'hud-mobile-standard', width: 844, minimumPlayerWidth: 250 },
+      { className: 'hud-mobile-tablet', width: 1180, minimumPlayerWidth: 275 },
+    ] as const;
+    const measuredPlayerWidths: number[] = [];
+
+    for (const tier of tiers) {
+      document.body.innerHTML = '';
+      document.body.className = `mobile-touch game-active ${tier.className}`;
+      await page.viewport(tier.width, 390);
+      const ui = el('div', { id: 'ui' });
+      const player = el('div', { id: 'player-frame', class: 'unitframe' });
+      player.style.height = '68px';
+      const target = el('div', { id: 'target-frame', class: 'unitframe' });
+      target.style.display = 'block';
+      target.style.width = '300px';
+      target.style.height = '68px';
+      const cast = el('div', { id: 'castbar' });
+      const swing = el('div', { id: 'swingbar' });
+      cast.style.display = 'block';
+      swing.style.display = 'block';
+      ui.append(player, target, cast, swing);
+      document.body.appendChild(ui);
+      await nextFrame();
+
+      const playerRect = player.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const castRect = cast.getBoundingClientRect();
+      const swingRect = swing.getBoundingClientRect();
+      measuredPlayerWidths.push(playerRect.width);
+      expect(playerRect.width).toBeGreaterThanOrEqual(tier.minimumPlayerWidth - EPSILON);
+      expect(targetRect.width / playerRect.width).toBeCloseTo(0.9, 2);
+      expect(targetRect.width).toBeLessThan(playerRect.width);
+      expect(castRect.width).toBeCloseTo(playerRect.width, 1);
+      expect(swingRect.width).toBeCloseTo(playerRect.width, 1);
+      expect((playerRect.left + playerRect.right) / 2).toBeCloseTo(tier.width / 2, 1);
+      expect((targetRect.left + targetRect.right) / 2).toBeCloseTo(tier.width / 2, 1);
+    }
+
+    expect(measuredPlayerWidths[1]).toBeGreaterThan(measuredPlayerWidths[0]);
+    expect(measuredPlayerWidths[2]).toBeGreaterThan(measuredPlayerWidths[1]);
+  });
+
   it('party-member rows (role=button tap targets)', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
     frames.appendChild(row);
     document.body.appendChild(frames);
-    expectAtLeastFloor(row, 'party-frame');
+    expectAtLeastFloor(row, 'party-frame', LEGACY_TOUCH_FLOOR);
   });
 
   it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
     const leave = el('button', { id: 'party-leave' });
+    leave.textContent = 'Leave Party';
     frames.appendChild(leave);
     document.body.appendChild(frames);
-    expectAtLeastFloor(leave, '#party-leave');
+    expectAtLeastFloor(leave, '#party-leave', LEGACY_TOUCH_FLOOR);
   });
 
   it('the mobile More-tray close button', () => {
@@ -132,15 +254,7 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     title.appendChild(close);
     tray.appendChild(title);
     document.body.appendChild(tray);
-    expectAtLeastFloor(close, '#mobile-more-close');
-  });
-
-  it('the community HUD toggle', () => {
-    const menu = el('details', { id: 'community-menu' });
-    const toggle = el('summary', { class: 'community-toggle' });
-    menu.appendChild(toggle);
-    document.body.appendChild(menu);
-    expectAtLeastFloor(toggle, '.community-toggle');
+    expectAtLeastFloor(close, '#mobile-more-close', LEGACY_TOUCH_FLOOR);
   });
 
   it('the movement / camera joystick', () => {
@@ -164,7 +278,60 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     zoom.style.width = '32px';
     zoom.style.height = '32px';
     document.body.appendChild(zoom);
-    expectAtLeastFloor(zoom, '.map-zoom-btn');
+    expectAtLeastFloor(zoom, '.map-zoom-btn', LEGACY_TOUCH_FLOOR);
+  });
+
+  it('the Bags item action sheet renders 40px controls, names them, and returns focus', () => {
+    const host = el('div', { id: 'bags' });
+    const opener = el('button');
+    document.body.append(opener, host);
+    opener.focus();
+    const menu = new BagItemActionMenu({
+      showError: () => undefined,
+      restoreFocus: (target) => target?.focus(),
+      onDismiss: () => undefined,
+    });
+    menu.open({
+      host,
+      itemId: 'bread',
+      itemName: 'Bread',
+      itemDetailsHtml: '<div class="tt-desc">Restores health.</div>',
+      actions: [{ id: 'consume' }, { id: 'linkToChat' }, { id: 'destroy', destructive: true }],
+      canAssignConsumable: true,
+      layout: ['healing_potion', 'bread', null, null, null, null],
+      itemNameForId: (id) => id,
+      onAction: () => true,
+      onAssign: () => true,
+      onReset: () => true,
+      opener,
+    });
+    const controls = Array.from(
+      host.querySelectorAll<HTMLElement>(
+        '.bag-item-action, .bag-item-destination, .bag-item-action-reset, .bag-item-action-close',
+      ),
+    );
+    expect(controls.length).toBe(11);
+    for (const [index, control] of controls.entries()) {
+      expectAtLeastFloor(control, `bag item action control ${index}`, LEGACY_TOUCH_FLOOR);
+      expect(control.getAttribute('aria-label')).toBeTruthy();
+    }
+    expect(host.querySelector('.bag-item-action-details')?.textContent).toContain(
+      'Restores health.',
+    );
+    const layout = host.querySelector<HTMLElement>('.bag-item-action-layout');
+    expect(getComputedStyle(layout as HTMLElement).gridTemplateColumns.split(' ')).toHaveLength(2);
+    expect(document.activeElement).toBe(host.querySelector('.bag-item-action'));
+    const close = host.querySelector<HTMLElement>('.bag-item-action-close');
+    close?.focus();
+    close?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }),
+    );
+    expect(document.activeElement).toBe(host.querySelector('.bag-item-action-reset'));
+    host
+      .querySelector('.bag-item-action-menu')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(menu.isOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
   });
 });
 

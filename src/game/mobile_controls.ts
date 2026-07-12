@@ -115,7 +115,6 @@ export interface MobileControlCallbacks {
   /** Cycle the hostile target (the Tab-target path) from the ring's Target button. */
   onCycleTarget(): void;
   onJump(): void;
-  onInteract(): void;
   /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
   /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
@@ -434,7 +433,6 @@ export class MobileControls {
 
     this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
-    this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
@@ -451,18 +449,18 @@ export class MobileControls {
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
-    const nameplatesBtn = document.getElementById('mobile-nameplates');
-    this.bindButton('mobile-nameplates', () => {
-      const on = this.callbacks.onNameplates();
-      nameplatesBtn?.classList.toggle('active', on);
-    });
-    const musicBtn = document.getElementById('mobile-music');
-    this.bindButton('mobile-music', () => {
-      const on = this.callbacks.onMusic();
-      // mirror the desktop #mm-music control: a diagonal slash (.mm-muted) signals
-      // "off", rather than dimming the note
-      musicBtn?.classList.toggle('mm-muted', !on);
-    });
+    this.bindTrayConditionToggle(
+      'mobile-nameplates',
+      () => this.callbacks.onNameplates(),
+      'hudChrome.mobile.nameplates',
+      'hudChrome.mobile.nameplatesOff',
+    );
+    this.bindTrayConditionToggle(
+      'mobile-music',
+      () => this.callbacks.onMusic(),
+      'hud.options.music',
+      'hudChrome.mobile.musicOff',
+    );
     this.bindHapticsToggle('mobile-haptics');
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
@@ -471,6 +469,7 @@ export class MobileControls {
       if (open) {
         const modal = document.getElementById('mobile-extra-controls');
         if (modal) {
+          modal.style.display = '';
           modal.style.left = '50%';
           modal.style.top = '50%';
           modal.style.right = 'auto';
@@ -541,15 +540,33 @@ export class MobileControls {
     };
     if (opts.pressFirst) {
       let suppressNextClick = false;
+      let suppressResetTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
+      const clearSuppressReset = () => {
+        if (suppressResetTimer !== null) globalThis.clearTimeout(suppressResetTimer);
+        suppressResetTimer = null;
+      };
       button.addEventListener('pointerdown', (e) => {
+        clearSuppressReset();
         suppressNextClick = true;
-        globalThis.setTimeout(() => {
-          suppressNextClick = false;
-        }, 700);
         run(e);
+      });
+      button.addEventListener('pointerup', () => {
+        clearSuppressReset();
+        // The compatibility click is generated after pointerup, even after a
+        // long hold. Keep suppression alive from release (not press) so that
+        // click cannot execute Jump/Interact a second time.
+        suppressResetTimer = globalThis.setTimeout(() => {
+          suppressNextClick = false;
+          suppressResetTimer = null;
+        }, 700);
+      });
+      button.addEventListener('pointercancel', () => {
+        clearSuppressReset();
+        suppressNextClick = false;
       });
       button.addEventListener('click', (e) => {
         if (suppressNextClick) {
+          clearSuppressReset();
           suppressNextClick = false;
           e.preventDefault();
           return;
@@ -567,6 +584,54 @@ export class MobileControls {
   private closeMoreModal(): void {
     document.getElementById('mobile-controls')?.classList.remove('expanded');
     document.body.classList.remove('mobile-more-open');
+  }
+
+  /** Sync the two externally-owned More-tray conditions without toggling them. */
+  syncTrayConditions(nameplatesOn: boolean, musicOn: boolean): void {
+    this.syncTrayConditionButton(
+      'mobile-nameplates',
+      nameplatesOn,
+      'hudChrome.mobile.nameplates',
+      'hudChrome.mobile.nameplatesOff',
+    );
+    this.syncTrayConditionButton(
+      'mobile-music',
+      musicOn,
+      'hud.options.music',
+      'hudChrome.mobile.musicOff',
+    );
+  }
+
+  /** Stateful condition buttons stay in the tray so several settings can be
+   *  adjusted in one visit, matching the existing Haptics toggle contract. */
+  private bindTrayConditionToggle(
+    id: string,
+    toggle: () => boolean,
+    onLabelKey: 'hudChrome.mobile.nameplates' | 'hud.options.music',
+    offLabelKey: 'hudChrome.mobile.nameplatesOff' | 'hudChrome.mobile.musicOff',
+  ): void {
+    const button = document.getElementById(id);
+    if (!button) return;
+    bindTouchTap(button, (e) => {
+      if (!this.active) return;
+      e.preventDefault();
+      triggerHaptic(HAPTIC_TAP, this.hapticsOn);
+      this.syncTrayConditionButton(id, toggle(), onLabelKey, offLabelKey);
+    });
+  }
+
+  private syncTrayConditionButton(
+    id: string,
+    on: boolean,
+    onLabelKey: 'hudChrome.mobile.nameplates' | 'hud.options.music',
+    offLabelKey: 'hudChrome.mobile.nameplatesOff' | 'hudChrome.mobile.musicOff',
+  ): void {
+    const button = document.getElementById(id);
+    if (!button) return;
+    button.classList.toggle('is-on', on);
+    button.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const label = button.querySelector('.mobile-label');
+    if (label) label.textContent = t(on ? onLabelKey : offLabelKey);
   }
 
   /** The haptics button is a stateful toggle, so it bypasses bindButton (no tray
@@ -818,7 +883,13 @@ export class MobileControls {
 
   syncAutorun(on: boolean): void {
     this.moveAutorunLocked = false;
-    this.syncMoveAutorunTarget(on ? 'locked' : 'hidden');
+    if (!on) {
+      // An external stop (interaction or death) must also end the current
+      // joystick gesture, otherwise its next pointermove can latch autorun again.
+      this.releaseMove();
+      return;
+    }
+    this.syncMoveAutorunTarget('locked');
   }
 
   private onCameraDown(e: PointerEvent): void {

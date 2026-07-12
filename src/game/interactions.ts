@@ -283,6 +283,7 @@ export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boo
   );
 }
 
+/** Route a picked entity and report only completed non-combat world interactions. */
 export function handlePickedEntity(
   world: PickInteractionWorld,
   hud: PickInteractionHud,
@@ -290,9 +291,9 @@ export function handlePickedEntity(
   button: number,
   screenX: number,
   screenY: number,
-): void {
+): boolean {
   const e = world.entities.get(id);
-  if (!e) return;
+  if (!e) return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
 
@@ -303,34 +304,49 @@ export function handlePickedEntity(
     if (e.kind === 'object') {
       if (d > INTERACT_RANGE + 1) {
         hud.showError(t('questUi.errors.tooFar'));
-        return;
+        return false;
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
       else if (e.templateId === 'mailbox') {
         // Dead players (ghosts included) cannot use the mail; the server-side
         // interact path refuses too, this just keeps the window from opening.
-        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
-        else hud.openMailbox();
+        if (world.player.dead) {
+          hud.showError(tSim('error.cantWhileDead'));
+          return false;
+        }
+        hud.openMailbox();
       } else world.pickUpObject(id);
+      return true;
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
-      else hud.showError(t('questUi.errors.tooFar'));
+      if (d <= INTERACT_RANGE + 1) {
+        hud.openLoot(id, screenX, screenY);
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'spirit_healer') {
           // The Spirit Healer resurrects a ghost in place (with Resurrection
           // Sickness). To the living it offers only watchful flavor.
           if (world.player.ghost) world.resurrectAtSpiritHealer();
-          else hud.showError(t('hudChrome.death.spiritHealerAlive'));
+          else {
+            hud.showError(t('hudChrome.death.spiritHealerAlive'));
+            return false;
+          }
         } else if (world.player.dead) {
           // Dead players and ghosts cannot talk to NPCs (the server refuses the
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
+          return false;
         } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
-      } else hud.showError(t('questUi.errors.tooFar'));
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {
@@ -341,20 +357,28 @@ export function handlePickedEntity(
       // drag threshold, so only a deliberate right-click attacks.
       world.startAutoAttack();
     }
+    return false;
   } else if (button === 0) {
     hud.closeContextMenu();
     if (e.kind === 'object') {
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE + 1) return;
+      if (d > INTERACT_RANGE + 1) return false;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
       else if (e.templateId === 'mailbox') {
-        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
-        else hud.openMailbox();
+        if (world.player.dead) {
+          hud.showError(tSim('error.cantWhileDead'));
+          return false;
+        }
+        hud.openMailbox();
       } else world.pickUpObject(id);
+      return true;
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
+      if (d <= INTERACT_RANGE + 1) {
+        hud.openLoot(id, screenX, screenY);
+        return true;
+      }
     } else if (e.kind === 'npc') {
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
@@ -365,7 +389,9 @@ export function handlePickedEntity(
         if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
+        return true;
       }
     }
   }
+  return false;
 }

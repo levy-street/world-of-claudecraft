@@ -184,7 +184,11 @@ import {
   shouldPlayMobVoiceSfxForEntity,
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
-import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
+import {
+  type ConsumableBarPreferences,
+  createConsumableBarPreferences,
+} from './consumable_bar_preferences_core';
+import { CONSUMABLE_BAR_SLOTS, resolveConsumableBarLayout } from './consumable_bar_view';
 import { formatMinimapCoords } from './coords';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
@@ -211,12 +215,6 @@ import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
-  PLAYER_FRAME_POS_KEY,
-  resetFramePositionsOnce,
-  TARGET_FRAME_POS_KEY,
-} from './frame_pos_reset';
-import { gossipMenuIsEmpty } from './gossip_menu';
-import {
   type AimPoint,
   abilityAoeRadius,
   cancelGroundAim,
@@ -235,6 +233,7 @@ import {
   holderTierForBalance,
 } from './holder_tier';
 import {
+  assignAbilityToMobileSlot,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
@@ -286,6 +285,7 @@ import {
   MAP_MAX_ZOOM,
   type MapNpcMarker,
   type MapQuestAreaMarker,
+  mapPinchZoomFactor,
   mapWindowMode,
   npcMarkerAt,
   questAreaObjectivesAt,
@@ -302,10 +302,12 @@ import {
   minimapZoomValue,
   nextMinimapZoom,
 } from './minimap_zoom';
+import type { VisualRect } from './mob_tooltip_layout';
+import { mobileMobTooltipLayout } from './mob_tooltip_layout';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import {
   clampMobilePage,
-  mobilePageCount,
+  effectiveMobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from './mobile_action_page_view';
@@ -367,6 +369,7 @@ import { TalentsWindow } from './talents_window';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
+import { bindTouchTooltipDismiss } from './touch_tooltip_dismiss';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { TutorialOverlay } from './tutorial';
@@ -404,8 +407,6 @@ import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
-
-let lpAdvancedLast = -1;
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -509,12 +510,9 @@ const COMBO_PIP_COUNT = 5;
 // The mob-hover tooltip's fixed desktop bottom-right slot (the WoW default
 // GameTooltip corner), in author-space px: the right margin clears the sidebar
 // icon rail, the bottom margin the community-links row, both fixed right-edge
-// chrome. Touch uses the slot immediately left of the minimap instead so it does
-// not cover the bottom action controls.
+// chrome. Touch resolves its position from the rendered minimap and obstacles.
 const MOB_TOOLTIP_MARGIN_RIGHT = 56;
 const MOB_TOOLTIP_MARGIN_BOTTOM = 60;
-const MOB_TOOLTIP_MOBILE_MINIMAP_GAP = 8;
-const MOB_TOOLTIP_MOBILE_EDGE_GAP = 8;
 // The descriptor for a hidden target frame (no target, or a targeted world object).
 // unitFrameView reads only `present` when hiding, so the rest are no-op defaults; a
 // shared const avoids allocating a fresh descriptor for every hidden frame.
@@ -702,9 +700,9 @@ const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
 // bottom resize handle. CSS clamps it to a valid range for the live viewport, so a value
 // saved in one orientation stays safe in another (never an off-screen / tiny panel).
 const MOBILE_CHAT_BOTTOM_KEY = 'woc_mobile_chat_bottom';
-// The persisted top-left keys for the movable unit frames live in
-// frame_pos_reset.ts (imported above) so the one-time reset clears the same
-// keys the MovableFrames read.
+// Persisted top-left for each movable unit frame (MovableFrame in movable_frame.ts).
+const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
+const PLAYER_FRAME_POS_KEY = 'woc_player_frame_pos';
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -719,7 +717,7 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'sport';
+type HotbarForm = 'normal' | 'bear' | 'cat' | 'stealth' | 'sport';
 
 const DELVE_AFFIX_COLORS: Record<string, string> = {
   restless_graves: '#8b7355',
@@ -773,15 +771,6 @@ function mobVoiceFamily(templateId: string): string | null {
   if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
   const fam = MOBS[templateId]?.family;
   return fam && SFX_MOB_FAMILIES.has(fam) ? fam : null;
-}
-
-/** Most-specific SFX key for a mob action. Prefers the subfamily key
- *  (mob_beast_wolf_attack) when that clip is loaded; falls back to the
- *  family key (mob_beast_attack) otherwise. Resolved at runtime so new
- *  creature-specific files just need a manifest rebuild, no code change. */
-function mobSfxKey(fam: string, templateId: string, action: string): string {
-  const subKey = `mob_${fam}_${templateId}_${action}`;
-  return sfx.hasVariants(subKey) ? subKey : `mob_${fam}_${action}`;
 }
 
 /** Sustained cast-loop clip for an ability's school, or null (physical/unknown). */
@@ -877,7 +866,8 @@ export class Hud {
   private consumableBarView: ActionBarView | undefined;
   private consumableBarPainter: ActionBarPainter | undefined;
   private consumableBarSlotBtns: HTMLButtonElement[] = [];
-  private readonly consumableBarIds: string[] = [];
+  private readonly consumableBarIds: (string | null)[] = [];
+  private readonly consumablePreferences: ConsumableBarPreferences;
   private consumablesOpen = false;
   /** Ring button refs so castSlot's used-flash can hit the ring too (the
    *  desktop bar is display:none under body.mobile-touch). */
@@ -888,6 +878,9 @@ export class Hud {
   // pick the touch layer uses. Null until wired; the attack handler then falls
   // back to the plain castSlot(0) toggle.
   onMobileAttackNearest: (() => void) | null = null;
+  // Main owns the responsive chat composer layout. Item/quest link insertion asks
+  // it to reveal and position that composer before writing/focusing the draft.
+  onOpenChatComposer: (() => void) | null = null;
   // Context replacement state for the mobile Jump button: main.ts owns both
   // the world scan/action and the fallback jump; HUD only paints the live state.
   onMobileCanContextInteract: (() => boolean) | null = null;
@@ -996,6 +989,10 @@ export class Hud {
   // the hover tooltip repaints when a mid-hover change moves its model. See
   // showMobHoverTooltip.
   private lastMobTooltipId: string | null = null;
+  private mobTooltipLayoutFrame: number | null = null;
+  private mobTooltipLayoutSignature = '';
+  private mobTooltipMutationObserver: MutationObserver | null = null;
+  private mobTooltipResizeObserver: ResizeObserver | null = null;
   private errorTimer: number | undefined;
   private bannerTimer: number | undefined;
   private pfLevelEl = $('#pf-level');
@@ -1352,7 +1349,13 @@ export class Hud {
     private sim: IWorld,
     private renderer: Renderer,
     private keybinds: Keybinds,
+    consumablePreferenceScope: string,
   ) {
+    this.consumablePreferences = createConsumableBarPreferences({
+      storage: localStorage,
+      scope: consumablePreferenceScope,
+      lookup: (itemId) => ITEMS[itemId],
+    });
     this.ignoredChatNames = this.loadIgnoredChatNames();
     this.meters = new Meters(sim);
     this.initChatTabs();
@@ -1365,6 +1368,12 @@ export class Hud {
     this.initMailIndicator();
     this.refreshKeybindLabels();
     this.buildXpTicks();
+    bindTouchTooltipDismiss(document, {
+      isTouchUi: () => document.body.classList.contains('mobile-touch'),
+      isVisible: () => this.tooltipEl.style.display === 'block',
+      containsTarget: (target) => target instanceof Node && this.tooltipEl.contains(target),
+      hide: () => this.hideTooltip(),
+    });
     document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
@@ -1391,6 +1400,7 @@ export class Hud {
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     mm.addEventListener('click', () => this.toggleMap());
+    this.initMobTooltipLayoutInvalidation();
     window.addEventListener('pointermove', (ev) => {
       if (this.emoteWheelOpen) this.updateEmoteWheelPointer(ev.clientX, ev.clientY);
     });
@@ -1629,9 +1639,45 @@ export class Hud {
     );
     $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
     $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    const mapPinchPointers = new Map<number, { x: number; y: number }>();
+    const mapPinchSuppressedTaps = new Set<number>();
+    let mapPinchPrevDistance: number | null = null;
+    const mapPinchDistance = (): number => {
+      const points = [...mapPinchPointers.values()];
+      if (points.length !== 2) return 0;
+      return Math.hypot(points[1].x - points[0].x, points[1].y - points[0].y);
+    };
+    mapCanvas.addEventListener('pointerdown', (ev) => {
+      if (ev.pointerType !== 'touch') return;
+      mapPinchPointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      mapCanvas.setPointerCapture(ev.pointerId);
+      if (mapPinchPointers.size !== 2) return;
+      ev.preventDefault();
+      mapPinchPrevDistance = mapPinchDistance();
+      for (const pointerId of mapPinchPointers.keys()) mapPinchSuppressedTaps.add(pointerId);
+      this.mapDrag = null;
+      mapCanvas.style.cursor = '';
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      if (!mapPinchPointers.has(ev.pointerId)) return;
+      mapPinchPointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+      if (mapPinchPointers.size !== 2 || mapPinchPrevDistance === null) return;
+      ev.preventDefault();
+      const currentDistance = mapPinchDistance();
+      const factor = mapPinchZoomFactor(mapPinchPrevDistance, currentDistance);
+      if (factor === 1) return;
+      this.zoomMap(factor);
+      mapPinchPrevDistance = currentDistance;
+    });
+    const endMapPinch = (ev: PointerEvent) => {
+      mapPinchPointers.delete(ev.pointerId);
+      if (mapPinchPointers.size < 2) mapPinchPrevDistance = null;
+    };
+    mapCanvas.addEventListener('pointerup', endMapPinch);
+    mapCanvas.addEventListener('pointercancel', endMapPinch);
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
-      if (!this.mapView || this.mapZoom <= 1) return;
+      if (mapPinchPointers.size > 1 || !this.mapView || this.mapZoom <= 1) return;
       const base = this.mapCenter ?? { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
       this.mapCenter = { ...base };
       this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
@@ -1639,7 +1685,7 @@ export class Hud {
       mapCanvas.style.cursor = 'grabbing';
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
-      if (!this.mapDrag || !this.mapView) return;
+      if (mapPinchPointers.size > 1 || !this.mapDrag || !this.mapView) return;
       const rect = mapCanvas.getBoundingClientRect();
       // "grab the paper" pan: the world point under the cursor stays under it.
       // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
@@ -1711,12 +1757,19 @@ export class Hud {
     // release can tell a stationary marker tap from a pan.
     mapCanvas.addEventListener('pointerdown', (ev) => {
       hideMapAreaTip();
-      mapTapStart = ev.pointerType === 'mouse' ? null : { x: ev.clientX, y: ev.clientY };
+      mapTapStart =
+        ev.pointerType === 'mouse' || mapPinchPointers.size > 1
+          ? null
+          : { x: ev.clientX, y: ev.clientY };
     });
     // A stationary touch release reveals the marker under the finger. iOS can raise
     // pointercancel (not pointerup) for a tap it briefly mistook for a gesture, so
     // both end the tap; a release that moved past the tolerance was a pan.
     const endMapTap = (ev: PointerEvent): void => {
+      if (mapPinchSuppressedTaps.delete(ev.pointerId)) {
+        mapTapStart = null;
+        return;
+      }
       if (ev.pointerType === 'mouse' || !mapTapStart) return;
       const moved = Math.hypot(ev.clientX - mapTapStart.x, ev.clientY - mapTapStart.y);
       mapTapStart = null;
@@ -1931,6 +1984,7 @@ export class Hud {
     installWindowResize({
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+      isTouchLayout: () => document.body.classList.contains('mobile-touch'),
     });
     window.addEventListener('resize', () => {
       document.querySelectorAll<HTMLElement>('.window.panel').forEach((el) => {
@@ -2329,24 +2383,12 @@ export class Hud {
     grip.setAttribute('aria-hidden', 'true');
     frame.appendChild(grip);
 
-    // Mobile-only resize handle: a BODY-LEVEL bar pinned by CSS to the open panel's bottom
-    // edge (it shares the panel's --mobile-chat-bottom var, so they move together) with a
-    // very high z-index so nothing can overlay it, and touch-action:none so a drag on it is
-    // a RESIZE, not a page scroll. Dragging it sets --mobile-chat-bottom (clamped by CSS).
-    // It is a direct child of body (not #ui / the wrap) so its z-index is not capped by an
-    // ancestor stacking context. Hidden on desktop via CSS.
-    const resizeHandle = document.createElement('div');
-    resizeHandle.className = 'chat-mobile-resize';
-    resizeHandle.title = t('hudChrome.chatWindow.resize');
-    resizeHandle.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(resizeHandle);
-    resizeHandle.addEventListener('pointerdown', (ev) =>
-      this.onMobileChatResizeStart(ev, resizeHandle),
-    );
-    resizeHandle.addEventListener('pointermove', (ev) => this.onMobileChatResizeMove(ev));
+    // Mobile reuses the in-frame corner grip instead of a body-level resize bar. Keeping
+    // the handle inside the chat stacking context means another HUD window can cover it.
+    grip.addEventListener('pointermove', (ev) => this.onMobileChatResizeMove(ev));
     const endMobileResize = (ev: PointerEvent) => this.onMobileChatResizeEnd(ev);
-    resizeHandle.addEventListener('pointerup', endMobileResize);
-    resizeHandle.addEventListener('pointercancel', endMobileResize);
+    grip.addEventListener('pointerup', endMobileResize);
+    grip.addEventListener('pointercancel', endMobileResize);
     try {
       const savedBottom = localStorage.getItem(MOBILE_CHAT_BOTTOM_KEY);
       if (savedBottom) {
@@ -2365,7 +2407,10 @@ export class Hud {
     // (hud.mobile.css). An inline style here would override those rules.
     tabs.setAttribute('aria-label', t('hudChrome.chatWindow.move'));
     tabs.addEventListener('pointerdown', (ev) => this.onChatBoxMoveStart(ev, wrap, tabs));
-    grip.addEventListener('pointerdown', (ev) => this.onChatBoxResizeStart(ev, wrap, frame));
+    grip.addEventListener('pointerdown', (ev) => {
+      if (this.isMobileLayout()) this.onMobileChatResizeStart(ev, grip);
+      else this.onChatBoxResizeStart(ev, wrap, frame);
+    });
     document.addEventListener('pointermove', (ev) => this.onChatBoxPointerMove(ev));
     const end = (ev: PointerEvent) => this.onChatBoxPointerEnd(ev);
     document.addEventListener('pointerup', end);
@@ -2587,10 +2632,6 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
-    // One-time v0.24.1 cleanup: drop frame drags saved against the reverted
-    // PR #1736 overhaul layout BEFORE the movers read them back (a saved
-    // position applies, and detaches the player frame, at construction).
-    resetFramePositionsOnce(localStorage);
     const isMobileLayout = () => this.isMobileLayout();
     // A live desktop-to-mobile viewport flip must re-home the anchored aura
     // bars (mobile owns its own aura placement), and the flip back re-anchors.
@@ -2914,6 +2955,7 @@ export class Hud {
   // Shared affordance: append a readable [Name] to the chat input and remember the
   // token it stands for, so applyPendingChatLinks can swap it back in on send.
   private insertChatLink(display: string, token: string): void {
+    this.onOpenChatComposer?.();
     const input = $('#chat-input') as unknown as HTMLInputElement;
     this.pendingChatLinks = [...this.pendingChatLinks, { display, token }];
     input.placeholder = this.activeChatPlaceholder();
@@ -3506,7 +3548,7 @@ export class Hud {
     itemIcon: (item) => this.itemIcon(item),
     moneyHtml: (copper) => this.moneyHtml(copper),
     itemTooltip: (item) => this.itemTooltip(item),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html, enabled) => this.attachTooltip(el, html, enabled),
   };
   // The interactive talents window. Hud stays the coordinator (closeOtherWindows
   // needs its private window state) and owns the single staged edit buffer
@@ -3585,6 +3627,23 @@ export class Hud {
     stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
+    consumableLayout: () => {
+      this.refreshConsumableBarIds();
+      return [...this.consumableBarIds];
+    },
+    consumablesCustom: () => this.consumablePreferences.layout() !== null,
+    assignConsumable: (itemId, slotIndex) => {
+      const automatic: (string | null)[] = [];
+      resolveConsumableBarLayout(this.sim.inventory, (id) => ITEMS[id], null, automatic);
+      const result = this.consumablePreferences.assign(itemId, slotIndex, automatic);
+      if (result.ok) this.refreshConsumableBarIds();
+      return result.ok;
+    },
+    resetConsumables: () => {
+      const changed = this.consumablePreferences.reset();
+      if (changed) this.refreshConsumableBarIds();
+      return changed;
+    },
     setPendingPetFeed: (active) => {
       this.pendingPetFeed = active;
     },
@@ -3866,7 +3925,8 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#spellbook'),
     ...this.windowFocus('#spellbook'),
     hideTooltip: () => this.hideTooltip(),
-    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTooltip: (el, html, enabled, directFocusOnly) =>
+      this.attachTooltip(el, html, enabled, directFocusOnly),
     abilitySummary: (known) =>
       describeAbilitySummary(known, this.sim.player.resourceType, this.sim.player.spellHaste),
     abilityTooltip: (known) => this.abilityTooltip(known),
@@ -3877,6 +3937,27 @@ export class Hud {
     // (empty or an item) map to null, never mistaken for an ability id.
     abilityIdByBarSlot: () =>
       this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
+    isTouch: () => this.isMobileLayout(),
+    hotbarActions: () => this.hotbarActions,
+    barToken: () => this.slotMapKey(),
+    itemName: (id) => (ITEMS[id] ? itemDisplayName(ITEMS[id]) : id),
+    assignMobileSlot: (request) => {
+      if (request.barToken !== this.slotMapKey()) return { changed: false, stale: true };
+      const assigned = assignAbilityToMobileSlot(
+        this.hotbarActions,
+        request.abilityId,
+        request.targetIndex,
+      );
+      if (assigned.changed) {
+        this.hotbarActions = assigned.actions;
+        this.mobileActionPage = Math.floor(request.targetIndex / 5);
+        this.saveSlotMap();
+      }
+      return { changed: assigned.changed, stale: false };
+    },
+    setMobileActionPage: (page) => {
+      this.mobileActionPage = page;
+    },
     hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
@@ -3994,8 +4075,16 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
-  attachTooltip(el: HTMLElement, html: () => string): void {
+  attachTooltip(
+    el: HTMLElement,
+    html: () => string,
+    enabled?: () => boolean,
+    directFocusOnly = false,
+  ): () => void {
     let touchTimer: number | undefined;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchMoved = false;
     // tooltip box size, measured once in showAt (right after the content is set)
     // and reused by every mousemove: the content cannot change between showAt
     // calls, so re-reading offsetWidth/Height per mousemove only forced a reflow
@@ -4007,6 +4096,10 @@ export class Hud {
       touchTimer = undefined;
     };
     const showAt = (x: number, y: number, trigger: 'touch' | 'mouse' | 'focus') => {
+      if (enabled && !enabled()) {
+        this.tooltipEl.style.display = 'none';
+        return;
+      }
       if (this.mobileHotbarDrag?.active) return;
       // Touch-only path: showing the tooltip means the held control is being
       // inspected, so the release click should peek, not fire its action.
@@ -4029,7 +4122,12 @@ export class Hud {
     el.addEventListener('pointerdown', () => {
       pointerFocusPending = true;
     });
-    el.addEventListener('focusin', () => {
+    el.addEventListener('focusin', (event) => {
+      // A tooltip attached to a composite row must describe the row only when
+      // the row itself receives keyboard focus. Focus from nested Add, Remove,
+      // or assignment controls bubbles through the row and must not reopen the
+      // row description after a Spellbook rerender.
+      if (directFocusOnly && event.target !== el) return;
       if (pointerFocusPending) {
         pointerFocusPending = false;
         return;
@@ -4066,10 +4164,19 @@ export class Hud {
       this.tooltipEl.style.display = 'none';
       const x = e.clientX,
         y = e.clientY;
+      touchStartX = x;
+      touchStartY = y;
+      touchMoved = false;
       touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
+    });
+    el.addEventListener('pointermove', (e) => {
+      if (!mobile() || e.pointerType !== 'touch' || touchTimer === undefined) return;
+      touchMoved = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY) > TAP_SLOP_PX;
+      if (touchMoved) clearTouchTimer();
     });
     el.addEventListener('pointerup', () => {
       clearTouchTimer();
+      touchMoved = false;
       // Safari desktop never focuses a button on click, so pointerdown's flag
       // above would otherwise never get consumed by a focusin and could wrongly
       // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
@@ -4077,8 +4184,10 @@ export class Hud {
     });
     el.addEventListener('pointercancel', () => {
       clearTouchTimer();
+      touchMoved = false;
       pointerFocusPending = false;
     });
+    return showNearElement;
   }
 
   private bindMobileFrameLongPress(
@@ -4140,9 +4249,217 @@ export class Hud {
     );
   }
 
+  private resetMobileMobTooltipConstraint(): void {
+    this.tooltipEl.classList.remove('mob-tooltip-clipped');
+    this.tooltipEl.style.removeProperty('max-height');
+  }
+
+  private visibleMobTooltip(): boolean {
+    return (
+      document.body.classList.contains('mobile-touch') &&
+      this.tooltipEl.classList.contains('mob-tooltip') &&
+      this.tooltipEl.style.display === 'block'
+    );
+  }
+
+  private currentMobTooltipLayoutSignature(): string {
+    const body = document.body;
+    const rootStyle = document.documentElement.style;
+    const bodyFlags = [
+      'mobile-touch',
+      'mobile-left-handed',
+      'hud-mobile-compact',
+      'hud-mobile-standard',
+      'hud-mobile-tablet',
+      'mobile-consumables-open',
+      'mobile-camera-joystick-on',
+      'mobile-pet-active',
+    ]
+      .map((className) => (body.classList.contains(className) ? '1' : '0'))
+      .join('');
+    const elementState = [
+      'mobile-consumables-row',
+      'party-frames',
+      'target-frame',
+      'player-frame',
+      'mobile-move-joystick',
+      'castbar',
+      'swingbar',
+    ]
+      .map((id) => {
+        const element = document.getElementById(id);
+        return element
+          ? `${element.className}|${element.getAttribute('style') ?? ''}|${element.childElementCount}`
+          : '';
+      })
+      .join('||');
+    return [
+      window.innerWidth,
+      window.innerHeight,
+      bodyFlags,
+      rootStyle.getPropertyValue('--ui-scale'),
+      rootStyle.getPropertyValue('--tooltip-scale'),
+      elementState,
+    ].join('::');
+  }
+
+  private scheduleVisibleMobTooltipLayout(force = false): void {
+    if (!this.visibleMobTooltip()) return;
+    const signature = this.currentMobTooltipLayoutSignature();
+    if (!force && signature === this.mobTooltipLayoutSignature) return;
+    this.mobTooltipLayoutSignature = signature;
+    if (this.mobTooltipLayoutFrame !== null) return;
+    this.mobTooltipLayoutFrame = window.requestAnimationFrame(() => {
+      this.mobTooltipLayoutFrame = null;
+      this.positionVisibleMobileMobTooltip();
+    });
+  }
+
+  private initMobTooltipLayoutInvalidation(): void {
+    window.addEventListener('resize', () => this.scheduleVisibleMobTooltipLayout(true));
+
+    if (typeof MutationObserver !== 'undefined') {
+      this.mobTooltipMutationObserver = new MutationObserver((records) => {
+        const obstacleChanged = records.some(
+          (record) => record.target !== document.body && record.target !== document.documentElement,
+        );
+        this.scheduleVisibleMobTooltipLayout(obstacleChanged);
+      });
+      this.mobTooltipMutationObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+      this.mobTooltipMutationObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style'],
+      });
+      for (const id of [
+        'mobile-consumables-row',
+        'party-frames',
+        'target-frame',
+        'player-frame',
+        'mobile-move-joystick',
+        'castbar',
+        'swingbar',
+      ]) {
+        const element = document.getElementById(id);
+        if (!element) continue;
+        this.mobTooltipMutationObserver.observe(element, {
+          attributes: true,
+          attributeFilter: ['class', 'style', 'hidden'],
+          childList: id === 'mobile-consumables-row' || id === 'party-frames',
+        });
+      }
+    }
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this.mobTooltipResizeObserver = new ResizeObserver(() => {
+        this.scheduleVisibleMobTooltipLayout(true);
+      });
+      for (const id of [
+        'minimap-wrap',
+        'tooltip',
+        'mobile-consumables-toggle',
+        'mobile-consumables-row',
+        'party-frames',
+        'target-frame',
+        'player-frame',
+        'mobile-move-joystick',
+        'castbar',
+        'swingbar',
+      ]) {
+        const element = document.getElementById(id);
+        if (element) this.mobTooltipResizeObserver.observe(element);
+      }
+    }
+  }
+
+  private visibleElementRect(element: Element | null): VisualRect | null {
+    if (!element) return null;
+    const style = getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden') return null;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 ? rect : null;
+  }
+
+  private visibleHudRect(id: string): VisualRect | null {
+    return this.visibleElementRect(document.getElementById(id));
+  }
+
+  private mobileCameraStartRect(): VisualRect | null {
+    const controls = document.getElementById('mobile-controls');
+    if (!controls) return null;
+    const pseudo = getComputedStyle(controls, '::before');
+    if (pseudo.content === 'none' || pseudo.display === 'none') return null;
+    const left = Number.parseFloat(pseudo.left);
+    const top = Number.parseFloat(pseudo.top);
+    const width = Number.parseFloat(pseudo.width);
+    const height = Number.parseFloat(pseudo.height);
+    if (![left, top, width, height].every(Number.isFinite) || width <= 0 || height <= 0)
+      return null;
+    const controlsRect = controls.getBoundingClientRect();
+    const visualLeft = controlsRect.left + left;
+    const visualTop = controlsRect.top + top;
+    return {
+      left: visualLeft,
+      top: visualTop,
+      right: visualLeft + width,
+      bottom: visualTop + height,
+      width,
+      height,
+    };
+  }
+
+  private mobileMobTooltipObstacles(): VisualRect[] {
+    const obstacles = [
+      'mobile-move-joystick',
+      'mobile-consumables-toggle',
+      'mobile-consumables-row',
+      'player-frame',
+      'target-frame',
+      'party-frames',
+      'castbar',
+      'swingbar',
+      'mobile-action-ring',
+    ]
+      .map((id) => this.visibleHudRect(id))
+      .filter((rect): rect is VisualRect => rect !== null);
+    for (const slot of document.querySelectorAll('.mobile-consumable-slot')) {
+      const rect = this.visibleElementRect(slot);
+      if (rect) obstacles.push(rect);
+    }
+    const cameraStart = this.mobileCameraStartRect();
+    if (cameraStart) obstacles.push(cameraStart);
+    return obstacles;
+  }
+
+  private positionVisibleMobileMobTooltip(): void {
+    if (!this.visibleMobTooltip()) return;
+    const minimapRect = this.visibleHudRect('minimap-wrap');
+    if (!minimapRect) return;
+
+    this.resetMobileMobTooltipConstraint();
+    const layout = mobileMobTooltipLayout({
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      uiScale: getUiScale(),
+      tooltipAuthorWidth: this.tooltipEl.offsetWidth,
+      tooltipNaturalAuthorHeight: this.tooltipEl.offsetHeight,
+      minimapRect,
+      leftHanded: document.body.classList.contains('mobile-left-handed'),
+      obstacles: this.mobileMobTooltipObstacles(),
+    });
+    this.tooltipEl.style.left = `${layout.left}px`;
+    this.tooltipEl.style.top = `${layout.top}px`;
+    this.tooltipEl.style.maxHeight = `${layout.maxHeight}px`;
+    this.tooltipEl.classList.toggle('mob-tooltip-clipped', layout.clipped);
+    this.mobTooltipLayoutSignature = this.currentMobTooltipLayoutSignature();
+  }
+
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
+    this.resetMobileMobTooltipConstraint();
   }
 
   private showRaidLockoutTooltip(): void {
@@ -4159,6 +4476,7 @@ export class Hud {
   // caller can cache it (attachTooltip's mousemove clamp reuses it instead of
   // re-reading offsetWidth/Height, which would force a reflow per mousemove).
   private paintTooltipAt(html: string, x: number, y: number): { w: number; h: number } {
+    this.resetMobileMobTooltipConstraint();
     this.tooltipEl.classList.remove('mob-tooltip');
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
@@ -4173,36 +4491,25 @@ export class Hud {
     return { w: tw, h: th };
   }
 
-  // Anchors the mob-hover tooltip to a fixed viewport corner instead of the
-  // cursor. Desktop keeps the WoW default bottom-right slot; touch moves to the
-  // left of the minimap so selected enemy info does not cover the bottom action
-  // controls.
+  // Anchors the mob-hover tooltip away from the cursor. Desktop keeps the WoW
+  // default bottom-right slot; touch follows the rendered minimap and HUD geometry.
   // Deliberately NOT tied to the player frame: that frame is player-movable
   // (MovableFrame), and an anchor riding it wanders wherever the frame was dragged.
   private paintMobTooltipBottomRight(html: string): void {
+    this.resetMobileMobTooltipConstraint();
     this.tooltipEl.classList.add('mob-tooltip');
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
+    const isMobileTouch = document.body.classList.contains('mobile-touch');
+    if (isMobileTouch) {
+      this.positionVisibleMobileMobTooltip();
+      return;
+    }
     const z = getUiScale();
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
-    const isMobileTouch = document.body.classList.contains('mobile-touch');
-    const minimapRect = isMobileTouch
-      ? (document.getElementById('minimap-wrap')?.getBoundingClientRect() ?? null)
-      : null;
-    const left =
-      minimapRect !== null
-        ? Math.max(
-            MOB_TOOLTIP_MOBILE_EDGE_GAP,
-            minimapRect.left / z - tw - MOB_TOOLTIP_MOBILE_MINIMAP_GAP,
-          )
-        : Math.max(8, window.innerWidth / z - tw - MOB_TOOLTIP_MARGIN_RIGHT);
-    const top =
-      minimapRect !== null
-        ? Math.max(MOB_TOOLTIP_MOBILE_EDGE_GAP, minimapRect.top / z)
-        : Math.max(8, window.innerHeight / z - th - MOB_TOOLTIP_MARGIN_BOTTOM);
-    this.tooltipEl.style.left = `${left}px`;
-    this.tooltipEl.style.top = `${top}px`;
+    this.tooltipEl.style.left = `${Math.max(8, window.innerWidth / z - tw - MOB_TOOLTIP_MARGIN_RIGHT)}px`;
+    this.tooltipEl.style.top = `${Math.max(8, window.innerHeight / z - th - MOB_TOOLTIP_MARGIN_BOTTOM)}px`;
   }
 
   // Shows the WoW-style mouseover tooltip (name / level / creature type) for a
@@ -4222,7 +4529,10 @@ export class Hud {
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
       .join(',');
     const key = `${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
-    if (key === this.lastMobTooltipId) return;
+    if (key === this.lastMobTooltipId) {
+      this.scheduleVisibleMobTooltipLayout();
+      return;
+    }
     this.lastMobTooltipId = key;
     const template = MOBS[entity.templateId];
     if (!template) {
@@ -4347,6 +4657,25 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    if (item.elixir) {
+      html += this.auraEffectTooltipHtml(item.elixir);
+      const seconds = item.elixir.duration;
+      const duration =
+        seconds >= 60 && seconds % 60 === 0
+          ? formatNumber(seconds / 60, {
+              style: 'unit',
+              unit: 'minute',
+              unitDisplay: 'long',
+              maximumFractionDigits: 0,
+            })
+          : formatNumber(seconds, {
+              style: 'unit',
+              unit: 'second',
+              unitDisplay: 'long',
+              maximumFractionDigits: 0,
+            });
+      html += `<div class="tt-sub">${esc(t('hudChrome.itemTooltip.duration', { duration }))}</div>`;
+    }
     if (item.kind === 'quest')
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
@@ -4692,10 +5021,7 @@ export class Hud {
     if (cupMatch && cupMatch.team !== null) return 'sport';
     if (this.sim.cfg.playerClass === 'druid') {
       if (this.sim.player.auras.some((a) => a.kind === 'form_bear')) return 'bear';
-      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) {
-        if (this.sim.player.auras.some((a) => a.kind === 'stealth')) return 'cat_stealth';
-        return 'cat';
-      }
+      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) return 'cat';
     }
     if (
       this.sim.cfg.playerClass === 'rogue' &&
@@ -4715,17 +5041,16 @@ export class Hud {
     );
   }
 
-  // Whether an ability belongs on a given form's default bar. Bear/Wolf bars hold
+  // Whether an ability belongs on a given form's default bar. Bear/cat bars hold
   // only that form's kit (its `requiresForm` abilities) plus the shift toggles;
   // the caster ('normal') bar excludes form-only abilities so they no longer
-  // auto-dump onto it. Stealth pages are intentionally manual: they begin empty
-  // and never receive automatic placements.
+  // auto-dump onto it. Rogue stealth has no `requiresForm` kit, so it keeps the
+  // full caster set.
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // The sport bar holds ONLY the sport kit; conversely no sport id may ever
     // auto-place onto (and pollute) a persisted class bar.
     if (form === 'sport') return !!SPORT_ABILITIES[id];
     if (SPORT_ABILITIES[id]) return false;
-    if (this.isStealthHotbarForm(form)) return false;
     if (form === 'bear' || form === 'cat') {
       return ABILITIES[id]?.requiresForm === form || Hud.FORM_TOGGLE_IDS.has(id);
     }
@@ -4737,14 +5062,11 @@ export class Hud {
     return this.sim.known.map((k) => k.def.id).filter((id) => this.shouldAutoPlaceOnForm(id, form));
   }
 
-  // True only for the druid form bars that seed a form-specific kit. Rogue and
-  // Wolf stealth pages take the separate blank/manual path below.
+  // True for the druid form bars that own a dedicated kit (bear/cat). Rogue
+  // stealth is excluded: the sim does not lock the caster kit in stealth, so its
+  // bar legitimately mirrors the normal layout.
   private isFormKitBar(form: HotbarForm = this.activeHotbarForm): boolean {
     return this.sim.cfg.playerClass === 'druid' && (form === 'bear' || form === 'cat');
-  }
-
-  private isStealthHotbarForm(form: HotbarForm = this.activeHotbarForm): boolean {
-    return form === 'stealth' || form === 'cat_stealth';
   }
 
   // Gates form-bar-only UI (e.g. the spellbook "Reset bar" button) so it never
@@ -4763,54 +5085,6 @@ export class Hud {
   private markFormBarSeeded(form: HotbarForm = this.activeHotbarForm): void {
     try {
       localStorage.setItem(this.formBarSeededKey(form), '1');
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  // Versioned separately from the druid form-kit migration. The first blank-page
-  // rollout also clears a byte-identical parent clone created by the previous
-  // behavior, while leaving every customized stealth layout untouched.
-  private stealthBarInitializedKey(form: HotbarForm = this.activeHotbarForm): string {
-    return `${this.slotMapKey(form)}_blank_v1`;
-  }
-
-  private loadStealthSlotMap(
-    parsed: HotbarAction[],
-    stored: boolean,
-    storedRaw: string | null,
-  ): void {
-    let initialized = false;
-    try {
-      initialized = localStorage.getItem(this.stealthBarInitializedKey()) === '1';
-    } catch {
-      /* storage unavailable */
-    }
-
-    let actions = parsed;
-    let shouldPersist = !stored;
-    if (!initialized) {
-      const parentForm: HotbarForm = this.activeHotbarForm === 'cat_stealth' ? 'cat' : 'normal';
-      let parentStoredRaw: string | null = null;
-      try {
-        parentStoredRaw = localStorage.getItem(this.slotMapKey(parentForm));
-      } catch {
-        /* storage unavailable */
-      }
-      if (!stored || (storedRaw !== null && storedRaw === parentStoredRaw)) {
-        actions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, () => null);
-        shouldPersist = true;
-      }
-    }
-
-    this.loadedSlotMapFromStorage = true;
-    this.hotbarActions = actions;
-    this.knownAbilityIdsAtLastSlotSync = null;
-    try {
-      // Persist first so a failed page write never leaves a success marker that
-      // suppresses the next migration attempt.
-      if (shouldPersist) localStorage.setItem(this.slotMapKey(), JSON.stringify(actions));
-      if (!initialized) localStorage.setItem(this.stealthBarInitializedKey(), '1');
     } catch {
       /* storage unavailable */
     }
@@ -4860,11 +5134,10 @@ export class Hud {
   private loadSlotMap(): void {
     let arr: unknown = null;
     let stored = false;
-    let storedRaw: string | null = null;
     try {
-      storedRaw = localStorage.getItem(this.slotMapKey());
-      arr = JSON.parse(storedRaw ?? 'null');
-      stored = Array.isArray(arr);
+      const raw = localStorage.getItem(this.slotMapKey());
+      stored = raw !== null;
+      arr = JSON.parse(raw ?? 'null');
     } catch {
       /* corrupt */
     }
@@ -4895,10 +5168,6 @@ export class Hud {
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
     }
-    if (this.isStealthHotbarForm()) {
-      this.loadStealthSlotMap(parsed, stored, storedRaw);
-      return;
-    }
     // Druid bear/cat bars auto-populate with that form's kit instead of cloning
     // the caster bar; existing characters are migrated once (see seedFormBarIfNeeded).
     if (this.isFormKitBar()) {
@@ -4907,6 +5176,28 @@ export class Hud {
       this.hotbarActions = parsed;
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
+    }
+    const emptyFormMap =
+      this.activeHotbarForm !== 'normal' && parsed.every((action) => action === null);
+    if (emptyFormMap) {
+      let fallback: unknown = null;
+      try {
+        fallback = JSON.parse(localStorage.getItem(this.slotMapKey('normal')) ?? 'null');
+      } catch {
+        /* corrupt */
+      }
+      const normalActions = parseHotbarActions(
+        fallback,
+        Hud.BAR_ABILITY_SLOTS,
+        (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
+        (id) => this.isHotbarItemId(id),
+      );
+      if (normalActions.some((action) => action !== null)) {
+        this.loadedSlotMapFromStorage = true;
+        this.hotbarActions = normalActions;
+        this.knownAbilityIdsAtLastSlotSync = null;
+        return;
+      }
     }
     this.loadedSlotMapFromStorage = stored;
     this.hotbarActions = parsed;
@@ -4948,12 +5239,13 @@ export class Hud {
     return true;
   }
 
-  // Rebuild the active bar from its default kit: druid forms get their form kit,
-  // caster bars get filtered known abilities, and stealth pages reset to blank.
-  // Item shortcuts and manual arrangement are intentionally discarded; it's a reset.
+  // Rebuild the active bar from its default kit (form bars get their form kit;
+  // the caster/stealth bar gets the form-filtered known abilities). Item
+  // shortcuts and manual arrangement are intentionally discarded — it's a reset.
   // The per-frame update() repaints the slot icons from hotbarActions, so we only
   // mutate state here (same as addAbilityToHotbar / drag-drop).
   private resetActiveFormBarToDefault(): void {
+    this.spellbookWindow.closePicker();
     this.hotbarActions = buildDefaultFormBar(
       this.formKitAbilityIds(this.activeHotbarForm),
       Hud.BAR_ABILITY_SLOTS,
@@ -4974,11 +5266,12 @@ export class Hud {
     const next = this.playerHotbarForm();
     if (next === this.activeHotbarForm) return;
     this.saveSlotMap();
+    this.spellbookWindow.closePicker();
     this.activeHotbarForm = next;
     this.dragAction = null;
-    this.clearMobileHotbarDrag();
+    this.clearActionDropTargets();
     this.loadSlotMap();
-    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
   }
 
   // Drop unlearned ability ids; place newly learned abilities in the first
@@ -5006,7 +5299,7 @@ export class Hud {
     this.hotbarActions = synced.actions;
     if (synced.changed) this.saveSlotMap();
     this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
-    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
@@ -5313,7 +5606,14 @@ export class Hud {
   // state lives on hotbarActions + sim, not on the view). The next update() call
   // repaints the ring from the new page.
   private cycleMobileActionPage(): void {
-    this.mobileActionPage = nextMobilePage(this.mobileActionPage);
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage, this.mobileActionPageCount());
+  }
+
+  private mobileActionPageCount(): number {
+    return effectiveMobilePageCount(
+      this.optionsHooks?.settings.get('mobileActionPageMinimum') ?? 2,
+      this.hotbarActions,
+    );
   }
 
   private flashActionSlot(barSlot: number): void {
@@ -5803,7 +6103,7 @@ export class Hud {
       // so slot positions are tap-stable (see the field comment). Counts and
       // the potion-cooldown sweep still update live off the sim each frame.
       if (this.consumablesOpen) {
-        consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);
+        this.refreshConsumableBarIds();
       }
       document.body.classList.toggle('mobile-consumables-open', this.consumablesOpen);
       toggle.setAttribute('aria-expanded', this.consumablesOpen ? 'true' : 'false');
@@ -5845,7 +6145,7 @@ export class Hud {
         slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
           slotIndex: i,
           isAttack: false,
-          hasAction: () => this.consumableBarIds[i] !== undefined,
+          hasAction: () => this.consumableBarIds[i] != null,
           ability: () => null,
           item: () => {
             const id = this.consumableBarIds[i];
@@ -5881,6 +6181,15 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
     const btn = this.consumableBarSlotBtns[i];
     if (btn) this.flashActionButton(btn);
+  }
+
+  private refreshConsumableBarIds(): void {
+    resolveConsumableBarLayout(
+      this.sim.inventory,
+      (id) => ITEMS[id],
+      this.consumablePreferences.layout(),
+      this.consumableBarIds,
+    );
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -6189,7 +6498,8 @@ export class Hud {
     const commands = document.createElement('div');
     commands.className = 'petbar-group';
     const stances = document.createElement('div');
-    stances.className = 'petbar-group';
+    stances.className = 'petbar-group petbar-stances';
+    stances.classList.toggle('expanded', this.petModeMenuOpen);
     bar.append(commands, stances);
     const petTooltip = (title: string, desc: string): string =>
       `<div class="tt-title">${esc(title)}</div><div class="tt-desc">${esc(desc)}</div>`;
@@ -6206,10 +6516,12 @@ export class Hud {
         cooldownText?: string;
         onContextMenu?: () => void;
         onTouchHold?: () => void;
+        kind?: 'stance-option';
       } = {},
     ) => {
       const btn = document.createElement('button');
       btn.className = 'pet-btn';
+      if (opts.kind === 'stance-option') btn.classList.add('pet-stance-option');
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
@@ -6441,7 +6753,7 @@ export class Hud {
           this.petModeMenuOpen = false;
           this.lastPetBarSig = '';
         },
-        { active: mode === entry.mode },
+        { active: mode === entry.mode, kind: 'stance-option' },
       );
     }
   }
@@ -6839,6 +7151,7 @@ export class Hud {
     // stay undefined when the ring DOM never got built, e.g. an older cached
     // template). Reuses the exact same world snapshot as the desktop bar.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
+      this.mobileActionPage = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
       const contextInteract = !!this.onMobileCanContextInteract?.();
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
@@ -6847,7 +7160,7 @@ export class Hud {
           inventory: sim.inventory,
         }),
         this.mobileActionPage,
-        mobilePageCount(),
+        this.mobileActionPageCount(),
         contextInteract,
       );
     }
@@ -8397,10 +8710,7 @@ export class Hud {
         } else if (ev.crit && tgt.kind === 'mob' && shouldPlayCritSfxForTarget(tgt)) {
           const fam = mobVoiceFamily(tgt.templateId);
           if (fam && shouldPlayMobVoiceSfxForEntity(tgt))
-            this.combat(mobSfxKey(fam, tgt.templateId, 'attack'), tp.x, tp.y, tp.z, 0.6, {
-              rate: 1.25,
-              cooldown: 0.1,
-            });
+            this.combat(`mob_${fam}_attack`, tp.x, tp.y, tp.z, 0.6, { rate: 1.25, cooldown: 0.1 });
         }
         return;
       }
@@ -8452,7 +8762,7 @@ export class Hud {
           this.mobAggroed.delete(ev.entityId);
           const fam = mobVoiceFamily(ent.templateId);
           if (fam && shouldPlayMobVoiceSfxForEntity(ent))
-            this.combat(mobSfxKey(fam, ent.templateId, 'death'), p.x, p.y, p.z, 0.8);
+            this.combat(`mob_${fam}_death`, p.x, p.y, p.z, 0.8);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
           this.combat('player_death', p.x, p.y, p.z, 0.7);
         }
@@ -8469,7 +8779,7 @@ export class Hud {
     this.mobAggroed.add(mob.id);
     const fam = mobVoiceFamily(mob.templateId);
     if (fam && shouldPlayMobVoiceSfxForEntity(mob))
-      this.combat(mobSfxKey(fam, mob.templateId, 'aggro'), mob.pos.x, mob.pos.y, mob.pos.z, 0.7);
+      this.combat(`mob_${fam}_aggro`, mob.pos.x, mob.pos.y, mob.pos.z, 0.7);
     return true;
   }
 
@@ -8480,14 +8790,7 @@ export class Hud {
       if (this.ensureMobEngaged(src)) return; // just fired the aggro alert
       const fam = mobVoiceFamily(src.templateId);
       if (fam && shouldPlayMobVoiceSfxForEntity(src))
-        this.combat(
-          mobSfxKey(fam, src.templateId, 'attack'),
-          src.pos.x,
-          src.pos.y,
-          src.pos.z,
-          0.55,
-          { cooldown: 0.25 },
-        );
+        this.combat(`mob_${fam}_attack`, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
     } else if (src.kind === 'player') {
       this.combat(weaponSwingKey(src.templateId), src.pos.x, src.pos.y, src.pos.z, 0.5, {
         cooldown: 0.08,
@@ -9490,45 +9793,12 @@ export class Hud {
           break;
         case 'lockpickSession':
           this.openLockpickBoard();
-          sfx.playUi('lockpick_begin');
           break;
-        case 'lockpickStep': {
+        case 'lockpickStep':
           this.lockpickWindow.onStep(ev.result);
-          switch (ev.result) {
-            case 'advanced': {
-              let pick = Math.floor(Math.random() * 4);
-              if (pick === lpAdvancedLast) pick = (pick + 1) % 4;
-              lpAdvancedLast = pick;
-              sfx.playUi(`lockpick_advanced_${pick + 1}`);
-              break;
-            }
-            case 'slip':
-              sfx.playUi('lockpick_slip');
-              break;
-            case 'bind':
-              sfx.playUi('lockpick_bind');
-              break;
-            case 'trap':
-              sfx.playUi('lockpick_trap');
-              break;
-            case 'pageCleared':
-              sfx.playUi('lockpick_page_cleared');
-              break;
-            case 'retry':
-              sfx.playUi('lockpick_retry');
-              break;
-            case 'success':
-              sfx.playUi('lockpick_success');
-              break;
-            case 'fail':
-              sfx.playUi('lockpick_fail');
-              break;
-          }
           break;
-        }
         case 'lockpickEnd':
           this.endLockpick(ev.outcome, ev.lootTier);
-          if (ev.outcome === 'success') sfx.playUi('lockpick_end');
           break;
         case 'lockpickBonus': {
           const tier =
@@ -9538,7 +9808,6 @@ export class Hud {
                 ? t('sim.lockpick.tierMedium')
                 : t('sim.lockpick.tierLow');
           this.combatLog(t('sim.lockpick.lockYields', { tier }), '#ffdd88');
-          sfx.playUi('lockpick_bonus');
           break;
         }
         case 'delveRiteChoosePrompt':
@@ -9887,8 +10156,6 @@ export class Hud {
       'No one has whispered you recently.': 'hud.errors.noRecentWhisper',
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
-      'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
-      'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
       'Your party is full.': 'hud.errors.partyFull',
@@ -10636,13 +10903,10 @@ export class Hud {
     this.renderGossip(npc);
   }
 
-  // closeIfEmpty is set only when re-rendering after an accept/turn-in click:
-  // a fresh NPC visit (or navigating Back) always shows the greeting even with
-  // an empty menu, but once the player has just resolved the one thing the NPC
-  // had to offer (the common case for a tutorial giver with a single starter
-  // quest), an empty menu means there is nothing left to do here and the
-  // window should close itself instead of hanging open with just the greeting.
-  private renderGossip(npc: Entity, closeIfEmpty = false): void {
+  private renderGossip(npc: Entity): void {
+    this.openGossipNpcId = npc.id;
+    this.openQuestDetailId = null;
+    const el = $('#quest-dialog');
     const def = NPCS[npc.templateId];
     // accepted-but-unfinished quests are tracked in the quest log; the NPC
     // only offers new quests (at the giver) and turn-ins (at the turn-in NPC)
@@ -10664,29 +10928,6 @@ export class Hud {
         ),
       )
       .map((qp) => qp.questId);
-    const hasVendor = npc.vendorItems.length > 0;
-    const hasMarket = !!def?.market;
-    const hasHeroicVendor = !!def?.heroicVendor;
-    const hasDelveBoard = Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId);
-    const hasVcup = npc.templateId === 'groundskeeper_bram';
-    if (
-      closeIfEmpty &&
-      gossipMenuIsEmpty({
-        questCount: interesting.length,
-        discussionCount: discussionQuests.length,
-        hasVendor,
-        hasMarket,
-        hasHeroicVendor,
-        hasDelveBoard,
-        hasVcup,
-      })
-    ) {
-      this.closeQuestDialog();
-      return;
-    }
-    this.openGossipNpcId = npc.id;
-    this.openQuestDetailId = null;
-    const el = $('#quest-dialog');
     markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
@@ -10711,16 +10952,16 @@ export class Hud {
         html += `<button type="button" class="qd-list-item" data-discuss="${esc(qid)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
       }
     }
-    if (hasVendor) {
+    if (npc.vendorItems.length > 0) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
-    if (hasMarket) {
+    if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
-    if (hasHeroicVendor) {
+    if (def?.heroicVendor) {
       html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
-    if (hasDelveBoard) {
+    if (Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId)) {
       const delveForNpc = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
       const openLabel = delveForNpc
         ? delveDisplayName(delveForNpc.id)
@@ -10729,7 +10970,7 @@ export class Hud {
     }
     // Groundskeeper Bram keeps the book of fixtures at the Sowfield gate: his
     // gossip menu opens the Vale Cup window (the delve-board button precedent).
-    if (hasVcup) {
+    if (npc.templateId === 'groundskeeper_bram') {
       html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
     el.innerHTML = html;
@@ -10820,7 +11061,7 @@ export class Hud {
         this.sim.reportTelemetry('quest_accept', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
         });
-        this.renderGossip(npc, true);
+        this.renderGossip(npc);
       });
       el.appendChild(btn);
     } else if (state === 'ready') {
@@ -10833,7 +11074,7 @@ export class Hud {
         this.sim.reportTelemetry('quest_turnin', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
         });
-        this.renderGossip(npc, true);
+        this.renderGossip(npc);
       });
       el.appendChild(btn);
     }
@@ -13217,6 +13458,7 @@ export class Hud {
   // Restore a saved loadout's action bar into the per-class slot map (reuses the
   // existing hotbar persistence; only places ids that resolve to real abilities).
   private applyLoadoutBar(bar: (string | null)[]): void {
+    this.spellbookWindow.closePicker();
     this.hotbarActions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, (_, i) => {
       const v = bar[i];
       return typeof v === 'string' && ABILITIES[v] ? { type: 'ability' as const, id: v } : null;
@@ -14316,6 +14558,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (this.spellbookWindow.closePicker()) return true;
     if (this.openLootChestId !== null) {
       this.closeLoot();
       return true;

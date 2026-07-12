@@ -50,7 +50,6 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
-import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody } from './door_portal';
@@ -121,6 +120,7 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import { resolveViewportResize } from './viewport_resize_core';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -171,9 +171,25 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 const ENTITY_LOD_RANGE_SQ = 58 * 58;
 
-// Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
-// animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
-//
+// Crowd-adaptive character LOD. In a dense scene (capital, raid, world boss) the
+// dominant client cost is many full-articulated rigs plus their shadow passes,
+// which the frame-budget governor cannot shed (characters are non-governable).
+// Once the visible-rig count climbs past a soft knee, pull the articulated-LOD
+// and full-shadow distances in toward a floor so more of the throng collapses to
+// the single-draw far LOD + static proxy shadow. Below the knee (ordinary play,
+// a handful of rigs) the scale is exactly 1, so normal scenes are untouched.
+// FPS-first: in a crowd the frozen far-pose that shows a little sooner is a fair
+// trade for staying above 60. Distances compare squared, so scale is squared.
+const CROWD_LOD_SOFT_RIGS = 14;
+const CROWD_LOD_HARD_RIGS = 48;
+const CROWD_LOD_MIN_SCALE = 0.6;
+function crowdLodScaleSq(visibleRigs: number): number {
+  if (visibleRigs <= CROWD_LOD_SOFT_RIGS) return 1;
+  const span = CROWD_LOD_HARD_RIGS - CROWD_LOD_SOFT_RIGS;
+  const t = Math.min(1, (visibleRigs - CROWD_LOD_SOFT_RIGS) / span);
+  const scale = 1 - t * (1 - CROWD_LOD_MIN_SCALE);
+  return scale * scale;
+}
 // Feet-above-terrain margin that counts as "airborne" for the jump pose. Mirrors
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
@@ -1558,17 +1574,28 @@ export class Renderer {
   }
 
   private resizeViewport(measured = this.measureViewport()): void {
-    this.viewport = measured;
-    this.camera.aspect = this.viewport.width / this.viewport.height;
-    this.camera.updateProjectionMatrix();
+    const change = resolveViewportResize(
+      { ...this.viewport, pixelRatio: this.webgl.getPixelRatio() },
+      { ...measured, pixelRatio: this.effectivePixelRatio() },
+    );
+    if (!change.resolutionChanged) return;
+    if (change.sizeChanged) {
+      this.viewport = measured;
+      this.camera.aspect = this.viewport.width / this.viewport.height;
+      this.camera.updateProjectionMatrix();
+    }
     this.applyResolution();
+  }
+
+  private effectivePixelRatio(): number {
+    return Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
   }
 
   // Push the current device pixel ratio (× renderScale, still capped by the
   // tier) to the renderer, composer, and vfx. Shared by resize and the
   // render-scale setting so a window resize never drops the chosen scale.
   private applyResolution(): void {
-    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
+    const ratio = this.effectivePixelRatio();
     this.webgl.setPixelRatio(ratio);
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     if (this.post) {
@@ -4211,7 +4238,6 @@ export class Renderer {
     const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
     const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
     const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
-    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -4584,19 +4610,12 @@ export class Renderer {
       }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // Distance-tiered mixer updates: near = every frame, mid = every Nth,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless.
-      // Both the near band and the mid cadence follow the same crowd-adaptive
-      // LOD the shadow bands use, because sampling clips + rebuilding bone
-      // matrices is the per-rig cost that actually scales with the crowd.
-      //
-      // Animation smoothness is cosmetic, but a cast windup is a telegraph the
-      // player reacts to, so the local player, the current target, and anything
-      // mid-cast always animate every frame no matter how dense the crowd.
+      // distance-tiered mixer updates: near = every frame, mid = every 2nd,
+      // far (static LOD mesh visible) = every 6th; edges latch regardless
       let animate = true;
-      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
+      if (id !== p.id) {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
+        else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
       }
       active.update(dt, st, animate);
 

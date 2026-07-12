@@ -2,54 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.',
-  'loading.tips.dungeons':
-    'Kiat: cobalah ruang bawah tanah pada tingkat kesulitan heroik setelah perlengkapanmu melampaui tingkat normal, untuk pertarungan yang lebih sulit dan lebih menguntungkan.',
-  'loading.tips.guilds':
-    'Kiat: bergabung dengan guild memberimu saluran obrolan pribadi dan daftar bersama anggota guildmu.',
-  'loading.tips.loadouts':
-    'Kiat: simpan lebih dari satu set talenta agar dapat bertukar build tanpa menggunakan poin dua kali.',
-  'loading.tips.market':
-    'Kiat: Pasar Dunia memungkinkanmu membeli dan menjual dengan pemain di seluruh dunia.',
-  'loading.tips.professions':
-    'Kiat: profesi pengumpulan dan kerajinan dapat dilatih bersamaan dengan kelas tempurmu.',
-  'loading.tips.pvp':
-    'Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu.',
-  'loading.tips.talents':
-    'Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.',
-  'entities.items.chunk_of_ore.name': 'Bongkahan Bijih',
-  'entities.quests.q_prof_intro.completion':
-    'Lihat? Bijih di tasmu dan kapalan di tanganmu. Teruslah menambang, menebang, dan memetik herba selama menjelajahi jalanan. Saat kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sebelahnya. Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Bongkahan Bijih',
-  'entities.quests.q_prof_intro.text':
-    'Setiap orang di Eastbrook menekuni pekerjaan selain mengayunkan pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ayunkan beliung dan bawakan aku 5 bongkahan. Tambang sendiri, ingat, aku tahu bedanya.',
-  'entities.quests.q_prof_intro.title': 'Pekerjaan untuk Setiap Tangan',
-  'hudChrome.auth.appleChoiceExpired':
-    'Sesi masuk dengan Apple itu telah kedaluwarsa. Silakan masuk lagi dengan Apple.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.',
-  'hudChrome.auth.appleError': 'Tidak dapat masuk dengan Apple. Silakan coba lagi.',
-  'hudChrome.auth.appleLoginCta': 'Lanjutkan dengan Apple',
-  'hudChrome.dailyRewards.reason.banned': 'Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}',
-  'hudChrome.itemHeroicTag': '[HEROIK]',
-  'hudChrome.itemSoulbound': 'Terikat Jiwa',
-  'hudChrome.keybinds.categoryPet': 'Peliharaan',
-  'hudChrome.keybinds.petAggressive': 'Peliharaan: Agresif',
-  'hudChrome.keybinds.petAttack': 'Peliharaan: Serang',
-  'hudChrome.keybinds.petDefensive': 'Peliharaan: Defensif',
-  'hudChrome.keybinds.petStop': 'Peliharaan: Berhenti',
-  'hudChrome.keybinds.petTaunt': 'Peliharaan: Ejek',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
-  'hudChrome.readyCheck.notReady': 'Belum Siap',
-  'hudChrome.readyCheck.prompt': '{name} memulai pemeriksaan kesiapan. Apakah kamu siap?',
-  'hudChrome.readyCheck.ready': 'Siap',
-  'hudChrome.readyCheck.result':
-    'Pemeriksaan kesiapan: {ready} siap, {notReady} belum siap, {noResponse} tidak merespons.',
-  'hudChrome.readyCheck.notInPartyError':
-    'Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.',
-  'hudChrome.readyCheck.inProgressError': 'Pemeriksaan kesiapan sedang berlangsung.',
   'entities.abilities.sport_boot.description':
     'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
   'entities.abilities.sport_boot.name': 'Tendangan Jauh',

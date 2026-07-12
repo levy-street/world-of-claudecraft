@@ -17,6 +17,7 @@ export const CONSUMABLE_BAR_SLOTS = 6;
 export const CONSUMABLE_KIND_ORDER = ['potion', 'elixir', 'food', 'drink'] as const;
 
 export type ConsumableLookup = (itemId: string) => ItemDef | undefined;
+export type ConsumableBarSlotId = string | null;
 
 /**
  * Fill `out` with the item ids the quick bar shows, in render order:
@@ -57,5 +58,35 @@ export function consumableBarItems(
     }
   }
   if (out.length > cap) out.length = cap;
+  return out;
+}
+
+/** Resolve all six painted slots. Automatic mode preserves consumableBarItems'
+ * ordering and pads the row. Custom mode is inventory-independent so depleted
+ * assignments stay visible; invalid or duplicate ids are rendered empty. */
+export function resolveConsumableBarLayout(
+  inventory: readonly Pick<InvSlot, 'itemId'>[],
+  lookup: ConsumableLookup,
+  customLayout: readonly ConsumableBarSlotId[] | null,
+  out: ConsumableBarSlotId[],
+): ConsumableBarSlotId[] {
+  out.length = 0;
+  if (!customLayout) {
+    const automatic = consumableBarItems(inventory, lookup, []);
+    for (let i = 0; i < CONSUMABLE_BAR_SLOTS; i++) out.push(automatic[i] ?? null);
+    return out;
+  }
+
+  const seen = new Set<string>();
+  for (let i = 0; i < CONSUMABLE_BAR_SLOTS; i++) {
+    const itemId = customLayout[i];
+    const def = itemId ? lookup(itemId) : undefined;
+    if (!itemId || !def || !CONSUMABLE_KIND_ORDER.includes(def.kind as never) || seen.has(itemId)) {
+      out.push(null);
+      continue;
+    }
+    seen.add(itemId);
+    out.push(itemId);
+  }
   return out;
 }

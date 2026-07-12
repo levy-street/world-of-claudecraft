@@ -35,6 +35,25 @@ import { questNumbersByLog } from './map_quest_list_view';
 export const MAP_MAX_ZOOM = 6;
 // At or above this zoom, the zoomed-detail overlay (buildings + vegetation) draws.
 export const MAP_DETAIL_ZOOM = 2.2;
+export const MAP_PINCH_DEADZONE_PX = 8;
+
+/** Convert a two-finger distance change into the same multiplicative factor
+ * consumed by Hud.zoomMap. A small deadzone prevents resting-finger jitter. */
+export function mapPinchZoomFactor(
+  previousDistance: number,
+  currentDistance: number,
+  deadzone = MAP_PINCH_DEADZONE_PX,
+): number {
+  if (
+    !Number.isFinite(previousDistance) ||
+    !Number.isFinite(currentDistance) ||
+    previousDistance <= 0 ||
+    currentDistance <= 0 ||
+    Math.abs(currentDistance - previousDistance) < deadzone
+  )
+    return 1;
+  return currentDistance / previousDistance;
+}
 
 // The zoomed-detail overlay only considers props/decorations within this many
 // world units of the visible region, so a footprint half-off the edge still draws.

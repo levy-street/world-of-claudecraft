@@ -906,10 +906,13 @@ export class OptionsWindow {
     this.languageSelect(body);
     this.renderThemeControls(body);
     const hooks = this.deps.options();
-    if (hooks)
-      this.applyControls(body, buildInterfaceControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderInterface(),
-      );
+    if (hooks) {
+      const controls = buildInterfaceControls(this.settingsSource(hooks), {
+        touch: useTouchInterface(),
+        nativeShell: isNativeAppShell(),
+      });
+      this.applyControls(body, controls, hooks, () => this.renderInterface());
+    }
 
     // On/off toggle for chat timestamps.
     const tsRow = document.createElement('div');

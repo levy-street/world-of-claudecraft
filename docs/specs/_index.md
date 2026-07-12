@@ -1,0 +1,4 @@
+# Specifications
+
+- [2026-07-11 - Mobile Bag Item Actions](2026-07-11-mobile-bag-item-actions.md) - Replace destructive or immediate mobile bag taps with item-specific actions and explicit Consumables quick-bar assignment.
+- [2026-07-11 - Mobile HUD Readability Adjustments](2026-07-11-mobile-hud-readability-adjustments.md) - Move target details below the minimap, enlarge responsive unit frames, and keep Consumables in two rows.

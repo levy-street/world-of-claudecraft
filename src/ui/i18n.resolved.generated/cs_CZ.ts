@@ -155,12 +155,10 @@ export const cs_CZ: EnTranslations = {
       "banner": "Sleduješ {name}"
     },
     "readyCheck": {
-      "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
-      "ready": "Připraven(a)",
-      "notReady": "Nepřipraven(a)",
-      "result": "Kontrola připravenosti: {ready} připraveno, {notReady} nepřipraveno, {noResponse} bez odpovědi.",
-      "notInPartyError": "Abys mohl(a) zahájit kontrolu připravenosti, musíš být ve skupině.",
-      "inProgressError": "Kontrola připravenosti už probíhá."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
@@ -241,7 +239,7 @@ export const cs_CZ: EnTranslations = {
         "no_wallet": "Připoj peněženku s alespoň 20 USD ve WOC.",
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
         "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
-        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const cs_CZ: EnTranslations = {
       "leaderboard": "Žebříčky",
       "dailyRewards": "Odměny",
       "nameplates": "Jména",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
       "toggleHaptics": "Přepnout haptiku",
@@ -406,12 +406,12 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
       "valecup": "Pohár údolí",
-      "categoryPet": "Mazlíček",
-      "petAttack": "Mazlíček: Útok",
-      "petStop": "Mazlíček: Zastavit",
-      "petTaunt": "Mazlíček: Provokace",
-      "petDefensive": "Mazlíček: Obranný",
-      "petAggressive": "Mazlíček: Agresivní"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -564,6 +564,10 @@ export const cs_CZ: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Automatika vybere desktopové nebo dotykové ovládání podle zařízení. Zvol Desktop pro vynucení klávesnice a myši (užitečné na tabletu s klávesnicí), nebo Dotyk pro ovládání na obrazovce.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Zvuky kroků",
       "clickFeedback": "Značka kliknutí",
       "lockCursorOnRotate": "Zamknout kurzor při otáčení",
@@ -736,8 +740,8 @@ export const cs_CZ: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
-    "itemHeroicTag": "[HRDINSKÉ]",
-    "itemSoulbound": "Vázáno na duši",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const cs_CZ: EnTranslations = {
       "backpack": "Batoh",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Prázdný slot batohu",
-      "unequipHint": "Klikni pro odebrání tohoto batohu"
+      "unequipHint": "Klikni pro odebrání tohoto batohu",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Tvůj raid byl převeden zpět na skupinu.",
@@ -1084,10 +1107,10 @@ export const cs_CZ: EnTranslations = {
       "spawn": "{name} povstává nad Thornpeak Heights!"
     },
     "auth": {
-      "appleLoginCta": "Pokračovat přes Apple",
-      "appleError": "Přihlášení přes Apple se nezdařilo. Zkus to znovu.",
-      "appleChoiceIntro": "Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.",
-      "appleChoiceExpired": "Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Zapomenuté heslo?",
       "forgotTitle": "Obnovení hesla",
       "forgotHint": "Zadejte své uživatelské jméno a na uloženou e-mailovou adresu pošleme odkaz pro obnovení.",
@@ -1108,7 +1131,18 @@ export const cs_CZ: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",
-      "removeFromBarAria": "Odebrat {name} z akční lišty"
+      "removeFromBarAria": "Odebrat {name} z akční lišty",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const cs_CZ: EnTranslations = {
       "label": "Resetovat pozice rámů"
     },
     "itemTooltip": {
-      "requiresLevel": "Vyžaduje úroveň {level}"
+      "requiresLevel": "Vyžaduje úroveň {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const cs_CZ: EnTranslations = {
       "parcelsLabel": "Balíky",
       "parcelsHint": "Klikni na předmět v batozích a přilož ho.",
       "removeParcelAria": "Odebrat {item} z dopisu",
-      "parcelQtyDecreaseAria": "Odeslat o jeden kus {item} méně",
-      "parcelQtyIncreaseAria": "Odeslat o jeden kus {item} více",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",
@@ -3940,14 +3975,14 @@ export const cs_CZ: EnTranslations = {
     "reconnecting": "Připojení ztraceno. Znovu se připojuje...",
     "connectionRejected": "Server ukončil připojení.",
     "tips": {
-      "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
-      "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
-      "dungeons": "Tip: až svou výbavou přerosteš normální obtížnost dungeonu, vyzkoušej hrdinskou obtížnost. Čeká tě těžší boj a lepší odměna.",
-      "market": "Tip: na Světovém trhu můžeš nakupovat a prodávat s hráči z celého světa.",
-      "guilds": "Tip: vstupem do cechu získáš soukromý chatovací kanál a sdílený seznam členů cechu.",
-      "professions": "Tip: sběračská a řemeslná povolání můžeš trénovat souběžně s bojovou třídou.",
-      "loadouts": "Tip: ulož si více než jednu sestavu talentů, abys mohl(a) přepínat mezi sestavami bez dvojího utrácení bodů.",
-      "pvp": "Tip: vyzvi jiného hráče na přátelský souboj, nebo se zařaď do fronty arény Popelavého kolosea a vyzkoušej svou sestavu."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const cs_CZ: EnTranslations = {
     "androidStandaloneDetail": "Jsi v režimu aplikace na celou obrazovku. Drž zařízení na šířku.",
     "androidInstallDetail": "Pro celou obrazovku na Androidu si tuto stránku nejdřív nainstaluj nebo přidej na plochu.",
     "androidInstallStep": "V Chromu klepni na menu a potom na Instalovat aplikaci nebo Přidat na plochu.",
+    "androidSamsungInstallStep": "V Samsung Internet klepni na menu a potom na Instalovat aplikaci nebo Přidat na plochu.",
     "androidOpenStep": "Otevři World of ClaudeCraft z nové ikony.",
     "otherStandaloneDetail": "Drž zařízení na šířku a na celou obrazovku.",
     "otherInstallDetail": "Pro nejlepší mobilní zážitek na celou obrazovku si tuto stránku nainstaluj nebo přidej na plochu."
@@ -5867,7 +5903,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Tesák starého Šedočelista"
       },
       "chunk_of_ore": {
-        "name": "Kus rudy"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Ošlehaná stránka účetní knihy"
@@ -7550,12 +7586,12 @@ export const cs_CZ: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Řemeslo pro každou ruku",
-        "text": "Každý v Eastbrooku ovládá vedle meče i nějaké řemeslo, {playerName}. Kolem města jsou roztroušené rudné žíly, tak se rozmáchni krumpáčem a přines mi 5 kusů. Vytěž je vlastníma rukama; rozdíl poznám.",
-        "completion": "Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Kus rudy"
+            "label": "Chunk of Ore"
           }
         }
       },

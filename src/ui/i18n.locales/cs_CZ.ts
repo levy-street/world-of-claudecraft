@@ -1364,6 +1364,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pro celou obrazovku na Androidu si tuto stránku nejdřív nainstaluj nebo přidej na plochu.',
   'mobilePreflight.androidInstallStep':
     'V Chromu klepni na menu a potom na Instalovat aplikaci nebo Přidat na plochu.',
+  'mobilePreflight.androidSamsungInstallStep':
+    'V Samsung Internet klepni na menu a potom na Instalovat aplikaci nebo Přidat na plochu.',
   'mobilePreflight.androidOpenStep': 'Otevři World of ClaudeCraft z nové ikony.',
   'mobilePreflight.androidStandaloneDetail':
     'Jsi v režimu aplikace na celou obrazovku. Drž zařízení na šířku.',
@@ -6492,50 +6494,4 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Hesla se neshodují.',
   'hudChrome.auth.resetErrInvalid':
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
-  'entities.items.chunk_of_ore.name': 'Kus rudy',
-  'entities.quests.q_prof_intro.completion':
-    'Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Kus rudy',
-  'entities.quests.q_prof_intro.text':
-    'Každý v Eastbrooku ovládá vedle meče i nějaké řemeslo, {playerName}. Kolem města jsou roztroušené rudné žíly, tak se rozmáchni krumpáčem a přines mi 5 kusů. Vytěž je vlastníma rukama; rozdíl poznám.',
-  'entities.quests.q_prof_intro.title': 'Řemeslo pro každou ruku',
-  'hudChrome.auth.appleChoiceExpired':
-    'Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.',
-  'hudChrome.auth.appleChoiceIntro': 'Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.',
-  'hudChrome.auth.appleError': 'Přihlášení přes Apple se nezdařilo. Zkus to znovu.',
-  'hudChrome.auth.appleLoginCta': 'Pokračovat přes Apple',
-  'hudChrome.dailyRewards.reason.banned': 'Máš zákaz účasti v denních odměnách. Důvod: {reason}',
-  'hudChrome.itemHeroicTag': '[HRDINSKÉ]',
-  'hudChrome.itemSoulbound': 'Vázáno na duši',
-  'hudChrome.keybinds.categoryPet': 'Mazlíček',
-  'hudChrome.keybinds.petAggressive': 'Mazlíček: Agresivní',
-  'hudChrome.keybinds.petAttack': 'Mazlíček: Útok',
-  'hudChrome.keybinds.petDefensive': 'Mazlíček: Obranný',
-  'hudChrome.keybinds.petStop': 'Mazlíček: Zastavit',
-  'hudChrome.keybinds.petTaunt': 'Mazlíček: Provokace',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden kus {item} méně',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden kus {item} více',
-  'hudChrome.readyCheck.notReady': 'Nepřipraven(a)',
-  'hudChrome.readyCheck.prompt': 'Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?',
-  'hudChrome.readyCheck.ready': 'Připraven(a)',
-  'hudChrome.readyCheck.result':
-    'Kontrola připravenosti: {ready} připraveno, {notReady} nepřipraveno, {noResponse} bez odpovědi.',
-  'hudChrome.readyCheck.notInPartyError':
-    'Abys mohl(a) zahájit kontrolu připravenosti, musíš být ve skupině.',
-  'hudChrome.readyCheck.inProgressError': 'Kontrola připravenosti už probíhá.',
-  'loading.tips.classes':
-    'Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.',
-  'loading.tips.dungeons':
-    'Tip: až svou výbavou přerosteš normální obtížnost dungeonu, vyzkoušej hrdinskou obtížnost. Čeká tě těžší boj a lepší odměna.',
-  'loading.tips.guilds':
-    'Tip: vstupem do cechu získáš soukromý chatovací kanál a sdílený seznam členů cechu.',
-  'loading.tips.loadouts':
-    'Tip: ulož si více než jednu sestavu talentů, abys mohl(a) přepínat mezi sestavami bez dvojího utrácení bodů.',
-  'loading.tips.market': 'Tip: na Světovém trhu můžeš nakupovat a prodávat s hráči z celého světa.',
-  'loading.tips.professions':
-    'Tip: sběračská a řemeslná povolání můžeš trénovat souběžně s bojovou třídou.',
-  'loading.tips.pvp':
-    'Tip: vyzvi jiného hráče na přátelský souboj, nebo se zařaď do fronty arény Popelavého kolosea a vyzkoušej svou sestavu.',
-  'loading.tips.talents':
-    'Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.',
 };

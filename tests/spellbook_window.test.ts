@@ -12,6 +12,11 @@ import { describe, expect, it } from 'vitest';
 const src = readFileSync(new URL('../src/ui/spellbook_window.ts', import.meta.url), 'utf8');
 const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+const hudChromeCatalog = readFileSync(
+  new URL('../src/ui/i18n.catalog/hud_chrome.ts', import.meta.url),
+  'utf8',
+);
 
 describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => {
   it('drives the panel from the pure view core', () => {
@@ -59,18 +64,190 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
   });
 });
 
-describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
+describe('spellbook_window: inline mobile slot picker', () => {
   it('feeds abilityIdByBarSlot through to the pure view core', () => {
     expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');
   });
 
-  it('gates the page label on both a non-null mobilePage AND touch mode', () => {
-    expect(code).toContain('row.mobilePage !== null');
-    expect(code).toContain("document.body.classList.contains('mobile-touch')");
+  it('renders exact equipped chips and a separate Remove control only for touch', () => {
+    expect(code).toContain('this.isTouch()');
+    expect(code).toContain('spell-assignment-chip');
+    expect(code).toContain('spell-hotbar-remove');
+    expect(code).toContain('row.assignment.kind');
+    expect(hudChromeCatalog).toContain("mobileChip: '{page} - A{position}'");
   });
 
-  it('renders the label through t() with the localized page-label key', () => {
-    expect(code).toContain("t('hudChrome.mobile.spellbookPageLabel'");
+  it('renders four ARIA tabs and five destination buttons from the pure picker model', () => {
+    expect(code).toContain('buildMobileSpellbookPicker({');
+    expect(code).toContain("setAttribute('role', 'tablist')");
+    expect(code).toContain("setAttribute('role', 'tab')");
+    expect(code).toContain("setAttribute('aria-selected'");
+    expect(code).toContain("setAttribute('role', 'group')");
+    expect(code).toContain('spell-slot-destination');
+    expect(code).toContain("setAttribute('aria-current', 'true')");
+  });
+
+  it('renders the picker close action as an icon with an accessible name', () => {
+    expect(code).toContain(
+      "close.setAttribute('aria-label', t('hudChrome.spellbook.closePicker'))",
+    );
+    expect(code).toContain("close.innerHTML = svgIcon('close')");
+    expect(code).not.toContain("close.textContent = t('hudChrome.spellbook.closePicker')");
+  });
+
+  it('owns picker keyboard navigation, assignment announcement, and focus return', () => {
+    expect(code).toContain('nextMobileSpellbookPickerPage(');
+    expect(code).toContain("key === 'Enter' || key === ' '");
+    expect(code).toContain("status.setAttribute('aria-live', 'polite')");
+    expect(code).toContain('focusDestinationIndex');
+    expect(code).toContain('this.focusPickerOpener()');
+    expect(code).toContain("status.className = 'spell-assignment-status'");
+    expect(code).toContain('this.rerenderPreservingView();');
+    expect(code).toContain("querySelector<HTMLElement>('.spell-assignment-status')");
+  });
+
+  it('preserves semantic touch-control focus across hotbar refreshes', () => {
+    expect(code).toContain("active.classList.contains('spell-assignment-chip')");
+    expect(code).toContain("active.classList.contains('spell-hotbar-remove')");
+    expect(code).toContain("active.classList.contains('spell-hotbar-add')");
+    expect(code).toContain("active.classList.contains('spell-slot-destination')");
+    expect(code).toContain("active.getAttribute('role') === 'tab'");
+    expect(code).toContain("refocus ??= '[data-close]'");
+  });
+
+  it('exposes a picker-first close seam without closing the Spellbook', () => {
+    expect(code).toContain('closePicker(): boolean');
+    expect(code).toContain('if (!this.pickerAbilityId) return false');
+    expect(code).toContain('return true');
+  });
+
+  it('suppresses ability descriptions while the mobile slot picker is open', () => {
+    expect(code).toContain('this.deps.hideTooltip();');
+    expect(code).toContain('() => this.pickerAbilityId === null');
+    expect(hud).toContain('if (enabled && !enabled())');
+    expect(hud).toContain(
+      'attachTooltip: (el, html, enabled, directFocusOnly) =>\n      this.attachTooltip(el, html, enabled, directFocusOnly)',
+    );
+  });
+
+  it('does not show the row description when focus returns to Add, Remove, or its chip', () => {
+    expect(code).toContain('undefined,\n        true,');
+    expect(code).toContain('() => this.pickerAbilityId === null,\n          true,');
+    expect(hud).toContain('if (directFocusOnly && event.target !== el) return;');
+  });
+
+  it('dismisses stale descriptions before any touch control action', () => {
+    expect(code).toContain("controls.addEventListener('pointerdown', dismissDescription)");
+    expect(code).toContain("controls.addEventListener('click', dismissDescription, true)");
+    expect(code).toContain('this.deps.hideTooltip()');
+  });
+
+  it('attaches a guarded ability-description tooltip to touch Spellbook rows', () => {
+    expect(code).toContain('this.deps.attachTooltip(');
+    expect(code).toContain('() => this.deps.abilityTooltip(known)');
+    expect(code).toContain('() => this.pickerAbilityId === null');
+  });
+
+  it('shows a description when the picker is closed and the touch row itself is tapped', () => {
+    expect(code).toContain('const showDescription = this.deps.attachTooltip(');
+    expect(code).toContain('bindTouchTap(el, () => {');
+    expect(code).toContain('if (this.pickerAbilityId !== null) return');
+    expect(code).toContain('showDescription()');
+  });
+
+  it('does not add a persistent selected/focused state to touch spell rows', () => {
+    expect(code).not.toContain('touch-selected');
+    expect(code).not.toContain('showAbilityDescription');
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook \.spell-row:hover\s*\{[^}]*background:\s*transparent/s,
+    );
+  });
+
+  it('cancels the shared touch-tooltip hold when the finger starts scrolling', () => {
+    expect(hud).toContain("el.addEventListener('pointermove', (e) => {");
+    expect(hud).toContain('Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY)');
+    expect(hud).toContain('if (touchMoved) clearTouchTimer()');
+  });
+
+  it('marks the Spellbook while the slot picker is open so inline descriptions stay hidden', () => {
+    expect(code).toContain("classList.add('spell-slot-picker-open')");
+    expect(code).toContain("classList.remove('spell-slot-picker-open')");
+    expect(mobileCss).toMatch(
+      /#spellbook\.spell-slot-picker-open \.spell-sub\s*\{[^}]*display:\s*none/,
+    );
+  });
+
+  it('keeps title and picker fixed while only the mobile spell list scrolls', () => {
+    expect(code).toContain('root.scrollTop = 0;');
+    expect(mobileCss).toMatch(
+      /#spellbook\.spell-slot-picker-open\s*\{[^}]*overflow-y:\s*hidden[^}]*display:\s*flex\s*!important/s,
+    );
+    expect(mobileCss).toMatch(
+      /#spellbook\.spell-slot-picker-open \.spell-list\s*\{[^}]*overflow-y:\s*auto/s,
+    );
+    expect(mobileCss).toMatch(
+      /#spellbook\.spell-slot-picker-open > \.panel-title\s*\{[^}]*position:\s*relative[^}]*top:\s*0/s,
+    );
+    expect(mobileCss).toMatch(
+      /#spellbook\.spell-slot-picker-open > \.panel-title\s*\{[^}]*margin-bottom:\s*0/s,
+    );
+    expect(mobileCss).toMatch(/#spellbook \.spell-slot-picker\s*\{[^}]*padding:\s*0 8px 8px/s);
+  });
+
+  it('shrinks picker controls to the touch floor then scrolls them in one row', () => {
+    expect(mobileCss).toContain('container-type: inline-size;');
+    expect(mobileCss).toContain(
+      '--spell-picker-control-size: clamp(40px, calc((100cqw - 60px) / 10), 48px);',
+    );
+    expect(mobileCss).toMatch(
+      /#spellbook \.spell-slot-picker\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto[^}]*touch-action:\s*pan-x/s,
+    );
+    expect(code).toContain("button.classList.toggle('has-occupant', !!destination.occupant)");
+    expect(code).toContain('class="spell-slot-label"');
+    expect(mobileCss).toMatch(
+      /#spellbook \.spell-slot-destination\.has-occupant \.spell-slot-label\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
+  it('keeps the mobile Spellbook close control below the window top edge', () => {
+    expect(mobileCss).not.toMatch(
+      /#spellbook > \.panel-title > \.panel-title-actions\s*\{[^}]*top:/s,
+    );
+  });
+
+  it('uses compact symbols and no redundant equipped check in touch controls', () => {
+    expect(code).toContain("add.textContent = '+'");
+    expect(code).toContain("remove.innerHTML = svgIcon('close')");
+    expect(code).toContain('chip.textContent = label');
+    expect(code).not.toContain('spell-equipped-check');
+    expect(mobileCss).toMatch(
+      /#spellbook \.spell-hotbar-remove\s*\{[^}]*width:\s*40px[^}]*height:\s*40px[^}]*padding:\s*0/s,
+    );
+  });
+
+  it('uses shared mobile chrome for Add, Remove, and assignment chips', () => {
+    expect(mobileCss).toMatch(
+      /#spellbook \.spell-hotbar-toggle,\s*body\.mobile-touch #spellbook \.spell-hotbar-remove,\s*body\.mobile-touch #spellbook \.spell-assignment-chip\s*\{[^}]*border:\s*2px[^}]*border-radius:\s*7px[^}]*background:\s*radial-gradient[^}]*font:\s*700 14px \/ 1 var\(--ui-font\)/s,
+    );
+  });
+
+  it('uses the same compact inner padding at the top and bottom of the Spellbook', () => {
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook\s*\{[^}]*--spellbook-edge-padding:\s*8px;[^}]*padding-top:\s*var\(--spellbook-edge-padding\);[^}]*padding-bottom:\s*var\(--spellbook-edge-padding\)/s,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook > \.panel-title\s*\{[^}]*margin-top:\s*0/s,
+    );
+  });
+
+  it('lets the mobile Spellbook cover the player-frame reservation', () => {
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook\s*\{[^}]*top:\s*max\(4px, env\(safe-area-inset-top\)\)[^}]*bottom:\s*max\(4px, env\(safe-area-inset-bottom\)\)[^}]*height:\s*auto;[^}]*max-height:\s*none/s,
+    );
+    expect(mobileCss).toMatch(/#spellbook\.spell-slot-picker-open\s*\{[^}]*height:\s*auto;/s);
+    expect(mobileCss).not.toMatch(
+      /#spellbook(?:\.spell-slot-picker-open)?\s*\{[^}]*height:[^;}]*!important/s,
+    );
   });
 });
 
@@ -101,7 +278,7 @@ describe('spellbook_window: hud.update() refresh call site', () => {
     // guard does not cover this path: without these, the open spellbook's toggles
     // would stop tracking the bar (the whole reason this path is not-cold).
     expect(code).toContain("btn.setAttribute('aria-pressed'");
-    expect(code).toContain('btn.disabled = !onBar && !hasFree');
+    expect(code).toContain('btn.disabled = !this.isTouch() && !onBar && !hasFree');
   });
 
   it('elides the per-frame toggle writes to on-bar flips only (this runs every frame)', () => {

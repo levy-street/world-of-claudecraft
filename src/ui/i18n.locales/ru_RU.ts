@@ -14,10 +14,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
-  'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
-  'hudChrome.readyCheck.notInPartyError':
-    'Чтобы начать проверку готовности, вы должны состоять в группе.',
-  'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
@@ -36,6 +32,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.undo': 'Отменить',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',
   'hudChrome.bags.capacity': '{used}/{total}',
+  'hudChrome.bags.itemActionsTitle': 'Действия: {item}',
+  'hudChrome.bags.itemActionEquip': 'Надеть',
+  'hudChrome.bags.itemActionEquipBag': 'Надеть сумку',
+  'hudChrome.bags.itemActionUse': 'Использовать',
+  'hudChrome.bags.itemActionConsume': 'Употребить',
+  'hudChrome.bags.itemActionLinkToChat': 'Ссылка в чат',
+  'hudChrome.bags.itemActionDestroy': 'Уничтожить',
+  'hudChrome.bags.itemActionDetails': 'Сведения о предмете',
+  'hudChrome.bags.itemActionAssignTitle': 'Назначить в расходники',
+  'hudChrome.bags.itemActionAssignSlot': 'Назначить в ячейку {slot}',
+  'hudChrome.bags.itemActionRemoveSlot': 'Убрать из ячейки {slot}',
+  'hudChrome.bags.itemActionSlotCurrent': 'Ячейка {slot}: {item}',
+  'hudChrome.bags.itemActionSlotEmpty': 'Ячейка {slot}: пусто',
+  'hudChrome.bags.itemActionResetAutomatic': 'Вернуть авторазмещение',
+  'hudChrome.bags.itemActionClose': 'Закрыть действия предмета',
+  'hudChrome.bags.itemActionAssigned': '{item} назначен в ячейку {slot}.',
+  'hudChrome.bags.itemActionRemoved': '{item} убран из ячейки {slot}.',
+  'hudChrome.bags.itemActionInvalid': 'Этот предмет нельзя назначить.',
+  'hudChrome.bags.itemActionFailed': 'Не удалось выполнить действие.',
   'hudChrome.mailbox.back': 'Назад',
   'hudChrome.mailbox.tabSend': 'Отправить',
   'hudChrome.mailbox.toLabel': 'Кому',
@@ -121,6 +136,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
+  'hudChrome.itemTooltip.duration': 'Длительность: {duration}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -1043,6 +1059,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Для полноэкранного режима на Android установите эту страницу или добавьте ее на главный экран.',
   'mobilePreflight.androidInstallStep':
     'В Chrome откройте меню, затем выберите Установить приложение или Добавить на главный экран.',
+  'mobilePreflight.androidSamsungInstallStep':
+    'В Samsung Internet откройте меню, затем выберите Установить приложение или Добавить на главный экран.',
   'mobilePreflight.androidOpenStep': 'Откройте World of ClaudeCraft через новый значок.',
   'mobilePreflight.otherStandaloneDetail': 'Держите устройство в полноэкранном альбомном режиме.',
   'mobilePreflight.otherInstallDetail':
@@ -3673,6 +3691,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionRing': 'Боевые действия',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
+  'hudChrome.mobile.nameplatesOff': 'Имена выкл.',
+  'hudChrome.mobile.musicOff': 'Музыка выкл.',
   'hudChrome.mobile.hotbarPage': 'Навыки',
   'hudChrome.mobile.hotbarPageAria': 'Показать следующий набор навыков',
   'hudChrome.mobile.jump': 'Прыжок',
@@ -6648,4 +6668,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  'hudChrome.options.mobileActionPages': 'Минимум страниц действий',
+  'hudChrome.options.mobileActionPagesTwo': '2 страницы',
+  'hudChrome.options.mobileActionPagesThree': '3 страницы',
+  'hudChrome.options.mobileActionPagesFour': '4 страницы',
+  'hudChrome.spellbook.add': 'Добавить',
+  'hudChrome.spellbook.remove': 'Убрать',
+  'hudChrome.spellbook.mobileChip': '{page} - A{position}',
+  'hudChrome.spellbook.desktopChip': 'Компьютер',
+  'hudChrome.spellbook.moveAssignmentAria': 'Переместить {name} из {slot}',
+  'hudChrome.spellbook.pickerPages': 'Страницы действий',
+  'hudChrome.spellbook.pickerDestinations': 'Ячейки действий',
+  'hudChrome.spellbook.destinationAria': 'Страница {page}, A{position}, {state}',
+  'hudChrome.spellbook.empty': 'Пусто',
+  'hudChrome.spellbook.closePicker': 'Закрыть ячейки',
+  'hudChrome.spellbook.assignedStatus': '{name} назначено на страницу {page}, A{position}',
 };

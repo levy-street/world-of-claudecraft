@@ -155,12 +155,10 @@ export const sv_SE: EnTranslations = {
       "banner": "Åskådar {name}"
     },
     "readyCheck": {
-      "prompt": "{name} har startat en beredskapskontroll. Är du redo?",
-      "ready": "Redo",
-      "notReady": "Inte redo",
-      "result": "Beredskapskontroll: {ready} redo, {notReady} inte redo, {noResponse} inget svar.",
-      "notInPartyError": "Du måste vara med i en grupp för att starta en beredskapskontroll.",
-      "inProgressError": "En beredskapskontroll pågår redan."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
@@ -241,7 +239,7 @@ export const sv_SE: EnTranslations = {
         "no_wallet": "Anslut en plånbok med minst 20 USD i WOC.",
         "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
-        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const sv_SE: EnTranslations = {
       "leaderboard": "Ranking",
       "dailyRewards": "Belöningar",
       "nameplates": "Namn",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
       "toggleHaptics": "Växla haptik",
@@ -406,12 +406,12 @@ export const sv_SE: EnTranslations = {
       "targetFriendlyNext": "Växla vänligt mål",
       "discord": "Discord",
       "valecup": "Dalcupen",
-      "categoryPet": "Djur",
-      "petAttack": "Djur: Anfall",
-      "petStop": "Djur: Stanna",
-      "petTaunt": "Djur: Provocera",
-      "petDefensive": "Djur: Defensivt",
-      "petAggressive": "Djur: Aggressivt"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Dalcupen",
@@ -564,6 +564,10 @@ export const sv_SE: EnTranslations = {
       "interfaceModeDesktop": "Skrivbord",
       "interfaceModeTouch": "Pek",
       "interfaceModeNote": "Auto väljer skrivbords- eller pekkontroller utifrån din enhet. Välj Skrivbord för att tvinga fram tangentbord och mus (användbart på en surfplatta med tangentbord), eller Pek för skärmkontrollerna.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Fotstegsljud",
       "clickFeedback": "Klickmarkör",
       "lockCursorOnRotate": "Lås pekare under rotation",
@@ -736,8 +740,8 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
-    "itemHeroicTag": "[HEROISK]",
-    "itemSoulbound": "Själabunden",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const sv_SE: EnTranslations = {
       "backpack": "Ryggsäck",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Tom väskplats",
-      "unequipHint": "Klicka för att ta bort den här väskan"
+      "unequipHint": "Klicka för att ta bort den här väskan",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",
@@ -1084,10 +1107,10 @@ export const sv_SE: EnTranslations = {
       "spawn": "{name} reser sig över Törntoppshöjderna!"
     },
     "auth": {
-      "appleLoginCta": "Fortsätt med Apple",
-      "appleError": "Det gick inte att logga in med Apple. Försök igen.",
-      "appleChoiceIntro": "Skapa ett nytt konto eller länka Apple till ett konto du redan har.",
-      "appleChoiceExpired": "Den här Apple-inloggningen har gått ut. Logga in med Apple igen.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Glömt lösenordet?",
       "forgotTitle": "Återställ ditt lösenord",
       "forgotHint": "Ange ditt användarnamn så skickar vi en återställningslänk till den registrerade e-postadressen.",
@@ -1108,7 +1131,18 @@ export const sv_SE: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",
-      "removeFromBarAria": "Ta bort {name} från handlingsfältet"
+      "removeFromBarAria": "Ta bort {name} från handlingsfältet",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const sv_SE: EnTranslations = {
       "label": "Återställ ramarnas positioner"
     },
     "itemTooltip": {
-      "requiresLevel": "Kräver nivå {level}"
+      "requiresLevel": "Kräver nivå {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const sv_SE: EnTranslations = {
       "parcelsLabel": "Paket",
       "parcelsHint": "Klicka på ett föremål i dina väskor för att bifoga det.",
       "removeParcelAria": "Ta bort {item} från brevet",
-      "parcelQtyDecreaseAria": "Skicka en {item} mindre",
-      "parcelQtyIncreaseAria": "Skicka en till {item}",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Skicka brev",
       "postageNote": "Porto: {amount}. Korpen flyger i ungefär {seconds}s.",
       "arrivedBanner": "Korpen har landat: post från {name}.",
@@ -3940,14 +3975,14 @@ export const sv_SE: EnTranslations = {
     "reconnecting": "Anslutning förlorad. Återansluter...",
     "connectionRejected": "Servern stängde anslutningen.",
     "tips": {
-      "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
-      "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
-      "dungeons": "Tips: prova en grotta på heroisk svårighetsgrad när din utrustning blivit för bra för normal, för en tuffare och mer givande strid.",
-      "market": "Tips: på Världsmarknaden kan du köpa och sälja med spelare från hela riket.",
-      "guilds": "Tips: när du går med i ett gille får du en privat chattkanal och en gemensam lista över dina gilleskamrater.",
-      "professions": "Tips: samlar- och hantverksyrken kan tränas parallellt med din stridsklass.",
-      "loadouts": "Tips: spara mer än en talanguppsättning för att växla mellan byggen utan att spendera poäng två gånger.",
-      "pvp": "Tips: utmana en annan spelare på en vänskaplig duell, eller ställ dig i kö till arenan i Det askgråa colosseumet för att testa ditt bygge."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const sv_SE: EnTranslations = {
     "androidStandaloneDetail": "Du är i helskärmsläge för appen. Håll enheten i liggande läge.",
     "androidInstallDetail": "För helskärm på Android, installera den här sidan eller lägg först till den på din Hemskärm.",
     "androidInstallStep": "I Chrome, tryck på menyn och sedan Installera app eller Lägg till på Hemskärmen.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Öppna World of ClaudeCraft från den nya ikonen.",
     "otherStandaloneDetail": "Håll din enhet i liggande helskärm.",
     "otherInstallDetail": "Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse."
@@ -5867,7 +5903,7 @@ export const sv_SE: EnTranslations = {
         "name": "Gamle Gråkäftens huggtand"
       },
       "chunk_of_ore": {
-        "name": "Malmklump"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Väderbiten liggarsida"
@@ -7550,12 +7586,12 @@ export const sv_SE: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Ett yrke för varje hand",
-        "text": "Alla i Östbäck har ett yrke vid sidan om svärdet, {playerName}. Det finns malmådror utspridda runt staden, så svinga en hacka och ge mig 5 klumpar. Bryt dem själv, märk väl; jag ser skillnaden.",
-        "completion": "Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Malmklump"
+            "label": "Chunk of Ore"
           }
         }
       },

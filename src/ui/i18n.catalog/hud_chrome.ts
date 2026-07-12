@@ -18,8 +18,6 @@ export const hudChromeStrings = {
     ready: 'Ready',
     notReady: 'Not Ready',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
-    notInPartyError: 'You must be in a party to start a ready check.',
-    inProgressError: 'A ready check is already in progress.',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
@@ -246,6 +244,8 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Rewards',
     nameplates: 'Names',
+    nameplatesOff: 'Names Off',
+    musicOff: 'Music Off',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
@@ -262,7 +262,7 @@ export const hudChromeStrings = {
     // the shared action_bar_view core, so no per-slot key lives here.
     actionRing: 'Combat actions',
     actionPageToggle: 'Switch action page',
-    // The bare page number ("1"/"2", painted big and gold over the swap-arrows
+    // The bare page number ("1"/"2"/"3"/"4", painted big and gold over the swap-arrows
     // glyph) rather than "Page 1 of 2": the toggle button already carries the
     // full "Switch action page" accessible name via actionPageToggle above, so
     // the indicator span only needs to be legible at a glance, not restate the
@@ -614,6 +614,10 @@ export const hudChromeStrings = {
     interfaceModeTouch: 'Touch',
     interfaceModeNote:
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
+    mobileActionPages: 'Minimum Action Pages',
+    mobileActionPagesTwo: '2 pages',
+    mobileActionPagesThree: '3 pages',
+    mobileActionPagesFour: '4 pages',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
@@ -1183,6 +1187,25 @@ export const hudChromeStrings = {
     bagSocketAria: '{name}: {slots}',
     socketEmpty: 'Empty bag slot',
     unequipHint: 'Click to remove this bag',
+    itemActionsTitle: '{item} actions',
+    itemActionEquip: 'Equip',
+    itemActionEquipBag: 'Equip Bag',
+    itemActionUse: 'Use',
+    itemActionConsume: 'Consume',
+    itemActionLinkToChat: 'Link to Chat',
+    itemActionDestroy: 'Destroy',
+    itemActionDetails: 'Item Details',
+    itemActionAssignTitle: 'Assign to Consumables',
+    itemActionAssignSlot: 'Assign to slot {slot}',
+    itemActionRemoveSlot: 'Remove from slot {slot}',
+    itemActionSlotCurrent: 'Slot {slot}: {item}',
+    itemActionSlotEmpty: 'Slot {slot}: Empty',
+    itemActionResetAutomatic: 'Reset to Automatic',
+    itemActionClose: 'Close item actions',
+    itemActionAssigned: 'Assigned {item} to slot {slot}.',
+    itemActionRemoved: 'Removed {item} from slot {slot}.',
+    itemActionInvalid: 'That item cannot be assigned.',
+    itemActionFailed: 'That action could not be completed.',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -1333,6 +1356,17 @@ export const hudChromeStrings = {
   spellbook: {
     addToBarAria: 'Add {name} to action bar',
     removeFromBarAria: 'Remove {name} from action bar',
+    add: 'Add',
+    remove: 'Remove',
+    mobileChip: '{page} - A{position}',
+    desktopChip: 'Desktop',
+    moveAssignmentAria: 'Move {name} from {slot}',
+    pickerPages: 'Action pages',
+    pickerDestinations: 'Action slots',
+    destinationAria: 'Page {page}, A{position}, {state}',
+    empty: 'Empty',
+    closePicker: 'Close slots',
+    assignedStatus: '{name} assigned to page {page}, A{position}',
   },
   // Live overworld mob nameplate label: a bracketed level then the localized mob
   // name (mirrors the corpse branch's worldContent.corpseName template). {level}
@@ -1385,6 +1419,7 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    duration: 'Duration: {duration}',
   },
   discord: {
     title: 'Discord',

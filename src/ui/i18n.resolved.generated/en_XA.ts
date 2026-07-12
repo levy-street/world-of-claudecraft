@@ -158,9 +158,7 @@ export const en_XA: EnTranslations = {
       "prompt": "[{name} ĥáš šţáŕţéð á ŕéáðý çĥéçķ. Áŕé ýóú ŕéáðý?]",
       "ready": "[Ŕéáðý]",
       "notReady": "[Ñóţ Ŕéáðý]",
-      "result": "[Ŕéáðý çĥéçķ: {ready} ŕéáðý, {notReady} ñóţ ŕéáðý, {noResponse} ñó ŕéšþóñšé.]",
-      "notInPartyError": "[Ýóú ɱúšţ ƀé íñ á þáŕţý ţó šţáŕţ á ŕéáðý çĥéçķ.]",
-      "inProgressError": "[Á ŕéáðý çĥéçķ íš áļŕéáðý íñ þŕóĝŕéšš.]"
+      "result": "[Ŕéáðý çĥéçķ: {ready} ŕéáðý, {notReady} ñóţ ŕéáðý, {noResponse} ñó ŕéšþóñšé.]"
     },
     "death": {
       "resurrectAtCorpse": "[Ŕéšúŕŕéçţ áţ Çóŕþšé]",
@@ -319,6 +317,8 @@ export const en_XA: EnTranslations = {
       "leaderboard": "[Ŕáñķš]",
       "dailyRewards": "[Ŕéŵáŕðš]",
       "nameplates": "[Ñáɱéš]",
+      "nameplatesOff": "[Ñáɱéš Óƒƒ]",
+      "musicOff": "[Ɱúšíç Óƒƒ]",
       "haptics": "[Ĥáþţíçš]",
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
       "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]",
@@ -564,6 +564,10 @@ export const en_XA: EnTranslations = {
       "interfaceModeDesktop": "[Ðéšķţóþ]",
       "interfaceModeTouch": "[Ţóúçĥ]",
       "interfaceModeNote": "[Áúţó þíçķš ðéšķţóþ óŕ ţóúçĥ çóñţŕóļš ƒŕóɱ ýóúŕ ðéʋíçé. Çĥóóšé Ðéšķţóþ ţó ƒóŕçé ķéýƀóáŕð áñð ɱóúšé (úšéƒúļ óñ á ţáƀļéţ ŵíţĥ á ķéýƀóáŕð), óŕ Ţóúçĥ ƒóŕ ţĥé óñ-šçŕééñ çóñţŕóļš.]",
+      "mobileActionPages": "[Ɱíñíɱúɱ Áçţíóñ Þáĝéš]",
+      "mobileActionPagesTwo": "[2 þáĝéš]",
+      "mobileActionPagesThree": "[3 þáĝéš]",
+      "mobileActionPagesFour": "[4 þáĝéš]",
       "footstepSounds": "[Ƒóóţšţéþ Šóúñðš]",
       "clickFeedback": "[Çļíçķ Ɱáŕķéŕ]",
       "lockCursorOnRotate": "[Ļóçķ Çúŕšóŕ Ŵĥíļé Ŕóţáţíñĝ]",
@@ -988,7 +992,26 @@ export const en_XA: EnTranslations = {
       "backpack": "[Ɓáçķþáçķ]",
       "bagSocketAria": "[{name}: {slots}]",
       "socketEmpty": "[Éɱþţý ƀáĝ šļóţ]",
-      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]"
+      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]",
+      "itemActionsTitle": "[{item} áçţíóñš]",
+      "itemActionEquip": "[Éɋúíþ]",
+      "itemActionEquipBag": "[Éɋúíþ Ɓáĝ]",
+      "itemActionUse": "[Úšé]",
+      "itemActionConsume": "[Çóñšúɱé]",
+      "itemActionLinkToChat": "[Ļíñķ ţó Çĥáţ]",
+      "itemActionDestroy": "[Ðéšţŕóý]",
+      "itemActionDetails": "[Íţéɱ Ðéţáíļš]",
+      "itemActionAssignTitle": "[Áššíĝñ ţó Çóñšúɱáƀļéš]",
+      "itemActionAssignSlot": "[Áššíĝñ ţó šļóţ {slot}]",
+      "itemActionRemoveSlot": "[Ŕéɱóʋé ƒŕóɱ šļóţ {slot}]",
+      "itemActionSlotCurrent": "[Šļóţ {slot}: {item}]",
+      "itemActionSlotEmpty": "[Šļóţ {slot}: Éɱþţý]",
+      "itemActionResetAutomatic": "[Ŕéšéţ ţó Áúţóɱáţíç]",
+      "itemActionClose": "[Çļóšé íţéɱ áçţíóñš]",
+      "itemActionAssigned": "[Áššíĝñéð {item} ţó šļóţ {slot}.]",
+      "itemActionRemoved": "[Ŕéɱóʋéð {item} ƒŕóɱ šļóţ {slot}.]",
+      "itemActionInvalid": "[Ţĥáţ íţéɱ çáññóţ ƀé áššíĝñéð.]",
+      "itemActionFailed": "[Ţĥáţ áçţíóñ çóúļð ñóţ ƀé çóɱþļéţéð.]"
     },
     "raidConvert": {
       "toPartyDone": "[Ýóúŕ ŕáíð ĥáš çóñʋéŕţéð ƀáçķ ţó á þáŕţý.]",
@@ -1108,7 +1131,18 @@ export const en_XA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
-      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
+      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]",
+      "add": "[Áðð]",
+      "remove": "[Ŕéɱóʋé]",
+      "mobileChip": "[{page} - Á{position}]",
+      "desktopChip": "[Ðéšķţóþ]",
+      "moveAssignmentAria": "[Ɱóʋé {name} ƒŕóɱ {slot}]",
+      "pickerPages": "[Áçţíóñ þáĝéš]",
+      "pickerDestinations": "[Áçţíóñ šļóţš]",
+      "destinationAria": "[Þáĝé {page}, Á{position}, {state}]",
+      "empty": "[Éɱþţý]",
+      "closePicker": "[Çļóšé šļóţš]",
+      "assignedStatus": "[{name} áššíĝñéð ţó þáĝé {page}, Á{position}]"
     },
     "nameplate": {
       "mob": "[[{level}] {name}]",
@@ -1132,7 +1166,8 @@ export const en_XA: EnTranslations = {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
     "itemTooltip": {
-      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
+      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
+      "duration": "[Ðúŕáţíóñ: {duration}]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -4132,6 +4167,7 @@ export const en_XA: EnTranslations = {
     "androidStandaloneDetail": "[Ýóú áŕé íñ ƒúļļšçŕééñ áþþ ɱóðé. Ķééþ ţĥé ðéʋíçé íñ ļáñðšçáþé.]",
     "androidInstallDetail": "[Ƒóŕ ƒúļļšçŕééñ óñ Áñðŕóíð, íñšţáļļ ţĥíš þáĝé óŕ áðð íţ ţó ýóúŕ Ĥóɱé šçŕééñ ƒíŕšţ.]",
     "androidInstallStep": "[Íñ Çĥŕóɱé, ţáþ ţĥé ɱéñú, ţĥéñ Íñšţáļļ áþþ óŕ Áðð ţó Ĥóɱé šçŕééñ.]",
+    "androidSamsungInstallStep": "[Íñ Šáɱšúñĝ Íñţéŕñéţ, ţáþ ţĥé ɱéñú, ţĥéñ Íñšţáļļ áþþ óŕ Áðð ţó Ĥóɱé šçŕééñ.]",
     "androidOpenStep": "[Óþéñ Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ƒŕóɱ ţĥé ñéŵ íçóñ.]",
     "otherStandaloneDetail": "[Ķééþ ýóúŕ ðéʋíçé íñ ļáñðšçáþé ƒúļļšçŕééñ.]",
     "otherInstallDetail": "[Íñšţáļļ óŕ áðð ţĥíš þáĝé ţó ýóúŕ Ĥóɱé šçŕééñ ƒóŕ ţĥé ƀéšţ ƒúļļšçŕééñ ɱóƀíļé éẋþéŕíéñçé.]"

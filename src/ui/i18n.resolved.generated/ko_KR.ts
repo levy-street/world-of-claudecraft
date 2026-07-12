@@ -158,9 +158,7 @@ export const ko_KR: EnTranslations = {
       "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
       "ready": "준비 완료",
       "notReady": "준비 안 됨",
-      "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.",
-      "notInPartyError": "준비 확인을 시작하려면 파티에 속해 있어야 합니다.",
-      "inProgressError": "준비 확인이 이미 진행 중입니다."
+      "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답."
     },
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
@@ -319,6 +317,8 @@ export const ko_KR: EnTranslations = {
       "leaderboard": "순위",
       "dailyRewards": "보상",
       "nameplates": "이름표",
+      "nameplatesOff": "이름 끄기",
+      "musicOff": "음악 끄기",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
       "toggleHaptics": "진동 전환",
@@ -564,6 +564,10 @@ export const ko_KR: EnTranslations = {
       "interfaceModeDesktop": "데스크톱",
       "interfaceModeTouch": "터치",
       "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
+      "mobileActionPages": "최소 행동 페이지 수",
+      "mobileActionPagesTwo": "2페이지",
+      "mobileActionPagesThree": "3페이지",
+      "mobileActionPagesFour": "4페이지",
       "footstepSounds": "발소리",
       "clickFeedback": "클릭 표시",
       "lockCursorOnRotate": "회전 중 커서 고정",
@@ -736,7 +740,7 @@ export const ko_KR: EnTranslations = {
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
-    "itemHeroicTag": "[영웅]",
+    "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "귀속",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -988,7 +992,26 @@ export const ko_KR: EnTranslations = {
       "backpack": "배낭",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
-      "unequipHint": "클릭하여 이 가방을 해제"
+      "unequipHint": "클릭하여 이 가방을 해제",
+      "itemActionsTitle": "{item} 동작",
+      "itemActionEquip": "장착",
+      "itemActionEquipBag": "가방 장착",
+      "itemActionUse": "사용",
+      "itemActionConsume": "소비",
+      "itemActionLinkToChat": "채팅에 링크",
+      "itemActionDestroy": "파괴",
+      "itemActionDetails": "아이템 상세",
+      "itemActionAssignTitle": "소모품에 지정",
+      "itemActionAssignSlot": "{slot}번 슬롯에 지정",
+      "itemActionRemoveSlot": "{slot}번 슬롯에서 제거",
+      "itemActionSlotCurrent": "{slot}번 슬롯: {item}",
+      "itemActionSlotEmpty": "{slot}번 슬롯: 비어 있음",
+      "itemActionResetAutomatic": "자동 배치로 재설정",
+      "itemActionClose": "아이템 동작 닫기",
+      "itemActionAssigned": "{item}을(를) {slot}번 슬롯에 지정했습니다.",
+      "itemActionRemoved": "{item}을(를) {slot}번 슬롯에서 제거했습니다.",
+      "itemActionInvalid": "이 아이템은 지정할 수 없습니다.",
+      "itemActionFailed": "동작을 완료할 수 없습니다."
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -1108,7 +1131,18 @@ export const ko_KR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
-      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
+      "add": "추가",
+      "remove": "제거",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "데스크톱",
+      "moveAssignmentAria": "{name}을(를) {slot}에서 이동",
+      "pickerPages": "행동 페이지",
+      "pickerDestinations": "행동 슬롯",
+      "destinationAria": "{page}페이지, A{position}, {state}",
+      "empty": "비어 있음",
+      "closePicker": "슬롯 닫기",
+      "assignedStatus": "{name}을(를) {page}페이지 A{position}에 배치했습니다"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const ko_KR: EnTranslations = {
       "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
-      "requiresLevel": "필요 레벨 {level}"
+      "requiresLevel": "필요 레벨 {level}",
+      "duration": "지속 시간: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const ko_KR: EnTranslations = {
     "androidStandaloneDetail": "전체 화면 앱 모드입니다. 기기를 가로로 유지하세요.",
     "androidInstallDetail": "Android에서 전체 화면을 사용하려면 이 페이지를 설치하거나 홈 화면에 추가하세요.",
     "androidInstallStep": "Chrome에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.",
+    "androidSamsungInstallStep": "Samsung Internet에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.",
     "androidOpenStep": "새 아이콘에서 World of ClaudeCraft를 여세요.",
     "otherStandaloneDetail": "기기를 가로 전체 화면으로 유지하세요.",
     "otherInstallDetail": "최상의 모바일 전체 화면 경험을 위해 이 페이지를 설치하거나 홈 화면에 추가하세요."
@@ -7552,7 +7588,7 @@ export const ko_KR: EnTranslations = {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
         "text": "이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.",
-        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.",
+        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.",
         "objectives": {
           "0": {
             "label": "광석 조각"

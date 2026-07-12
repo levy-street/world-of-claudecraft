@@ -257,6 +257,23 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
 });
 
 describe('options_view: interface dispatch matrix (cluster 5)', () => {
+  it('offers the discrete mobile page minimum only for touch interfaces', () => {
+    const source = makeSource({ mobileActionPageMinimum: 3 });
+    const touch = buildInterfaceControls(source, { touch: true, nativeShell: false });
+    const desktop = buildInterfaceControls(source, { touch: false, nativeShell: false });
+
+    expect(find(touch, 'mobileActionPageMinimum')).toMatchObject({
+      control: 'choice',
+      current: 3,
+      rerender: false,
+    });
+    const control = find(touch, 'mobileActionPageMinimum');
+    if (control?.control === 'choice') {
+      expect(control.options.map((option) => option.value)).toEqual([2, 3, 4]);
+    }
+    expect(find(desktop, 'mobileActionPageMinimum')).toBeUndefined();
+  });
+
   it('lists the comfort sliders then the comfort + accessibility bool toggles', () => {
     const controls = buildInterfaceControls(makeSource());
     expect(keysOf(controls)).toEqual([

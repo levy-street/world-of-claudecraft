@@ -73,6 +73,9 @@ export const SETTING_RANGES = {
   // larger or smaller thumbs can size the controls to taste (default 1.0x).
   // Surfaced in the Esc menu only on phone-touch devices.
   actionButtonScale: { min: 0.8, max: 1.3, def: 1 },
+  // touch only: the minimum number of five-slot mobile action pages visible in
+  // the page cycle. Occupied higher pages can expand the effective count up to 4.
+  mobileActionPageMinimum: { min: 2, max: 4, def: 2 },
   // touch-only: how far the move thumbstick must travel before it registers
   // movement. Higher values resist accidental drift on a jittery thumb; lower
   // values make the stick more responsive. Default matches the old fixed 0.22.
@@ -276,12 +279,18 @@ const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
 
 function clampNumeric(key: NumericSettingKey, v: number): number {
+  if (key === 'mobileActionPageMinimum') return normalizeMobileActionPageMinimum(v);
   const r = SETTING_RANGES[key];
   if (!Number.isFinite(v)) return r.def;
   return Math.min(r.max, Math.max(r.min, v));
 }
 
 export type ClickMoveMouseButton = 0 | 2;
+
+export function normalizeMobileActionPageMinimum(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 2;
+  return Math.min(4, Math.max(2, Math.round(value)));
+}
 
 export function normalizeClickMoveButton(value: number): ClickMoveMouseButton {
   return value >= 1 ? 2 : 0;

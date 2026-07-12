@@ -15,7 +15,15 @@ import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
-import { buildSpellbookView, type SpellbookInput } from '../src/ui/spellbook_view';
+import type { HotbarAction } from '../src/ui/hotbar';
+import {
+  buildMobileSpellbookPicker,
+  buildSpellbookView,
+  isSpellbookBarTokenCurrent,
+  mobileSpellbookAssignment,
+  nextMobileSpellbookPickerPage,
+  type SpellbookInput,
+} from '../src/ui/spellbook_view';
 
 // A class whose kit has at least two abilities, so we can exercise known/locked.
 const CLASS_ID = Object.values(CLASSES).find((c) => c.abilities.length >= 2)!.id as PlayerClass;
@@ -139,15 +147,28 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
     }
   });
 
-  it('assigns null for slot 11 (outside the ring pages)', () => {
+  it('assigns page 2 for a bar-assigned row on slots 11-15', () => {
+    for (const slot of [11, 12, 13, 14, 15]) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(2);
+    }
+  });
+
+  it('assigns page 3 for slots 16-20', () => {
     const v = buildSpellbookView(
       input({
         known: [known('sim', KIT[0])],
         barAbilityIds: [KIT[0]],
-        abilityIdByBarSlot: slotsWith(KIT[0], 11),
+        abilityIdByBarSlot: slotsWith(KIT[0], 16),
       }),
     );
-    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
+    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBe(3);
   });
 
   it('assigns null for a row that is off-bar even if abilityIdByBarSlot is provided', () => {
@@ -164,6 +185,80 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
   it('assigns null when abilityIdByBarSlot is omitted (desktop / not-yet-wired callers)', () => {
     const v = buildSpellbookView(input({ known: [known('sim', KIT[0])], barAbilityIds: [KIT[0]] }));
     expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
+  });
+});
+
+describe('buildSpellbookView: exact assignment state', () => {
+  const slotsWith = (abilityId: string, sourceSlot: number): (string | null)[] => {
+    const slots: (string | null)[] = new Array(22).fill(null);
+    slots[sourceSlot - 1] = abilityId;
+    return slots;
+  };
+
+  it.each([
+    [1, 0, 1],
+    [5, 0, 5],
+    [6, 1, 1],
+    [20, 3, 5],
+  ])('reports source slot %i as mobile P%i A%i', (sourceSlot, page, position) => {
+    const view = buildSpellbookView(
+      input({
+        known: [known('sim', KIT[0])],
+        barAbilityIds: [KIT[0]],
+        abilityIdByBarSlot: slotsWith(KIT[0], sourceSlot),
+        touchPresentation: true,
+      }),
+    );
+    expect(view.rows.find((row) => row.abilityId === KIT[0])?.assignment).toEqual({
+      kind: 'mobile',
+      sourceSlot,
+      page,
+      position,
+    });
+  });
+
+  it.each([21, 22])('reports source slot %i as desktop overflow', (sourceSlot) => {
+    const view = buildSpellbookView(
+      input({
+        known: [known('sim', KIT[0])],
+        barAbilityIds: [KIT[0]],
+        abilityIdByBarSlot: slotsWith(KIT[0], sourceSlot),
+        touchPresentation: true,
+      }),
+    );
+    expect(view.rows.find((row) => row.abilityId === KIT[0])?.assignment).toEqual({
+      kind: 'desktop',
+      sourceSlot,
+    });
+  });
+
+  it('uses the lowest source slot for corrupt duplicate assignments', () => {
+    const slots = slotsWith(KIT[0], 12);
+    slots[2] = KIT[0];
+    const view = buildSpellbookView(
+      input({
+        known: [known('sim', KIT[0])],
+        barAbilityIds: [KIT[0]],
+        abilityIdByBarSlot: slots,
+        touchPresentation: true,
+      }),
+    );
+    expect(view.rows.find((row) => row.abilityId === KIT[0])?.assignment).toMatchObject({
+      kind: 'mobile',
+      sourceSlot: 3,
+    });
+  });
+
+  it('keeps touch Add enabled on a full bar while desktop Add stays disabled', () => {
+    const base = {
+      known: [known('sim', KIT[0])],
+      barAbilityIds: [],
+      hasFreeSlot: false,
+    };
+    const touch = buildSpellbookView(input({ ...base, touchPresentation: true }));
+    const desktop = buildSpellbookView(input({ ...base, touchPresentation: false }));
+    expect(touch.rows.find((row) => row.abilityId === KIT[0])?.toggleDisabled).toBe(false);
+    expect(desktop.rows.find((row) => row.abilityId === KIT[0])?.toggleDisabled).toBe(true);
   });
 });
 
@@ -190,5 +285,103 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
   it('is deterministic: identical inputs produce a deep-equal view', () => {
     const i = input({ known: [known('sim', KIT[0])] });
     expect(buildSpellbookView(i)).toEqual(buildSpellbookView(i));
+  });
+});
+
+describe('mobile Spellbook picker model', () => {
+  const actions = (): HotbarAction[] => Array<HotbarAction>(22).fill(null);
+
+  it('projects four tabs and five stable destinations for the selected page', () => {
+    const bar = actions();
+    bar[5] = { type: 'ability', id: 'frost_armor' };
+    bar[6] = { type: 'item', id: 'baked_bread' };
+
+    const picker = buildMobileSpellbookPicker({
+      actions: bar,
+      abilityId: 'fireball',
+      selectedPage: 1,
+      barToken: 'mage:normal',
+    });
+
+    expect(picker.tabs.map((tab) => [tab.page, tab.selected, tab.tabIndex])).toEqual([
+      [0, false, -1],
+      [1, true, 0],
+      [2, false, -1],
+      [3, false, -1],
+    ]);
+    expect(picker.destinations.map((destination) => destination.sourceSlot)).toEqual([
+      6, 7, 8, 9, 10,
+    ]);
+    expect(picker.destinations[0].occupant).toEqual({ type: 'ability', id: 'frost_armor' });
+    expect(picker.destinations[1].occupant).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(picker.destinations[2].occupant).toBeNull();
+  });
+
+  it('reports mobile, desktop, and unassigned locations using stable source slots', () => {
+    const bar = actions();
+    bar[19] = { type: 'ability', id: 'fireball' };
+    expect(mobileSpellbookAssignment(bar, 'fireball')).toEqual({
+      kind: 'mobile',
+      sourceSlot: 20,
+      page: 3,
+      position: 5,
+    });
+    bar[19] = null;
+    bar[20] = { type: 'ability', id: 'fireball' };
+    expect(mobileSpellbookAssignment(bar, 'fireball')).toEqual({
+      kind: 'desktop',
+      sourceSlot: 21,
+    });
+    bar[20] = null;
+    expect(mobileSpellbookAssignment(bar, 'fireball')).toEqual({ kind: 'unassigned' });
+  });
+
+  it('focuses current destination, then first empty destination, then A1', () => {
+    const current = actions();
+    current[7] = { type: 'ability', id: 'fireball' };
+    expect(
+      buildMobileSpellbookPicker({
+        actions: current,
+        abilityId: 'fireball',
+        selectedPage: 1,
+        barToken: 'mage:normal',
+      }).focusDestinationIndex,
+    ).toBe(2);
+
+    const partlyOccupied = actions();
+    partlyOccupied[5] = { type: 'item', id: 'baked_bread' };
+    expect(
+      buildMobileSpellbookPicker({
+        actions: partlyOccupied,
+        abilityId: 'fireball',
+        selectedPage: 1,
+        barToken: 'mage:normal',
+      }).focusDestinationIndex,
+    ).toBe(1);
+
+    const full = actions();
+    for (let index = 5; index < 10; index++) full[index] = { type: 'item', id: `item-${index}` };
+    expect(
+      buildMobileSpellbookPicker({
+        actions: full,
+        abilityId: 'fireball',
+        selectedPage: 1,
+        barToken: 'mage:normal',
+      }).focusDestinationIndex,
+    ).toBe(0);
+  });
+
+  it('moves picker tabs with arrows and Home or End', () => {
+    expect(nextMobileSpellbookPickerPage(0, 'ArrowLeft')).toBe(3);
+    expect(nextMobileSpellbookPickerPage(3, 'ArrowRight')).toBe(0);
+    expect(nextMobileSpellbookPickerPage(2, 'Home')).toBe(0);
+    expect(nextMobileSpellbookPickerPage(1, 'End')).toBe(3);
+    expect(nextMobileSpellbookPickerPage(1, 'Enter')).toBe(1);
+  });
+
+  it('compares immutable character and form bar tokens exactly', () => {
+    expect(isSpellbookBarTokenCurrent('character-1:normal', 'character-1:normal')).toBe(true);
+    expect(isSpellbookBarTokenCurrent('character-1:normal', 'character-1:bear')).toBe(false);
+    expect(isSpellbookBarTokenCurrent('character-1:normal', 'character-2:normal')).toBe(false);
   });
 });

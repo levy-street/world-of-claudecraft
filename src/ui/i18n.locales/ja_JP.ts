@@ -14,10 +14,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
-  'hudChrome.itemHeroicTag': '[ヒロイック]',
-  'hudChrome.readyCheck.notInPartyError':
-    '準備確認を開始するにはパーティーに参加している必要があります。',
-  'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',
   'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleChoiceIntro':
@@ -37,6 +33,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.undo': '元に戻す',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',
   'hudChrome.bags.capacity': '{used}/{total}',
+  'hudChrome.bags.itemActionsTitle': '{item}の操作',
+  'hudChrome.bags.itemActionEquip': '装備',
+  'hudChrome.bags.itemActionEquipBag': 'バッグを装備',
+  'hudChrome.bags.itemActionUse': '使用',
+  'hudChrome.bags.itemActionConsume': '消費',
+  'hudChrome.bags.itemActionLinkToChat': 'チャットにリンク',
+  'hudChrome.bags.itemActionDestroy': '破棄',
+  'hudChrome.bags.itemActionDetails': 'アイテム詳細',
+  'hudChrome.bags.itemActionAssignTitle': '消耗品に登録',
+  'hudChrome.bags.itemActionAssignSlot': 'スロット{slot}に登録',
+  'hudChrome.bags.itemActionRemoveSlot': 'スロット{slot}から解除',
+  'hudChrome.bags.itemActionSlotCurrent': 'スロット{slot}: {item}',
+  'hudChrome.bags.itemActionSlotEmpty': 'スロット{slot}: 空き',
+  'hudChrome.bags.itemActionResetAutomatic': '自動配置に戻す',
+  'hudChrome.bags.itemActionClose': 'アイテム操作を閉じる',
+  'hudChrome.bags.itemActionAssigned': '{item}をスロット{slot}に登録しました。',
+  'hudChrome.bags.itemActionRemoved': '{item}をスロット{slot}から解除しました。',
+  'hudChrome.bags.itemActionInvalid': 'このアイテムは登録できません。',
+  'hudChrome.bags.itemActionFailed': '操作を完了できませんでした。',
   'hudChrome.mailbox.back': '戻る',
   'hudChrome.mailbox.tabSend': '送信',
   'hudChrome.mailbox.toLabel': '宛先',
@@ -124,6 +139,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
+  'hudChrome.itemTooltip.duration': '持続時間: {duration}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -1024,6 +1040,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'Androidで全画面にするには、このページをインストールするかホーム画面に追加してください。',
   'mobilePreflight.androidInstallStep':
     'Chromeでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。',
+  'mobilePreflight.androidSamsungInstallStep':
+    'Samsung Internetでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。',
   'mobilePreflight.androidOpenStep': '新しいアイコンからWorld of ClaudeCraftを開きます。',
   'mobilePreflight.otherStandaloneDetail': '端末を横向き全画面に保ってください。',
   'mobilePreflight.otherInstallDetail':
@@ -3633,6 +3651,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionRing': '戦闘アクション',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',
+  'hudChrome.mobile.nameplatesOff': '名前オフ',
+  'hudChrome.mobile.musicOff': '音楽オフ',
   'hudChrome.mobile.hotbarPage': 'スキル',
   'hudChrome.mobile.hotbarPageAria': '次のスキルセットを表示',
   'hudChrome.mobile.jump': 'ジャンプ',
@@ -6520,4 +6540,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
+  'hudChrome.options.mobileActionPages': '最小アクションページ数',
+  'hudChrome.options.mobileActionPagesTwo': '2ページ',
+  'hudChrome.options.mobileActionPagesThree': '3ページ',
+  'hudChrome.options.mobileActionPagesFour': '4ページ',
+  'hudChrome.spellbook.add': '追加',
+  'hudChrome.spellbook.remove': '解除',
+  'hudChrome.spellbook.mobileChip': '{page} - A{position}',
+  'hudChrome.spellbook.desktopChip': 'デスクトップ',
+  'hudChrome.spellbook.moveAssignmentAria': '{name}を{slot}から移動',
+  'hudChrome.spellbook.pickerPages': 'アクションページ',
+  'hudChrome.spellbook.pickerDestinations': 'アクションスロット',
+  'hudChrome.spellbook.destinationAria': '{page}ページ、A{position}、{state}',
+  'hudChrome.spellbook.empty': '空き',
+  'hudChrome.spellbook.closePicker': 'スロットを閉じる',
+  'hudChrome.spellbook.assignedStatus': '{name}を{page}ページのA{position}に割り当てました',
 };

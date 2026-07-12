@@ -155,12 +155,10 @@ export const id_ID: EnTranslations = {
       "banner": "Menonton {name}"
     },
     "readyCheck": {
-      "prompt": "{name} memulai pemeriksaan kesiapan. Apakah kamu siap?",
-      "ready": "Siap",
-      "notReady": "Belum Siap",
-      "result": "Pemeriksaan kesiapan: {ready} siap, {notReady} belum siap, {noResponse} tidak merespons.",
-      "notInPartyError": "Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.",
-      "inProgressError": "Pemeriksaan kesiapan sedang berlangsung."
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
@@ -241,7 +239,7 @@ export const id_ID: EnTranslations = {
         "no_wallet": "Hubungkan dompet dengan setidaknya $20 USD dalam WOC.",
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
-        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -319,6 +317,8 @@ export const id_ID: EnTranslations = {
       "leaderboard": "Peringkat",
       "dailyRewards": "Hadiah",
       "nameplates": "Nama",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
       "toggleHaptics": "Alihkan haptik",
@@ -406,12 +406,12 @@ export const id_ID: EnTranslations = {
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
       "valecup": "Piala Lembah",
-      "categoryPet": "Peliharaan",
-      "petAttack": "Peliharaan: Serang",
-      "petStop": "Peliharaan: Berhenti",
-      "petTaunt": "Peliharaan: Ejek",
-      "petDefensive": "Peliharaan: Defensif",
-      "petAggressive": "Peliharaan: Agresif"
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -564,6 +564,10 @@ export const id_ID: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Sentuh",
       "interfaceModeNote": "Otomatis memilih kontrol desktop atau sentuh dari perangkat Anda. Pilih Desktop untuk memaksa keyboard dan mouse (berguna pada tablet dengan keyboard), atau Sentuh untuk kontrol di layar.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Suara Langkah Kaki",
       "clickFeedback": "Penanda Klik",
       "lockCursorOnRotate": "Kunci Kursor Saat Memutar",
@@ -736,8 +740,8 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
-    "itemHeroicTag": "[HEROIK]",
-    "itemSoulbound": "Terikat Jiwa",
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -988,7 +992,26 @@ export const id_ID: EnTranslations = {
       "backpack": "Ransel",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Slot tas kosong",
-      "unequipHint": "Klik untuk melepas tas ini"
+      "unequipHint": "Klik untuk melepas tas ini",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Raid Anda telah diubah kembali menjadi rombongan.",
@@ -1084,10 +1107,10 @@ export const id_ID: EnTranslations = {
       "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
     },
     "auth": {
-      "appleLoginCta": "Lanjutkan dengan Apple",
-      "appleError": "Tidak dapat masuk dengan Apple. Silakan coba lagi.",
-      "appleChoiceIntro": "Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.",
-      "appleChoiceExpired": "Sesi masuk dengan Apple itu telah kedaluwarsa. Silakan masuk lagi dengan Apple.",
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
       "forgotPrompt": "Lupa kata sandi?",
       "forgotTitle": "Atur ulang kata sandimu",
       "forgotHint": "Masukkan nama penggunamu dan kami akan mengirim tautan pengaturan ulang ke alamat email yang terdaftar.",
@@ -1108,7 +1131,18 @@ export const id_ID: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
-      "removeFromBarAria": "Hapus {name} dari bilah aksi"
+      "removeFromBarAria": "Hapus {name} dari bilah aksi",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const id_ID: EnTranslations = {
       "label": "Atur Ulang Posisi Bingkai"
     },
     "itemTooltip": {
-      "requiresLevel": "Membutuhkan Level {level}"
+      "requiresLevel": "Membutuhkan Level {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1332,8 +1367,8 @@ export const id_ID: EnTranslations = {
       "parcelsLabel": "Bingkisan",
       "parcelsHint": "Klik barang di tasmu untuk melampirkannya.",
       "removeParcelAria": "Keluarkan {item} dari surat",
-      "parcelQtyDecreaseAria": "Kirim satu {item} lebih sedikit",
-      "parcelQtyIncreaseAria": "Kirim satu {item} lebih banyak",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",
@@ -3940,14 +3975,14 @@ export const id_ID: EnTranslations = {
     "reconnecting": "Koneksi terputus. Menyambungkan kembali...",
     "connectionRejected": "Server menutup koneksi.",
     "tips": {
-      "classes": "Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.",
-      "talents": "Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.",
-      "dungeons": "Kiat: cobalah ruang bawah tanah pada tingkat kesulitan heroik setelah perlengkapanmu melampaui tingkat normal, untuk pertarungan yang lebih sulit dan lebih menguntungkan.",
-      "market": "Kiat: Pasar Dunia memungkinkanmu membeli dan menjual dengan pemain di seluruh dunia.",
-      "guilds": "Kiat: bergabung dengan guild memberimu saluran obrolan pribadi dan daftar bersama anggota guildmu.",
-      "professions": "Kiat: profesi pengumpulan dan kerajinan dapat dilatih bersamaan dengan kelas tempurmu.",
-      "loadouts": "Kiat: simpan lebih dari satu set talenta agar dapat bertukar build tanpa menggunakan poin dua kali.",
-      "pvp": "Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu."
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
     }
   },
   "errors": {
@@ -4132,6 +4167,7 @@ export const id_ID: EnTranslations = {
     "androidStandaloneDetail": "Kamu berada dalam mode aplikasi layar penuh. Pertahankan perangkat dalam posisi lanskap.",
     "androidInstallDetail": "Untuk layar penuh di Android, pasang halaman ini atau tambahkan ke layar Beranda terlebih dahulu.",
     "androidInstallStep": "Di Chrome, ketuk menu, lalu Pasang aplikasi atau Tambahkan ke layar Beranda.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Buka World of ClaudeCraft dari ikon baru.",
     "otherStandaloneDetail": "Pertahankan perangkatmu dalam layar penuh posisi lanskap.",
     "otherInstallDetail": "Pasang atau tambahkan halaman ini ke layar Beranda untuk pengalaman seluler layar penuh terbaik."
@@ -5867,7 +5903,7 @@ export const id_ID: EnTranslations = {
         "name": "Taring Greyjaw Tua"
       },
       "chunk_of_ore": {
-        "name": "Bongkahan Bijih"
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Halaman Buku Besar Lapuk"
@@ -7550,12 +7586,12 @@ export const id_ID: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Pekerjaan untuk Setiap Tangan",
-        "text": "Setiap orang di Eastbrook menekuni pekerjaan selain mengayunkan pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ayunkan beliung dan bawakan aku 5 bongkahan. Tambang sendiri, ingat, aku tahu bedanya.",
-        "completion": "Lihat? Bijih di tasmu dan kapalan di tanganmu. Teruslah menambang, menebang, dan memetik herba selama menjelajahi jalanan. Saat kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sebelahnya. Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.",
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Bongkahan Bijih"
+            "label": "Chunk of Ore"
           }
         }
       },

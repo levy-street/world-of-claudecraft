@@ -81,6 +81,16 @@ describe('options_window: WCAG 2.2 AA', () => {
 // swapped coercion reds the build. Driving the live DOM + events is the opt-in
 // browser suite; this is the no-DOM-suite equivalent.
 describe('options_window: control-primitive dispatch wiring', () => {
+  it('passes the live touch environment to Interface controls', () => {
+    const renderInterface = painter.slice(
+      painter.indexOf('private renderInterface(): void'),
+      painter.indexOf('// On/off toggle for chat timestamps.'),
+    );
+    expect(renderInterface).toContain('buildInterfaceControls(this.settingsSource(hooks), {');
+    expect(renderInterface).toContain('touch: useTouchInterface()');
+    expect(renderInterface).toContain('nativeShell: isNativeAppShell()');
+  });
+
   it('routes each descriptor kind to its matching builder', () => {
     expect(painter).toContain('this.settingSlider(parent, c, hooks)');
     expect(painter).toContain('this.settingToggle(parent, c, hooks)');

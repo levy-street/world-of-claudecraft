@@ -57,9 +57,12 @@ export function syncMobileMenuPlacement(doc: Document, placement: MobileMenuPlac
 export function applyMobileHudLayout(win: Window = window): void {
   const doc = win.document;
   const body = doc.body;
+  const stableGameRoot =
+    body.classList.contains('game-active') && body.classList.contains('mobile-touch');
+  const stableRect = stableGameRoot ? body.getBoundingClientRect() : null;
   const layout = resolveMobileHudLayout({
-    width: win.innerWidth,
-    height: win.innerHeight,
+    width: stableRect?.width || win.innerWidth,
+    height: stableRect?.height || win.innerHeight,
     safeAreaTop: 0,
     safeAreaRight: 0,
     safeAreaBottom: 0,

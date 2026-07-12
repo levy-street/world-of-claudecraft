@@ -14,9 +14,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
-  'hudChrome.itemHeroicTag': '[영웅]',
-  'hudChrome.readyCheck.notInPartyError': '준비 확인을 시작하려면 파티에 속해 있어야 합니다.',
-  'hudChrome.readyCheck.inProgressError': '준비 확인이 이미 진행 중입니다.',
   'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
   'hudChrome.auth.appleError': 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
@@ -35,6 +32,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.undo': '실행 취소',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',
   'hudChrome.bags.capacity': '{used}/{total}',
+  'hudChrome.bags.itemActionsTitle': '{item} 동작',
+  'hudChrome.bags.itemActionEquip': '장착',
+  'hudChrome.bags.itemActionEquipBag': '가방 장착',
+  'hudChrome.bags.itemActionUse': '사용',
+  'hudChrome.bags.itemActionConsume': '소비',
+  'hudChrome.bags.itemActionLinkToChat': '채팅에 링크',
+  'hudChrome.bags.itemActionDestroy': '파괴',
+  'hudChrome.bags.itemActionDetails': '아이템 상세',
+  'hudChrome.bags.itemActionAssignTitle': '소모품에 지정',
+  'hudChrome.bags.itemActionAssignSlot': '{slot}번 슬롯에 지정',
+  'hudChrome.bags.itemActionRemoveSlot': '{slot}번 슬롯에서 제거',
+  'hudChrome.bags.itemActionSlotCurrent': '{slot}번 슬롯: {item}',
+  'hudChrome.bags.itemActionSlotEmpty': '{slot}번 슬롯: 비어 있음',
+  'hudChrome.bags.itemActionResetAutomatic': '자동 배치로 재설정',
+  'hudChrome.bags.itemActionClose': '아이템 동작 닫기',
+  'hudChrome.bags.itemActionAssigned': '{item}을(를) {slot}번 슬롯에 지정했습니다.',
+  'hudChrome.bags.itemActionRemoved': '{item}을(를) {slot}번 슬롯에서 제거했습니다.',
+  'hudChrome.bags.itemActionInvalid': '이 아이템은 지정할 수 없습니다.',
+  'hudChrome.bags.itemActionFailed': '동작을 완료할 수 없습니다.',
   'hudChrome.mailbox.back': '뒤로 가기',
   'hudChrome.mailbox.tabSend': '보내기',
   'hudChrome.mailbox.toLabel': '받는 사람',
@@ -119,6 +135,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.',
   'hudChrome.loot.chestTitle': '상자',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
+  'hudChrome.itemTooltip.duration': '지속 시간: {duration}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -1012,6 +1029,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'Android에서 전체 화면을 사용하려면 이 페이지를 설치하거나 홈 화면에 추가하세요.',
   'mobilePreflight.androidInstallStep':
     'Chrome에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.',
+  'mobilePreflight.androidSamsungInstallStep':
+    'Samsung Internet에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.',
   'mobilePreflight.androidOpenStep': '새 아이콘에서 World of ClaudeCraft를 여세요.',
   'mobilePreflight.otherStandaloneDetail': '기기를 가로 전체 화면으로 유지하세요.',
   'mobilePreflight.otherInstallDetail':
@@ -2694,7 +2713,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.text':
     '이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.',
   'entities.quests.q_prof_intro.completion':
-    '봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.',
+    '봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광석 조각',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
@@ -3621,6 +3640,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionRing': '전투 행동',
   'hudChrome.mobile.haptics': '진동',
   'hudChrome.mobile.hapticsOff': '진동 꺼짐',
+  'hudChrome.mobile.nameplatesOff': '이름 끄기',
+  'hudChrome.mobile.musicOff': '음악 끄기',
   'hudChrome.mobile.hotbarPage': '스킬',
   'hudChrome.mobile.hotbarPageAria': '다음 스킬 세트 표시',
   'hudChrome.mobile.jump': '점프',
@@ -6505,4 +6526,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
+  'hudChrome.options.mobileActionPages': '최소 행동 페이지 수',
+  'hudChrome.options.mobileActionPagesTwo': '2페이지',
+  'hudChrome.options.mobileActionPagesThree': '3페이지',
+  'hudChrome.options.mobileActionPagesFour': '4페이지',
+  'hudChrome.spellbook.add': '추가',
+  'hudChrome.spellbook.remove': '제거',
+  'hudChrome.spellbook.mobileChip': '{page} - A{position}',
+  'hudChrome.spellbook.desktopChip': '데스크톱',
+  'hudChrome.spellbook.moveAssignmentAria': '{name}을(를) {slot}에서 이동',
+  'hudChrome.spellbook.pickerPages': '행동 페이지',
+  'hudChrome.spellbook.pickerDestinations': '행동 슬롯',
+  'hudChrome.spellbook.destinationAria': '{page}페이지, A{position}, {state}',
+  'hudChrome.spellbook.empty': '비어 있음',
+  'hudChrome.spellbook.closePicker': '슬롯 닫기',
+  'hudChrome.spellbook.assignedStatus': '{name}을(를) {page}페이지 A{position}에 배치했습니다',
 };

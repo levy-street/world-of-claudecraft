@@ -158,9 +158,7 @@ export const zh_TW: EnTranslations = {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",
       "notReady": "未準備",
-      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。",
-      "notInPartyError": "你必須加入隊伍才能發起就緒確認。",
-      "inProgressError": "就緒確認已在進行中。"
+      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。"
     },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
@@ -319,6 +317,8 @@ export const zh_TW: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "獎勵",
       "nameplates": "名條",
+      "nameplatesOff": "名稱關閉",
+      "musicOff": "音樂關閉",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
       "toggleHaptics": "切換觸覺回饋",
@@ -564,6 +564,10 @@ export const zh_TW: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "觸控",
       "interfaceModeNote": "自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。",
+      "mobileActionPages": "最少動作頁數",
+      "mobileActionPagesTwo": "2 頁",
+      "mobileActionPagesThree": "3 頁",
+      "mobileActionPagesFour": "4 頁",
       "footstepSounds": "腳步聲",
       "clickFeedback": "點擊標記",
       "lockCursorOnRotate": "旋轉時鎖定游標",
@@ -736,7 +740,7 @@ export const zh_TW: EnTranslations = {
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
-    "itemHeroicTag": "[英雄]",
+    "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -988,7 +992,26 @@ export const zh_TW: EnTranslations = {
       "backpack": "背包",
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包欄位",
-      "unequipHint": "點擊移除此背包"
+      "unequipHint": "點擊移除此背包",
+      "itemActionsTitle": "{item}操作",
+      "itemActionEquip": "裝備",
+      "itemActionEquipBag": "裝備背包",
+      "itemActionUse": "使用",
+      "itemActionConsume": "食用",
+      "itemActionLinkToChat": "連結到聊天",
+      "itemActionDestroy": "摧毀",
+      "itemActionDetails": "物品詳情",
+      "itemActionAssignTitle": "指派到消耗品列",
+      "itemActionAssignSlot": "指派到欄位{slot}",
+      "itemActionRemoveSlot": "從欄位{slot}移除",
+      "itemActionSlotCurrent": "欄位{slot}：{item}",
+      "itemActionSlotEmpty": "欄位{slot}：空",
+      "itemActionResetAutomatic": "恢復自動排列",
+      "itemActionClose": "關閉物品操作",
+      "itemActionAssigned": "已將{item}指派到欄位{slot}。",
+      "itemActionRemoved": "已將{item}從欄位{slot}移除。",
+      "itemActionInvalid": "此物品無法指派。",
+      "itemActionFailed": "無法完成此操作。"
     },
     "raidConvert": {
       "toPartyDone": "你的團隊已轉換回隊伍。",
@@ -1108,7 +1131,18 @@ export const zh_TW: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "將 {name} 加入動作列",
-      "removeFromBarAria": "將 {name} 從動作列移除"
+      "removeFromBarAria": "將 {name} 從動作列移除",
+      "add": "加入",
+      "remove": "移除",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "桌面版",
+      "moveAssignmentAria": "將 {name} 從 {slot} 移動",
+      "pickerPages": "動作頁",
+      "pickerDestinations": "動作欄位",
+      "destinationAria": "第{page}頁，A{position}，{state}",
+      "empty": "空白",
+      "closePicker": "關閉欄位",
+      "assignedStatus": "{name} 已分配到第{page}頁 A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等級 {level}"
+      "requiresLevel": "需要等級 {level}",
+      "duration": "持續時間：{duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const zh_TW: EnTranslations = {
     "androidStandaloneDetail": "你正在全螢幕應用模式中。請保持橫向。",
     "androidInstallDetail": "若要在 Android 上全螢幕，請先安裝此頁面或加入主畫面。",
     "androidInstallStep": "在 Chrome 中點選選單，然後選擇安裝應用程式或加入主畫面。",
+    "androidSamsungInstallStep": "在 Samsung Internet 中點選選單，然後選擇安裝應用程式或加入主畫面。",
     "androidOpenStep": "從新圖示開啟 World of ClaudeCraft。",
     "otherStandaloneDetail": "請保持裝置為橫向全螢幕。",
     "otherInstallDetail": "安裝此頁面或將其加入主畫面，以獲得最佳行動裝置全螢幕體驗。"
@@ -7552,7 +7588,7 @@ export const zh_TW: EnTranslations = {
       "q_prof_intro": {
         "title": "人人都有一技之長",
         "text": "伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。",
-        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，靠這些都能正經謀生。",
+        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。",
         "objectives": {
           "0": {
             "label": "礦石塊"

@@ -173,6 +173,8 @@ const UI_PURE_CORES = [
   'src/ui/action_bar_view.ts',
   'src/ui/mobile_action_page_view.ts',
   'src/ui/consumable_bar_view.ts',
+  'src/ui/bag_item_actions_view.ts',
+  'src/ui/consumable_bar_preferences_core.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
@@ -204,6 +206,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/viewport_resize_core.ts',
   'src/render/water_core.ts',
 ].map((rel) => join(repoRoot, rel));
 

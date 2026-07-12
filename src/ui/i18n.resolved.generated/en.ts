@@ -158,9 +158,7 @@ export const en: EnTranslations = {
       "prompt": "{name} has started a ready check. Are you ready?",
       "ready": "Ready",
       "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.",
-      "notInPartyError": "You must be in a party to start a ready check.",
-      "inProgressError": "A ready check is already in progress."
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
     },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
@@ -319,6 +317,8 @@ export const en: EnTranslations = {
       "leaderboard": "Ranks",
       "dailyRewards": "Rewards",
       "nameplates": "Names",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
       "toggleHaptics": "Toggle haptics",
@@ -564,6 +564,10 @@ export const en: EnTranslations = {
       "interfaceModeDesktop": "Desktop",
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "Footstep Sounds",
       "clickFeedback": "Click Marker",
       "lockCursorOnRotate": "Lock Cursor While Rotating",
@@ -988,7 +992,26 @@ export const en: EnTranslations = {
       "backpack": "Backpack",
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Empty bag slot",
-      "unequipHint": "Click to remove this bag"
+      "unequipHint": "Click to remove this bag",
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "Your raid has converted back to a party.",
@@ -1108,7 +1131,18 @@ export const en: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",
-      "removeFromBarAria": "Remove {name} from action bar"
+      "removeFromBarAria": "Remove {name} from action bar",
+      "add": "Add",
+      "remove": "Remove",
+      "mobileChip": "{page} - A{position}",
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1132,7 +1166,8 @@ export const en: EnTranslations = {
       "label": "Reset Frame Positions"
     },
     "itemTooltip": {
-      "requiresLevel": "Requires Level {level}"
+      "requiresLevel": "Requires Level {level}",
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -4132,6 +4167,7 @@ export const en: EnTranslations = {
     "androidStandaloneDetail": "You are in fullscreen app mode. Keep the device in landscape.",
     "androidInstallDetail": "For fullscreen on Android, install this page or add it to your Home screen first.",
     "androidInstallStep": "In Chrome, tap the menu, then Install app or Add to Home screen.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "Open World of ClaudeCraft from the new icon.",
     "otherStandaloneDetail": "Keep your device in landscape fullscreen.",
     "otherInstallDetail": "Install or add this page to your Home screen for the best fullscreen mobile experience."
