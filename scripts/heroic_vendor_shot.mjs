@@ -115,13 +115,13 @@ const bagsState = await page.evaluate(() => {
   const bags = document.querySelector('#bags');
   return {
     display: bags?.style.display,
-    rows: document.querySelectorAll('#bags .item-cell').length,
+    rows: document.querySelectorAll('#bags .bag-item').length,
   };
 });
 console.log('bags:', JSON.stringify(bagsState));
 await new Promise((r) => setTimeout(r, 700));
 await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .item-cell')];
+  const rows = [...document.querySelectorAll('#bags .bag-item')];
   const target = rows.find((el) =>
     /The Architect's Cornerstone/.test(el.getAttribute('aria-label') ?? ''),
   );

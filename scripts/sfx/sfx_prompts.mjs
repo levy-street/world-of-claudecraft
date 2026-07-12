@@ -194,6 +194,11 @@ export const SFX = [
       'Earthy nature magic growing: rustling leaves and a low primal hum building. Seamless loop, no music.',
   },
 
+  // Per-ability cast loop override (custom recording, not ElevenLabs). See
+  // castKeyForAbility in src/ui/hud.ts: lightning_bolt uses this clip instead
+  // of its school default (arcane).
+  { key: 'cast_lightning_bolt', custom: true, loop: true },
+
   // --- Spell projectiles ----------------------------------------------------
   {
     key: 'proj_fire',

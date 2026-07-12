@@ -26,15 +26,24 @@ import ffmpegPath from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
 import {
   classify,
+  DURATION_THRESHOLD,
   LOSSLESS_EXTENSIONS,
   MIN_SOURCE_BITRATE,
   TARGET_BITRATE,
-  TARGET_SAMPLE_RATE,
   TARGET_PEAK_DBFS,
-  DURATION_THRESHOLD,
+  TARGET_SAMPLE_RATE,
 } from './sfx/sfx_conform_rules.mjs';
 
-const AUDIO_EXTENSIONS = new Set(['.mp3', '.wav', '.flac', '.aiff', '.aif', '.ogg', '.opus', '.m4a']);
+const AUDIO_EXTENSIONS = new Set([
+  '.mp3',
+  '.wav',
+  '.flac',
+  '.aiff',
+  '.aif',
+  '.ogg',
+  '.opus',
+  '.m4a',
+]);
 
 const fix = process.argv.includes('--fix');
 const root = process.cwd();
@@ -43,8 +52,10 @@ const ffprobePath = ffprobeStatic.path;
 
 function ffprobe(file) {
   const out = execFileSync(ffprobePath, [
-    '-v', 'quiet',
-    '-print_format', 'json',
+    '-v',
+    'quiet',
+    '-print_format',
+    'json',
     '-show_format',
     '-show_streams',
     file,
@@ -54,7 +65,7 @@ function ffprobe(file) {
 
 function getStats(file) {
   const info = ffprobe(file);
-  const stream = info.streams.find(s => s.codec_type === 'audio');
+  const stream = info.streams.find((s) => s.codec_type === 'audio');
   const duration = parseFloat(info.format.duration ?? '0');
   const bitrate = Math.round(parseInt(info.format.bit_rate ?? '0') / 1000);
   const sampleRate = parseInt(stream?.sample_rate ?? '0');
@@ -64,11 +75,11 @@ function getStats(file) {
 // Returns the peak dBFS of a file using ffmpeg volumedetect.
 // Throws if the output cannot be parsed rather than silently returning 0.
 function getPeakDb(file) {
-  const result = spawnSync(ffmpegPath, [
-    '-hide_banner', '-i', file,
-    '-af', 'volumedetect',
-    '-f', 'null', '-',
-  ], { encoding: 'utf8' });
+  const result = spawnSync(
+    ffmpegPath,
+    ['-hide_banner', '-i', file, '-af', 'volumedetect', '-f', 'null', '-'],
+    { encoding: 'utf8' },
+  );
   const match = (result.stderr || '').match(/max_volume:\s*([-\d.]+)\s*dB/);
   if (!match) throw new Error(`volumedetect parse failed for ${path.basename(file)}`);
   return parseFloat(match[1]);
@@ -77,11 +88,11 @@ function getPeakDb(file) {
 // Returns the integrated loudness in LUFS using ffmpeg ebur128.
 // Throws if the output cannot be parsed.
 function getLufs(file) {
-  const result = spawnSync(ffmpegPath, [
-    '-hide_banner', '-i', file,
-    '-af', 'ebur128=peak=true',
-    '-f', 'null', '-',
-  ], { encoding: 'utf8' });
+  const result = spawnSync(
+    ffmpegPath,
+    ['-hide_banner', '-i', file, '-af', 'ebur128=peak=true', '-f', 'null', '-'],
+    { encoding: 'utf8' },
+  );
   const match = (result.stderr || '').match(/I:\s*([-\d.]+)\s*LUFS/);
   if (!match) throw new Error(`ebur128 parse failed for ${path.basename(file)}`);
   return parseFloat(match[1]);
@@ -96,20 +107,34 @@ function conformPeak(inputFile, outputFile, peakDb) {
   const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(outputFile)}`);
   try {
     execFileSync(ffmpegPath, [
-      '-hide_banner', '-loglevel', 'error',
-      '-y', '-i', inputFile,
-      '-af', `volume=${adjustment}dB,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
-      '-ar', String(TARGET_SAMPLE_RATE),
-      '-b:a', `${TARGET_BITRATE}k`,
-      '-codec:a', 'libmp3lame',
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      inputFile,
+      '-af',
+      `volume=${adjustment}dB,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
+      '-ar',
+      String(TARGET_SAMPLE_RATE),
+      '-b:a',
+      `${TARGET_BITRATE}k`,
+      '-codec:a',
+      'libmp3lame',
       tmp,
     ]);
     renameSync(tmp, outputFile);
   } finally {
-    try { unlinkSync(tmp); } catch { /* already renamed or never created */ }
+    try {
+      unlinkSync(tmp);
+    } catch {
+      /* already renamed or never created */
+    }
   }
   if (inputFile !== outputFile) {
-    try { unlinkSync(inputFile); } catch (e) {
+    try {
+      unlinkSync(inputFile);
+    } catch (e) {
       console.warn(`  WARN could not remove source file ${path.basename(inputFile)}: ${e.message}`);
     }
   }
@@ -119,20 +144,34 @@ function conformLufs(inputFile, outputFile) {
   const tmp = path.join(tmpdir(), `sfx_conform_${path.basename(outputFile)}`);
   try {
     execFileSync(ffmpegPath, [
-      '-hide_banner', '-loglevel', 'error',
-      '-y', '-i', inputFile,
-      '-af', `loudnorm=I=-14:LRA=7:TP=-1,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
-      '-ar', String(TARGET_SAMPLE_RATE),
-      '-b:a', `${TARGET_BITRATE}k`,
-      '-codec:a', 'libmp3lame',
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      inputFile,
+      '-af',
+      `loudnorm=I=-14:LRA=7:TP=-1,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
+      '-ar',
+      String(TARGET_SAMPLE_RATE),
+      '-b:a',
+      `${TARGET_BITRATE}k`,
+      '-codec:a',
+      'libmp3lame',
       tmp,
     ]);
     renameSync(tmp, outputFile);
   } finally {
-    try { unlinkSync(tmp); } catch { /* already renamed or never created */ }
+    try {
+      unlinkSync(tmp);
+    } catch {
+      /* already renamed or never created */
+    }
   }
   if (inputFile !== outputFile) {
-    try { unlinkSync(inputFile); } catch (e) {
+    try {
+      unlinkSync(inputFile);
+    } catch (e) {
       console.warn(`  WARN could not remove source file ${path.basename(inputFile)}: ${e.message}`);
     }
   }
@@ -143,7 +182,7 @@ function conformLufs(inputFile, outputFile) {
 // Two lossless or two lossy files for the same stem: first alphabetically wins, warn.
 const allFiles = existsSync(sfxDir)
   ? readdirSync(sfxDir)
-      .filter(f => AUDIO_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .filter((f) => AUDIO_EXTENSIONS.has(path.extname(f).toLowerCase()))
       .sort()
   : [];
 
@@ -163,15 +202,21 @@ for (const name of allFiles) {
   const existingIsLossless = LOSSLESS_EXTENSIONS.has(existingExt);
   if (newIsLossless && !existingIsLossless) {
     // Unambiguous: lossless always beats lossy.
-    console.log(`  WARN ${stem}: ${name} (lossless) takes priority over ${existing} -- remove the lossy copy after conforming`);
+    console.log(
+      `  WARN ${stem}: ${name} (lossless) takes priority over ${existing} -- remove the lossy copy after conforming`,
+    );
     byKey.set(stem, name);
   } else if (!newIsLossless && existingIsLossless) {
     // Unambiguous: existing lossless stays.
-    console.log(`  WARN ${stem}: ${existing} (lossless) takes priority over ${name} -- remove the lossy copy after conforming`);
+    console.log(
+      `  WARN ${stem}: ${existing} (lossless) takes priority over ${name} -- remove the lossy copy after conforming`,
+    );
   } else {
     // Two lossless or two lossy files for the same key: ambiguous, cannot determine
     // which is correct. Skip both and force the contributor to resolve it manually.
-    console.log(`  ERROR ${stem}: ambiguous duplicate (${existing} vs ${name}) -- remove one and rerun`);
+    console.log(
+      `  ERROR ${stem}: ambiguous duplicate (${existing} vs ${name}) -- remove one and rerun`,
+    );
     byKey.delete(stem);
     conflicts.push(stem);
   }
@@ -198,7 +243,9 @@ for (const name of files) {
   // Lossless sources skip this gate entirely.
   const preliminary = classify({ duration, bitrate, sampleRate, isLossless });
   if (preliminary.reject) {
-    console.log(`  REJECT ${name}  [${bitrate}kbps source, minimum ${MIN_SOURCE_BITRATE}kbps; re-export at 128kbps or higher]`);
+    console.log(
+      `  REJECT ${name}  [${bitrate}kbps source, minimum ${MIN_SOURCE_BITRATE}kbps; re-export at 128kbps or higher]`,
+    );
     rejected++;
     continue;
   }
@@ -212,7 +259,14 @@ for (const name of files) {
     lufs = getLufs(file);
   }
 
-  const { problems, normBranch } = classify({ duration, bitrate, sampleRate, peakDb, lufs, isLossless });
+  const { problems, normBranch } = classify({
+    duration,
+    bitrate,
+    sampleRate,
+    peakDb,
+    lufs,
+    isLossless,
+  });
 
   if (problems.length === 0) {
     console.log(`  ok   ${name}`);
@@ -244,13 +298,19 @@ for (const name of files) {
 
 console.log('');
 if (conflicts.length > 0) {
-  console.log(`${conflicts.length} key(s) skipped due to ambiguous duplicates: ${conflicts.join(', ')}. Remove one file per key and rerun.`);
+  console.log(
+    `${conflicts.length} key(s) skipped due to ambiguous duplicates: ${conflicts.join(', ')}. Remove one file per key and rerun.`,
+  );
 }
 if (rejected > 0) {
-  console.log(`${rejected} file(s) rejected: source bitrate below ${MIN_SOURCE_BITRATE}kbps. Re-export from your DAW and resubmit.`);
+  console.log(
+    `${rejected} file(s) rejected: source bitrate below ${MIN_SOURCE_BITRATE}kbps. Re-export from your DAW and resubmit.`,
+  );
 }
 if (fix) {
-  console.log(`${fixed}/${issues} files conformed. ${files.length - issues - rejected} already at spec.`);
+  console.log(
+    `${fixed}/${issues} files conformed. ${files.length - issues - rejected} already at spec.`,
+  );
 } else if (issues > 0) {
   console.log(`${issues} file(s) out of spec. Run with --fix to conform them.`);
 }

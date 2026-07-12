@@ -56,9 +56,7 @@ const info = await page.evaluate(() => {
   document.querySelector('#bags').style.display = 'none';
   g.hud.toggleBags();
   g.hud.renderBags();
-  const rows = [...document.querySelectorAll('#bags .item-cell')].map((r) =>
-    (r.getAttribute('aria-label') || '').trim(),
-  );
+  const rows = [...document.querySelectorAll('#bags .bag-item')].map((r) => r.textContent.trim());
   return { rows };
 });
 console.log('bag rows:', JSON.stringify(info.rows));
@@ -69,15 +67,15 @@ await page.screenshot({ path: 'tmp/cragmaw_drops_bag.png' });
 // Hover each new item to surface its tooltip, and capture name + quality + stats.
 async function shotTooltip(label, file) {
   const idx = await page.evaluate((label) => {
-    const rows = [...document.querySelectorAll('#bags .item-cell')];
-    return rows.findIndex((r) => (r.getAttribute('aria-label') || '').includes(label));
+    const rows = [...document.querySelectorAll('#bags .bag-item')];
+    return rows.findIndex((r) => r.textContent.includes(label));
   }, label);
   if (idx < 0) {
     console.log(`tooltip ${label}: row not found`);
     return;
   }
   const rect = await page.evaluate((i) => {
-    const r = [...document.querySelectorAll('#bags .item-cell')][i].getBoundingClientRect();
+    const r = [...document.querySelectorAll('#bags .bag-item')][i].getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }, idx);
   // Approach from outside the element so a real mouseenter + mousemove fires.

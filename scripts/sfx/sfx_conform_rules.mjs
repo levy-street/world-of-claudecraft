@@ -24,7 +24,14 @@ export const LOSSLESS_EXTENSIONS = new Set(['.wav', '.flac', '.aiff', '.aif']);
  * @param {{ duration: number, bitrate: number, sampleRate: number, peakDb?: number|null, lufs?: number|null, isLossless?: boolean }} stats
  * @returns {{ reject: boolean, problems: string[], normBranch: 'peak'|'lufs'|null }}
  */
-export function classify({ duration, bitrate, sampleRate, peakDb = null, lufs = null, isLossless = false }) {
+export function classify({
+  duration,
+  bitrate,
+  sampleRate,
+  peakDb = null,
+  lufs = null,
+  isLossless = false,
+}) {
   if (!isLossless && bitrate < MIN_SOURCE_BITRATE) {
     return { reject: true, problems: [], normBranch: null };
   }
