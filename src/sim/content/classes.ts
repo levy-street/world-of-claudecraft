@@ -3825,7 +3825,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
     description:
-      'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+      'Assume a Shadowform, increasing your Shadow damage by 15% until you shift back. Casting a healing spell ends the form. Cast again to return to normal form. (Shadow signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',

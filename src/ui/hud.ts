@@ -4600,18 +4600,10 @@ export class Hud {
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
     const p = this.sim.player;
-    // Gloamveil Form's spell power is Shadow-school only in the sim, and it is NOT sent as
-    // a separate wire field. Re-derive it from the form aura (which IS synced on both
-    // hosts) so the tooltip estimate for a shadow spell matches the sim on offline AND
-    // online, mirroring recalcPlayerStats' shadowSpellPowerBonus.
-    let shadowSpellPowerBonus = 0;
-    for (const aura of p.auras)
-      if (aura.kind === 'form_shadow') shadowSpellPowerBonus += aura.value;
     const scaling: AbilityScaling = {
       spellPower: p.spellPower,
       rangedPower: p.rangedPower,
       attackPower: p.attackPower,
-      shadowSpellPowerBonus: Math.max(0, Math.round(shadowSpellPowerBonus)),
     };
     const damageText = abilityEffectText(res, scaling);
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;

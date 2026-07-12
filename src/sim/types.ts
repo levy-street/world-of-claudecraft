@@ -1818,10 +1818,6 @@ export interface Entity {
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
-  // Extra spell power that applies ONLY to Shadow-school output (Gloamveil Form). Kept
-  // off the generic spellPower so it never strengthens a non-Shadow spell; abilityScalingPower
-  // adds it back for shadow abilities.
-  shadowSpellPowerBonus: number;
   // Haste fractions from item-set bonuses (0 = none). Melee/ranged haste speed up
   // the respective auto-attack swing; spell haste shortens cast and channel time.
   meleeHaste: number;

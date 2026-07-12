@@ -26,10 +26,6 @@ export interface AbilityScaling {
   spellPower: number;
   rangedPower: number;
   attackPower: number;
-  // Extra spell power that applies to SHADOW-school output only (Gloamveil Form),
-  // matching the sim's abilityScalingPower. Optional: omitted (treated as 0) by callers
-  // that never carry a shadow-form bonus.
-  shadowSpellPowerBonus?: number;
 }
 
 /** Flat bonus this character adds to ONE displayed hit of `eff` (or, for a DoT, to

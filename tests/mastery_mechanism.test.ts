@@ -4,16 +4,15 @@
 // Plus the second-pass follow-ups (codex review of the fixes themselves):
 //  - a flat DAMAGE-magnitude buff (thorns) must still scale, only rates are exempt
 //  - a buff-strengthening talent must ride buffPct, not the (now buff-exempt) dmgPct
+// Plus Gloamveil Form: a +15% Shadow-school damage amplifier (not flat spell power),
+//  and healing ends the form.
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
-import { createMob, recalcPlayerStats } from '../src/sim/entity';
-import type { ResolvedAbility } from '../src/sim/sim';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { abilityScalingPower } from '../src/sim/spell_scaling';
-import type { AbilityDef, Aura, Entity } from '../src/sim/types';
-import { abilityDamageBonus } from '../src/ui/ability_damage';
+import type { Aura, Entity } from '../src/sim/types';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
   it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
@@ -64,18 +63,109 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
   });
 });
 
-describe('Gloamveil Form spell power is Shadow-school only (F6)', () => {
-  it('adds its +15 to shadow spells only, not to the generic spell power or other schools', () => {
+describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
+  // Build a priest and a hostile dummy; return the damage a raw dealDamage of the given
+  // school does, optionally while the priest is in Gloamveil Form (form_shadow, value 15).
+  const hit = (school: string, inForm: boolean): number => {
     const sim = new Sim({ seed: 1, playerClass: 'priest', autoEquip: true });
     sim.setPlayerLevel(20);
     const p = sim.entities.get(sim.playerId) as Entity;
-    const meta = (sim as unknown as { players: Map<number, unknown> }).players.get(sim.playerId);
-    const mods = (sim as unknown as { playerMods(m: unknown): unknown }).playerMods(meta);
-    const eq = (meta as { equipment: unknown }).equipment;
-    const eqi = (meta as { equipmentInstance: unknown }).equipmentInstance;
+    if (inForm) {
+      p.auras.push({
+        kind: 'form_shadow',
+        name: 'Gloamveil Form',
+        value: 15,
+        remaining: 3600,
+        duration: 3600,
+        sourceId: p.id,
+        school: 'shadow',
+      } as Aura);
+    }
+    const dummy = createMob(
+      (sim as unknown as { nextId: number }).nextId++,
+      MOBS.ridge_stalker,
+      20,
+      {
+        x: p.pos.x,
+        y: p.pos.y,
+        z: p.pos.z + 3,
+      },
+    );
+    dummy.maxHp = dummy.hp = 5_000_000;
+    dummy.hostile = true;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+    (sim as unknown as { dealDamage: Sim['dealDamage'] }).dealDamage(
+      p,
+      dummy,
+      1000,
+      false,
+      school,
+      'test',
+      'hit',
+    );
+    return dummy.maxHp - dummy.hp;
+  };
 
-    const spBefore = p.spellPower;
-    // Enter Gloamveil Form (form_shadow, value 15) and re-derive stats.
+  it('a shadow hit deals 15% more in the form; a holy hit is unaffected', () => {
+    // 1000 shadow -> 1150 in form (round(1000 * 1.15)); holy is not a shadow school.
+    expect(hit('shadow', false)).toBe(1000);
+    expect(hit('shadow', true)).toBe(1150);
+    expect(hit('holy', false)).toBe(1000);
+    expect(hit('holy', true)).toBe(1000);
+  });
+
+  it('amplifies periodic Shadow damage too (a Shadow Word: Pain DoT tick is +15%)', () => {
+    // Every shadow damage path funnels through dealDamage, so the DoT ticks benefit like
+    // direct hits. Same seed, only the form differs.
+    const dotDamage = (inForm: boolean): number => {
+      const sim = new Sim({ seed: 3, playerClass: 'priest', autoEquip: true });
+      sim.setPlayerLevel(20);
+      const p = sim.entities.get(sim.playerId) as Entity;
+      p.facing = 0;
+      p.resource = p.maxResource;
+      if (inForm) {
+        p.auras.push({
+          kind: 'form_shadow',
+          name: 'Gloamveil Form',
+          value: 15,
+          remaining: 3600,
+          duration: 3600,
+          sourceId: p.id,
+          school: 'shadow',
+        } as Aura);
+      }
+      const dummy = createMob(
+        (sim as unknown as { nextId: number }).nextId++,
+        MOBS.ridge_stalker,
+        20,
+        {
+          x: p.pos.x,
+          y: p.pos.y,
+          z: p.pos.z + 3,
+        },
+      );
+      dummy.maxHp = dummy.hp = 5_000_000;
+      dummy.hostile = true;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      sim.targetEntity(dummy.id, sim.playerId);
+      sim.castAbility('shadow_word_pain', sim.playerId);
+      for (let i = 0; i < 120; i++) sim.tick();
+      return dummy.maxHp - dummy.hp;
+    };
+    const plain = dotDamage(false);
+    const inForm = dotDamage(true);
+    expect(plain).toBeGreaterThan(0);
+    expect(inForm).toBe(Math.round(plain * 1.15));
+  });
+
+  it('casting a heal ends Gloamveil Form (so the amplifier stops)', () => {
+    // The form forbids healing: any heal/hot/aoeHeal drops form_shadow. This is enforced
+    // in effect_dispatch; pin it so the "healing takes you out of the form" rule holds.
+    const sim = new Sim({ seed: 2, playerClass: 'priest', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const p = sim.entities.get(sim.playerId) as Entity;
+    p.facing = 0;
+    p.resource = p.maxResource;
     p.auras.push({
       kind: 'form_shadow',
       name: 'Gloamveil Form',
@@ -85,33 +175,10 @@ describe('Gloamveil Form spell power is Shadow-school only (F6)', () => {
       sourceId: p.id,
       school: 'shadow',
     } as Aura);
-    recalcPlayerStats(p, 'priest', eq as never, mods as never, eqi as never);
-
-    // The +15 lives in the shadow-only channel, NOT the generic spell power.
-    expect(p.shadowSpellPowerBonus).toBe(15);
-    expect(p.spellPower).toBe(spBefore);
-
-    const shadowSpell = { school: 'shadow' } as AbilityDef;
-    const holySpell = { school: 'holy' } as AbilityDef;
-    expect(abilityScalingPower(p, shadowSpell)).toBe(p.spellPower + 15);
-    expect(abilityScalingPower(p, holySpell)).toBe(p.spellPower);
-  });
-
-  it('the tooltip damage estimate carries the shadow bonus (AbilityScaling wiring)', () => {
-    // The HUD derives shadowSpellPowerBonus from the synced form aura and passes it in
-    // AbilityScaling, so the shadow-spell tooltip estimate reflects Gloamveil on both
-    // hosts. A shadow direct nuke's estimated bonus must rise with the shadow SP.
-    const res = {
-      def: { school: 'shadow' },
-      castTime: 1.5,
-      effects: [{ type: 'directDamage', min: 50, max: 50 }],
-    } as unknown as ResolvedAbility;
-    const eff = res.effects[0];
-    const base = { spellPower: 200, rangedPower: 0, attackPower: 0 };
-    const withBonus = { ...base, shadowSpellPowerBonus: 15 };
-    expect(abilityDamageBonus(res, eff, withBonus)).toBeGreaterThan(
-      abilityDamageBonus(res, eff, base),
-    );
+    // Cast a heal (Lesser Heal, a ~2 s cast). When it resolves, the form must drop.
+    sim.castAbility('lesser_heal', sim.playerId);
+    for (let i = 0; i < 60 && p.auras.some((a) => a.kind === 'form_shadow'); i++) sim.tick();
+    expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(false);
   });
 });
 

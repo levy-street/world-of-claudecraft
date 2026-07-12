@@ -146,6 +146,16 @@ export function dealDamage(
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
 
+  // Gloamveil Form (Shadowform): while in the form, the caster's SHADOW-school damage
+  // is amplified (classic +15%). School-scoped so only shadow spells benefit, and a
+  // source-output mod (skipped when the amount is already final, e.g. a redirect share).
+  // Every shadow damage path (direct nuke, DoT tick, Mind Flay channel, AoE) funnels
+  // here, so this one site covers them all; the boost is dynamic (it follows the form).
+  if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
+    const form = source.auras.find((a) => a.kind === 'form_shadow');
+    if (form) amount = Math.round(amount * (1 + form.value / 100));
+  }
+
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.
