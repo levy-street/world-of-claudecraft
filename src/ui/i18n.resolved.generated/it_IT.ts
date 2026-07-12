@@ -6945,15 +6945,6 @@ export const it_IT: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scettro della corte senza morte"
       },
-      "deathless_warguard_legmail": {
-        "name": "Cosciali di maglia del guardiaguerra senza morte"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema straccianima"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapace di pelle del flagello"
-      },
       "cryptplate_helm": {
         "name": "Elmo della corazza della cripta"
       },
@@ -6992,9 +6983,6 @@ export const it_IT: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Spadone senza morte"
-      },
-      "soulforged_warplate": {
-        "name": "Corazza da guerra forgianima"
       },
       "stormcallers_focus": {
         "name": "Focus dell'evocatempesta"
@@ -7309,6 +7297,15 @@ export const it_IT: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagello di Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardiaguerra senza morte"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Ierofante senza morte"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lama senza morte"
       },
       "reliquary_ledger_wraith": {
         "name": "Spettro del Registro"

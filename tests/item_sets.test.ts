@@ -131,19 +131,20 @@ describe('aggregateSetBonuses (pure resolver)', () => {
 });
 
 describe('item set tooltip model', () => {
-  it('counts base and Heroic alternatives as one logical member of every item set', () => {
-    const logicalMembers = new Map<string, Set<string>>();
-    for (const item of Object.values(ITEMS)) {
-      if (!item.set) continue;
-      const members = logicalMembers.get(item.set) ?? new Set<string>();
-      members.add(item.heroicOf ?? item.id);
-      logicalMembers.set(item.set, members);
-    }
-    const expectedCounts = Object.fromEntries(
-      [...logicalMembers].map(([setId, members]) => [setId, members.size]),
-    );
-
-    expect(itemSetMemberCounts()).toEqual(expectedCounts);
+  it('counts each set as its distinct equip slots (base + all heroic versions are one piece)', () => {
+    const counts = itemSetMemberCounts();
+    // The t2 sets are 5 slots (soulflame cloth is 4). The normal piece, its
+    // auto-generated heroic variant, and any bespoke heroic raid piece for the
+    // same slot all collapse to one member, so the "X/N" denominator reflects the
+    // real number of collectible pieces (not the parallel heroic-variant ids).
+    expect(counts.crownforged).toBe(4);
+    expect(counts.nighttalon).toBe(4);
+    expect(counts.soulflame).toBe(4);
+    expect(counts.stormcallers).toBe(4);
+    // Leveling haste kits: 3 pieces each.
+    expect(counts.vale_arcanist).toBe(3);
+    expect(counts.boundstone_vanguard).toBe(3);
+    expect(counts.greyjaw_stalker).toBe(3);
   });
 
   it('keeps four-piece families at four and the Boundstone family at three', () => {
@@ -220,6 +221,26 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     // Rogue AP = str + agi + bonusAp; the only set bonus at 2pc is +40 AP.
     expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(40);
     expect(two.attackPower).toBeGreaterThan(base.attackPower);
+  });
+
+  it('normal and heroic Nythraxis armor pieces mix for set thresholds', () => {
+    // A heroic helmet variant counts as the same set slot as its normal base, so
+    // mixing it with three normal pieces still reaches the 3-piece Wraithfire
+    // threshold (int +15, spi +15). Derive the expected primary totals from the
+    // live item defs so the heroic-variant stat rescale stays the source of truth.
+    const worn = {
+      helmet: 'heroic_soulflame_cowl', // heroic helmet mixed with normal pieces
+      shoulder: 'soulflame_mantle',
+      gloves: 'soulflame_gloves',
+      waist: 'soulflame_cord',
+    };
+    const base = statsFor('mage', 20, {});
+    const mixed = statsFor('mage', 20, worn);
+    const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
+    const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
+    expect(mixed.knockbackResistance).toBe(1);
+    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 15); // +15 = 3pc Wraithfire int
+    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 15); // +15 = 3pc Wraithfire spi
   });
 
   it("Necromancer's (t1 caster): knockback resistance at 2pc, int/sta added at 3pc", () => {

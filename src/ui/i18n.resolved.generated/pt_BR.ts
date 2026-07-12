@@ -6945,15 +6945,6 @@ export const pt_BR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro da Corte Imortal"
       },
-      "deathless_warguard_legmail": {
-        "name": "Malha de Pernas Imortal da Guarda de Guerra"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Dilacera-Almas"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapaça de Couro do Flagelo"
-      },
       "cryptplate_helm": {
         "name": "Elmo de Placas da Cripta"
       },
@@ -6992,9 +6983,6 @@ export const pt_BR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"
-      },
-      "soulforged_warplate": {
-        "name": "Placa de Guerra Forjada na Alma"
       },
       "stormcallers_focus": {
         "name": "Foco do Invocador da Tempestade"
@@ -7309,6 +7297,15 @@ export const pt_BR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guarda de Guerra Imortal"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imortal"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lâmina Imortal"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"

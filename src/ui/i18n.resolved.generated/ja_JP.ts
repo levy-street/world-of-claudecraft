@@ -6945,15 +6945,6 @@ export const ja_JP: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死の宮廷の笏"
       },
-      "deathless_warguard_legmail": {
-        "name": "不死の戦衛レッグメイル"
-      },
-      "soulrend_diadem": {
-        "name": "ソウルレンドの宝冠"
-      },
-      "scourgehide_carapace": {
-        "name": "スカージハイドの甲殻"
-      },
       "cryptplate_helm": {
         "name": "クリプトプレートヘルム"
       },
@@ -6992,9 +6983,6 @@ export const ja_JP: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死の大剣"
-      },
-      "soulforged_warplate": {
-        "name": "魂鍛の戦甲"
       },
       "stormcallers_focus": {
         "name": "ストームコーラーの焦点"
@@ -7309,6 +7297,15 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"

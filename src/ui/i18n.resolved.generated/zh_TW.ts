@@ -6945,15 +6945,6 @@ export const zh_TW: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死王庭權杖"
       },
-      "deathless_warguard_legmail": {
-        "name": "不死戰衛腿甲"
-      },
-      "soulrend_diadem": {
-        "name": "裂魂冠冕"
-      },
-      "scourgehide_carapace": {
-        "name": "災禍之皮甲殼"
-      },
       "cryptplate_helm": {
         "name": "墓板頭盔"
       },
@@ -6992,9 +6983,6 @@ export const zh_TW: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死巨刃"
-      },
-      "soulforged_warplate": {
-        "name": "鑄魂戰甲"
       },
       "stormcallers_focus": {
         "name": "喚雷之核"
@@ -7309,6 +7297,15 @@ export const zh_TW: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奧德倫，亡魂戰衛"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "馬爾里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
       },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"

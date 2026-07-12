@@ -6945,15 +6945,6 @@ export const nl_NL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scepter van het Doodloze Hof"
       },
-      "deathless_warguard_legmail": {
-        "name": "Doodloze Krijgswacht-Beenmalie"
-      },
-      "soulrend_diadem": {
-        "name": "Zielscheur-Diadeem"
-      },
-      "scourgehide_carapace": {
-        "name": "Geselhuid-Pantser"
-      },
       "cryptplate_helm": {
         "name": "Kryptplaat-Helm"
       },
@@ -6992,9 +6983,6 @@ export const nl_NL: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"
-      },
-      "soulforged_warplate": {
-        "name": "Zielgesmede Krijgsplaat"
       },
       "stormcallers_focus": {
         "name": "Stormroepers Focus"
@@ -7309,6 +7297,15 @@ export const nl_NL: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Doodloze Krijgswacht"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Doodloze Hiërofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Doodloos Mes"
       },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"

@@ -6945,15 +6945,6 @@ export const de_DE: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Zepter des Todlosen Hofes"
       },
-      "deathless_warguard_legmail": {
-        "name": "Todlose Beinkette der Kriegswache"
-      },
-      "soulrend_diadem": {
-        "name": "Seelenriss-Diadem"
-      },
-      "scourgehide_carapace": {
-        "name": "Geißelhaut-Panzer"
-      },
       "cryptplate_helm": {
         "name": "Gruftplatten-Helm"
       },
@@ -6992,9 +6983,6 @@ export const de_DE: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"
-      },
-      "soulforged_warplate": {
-        "name": "Seelengeschmiedete Kriegsplatte"
       },
       "stormcallers_focus": {
         "name": "Fokus des Sturmrufers"
@@ -7309,6 +7297,15 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Todlose Kriegswache"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Todloser Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Todlose Klinge"
       },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"

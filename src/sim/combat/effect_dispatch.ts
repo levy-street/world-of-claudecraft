@@ -18,6 +18,7 @@
 import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -278,13 +279,19 @@ export function runEffects(
         const interruptedDef =
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
+        // A scripted mob channel (Malric's Mending) resolves to no ability def but
+        // is still meant to be interruptible: a matching school-lockout breaks it in
+        // updateBossMechanics. Everything else that resolves to nothing stays immune.
+        const scriptedChannel = interruptedDef
+          ? undefined
+          : SCRIPTED_INTERRUPTIBLE_CHANNELS[target.castingAbility];
         if (
-          !interruptedDef ||
-          interruptedDef.school === 'physical' ||
-          interruptedDef.uninterruptible
+          (!interruptedDef && !scriptedChannel) ||
+          interruptedDef?.school === 'physical' ||
+          interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef.school;
+        const school = interruptedDef?.school ?? scriptedChannel!.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (remaining === null) break;

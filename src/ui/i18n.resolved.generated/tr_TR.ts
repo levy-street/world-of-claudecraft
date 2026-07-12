@@ -6945,15 +6945,6 @@ export const tr_TR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Ölümsüz Saray Asası"
       },
-      "deathless_warguard_legmail": {
-        "name": "Ölümsüz Savaşmuhafızı Bacak Zırhı"
-      },
-      "soulrend_diadem": {
-        "name": "Ruhyırtan Tacı"
-      },
-      "scourgehide_carapace": {
-        "name": "Afetpostu Kabuğu"
-      },
       "cryptplate_helm": {
         "name": "Mezarzırh Miğferi"
       },
@@ -6992,9 +6983,6 @@ export const tr_TR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"
-      },
-      "soulforged_warplate": {
-        "name": "Ruhdövümü Savaş Zırhı"
       },
       "stormcallers_focus": {
         "name": "Fırtınaçağıranın Odağı"
@@ -7309,6 +7297,15 @@ export const tr_TR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Ölümsüz Savaşmuhafızı"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Ölümsüz Başrahip"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Ölümsüz Bıçak"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
