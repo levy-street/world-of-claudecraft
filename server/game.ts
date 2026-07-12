@@ -1,6 +1,7 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { isHoverCosmeticId } from '../src/sim/content/hover_cosmetics';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -87,6 +88,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  setAccountHoverCosmetic,
   setAccountWeaponSkinLoadout,
   touchCharacterLogin,
   walletForAccount,
@@ -410,6 +412,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'unequip_mech_chroma',
   'claim_event_skin',
   'change_weapon_skin',
+  'change_hover',
   'prestige',
   'market_list',
   'market_buy',
@@ -698,6 +701,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skin) out.sk = e.skin;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
+  if (e.hoverCosmeticId) out.hov = e.hoverCosmeticId; // applied hover cosmetic (render-only, like wsk)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -1892,6 +1896,9 @@ export class GameServer {
       // never resurrects from the stale side.
       weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
       weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
+      // Last-write-wins like the loadout; an old-shape `b` (no key at runtime)
+      // keeps the remembered value so unrelated cosmetic merges never clear it.
+      hoverId: 'hoverId' in b ? (b.hoverId ?? null) : (a.hoverId ?? null),
     };
   }
 
@@ -1914,6 +1921,7 @@ export class GameServer {
         mechChromaIds: [],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        hoverId: null,
       },
       cosmetics,
     );
@@ -1928,6 +1936,7 @@ export class GameServer {
       live.accountCosmetics = merged;
       this.applyAccountQuestLockouts(live.pid, merged);
       this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
+      this.sim.setHoverCosmetic(live.pid, merged.hoverId ?? null);
       this.resyncQuests(live);
     }
   }
@@ -1938,6 +1947,7 @@ export class GameServer {
       mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
       weaponSkinIds: [...new Set(cosmetics.weaponSkinIds ?? [])],
       weaponSkinLoadout: { ...(cosmetics.weaponSkinLoadout ?? {}) },
+      hoverId: cosmetics.hoverId ?? null,
     };
     this.accountCosmeticsByAccount.set(accountId, exact);
     for (const live of this.clients.values()) {
@@ -1945,6 +1955,7 @@ export class GameServer {
       live.accountCosmetics = exact;
       this.applyAccountQuestLockouts(live.pid, exact);
       this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(exact));
+      this.sim.setHoverCosmetic(live.pid, exact.hoverId ?? null);
       this.resyncQuests(live);
     }
   }
@@ -2064,6 +2075,21 @@ export class GameServer {
     );
   }
 
+  /** Apply or clear the account's hover cosmetic. Free to apply for now (no
+   *  store SKU yet): only catalog membership is validated. Mirrors the
+   *  weapon-skin flow: optimistic live state, then one atomic jsonb_set
+   *  (fire-and-forget; re-applying the RETURNING could resurrect a cleared
+   *  cosmetic on out-of-order round trips). */
+  private changeAccountHoverCosmetic(session: ClientSession, id: string | null): void {
+    if (id !== null && !isHoverCosmeticId(id)) return;
+    if (!this.sim.setHoverCosmetic(session.pid, id)) return;
+    const current = session.accountCosmetics;
+    this.updateLiveAccountCosmetics(session.accountId, { ...current, hoverId: id });
+    void setAccountHoverCosmetic(session.accountId, id).catch((err) =>
+      console.error('failed to save hover cosmetic:', err),
+    );
+  }
+
   join(
     ws: WebSocket,
     accountId: number,
@@ -2139,12 +2165,14 @@ export class GameServer {
         mechChromaIds: [],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        hoverId: null,
       },
     );
     this.applyAccountQuestLockouts(pid, accountCosmetics);
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
+    this.sim.setHoverCosmetic(pid, accountCosmetics.hoverId ?? null);
     const sessionIp = meta.ip ?? '';
     const botTrackingContext = this.botDetector.createTrackingContext(
       { accountId, characterId, name, ip: sessionIp },
@@ -3392,6 +3420,11 @@ export class GameServer {
         const skinId = typeof msg.skin === 'string' ? msg.skin : null;
         const wtype = typeof msg.wtype === 'string' ? msg.wtype : undefined;
         if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
+        break;
+      }
+      case 'change_hover': {
+        const id = typeof msg.id === 'string' ? msg.id : null;
+        this.changeAccountHoverCosmetic(session, id);
         break;
       }
       // Skin-select event lock-in. The Sim re-validates the skin against the

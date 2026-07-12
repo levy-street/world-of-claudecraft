@@ -835,6 +835,9 @@ export interface AccountCosmetics {
   // loadout. Account-wide by design; characters never carry either.
   weaponSkinIds: string[];
   weaponSkinLoadout: Record<string, string>;
+  // Applied hover cosmetic (back wings / jetpack), or null. Free to apply for
+  // now (no store SKU yet); account-wide like the rest.
+  hoverId: string | null;
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -865,6 +868,7 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     mechChromaIds: uniqueStrings(src.mechChromaIds),
     weaponSkinIds: uniqueStrings(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
+    hoverId: typeof src.hoverId === 'string' ? src.hoverId : null,
   };
 }
 
@@ -952,6 +956,21 @@ export async function setAccountWeaponSkinLoadout(
        COALESCE(cosmetics, '{}'::jsonb), '{weaponSkinLoadout}', $2::jsonb)
      WHERE id = $1 RETURNING cosmetics`,
     [accountId, JSON.stringify(loadout)],
+  );
+  return normalizeAccountCosmetics(res.rows[0]?.cosmetics);
+}
+
+/** Persist the applied hover cosmetic (single atomic jsonb_set, like the
+ *  weapon-skin loadout writer above; null clears it). */
+export async function setAccountHoverCosmetic(
+  accountId: number,
+  hoverId: string | null,
+): Promise<AccountCosmetics> {
+  const res = await pool.query(
+    `UPDATE accounts SET cosmetics = jsonb_set(
+       COALESCE(cosmetics, '{}'::jsonb), '{hoverId}', $2::jsonb)
+     WHERE id = $1 RETURNING cosmetics`,
+    [accountId, JSON.stringify(hoverId)],
   );
   return normalizeAccountCosmetics(res.rows[0]?.cosmetics);
 }

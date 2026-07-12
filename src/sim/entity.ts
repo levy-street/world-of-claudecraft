@@ -156,6 +156,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     mainhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
+    hoverCosmeticId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',

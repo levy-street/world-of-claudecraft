@@ -8,6 +8,9 @@ export interface AccountCosmetics {
   // loadout. Both are account state: every character on the account shares them.
   weaponSkinIds: string[];
   weaponSkinLoadout: Record<string, string>;
+  /** Applied hover cosmetic (back wings / jetpack), or null. Account-wide,
+   *  free to apply for now (no store SKU yet); cosmetic only. */
+  hoverId: string | null;
 }
 
 export interface IWorldCosmetics {
@@ -22,4 +25,6 @@ export interface IWorldCosmetics {
   // server enforces account ownership and the equipped-weapon-type match; the
   // offline Sim enforces the type match only (the paid store is online-only).
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void;
+  /** Apply or clear a hover cosmetic (back wings / jetpack); cosmetic only. */
+  changeHoverCosmetic(id: string | null): void;
 }

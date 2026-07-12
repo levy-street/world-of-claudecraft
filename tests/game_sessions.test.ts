@@ -20,6 +20,7 @@ const grantAccountWeaponSkins = vi.fn(async (_accountId: number, skinIds: string
   mechChromaIds: [],
   weaponSkinIds: [...skinIds],
   weaponSkinLoadout: {},
+  hoverId: null,
 }));
 const setAccountWeaponSkinLoadout = vi.fn(
   async (_accountId: number, loadout: Record<string, string>) => ({
@@ -29,6 +30,13 @@ const setAccountWeaponSkinLoadout = vi.fn(
     weaponSkinLoadout: loadout,
   }),
 );
+const setAccountHoverCosmetic = vi.fn(async (_accountId: number, _hoverId: string | null) => ({
+  completedQuestIds: [],
+  mechChromaIds: [],
+  weaponSkinIds: [],
+  weaponSkinLoadout: {},
+  hoverId: _hoverId,
+}));
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -48,6 +56,8 @@ vi.mock('../server/db', () => ({
     grantAccountWeaponSkins(...(args as [number, string[]])),
   setAccountWeaponSkinLoadout: (...args: unknown[]) =>
     setAccountWeaponSkinLoadout(...(args as [number, Record<string, string>])),
+  setAccountHoverCosmetic: (...args: unknown[]) =>
+    setAccountHoverCosmetic(...(args as [number, string | null])),
   // Character load leases: leave() releases and the autosave loop heartbeats, so
   // these must exist on the mock or those paths throw on the undefined export.
   acquireCharacterLease: vi.fn(async () => true),
@@ -102,6 +112,7 @@ describe('GameServer sessions', () => {
           mechChromaIds: [],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          hoverId: null,
         },
       }),
     );
@@ -235,6 +246,7 @@ describe('GameServer sessions', () => {
           mechChromaIds: ['amber_crimson'],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          hoverId: null,
         },
       }),
     );
@@ -261,6 +273,7 @@ describe('GameServer sessions', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      hoverId: null,
     };
     const first = expectJoined(
       server.join(fakeWs(), 11, 101, 'Mechone', 'shaman', null, false, {
@@ -616,6 +629,7 @@ describe('GameServer weapon skin commands', () => {
       mechChromaIds: [],
       weaponSkinIds,
       weaponSkinLoadout,
+      hoverId: null,
     },
   });
 
@@ -724,6 +738,7 @@ describe('GameServer weapon skin commands', () => {
       mechChromaIds: [],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: {},
+      hoverId: null,
     };
     const first = expectJoined(
       server.join(fakeWs(), 11, 101, 'Skinone', 'warrior', null, false, {
@@ -746,5 +761,95 @@ describe('GameServer weapon skin commands', () => {
     expect(second.accountCosmetics.weaponSkinLoadout.sword).toBe('ice_fang_sword');
     expect(setAccountWeaponSkinLoadout).toHaveBeenCalledTimes(1);
     expect(setAccountWeaponSkinLoadout).toHaveBeenCalledWith(11, { sword: 'ice_fang_sword' });
+  });
+});
+
+// Hover cosmetics: the change_hover dispatch free-applies any CATALOG id (no
+// store SKU yet, the change_skin precedent), so catalog membership is the
+// whole gate; junk strings return early with no state change and no db write,
+// and the accepted value persists via one fire-and-forget atomic jsonb_set.
+describe('GameServer hover cosmetic commands', () => {
+  const withHover = (hoverId: string | null = null) => ({
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+      hoverId,
+    },
+  });
+
+  function changeHover(server: GameServer, session: ClientSession, id: unknown) {
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'change_hover', id }));
+  }
+
+  it('applies a catalog cosmetic, mirrors the account view, and persists it', () => {
+    setAccountHoverCosmetic.mockClear();
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Hoverer', 'warrior', null, false, { ...withHover() }),
+    );
+
+    changeHover(server, session, 'butterfly_drift');
+
+    expect(server.sim.entities.get(session.pid)?.hoverCosmeticId).toBe('butterfly_drift');
+    expect(session.accountCosmetics.hoverId).toBe('butterfly_drift');
+    expect(setAccountHoverCosmetic).toHaveBeenCalledWith(11, 'butterfly_drift');
+  });
+
+  it('join seeds the persisted hover onto the fresh entity; junk ids are rejected', () => {
+    setAccountHoverCosmetic.mockClear();
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Junkproof', 'warrior', null, false, {
+        ...withHover('dawnfeather_wings'),
+      }),
+    );
+    // The join seeded accountCosmetics.hoverId onto the sim entity.
+    expect(server.sim.entities.get(session.pid)?.hoverCosmeticId).toBe('dawnfeather_wings');
+
+    changeHover(server, session, 'not_a_cosmetic');
+    changeHover(server, session, '__proto__'); // prototype keys must not pass the gate
+
+    expect(server.sim.entities.get(session.pid)?.hoverCosmeticId).toBe('dawnfeather_wings');
+    expect(session.accountCosmetics.hoverId).toBe('dawnfeather_wings');
+    expect(setAccountHoverCosmetic).not.toHaveBeenCalled();
+  });
+
+  it('clears with null (non-string ids coerce to a clear) and persists the clear', () => {
+    setAccountHoverCosmetic.mockClear();
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Lander', 'warrior', null, false, {
+        ...withHover('tinkers_jetpack'),
+      }),
+    );
+    expect(server.sim.entities.get(session.pid)?.hoverCosmeticId).toBe('tinkers_jetpack');
+
+    changeHover(server, session, 42); // non-string: dispatch coerces to null
+
+    expect(server.sim.entities.get(session.pid)?.hoverCosmeticId).toBeNull();
+    expect(session.accountCosmetics.hoverId).toBeNull();
+    expect(setAccountHoverCosmetic).toHaveBeenCalledWith(11, null);
+  });
+
+  it('applies the hover to every live character on the account', () => {
+    setAccountHoverCosmetic.mockClear();
+    const server = new GameServer();
+    const first = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Hoverone', 'warrior', null, false, { ...withHover() }),
+    );
+    // Second live character rides the GM exemption from the session cap, the
+    // same trick as the weapon-skin sweep test above.
+    const second = expectJoined(
+      server.join(fakeWs(), 11, 102, 'Hovertwo', 'warrior', null, true, { ...withHover() }),
+    );
+
+    changeHover(server, first, 'butterfly_drift');
+
+    expect(server.sim.entities.get(first.pid)?.hoverCosmeticId).toBe('butterfly_drift');
+    expect(server.sim.entities.get(second.pid)?.hoverCosmeticId).toBe('butterfly_drift');
+    expect(second.accountCosmetics.hoverId).toBe('butterfly_drift');
+    expect(setAccountHoverCosmetic).toHaveBeenCalledTimes(1);
   });
 });

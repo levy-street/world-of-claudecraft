@@ -62,6 +62,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { isHoverCosmeticId } from './content/hover_cosmetics';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import {
@@ -1244,6 +1245,7 @@ export class Sim {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    hoverId: null,
   };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
@@ -2319,6 +2321,27 @@ export class Sim {
 
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
     this.setWeaponSkin(this.primaryId, skinId, weaponType);
+  }
+
+  /** Apply or clear a hover cosmetic (back wings / jetpack). Purely cosmetic:
+   *  the hover is a render-only glide; movement math never changes. Offline
+   *  applies freely (the change_skin precedent); online the server validates
+   *  and persists to accounts.cosmetics. */
+  setHoverCosmetic(pid: number, id: string | null): boolean {
+    const e = this.entities.get(pid);
+    if (!e || e.kind !== 'player') return false;
+    if (id !== null && !isHoverCosmeticId(id)) return false;
+    e.hoverCosmeticId = id;
+    // Mirror the local player's accountCosmetics view (the weapon-skin loadout
+    // precedent) so a store's applied badge reads the same on both hosts.
+    if (pid === this.primaryId) {
+      this.accountCosmetics = { ...this.accountCosmetics, hoverId: id };
+    }
+    return true;
+  }
+
+  changeHoverCosmetic(id: string | null): void {
+    this.setHoverCosmetic(this.primaryId, id);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and

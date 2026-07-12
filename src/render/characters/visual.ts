@@ -4,9 +4,11 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
+import { HOVER_COSMETICS } from '../../sim/content/hover_cosmetics';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
+import { HOVER_ATTACH, HOVER_FLAP, HOVER_VFX } from '../hover_vfx';
 import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
@@ -20,6 +22,7 @@ import {
   applyMaterials,
   assembleModel,
   ensureSkinTexture,
+  hoverAttachmentPayload,
   prepareVisual,
   setHeldWeapon,
   skinEmissiveTexture,
@@ -80,6 +83,13 @@ const HIT_REACT_COOLDOWN = 0.9;
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
+// Hover cosmetics: the render-only levitation. The entity's sim position and
+// speed never change (gameplay-neutral by the graphics-fairness rule); the
+// VISUAL floats up and bobs, glides on the airborne pose instead of running,
+// and leans forward slightly while moving.
+const HOVER_RISE = 0.34;
+const HOVER_BOB = 0.05;
+const HOVER_LEAN = 0.16; // rad, while moving
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
@@ -135,6 +145,19 @@ export class CharacterVisual {
     blend: number;
     duringShot: boolean;
   }[] = [];
+  // Hover cosmetic (back wings / jetpack): payload on the chest bone, wing
+  // halves flapped procedurally, ambient VFX handle, and the live hover flag
+  // the locomotion override reads.
+  private hoverId: string | null = null;
+  private hoverPayload: THREE.Object3D | null = null;
+  private hoverWings: { l: THREE.Object3D | null; r: THREE.Object3D | null } = {
+    l: null,
+    r: null,
+  };
+  private hoverVfx: WeaponVfxHandle | null = null;
+  private hoverFlapPhase = Math.random() * Math.PI * 2;
+  private hoverActive = false;
+  private hoverLean = 0;
   private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private disposed = false;
   private ghosted = false;
@@ -278,8 +301,13 @@ export class CharacterVisual {
     this.initialized = true;
 
     if (!this.deadLock) {
+      // The hover glide swaps the locomotion CLIP without a baseState change,
+      // so a hover flip re-fades the base action like a state edge.
+      const hovering = this.hoverPayload !== null && !s.dead && !s.swimming && !s.sitting;
+      const hoverChanged = hovering !== this.hoverActive;
+      this.hoverActive = hovering;
       const desired = this.desiredBase(s);
-      const baseChanged = desired !== this.baseState;
+      const baseChanged = desired !== this.baseState || hoverChanged;
       if (baseChanged) this.baseState = desired;
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
@@ -288,8 +316,9 @@ export class CharacterVisual {
       } else if (baseChanged && !this.currentIsOneShot) {
         this.fadeTo(this.baseAction(), FADE, false);
       }
-      // foot-speed matching on locomotion cycles
-      if (!this.currentIsOneShot && this.current) {
+      // foot-speed matching on locomotion cycles (the hover glide is not a
+      // footstep cycle: it keeps its authored speed)
+      if (!this.currentIsOneShot && this.current && !this.hoverActive) {
         const timeScale = locomotionTimeScale(this.baseState, s, this.def.walkRef, this.def.runRef);
         if (timeScale !== null) {
           if (timeScale < 0 && this.current.time <= 1e-3)
@@ -303,12 +332,18 @@ export class CharacterVisual {
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
     const wantPitch = s.swimming && !s.dead ? proneAngle : 0;
     this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
-    this.poseWrap.rotation.x = this.swimPitch;
+    // Hovering leans forward slightly while moving (the glide reads as drift,
+    // not a stroll); eased like the swim pitch.
+    const wantLean = this.hoverActive && s.moving ? HOVER_LEAN : 0;
+    this.hoverLean += (wantLean - this.hoverLean) * Math.min(1, dt * 6);
+    this.poseWrap.rotation.x = this.swimPitch + this.hoverLean;
     this.poseWrap.rotation.z = 0;
     this.poseWrap.position.y =
       s.swimming && !s.dead
         ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
-        : 0;
+        : this.hoverActive
+          ? HOVER_RISE + Math.sin(performance.now() / 640 + this.bobPhase) * HOVER_BOB
+          : 0;
 
     // distant corpses show the static idle far mesh — tip it over
     if (this.farMesh && this.farMesh.visible) {
@@ -538,6 +573,57 @@ export class CharacterVisual {
     this.reattachHeldWeapon();
   }
 
+  /** Apply or clear a hover cosmetic: hang the wings / jetpack payload on the
+   *  chest bone (back mount), find the wing halves for the procedural flap,
+   *  and light the ambient VFX. The hover MOTION reads hoverActive per frame
+   *  in update(). */
+  setHoverCosmetic(hoverId: string | null): void {
+    if (hoverId === this.hoverId) return;
+    this.hoverId = hoverId;
+    this.disposeHoverAttachment();
+    const def = hoverId ? HOVER_COSMETICS[hoverId] : null;
+    if (!def) return;
+    const chest = this.model.getObjectByName('chest') ?? this.model.getObjectByName('spine');
+    if (!chest) return;
+    const payload = hoverAttachmentPayload(def.id);
+    if (!payload) return;
+    const mount = HOVER_ATTACH[def.model];
+    if (mount) {
+      payload.position.set(mount.pos[0], mount.pos[1], mount.pos[2]);
+      payload.rotation.y = mount.rotY;
+      payload.scale.setScalar(mount.scale);
+    }
+    chest.add(payload);
+    this.hoverPayload = payload;
+    // GLTFLoader sanitizes node names (wing.l arrives as wingl): try both.
+    this.hoverWings = {
+      l: payload.getObjectByName('wing.l') ?? payload.getObjectByName('wingl') ?? null,
+      r: payload.getObjectByName('wing.r') ?? payload.getObjectByName('wingr') ?? null,
+    };
+    const vfx = createWeaponVfx(payload, HOVER_VFX[def.vfx], { grounded: false });
+    vfx.setBackdropVisible(false);
+    vfx.setTuning({});
+    vfx.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
+    vfx.group.traverse((o) => {
+      o.userData.weaponVfxMesh = true;
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh) mesh.castShadow = false;
+    });
+    this.hoverVfx = vfx;
+  }
+
+  private disposeHoverAttachment(): void {
+    if (this.hoverVfx) {
+      this.hoverVfx.dispose();
+      this.hoverVfx = null;
+    }
+    if (this.hoverPayload) {
+      this.hoverPayload.removeFromParent();
+      this.hoverPayload = null;
+    }
+    this.hoverWings = { l: null, r: null };
+  }
+
   private reattachHeldWeapon(): void {
     this.disposeWeaponVfx();
     const payloads = setHeldWeapon(this.model, this.def, this.weaponItemId, this.weaponSkinId);
@@ -623,6 +709,21 @@ export class CharacterVisual {
   updateWeaponVfx(dt: number): void {
     this.applySkinOrientation(dt);
     for (const handle of this.weaponVfx) handle.update(dt);
+    if (this.hoverPayload) {
+      // Procedural wing flap: both halves hinge about the central mount. The
+      // beat keeps a gentle idle rhythm and doubles while actively hovering.
+      // Axis 'y' folds the wings open/closed (a resting butterfly); axis 'z'
+      // beats the tips up and down (feathered / membrane wings in flight).
+      const def = this.hoverId ? HOVER_COSMETICS[this.hoverId] : null;
+      const flap = def ? HOVER_FLAP[def.model] : undefined;
+      if (flap && (this.hoverWings.l || this.hoverWings.r)) {
+        this.hoverFlapPhase += dt * flap.speed * (this.hoverActive ? 1 : 0.45);
+        const a = Math.sin(this.hoverFlapPhase) * flap.amp;
+        if (this.hoverWings.l) this.hoverWings.l.rotation[flap.axis] = a;
+        if (this.hoverWings.r) this.hoverWings.r.rotation[flap.axis] = -a;
+      }
+      this.hoverVfx?.update(dt);
+    }
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their
@@ -658,6 +759,7 @@ export class CharacterVisual {
     for (const handle of this.weaponVfx) {
       handle.setPixelScale(heightPx * this.weaponVfxSpriteScale);
     }
+    this.hoverVfx?.setPixelScale(heightPx * this.weaponVfxSpriteScale);
   }
 
   /** Set the camera fov this visual renders under (preview rigs differ from the
@@ -689,6 +791,7 @@ export class CharacterVisual {
   dispose(): void {
     this.disposed = true;
     this.disposeWeaponVfx();
+    this.disposeHoverAttachment();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();
@@ -761,6 +864,16 @@ export class CharacterVisual {
 
   private baseAction(): THREE.AnimationAction | null {
     const c = this.def.clips;
+    // Hover glide: MOVING locomotion states ride the airborne pose (the
+    // wings/jetpack carry the character; feet never run). Standing still keeps
+    // the normal idle, calmly afloat on the lift + bob; casting, sitting,
+    // swimming, jumping, and death keep their own clips.
+    if (
+      this.hoverActive &&
+      (this.baseState === 'walk' || this.baseState === 'walkBack' || this.baseState === 'run')
+    ) {
+      return this.action(c.jump) ?? this.action(c.idle);
+    }
     switch (this.baseState) {
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);

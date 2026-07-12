@@ -530,6 +530,7 @@ export interface EntityView {
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
+  hoverCosmeticId: string | null; // last-rendered hover cosmetic, diffed for live swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -3595,6 +3596,7 @@ export class Renderer {
       mainhandItemId: e.mainhandItemId,
       // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
       weaponSkinId: null,
+      hoverCosmeticId: null,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3672,6 +3674,7 @@ export class Renderer {
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
     v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
+    v.hoverCosmeticId = null; // ditto for the hover attachment
     v.group.add(next.root);
   }
 
@@ -4444,6 +4447,13 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         v.weaponSkinId = e.weaponSkinId;
         v.visual.setWeaponSkin(e.weaponSkinId);
+      }
+
+      // live hover-cosmetic swap: back wings / jetpack applied or cleared
+      // (self or a peer, via the identity wire); re-hangs the attachment + VFX
+      if (e.hoverCosmeticId !== v.hoverCosmeticId) {
+        v.hoverCosmeticId = e.hoverCosmeticId;
+        v.visual.setHoverCosmetic(e.hoverCosmeticId);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the

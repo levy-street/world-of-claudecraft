@@ -2,6 +2,7 @@
 // NPC id, druid/polymorph form) onto a rigged glTF asset + clip names + kit.
 // Pure data + dispatch — no three.js imports, no loading.
 
+import { HOVER_COSMETIC_LIST, HOVER_COSMETICS } from '../../sim/content/hover_cosmetics';
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { MOBS } from '../../sim/data';
@@ -262,6 +263,7 @@ const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
+const COSMETICS = 'models/cosmetics';
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
  *  has no mapped model (then the class default attach is kept). Mirrors the bag
@@ -1164,6 +1166,16 @@ export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride |
 }
 
 /** Every glb the manifest can reference (for preloading). */
+/** GLB url for a hover cosmetic's back attachment, or null. */
+export function hoverCosmeticModelUrl(hoverId: string | null): string | null {
+  const def = hoverId ? HOVER_COSMETICS[hoverId] : null;
+  return def ? `${COSMETICS}/${def.model}.glb` : null;
+}
+
+export function hoverCosmeticModelUrls(): string[] {
+  return HOVER_COSMETIC_LIST.map((def) => `${COSMETICS}/${def.model}.glb`);
+}
+
 export function manifestUrls(): string[] {
   const urls = new Set<string>();
   for (const def of Object.values(VISUALS)) {
@@ -1178,6 +1190,8 @@ export function manifestUrls(): string[] {
   // Season 1 Armory weapon-skin models: also attachable on any nearby player at
   // any moment (account-wide cosmetics), so they preload with the same sweep.
   for (const url of weaponSkinModelUrls()) urls.add(url);
+  // Hover cosmetics (back wings / jetpack): same any-player-any-moment rule.
+  for (const url of hoverCosmeticModelUrls()) urls.add(url);
   return [...urls];
 }
 

@@ -1972,6 +1972,10 @@ export interface Entity {
   // applies. Render-only: the client swaps the held weapon model and rarity VFX.
   // Recomputed in recalcPlayerStats and synced in identity fields (terse `wsk`).
   weaponSkinId: string | null;
+  /** Applied hover cosmetic (back wings / jetpack), or null. Render-only:
+   *  drives the hover glide + attachment; never feeds movement or stats.
+   *  Synced in the identity wire (terse `hov`). */
+  hoverCosmeticId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,

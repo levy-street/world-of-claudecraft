@@ -39,6 +39,8 @@ provided as a courtesy.
 | Claudium storefront weapon models and card art (emberfang, Red Skull, and Purple sets) | World of ClaudeCraft | Project-generated and normalized through the PR 1405 asset pipeline | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
 | Season 1 Armory weapon models + icons (Wrought Iron, Guildmark, Emberwrought, Hoarfrost, and Fallen Star collections plus the rude_awakening_sword flagship, in `public/models/weapons/` + `public/ui/weapons/`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (encore_the_second_falling_star) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Hover cosmetic back attachments (hover_butterfly_wings, hover_angel_wings, hover_jetpack, hover_dragon_wings in `public/models/cosmetics/`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D), packaged by scripts/build_hover_attachments.mjs | Project asset |
 
 | Claudium visual asset set (`public/claudium/`: coin + UI icons, denomination stacks, UI animations, gift-card faces, gift send/receive/redeem flow) | World of ClaudeCraft | Project-generated via the Higgsfield MCP connector (Recraft V4.1 stills, Seedance 2.0 motion), composited and web-optimized locally; owned under the Higgsfield paid-plan license | Project asset |
 
@@ -47,7 +49,6 @@ provided as a courtesy.
 | Assets | Author | Source | License |
 |---|---|---|---|
 | Quest event sound effects (`public/audio/sfx/quest_*.mp3`); original compositions | @jamiecypher | Original work | CC0 1.0 |
-| Generated weapon model + icon (encore_the_second_falling_star) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Lockpick minigame sound effects (`public/audio/sfx/lockpick_*.mp3`); original sound design edited and layered in Reaper from CC0 source samples | @jamiecypher | https://freesound.org | CC0 1.0 |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,

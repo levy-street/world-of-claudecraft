@@ -17,6 +17,7 @@ import { addRimGlow, GFX } from '../gfx';
 import {
   type AttachDef,
   characterPreloadUrls,
+  hoverCosmeticModelUrl,
   itemWeaponModelUrl,
   SKIN_EMISSIVE,
   SKINS,
@@ -621,6 +622,27 @@ export function setHeldWeapon(
   return payloads;
 }
 
+/** A cloned hover-cosmetic back attachment (wings / jetpack), ready to hang on
+ *  the chest bone. Meshes are tagged hoverCosmeticMesh so the tint/caster
+ *  passes leave them alone (they ship their own painted materials), with
+ *  per-instance material clones for the same shared-cache reasons as the
+ *  weapon skins. */
+export function hoverAttachmentPayload(hoverId: string): THREE.Object3D | null {
+  const url = hoverCosmeticModelUrl(hoverId);
+  if (!url) return null;
+  const payload = cloneSkinned(resolvedGltf(url).scene);
+  payload.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.userData.hoverCosmeticMesh = true;
+    mesh.castShadow = true;
+    mesh.material = Array.isArray(mesh.material)
+      ? mesh.material.map((m) => m.clone())
+      : mesh.material.clone();
+  });
+  return payload;
+}
+
 /** A standalone display clone of a weapon-skin model for the armory inspect
  *  turntable (weapon-only mode). Origin is the grip, like every held model.
  *  Materials are cloned per call: the VFX emissive derive mutates them in
@@ -751,7 +773,12 @@ export function applyMaterials(
     // payload materials are per-instance clones the VFX emissive derive mutates
     // and restores. Tinting either (or re-deriving them from the shared cache
     // on a body-skin change) corrupts live handles, so both stay untouched.
-    if (mesh.userData.weaponVfxMesh || mesh.userData.weaponSkinIsolated) return;
+    if (
+      mesh.userData.weaponVfxMesh ||
+      mesh.userData.weaponSkinIsolated ||
+      mesh.userData.hoverCosmeticMesh
+    )
+      return;
     // Always derive a skin/material variant from the assembled model's source
     // material. Reusing the last applied variant would retain its alternate map
     // when skin 0 asks to restore the embedded default texture.

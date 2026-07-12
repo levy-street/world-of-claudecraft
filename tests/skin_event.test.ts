@@ -173,6 +173,7 @@ describe('cosmetic skin-select event', () => {
         mechChromaIds: [chroma.id],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        hoverId: null,
       };
       expect((sim as any).unequipMechChroma(chroma.id)).toBe(true);
       expect(sim.accountCosmetics.mechChromaIds).not.toContain(chroma.id);

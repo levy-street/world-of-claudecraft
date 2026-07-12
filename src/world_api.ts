@@ -235,6 +235,7 @@ export const COMMAND_NAMES = [
   'unequip_mech_chroma',
   'claim_event_skin',
   'change_weapon_skin',
+  'change_hover',
   'release',
   'challengeResponse',
   'chat',
@@ -448,6 +449,7 @@ export const COMMAND_FACETS = {
   claim_event_skin: 'IWorldCosmetics',
   unequip_mech_chroma: 'IWorldCosmetics',
   change_weapon_skin: 'IWorldCosmetics',
+  change_hover: 'IWorldCosmetics',
   // IWorldPet: hunter-pet commands (snake_case wire strings, by design; pet state
   // mirrors on the owned-mob entity wire, not a self-snapshot field).
   pet_abandon: 'IWorldPet',
