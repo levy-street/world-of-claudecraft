@@ -175,8 +175,7 @@ import {
   type ChatTabId,
   channelNeedsJoin,
   chatOpenTabLabelKey,
-  composeChatLine,
-  composeWhisperReply,
+  composeChatTabLine,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
@@ -2895,9 +2894,9 @@ export class Hud {
     this.bindContextMenuActions((act) => {
       if (!isChatOpenTab(act)) return;
       if (this.chatTabs.includes(act)) this.removeChatTab(act);
-      // Focus the whisper tab on open so the effect is visible (channels stay put,
-      // as opening one must not hijack where the player's typed text goes).
-      else this.addChatTab(act, { select: act === WHISPER_TAB });
+      // Choosing a new tab also selects its send channel. This makes the freshly
+      // opened view immediately usable instead of retaining the previous tab.
+      else this.addChatTab(act, { select: true });
     });
   }
 
@@ -2953,9 +2952,7 @@ export class Hud {
   // plain text replies to the last whisperer (/r) instead of binding a channel.
   composeChatSend(typed: string): string {
     const withLinks = this.applyPendingChatLinks(typed);
-    if (this.activeChatTab === WHISPER_TAB) return composeWhisperReply(withLinks);
-    const ch = this.chatSendChannel();
-    return ch ? composeChatLine(ch, withLinks) : withLinks.trim();
+    return composeChatTabLine(this.activeChatTab, withLinks);
   }
 
   // Shift-click a quest-log entry: open the chat input and insert a readable

@@ -5,6 +5,7 @@ import {
   channelSendPrefix,
   chatOpenTabLabelKey,
   composeChatLine,
+  composeChatTabLine,
   composeWhisperReply,
   isChatOpenTab,
   isChatTabChannel,
@@ -23,8 +24,8 @@ describe('chat channel tabs — pure model', () => {
   });
 
   it('maps each channel to the slash prefix the sim/server parses', () => {
-    // say is the engine default for unprefixed text
-    expect(channelSendPrefix('say')).toBe('');
+    // Say must be explicit because the online server remembers the previous channel.
+    expect(channelSendPrefix('say')).toBe('/s ');
     expect(channelSendPrefix('yell')).toBe('/y ');
     expect(channelSendPrefix('party')).toBe('/p ');
     expect(channelSendPrefix('world')).toBe('/world ');
@@ -49,8 +50,8 @@ describe('chat channel tabs — pure model', () => {
       expect(composeChatLine('party', 'pull on 3')).toBe('/p pull on 3');
     });
 
-    it('sends plain text unprefixed for the say channel', () => {
-      expect(composeChatLine('say', 'hello there')).toBe('hello there');
+    it('forces the say channel instead of inheriting the server remembered channel', () => {
+      expect(composeChatLine('say', 'hello there')).toBe('/s hello there');
     });
 
     it('lets an explicit slash command win over the active channel', () => {
@@ -62,6 +63,24 @@ describe('chat channel tabs — pure model', () => {
     it('trims and drops empty input', () => {
       expect(composeChatLine('world', '   ')).toBe('');
       expect(composeChatLine('world', '  ping  ')).toBe('/world ping');
+    });
+  });
+
+  describe('composeChatTabLine', () => {
+    it('follows each newly selected channel tab instead of retaining the previous channel', () => {
+      expect(composeChatTabLine('party', 'pull on 3')).toBe('/p pull on 3');
+      expect(composeChatTabLine('world', 'need one healer')).toBe('/world need one healer');
+      expect(composeChatTabLine('guild', 'hello guild')).toBe('/gu hello guild');
+    });
+
+    it('keeps built-in views unbound and the whisper tab reply-scoped', () => {
+      expect(composeChatTabLine('all', 'hello there')).toBe('/s hello there');
+      expect(composeChatTabLine('combat', 'hello there')).toBe('/s hello there');
+      expect(composeChatTabLine(WHISPER_TAB, 'on my way')).toBe('/r on my way');
+    });
+
+    it('lets an explicit command override the selected tab', () => {
+      expect(composeChatTabLine('world', '/p inc')).toBe('/p inc');
     });
   });
 

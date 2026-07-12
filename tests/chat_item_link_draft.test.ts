@@ -48,6 +48,6 @@ describe('item links in a chat draft', () => {
     hud.insertItemChatLink(heroicId);
 
     expect(input.value).toBe('[Moonwrack Robe] [Moonwrack Robe]');
-    expect(hud.composeChatSend(input.value)).toBe(`[[i:${baseId}]] [[i:${heroicId}]]`);
+    expect(hud.composeChatSend(input.value)).toBe(`/s [[i:${baseId}]] [[i:${heroicId}]]`);
   }, 15_000);
 });
