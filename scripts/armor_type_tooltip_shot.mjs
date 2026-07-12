@@ -58,7 +58,7 @@ await new Promise((r) => setTimeout(r, 400));
 
 await page.keyboard.press('b'); // open bags
 await new Promise((r) => setTimeout(r, 600));
-const bagCount = await page.evaluate(() => document.querySelectorAll('#bags .item-cell').length);
+const bagCount = await page.evaluate(() => document.querySelectorAll('#bags .bag-item').length);
 console.log('bag rows:', bagCount);
 
 async function hoverItem(name, shot) {
@@ -66,8 +66,8 @@ async function hoverItem(name, shot) {
   await page.mouse.move(10, 10);
   await new Promise((r) => setTimeout(r, 120));
   const ok = await page.evaluate((nm) => {
-    const rows = [...document.querySelectorAll('#bags .item-cell')];
-    const row = rows.find((r) => (r.getAttribute('aria-label') || '').includes(nm));
+    const rows = [...document.querySelectorAll('#bags .bag-item')];
+    const row = rows.find((r) => r.textContent.includes(nm));
     if (!row) return false;
     const b = row.getBoundingClientRect();
     const x = b.x + b.width / 2;
@@ -115,8 +115,8 @@ await hoverItem('Valewoven Robe', 'tmp/armor_type_cloth.png');
 await page.mouse.move(10, 10);
 await new Promise((r) => setTimeout(r, 120));
 await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .item-cell')];
-  const row = rows.find((r) => (r.getAttribute('aria-label') || '').includes('Militia Chainvest'));
+  const rows = [...document.querySelectorAll('#bags .bag-item')];
+  const row = rows.find((r) => r.textContent.includes('Militia Chainvest'));
   if (!row) return;
   const b = row.getBoundingClientRect();
   for (const type of ['mouseenter', 'mouseover', 'mousemove']) {

@@ -79,7 +79,9 @@ const failed = [];
 
 // Only the generation step needs the API key; the manifest rebuild runs from
 // whatever .mp3 files are already on disk and works without a key.
-const needsKey = SFX.some((e) => !e.custom && (!existsSync(path.join(sfxDir, `${e.key}.mp3`)) || force));
+const needsKey = SFX.some(
+  (e) => !e.custom && (!existsSync(path.join(sfxDir, `${e.key}.mp3`)) || force),
+);
 if (needsKey && !KEY) {
   console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
   process.exit(1);

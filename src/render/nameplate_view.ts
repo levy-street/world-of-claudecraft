@@ -26,60 +26,8 @@ import { isMobThreateningViewer } from './nameplate_threat';
 // Beyond this many yards an entity's nameplate is hidden entirely (it reads as a
 // sub-pixel label long before this). Was a renderer-local const; it is a
 // nameplate-visibility concern, so it lives with the view model now.
-// This is the NON-ENEMY radius: player, NPC, friendly-mob, and object plates are
-// navigation/social aids (quest '!'/'?' markers, vendors, party members), so they
-// keep the original wide range.
 export const NAMEPLATE_RANGE = 55;
 export const NAMEPLATE_RANGE_SQ = NAMEPLATE_RANGE * NAMEPLATE_RANGE;
-
-// ENEMY plates (live hostile wild mobs) cut off much closer: at the old shared
-// 55yd radius a camp of distant enemies filled the screen with clutter, worst on
-// short mobile-landscape viewports. 40yd matches the classic-MMO enemy nameplate
-// range (and is comfortably inside the ~120yd interest radius); a lootable enemy
-// corpse intentionally keeps the wide NAMEPLATE_RANGE, since its '$' plate is a
-// loot beacon, not combat clutter.
-export const NAMEPLATE_ENEMY_RANGE = 40;
-export const NAMEPLATE_ENEMY_RANGE_SQ = NAMEPLATE_ENEMY_RANGE * NAMEPLATE_ENEMY_RANGE;
-
-// Distance-based plate scaling: full size up close, easing down to a floor at
-// that plate's own max range. The floor stays at 0.7 so the name text remains
-// legible (much below that it turns to noise); the last NAMEPLATE_FADE_BAND yards
-// before the cutoff fade the plate's opacity to zero instead of shrinking it
-// further, so plates never pop in or out at full strength.
-export const NAMEPLATE_SCALE_FULL_RANGE = 15;
-export const NAMEPLATE_SCALE_FLOOR = 0.7;
-export const NAMEPLATE_FADE_BAND = 5;
-
-/** The nameplate cutoff radius for `e`: live hostile wild mobs use the short
- *  enemy range, everything else (players, NPCs, friendlies, objects, lootable
- *  corpses) keeps the wide navigation-aid range. */
-export function nameplateMaxRange(e: Entity): number {
-  return e.kind === 'mob' && e.hostile && !e.dead ? NAMEPLATE_ENEMY_RANGE : NAMEPLATE_RANGE;
-}
-
-/**
- * Scale factor for a plate at `d` yards with cutoff `maxRange`: 1 within
- * NAMEPLATE_SCALE_FULL_RANGE, then a smoothstep down to NAMEPLATE_SCALE_FLOOR
- * at maxRange. Monotonic, continuous, and clamped at both ends.
- */
-export function nameplateScaleForDistance(d: number, maxRange: number): number {
-  const span = maxRange - NAMEPLATE_SCALE_FULL_RANGE;
-  if (span <= 0 || d <= NAMEPLATE_SCALE_FULL_RANGE) return 1;
-  const t = Math.min(1, (d - NAMEPLATE_SCALE_FULL_RANGE) / span);
-  const eased = t * t * (3 - 2 * t);
-  return 1 - (1 - NAMEPLATE_SCALE_FLOOR) * eased;
-}
-
-/**
- * Opacity multiplier for a plate at `d` yards with cutoff `maxRange`: 1 until
- * the fade band starts (maxRange - NAMEPLATE_FADE_BAND), then linear to 0 at
- * maxRange, so the plate dissolves instead of popping at the cutoff.
- */
-export function nameplateFadeForDistance(d: number, maxRange: number): number {
-  const bandStart = maxRange - NAMEPLATE_FADE_BAND;
-  if (d <= bandStart) return 1;
-  return Math.max(0, Math.min(1, (maxRange - d) / NAMEPLATE_FADE_BAND));
-}
 
 // Within this many yards (or when targeted / casting) a nameplate refreshes its
 // content every render pass, not just on the throttled full pass, so a nearby
@@ -119,11 +67,6 @@ export interface NameplatePlan {
   threat: boolean;
   /** combo pips the viewer has built on this entity (0 = hide the row) */
   comboPips: number;
-  /** distance scale the painter folds into the plate's transform (1 near, down
-   *  to NAMEPLATE_SCALE_FLOOR at this plate's own max range) */
-  scale: number;
-  /** distance-fade opacity multiplier (1 outside the fade band, 0 at cutoff) */
-  fade: number;
 }
 
 /** A zeroed plan for the painter to own and reuse. */
@@ -135,8 +78,6 @@ export function newNameplatePlan(): NameplatePlan {
     hasOverheadEmote: false,
     threat: false,
     comboPips: 0,
-    scale: 1,
-    fade: 1,
   };
 }
 
@@ -183,24 +124,14 @@ export function nameplatePlanInto(
     e.templateId === 'delve_bell_rope_pulled';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
-  const maxRange = nameplateMaxRange(e);
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
-    d2 > maxRange * maxRange ||
+    d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
     (!showNameplates && e.kind === 'mob' && !e.dead);
-  if (out.hidden) {
-    // the plan object is reused across entities, so reset the cosmetic fields
-    out.scale = 1;
-    out.fade = 1;
-  } else {
-    const d = Math.sqrt(d2);
-    out.scale = nameplateScaleForDistance(d, maxRange);
-    out.fade = nameplateFadeForDistance(d, maxRange);
-  }
   out.anchorYOffset =
     viewHeight * e.scale +
     (isSelf && hasOverheadEmote && !showOwnNameplate

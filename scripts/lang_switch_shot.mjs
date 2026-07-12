@@ -34,14 +34,20 @@ await sleep(200);
 await page.evaluate(() => document.querySelector('#btn-start-offline').click());
 await sleep(3500);
 
-// Open the Esc game menu, then the Interface settings category.
+// Open the Esc game menu, then the Interface settings page.
 async function openInterface() {
   await page.evaluate(() => document.querySelector('#mm-options').click());
   await sleep(300);
-  // The redesigned menu is a category rail; the Interface tab carries a stable
-  // data-category id, so no localized-label matching is needed.
+  // Click the "Interface" option (label localized; match by the panel button order is
+  // brittle, so find the button whose handler routes to interface via its text).
   const clicked = await page.evaluate(() => {
-    const target = document.querySelector('#options-menu .opt-tab[data-category="interface"]');
+    const btns = [...document.querySelectorAll('#options-menu .opt-btn')];
+    // Interface is the 3rd menu entry; click the one matching its current label.
+    const target = btns.find((b) =>
+      /Interface|Interfaz|Interfaccia|Benutzer|界面|인터페이스|インターフェース|Интерфейс/i.test(
+        b.textContent || '',
+      ),
+    );
     if (target) {
       target.click();
       return true;
@@ -66,15 +72,11 @@ await page.screenshot({
   clip: { x: box.x, y: box.y, width: box.w, height: box.h },
 });
 
-// Switch to Spanish via the picker. The Language control is the shared custom
-// dropdown (.ui-dd), not a native <select>: open the trigger, then click the
-// Spanish option (its data-val carries the locale id).
+// Switch to Spanish via the picker and dispatch the change event.
 await page.evaluate(() => {
-  document.querySelector('#options-menu .set-lang-select .ui-dd-btn')?.click();
-});
-await sleep(200);
-await page.evaluate(() => {
-  document.querySelector('#options-menu .set-lang-select .ui-dd-item[data-val="es"]')?.click();
+  const sel = document.querySelector('#options-menu .set-lang-select');
+  sel.value = 'es';
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
 });
 await sleep(800);
 await page.screenshot({ path: 'tmp/lang_interface_es.png' });
@@ -89,14 +91,12 @@ await page.screenshot({
 });
 
 const labels = await page.evaluate(() => {
-  const names = [...document.querySelectorAll('#options-menu .opt-row-label')].map(
-    (n) => n.textContent,
-  );
+  const names = [...document.querySelectorAll('#options-menu .set-name')].map((n) => n.textContent);
   const sel = document.querySelector('#options-menu .set-lang-select');
   return {
     firstRow: names[0],
-    selectValue: sel?.dataset.value,
-    title: document.querySelector('#options-menu .window-title')?.textContent,
+    selectValue: sel?.value,
+    title: document.querySelector('#options-menu .panel-title span')?.textContent,
   };
 });
 console.log('after switch:', JSON.stringify(labels));

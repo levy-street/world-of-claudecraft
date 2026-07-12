@@ -42,11 +42,7 @@ import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
-import {
-  type CameraOcclusionState,
-  resolveCameraBaseFov,
-  stepCameraOcclusion,
-} from './camera_collision';
+import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
@@ -552,12 +548,6 @@ export interface EntityView {
   nameplateTransform: string;
   nameplateSig: string;
   nameplateHpWidth: string;
-  /** distance scale from the last plan, reapplied by the declutter re-anchor pass */
-  nameplateScale: number;
-  /** static plate opacity (stealth etc.); the distance fade multiplies it */
-  nameplateBaseOpacity: string;
-  /** last-written style.opacity, to diff cheaply (the fade writer owns the property) */
-  nameplateOpacity: string;
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
@@ -802,12 +792,6 @@ export class Renderer {
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
   private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
-  // The player's Field of View comfort setting (Settings.cameraFov, 55..100),
-  // resolved. setCameraFov writes it; updateCamera threads it through
-  // stepCameraOcclusion as the occlusion base every frame, so the slider changes
-  // the rendered FOV and the per-frame camera update preserves it (rather than
-  // forcing the shipped CAMERA_BASE_FOV back each frame).
-  private cameraBaseFov = CAMERA_BASE_FOV;
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -1621,12 +1605,9 @@ export class Renderer {
     return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
   }
 
-  /** Vertical camera field of view in degrees (55..100, default 60). Stored as the
-   *  per-frame occlusion base so updateCamera keeps the player's choice instead of
-   *  snapping back to CAMERA_BASE_FOV each frame. */
+  /** Vertical camera field of view in degrees (55..100, default 60). */
   setCameraFov(deg: number): void {
-    this.cameraBaseFov = resolveCameraBaseFov(deg);
-    this.camera.fov = this.cameraBaseFov;
+    this.camera.fov = Math.min(100, Math.max(55, deg));
     this.camera.updateProjectionMatrix();
   }
 
@@ -3581,9 +3562,6 @@ export class Renderer {
       nameplateTransform: '',
       nameplateSig: '',
       nameplateHpWidth: '',
-      nameplateScale: 1,
-      nameplateBaseOpacity: '1',
-      nameplateOpacity: '',
       comboSig: '',
       tierValue: 0,
       devTierValue: 0,
@@ -5381,7 +5359,7 @@ export class Renderer {
       // stays at the player's requested zoom instead of clamping inside the pit.
       this.camOcclusion.pullT = 1;
       this.camOcclusion.lensT = 1;
-      this.camOcclusion.fov = this.cameraBaseFov;
+      this.camOcclusion.fov = CAMERA_BASE_FOV;
     } else {
       // Camera collision for non-hideable blockers. Camera-ghost props are left
       // at the requested zoom and hidden in props.ts while keeping their shadows.
@@ -5414,10 +5392,8 @@ export class Renderer {
         CAMERA_PULL_IN_RATE,
         CAMERA_PULL_OUT_RATE,
         CAMERA_SOFT_PULL_WEIGHT,
-        this.cameraBaseFov,
-        // Never let the occlusion-compensation ceiling fall below the player's own
-        // base FOV, or a wide setting (up to 100) would briefly NARROW under a clamp.
-        Math.max(CAMERA_MAX_COMP_FOV, this.cameraBaseFov),
+        CAMERA_BASE_FOV,
+        CAMERA_MAX_COMP_FOV,
       );
     }
     const ct = this.camOcclusion.pullT;
@@ -5513,8 +5489,7 @@ export class Renderer {
       b.el.style.display = '';
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      // chat bubbles share the anchor transform but never distance-scale
-      b.el.style.transform = nameplateScreenTransform(sx, sy, 1);
+      b.el.style.transform = nameplateScreenTransform(sx, sy);
     }
   }
 

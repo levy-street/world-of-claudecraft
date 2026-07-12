@@ -48,8 +48,8 @@ await page.screenshot({ path: 'tmp/cmp_1_bags.png' });
 // Hover the upgrade chest to raise its comparison tooltip.
 async function hoverItem(name, shot) {
   const ok = await page.evaluate((nm) => {
-    const rows = [...document.querySelectorAll('#bags .item-cell')];
-    const row = rows.find((r) => (r.getAttribute('aria-label') || '').includes(nm));
+    const rows = [...document.querySelectorAll('#bags .bag-item')];
+    const row = rows.find((r) => r.textContent.includes(nm));
     if (!row) return false;
     const b = row.getBoundingClientRect();
     const x = b.x + b.width / 2,
