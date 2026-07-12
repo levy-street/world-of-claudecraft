@@ -4206,8 +4206,14 @@ export class Hud {
       touchMoved = false;
       // Safari desktop never focuses a button on click, so pointerdown's flag
       // above would otherwise never get consumed by a focusin and could wrongly
-      // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
-      pointerFocusPending = false;
+      // swallow a later, real keyboard-focus tooltip; drop it once the press
+      // ends. One task LATER though: on touch the compatibility focus lands
+      // AFTER pointerup, and its focusin used to repaint the tooltip the tap
+      // handler had just painted (a visible double render on phones), so the
+      // flag must still be armed when that focusin arrives.
+      window.setTimeout(() => {
+        pointerFocusPending = false;
+      }, 0);
     });
     el.addEventListener('pointercancel', () => {
       clearTouchTimer();

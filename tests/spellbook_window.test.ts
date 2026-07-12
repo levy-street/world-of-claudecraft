@@ -300,6 +300,14 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(hud).toContain('const clamped = Math.max(8, bound / z - ttW - 6);');
   });
 
+  it('keeps the tap focus flag armed until the compat focus lands (one render)', () => {
+    // The compatibility focus fires AFTER pointerup on touch: a synchronous
+    // reset there let the focusin repaint the description the tap had just
+    // painted, a visible double render. The reset defers one task instead.
+    expect(hud).toContain('flag must still be armed when that focusin arrives');
+    expect(hud).toMatch(/window\.setTimeout\(\(\) => \{\s*pointerFocusPending = false;\s*\}, 0\);/);
+  });
+
   it('keeps the touch-selected row seat readable on the panel gradient', () => {
     // The gradient bottoms out at the same color as the seat fill, so the
     // gold-dim inset ring is what makes the selection visible.
