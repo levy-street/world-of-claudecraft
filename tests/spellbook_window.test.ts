@@ -300,12 +300,19 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(hud).toContain('const clamped = Math.max(8, bound / z - ttW - 6);');
   });
 
-  it('keeps the tap focus flag armed until the compat focus lands (one render)', () => {
-    // The compatibility focus fires AFTER pointerup on touch: a synchronous
-    // reset there let the focusin repaint the description the tap had just
-    // painted, a visible double render. The reset defers one task instead.
-    expect(hud).toContain('flag must still be armed when that focusin arrives');
-    expect(hud).toMatch(/window\.setTimeout\(\(\) => \{\s*pointerFocusPending = false;\s*\}, 0\);/);
+  it('gates the compat tap replay away from the tooltip on the touch layout', () => {
+    // The browser replays a touch tap as mouse and focus events right after
+    // pointerup: the old row's mouseleave/focusout hid the description the
+    // tap just painted, and the new row's focusin repainted it, a visible
+    // double render. All three stand down inside the shared replay window.
+    expect(hud).toContain('private tooltipTouchPressAt = 0;');
+    expect(hud).toContain(
+      'return performance.now() - this.tooltipTouchPressAt < CLICK_SUPPRESS_MS;',
+    );
+    expect(
+      hud.match(/if \(mobile\(\) && this\.tooltipTouchReplayActive\(\)\) return;/g),
+    ).toHaveLength(3);
+    expect(hud).toContain('this.tooltipTouchPressAt = performance.now();');
   });
 
   it('keeps the touch-selected row seat readable on the panel gradient', () => {

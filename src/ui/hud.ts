@@ -984,6 +984,19 @@ export class Hud {
   private tooltipEl = $('#tooltip');
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
+  // Timestamp of the last touch/pen press on a tooltip-bearing element. The
+  // browser replays a touch tap as compatibility mouse and focus events right
+  // after pointerup, and those replays must not hide or repaint a tooltip the
+  // tap itself just painted: the previously hovered row's mouseleave/focusout
+  // hid the fresh description and the new row's focusin repainted it, a
+  // visible double render on phones. Real keyboard or mouse interactions
+  // never follow a touch press this closely, so the shared CLICK_SUPPRESS_MS
+  // window separates the replay from genuine input.
+  private tooltipTouchPressAt = 0;
+
+  private tooltipTouchReplayActive(): boolean {
+    return performance.now() - this.tooltipTouchPressAt < CLICK_SUPPRESS_MS;
+  }
   // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
   // so main.ts's per-frame updateHoverCursor can call it every frame while the
   // same mob stays hovered without rebuilding the tooltip HTML each time.
@@ -4150,6 +4163,10 @@ export class Hud {
       pointerFocusPending = true;
     });
     el.addEventListener('focusin', (event) => {
+      // Inside the touch replay window this focus is the compatibility side
+      // effect of a tap, not keyboard navigation: the tap already painted
+      // whatever it wanted painted, so stand down (see tooltipTouchPressAt).
+      if (mobile() && this.tooltipTouchReplayActive()) return;
       // A tooltip attached to a composite row must describe the row only when
       // the row itself receives keyboard focus. Focus from nested Add, Remove,
       // or assignment controls bubbles through the row and must not reopen the
@@ -4177,15 +4194,22 @@ export class Hud {
     });
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
+      // Compat replay of a touch tap: the virtual mouse leaving the OLD row
+      // must not hide the description the new row's tap just painted.
+      if (mobile() && this.tooltipTouchReplayActive()) return;
       this.tooltipEl.style.display = 'none';
     });
     el.addEventListener('focusout', () => {
       clearTouchTimer();
+      // Same replay guard as mouseleave: focus moving off the old row is a
+      // tap side effect, not the player leaving a keyboard-focused control.
+      if (mobile() && this.tooltipTouchReplayActive()) return;
       this.tooltipEl.style.display = 'none';
     });
     el.addEventListener('pointerdown', (e) => {
       if (!mobile() || e.pointerType === 'mouse') return;
       clearTouchTimer();
+      this.tooltipTouchPressAt = performance.now();
       // A fresh press: drop any stale peek and dismiss a lingering tooltip.
       this.peekGuard.press();
       this.tooltipEl.style.display = 'none';
@@ -4201,19 +4225,17 @@ export class Hud {
       touchMoved = Math.hypot(e.clientX - touchStartX, e.clientY - touchStartY) > TAP_SLOP_PX;
       if (touchMoved) clearTouchTimer();
     });
-    el.addEventListener('pointerup', () => {
+    el.addEventListener('pointerup', (e) => {
       clearTouchTimer();
       touchMoved = false;
+      // Refresh the replay window from the release too: a long-press hold can
+      // outlast a window measured from the press start, and the compatibility
+      // replay always fires right after THIS event.
+      if (e.pointerType !== 'mouse') this.tooltipTouchPressAt = performance.now();
       // Safari desktop never focuses a button on click, so pointerdown's flag
       // above would otherwise never get consumed by a focusin and could wrongly
-      // swallow a later, real keyboard-focus tooltip; drop it once the press
-      // ends. One task LATER though: on touch the compatibility focus lands
-      // AFTER pointerup, and its focusin used to repaint the tooltip the tap
-      // handler had just painted (a visible double render on phones), so the
-      // flag must still be armed when that focusin arrives.
-      window.setTimeout(() => {
-        pointerFocusPending = false;
-      }, 0);
+      // swallow a later, real keyboard-focus tooltip; drop it once the press ends.
+      pointerFocusPending = false;
     });
     el.addEventListener('pointercancel', () => {
       clearTouchTimer();
