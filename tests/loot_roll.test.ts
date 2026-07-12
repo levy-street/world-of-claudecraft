@@ -202,6 +202,29 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     // The roll is closed and no longer offered to anyone.
     expect(activeLootRolls(sim.ctx, a)).toHaveLength(0);
   });
+
+  it('never destroys the item when the winner disconnects before the roll resolves (#loot-freeze)', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+    // a wins the roll (need beats greed) but disconnects before the roll
+    // actually resolves; the last vote to land (c's pass) triggers resolution
+    // while a's player/entity records are already gone.
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    sim.removePlayer(a);
+    submitLootRoll(sim.ctx, rollId, 'greed', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+    const returned = mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots');
+    expect(returned?.openToAll).toBe(true);
+    expect(returned?.count).toBe(1);
+    expect(activeLootRolls(sim.ctx, b)).toHaveLength(0);
+  });
 });
 
 describe('loot_roll: group roll status + resolution broadcast (module entry)', () => {

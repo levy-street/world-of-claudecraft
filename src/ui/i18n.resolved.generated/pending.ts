@@ -25,7 +25,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "es_ES": [
     "entities.abilities.chain_heal.description",
@@ -43,7 +51,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_FR": [
     "entities.abilities.chain_heal.description",
@@ -61,7 +77,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_CA": [
     "entities.abilities.chain_heal.description",
@@ -79,7 +103,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "en_CA": [],
   "it_IT": [
@@ -98,7 +130,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "de_DE": [
     "entities.abilities.chain_heal.description",
@@ -116,7 +156,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -138,7 +186,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -201,7 +257,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.trueshot_aura.description",
     "entities.abilities.trueshot_aura.name",
     "entities.abilities.wyvern_sting.description",
-    "entities.abilities.wyvern_sting.name"
+    "entities.abilities.wyvern_sting.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "nl_NL": [
     "entities.abilities.chain_heal.description",
@@ -219,7 +283,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "pl_PL": [
     "entities.abilities.chain_heal.description",
@@ -237,7 +309,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "id_ID": [
     "entities.abilities.chain_heal.description",
@@ -255,7 +335,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "tr_TR": [
     "entities.abilities.chain_heal.description",
@@ -273,7 +361,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "sv_SE": [
     "entities.abilities.chain_heal.description",
@@ -291,7 +387,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "vi_VN": [
     "entities.abilities.chain_heal.description",
@@ -309,7 +413,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "da_DK": [
     "entities.abilities.chain_heal.description",
@@ -327,6 +439,14 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.skull_bash.description",
     "entities.abilities.skull_bash.name",
     "entities.abilities.spell_lock.description",
-    "entities.abilities.spell_lock.name"
+    "entities.abilities.spell_lock.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ]
 };

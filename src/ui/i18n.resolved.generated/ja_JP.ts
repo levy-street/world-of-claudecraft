@@ -337,7 +337,13 @@ export const ja_JP: EnTranslations = {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
       "talkBodyTouch": "レッドブルック元帥に近づき、「使用」ボタンをタップして話しかけ、依頼を受けましょう。",
       "returnBodyTouch": "依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。",
-      "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！"
+      "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！",
+      "slayTargetHint": "戦闘は初めてですか？{targetKey} を押すか狼をクリックしてターゲットし、アクションバーのスキルで攻撃しましょう。",
+      "slayTargetHintTouch": "戦闘は初めてですか？狼をタップしてターゲットし、アクションバーのスキルをタップして攻撃しましょう。",
+      "nextTipsTitle": "次にすべきこと",
+      "nextTipQuestLog": "クエストログ（{key}）を開いて近くの次のクエストを確認しましょう。",
+      "nextTipMap": "ワールドマップ（{key}）でクエストの場所を確認しましょう。",
+      "nextTipSocial": "ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。"
     },
     "widgets": {
       "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
@@ -924,6 +930,7 @@ export const ja_JP: EnTranslations = {
     "corpseHarvest": {
       "title": "採取",
       "harvestButton": "採取",
+      "harvestButtonTooltip": "採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
@@ -1104,7 +1111,8 @@ export const ja_JP: EnTranslations = {
       "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
     },
     "loot": {
-      "chestTitle": "宝箱"
+      "chestTitle": "宝箱",
+      "takeAllTooltip": "すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",

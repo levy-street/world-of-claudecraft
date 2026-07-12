@@ -215,9 +215,19 @@ import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
+import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
-import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import {
+  cacheControlFor,
+  etagFor,
+  isNotModified,
+  isPublicSfxPath,
+  requestedSfxBlobHash,
+  requestedSfxVersion,
+  sfxBlobIntegrityMatches,
+} from './static_cache';
+import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { passesTurnstile } from './turnstile';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -262,6 +272,9 @@ export function resetActiveConfigForTests(): void {
 }
 
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
+const SFX_PACK_DIR = process.env.SFX_PACK_DIR?.trim()
+  ? path.resolve(process.env.SFX_PACK_DIR.trim())
+  : null;
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],
@@ -653,8 +666,8 @@ const MIME: Record<string, string> = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.mp3': 'audio/mpeg',
 };
-
 // The admin dashboard is reached via the admin.* subdomain (Caddy proxies it
 // to this same port) or /admin for local dev. The hostname only picks which
 // HTML shell is served, the admin API itself is gated by admin tokens.
@@ -665,7 +678,15 @@ function isAdminRequest(req: http.IncomingMessage): boolean {
 }
 
 function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void {
-  let urlPath = (req.url ?? '/').split('?')[0];
+  let requestUrl: URL;
+  try {
+    requestUrl = new URL(req.url ?? '/', 'http://static.local');
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('invalid request target');
+    return;
+  }
+  let urlPath = requestUrl.pathname;
   // The curated Guide is the site wiki: a client-routed SPA served at /wiki with its
   // own shell, so deep paths (/wiki/classes/...) fall back to guide.html rather than the
   // game's index.html. (It previously 302'd to a standalone MediaWiki; that is retired.)
@@ -677,8 +698,33 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   // normalize once and reuse for BOTH file resolution and cache policy,
   // otherwise /assets/../x would serve a mutable file with immutable caching
   urlPath = path.posix.normalize(urlPath).replace(/^([.][.][/\\])+/, '');
-  const file = path.join(STATIC_DIR, urlPath);
-  const stats = file.startsWith(STATIC_DIR) && fs.existsSync(file) ? fs.statSync(file) : null;
+  const overlayFile = resolveSfxOverlayFile(SFX_PACK_DIR, urlPath);
+  const file = overlayFile ?? path.join(STATIC_DIR, urlPath);
+  const cachePath = `${urlPath}${requestUrl.search}`;
+  const requestedVersion = requestedSfxVersion(cachePath);
+  const requestedBlobHash = requestedSfxBlobHash(cachePath);
+  const needsVerifiedSfx = requestedVersion !== null || requestedBlobHash !== null;
+  let verifiedSfx: StaticSfxSnapshot | null = null;
+  let stats: fs.Stats | null = null;
+  if (overlayFile !== null || file.startsWith(STATIC_DIR)) {
+    try {
+      if (needsVerifiedSfx) {
+        verifiedSfx = readStaticSfxSnapshot(file);
+        stats = verifiedSfx.stats;
+      } else {
+        // statSync is already the existence check. Keeping it inside this catch
+        // closes the former existsSync-to-statSync disappearance race.
+        stats = fs.statSync(file);
+      }
+    } catch {
+      if (needsVerifiedSfx) {
+        res.writeHead(404, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+        res.end('SFX asset changed during integrity verification');
+        return;
+      }
+      stats = null;
+    }
+  }
   if (!stats?.isFile()) {
     // Asset paths must 404, not SPA-fall-back: a missing .glb served as index.html
     // surfaces as a cryptic GLTFLoader parse error instead of a clear 404.
@@ -700,8 +746,14 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   }
   const isReadMethod = req.method === 'GET' || req.method === 'HEAD';
   const etag = etagFor(stats);
+  const actualSfxHash = verifiedSfx?.hash;
+  if (!sfxBlobIntegrityMatches(cachePath, actualSfxHash)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+    res.end('content-addressed SFX blob failed integrity verification');
+    return;
+  }
   const validators = {
-    'Cache-Control': cacheControlFor(urlPath),
+    'Cache-Control': cacheControlFor(cachePath, actualSfxHash),
     ETag: etag,
     'Last-Modified': stats.mtime.toUTCString(),
   };
@@ -713,11 +765,15 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   res.writeHead(200, {
     ...validators,
     'Content-Type': MIME[path.extname(file)] ?? 'application/octet-stream',
-    'Content-Length': stats.size,
+    'Content-Length': verifiedSfx?.bytes.length ?? stats.size,
   });
   if (req.method === 'HEAD') {
-    // don't read a multi-MB asset from disk just to discard the bytes
+    // Versioned SFX was already snapshotted for integrity, but HEAD sends no body.
     res.end();
+    return;
+  }
+  if (verifiedSfx !== null) {
+    res.end(verifiedSfx.bytes);
     return;
   }
   fs.createReadStream(file).pipe(res);
@@ -2157,10 +2213,11 @@ function applyCorsAndPreflight(
   res: http.ServerResponse,
   isApi: boolean,
   publicCorsPath: boolean,
+  publicSfxPath: boolean,
 ): boolean {
-  if (publicCorsPath) publicCors(res);
+  if (publicCorsPath || publicSfxPath) publicCors(res);
   else if (isApi) maybeCors(req, res);
-  if (req.method === 'OPTIONS' && (isApi || publicCorsPath)) {
+  if (req.method === 'OPTIONS' && (isApi || publicCorsPath || publicSfxPath)) {
     res.writeHead(204);
     res.end();
     return true;
@@ -2191,7 +2248,8 @@ export function routeHttpRequest(req: http.IncomingMessage, res: http.ServerResp
   // origin so browser-origin companion apps can call them client-side; every
   // other /api route keeps the narrow realm/native allowlist.
   const publicCorsPath = isPublicCorsPath(path);
-  if (applyCorsAndPreflight(req, res, isApi, publicCorsPath)) return;
+  const publicSfxPath = isPublicSfxPath(url);
+  if (applyCorsAndPreflight(req, res, isApi, publicCorsPath, publicSfxPath)) return;
   // Operational health + metrics endpoints, ahead of the /internal/ arm so they
   // answer even while the rest of the surface drains. GET-only exact matches on
   // the query-stripped path (mirroring the /sitemap-characters.xml arm below);

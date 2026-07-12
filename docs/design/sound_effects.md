@@ -1,10 +1,11 @@
-# Sound Effects — design, catalog & integration
+# Sound Effects: design, catalog and integration
 
-Generated spatial sound effects for World of ClaudeCraft, produced with the
-**ElevenLabs Sound Effects API** (`POST /v1/sound-generation`) and played through
-a new lightweight 3D Web Audio engine. This document is the human-readable
-catalog; the authoritative machine list (prompts, durations, loop flags) lives in
-`scripts/sfx/sfx_prompts.mjs` and is consumed by `scripts/gen_sfx.mjs`.
+Sampled sound effects for World of ClaudeCraft, played through a lightweight Web
+Audio engine. Natural world and character cues can be produced with the
+**ElevenLabs Sound Effects API** (`POST /v1/sound-generation`); UI/event cues use
+deterministic local FFmpeg synthesis. This document is the human-readable
+catalog. The authoritative machine list (prompts, durations, loop flags, and
+generator ownership) lives in `scripts/sfx/sfx_prompts.mjs`.
 
 ## Goals
 - **Immersive world layer:** footsteps that change with surface (grass / dirt /
@@ -16,16 +17,18 @@ catalog; the authoritative machine list (prompts, durations, loop flags) lives i
   *other* players' and creatures' footsteps and combat attenuate with distance and
   pan with direction relative to the camera. Personal UI events (level-up, loot,
   quest, coin) stay non-positional.
-- **Extreme efficiency:** one decoded buffer per clip (shared), a hard concurrency
+- **Extreme efficiency:** one decoded buffer per published track (shared), a hard concurrency
   cap, distance culling that reuses the renderer's own range gate, per-entity
   footstep throttling, pooled looping sources, and zero per-frame allocation in
   the hot path.
 
-## What we DON'T regenerate
-The existing procedural WebAudio blips in `src/game/audio.ts` (UI click, coin,
-level-up fanfare, quest accept/done, bag open/close, error, whisper, duel/arena
-stingers) are crisp, zero-weight, and non-positional — they stay. Generated assets
-are spent only on the immersive world/combat/creature layer below.
+## Authoring policy
+World, combat, creature, ambience, and personal UI cues all live in the sampled
+catalog. `src/game/audio.ts` remains a compatibility facade for its established
+method names, but routes reachable UI calls through `sfx.playUi()` so every sound
+is visible, previewable, replaceable, and masterable in the SFX Studio. The
+deterministic `scripts/gen_ui_sfx.mjs` generator supplies the initial UI masters;
+ElevenLabs remains the optional generator for natural world and character audio.
 
 ---
 
@@ -36,16 +39,18 @@ A decoupled 3D engine with **its own `AudioContext` + `AudioListener`** (sibling
 `audio`/`music`/`voice`). Driven by the `sfxVolume` setting (wired alongside
 `audio.setVolume` in `main.ts`). API:
 - `init()` — gated on the same user gesture as `audio.init()` (`enterWorld`);
-  preloads + decodes every clip in the manifest into a shared buffer cache.
+  preloads the startup working set and lazily deduplicates fetch/decode work for
+  contextual cues.
 - `setListener(x,y,z, fx,fy,fz)` — called once per frame by the renderer with the
   camera position + forward vector.
 - `playAt(key, x,y,z, opts?)` — one-shot positional clip via a `PannerNode`
   (equalpower, linear rolloff, hard `maxDistance` cutoff). Random ±6% rate / ±2dB
-  gain jitter so repeats (footsteps, swings) never machine-gun.
+  gain jitter so repeats (footsteps, swings) never machine-gun. Caller rate and
+  jitter multiply the per-key authored playback rate from the manifest.
 - `playUi(key, opts?)` — non-positional one-shot straight to the master bus.
-- `loopAt(key, id, x,y,z)` / `loopGlobal(key, id)` / `stopLoop(id, fade)` /
-  `setLoopTarget(...)` — pooled looping sources for ambience & sustained casts,
-  cross-faded.
+- `loop(id, key, target, x?,y?,z?)` / `unloop(id, fade)` are pooled looping
+  sources for ambience and sustained casts, cross-faded by gain and started at
+  the per-key authored playback rate.
 - Concurrency cap (`MAX_VOICES`), buffer cache, and a per-key cooldown protect the
   frame budget. Unknown keys / missing files are silent no-ops.
 
@@ -58,7 +63,7 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
 - **Footsteps:** a per-`EntityView` distance accumulator (`stepAccum += speed*dt`)
   fires `sink.footstep(x,y,z, surface, running, self)` each stride. Surface =
   `zoneBiomeAt(z)` (vale→grass, marsh→dirt, peaks→stone) → water if wading →
-  dungeon→wood/stone → snow if weather is snowing. Suppressed while airborne /
+  dock decks→wood → dungeon→stone → snow if weather is snowing. Suppressed while airborne /
   swimming / dead and gated by `d2 < SFX_RANGE_SQ`.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
@@ -79,16 +84,18 @@ entity positions. It imports the `sfx` singleton (precedent: it already imports
   `buff_apply`/`debuff_apply`.
 - `death` → creature **family death** (mob) or `player_death`. Mob **aggro**
   vocalization fires the first time a mob deals damage (no aggro SimEvent exists).
-- Personal UI events keep their existing procedural `audio.*` blips (unchanged).
+- Personal UI events keep the stable `audio.*` call surface while the facade
+  resolves those calls to typed sampled `ui_*` keys.
 
 ### Surface & family mapping
-- **Surface** (footsteps): `vale→grass`, `marsh→dirt`, `peaks→stone`, dungeon
-  (`x>DUNGEON_X_THRESHOLD`)→`wood`, wading (`y≤WATER_LEVEL-0.3` & not deep)→`water`,
-  deep→`swim`, weather snow→`snow`. Source: `zoneBiomeAt`, `groundHeight`,
-  `WATER_LEVEL` from `src/sim/world.ts`.
-- **Creature family** (vocalizations): `MOBS[templateId].family` ∈ {beast,
-  humanoid, murloc, spider, kobold, undead, troll, ogre, elemental, dragonkin,
-  demon}, with a `wild_boar`/`elder_bristleback` → **boar** templateId override.
+- **Surface** (footsteps): `vale→grass`, `marsh→dirt`, `peaks→stone`, dock deck
+  footprints→`wood`, dungeon→`stone`, wading (`y≤WATER_LEVEL-0.3` & not deep)→`water`,
+  deep→`swim`, weather snow→`snow`. Source: the pure render audio resolver,
+  `zoneBiomeAt`, `groundHeight`, and `WATER_LEVEL` from `src/sim/world.ts`.
+- **Creature family** (vocalizations): `MOBS[templateId].family` maps to one of
+  `beast`, `boar`, `spider`, `mudfin`, `burrower`, `humanoid`, `undead`, `troll`,
+  `ogre`, `elemental`, `dragonkin`, or `demon`, with a
+  `wild_boar`/`elder_bristleback` to **boar** templateId override.
 - **Weapon class** (swings) & **material** (impacts) derive from the source/target
   player class or mob family (plate: warrior/paladin → metal; leather: rogue/hunter/
   shaman; cloth: mage/priest/warlock/druid; undead → bone; else flesh).
@@ -98,8 +105,13 @@ entity positions. It imports the `sfx` singleton (precedent: it already imports
 ## Catalog
 
 `spatial` = positioned 3D; `loop` = seamless looping (ElevenLabs `loop:true`).
-Keys map to `public/audio/sfx/<key>.mp3`; the manifest
-`src/game/sfx_manifest.generated.ts` is emitted by the generator.
+Keys map to `public/audio/sfx/<key>.mp3`; the independently generated manifest
+`src/game/sfx_manifest.generated.ts` carries a content hash, immutable URL,
+preload class, spatial flag, byte count, resolved runtime gain, and playback rate.
+An entry may declare ordered variants. Their files use
+`public/audio/sfx/<key>_<number>.mp3`, and accepted one-shots cycle through the
+ordered tracks. A persistent loop chooses one track when it starts and keeps it
+until that loop stops.
 
 ### Movement & footsteps (spatial one-shots, pitch-randomized in code)
 | key | dur | prompt summary |
@@ -179,7 +191,7 @@ Keys map to `public/audio/sfx/<key>.mp3`; the manifest
 ### Creature vocalizations (spatial)
 Per family: `mob_<family>_aggro` (alerted, entering combat), `mob_<family>_attack`
 (lunging strike vocalization), `mob_<family>_death` (slain). Hurt reuses a
-pitched-up `attack`. Families: `beast`, `boar`, `spider`, `murloc`, `kobold`,
+pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 `humanoid`, `undead`, `troll`, `ogre`, `elemental`, `dragonkin`, `demon`.
 
 | family | aggro / attack / death prompt summary |
@@ -187,8 +199,8 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `murloc`, `kobold`,
 | `beast` | a wolf — snarling alert growl / vicious biting snarl / dying yelp and whimper |
 | `boar` | a wild boar — angry snorting squeal / charging grunt / dying squeal |
 | `spider` | a giant spider — hissing chitter alert / lunging hiss / shriveling death hiss |
-| `murloc` | a murloc fish-man — warbling gurgle cry / croaking attack gurgle / gurgling death rattle |
-| `kobold` | a small kobold — startled yipping bark / snarling bite / squealing death |
+| `mudfin` | a mudfin fish creature: warbling gurgle cry / croaking attack gurgle / gurgling death rattle |
+| `burrower` | an insectoid burrower: scraping alert / chittering strike / collapsing shell rattle |
 | `humanoid` | a bandit man — angry war shout / grunting strike / pained death cry |
 | `undead` | a skeleton — rattling bone groan alert / hollow moaning strike / clattering collapse |
 | `troll` | a troll — guttural roaring alert / savage grunt strike / heavy groaning death |
@@ -211,20 +223,120 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `murloc`, `kobold`,
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
 
+### Interface and personal event cues
+
+These cues are non-positional, preload at startup, and keep the existing
+`GameAudio` method surface. They are sampled assets, so they use the same Studio
+editing, mastering, caching, and playback limits as the world catalog.
+
+| keys | purpose |
+|---|---|
+| `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
+| `ui_bag_open`, `ui_bag_close` | inventory transitions |
+| `ui_coin`, `ui_loot_item` | currency and item rewards |
+| `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
+| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
+| `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |
+| `ui_fiesta_score_mine`, `ui_fiesta_score_other` | team score feedback |
+| `ui_fiesta_wave`, `ui_fiesta_augment`, `ui_fiesta_down`, `ui_fiesta_revive` | Fiesta round and player-state feedback |
+
 ---
 
 ## Generation
-`ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]` — reads
+`ELEVENLABS_API_KEY=... node scripts/gen_sfx.mjs [--force]` reads
 `scripts/sfx/sfx_prompts.mjs`, calls `POST /v1/sound-generation` per clip
 (`duration_seconds`, `prompt_influence` 0.4, `loop` per entry,
 `output_format=mp3_44100_128`), writes `public/audio/sfx/<key>.mp3`, and emits
-`src/game/sfx_manifest.generated.ts` (key → `/audio/sfx/<key>.mp3`). Idempotent
+the sampled files. `node scripts/build_sfx_manifest.mjs` independently emits
+`src/game/sfx_manifest.generated.ts` with URLs of the form
+`/audio/sfx/<key>.mp3?v=<content-hash>`. Generation is idempotent
 (skips existing; `--force` to regenerate). Offline-only; the key is never read at
-runtime. Served from `public/` via plain `/audio/sfx/...` paths (no media-manifest
-hashing), matching the voice-over assets.
+runtime. Exact versioned SFX URLs receive immutable production caching; unhashed
+or stale URLs must revalidate.
+
+`npm run sfx:ui -- --force` rebuilds the deterministic sampled UI cues
+locally with FFmpeg. Their fixed synthesis parameters and noise seeds make the
+assets repeatable for a given FFmpeg build. The shared production conform step
+then emits 44.1 kHz, 192 kbps MP3s using the same short-true-peak and sustained-LUFS
+branches as every other catalog cue. Run
+`npm run sfx:manifest` after any direct asset generation or replacement.
+
+For the complete authoring and artifact workflow, see the
+[SFX Studio tutorial](../sfx-studio-tutorial.md). For editing, run
+`npm run sfx:studio`. The loopback-only Studio inventories the
+catalog, previews associated animations and environments, validates uploads,
+supports non-destructive slicing and seam crossfades, fades, reverse, multi-band
+EQ, compression, two-pass EBU R128 normalization, limiter and encoded-file QA.
+Audio Publish bakes that authoring work and transactionally publishes the
+verified MP3 and tracked render recipe, then regenerates the manifest for the
+new content hash. Apply Playback Mix writes only the checked-in gain and speed
+maps and regenerates the manifest. It does not render, conform, resample, or
+otherwise change the audio bytes.
+Runtime loop cues cannot bypass seam processing, and one-shots cannot be
+reclassified as loops.
+
+### Production export
+
+The Studio toolbar's Export All action downloads a deterministic production ZIP
+from every published SFX master and the applied playback profile. Export is
+blocked while saved playback changes are unapplied or saved audio drafts differ
+from their publication baselines. Local uploads, previews, version history,
+music, and NPC voice lines are not part of this SFX artifact.
+
+The artifact stores audio as immutable
+`audio/sfx/blobs/<full-sha256>.mp3` files and includes a stable
+`audio/sfx/runtime-pack.json`, authoring maps, integrity metadata, and an
+installer. Run `node install.mjs <production-static-root>` after extracting the
+ZIP. The installer verifies and copies every blob first, then atomically replaces
+the stable runtime manifest. Production can set `SFX_PACK_DIR` to a persistent
+overlay's `audio/sfx` directory. Docker Compose maps `EASTBROOK_SFX_DIR` for this
+purpose, so a container rebuild does not discard an installed pack.
+
+The client accepts a pack only when its compiled catalog hash matches, every
+fixed key is present, and any extra keys match the constrained mob-subfamily
+grammar. A malformed, incomplete, external-URL, or incompatible pack is rejected
+as a whole and playback uses the compiled generated manifest. New event routing
+or a new fixed SFX key still requires a normal game code deployment.
+
+### Runtime mix and speed
+
+Cross-clip balance is separate from asset mastering. Trim, slices, fades, seam
+construction, reverse, EQ, dynamics, loudness, and encoding remain baked in the
+published asset. The reversible playback controls live in two plain-data files:
+
+- `scripts/sfx/sfx_gain_map.json` stores category baseline dB plus per-key
+  fine-tune dB. The layers add, and the resolved value must stay at or below
+  0 dB.
+- `scripts/sfx/sfx_speed_map.json` stores the playback rate for each adjusted
+  key.
+
+Manifest generation resolves both maps into a linear `gain` multiplier and a
+`playbackRate` for every key. At playback, `src/game/sfx.ts` applies the gain to
+the cue's `GainNode` and the rate to its `AudioBufferSourceNode`. One-shot caller
+rate and pitch jitter layer on top. This uses Web Audio resampling, so speed and
+pitch move together. The maps stay independent of rendering and any separate
+conform process, so applying either one never changes the source or published
+audio hash.
+
+Studio audition A is the untouched source bypass. B previews the live authoring
+graph with runtime mix and speed, while C applies the same runtime values to the
+exact rendered master. This keeps comparisons honest without putting playback
+decisions into rendered bytes.
+
+Model and environment cues use real game assets in the context viewer. Personal
+UI cues use cue-specific representative interface mocks, clearly labeled as
+non-positional authoring context rather than pretending an unrelated model is
+the live HUD. The Studio inventories published masters without silently changing
+them. Existing cues keep their current balance until an author listens and
+applies a reviewed playback-map change; audio mastering remains a separate
+publish. Every new Studio exact render and publish ends in the shared 44.1 kHz,
+192 kbps production conform pass. Spatial stereo files are folded to one retained
+channel after runtime decode to reduce positional buffer memory.
 
 ## Efficiency budget
-- One decoded `AudioBuffer` per clip, shared across all sources.
+- One decoded `AudioBuffer` per loaded clip, shared across all sources. Only the
+  startup set is eager; contextual assets are loaded once on demand.
 - `MAX_VOICES` concurrent one-shots; over-cap plays are dropped (oldest-wins).
 - Footsteps gated by `d2 < SFX_RANGE_SQ` (reuses the renderer's per-entity squared
   distance) and a per-entity stride accumulator — no timers, no per-frame alloc.

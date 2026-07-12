@@ -15,7 +15,7 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 | `interactions.ts` | `handlePickedEntity`: the **only** file here that calls `IWorld`; routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud`. |
 | `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
 | `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
-| `audio.ts` | `GameAudio` (`audio` singleton): procedural SFX. |
+| `audio.ts` | `GameAudio` (`audio` singleton): compatibility facade mapping non-positional UI/event methods to typed sampled `sfx.playUi()` cues. |
 | `music.ts` | `MusicDirector` (`music` singleton): procedural zone/combat soundtrack. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings`: persisted Esc-menu options. |
@@ -29,14 +29,29 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
   callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
   through the `IWorld`-shaped interfaces passed to them. Do not import
   `Sim`/`ClientWorld` here.
-- **`audio.ts`/`music.ts` synthesize everything**, every procedural SFX and music
-  note is built in code via WebAudio, with nothing to load. **`sfx.ts`/`voice.ts`
-  are the exception:** they play pre-rendered clips under `public/audio/` (spatial
-  effects + NPC voice) keyed off their `*_manifest.generated.ts`; a missing clip is
-  a silent no-op (the dialogue/combat text stays the source of truth).
+- **`music.ts` synthesizes its soundtrack** in code via WebAudio. **`audio.ts` is
+  primarily a compatibility facade over `sfx.ts`:** personal UI/event methods
+  resolve to typed sampled `ui_*` cues. The release-specific `readyCheck()` chime
+  remains a small procedural WebAudio fallback until it has a dedicated sampled
+  catalog key. `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
+  keyed off their `*_manifest.generated.ts`; a missing clip is a silent no-op (the
+  dialogue/combat text stays the source of truth).
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`
   are called from `enterWorld` in `main.ts`, not at module load. `setVolume` is safe
   before init. (`voice.ts` uses a plain `Audio` element, so it has no gated init.)
+- **SFX mix and speed are runtime data.** The generated SFX manifest resolves the
+  category baseline plus per-key fine tune from `scripts/sfx/sfx_gain_map.json`
+  and per-key rate from `scripts/sfx/sfx_speed_map.json`. `sfx.ts` applies gain
+  through each `GainNode` and rate through `AudioBufferSourceNode.playbackRate`.
+  One-shot caller rates and jitter multiply the authored rate; loops use the
+  authored rate directly. `playbackRate` intentionally couples pitch and speed.
+  These values never rewrite, conform, or resample the audio asset.
+- **Production SFX packs are strict whole-catalog overrides.** On startup,
+  `sfx.ts` may load `/audio/sfx/runtime-pack.json` before preloading audio. The
+  pack can override only ordered track URLs, gain, and playback rate for the
+  exact compiled key set and catalog hash. Invalid or unavailable packs fall
+  back as a whole to the generated manifest. One-shots cycle tracks only when a
+  source is accepted; loops pin a track until stopped.
 - **Each module owns its `localStorage` key:** keybinds `woc_keybinds` (namespaced
   per character: `woc_keybinds:char:<id>` online, `woc_keybinds:offline:<class>:<name>`
   offline, with the bare key kept as a read-only legacy seed for fresh characters),
@@ -63,8 +78,12 @@ Extract non-trivial input/camera/perf math into a pure, unit-tested module (the
   edge action, extend `InputCallbacks.onUiKey`'s union and add a `case` in
   `Input.dispatchEdge`, then wire it where `new Input(...)` is constructed in
   `main.ts`. Action-bar slots (`slot0..11`) already route to `onAbility`.
-- **A new SFX:** add a method to `GameAudio` composed from the private `tone()`
-  /`noise()` primitives; call it from `main.ts`/HUD via the `audio` singleton.
+- **A new SFX:** add the catalog entry and sampled asset, regenerate
+  `sfx_manifest.generated.ts`, and route the typed key through `sfx.ts`. Personal
+  UI/event call surfaces stay on `GameAudio`; author and publish them through the
+  SFX Studio or the deterministic UI generator. Tune cross-clip gain and speed
+  through the Studio-backed checked-in maps, never by editing the generated
+  manifest or baking those values into the asset.
 - **A new music cue/zone:** add a `MusicZone`, a `composeX()` theme, register it
   in the `buildMusicThemes()` map (music.ts), and drive it from
   `music.update(zone, inCombat)`.
