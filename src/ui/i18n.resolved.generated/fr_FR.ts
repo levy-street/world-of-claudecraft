@@ -6001,6 +6001,10 @@ export const fr_FR: EnTranslations = {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+      },
       "bear_charge": {
         "name": "Ruée de Bruin",
         "description": "Charge un ennemi, génère 9 points de rage et l'étourdit pendant 1 s. Portée de 8-25 m. Forme de Bruin uniquement."

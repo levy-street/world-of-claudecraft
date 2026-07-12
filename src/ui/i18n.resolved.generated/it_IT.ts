@@ -6001,6 +6001,10 @@ export const it_IT: EnTranslations = {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+      },
       "bear_charge": {
         "name": "Carica di Bruin",
         "description": "Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Gittata di 7-23 metri. Solo in Forma di Bruin."

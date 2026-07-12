@@ -155,4 +155,10 @@ describe('choice-row dispel spells', () => {
     expect(mag?.options.some((o) => o.effect.grant?.ability === 'spellsteal')).toBe(true);
     expect(mag?.options.some((o) => o.effect.grant?.ability === 'counterspell')).toBe(false);
   });
+
+  it('the hunter level-8 row offers Startle Shot, not the baseline ranged interrupt', () => {
+    const hun = CHOICE_ROWS.hunter.rows.find((r) => r.level === 8);
+    expect(hun?.options.some((o) => o.effect.grant?.ability === 'startle_shot')).toBe(true);
+    expect(hun?.options.some((o) => o.effect.grant?.ability === 'counter_shot')).toBe(false);
+  });
 });

@@ -6001,6 +6001,10 @@ export const pt_BR: EnTranslations = {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+      },
       "bear_charge": {
         "name": "Investida de Bruin",
         "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8 a 25 m. Apenas Forma de Bruin."

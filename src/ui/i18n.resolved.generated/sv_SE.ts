@@ -6001,6 +6001,10 @@ export const sv_SE: EnTranslations = {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+      },
       "bear_charge": {
         "name": "Bruinrusning",
         "description": "Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform."

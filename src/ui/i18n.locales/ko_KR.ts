@@ -6693,4 +6693,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 집어삼키고 최대 생명력의 6%를 회복합니다.',
   'entities.abilities.spellsteal.name': '주문 도둑',
   'entities.abilities.spellsteal.description': '적에게서 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
+  'entities.abilities.startle_shot.name': '교란 사격',
+  'entities.abilities.startle_shot.description': '거친 사격으로 대상을 혼란시킵니다. 피해를 입으면 효과가 풀립니다.',
 };

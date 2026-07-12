@@ -6001,6 +6001,10 @@ export const tr_TR: EnTranslations = {
         "name": "Spellsteal",
         "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+      },
       "bear_charge": {
         "name": "Bruin Hücumu",
         "description": "Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil. Yalnızca Bruin Formu."

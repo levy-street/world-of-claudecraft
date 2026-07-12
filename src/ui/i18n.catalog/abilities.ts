@@ -1601,6 +1601,11 @@ const classAbilityNamesEn = {
         'Spellsteal',
         'Steals a beneficial magic effect from an enemy, transferring it to yourself.',
       ],
+      [
+        'startle_shot',
+        'Startle Shot',
+        'A wild shot that disorients the target. Any damage breaks the effect.',
+      ],
     ]),
   },
 };

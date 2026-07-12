@@ -6001,6 +6001,10 @@ export const zh_CN: EnTranslations = {
         "name": "窃法",
         "description": "从敌人身上窃取一个有益的魔法效果，转移到自己身上。"
       },
+      "startle_shot": {
+        "name": "惊扰射击",
+        "description": "一记狂野的射击，使目标迷乱。任何伤害都会解除该效果。"
+      },
       "bear_charge": {
         "name": "巨熊冲锋",
         "description": "冲向一名敌人，生成9点怒气并将其昏迷1秒。射程8-25码。仅限巨熊形态使用。"

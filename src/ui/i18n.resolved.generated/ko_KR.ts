@@ -6001,6 +6001,10 @@ export const ko_KR: EnTranslations = {
         "name": "주문 도둑",
         "description": "적에게서 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다."
       },
+      "startle_shot": {
+        "name": "교란 사격",
+        "description": "거친 사격으로 대상을 혼란시킵니다. 피해를 입으면 효과가 풀립니다."
+      },
       "bear_charge": {
         "name": "큰곰 돌진",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."

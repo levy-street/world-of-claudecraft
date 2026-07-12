@@ -2242,6 +2242,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
   voidfeast: r('shadow', 'venom', ['flame'], ['glow']),
   spellsteal: r('arcane', 'arcanePink', ['sunburst'], ['glow']),
+  startle_shot: r('nature', 'venom', ['sunburst'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),

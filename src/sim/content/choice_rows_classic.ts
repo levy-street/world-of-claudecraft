@@ -925,14 +925,14 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'ranged_control',
-      decision: 'ranged interrupt vs ground root vs frequent rooting shot',
+      decision: 'ranged disorient vs ground root vs frequent rooting shot',
       options: [
         {
-          id: 'hun_r8_counter_shot',
-          name: 'Hushing Shot',
-          description: 'Grants Hushing Shot.',
-          icon: 'counter_shot',
-          effect: { grant: { ability: 'counter_shot' } },
+          id: 'hun_r8_startle_shot',
+          name: 'Startle Shot',
+          description: 'Grants Startle Shot: a ranged disorient that breaks on any damage.',
+          icon: 'startle_shot',
+          effect: { grant: { ability: 'startle_shot' } },
         },
         {
           id: 'hun_r8_frost_trap',

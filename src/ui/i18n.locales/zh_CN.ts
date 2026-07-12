@@ -6356,4 +6356,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '吞噬一个魔法效果（敌人的增益或友方的减益），并治疗自身相当于最大生命值6%的生命。',
   'entities.abilities.spellsteal.name': '窃法',
   'entities.abilities.spellsteal.description': '从敌人身上窃取一个有益的魔法效果，转移到自己身上。',
+  'entities.abilities.startle_shot.name': '惊扰射击',
+  'entities.abilities.startle_shot.description': '一记狂野的射击，使目标迷乱。任何伤害都会解除该效果。',
 };

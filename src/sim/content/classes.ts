@@ -4861,6 +4861,26 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health.',
   },
 
+  // Choice-row control spell (Talents 2.0 counterplay row): a ranged disorient that
+  // replaces the now-baseline interrupt option. Breaks on any damage, like Gouge.
+  startle_shot: {
+    id: 'startle_shot',
+    name: 'Startle Shot',
+    class: 'hunter',
+    learnLevel: 8,
+    cost: 25,
+    castTime: 0,
+    cooldown: 20,
+    range: 35,
+    minRange: 8,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    targetType: 'enemy',
+    effects: [{ type: 'incapacitate', duration: 4 }],
+    description: 'A wild shot that disorients the target for $d sec. Any damage breaks the effect.',
+  },
+
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants

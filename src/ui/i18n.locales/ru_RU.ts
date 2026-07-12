@@ -6830,4 +6830,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пожирает магический эффект (полезный у врага или вредный у союзника) и исцеляет вас на 6% максимального здоровья.',
   'entities.abilities.spellsteal.name': 'Кража заклинаний',
   'entities.abilities.spellsteal.description': 'Похищает у врага полезный магический эффект и переносит его на вас.',
+  'entities.abilities.startle_shot.name': 'Пугающий выстрел',
+  'entities.abilities.startle_shot.description': 'Шальной выстрел, дезориентирующий цель. Любой урон снимает эффект.',
 };

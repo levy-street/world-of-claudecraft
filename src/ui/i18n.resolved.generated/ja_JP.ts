@@ -6001,6 +6001,10 @@ export const ja_JP: EnTranslations = {
         "name": "呪文奪取",
         "description": "敵から有益な魔法効果を1つ奪い、自分に移す。"
       },
+      "startle_shot": {
+        "name": "かく乱の一矢",
+        "description": "荒々しい一矢で対象を混乱させる。ダメージを受けると効果は解除される。"
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"
