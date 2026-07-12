@@ -75,3 +75,32 @@ describe('social_window: delegated row listeners (no per-tick churn)', () => {
     expect(body).not.toContain('addEventListener');
   });
 });
+
+describe('social_window: Book of Deeds title spans (both roster surfaces)', () => {
+  // The pure row model carries the deed ID (social_view.test.ts); these pins
+  // hold the RENDER arm: each surface localizes through deedTitleText, hides
+  // entirely on '' (untitled/stale, never an empty decorated span), and emits
+  // the muted .soc-title INSIDE the ellipsized name cell. Deleting either
+  // span emission, either hide guard, or the localization call reds here.
+  it('friends rows localize the id, gate on it, and emit .soc-title inside the name', () => {
+    expect(painter).toContain(
+      "const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';",
+    );
+    expect(painter).toContain(
+      'const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : \'\';',
+    );
+    expect(painter).toContain('${esc(f.name)}${titleSpan}');
+  });
+
+  it('guild rows localize the id, gate on it, and place the title AFTER the rank chip', () => {
+    expect(painter).toContain(
+      "const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';",
+    );
+    expect(painter).toContain('<span class="soc-title">${esc(memberTitle)}</span>');
+    // name, then rank chip, then title: a long title trims off the tail and
+    // can never push the chip out of the ellipsized cell.
+    expect(painter).toContain(
+      '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}',
+    );
+  });
+});

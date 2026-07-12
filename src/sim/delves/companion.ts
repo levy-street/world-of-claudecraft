@@ -14,6 +14,7 @@
 // Sim (foreign quest/delve callers). The heal is a DIRECT hp mutation + heal/spellfx
 // emit (no aura). `src/sim`-pure: no DOM/Three/Math.random.
 
+import * as deedsMod from '../deeds';
 import type { SimContext } from '../sim_context';
 import {
   DELVE_COMPANION_HEAL_INTERVAL,
@@ -80,6 +81,8 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
         fx: 'tick',
       });
       ctx.maybeCompanionBark(run, owner.id, 'ally_revive');
+      // The rank 3 boon actually saved someone.
+      deedsMod.onCompanionReviveForDeeds(ctx, owner.id);
     }
   }
   if (owner.dead) {

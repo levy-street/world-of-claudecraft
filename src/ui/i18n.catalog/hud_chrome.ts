@@ -1,7 +1,7 @@
 // i18n source catalog - in-game HUD chrome strings that were previously hard-coded
 // at their call sites (emote wheel/editor, swing timer, rest indicator, mobile
 // controls, minimap/compass/clock widgets, DPS/HPS meters formatting). English
-// values only; the 13 locale translations live in src/ui/i18n.locales/<lang>.ts
+// values only; the locale translations live in src/ui/i18n.locales/<lang>.ts
 // (the runtime-authoritative overlays), filled by the maintainer at release.
 //
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
@@ -363,6 +363,7 @@ export const hudChromeStrings = {
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
+    deeds: 'Deeds',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -434,6 +435,24 @@ export const hudChromeStrings = {
       'Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.',
     doneBodyTouch:
       'You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting.',
+    // Appended to the slay-step body (hud.tutorial.slayBody) so first-time players
+    // learn HOW to fight, not just what to fight: playtesters reported the wolf
+    // step never explains targeting. Keyboard/mouse points at the actual bound
+    // target key (Tab by default, see src/game/keybinds.ts) and a click; the
+    // touch variant taps instead, matching the other *Touch keys in this block.
+    // English-only add, WORDY by M16, so the five non-Latin overlays carry real
+    // fills below.
+    slayTargetHint:
+      'New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.',
+    slayTargetHintTouch:
+      'New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.',
+    // Shown as a short bulleted list under the closing "done" card so a brand-new
+    // player has somewhere to go right after the last tutorial step, instead of
+    // being dropped into the open world with no pointer (see tutorial.ts).
+    nextTipsTitle: 'Where to next',
+    nextTipQuestLog: 'Open your Quest Log ({key}) to find your next task nearby.',
+    nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
+    nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {
@@ -1214,6 +1233,12 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
+    // Playtester-clarity fix: new players did not know Harvest is a separate,
+    // no-cost gathering action (not a profession skill check) that extracts raw
+    // crafting materials (hide, fang, silk, and the rest of the component list
+    // below) from the corpse, on top of any coin or items taken with Take All.
+    harvestButtonTooltip:
+      'Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
@@ -1444,6 +1469,9 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
+    // Playtester-clarity fix: pairs with corpseHarvest.harvestButtonTooltip so
+    // the two loot-window buttons read as clearly distinct actions.
+    takeAllTooltip: 'Take All: collect every coin and item in this loot window.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare
@@ -1679,6 +1707,20 @@ export const hudChromeStrings = {
     linkedAs: 'Linked as {login}',
     unlink: 'Unlink GitHub',
   },
+  // Steam account link (the deeds achievement mirror), the stacked card beside
+  // the GitHub one on character select. Renders only when the server's
+  // /api/status advert says the Steam surface is lit; linking itself is
+  // desktop-app only (the shell mints the session ticket), web shows status +
+  // Unlink. Linking is never a sign-in method.
+  steam: {
+    title: 'Steam',
+    link: 'Link Steam',
+    unlink: 'Unlink Steam',
+    linked: 'Linked to Steam account {id}',
+    benefits:
+      'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
+    noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+  },
   // The Ravenpost mailbox window + envelope indicator. Authored letter
   // sender/subject/body localize via entities.letters.* (world_entity_i18n),
   // not here; these are the window chrome and the structured mailResult lines.
@@ -1909,5 +1951,86 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+  },
+  // The Book of Deeds window: the deed catalog browser (summary strip,
+  // category rail, entry cards, title picker), the watchlist HUD tracker, and
+  // the unlock moment (banner, log lines, retro catch-up summary). Deed
+  // names, descriptions, and title strings are sim content localized through
+  // deed_i18n.ts, never through these keys.
+  deeds: {
+    title: 'Book of Deeds',
+    close: 'Close the Book of Deeds',
+    searchPlaceholder: 'Search deeds',
+    searchAria: 'Search deeds by name',
+    renownLabel: 'Renown',
+    countLabel: '{earned}/{total} deeds',
+    completionAria: 'Deeds earned: {earned} of {total}',
+    recentLabel: 'Recent:',
+    nearestLabel: 'Nearly there:',
+    filterGroupAria: 'Filter deeds',
+    filterAll: 'All',
+    filterEarned: 'Earned',
+    filterUnearned: 'Unearned',
+    filterNearly: 'Nearly done',
+    categoriesAria: 'Deed categories',
+    catProgression: 'Progression',
+    catCombat: 'Combat',
+    catDungeon: 'Dungeons',
+    catDelve: 'Delves',
+    catChronicle: 'Chronicles',
+    catCollection: 'Collection',
+    catPvp: 'PvP and Sport',
+    catSocial: 'Social',
+    catExploration: 'Exploration',
+    catFeat: 'Feats',
+    categoryCountAria: '{category}: {earned} of {visible} deeds earned',
+    emptyCategory: 'No deeds match here.',
+    progressText: '{current}/{target}',
+    progressAria: 'Progress: {current} of {target}',
+    renownChip: '{renown} Renown',
+    earnedDate: 'Earned {date}',
+    featRibbon: 'Feat',
+    hiddenBadge: 'Hidden',
+    titleChip: 'Title reward',
+    watch: 'Watch',
+    unwatch: 'Unwatch',
+    watchFull: 'Watchlist full ({cap} max)',
+    watchAria: 'Watch {name} on the HUD tracker',
+    unwatchAria: 'Stop watching {name}',
+    titlesSection: 'Titles',
+    titlesAria: 'Choose your displayed title',
+    titlesNone: 'No Title',
+    titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
+    unlockedBanner: 'Deed accomplished: {name}',
+    unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
+    retroSummary: 'Your chronicle catches up: {count} deeds recorded.',
+    broadcastLine: '{name} has accomplished a deed: {deed}',
+    rarityLine: 'Earned by {percent} of adventurers',
+    trackerLabel: 'Deeds',
+    collapseHint: 'Collapse deed tracker',
+    expandHint: 'Expand deed tracker',
+    // Compact touch tier: the tracker header is a count chip that opens the Book
+    // of Deeds dialog rather than toggling the inline watch list.
+    openBookHint: 'Open the Book of Deeds',
+    charTitleLabel: 'Title',
+    charTitleNone: 'No title chosen',
+    charOpenBook: 'Book of Deeds',
+    // The Renown tab of the high-score window: tab label, the deeds-board
+    // column headers (rank/name reuse the shared game.leaderboard.* headers,
+    // the Renown column reuses renownLabel above), the viewer's standing
+    // line, and the empty-board state.
+    lbTab: 'Renown',
+    lbDeedsCol: 'Deeds',
+    lbTitleCol: 'Title',
+    lbSelf: 'Your standing: rank {rank}, top {percent} percent',
+    lbEmpty: 'No ranked chroniclers yet.',
+    // The options-window account row (accounts.deed_broadcasts): whether a
+    // marquee unlock is shared with guildmates and followers.
+    broadcastsLabel: 'Share deed unlocks with guild and friends',
+    // The name-plus-title display pattern every titled surface composes
+    // through (chat sender, target frame): the bracket decoration and its
+    // placement around the name live HERE so a locale owns both. Non-wordy
+    // after placeholder strip, so no forced non-Latin fills.
+    titledName: '{name} [{title}]',
   },
 };

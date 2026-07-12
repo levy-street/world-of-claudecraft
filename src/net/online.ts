@@ -1,11 +1,7 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import {
-  isDesktopAppRuntime,
-  normalizeOrigin,
-  runtimeApiOrigin,
-  runtimeWebSocketUrl,
-} from '../runtime';
+import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN } from '../client_origin';
+import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
@@ -25,6 +21,7 @@ import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/w
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
+import { freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -34,6 +31,7 @@ import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
+  type DeedStats,
   type DungeonDifficulty,
   type Entity,
   type EquipSlot,
@@ -66,6 +64,8 @@ import {
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
   type DailyRewardStatus,
+  type DeedsLeaderboardPage,
+  type DeedsRarity,
   type DelveCompanionInfo,
   type DelveDailyInfo,
   type DelveRunInfo,
@@ -142,16 +142,13 @@ export function buildWebSocketUrl(protocol: string, host: string): string {
   return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
-export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
-export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
-export const DESKTOP_APP = isDesktopAppRuntime();
-export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
-
-export function apiUrl(path: string, base = ''): string {
-  if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
-  return origin ? `${origin}${path}` : path;
-}
+export {
+  apiUrl,
+  DESKTOP_API_ORIGIN,
+  DESKTOP_APP,
+  NATIVE_API_ORIGIN,
+  NATIVE_APP,
+} from '../client_origin';
 
 export function buildWebSocketAuthMessage(
   token: string,
@@ -512,6 +509,20 @@ export class Api {
     await this.post('/api/account/deactivate', { username, password });
   }
 
+  // The account's deed-broadcast setting (accounts.deed_broadcasts): whether a
+  // marquee unlock fans out to guildmates and followers. Read/write pair for
+  // the options toggle; both need the signed-in bearer. A malformed read body
+  // conservatively reads as enabled (the column default).
+  async deedBroadcasts(): Promise<boolean> {
+    const data = await this.get('/api/deeds/broadcasts');
+    return data.enabled !== false;
+  }
+
+  async setDeedBroadcasts(enabled: boolean): Promise<boolean> {
+    const data = await this.post('/api/deeds/broadcasts', { enabled });
+    return data.enabled === true;
+  }
+
   // Request a verified email change: server mails a confirm link to the new
   // address and a notice to the old one. The address only changes on verify.
   async changeEmail(password: string, newEmail: string): Promise<void> {
@@ -772,6 +783,34 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // ── Steam link (deed achievement mirror) ───────────────────────────────────
+  // The public capability advert: whether this server has the Steam surface
+  // lit. Read BEFORE any authed steam call so a dark server renders no link UI.
+  async steamAdvert(): Promise<boolean> {
+    try {
+      const data = await this.get('/api/status');
+      return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Current account's Steam link status ({ enabled, linked, steamId? }).
+  async steamStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/steam/status');
+  }
+
+  // Link via a desktop-shell session ticket; the server verifies it upstream
+  // and answers the verified id (never client-named).
+  async steamLink(ticket: string): Promise<{ linked: boolean; steamId: string }> {
+    return this.post('/api/steam/link', { ticket });
+  }
+
+  // Unlink Steam from the current account. Idempotent.
+  async unlinkSteam(): Promise<void> {
+    await this.delete('/api/steam/link', {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -1010,6 +1049,7 @@ function blankEntity(id: number): Entity {
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    title: null,
   };
 }
 
@@ -1097,6 +1137,15 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldDeeds: the Book of Deeds self mirror, from the snapshot self
+  // (`s.deeds`/`s.dstats` heavy-gated, `s.renown`/`s.atitle` per-tick diffed).
+  // PRESENTATION-ONLY EVENTS: `deedUnlocked` rides the events queue for HUD
+  // toasts and must NEVER mutate these mirrors; snapshot state is the single
+  // authority, so reconnects and missed event frames cannot drift them. ---
+  deedsEarned = new Map<string, string>();
+  deedStats: DeedStats = freshDeedStats();
+  renown = 0;
+  activeTitle: string | null = null;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -1248,7 +1297,37 @@ export class ClientWorld implements IWorld {
     this.openSocket();
     // input stream at sim rate
     this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
+
+  // Mobile browsers suspend JS timers AND the network stack together while a
+  // tab is backgrounded (screen lock, app switch): iOS Safari and Android
+  // Chrome both routinely kill the underlying socket without ever delivering
+  // its close event to a frozen page, and any pending reconnect setTimeout is
+  // itself throttled to roughly once a minute in the background. Purely
+  // event-driven reconnect (onclose -> backoff -> retry) then leaves the
+  // player stuck on a zombie "connected" socket, or several backoff steps
+  // behind, the moment they foreground the app again: reported as frequent
+  // disconnects even though most drops are really just late reconnects. On
+  // resume, force a real state check and retry immediately instead of
+  // waiting for a close event or the rest of the backoff delay.
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState !== 'visible') return;
+    if (this.sessionEnded) return;
+    if (this.ws.readyState === WebSocket.OPEN) return;
+    if (this.reconnectTimer !== undefined) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+      this.openSocket();
+      return;
+    }
+    // No reconnect scheduled yet but the socket is not open: onclose was
+    // never delivered while suspended (the zombie-socket case). Drive the
+    // same path a real close would have.
+    if (this.connected) this.socketClosed();
+  };
 
   private openSocket(): void {
     // when a realm was picked, connect to that realm's origin; otherwise the
@@ -1277,8 +1356,7 @@ export class ClientWorld implements IWorld {
     this.connected = false;
     if (this.sessionEnded) return;
     if (this.reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
-      this.sessionEnded = true;
-      clearInterval(this.sendTimer);
+      this.endSession();
       this.onDisconnect?.('Connection to the server was lost.');
       return;
     }
@@ -1295,6 +1373,9 @@ export class ClientWorld implements IWorld {
     this.sessionEnded = true;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   close(): void {
@@ -1542,7 +1623,7 @@ export class ClientWorld implements IWorld {
       if (this.socialInfo && Array.isArray(msg.list)) {
         const byId = new Map<
           number,
-          { x: number; z: number; zone: string; status: PresenceStatus }
+          { x: number; z: number; zone: string; status: PresenceStatus; title?: string | null }
         >();
         for (const e of msg.list) byId.set(e.id, e);
         const apply = (arr: FriendInfo[]) => {
@@ -1554,6 +1635,9 @@ export class ClientWorld implements IWorld {
               m.zone = u.zone;
               m.status = u.status;
               m.online = true;
+              // rides only on servers that send it; an older server's frame
+              // must not wipe the DB-sourced roster title
+              if (u.title !== undefined) m.activeTitle = u.title;
             }
           }
         };
@@ -1661,6 +1745,7 @@ export class ClientWorld implements IWorld {
         e.dungeonId = w.dgn ?? null;
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
+        e.title = w.title ?? null; // Book of Deeds active title (a deed id)
         if (e.kind === 'npc') {
           const def = NPCS[e.templateId];
           e.questIds = def ? [...def.questIds] : [];
@@ -1990,6 +2075,23 @@ export class ClientWorld implements IWorld {
       // "no bank"); away from a banker the server encodes it as null. Never default
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
+      // --- IWorldDeeds self-decode: `deeds`/`dstats` are heavy-gated,
+      // `renown`/`atitle` per-tick diffed (all four delta-omitted: a missing
+      // key keeps the prior mirror). The wire carries plain objects/arrays
+      // (Maps and Sets do not survive JSON.stringify), so the earned Map and
+      // both stat Sets rebuild here. `deedUnlocked` events are presentation
+      // only and never touch these mirrors. ---
+      if (s.deeds !== undefined) this.deedsEarned = new Map(Object.entries(s.deeds ?? {}));
+      if (s.dstats !== undefined && s.dstats) {
+        this.deedStats = {
+          counters: { ...freshDeedStats().counters, ...(s.dstats.counters ?? {}) },
+          itemsDiscovered: new Set(s.dstats.itemsDiscovered ?? []),
+          visited: new Set(s.dstats.visited ?? []),
+          dungeonClears: s.dstats.dungeonClears ?? {},
+        };
+      }
+      if (s.renown !== undefined) this.renown = s.renown ?? 0;
+      if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
@@ -2600,6 +2702,33 @@ export class ClientWorld implements IWorld {
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
   }
+  // --- IWorldDeeds: title selection. No optimistic local write (the bank
+  // precedent): the mirror updates from the `atitle` snapshot echo once the
+  // sim validator accepts, so a rejected send leaves the client untouched. ---
+  setActiveTitle(deedId: string | null): void {
+    this.cmd({ cmd: 'deed_set_title', deedId });
+  }
+  // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
+  // async-read variant), resolving the endpoint payload verbatim or null on
+  // any failure (the facet's documented no-data value; the window hides the
+  // slot). The consumer caches per window-open, so no TTL cache here.
+  async deedsRarity(): Promise<DeedsRarity | null> {
+    try {
+      const res = await fetch(apiUrl('/api/deeds/rarity', this.base));
+      if (!res.ok) return null;
+      const data = (await res.json()) as DeedsRarity;
+      if (
+        typeof data?.totalEligible !== 'number' ||
+        typeof data?.earned !== 'object' ||
+        data.earned === null
+      ) {
+        return null;
+      }
+      return data;
+    } catch {
+      return null;
+    }
+  }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
   // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy
@@ -2795,6 +2924,42 @@ export class ClientWorld implements IWorld {
         pageCount: data.pageCount ?? 1,
         total: data.total ?? data.leaders?.length ?? 0,
         pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+
+  // Renown board (REST GET, no wire command): ?board=deeds ranks ACCOUNTS by
+  // lifetime deed Renown, character-faced and global-only. The bearer rides
+  // the read so a ranked caller's `self` standing comes back on the page; any
+  // failure (offline, 401, non-JSON) resolves the empty page like the other
+  // boards, never a throw.
+  async deedsLeaderboard(
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+  ): Promise<DeedsLeaderboardPage> {
+    const empty: DeedsLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=deeds&page=${page}&pageSize=${pageSize}`, this.base),
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+        ...(data.self ? { self: data.self } : {}),
       };
     } catch {
       return empty;

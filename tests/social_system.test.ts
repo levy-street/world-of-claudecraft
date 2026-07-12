@@ -12,6 +12,7 @@ import {
   type SocialTransport,
   validateGuildName,
 } from '../server/social';
+import type { SimEvent } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -19,7 +20,7 @@ import {
 // ---------------------------------------------------------------------------
 
 class FakeDb implements SocialDb {
-  private chars = new Map<number, CharInfo>();
+  private chars = new Map<number, CharInfo & { activeTitle: string | null }>();
   private friends = new Map<number, Set<number>>();
   blocks = new Map<number, Set<number>>();
   private guilds = new Map<number, string>();
@@ -27,7 +28,13 @@ class FakeDb implements SocialDb {
   private nextGuildId = 1;
 
   addChar(id: number, name: string, cls = 'warrior', level = 10, realm = 'Claudemoon'): void {
-    this.chars.set(id, { id, name, cls, level, realm });
+    this.chars.set(id, { id, name, cls, level, realm, activeTitle: null });
+  }
+
+  // Test helper mirroring the state->>'activeTitle' column read (a deed id or null).
+  setActiveTitle(id: number, deedId: string | null): void {
+    const c = this.chars.get(id);
+    if (c) c.activeTitle = deedId;
   }
 
   async findCharacterByName(name: string): Promise<CharInfo | null> {
@@ -49,7 +56,7 @@ class FakeDb implements SocialDb {
   async removeFriend(c: number, f: number): Promise<void> {
     this.friends.get(c)?.delete(f);
   }
-  async listFriends(c: number): Promise<CharInfo[]> {
+  async listFriends(c: number): Promise<(CharInfo & { activeTitle: string | null })[]> {
     return [...(this.friends.get(c) ?? [])].map((id) => this.chars.get(id)!).filter(Boolean);
   }
   async whoFriended(c: number): Promise<number[]> {
@@ -120,7 +127,9 @@ class FakeDb implements SocialDb {
   }
   async guildMembers(
     guildId: number,
-  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]> {
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  > {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({
@@ -213,6 +222,10 @@ class FakeTransport implements SocialTransport {
   }
   onBlocksChanged(id: number, ids: number[]): void {
     this.blockSets.set(id, ids);
+  }
+  founded: number[] = [];
+  onGuildFounded(id: number): void {
+    this.founded.push(id);
   }
   isIgnoring(recipientId: number, senderCharacterId: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
@@ -485,6 +498,22 @@ describe('guilds', () => {
     expect(h.tx.errorsFor(2).join()).toMatch(/already exists/i);
   });
 
+  it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
+    // Every refusal arm must stay silent: an invalid name, then a real
+    // founding, then a duplicate name, then a create while already guilded.
+    await h.svc.guildCreate(h.actor(1), 'no');
+    expect(h.tx.founded).toEqual([]);
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    expect(h.tx.founded).toEqual([1]);
+    await h.svc.guildCreate(h.actor(2), 'iron vanguard');
+    await h.svc.guildCreate(h.actor(1), 'Second Banner');
+    expect(h.tx.founded).toEqual([1]);
+    // A JOIN never counts as founding.
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    expect(h.tx.founded).toEqual([1]);
+  });
+
   it('invites, accepts, and broadcasts the join to all members', async () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');
@@ -616,6 +645,65 @@ describe('guilds', () => {
     ).toBe(true);
     expect(h.tx.eventsFor(2).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
     expect(h.tx.eventsFor(3)).toHaveLength(0); // Gimel is not in the guild
+  });
+
+  it('the snapshot carries each friend and roster member activeTitle (deed id or null)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.friendAdd(h.actor(1), 'Gimel');
+    h.db.setActiveTitle(2, 'prog_veteran');
+    h.db.setActiveTitle(3, null);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.activeTitle).toBe('prog_veteran');
+    expect(aleph?.activeTitle).toBeNull();
+    const gimel = snap.friends.find((f) => f.name === 'Gimel');
+    expect(gimel?.activeTitle).toBeNull();
+    h.db.setActiveTitle(3, 'hid_saul_footnote');
+    const snap2 = await h.svc.snapshot(1);
+    expect(snap2.friends.find((f) => f.name === 'Gimel')?.activeTitle).toBe('hid_saul_footnote');
+  });
+
+  it('stamps the sender title (a deed id) on guild and officer chat, omitted when untitled', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.clear();
+    // titled sender: the deed ID rides fromTitle on every delivered copy
+    const titled = { ...h.actor(1), activeTitle: 'prog_veteran' };
+    expect(await h.svc.guildChat(titled, 'hail')).toBe(true);
+    for (const id of [1, 2]) {
+      const line = h.tx.eventsFor(id).find((e) => e.type === 'chat')!;
+      expect(line.type === 'chat' && line.fromTitle).toBe('prog_veteran');
+    }
+    // untitled sender (null and absent alike): the key is omitted entirely
+    h.tx.clear();
+    expect(await h.svc.guildChat({ ...h.actor(1), activeTitle: null }, 'plain')).toBe(true);
+    const plain = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('fromTitle' in plain).toBe(false);
+    // officer chat stamps the same way, and omits the key untitled
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    h.tx.clear();
+    expect(await h.svc.officerChat(titled, 'ranks')).toBe(true);
+    const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect(officer.type === 'chat' && officer.fromTitle).toBe('prog_veteran');
+    h.tx.clear();
+    expect(await h.svc.officerChat({ ...h.actor(1), activeTitle: null }, 'bare')).toBe(true);
+    const bareOfficer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('fromTitle' in bareOfficer).toBe(false);
+  });
+
+  it('keeps the chat fromTitle field type identical across SocialEvent and SimEvent', () => {
+    // The guild/officer relay frame is its own union member (no fromPid), but
+    // the client casts it into the one SimEvent switch, so the title field
+    // must stay assignment-compatible in both directions.
+    type SocialTitle = Extract<SocialEvent, { type: 'chat' }>['fromTitle'];
+    type SimTitle = Extract<SimEvent, { type: 'chat' }>['fromTitle'];
+    const a: SocialTitle = 'prog_veteran' as SimTitle;
+    const b: SimTitle = 'prog_veteran' as SocialTitle;
+    expect(a).toBe(b);
   });
 
   it('suppresses guild chat from a player the recipient ignores', async () => {
@@ -921,5 +1009,96 @@ describe('guild calendar events', () => {
     });
     expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
     expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Deed unlock broadcast: marquee unlocks fan out to online guildmates and to
+// the players who friended the earner. The caller (game.ts) owns the marquee
+// bar, the retro gate, and the opt-out; this layer owns audience resolution,
+// the ignore filter, and the id-based event shape.
+// ---------------------------------------------------------------------------
+
+describe('broadcastDeedUnlock', () => {
+  // Earner 1 leads a guild seating 2 and 3; 4 follows the earner from outside
+  // the guild; 5 is unrelated.
+  async function deedSetup() {
+    const h = setup();
+    h.add(1, 'Earner');
+    h.add(2, 'Guildie');
+    h.add(3, 'Officerin');
+    h.add(4, 'Follower');
+    h.add(5, 'Stranger');
+    for (const id of [1, 2, 3, 4, 5]) h.tx.setOnline(id);
+    const created = await h.db.createGuildWithLeader('Bookbinders', 1);
+    if ('error' in created) throw new Error('guild seed failed');
+    await h.db.addGuildMemberAtomic(created.guildId, 2, 'member', 50);
+    await h.db.addGuildMemberAtomic(created.guildId, 3, 'officer', 50);
+    await h.db.addFriend(4, 1); // 4 put the earner on THEIR list
+    return h;
+  }
+
+  it('delivers one id-based frame to online guildmates and followers, never the earner', async () => {
+    const h = await deedSetup();
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    // The exact wire shape: ids and the earner's name only. Pinning the FULL
+    // object also proves no `text` field rides along (the server never sends
+    // English for this event; the client composes the visible line).
+    const expected = { type: 'deedBroadcast', characterName: 'Earner', deedId: 'prog_veteran' };
+    expect(h.tx.eventsFor(2)).toEqual([expected]);
+    expect(h.tx.eventsFor(3)).toEqual([expected]);
+    expect(h.tx.eventsFor(4)).toEqual([expected]);
+    expect(h.tx.eventsFor(1)).toEqual([]); // the earner's toast is client-side
+    expect(h.tx.eventsFor(5)).toEqual([]); // strangers never hear it
+  });
+
+  it('skips offline members and recipients who ignore the earner', async () => {
+    const h = await deedSetup();
+    h.tx.setOffline(2);
+    await h.db.addBlock(3, 1); // 3 ignores the earner
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'cmb_thunzharr');
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toHaveLength(1);
+  });
+
+  it('skips a recipient the earner has ignored', async () => {
+    const h = await deedSetup();
+    await h.db.addBlock(1, 2); // the earner blocks guildmate 2
+    await h.db.addBlock(1, 4); // and follower 4 (blockAdd cannot unfriend THEIR edge)
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toHaveLength(1); // unblocked guildmate still hears it
+  });
+
+  it('delivers exactly once to a follower who is also a guildmate', async () => {
+    const h = await deedSetup();
+    await h.db.addFriend(2, 1); // guildmate 2 also follows the earner
+    await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
+    expect(h.tx.eventsFor(2)).toHaveLength(1);
+  });
+
+  it('is a quiet no-op for a guildless earner nobody follows', async () => {
+    const h = setup();
+    h.add(9, 'Hermit');
+    h.tx.setOnline(9);
+    await h.svc.broadcastDeedUnlock(h.actor(9), 'prog_veteran');
+    expect(h.tx.delivered.size).toBe(0);
+  });
+
+  it('keeps the SocialEvent and SimEvent declarations structurally identical', () => {
+    // The event is declared in BOTH unions (SocialEvent for server delivery,
+    // SimEvent so the one client event switch stays well-typed) and the client
+    // casts one to the other on the events-frame passthrough. A field added or
+    // retyped on either side alone reds tsc here: the literal must satisfy the
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    const fromSocial: Extract<SimEvent, { type: 'deedBroadcast' }> = {
+      type: 'deedBroadcast',
+      characterName: 'Earner',
+      deedId: 'prog_veteran',
+    } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
+    const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
+    expect(fromSim).toEqual(fromSocial);
   });
 });

@@ -46,19 +46,29 @@ const GROUPS: Group[] = [
       { keys: ['M'], label: 'controls.worldMap' },
       { keys: ['B'], label: 'controls.bags' },
       { keys: ['N'], label: 'guide.controls.talents' },
+      { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
+      { keys: ['T'], label: 'guide.controls.crafting' },
       { keys: ['O'], label: 'controls.friends' },
       { keys: ['G'], label: 'guide.controls.arena' },
+      { keys: ['Y'], label: 'guide.controls.valeCup' },
       { keys: ['K'], label: 'guide.controls.leaderboard' },
+      { keys: ['I'], label: 'guide.controls.calendar' },
+      { keys: ['U'], label: 'guide.controls.discord' },
       { keys: ['V'], label: 'controls.nameplates' },
       { keys: ['X'], label: 'controls.emoteWheel' },
-      { keys: ['Enter'], label: 'controls.chat' },
+      { keys: ['Enter', 'NumEnter'], label: 'controls.chat' },
     ],
+  },
+  {
+    heading: 'guide.controls.groupPet',
+    rows: [{ keys: ['Ctrl+1', 'Ctrl+5'], label: 'guide.controls.petBar' }],
   },
   {
     heading: 'guide.controls.groupCamera',
     rows: [
       { keys: ['controls.rightDrag'], label: 'controls.mouselook' },
       { keys: ['controls.leftDrag'], label: 'controls.orbit' },
+      { keys: ['guide.controls.bothMouse'], label: 'guide.controls.runForward' },
       { keys: ['controls.mouseWheel'], label: 'controls.zoom' },
     ],
   },
@@ -97,6 +107,7 @@ export const controls: GuidePage = {
         <h1>${esc(t('guide.nav.controls'))}</h1>
         ${lead('guide.controls.intro')}
         ${groups}
+        <p>${esc(t('guide.controls.attackMoveNote'))}</p>
         <section class="guide-block">
           <h2>${esc(t('guide.controls.mobileHeading'))}</h2>
           <p>${esc(t('guide.controls.mobileBody'))}</p>

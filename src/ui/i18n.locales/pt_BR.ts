@@ -51,7 +51,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.professions': 'Profissões',
   'guide.nav.valeCup': 'Copa do Vale',
   'guide.professions.archetypeChooseBody':
-    'Você declara seu primeiro arquétipo por meio de uma missão de história do início da zona um que o aceita formalmente nessa identidade. Até completar essa missão, você ainda não escolheu arquétipo algum.',
+    'Declarar um arquétipo será um momento de história: uma missão que o aceita formalmente naquela identidade. Esse caminho ainda está sendo construído, então, por ora, cada personagem percorre o mundo com a escolha ainda pela frente, e cada ofício avança até o grau de qualidade raro nesse meio-tempo.',
   'guide.professions.archetypeChooseTitle': 'Escolhendo seu arquétipo',
   'guide.professions.archetypeIdentityBody':
     'Seu arquétipo ativo é uma declaração sobre quem o seu personagem é no mundo, reconhecida na forma como os outros e o próprio mundo se dirigem a você. As recompensas e os reconhecimentos exatos que o acompanham ainda estão sendo finalizados; volte aqui conforme o sistema for se completando.',
@@ -59,38 +59,38 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeIntro':
     'Cada um dos dez ofícios também representa um arquétipo, uma identidade mais ampla que você pode adotar além de simplesmente trabalhar naquele ofício. Seu arquétipo ativo é uma escolha única por vez, não uma lista de tarefas: você carrega um, e pode trocar depois se quiser.',
   'guide.professions.archetypeSwitchBody':
-    'Ter declarado um arquétipo uma vez não prende você a ele para sempre. Mudar para outro arquétipo exige antes completar uma missão repetível de "fazer as pazes" com o antigo, e a cada troca a reparação esperada da próxima vez fica um pouco mais exigente, para que trocar continue significativo em vez de gratuito.',
+    'Uma declaração também não será uma sentença perpétua. O plano é um ato repetível de fazer as pazes com o seu antigo ofício antes de assumir um novo, com a reparação ficando mais exigente a cada troca, para que a escolha continue significativa em vez de gratuita. Assim como a própria declaração, ele ainda está a caminho.',
   'guide.professions.archetypeSwitchTitle': 'Mudando de ideia',
   'guide.professions.archetypeTitle': 'Os dez arquétipos',
   'guide.professions.craftComboBody':
-    'Além da lista de receitas de um único ofício, a roda também aceita receitas combinadas que recorrem a dois ofícios vizinhos ao mesmo tempo, recompensando um personagem (ou uma dupla de parceiros de troca) que investiu em ofícios adjacentes no anel em vez de em um só isolado.',
+    'Além da lista de receitas de um único ofício, a roda também aceita receitas combinadas que recorrem a dois ofícios vizinhos ao mesmo tempo, recompensando um personagem que investiu em ofícios adjacentes no anel em vez de em um só isolado. O próprio artesão precisa dominar os dois ofícios; a perícia de um parceiro não pode substituir nenhuma das metades.',
   'guide.professions.craftComboTitle': 'Receitas combinadas',
   'guide.professions.craftIntro':
     'Dez ofícios de criação transformam materiais coletados em equipamentos e bens acabados: a Forja de Armaduras, a Forja de Armas e a Joalheria dão forma à matéria bruta em equipamento vestível; a Alquimia e a Engenharia avançam por tentativa e erro; a Culinária, a Escrivania e o Encantamento tocam, cada um, o produto de outros ofícios; a Alfaiataria e a Couraria trabalham a partir de moldes exatos. Juntos eles formam uma roda, com cada ofício ao lado de dois vizinhos e oposto a um outro.',
   'guide.professions.craftMasteryBody':
-    'Criar com sucesso desenvolve a perícia naquele ofício, e as receitas mais ricas ficam guardadas atrás de perícia mais alta: as receitas básicas estão abertas a qualquer um, enquanto as progressivamente mais avançadas pedem progressivamente mais maestria para serem tentadas. Aumentar sua perícia em um ofício é o caminho que leva dos bens simples de iniciante até as receitas mais ambiciosas.',
+    'Criar com sucesso desenvolve a perícia naquele ofício, e a perícia nunca tranca as receitas de um ofício longe de você: se você conhece uma receita e tem seus materiais, pode tentá-la. O que a perícia lhe compra, em vez disso, é qualidade, uma mão treinada produz um trabalho mais fino. A única exceção são as receitas combinadas, que pedem que você tenha se provado nos dois ofícios delas antes de se abrirem.',
   'guide.professions.craftMasteryTitle': 'Perícia e maestria',
   'guide.professions.craftRecipesBody':
-    'Cada ofício tem as próprias receitas, cada uma pedindo reagentes específicos que você coleta ou compra. As receitas mais básicas de cada ofício não pedem nada além de materiais comuns e podem ser feitas desde o comecinho, então você pode começar a trabalhar um ofício no momento em que o adota, em vez de esperar para desbloqueá-lo.',
+    'Cada receita pede reagentes específicos que você coleta ou compra. As receitas mais simples não pedem nada além de materiais comuns e podem ser criadas desde o comecinho, então você pode começar a trabalhar um ofício no momento em que o adota. As listas de receitas ainda estão sendo preenchidas: alguns ofícios aguardam suas primeiras receitas, e mais chegam conforme os ofícios crescem.',
   'guide.professions.craftRecipesTitle': 'Receitas e reagentes',
   'guide.professions.craftRingBody':
     'Os dez ofícios estão dispostos em um anel fixo, e a posição de um ofício nesse anel importa: ofícios vizinhos na roda têm mais em comum entre si do que ofícios em lados opostos. Comprometer-se com um ofício deve parecer entrar para uma família de ofícios aparentados, não escolher uma habilidade isolada.',
   'guide.professions.craftRingTitle': 'Uma roda de especialidades',
   'guide.professions.craftTitle': 'Os dez ofícios',
   'guide.professions.gatherIntro':
-    'Três ofícios de coleta permitem extrair matérias-primas diretamente do mundo: a Mineração arranca minério e pedra dos veios, a Lenharia derruba madeira dos bosques, e o Herborismo colhe ervas e plantas que crescem soltas. Cada um é acompanhado em separado, então trabalhar um nunca atrasa seu progresso em outro.',
+    'Três ofícios de coleta permitem extrair matérias-primas diretamente do mundo: a Mineração arranca minério e pedra dos veios, a Lenharia derruba madeira dos bosques, e o Herborismo colhe ervas e plantas que crescem soltas. Cada um é acompanhado em separado, então trabalhar um nunca atrasa seu progresso em outro. Novato em tudo isso? O Capataz Odell, em Eastbrook, tem uma tarefa curta, Um Ofício para Cada Mão, que guia você pela sua primeira colheita.',
   'guide.professions.gatherProficiencyBody':
-    'Cada colheita bem-sucedida aumenta sua proficiência naquele ofício de coleta. Uma proficiência mais alta inclina o que você tira de um nó para graus mais raros de material, do comum para cima, embora os graus mais raros continuem raros mesmo com proficiência alta. Mais prática nunca prejudica suas chances, só as melhora.',
-  'guide.professions.gatherProficiencyTitle': 'Proficiência e qualidade do material',
+    'Cada colheita bem-sucedida aumenta sua proficiência naquele ofício de coleta, e sua ficha de personagem acompanha cada ofício por conta própria. Mais prática nunca prejudica seu progresso, só o aumenta.',
+  'guide.professions.gatherProficiencyTitle': 'Proficiência',
   'guide.professions.gatherTitle': 'Coleta: Mineração, Lenharia e Herborismo',
   'guide.professions.gatherToolsBody':
-    'Vendedores oferecem ferramentas básicas para cada ofício de coleta, e as melhores podem ser criadas, então trabalhar um nó de recurso deve parecer cada vez mais capaz conforme você se equipa para isso, em vez de permanecer estático. Ferramentas de nível mais alto são o caminho pretendido para liberar acesso a nós mais ricos e trabalhá-los com mais eficiência em uma sessão longa.',
+    'Vendedores oferecem ferramentas básicas para cada ofício de coleta, e as melhores podem ser criadas. Nenhuma ferramenta é exigida para trabalhar um nó hoje: as ferramentas são a base para nós mais ricos que virão, onde picaretas, machados e foices de nível mais alto serão o caminho de entrada.',
   'guide.professions.gatherToolsTitle': 'Ferramentas do ofício',
   'guide.professions.gatherWhatBody':
-    'Veios de minério, bosques de madeira e canteiros de ervas ficam espalhados pelas zonas como pontos visíveis e sem dono. Aproxime-se de um e interaja com ele para colher o que houver ali. Depois que você colhe um nó, ele precisa de um tempo para se recuperar antes que você, pessoalmente, possa colhê-lo de novo, mas ele nunca bloqueia mais ninguém: outro jogador pode colher exatamente o mesmo nó nesse meio-tempo.',
+    'Veios de minério, bosques de madeira e canteiros de ervas ficam espalhados pelo Vale e pelo pântano como pontos visíveis e sem dono. Aproxime-se de um e interaja com ele para colher o que houver ali. Depois que você colhe um nó, ele precisa de um tempo para se recuperar antes que você, pessoalmente, possa colhê-lo de novo, mas ele nunca bloqueia mais ninguém: outro jogador pode colher exatamente o mesmo nó nesse meio-tempo.',
   'guide.professions.gatherWhatTitle': 'Nós de recurso',
   'guide.professions.intro':
-    'Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento nas estações de criação de dez ofícios diferentes e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.',
+    'Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.',
   'guide.valeCupPage.heading': 'A Copa do Vale',
   'guide.valeCupPage.howHeading': 'Como jogar',
   'guide.valeCupPage.howMatch':
@@ -126,10 +126,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cada time joga sob um estandarte. O capitão escolhe a nação, e se os dois lados hasteiam o mesmo, o time visitante joga com a paleta invertida.',
   'guide.valeCupPage.nationsHeading': 'As oito nações de estandarte',
   'guide.valeCupPage.rewardsBody':
-    'As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e pontos de recompensa diária vêm junto. Desertar de uma partida suspende sua vaga, e o Zelador não esquece.',
+    'As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e uma vitória também conta para as tarefas de recompensa do dia. Desertar de uma partida suspende sua vaga, e o Zelador não esquece.',
   'guide.valeCupPage.rewardsHeading': 'Regras da trégua',
   'guide.valeCupPage.rolesBody':
-    'Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento.',
+    'Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento. Nas categorias de um contra um e dois contra dois, todos jogam com o kit versátil, então a escolha de função ganha peso a partir do três contra três.',
   'guide.valeCupPage.rolesHeading': 'Funções esportivas',
   'guide.valeCupPage.spectateBody':
     'Uma partida acontece por vez no estádio, e qualquer um pode chegar e assistir das arquibancadas.',
@@ -4673,7 +4673,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O modo automático suaviza os efeitos CSS pesados (desfoque, brilho, movimento de fundo) com base no seu navegador e dispositivo. Reduza-o manualmente se a interface parecer lenta.',
   'guide.bestiary.heading': 'Bestiário',
   'guide.bestiary.intro':
-    'As criaturas do mundo, agrupadas por família. Estes são os inimigos que você encontra a céu aberto. As coisas mais mortais aguardam, sem listagem, atrás das portas das masmorras.',
+    'As criaturas do mundo, agrupadas por família. Estes são os inimigos do dia a dia que você encontra a céu aberto. Inimigos de elite e seus senhores da guerra se mantêm fora destas páginas, e as coisas mais mortais de todas aguardam atrás das portas das masmorras.',
   'guide.bestiary.levels': 'Níveis {min} a {max}',
   'guide.bestiary.levelsSame': 'Nível {min}',
   'guide.bestiary.rare': 'Raro',
@@ -4708,7 +4708,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.roleLabel': 'Atua como',
   'guide.classPage.specsHeading': 'Especializações',
   'guide.combat.growBody':
-    'Cada nível torna você mais resistente e libera novas habilidades, até chegar ao limite do nível {cap}. Cumprir missões é a forma mais rápida de subir; masmorras e exploração completam o resto.',
+    'Cada nível torna você mais resistente e libera novas habilidades, até chegar ao limite do nível {cap}. Cumprir missões é a forma mais rápida de subir; caçar, percorrer masmorras e incursões completam o resto.',
   'guide.combat.growTitle': 'Você fica mais forte a cada nível',
   'guide.combat.hitBody':
     'Ataques podem errar ou ser esquivados, e os do inimigo também, enquanto magias podem ser resistidas por completo. Lutar perto do seu próprio nível é o que faz seus golpes conectarem; quanto maior a diferença de nível, mais você ataca o ar.',
@@ -4726,7 +4726,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': 'Ação',
   'guide.controls.arena': 'Arena',
   'guide.controls.controllerBody':
-    'Controles também funcionam, e o suporte a controle vem ativado por padrão. O analógico esquerdo move, o direito ajusta a câmera, e os botões de ação e de ombro cobrem suas habilidades, o pulo e a interação. Abra qualquer janela para fazer surgir um ponteiro na tela para os menus. Você pode remapear os botões e ajustar a zona morta do analógico, a velocidade da câmera, a vibração e a visão invertida nas configurações de controle dentro das opções.',
+    'Controles também funcionam, e o suporte a controle vem ativado por padrão. O analógico esquerdo move, o direito ajusta a câmera, e os botões de ação e de ombro cobrem suas habilidades, o pulo e a interação. Abra uma janela como suas bolsas para fazer surgir um ponteiro na tela, e o menu do jogo é navegado diretamente com o direcional e os botões de ação. Você pode remapear os botões e ajustar a zona morta do analógico, a velocidade da câmera, a vibração e a visão invertida nas configurações de controle dentro das opções.',
   'guide.controls.controllerHeading': 'No controle',
   'guide.controls.cycleFriendly': 'Alternar alvo aliado',
   'guide.controls.gameMenu': 'Abrir o menu do jogo e as opções',
@@ -4735,16 +4735,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Movimento',
   'guide.controls.intro':
-    'Teclas padrão para desktop. Cada atalho pode ser alterado nas opções do jogo.',
+    'Teclas padrão para desktop. Cada atalho pode ser alterado nas opções do jogo, exceto Esc, que sempre abre o menu do jogo, e um atalho pode ser uma combinação com modificador, como Shift+Z.',
   'guide.controls.keyHeader': 'Tecla',
   'guide.controls.leaderboard': 'Placar de líderes',
   'guide.controls.mobileBody':
-    'Os controles de toque aparecem automaticamente em celulares e tablets: um analógico de movimento à esquerda, arraste em qualquer lugar à direita para olhar ao redor e botões na tela para suas habilidades e menus.',
+    'Os controles de toque aparecem automaticamente em celulares e tablets: um analógico de movimento à esquerda, arraste em qualquer outro lugar para olhar ao redor, junte dois dedos para dar zoom na câmera e botões na tela para suas habilidades e menus. Uma pequena seta no canto superior esquerdo mostra ou oculta os botões de menu, e o botão Mais ali guarda o resto das suas janelas.',
   'guide.controls.mobileHeading': 'No celular',
   'guide.controls.talents': 'Talentos',
   'guide.controls.targetFriendly': 'Mirar o aliado mais próximo',
   'guide.delvesPage.affixesBody':
-    'Incursões mais difíceis sorteiam um modificador que muda como a descida se desenrola, de mortos inquietos a ar viciado, até obras de teto que cedem. Eles elevam o perigo e a recompensa na mesma medida. Uma incursão com tema de cripta pode sortear qualquer um destes:',
+    'Incursões mais difíceis sorteiam um modificador que muda como a descida se desenrola, de mortos inquietos a ar viciado, até obras de teto que cedem. Eles elevam o perigo e a recompensa na mesma medida. Cada incursão recorre aos modificadores que combinam com seu tema; pelo reino afora, o conjunto é assim:',
   'guide.delvesPage.affixesHeading': 'Modificadores de incursão',
   'guide.delvesPage.affixesLabel': 'Modificadores possíveis',
   'guide.delvesPage.companionBody':
@@ -4776,7 +4776,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma incursão é uma pequena masmorra instanciada feita só para você e até um aliado, uma cópia privada na qual você não pode ser perturbado. Você a inicia a partir de um quadro mantido por um guardião de incursões pelo mundo, entra, luta descendo por um punhado de salas e termina num único guardião. As incursões são rápidas e feitas para serem repetidas, então uma incursão é um progresso confiável sempre que o mundo aberto seca.',
   'guide.delvesPage.whatHeading': 'O que é uma incursão',
   'guide.delvesPage.whereBody':
-    'A primeira incursão, o Relicário Desmoronado, abre na Colina do Relicário, no vale inicial do Vale de Eastbrook. O Irmão Halven cuida do quadro por lá, e vai mandar você descer assim que estiver pronto.',
+    'A primeira incursão, o Relicário Desmoronado, abre na Colina do Relicário, no vale inicial do Vale de Eastbrook. O Irmão Halven cuida do quadro por lá, e vai mandar você descer assim que estiver pronto. As rondas dele não param por aí: passados os Montículos dos Trolls, na orla norte do pântano de Mirefen, o mesmo guardião abre A Ladainha Afogada para os desbravadores que já ganharam firmeza.',
   'guide.delvesPage.whereHeading': 'Onde encontrar uma',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
@@ -4793,7 +4793,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.party':
     'As masmorras são feitas para um grupo de cinco. O raide de fim de jogo é para dez.',
   'guide.dungeonsPage.raidBody':
-    'Além de uma porta real selada aguarda um desafio de dez jogadores: uma luta de várias fases e um poder sem morte que o raide inteiro deve neutralizar em conjunto. Conquiste sua entrada e depois traga nove amigos.',
+    'Além de uma porta real selada aguarda um desafio de dez jogadores: uma luta de várias fases e um poder imortal que o raide inteiro precisa neutralizar em conjunto. Conquiste sua entrada e depois traga nove amigos.',
   'guide.dungeonsPage.raidName': 'O raide de fim de jogo',
   'guide.dungeonsPage.raidSize': 'Dez jogadores, nível {n}',
   'guide.dungeonsPage.sanctumBody':
@@ -4836,11 +4836,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a1':
     'Sim. O jogo inteiro é gratuito até o nível máximo, e o código-fonte é aberto no GitHub.',
   'guide.faqPage.a2':
-    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional libera apenas adornos cosméticos e nunca afeta poder ou progressão.',
+    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional apenas acrescenta adornos cosméticos e uma fatia do fundo de prêmios das recompensas diárias, e nunca afeta poder ou progressão.',
   'guide.faqPage.a3':
     'Sim. O jogo roda em um navegador de celular com controles de toque, e também há um lançador para desktop.',
   'guide.faqPage.a4':
-    'Sim. Existe um modo offline para um jogador instantâneo, e o mundo online é totalmente jogável sozinho, exceto pelas masmorras e pelo raide.',
+    'Sim. Existe um modo offline para um jogador instantâneo, e o mundo online é totalmente jogável sozinho, exceto pelas masmorras, pela raide e pelo chefe mundial.',
   'guide.faqPage.a5':
     'Nove, cobrindo os clássicos papéis de tanque, curandeiro e dano, cada uma com um sistema de recurso (fúria, mana ou energia) e suas próprias habilidades características.',
   'guide.faqPage.a6':
@@ -4914,7 +4914,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Sim. O jogo inteiro é gratuito até o nível máximo, e é de código aberto no GitHub.',
   'guide.home.faq.a2':
-    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional libera apenas adornos cosméticos e nunca afeta o poder.',
+    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional apenas acrescenta adornos cosméticos e uma fatia do fundo de prêmios das recompensas diárias, e nunca afeta o poder.',
   'guide.home.faq.a3':
     'Sim. Há um modo instantâneo para um jogador no seu navegador, além do mundo online compartilhado.',
   'guide.home.faq.a4':
@@ -4965,7 +4965,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.basicsHeading': 'O básico',
   'guide.howToPlay.controlsLink': 'Veja a referência completa de controles',
   'guide.howToPlay.deathBody':
-    'Se você cair, liberta seu espírito e revive no cemitério mais próximo, de volta com vida cheia, e depois segue até onde estava. Nenhuma experiência é perdida.',
+    'Se você cair, seu corpo fica onde tombou e você se ergue como um fantasma no cemitério mais próximo. Corra com seu espírito de volta até o corpo para reviver ali mesmo, sem penalidade alguma, ou aceite o Guardião Pálido no cemitério para um ressurgimento imediato ao custo de uma fraqueza passageira. Heróis recém-criados são poupados por completo da fraqueza, e nada do que você possui ou conquistou é jamais perdido.',
   'guide.howToPlay.deathTitle': 'A morte não é o fim',
   'guide.howToPlay.firstHeading': 'Seus primeiros 15 minutos',
   'guide.howToPlay.groupingBody':
@@ -4980,7 +4980,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aceite missões de pessoas com um marcador acima da cabeça, complete o objetivo e entregue-as por experiência, moedas e equipamento. O rastreador na tela mantém suas metas à vista.',
   'guide.howToPlay.questsTitle': 'Missões',
   'guide.howToPlay.reassure':
-    'Os talentos são liberados no nível 10 e podem ser redefinidos a qualquer momento, então suas escolhas iniciais nunca são permanentes. Experimente à vontade.',
+    'Os talentos são liberados no nível 10 e podem ser redefinidos a qualquer momento em que você estiver fora de combate, então suas escolhas iniciais nunca são permanentes. Experimente à vontade.',
   'guide.howToPlay.resourcesBody':
     'Feitiços e habilidades custam um recurso. Guerreiros acumulam Fúria lutando, ladinos gastam Energia que se recarrega sozinha, e todos os demais conjuram a partir de uma reserva de Mana.',
   'guide.howToPlay.resourcesTitle': 'Recursos',
@@ -4988,7 +4988,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Escolha uma classe e um visual, dê um nome ao seu herói e entre no mundo. Você pode criar mais personagens depois.',
   'guide.howToPlay.step1Title': 'Crie um personagem',
   'guide.howToPlay.step2Body':
-    'O Marechal Redbrook está esperando na cidade inicial. Fale com ele e aceite Lobos à Porta.',
+    'O Marechal Redbrook está esperando na cidade inicial com Lobos à Porta, e o Capataz Odell, ali perto, também tem trabalho. Fale com um deles para pegar sua primeira missão.',
   'guide.howToPlay.step2Title': 'Encontre sua primeira missão',
   'guide.howToPlay.step3Body':
     'Mova-se com W, A, S, D. Segure o botão direito do mouse e arraste para olhar ao redor. É quase tudo.',
@@ -5033,7 +5033,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.title': 'Não conseguimos encontrar essa página',
   'guide.placeholder.note': 'Esta parte do guia está a caminho.',
   'guide.questsPage.acceptBody':
-    'Pessoas com um marcador acima da cabeça têm trabalho para você. Fale com elas para aceitar uma missão. A sua primeiríssima é Lobos à Porta, do Marechal Redbrook em Eastbrook.',
+    'Pessoas com um marcador acima da cabeça têm trabalho para você. Fale com elas para aceitar uma missão. Em Eastbrook, o Marechal Redbrook espera com Lobos à Porta, uma das primeiras missões que você pode pegar.',
   'guide.questsPage.acceptTitle': 'Encontrando e aceitando',
   'guide.questsPage.heading': 'Missões',
   'guide.questsPage.intro':
@@ -5042,7 +5042,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Abata certos inimigos, colete itens ou interaja com algo no mundo. O rastreador na tela conta seu progresso conforme você avança. Se mudar de ideia, você pode abandonar uma missão do seu registro de missões e pegá-la de novo com quem a deu mais tarde.',
   'guide.questsPage.objectivesTitle': 'Objetivos',
   'guide.questsPage.partyBody':
-    'Membros do grupo por perto compartilham o crédito de abates e objetivos, então cumprir missões juntos é mais rápido, nunca mais lento. Você também pode compartilhar uma missão com seu grupo: poste-a no chat como um link clicável com o comando /share, e qualquer membro por perto que se qualifique pode pegar a mesma missão com um clique.',
+    'Membros do grupo por perto compartilham o crédito de abates e objetivos, então cumprir missões juntos é mais rápido, nunca mais lento. Você também pode compartilhar uma missão com seu grupo: poste-a no chat como um link clicável com o comando /share, e qualquer membro que se qualifique pode pegar a mesma missão com um clique.',
   'guide.questsPage.partyTitle': 'Cumprindo missões em grupo',
   'guide.questsPage.soloNote':
     'A história principal é jogável sozinho até o final de cada capítulo, que é uma masmorra de cinco jogadores.',
@@ -5175,13 +5175,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'Aprimoramentos e melhorias duram apenas a partida. Eles servem para builds divertidas e improvisadas, não para poder permanente, então ninguém compra a vitória.',
   'guide.arenaPage.coliseumBody':
-    'O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória o eleva naquele placar para o reino inteiro ver.',
+    'O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória o eleva naquele placar para o reino inteiro ver. Abra a janela da Arena para se inscrever em uma categoria, sozinho ou com seu parceiro.',
   'guide.arenaPage.coliseumHeading': 'O Coliseu das Cinzas',
   'guide.arenaPage.duelsBody':
     'Desafie qualquer jogador que encontrar para um duelo amistoso. Nada está em jogo além do orgulho, então é a forma mais fácil de aprender um confronto ou resolver uma discussão amigável.',
   'guide.arenaPage.duelsHeading': 'Duelos',
   'guide.arenaPage.fiestaBody':
-    'Fiesta é um modo rápido de dois contra dois jogado em rodadas curtas. Entre as rodadas você escolhe aprimoramentos, reforços rápidos que remodelam seu arsenal na hora, então nenhuma partida é igual à outra.',
+    'Fiesta é uma briga rápida de dois contra dois travada como uma única disputa contínua, com cada lutador colocado em pé de igualdade. Conforme a luta corre, você escolhe aprimoramentos, reforços rápidos que remodelam seu arsenal na hora, então nenhuma partida é igual à outra.',
   'guide.arenaPage.fiestaHeading': 'Fiesta dois contra dois',
   'guide.arenaPage.heading': 'Arena e JcJ',
   'guide.arenaPage.intro':
@@ -5204,7 +5204,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': 'Estilo',
   'guide.classPage.fullKitHeading': 'O arsenal completo',
   'guide.classPage.fullKitNote':
-    'Todas as habilidades que esta classe pode aprender, na ordem em que ficam disponíveis. Os talentos decidem quais delas sustentam sua build.',
+    'O arsenal que esta classe aprende conforme sobe de nível, na ordem em que fica disponível. Os talentos concedem mais algumas habilidades e decidem quais delas sustentam sua build.',
   'guide.classPage.masteryLabel': 'Maestria',
   'guide.classPage.petsHeading': 'Demônios',
   'guide.classPage.petsNote':
@@ -5212,7 +5212,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelBand': 'Níveis {min} a {max}',
   'guide.dungeonsPage.partySize': '{n} jogadores',
   'guide.faqPage.a10':
-    'O limite é o nível {cap}. A partir daí você encara as masmorras de cinco jogadores e a raide de dez jogadores, busca equipamentos melhores e se testa na arena.',
+    'O limite é o nível {cap}. A partir daí você encara as masmorras de cinco jogadores e a raide de dez jogadores, enfrenta-as de novo em modo heroico por saque aprimorado, encara o chefe mundial quando ele se ergue, testa-se na arena, mergulha em incursões com um companheiro ao seu lado e persegue feitos no Livro dos Feitos para subir na classificação do reino.',
   'guide.faqPage.a11':
     'Convide qualquer pessoa que encontrar para um grupo, pergunte no chat ou junte-se a outros na entrada de uma masmorra. A maior parte do mundo pode ser feita sozinho, então agrupar é uma escolha, não uma exigência.',
   'guide.faqPage.a9':
@@ -5291,17 +5291,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Amigável para jogar sozinho',
   'guide.talentsPage.heading': 'Talentos e especializações',
   'guide.talentsPage.howBody':
-    'Os talentos ficam disponíveis no nível 10, e você continua ganhando pontos conforme sobe até o limite. Você os gasta no painel de talentos da sua classe, e pode salvar mais de uma configuração para alternar entre builds.',
+    'Os talentos ficam disponíveis no nível 10, e você continua ganhando pontos conforme sobe até o limite. Você os gasta no painel de talentos da sua classe, onde as fileiras mais profundas se abrem conforme você investe e sobe de nível, e pode salvar mais de uma configuração para alternar entre builds.',
   'guide.talentsPage.howHeading': 'Como funcionam',
   'guide.talentsPage.intro':
     'Os talentos são como você torna uma classe a sua. Eles são opcionais, tolerantes e fáceis de mudar, então você pode experimentar sem medo.',
   'guide.talentsPage.resetNote':
-    'Você pode redefinir seus talentos a qualquer momento fora de combate, então uma escolha precoce nunca é uma armadilha. Teste coisas, veja do que gosta e mude de ideia à vontade.',
+    'Você pode redefinir seus talentos a qualquer momento fora de combate e desde que não esteja em uma partida de arena, então uma escolha precoce nunca é uma armadilha. Teste coisas, veja do que gosta e mude de ideia à vontade.',
   'guide.talentsPage.resetTitle': 'Nada é permanente',
   'guide.talentsPage.shareNote':
     'Uma build pronta pode ser copiada para um código curto compartilhável e passada a um amigo, que o cola direto no próprio painel de talentos para carregá-la.',
   'guide.talentsPage.specsBody':
-    'Toda classe tem algumas especializações, cada uma com sua própria função e um foco característico. Aqui está o formato de todas elas. Abra uma classe para ver seu arsenal completo.',
+    'Toda classe tem algumas especializações, cada uma com sua própria função e um foco característico. Escolher uma no painel de talentos concede uma habilidade característica e uma maestria duradoura própria. Aqui está o formato de todas elas. Abra uma classe para ver seu arsenal completo.',
   'guide.talentsPage.specsHeading': 'Especializações por classe',
   'guide.talentsPage.whatBody':
     'Conforme você sobe de nível, ganha pontos de talento para gastar em pequenas melhorias permanentes em suas habilidades e atributos. Eles moldam como uma classe se sente, inclinando-a para mais dano, defesa mais robusta ou cura mais forte.',
@@ -5312,10 +5312,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Toda classe se vira bem e chega ao limite. Escolha a fantasia que você gosta, não a que outra pessoa diz ser a melhor.',
   'guide.wishPage.i1Title': 'Não dá para escolher a classe errada',
   'guide.wishPage.i2Body':
-    'Quando você cai, liberta seu espírito e revive no cemitério mais próximo, e depois volta caminhando. Nenhuma experiência é perdida, então é seguro arriscar e aprender.',
+    'Quando você cai, ergue-se como um fantasma no cemitério mais próximo. Corra de volta até seu corpo para reviver sem custo, ou aceite o ressurgimento imediato do Guardião Pálido e carregue uma fraqueza passageira pela conveniência. Nenhuma experiência, equipamento ou dinheiro é jamais perdido, então é seguro arriscar e aprender.',
   'guide.wishPage.i2Title': 'Morrer quase não custa nada',
   'guide.wishPage.i3Body':
-    'Eles ficam disponíveis no nível 10 e podem ser redefinidos quando você quiser, então suas escolhas iniciais nunca são permanentes.',
+    'Eles ficam disponíveis no nível 10 e podem ser redefinidos quando você quiser, fora de combate, então suas escolhas iniciais nunca são permanentes.',
   'guide.wishPage.i3Title': 'Os talentos não são uma armadilha',
   'guide.wishPage.i4Body':
     'As missões são a forma mais rápida de subir de nível e elas guiam você pelo mundo. Quando estiver em dúvida sobre aonde ir, encontre o próximo marcador.',
@@ -5352,7 +5352,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A onda de abertura: reforços limpos de um único atributo que afiam o básico da sua classe.',
   'guide.arenaPage.waveSilverTitle': 'Prata',
   'guide.arenaPage.wavesBody':
-    'Cada rodada de uma Fiesta lhe dá uma nova escolha, e as escolhas ficam mais ousadas conforme a partida avança. Você constrói de uma onda para a próxima, escolhendo uma de poucas opções a cada vez e mantendo-a pelo resto da disputa.',
+    'Uma disputa de Fiesta lhe entrega novas escolhas conforme avança, e as escolhas ficam mais ousadas quanto mais a luta se estende. Você constrói de uma onda para a próxima, escolhendo uma de poucas opções a cada vez e mantendo-a pelo resto da disputa.',
   'guide.arenaPage.wavesTitle': 'Os aprimoramentos chegam em ondas',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Servos encapuzados do culto da morte cuja obra profana as sepulturas do Vale aos cumes. Onde eles se reúnem, os mortos não descansam.',
@@ -5366,12 +5366,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um elemental de tempestade ganhando ombros, caminhando pelos despenhadeiros distantes acima de Stormcrag com um fragmento-coração que vale enfrentar os raios.',
   'guide.bestiary.notedLabel': 'Digno de nota',
   'guide.combat.ccBody':
-    'Controle de grupo é um tipo especial de penalidade que limita o que um alvo pode fazer: atordoamentos, enraizamentos e reduções de velocidade, silêncios que impedem conjurações, desarmes, medos e transformações que tornam um inimigo inofensivo por um instante. Alguns deles, como enraizamentos, medos e transformações, perdem o efeito quando reaplicados rápido demais, então não podem ser encadeados para sempre.',
+    'Controle de grupo é um tipo especial de penalidade que limita o que um alvo pode fazer: atordoamentos, enraizamentos e reduções de velocidade, silêncios que impedem conjurações, desarmes, medos e transformações que tornam um inimigo inofensivo por um instante. Contra outros jogadores, o controle se desgasta com a repetição: o mesmo tipo reaplicado rápido demais enfraquece e depois falha por completo, e um atordoamento que abre a partir da furtividade é contado à parte dos atordoamentos que vêm depois, então ninguém pode ser mantido indefeso para sempre. As criaturas do mundo não guardam esse rancor: o controle nunca enfraquece com a repetição contra elas, embora muitos dos inimigos mais poderosos, os elites nomeados e os chefes mais fortes entre eles, não possam ser controlados de forma alguma.',
   'guide.combat.deathBody':
-    'Se sua vida chegar a zero, você é derrubado. Liberte seu espírito para reviver no cemitério mais próximo com vida cheia, e depois volte caminhando, então uma morte custa um pouco de tempo, não seu progresso. Entre lutas, sente-se para comer e beber, assim você começa a próxima com força total.',
+    'Se sua vida chegar a zero, você é derrubado onde está, e seu corpo fica ali. Liberte seu espírito e você se ergue como um fantasma no cemitério mais próximo: mais veloz que os vivos, fora do alcance dos seus inimigos, mas incapaz de lutar, saquear ou falar com quem quer que seja, exceto o Guardião Pálido que paira sobre as lápides. Dali você escolhe. Leve seu fantasma de volta até o corpo e você revive ali mesmo, com parte da sua vida e mana restauradas e nenhuma penalidade. Ou aceite do Guardião Pálido um ressurgimento imediato onde está, ao preço do Tributo do Guardião: um enfraquecimento temporário de tudo o que você é, que dura mais quanto mais experiente você for, e poupa por completo os personagens recém-criados. Caia dentro de uma masmorra e seu espírito aguarda no cemitério do lado de fora; leve seu fantasma de volta pela porta e você revive na entrada. As incursões são a exceção: caia nelas e você é simplesmente reposto de pé na entrada da incursão, embora uma segunda queda encerre a jornada. Por qualquer caminho, você não perde experiência, equipamento nem dinheiro. Entre lutas, sente-se para comer e beber, assim você começa a próxima com força total.',
   'guide.combat.deathTitle': 'Quando você cai',
   'guide.combat.effectsBody':
-    'Muitas habilidades aplicam um efeito que perdura. Os úteis (benefícios) aumentam seus atributos, escudam você ou curam um pouco de cada vez; os prejudiciais (penalidades) drenam sua vida com dano ao longo do tempo ou enfraquecem você. Observe os pequenos ícones perto da sua barra de ação para ver o que está em você e quanto tempo dura.',
+    'Muitas habilidades aplicam um efeito que perdura. Os úteis (benefícios) aumentam seus atributos, escudam você ou curam um pouco de cada vez; os prejudiciais (penalidades) drenam sua vida com dano ao longo do tempo ou enfraquecem você. Observe os pequenos ícones no canto superior da tela, ao lado do minimapa, para ver o que está em você e quanto tempo dura.',
   'guide.combat.effectsTitle': 'Benefícios, penalidades e controle de grupo',
   'guide.dungeonsPage.cryptLeadBody':
     'Lá no alto dos cumes, longe da luta principal, jaz um mistério mais frio. Sepulturas antigas trazem uma coroa que registro algum recorda, e os mortos que as guardam um dia serviram a um rei esquecido. Leia suas lápides, reúna as pedras-chave que eles guardaram e você poderá abrir um túmulo que três almas leais morreram para manter selado, o desafio opcional que abre o reino ao seu raide de dez jogadores para quem seguir as pistas até o fim.',
@@ -5380,7 +5380,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O templo tem sua própria lenda, mais antiga que o culto que você persegue em outros lugares. Na margem do Glimmermere, um tarn que bebe o luar e devolve os afogados, um vigia solitário guarda um portal de luz pálida. Sob a superfície, uma escadaria de pedra fria desce até ele. As pessoas que afundaram ali não se afogaram por desventura: eram o Coro Pálido, que mergulhou em adoração e nunca parou de cantar. Os antigos guardiões riscaram um único aviso nas rochas antes de a água levá-los, uma prece a algo que chamavam de Lua Afogada, com uma mão mais firme acrescentando duas palavras abaixo: ela apenas dorme.',
   'guide.dungeonsPage.templeLoreTitle': 'O Templo Afogado, um pouco mais fundo',
   'guide.economy.buyingBody':
-    'Fique perto de um comerciante para abrir a janela dele. Você pode comprar qualquer coisa que ele tenha em estoque, se puder pagar, e vender a maior parte do que está em suas bolsas por moedas. Se vender algo por engano, um vendedor guardará suas vendas recentes para você poder recomprá-las.',
+    'Fale com um comerciante e escolha ver as mercadorias dele, e a loja abre com três abas: Explorar, Vender e Recompra. Explorar reúne tudo o que ele tem em estoque, seu se você puder pagar. Vender lista o que das suas bolsas ele aceita pagar, e vender uma peça que carrega a própria qualidade sorteada pede que você confirme antes, para que uma cópia valiosa nunca escape por engano. Se você se desfizer de algo de que se arrependa, a aba Recompra guarda suas vendas recentes para você recomprá-las pela moeda que recebeu.',
   'guide.economy.buyingTitle': 'Comprar e vender',
   'guide.economy.coinBody':
     'O dinheiro vem em três moedas. Cem de cobre fazem uma de prata, e cem de prata fazem uma de ouro, então sua bolsa enche a partir da menor moeda primeiro. Você as ganha com recompensas de missões, saqueando inimigos abatidos e vendendo o que não precisa mais.',
@@ -5388,10 +5388,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.economy.intro':
     'As moedas lubrificam o mundo inteiro: compram seu equipamento, suprimentos e apetrechos de viagem, e mudam de mãos entre jogadores. Você junta tudo isso só de jogar, então pense nesta página como um mapa de onde seu dinheiro vem e para onde vai.',
   'guide.economy.junkBody':
-    'Itens que você não tem utilidade ainda podem ser vendidos a qualquer vendedor, então esvazie suas bolsas sempre que passar pela cidade, em vez de deixá-las lotar. Tralhas realmente sem valor também podem ser descartadas de vez para abrir espaço.',
+    'Itens que você não tem utilidade ainda podem ser vendidos a qualquer vendedor, então esvazie suas bolsas sempre que passar pela cidade, em vez de deixá-las lotar. A aba Vender do vendedor tem até um botão de um clique que vende de uma vez cada bugiganga de qualidade Pobre. Tralhas realmente sem valor também podem ser descartadas de vez para abrir espaço.',
   'guide.economy.junkTitle': 'Limpando a tralha',
   'guide.economy.marketBody':
-    'O Mercador comanda o Mercado Mundial, uma central movida por jogadores onde você pode comprar e vender com pessoas que talvez nunca encontre. Fale com o Mercador para abri-lo. O Mercador também mantém um estoque fixo de suas próprias mercadorias listado lá, então sempre há algo para comprar mesmo quando nenhum outro jogador anunciou nada.',
+    'O Mercador comanda o Mercado Mundial, uma central movida por jogadores onde você pode comprar e vender com pessoas que talvez nunca encontre. Fale com o Mercador em Eastbrook, ou com o Leiloeiro Voss lá em Highwatch, para abri-lo: ambos os guardiões servem ao mesmo mercado compartilhado. O Mercador também mantém um estoque fixo de suas próprias mercadorias listado lá, então sempre há algo para comprar mesmo quando nenhum outro jogador anunciou nada.',
   'guide.economy.marketBrowse':
     'Navegando: percorra as listagens ou busque por nome para achar o que está à venda. Cada listagem mostra os itens, o vendedor e o preço pedido pelo lote inteiro.',
   'guide.economy.marketCollect':
@@ -5402,8 +5402,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O preço fica a seu critério. Listar um pouco abaixo do que os outros pedem tende a vender mais rápido, enquanto um preço alto pode ficar parado. Navegue primeiro para ver qual é o preço de mercado antes de anunciar.',
   'guide.economy.marketTitle': 'O Mercado Mundial',
   'guide.economy.marksBody':
-    'Moedas não são a única coisa que você acumula. As incursões pagam Selos de Incursão, uma moeda separada que você gasta apenas com o guardião de incursões, em melhorias para a companheira e equipamentos que você não encontra em outro lugar. Eles nunca se misturam com o seu dinheiro.',
-  'guide.economy.marksTitle': 'Uma segunda moeda: Selos de Incursão',
+    'Dinheiro não é a única coisa que você acumula. As incursões pagam Selos de Incursão, gastos apenas com o guardião de incursões, em melhorias para a companheira e equipamentos que você não encontra em outro lugar. As masmorras heroicas deixam Marcas Heroicas no chefe final, gastas com o Intendente Heroico em Highwatch, em joalheria que nenhum outro canto do reino vende. Nenhuma delas jamais se mistura com o seu dinheiro.',
+  'guide.economy.marksTitle': 'Selos e Marcas: as moedas além do dinheiro',
   'guide.economy.tradeBody':
     'Você pode negociar cara a cara com qualquer um que esteja perto de você. Os dois colocam itens e moedas numa janela compartilhada, e a troca só acontece depois que ambos confirmam, então nenhum dos lados pode ser enganado. É o jeito simples de passar um saque a um amigo ou fechar um acordo.',
   'guide.economy.tradeTitle': 'Negociando com outros jogadores',
@@ -5431,7 +5431,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Há duas linhas cosméticas para colecionar. A maioria das classes tem várias aparências alternativas, uma releitura do visual da classe que só você pode usar. Ao lado delas estão os cromas: esquemas de cores bicolores com nome que repintam um visual por completo, de metais sóbrios a cores imperiais vivas.',
   'guide.gear.cosmeticsTitle': 'Visuais e cosméticos',
   'guide.gear.fishingBody':
-    'A pesca é uma mudança tranquila de ritmo. Equipe uma vara de pescar, lance em águas abertas e fisgue o que morder a isca. Você pega principalmente peixes que são comida pronta para comer, uma ou outra tralha para vender por algumas moedas, e de vez em quando uma cobiçada captura rara. O que você encontra depende das águas onde pesca.',
+    'A pesca é uma mudança tranquila de ritmo. Equipe uma vara de pescar, use-a junto de águas abertas e fisgue o que morder a isca. Você pega principalmente peixes que são comida pronta para comer, uma ou outra tralha para vender por algumas moedas, e de vez em quando uma cobiçada captura rara. O que você encontra depende das águas onde pesca.',
   'guide.gear.fishingFood':
     'Os peixes que você fisga são comida: coma um enquanto se senta para descansar e ele restaura vida, com os peixes mais substanciosos vindo das águas mais frias e profundas do norte. Uma linha no lago é um jeito sereno de manter sua bolsa abastecida entre lutas.',
   'guide.gear.fishingRare':
@@ -5440,7 +5440,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'Equipamento é o que seu personagem veste e os itens que você carrega. Um equipamento melhor é a forma mais constante de ficar mais forte, e você pega a maior parte só de jogar.',
   'guide.gear.itemLevelBody':
-    'Se você quer um jeito rápido de comparar duas peças, ative Mostrar nível do item nas opções. Cada arma e peça de armadura passa a mostrar um nível do item, um único número para o quão poderosa ela é mais ou menos, com base em sua origem, então você percebe num relance qual melhoria pesa mais, mesmo entre espaços diferentes.',
+    'Se você quer um jeito rápido de comparar duas peças, ative Mostrar nível do item nas opções. Equipamento conquistado no mundo, de inimigos e missões, passa a mostrar um nível do item, um único número para o quão poderoso ele é mais ou menos, com base em sua origem, então você percebe num relance qual melhoria pesa mais, mesmo entre espaços diferentes. Peças sem tal origem, como itens básicos de vendedor e equipamento inicial, não mostram nível do item, então um número ausente é normal, não um defeito.',
   'guide.gear.qualityBody':
     'Cada item tem uma qualidade, e seu nome é colorido para combinar, então você lê seu valor num relance. Do mais comum ao mais cobiçado:',
   'guide.gear.qualityCommon': 'Comum',
@@ -5453,7 +5453,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityTitle': 'Qualidade, num relance',
   'guide.gear.qualityUncommon': 'Incomum',
   'guide.gear.setsBody':
-    'As armaduras mais raras vêm em famílias combinando, várias peças talhadas para parecer e lutar como uma só. Vista o bastante de uma família ao mesmo tempo e o conjunto desperta, concedendo bônus por cima dos atributos de cada peça, e quanto mais peças você usa mais forte ele fica. Elas largam do conteúdo em grupo mais difícil perto do limite de nível, então perseguir um conjunto completo é um objetivo clássico de fim de jogo.',
+    'Algumas armaduras vêm em famílias combinando, várias peças talhadas para parecer e lutar como uma só. Vista o bastante de uma família ao mesmo tempo e o conjunto desperta, concedendo bônus por cima dos atributos de cada peça, e quanto mais peças você usa mais forte ele fica. Algumas dessas famílias surgem como saques valiosos enquanto você sobe de nível; as maiores delas vêm do conteúdo em grupo mais difícil perto do limite de nível, então perseguir um conjunto completo é um objetivo clássico de fim de jogo.',
   'guide.gear.setsTitle': 'Conjuntos e bônus de conjunto',
   'guide.gear.slotChest': 'Peito',
   'guide.gear.slotFeet': 'Pés',
@@ -5464,10 +5464,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Ombros',
   'guide.gear.slotWaist': 'Cintura',
   'guide.gear.slotsBody':
-    'Você tem um espaço de arma e sete espaços de armadura. Cada classe pode usar apenas certas armas e veste armadura até o seu próprio peso, tecido, couro ou malha, então as melhorias que servem para você são as feitas para sua classe. Dentro disso, preencha cada espaço com a melhor peça que encontrar.',
+    'Você tem um espaço de arma, sete espaços de armadura e três espaços de joalheria: um de pescoço e dois de dedo. Cada classe pode usar apenas certas armas e veste armadura até o seu próprio peso, tecido, couro ou malha, então as melhorias que servem para você são as feitas para sua classe. A joalheria não tem peso algum: qualquer classe veste o que quer que conquiste. Dentro disso, preencha cada espaço com a melhor peça que encontrar.',
   'guide.gear.slotsTitle': 'O que você pode equipar',
   'guide.gear.sourcesBody':
-    'A maioria das suas melhorias iniciais são recompensas de missões, então vale a pena terminar missões em vez de farmar. Inimigos largam equipamento quando você os derrota, vendedores na cidade vendem o básico de confiança, e o mercado de jogadores permite comprar de outros aventureiros.',
+    'A maioria das suas melhorias iniciais são recompensas de missões, então vale a pena terminar missões em vez de farmar. Inimigos largam equipamento quando você os derrota, vendedores na cidade vendem o básico de confiança, artesãos transformam materiais coletados em peças vestíveis, e o mercado de jogadores permite comprar de outros aventureiros. Lá no topo, duas moedas de selos compram equipamentos que não se encontram em nenhum outro lugar: os Selos de Incursão com o guardião de incursões, e as Marcas Heroicas com o Intendente Heroico.',
   'guide.gear.sourcesTitle': 'De onde vem o equipamento',
   'guide.gear.upgradeBody':
     'Trocar uma peça antiga por uma melhoria nova faz mais por você do que jogar de forma impecável com um equipamento que você já superou. Quando algo melhor cair ou uma missão oferecer, pegue. Não guarde seus bons itens para depois.',
@@ -5503,7 +5503,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     'Cada nível torna você mais resistente e traz novas habilidades, até o limite do nível {cap}.',
   'guide.progression.capJourneyBody':
-    'O nível {cap} é o limite, o fim da progressão de nível, mas não do crescimento. A partir dali você encara masmorras e o raide, busca equipamento melhor e se testa na arena.',
+    'O nível {cap} é o limite, o fim da progressão de nível, mas não do crescimento. A partir dali você encara masmorras e o raide no normal e no heroico, encara o chefe mundial quando ele se ergue, busca equipamento melhor e se testa na arena.',
   'guide.progression.capTitle': 'Chegando ao nível {cap}',
   'guide.progression.intro':
     'Toda luta, missão e passo ao norte deixa seu herói mais forte. Veja como a progressão de nível funciona e o que mantém você crescendo depois de chegar ao topo.',
@@ -5513,12 +5513,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     'Não há pressa. O mundo está aqui para ser aproveitado no seu próprio ritmo, então perambule, aceite as missões que chamarem sua atenção e deixe seu herói crescer pelo caminho.',
   'guide.progression.prestigeBody':
-    'A experiência continua contando mesmo depois do limite. Ela alimenta um nível virtual cosmético, então sua barra de experiência segue subindo, e uma classificação de prestígio de longo prazo que você pode conquistar pelo reconhecimento. Passar de grandes marcos de experiência acumulada também desbloqueia títulos cosméticos e bordas de placa de nome que aparecem na sua ficha de personagem. Tudo isso é puramente opcional e nunca concede poder, apenas uma marca da estrada que você percorreu.',
+    'A experiência continua contando mesmo depois do limite. Ela alimenta um nível virtual cosmético, então sua barra de experiência segue subindo, e uma classificação de prestígio de longo prazo que você pode conquistar pela sua ficha de personagem assim que chegar lá. Passar de grandes marcos de experiência acumulada também rende feitos no seu Livro dos Feitos, com títulos cosméticos e bordas de placa de nome que aparecem na sua ficha de personagem. Tudo isso é puramente opcional e nunca concede poder, apenas uma marca da estrada que você percorreu.',
   'guide.progression.restedBody':
-    'Descanse num lugar seguro como uma estalagem, fora de combate, e seu personagem acumula experiência descansada enquanto fica ali sentado. Da próxima vez que sair para lutar, esse acúmulo dá um impulso extra aos seus abates até esgotar. Uma pausa na estalagem nunca é tempo perdido; ela acelera seu próximo trecho de progressão.',
+    'Entre em uma estalagem e fique fora de combate, e seu personagem acumula experiência descansada enquanto espera. Toda cidade tem uma. Da próxima vez que você sair para lutar, esse acúmulo dá um impulso extra aos seus abates até esgotar. Uma pausa na estalagem nunca é tempo perdido; ela acelera seu próximo trecho de progressão.',
   'guide.progression.restedTitle': 'Experiência descansada',
   'guide.progression.xpBody':
-    'Você ganha experiência completando missões e derrotando inimigos. As missões dão de longe o máximo, então seguir a trilha de missões é a forma mais rápida de subir. Abater coisas pelo caminho preenche o resto.',
+    'Você ganha experiência completando missões, derrotando inimigos e concluindo incursões. As missões dão de longe o máximo, então seguir a trilha de missões é a forma mais rápida de subir. Abates e incursões pelo caminho preenchem o resto.',
   'guide.progression.xpTitle': 'Como você ganha experiência',
   'guide.questsPage.sagaBody':
     'A história principal é uma longa perseguição. Um culto da morte está em ação nas sepulturas do reino, e cada capítulo que você fecha aponta uma zona mais adiante na estrada. Você nunca enfrenta a conspiração inteira de uma vez; você puxa um fio, e ele leva à próxima mão que o segura.',
@@ -5543,7 +5543,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ao lado da história, os marechais e guardiões do Vale e do brejo oferecem uma escada de recompensas fixa. Suba por ela, inimigo a inimigo, do jeito que cada caçador de recompensas antes de você conquistou seu lugar. É progressão honesta e um tour pelos piores encrenqueiros de cada zona.',
   'guide.questsPage.sideWardenTitle': 'Conquistando seu nome',
   'guide.questsPage.typeGatherBody':
-    'Colete itens do mundo ou do que os inimigos largam: ervas, minério, cartas perdidas, os sombrios reagentes de um culto. Algumas peças só caem de um inimigo específico, então a caçada e a coleta andam juntas.',
+    'Colete itens do mundo ou do que os inimigos largam: ervas, minério, os sombrios reagentes de um culto. Algumas peças só caem de um inimigo específico, então a caçada e a coleta andam juntas.',
   'guide.questsPage.typeGatherTitle': 'Coletar',
   'guide.questsPage.typeGroupBody':
     'Cada capítulo da história principal termina numa porta de masmorra. A introdução pode ser feita sozinho, mas o golpe final contra o vilão de um capítulo é feito para um grupo de cinco.',
@@ -5555,7 +5555,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Algumas missões fazem você reunir uma cidade antes de uma investida ao norte: reduza a ameaça nos portões e junte o que os defensores precisam. Estes são objetivos de abater e coletar a serviço das pessoas cuja história você vive, e mantêm você em movimento com elas.',
   'guide.questsPage.typeMusterTitle': 'Reunir a defesa',
   'guide.questsPage.typeSlayBody':
-    'Reduza um bando de feras ou quebre o domínio de um culto derrotando um número definido de um inimigo marcado. A primeira missão do jogo, limpar os lobos da estrada de Eastbrook, é uma destas.',
+    'Reduza um bando de feras ou quebre o domínio de um culto derrotando um número definido de um inimigo marcado. Uma das suas primeiras missões, limpar os lobos da estrada de Eastbrook, é uma destas.',
   'guide.questsPage.typeSlayTitle': 'Abater',
   'guide.questsPage.typesBody':
     'A maioria das missões tem um de poucos formatos familiares. O rastreador na tela detalha exatamente o que cada uma quer, então você nunca fica adivinhando.',
@@ -5565,7 +5565,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um canal sempre ativo que abrange o reino inteiro e alcança todos os jogadores online, bom para fazer uma pergunta ou conversar à toa. Diferente dos canais Mundo e Procurando Grupo, você nunca precisa optar por participar.',
   'guide.social.chanGuild': 'Guilda e Oficial.',
   'guide.social.chanGuildBody':
-    'Canais para a sua guilda. O chat da guilda alcança todos os membros; o canal de oficial é só para oficiais.',
+    'Canais para a sua guilda. O chat da guilda alcança todos os membros; o canal de oficial é para os oficiais e o líder da guilda.',
   'guide.social.chanLfg': 'Procurando Grupo.',
   'guide.social.chanLfgBody':
     'Um canal opcional para o reino inteiro, para achar gente para encarar uma masmorra. Abra a aba dele para entrar.',
@@ -5588,7 +5588,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O chat é dividido em canais, cada um exibido em sua própria aba. Digite uma mensagem para enviá-la no canal ativo, ou use um comando com barra para direcionar uma linha a outro lugar. Estes são os canais nos quais você pode falar:',
   'guide.social.chatHeading': 'Canais de chat',
   'guide.social.etiquetteBody':
-    'Formar grupo é uma escolha, não uma obrigação. Diga olá quando entrar, role Preciso só em equipamento que você realmente vai usar, e avise o grupo antes de ir embora. Um pouco de cortesia faz muita diferença, e a maioria dos jogadores gosta da companhia.',
+    'Formar grupo é uma escolha, não uma obrigação. Diga olá quando entrar, role Preciso só em equipamento que você realmente vai usar, e avise o grupo antes de ir embora. Um pouco de cortesia faz muita diferença, e a maioria dos jogadores gosta da companhia. Os moderadores mantêm a ordem, e um jogador que não deixa os outros aproveitarem o jogo pode ser levado a uma cela até que um moderador o solte.',
   'guide.social.etiquetteHeading': 'Etiqueta de grupo',
   'guide.social.friendsBody':
     'Adicione jogadores à sua lista de amigos para ver quando estão online e onde estão, assim você pode formar grupo no instante em que eles entrarem.',
@@ -5608,7 +5608,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O dinheiro de um abate pode ir para quem o saqueia, ou ser dividido igualmente pelo grupo.',
   'guide.social.lootCoinTitle': 'Moedas.',
   'guide.social.lootCommonBody':
-    'Saques comuns podem ir para quem saqueia, enquanto saques melhores são postos em sorteio para todos terem uma chance justa.',
+    'Saques comuns podem circular pelo grupo por turnos ou ir para quem saqueia, enquanto saques melhores são postos em sorteio para que todos tenham uma chance justa.',
   'guide.social.lootCommonTitle': 'Itens.',
   'guide.social.lootHeading': 'Saque do grupo',
   'guide.social.lootMasterBody':
@@ -5628,13 +5628,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Agilidade aprimora você de várias formas: aumenta sua chance de acerto crítico e sua chance de esquiva, e adiciona um pouco de armadura. Para ladinos e caçadores ela também alimenta o poder de ataque, e impulsiona os tiros à distância de um caçador.',
   'guide.stats.agiTitle': 'Agilidade',
   'guide.stats.apBody':
-    'O poder de ataque mede o quão forte sua arma golpeia. Seus atributos principais o alimentam, e armas e equipamentos mais fortes o elevam ainda mais, por isso uma melhoria pode ser um salto real de dano.',
+    'O poder de ataque mede o quão forte sua arma golpeia. Seus atributos principais o alimentam, e o equipamento que carrega esses atributos o eleva ainda mais, enquanto uma arma mais forte aumenta seu dano diretamente, e é por isso que uma melhoria pode ser um salto real de dano.',
   'guide.stats.apTitle': 'Poder de ataque',
   'guide.stats.armorBody':
     'A armadura reduz o dano físico que você sofre. Ela vem principalmente do que você veste, e as classes de armadura mais pesada carregam muito mais dela. Mais armadura contra um inimigo perto do seu nível faz cada golpe dele acertar mais leve.',
   'guide.stats.armorTitle': 'Armadura',
   'guide.stats.critBody':
-    'Sua chance de acerto crítico é a frequência com que um ataque acerta com dano extra. Todos começam com uma pequena chance básica, e a Agilidade (mais alguns talentos e equipamentos) a aumenta.',
+    'Sua chance de acerto crítico é a frequência com que um ataque acerta com dano extra. Todos começam com uma pequena chance básica, e a Agilidade (mais alguns talentos e equipamentos) a aumenta. Sua ficha mostra tanto a chance em si quanto o índice de crítico com que seu equipamento contribui para ela.',
   'guide.stats.critTitle': 'Acerto crítico',
   'guide.stats.dodgeBody':
     'Esquiva é sua chance de evitar por completo um ataque corpo a corpo. Você começa com uma pequena chance básica, e a Agilidade a aumenta, então classes ágeis escapam de mais golpes.',
@@ -5660,7 +5660,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O poder mágico é a contraparte do poder de ataque para um conjurador: ele aumenta o dano que suas magias causam. O Intelecto o alimenta, e equipamentos e benefícios de conjurador somam mais por cima, então um conjurador acompanha o poder mágico do mesmo jeito que um lutador corpo a corpo acompanha o poder de ataque.',
   'guide.stats.spTitle': 'Poder mágico',
   'guide.stats.spiBody':
-    'O Espírito comanda a rapidez com que a mana de um conjurador retorna fora de combate. Como o Intelecto, ele serve às classes de mana e significa pouco para as outras.',
+    'O Espírito comanda a rapidez com que a mana de um conjurador retorna sempre que ele pausa suas conjurações, o que é a maior parte do tempo entre as lutas. Como o Intelecto, ele serve às classes de mana e significa pouco para as outras.',
   'guide.stats.spiTitle': 'Espírito',
   'guide.stats.staBody':
     'O Vigor é sua resistência. Mais Vigor significa uma reserva de vida maior, e acelera a vida que você recupera ao descansar fora de combate. Toda classe quer um pouco.',
@@ -5681,16 +5681,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshGreeting':
     'Pare no portão. Passando aqueles juncos, o brejo faz a matança por nós.',
   'guide.worldPage.marshPlaceNotes':
-    'Fenbridge guarda a única estrada seca. Os Juncos do Espreitador e os Baixios de Deepfen fervilham de feras do pântano e Mudfins; o Matagal da Viúva é tecido de teias; a Capela Afogada e os Montículos dos Trolls guardam perigos mais antigos; o Acampamento de Gravecaller é o culto entrincheirado, e o Bastião Submerso é o coração instanciado do pântano.',
+    'Fenbridge guarda a única estrada seca. Os Juncos do Espreitador e os Baixios de Deepfen fervilham de feras do pântano e Mudfins; o Matagal da Viúva é tecido de teias; a Capela Afogada e os Montículos dos Trolls guardam perigos mais antigos, com A Ladainha Afogada, a incursão do próprio pântano, abrindo logo ao norte dos montículos; o Acampamento de Gravecaller é o culto entrincheirado, e o Bastião Submerso é o coração instanciado do pântano.',
   'guide.worldPage.peaksGreeter': 'Capitã Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Duzentos anos esta muralha resistiu. Ela não cairá sob minha vigilância, mas range.',
   'guide.worldPage.peaksPlaceNotes':
-    'Highwatch defende a muralha. A Cumeeira do Espreitador e as Tocas de Deeprock pertencem a felinos da serra e escavadores; os Sopés dos Ogros e o Acampamento de Guerra de Drogmar a brutamontes de aluguel; Stormcrag crepita de elementais e o Glimmermere reluz abaixo dele; as Tendas do Culto do Verme e os Campos dos Revenantes cercam o terreno alto do culto, com o Santuário do Gravewyrm no seu topo.',
+    'Highwatch defende a muralha. A Cumeeira do Espreitador e as Tocas de Deeprock pertencem a felinos da serra e escavadores; os Sopés dos Ogros e o Acampamento de Guerra de Drogmar a brutamontes de aluguel; Stormcrag crepita de elementais, e abaixo dele reluz o Glimmermere, o lago cuja margem guarda o portão de luz pálida que desce até o Templo Afogado; as Tendas do Culto do Verme e os Campos dos Revenantes cercam o terreno alto do culto, com o Santuário do Gravewyrm no seu topo.',
   'guide.worldPage.valeGreeter': 'Marechal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Mantenha sua lâmina por perto. O Vale não é mais o que era.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook é sua primeira base de operações. A Trilha do Lobo e a Campina do Javali são terreno de caça ameno; o Lago Espelho é água tranquila para pescar; a Sableweb e a Escavação de Cobre escondem aranhas e escavadores gananciosos por minério; um Acampamento de Bandidos e a Capela Caída guardam trabalhos mais duros; a Colina do Relicário desce até o Relicário Desmoronado, o primeiro delve do mundo; e a Clareira de Brightwood é um bosque calmo e ensolarado ao norte.',
+    'Eastbrook é sua primeira base de operações. A Trilha do Lobo e a Campina do Javali são terreno de caça ameno; o Lago Espelho é boa água para pescar, embora mudfins fervilhem em seus rasos; a Sableweb e a Escavação de Cobre escondem aranhas e escavadores gananciosos por minério; um Acampamento de Bandidos e a Capela Caída guardam trabalhos mais duros; a Colina do Relicário desce até o Relicário Desmoronado, a primeira incursão do reino; a Clareira de Brightwood é um bosque calmo e ensolarado ao norte; e o Sowfield é o campo murado de boarball de Eastbrook, onde a Copa do Vale é disputada sob uma trégua de colheita.',
   'guide.worldPage.gladeTitle': 'Um canto tranquilo: Clareira de Brightwood',
   'guide.worldPage.gladeBody':
     'Nem toda história no Vale fala dos mortos. Ao norte, uma clareira ensolarada chamada Brightwood Glade mantém seu próprio ritmo mais gentil, só trilhas silenciosas e luz salpicada sob os galhos. É um contraponto suave à trilha que você segue, e vale ser vista quando a estrada lhe der espaço para vaguear.',
@@ -6478,7 +6478,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chuva ambiente e neve. Apenas atmosfera, e desligá-lo economiza um pouco durante as tempestades.',
   'guide.settingsPage.tableFoot':
     'Procurando um controle deslizante de distância de desenho ou um limite FPS? Não há nada para procurar: a distância de visualização faz parte de cada nível de qualidade e o ritmo dos quadros segue a sua exibição.',
-  'guide.settingsPage.tableHeading': 'Cada opção, explicada',
+  'guide.settingsPage.tableHeading': 'Cada opção de gráficos, explicada',
   'guide.settingsPage.tagReload': 'depois de recarregar',
   'guide.settingsPage.value100': '100%',
   'guide.settingsPage.value50to70': '50 a 70%',
@@ -6490,7 +6490,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsWhy':
     'Ultra é renderizado na resolução mais alta que sua tela oferece com a iluminação mais rica. Ele também desativa a rede de segurança e é apenas para desktop: os telefones e o aplicativo atingem o limite de High.',
   'guide.settingsPage.wherePath':
-    'Tudo nesta página está no jogo: pressione Esc e procure em Gráficos, Interface e Sobreposição de desempenho.',
+    'Tudo nesta página fica no jogo: pressione Esc para abrir as opções. O menu abre em uma Visão Geral do essencial fixado, com as categorias em uma barra ao lado: as configurações abaixo ficam em Gráficos, Interface e Acessibilidade, no grupo Tela, e a Sobreposição de Desempenho em Sistema. Mais rápido ainda, digite um nome na caixa de busca no topo e vá direto até ele.',
   'guide.settingsPage.whyLabel': 'Por que funciona:',
   'hudChrome.crafting.close': 'Fechar elaboração',
   'hudChrome.crafting.craft': 'Arte',
@@ -6648,6 +6648,138 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'As senhas não coincidem.',
   'hudChrome.auth.resetErrInvalid':
     'Este link de redefinição é inválido ou expirou. Solicite um novo.',
+  'apiError.deeds.invalid_input': 'Entrada inválida.',
+  'apiError.steam.account_taken': 'Essa conta Steam já está vinculada a outra conta.',
+  'apiError.steam.already_linked': 'Sua conta já tem uma conta Steam vinculada.',
+  'apiError.steam.banned': 'Essa conta Steam não pode ser vinculada.',
+  'apiError.steam.disabled': 'A vinculação com o Steam não está disponível no momento.',
+  'apiError.steam.invalid_ticket':
+    'O Steam não conseguiu verificar este pedido de vinculação. Tente novamente pelo aplicativo para desktop.',
+  'apiError.steam.upstream': 'O Steam não respondeu. Tente novamente em instantes.',
+  'entities.npcs.chronicler_edda_hartwell.greeting':
+    'A montanha não esquece nada, {playerName}, e eu também não. Vejamos o que você andou fazendo.',
+  'entities.npcs.chronicler_edda_hartwell.name': 'Cronista Zenzie',
+  'entities.npcs.chronicler_edda_hartwell.title': 'A Crônica das Alturas',
+  'entities.npcs.chronicler_osric_fenn.greeting':
+    'Cuidado com a umidade nas páginas, {playerName}. O brejo devora mais livros do que os leitores jamais devorarão.',
+  'entities.npcs.chronicler_osric_fenn.name': 'Cronista Osric Fenn',
+  'entities.npcs.chronicler_osric_fenn.title': 'A Crônica do Pântano',
+  'entities.npcs.chronicler_saul.greeting':
+    'Cada feito que vale a pena fazer merece ser anotado duas vezes, {playerName}: uma para o registro e outra para a beira da fogueira.',
+  'entities.npcs.chronicler_saul.name': 'Saul, o Cronista',
+  'entities.npcs.chronicler_saul.title': 'A Crônica do Vale',
+  'guide.controls.deeds': 'Livro dos Feitos',
+  'guide.deedsPage.cat.chronicle': 'Crônicas',
+  'guide.deedsPage.cat.collection': 'Coleção',
+  'guide.deedsPage.cat.combat': 'Combate',
+  'guide.deedsPage.cat.delve': 'Incursões',
+  'guide.deedsPage.cat.dungeon': 'Masmorras',
+  'guide.deedsPage.cat.exploration': 'Exploração',
+  'guide.deedsPage.cat.feat': 'Proezas',
+  'guide.deedsPage.cat.progression': 'Progressão',
+  'guide.deedsPage.cat.pvp': 'JcJ e Esporte',
+  'guide.deedsPage.cat.social': 'Social',
+  'guide.deedsPage.catHeading': '{label} ({count})',
+  'guide.deedsPage.catalogBody':
+    'Aqui estão todos os feitos que o Livro pode guardar, reunidos por categoria. Os secretos ficam de fora de propósito, esperando que você os descubra. Abra o Livro dos Feitos no jogo para ver exatamente o que cada um pede.',
+  'guide.deedsPage.catalogHeading': 'O rol completo de feitos',
+  'guide.deedsPage.chroniclesBody':
+    'Cada zona guarda a própria Crônica, um conjunto de feitos reunidos por um Cronista local que tomou para si a tarefa de registrar cada viajante que passa por ali. Saul, do Vale de Eastbrook, é o primeiro deles. Uma Crônica se divide em capítulos, e você é livre para percorrê-los na ordem que preferir.',
+  'guide.deedsPage.chroniclesHeading': 'Crônicas',
+  'guide.deedsPage.colName': 'Feito',
+  'guide.deedsPage.colRenown': 'Renome',
+  'guide.deedsPage.colReward': 'Recompensa',
+  'guide.deedsPage.featTag': 'Proeza',
+  'guide.deedsPage.featsBody':
+    'As Proezas são uma prateleira à parte: registros de legado e de primazias mundiais, os feitos ligados a uma era que já passou ou a um momento que só vai acontecer uma vez. Elas não rendem Renome e ficam fora da contagem de conclusão, guardadas para sempre como memória do que foi feito.',
+  'guide.deedsPage.featsHeading': 'Proezas',
+  'guide.deedsPage.howBody':
+    'Os feitos são conquistados e guardados um personagem de cada vez, então cada herói que você joga forma um Livro só seu; só o Placar do reino reúne o seu Renome por todos os personagens que você joga, e conta cada feito uma única vez. Cada feito diz com clareza o que pede de você, ali mesmo no Livro dos Feitos dentro do jogo, então você sempre sabe o que perseguir, e pode acompanhar os que estiver caçando para mantê-los à vista enquanto joga. Uns poucos permanecem secretos e só se revelam depois de conquistados. O Livro também se mantém honesto: tudo o que o seu histórico passado puder comprovar, ele credita na hora, então um veterano nunca o abre numa página vazia; só os feitos de contagem começam sua conta do zero.',
+  'guide.deedsPage.howHeading': 'Como funcionam os feitos',
+  'guide.deedsPage.intro':
+    'O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.',
+  'guide.deedsPage.renownBody':
+    'O Renome é a pontuação por trás do Livro. Cada feito conquistado vale uma quantia fixa, e seu total só sobe, então uma semana parada nunca faz você perder terreno. Um punhado de feitos depende mais de sorte do que de habilidade, e as Proezas são uma honraria à parte, então nenhum dos dois vale Renome algum.',
+  'guide.deedsPage.renownHeading': 'Renome',
+  'guide.deedsPage.rewardBorder': 'Moldura',
+  'guide.deedsPage.rewardsBody':
+    'As recompensas servem só para exibir, e é justamente essa a intenção. Alguns feitos concedem um título para ostentar ou uma moldura para o seu nome, e nunca nada que torne seu herói mais forte. Escolha o título que quiser no Livro dos Feitos e ele acompanha você na placa de nome, no chat e nos placares, para que todos vejam.',
+  'guide.deedsPage.rewardsHeading': 'Títulos e molduras',
+  'guide.deedsPage.standingsNote':
+    'Os reinos mantêm uma contagem contínua de Renome de todas as contas. Para ver quem está onde, abra o Placar no jogo e vá até a aba de Renome; a classificação fica lá, não na wiki.',
+  'guide.nav.deeds': 'Livro dos Feitos',
+  'hudChrome.deeds.broadcastLine': '{name} realizou um feito: {deed}',
+  'hudChrome.deeds.broadcastsLabel': 'Compartilhar feitos desbloqueados com a guilda e os amigos',
+  'hudChrome.deeds.catChronicle': 'Crônicas',
+  'hudChrome.deeds.catCollection': 'Coleção',
+  'hudChrome.deeds.catCombat': 'Combate',
+  'hudChrome.deeds.catDelve': 'Incursões',
+  'hudChrome.deeds.catDungeon': 'Masmorras',
+  'hudChrome.deeds.catExploration': 'Exploração',
+  'hudChrome.deeds.catFeat': 'Proezas',
+  'hudChrome.deeds.catProgression': 'Progressão',
+  'hudChrome.deeds.catPvp': 'JcJ e Esporte',
+  'hudChrome.deeds.catSocial': 'Social',
+  'hudChrome.deeds.categoriesAria': 'Categorias de feitos',
+  'hudChrome.deeds.categoryCountAria': '{category}: {earned} de {visible} feitos conquistados',
+  'hudChrome.deeds.charOpenBook': 'Livro dos Feitos',
+  'hudChrome.deeds.charTitleLabel': 'Título',
+  'hudChrome.deeds.charTitleNone': 'Nenhum título escolhido',
+  'hudChrome.deeds.close': 'Fechar o Livro dos Feitos',
+  'hudChrome.deeds.collapseHint': 'Recolher o rastreador de feitos',
+  'hudChrome.deeds.completionAria': 'Feitos conquistados: {earned} de {total}',
+  'hudChrome.deeds.countLabel': '{earned}/{total} feitos',
+  'hudChrome.deeds.earnedDate': 'Conquistado em {date}',
+  'hudChrome.deeds.emptyCategory': 'Nenhum feito encontrado aqui.',
+  'hudChrome.deeds.expandHint': 'Expandir o rastreador de feitos',
+  'hudChrome.deeds.featRibbon': 'Proeza',
+  'hudChrome.deeds.filterAll': 'Todos',
+  'hudChrome.deeds.filterEarned': 'Conquistados',
+  'hudChrome.deeds.filterGroupAria': 'Filtrar feitos',
+  'hudChrome.deeds.filterNearly': 'Quase lá',
+  'hudChrome.deeds.filterUnearned': 'Pendentes',
+  'hudChrome.deeds.hiddenBadge': 'Oculto',
+  'hudChrome.deeds.lbDeedsCol': 'Feitos',
+  'hudChrome.deeds.lbEmpty': 'Ainda não há cronistas na classificação.',
+  'hudChrome.deeds.lbSelf': 'Sua colocação: posição {rank}, entre os {percent} por cento melhores',
+  'hudChrome.deeds.lbTab': 'Renome',
+  'hudChrome.deeds.lbTitleCol': 'Título',
+  'hudChrome.deeds.nearestLabel': 'Quase lá:',
+  'hudChrome.deeds.progressAria': 'Progresso: {current} de {target}',
+  'hudChrome.deeds.progressText': '{current}/{target}',
+  'hudChrome.deeds.rarityLine': 'Conquistado por {percent} dos aventureiros',
+  'hudChrome.deeds.recentLabel': 'Recentes:',
+  'hudChrome.deeds.renownChip': '{renown} de Renome',
+  'hudChrome.deeds.renownLabel': 'Renome',
+  'hudChrome.deeds.retroSummary': 'Sua crônica se põe em dia: {count} feitos registrados.',
+  'hudChrome.deeds.searchAria': 'Buscar feitos pelo nome',
+  'hudChrome.deeds.searchPlaceholder': 'Buscar feitos',
+  'hudChrome.deeds.title': 'Livro dos Feitos',
+  'hudChrome.deeds.titleChip': 'Recompensa de título',
+  'hudChrome.deeds.titledName': '{name} [{title}]',
+  'hudChrome.deeds.titlesAria': 'Escolha o título que será exibido',
+  'hudChrome.deeds.titlesEmpty':
+    'Conquiste um feito que conceda um título para desbloquear esta prateleira.',
+  'hudChrome.deeds.titlesNone': 'Sem título',
+  'hudChrome.deeds.titlesSection': 'Títulos',
+  'hudChrome.deeds.trackerLabel': 'Feitos',
+  'hudChrome.deeds.unlockedBanner': 'Feito realizado: {name}',
+  'hudChrome.deeds.unlockedTitleHint':
+    'Novo título conquistado: {title}. Escolha-o no Livro dos Feitos.',
+  'hudChrome.deeds.unwatch': 'Parar de acompanhar',
+  'hudChrome.deeds.unwatchAria': 'Parar de acompanhar {name}',
+  'hudChrome.deeds.watch': 'Acompanhar',
+  'hudChrome.deeds.watchAria': 'Acompanhar {name} no rastreador do HUD',
+  'hudChrome.deeds.watchFull': 'Lista de acompanhamento cheia (máximo de {cap})',
+  'hudChrome.mobile.deeds': 'Feitos',
+  'hudChrome.steam.benefits':
+    'Vincule sua conta Steam pelo aplicativo para desktop para espelhar os feitos que você ganhar como conquistas do Steam.',
+  'hudChrome.steam.link': 'Vincular Steam',
+  'hudChrome.steam.linked': 'Vinculado à conta Steam {id}',
+  'hudChrome.steam.noTicket':
+    'O Steam não forneceu um tíquete de vinculação. Inicie o Steam e tente novamente.',
+  'hudChrome.steam.title': 'Steam',
+  'hudChrome.steam.unlink': 'Desvincular Steam',
   'loading.tips.classes':
     'Dica: cada uma das 9 classes tem um estilo diferente. Experimente algumas antes de escolher uma.',
   'loading.tips.dungeons':
@@ -6700,4 +6832,146 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Você precisa estar em um grupo para iniciar uma verificação de prontidão.',
   'hudChrome.readyCheck.inProgressError': 'Já há uma verificação de prontidão em andamento.',
+  'guide.bestiary.flavor.sethrael_palecoil':
+    'Uma serpente pálida como osso que desliza pelo fundo profundo do Glimmermere, guardiã silenciosa das águas que reivindicou para si. Nadadores que dividem o lago com ela raramente voltam à superfície.',
+  'guide.combat.metersBody':
+    'Curioso para saber como foi uma luta? Pressione Z para abrir os medidores do grupo, que contabilizam dano, cura e ameaça do seu grupo, confronto a confronto.',
+  'guide.combat.queueBody':
+    'Você não precisa cronometrar seus toques à perfeição. Pressione sua próxima habilidade nos instantes finais da conjuração atual e ela entra na fila, disparando no momento exato em que a conjuração termina, então o jogo bem treinado flui sem lacunas. Um toque cedo demais é simplesmente recusado, então nada se perde. Alguns golpes corpo a corpo funcionam do mesmo jeito, saindo junto com o seu próximo golpe de arma.',
+  'guide.combat.queueTitle': 'Seu próximo movimento já está engatilhado',
+  'guide.controls.arrowKeys': 'Teclas de seta',
+  'guide.controls.attackMoveNote':
+    'Mais um, desativado por padrão: ative Mover e Atacar nas opções para reservar uma tecla (A, enquanto a opção estiver ligada) que leva você em direção ao cursor e parte para cima do inimigo sob ele, ou do primeiro que encontrar pelo caminho.',
+  'guide.controls.bothMouse': 'Ambos os botões do mouse',
+  'guide.controls.calendar': 'Calendário de eventos',
+  'guide.controls.crafting': 'Criação',
+  'guide.controls.discord': 'Discord',
+  'guide.controls.groupPet': 'Comandos do mascote',
+  'guide.controls.petBar':
+    'Barra do mascote: Atacar, Parar, Provocar, Defensivo, Agressivo (com um mascote de caçador ou bruxo invocado)',
+  'guide.controls.runForward': 'Correr para frente',
+  'guide.controls.valeCup': 'Copa do Vale',
+  'guide.dungeonsPage.heroicBody':
+    'Cada masmorra de cinco jogadores, e a própria raide, tem uma versão heroica à espera além do nível máximo. Os mesmos salões, refeitos para um grupo de fim de jogo bem equipado: tudo golpeia mais forte, nada pode ser despistado a pé, e os chefes ignoram por completo atordoamentos e imobilizações. Deixe para trás as versões normais primeiro; o heroico presume que você já as superou.',
+  'guide.dungeonsPage.heroicHowBody':
+    'Escolha a dificuldade antes que seu grupo reserve a instância: digite /dungeon heroic ou acione a opção Dificuldade da Masmorra no menu do grupo. A escolha é compartilhada pelo grupo inteiro e se fixa na porta, então uma incursão permanece aquilo que foi reservado.',
+  'guide.dungeonsPage.heroicLockoutBody':
+    'As masmorras normais podem ser percorridas o dia inteiro. O heroico pede paciência: matar o chefe final prende todos na incursão a uma única conclusão heroica daquela masmorra por dia, e a raide mantém um bloqueio diário para cada dificuldade. Uma incursão de cinco jogadores já concluída continua aberta ao próprio grupo para retornos de corpo e saque, então ninguém fica trancado longe do que conquistou ali. A raide é mais rígida: assim que o abate o prende, a porta permanece fechada até a redefinição diária, então recolha seus despojos antes de deixar a arena.',
+  'guide.dungeonsPage.heroicRewardsBody':
+    'Os chefes heroicos largam o saque que você conhece, aprimorado e marcado como Heroico na dica de item, e o chefe final de cada incursão acrescenta épicos que não se encontram em nenhum outro lugar. Esse último abate também deixa Marcas Heroicas para cada participante: uma moeda gasta com o Intendente Vex em Highwatch, cujo estoque de anéis e colares é a única joalheria do reino.',
+  'guide.dungeonsPage.heroicRewardsTitle': 'Marcas Heroicas e despojos aprimorados',
+  'guide.dungeonsPage.heroicTitle': 'Modo heroico',
+  'guide.economy.dailyBody':
+    'Um botão de baú do tesouro na sua tela abre a janela de recompensas diárias. Cada dia propõe um punhado de tarefas, completar missões, lutar no Coliseu Cinzento, vencer uma partida da Copa do Vale, e oferece um giro grátis da roda de prêmios, tudo valendo pontos para a classificação daquele dia, e os que mais pontuam no dia dividem um fundo de prêmios destinado aos portadores do token comunitário opcional. Nada disso concede poder no jogo. A própria janela detalha as regras do dia e quem é elegível, mostra o placar e guarda o seu histórico.',
+  'guide.economy.dailyTitle': 'Recompensas diárias',
+  'guide.economy.mailBody':
+    'Toda cidade principal mantém um pilar de corvo entalhado: uma caixa de correio do Correio dos Corvos, o serviço de cartas do reino. Fique junto de um para escrever a qualquer personagem pelo nome, um amigo online ou há muito offline, e anexe moedas ou bens à carta por uma pequena taxa postal. O corvo leva um tempinho para voar; quando pousa, um indicador de envelope avisa o destinatário de que algo o aguarda.',
+  'guide.economy.mailHow':
+    'Recolher funciona da mesma forma ao contrário: fique junto de qualquer pilar para ler suas cartas e recolher o que elas trazem para sua carteira e suas bolsas. Uma carta simples se desfaz depois de um tempo, mas uma que ainda carrega moedas ou bens espera por você, por mais que você demore. Algumas coisas o correio recusa de imediato: itens vinculados à alma, bens de missão e fichas cosméticas únicas viajam com você ou não viajam de jeito nenhum. E fique de olho no pilar depois de uma boa entrega de missão; alguns doadores de missão escrevem.',
+  'guide.economy.mailTitle': 'O Correio dos Corvos',
+  'guide.footer.linksLabel': 'Links de jogo e comunidade',
+  'guide.gear.bagsBody':
+    'Tudo o que você recolhe fica em uma mochila compartilhada, e você a amplia equipando bolsas. Sua janela de bolsas tem quatro encaixes de bolsa: clique em uma bolsa na sua mochila para encaixá-la em um espaço livre, e cada bolsa que você usa adiciona o próprio espaço. Bolsas simples são mercadorias baratas de vendedor, as mais espaçosas caem de feras, e as melhores vêm dos chefes de masmorra, então seu espaço de carga cresce lado a lado com seu equipamento.',
+  'guide.gear.bagsTitle': 'Bolsas e espaço de carga',
+  'guide.gear.slotFinger': 'Dedo',
+  'guide.gear.slotNeck': 'Pescoço',
+  'guide.gear.soulboundBody':
+    'Algumas recompensas especiais são vinculadas à alma, presas ao seu personagem desde o instante em que você as ganha. Um item vinculado à alma não pode ser negociado, enviado pelo correio, vendido a um vendedor nem anunciado no mercado; ele é seu e só seu. Hoje essa proteção guarda fichas de prêmio como as Marcas Heroicas, enquanto o equipamento que você conquista é seu para negociar, vender ou compartilhar livremente.',
+  'guide.gear.soulboundTitle': 'Vinculado à alma: seu e só seu',
+  'guide.glossary.deedDef':
+    'Uma conquista registrada no Livro dos Feitos. Obter um concede Renome, e alguns concedem um título cosmético ou uma borda de placa de nome.',
+  'guide.glossary.deedTerm': 'Feito',
+  'guide.glossary.heroicDef':
+    'A versão mais difícil de uma masmorra ou da raide, ajustada para grupos de fim de jogo bem equipados. Os chefes heroicos largam saque aprimorado, e o chefe final paga Marcas Heroicas.',
+  'guide.glossary.heroicTerm': 'Heroico',
+  'guide.glossary.loadoutDef':
+    'Uma configuração de talentos salva. Mantenha várias e alterne entre builds sem gastar seus pontos de novo um a um.',
+  'guide.glossary.loadoutTerm': 'Configuração',
+  'guide.glossary.lockoutDef':
+    'Um limite diário sobre as maiores recompensas repetíveis. Cada masmorra heroica paga uma conclusão por dia, a raide controla o normal e o heroico separadamente, e saquear um chefe mundial inicia o seu. Uma incursão de cinco jogadores já concluída continua aberta ao próprio grupo; a porta trancada da raide não reabre até a redefinição.',
+  'guide.glossary.lockoutTerm': 'Bloqueio',
+  'guide.glossary.metersDef':
+    'A janela de placar do grupo para a luta atual: dano causado, cura realizada e quem detém a maior ameaça, mantidos por confronto. Abra-a com seu atalho (Z por padrão).',
+  'guide.glossary.metersTerm': 'Medidores de dano',
+  'guide.glossary.petBarDef':
+    'A fileira de comandos que um mascote de caçador ou bruxo adiciona: Atacar, Parar, Provocar, Defensivo e Agressivo, atribuídos a Ctrl mais 1 a 5 por padrão.',
+  'guide.glossary.petBarTerm': 'Barra do mascote',
+  'guide.glossary.readyCheckDef':
+    'Um líder de grupo digitando /ready para consultar o grupo ou a raide: cada um confirma Pronto ou Não Pronto, e o grupo vê a contagem.',
+  'guide.glossary.readyCheckTerm': 'Verificação de prontidão',
+  'guide.glossary.renownDef':
+    'A pontuação vitalícia que a soma dos seus feitos alcança. Ela só sobe, e o reino mantém a classificação dela no Placar.',
+  'guide.glossary.renownTerm': 'Renome',
+  'guide.glossary.restedDef':
+    'Experiência bônus que seu personagem acumula ao descansar em uma estalagem, fora de combate. Seus próximos abates ganham experiência extra até o acúmulo se esgotar.',
+  'guide.glossary.restedTerm': 'Descansado',
+  'guide.glossary.soulboundDef':
+    'Um item preso ao seu personagem desde o instante em que você o adquire. Não pode ser negociado, enviado pelo correio, vendido a um vendedor nem anunciado no mercado.',
+  'guide.glossary.soulboundTerm': 'Vinculado à alma',
+  'guide.glossary.spiritHealerDef':
+    'O curandeiro espiritual do reino, pairando sobre cada cemitério: ele pode reerguer seu fantasma ali mesmo ao preço de uma fraqueza passageira.',
+  'guide.glossary.spiritHealerTerm': 'O Guardião Pálido',
+  'guide.glossary.targetMarkerDef':
+    'Um símbolo que qualquer membro do grupo ou da raide pode fixar sobre um alvo para que todos foquem, ou evitem, o mesmo. Oito símbolos, um alvo por símbolo.',
+  'guide.glossary.targetMarkerTerm': 'Marcador de alvo',
+  'guide.glossary.worldBossDef':
+    'Um chefe com força de raide que surge no mundo aberto em um ritmo constante, enfrentado por quem quer que se reúna para respondê-lo, e não por um grupo fixo.',
+  'guide.glossary.worldBossTerm': 'Chefe mundial',
+  'guide.models.formBear': 'Forma de Bruin',
+  'guide.models.formCat': 'Forma de Lobo',
+  'guide.models.formTravel': 'Forma de Fleet',
+  'guide.models.groupForms': 'Formas de Druida',
+  'guide.nav.sidebarLabel': 'Tópicos do guia',
+  'guide.professions.craftHowBody':
+    'Abra a janela de Criação (tecla padrão T) para ver cada receita que você conhece, o que cada uma exige e o que você tem em mãos; quando os materiais estão ali, um clique faz o trabalho. Receitas comuns podem ser criadas em qualquer lugar do mundo. Um punhado de receitas avançadas de ferramentas, em vez disso, pede que você esteja no polo de criação em Highwatch.',
+  'guide.professions.craftHowTitle': 'A janela de criação',
+  'guide.professions.focusBody':
+    'Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e direcione um pequeno orçamento de pontos de foco aos tipos de componente que lhe interessam. Quanto mais foco você dá a um componente, mais fino e rico ele sai de cada corpo dali em diante; sua distribuição acompanha seu personagem por onde ele andar, e você pode reajustá-la, de graça, em qualquer visita posterior à cidade.',
+  'guide.professions.focusTitle': 'Foco da Cidade',
+  'guide.professions.harvestBody':
+    'A coleta não para nos nós. Algumas feras abatidas podem ser colhidas em busca de componentes, couros, presas, seda e coisas mais estranhas, direto do corpo, junto de seu saque comum. Um coletor por abate: quem colhe primeiro leva tudo. A escolha também é sua a cada vez: retire tudo o que o corpo oferece, ou concentre-se em um único componente e leve um grau mais fino dele. Qualquer personagem pode colher, sem exigir ofício ou treinamento, e um componente especialmente fino chega a carregar o nome de quem o colheu.',
+  'guide.professions.harvestTitle': 'Colhendo a própria caçada',
+  'guide.search.typeAbility': 'Habilidade',
+  'guide.search.typeDeed': 'Feito',
+  'guide.settingsPage.audioBody':
+    'A janela de opções não é só de pixels. Uma categoria de Áudio tem controles de volume separados para efeitos, música e voz, e a categoria Interface traz um seletor de idioma que relocaliza toda a interface na hora, sem precisar recarregar, além de um seletor de tema para a aparência das janelas. O idioma também vem fixado em primeiro lugar na Visão Geral, então está sempre a um passo de você abrir o menu.',
+  'guide.settingsPage.audioTitle': 'Som e idioma',
+  'guide.settingsPage.autolootBody':
+    'Prefere não clicar em cada corpo? Uma opção de interface, desativada por padrão, recolhe o saque dos seus próprios abates conforme você passa por eles.',
+  'guide.settingsPage.factSearchBody':
+    'Não sabe onde fica uma opção? Digite na caixa de busca no topo do menu. Ela também entende expressões comuns, então fps encontra o indicador de FPS, e escolher um resultado leva você direto à configuração e a deixa destacada.',
+  'guide.settingsPage.factSearchTitle': 'A busca encontra primeiro',
+  'guide.settingsPage.touchBody':
+    'Em uma tela sensível ao toque, as opções também ganham um conjunto de conforto próprio: tamanho e sensibilidade do joystick, tamanho e opacidade dos botões na tela, um layout espelhado para canhotos, um controle de câmera opcional e visão por toque invertida, para que a tela se ajuste às suas mãos, e não o contrário.',
+  'guide.social.calendarBody':
+    'Pressione I para abrir o calendário de eventos. Ele marca os dias do reino que valem um planejamento, da convocação semanal de raide à noite de Fiesta, e é onde as guildas mantêm sua agenda: o líder da guilda e os oficiais podem marcar eventos nele, e cada membro os vê na mesma página.',
+  'guide.social.calendarHeading': 'O calendário de eventos',
+  'guide.social.communityBody':
+    'Comece uma linha de chat com um ponto de exclamação para fazer uma chamada da comunidade: !lfg para procurar um grupo, !wts e !wtb para negociar, !recruit para sua guilda, !event para anunciar uma raide ou encontro, e !help para pedir uma mão. Um menu das chamadas aparece no instante em que você digita o sinal. Cada chamada é transmitida no mundo e ecoada no Discord da comunidade, então alcança jogadores que nem estão conectados. As chamadas da comunidade fazem parte do jogo online.',
+  'guide.social.communityHeading': 'Chamando toda a comunidade',
+  'guide.social.emotesBody':
+    'Seu personagem também pode falar sem palavras: digite um emote como /wave, /dance, /cheer ou /bow, mire primeiro em um amigo para direcioná-lo a ele, ou segure X para abrir a roda de emotes e ter uma expressão rápida acima da cabeça.',
+  'guide.social.markersBody':
+    'Em um grupo, selecione uma criatura hostil e clique com o botão direito no retrato dela no quadro de alvo (toque longo no touch) para coroá-la com um dos oito símbolos de raide. Qualquer membro pode marcar, cada símbolo fica em um alvo por vez, e reaplicar um símbolo ao seu próprio alvo o remove. Ordem de abate, atribuições de controle de grupo ou um simples "este primeiro" viajam mais rápido como símbolo do que como frase.',
+  'guide.social.markersHeading': 'Marcadores de alvo',
+  'guide.social.readyBody':
+    'Antes de uma puxada grande, o líder do grupo pode digitar /ready para consultar a sala: todos os demais recebem um aviso de Pronto ou Não Pronto, e assim que todos respondem, ou 30 segundos se esgotam, o grupo inteiro vê um único resumo da contagem. Ninguém é apontado; o que importa é a contagem, não o culpado.',
+  'guide.social.readyHeading': 'Verificações de prontidão',
+  'guide.social.slashBody':
+    'Alguns comandos do dia a dia valem a pena memorizar: /w Nome envia um sussurro e /r responde ao último que você recebeu, /invite convida alguém para o seu grupo, /follow faz você seguir os passos de um amigo, /roll joga os dados à vista do grupo, /who mostra quem está online e /afk marca você como ausente. Digite /help no jogo para a lista completa.',
+  'guide.social.slashHeading': 'Comandos de barra úteis',
+  'guide.stats.hasteBody':
+    'A Aceleração é um atributo que agiliza tudo o que você faz: golpes corpo a corpo, disparos à distância e conjurações aceleram todos juntos. Ela vem do equipamento, sobretudo dos bônus de conjunto de armadura, enquanto algumas habilidades concedem um breve surto de golpes mais rápidos. Sua ficha a mostra como Índice de Aceleração.',
+  'guide.stats.hasteTitle': 'Aceleração',
+  'guide.talentsPage.choiceNote':
+    'Alguns pontos em cada árvore são uma encruzilhada, e não uma compra: o nó oferece duas ou três opções e você se compromete com uma delas. Sua próxima redefinição reabre a escolha, como tudo o mais na árvore.',
+  'guide.valeCupPage.bettingBody':
+    'Os espectadores no Sowfield podem apostar em um lado enquanto uma partida se forma: as apostas se juntam num bolo, e ao apito final os vencedores dividem o bolo dos perdedores na proporção do que apostaram. Uma partida empatada, ou uma zebra em que ninguém apostou, devolve cada moeda. Jogadores escalados na partida não podem apostar nela, e a grade guarda seu registro vitalício de vitórias, derrotas e saldo de moedas.',
+  'guide.valeCupPage.bettingHeading': 'Uma aposta na grade',
+  'guide.valeCupPage.practiceBody':
+    'A janela da Copa do Vale também oferece treino: uma cópia privada do campo onde bots preenchem os dois lados e nada conta para o seu histórico. Faltando um jogador ou dois para valer? Depois de uma curta espera, bots completam os times, e qualquer partida com bots em campo é amistosa, nunca ranqueada. E quando o Sowfield fica ocioso, os bots fazem uma exibição que você pode assistir, e apostar, das arquibancadas; no instante em que jogadores reais ficam prontos, a exibição cede o campo e cada aposta é devolvida.',
+  'guide.valeCupPage.practiceHeading': 'Partidas de treino e o campo ocioso',
+  'guide.worldPage.worldBossBody':
+    'No alto de Thornpeak, a tempestade sobre Stormcrag às vezes toma forma. Thunzharr, o Pico Desperto se ergue ali em um ritmo constante, um elemental com força de raide enfrentado no mundo aberto por quem quer que atenda ao chamado, e ele fica mais poderoso quanto mais desafiantes se erguem contra ele. Cada um que entra na luta ganha o próprio sorteio dos despojos dele, honrado nos termos do bloqueio de raide, e sua queda perdura o bastante para que os tombados corram de volta e reivindiquem o que lhes cabe. Reúna mais espadas do que você acha que precisa.',
+  'guide.worldPage.worldBossTitle': 'Quando o pico desperta: o chefe mundial',
 };

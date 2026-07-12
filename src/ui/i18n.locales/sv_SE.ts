@@ -35,7 +35,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.professions': 'Yrken',
   'guide.nav.valeCup': 'Dalcupen',
   'guide.professions.archetypeChooseBody':
-    'Du antar din första arketyp genom ett tidigt berättelseuppdrag i zon ett som formellt upptar dig i den identiteten. Innan du har slutfört det uppdraget har du inte valt någon arketyp alls.',
+    'Att förklara en arketyp kommer att bli ett berättelseögonblick: ett uppdrag som formellt tar upp dig i den identiteten. Den vägen håller fortfarande på att byggas, så för tillfället vandrar varje karaktär genom världen med valet framför sig, och varje hantverk avancerar under tiden till kvalitetsnivån Sällsynt.',
   'guide.professions.archetypeChooseTitle': 'Att välja arketyp',
   'guide.professions.archetypeIdentityBody':
     'Din aktiva arketyp är ett uttalande om vem din karaktär är i världen, och den märks i hur andra och världen tilltalar dig. Exakt vilka belöningar och vilket erkännande som följer med håller ännu på att färdigställas; titta in igen allteftersom systemet fylls på.',
@@ -43,38 +43,38 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeIntro':
     'Vart och ett av de tio hantverken står också för en arketyp, en bredare identitet du kan anta bortom att bara utöva yrket. Din aktiva arketyp är ett enda val i taget, inte en checklista: du bär en, och kan byta senare om du vill.',
   'guide.professions.archetypeSwitchBody':
-    'Att en gång ha antagit en arketyp låser dig inte vid den för alltid. Att byta till en annan arketyp innebär att du först slutför ett upprepningsbart "gottgörelseuppdrag" för din gamla, och för varje byte blir gottgörelsen som förväntas av dig nästa gång lite brantare, så att byten förblir meningsfulla i stället för kostnadsfria.',
+    'Inte heller kommer en förklaring att bli ett livstidsstraff. Planen är en upprepningsbar gottgörelse till ditt gamla yrke innan du tar upp ett nytt, där gottgörelsen blir brantare för varje gång du byter, så att valet förblir meningsfullt i stället för kostnadsfritt. Liksom själva förklaringen är den fortfarande på väg.',
   'guide.professions.archetypeSwitchTitle': 'Att ändra sig',
   'guide.professions.archetypeTitle': 'De tio arketyperna',
   'guide.professions.craftComboBody':
-    'Utöver ett enskilt hantverks egen receptlista stöder hjulet också kombinationsrecept som kräver två angränsande hantverk på en gång, vilket belönar en karaktär (eller ett par handelspartner) som har satsat på närliggande yrken på ringen snarare än ett i isolering.',
+    'Utöver ett enskilt hantverks egen receptlista stöder hjulet också kombinationsrecept som kräver två angränsande hantverk på en gång, vilket belönar en karaktär som har satsat på närliggande yrken på ringen snarare än ett i isolering. Hantverkaren måste själv behärska båda yrkena; en partners skicklighet kan inte träda in för någondera halvan.',
   'guide.professions.craftComboTitle': 'Kombinationsrecept',
   'guide.professions.craftIntro':
     'Tio hantverksyrken förvandlar insamlade material till färdig utrustning och varor: Rustningssmide, Vapensmide och Juvelerarkonst formar råmaterial till bärbar utrustning; Alkemi och Ingenjörskonst drivs av försök och misstag; Matlagning, Skrivkonst och Förtrollning arbetar var och en med andra hantverks produkter; Skrädderi och Garvning arbetar efter exakta mönster. Tillsammans bildar de ett hjul, där varje hantverk sitter bredvid två grannar och mittemot ett annat.',
   'guide.professions.craftMasteryBody':
-    'Lyckade hantverk bygger skicklighet i det yrket, och rikare recept är låsta bakom högre skicklighet: grundrecepten är öppna för alla, medan allt mer avancerade recept kräver allt större mästerskap för att ens kunna prövas. Att öka din skicklighet i ett hantverk är vägen från enkla nybörjarvaror till dess mer ambitiösa recept.',
+    'Lyckade hantverk bygger skicklighet i det yrket, och skicklighet låser aldrig bort ett hantverks recept: kan du ett recept och har dess material, kan du försöka dig på det. Vad skicklighet i stället köper dig är kvalitet, en övad hand gör finare arbete. Det enda undantaget är kombinationsrecept, som ber dig ha bevisat dig i båda sina hantverk innan de öppnas.',
   'guide.professions.craftMasteryTitle': 'Skicklighet och mästerskap',
   'guide.professions.craftRecipesBody':
-    'Varje hantverk har sina egna recept, som vart och ett kräver särskilda reagenser du samlar eller köper. De mest grundläggande recepten i varje hantverk kräver inget annat än vanliga material och kan tillverkas från allra första början, så du kan börja utöva ett yrke i samma stund som du tar upp det i stället för att vänta på att låsa upp det.',
+    'Varje recept kräver särskilda reagenser du samlar eller köper. De enklaste recepten ber inte om annat än vanliga material och kan tillverkas från allra första början, så du kan börja utöva ett yrke i samma stund du tar upp det. Receptlistorna fylls fortfarande på: några yrken väntar på sina första recept, och fler kommer i takt med att hantverken växer.',
   'guide.professions.craftRecipesTitle': 'Recept och reagenser',
   'guide.professions.craftRingBody':
     'De tio hantverken är ordnade i en fast ring, och var ett hantverk sitter på ringen spelar roll: hantverk bredvid varandra på hjulet har mer gemensamt än hantverk på motsatta sidor. Att satsa på ett hantverk ska kännas som att gå med i en familj av besläktade yrken, inte som att välja en isolerad färdighet.',
   'guide.professions.craftRingTitle': 'Ett hjul av specialiteter',
   'guide.professions.craftTitle': 'De tio hantverken',
   'guide.professions.gatherIntro':
-    'Tre insamlingsyrken låter dig hämta råmaterial direkt ur världen: Gruvdrift bryter malm och sten ur ådror, Skogsavverkning fäller timmer ur träddungar, och Örtkunskap samlar örter och växter som växer vilt. Vart och ett spåras separat, så att arbeta med ett saktar aldrig ner dina framsteg i ett annat.',
+    'Tre insamlingsyrken låter dig hämta råmaterial direkt ur världen: Gruvdrift bryter malm och sten ur ådror, Skogsavverkning fäller timmer ur träddungar, och Örtkunskap samlar örter och växter som växer vilt. Vart och ett spåras separat, så att arbeta med ett saktar aldrig ner dina framsteg i ett annat. Ny på alltihop? Foreman Odell i Östbäck har ett kort ärende, Ett yrke för varje hand, som lotsar dig genom din första skörd.',
   'guide.professions.gatherProficiencyBody':
-    'Varje lyckad skörd bygger din färdighet i det insamlingsyrket. Högre färdighet skiftar vad du får ut ur en fyndplats mot sällsyntare materialkvaliteter, från vanlig och uppåt, även om de sällsyntaste kvaliteterna förblir sällsynta även vid hög färdighet. Mer övning skadar aldrig dina odds, den förbättrar dem bara.',
-  'guide.professions.gatherProficiencyTitle': 'Färdighet och materialkvalitet',
+    'Varje lyckad skörd bygger din färdighet i det insamlingsyrket, och ditt karaktärsblad spårar varje yrke för sig. Mer övning skadar aldrig dina framsteg, den bara lägger till dem.',
+  'guide.professions.gatherProficiencyTitle': 'Färdighet',
   'guide.professions.gatherTitle': 'Insamling: Gruvdrift, Skogsavverkning och Örtkunskap',
   'guide.professions.gatherToolsBody':
-    'Handlare säljer grundverktyg för varje insamlingsyrke, och bättre kan tillverkas, så tanken är att arbetet vid en resursfyndplats ska kännas allt kraftfullare i takt med att du rustar upp för det, snarare än att förbli oförändrat. Verktyg av högre klass är den avsedda vägen att låsa upp rikare fyndplatser och att arbeta dem mer effektivt under en lång session.',
+    'Handlare säljer grundverktyg för varje insamlingsyrke, och bättre kan tillverkas. Inget verktyg krävs för att arbeta en fyndplats i dag: verktygen är grundarbete för rikare fyndplatser som kommer, där hackor, yxor och skäror av högre klass blir vägen in.',
   'guide.professions.gatherToolsTitle': 'Yrkets verktyg',
   'guide.professions.gatherWhatBody':
-    'Malmådror, träddungar och örtsnår ligger utplacerade i zonerna som synliga fasta punkter utan ägare. Gå fram till en och interagera med den för att skörda vad den rymmer. När du har skördat en fyndplats behöver den tid att återhämta sig innan just du kan skörda den igen, men den blockerar aldrig någon annan: en annan spelare kan skörda samma fyndplats under tiden.',
+    'Malmådror, träddungar och örtsnår ligger utplacerade i Dalen och träsket som synliga fasta punkter utan ägare. Gå fram till en och interagera med den för att skörda vad den rymmer. När du har skördat en fyndplats behöver den tid att återhämta sig innan just du kan skörda den igen, men den blockerar aldrig någon annan: en annan spelare kan skörda samma fyndplats under tiden.',
   'guide.professions.gatherWhatTitle': 'Resursfyndplatser',
   'guide.professions.intro':
-    'Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning vid hantverksstationerna för tio olika yrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.',
+    'Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning och varor genom tio hantverksyrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.',
   'guide.valeCupPage.heading': 'Dalcupen',
   'guide.valeCupPage.howHeading': 'Så spelar du',
   'guide.valeCupPage.howMatch':
@@ -109,10 +109,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje lag spelar under ett banér. Kaptenen väljer nation, och om båda sidor för samma banér spelar bortalaget i inverterade färger.',
   'guide.valeCupPage.nationsHeading': 'De åtta banérnationerna',
   'guide.valeCupPage.rewardsBody':
-    'Fredsreglerna innebär ingen erfarenhet och inget byte: en avgjord match räknas in i ditt facit och på vinnartavlan, och poäng till dagliga belöningar följer med. Att överge en match bänkar din plats, och Vaktmästaren minns.',
+    'Fredsreglerna innebär ingen erfarenhet och inget byte: en avgjord match räknas in i ditt facit och på vinnartavlan, och en seger räknas också mot dagens belöningsuppgifter. Att överge en match bänkar din plats, och Vaktmästaren minns.',
   'guide.valeCupPage.rewardsHeading': 'Fredsregler',
   'guide.valeCupPage.rolesBody':
-    'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament.',
+    'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament. I divisionerna en mot en och två mot två spelar alla allroundsuppsättningen, så rollval kommer till sin rätt först från tre mot tre och uppåt.',
   'guide.valeCupPage.rolesHeading': 'Sportroller',
   'guide.valeCupPage.spectateBody':
     'En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.',
@@ -3375,13 +3375,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'Förstärkningar och kraftuppladdningar håller bara under matchen. De handlar om lekfulla, improviserade byggen, inte varaktig makt, så ingen köper sig till en seger.',
   'guide.arenaPage.coliseumBody':
-    'Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se.',
+    'Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se. Öppna Arena-fönstret för att anmäla dig till en division, ensam eller med din partner.',
   'guide.arenaPage.coliseumHeading': 'Det askgråa colosseumet',
   'guide.arenaPage.duelsBody':
     'Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.',
   'guide.arenaPage.duelsHeading': 'Dueller',
   'guide.arenaPage.fiestaBody':
-    'Fiesta är ett snabbt två-mot-två-läge som spelas i korta rundor. Mellan rundorna draftar du förstärkningar, snabba boostar som omformar din uppsättning i farten, så att inga två matcher spelas riktigt likadant.',
+    'Fiesta är ett snabbt slagsmål två mot två som utkämpas som en enda sammanhängande drabbning, med varje kämpe ställd på jämn fot. Medan striden pågår draftar du förstärkningar, snabba boostar som omformar din uppsättning i farten, så att inga två matcher spelas riktigt likadant.',
   'guide.arenaPage.fiestaHeading': 'Två-mot-två-fiesta',
   'guide.arenaPage.heading': 'Arena och PvP',
   'guide.arenaPage.intro':
@@ -3402,7 +3402,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.',
   'guide.arenaPage.waveSilverTitle': 'Silver',
   'guide.arenaPage.wavesBody':
-    'Varje runda i en Fiesta ger dig ett färskt val, och valen blir djärvare allteftersom matchen fortskrider. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.',
+    'En Fiesta-drabbning ger dig färska val efter hand, och valen blir djärvare ju längre striden pågår. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.',
   'guide.arenaPage.wavesTitle': 'Förstärkningar kommer i vågor',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Kåpklädda tjänare till dödskulten vars verk besudlar gravarna från dalen till topparna. Där de samlas vilar inte de döda.',
@@ -3416,7 +3416,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En stormelementar med axlar, som vandrar de bortre klipporna ovanför Stormcrag med en hjärtskärva värd att trotsa blixten för.',
   'guide.bestiary.heading': 'Bestiarium',
   'guide.bestiary.intro':
-    'Världens varelser, grupperade efter familj. Dessa är de fiender du möter ute i det öppna. De dödligaste tingen väntar, olistade, bakom fängelsehålornas dörrar.',
+    'Världens varelser, grupperade efter familj. Dessa är de vardagsfiender du möter ute i det öppna. Elitfiender och deras krigsherrar håller sig borta från dessa sidor, och de dödligaste tingen av alla väntar bakom fängelsehålornas dörrar.',
   'guide.bestiary.levels': 'Nivå {min} till {max}',
   'guide.bestiary.levelsSame': 'Nivå {min}',
   'guide.bestiary.notedLabel': 'Värt att notera',
@@ -3463,7 +3463,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.back': 'Alla klasser',
   'guide.classPage.fullKitHeading': 'Hela uppsättningen',
   'guide.classPage.fullKitNote':
-    'Varje förmåga denna klass kan lära sig, i den ordning den blir tillgänglig. Talanger avgör vilka som bär ditt bygge.',
+    'Uppsättningen den här klassen lär sig medan den stiger i nivå, i den ordning den blir tillgänglig. Talanger ger några förmågor till och avgör vilka som bär ditt bygge.',
   'guide.classPage.masteryLabel': 'Mästerskap',
   'guide.classPage.petsHeading': 'Demoner',
   'guide.classPage.petsNote':
@@ -3472,15 +3472,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.roleLabel': 'Spelar som',
   'guide.classPage.specsHeading': 'Specialiseringar',
   'guide.combat.ccBody':
-    'Masskontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rötter och nedsaktningar, tystnader som stoppar besvärjelser, avväpningar, skräckeffekter, och förvandlingar som gör en fiende ofarlig för ett ögonblick. Vissa av dessa, som rötter, skräck och förvandlingar, tappar sitt grepp när de läggs på igen för snabbt, så de kan inte kedjas i all evighet.',
+    'Masskontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rötter och nedsaktningar, tystnader som stoppar besvärjelser, avväpningar, skräckeffekter, och förvandlingar som gör en fiende ofarlig för ett ögonblick. Mot andra spelare tunnas kontrollen ut av upprepning: samma slag som läggs på igen för snabbt försvagas och slutar sedan verka helt, och en bedövning som inleds från smygläge räknas skilt från de bedövningar som följer, så ingen kan kedjas hjälplös i all evighet. Världens varelser hyser inget sådant agg: kontroll försvagas aldrig av upprepning mot dem, även om många av de mäktigaste fienderna, namngivna eliter och de starkaste bossarna bland dem, inte kan kontrolleras alls.',
   'guide.combat.deathBody':
-    'Om din hälsa når noll blir du nedlagd. Släpp din ande för att återupplivas vid närmaste kyrkogård med full hälsa, och ta dig sedan tillbaka, så en död kostar dig lite tid, inte ditt framsteg. Mellan strider, sätt dig ner och ät och drick så att du börjar nästa vid full styrka.',
+    'Om din hälsa når noll blir du nedlagd där du står, och din kropp ligger kvar. Släpp din ande, så reser du dig som en gengångare vid närmaste kyrkogård: snabbare till fots än de levande, utom räckhåll för dina fiender, men oförmögen att slåss, plundra eller tala med någon annan än Den bleka väktaren som svävar över stenarna. Därifrån väljer du. Spring med din gengångare tillbaka till din kropp, så återupplivas du på fläcken med en del av din hälsa och mana återställd och helt utan påföljd. Eller anta Den bleka väktarens omedelbara uppståndelse där du står, till priset av Väktartullen: en tillfällig försvagning av allt du är, som varar längre ju mer luttrad du är och som skonar helt nya karaktärer helt och hållet. Faller du inne i en fängelsehåla väntar din ande vid kyrkogården utanför; gå med din gengångare tillbaka genom dörren, så återupplivas du vid ingången. Delver är undantaget: faller du där sätts du helt enkelt på fötter igen vid delvens ingång, men ett andra fall avslutar passet. Vilken väg du än väljer förlorar du ingen erfarenhet, utrustning eller mynt. Mellan strider, sätt dig ner och ät och drick så att du börjar nästa vid full styrka.',
   'guide.combat.deathTitle': 'När du faller',
   'guide.combat.effectsBody':
-    'Många förmågor lägger på en effekt som dröjer kvar. Hjälpsamma (förstärkningar) höjer dina egenskaper, skyddar dig eller läker dig lite i taget; skadliga (försvagningar) tömmer din hälsa med skada över tid eller försvagar dig. Håll koll på de små ikonerna nära din handlingsrad för att se vad som ligger på dig och hur länge det varar.',
+    'Många förmågor lägger på en effekt som dröjer kvar. Hjälpsamma (förstärkningar) höjer dina egenskaper, skyddar dig eller läker dig lite i taget; skadliga (försvagningar) tömmer din hälsa med skada över tid eller försvagar dig. Håll koll på de små ikonerna i skärmens övre hörn, bredvid minikartan, för att se vad som ligger på dig och hur länge det varar.',
   'guide.combat.effectsTitle': 'Förstärkningar, försvagningar och masskontroll',
   'guide.combat.growBody':
-    'Varje nivå gör dig tåligare och låser upp nya förmågor, hela vägen till taket på nivå {cap}. Att lösa uppdrag är det snabbaste sättet uppåt; fängelsehålor och utforskning rundar av det.',
+    'Varje nivå gör dig tåligare och låser upp nya förmågor, hela vägen till taket på nivå {cap}. Att lösa uppdrag är det snabbaste sättet uppåt; jakt, fängelsehåleturer och delver rundar av det.',
   'guide.combat.growTitle': 'Du blir starkare för varje nivå',
   'guide.combat.hitBody':
     'Attacker kan missa eller undvikas, och det kan fiendens också, medan besvärjelser kan motstås helt. Att slåss nära din egen nivå är vad som får dina slag att träffa; ju större nivåskillnaden är, desto mer slår du i tomma luften.',
@@ -3498,7 +3498,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': 'Handling',
   'guide.controls.arena': 'Arena',
   'guide.controls.controllerBody':
-    'Handkontroller fungerar också, och stöd för handkontroll är på som standard. Vänsterspaken förflyttar dig, högerspaken styr kameran, och ansikts- och axelknapparna täcker dina förmågor, hopp och interaktion. Öppna valfritt fönster för att ta fram en pekare på skärmen för menyer. Du kan binda om knapparna och justera spakens dödzon, kamerahastighet, vibration och inverterat sikte i handkontrollsinställningarna under alternativ.',
+    'Handkontroller fungerar också, och stöd för handkontroll är på som standard. Vänsterspaken förflyttar dig, högerspaken styr kameran, och ansikts- och axelknapparna täcker dina förmågor, hopp och interaktion. Öppna ett fönster som dina väskor för att ta fram en pekare på skärmen, och spelmenyn navigeras direkt med styrkorset och ansiktsknapparna. Du kan binda om knapparna och justera spakens dödzon, kamerahastighet, vibration och inverterat sikte i handkontrollsinställningarna under alternativ.',
   'guide.controls.controllerHeading': 'På handkontroll',
   'guide.controls.cycleFriendly': 'Växla mellan vänliga mål',
   'guide.controls.gameMenu': 'Öppna spelmeny och alternativ',
@@ -3507,16 +3507,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Gränssnitt',
   'guide.controls.groupMovement': 'Förflyttning',
   'guide.controls.intro':
-    'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar.',
+    'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar, utom Esc, som alltid öppnar spelmenyn, och en bindning kan vara en modifierarkombination som Shift+Z.',
   'guide.controls.keyHeader': 'Tangent',
   'guide.controls.leaderboard': 'Topplista',
   'guide.controls.mobileBody':
-    'Pekkontroller visas automatiskt på telefoner och surfplattor: en rörelsespak till vänster, dra var som helst till höger för att titta, och knappar på skärmen för dina förmågor och menyer.',
+    'Pekkontroller visas automatiskt på telefoner och surfplattor: en rörelsespak till vänster, dra var som helst annars för att titta, nyp med två fingrar för att zooma kameran, och knappar på skärmen för dina förmågor och menyer. En liten pil i övre vänstra hörnet visar eller döljer menyknapparna, och Mer-knappen där rymmer resten av dina fönster.',
   'guide.controls.mobileHeading': 'På mobil',
   'guide.controls.talents': 'Talanger',
   'guide.controls.targetFriendly': 'Måla in närmaste vänliga',
   'guide.delvesPage.affixesBody':
-    'Svårare omgångar slumpar fram en modifierare som ändrar hur nedstigningen spelas, från rastlösa döda, till dålig luft, till takverk som ger vika. De höjer faran och belöningen tillsammans. En delve med kryptatema kan slumpa fram någon av dessa:',
+    'Svårare omgångar slumpar fram en modifierare som ändrar hur nedstigningen spelas, från rastlösa döda, till dålig luft, till takverk som ger vika. De höjer faran och belöningen tillsammans. Varje delve drar från de modifierare som passar dess tema; i hela riket ser poolen ut så här:',
   'guide.delvesPage.affixesHeading': 'Omgångsmodifierare',
   'guide.delvesPage.affixesLabel': 'Möjliga modifierare',
   'guide.delvesPage.companionBody':
@@ -3548,7 +3548,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En delve är en liten instansierad fängelsehåla gjord enbart för dig och upp till en allierad, en privat kopia där du inte kan bli störd. Du startar den från en tavla som sköts av en delvevaktare ute i världen, hoppar in, slåss dig ner genom en handfull rum och avslutar på en enda väktare. Omgångar går snabbt och är menade att upprepas, så en delve är en pålitlig bit framsteg närhelst den öppna världen sinar.',
   'guide.delvesPage.whatHeading': 'Vad en delve är',
   'guide.delvesPage.whereBody':
-    'Den första delven, Det rasade relikvariet, öppnar vid Relikkullen i startdalen Östbäcksdalen. Broder Halven sköter tavlan där, och han skickar ner dig så snart du är redo.',
+    'Den första delven, Det rasade relikvariet, öppnar vid Relikkullen i startdalen Östbäcksdalen. Broder Halven sköter tavlan där, och han skickar ner dig så snart du är redo. Hans rundor slutar inte där: bortom Trollhögarna vid Dykärrsträskets norra rand öppnar samme väktare Den dränkta litanian för delvare som har hittat fotfästet.',
   'guide.delvesPage.whereHeading': 'Var du hittar en',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
@@ -3585,7 +3585,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeLoreTitle': 'Det dränkta templet, lite djupare',
   'guide.dungeonsPage.templeName': 'Det dränkta templet',
   'guide.economy.buyingBody':
-    'Ställ dig nära en köpman för att öppna deras fönster. Du kan köpa allt de har i lager om du har råd, och sälja det mesta i dina väskor mot mynt. Om du säljer något av misstag håller en handlare kvar dina senaste försäljningar så att du kan köpa tillbaka dem.',
+    'Tala med en köpman och välj att bläddra bland deras varor, så öppnas butiken med tre flikar: Bläddra, Sälj och Återköp. Bläddra rymmer allt de har i lager, ditt om du har råd. Sälj listar det i dina väskor som de betalar för, och att sälja en pjäs som bär sin egen slumpade kvalitet ber dig bekräfta först, så att en dyrbar kopia aldrig glider iväg av misstag. Om du gör dig av med något du ångrar håller fliken Återköp kvar dina senaste försäljningar så att du kan köpa tillbaka dem för myntet du fick.',
   'guide.economy.buyingTitle': 'Köpa och sälja',
   'guide.economy.coinBody':
     'Pengar finns i tre mynt. Hundra koppar blir ett silver, och hundra silver blir ett guld, så din börs fylls från det minsta myntet först. Du tjänar dem från uppdragsbelöningar, från att plundra fallna fiender och från att sälja det du inte längre behöver.',
@@ -3593,10 +3593,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.economy.intro':
     'Mynt smörjer hela världen: de köper din utrustning, dina förnödenheter och din reseutrustning, och byter ägare mellan spelare. Du plockar upp allt detta bara genom att spela, så se den här sidan som en karta över var dina pengar kommer ifrån och var de tar vägen.',
   'guide.economy.junkBody':
-    'Byten du inte har någon nytta av går fortfarande att sälja till vilken handlare som helst, så töm dina väskor varje gång du passerar genom staden i stället för att låta dem fyllas. Helt värdelösa småsaker kan också kastas direkt för att göra plats.',
+    'Byten du inte har någon nytta av går fortfarande att sälja till vilken handlare som helst, så töm dina väskor varje gång du passerar genom staden i stället för att låta dem fyllas. Handlarens Sälj-flik har till och med en enklicksknapp som säljer varenda småsak av Undermålig kvalitet på en gång. Helt värdelösa småsaker kan också kastas direkt för att göra plats.',
   'guide.economy.junkTitle': 'Rensa bort skräp',
   'guide.economy.marketBody':
-    'Köpmannen driver Världsmarknaden, en spelardriven börs där du kan köpa och sälja med folk du kanske aldrig träffar. Tala med Köpmannen för att öppna den. Köpmannen håller också ett stående lager av sina egna varor listade där, så det finns alltid något att köpa även när inga andra spelare har lagt upp något.',
+    'Köpmannen driver Världsmarknaden, en spelardriven börs där du kan köpa och sälja med folk du kanske aldrig träffar. Tala med Köpmannen i Östbäck, eller med Auktionsförrättare Voss uppe i Highwatch, för att öppna den: båda förvaltarna betjänar en och samma delade marknad. Köpmannen håller också ett stående lager av sina egna varor listade där, så det finns alltid något att köpa även när inga andra spelare har lagt upp något.',
   'guide.economy.marketBrowse':
     'Bläddra: skrolla genom annonserna eller sök på namn för att hitta det som är till salu. Varje annons visar varorna, säljaren och begärt pris för hela bunten.',
   'guide.economy.marketCollect':
@@ -3607,8 +3607,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Prissättningen är upp till dig. Att lägga sig lite under vad andra begär brukar sälja snabbare, medan ett brant pris kan bli liggande orört. Bläddra först för att se hur gångpriset ser ut innan du lägger upp.',
   'guide.economy.marketTitle': 'Världsmarknaden',
   'guide.economy.marksBody':
-    'Mynt är inte det enda du lägger på hög. Delver betalar ut Delve-märken, en separat valuta du bara spenderar hos delvevaktaren, på följeslagaruppgraderingar och utrustning du inte hittar någon annanstans. De blandas aldrig med ditt mynt.',
-  'guide.economy.marksTitle': 'En andra valuta: Delve-märken',
+    'Mynt är inte det enda du lägger på hög. Delver betalar ut Delve-märken, som du bara spenderar hos delvevaktaren på följeslagaruppgraderingar och utrustning du inte hittar någon annanstans. Heroiska fängelsehåleomgångar lämnar heroiska märken på slutbossen, som du spenderar hos den heroiska kvartersmästaren i Highwatch på smycken som ingen annan del av riket säljer. Ingendera blandas någonsin med ditt mynt.',
+  'guide.economy.marksTitle': 'Märken: valutorna bortom mynt',
   'guide.economy.tradeBody':
     'Du kan byta öga mot öga med vem som helst som står nära dig. Ni lägger båda föremål och mynt i ett delat fönster och bytet sker först när ni båda bekräftar det, så ingen sida kan bli lurad. Det är det enkla sättet att räcka en vän ett byte eller göra upp en affär.',
   'guide.economy.tradeTitle': 'Handla med andra spelare',
@@ -3647,15 +3647,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a1':
     'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
   'guide.faqPage.a10':
-    'Taket är nivå {cap}. Därifrån kör du fängelsehålorna för fem spelare och raiden för tio, jagar bättre utrustning och prövar dig själv i arenan.',
+    'Taket är nivå {cap}. Därifrån kör du fängelsehålorna för fem spelare och raiden för tio, tar dig an dem igen i heroiskt läge för uppgraderat byte, möter världsbossen när han reser sig, prövar dig själv i arenan, dyker ner i delver med en följeslagare vid din sida, och jagar bedrifter i Bedrifternas bok för att klättra i rikets ställning.',
   'guide.faqPage.a11':
     'Bjud in vem du än möter till en grupp, fråga i chatten, eller slå er ihop vid en fängelsehåla. Det mesta av världen går att klara ensam, så att gruppera sig är ett val, inte ett krav.',
   'guide.faqPage.a2':
-    'Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token låser bara upp kosmetiska detaljer och påverkar aldrig styrka eller progression.',
+    'Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token lägger bara till kosmetisk flärd och en andel av prispotten för dagliga belöningar, och den påverkar aldrig styrka eller progression.',
   'guide.faqPage.a3':
     'Ja. Spelet körs i en mobilwebbläsare med pekkontroller, och det finns även en datorklient.',
   'guide.faqPage.a4':
-    'Ja. Det finns ett direktstartat enspelarläge offline, och onlinevärlden går helt att klara ensam förutom fängelsehålor och raiden.',
+    'Ja. Det finns ett direktstartat enspelarläge offline, och onlinevärlden går helt att klara ensam förutom fängelsehålor, raiden och världsbossen.',
   'guide.faqPage.a5':
     'Nio, som täcker de klassiska rollerna tank, läkare och skadegörare, var och en med ett resurssystem (raseri, mana eller energi) och sina egna signaturförmågor.',
   'guide.faqPage.a6':
@@ -3706,7 +3706,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Det finns två kosmetiska linjer att samla. De flesta klasser har flera alternativa utseenden, en ny tolkning av klassens look som är din ensam att bära. Vid sidan av dem finns kromer: namngivna tvåfärgade färgscheman som målar om ett utseende helt, från dämpade metaller till lysande kejserliga färger.',
   'guide.gear.cosmeticsTitle': 'Utseenden och kosmetika',
   'guide.gear.fishingBody':
-    'Fiske är ett lugnt avbrott. Utrusta ett fiskespö, kasta ut i öppet vatten och dra in det som nappar. Mestadels fångar du fisk som är mat du kan äta, enstaka skräp att sälja för några mynt, och då och då en eftertraktad sällsynt fångst. Vad du hittar beror på vattnet du fiskar i.',
+    'Fiske är ett lugnt avbrott. Bär ett fiskespö, använd det vid öppet vatten och dra in det som nappar. Mestadels fångar du fisk som är mat du kan äta, enstaka skräp att sälja för några mynt, och då och då en eftertraktad sällsynt fångst. Vad du hittar beror på vattnet du fiskar i.',
   'guide.gear.fishingFood':
     'Fisken du drar in är mat: ät en medan du sitter och vilar så återställer den hälsa, med den bättre fisken från de kallare, djupare vattnen i norr. En lina i sjön är ett stilla sätt att hålla din packning fylld mellan strider.',
   'guide.gear.fishingRare':
@@ -3715,7 +3715,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'Utrustning är det din karaktär bär och föremålen du har med dig. Bättre utrustning är det stadigaste sättet att bli starkare, och du plockar upp det mesta bara genom att spela.',
   'guide.gear.itemLevelBody':
-    'Om du vill ha ett snabbt sätt att jämföra två pjäser, slå på Visa föremålsnivå i alternativen. Varje vapen och rustningspjäs visar då en föremålsnivå, en enda siffra för ungefär hur kraftfull den är utifrån var den kom ifrån, så att du på ett ögonkast kan se vilken uppgradering som väger tyngst, även mellan olika platser.',
+    'Om du vill ha ett snabbt sätt att jämföra två pjäser, slå på Visa föremålsnivå i alternativen. Utrustning som vunnits ute i världen, från fiender och uppdrag, visar då en föremålsnivå, en enda siffra för ungefär hur kraftfull den är utifrån var den kom ifrån, så att du på ett ögonkast kan se vilken uppgradering som väger tyngst, även mellan olika platser. Pjäser utan en sådan källa, som enkla handlarvaror och nybörjarutrustning, visar ingen föremålsnivå, så en saknad siffra är normalt, inte ett fel.',
   'guide.gear.qualityBody':
     'Varje föremål har en kvalitet, och dess namn är färglagt för att matcha så att du kan avläsa dess värde med en blick. Från vanligast till mest eftertraktad:',
   'guide.gear.qualityCommon': 'Vanlig',
@@ -3728,7 +3728,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityTitle': 'Kvalitet, med en blick',
   'guide.gear.qualityUncommon': 'Ovanlig',
   'guide.gear.setsBody':
-    'Den sällsyntaste rustningen kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Dessa faller från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.',
+    'En del rustning kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Några sådana familjer dyker upp som eftertraktade byten medan du klättrar i nivå; de främsta av dem kommer från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.',
   'guide.gear.setsTitle': 'Set och setbonusar',
   'guide.gear.slotChest': 'Bröst',
   'guide.gear.slotFeet': 'Fötter',
@@ -3739,10 +3739,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Axlar',
   'guide.gear.slotWaist': 'Midja',
   'guide.gear.slotsBody':
-    'Du har en vapenplats och sju rustningsplatser. Varje klass kan bara använda vissa vapen och bär rustning upp till sin egen tyngd, tyg, läder eller ringbrynja, så de uppgraderingar som passar dig är de som är gjorda för din klass. Inom det, fyll varje plats med den bästa pjäsen du hittar.',
+    'Du har en vapenplats, sju rustningsplatser och tre smyckesplatser: en hals och två fingrar. Varje klass kan bara använda vissa vapen och bär rustning upp till sin egen tyngd, tyg, läder eller ringbrynja, så de uppgraderingar som passar dig är de som är gjorda för din klass. Smycken väger ingenting alls: vilken klass som helst bär vad den än förtjänar. Inom det, fyll varje plats med den bästa pjäsen du hittar.',
   'guide.gear.slotsTitle': 'Vad du kan utrusta',
   'guide.gear.sourcesBody':
-    'Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, och spelarmarknaden låter dig köpa från andra äventyrare.',
+    'Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.',
   'guide.gear.sourcesTitle': 'Var utrustning kommer ifrån',
   'guide.gear.upgradeBody':
     'Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.',
@@ -3827,7 +3827,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Ja. Hela spelet är gratis upp till nivåtaket, och det är öppen källkod på GitHub.',
   'guide.home.faq.a2':
-    'Nej. Spelet är fullt spelbart utan en. Den valfria community-token låser bara upp kosmetisk flärd och påverkar aldrig styrkan.',
+    'Nej. Spelet är fullt spelbart utan en. Den valfria community-token lägger bara till kosmetisk flärd och en andel av prispotten för dagliga belöningar, och den påverkar aldrig styrkan.',
   'guide.home.faq.a3':
     'Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.',
   'guide.home.faq.a4':
@@ -3875,7 +3875,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.basicsHeading': 'Grunderna',
   'guide.howToPlay.controlsLink': 'Se den fullständiga referensen för kontroller',
   'guide.howToPlay.deathBody':
-    'Om du faller släpper du din ande och återupplivas vid närmaste kyrkogård, tillbaka till full hälsa, och tar dig sedan till där du var. Ingen erfarenhet går förlorad.',
+    'Om du faller ligger din kropp kvar där den föll, och du reser dig som en gengångare vid närmaste kyrkogård. Spring med din ande tillbaka till kroppen för att återupplivas på fläcken, utan påföljd, eller ta emot Den bleka väktaren vid kyrkogården för en omedelbar uppståndelse till priset av en övergående försvagning. Helt nya hjältar skonas från försvagningen helt och hållet, och inget du äger eller förtjänat går någonsin förlorat.',
   'guide.howToPlay.deathTitle': 'Döden är inte slutet',
   'guide.howToPlay.firstHeading': 'Dina första 15 minuter',
   'guide.howToPlay.groupingBody':
@@ -3890,7 +3890,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Anta uppdrag från personer med en markör över huvudet, slutför målet och lämna in dem för erfarenhet, mynt och utrustning. Spåraren på skärmen håller dina mål i sikte.',
   'guide.howToPlay.questsTitle': 'Uppdrag',
   'guide.howToPlay.reassure':
-    'Talanger låses upp vid nivå 10 och kan återställas när som helst, så dina tidiga val är aldrig permanenta. Experimentera fritt.',
+    'Talanger låses upp vid nivå 10 och kan återställas när som helst så länge du är utanför strid, så dina tidiga val är aldrig permanenta. Experimentera fritt.',
   'guide.howToPlay.resourcesBody':
     'Besvärjelser och förmågor kostar en resurs. Krigare bygger upp Raseri genom att slåss, skurkar spenderar Energi som fylls på av sig själv, och alla andra besvärjer från en pool av Mana.',
   'guide.howToPlay.resourcesTitle': 'Resurser',
@@ -3898,7 +3898,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Välj en klass och ett utseende, ge din hjälte ett namn och gå in i världen. Du kan skapa fler karaktärer senare.',
   'guide.howToPlay.step1Title': 'Skapa en karaktär',
   'guide.howToPlay.step2Body':
-    'Marskalk Redbrook väntar i startbyn. Prata med honom och anta Vargar vid dörren.',
+    'Marskalk Redbrook väntar i startbyn med Vargar vid dörren, och Foreman Odell i närheten har arbete också. Prata med endera för att anta ditt första uppdrag.',
   'guide.howToPlay.step2Title': 'Hitta ditt första uppdrag',
   'guide.howToPlay.step3Body':
     'Rör dig med W, A, S, D. Håll ner höger musknapp och dra för att se dig omkring. Det är ungefär allt.',
@@ -3986,7 +3986,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     'Varje nivå gör dig tåligare och ger nya förmågor, hela vägen upp till maxnivån {cap}.',
   'guide.progression.capJourneyBody':
-    'Nivå {cap} är taket, slutet på nivåökningen men inte på utvecklingen. Därifrån springer du fängelsehålor och raiden, jagar bättre utrustning och prövar dig själv i arenan.',
+    'Nivå {cap} är taket, slutet på nivåökningen men inte på utvecklingen. Därifrån kör du fängelsehålor och raiden på normal och heroisk, möter världsbossen när han reser sig, jagar bättre utrustning och prövar dig själv i arenan.',
   'guide.progression.capTitle': 'Att nå nivå {cap}',
   'guide.progression.intro':
     'Varje strid, uppdrag och steg norrut gör din hjälte starkare. Här är hur nivåökning fungerar och vad som håller dig växande när du väl når toppen.',
@@ -3996,15 +3996,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     'Det är ingen brådska. Världen finns där att njuta av i din egen takt, så vandra omkring, ta de uppdrag som fångar din blick och låt din hjälte växa längs vägen.',
   'guide.progression.prestigeBody':
-    'Erfarenheten räknas vidare även efter taket. Den göder en kosmetisk virtuell nivå, så din erfarenhetsmätare fortsätter klättra, och en långsiktig prestigerang du kan tjäna in för erkännandets skull. Att passera stora milstolpar i livstidserfarenhet låser också upp kosmetiska titlar och namnskyltsramar som visas på ditt karaktärsblad. Allt är helt valfritt och ger aldrig kraft, bara ett tecken på vägen du har vandrat.',
+    'Erfarenheten räknas vidare även efter taket. Den göder en kosmetisk virtuell nivå, så din erfarenhetsmätare fortsätter klättra, och en långsiktig prestigerang du kan hämta ut från ditt karaktärsblad när du väl är där. Att passera stora milstolpar i livstidserfarenhet förtjänar också bedrifter i din Bedrifternas bok, med kosmetiska titlar och namnskyltsramar som visas på ditt karaktärsblad. Allt är helt valfritt och ger aldrig kraft, bara ett tecken på vägen du har vandrat.',
   'guide.progression.restedBody':
-    'Vila på en trygg plats som ett värdshus, utanför strid, så bygger din karaktär upp vilad erfarenhet medan du sitter där. Nästa gång du ger dig ut och strider ger den poolen dina drap en extra skjuts tills den sinar. En paus vid värdshuset är aldrig bortkastad tid; den snabbar på din nästa sträcka av nivåökning.',
+    'Kliv in på ett värdshus och håll dig utanför strid, så bygger din karaktär upp vilad erfarenhet medan du väntar. Varje stad har ett. Nästa gång du ger dig ut och strider ger den poolen dina dråp en extra skjuts tills den sinar. En paus vid värdshuset är aldrig bortkastad tid; den snabbar på din nästa sträcka av nivåökning.',
   'guide.progression.restedTitle': 'Vilad erfarenhet',
   'guide.progression.xpBody':
-    'Du tjänar erfarenhet genom att slutföra uppdrag och genom att besegra fiender. Uppdrag ger absolut mest, så att följa uppdragsspåret är det snabbaste sättet att klättra. Att döda saker längs vägen fyller i resten.',
+    'Du tjänar erfarenhet genom att slutföra uppdrag, genom att besegra fiender och genom att rensa delver. Uppdrag ger absolut mest, så att följa uppdragsspåret är det snabbaste sättet att klättra. Dråp och delveturer längs vägen fyller i resten.',
   'guide.progression.xpTitle': 'Hur du tjänar erfarenhet',
   'guide.questsPage.acceptBody':
-    'Folk med en markör över huvudet har arbete åt dig. Prata med dem för att anta ett uppdrag. Ditt allra första är Vargar vid dörren, från Marskalk Redbrook i Östbäck.',
+    'Folk med en markör över huvudet har arbete åt dig. Prata med dem för att anta ett uppdrag. I Östbäck väntar Marskalk Redbrook med Vargar vid dörren, ett av de första uppdragen du kan anta.',
   'guide.questsPage.acceptTitle': 'Hitta och anta',
   'guide.questsPage.heading': 'Uppdrag',
   'guide.questsPage.intro':
@@ -4013,7 +4013,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Dräp vissa fiender, samla föremål eller interagera med något i världen. Skärmens spårare räknar din framgång allteftersom. Om du ändrar dig kan du släppa ett uppdrag från din uppdragslogg och ta upp det igen från dess givare senare.',
   'guide.questsPage.objectivesTitle': 'Mål',
   'guide.questsPage.partyBody':
-    'Gruppmedlemmar i närheten delar drap- och måluppfyllelse, så att lösa uppdrag tillsammans är snabbare, aldrig långsammare. Du kan också dela ett uppdrag med din grupp: lägg upp det i chatten som en klickbar länk med kommandot /share, och vilken närliggande medlem som helst som kvalificerar kan ta upp samma uppdrag med ett klick.',
+    'Gruppmedlemmar i närheten delar dråp- och måluppfyllelse, så att lösa uppdrag tillsammans är snabbare, aldrig långsammare. Du kan också dela ett uppdrag med din grupp: lägg upp det i chatten som en klickbar länk med kommandot /share, och vilken medlem som helst som kvalificerar kan ta upp samma uppdrag med ett klick.',
   'guide.questsPage.partyTitle': 'Uppdrag i grupp',
   'guide.questsPage.sagaBody':
     'Huvudberättelsen är en enda lång jakt. En dödskult är i farten vid rikets gravar, och varje kapitel du avslutar pekar en zon längre upp längs vägen. Du strider aldrig mot hela konspirationen på en gång; du drar i en tråd, och den leder till nästa hand som håller i den.',
@@ -4046,7 +4046,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ta ett färdigt uppdrag till dess inlämningsmarkör, kartan visar dig var, för erfarenhet, mynt och ofta en utrustningsdel vald för att passa din klass. Det är oftast den som gav dig det, även om vissa uppdrag skickar dig vidare till någon annan.',
   'guide.questsPage.turninTitle': 'Lämna in',
   'guide.questsPage.typeGatherBody':
-    'Samla föremål från världen eller från vad fiender släpper: örter, malm, förkomna brev, en kults dystra reagenser. Vissa delar faller bara från en särskild fiende, så jakten och bytet hör ihop.',
+    'Samla föremål från världen eller från vad fiender släpper: örter, malm, en kults dystra reagenser. Vissa delar faller bara från en särskild fiende, så jakten och bytet hör ihop.',
   'guide.questsPage.typeGatherTitle': 'Samla',
   'guide.questsPage.typeGroupBody':
     'Varje kapitel i huvudberättelsen slutar vid en fängelsehåledörr. Upptakten kan klaras ensam, men det avgörande slaget mot ett kapitels skurk är menat för en grupp om fem.',
@@ -4058,7 +4058,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Vissa uppdrag låter dig samla en stad inför en framstöt norrut: tunna ut hotet vid portarna och samla det försvararna behöver. Dessa är dräp- och insamlingsmål i tjänst hos folket vars berättelse du befinner dig i, och de håller dig i rörelse med dem.',
   'guide.questsPage.typeMusterTitle': 'Mönstra försvaret',
   'guide.questsPage.typeSlayBody':
-    'Tunna ut en flock bestar eller bryt en kults grepp genom att besegra ett bestämt antal av en markerad fiende. Spelets första uppdrag, att rensa vargar från Östbäcksvägen, är ett av dessa.',
+    'Tunna ut en flock bestar eller bryt en kults grepp genom att besegra ett bestämt antal av en markerad fiende. Ett av dina första uppdrag, att rensa vargar från Östbäcksvägen, är ett av dessa.',
   'guide.questsPage.typeSlayTitle': 'Dräp',
   'guide.questsPage.typesBody':
     'De flesta uppdrag har en av några bekanta former. Skärmens spårare stavar exakt ut vad var och ett vill, så du lämnas aldrig att gissa.',
@@ -4089,7 +4089,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.',
   'guide.social.chanGuild': 'Gille och officer.',
   'guide.social.chanGuildBody':
-    'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är bara för officerare.',
+    'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är för officerare och gilleledaren.',
   'guide.social.chanLfg': 'Söker grupp.',
   'guide.social.chanLfgBody':
     'En frivillig rikestäckande kanal för att hitta folk till en fängelsehåla. Öppna dess flik för att gå med.',
@@ -4111,7 +4111,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Chatten är uppdelad i kanaler, var och en visad på sin egen flik. Skriv ett meddelande för att skicka det på den aktiva kanalen, eller använd ett snedstreckskommando för att rikta en rad någon annanstans. Detta är kanalerna du kan prata på:',
   'guide.social.chatHeading': 'Chattkanaler',
   'guide.social.etiquetteBody':
-    'Att gruppera är ett val, inte ett tvång. Säg hej när du går med, rulla Behov bara på utrustning du faktiskt kommer att använda, och låt gruppen veta innan du drar vidare. Lite hyfs räcker långt, och de flesta spelare uppskattar sällskapet.',
+    'Att gruppera är ett val, inte ett tvång. Säg hej när du går med, rulla Behov bara på utrustning du faktiskt kommer att använda, och låt gruppen veta innan du drar vidare. Lite hyfs räcker långt, och de flesta spelare uppskattar sällskapet. Moderatorer håller ordning, och en spelare som inte låter andra njuta av spelet kan flyttas till en fängelsecell tills en moderator släpper ut denne.',
   'guide.social.etiquetteHeading': 'Gruppetikett',
   'guide.social.friendsBody':
     'Lägg till spelare i din vänlista för att se när de är online och var de befinner sig, så du kan gruppera dig så snart de loggar in.',
@@ -4131,7 +4131,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Pengar från ett drap kan gå till den som plundrar det, eller delas jämnt över gruppen.',
   'guide.social.lootCoinTitle': 'Mynt.',
   'guide.social.lootCommonBody':
-    'Vanliga fynd kan gå till plundraren, medan bättre fynd läggs upp för en rullning så att alla får en rättvis chans.',
+    'Vanliga fynd kan gå laget runt i gruppen eller till den som plundrar, medan bättre fynd läggs upp för en rullning så att alla får en rättvis chans.',
   'guide.social.lootCommonTitle': 'Föremål.',
   'guide.social.lootHeading': 'Gruppbyte',
   'guide.social.lootMasterBody':
@@ -4151,13 +4151,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Smidighet vässar dig på flera sätt: den höjer din chans att landa en kritisk träff och din chans att väja undan, och den lägger till lite rustning. För skurkar och jägare göder den också anfallskraft, och den driver en jägares avståndsskott.',
   'guide.stats.agiTitle': 'Smidighet',
   'guide.stats.apBody':
-    'Anfallskraft mäter hur hårt ditt vapen slår. Dina primära attribut göder den, och starkare vapen och utrustning höjer den ytterligare, vilket är varför en uppgradering kan vara ett verkligt skutt i skada.',
+    'Anfallskraft mäter hur hårt ditt vapen slår. Dina primära attribut göder den, och utrustning som bär de attributen höjer den ytterligare, medan ett starkare vapen höjer din skada direkt, vilket är varför en uppgradering kan vara ett verkligt skutt i skada.',
   'guide.stats.apTitle': 'Anfallskraft',
   'guide.stats.armorBody':
     'Rustning minskar den fysiska skada du tar. Den kommer mestadels från vad du bär, och de tyngre rustningsklasserna bär långt mer av den. Mer rustning mot en fiende nära din nivå innebär att var och en av dess träffar landar mjukare.',
   'guide.stats.armorTitle': 'Rustning',
   'guide.stats.critBody':
-    'Din kritiska träffchans är hur ofta en attack landar för extra skada. Alla börjar med en liten baschans, och Smidighet (plus en del talanger och utrustning) bygger på den.',
+    'Din kritiska träffchans är hur ofta en attack landar för extra skada. Alla börjar med en liten baschans, och Smidighet (plus en del talanger och utrustning) bygger på den. Ditt karaktärsblad visar både själva chansen och den kritiska träffvärdering som din utrustning bidrar med till den.',
   'guide.stats.critTitle': 'Kritisk träff',
   'guide.stats.dodgeBody':
     'Väjning är din chans att helt undvika en inkommande närstridsattack. Du börjar med en liten baschans, och Smidighet höjer den, så viga klasser slinker undan fler slag.',
@@ -4183,7 +4183,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Besvärjelsekraft är en besvärjares motsvarighet till anfallskraft: den höjer skadan dina besvärjelser gör. Intellekt matar den, och besvärjarutrustning och förstärkningar lägger till mer ovanpå, så en besvärjare bevakar besvärjelsekraft på samma sätt som en närstridskämpe bevakar anfallskraft.',
   'guide.stats.spTitle': 'Besvärjelsekraft',
   'guide.stats.spiBody':
-    'Ande styr hur snabbt en besvärjares mana återvänder medan denne är utanför strid. Liksom Intellekt tjänar den manaklasserna och betyder föga för de andra.',
+    'Ande styr hur snabbt en besvärjares mana återvänder närhelst denne pausar sina besvärjelser, vilket är merparten av tiden mellan strider. Liksom Intellekt tjänar den manaklasserna och betyder föga för de andra.',
   'guide.stats.spiTitle': 'Ande',
   'guide.stats.staBody':
     'Uthållighet är din uthållighet. Mer Uthållighet innebär en större hälsopool, och den snabbar på hälsan du återhämtar medan du vilar utanför strid. Varje klass vill ha en del.',
@@ -4204,17 +4204,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'En klassisk MMO du spelar gratis i din webbläsare.',
   'guide.talentsPage.heading': 'Talanger och specialiseringar',
   'guide.talentsPage.howBody':
-    'Talanger låses upp vid nivå 10, och du fortsätter tjäna poäng medan du klättrar mot maxnivån. Du spenderar dem i din klass talangpanel, och du kan spara fler än en uppsättning för att växla mellan byggen.',
+    'Talanger låses upp vid nivå 10, och du fortsätter tjäna poäng medan du klättrar mot maxnivån. Du spenderar dem i din klass talangpanel, där djupare rader öppnas allteftersom du investerar och stiger i nivå, och du kan spara fler än en uppsättning för att växla mellan byggen.',
   'guide.talentsPage.howHeading': 'Så fungerar de',
   'guide.talentsPage.intro':
     'Talanger är hur du gör en klass till din egen. De är frivilliga, förlåtande och lätta att ändra, så du kan experimentera utan rädsla.',
   'guide.talentsPage.resetNote':
-    'Du kan återställa dina talanger när som helst du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar, och ändra dig fritt.',
+    'Du kan återställa dina talanger när som helst du är utanför strid och inte i en arenamatch, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar, och ändra dig fritt.',
   'guide.talentsPage.resetTitle': 'Inget är permanent',
   'guide.talentsPage.shareNote':
     'Ett färdigt bygge kan kopieras till en kort delbar kod och ges till en vän, som klistrar in den rakt i sin egen talangpanel för att ladda det.',
   'guide.talentsPage.specsBody':
-    'Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Här är formen på dem alla. Öppna en klass för dess fullständiga uppsättning.',
+    'Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Att välja en i talangpanelen ger en kännetecknande förmåga och ett bestående mästerskap av sitt eget slag. Här är formen på dem alla. Öppna en klass för dess fullständiga uppsättning.',
   'guide.talentsPage.specsHeading': 'Specialiseringar per klass',
   'guide.talentsPage.whatBody':
     'När du levlar tjänar du talangpoäng att spendera på små, permanenta förbättringar av dina förmågor och egenskaper. De formar hur en klass känns och lutar den mot mer skada, robustare försvar eller starkare läkning.',
@@ -4234,10 +4234,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje klass kan klara sig själv och nå maxnivån. Välj den fantasi du gillar, inte den som någon annan kallar bäst.',
   'guide.wishPage.i1Title': 'Du kan inte välja fel klass',
   'guide.wishPage.i2Body':
-    'När du faller släpper du din ande och återupplivas vid närmaste kyrkogård, och tar dig sedan tillbaka. Ingen erfarenhet går förlorad, så det är tryggt att ta risker och lära sig.',
+    'När du faller reser du dig som en gengångare vid närmaste kyrkogård. Spring tillbaka till din kropp för att återupplivas utan påföljd, eller ta Den bleka väktarens omedelbara uppståndelse och bär en kortvarig försvagning för bekvämligheten. Ingen erfarenhet, utrustning eller mynt går någonsin förlorad, så det är tryggt att ta risker och lära sig.',
   'guide.wishPage.i2Title': 'Att dö kostar dig knappt något',
   'guide.wishPage.i3Body':
-    'De låses upp vid nivå 10 och återställs när du vill, så dina tidiga val är aldrig permanenta.',
+    'De låses upp vid nivå 10 och återställs när du vill, så länge du är utanför strid, så dina tidiga val är aldrig permanenta.',
   'guide.wishPage.i3Title': 'Talanger är ingen fälla',
   'guide.wishPage.i4Body':
     'Uppdrag är det snabbaste sättet att levla och de leder dig tvärs över världen. När du är osäker på vart du ska, leta upp nästa markör.',
@@ -4272,14 +4272,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshGreeting':
     'Stanna vid porten. Bortom de vassen sköter myren dödandet åt oss.',
   'guide.worldPage.marshPlaceNotes':
-    'Fenbridge vaktar den enda torra vägen. Prowler Reeds och Deepfen Shallows kryllar av träskbestar och Mudfiner; Widow Thicket är tjockt spunnet med väv; Drowned Chapel och Troll Mounds rymmer äldre faror; Gravecaller Encampment är kulten nedgrävd, och Den sjunkna bastionen är myrens instansierade hjärta.',
+    'Kärrbron vaktar den enda torra vägen. Smygjägarvassen och Djupkärrsgrunden kryllar av träskbestar och Mudfiner; Änkesnåret är tjockt spunnet med väv; Det dränkta kapellet och Trollhögarna rymmer äldre faror, medan Den dränkta litanian, kärrets egen delve, öppnar strax norr om högarna; Gravkallarlägret är kulten nedgrävd, och Den sjunkna bastionen är kärrets instansierade hjärta.',
   'guide.worldPage.peaksBlurb':
     'Vindpiskade åsar och gamla gruvverk som klättrar mot rikets kallaste, högsta faror, hållna av utposten Highwatch.',
   'guide.worldPage.peaksGreeter': 'Kapten Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer och Glimmermere lyser nedanför den; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
+    "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
   'guide.worldPage.places': 'Anmärkningsvärda platser',
   'guide.worldPage.residents': 'Vem du kommer att möta',
   'guide.worldPage.valeBlurb':
@@ -4287,7 +4287,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Marskalk Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Håll ditt svärd nära. Dalen är inte vad den var.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook är din första hembas. Wolf Run och Boar Meadow är milda jaktmarker; Mirror Lake är stilla vatten att fiska i; Sableweb och Copper Dig döljer spindlar och malmgiriga grävare; ett Bandit Camp och Fallen Chapel rymmer hårdare arbete; Reliquary Hill leder ner i Collapsed Reliquary, rikets första delve; och Brightwood Glade är en lugn, solbelyst lund i norr.',
+    'Östbäck är din första hembas. Vargstråket och Vildsvinsängen är milda jaktmarker; Spegelsjön är gott fiskevatten, fast gyttjefenor svärmar i grunden; Sableweb och Kopparbrottet döljer spindlar och malmgiriga grävare; ett Banditläger och Det fallna kapellet rymmer hårdare arbete; Relikkullen leder ner i Det rasade relikvariet, rikets första delve; Ljusskogsgläntan är en lugn, solbelyst lund i norr; och Suggfältet är Östbäcks muromgärdade vildsvinsbollsplan, där Dalcupen spelas under ett skördestillestånd.',
   'highscores.desc': 'Följ världens största hjältar och jämför dina framsteg.',
   'highscores.title': 'Topplista över höga poäng',
   'hud.arena.close': 'Stäng arena',
@@ -6396,7 +6396,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
   'guide.settingsPage.tableFoot':
     'Letar du efter ett skjutavståndsreglage eller en FPS-keps? Det finns inget att jaga efter: visningsavstånd är en del av varje kvalitetsnivå, och bildrutetempo följer din skärm.',
-  'guide.settingsPage.tableHeading': 'Varje alternativ, förklarat',
+  'guide.settingsPage.tableHeading': 'Varje grafikalternativ, förklarat',
   'guide.settingsPage.tagReload': 'efter omladdning',
   'guide.settingsPage.value100': '100 %',
   'guide.settingsPage.value50to70': '50 till 70 %',
@@ -6408,7 +6408,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsWhy':
     'Ultra återger med den högsta upplösningen din skärm erbjuder med den rikaste belysningen. Det stänger också av skyddsnätet, och det är endast för skrivbordet: telefoner och appen toppas vid High.',
   'guide.settingsPage.wherePath':
-    'Allt på den här sidan lever i spelet: tryck på Esc och titta i grafik, gränssnitt och prestandaöverlägg.',
+    'Allt på den här sidan lever i spelet: tryck på Esc för att öppna alternativen. Menyn öppnas på en Översikt av fästa väsentligheter, med kategorierna på en rad bredvid: inställningarna nedan finns under Grafik, Gränssnitt och Tillgänglighet i Skärm-gruppen, och Prestandaöverlägget under System. Ännu snabbare: skriv in ett namn i sökrutan högst upp och hoppa direkt dit.',
   'guide.settingsPage.whyLabel': 'Varför det fungerar:',
   'hudChrome.crafting.close': 'Nära hantverk',
   'hudChrome.crafting.craft': 'Hantverk',
@@ -6564,6 +6564,136 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Lösenorden stämmer inte överens.',
   'hudChrome.auth.resetErrInvalid':
     'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
+  'apiError.deeds.invalid_input': 'Ogiltig indata.',
+  'apiError.steam.account_taken': 'Det Steam-kontot är redan länkat till ett annat konto.',
+  'apiError.steam.already_linked': 'Ditt konto har redan ett länkat Steam-konto.',
+  'apiError.steam.banned': 'Det Steam-kontot kan inte länkas.',
+  'apiError.steam.disabled': 'Steam-länkning är inte tillgänglig just nu.',
+  'apiError.steam.invalid_ticket':
+    'Steam kunde inte verifiera länkbegäran. Försök igen från skrivbordsappen.',
+  'apiError.steam.upstream': 'Steam svarade inte. Försök igen om en stund.',
+  'entities.npcs.chronicler_edda_hartwell.greeting':
+    'Berget glömmer ingenting, {playerName}, och det gör inte jag heller. Låt oss se vad du har uträttat.',
+  'entities.npcs.chronicler_edda_hartwell.name': 'Krönikör Zenzie',
+  'entities.npcs.chronicler_edda_hartwell.title': 'Topparnas krönika',
+  'entities.npcs.chronicler_osric_fenn.greeting':
+    'Akta sidorna för fukten, {playerName}. Kärret slukar fler böcker än vad läsarna någonsin gör.',
+  'entities.npcs.chronicler_osric_fenn.name': 'Krönikör Osric Fenn',
+  'entities.npcs.chronicler_osric_fenn.title': 'Träskets krönika',
+  'entities.npcs.chronicler_saul.greeting':
+    'Varje bedrift värd att utföra är värd att nedteckna två gånger, {playerName}: en gång för liggaren och en gång för brasan.',
+  'entities.npcs.chronicler_saul.name': 'Krönikören Saul',
+  'entities.npcs.chronicler_saul.title': 'Dalens krönika',
+  'guide.controls.deeds': 'Bedrifternas bok',
+  'guide.deedsPage.cat.chronicle': 'Krönikor',
+  'guide.deedsPage.cat.collection': 'Samling',
+  'guide.deedsPage.cat.combat': 'Strid',
+  'guide.deedsPage.cat.delve': 'Delver',
+  'guide.deedsPage.cat.dungeon': 'Fängelsehål',
+  'guide.deedsPage.cat.exploration': 'Utforskning',
+  'guide.deedsPage.cat.feat': 'Bragder',
+  'guide.deedsPage.cat.progression': 'Progression',
+  'guide.deedsPage.cat.pvp': 'PvP och sport',
+  'guide.deedsPage.cat.social': 'Socialt',
+  'guide.deedsPage.catHeading': '{label} ({count})',
+  'guide.deedsPage.catalogBody':
+    'Här är alla bedrifter boken rymmer, ordnade efter kategori. De hemliga är utelämnade med flit och väntar på att du ska hitta dem. Öppna Bedrifternas bok i spelet för att se exakt vad var och en kräver.',
+  'guide.deedsPage.catalogHeading': 'Den fullständiga bedriftsrullan',
+  'guide.deedsPage.chroniclesBody':
+    'Varje zon har sin egen krönika, en samling bedrifter sammanställd av en lokal krönikör som tagit på sig att nedteckna varje resenär som färdas genom trakten. Saul i Östbäcksdalen är den förste av dem. En krönika är uppdelad i kapitel, och du får beta av dem i den ordning som passar dig.',
+  'guide.deedsPage.chroniclesHeading': 'Krönikor',
+  'guide.deedsPage.colName': 'Bedrift',
+  'guide.deedsPage.colRenown': 'Ryktbarhet',
+  'guide.deedsPage.colReward': 'Belöning',
+  'guide.deedsPage.featTag': 'Bragd',
+  'guide.deedsPage.featsBody':
+    'Bragder står på en hylla för sig: uppteckningar av arv och av att vara först i världen, bedrifter knutna till en svunnen era eller ett ögonblick som bara inträffar en enda gång. De ger ingen ryktbarhet och räknas inte in i fullbordandet, utan bevaras för alltid som ett minne av det som uträttades.',
+  'guide.deedsPage.featsHeading': 'Bragder',
+  'guide.deedsPage.howBody':
+    'Bedrifter fullbordas och bevaras en karaktär i taget, så varje hjälte du spelar bygger en egen Bok; bara rikets topplista samlar din Ryktbarhet över alla karaktärer du spelar, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.',
+  'guide.deedsPage.howHeading': 'Så fungerar bedrifter',
+  'guide.deedsPage.intro':
+    'Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.',
+  'guide.deedsPage.renownBody':
+    'Ryktbarhet är poängräkningen bakom boken. Varje bedrift du fullbordar är värd en bestämd summa, och din totalsumma kan bara stiga, så en lugn vecka gör aldrig att du tappar mark. En handfull bedrifter avgörs av tur snarare än skicklighet, och bragder är en ära för sig, så ingen av dem ger någon ryktbarhet alls.',
+  'guide.deedsPage.renownHeading': 'Ryktbarhet',
+  'guide.deedsPage.rewardBorder': 'Ram',
+  'guide.deedsPage.rewardsBody':
+    'Belöningarna är enbart för syns skull, och det är hela poängen. Vissa bedrifter skänker en titel att bära eller en ram som pryder ditt namn, men aldrig något som gör din hjälte starkare. Välj den titel du vill ha i Bedrifternas bok, så följer den med på din namnskylt, i chatten och på topplistorna där alla kan se den.',
+  'guide.deedsPage.rewardsHeading': 'Titlar och ramar',
+  'guide.deedsPage.standingsNote':
+    'Rikena för en löpande räkning av Ryktbarhet över alla konton. Vill du se vem som står var, öppna topplistan i spelet och slå upp dess Ryktbarhet-flik; ställningen finns där, inte på wikin.',
+  'guide.nav.deeds': 'Bedrifternas bok',
+  'hudChrome.deeds.broadcastLine': '{name} har fullbordat en bedrift: {deed}',
+  'hudChrome.deeds.broadcastsLabel': 'Dela fullbordade bedrifter med gille och vänner',
+  'hudChrome.deeds.catChronicle': 'Krönikor',
+  'hudChrome.deeds.catCollection': 'Samling',
+  'hudChrome.deeds.catCombat': 'Strid',
+  'hudChrome.deeds.catDelve': 'Delver',
+  'hudChrome.deeds.catDungeon': 'Fängelsehål',
+  'hudChrome.deeds.catExploration': 'Utforskning',
+  'hudChrome.deeds.catFeat': 'Bragder',
+  'hudChrome.deeds.catProgression': 'Progression',
+  'hudChrome.deeds.catPvp': 'PvP och sport',
+  'hudChrome.deeds.catSocial': 'Socialt',
+  'hudChrome.deeds.categoriesAria': 'Bedriftskategorier',
+  'hudChrome.deeds.categoryCountAria': '{category}: {earned} av {visible} bedrifter fullbordade',
+  'hudChrome.deeds.charOpenBook': 'Bedrifternas bok',
+  'hudChrome.deeds.charTitleLabel': 'Titel',
+  'hudChrome.deeds.charTitleNone': 'Ingen titel vald',
+  'hudChrome.deeds.close': 'Stäng Bedrifternas bok',
+  'hudChrome.deeds.collapseHint': 'Fäll ihop bedriftsspåraren',
+  'hudChrome.deeds.completionAria': 'Fullbordade bedrifter: {earned} av {total}',
+  'hudChrome.deeds.countLabel': '{earned}/{total} bedrifter',
+  'hudChrome.deeds.earnedDate': 'Fullbordad {date}',
+  'hudChrome.deeds.emptyCategory': 'Inga bedrifter matchar här.',
+  'hudChrome.deeds.expandHint': 'Fäll ut bedriftsspåraren',
+  'hudChrome.deeds.featRibbon': 'Bragd',
+  'hudChrome.deeds.filterAll': 'Alla',
+  'hudChrome.deeds.filterEarned': 'Fullbordade',
+  'hudChrome.deeds.filterGroupAria': 'Filtrera bedrifter',
+  'hudChrome.deeds.filterNearly': 'Nästan klara',
+  'hudChrome.deeds.filterUnearned': 'Ofullbordade',
+  'hudChrome.deeds.hiddenBadge': 'Dold',
+  'hudChrome.deeds.lbDeedsCol': 'Bedrifter',
+  'hudChrome.deeds.lbEmpty': 'Inga rankade krönikörer ännu.',
+  'hudChrome.deeds.lbSelf': 'Din placering: plats {rank}, bland de främsta {percent} procenten',
+  'hudChrome.deeds.lbTab': 'Ryktbarhet',
+  'hudChrome.deeds.lbTitleCol': 'Titel',
+  'hudChrome.deeds.nearestLabel': 'Nästan framme:',
+  'hudChrome.deeds.progressAria': 'Framsteg: {current} av {target}',
+  'hudChrome.deeds.progressText': '{current}/{target}',
+  'hudChrome.deeds.rarityLine': 'Fullbordad av {percent} av äventyrarna',
+  'hudChrome.deeds.recentLabel': 'Nyligen:',
+  'hudChrome.deeds.renownChip': '{renown} ryktbarhet',
+  'hudChrome.deeds.renownLabel': 'Ryktbarhet',
+  'hudChrome.deeds.retroSummary': 'Din krönika kommer ikapp: {count} bedrifter nedtecknade.',
+  'hudChrome.deeds.searchAria': 'Sök bedrifter efter namn',
+  'hudChrome.deeds.searchPlaceholder': 'Sök bedrifter',
+  'hudChrome.deeds.title': 'Bedrifternas bok',
+  'hudChrome.deeds.titleChip': 'Titelbelöning',
+  'hudChrome.deeds.titledName': '{name} [{title}]',
+  'hudChrome.deeds.titlesAria': 'Välj vilken titel som ska visas',
+  'hudChrome.deeds.titlesEmpty':
+    'Fullborda en bedrift som skänker en titel för att låsa upp den här hyllan.',
+  'hudChrome.deeds.titlesNone': 'Ingen titel',
+  'hudChrome.deeds.titlesSection': 'Titlar',
+  'hudChrome.deeds.trackerLabel': 'Bedrifter',
+  'hudChrome.deeds.unlockedBanner': 'Bedrift fullbordad: {name}',
+  'hudChrome.deeds.unlockedTitleHint': 'Ny titel förtjänad: {title}. Välj den i Bedrifternas bok.',
+  'hudChrome.deeds.unwatch': 'Sluta bevaka',
+  'hudChrome.deeds.unwatchAria': 'Sluta bevaka {name}',
+  'hudChrome.deeds.watch': 'Bevaka',
+  'hudChrome.deeds.watchAria': 'Bevaka {name} i HUD-spåraren',
+  'hudChrome.deeds.watchFull': 'Bevakningslistan är full (högst {cap})',
+  'hudChrome.mobile.deeds': 'Bedrifter',
+  'hudChrome.steam.benefits':
+    'Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.',
+  'hudChrome.steam.link': 'Länka Steam',
+  'hudChrome.steam.linked': 'Länkat till Steam-kontot {id}',
+  'hudChrome.steam.noTicket': 'Steam lämnade ingen länkbiljett. Starta Steam och försök igen.',
+  'hudChrome.steam.title': 'Steam',
+  'hudChrome.steam.unlink': 'Koppla bort Steam',
   'entities.items.chunk_of_ore.name': 'Malmklump',
   'entities.quests.q_prof_intro.completion':
     'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
@@ -6612,4 +6742,146 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tips: utmana en annan spelare på en vänskaplig duell, eller ställ dig i kö till arenan i Det askgråa colosseumet för att testa ditt bygge.',
   'loading.tips.talents':
     'Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.',
+  'guide.bestiary.flavor.sethrael_palecoil':
+    'En benblek orm som glider längs Skimmertjärnens djupa avsats, tyst väktare över vattnet den gjort till sitt. Simmare som delar tjärnen med den når sällan ytan igen.',
+  'guide.combat.metersBody':
+    'Nyfiken på hur en strid gick? Tryck på Z för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.',
+  'guide.combat.queueBody':
+    'Du behöver inte tajma dina tryck till bildrutan. Tryck på din nästa förmåga under de sista ögonblicken av den pågående besvärjelsen, så köas den och avfyras i samma stund som besvärjelsen är klar, så att inövat spel flyter utan luckor. Ett tryck för tidigt avvisas helt enkelt, så inget går till spillo. Vissa närstridshugg fungerar likadant och rider ut på din nästa vapensving.',
+  'guide.combat.queueTitle': 'Ditt nästa drag är redan laddat',
+  'guide.controls.arrowKeys': 'Piltangenter',
+  'guide.controls.attackMoveNote':
+    'En till, avstängd som standard: aktivera Anfallsförflyttning i inställningarna för att reservera en tangent (A, medan alternativet är på) som för dig mot markören och öppnar eld på fienden under den, eller den första du möter längs vägen.',
+  'guide.controls.bothMouse': 'Båda musknapparna',
+  'guide.controls.calendar': 'Händelsekalender',
+  'guide.controls.crafting': 'Hantverk',
+  'guide.controls.discord': 'Discord',
+  'guide.controls.groupPet': 'Djurkommandon',
+  'guide.controls.petBar':
+    'Djurrad: Anfall, Stopp, Håna, Defensiv, Aggressiv (med ett jägar- eller häxmästardjur ute)',
+  'guide.controls.runForward': 'Spring framåt',
+  'guide.controls.valeCup': 'Dalcupen',
+  'guide.dungeonsPage.heroicBody':
+    'Varje fängelsehåla för fem spelare, och raiden själv, har en heroisk version som väntar bortom nivåtaket. Samma salar, omgjorda för ett välrustat slutspelsgäng: allt slår hårdare, inget går att springa ifrån till fots, och bossarna skakar av sig bedövningar och snaror helt och hållet. Väx först ur de normala versionerna; heroiskt förutsätter att du har gjort det.',
+  'guide.dungeonsPage.heroicHowBody':
+    'Välj svårighetsgrad innan din grupp gör anspråk på instansen: skriv /dungeon heroic, eller slå om reglaget Fängelsehålans svårighetsgrad i gruppmenyn. Valet delas av hela gruppen och låses fast vid dörren, så att ett pass förblir det som det gjordes anspråk på.',
+  'guide.dungeonsPage.heroicLockoutBody':
+    'Normala fängelsehålor går att köra hela dagen. Heroiskt kräver tålamod: dråpet på den sista bossen låser alla i passet till en heroisk rensning av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. Ett rensat pass för fem spelare förblir öppet för den egna gruppen för likfärder och byte, så att ingen låses ute från det de förtjänat där. Raiden är strängare: så snart dess dråp låser dig förblir dörren stängd fram till den dagliga återställningen, så samla dina byten innan du lämnar arenan.',
+  'guide.dungeonsPage.heroicRewardsBody':
+    'Heroiska bossar släpper bytet du känner igen, uppgraderat och märkt Heroisk i verktygstipset, och den sista bossen i varje pass lägger till episka föremål som inte finns någon annanstans. Det sista dråpet lämnar också Heroiska märken åt varje deltagare: en valuta du spenderar hos Kvartersmästare Vex i Highwatch, vars lager av ringar och halsband är rikets enda smycken.',
+  'guide.dungeonsPage.heroicRewardsTitle': 'Heroiska märken och uppgraderat byte',
+  'guide.dungeonsPage.heroicTitle': 'Heroiskt läge',
+  'guide.economy.dailyBody':
+    'En skattkisteknapp på skärmen öppnar fönstret för dagliga belöningar. Varje dag lägger fram en handfull uppgifter, lös uppdrag, kämpa i Askgrå kolosseum, vinn en match i Dalcupen, och erbjuder ett gratis snurr på prishjulet, allt värt poäng mot dagens ställning, och dagens toppsamlare delar på en prispott för innehavare av den valfria community-token. Inget av det ger makt i spelet. Fönstret självt redogör för dagens regler och vem som är berättigad, visar topplistan och sparar din historik.',
+  'guide.economy.dailyTitle': 'Dagliga belöningar',
+  'guide.economy.mailBody':
+    'Varje huvudort har en snidad korppelare: en brevlåda för Korpposten, rikets brevtjänst. Ställ dig vid en för att skriva till valfri karaktär vid namn, en vän online eller sedan länge offline, och foga mynt eller varor till brevet mot en liten portokostnad. Korpen tar en kort stund att flyga; när den landar berättar en kuvertsymbol för mottagaren att något väntar.',
+  'guide.economy.mailHow':
+    'Att hämta fungerar likadant fast omvänt: ställ dig vid vilken pelare som helst för att läsa dina brev och ta det de bär med sig ner i din börs och dina väskor. Ett vanligt brev tynar bort efter ett tag, men ett som fortfarande bär mynt eller varor väntar på dig, hur lång tid du än tar. Vissa saker vägrar posten blankt: själsbundna föremål, uppdragsvaror och unika kosmetiska polletter följer med dig eller inte alls. Och håll ett öga på pelaren efter en lyckad inlämning; somliga uppdragsgivare skriver.',
+  'guide.economy.mailTitle': 'Korpposten',
+  'guide.footer.linksLabel': 'Spel- och communitylänkar',
+  'guide.gear.bagsBody':
+    'Allt du plockar upp ryms i en enda gemensam packning, och du utökar den genom att utrusta väskor. Ditt väskfönster har fyra väskfack: klicka på en väska i din packning för att sätta den i ett ledigt fack, och varje väska du bär lägger till sitt eget utrymme. Enkla väskor är billiga handlarvaror, rymligare släpps av bestar, och de finaste kommer från fängelsehålebossar, så ditt lastutrymme växer i takt med din utrustning.',
+  'guide.gear.bagsTitle': 'Väskor och lastutrymme',
+  'guide.gear.slotFinger': 'Finger',
+  'guide.gear.slotNeck': 'Hals',
+  'guide.gear.soulboundBody':
+    'Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.',
+  'guide.gear.soulboundTitle': 'Själsbunden: din och endast din',
+  'guide.glossary.deedDef':
+    'En prestation som tecknas ner i Bedrifternas bok. Att förtjäna en ger Ryktbarhet, och somliga ger en kosmetisk titel eller namnskyltsram.',
+  'guide.glossary.deedTerm': 'Bedrift',
+  'guide.glossary.heroicDef':
+    'Den svårare versionen av en fängelsehåla eller raiden, avstämd för välrustade slutspelsgrupper. Heroiska bossar släpper uppgraderat byte, och den sista bossen betalar ut Heroiska märken.',
+  'guide.glossary.heroicTerm': 'Heroisk',
+  'guide.glossary.loadoutDef':
+    'En sparad talanguppsättning. Behåll flera och växla mellan byggen utan att spendera om dina poäng ett i taget.',
+  'guide.glossary.loadoutTerm': 'Uppsättning',
+  'guide.glossary.lockoutDef':
+    'Ett dagligt tak på de största upprepbara belöningarna. Varje heroisk fängelsehåla betalar ut en rensning per dag, raiden håller reda på normalt och heroiskt var för sig, och att plundra en världsboss startar din. Ett rensat pass för fem spelare förblir öppet för den egna gruppen; den låsta raiddörren öppnas inte igen förrän återställningen.',
+  'guide.glossary.lockoutTerm': 'Spärr',
+  'guide.glossary.metersDef':
+    'Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Z som standard).',
+  'guide.glossary.metersTerm': 'Skademätare',
+  'guide.glossary.petBarDef':
+    'Kommandoraden som ett jägar- eller häxmästardjur lägger till: Anfall, Stopp, Håna, Defensiv och Aggressiv, bundna till Ctrl plus 1 till 5 som standard.',
+  'guide.glossary.petBarTerm': 'Djurrad',
+  'guide.glossary.readyCheckDef':
+    'En gruppledare som skriver /ready för att fråga gruppen eller raiden: alla bekräftar Redo eller Inte redo, och gruppen ser sammanräkningen.',
+  'guide.glossary.readyCheckTerm': 'Redokontroll',
+  'guide.glossary.renownDef':
+    'Livstidspoängen som dina bedrifter summerar till. Den bara klättrar, och riket håller en ställning över den på topplistan.',
+  'guide.glossary.renownTerm': 'Ryktbarhet',
+  'guide.glossary.restedDef':
+    'Bonuserfarenhet som din karaktär lägger undan medan den vilar på ett värdshus, utanför strid. Dina nästa dråp ger extra erfarenhet tills poolen sinar.',
+  'guide.glossary.restedTerm': 'Vilad',
+  'guide.glossary.soulboundDef':
+    'Ett föremål som binds till din karaktär från det ögonblick du får det. Det kan inte bytas, skickas med post, säljas till handlare eller läggas upp på marknaden.',
+  'guide.glossary.soulboundTerm': 'Själsbunden',
+  'guide.glossary.spiritHealerDef':
+    'Rikets andeläkare, som svävar över varje kyrkogård: den kan resa din gengångare på fläcken till priset av en övergående försvagning.',
+  'guide.glossary.spiritHealerTerm': 'Den bleka väktaren',
+  'guide.glossary.targetMarkerDef':
+    'En symbol som vilken grupp- eller raidmedlem som helst kan fästa över ett mål så att alla fokuserar på, eller undviker, samma. Åtta symboler, ett mål per symbol.',
+  'guide.glossary.targetMarkerTerm': 'Målmarkör',
+  'guide.glossary.worldBossDef':
+    'En boss av raidstyrka som reser sig i den öppna världen i en jämn rytm, bekämpad av vem som än samlas för att svara snarare än av en fast grupp.',
+  'guide.glossary.worldBossTerm': 'Världsboss',
+  'guide.models.formBear': 'Bruinform',
+  'guide.models.formCat': 'Vargform',
+  'guide.models.formTravel': 'Fleetform',
+  'guide.models.groupForms': 'Druidformer',
+  'guide.nav.sidebarLabel': 'Guideämnen',
+  'guide.professions.craftHowBody':
+    'Öppna Hantverksfönstret (standardtangent T) för att se varje recept du kan, vad vart och ett kräver och vad du har till hands; när materialen finns där gör ett klick jobbet. Vanliga recept kan tillverkas var som helst i världen. En handfull avancerade verktygsrecept ber dig i stället att stå vid hantverksnavet i Highwatch.',
+  'guide.professions.craftHowTitle': 'Hantverksfönstret',
+  'guide.professions.focusBody':
+    'Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och rikta en liten budget av fokuspoäng mot de komponenttyper du bryr dig om. Ju mer fokus du ger en komponent, desto finare och rikare kommer den av varje senare kropp; din fördelning följer din karaktär vart den än vandrar, och du kan göra om den, gratis, vid vilket senare besök i staden som helst.',
+  'guide.professions.focusTitle': 'Stadsfokus',
+  'guide.professions.harvestBody':
+    'Insamling stannar inte vid fyndplatser. Vissa fällda bestar kan skördas på komponenter, skinn, huggtänder, silke och märkligare ting, direkt från kroppen jämte dess vanliga byte. En skördare per dråp: den som skördar först tar allt. Valet är också ditt varje gång: skala av allt kroppen erbjuder, eller koncentrera dig på en enda komponent och ta en finare kvalitet av den. Vilken karaktär som helst kan skörda, inget yrke eller ingen träning krävs, och en särskilt fin komponent bär till och med namnet på den som skördade den.',
+  'guide.professions.harvestTitle': 'Att skörda själva jakten',
+  'guide.search.typeAbility': 'Förmåga',
+  'guide.search.typeDeed': 'Bedrift',
+  'guide.settingsPage.audioBody':
+    'Alternativfönstret är inte bara bildpunkter. En Ljud-kategori håller separata volymreglage för effekter, musik och röst, och Gränssnitt-kategorin bär en språkväljare som omlokaliserar hela gränssnittet på fläcken, ingen omladdning behövs, plus en temaväljare för fönstrens utsmyckning. Språk är också fäst först på Översikten, så det är alltid ett steg från att menyn öppnas.',
+  'guide.settingsPage.audioTitle': 'Ljud och språk',
+  'guide.settingsPage.autolootBody':
+    'Föredrar du att inte klicka på varje kropp? Ett gränssnittsalternativ, avstängt som standard, håvar in bytet från dina egna dråp när du går förbi dem.',
+  'guide.settingsPage.factSearchBody':
+    'Osäker på var ett alternativ finns? Skriv i sökrutan högst upp i menyn. Den förstår vanliga formuleringar också, så fps hittar FPS-mätaren, och att välja ett resultat hoppar dig till inställningen och lämnar den markerad.',
+  'guide.settingsPage.factSearchTitle': 'Sök hittar det först',
+  'guide.settingsPage.touchBody':
+    'På en pekskärm får alternativen också en egen bekvämlighetssamling: spakstorlek och känslighet, storlek och opacitet på knapparna på skärmen, en vänsterhänt spegelvänd layout, en valfri kameraspak och inverterad pekblick, så att skärmen passar dina händer i stället för tvärtom.',
+  'guide.social.calendarBody':
+    'Tryck på I för att öppna händelsekalendern. Den markerar de dagar i riket det är värt att planera kring, från det veckovisa raiduppropet till fiesta-kvällen, och det är där gillen håller sitt schema: gilleledaren och officerarna kan boka evenemang på den, och varje medlem ser dem på samma sida.',
+  'guide.social.calendarHeading': 'Händelsekalendern',
+  'guide.social.communityBody':
+    'Inled en chattrad med ett utropstecken för att göra ett community-upprop: !lfg för att söka en grupp, !wts och !wtb för att handla, !recruit för ditt gille, !event för att tillkännage en raid eller ett möte, och !help för att be om en hjälpande hand. En meny över uppropen dyker upp i samma stund du skriver tecknet. Varje upprop sänds ut i världen och ekar till community-Discorden, så att det når spelare som inte ens är inloggade. Community-upprop är en del av onlinespelet.',
+  'guide.social.communityHeading': 'Att kalla på hela communityn',
+  'guide.social.emotesBody':
+    'Din karaktär kan också tala utan ord: skriv en emote som /wave, /dance, /cheer eller /bow, rikta den mot en vän genom att välja denne först, eller håll in X för att öppna emotehjulet för ett snabbt uttryck ovanför huvudet.',
+  'guide.social.markersBody':
+    'I en grupp, välj en fientlig varelse och högerklicka på dess porträtt i målramen (långtryck på pekskärm) för att kröna den med en av åtta raidsymboler. Vilken medlem som helst kan markera, varje symbol lever på ett mål i taget, och att lägga en symbol på nytt på dess eget mål tar bort den. Dödsordning, masskontrollsuppdrag eller ett enkelt "den här först" färdas alla snabbare som en symbol än som en mening.',
+  'guide.social.markersHeading': 'Målmarkörer',
+  'guide.social.readyBody':
+    'Före en stor dragning kan gruppledaren skriva /ready för att fråga rummet: alla andra får en fråga om Redo eller Inte redo, och när alla har svarat, eller 30 sekunder runnit ut, ser hela gruppen en enda sammanfattning av räkningen. Ingen pekas ut; poängen är räkningen, inte den skyldige.',
+  'guide.social.readyHeading': 'Redokontroller',
+  'guide.social.slashBody':
+    'Några vardagskommandon är värda att lägga på minnet: /w Namn skickar en viskning och /r svarar på den senaste du fick, /invite bjuder in någon i din grupp, /follow faller in i steg bakom en vän, /roll kastar tärning för gruppen att se, /who visar vilka som är online, och /afk markerar dig som borta. Skriv /help i spelet för hela listan.',
+  'guide.social.slashHeading': 'Praktiska snedstreckskommandon',
+  'guide.stats.hasteBody':
+    'Snabbhet är en egenskap som påskyndar allt du gör: närstridssving, avståndsskott och besvärjelser snabbas upp tillsammans. Den kommer från utrustning, framför allt från bonusar för rustningsuppsättningar, medan ett fåtal förmågor ger en kort skur av snabbare sving. Ditt blad visar den som Snabbhetsvärde.',
+  'guide.stats.hasteTitle': 'Snabbhet',
+  'guide.talentsPage.choiceNote':
+    'Ett fåtal poäng i varje träd är en vägkorsning snarare än ett köp: noden erbjuder två eller tre alternativ och du binder dig vid ett av dem. Din nästa återställning öppnar valet på nytt, precis som allt annat i trädet.',
+  'guide.valeCupPage.bettingBody':
+    'Åskådare vid Suggfältet kan hålla på en sida medan en match formas: insatserna läggs i en pott, och vid slutsignalen delar vinnarna på förlorarnas pott i proportion till vad de satsade. En oavgjord match, eller en skräll ingen höll på, återbetalar varje mynt. Spelare som sitter med i matchen kan inte satsa på den, och räcket håller ditt facit över vinster, förluster och nettomynt för hela livet.',
+  'guide.valeCupPage.bettingHeading': 'En vadslagning vid räcket',
+  'guide.valeCupPage.practiceBody':
+    'Dalcupen-fönstret erbjuder också träning: en privat kopia av planen där bottar fyller båda sidorna och inget räknas mot ditt facit. Saknar du en spelare eller två till det riktiga? Efter en kort väntan rundar bottar ut lagen, och varje match med bottar på planen är en vänskapsmatch, aldrig rankad. Och när Suggfältet står tomt sätter bottarna upp en uppvisning du kan se på, och satsa på, från läktaren; i samma stund riktiga spelare gör sig redo lämnar uppvisningen planen och varje insats återbetalas.',
+  'guide.valeCupPage.practiceHeading': 'Träningsmatcher och den tomma planen',
+  'guide.worldPage.worldBossBody':
+    'Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.',
+  'guide.worldPage.worldBossTitle': 'När berget vaknar: världsbossen',
 };

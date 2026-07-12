@@ -23,6 +23,7 @@
 import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -301,9 +302,15 @@ export class SocialWindow {
         const meta = f.online
           ? `<span class="zone">${esc(f.zone ? localizeZone(f.zone) : '')}</span><br>${esc(statusLabel(f.status))}`
           : esc(t('hud.social.status.offline'));
+        // The friend's Book of Deeds title (a deed id, localized here; '' for
+        // untitled/stale hides the span entirely). It rides INSIDE the
+        // ellipsized .soc-name cell, so a long combo trims the title tail and
+        // never pushes the meta column or action buttons.
+        const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
+        const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
         const name = f.online
-          ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}</button>`
-          : `<span class="soc-name">${esc(f.name)}</span>`;
+          ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
+          : `<span class="soc-name">${esc(f.name)}${titleSpan}</span>`;
         const whisper = f.online
           ? `<button type="button" class="soc-x" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
           : '';
@@ -352,7 +359,13 @@ export class SocialWindow {
         const meta = m.online
           ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
           : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
-        const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>`;
+        // The title sits AFTER the rank chip so the chip stays glued to the
+        // name; the ellipsized .soc-name cell trims the title tail first.
+        const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
+        const memberTitleSpan = memberTitle
+          ? `<span class="soc-title">${esc(memberTitle)}</span>`
+          : '';
+        const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}`;
         const name =
           m.online && !m.self
             ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`

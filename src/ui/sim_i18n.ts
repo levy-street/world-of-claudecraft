@@ -158,6 +158,7 @@ const baseEnTable = {
   'log.partyLeft': '{name} has left the party.',
   'log.partyRemoved': '{name} has been removed from the party.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
+  'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
   'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
@@ -5481,6 +5482,10 @@ const RULES: Rule[] = [
   {
     re: /^(.+) wins (.+) \((\d+)\)$/,
     build: (m) => tSim('loot.rollWin', { winner: m[1], item: m[2], roll: m[3] }),
+  },
+  {
+    re: /^(.+) was offline; (.+) returned to the corpse\.$/,
+    build: (m) => tSim('loot.rollWinnerOffline', { winner: m[1], item: m[2] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,

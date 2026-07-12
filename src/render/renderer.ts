@@ -33,14 +33,13 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import type { SpatialAudioSink, Surface } from './audio_sink';
+import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
@@ -60,6 +59,7 @@ import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './clic
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody } from './door_portal';
@@ -137,8 +137,13 @@ import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_tea
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
+import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+
+// Festival gold/white celebration palette, shared by the Vale Cup full-time
+// draw show and the Book of Deeds unlock burst (one palette, two sites).
+const FESTIVAL_GOLD_COLORS: readonly number[] = [0xffd14d, 0xfff2c0];
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -546,6 +551,7 @@ export interface EntityView {
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
   nameEl: HTMLDivElement;
+  titleEl: HTMLDivElement; // Book of Deeds title subtitle (players only)
   guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
   hpFill: HTMLDivElement;
@@ -563,6 +569,7 @@ export interface EntityView {
   nameplateTransform: string;
   nameplateSig: string;
   nameplateHpWidth: string;
+  titleSig: string; // cheap-diff for the deed-title subtitle (lang|deed id)
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
@@ -945,6 +952,7 @@ export class Renderer {
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
+  private readonly ambientPointSources: readonly AmbientPointSource[];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -1032,6 +1040,7 @@ export class Renderer {
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
+    this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
@@ -1611,13 +1620,7 @@ export class Renderer {
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
-    if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevelAt(x, z);
-    if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
-    const biome = zoneBiomeAt(z);
-    if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
-    return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
+    return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
@@ -3002,6 +3005,25 @@ export class Renderer {
       case 'levelup':
         this.vfx.levelUpPillar(this.sim.playerId);
         break;
+      case 'deedUnlocked': {
+        // Book of Deeds earned moment: one festival-gold shell just above the
+        // player's head (the hud pid gate already dropped other players'
+        // copies). Retro back-credits (the on-join catch-up) draw nothing;
+        // the HUD folds them into a single summary line. A reduced-motion
+        // player skips the burst too: it is a sudden personal flash at the
+        // camera's focus, and the banner plus gold log line carry the moment.
+        if (!shouldPlayDeedFirework(ev, this.reducedMotion())) break;
+        const v = this.views.get(this.sim.playerId);
+        if (!v) break;
+        const p = this.sim.player;
+        this.tmpV.set(
+          v.group.position.x,
+          v.group.position.y + v.height * (p.scale ?? 1) + 2.2,
+          v.group.position.z,
+        );
+        this.vfx.fireworkBurst(this.tmpV, FESTIVAL_GOLD_COLORS, 46, 1.1);
+        break;
+      }
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
@@ -3070,7 +3092,7 @@ export class Renderer {
           const nation = ev.winner === 'A' ? ev.nationA : ev.nationB;
           this.queueValeCupFireworks(ev.x, ev.z, nationColors(nation, away), 10);
         } else {
-          this.queueValeCupFireworks(ev.x, ev.z, [0xffd14d, 0xfff2c0], 5);
+          this.queueValeCupFireworks(ev.x, ev.z, FESTIVAL_GOLD_COLORS, 5);
         }
         break;
       }
@@ -3497,6 +3519,11 @@ export class Renderer {
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
+    // Book of Deeds title subtitle under the name (players only); hidden
+    // until the entity's `title` wire field resolves to real text
+    const titleEl = document.createElement('div');
+    titleEl.className = 'np-title';
+    titleEl.style.display = 'none';
     // guild tag under the name (players in a guild); hidden until set
     const guildEl = document.createElement('div');
     guildEl.className = 'np-guild';
@@ -3524,6 +3551,7 @@ export class Renderer {
       devTierEl,
       discordEl,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       castBar,
@@ -3558,6 +3586,7 @@ export class Renderer {
       clickTarget,
       nameplate: np,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       hpFill,
@@ -3583,6 +3612,7 @@ export class Renderer {
       nameplateTransform: '',
       nameplateSig: '',
       nameplateHpWidth: '',
+      titleSig: '',
       comboSig: '',
       tierValue: 0,
       devTierValue: 0,
@@ -5475,8 +5505,8 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
-      const crowd = !inDungeon && isAtSowfield(px, pz) ? (this.sim.cupInfo?.live ? 1 : 0.4) : 0;
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd);
+      const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
     }
   }
 

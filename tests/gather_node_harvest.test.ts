@@ -196,6 +196,33 @@ describe('gather node harvest (#1121)', () => {
     expect(after).toBe((before ?? 0) + 1);
   });
 
+  it('a harvest grants character XP scaled to the node level (profession XP)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'XpMiner');
+    teleportOntoNode(sim, pid, NODE_ID);
+    const meta = mustMeta(sim, pid);
+    const before = meta.xp;
+
+    sim.harvestNode(NODE_ID, pid);
+    sim.tick();
+
+    expect(meta.xp).toBeGreaterThan(before);
+  });
+
+  it('a harvest of a node far below a high-level player grants zero XP (gray band)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'MaxLevelMiner');
+    teleportOntoNode(sim, pid, NODE_ID);
+    sim.setPlayerLevel(20);
+    const meta = mustMeta(sim, pid);
+    const before = meta.xp;
+
+    sim.harvestNode(NODE_ID, pid);
+    sim.tick();
+
+    expect(meta.xp).toBe(before);
+  });
+
   it('denies harvest for a dead player without granting the item or the timer', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Ghost');

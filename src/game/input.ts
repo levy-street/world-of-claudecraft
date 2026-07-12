@@ -1,7 +1,7 @@
-// Default (Mouse Camera off): classic-MMO-style — WASD + A/D keyboard turn, Q/E strafe,
-// left-drag orbits, right-drag mouselooks, both buttons run forward.
-// Optional Mouse Camera (on): OSRS-style — WASD is camera-relative, A/D strafe,
-// mouse drag rotates the orbit (no pointer lock), no keyboard turn.
+// Default (Mouse Camera off): classic-MMO-style (WASD + A/D keyboard turn, Q/E strafe,
+// left-drag orbits, right-drag mouselooks, both buttons run forward).
+// Optional Mouse Camera (on): OSRS-style (WASD is camera-relative, A/D strafe,
+// mouse drag rotates the orbit (no pointer lock), no keyboard turn).
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -70,6 +70,7 @@ export interface InputCallbacks {
       | 'leaderboard'
       | 'calendar'
       | 'discord'
+      | 'deeds'
       | 'crafting',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -737,6 +738,16 @@ export class Input {
       // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
       // (Firefox) and is a no-op where there is nothing to cancel.
       if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
+      // 'chat' focuses the composer textarea as a side effect of this very
+      // keydown. Left un-prevented, the browser still delivers the follow-up
+      // keypress (and its default newline insertion) to whichever element is
+      // focused AT THAT POINT, i.e. the composer we just focused, so Enter
+      // both opens chat and types a newline into it before the placeholder is
+      // ever seen. Cancel the default so the composer opens empty, but only
+      // when the key was not itself focused on a button: a button's own Enter
+      // activation is a real default action too, and it should still fire
+      // alongside chat opening, same as before this fix.
+      if (edge === 'chat' && tag !== 'button') e.preventDefault?.();
       if (edge.startsWith('slot')) {
         // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
         // whether a slot charges (shoot) or fires immediately (tap = down+up).
@@ -852,6 +863,9 @@ export class Input {
         return;
       case 'discord':
         this.cb.onUiKey('discord');
+        return;
+      case 'deeds':
+        this.cb.onUiKey('deeds');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

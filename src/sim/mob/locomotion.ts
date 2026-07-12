@@ -29,6 +29,7 @@
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -637,6 +638,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // a wiped pull must not receive a personal slot from a later kill).
   mob.bossDamagers.clear();
   ctx.despawnSummonedAdds(mob);
+  // An evade ends the attempt; the deed window re-arms.
+  deedsMod.resetDeedEncounter(ctx, mob);
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
