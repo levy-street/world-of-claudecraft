@@ -22,6 +22,7 @@ export interface DesktopBuilderConfig {
       apiOrigin?: string;
       loginOrigin?: string;
       crashSubmitUrl?: string;
+      steamAppId?: string;
     };
   };
   publish: { channel?: UpdateChannel; [key: string]: unknown } | null;
@@ -29,6 +30,8 @@ export interface DesktopBuilderConfig {
   mac: { [key: string]: unknown };
   win: { azureSignOptions?: AzureSignOptions; [key: string]: unknown };
   linux: { [key: string]: unknown };
+  files?: string[];
+  asarUnpack?: string[];
   [key: string]: unknown;
 }
 
@@ -41,6 +44,8 @@ export function desktopBuilderConfig(input: {
   crashSubmitUrl?: string;
   azureSign?: AzureSignOptions | null;
   updateChannel?: string | null;
+  steamAppId?: string;
+  steamworksInstalled?: (() => boolean) | null;
 }): DesktopBuilderConfig;
 
 export function isChannelFeedFile(fileName: unknown, channel: unknown): boolean;

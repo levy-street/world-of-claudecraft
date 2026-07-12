@@ -65,6 +65,13 @@ export interface UnitFrameDescriptor {
   levelText: string | null;
   /** The unit's display name. */
   name: string;
+  /** The name line's title decoration (the Book of Deeds display title),
+   *  PRE-LOCALIZED at the call site (the core stays i18n-free): everything the
+   *  locale pattern places before the name (`titlePre`) and after it
+   *  (`titlePost`). Optional and absent for instances without a title surface
+   *  (player, party); absent means empty decoration. */
+  titlePre?: string;
+  titlePost?: string;
   /** The portrait identity. The PAINTER owns the repaint gate (repaint only when
    *  this key changes); the core just exposes it so target's lastPortraitTarget
    *  gating is the same code path. */
@@ -92,6 +99,10 @@ export interface UnitFrameView {
   resText: string;
   levelText: string | null;
   name: string;
+  /** The pre-localized title decoration around the name ('' when untitled or
+   *  the instance has no title surface). */
+  titlePre: string;
+  titlePost: string;
   portraitKey: string;
   /** The absorb-shield overlay fraction (hp + absorb) / maxHp, clamped by
    *  absorbBarView; equals hpFrac when there is no shield. */
@@ -113,6 +124,8 @@ const HIDDEN: UnitFrameView = {
   resText: '',
   levelText: null,
   name: '',
+  titlePre: '',
+  titlePost: '',
   portraitKey: '',
   absorbFrac: 0,
   absorbOvershield: false,
@@ -153,6 +166,8 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     resText: d.resText,
     levelText: d.levelText,
     name: d.name,
+    titlePre: d.titlePre ?? '',
+    titlePost: d.titlePost ?? '',
     portraitKey: d.portraitKey,
     absorbFrac: absorb.fillFrac,
     absorbOvershield: absorb.overshield,

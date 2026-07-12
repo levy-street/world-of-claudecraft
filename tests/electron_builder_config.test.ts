@@ -113,20 +113,25 @@ describe('desktopBuilderConfig', () => {
     }
     // Steam builds publish nothing, so the same origin does not throw there.
     expect(
-      desktopBuilderConfig({ base, distribution: 'steam', apiOrigin: 'localhost:8787' }).publish,
+      desktopBuilderConfig({
+        base,
+        distribution: 'steam',
+        apiOrigin: 'localhost:8787',
+        steamAppId: '480',
+      }).publish,
     ).toBeNull();
   });
 
   it('never mutates the base config object', () => {
     const before = JSON.stringify(base);
-    desktopBuilderConfig({ base, distribution: 'steam' });
+    desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' });
     desktopBuilderConfig({ base, distribution: 'website', mode: 'pack' });
     expect(JSON.stringify(base)).toBe(before);
   });
 
   it('steam: nulls publish, stamps steam, targets dir layouts in release-steam', () => {
-    const config = desktopBuilderConfig({ base, distribution: 'steam' });
-    expect(config.extraMetadata.wocDesktop).toEqual({ distribution: 'steam' });
+    const config = desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' });
+    expect(config.extraMetadata.wocDesktop).toEqual({ distribution: 'steam', steamAppId: '480' });
     expect(config.publish).toBeNull();
     // The update-track split never touches Steam: publish stays nulled and a
     // dev origin does not trip the production-channel guard.
@@ -134,6 +139,7 @@ describe('desktopBuilderConfig', () => {
       base,
       distribution: 'steam',
       apiOrigin: 'http://localhost:8787',
+      steamAppId: '480',
     });
     expect(devSteam.publish).toBeNull();
     expect(config.directories.output).toBe('release-steam');
@@ -142,6 +148,97 @@ describe('desktopBuilderConfig', () => {
     expect(config.linux.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
     // Non-target mac keys survive the override.
     expect(config.mac.hardenedRuntime).toBe(true);
+  });
+
+  it('steam: ships steamworks.js (files re-include + native dist asarUnpack); website does not', () => {
+    const steam = desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' });
+    const steamFiles = steam.files ?? [];
+    expect(steamFiles).toContain('node_modules/steamworks.js/**');
+    expect(steam.asarUnpack).toContain('node_modules/steamworks.js/dist/**');
+    // The re-include must come AFTER the base '!node_modules/**' exclusion so
+    // electron-builder's later-pattern-wins ordering re-admits the package.
+    expect(steamFiles.indexOf('node_modules/steamworks.js/**')).toBeGreaterThan(
+      steamFiles.indexOf('!node_modules/**'),
+    );
+    // Website artifacts stay byte-identical to a pre-Steam build: no
+    // steamworks entries anywhere.
+    const website = desktopBuilderConfig({ base, distribution: 'website' });
+    expect(website.files ?? []).not.toContain('node_modules/steamworks.js/**');
+    expect(website.asarUnpack ?? []).not.toContain('node_modules/steamworks.js/dist/**');
+  });
+
+  it('steam: fails fast when the steamworks.js optional dependency is absent', () => {
+    // steamworks.js is an optionalDependency, which npm skips silently on
+    // install failure. A depot packaged from such a tree would ship without
+    // Steam (electron/steam.cjs degrades to null), so the steam channel must
+    // refuse to build. The presence probe is injected, so this stays hermetic.
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'steam',
+        steamAppId: '480',
+        steamworksInstalled: () => false,
+      }),
+    ).toThrow(/steamworks\.js optional dependency/);
+    // Present: the steam config derives as usual, native package re-included.
+    const present = desktopBuilderConfig({
+      base,
+      distribution: 'steam',
+      steamAppId: '480',
+      steamworksInstalled: () => true,
+    });
+    expect(present.publish).toBeNull();
+    expect(present.files ?? []).toContain('node_modules/steamworks.js/**');
+    // The probe never runs for other channels: a website build succeeds even
+    // when the same probe reports steamworks.js absent.
+    expect(() =>
+      desktopBuilderConfig({ base, distribution: 'website', steamworksInstalled: () => false }),
+    ).not.toThrow();
+    // And an unprobed steam build (no injected check) is a pure derivation that
+    // never touches the filesystem, so the config tests above stay valid.
+    expect(
+      desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '480' }).publish,
+    ).toBeNull();
+  });
+
+  it('steam: refuses a missing or non-numeric WOC_STEAM_APP_ID (no silent Spacewar depot)', () => {
+    // Without the id the packaged depot would init Steam with the Spacewar dev
+    // id (480) and every link ticket would verify against the wrong app; that
+    // mistake must die at build time, not on players' machines.
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam' })).toThrow(/WOC_STEAM_APP_ID/);
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '' })).toThrow(
+      /WOC_STEAM_APP_ID/,
+    );
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam', steamAppId: 'abc' })).toThrow(
+      /WOC_STEAM_APP_ID/,
+    );
+    // "0" is all-digits but not a real Steam app: the /^\d+$/ shape check
+    // alone would stamp app id 0 into the depot, so the gate requires a
+    // POSITIVE integer (the runtime string branch holds the same bar).
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '0' })).toThrow(
+      /WOC_STEAM_APP_ID/,
+    );
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '00' })).toThrow(
+      /WOC_STEAM_APP_ID/,
+    );
+    // Pack mode gets no exemption: a local steam pack wants the same guard (a
+    // deliberate Spacewar pack passes WOC_STEAM_APP_ID=480 explicitly).
+    expect(() => desktopBuilderConfig({ base, distribution: 'steam', mode: 'pack' })).toThrow(
+      /WOC_STEAM_APP_ID/,
+    );
+  });
+
+  it('stamps a numeric steamAppId for the steam channel; website never stamps', () => {
+    const stamped = desktopBuilderConfig({ base, distribution: 'steam', steamAppId: '3140820' });
+    expect(stamped.extraMetadata.wocDesktop.steamAppId).toBe('3140820');
+    const website = desktopBuilderConfig({
+      base,
+      distribution: 'website',
+      steamAppId: '3140820',
+    });
+    expect('steamAppId' in website.extraMetadata.wocDesktop).toBe(false);
+    // The website channel needs no id at all.
+    expect(() => desktopBuilderConfig({ base, distribution: 'website' })).not.toThrow();
   });
 
   it('stamps the resolved web origins so a packaged build never reads them from runtime env', () => {
@@ -176,7 +273,12 @@ describe('desktopBuilderConfig', () => {
     expect(config.mac.target).toEqual(['dmg']);
     expect(config.win.target).toEqual(['nsis']);
     expect(config.linux.target).toEqual(['AppImage']);
-    const steamPack = desktopBuilderConfig({ base, distribution: 'steam', mode: 'pack' });
+    const steamPack = desktopBuilderConfig({
+      base,
+      distribution: 'steam',
+      mode: 'pack',
+      steamAppId: '480',
+    });
     expect(steamPack.mac.target).toEqual(['dir']);
   });
 

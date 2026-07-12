@@ -67,6 +67,8 @@ export function desktopBuilderConfig({
   crashSubmitUrl = '',
   azureSign = null,
   updateChannel = null,
+  steamAppId = '',
+  steamworksInstalled = null,
 }) {
   if (distribution !== 'website' && distribution !== 'steam') {
     throw new Error(`unknown desktop distribution: ${distribution}`);
@@ -79,6 +81,11 @@ export function desktopBuilderConfig({
       ...(apiOrigin ? { apiOrigin } : {}),
       ...(loginOrigin ? { loginOrigin } : {}),
       ...(crashSubmitUrl ? { crashSubmitUrl } : {}),
+      // The Steamworks app id electron/steam.cjs initializes with; stamped
+      // for the steam channel only (website builds never touch Steam). The
+      // steam branch below refuses to build without a numeric id, so the
+      // stamp is unconditional here.
+      ...(distribution === 'steam' ? { steamAppId } : {}),
     },
   };
   if (distribution === 'website' && config.publish) {
@@ -117,6 +124,36 @@ export function desktopBuilderConfig({
     config.win = { ...(config.win ?? {}), azureSignOptions: azureSign };
   }
   if (distribution === 'steam') {
+    // A packaged depot cannot recover the app id from env (electron/steam.cjs
+    // closes that hatch), so a missing or garbage id would ship a depot that
+    // inits Steam with the Spacewar dev id (480) and mints link tickets the
+    // server rejects. That mistake must die at build time, not on players'
+    // machines; a deliberate Spacewar test depot passes WOC_STEAM_APP_ID=480
+    // explicitly. The unpackaged dev loop never runs this script.
+    if (!/^\d+$/.test(steamAppId) || Number(steamAppId) <= 0) {
+      throw new Error(
+        `steam channel builds need a positive numeric WOC_STEAM_APP_ID in the build env; ` +
+          `got "${steamAppId}". Without it the packaged depot would init Steam with the ` +
+          'Spacewar dev id (480) and link tickets would verify against the wrong app. ' +
+          'App id 0 is not a real Steam app, so a set-but-zero id is refused too.',
+      );
+    }
+    // steamworks.js is an optionalDependency, so a plain server/web install (or
+    // a failed native prebuild) can drop it silently, and electron/steam.cjs
+    // then degrades to null on every path. A depot packaged from such a tree
+    // would ship WITHOUT Steam and nobody would notice, so the steam channel
+    // refuses to build here. The presence probe is INJECTED (this module stays
+    // free of fs, like stampChannelFeedFiles): scripts/electron-build.mjs wires
+    // the real node_modules check, and the config tests pass a fake. An absent
+    // probe (null) is a pure config derivation, so it never runs.
+    if (typeof steamworksInstalled === 'function' && !steamworksInstalled()) {
+      throw new Error(
+        'steam channel build needs the steamworks.js optional dependency, but it is ' +
+          'not installed under node_modules/steamworks.js. Reinstall it (npm install ' +
+          'steamworks.js) before packaging the Steam depot; otherwise the build would ' +
+          'ship without Steam.',
+      );
+    }
     config.publish = null;
     config.directories = { ...(config.directories ?? {}), output: 'release-steam' };
     // One depot per OS: mac ships a single universal .app (Steam has no mac
@@ -125,6 +162,18 @@ export function desktopBuilderConfig({
     config.mac = { ...(config.mac ?? {}), target: [{ target: 'dir', arch: ['universal'] }] };
     config.win = { ...(config.win ?? {}), target: [{ target: 'dir', arch: ['x64'] }] };
     config.linux = { ...(config.linux ?? {}), target: [{ target: 'dir', arch: ['x64'] }] };
+    // steamworks.js rides the Steam depot ONLY: the base files whitelist
+    // excludes node_modules entirely (main-process deps are esbuild-vendored),
+    // but a napi native module cannot be bundled, so the steam channel
+    // re-includes exactly this package and asar-unpacks its dist/** (the
+    // .node binaries plus the steam_api dynamic libraries must load from real
+    // disk; electron-builder redirects the in-asar require automatically).
+    // Website artifacts stay byte-identical to a pre-Steam build.
+    config.files = [...(config.files ?? []), 'node_modules/steamworks.js/**'];
+    config.asarUnpack = [
+      ...(Array.isArray(config.asarUnpack) ? config.asarUnpack : []),
+      'node_modules/steamworks.js/dist/**',
+    ];
   }
   if (mode === 'pack') {
     for (const os of ['mac', 'win', 'linux']) {

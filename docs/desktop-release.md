@@ -14,13 +14,15 @@ Sign-in is email and Discord only, identical to the web flow: email/password log
 inside the app, and "Continue with Discord" opens the player's default browser on the
 `/desktop-login` page, which hands a one-time code back to the app over the
 `worldofclaudecraft://desktop-login` deep link. There is no Steam sign-in on any
-channel (Steam is distribution only).
+channel; on the Steam channel the shell's one Steam surface is the account-link
+ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`).
 
 The build stamps `wocDesktop` into the packaged `package.json` (electron-builder
 `extraMetadata`, wired in `scripts/electron-build.mjs` +
 `scripts/electron-builder-config.mjs`): the `distribution` channel, the `apiOrigin`
-the Vite bundle was baked with, the main-process-only `loginOrigin`, and the optional
-`crashSubmitUrl`. The shell resolves the stamp at runtime in
+the Vite bundle was baked with, the main-process-only `loginOrigin`, the optional
+`crashSubmitUrl`, and (steam channel only) the `steamAppId` fed by the
+`WOC_STEAM_APP_ID` build env. The shell resolves the stamp at runtime in
 `electron/desktop_config.cjs`, and a PACKAGED build ignores the `WOC_*` and
 `VITE_DESKTOP_*` runtime env vars entirely (the stamp is final), so a local env var
 cannot steer an installed app to another API, login page, updater state, or crash
@@ -74,6 +76,7 @@ Linux artifacts on Linux). Cross-building is not part of this runbook.
 | Azure service principal with "Trusted Signing Certificate Profile Signer" role | CI auth for signing | CI secrets `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` |
 | Update host: a static HTTPS host / bucket serving `https://updates.worldofclaudecraft.com/desktop/` | website auto-update feed + installer downloads | e.g. Cloudflare R2 bucket behind that hostname (any static host works; the app only GETs) |
 | Steam partner account + app ID + three depot IDs | Steam distribution | partner.steamgames.com |
+| Steamworks publisher Web API key (+ `STEAM_ENABLED=1`, `STEAM_APP_ID`) | the Book of Deeds achievement mirror + account link (`server/steam/`) | game-server runtime env `STEAM_WEB_API_KEY` (see `DEPLOY.md`) |
 | Optional: a crash-minidump endpoint (e.g. a Sentry project's minidump URL) | crash uploads | build env `WOC_CRASH_SUBMIT_URL` (https only) |
 
 Never commit any of these values; they are env vars in CI or the local shell.
@@ -98,6 +101,9 @@ carries for desktop:
 - The desktop-origin Turnstile admission (`server/turnstile.ts`): the widget cannot
   run at `app://`, so desktop-Origin requests are admitted without it; a documented,
   accepted softening of the bot gate for the desktop origins only.
+- The Steam account-link routes and the Book of Deeds achievement mirror
+  (`server/steam/`), env-gated OFF until `STEAM_ENABLED=1` is set (`DEPLOY.md`,
+  operational notes).
 
 Verify after deploying (should print the origin back):
 
@@ -303,7 +309,11 @@ and skips, by design.
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on
-mac; Steam mac builds must ALSO be Developer ID signed + notarized). Output layouts
+mac; Steam mac builds must ALSO be Developer ID signed + notarized). Set
+`WOC_STEAM_APP_ID` in the build env so the stamp carries the real app id: the build
+refuses to run without a numeric id, because a packaged depot without the stamp
+would init Steam with the Spacewar fallback id (480) and link tickets would verify
+against the wrong app. Output layouts
 in `release-steam/`:
 
 - `mac-universal/World of ClaudeCraft.app` (one universal .app)
@@ -329,15 +339,19 @@ Rules that keep this working:
   as-is and preserves the notarized signature).
 - Do NOT apply the Valve DRM wrapper on any platform (it rewrites the exe like a
   packer, is unavailable for mac, and Valve itself calls it weak).
-- No Steamworks SDK is linked, which Valve explicitly supports; consequences:
-  no achievements/cloud/rich presence, and the Steam OVERLAY does not hook the game.
-  Accepted for v1. If overlay/achievements are ever wanted, that is a steamworks.js
-  (or successor) project with its own CI gate; do not bolt it on casually.
+- The Steamworks SDK loads on this channel only to mint the account-link
+  ticket: `electron/steam.cjs` lazily requires `steamworks.js`, which rides the
+  steam depot alone, asar-unpacked (`scripts/electron-builder-config.mjs`);
+  website builds never load it. Achievements reach Steam through the SERVER'S
+  Book of Deeds mirror (`server/steam/`), not the client SDK; cloud and rich
+  presence stay unused, and the Steam OVERLAY is not hooked (nothing calls an
+  overlay enable). Gate: `tests/electron_steam.test.ts`.
 - Updates ship as new SteamPipe builds promoted to the default branch; the in-app
   updater is off in this channel (runtime stamp) AND the build has no publish feed
   (no app-update.yml), so there is nothing to disable manually. Steam policy is that
   updates flow through Steam; keep it that way.
-- `steam_appid.txt` is not needed (SDK never initialized) and must not ship.
+- `steam_appid.txt` is not needed (`electron/steam.cjs` passes the app id
+  straight to `init`) and must not ship.
 
 ## Error logging, crash dumps, privacy
 

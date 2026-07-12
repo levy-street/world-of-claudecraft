@@ -132,6 +132,9 @@ const NPC_IDS = [
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
   'groundskeeper_bram', // Vale Cup queue master at the Sowfield gate (docs/prd/vale-cup.md)
+  'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
+  'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
+  'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
 ] as const;
 
 const QUEST_IDS = [

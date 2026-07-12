@@ -26,7 +26,7 @@ the relevant sub-directory files), before the change is called done.
 ## Scope gate (scale the review to the change)
 
 Determine the diff first: `git diff --name-only` (working tree), else
-`git diff --name-only "$(git merge-base HEAD main)"..HEAD`. Then scale:
+`git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD`. Then scale:
 - **Docs / tests / comments only, no source change** -> output
   **"QA gate: out of scope (docs/tests/comments only); no implementation surface to QA."**
   and STOP.
@@ -83,7 +83,7 @@ Skip if no `src/sim/` files are in scope.
   modules behind the `SimContext` seam (`src/sim/sim_context.ts`); `Sim` is a thin coordinator.
 - `npx vitest run tests/architecture.test.ts` passes. This guard now has three arms: the sim
   import / DOM / nondeterminism scan AND the UI / render pure-core split (it enforces that every
-  `src/ui/*_view.ts` | `*_core.ts` and `src/render/*_view.ts` is registered in `UI_PURE_CORES` /
+  `src/ui/*_view.ts` | `*_core.ts` and `src/render/*_view.ts` | `*_core.ts` is registered in `UI_PURE_CORES` /
   `RENDER_PURE_CORES` and imports no `three`, no `*_painter` / `*_window` / `painter_host`, and
   no i18n runtime). Run it for any sim OR UI/render-core change, not only sim.
 - A same-seed-same-result determinism test exists or is updated for new sim logic.
@@ -91,8 +91,11 @@ Skip if no `src/sim/` files are in scope.
 ### 2. Three-host / IWorld parity
 
 Skip if the change is purely internal to one host.
-- New/changed `IWorld` members (`src/world_api.ts`) are implemented in BOTH `Sim`
-  (`src/sim/sim.ts`) and `ClientWorld` (`src/net/online.ts`), with no stub in `ClientWorld`.
+- New/changed `IWorld` members land in the matching facet file (`src/world_api/<facet>.ts`,
+  never the barrel) and are implemented in BOTH `Sim` (`src/sim/sim.ts`) and `ClientWorld`
+  (`src/net/online.ts`), with no stub in `ClientWorld`; the no-stub / kind-flip guard is
+  `npx vitest run tests/world_api_parity.test.ts` (the `IWORLD_MEMBERS` pin, updated in the
+  same change).
 - New snapshot fields are both encoded (`server/game.ts` `wireEntity`/`selfWireJson`) and
   decoded (`src/net/online.ts` `applyWire`/`applySnapshot`), delta-guarded.
 - New `SimEvent`s are handled on the client; personal events route by `pid`.
@@ -109,12 +112,21 @@ Skip if the change is purely internal to one host.
 Skip if no `server/` files are in scope.
 - The client never decides combat/loot/quest/economy outcomes; handlers validate intent and let
   the `Sim` compute results (no client-supplied damage/loot/level/gold).
+- A new REST endpoint is a `RouteDef` module (`server/<domain>.ts` `export const routes`)
+  registered in `server/http/registry.ts` (scaffold: `npm run new:endpoint`), NEVER an inline
+  handler appended to the legacy `server/main.ts` ladder (retained only for the
+  `API_DISPATCH=legacy` rollback). Auth / ownership / rate limiting are declared middleware
+  and `meta.requireOwned`, not in-handler code; new error codes are APPENDED to
+  `server/http/error_codes.ts` (append-only, snapshot-guarded by
+  `tests/server/http/error_codes.test.ts`). Read `server/http/CLAUDE.md` when `server/http/`
+  or a routes table is in scope.
 - Dev/cheat command paths are gated behind `ALLOW_DEV_COMMANDS`; nothing enables it by default
   or in production.
 - All SQL is parameterized (`$1, $2, ...` via `pg`); no string-built queries.
 - New WS commands and REST endpoints validate every argument (type, range, length, ownership);
   rate limiting applies to abusable actions.
-- Admin endpoints require the admin flag; moderation actions are admin-gated.
+- Admin endpoints require the admin gate (the `require_admin` middleware on a RouteDef, or
+  `adminAccountId` / `isAdminAccount` on the legacy arm); moderation actions are admin-gated.
 - No secrets hardcoded, none bundled into the client, none logged. For anything touching auth,
   tokens, wallet, or the deploy secret, dispatch `privacy-security-review`.
 
@@ -122,11 +134,13 @@ Skip if no `server/` files are in scope.
 
 Skip if persistence is unchanged.
 - Schema DDL changes are additive and idempotent (`IF NOT EXISTS`), safe to re-run on every boot
-  under the advisory lock. The schema is inline DDL applied in order by `ensureSchema()` across
-  `server/db.ts`, `server/social_db.ts`, and `server/oauth_db.ts` (no migrations directory).
-- Any JSONB blob (`characters.state`, `world_state.data`, `accounts.cosmetics`) defaults new
-  fields on load; characters/rows saved before this change still load without throwing or losing
-  data.
+  under the advisory lock. The schema is inline DDL applied in order by `ensureSchema()` in
+  `server/db.ts` (its `SCHEMA` plus the domain `*_SCHEMA` modules it imports; no migrations
+  directory), and the order is load-bearing.
+- Any JSONB blob (`characters.state`, the `world_state.data` rows: market via
+  `saveMarketState` / `loadMarketState` / `MarketSave` and mail via `saveMailState` /
+  `loadMailState` / `MailSave`, and `accounts.cosmetics`) defaults new fields on load;
+  characters/rows saved before this change still load without throwing or losing data.
 - New fields are written on every save path (autosave + on-leave + on-shutdown), not just held
   in memory.
 - A new NOT NULL column on an existing table has a DEFAULT; new query predicates have indexes.
@@ -137,14 +151,12 @@ Skip if persistence is unchanged.
 
 Skip if no player-visible text changed.
 - Every new player-visible string is a `t()` key whose ENGLISH is added to the matching
-  `src/ui/i18n.catalog/<domain>.ts` module and rendered via `t()`. Contributors add English
-  ONLY. The locale overlays in `src/ui/i18n.locales/<lang>.ts` are partial maps, not
-  `: typeof en`, so a missing non-English fill is NOT a `tsc` error and (except the M16 case
-  below) NOT a PR-tier failure; the build English-fills and marks the row `pending`, and only
-  the release tier (`I18N_RELEASE_TIER=1`) hard-fails on a `pending` row. Do not flag a missing
-  translation. A
-  new key absent from the `en` catalog, or a hand-edited `i18n.locales/<lang>.ts` overlay, IS a
-  `[FAIL]`.
+  `src/ui/i18n.catalog/<domain>.ts` module and rendered via `t()`; contributors add English
+  ONLY. A new key absent from the `en` catalog, or a hand-edited `i18n.locales/<lang>.ts`
+  overlay, IS a `[FAIL]`; a missing translation (a `pending` row) is NOT, except the M16
+  wordy-English case. The full model (pending rows, PR vs release tier, M16) is in
+  `src/ui/CLAUDE.md`; the runnable check is
+  `npx vitest run tests/i18n_completeness.test.ts tests/i18n_emit_shape.test.ts`.
 - `src/sim/` and `server/` stay language-agnostic but emit a stable key plus values, or English
   re-localized via the matchers (`src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts`) in the SAME
   change. `npx vitest run tests/localization_fixes.test.ts` (the S3 guard) is green.
@@ -153,10 +165,6 @@ Skip if no player-visible text changed.
 - No user-readable literal escapes the system: no `?? 'English'` fallbacks, no concat of English
   fragments, no literal passed to `setAttribute('aria-label'|'title'|'placeholder'|'alt')` or
   `document.title`. The admin dashboard text is in scope (operators are users).
-- Watch the M16 trap: a wordy new English value (a run of 4+ consecutive lowercase letters)
-  needs its five non-Latin (`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/`ru_RU`) fills in the SAME change,
-  because the always-on `tests/i18n_completeness.test.ts` reds at PR tier, not just release
-  (the maintainer normally adds them at merge).
   For any change to the wire/matcher seam, dispatch `cross-platform-sync`.
 
 ### 6. Renderer & UI
@@ -168,84 +176,27 @@ Skip if no `src/render/` or `src/ui/` files are in scope.
   from the build.
 - No raw emoji as an in-game icon (procedural icons / proper assets instead).
 
-#### 6b. Frontend seams (the v0.16.0 architecture)
+#### 6b. Frontend seams, mobile, and tier fairness (dispatch `frontend-seam-reviewer`)
 
-When the change adds or alters HUD/render presentation, hold these (each has a standing gate):
-- **Per-frame write elision.** Per-frame DOM writes route through the `PainterHost` elided
-  writers (`src/ui/painter_host.ts`); a `*_painter` does no raw `textContent` / `style` /
-  `setAttribute` write and no forced-reflow read beyond a documented allowed write. Gates:
-  `tests/painter_host.test.ts`, `tests/hud_perf_budget.test.ts`.
-- **Pure core + thin painter.** A new window/panel/element is a `<name>_view.ts` (or
-  `<name>_core.ts`) pure core plus a thin `<name>_painter.ts` / `<name>_window.ts` consumer; the
-  core is registered in `UI_PURE_CORES` (`tests/architecture.test.ts`) and has a
-  `tests/<name>_view.test.ts`. New self-contained UI is its own module the HUD composes, not a
-  new section bolted onto `hud.ts`.
-- **No magic values in painters.** Painters drive CSS vars / tokens and named constants, never a
-  literal hex/px in TS. This guard is decentralized per painter (for example
-  `tests/unit_frame_painter.test.ts`, `tests/auras_painter.test.ts`,
-  `tests/cast_bar_painter.test.ts`); confirm the touched painter has and passes its own check.
-- **CSS pipeline.** New styling lives in `src/styles/*.css` using the tiered tokens and the
-  correct `@layer` order, never an inline `<style>` block or inline hex/px. Gates:
-  `tests/styles_extraction.test.ts`, `tests/css_corpus.test.ts`, `tests/css_value_validity.test.ts`.
-- **Accessibility (WCAG 2.2 AA chrome).** Interactive UI traps and returns focus via the shared
-  `FocusManager` (`src/ui/focus_manager.ts`; the trap is focus-inside-only because Tab is a game
-  key), announces via the live regions, keeps a visible `:focus-visible`, survives
-  `forced-colors`, and meets the target-size floor. Gates: `tests/focus_manager.test.ts`,
-  `tests/focus_visible_guard.test.ts`, the live-region tests; mark `[VERIFY]` for the opt-in axe
-  suite (`npm run test:browser`), which the bare CI run excludes.
-- **Graphics tiering.** Anything whose cost scales with quality reads the STATIC preset via
-  `src/game/ui_tier_knobs.ts` / `ui_effects_profile.ts`, never the live FPS governor
-  (`RenderBudgetGovernor`). Gate: `tests/ui_tier_knobs.test.ts`.
-
-### 6c. Responsive & mobile
-
-When the change touches layout, CSS, the HUD, or mobile controls, confirm the mobile web game
-does not regress (it is easy to break silently):
-- The in-game view is landscape-only (decision 16a): the `#rotate-device` overlay shows in
-  portrait under `body.mobile-touch.game-active`, and `requestMobileFullscreenLandscape()` plus
-  the orientationchange handling survive the change.
-- Safe-area insets (notch), dynamic-viewport units (`dvh`, not a bare `vh`), and the breakpoint
-  system are preserved; nothing reintroduces the `user-scalable=no` / `maximum-scale=1.0`
-  viewport lock (the 16px input-font floor is the anti-zoom guard).
-- Touch targets: every control is at least 24px (or has adequate spacing); the mobile touch
-  controls keep their existing larger floor (do not weaken it).
-- The pre-game shell, the `/wiki` guide, and the admin dashboard stay portrait-capable; the
-  landscape lock is in-game only.
-- Mark the mobile E2E scripts `[VERIFY]` (they need a real CDP mobile profile and `npm run dev`):
-  the `scripts/mobile_*.mjs` suite (input-zoom, button size, joystick size, chat / minimap /
-  community-HUD safe areas). A CSS-text check is not a substitute; it cannot catch a `dvh`->`vh`
-  swap, a dropped safe-area inset, or a lost `@media` breakpoint.
-
-### 6d. Fairness across graphics tiers and devices
-
-The game is competitive and server-authoritative, so a player's graphics preset, effects quality,
-frame rate, or device (desktop vs mobile-landscape) must change only COSMETIC fidelity and render
-cadence, never the information the player has or any gameplay outcome. When a change touches
-graphics tiering, the per-frame layer, culling / draw distance, nameplates, telegraphs, the
-effects resolver, or mobile controls, verify:
-- Gameplay-load-bearing signals render on EVERY tier including the lowest, and on mobile: AoE /
-  hazard / boss telegraphs and ground-AoE indicators, enemy and player cast bars, the debuff /
-  aura timers that inform play, click-to-move and target markers, and the presence and nameplate
-  of an interactable unit in range. A tier knob may lower the REFRESH CADENCE or prettiness of
-  these (for example the nameplate or aura throttle), but must never drop the signal, hide it, or
-  delay it enough to remove the player's reaction window.
-- No tier- or device-gated draw distance or entity culling that lets one player see a
-  gameplay-relevant entity, projectile, or telegraph that another, on a lower tier or on mobile,
-  cannot. Cosmetic-only culling (particles, decals, ambient detail) is fine.
-- The tier knobs stay PURE functions of the STATIC preset (`src/game/ui_tier_knobs.ts` /
-  `ui_effects_profile.ts`); they never read the live FPS governor (`RenderBudgetGovernor`) and
-  never write sim state, so two players on the same server see the same world regardless of their
-  settings or frame rate. (Import-absence is asserted; the `ui` gfx band stays `governable: false`.)
-- Input-to-action timing is tier- and device-independent: the sim is a fixed 20 Hz and
-  server-authoritative, so no preset, frame rate, or mobile/desktop control scheme yields a faster
-  cast, cooldown, or movement, a larger hitbox, or any aim assist a desktop player lacks.
-- Any gameplay-relevant value a buff/debuff carries reaches every client regardless of tier (the
-  resolved precedent: the aura stat-sap wire-parity fix sends an aura's value to all clients; do
-  not let a fidelity knob gate a value that informs play). Confirm any genuinely offline-only
-  display (for example absorb) is display-only, not an advantage.
-- Mark `[VERIFY]` the cross-tier check that needs a run: capture the same scene at the lowest and
-  highest preset and on a mobile-landscape profile, and confirm every load-bearing signal above is
-  present in all three.
+For any HUD/render presentation, styles, mobile, or graphics-tiering change, the deep checklist
+is the `frontend-seam-reviewer` agent; dispatch it and hold only the headline rules here:
+- **Pure core + thin painter.** A new window/panel/frame is a `*_view.ts` / `*_core.ts` pure
+  core registered in `UI_PURE_CORES` (`tests/architecture.test.ts`) plus a thin painter whose
+  per-frame DOM writes route through the `PainterHost` elided writers; never a new section
+  bolted onto `hud.ts`. Gates: `tests/painter_host.test.ts`, `tests/hud_perf_budget.test.ts`.
+- **Tokens and layers.** Painters drive tokens / CSS vars, never a literal hex/px in TS
+  (per-painter source scans); new CSS lives in `src/styles/*.css` in the correct `@layer`
+  (`tests/styles_extraction.test.ts`, `tests/css_corpus.test.ts`).
+- **A11y chrome.** Focus trap/return via the shared `FocusManager`, visible `:focus-visible`,
+  live regions (`tests/focus_manager.test.ts`, `tests/focus_visible_guard.test.ts`).
+- **Mobile.** Landscape-only in-game, safe-area insets, `dvh` not bare `vh`, the 16px
+  input-font floor, the 40x40 touch floor; mark the `scripts/mobile_*.mjs` E2E suite
+  `[VERIFY]` (a CSS-text check cannot catch a `dvh`->`vh` swap or a dropped inset).
+- **Tier fairness.** Tier knobs read the STATIC preset (`src/game/ui_effects_profile.ts` /
+  `ui_tier_knobs.ts`), never the live FPS governor, and no tier/device sheds ACTIONABLE
+  information (telegraphs, cast bars, debuff timers, enemy positions), only cosmetic richness.
+  Gates: `tests/ui_tier_knobs.test.ts`, `tests/ui_effects_profile.test.ts`;
+  `docs/design/graphics-settings-fairness.md` is the contract.
 
 ### 7. Content fidelity
 
@@ -289,19 +240,17 @@ Skip if no `src/sim/content/` files are in scope.
 - The relevant Vitest files pass; for a full check the CI-equivalent gate is green, in the order
   the CI workflow runs it: `npm run i18n:gen` then the i18n freshness check
   (`git diff --exit-code` over the generated i18n artifacts), `npm run security:gate`,
+  `npm run ci:changed` (biome, changed files), `npm run sfx:check`,
   `npm test`, `npx tsc --noEmit`, `npm run build:env`, `npm run build:server`, `npm run build`.
-- The CI `lint` job runs in PARALLEL to that gate: `biome ci --changed --since=<base>` on
-  CHANGED files only, failing on errors and format/import diffs but NOT on lint warnings. Clear
-  it locally with `npm run ci:changed`. Confirm the diff reformatted ONLY files it intentionally
-  changed: a stray whole-tree `biome --write` that drags an unrelated monolith into the diff is a
-  `[FAIL]` (the repo defers the global Biome chore; never reformat the legacy tree).
-- Locally, `npm run gate` (`scripts/gate.mjs`) runs those CI checks end to end (changed-files
-  biome pulled forward as an early fast-fail, then the remaining pr-gate steps; release-tier
-  automatically on a `release/**` branch) with vitest workers capped at half the cores;
-  recommend it over ad-hoc shell chains, which mask
-  exit codes when piped (`npm test | tail` reports green on a red run) and flake the heavy sim
-  suites when an unbounded run saturates the cores (failing files that pass in one isolated
-  `npx vitest run` call are load flakes, not regressions).
+- Biome gates CHANGED FILES ONLY (`npm run ci:changed`); it fails on errors and format diffs,
+  not lint warnings. A stray whole-tree `biome --write` that drags an unrelated monolith into
+  the diff is a `[FAIL]` (the global Biome chore is deferred; never reformat the legacy tree).
+- Recommend `npm run gate` (`scripts/gate.mjs`) over an ad-hoc shell chain for the full check
+  (release-tier automatically on a `release/**` branch); the rationale (piped exit codes,
+  load flakes, worker caps) is in root `CLAUDE.md`.
+- The SFX suites need FFmpeg on PATH (CI installs it before `npm test`;
+  `tests/sfx_gate_preflight.test.ts` pins the fail-fast message). A red sfx test on a machine
+  without FFmpeg is environmental, not a regression.
 - No em dashes, en dashes, or emojis in code, comments, docs, commit/PR text, or player copy. Do
   NOT strip a dash that is native to a locale overlay (for example ru); that is correct there.
 - On a `release/**` branch, the release-tier i18n gate shows pending=0 and the release malware
@@ -312,11 +261,13 @@ Skip if no `src/sim/content/` files are in scope.
 | Diff touches | Dispatch |
 |---|---|
 | `server/`, `src/admin/`, `src/net/`, a deploy/secret file, new SQL/auth/secret/wallet code, or a new `Math.random`/`Date.now`/`performance.now` in `src/sim/` or a pure core | privacy-security-review |
-| `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, `world_state`, `accounts.cosmetics`) | migration-safety |
+| `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, a `world_state` row incl. market/mail, `accounts.cosmetics`) | migration-safety |
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
+| `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |
 | a release tag / `release/**` branch | release-malware-audit (plus `I18N_RELEASE_TIER=1`) |
 | new or rewritten tests, or acceptance criteria that claim coverage | test-coverage-auditor |
+| `src/sim/content/` balance-number change | no automated guard exists: flag for maintainer review against `docs/design/` |
 | any completed deliverable set | this gate is the default |
 
 Consuming an already-landed `IWorld` member does not change it; do not dispatch
@@ -348,7 +299,7 @@ findings are non-issues on a second look, so confirm from the code before you fl
 - [VERIFY] Same-seed determinism (run the determinism test)
 - [N/A] No sim files in scope
 
-(continue for every applicable category, including 6b / 6c when UI changed)
+(continue for every applicable category, including 6b when UI changed)
 
 ### Summary
 - BLOCKING (FAIL): X

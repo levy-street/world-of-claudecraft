@@ -221,6 +221,13 @@ export const QUEST_ORDER: string[] = [
   ...TEMPLE_QUEST_ORDER,
 ];
 
+// The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
+// here: this merge module sits on the guide entry's static import graph (via
+// icons.ts and the entity localizers), and a re-export would color the deeds
+// table, hidden deeds included, into a chunk the public wiki serves (guarded
+// by tests/guide.test.ts). Consumers import DEEDS/DEED_ORDER directly from
+// './content/deeds'.
+
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
 // before others shifts their spawn positions. New rare-elite camps
 // (ZONE1_CHAPEL_CAMPS) and the Eastbrook rare Grix are appended LAST so every

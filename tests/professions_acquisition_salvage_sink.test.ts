@@ -37,6 +37,7 @@ const GATED_RECIPE: ProfessionRecipeRecord = {
   skillReq: 0,
   trivialAt: 25,
   itemLevelBudget: 1,
+  level: 1,
   acquisition: ['trainer'],
 };
 

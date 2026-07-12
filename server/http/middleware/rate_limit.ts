@@ -37,6 +37,8 @@ import {
   rateLimitNow,
   rateLimitTier2Store,
   reportsCreateRateLimited,
+  STEAM_LINK_MAX_PER_MINUTE,
+  steamLinkRateLimited,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
@@ -199,6 +201,18 @@ export const CARD_UPLOAD_POLICY: RateLimitPolicy = {
   limit: CARD_UPLOAD_MAX_PER_MINUTE,
   windowSeconds: WINDOW_SECONDS,
   tier1: (ctx) => cardUploadRateLimited(ctx.req, ctxAccountId(ctx)),
+  tier2: 'global',
+};
+
+// Steam link attempts (POST /api/steam/link). 'ip+account' (mounts BEHIND the
+// route's auth guard) and deliberately tight: every allowed attempt is an
+// upstream AuthenticateUserTicket call against the Steam Web API.
+export const STEAM_LINK_POLICY: RateLimitPolicy = {
+  name: 'steam_link',
+  keyClass: 'ip+account',
+  limit: STEAM_LINK_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => steamLinkRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
 

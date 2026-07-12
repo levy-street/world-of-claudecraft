@@ -33,6 +33,7 @@ function friend(over: Partial<FriendInfo> & { name: string }): FriendInfo {
     realm: 'Test',
     online: true,
     ...over,
+    activeTitle: over.activeTitle ?? null,
   };
 }
 
@@ -154,6 +155,26 @@ describe('per-tab row models', () => {
 
   it('returns a null guild for a guildless viewer', () => {
     expect(guildView({ ...SOCIAL, guild: null }, 'Me').guild).toBeNull();
+  });
+
+  it('passes each row activeTitle through as a DEED ID (null untitled), both tabs', () => {
+    const social: SocialInfo = {
+      ...SOCIAL,
+      friends: [friend({ name: 'Titled', activeTitle: 'prog_veteran' }), friend({ name: 'Plain' })],
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: [
+          guildMember({ name: 'MTitled', rank: 'member', activeTitle: 'hid_saul_footnote' }),
+          guildMember({ name: 'MPlain', rank: 'member' }),
+        ],
+      },
+    };
+    const friends = friendRows(social);
+    expect(friends.find((r) => r.name === 'Titled')?.activeTitle).toBe('prog_veteran');
+    expect(friends.find((r) => r.name === 'Plain')?.activeTitle).toBeNull();
+    const rows = guildView(social, 'Me').guild!.rows;
+    expect(rows.find((r) => r.name === 'MTitled')?.activeTitle).toBe('hid_saul_footnote');
+    expect(rows.find((r) => r.name === 'MPlain')?.activeTitle).toBeNull();
   });
 
   it('maps each member last_login into the guild row (null when unknown)', () => {

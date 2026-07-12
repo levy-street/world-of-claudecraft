@@ -42,6 +42,8 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
+//                                            rarity + the account-Renown leaderboard reads
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -59,6 +61,7 @@ import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
 import type { IWorldDailyRewards } from './world_api/daily_rewards';
+import type { IWorldDeeds } from './world_api/deeds';
 import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeons } from './world_api/dungeons';
@@ -82,11 +85,18 @@ import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 export type {
+  DeedsLeaderboardPage,
   DevLeaderboardPage,
   GuildLeaderboardPage,
   LeaderboardPage,
 } from './sim/leaderboard_page';
-export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
+export type {
+  ArenaCombatant,
+  ArenaFormat,
+  ArenaStanding,
+  DeedStats,
+  OverheadEmoteId,
+} from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export type { BankBonusSource, BankInfo } from './world_api/bank';
@@ -103,6 +113,11 @@ export type {
   DailyRewardStatus,
   DailyRewardTaskView,
 } from './world_api/daily_rewards';
+export type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
+  DeedsRarity,
+} from './world_api/deeds';
 export type {
   DelveCompanionInfo,
   DelveDailyInfo,
@@ -180,7 +195,8 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
-    IWorldValeCup {}
+    IWorldValeCup,
+    IWorldDeeds {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -342,6 +358,7 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'deed_set_title',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -407,7 +424,8 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
-  | 'IWorldValeCup';
+  | 'IWorldValeCup'
+  | 'IWorldDeeds';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -560,4 +578,8 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldDeeds: the Book of Deeds title selection (snake_case wire string, by
+  // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
+  // send, untagged).
+  deed_set_title: 'IWorldDeeds',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

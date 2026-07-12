@@ -3,19 +3,40 @@
 
 # tests/: Vitest suite
 
-Around 464 `*.test.ts` files. Tests import `src/sim/` and `server/` modules
-**directly** and exercise them **deterministically** in plain Node: no live
-server, browser, or Postgres for unit tests. Browser/E2E + screenshot tests live
-in `scripts/*.mjs` (need `npm run dev`/`server`), NOT here.
+Tests import `src/sim/` and `server/` modules **directly** and exercise them
+**deterministically** in plain Node: no live server, browser, or Postgres for unit
+tests. Browser/E2E + screenshot tests live in `scripts/*.mjs` (need `npm run
+dev`/`server`), NOT here.
 
-## Naming
-`<area>.test.ts` pairs with the module under test: `sim.test.ts` to `src/sim/sim.ts`,
-`talents.test.ts` to `src/sim/content/talents.ts`, `social_system.test.ts` to `server/social.ts`,
-`snapshots.test.ts`/`bandwidth.test.ts` to `server/game.ts`.
+## Where a new test lands (module-first, test-first)
+A NEW module (sim system, pure-core view, painter, RouteDef) gets its OWN paired
+`tests/<module>.test.ts` (RouteDef suites under `tests/server/`); never append its
+cases to `sim.test.ts` or another existing big suite. Bug fixes are test-first: a
+failing repro test first (extract the buried unit into its own module if needed),
+then the smallest change that turns it green (`extract-and-test` skill).
+
+## Map
+Most tests sit flat here: `<area>.test.ts` pairs with the module under test; `ls tests/`
+to find an area. Cross-boundary pairs worth knowing: `social_system.test.ts` to
+`server/social.ts`, `snapshots.test.ts`/`bandwidth.test.ts` to `server/game.ts`.
+Subdirectories (plus one shared fixture):
+- `parity/`: the golden-trace sim-drift gate; own `CLAUDE.md` (see Coverage & guards).
+- `server/`: the RouteDef/http-pipeline suite. REUSE the shared fakes in
+  `tests/server/helpers/` (`fake_ctx`, `fake_db`, `fake_http`, ... via the `index.ts`
+  barrel) instead of hand-rolling mocks; scaffold a new endpoint with
+  `npm run new:endpoint` (see `server/http/CLAUDE.md`).
+- `admin/`: the Svelte admin components, per-file jsdom (DOM rule below; the
+  `tests/admin/_setup.ts` header documents the convention).
+- `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
+  `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
+- `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
+- `helpers/` + `util/`: shared cross-suite utilities (`i18n_determinism.ts`, `alloc_probe.ts`).
+- `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
+  mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
 ## The core idiom (sim tests)
-Most files construct a `Sim` and advance fixed ticks. Each file redefines small
-local helpers (not shared); copy the pattern from `sim.test.ts`:
+Most files construct a `Sim` and advance fixed ticks. Sim test files redefine small
+local helpers (shared fakes are a `tests/server/` thing); copy the pattern from `sim.test.ts`:
 
 ```ts
 const makeSim = (cls='warrior', seed=42) => new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -37,26 +58,37 @@ fake socket: `fakeWs()` collects `JSON.parse`'d sends; `server.join(...)`,
 For the online client path, build a `ClientWorld` with `Object.create(ClientWorld.prototype)`
 (see `bareClient` in `snapshots.test.ts`/`talents.test.ts`) and call `applySnapshot(...)`.
 `server/social.ts` etc. take injected interfaces: implement an in-memory `FakeDb`/
-transport (see `social_system.test.ts`) rather than mocking.
+transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpoints
+use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
-One test area per subsystem (combat/AI, the 9 classes, progression/xp, talents, social/guilds,
-snapshots/bandwidth/interest, security/auth, keybinds/mobile, admin/moderation, i18n); `ls tests/`
-to find the file for an area.
-`architecture.test.ts` is the `src/sim` purity backstop: it scans every sim file and fails on a
-render/ui/game/net/three import, a DOM global, or `Math.random`/`Date.now`/`performance.now`. Run
-it after any `src/sim/` change. It ALSO completeness-checks the UI/render pure cores, so a NEW pure
-core MUST follow the `*_view`/`*_core` naming (a bare name escapes the reverse sweep) and be
-registered in `UI_PURE_CORES`/`RENDER_PURE_CORES`, or the guard fails.
-`malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,
-zero high-severity findings allowed in the tree); run it after touching the scanner.
+- `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
+  design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
+  `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.
+- `architecture.test.ts` is the `src/sim` purity backstop: scans every sim file, fails on a
+  render/ui/game/net/three import, a DOM global, or `Math.random`/`Date.now`/`performance.now`;
+  run it after any `src/sim/` change. It ALSO completeness-checks the UI/render pure cores: a NEW
+  pure core MUST follow the `*_view`/`*_core` naming (a bare name escapes the reverse sweep) and
+  be registered in `UI_PURE_CORES`/`RENDER_PURE_CORES`, or the guard fails.
+- `guide.test.ts` is the wiki freshness gate: new/changed player-facing content in
+  `src/sim/content/` fails it until `npm run wiki:content` regenerates (auto in `pretest`).
+- `css_corpus.test.ts` guards the CSS union corpus + brace balance (a dropped closing
+  brace silently discards all later CSS); re-run after touching `src/styles/` or entry inline styles.
+- Perf budgets: `hud_perf_budget` (baseline in `hud_perf_budget.baseline.md`), `render_budget`,
+  `tests/server/perf_gate` + `tick_perf_capture`, `alloc_probe` (probe in `tests/util/`).
+- SFX gates: the `sfx_*` suites (`sfx_conform`, `sfx_studio_server_security`,
+  `tests/server/static_sfx_serving`, ...) mirror `npm run sfx:check`.
+- `malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,
+  zero high-severity findings allowed in the tree); run it after touching the scanner.
 
 ## i18n gates live here (don't produce strings, enforce them)
 Run them after any sim/server player-text or English-catalog change. They depend on generated
 artifacts: `pretest` runs `npm run i18n:gen`, so `npm test` regenerates the resolved tables and
 `src/ui/i18n.status.json` first; a bare `npx vitest run` does NOT, so run `npm run i18n:gen`
 yourself or the S3 guard throws "status.json is missing".
-- **`localization_fixes.test.ts` is the S3 guard**: it parses `src/sim/sim.ts` and `server/game.ts`,
+- **`localization_fixes.test.ts` is the S3 guard**: it parses `src/sim/sim.ts`, `server/game.ts`,
+  and a broad set of sim source modules (combat/mob/pet/delves/instances/market/bank/loot and more;
+  the authoritative file list lives in the test itself),
   enumerating every player-facing emit and asserting each is recognized by a `hud.ts` localize arm or
   the `localizeServerText`/`localizeSimText` matchers (plus `simDICT`/`serverDICT`/`adminDICT`
   completeness + placeholder parity per locale). Add or change a sim/server player string and update
@@ -67,12 +99,13 @@ yourself or the S3 guard throws "status.json is missing".
 
 ## Running & adding
 - Single file (preferred while iterating): `npx vitest run tests/<file>.test.ts`.
-- **DOM in tests:** the default Vitest env is plain Node (no `document`/`window`) and **jsdom is
-  deliberately NOT a dependency**. When you need one global, stub it on `globalThis` (`localStorage`
-  in `keybinds.test.ts`, `WebSocket` in `snapshots.test.ts`). For a DOM-touching UI test (focus
-  wiring, a write-elided painter, a keyed pool), build a small **hand-rolled fake DOM** that models
-  only the contract under test (`focus_manager.test.ts`, `painter_host.test.ts`,
-  `hud_perf_budget.test.ts`); do NOT reach for jsdom. The real-browser path (WebKit/Safari CSS, axe,
-  target-size) is the OPT-IN Playwright suite `tests/browser/*.browser.test.ts`
-  (`npm run test:browser`), never a bare `vitest run`.
+- **DOM in tests, the two-branch rule.** The default Vitest env is plain Node (no
+  `document`/`window`). Game-HUD/UI tests stay there: stub a single global on `globalThis`
+  (`localStorage` in `keybinds.test.ts`, `WebSocket` in `snapshots.test.ts`) or build a small
+  **hand-rolled fake DOM** modeling only the contract under test (`focus_manager.test.ts`,
+  `painter_host.test.ts`); never jsdom. The sanctioned jsdom branch is the Svelte admin suite
+  (`tests/admin/`, per-file `// @vitest-environment jsdom` docblock plus `import './_setup'`)
+  and the DOM-download tests (`desktop_download_dom.test.ts`, `corpse_harvest_window.test.ts`);
+  jsdom stays scoped per-file so the hundreds of Node-env files keep the fast default.
+  Enumerate the live jsdom set with `grep -rl '@vitest-environment jsdom' tests/`.
 - Add/update a test here when you change sim or server behavior (see root CLAUDE.md).
