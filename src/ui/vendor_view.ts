@@ -34,22 +34,6 @@ export interface VendorView {
   buyback: VendorBuybackRow[];
 }
 
-export interface VendorSellRow {
-  itemId: string;
-  item: ItemDef;
-  /** Total units held across every bag slot of this item. Always > 0. */
-  count: number;
-  /** Per-unit vendor sell value (copper). Always > 0. */
-  unitPrice: number;
-  /** Copper for selling the whole stack: unitPrice times count. */
-  total: number;
-  /** True if ANY aggregated slot carried per-instance (rolled-stat) payload. The
-   *  sim sells by itemId and buyback only restores a BASE copy, so a one-click
-   *  whole-stack sell of a rolled row would lose the rolled stats: the UI gates it
-   *  behind a confirm. Plain fungible rows (no instance) sell with no friction. */
-  instanced: boolean;
-}
-
 /**
  * Build the structured vendor view from raw inputs.
  *
@@ -76,51 +60,4 @@ export function buildVendorView(
     buyback.push({ itemId: slot.itemId, item, count: slot.count, price: item.sellValue });
   }
   return { goods, buyback };
-}
-
-/**
- * Build the sellable-inventory rows for the vendor Sell tab.
- *
- * A bag slot is sellable only if its item still exists, its count is positive,
- * and the vendor will actually pay for it: quest items and noVendorSell items are
- * excluded (the same rejections the sim's sellItem enforces), and a zero (or
- * missing) sellValue item is excluded too (nothing to gain, and never a "sellable"
- * row). Slots of the same item are aggregated into ONE row keyed by itemId, in
- * first-seen order, because the sim sells by itemId across every slot: a row's
- * count is the total held and its Sell action sells that whole total (the classic
- * right-click-sells-the-stack dispatch), so the displayed total is exactly what
- * the sale pays out.
- */
-export function buildVendorSellRows(
-  inventory: readonly InvSlot[],
-  items: Record<string, ItemDef>,
-): VendorSellRow[] {
-  const byId = new Map<string, VendorSellRow>();
-  const order: string[] = [];
-  for (const slot of inventory) {
-    if (slot.count <= 0) continue;
-    const item = items[slot.itemId];
-    if (!item) continue;
-    if (item.kind === 'quest') continue;
-    if (item.noVendorSell) continue;
-    if (!item.sellValue || item.sellValue <= 0) continue;
-    const slotInstanced = slot.instance != null;
-    const existing = byId.get(slot.itemId);
-    if (existing) {
-      existing.count += slot.count;
-      existing.total = existing.unitPrice * existing.count;
-      if (slotInstanced) existing.instanced = true;
-    } else {
-      byId.set(slot.itemId, {
-        itemId: slot.itemId,
-        item,
-        count: slot.count,
-        unitPrice: item.sellValue,
-        total: item.sellValue * slot.count,
-        instanced: slotInstanced,
-      });
-      order.push(slot.itemId);
-    }
-  }
-  return order.map((id) => byId.get(id) as VendorSellRow);
 }

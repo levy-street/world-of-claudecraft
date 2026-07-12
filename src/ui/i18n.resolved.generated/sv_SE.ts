@@ -322,8 +322,6 @@ export const sv_SE: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
       "toggleHaptics": "Växla haptik",
-      "showMenuButtons": "Visa menyknappar",
-      "hideMenuButtons": "Dölj menyknappar",
       "hotbarPage": "Förmågor",
       "hotbarPageAria": "Visa nästa uppsättning förmågor",
       "actionRing": "Stridsaktioner",
@@ -339,7 +337,13 @@ export const sv_SE: EnTranslations = {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
       "talkBodyTouch": "Ställ dig nära marskalk Redbrook och tryck på Använd-knappen för att tala, anta sedan hans uppgift.",
       "returnBodyTouch": "Din uppgift är klar. Återvänd till marskalk Redbrook och tryck på Använd-knappen för att lämna in den.",
-      "doneBodyTouch": "Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten."
+      "doneBodyTouch": "Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klicka för att växla mellan 12/24-timmar",
@@ -588,84 +592,7 @@ export const sv_SE: EnTranslations = {
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Vänsterhänt layout",
-      "ia": {
-        "railDisplay": "Visning",
-        "railInput": "Inmatning",
-        "railSystem": "Systeminställningar",
-        "catOverviewName": "Översikt",
-        "catOverviewSub": "Fästa grundinställningar, snabbåtgärder och ändringar.",
-        "catGraphicsSub": "Kvalitet, sikt och världsgrafik.",
-        "catInterfaceSub": "HUD-skala, paneler, chatt och enhetsramar.",
-        "catAccessibilityName": "Tillgänglighet",
-        "catAccessibilitySub": "Rörelse, kontrast och behagligt innehåll.",
-        "catControlsName": "Kontroller",
-        "catControlsSub": "Kamera, rörelse, strid och återkoppling.",
-        "catKeybindsSub": "Bind tangenter till varje åtgärd.",
-        "catControllerSub": "Handkontrollens känsla och knapplayout.",
-        "catTouchName": "Pekstyrning",
-        "catTouchSub": "Styrspakar på skärmen, blick och knappar.",
-        "catAudioSub": "Volym och ljudinställningar.",
-        "catSystemName": "Systeminställningar",
-        "catSystemSub": "Prestanda, hjälp och information."
-      },
-      "done": "Klar",
-      "resetAllTitle": "Återställ alla inställningar?",
-      "resetAllBody": "Detta återställer alla inställningar till standardvärdena. Det går inte att ångra.",
-      "searchPlaceholder": "Sök inställningar",
-      "searchScopeAll": "Alla inställningar",
-      "searchScopeThis": "Det här avsnittet",
-      "searchEmpty": "Inga inställningar matchar din sökning.",
-      "searchGoTo": "Gå till {category}",
-      "modeOnline": "Anslutet läge",
-      "modeOffline": "Frånkopplat läge",
-      "changed": "{count} ändrade",
-      "changedSummary": "{count} ändrade från standardvärdena",
-      "legend": {
-        "category": "Kategori",
-        "navigate": "Navigera",
-        "select": "Markera",
-        "back": "Tillbaka",
-        "reset": "Återställ",
-        "clear": "Rensa",
-        "page": "Sida"
-      },
-      "keybindCleared": "Tilldelningen för {action} rensades",
-      "keybindRebinding": "Tilldelar om {action}. Tryck på en tangent eller Escape för att avbryta.",
-      "keybindEvicted": "Tilldelade {key} till {action}; tog bort den från {evicted}",
-      "keybindTaken": "Tangent borttagen",
-      "keybindUnbound": "{action} har ingen tangent",
-      "keybindModifierHint": "Tips: du kan tilldela kombinationer med modifieringstangenter. Håll ned Shift, Ctrl eller Alt medan du trycker på en tangent för att registrera kombinationen, till exempel Shift+1.",
-      "conflictDot": "Tilldelningskonflikt",
-      "overviewConflictAlert": "Vissa tangenttilldelningar krockar eller saknas.",
-      "sec": {
-        "quality": "Kvalitet",
-        "view": "Vy",
-        "general": "Allmänt",
-        "scaleText": "Skala och text",
-        "panels": "Paneler",
-        "unitFrames": "Enhetsramar",
-        "actionBars": "Åtgärdsfält",
-        "chat": "Chatt",
-        "combatTooltips": "Strid och verktygstips",
-        "hudExtras": "Extra HUD-element",
-        "motionContrast": "Rörelse och kontrast",
-        "content": "Innehåll",
-        "camera": "Kamerastyrning",
-        "movement": "Förflyttning",
-        "combat": "Strid",
-        "feedback": "Återkoppling",
-        "inputMode": "Inmatningsläge",
-        "feel": "Känsla",
-        "sticks": "Styrspakar",
-        "look": "Blickstyrning",
-        "buttons": "Knappar",
-        "volume": "Volym",
-        "toggles": "Växlar",
-        "performance": "Prestanda",
-        "support": "Hjälp",
-        "about": "Information"
-      }
+      "mobileLeftHanded": "Vänsterhänt layout"
     },
     "controller": {
       "title": "Handkontroll",
@@ -677,8 +604,7 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
-      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.",
-      "duplicate": "Även tilldelad till {buttons}"
+      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
     },
     "perf": {
       "title": "Prestandaöverlägg",
@@ -811,11 +737,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Bygge {n}",
-      "choicesTab": "Val",
-      "resetChoices": "Återställ val",
-      "tierLevel": "Nivå {n}",
-      "tierLevelLabel": "Nivå"
+      "defaultBuildName": "Bygge {n}"
     },
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
@@ -1008,6 +930,7 @@ export const sv_SE: EnTranslations = {
     "corpseHarvest": {
       "title": "Skörda",
       "harvestButton": "Skörda",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.",
       "alreadyHarvested": "Det här kadavret har redan skördats.",
       "componentAria": "Skörda {component}",
@@ -1188,7 +1111,8 @@ export const sv_SE: EnTranslations = {
       "resetErrInvalid": "Den här återställningslänken är ogiltig eller har gått ut. Begär en ny."
     },
     "loot": {
-      "chestTitle": "Kista"
+      "chestTitle": "Kista",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",
@@ -5033,8 +4957,6 @@ export const sv_SE: EnTranslations = {
       "buybackTitle": "Återköp",
       "buybackEmpty": "Inga föremål",
       "buybackAria": "Köp tillbaka {item} för {price}",
-      "sellItemAria": "Sälj {item} för {price}",
-      "sellRolledWarning": "Slumpade egenskaper kan inte återställas genom återköp.",
       "sellQuantityTitle": "Sälj {item}",
       "sellQuantityInput": "Antal att sälja",
       "sellQuantityConfirm": "Sälj",

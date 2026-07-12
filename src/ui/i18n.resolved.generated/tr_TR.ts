@@ -322,8 +322,6 @@ export const tr_TR: EnTranslations = {
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
       "toggleHaptics": "Dokunsal geri bildirimi aç/kapat",
-      "showMenuButtons": "Menü düğmelerini göster",
-      "hideMenuButtons": "Menü düğmelerini gizle",
       "hotbarPage": "Yetenekler",
       "hotbarPageAria": "Sonraki yetenek grubunu göster",
       "actionRing": "Savaş eylemleri",
@@ -339,7 +337,13 @@ export const tr_TR: EnTranslations = {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
       "talkBodyTouch": "Mareşal Redbrook'a yaklaş ve konuşmak için Kullan düğmesine dokun, ardından görevini kabul et.",
       "returnBodyTouch": "Görevin tamamlandı. Mareşal Redbrook'a dön ve teslim etmek için Kullan düğmesine dokun.",
-      "doneBodyTouch": "Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla'ya, ardından Görevler'e dokun. İyi avlar."
+      "doneBodyTouch": "Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla'ya, ardından Görevler'e dokun. İyi avlar.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla",
@@ -588,84 +592,7 @@ export const tr_TR: EnTranslations = {
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
-      "mobileLeftHanded": "Solak düzen",
-      "ia": {
-        "railDisplay": "Görüntü",
-        "railInput": "Giriş",
-        "railSystem": "Sistem",
-        "catOverviewName": "Genel Bakış",
-        "catOverviewSub": "Sabitlenmiş temel ayarlar, hızlı eylemler ve değişiklikler.",
-        "catGraphicsSub": "Kalite, görüş ve dünya görselleri.",
-        "catInterfaceSub": "HUD ölçeği, paneller, sohbet ve birim çerçeveleri.",
-        "catAccessibilityName": "Erişilebilirlik",
-        "catAccessibilitySub": "Hareket, kontrast ve içerik rahatlığı.",
-        "catControlsName": "Kontroller",
-        "catControlsSub": "Kamera, hareket, savaş ve geri bildirim.",
-        "catKeybindsSub": "Her eylem için tuş ata.",
-        "catControllerSub": "Oyun kumandası hissi ve düğme düzeni.",
-        "catTouchName": "Dokunmatik",
-        "catTouchSub": "Ekran çubukları, görüş ve düğmeler.",
-        "catAudioSub": "Ses düzeyi ve ses açma kapama seçenekleri.",
-        "catSystemName": "Sistem",
-        "catSystemSub": "Performans, destek ve hakkında."
-      },
-      "done": "Bitti",
-      "resetAllTitle": "Tüm ayarlar sıfırlansın mı?",
-      "resetAllBody": "Bu işlem her ayarı varsayılan değerine döndürür. Geri alınamaz.",
-      "searchPlaceholder": "Ayarlarda ara",
-      "searchScopeAll": "Tüm ayarlar",
-      "searchScopeThis": "Bu bölüm",
-      "searchEmpty": "Aramanla eşleşen ayar yok.",
-      "searchGoTo": "{category} bölümüne git",
-      "modeOnline": "Çevrimiçi",
-      "modeOffline": "Çevrimdışı",
-      "changed": "{count} değişiklik",
-      "changedSummary": "Varsayılanlardan {count} değişiklik",
-      "legend": {
-        "category": "Kategori",
-        "navigate": "Gezin",
-        "select": "Seç",
-        "back": "Geri",
-        "reset": "Sıfırla",
-        "clear": "Temizle",
-        "page": "Sayfa"
-      },
-      "keybindCleared": "{action} temizlendi",
-      "keybindRebinding": "{action} yeniden atanıyor. Bir tuşa bas veya iptal etmek için Escape tuşuna bas.",
-      "keybindEvicted": "{key}, {action} için atandı; {evicted} üzerinden kaldırıldı",
-      "keybindTaken": "Tuş kaldırıldı",
-      "keybindUnbound": "{action} için tuş yok",
-      "keybindModifierHint": "İpucu: değiştirici tuş birleşimleri atayabilirsin. Bir tuşa basarken Shift, Ctrl veya Alt tuşunu basılı tutarak birleşimi yakala (örneğin Shift+1).",
-      "conflictDot": "Tuş ataması çakışması",
-      "overviewConflictAlert": "Bazı tuş atamaları çakışıyor veya atanmamış.",
-      "sec": {
-        "quality": "Kalite",
-        "view": "Görüş",
-        "general": "Genel",
-        "scaleText": "Ölçek ve Metin",
-        "panels": "Paneller",
-        "unitFrames": "Birim Çerçeveleri",
-        "actionBars": "Eylem Çubukları",
-        "chat": "Sohbet",
-        "combatTooltips": "Savaş ve İpuçları",
-        "hudExtras": "Ek HUD Öğeleri",
-        "motionContrast": "Hareket ve Kontrast",
-        "content": "İçerik",
-        "camera": "Kamera",
-        "movement": "Hareket",
-        "combat": "Savaş",
-        "feedback": "Geri Bildirim",
-        "inputMode": "Giriş Modu",
-        "feel": "Hissiyat",
-        "sticks": "Çubuklar",
-        "look": "Bakış",
-        "buttons": "Düğmeler",
-        "volume": "Ses Düzeyi",
-        "toggles": "Açma Kapama",
-        "performance": "Performans",
-        "support": "Destek",
-        "about": "Hakkında"
-      }
+      "mobileLeftHanded": "Solak düzen"
     },
     "controller": {
       "title": "Oyun Kolu",
@@ -677,8 +604,7 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
-      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın.",
-      "duplicate": "Ayrıca {buttons} için atanmış"
+      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
     },
     "perf": {
       "title": "Performans Katmanı",
@@ -811,11 +737,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Yapı {n}",
-      "choicesTab": "Seçimler",
-      "resetChoices": "Seçimleri Sıfırla",
-      "tierLevel": "{n}. Seviye",
-      "tierLevelLabel": "Seviye"
+      "defaultBuildName": "Yapı {n}"
     },
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
@@ -1008,6 +930,7 @@ export const tr_TR: EnTranslations = {
     "corpseHarvest": {
       "title": "Toplama",
       "harvestButton": "Topla",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
@@ -1188,7 +1111,8 @@ export const tr_TR: EnTranslations = {
       "resetErrInvalid": "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste."
     },
     "loot": {
-      "chestTitle": "Sandık"
+      "chestTitle": "Sandık",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
@@ -5033,8 +4957,6 @@ export const tr_TR: EnTranslations = {
       "buybackTitle": "Geri Alım",
       "buybackEmpty": "Eşya yok",
       "buybackAria": "{item} eşyasını {price} karşılığında geri al",
-      "sellItemAria": "{item} öğesini {price} karşılığında sat",
-      "sellRolledWarning": "Rastgele özellikler geri satın almayla kurtarılamaz.",
       "sellQuantityTitle": "{item} Sat",
       "sellQuantityInput": "Satılacak miktar",
       "sellQuantityConfirm": "Sat",

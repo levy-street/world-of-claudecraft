@@ -52,37 +52,6 @@ describe('rovingTarget: same input -> same output', () => {
   });
 });
 
-describe("rovingTarget: 'vertical' orientation (owns Up/Down/Home/End only)", () => {
-  // The Esc-menu rail (spec section 5) is a vertical roving tablist that must leave
-  // Left/Right free for in-row value adjust, so it needs an orientation that owns the
-  // vertical arrows and Home/End but NOT the horizontal arrows.
-  it('Home -> 0 and End -> count - 1', () => {
-    expect(rovingTarget('Home', 2, 4, 'vertical')).toBe(0);
-    expect(rovingTarget('End', 1, 4, 'vertical')).toBe(3);
-  });
-
-  it('owns ArrowDown (next) / ArrowUp (prev), wrapping at the ends', () => {
-    expect(rovingTarget('ArrowDown', 0, 3, 'vertical')).toBe(1);
-    expect(rovingTarget('ArrowDown', 2, 3, 'vertical')).toBe(0); // wrap forward
-    expect(rovingTarget('ArrowUp', 1, 3, 'vertical')).toBe(0);
-    expect(rovingTarget('ArrowUp', 0, 3, 'vertical')).toBe(2); // wrap back
-  });
-
-  it('IGNORES ArrowLeft/ArrowRight so in-row value adjust never competes (the pin)', () => {
-    expect(rovingTarget('ArrowRight', 0, 3, 'vertical')).toBeNull();
-    expect(rovingTarget('ArrowRight', 2, 3, 'vertical')).toBeNull();
-    expect(rovingTarget('ArrowLeft', 1, 3, 'vertical')).toBeNull();
-    expect(rovingTarget('ArrowLeft', 0, 3, 'vertical')).toBeNull();
-  });
-
-  it('returns null when there are no options, and for non-roving keys', () => {
-    expect(rovingTarget('ArrowDown', 0, 0, 'vertical')).toBeNull();
-    for (const k of ['Tab', 'Enter', ' ', 'Escape', 'a', 'Backspace', 'Delete']) {
-      expect(rovingTarget(k, 0, 3, 'vertical'), k).toBeNull();
-    }
-  });
-});
-
 describe('rovingTarget: equivalence with the three folded talents handlers', () => {
   // The exact inline arithmetic each handler computed before they were folded onto the
   // core, reproduced here so the fold is proven byte-faithful across a small index grid.

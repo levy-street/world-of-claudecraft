@@ -33,20 +33,15 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import type { SpatialAudioSink, Surface } from './audio_sink';
+import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
-import {
-  type CameraOcclusionState,
-  resolveCameraBaseFov,
-  stepCameraOcclusion,
-} from './camera_collision';
+import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
@@ -127,6 +122,7 @@ import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_tea
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
+import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 
@@ -552,12 +548,6 @@ export interface EntityView {
   nameplateTransform: string;
   nameplateSig: string;
   nameplateHpWidth: string;
-  /** distance scale from the last plan, reapplied by the declutter re-anchor pass */
-  nameplateScale: number;
-  /** static plate opacity (stealth etc.); the distance fade multiplies it */
-  nameplateBaseOpacity: string;
-  /** last-written style.opacity, to diff cheaply (the fade writer owns the property) */
-  nameplateOpacity: string;
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
@@ -802,12 +792,6 @@ export class Renderer {
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
   private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
-  // The player's Field of View comfort setting (Settings.cameraFov, 55..100),
-  // resolved. setCameraFov writes it; updateCamera threads it through
-  // stepCameraOcclusion as the occlusion base every frame, so the slider changes
-  // the rendered FOV and the per-frame camera update preserves it (rather than
-  // forcing the shipped CAMERA_BASE_FOV back each frame).
-  private cameraBaseFov = CAMERA_BASE_FOV;
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -951,6 +935,7 @@ export class Renderer {
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
+  private readonly ambientPointSources: readonly AmbientPointSource[];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -1038,6 +1023,7 @@ export class Renderer {
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
+    this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
@@ -1612,21 +1598,12 @@ export class Renderer {
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
-    if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevelAt(x, z);
-    if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
-    const biome = zoneBiomeAt(z);
-    if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
-    return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
+    return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
 
-  /** Vertical camera field of view in degrees (55..100, default 60). Stored as the
-   *  per-frame occlusion base so updateCamera keeps the player's choice instead of
-   *  snapping back to CAMERA_BASE_FOV each frame. */
+  /** Vertical camera field of view in degrees (55..100, default 60). */
   setCameraFov(deg: number): void {
-    this.cameraBaseFov = resolveCameraBaseFov(deg);
-    this.camera.fov = this.cameraBaseFov;
+    this.camera.fov = Math.min(100, Math.max(55, deg));
     this.camera.updateProjectionMatrix();
   }
 
@@ -3581,9 +3558,6 @@ export class Renderer {
       nameplateTransform: '',
       nameplateSig: '',
       nameplateHpWidth: '',
-      nameplateScale: 1,
-      nameplateBaseOpacity: '1',
-      nameplateOpacity: '',
       comboSig: '',
       tierValue: 0,
       devTierValue: 0,
@@ -5381,7 +5355,7 @@ export class Renderer {
       // stays at the player's requested zoom instead of clamping inside the pit.
       this.camOcclusion.pullT = 1;
       this.camOcclusion.lensT = 1;
-      this.camOcclusion.fov = this.cameraBaseFov;
+      this.camOcclusion.fov = CAMERA_BASE_FOV;
     } else {
       // Camera collision for non-hideable blockers. Camera-ghost props are left
       // at the requested zoom and hidden in props.ts while keeping their shadows.
@@ -5414,10 +5388,8 @@ export class Renderer {
         CAMERA_PULL_IN_RATE,
         CAMERA_PULL_OUT_RATE,
         CAMERA_SOFT_PULL_WEIGHT,
-        this.cameraBaseFov,
-        // Never let the occlusion-compensation ceiling fall below the player's own
-        // base FOV, or a wide setting (up to 100) would briefly NARROW under a clamp.
-        Math.max(CAMERA_MAX_COMP_FOV, this.cameraBaseFov),
+        CAMERA_BASE_FOV,
+        CAMERA_MAX_COMP_FOV,
       );
     }
     const ct = this.camOcclusion.pullT;
@@ -5460,8 +5432,8 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
-      const crowd = !inDungeon && isAtSowfield(px, pz) ? (this.sim.cupInfo?.live ? 1 : 0.4) : 0;
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd);
+      const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
     }
   }
 
@@ -5513,8 +5485,7 @@ export class Renderer {
       b.el.style.display = '';
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      // chat bubbles share the anchor transform but never distance-scale
-      b.el.style.transform = nameplateScreenTransform(sx, sy, 1);
+      b.el.style.transform = nameplateScreenTransform(sx, sy);
     }
   }
 

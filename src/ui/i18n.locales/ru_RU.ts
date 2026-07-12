@@ -14,89 +14,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
-  'itemUi.vendor.sellItemAria': 'Продать {item} за {price}',
   'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
-  'hudChrome.options.done': 'Готово',
-  'hudChrome.options.keybindUnbound': 'Для действия «{action}» не назначена клавиша',
-  'hudChrome.options.legend.back': 'Назад',
-  'hudChrome.options.legend.page': 'Страница',
-  'hudChrome.options.searchGoTo': 'Перейти к разделу «{category}»',
-  'hudChrome.options.sec.chat': 'Чат',
-  'hudChrome.options.sec.feel': 'Ощущения',
-  'hudChrome.options.sec.look': 'Обзор',
-  'hudChrome.options.sec.view': 'Обзор',
   'hudChrome.readyCheck.notInPartyError':
     'Чтобы начать проверку готовности, вы должны состоять в группе.',
   'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
-  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
-  'hudChrome.options.ia.railDisplay': 'Экран',
-  'hudChrome.options.ia.railInput': 'Ввод',
-  'hudChrome.options.ia.railSystem': 'Система',
-  'hudChrome.options.ia.catOverviewName': 'Обзор',
-  'hudChrome.options.ia.catOverviewSub':
-    'Закрепленные настройки, быстрые действия и что изменилось.',
-  'hudChrome.options.ia.catGraphicsSub': 'Качество, обзор и вид мира.',
-  'hudChrome.options.ia.catInterfaceSub': 'Масштаб интерфейса, панели, чат и рамки юнитов.',
-  'hudChrome.options.ia.catAccessibilityName': 'Доступность',
-  'hudChrome.options.ia.catAccessibilitySub': 'Анимация, контраст и комфорт контента.',
-  'hudChrome.options.ia.catControlsName': 'Управление',
-  'hudChrome.options.ia.catControlsSub': 'Камера, движение, бой и отклик.',
-  'hudChrome.options.ia.catKeybindsSub': 'Назначьте клавиши для всех действий.',
-  'hudChrome.options.ia.catControllerSub': 'Отклик геймпада и раскладка кнопок.',
-  'hudChrome.options.ia.catTouchName': 'Сенсор',
-  'hudChrome.options.ia.catTouchSub': 'Экранные стики, обзор и кнопки.',
-  'hudChrome.options.ia.catAudioSub': 'Громкость и переключатели звука.',
-  'hudChrome.options.ia.catSystemName': 'Система',
-  'hudChrome.options.ia.catSystemSub': 'Производительность, поддержка и о программе.',
-  // Esc menu redesign P2 (desktop chrome): search strip, reset-all confirm,
-  // status block, and the section heads. M16 fills.
-  'hudChrome.options.resetAllTitle': 'Сбросить все настройки?',
-  'hudChrome.options.resetAllBody':
-    'Все настройки вернутся к значениям по умолчанию. Это действие нельзя отменить.',
-  'hudChrome.options.searchPlaceholder': 'Поиск настроек',
-  'hudChrome.options.searchScopeAll': 'Все настройки',
-  'hudChrome.options.searchScopeThis': 'Этот раздел',
-  'hudChrome.options.searchEmpty': 'Нет настроек, соответствующих запросу.',
-  'hudChrome.options.modeOnline': 'В сети',
-  'hudChrome.options.modeOffline': 'Не в сети',
-  'hudChrome.options.changed': 'Изменено: {count}',
-  'hudChrome.options.changedSummary': 'Изменено относительно стандартных: {count}',
-  'hudChrome.options.legend.category': 'Категория',
-  'hudChrome.options.legend.navigate': 'Навигация',
-  'hudChrome.options.legend.select': 'Выбрать',
-  'hudChrome.options.legend.reset': 'Сброс',
-  'hudChrome.options.legend.clear': 'Очистить',
-  'hudChrome.options.keybindCleared': 'Очищено: {action}',
-  'hudChrome.options.keybindRebinding':
-    'Переназначение «{action}». Нажмите клавишу или Escape для отмены.',
-  'hudChrome.options.keybindEvicted': '{key} назначена на «{action}»; снята с «{evicted}».',
-  'hudChrome.options.keybindTaken': 'Клавиша снята',
-  'hudChrome.options.conflictDot': 'Конфликт клавиш',
-  'hudChrome.options.overviewConflictAlert':
-    'Некоторые привязки клавиш конфликтуют или не назначены.',
-  'hudChrome.controller.duplicate': 'Также назначено на {buttons}',
-  'hudChrome.options.sec.quality': 'Качество',
-  'hudChrome.options.sec.general': 'Основные',
-  'hudChrome.options.sec.scaleText': 'Масштаб и текст',
-  'hudChrome.options.sec.panels': 'Панели',
-  'hudChrome.options.sec.unitFrames': 'Рамки существ',
-  'hudChrome.options.sec.actionBars': 'Панели действий',
-  'hudChrome.options.sec.combatTooltips': 'Бой и подсказки',
-  'hudChrome.options.sec.hudExtras': 'Дополнения интерфейса',
-  'hudChrome.options.sec.motionContrast': 'Анимация и контраст',
-  'hudChrome.options.sec.content': 'Содержимое',
-  'hudChrome.options.sec.camera': 'Камера',
-  'hudChrome.options.sec.movement': 'Движение',
-  'hudChrome.options.sec.combat': 'Бой',
-  'hudChrome.options.sec.feedback': 'Отклик',
-  'hudChrome.options.sec.inputMode': 'Режим ввода',
-  'hudChrome.options.sec.sticks': 'Стики',
-  'hudChrome.options.sec.buttons': 'Кнопки',
-  'hudChrome.options.sec.volume': 'Громкость',
-  'hudChrome.options.sec.toggles': 'Переключатели',
-  'hudChrome.options.sec.performance': 'Производительность',
-  'hudChrome.options.sec.support': 'Поддержка',
-  'hudChrome.options.sec.about': 'О программе',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
@@ -199,6 +120,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
+  'hudChrome.loot.takeAllTooltip': 'Взять все: забрать все монеты и предметы из этого окна добычи.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -264,6 +186,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Задание выполнено. Вернитесь к маршалу Редбруку и нажмите кнопку «Использовать», чтобы сдать его.',
   'hudChrome.tutorial.doneBodyTouch':
     'Основы освоены, {name}. Долина в вашем распоряжении: исследуйте её. Нажмите «Еще», затем «Журнал заданий», чтобы просмотреть свои задания в любой момент. Удачной охоты!',
+  'hudChrome.tutorial.slayTargetHint':
+    'Впервые в бою? Нажмите {targetKey} или щелкните по волку, чтобы выбрать цель, затем атакуйте способностью с панели действий.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Впервые в бою? Коснитесь волка, чтобы выбрать цель, затем коснитесь способности на панели действий, чтобы атаковать.',
+  'hudChrome.tutorial.nextTipsTitle': 'Что дальше',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Откройте журнал заданий ({key}), чтобы найти следующее задание поблизости.',
+  'hudChrome.tutorial.nextTipMap':
+    'Проверьте карту мира ({key}), чтобы увидеть, где вас ждут задания.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Откройте раздел «Общение» ({key}), чтобы найти группу для сложных боёв.',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
@@ -314,6 +247,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.concentrateHint':
     'Чем меньше выбрано компонентов, тем выше их качество.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Этот труп уже был собран.',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Добыча: собрать с этого трупа материалы для крафта (шкура, клык, шелк и подобные компоненты) отдельно от добычи. Добывать может любой, но каждый труп может обработать только один игрок.',
   'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
   'hudChrome.corpseHarvest.components.hide': 'Шкура',
   'hudChrome.corpseHarvest.components.fang': 'Клык',
@@ -511,8 +446,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.',
-  'hudChrome.options.keybindModifierHint':
-    'Совет: можно назначать сочетания с модификатором. Удерживайте Shift, Ctrl или Alt и нажмите клавишу, чтобы записать сочетание (например, Shift+1).',
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
@@ -531,10 +464,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
-  'hudChrome.talents.choicesTab': 'Выбор талантов',
-  'hudChrome.talents.resetChoices': 'Сбросить выбор',
-  'hudChrome.talents.tierLevel': 'Уровень {n}',
-  'hudChrome.talents.tierLevelLabel': 'Уровень',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
   'meta.builtOn': 'Сборка от {date}',
@@ -1814,7 +1743,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.buybackTitle': 'Выкуп',
   'itemUi.vendor.buybackEmpty': 'Нет предметов',
   'itemUi.vendor.buybackAria': 'Выкупить {item} за {price}',
-  'itemUi.vendor.sellRolledWarning': 'Случайные характеристики нельзя вернуть выкупом.',
   'itemUi.vendor.sellQuantityTitle': 'Продать {item}',
   'itemUi.vendor.sellQuantityInput': 'Количество для продажи',
   'itemUi.vendor.sellQuantityConfirm': 'Продать',
@@ -3772,8 +3700,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycle': 'Сменить цель',
   'hudChrome.mobile.targetCycleShort': 'Цель',
   'hudChrome.mobile.toggleHaptics': 'Вкл/выкл вибрацию',
-  'hudChrome.mobile.showMenuButtons': 'Показать кнопки меню',
-  'hudChrome.mobile.hideMenuButtons': 'Скрыть кнопки меню',
   'hudChrome.rest.resting': 'Отдых',
   'hudChrome.swing.ready': 'Замах',
   'hudChrome.swing.seconds': '{seconds} сек.',
@@ -3830,7 +3756,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Сбросить раскладку кнопок',
   'hudChrome.controller.menuAction': 'Игровое меню',
   'hudChrome.controller.help':
-    'Левый стик отвечает за движение, правый наводит камеру. Откройте окно, чтобы использовать экранный указатель.',
+    'Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель.',
   'hud.tutorial.title': 'Новый искатель приключений',
   'hud.tutorial.stepLabel': 'Шаг {current} из {total}',
   'hud.tutorial.skip': 'Пропустить обучение',

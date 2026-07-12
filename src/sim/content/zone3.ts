@@ -3141,7 +3141,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
   wells: [{ x: 0, z: 662, r: 1.5 }],
   stalls: [
     { x: -7.5, z: 667, rot: Math.PI / 2, r: 1.7 }, // Quartermaster Bree
-    { x: -4.5, z: 673.5, rot: -0.6, r: 1.7 }, // Armorer Hode
+    { x: -4.5, z: 673.5, rot: -0.6, r: 1.7, smithy: true }, // Armorer Hode
   ],
   mines: [
     { x: 88, z: 612, rot: -2.0 }, // Deeprock Burrows

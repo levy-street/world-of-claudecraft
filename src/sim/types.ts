@@ -1556,6 +1556,10 @@ export interface GatherNodeDef {
   zoneId: string;
   type: GatherNodeType;
   pos: { x: number; z: number };
+  // Effective content level for the profession-XP green/gray curve
+  // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
+  // time from the node's zone levelRange midpoint rather than looked up live.
+  level: number;
 }
 
 export interface DungeonSpawn {
@@ -1620,7 +1624,7 @@ export interface BuildingDef {
 export interface ZonePropsDef {
   buildings: BuildingDef[];
   wells: { x: number; z: number; r: number }[];
-  stalls: { x: number; z: number; rot: number; r: number }[];
+  stalls: { x: number; z: number; rot: number; r: number; smithy?: true }[];
   mines: { x: number; z: number; rot: number }[];
   docks: {
     x: number;

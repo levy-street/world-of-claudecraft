@@ -322,8 +322,6 @@ export const en: EnTranslations = {
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
       "toggleHaptics": "Toggle haptics",
-      "showMenuButtons": "Show menu buttons",
-      "hideMenuButtons": "Hide menu buttons",
       "hotbarPage": "Skills",
       "hotbarPageAria": "Show next set of skills",
       "actionRing": "Combat actions",
@@ -339,7 +337,13 @@ export const en: EnTranslations = {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
       "talkBodyTouch": "Stand close to Marshal Redbrook and tap the Use button to speak, then accept his task.",
       "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
-      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
+      "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Local time - click to toggle 12/24-hour",
@@ -588,84 +592,7 @@ export const en: EnTranslations = {
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout",
-      "ia": {
-        "railDisplay": "Display",
-        "railInput": "Input",
-        "railSystem": "System",
-        "catOverviewName": "Overview",
-        "catOverviewSub": "Pinned essentials, quick actions, and what changed.",
-        "catGraphicsSub": "Quality, view, and world visuals.",
-        "catInterfaceSub": "HUD scale, panels, chat, and unit frames.",
-        "catAccessibilityName": "Accessibility",
-        "catAccessibilitySub": "Motion, contrast, and content comfort.",
-        "catControlsName": "Controls",
-        "catControlsSub": "Camera, movement, combat, and feedback.",
-        "catKeybindsSub": "Bind keys for every action.",
-        "catControllerSub": "Gamepad feel and button layout.",
-        "catTouchName": "Touch",
-        "catTouchSub": "On-screen sticks, look, and buttons.",
-        "catAudioSub": "Volume and sound toggles.",
-        "catSystemName": "System",
-        "catSystemSub": "Performance, support, and about."
-      },
-      "done": "Done",
-      "resetAllTitle": "Reset all settings?",
-      "resetAllBody": "This restores every setting to its default. This cannot be undone.",
-      "searchPlaceholder": "Search settings",
-      "searchScopeAll": "All settings",
-      "searchScopeThis": "This section",
-      "searchEmpty": "No settings match your search.",
-      "searchGoTo": "Go to {category}",
-      "modeOnline": "Online",
-      "modeOffline": "Offline",
-      "changed": "{count} changed",
-      "changedSummary": "{count} changed from defaults",
-      "legend": {
-        "category": "Category",
-        "navigate": "Navigate",
-        "select": "Select",
-        "back": "Back",
-        "reset": "Reset",
-        "clear": "Clear",
-        "page": "Page"
-      },
-      "keybindCleared": "Cleared {action}",
-      "keybindRebinding": "Rebinding {action}. Press a key, or Escape to cancel.",
-      "keybindEvicted": "Bound {key} to {action}; removed from {evicted}",
-      "keybindTaken": "Key removed",
-      "keybindUnbound": "{action} has no key",
-      "keybindModifierHint": "Tip: you can bind modifier combinations. Hold Shift, Ctrl, or Alt while pressing a key to capture the combo (for example Shift+1).",
-      "conflictDot": "Binding conflict",
-      "overviewConflictAlert": "Some key bindings conflict or are unbound.",
-      "sec": {
-        "quality": "Quality",
-        "view": "View",
-        "general": "General",
-        "scaleText": "Scale and Text",
-        "panels": "Panels",
-        "unitFrames": "Unit Frames",
-        "actionBars": "Action Bars",
-        "chat": "Chat",
-        "combatTooltips": "Combat and Tooltips",
-        "hudExtras": "HUD Extras",
-        "motionContrast": "Motion and Contrast",
-        "content": "Content",
-        "camera": "Camera",
-        "movement": "Movement",
-        "combat": "Combat",
-        "feedback": "Feedback",
-        "inputMode": "Input Mode",
-        "feel": "Feel",
-        "sticks": "Sticks",
-        "look": "Look",
-        "buttons": "Buttons",
-        "volume": "Volume",
-        "toggles": "Toggles",
-        "performance": "Performance",
-        "support": "Support",
-        "about": "About"
-      }
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Controller",
@@ -677,8 +604,7 @@ export const en: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer.",
-      "duplicate": "Also bound to {buttons}"
+      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
     },
     "perf": {
       "title": "Performance Overlay",
@@ -811,11 +737,7 @@ export const en: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}",
-      "choicesTab": "Choices",
-      "resetChoices": "Reset choices",
-      "tierLevel": "Level {n}",
-      "tierLevelLabel": "Level"
+      "defaultBuildName": "Build {n}"
     },
     "tips": {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
@@ -1008,6 +930,7 @@ export const en: EnTranslations = {
     "corpseHarvest": {
       "title": "Harvest",
       "harvestButton": "Harvest",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Fewer chosen components yield a higher tier each.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
@@ -1188,7 +1111,8 @@ export const en: EnTranslations = {
       "resetErrInvalid": "This reset link is invalid or has expired. Request a new one."
     },
     "loot": {
-      "chestTitle": "Chest"
+      "chestTitle": "Chest",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",
@@ -1861,7 +1785,7 @@ export const en: EnTranslations = {
       "talents": "Talents",
       "arena": "Arena",
       "leaderboard": "Leaderboard",
-      "abilities": "Use action bar abilities (the number row plus Q and E; the secondary bar sits on the numpad or Shift+1 to Shift+0)",
+      "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
       "gameMenu": "Open game menu and options",
@@ -5033,8 +4957,6 @@ export const en: EnTranslations = {
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",
-      "sellItemAria": "Sell {item} for {price}",
-      "sellRolledWarning": "Rolled stats cannot be recovered by buyback.",
       "sellQuantityTitle": "Sell {item}",
       "sellQuantityInput": "Quantity to sell",
       "sellQuantityConfirm": "Sell",
@@ -7643,7 +7565,7 @@ export const en: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins in the rocks around the Copper Dig, southwest of town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
         "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {

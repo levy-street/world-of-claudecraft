@@ -322,8 +322,6 @@ export const pl_PL: EnTranslations = {
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
       "toggleHaptics": "Przełącz wibracje",
-      "showMenuButtons": "Pokaż przyciski menu",
-      "hideMenuButtons": "Ukryj przyciski menu",
       "hotbarPage": "Umiejętności",
       "hotbarPageAria": "Pokaż następny zestaw umiejętności",
       "actionRing": "Działania bojowe",
@@ -339,7 +337,13 @@ export const pl_PL: EnTranslations = {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
       "talkBodyTouch": "Stań blisko marszałka Redbrooka i dotknij przycisku Użyj, aby z nim porozmawiać, a następnie przyjmij jego zadanie.",
       "returnBodyTouch": "Twoje zadanie jest wykonane. Wróć do marszałka Redbrooka i dotknij przycisku Użyj, aby je oddać.",
-      "doneBodyTouch": "Masz już podstawy, {name}. Dolina stoi przed tobą otworem. Dotknij Więcej, a potem Zadania, aby w każdej chwili przejrzeć swój dziennik. Dobrych łowów."
+      "doneBodyTouch": "Masz już podstawy, {name}. Dolina stoi przed tobą otworem. Dotknij Więcej, a potem Zadania, aby w każdej chwili przejrzeć swój dziennik. Dobrych łowów.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny",
@@ -588,84 +592,7 @@ export const pl_PL: EnTranslations = {
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",
-      "mobileLeftHanded": "Układ leworęczny",
-      "ia": {
-        "railDisplay": "Wyświetlanie",
-        "railInput": "Sterowanie",
-        "railSystem": "Ustawienia systemu",
-        "catOverviewName": "Przegląd",
-        "catOverviewSub": "Przypięte podstawy, szybkie działania i wprowadzone zmiany.",
-        "catGraphicsSub": "Jakość, widok i wygląd świata.",
-        "catInterfaceSub": "Skala HUD, panele, czat i ramki jednostek.",
-        "catAccessibilityName": "Ułatwienia dostępu",
-        "catAccessibilitySub": "Ruch, kontrast i komfortowa zawartość.",
-        "catControlsName": "Sterowanie",
-        "catControlsSub": "Kamera, ruch, walka i informacje zwrotne.",
-        "catKeybindsSub": "Przypisz klawisze do każdej akcji.",
-        "catControllerSub": "Wrażenia z pada i układ przycisków.",
-        "catTouchName": "Sterowanie dotykowe",
-        "catTouchSub": "Drążki ekranowe, rozglądanie i przyciski.",
-        "catAudioSub": "Głośność i przełączniki dźwięku.",
-        "catSystemName": "Ustawienia systemu",
-        "catSystemSub": "Wydajność, pomoc i informacje."
-      },
-      "done": "Gotowe",
-      "resetAllTitle": "Wyzerować wszystkie ustawienia?",
-      "resetAllBody": "Spowoduje to przywrócenie wartości domyślnych wszystkich ustawień. Tej operacji nie można cofnąć.",
-      "searchPlaceholder": "Szukaj ustawień",
-      "searchScopeAll": "Wszystkie ustawienia",
-      "searchScopeThis": "Ta sekcja",
-      "searchEmpty": "Żadne ustawienia nie pasują do wyszukiwania.",
-      "searchGoTo": "Przejdź do {category}",
-      "modeOnline": "Tryb sieciowy",
-      "modeOffline": "Tryb bez połączenia",
-      "changed": "Zmieniono: {count}",
-      "changedSummary": "Zmieniono względem wartości domyślnych: {count}",
-      "legend": {
-        "category": "Kategoria",
-        "navigate": "Nawigacja",
-        "select": "Wybierz",
-        "back": "Wstecz",
-        "reset": "Wyzeruj",
-        "clear": "Wyczyść",
-        "page": "Strona"
-      },
-      "keybindCleared": "Usunięto przypisanie dla {action}",
-      "keybindRebinding": "Zmienianie przypisania {action}. Naciśnij klawisz albo Escape, aby anulować.",
-      "keybindEvicted": "Przypisano {key} do {action}; usunięto z {evicted}",
-      "keybindTaken": "Usunięto klawisz",
-      "keybindUnbound": "{action} nie ma przypisanego klawisza",
-      "keybindModifierHint": "Wskazówka: możesz przypisywać kombinacje z klawiszami modyfikującymi. Przytrzymaj Shift, Ctrl lub Alt podczas naciskania klawisza, aby przechwycić kombinację, na przykład Shift+1.",
-      "conflictDot": "Konflikt przypisania",
-      "overviewConflictAlert": "Niektóre przypisania klawiszy są w konflikcie lub ich brakuje.",
-      "sec": {
-        "quality": "Jakość",
-        "view": "Widok",
-        "general": "Ogólne",
-        "scaleText": "Skala i tekst",
-        "panels": "Panele",
-        "unitFrames": "Ramki jednostek",
-        "actionBars": "Paski akcji",
-        "chat": "Czat",
-        "combatTooltips": "Walka i podpowiedzi",
-        "hudExtras": "Dodatki HUD",
-        "motionContrast": "Ruch i kontrast",
-        "content": "Zawartość",
-        "camera": "Sterowanie kamerą",
-        "movement": "Poruszanie się",
-        "combat": "Walka",
-        "feedback": "Informacje zwrotne",
-        "inputMode": "Tryb sterowania",
-        "feel": "Odczucia",
-        "sticks": "Drążki",
-        "look": "Rozglądanie",
-        "buttons": "Przyciski",
-        "volume": "Głośność",
-        "toggles": "Przełączniki",
-        "performance": "Wydajność",
-        "support": "Pomoc",
-        "about": "Informacje"
-      }
+      "mobileLeftHanded": "Układ leworęczny"
     },
     "controller": {
       "title": "Kontroler",
@@ -677,8 +604,7 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
-      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego.",
-      "duplicate": "Przypisano również do {buttons}"
+      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
     },
     "perf": {
       "title": "Nakładka wydajności",
@@ -811,11 +737,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Zestaw {n}",
-      "choicesTab": "Wybory",
-      "resetChoices": "Wyzeruj wybory",
-      "tierLevel": "Poziom {n}",
-      "tierLevelLabel": "Poziom"
+      "defaultBuildName": "Zestaw {n}"
     },
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
@@ -1008,6 +930,7 @@ export const pl_PL: EnTranslations = {
     "corpseHarvest": {
       "title": "Zbieranie",
       "harvestButton": "Zbierz",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Im mniej części wybierzesz, tym wyższa jakość każdej z nich.",
       "alreadyHarvested": "Z tego truchła już wszystko zebrano.",
       "componentAria": "Zbierz: {component}",
@@ -1188,7 +1111,8 @@ export const pl_PL: EnTranslations = {
       "resetErrInvalid": "Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy."
     },
     "loot": {
-      "chestTitle": "Skrzynia"
+      "chestTitle": "Skrzynia",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Dodaj {name} do paska akcji",
@@ -5033,8 +4957,6 @@ export const pl_PL: EnTranslations = {
       "buybackTitle": "Odkup",
       "buybackEmpty": "Brak przedmiotów",
       "buybackAria": "Odkup {item} za {price}",
-      "sellItemAria": "Sprzedaj {item} za {price}",
-      "sellRolledWarning": "Losowych statystyk nie można odzyskać przez odkupienie przedmiotu.",
       "sellQuantityTitle": "Sprzedaj {item}",
       "sellQuantityInput": "Ilość do sprzedania",
       "sellQuantityConfirm": "Sprzedaj",

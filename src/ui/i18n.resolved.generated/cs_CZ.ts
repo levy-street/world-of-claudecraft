@@ -322,8 +322,6 @@ export const cs_CZ: EnTranslations = {
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
       "toggleHaptics": "Přepnout haptiku",
-      "showMenuButtons": "Zobrazit tlačítka nabídky",
-      "hideMenuButtons": "Skrýt tlačítka nabídky",
       "hotbarPage": "Dovednosti",
       "hotbarPageAria": "Zobrazit další sadu dovedností",
       "actionRing": "Bojové akce",
@@ -339,7 +337,13 @@ export const cs_CZ: EnTranslations = {
       "moveBodyTouch": "Pohybuj se páčkou pohybu a tažením po obrazovce se rozhlížej. Udělej pár kroků a začni.",
       "talkBodyTouch": "Postav se blízko maršála Redbrooka, klepni na Použít, promluv s ním a přijmi jeho úkol.",
       "returnBodyTouch": "Tvůj úkol je hotový. Vrať se k maršálu Redbrookovi a klepni na Použít pro odevzdání.",
-      "doneBodyTouch": "Základy už znáš, {name}. Údolí je tvoje k prozkoumání. Klepni na Více a potom Úkoly, kdykoli chceš zkontrolovat deník úkolů. Dobrý lov."
+      "doneBodyTouch": "Základy už znáš, {name}. Údolí je tvoje k prozkoumání. Klepni na Více a potom Úkoly, kdykoli chceš zkontrolovat deník úkolů. Dobrý lov.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Místní čas - kliknutím přepneš 12/24 h",
@@ -588,84 +592,7 @@ export const cs_CZ: EnTranslations = {
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
-      "mobileLeftHanded": "Rozvržení pro leváky",
-      "ia": {
-        "railDisplay": "Zobrazení",
-        "railInput": "Vstup",
-        "railSystem": "Systémová nastavení",
-        "catOverviewName": "Přehled",
-        "catOverviewSub": "Připnuté základní volby, rychlé akce a změny.",
-        "catGraphicsSub": "Kvalita, dohled a vzhled světa.",
-        "catInterfaceSub": "Měřítko HUD, panely, chat a rámečky jednotek.",
-        "catAccessibilityName": "Přístupnost",
-        "catAccessibilitySub": "Pohyb, kontrast a pohodlné zobrazení obsahu.",
-        "catControlsName": "Ovládání",
-        "catControlsSub": "Kamera, pohyb, boj a odezva.",
-        "catKeybindsSub": "Nastav klávesy pro každou akci.",
-        "catControllerSub": "Pocit z gamepadu a rozložení tlačítek.",
-        "catTouchName": "Dotykové ovládání",
-        "catTouchSub": "Ovládací páčky na obrazovce, rozhlížení a tlačítka.",
-        "catAudioSub": "Hlasitost a přepínače zvuku.",
-        "catSystemName": "Systémová nastavení",
-        "catSystemSub": "Výkon, podpora a informace."
-      },
-      "done": "Hotovo",
-      "resetAllTitle": "Resetovat všechna nastavení?",
-      "resetAllBody": "Tím se všechna nastavení vrátí na výchozí hodnoty. Tuto akci nelze vrátit zpět.",
-      "searchPlaceholder": "Hledat v nastavení",
-      "searchScopeAll": "Všechna nastavení",
-      "searchScopeThis": "Tato sekce",
-      "searchEmpty": "Tvému hledání neodpovídá žádné nastavení.",
-      "searchGoTo": "Přejít na {category}",
-      "modeOnline": "Síťový režim",
-      "modeOffline": "Režim bez připojení",
-      "changed": "Změněno: {count}",
-      "changedSummary": "Změněno oproti výchozím hodnotám: {count}",
-      "legend": {
-        "category": "Kategorie",
-        "navigate": "Navigace",
-        "select": "Vybrat",
-        "back": "Zpět",
-        "reset": "Resetovat",
-        "clear": "Vymazat",
-        "page": "Stránka"
-      },
-      "keybindCleared": "Vymazána klávesa pro {action}",
-      "keybindRebinding": "Přemapování akce {action}. Stiskni klávesu, nebo zruš akci klávesou Escape.",
-      "keybindEvicted": "Přiřazena klávesa {key} k akci {action}; odebrána z {evicted}",
-      "keybindTaken": "Klávesa odebrána",
-      "keybindUnbound": "{action} nemá přiřazenou klávesu",
-      "keybindModifierHint": "Tip: můžeš přiřadit kombinace modifikačních kláves. Podrž Shift, Ctrl nebo Alt a stiskni klávesu, aby se kombinace zachytila, například Shift+1.",
-      "conflictDot": "Konflikt přiřazení",
-      "overviewConflictAlert": "Některá přiřazení kláves jsou v konfliktu nebo chybí.",
-      "sec": {
-        "quality": "Kvalita",
-        "view": "Výhled",
-        "general": "Obecné",
-        "scaleText": "Měřítko a text",
-        "panels": "Panely",
-        "unitFrames": "Rámečky jednotek",
-        "actionBars": "Lišty akcí",
-        "chat": "Konverzace",
-        "combatTooltips": "Boj a popisky",
-        "hudExtras": "Doplňky HUD",
-        "motionContrast": "Pohyb a kontrast",
-        "content": "Obsah",
-        "camera": "Ovládání kamery",
-        "movement": "Pohyb",
-        "combat": "Boj",
-        "feedback": "Odezva",
-        "inputMode": "Režim vstupu",
-        "feel": "Pocit ze hry",
-        "sticks": "Ovládací páčky",
-        "look": "Rozhlížení",
-        "buttons": "Tlačítka",
-        "volume": "Hlasitost",
-        "toggles": "Přepínače",
-        "performance": "Výkon",
-        "support": "Podpora",
-        "about": "Informace"
-      }
+      "mobileLeftHanded": "Rozvržení pro leváky"
     },
     "controller": {
       "title": "Ovladač",
@@ -677,8 +604,7 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
-      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce.",
-      "duplicate": "Také přiřazeno k {buttons}"
+      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
     },
     "perf": {
       "title": "Performance overlay",
@@ -811,11 +737,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Sestava {n}",
-      "choicesTab": "Volby",
-      "resetChoices": "Resetovat volby",
-      "tierLevel": "Úroveň {n}",
-      "tierLevelLabel": "Úroveň"
+      "defaultBuildName": "Sestava {n}"
     },
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
@@ -1008,6 +930,7 @@ export const cs_CZ: EnTranslations = {
     "corpseHarvest": {
       "title": "Sklizeň",
       "harvestButton": "Sklidit",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
@@ -1188,7 +1111,8 @@ export const cs_CZ: EnTranslations = {
       "resetErrInvalid": "Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový."
     },
     "loot": {
-      "chestTitle": "Truhla"
+      "chestTitle": "Truhla",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",
@@ -5033,8 +4957,6 @@ export const cs_CZ: EnTranslations = {
       "buybackTitle": "Zpětný odkup",
       "buybackEmpty": "Žádné předměty",
       "buybackAria": "Odkoupit zpět {item} za {price}",
-      "sellItemAria": "Prodat {item} za {price}",
-      "sellRolledWarning": "Náhodně vytvořené vlastnosti nelze získat zpět odkoupením.",
       "sellQuantityTitle": "Prodat {item}",
       "sellQuantityInput": "Množství k prodeji",
       "sellQuantityConfirm": "Prodat",

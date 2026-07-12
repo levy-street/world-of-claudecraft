@@ -13,38 +13,86 @@ export const pending: Record<string, readonly string[]> = {
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "es_ES": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_FR": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_CA": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "en_CA": [],
   "it_IT": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "de_DE": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -54,55 +102,127 @@ export const pending: Record<string, readonly string[]> = {
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "nl_NL": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "pl_PL": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "id_ID": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "tr_TR": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "sv_SE": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "vi_VN": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "da_DK": [
     "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
-    "glitchReroll.title"
+    "glitchReroll.title",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ]
 };

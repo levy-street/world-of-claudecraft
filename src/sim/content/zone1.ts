@@ -702,7 +702,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'A Trade for Every Hand',
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
-    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins in the rocks around the Copper Dig, southwest of town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
     completionText:
       "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
     objectives: [{ type: 'collect', itemId: 'chunk_of_ore', count: 5, label: 'Chunk of Ore' }],
@@ -1219,7 +1219,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
   wells: [{ x: 0, z: 2, r: 1.5 }],
   stalls: [
     { x: -8.5, z: 3, rot: Math.PI / 2, r: 1.7 },
-    { x: 9.5, z: 17.5, rot: -2.7, r: 1.7 }, // Smith Haldren's smithy stall
+    { x: 9.5, z: 17.5, rot: -2.7, r: 1.7, smithy: true }, // Smith Haldren's stall
     { x: 0, z: 11.5, rot: Math.PI, r: 1.8 }, // The Merchant's World Market stall
   ],
   mines: [{ x: -88, z: -68, rot: 0.8 }],

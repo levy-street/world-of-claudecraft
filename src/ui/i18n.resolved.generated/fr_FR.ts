@@ -322,8 +322,6 @@ export const fr_FR: EnTranslations = {
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
       "toggleHaptics": "Activer/désactiver les vibrations",
-      "showMenuButtons": "Afficher les boutons du menu",
-      "hideMenuButtons": "Masquer les boutons du menu",
       "hotbarPage": "Techniques",
       "hotbarPageAria": "Afficher la série de techniques suivante",
       "actionRing": "Actions de combat",
@@ -339,7 +337,13 @@ export const fr_FR: EnTranslations = {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
       "talkBodyTouch": "Tiens-toi près du maréchal Redbrook et touche le bouton Utiliser pour lui parler, puis accepte sa mission.",
       "returnBodyTouch": "Ta mission est accomplie. Retourne voir le maréchal Redbrook et touche le bouton Utiliser pour la rendre.",
-      "doneBodyTouch": "Tu maîtrises les bases, {name}. Le Val est à toi : touche Plus, puis Journal de quêtes, pour consulter ton journal de quêtes à tout moment. Bonne chasse !"
+      "doneBodyTouch": "Tu maîtrises les bases, {name}. Le Val est à toi : touche Plus, puis Journal de quêtes, pour consulter ton journal de quêtes à tout moment. Bonne chasse !",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Heure locale - cliquez pour basculer 12/24 heures",
@@ -588,84 +592,7 @@ export const fr_FR: EnTranslations = {
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
-      "mobileLeftHanded": "Disposition pour gaucher",
-      "ia": {
-        "railDisplay": "Affichage",
-        "railInput": "Saisie",
-        "railSystem": "Système",
-        "catOverviewName": "Vue d’ensemble",
-        "catOverviewSub": "Éléments épinglés, actions rapides et changements effectués.",
-        "catGraphicsSub": "Qualité, champ de vision et apparence du monde.",
-        "catInterfaceSub": "Échelle de l’ATH, panneaux, discussion et cadres d’unités.",
-        "catAccessibilityName": "Accessibilité",
-        "catAccessibilitySub": "Mouvement, contraste et confort du contenu.",
-        "catControlsName": "Commandes",
-        "catControlsSub": "Caméra, déplacement, combat et retour d’action.",
-        "catKeybindsSub": "Attribuez une touche à chaque action.",
-        "catControllerSub": "Sensations de la manette et disposition des boutons.",
-        "catTouchName": "Tactile",
-        "catTouchSub": "Joysticks à l’écran, vue et boutons.",
-        "catAudioSub": "Volume et options sonores.",
-        "catSystemName": "Système",
-        "catSystemSub": "Performances, assistance et informations."
-      },
-      "done": "Terminé",
-      "resetAllTitle": "Réinitialiser tous les réglages ?",
-      "resetAllBody": "Cette action rétablit la valeur par défaut de tous les réglages. Elle est irréversible.",
-      "searchPlaceholder": "Rechercher dans les réglages",
-      "searchScopeAll": "Tous les réglages",
-      "searchScopeThis": "Cette section",
-      "searchEmpty": "Aucun réglage ne correspond à votre recherche.",
-      "searchGoTo": "Aller à {category}",
-      "modeOnline": "En ligne",
-      "modeOffline": "Hors ligne",
-      "changed": "{count} modifiés",
-      "changedSummary": "{count} différents des valeurs par défaut",
-      "legend": {
-        "category": "Catégorie",
-        "navigate": "Naviguer",
-        "select": "Sélectionner",
-        "back": "Retour",
-        "reset": "Réinitialiser",
-        "clear": "Effacer",
-        "page": "Changer de page"
-      },
-      "keybindCleared": "Attribution de {action} effacée",
-      "keybindRebinding": "Nouvelle attribution pour {action}. Appuyez sur une touche ou sur Échap pour annuler.",
-      "keybindEvicted": "{key} attribuée à {action}, puis retirée de {evicted}",
-      "keybindTaken": "Touche retirée",
-      "keybindUnbound": "Aucune touche n’est attribuée à {action}",
-      "keybindModifierHint": "Conseil : vous pouvez attribuer des combinaisons avec une touche de modification. Maintenez Maj, Ctrl ou Alt tout en appuyant sur une touche pour enregistrer la combinaison, par exemple Maj+1.",
-      "conflictDot": "Conflit d’attribution",
-      "overviewConflictAlert": "Certaines attributions de touches sont en conflit ou sans touche.",
-      "sec": {
-        "quality": "Qualité",
-        "view": "Vue",
-        "general": "Général",
-        "scaleText": "Échelle et texte",
-        "panels": "Panneaux",
-        "unitFrames": "Cadres d’unités",
-        "actionBars": "Barres d’action",
-        "chat": "Discussion",
-        "combatTooltips": "Combat et infobulles",
-        "hudExtras": "Options supplémentaires de l’ATH",
-        "motionContrast": "Mouvement et contraste",
-        "content": "Contenu",
-        "camera": "Caméra",
-        "movement": "Déplacement",
-        "combat": "Options de combat",
-        "feedback": "Retour d’action",
-        "inputMode": "Mode de saisie",
-        "feel": "Sensations",
-        "sticks": "Joysticks",
-        "look": "Vue",
-        "buttons": "Boutons",
-        "volume": "Réglage du volume",
-        "toggles": "Boutons bascule",
-        "performance": "Performances",
-        "support": "Assistance",
-        "about": "À propos"
-      }
+      "mobileLeftHanded": "Disposition pour gaucher"
     },
     "controller": {
       "title": "Manette",
@@ -677,8 +604,7 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
-      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",
-      "duplicate": "Également attribué à {buttons}"
+      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
     },
     "perf": {
       "title": "Surcouche de performance",
@@ -811,11 +737,7 @@ export const fr_FR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Configuration {n}",
-      "choicesTab": "Choix",
-      "resetChoices": "Réinitialiser les choix",
-      "tierLevel": "Niveau {n}",
-      "tierLevelLabel": "Niveau"
+      "defaultBuildName": "Configuration {n}"
     },
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
@@ -1008,6 +930,7 @@ export const fr_FR: EnTranslations = {
     "corpseHarvest": {
       "title": "Dépeçage",
       "harvestButton": "Dépecer",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Moins vous choisissez de composants, plus la qualité de chacun est élevée.",
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
@@ -1188,7 +1111,8 @@ export const fr_FR: EnTranslations = {
       "resetErrInvalid": "Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau."
     },
     "loot": {
-      "chestTitle": "Coffre"
+      "chestTitle": "Coffre",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
@@ -5033,8 +4957,6 @@ export const fr_FR: EnTranslations = {
       "buybackTitle": "Rachat",
       "buybackEmpty": "Aucun objet",
       "buybackAria": "Racheter {item} pour {price}",
-      "sellItemAria": "Vendre {item} pour {price}",
-      "sellRolledWarning": "Les caractéristiques aléatoires ne peuvent pas être récupérées par rachat.",
       "sellQuantityTitle": "Vendre {item}",
       "sellQuantityInput": "Quantité à vendre",
       "sellQuantityConfirm": "Vendre",

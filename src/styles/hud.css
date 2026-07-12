@@ -29,11 +29,6 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
-    /* The painter's transform is translate3d(sx,sy) scale(distance)
-       translate(-50%,-100%); origin 0 0 keeps the plate's bottom-center anchor
-       exactly at (sx,sy) while the distance scale shrinks it toward that point
-       (the default 50% 50% origin would drift a scaled plate off its anchor). */
-    transform-origin: 0 0;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -352,6 +347,25 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--gold-dim);
+  }
+  .tut-next-tips {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b8ad8e;
+  }
+  .tut-next-tips-title {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff14;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 3px;
   }
   .tut-skip {
     margin-top: 11px;
@@ -4162,14 +4176,6 @@
     color: #887c5c;
     margin-top: 8px;
   }
-  /* Primary action row (Accept / Cancel): one wrapper so the pair lays out as a
-     row on desktop (matching the old inline-button flow) and can ride sticky at
-     the window bottom on touch (hud.mobile.css). */
-  .trade-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
 
   /* ---------- elite target frame ---------- */
   #target-frame.elite .portrait {
@@ -4251,5 +4257,25 @@
   .mail-indicator-count {
     font: 700 11px var(--title-font);
     letter-spacing: 0.4px;
+  }
+  /* ---------- intro logo overlay ---------- */
+  /* Wordmark shown fading in/hold/out over the opening of the first-spawn intro
+     cinematic (spawn_cinematic.ts): intro_logo_overlay.ts drives opacity/display
+     from the pure logo_fade.ts curve each frame, so this rule only sets the
+     static look and the base hidden state. Centered over the canvas, above the
+     HUD (which the intro hides) but never intercepting input. */
+  #intro-logo {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(46vw, 420px);
+    max-width: 90vw;
+    height: auto;
+    z-index: 40;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 14px #000a);
   }
 }

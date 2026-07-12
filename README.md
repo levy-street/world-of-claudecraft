@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.24.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.24.1-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
@@ -240,13 +240,13 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 | Input | Action |
 |---|---|
-| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held); dedicated strafe keys are unbound by default and rebindable |
+| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
-| `1`-`9`, `0`, `Q`, `E` | action bar (`-`/`=` as alternates; the secondary bar sits on the numpad or `Shift+1` to `Shift+0`) |
+| `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `G` | character, spellbook, quest log, world map, bags, arena |
-| `V` / `Z` / `R` / `Esc` | nameplates, damage meters, autorun, close windows or clear target |
+| `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 
@@ -267,7 +267,7 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | `src/sim/` | Deterministic game core, the source of truth. No DOM or Three dependencies. |
 | `src/sim/content/` | Data as code: the nine classes, abilities, zones, dungeons, items, talents. |
 | `src/render/` | Three.js renderer (procedural geometry, textures, VFX). Reads the world, never mutates it. |
-| `src/game/` | Local input, camera, keybinds, mobile controls, procedural WebAudio. |
+| `src/game/` | Local input, camera, keybinds, mobile controls, sampled WebAudio SFX, and procedural music. |
 | `src/ui/` | Classic HUD (frames, windows, tooltips, map, floating combat text), procedural icons, i18n. |
 | `src/net/` | Online client: REST auth plus a WebSocket world mirror (`ClientWorld`). |
 | `src/admin/` | Admin dashboard SPA (separate `admin.html` entry). |
@@ -291,14 +291,18 @@ And almost none of it is a shipped asset. The world is drawn from code:
 - Procedural towns, creatures, terrain, water, weather, and real-time shadows, with no 3D model files for the world.
 - Twelve rigged creature families with full walk, attack, cast, sit, and death animations.
 - Spell, item, and buff icons painted on canvas at runtime.
-- A complete classic HUD (unit frames, action bars, tooltips, quest log, world map, minimap, floating combat text) and procedural WebAudio for every sound.
+- A complete classic HUD (unit frames, action bars, tooltips, quest log, world map, minimap, floating combat text), sampled spatial/UI sound effects, and a procedural soundtrack.
 
 ## Development
+
+The SFX validation tests require `ffmpeg` and `ffprobe` on `PATH`. Install FFmpeg with your
+platform package manager before running `npm test`, `npm run gate`, or the SFX Studio.
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
 npm run gate                    # complete CI-equivalent contribution gate
 npm run build                   # production web build
+npm run sfx:studio              # local SFX authoring, runtime mix, and production export
 node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)
 node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure and drink, death and release
 node scripts/visual_tour.mjs    # screenshot tour of the zone and UI into tmp/
@@ -311,7 +315,10 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 Logic and unit tests use Vitest. While iterating, run a single file: `npx vitest run tests/sim.test.ts`. The E2E and visual scripts drive real browsers via `puppeteer-core` and need `npm run dev` running (often `npm run server` too). Browser agents can drive movement through `window.__game.controller` instead of simulating held keys, for example `controller.move({ forward: true }, facingRadians)` or compact flags like `{ f: 1, sr: 1 }`.
 
-For the server commands see [Develop online](#develop-online-with-hot-reload) above, [DEPLOY.md](DEPLOY.md) for production, and [CREDITS.md](CREDITS.md) for asset licenses.
+For the server commands see [Develop online](#develop-online-with-hot-reload) above,
+the [SFX Studio tutorial](docs/sfx-studio-tutorial.md) for sound authoring and
+artifact export, [DEPLOY.md](DEPLOY.md) for production, and
+[CREDITS.md](CREDITS.md) for asset licenses.
 
 ## Localization
 

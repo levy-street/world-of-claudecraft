@@ -322,8 +322,6 @@ export const id_ID: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
       "toggleHaptics": "Alihkan haptik",
-      "showMenuButtons": "Tampilkan tombol menu",
-      "hideMenuButtons": "Sembunyikan tombol menu",
       "hotbarPage": "Kemampuan",
       "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya",
       "actionRing": "Aksi tempur",
@@ -339,7 +337,13 @@ export const id_ID: EnTranslations = {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
       "talkBodyTouch": "Berdirilah dekat Marshal Redbrook dan ketuk tombol Use untuk berbicara, lalu terima tugasnya.",
       "returnBodyTouch": "Tugas Anda selesai. Kembalilah ke Marshal Redbrook dan ketuk tombol Use untuk menyerahkannya.",
-      "doneBodyTouch": "Anda sudah menguasai dasarnya, {name}. Lembah ini milik Anda untuk dijelajahi. Ketuk More, lalu Quests, untuk meninjau catatan misi Anda kapan saja. Selamat berburu."
+      "doneBodyTouch": "Anda sudah menguasai dasarnya, {name}. Lembah ini milik Anda untuk dijelajahi. Ketuk More, lalu Quests, untuk meninjau catatan misi Anda kapan saja. Selamat berburu.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Waktu lokal - klik untuk beralih 12/24 jam",
@@ -588,84 +592,7 @@ export const id_ID: EnTranslations = {
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
-      "mobileLeftHanded": "Tata letak kidal",
-      "ia": {
-        "railDisplay": "Tampilan",
-        "railInput": "Masukan",
-        "railSystem": "Sistem",
-        "catOverviewName": "Ringkasan",
-        "catOverviewSub": "Hal penting yang disematkan, tindakan cepat, dan perubahan.",
-        "catGraphicsSub": "Kualitas, pandangan, dan visual dunia.",
-        "catInterfaceSub": "Skala HUD, panel, obrolan, dan bingkai unit.",
-        "catAccessibilityName": "Aksesibilitas",
-        "catAccessibilitySub": "Gerakan, kontras, dan kenyamanan konten.",
-        "catControlsName": "Kontrol",
-        "catControlsSub": "Kamera, gerakan, pertarungan, dan umpan balik.",
-        "catKeybindsSub": "Tetapkan tombol untuk setiap tindakan.",
-        "catControllerSub": "Respons gamepad dan tata letak tombol.",
-        "catTouchName": "Sentuh",
-        "catTouchSub": "Stik layar, pandangan, dan tombol.",
-        "catAudioSub": "Volume suara dan tombol alih audio.",
-        "catSystemName": "Sistem",
-        "catSystemSub": "Kinerja, dukungan, dan tentang."
-      },
-      "done": "Selesai",
-      "resetAllTitle": "Atur ulang semua pengaturan?",
-      "resetAllBody": "Ini mengembalikan semua pengaturan ke nilai bawaannya. Tindakan ini tidak dapat dibatalkan.",
-      "searchPlaceholder": "Cari pengaturan",
-      "searchScopeAll": "Semua pengaturan",
-      "searchScopeThis": "Bagian ini",
-      "searchEmpty": "Tidak ada pengaturan yang cocok dengan pencarianmu.",
-      "searchGoTo": "Buka {category}",
-      "modeOnline": "Daring",
-      "modeOffline": "Luring",
-      "changed": "{count} diubah",
-      "changedSummary": "{count} berbeda dari bawaan",
-      "legend": {
-        "category": "Kategori",
-        "navigate": "Navigasi",
-        "select": "Pilih",
-        "back": "Kembali",
-        "reset": "Atur Ulang",
-        "clear": "Hapus",
-        "page": "Halaman"
-      },
-      "keybindCleared": "{action} dikosongkan",
-      "keybindRebinding": "Menetapkan ulang {action}. Tekan tombol, atau Escape untuk membatalkan.",
-      "keybindEvicted": "{key} ditetapkan ke {action}; dihapus dari {evicted}",
-      "keybindTaken": "Tombol dihapus",
-      "keybindUnbound": "Tidak ada tombol untuk {action}",
-      "keybindModifierHint": "Kiat: kamu dapat menetapkan kombinasi tombol pengubah. Tahan Shift, Ctrl, atau Alt sambil menekan tombol untuk merekam kombinasinya (misalnya Shift+1).",
-      "conflictDot": "Konflik pintasan",
-      "overviewConflictAlert": "Beberapa pintasan tombol bertabrakan atau belum ditetapkan.",
-      "sec": {
-        "quality": "Kualitas",
-        "view": "Pandangan",
-        "general": "Umum",
-        "scaleText": "Skala dan Teks",
-        "panels": "Panel",
-        "unitFrames": "Bingkai Unit",
-        "actionBars": "Bilah Aksi",
-        "chat": "Obrolan",
-        "combatTooltips": "Pertarungan dan Keterangan Alat",
-        "hudExtras": "Ekstra HUD",
-        "motionContrast": "Gerakan dan Kontras",
-        "content": "Konten",
-        "camera": "Kamera",
-        "movement": "Gerakan",
-        "combat": "Pertarungan",
-        "feedback": "Umpan Balik",
-        "inputMode": "Mode Masukan",
-        "feel": "Respons",
-        "sticks": "Stik",
-        "look": "Arah Pandang",
-        "buttons": "Tombol",
-        "volume": "Volume Suara",
-        "toggles": "Tombol Alih",
-        "performance": "Kinerja",
-        "support": "Dukungan",
-        "about": "Tentang"
-      }
+      "mobileLeftHanded": "Tata letak kidal"
     },
     "controller": {
       "title": "Kontroler",
@@ -677,8 +604,7 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
-      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",
-      "duplicate": "Juga terikat ke {buttons}"
+      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
     },
     "perf": {
       "title": "Lapisan Performa",
@@ -811,11 +737,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Rakitan {n}",
-      "choicesTab": "Pilihan",
-      "resetChoices": "Atur Ulang Pilihan",
-      "tierLevel": "Tingkat {n}",
-      "tierLevelLabel": "Tingkat"
+      "defaultBuildName": "Rakitan {n}"
     },
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
@@ -1008,6 +930,7 @@ export const id_ID: EnTranslations = {
     "corpseHarvest": {
       "title": "Panen",
       "harvestButton": "Panen",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
@@ -1188,7 +1111,8 @@ export const id_ID: EnTranslations = {
       "resetErrInvalid": "Tautan pengaturan ulang ini tidak valid atau sudah kedaluwarsa. Minta yang baru."
     },
     "loot": {
-      "chestTitle": "Peti"
+      "chestTitle": "Peti",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
@@ -5033,8 +4957,6 @@ export const id_ID: EnTranslations = {
       "buybackTitle": "Beli Kembali",
       "buybackEmpty": "Tidak ada barang",
       "buybackAria": "Beli kembali {item} seharga {price}",
-      "sellItemAria": "Jual {item} seharga {price}",
-      "sellRolledWarning": "Atribut acak tidak dapat dipulihkan dengan membeli kembali.",
       "sellQuantityTitle": "Jual {item}",
       "sellQuantityInput": "Jumlah yang dijual",
       "sellQuantityConfirm": "Jual",

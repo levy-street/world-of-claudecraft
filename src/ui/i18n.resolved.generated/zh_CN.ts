@@ -322,8 +322,6 @@ export const zh_CN: EnTranslations = {
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈",
-      "showMenuButtons": "显示菜单按钮",
-      "hideMenuButtons": "隐藏菜单按钮",
       "hotbarPage": "技能",
       "hotbarPageAria": "显示下一组技能",
       "actionRing": "战斗动作",
@@ -339,7 +337,13 @@ export const zh_CN: EnTranslations = {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
       "talkBodyTouch": "靠近雷德布鲁克元帅并点击“使用”按钮与他交谈，然后接受他的任务。",
       "returnBodyTouch": "任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。",
-      "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。"
+      "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。",
+      "slayTargetHint": "第一次战斗？按下 {targetKey} 或点击狼来选中它，然后使用快捷栏技能攻击它。",
+      "slayTargetHintTouch": "第一次战斗？点击狼来选中它，然后点击快捷栏技能攻击它。",
+      "nextTipsTitle": "接下来去哪",
+      "nextTipQuestLog": "打开任务日志（{key}）查找附近的下一个任务。",
+      "nextTipMap": "查看世界地图（{key}）了解任务所在位置。",
+      "nextTipSocial": "打开社交面板（{key}）寻找队伍应对更强的战斗。"
     },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
@@ -588,84 +592,7 @@ export const zh_CN: EnTranslations = {
       "showSecondaryActionBar": "显示副动作条",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局",
-      "ia": {
-        "railDisplay": "显示",
-        "railInput": "输入",
-        "railSystem": "系统",
-        "catOverviewName": "概览",
-        "catOverviewSub": "固定的常用项、快捷操作，以及已更改的内容。",
-        "catGraphicsSub": "画质、视野与世界画面。",
-        "catInterfaceSub": "界面缩放、面板、聊天与单位框体。",
-        "catAccessibilityName": "无障碍",
-        "catAccessibilitySub": "动态效果、对比度与内容舒适度。",
-        "catControlsName": "控制",
-        "catControlsSub": "镜头、移动、战斗与反馈。",
-        "catKeybindsSub": "为每个操作绑定按键。",
-        "catControllerSub": "手柄手感与按键布局。",
-        "catTouchName": "触控",
-        "catTouchSub": "屏幕摇杆、视角与按钮。",
-        "catAudioSub": "音量与声音开关。",
-        "catSystemName": "系统",
-        "catSystemSub": "性能、支持与关于。"
-      },
-      "done": "完成",
-      "resetAllTitle": "重置所有设置？",
-      "resetAllBody": "这会将每项设置恢复为默认值。此操作无法撤销。",
-      "searchPlaceholder": "搜索设置",
-      "searchScopeAll": "所有设置",
-      "searchScopeThis": "当前分区",
-      "searchEmpty": "没有符合搜索的设置。",
-      "searchGoTo": "前往{category}",
-      "modeOnline": "在线",
-      "modeOffline": "离线",
-      "changed": "已更改 {count} 项",
-      "changedSummary": "已更改 {count} 项（相对默认）",
-      "legend": {
-        "category": "分类",
-        "navigate": "导航",
-        "select": "选择",
-        "back": "返回",
-        "reset": "重置",
-        "clear": "清除",
-        "page": "页面"
-      },
-      "keybindCleared": "已清除 {action}",
-      "keybindRebinding": "正在重绑定 {action}。请按一个键，或按 Esc 取消。",
-      "keybindEvicted": "已将 {key} 绑定到 {action}；已从 {evicted} 移除。",
-      "keybindTaken": "按键已移除",
-      "keybindUnbound": "{action} 尚未绑定按键",
-      "keybindModifierHint": "提示：你可以绑定组合键。按住 Shift、Ctrl 或 Alt 的同时按下某个键即可录制组合键（例如 Shift+1）。",
-      "conflictDot": "按键冲突",
-      "overviewConflictAlert": "部分按键绑定存在冲突或未绑定。",
-      "sec": {
-        "quality": "画质",
-        "view": "视野",
-        "general": "通用",
-        "scaleText": "缩放与文字",
-        "panels": "面板",
-        "unitFrames": "单位框体",
-        "actionBars": "动作条",
-        "chat": "聊天",
-        "combatTooltips": "战斗与提示",
-        "hudExtras": "HUD 附加项",
-        "motionContrast": "动态与对比度",
-        "content": "内容",
-        "camera": "镜头",
-        "movement": "移动",
-        "combat": "战斗",
-        "feedback": "反馈",
-        "inputMode": "输入模式",
-        "feel": "操作感",
-        "sticks": "摇杆",
-        "look": "视角",
-        "buttons": "按钮",
-        "volume": "音量",
-        "toggles": "开关",
-        "performance": "性能",
-        "support": "支持",
-        "about": "关于"
-      }
+      "mobileLeftHanded": "左手布局"
     },
     "controller": {
       "title": "手柄",
@@ -677,8 +604,7 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
-      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。",
-      "duplicate": "也绑定到 {buttons}"
+      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
       "title": "性能监视器",
@@ -811,11 +737,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}",
-      "choicesTab": "天赋选择",
-      "resetChoices": "重置选择",
-      "tierLevel": "等级 {n}",
-      "tierLevelLabel": "等级"
+      "defaultBuildName": "配置 {n}"
     },
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
@@ -1008,6 +930,7 @@ export const zh_CN: EnTranslations = {
     "corpseHarvest": {
       "title": "采集",
       "harvestButton": "采集",
+      "harvestButtonTooltip": "采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
@@ -1188,7 +1111,8 @@ export const zh_CN: EnTranslations = {
       "resetErrInvalid": "此重置链接无效或已过期。请重新申请一个。"
     },
     "loot": {
-      "chestTitle": "宝箱"
+      "chestTitle": "宝箱",
+      "takeAllTooltip": "全部拾取：收取此战利品窗口中的所有金币和物品。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
@@ -5033,8 +4957,6 @@ export const zh_CN: EnTranslations = {
       "buybackTitle": "回购",
       "buybackEmpty": "没有物品",
       "buybackAria": "以 {price} 回购 {item}",
-      "sellItemAria": "以 {price} 的价格出售 {item}",
-      "sellRolledWarning": "随机属性无法通过回购找回。",
       "sellQuantityTitle": "出售 {item}",
       "sellQuantityInput": "要出售的数量",
       "sellQuantityConfirm": "出售",

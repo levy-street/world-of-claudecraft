@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   desktopBridge,
-  isGlitchPlatformOrigin,
   isElectronRuntime,
+  isGlitchPlatformOrigin,
   isWebServedRuntime,
   normalizeGameApiOrigin,
   normalizeOrigin,

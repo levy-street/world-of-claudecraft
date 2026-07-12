@@ -322,8 +322,6 @@ export const ja_JP: EnTranslations = {
       "haptics": "振動",
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
-      "showMenuButtons": "メニューボタンを表示",
-      "hideMenuButtons": "メニューボタンを非表示",
       "hotbarPage": "スキル",
       "hotbarPageAria": "次のスキルセットを表示",
       "actionRing": "戦闘アクション",
@@ -339,7 +337,13 @@ export const ja_JP: EnTranslations = {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
       "talkBodyTouch": "レッドブルック元帥に近づき、「使用」ボタンをタップして話しかけ、依頼を受けましょう。",
       "returnBodyTouch": "依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。",
-      "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！"
+      "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！",
+      "slayTargetHint": "戦闘は初めてですか？{targetKey} を押すか狼をクリックしてターゲットし、アクションバーのスキルで攻撃しましょう。",
+      "slayTargetHintTouch": "戦闘は初めてですか？狼をタップしてターゲットし、アクションバーのスキルをタップして攻撃しましょう。",
+      "nextTipsTitle": "次にすべきこと",
+      "nextTipQuestLog": "クエストログ（{key}）を開いて近くの次のクエストを確認しましょう。",
+      "nextTipMap": "ワールドマップ（{key}）でクエストの場所を確認しましょう。",
+      "nextTipSocial": "ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。"
     },
     "widgets": {
       "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
@@ -588,84 +592,7 @@ export const ja_JP: EnTranslations = {
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト",
-      "ia": {
-        "railDisplay": "表示",
-        "railInput": "入力",
-        "railSystem": "システム",
-        "catOverviewName": "概要",
-        "catOverviewSub": "よく使う項目、クイック操作、変更点をまとめて表示します。",
-        "catGraphicsSub": "画質、視界、世界の見た目。",
-        "catInterfaceSub": "HUDの拡大率、パネル、チャット、ユニットフレーム。",
-        "catAccessibilityName": "アクセシビリティ",
-        "catAccessibilitySub": "モーション、コントラスト、コンテンツの快適さ。",
-        "catControlsName": "操作",
-        "catControlsSub": "カメラ、移動、戦闘、フィードバック。",
-        "catKeybindsSub": "すべての操作にキーを割り当てます。",
-        "catControllerSub": "ゲームパッドの操作感とボタン配置。",
-        "catTouchName": "タッチ",
-        "catTouchSub": "画面上のスティック、視点、ボタン。",
-        "catAudioSub": "音量とサウンドの切り替え。",
-        "catSystemName": "システム",
-        "catSystemSub": "パフォーマンス、サポート、バージョン情報。"
-      },
-      "done": "完了",
-      "resetAllTitle": "すべての設定をリセットしますか？",
-      "resetAllBody": "すべての設定を初期値に戻します。この操作は元に戻せません。",
-      "searchPlaceholder": "設定を検索",
-      "searchScopeAll": "すべての設定",
-      "searchScopeThis": "このセクション",
-      "searchEmpty": "検索に一致する設定はありません。",
-      "searchGoTo": "{category}へ移動",
-      "modeOnline": "オンライン",
-      "modeOffline": "オフライン",
-      "changed": "{count} 件変更",
-      "changedSummary": "初期値から {count} 件変更",
-      "legend": {
-        "category": "カテゴリ",
-        "navigate": "移動",
-        "select": "決定",
-        "back": "戻る",
-        "reset": "リセット",
-        "clear": "クリア",
-        "page": "ページ"
-      },
-      "keybindCleared": "{action} をクリアしました",
-      "keybindRebinding": "{action} を再割り当て中です。キーを押すか、Esc でキャンセルしてください。",
-      "keybindEvicted": "{key} を {action} に割り当てました。{evicted} からは解除されました。",
-      "keybindTaken": "キー解除",
-      "keybindUnbound": "{action}にキーが割り当てられていません",
-      "keybindModifierHint": "ヒント：修飾キーの組み合わせを割り当てられます。Shift、Ctrl、Alt のいずれかを押しながらキーを押すと、その組み合わせが登録されます（例：Shift+1）。",
-      "conflictDot": "キー競合",
-      "overviewConflictAlert": "一部のキー割り当てが競合しているか未設定です。",
-      "sec": {
-        "quality": "品質",
-        "view": "視野",
-        "general": "一般",
-        "scaleText": "拡大と文字",
-        "panels": "パネル",
-        "unitFrames": "ユニットフレーム",
-        "actionBars": "アクションバー",
-        "chat": "チャット",
-        "combatTooltips": "戦闘とツールチップ",
-        "hudExtras": "HUD の追加項目",
-        "motionContrast": "モーションとコントラスト",
-        "content": "コンテンツ",
-        "camera": "カメラ",
-        "movement": "移動",
-        "combat": "戦闘",
-        "feedback": "フィードバック",
-        "inputMode": "入力モード",
-        "feel": "操作感",
-        "sticks": "スティック",
-        "look": "視点",
-        "buttons": "ボタン",
-        "volume": "音量",
-        "toggles": "切り替え",
-        "performance": "パフォーマンス",
-        "support": "サポート",
-        "about": "情報"
-      }
+      "mobileLeftHanded": "左利き用レイアウト"
     },
     "controller": {
       "title": "コントローラー",
@@ -677,8 +604,7 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。",
-      "duplicate": "{buttons} にも割り当て済み"
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
@@ -811,11 +737,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "ビルド {n}",
-      "choicesTab": "選択",
-      "resetChoices": "選択をリセット",
-      "tierLevel": "レベル {n}",
-      "tierLevelLabel": "レベル"
+      "defaultBuildName": "ビルド {n}"
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
@@ -1008,6 +930,7 @@ export const ja_JP: EnTranslations = {
     "corpseHarvest": {
       "title": "採取",
       "harvestButton": "採取",
+      "harvestButtonTooltip": "採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
@@ -1188,7 +1111,8 @@ export const ja_JP: EnTranslations = {
       "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
     },
     "loot": {
-      "chestTitle": "宝箱"
+      "chestTitle": "宝箱",
+      "takeAllTooltip": "すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
@@ -5033,8 +4957,6 @@ export const ja_JP: EnTranslations = {
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",
-      "sellItemAria": "{item}を{price}で売却",
-      "sellRolledWarning": "ランダムな性能は買い戻しでは戻せません。",
       "sellQuantityTitle": "{item}を売却",
       "sellQuantityInput": "売却する数量",
       "sellQuantityConfirm": "売却",

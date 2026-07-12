@@ -322,8 +322,6 @@ export const de_DE: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
       "toggleHaptics": "Haptik umschalten",
-      "showMenuButtons": "Menütasten anzeigen",
-      "hideMenuButtons": "Menütasten ausblenden",
       "hotbarPage": "Fähigkeiten",
       "hotbarPageAria": "Nächste Fähigkeitengruppe anzeigen",
       "actionRing": "Kampfhandlungen",
@@ -339,7 +337,13 @@ export const de_DE: EnTranslations = {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
       "talkBodyTouch": "Stell dich nah an Marschall Redbrook und tippe auf die Schaltfläche Benutzen, um mit ihm zu sprechen, und nimm dann seine Aufgabe an.",
       "returnBodyTouch": "Deine Aufgabe ist erledigt. Kehre zu Marschall Redbrook zurück und tippe auf die Schaltfläche Benutzen, um sie abzugeben.",
-      "doneBodyTouch": "Du beherrschst die Grundlagen, {name}. Das Eastbrook-Tal liegt bereit, von dir erkundet zu werden. Tippe auf Mehr und dann auf Questlog, um jederzeit dein Questlog einzusehen. Gute Jagd."
+      "doneBodyTouch": "Du beherrschst die Grundlagen, {name}. Das Eastbrook-Tal liegt bereit, von dir erkundet zu werden. Tippe auf Mehr und dann auf Questlog, um jederzeit dein Questlog einzusehen. Gute Jagd.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Ortszeit - klicken, um zwischen 12-/24-Stunden zu wechseln",
@@ -588,84 +592,7 @@ export const de_DE: EnTranslations = {
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
-      "mobileLeftHanded": "Linkshänder-Layout",
-      "ia": {
-        "railDisplay": "Anzeige",
-        "railInput": "Eingabe",
-        "railSystem": "Systemeinstellungen",
-        "catOverviewName": "Übersicht",
-        "catOverviewSub": "Angeheftete Grundlagen, Schnellaktionen und Änderungen.",
-        "catGraphicsSub": "Qualität, Sichtweite und Weltdarstellung.",
-        "catInterfaceSub": "HUD-Skalierung, Fenster, Chat und Einheitenrahmen.",
-        "catAccessibilityName": "Barrierefreiheit",
-        "catAccessibilitySub": "Bewegung, Kontrast und angenehme Inhaltsdarstellung.",
-        "catControlsName": "Steuerung",
-        "catControlsSub": "Kamera, Bewegung, Kampf und Rückmeldungen.",
-        "catKeybindsSub": "Tasten für jede Aktion belegen.",
-        "catControllerSub": "Gamepad-Gefühl und Tastenbelegung.",
-        "catTouchName": "Touch-Steuerung",
-        "catTouchSub": "Bildschirmsticks, Blicksteuerung und Tasten.",
-        "catAudioSub": "Lautstärke und Soundoptionen.",
-        "catSystemName": "Systemeinstellungen",
-        "catSystemSub": "Leistung, Support und Info."
-      },
-      "done": "Fertig",
-      "resetAllTitle": "Alle Einstellungen zurücksetzen?",
-      "resetAllBody": "Dadurch werden alle Einstellungen auf ihre Standardwerte zurückgesetzt. Dies kann nicht rückgängig gemacht werden.",
-      "searchPlaceholder": "Einstellungen durchsuchen",
-      "searchScopeAll": "Alle Einstellungen",
-      "searchScopeThis": "Dieser Abschnitt",
-      "searchEmpty": "Keine Einstellungen entsprechen deiner Suche.",
-      "searchGoTo": "Zu {category} wechseln",
-      "modeOnline": "Mit Verbindung",
-      "modeOffline": "Ohne Verbindung",
-      "changed": "{count} geändert",
-      "changedSummary": "{count} gegenüber den Standardwerten geändert",
-      "legend": {
-        "category": "Kategorie",
-        "navigate": "Navigieren",
-        "select": "Auswählen",
-        "back": "Zurück",
-        "reset": "Zurücksetzen",
-        "clear": "Löschen",
-        "page": "Seite"
-      },
-      "keybindCleared": "Belegung für {action} gelöscht",
-      "keybindRebinding": "{action} neu belegen. Drücke eine Taste oder Escape zum Abbrechen.",
-      "keybindEvicted": "{key} an {action} gebunden und Belegung von {evicted} entfernt",
-      "keybindTaken": "Taste entfernt",
-      "keybindUnbound": "{action} hat keine Taste",
-      "keybindModifierHint": "Tipp: Du kannst Tastenkombinationen mit Modifikatoren belegen. Halte Umschalt, Strg oder Alt gedrückt, während du eine Taste drückst, um die Kombination zu erfassen, zum Beispiel Umschalt+1.",
-      "conflictDot": "Belegungskonflikt",
-      "overviewConflictAlert": "Einige Tastenbelegungen stehen im Konflikt oder sind nicht belegt.",
-      "sec": {
-        "quality": "Qualität",
-        "view": "Sicht",
-        "general": "Allgemein",
-        "scaleText": "Skalierung und Text",
-        "panels": "Fenster",
-        "unitFrames": "Einheitenrahmen",
-        "actionBars": "Aktionsleisten",
-        "chat": "Unterhaltung",
-        "combatTooltips": "Kampf und Tooltips",
-        "hudExtras": "HUD-Extras",
-        "motionContrast": "Bewegung und Kontrast",
-        "content": "Inhalte",
-        "camera": "Kamera",
-        "movement": "Bewegung",
-        "combat": "Kampf",
-        "feedback": "Rückmeldungen",
-        "inputMode": "Eingabemodus",
-        "feel": "Spielgefühl",
-        "sticks": "Steuerknüppel",
-        "look": "Blicksteuerung",
-        "buttons": "Tasten",
-        "volume": "Lautstärke",
-        "toggles": "Schalter",
-        "performance": "Leistung",
-        "support": "Hilfe",
-        "about": "Info"
-      }
+      "mobileLeftHanded": "Linkshänder-Layout"
     },
     "controller": {
       "title": "Controller",
@@ -677,8 +604,7 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
-      "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden.",
-      "duplicate": "Auch an {buttons} gebunden"
+      "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
     },
     "perf": {
       "title": "Leistungsanzeige",
@@ -811,11 +737,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}",
-      "choicesTab": "Auswahlmöglichkeiten",
-      "resetChoices": "Auswahl zurücksetzen",
-      "tierLevel": "Stufe {n}",
-      "tierLevelLabel": "Stufe"
+      "defaultBuildName": "Build {n}"
     },
     "tips": {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
@@ -1008,6 +930,7 @@ export const de_DE: EnTranslations = {
     "corpseHarvest": {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
@@ -1188,7 +1111,8 @@ export const de_DE: EnTranslations = {
       "resetErrInvalid": "Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an."
     },
     "loot": {
-      "chestTitle": "Truhe"
+      "chestTitle": "Truhe",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "{name} zur Aktionsleiste hinzufügen",
@@ -5033,8 +4957,6 @@ export const de_DE: EnTranslations = {
       "buybackTitle": "Rückkauf",
       "buybackEmpty": "Keine Gegenstände",
       "buybackAria": "{item} für {price} zurückkaufen",
-      "sellItemAria": "{item} für {price} verkaufen",
-      "sellRolledWarning": "Zufällig erzeugte Werte können durch Rückkauf nicht wiederhergestellt werden.",
       "sellQuantityTitle": "{item} verkaufen",
       "sellQuantityInput": "Zu verkaufende Menge",
       "sellQuantityConfirm": "Verkaufen",

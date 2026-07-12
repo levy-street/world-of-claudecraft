@@ -73,6 +73,7 @@ describe('material-cost discount when crafting (#1134, crafting.ts)', () => {
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 10,
+    level: 10,
   };
 
   it('a non-specialized player pays the full listed material cost', () => {

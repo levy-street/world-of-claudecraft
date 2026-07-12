@@ -1,12 +1,7 @@
 // Online play: REST auth client + WebSocket world mirror.
 
-import {
-  isDesktopAppRuntime,
-  normalizeGameApiOrigin,
-  normalizeOrigin,
-  runtimeApiOrigin,
-  runtimeWebSocketUrl,
-} from '../runtime';
+import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN } from '../client_origin';
+import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
@@ -153,18 +148,13 @@ export function buildWebSocketUrl(protocol: string, host: string): string {
   return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
-export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
-export const NATIVE_API_ORIGIN = normalizeGameApiOrigin(
-  String(import.meta.env.VITE_API_ORIGIN ?? ''),
-);
-export const DESKTOP_APP = isDesktopAppRuntime();
-export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
-
-export function apiUrl(path: string, base = ''): string {
-  if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
-  return origin ? `${origin}${path}` : path;
-}
+export {
+  apiUrl,
+  DESKTOP_API_ORIGIN,
+  DESKTOP_APP,
+  NATIVE_API_ORIGIN,
+  NATIVE_APP,
+} from '../client_origin';
 
 export function buildWebSocketAuthMessage(
   token: string,
@@ -1289,7 +1279,37 @@ export class ClientWorld implements IWorld {
     this.openSocket();
     // input stream at sim rate
     this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
+
+  // Mobile browsers suspend JS timers AND the network stack together while a
+  // tab is backgrounded (screen lock, app switch): iOS Safari and Android
+  // Chrome both routinely kill the underlying socket without ever delivering
+  // its close event to a frozen page, and any pending reconnect setTimeout is
+  // itself throttled to roughly once a minute in the background. Purely
+  // event-driven reconnect (onclose -> backoff -> retry) then leaves the
+  // player stuck on a zombie "connected" socket, or several backoff steps
+  // behind, the moment they foreground the app again: reported as frequent
+  // disconnects even though most drops are really just late reconnects. On
+  // resume, force a real state check and retry immediately instead of
+  // waiting for a close event or the rest of the backoff delay.
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState !== 'visible') return;
+    if (this.sessionEnded) return;
+    if (this.ws.readyState === WebSocket.OPEN) return;
+    if (this.reconnectTimer !== undefined) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = undefined;
+      this.openSocket();
+      return;
+    }
+    // No reconnect scheduled yet but the socket is not open: onclose was
+    // never delivered while suspended (the zombie-socket case). Drive the
+    // same path a real close would have.
+    if (this.connected) this.socketClosed();
+  };
 
   private openSocket(): void {
     // when a realm was picked, connect to that realm's origin; otherwise the
@@ -1318,8 +1338,7 @@ export class ClientWorld implements IWorld {
     this.connected = false;
     if (this.sessionEnded) return;
     if (this.reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
-      this.sessionEnded = true;
-      clearInterval(this.sendTimer);
+      this.endSession();
       this.onDisconnect?.('Connection to the server was lost.');
       return;
     }
@@ -1336,6 +1355,9 @@ export class ClientWorld implements IWorld {
     this.sessionEnded = true;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   close(): void {

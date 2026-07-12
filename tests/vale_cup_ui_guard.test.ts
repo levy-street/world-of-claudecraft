@@ -44,11 +44,9 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
     expect(windowSrc).toContain('buildVcupView(');
   });
 
-  it('gives the close control a real button via the shared frame builder', () => {
-    // The chrome (titlebar + close button) is stamped by the shared window-frame
-    // builder; the window names its own close aria key on the descriptor.
-    expect(windowSrc).toContain('renderWindowFrame(');
-    expect(windowSrc).toContain("closeLabelKey: 'hudChrome.vcup.close'");
+  it('gives the close control a real button with an aria-label', () => {
+    expect(windowSrc).toContain('class="x-btn" data-close aria-label=');
+    expect(windowSrc).toContain("t('hudChrome.vcup.close')");
   });
 
   it('renders bracket tabs, the nation flag grid, and roles as real buttons with aria-pressed', () => {
@@ -61,9 +59,7 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
   });
 
   it('routes every close path through close() so focus returns to the opener', () => {
-    // The frame builder wires its close control to the injected onClose, which the
-    // window points at close() (WCAG 2.4.3 focus-return).
-    expect(windowSrc).toContain('() => this.close()');
+    expect(windowSrc).toContain("data-close]')?.addEventListener('click', () => this.close())");
     expect(windowSrc).toContain('this.deps.restoreFocus(this.openerFocus)');
     expect(windowSrc).toContain('this.openerFocus = this.deps.captureFocus()');
   });

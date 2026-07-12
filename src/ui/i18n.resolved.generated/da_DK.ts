@@ -322,8 +322,6 @@ export const da_DK: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
       "toggleHaptics": "Slå haptik til/fra",
-      "showMenuButtons": "Vis menuknapper",
-      "hideMenuButtons": "Skjul menuknapper",
       "hotbarPage": "Evner",
       "hotbarPageAria": "Vis næste sæt evner",
       "actionRing": "Kamphandlinger",
@@ -339,7 +337,13 @@ export const da_DK: EnTranslations = {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
       "talkBodyTouch": "Stil dig tæt på Marskal Redbrook og tryk på Brug-knappen for at tale, og accepter derefter hans opgave.",
       "returnBodyTouch": "Din opgave er fuldført. Vend tilbage til Marskal Redbrook og tryk på Brug-knappen for at aflevere den.",
-      "doneBodyTouch": "Du har styr på det grundlæggende, {name}. Dalen er din at udforske. Tryk på Mere, derefter Opgaver, for at gennemse din opgavelog når som helst. God jagt."
+      "doneBodyTouch": "Du har styr på det grundlæggende, {name}. Dalen er din at udforske. Tryk på Mere, derefter Opgaver, for at gennemse din opgavelog når som helst. God jagt.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klik for at skifte mellem 12/24-timers",
@@ -588,84 +592,7 @@ export const da_DK: EnTranslations = {
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Venstrehånds layout",
-      "ia": {
-        "railDisplay": "Visning",
-        "railInput": "Betjening",
-        "railSystem": "Systemindstillinger",
-        "catOverviewName": "Oversigt",
-        "catOverviewSub": "Fastgjorte grundindstillinger, hurtige handlinger og ændringer.",
-        "catGraphicsSub": "Kvalitet, udsyn og verdensgrafik.",
-        "catInterfaceSub": "HUD-skala, paneler, chat og enhedsrammer.",
-        "catAccessibilityName": "Tilgængelighed",
-        "catAccessibilitySub": "Bevægelse, kontrast og behageligt indhold.",
-        "catControlsName": "Styring",
-        "catControlsSub": "Kamera, bevægelse, kamp og respons.",
-        "catKeybindsSub": "Tildel taster til hver handling.",
-        "catControllerSub": "Følelse og knaplayout for gamepad.",
-        "catTouchName": "Berøringsstyring",
-        "catTouchSub": "Skærmstyrepinde, blikstyring og knapper.",
-        "catAudioSub": "Lydstyrke og lydindstillinger.",
-        "catSystemName": "Systemindstillinger",
-        "catSystemSub": "Ydeevne, hjælp og information."
-      },
-      "done": "Færdig",
-      "resetAllTitle": "Nulstil alle indstillinger?",
-      "resetAllBody": "Dette gendanner alle indstillinger til deres standardværdier. Det kan ikke fortrydes.",
-      "searchPlaceholder": "Søg i indstillinger",
-      "searchScopeAll": "Alle indstillinger",
-      "searchScopeThis": "Dette afsnit",
-      "searchEmpty": "Ingen indstillinger matcher din søgning.",
-      "searchGoTo": "Gå til {category}",
-      "modeOnline": "Forbundet",
-      "modeOffline": "Uden forbindelse",
-      "changed": "{count} ændret",
-      "changedSummary": "{count} ændret fra standardindstillingerne",
-      "legend": {
-        "category": "Kategori",
-        "navigate": "Naviger",
-        "select": "Vælg",
-        "back": "Tilbage",
-        "reset": "Nulstil",
-        "clear": "Ryd",
-        "page": "Side"
-      },
-      "keybindCleared": "Tildelingen for {action} blev ryddet",
-      "keybindRebinding": "Tildeler {action} igen. Tryk på en tast eller Escape for at annullere.",
-      "keybindEvicted": "Tildelte {key} til {action}; fjernede den fra {evicted}",
-      "keybindTaken": "Tast fjernet",
-      "keybindUnbound": "{action} har ingen tast",
-      "keybindModifierHint": "Tip: Du kan tildele kombinationer med modificeringstaster. Hold Shift, Ctrl eller Alt nede, mens du trykker på en tast, for at registrere kombinationen, for eksempel Shift+1.",
-      "conflictDot": "Tildelingskonflikt",
-      "overviewConflictAlert": "Nogle tastetildelinger er i konflikt eller mangler.",
-      "sec": {
-        "quality": "Kvalitet",
-        "view": "Udsyn",
-        "general": "Generelt",
-        "scaleText": "Skala og tekst",
-        "panels": "Paneler",
-        "unitFrames": "Enhedsrammer",
-        "actionBars": "Handlingsbjælker",
-        "chat": "Samtale",
-        "combatTooltips": "Kamp og værktøjstip",
-        "hudExtras": "Ekstra HUD-elementer",
-        "motionContrast": "Bevægelse og kontrast",
-        "content": "Indhold",
-        "camera": "Kamerastyring",
-        "movement": "Bevægelse",
-        "combat": "Kamp",
-        "feedback": "Respons",
-        "inputMode": "Betjeningstilstand",
-        "feel": "Følelse",
-        "sticks": "Styrepinde",
-        "look": "Blikstyring",
-        "buttons": "Knapper",
-        "volume": "Lydstyrke",
-        "toggles": "Til og fra-knapper",
-        "performance": "Ydeevne",
-        "support": "Hjælp",
-        "about": "Information"
-      }
+      "mobileLeftHanded": "Venstrehånds layout"
     },
     "controller": {
       "title": "Controller",
@@ -677,8 +604,7 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
-      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren.",
-      "duplicate": "Også tildelt til {buttons}"
+      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
     },
     "perf": {
       "title": "Ydelsesoverlay",
@@ -811,11 +737,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}",
-      "choicesTab": "Valg",
-      "resetChoices": "Nulstil valg",
-      "tierLevel": "Niveau {n}",
-      "tierLevelLabel": "Niveau"
+      "defaultBuildName": "Build {n}"
     },
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
@@ -1008,6 +930,7 @@ export const da_DK: EnTranslations = {
     "corpseHarvest": {
       "title": "Høst",
       "harvestButton": "Høst",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.",
       "alreadyHarvested": "Dette kadaver er allerede blevet høstet.",
       "componentAria": "Høst {component}",
@@ -1188,7 +1111,8 @@ export const da_DK: EnTranslations = {
       "resetErrInvalid": "Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt."
     },
     "loot": {
-      "chestTitle": "Kiste"
+      "chestTitle": "Kiste",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
@@ -5033,8 +4957,6 @@ export const da_DK: EnTranslations = {
       "buybackTitle": "Tilbagekøb",
       "buybackEmpty": "Ingen genstande",
       "buybackAria": "Køb {item} tilbage for {price}",
-      "sellItemAria": "Sælg {item} for {price}",
-      "sellRolledWarning": "Tilfældige egenskaber kan ikke gendannes ved tilbagekøb.",
       "sellQuantityTitle": "Sælg {item}",
       "sellQuantityInput": "Antal at sælge",
       "sellQuantityConfirm": "Sælg",
