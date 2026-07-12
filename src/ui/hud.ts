@@ -719,7 +719,7 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type HotbarForm = 'normal' | 'bear' | 'cat' | 'stealth' | 'sport';
+type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'sport';
 
 const DELVE_AFFIX_COLORS: Record<string, string> = {
   restless_graves: '#8b7355',
@@ -4692,7 +4692,10 @@ export class Hud {
     if (cupMatch && cupMatch.team !== null) return 'sport';
     if (this.sim.cfg.playerClass === 'druid') {
       if (this.sim.player.auras.some((a) => a.kind === 'form_bear')) return 'bear';
-      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) return 'cat';
+      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) {
+        if (this.sim.player.auras.some((a) => a.kind === 'stealth')) return 'cat_stealth';
+        return 'cat';
+      }
     }
     if (
       this.sim.cfg.playerClass === 'rogue' &&
@@ -4712,16 +4715,17 @@ export class Hud {
     );
   }
 
-  // Whether an ability belongs on a given form's default bar. Bear/cat bars hold
+  // Whether an ability belongs on a given form's default bar. Bear/Wolf bars hold
   // only that form's kit (its `requiresForm` abilities) plus the shift toggles;
   // the caster ('normal') bar excludes form-only abilities so they no longer
-  // auto-dump onto it. Rogue stealth has no `requiresForm` kit, so it keeps the
-  // full caster set.
+  // auto-dump onto it. Stealth pages are intentionally manual: they begin empty
+  // and never receive automatic placements.
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // The sport bar holds ONLY the sport kit; conversely no sport id may ever
     // auto-place onto (and pollute) a persisted class bar.
     if (form === 'sport') return !!SPORT_ABILITIES[id];
     if (SPORT_ABILITIES[id]) return false;
+    if (this.isStealthHotbarForm(form)) return false;
     if (form === 'bear' || form === 'cat') {
       return ABILITIES[id]?.requiresForm === form || Hud.FORM_TOGGLE_IDS.has(id);
     }
@@ -4733,11 +4737,14 @@ export class Hud {
     return this.sim.known.map((k) => k.def.id).filter((id) => this.shouldAutoPlaceOnForm(id, form));
   }
 
-  // True for the druid form bars that own a dedicated kit (bear/cat). Rogue
-  // stealth is excluded: the sim does not lock the caster kit in stealth, so its
-  // bar legitimately mirrors the normal layout.
+  // True only for the druid form bars that seed a form-specific kit. Rogue and
+  // Wolf stealth pages take the separate blank/manual path below.
   private isFormKitBar(form: HotbarForm = this.activeHotbarForm): boolean {
     return this.sim.cfg.playerClass === 'druid' && (form === 'bear' || form === 'cat');
+  }
+
+  private isStealthHotbarForm(form: HotbarForm = this.activeHotbarForm): boolean {
+    return form === 'stealth' || form === 'cat_stealth';
   }
 
   // Gates form-bar-only UI (e.g. the spellbook "Reset bar" button) so it never
@@ -4756,6 +4763,54 @@ export class Hud {
   private markFormBarSeeded(form: HotbarForm = this.activeHotbarForm): void {
     try {
       localStorage.setItem(this.formBarSeededKey(form), '1');
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  // Versioned separately from the druid form-kit migration. The first blank-page
+  // rollout also clears a byte-identical parent clone created by the previous
+  // behavior, while leaving every customized stealth layout untouched.
+  private stealthBarInitializedKey(form: HotbarForm = this.activeHotbarForm): string {
+    return `${this.slotMapKey(form)}_blank_v1`;
+  }
+
+  private loadStealthSlotMap(
+    parsed: HotbarAction[],
+    stored: boolean,
+    storedRaw: string | null,
+  ): void {
+    let initialized = false;
+    try {
+      initialized = localStorage.getItem(this.stealthBarInitializedKey()) === '1';
+    } catch {
+      /* storage unavailable */
+    }
+
+    let actions = parsed;
+    let shouldPersist = !stored;
+    if (!initialized) {
+      const parentForm: HotbarForm = this.activeHotbarForm === 'cat_stealth' ? 'cat' : 'normal';
+      let parentStoredRaw: string | null = null;
+      try {
+        parentStoredRaw = localStorage.getItem(this.slotMapKey(parentForm));
+      } catch {
+        /* storage unavailable */
+      }
+      if (!stored || (storedRaw !== null && storedRaw === parentStoredRaw)) {
+        actions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, () => null);
+        shouldPersist = true;
+      }
+    }
+
+    this.loadedSlotMapFromStorage = true;
+    this.hotbarActions = actions;
+    this.knownAbilityIdsAtLastSlotSync = null;
+    try {
+      // Persist first so a failed page write never leaves a success marker that
+      // suppresses the next migration attempt.
+      if (shouldPersist) localStorage.setItem(this.slotMapKey(), JSON.stringify(actions));
+      if (!initialized) localStorage.setItem(this.stealthBarInitializedKey(), '1');
     } catch {
       /* storage unavailable */
     }
@@ -4805,10 +4860,11 @@ export class Hud {
   private loadSlotMap(): void {
     let arr: unknown = null;
     let stored = false;
+    let storedRaw: string | null = null;
     try {
-      const raw = localStorage.getItem(this.slotMapKey());
-      stored = raw !== null;
-      arr = JSON.parse(raw ?? 'null');
+      storedRaw = localStorage.getItem(this.slotMapKey());
+      arr = JSON.parse(storedRaw ?? 'null');
+      stored = Array.isArray(arr);
     } catch {
       /* corrupt */
     }
@@ -4839,6 +4895,10 @@ export class Hud {
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
     }
+    if (this.isStealthHotbarForm()) {
+      this.loadStealthSlotMap(parsed, stored, storedRaw);
+      return;
+    }
     // Druid bear/cat bars auto-populate with that form's kit instead of cloning
     // the caster bar; existing characters are migrated once (see seedFormBarIfNeeded).
     if (this.isFormKitBar()) {
@@ -4847,28 +4907,6 @@ export class Hud {
       this.hotbarActions = parsed;
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
-    }
-    const emptyFormMap =
-      this.activeHotbarForm !== 'normal' && parsed.every((action) => action === null);
-    if (emptyFormMap) {
-      let fallback: unknown = null;
-      try {
-        fallback = JSON.parse(localStorage.getItem(this.slotMapKey('normal')) ?? 'null');
-      } catch {
-        /* corrupt */
-      }
-      const normalActions = parseHotbarActions(
-        fallback,
-        Hud.BAR_ABILITY_SLOTS,
-        (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-        (id) => this.isHotbarItemId(id),
-      );
-      if (normalActions.some((action) => action !== null)) {
-        this.loadedSlotMapFromStorage = true;
-        this.hotbarActions = normalActions;
-        this.knownAbilityIdsAtLastSlotSync = null;
-        return;
-      }
     }
     this.loadedSlotMapFromStorage = stored;
     this.hotbarActions = parsed;
@@ -4910,9 +4948,9 @@ export class Hud {
     return true;
   }
 
-  // Rebuild the active bar from its default kit (form bars get their form kit;
-  // the caster/stealth bar gets the form-filtered known abilities). Item
-  // shortcuts and manual arrangement are intentionally discarded — it's a reset.
+  // Rebuild the active bar from its default kit: druid forms get their form kit,
+  // caster bars get filtered known abilities, and stealth pages reset to blank.
+  // Item shortcuts and manual arrangement are intentionally discarded; it's a reset.
   // The per-frame update() repaints the slot icons from hotbarActions, so we only
   // mutate state here (same as addAbilityToHotbar / drag-drop).
   private resetActiveFormBarToDefault(): void {
@@ -4938,7 +4976,7 @@ export class Hud {
     this.saveSlotMap();
     this.activeHotbarForm = next;
     this.dragAction = null;
-    this.clearActionDropTargets();
+    this.clearMobileHotbarDrag();
     this.loadSlotMap();
     this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
