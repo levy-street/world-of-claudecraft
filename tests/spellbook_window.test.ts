@@ -135,8 +135,10 @@ describe('spellbook_window: inline mobile slot picker', () => {
   });
 
   it('does not show the row description when focus returns to Add, Remove, or its chip', () => {
-    expect(code).toContain('undefined,\n        true,');
-    expect(code).toContain('() => this.pickerAbilityId === null,\n          true,');
+    expect(code).toContain('() => !this.suppressDescriptionOnRefocus,\n        true,');
+    expect(code).toContain(
+      '() => this.pickerAbilityId === null && !this.suppressDescriptionOnRefocus,\n          true,',
+    );
     expect(hud).toContain('if (directFocusOnly && event.target !== el) return;');
   });
 
@@ -171,7 +173,7 @@ describe('spellbook_window: inline mobile slot picker', () => {
     // the tooltip's right edge to it (pulling left only, floored at 8px).
     expect(code).toContain("el.querySelector<HTMLElement>('.spell-touch-controls')");
     expect(hud).toContain('const showNearElement = (maxRightX?: number) => {');
-    expect(hud).toContain('const clamped = Math.max(8, maxRightX / z - ttW - 6);');
+    expect(hud).toContain('const clamped = Math.max(8, bound / z - ttW - 6);');
   });
 
   it('does not add a persistent selected/focused state to touch spell rows', () => {
@@ -267,10 +269,35 @@ describe('spellbook_window: inline mobile slot picker', () => {
     );
   });
 
-  it('aligns the header close cluster with the row +/x column', () => {
+  it('keeps the header a floating plate inside the frame, X aligned with rows', () => {
+    // No negative inline margins: the plate must not paint over the beveled
+    // inner hairline on either side. With the plate at --window-pad, a 4px
+    // actions inset matches the rows' 4px inner right padding.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #spellbook > \.panel-title > \.panel-title-actions\s*\{[^}]*inset-inline-end:\s*calc\(var\(--window-pad\) \+ 4px\)/s,
+      /body\.mobile-touch #spellbook > \.panel-title\s*\{[^}]*margin-top:\s*0;[^}]*margin-inline:\s*0/s,
     );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook > \.panel-title > \.panel-title-actions\s*\{[^}]*inset-inline-end:\s*4px/s,
+    );
+  });
+
+  it('never freezes or resizes inset-pinned windows on the touch layout', () => {
+    // The drag/resize seed writes inline left/top with bottom:auto, which
+    // unpins a top+bottom sheet and leaves it content-tall (offscreen and
+    // unscrollable). Both entry points bail on body.mobile-touch.
+    expect(hud).toContain('// draggable on touch, the same hazard placeNewWindow already guards.');
+    expect(hud).toContain("if (document.body.classList.contains('mobile-touch')) return;");
+    const windowResize = readFileSync(
+      new URL('../src/ui/window_resize.ts', import.meta.url),
+      'utf8',
+    );
+    expect(windowResize).toContain('if (deps.isTouchLayout?.()) return null;');
+  });
+
+  it('keeps a focus-driven reshow clamped to the last passed boundary', () => {
+    expect(hud).toContain('let lastMaxRight: number | undefined;');
+    expect(hud).toContain('if (maxRightX !== undefined) lastMaxRight = maxRightX;');
+    expect(hud).toContain('const clamped = Math.max(8, bound / z - ttW - 6);');
   });
 
   it('keeps the touch-selected row seat readable on the panel gradient', () => {

@@ -111,6 +111,11 @@ export class SpellbookWindow {
   // Cleared by every path that hides the tooltip (strip dead zone, picker,
   // close), so a fresh tap after any of those shows again rather than toggling.
   private descriptionAbilityId: string | null = null;
+  // True only while rerenderPreservingView restores focus: the programmatic
+  // focus() fires the same focusin the tooltip listens to, which used to
+  // reopen a description the player just dismissed (tapping X on a phone
+  // rerenders the list and refocuses the row).
+  private suppressDescriptionOnRefocus = false;
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
@@ -212,7 +217,11 @@ export class SpellbookWindow {
     refocus ??= '[data-close]';
     this.render();
     root.scrollTop = scrollTop;
+    // The focus restore is bookkeeping, not a fresh description request: gate
+    // the tooltip's focusin path while the synchronous focus() call runs.
+    this.suppressDescriptionOnRefocus = true;
     (root.querySelector(refocus) as HTMLElement | null)?.focus();
+    this.suppressDescriptionOnRefocus = false;
   }
 
   render(): void {
@@ -352,7 +361,7 @@ export class SpellbookWindow {
         const showDescription = this.deps.attachTooltip(
           el,
           () => this.deps.abilityTooltip(known),
-          () => this.pickerAbilityId === null,
+          () => this.pickerAbilityId === null && !this.suppressDescriptionOnRefocus,
           true,
         );
         bindTouchTap(el, () => {
@@ -438,7 +447,7 @@ export class SpellbookWindow {
           const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
           return this.deps.abilityTooltip(live);
         },
-        undefined,
+        () => !this.suppressDescriptionOnRefocus,
         true,
       );
     } else {
@@ -446,6 +455,7 @@ export class SpellbookWindow {
         el,
         () =>
           `<div class="tt-title">${esc(name)}</div><div class="tt-sub">${esc(t('abilityUi.spellbook.learnAtLevel', { level: learnLevel }))}</div>`,
+        () => !this.suppressDescriptionOnRefocus,
       );
     }
     list.appendChild(el);

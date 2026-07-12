@@ -2787,13 +2787,20 @@
     font-size: 16px;
   }
   /* Seat the header actions on the same column as the row +/x controls: the
-     rows sit --window-pad inside the frame and keep a 4px inner right padding,
-     so pinning the header cluster at pad + 4px lines both X columns up. */
+     header plate itself already sits --window-pad inside the frame (its inline
+     margins are zeroed in the .panel-title rule below), and the rows keep a
+     4px inner right padding, so a 4px inset lines both X columns up. */
   body.mobile-touch #spellbook > .panel-title > .panel-title-actions {
-    inset-inline-end: calc(var(--window-pad) + 4px);
+    inset-inline-end: 4px;
   }
   body.mobile-touch #spellbook > .panel-title {
+    /* A floating plate INSIDE the frame, not an edge-to-edge bar: the shared
+       negative inline margins reach the border box and paint over the beveled
+       inner gold hairline on both sides. Content width plus all-corner radius
+       keeps the frame decoration fully visible around it. */
     margin-top: 0;
+    margin-inline: 0;
+    border-radius: 4px;
   }
   body.mobile-touch #spellbook .spell-row {
     min-height: 52px;

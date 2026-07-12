@@ -1945,6 +1945,12 @@ export class Hud {
       if (!el) return;
       this.bringWindowToFront(el);
       if (ev.button !== 0 || !target || !this.isWindowDragHandle(target, el)) return;
+      // Touch windows are inset-pinned sheets (top AND bottom): the drag seed
+      // below freezes the current position into inline left/top with
+      // bottom:auto, which drops the bottom pin and leaves the sheet as tall
+      // as its content (offscreen and unscrollable). Windows are simply not
+      // draggable on touch, the same hazard placeNewWindow already guards.
+      if (document.body.classList.contains('mobile-touch')) return;
       ev.preventDefault();
       this.hideTooltip();
       const rect = el.getBoundingClientRect();
@@ -4113,16 +4119,24 @@ export class Hud {
       ttW = size.w;
       ttH = size.h;
     };
+    // The boundary of the last boundary-passing show. A touch spellbook tap
+    // shows the description WITH the strip boundary, but the browser then
+    // focuses the row and the focusin path repaints it with NO argument;
+    // remembering the boundary keeps that repaint clamped too, so the box
+    // never lands back over the row's +/x controls.
+    let lastMaxRight: number | undefined;
     const showNearElement = (maxRightX?: number) => {
+      if (maxRightX !== undefined) lastMaxRight = maxRightX;
+      const bound = lastMaxRight;
       const rect = el.getBoundingClientRect();
       showAt(rect.right, rect.top + rect.height / 2, 'focus');
-      if (maxRightX === undefined || this.tooltipEl.style.display === 'none') return;
+      if (bound === undefined || this.tooltipEl.style.display === 'none') return;
       // A composite row (the touch spellbook) passes the left edge of its own
       // controls strip: keep the tooltip's right edge at that boundary so the
       // description never covers the row's buttons. Only ever pull the box
       // LEFT of its default seat, and never past the viewport-left floor.
       const z = getUiScale();
-      const clamped = Math.max(8, maxRightX / z - ttW - 6);
+      const clamped = Math.max(8, bound / z - ttW - 6);
       const current = Number.parseFloat(this.tooltipEl.style.left);
       if (Number.isNaN(current) || clamped < current) this.tooltipEl.style.left = `${clamped}px`;
     };

@@ -31,7 +31,8 @@ export interface WindowResizeDeps {
   pinWindow(el: HTMLElement, rect: DOMRect): void;
   /** Coarse-pointer probe; defaults to a matchMedia check. */
   isCoarsePointer?(): boolean;
-  /** Touch-layout probe (body.mobile-touch); reserved for touch-specific sizing. */
+  /** Touch-layout probe (body.mobile-touch): the grip is disabled there, since
+   *  the engage-time pin would unpin the inset-pinned mobile sheets. */
   isTouchLayout?(): boolean;
 }
 
@@ -100,6 +101,11 @@ export function installWindowResize(deps: WindowResizeDeps): () => void {
   // is measured against the CLIENT box, not the border box, so the classic
   // scrollbar gutter stays grabbable as a scrollbar.
   const cornerHit = (ev: PointerEvent): HTMLElement | null => {
+    // Touch layout: windows are inset-pinned sheets (top AND bottom), and the
+    // engage-time pin freezes inline left/top with bottom:auto, dropping the
+    // bottom pin and leaving the sheet content-tall (offscreen and
+    // unscrollable). No window resizes on the touch layout.
+    if (deps.isTouchLayout?.()) return null;
     const target = ev.target as HTMLElement | null;
     if (!target?.closest) return null;
     const el = target.closest<HTMLElement>('.window.panel');

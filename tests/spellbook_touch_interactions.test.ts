@@ -270,6 +270,29 @@ describe('SpellbookWindow touch description controls', () => {
     expect(tooltip.style.display).toBe('block');
   });
 
+  it('does not reopen the description when the removal rerender restores row focus', () => {
+    // The real-device regression: the player taps a row (it takes focus), then
+    // taps X. The strip dead zone hides the description, removeFromBar
+    // rerenders the list, and rerenderPreservingView restores focus to the
+    // row, whose focusin used to read as a fresh description request.
+    const rows = root.querySelectorAll<HTMLElement>('.spell-row');
+    tap(rows[1], 18);
+    rows[1].focus();
+    expect(tooltip.style.display).toBe('block');
+
+    const remove = required(
+      rows[1].querySelector<HTMLButtonElement>('.spell-hotbar-remove'),
+      'remove button',
+    );
+    activateControl(remove, 19);
+    expect(removeFromBar).toHaveBeenCalledTimes(1);
+
+    // The rerender restored focus to the row, but the description stays away.
+    const refocused = root.querySelectorAll<HTMLElement>('.spell-row')[1];
+    expect(document.activeElement).toBe(refocused);
+    expect(tooltip.style.display).toBe('none');
+  });
+
   it('keeps the description clear of the +/x column by passing its left boundary', () => {
     const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
     const controls = required(
