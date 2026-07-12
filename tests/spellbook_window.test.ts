@@ -212,7 +212,7 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(mobileCss).toMatch(
       /#spellbook\.spell-slot-picker-open > \.panel-title\s*\{[^}]*margin-bottom:\s*0/s,
     );
-    expect(mobileCss).toMatch(/#spellbook \.spell-slot-picker\s*\{[^}]*padding:\s*0 8px 8px/s);
+    expect(mobileCss).toMatch(/#spellbook \.spell-slot-picker\s*\{[^}]*padding:\s*8px/s);
   });
 
   it('shrinks picker controls to the touch floor then scrolls them in one row', () => {
@@ -256,14 +256,18 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(mobileCss).toMatch(
       /body\.mobile-touch #spellbook\s*\{[^}]*--spellbook-edge-padding:\s*8px;[^}]*--window-pad:\s*var\(--spellbook-edge-padding\)/s,
     );
-    // No direct padding override: the top edge follows --window-pad (which the
-    // sticky header's negative margins mirror, so the title plate stays inside
-    // the frame), and the bottom edge keeps the generic mobile .window
-    // scroll-end reservation (18px plus safe area) as the visible gap.
+    // No direct padding-top override: the top edge follows --window-pad
+    // (which the header geometry mirrors). The bottom pad restates the SAME
+    // compact value, overriding the generic mobile .window 18px reservation:
+    // the list clips its own rows now, so the frame hugs the content with a
+    // symmetric edge, and the list adds no extra scroll-end reservation.
     const block = mobileCss.match(/body\.mobile-touch #spellbook\s*\{[^}]*\}/s)?.[0] ?? '';
     expect(block).not.toBe('');
     expect(block).not.toContain('padding-top:');
-    expect(block).not.toContain('padding-bottom:');
+    expect(block).toContain('padding-bottom: var(--window-pad);');
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook \.spell-list\s*\{[^}]*padding-bottom:\s*0;[^}]*scroll-padding-bottom:\s*0/s,
+    );
     expect(mobileCss).toMatch(
       /body\.mobile-touch #spellbook > \.panel-title\s*\{[^}]*margin-top:\s*0/s,
     );
@@ -356,10 +360,16 @@ describe('spellbook_window: inline mobile slot picker', () => {
     );
   });
 
-  it('lets the mobile Spellbook cover the player-frame reservation', () => {
+  it('hugs the content height and keeps the viewport clearance as a cap', () => {
+    // No bottom pin: a short list (or the compact picker state) would leave
+    // a fat empty band above the lower frame. The max-height cap preserves
+    // the old pin's 4px-plus-safe-area viewport clearance when content is
+    // taller than the screen.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #spellbook\s*\{[^}]*top:\s*max\(4px, env\(safe-area-inset-top\)\)[^}]*bottom:\s*max\(4px, env\(safe-area-inset-bottom\)\)[^}]*height:\s*auto;[^}]*max-height:\s*none/s,
+      /body\.mobile-touch #spellbook\s*\{[^}]*top:\s*max\(4px, env\(safe-area-inset-top\)\)[^}]*height:\s*auto;[^}]*max-height:\s*calc\(\s*var\(--app-vh\)\s*\/\s*var\(--ui-scale, 1\)\s*-\s*max\(4px, env\(safe-area-inset-top\)\)\s*-\s*max\(4px, env\(safe-area-inset-bottom\)\)\s*\)/s,
     );
+    const block = mobileCss.match(/body\.mobile-touch #spellbook\s*\{[^}]*\}/s)?.[0] ?? '';
+    expect(block).not.toMatch(/\n\s*bottom:/);
     expect(mobileCss).toMatch(/#spellbook\.spell-slot-picker-open\s*\{[^}]*height:\s*auto;/s);
     expect(mobileCss).not.toMatch(
       /#spellbook(?:\.spell-slot-picker-open)?\s*\{[^}]*height:[^;}]*!important/s,

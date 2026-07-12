@@ -2473,14 +2473,24 @@
     /* Drive the compact edges through the shared window pad instead of a direct
        padding override: the sticky header's negative margins and sticky top
        mirror --window-pad (layout.css), so a direct padding-top override left
-       the title plate overshooting the frame on the top and both sides. The
-       bottom edge deliberately keeps the generic mobile .window reservation
-       (18px plus safe area), so the last row never rests on the lower frame. */
+       the title plate overshooting the frame on the top and both sides. */
     --window-pad: var(--spellbook-edge-padding);
+    /* The bottom edge matches the sides: the LIST is the scroll container
+       (rows clip inside their own box, never against the frame), so the
+       generic mobile .window bottom reservation (18px plus safe area) only
+       read as a fat empty band under the last row. */
+    padding-bottom: var(--window-pad);
     top: max(4px, env(safe-area-inset-top));
-    bottom: max(4px, env(safe-area-inset-bottom));
+    /* Size to content instead of pinning to the viewport bottom: a short
+       list (or the compact picker state) left a huge empty stretch above
+       the lower frame. The cap keeps the old pin's viewport clearance. */
     height: auto;
-    max-height: none;
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      max(4px, env(safe-area-inset-top)) -
+      max(4px, env(safe-area-inset-bottom))
+    );
     container-type: inline-size;
   }
   /* The window itself must not scroll on touch: rows used to slide under the
@@ -2501,6 +2511,11 @@
     flex: 1 1 auto;
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* No extra scroll-end reservation inside the list (the shared 18px rule
+       for delegated scroll surfaces): the window's own compact bottom pad is
+       the visible gap, keeping the end of the list symmetric with the sides. */
+    padding-bottom: 0;
+    scroll-padding-bottom: 0;
   }
   body.mobile-touch.vendor-open #vendor-window,
   body.mobile-touch.vendor-open #bags {
@@ -2961,7 +2976,9 @@
     z-index: 2;
     display: grid;
     gap: 6px;
-    padding: 0 8px 8px;
+    /* Symmetric inner padding: the strip sat flush under the title with its
+       controls starting at the very top edge while keeping an 8px bottom. */
+    padding: 8px;
     border-block: 1px solid #4a3d1d;
     background: #101018f2;
   }
