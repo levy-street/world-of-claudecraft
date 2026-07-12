@@ -6292,6 +6292,18 @@ export const zh_CN: EnTranslations = {
         "name": "惊扰射击",
         "description": "狂野射击使目标迷惑{duration}秒。受到任何伤害都会打破该效果。"
       },
+      "spell_reflect": {
+        "name": "法术反射",
+        "description": "举起盾牌，将下一个敌对法术反弹回施法者。"
+      },
+      "smoke_screen": {
+        "name": "烟幕",
+        "description": "遁入烟雾之中，在一段时间内提高你的躲闪几率。"
+      },
+      "typhoon": {
+        "name": "台风",
+        "description": "一阵狂风将附近所有敌人击退并使其昏乱，降低其移动速度。"
+      },
       "bear_charge": {
         "name": "巨熊冲锋",
         "description": "冲向一名敌人，生成9点怒气并将其昏迷1秒。射程8-25码。仅限巨熊形态使用。"

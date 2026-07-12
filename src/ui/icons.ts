@@ -2246,6 +2246,9 @@ const BASE_ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Revenge: a wide frontal sweep (sword crossed with a broad slash arc), steel,
   // distinct from cleave's axe+arcs and heroic_strike's bare sword+glow.
   revenge: r('steel', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['arcs']),
+  spell_reflect: r('arcane', 'steel', ['shield'], ['glow']),
+  smoke_screen: r('shadow', 'steel', ['fist'], ['glow']),
+  typhoon: r('nature', 'sky', ['sunburst'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),

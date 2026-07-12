@@ -1754,6 +1754,33 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeKnockback': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        // Snapshot the set first: applyKnockback moves entities, and iterating a live
+        // radius query while displacing its members would be order-dependent.
+        for (const m of [...ctx.hostilesInRadius(p, p.pos, eff.radius)]) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          ctx.applyKnockback(p, m, eff.distance);
+          ctx.applyAura(m, {
+            id: `${ability.id}_daze`,
+            name: ability.name,
+            kind: 'slow',
+            remaining: eff.dazeDuration,
+            duration: eff.dazeDuration,
+            value: eff.dazeMult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+          ctx.enterCombat(p, m);
+        }
+        break;
+      }
       case 'aoeRoot': {
         const center = p.castAim ?? p.pos;
         if (p.castAim) {

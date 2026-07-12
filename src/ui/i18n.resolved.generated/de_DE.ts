@@ -6292,6 +6292,18 @@ export const de_DE: EnTranslations = {
         "name": "Startle Shot",
         "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
+      "spell_reflect": {
+        "name": "Spell Reflect",
+        "description": "Raises your shield, reflecting the next hostile spell back at its caster."
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge for a time."
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all nearby enemies and dazes them, slowing their movement."
+      },
       "bear_charge": {
         "name": "Bruin-Ansturm",
         "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 8-25 m. Nur in Bruin Form."

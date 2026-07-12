@@ -135,6 +135,22 @@ export function dealDamage(
     }
   }
 
+  // Warrior Spell Reflect (Talents 2.0 counterplay row): a single-charge self-aura bounces
+  // the next incoming DIRECT spell hit back at its caster and is consumed. Only direct,
+  // non-physical (spell) damage reflects; DoT ticks and other incidental damage (direct=false)
+  // pass through untouched. The reflected hit is itself incidental (direct=false, noRage) so
+  // it can never be re-reflected and never walks the caster's leash anchor.
+  if (source && source.id !== target.id && direct && school !== 'physical' && amount > 0) {
+    const ri = target.auras.findIndex((a) => a.kind === 'spell_reflect');
+    if (ri >= 0) {
+      const reflectName = target.auras[ri].name;
+      target.auras.splice(ri, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: reflectName, gained: false });
+      ctx.dealDamage(target, source, amount, crit, school, ability, 'hit', true, undefined, false);
+      return;
+    }
+  }
+
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
     source &&

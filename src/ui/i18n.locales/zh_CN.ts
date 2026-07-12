@@ -6614,4 +6614,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '集结呐喊',
   'entities.abilities.rallying_cry.description':
     '发出一声集结呐喊，使你和 40 码内的队伍成员获得 20% 的额外最大生命值，持续 10 秒。',
+  'entities.abilities.spell_reflect.name': '法术反射',
+  'entities.abilities.spell_reflect.description': '举起盾牌，将下一个敌对法术反弹回施法者。',
+  'entities.abilities.smoke_screen.name': '烟幕',
+  'entities.abilities.smoke_screen.description': '遁入烟雾之中，在一段时间内提高你的躲闪几率。',
+  'entities.abilities.typhoon.name': '台风',
+  'entities.abilities.typhoon.description': '一阵狂风将附近所有敌人击退并使其昏乱，降低其移动速度。',
 };

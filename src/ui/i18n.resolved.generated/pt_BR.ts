@@ -6292,6 +6292,18 @@ export const pt_BR: EnTranslations = {
         "name": "Startle Shot",
         "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
+      "spell_reflect": {
+        "name": "Spell Reflect",
+        "description": "Raises your shield, reflecting the next hostile spell back at its caster."
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge for a time."
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all nearby enemies and dazes them, slowing their movement."
+      },
       "bear_charge": {
         "name": "Investida de Bruin",
         "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8 a 25 m. Apenas Forma de Bruin."

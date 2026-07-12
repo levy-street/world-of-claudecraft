@@ -80,7 +80,9 @@ describe('every row-granted spell casts on its class', () => {
         for (let i = 0; i < 6; i++) events.push(...sim.tick());
         const errors = events.filter(
           (e): e is Extract<SimEvent, { type: 'error' }> =>
-            e.type === 'error' && !/requires|range|facing|target/i.test(e.text),
+            // "Nothing to dispel" is benign here: a dispel/steal grant cast at a fresh
+            // dummy engaged (cooldown/GCD consumed) but found no eligible aura to strip.
+            e.type === 'error' && !/requires|range|facing|target|nothing to dispel/i.test(e.text),
         );
         expect(errors, `${g.id} cast errors: ${errors.map((e) => e.text).join('; ')}`).toEqual([]);
         // Proof the cast engaged: cooldown started, GCD consumed, casting began,

@@ -6961,4 +6961,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '재집결의 함성',
   'entities.abilities.rallying_cry.description':
     '재집결의 함성을 내질러 자신과 40yd 이내의 파티원에게 10초 동안 최대 생명력을 20% 추가로 부여합니다.',
+  'entities.abilities.spell_reflect.name': '주문 반사',
+  'entities.abilities.spell_reflect.description': '방패를 들어 다음에 받는 적대적 주문을 시전자에게 되돌립니다.',
+  'entities.abilities.smoke_screen.name': '연막',
+  'entities.abilities.smoke_screen.description': '연기 속으로 몸을 숨겨 일정 시간 동안 회피율을 높입니다.',
+  'entities.abilities.typhoon.name': '태풍',
+  'entities.abilities.typhoon.description': '돌풍이 주변의 모든 적을 밀쳐내고 무력화시켜 이동 속도를 늦춥니다.',
 };

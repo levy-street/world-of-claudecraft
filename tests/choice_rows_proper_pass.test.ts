@@ -279,20 +279,22 @@ describe('all-class choice-row proper pass', () => {
     expect(sim.resolvedAbility('drain_life')?.castWhileMoving).toBe(true);
   });
 
-  it('druid Headbutt and Red Haze are usable while shifted', () => {
+  it('druid Typhoon casts and Red Haze is usable while shifted', () => {
     const sim = simWithRows('druid', {
-      8: 'dru_r8_skull_bash',
+      8: 'dru_r8_typhoon',
       20: 'dru_r20_berserk',
     });
     addTarget(sim, 9905);
     sim.player.resource = sim.player.maxResource;
+    // Typhoon is a caster-form nature spell: it engages in humanoid form.
+    sim.castAbility('typhoon');
+    expect(sim.player.cooldowns.has('typhoon')).toBe(true);
+    settle(sim);
+    // Berserk (Red Haze) stays usable after shifting into cat form.
+    sim.player.resource = sim.player.maxResource;
     sim.castAbility('cat_form');
     settle(sim);
     expect(sim.player.auras.some((a) => a.kind === 'form_cat')).toBe(true);
-    sim.player.resource = sim.player.maxResource;
-    sim.castAbility('skull_bash');
-    expect(sim.player.cooldowns.has('skull_bash')).toBe(true);
-    settle(sim);
     sim.castAbility('berserk');
     expect(sim.player.auras.some((a) => a.id === 'berserk')).toBe(true);
   });

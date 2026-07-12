@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "9ceacf37",
+      "state": "9fbc9d75",
       "events": "64d309dc",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "36c2f5da",
+      "state": "2e82867a",
       "events": "90b217f1",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "88faf56c",
+      "state": "1b86aaa0",
       "events": "d13b86f9",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "2404171f",
+      "state": "bfa456dd",
       "events": "669c1069",
       "rng": {
         "draws": 230,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "f03de54c",
+      "state": "f1f63110",
       "events": "33e0a756",
       "rng": {
         "draws": 384,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 409,
-      "state": "1bc93af5",
+      "state": "3dc4adff",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 409,
-      "state": "0ac2a51e",
+      "state": "9bb89eee",
       "events": "384ae6a8",
       "rng": {
         "draws": 608,
@@ -159,7 +159,7 @@
           "talents": {
             "rows": {
               "5": "war_r5_twin_onrush",
-              "8": "war_r8_pummel",
+              "8": "war_r8_spell_reflect",
               "11": "war_r11_razor_howl",
               "14": "war_r14_crippling_blows",
               "17": "war_r17_reckless_vow",
@@ -293,7 +293,7 @@
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
-              "8": "rog_r8_kick",
+              "8": "rog_r8_smoke_screen",
               "11": "rog_r11_preparation",
               "14": "rog_r14_seal_fate",
               "17": "rog_r17_cloak_of_shadows",

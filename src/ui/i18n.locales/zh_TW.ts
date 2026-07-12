@@ -6614,4 +6614,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '團結號令',
   'entities.abilities.rallying_cry.description':
     '發出一聲團結的號令，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。',
+  'entities.abilities.spell_reflect.name': '法術反射',
+  'entities.abilities.spell_reflect.description': '舉起盾牌，將下一個敵對法術反彈回施法者。',
+  'entities.abilities.smoke_screen.name': '煙幕',
+  'entities.abilities.smoke_screen.description': '遁入煙霧之中，在一段時間內提高你的閃躲幾率。',
+  'entities.abilities.typhoon.name': '颱風',
+  'entities.abilities.typhoon.description': '一陣狂風將附近所有敵人擊退並使其昏亂，降低其移動速度。',
 };

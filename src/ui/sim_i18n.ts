@@ -51,6 +51,7 @@ const baseEnTable = {
   'error.cannotEquip': 'You cannot equip that.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  'error.nothingToDispel': 'Nothing to dispel.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
   'error.nothingToConsume': 'Nothing to consume.',

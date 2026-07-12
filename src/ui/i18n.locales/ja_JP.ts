@@ -6971,4 +6971,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': '結束の雄叫び',
   'entities.abilities.rallying_cry.description':
     '結束の雄叫びを上げ、40yd以内の自分とパーティメンバーの最大体力を10秒間、20%増加させます。',
+  'entities.abilities.spell_reflect.name': '魔法反射',
+  'entities.abilities.spell_reflect.description': '盾を構え、次に受ける敵の呪文を術者へ跳ね返す。',
+  'entities.abilities.smoke_screen.name': 'スモークスクリーン',
+  'entities.abilities.smoke_screen.description': '煙幕に紛れ、一定時間、回避率を上昇させる。',
+  'entities.abilities.typhoon.name': 'タイフーン',
+  'entities.abilities.typhoon.description': '突風で周囲の敵をすべて吹き飛ばし、よろめかせて移動速度を下げる。',
 };

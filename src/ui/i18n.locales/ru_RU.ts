@@ -7103,4 +7103,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rallying_cry.name': 'Сплачивающий клич',
   'entities.abilities.rallying_cry.description':
     'Издает сплачивающий клич, даруя вам и членам группы в пределах 40 м 20% дополнительного максимального здоровья в течение 10 сек.',
+  'entities.abilities.spell_reflect.name': 'Отражение заклинаний',
+  'entities.abilities.spell_reflect.description': 'Поднимает щит, отражая следующее вражеское заклинание обратно в чародея.',
+  'entities.abilities.smoke_screen.name': 'Дымовая завеса',
+  'entities.abilities.smoke_screen.description': 'Скрывает вас в облаке дыма, повышая шанс уклонения на время.',
+  'entities.abilities.typhoon.name': 'Тайфун',
+  'entities.abilities.typhoon.description': 'Порыв ветра отбрасывает всех врагов поблизости и оглушает их, замедляя передвижение.',
 };

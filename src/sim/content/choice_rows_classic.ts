@@ -161,14 +161,14 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'counterplay',
-      decision: 'school interrupt vs area root vs crippling slow',
+      decision: 'spell reflect vs area root vs crippling slow',
       options: [
         {
-          id: 'war_r8_pummel',
-          name: 'Jawcrack',
-          description: 'Interrupt spellcasting for a 4 sec school lockout.',
-          icon: 'pummel',
-          effect: { grant: { ability: 'pummel' } },
+          id: 'war_r8_spell_reflect',
+          name: 'Spell Reflect',
+          description: 'Grants Spell Reflect: bounce the next hostile spell back at its caster.',
+          icon: 'spell_reflect',
+          effect: { grant: { ability: 'spell_reflect' } },
         },
         {
           id: 'war_r8_concussive_clap',
@@ -1230,14 +1230,14 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'control',
-      decision: 'spell interrupt vs Eye Jab follow-up vs Low Blow energy refund',
+      decision: 'evasive smoke vs Eye Jab follow-up vs Low Blow energy refund',
       options: [
         {
-          id: 'rog_r8_kick',
-          name: 'Boot',
-          description: 'Grants Boot.',
-          icon: 'kick',
-          effect: { grant: { ability: 'kick' } },
+          id: 'rog_r8_smoke_screen',
+          name: 'Smoke Screen',
+          description: 'Grants Smoke Screen: a cloud that raises your dodge by 30% for 8 sec.',
+          icon: 'smoke_screen',
+          effect: { grant: { ability: 'smoke_screen' } },
         },
         {
           id: 'rog_r8_improved_gouge',
@@ -2450,14 +2450,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'disruption',
-      decision: 'any-form interrupt vs root-to-spell setup vs Concuss rage and reset',
+      decision: 'area knockback vs root-to-spell setup vs Concuss rage and reset',
       options: [
         {
-          id: 'dru_r8_skull_bash',
-          name: 'Headbutt',
-          description: 'Grants Headbutt.',
-          icon: 'skull_bash',
-          effect: { grant: { ability: 'skull_bash' } },
+          id: 'dru_r8_typhoon',
+          name: 'Typhoon',
+          description: 'Grants Typhoon: knock back and daze all enemies within 8 yd.',
+          icon: 'typhoon',
+          effect: { grant: { ability: 'typhoon' } },
         },
         {
           id: 'dru_r8_improved_roots',

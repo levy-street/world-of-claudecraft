@@ -6292,6 +6292,18 @@ export const sv_SE: EnTranslations = {
         "name": "Startle Shot",
         "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
+      "spell_reflect": {
+        "name": "Spell Reflect",
+        "description": "Raises your shield, reflecting the next hostile spell back at its caster."
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge for a time."
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all nearby enemies and dazes them, slowing their movement."
+      },
       "bear_charge": {
         "name": "Bruinrusning",
         "description": "Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform."

@@ -192,7 +192,7 @@ describe('precomputed modifiers', () => {
       alloc({ rows: { 8: rowOption('warrior', 1, 0) } }),
       20,
     );
-    expect(leap.grants.some((g) => g.ability === 'pummel')).toBe(true);
+    expect(leap.grants.some((g) => g.ability === 'spell_reflect')).toBe(true);
     expect(leap.grants.some((g) => g.ability === 'mortal_strike')).toBe(false);
   });
 
@@ -312,7 +312,7 @@ describe('Sim integration', () => {
     const meta = sim2.meta(pid)!;
     expect(meta.talents).toEqual(build);
     expect(meta.talentMods.spec).toBe('arms');
-    expect(meta.talentMods.grants.some((g) => g.ability === 'pummel')).toBe(true);
+    expect(meta.talentMods.grants.some((g) => g.ability === 'spell_reflect')).toBe(true);
     expect(meta.talentMods.grants.some((g) => g.ability === 'bladestorm')).toBe(true);
   });
 
@@ -337,7 +337,7 @@ describe('loadouts and build-string application', () => {
       rows: { 5: rowOption('warrior', 0), 17: rowOption('warrior', 4) },
     });
 
-    expect(sim.saveLoadout('Arms PvE', ['mortal_strike', 'pummel', null], arms)).toBe(0);
+    expect(sim.saveLoadout('Arms PvE', ['mortal_strike', 'spell_reflect', null], arms)).toBe(0);
     expect(sim.saveLoadout('Prot Tank', ['shield_slam', 'shield_wall'], prot)).toBe(1);
     expect(sim.loadouts.length).toBe(2);
     expect(sim.talents).toEqual(prot);
@@ -347,9 +347,9 @@ describe('loadouts and build-string application', () => {
     expect(sim.talents).toEqual(arms);
     expect(sim.talentSpec).toBe('arms');
     expect(sim.activeLoadout).toBe(0);
-    expect(sim.loadouts[0].bar).toEqual(['mortal_strike', 'pummel', null]);
+    expect(sim.loadouts[0].bar).toEqual(['mortal_strike', 'spell_reflect', null]);
     expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(true);
-    expect(sim.known.some((k) => k.def.id === 'pummel')).toBe(true);
+    expect(sim.known.some((k) => k.def.id === 'spell_reflect')).toBe(true);
   });
 
   it('deletes a loadout, repairs the active index, and caps loadout count', () => {
@@ -466,7 +466,7 @@ describe('ClientWorld wire path', () => {
     expect(c.loadouts.length).toBe(1);
     expect(c.activeLoadout).toBe(0);
     expect(c.known.some((k: any) => k.def.id === 'shield_slam')).toBe(true);
-    expect(c.known.some((k: any) => k.def.id === 'pummel')).toBe(true);
+    expect(c.known.some((k: any) => k.def.id === 'spell_reflect')).toBe(true);
     expect(c.known.some((k: any) => k.def.id === 'reckless_vow')).toBe(true);
     expect(c.talentPoints()).toEqual({ total: 6, spent: pickedRows(snapshotAlloc.rows) });
   });

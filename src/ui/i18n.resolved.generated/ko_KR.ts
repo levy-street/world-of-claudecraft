@@ -6292,6 +6292,18 @@ export const ko_KR: EnTranslations = {
         "name": "기습 사격",
         "description": "거친 사격으로 대상을 {duration}초 동안 혼란시킵니다. 피해를 받으면 효과가 깨집니다."
       },
+      "spell_reflect": {
+        "name": "주문 반사",
+        "description": "방패를 들어 다음에 받는 적대적 주문을 시전자에게 되돌립니다."
+      },
+      "smoke_screen": {
+        "name": "연막",
+        "description": "연기 속으로 몸을 숨겨 일정 시간 동안 회피율을 높입니다."
+      },
+      "typhoon": {
+        "name": "태풍",
+        "description": "돌풍이 주변의 모든 적을 밀쳐내고 무력화시켜 이동 속도를 늦춥니다."
+      },
       "bear_charge": {
         "name": "큰곰 돌진",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."

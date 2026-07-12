@@ -215,6 +215,10 @@ export type AuraKind =
   // src/sim/spirit.ts and recalcPlayerStats.
   | 'buff_allstats_pct'
   | 'thorns'
+  // Warrior Spell Reflect (Talents 2.0 counterplay row): a single-charge self-aura that
+  // bounces the NEXT incoming direct spell hit back at its caster and is consumed. Purely a
+  // combat-hook marker (no stat contribution); intercepted in dealDamage.
+  | 'spell_reflect'
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
@@ -1701,6 +1705,16 @@ export type AbilityEffect =
       max: number;
       // A true freeze prevents actions as well as movement.
       stun?: boolean;
+    }
+  // Druid Typhoon (Talents 2.0 counterplay row): shove every hostile in radius away from the
+  // caster by `distance` yd (via the shared knockback step-walker, so terrain/collision/
+  // knockback-resistance all apply) and daze them (a slow) for `dazeDuration`.
+  | {
+      type: 'aoeKnockback';
+      radius: number;
+      distance: number;
+      dazeMult: number;
+      dazeDuration: number;
     }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =

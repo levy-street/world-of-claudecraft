@@ -6292,6 +6292,18 @@ export const en_CA: EnTranslations = {
         "name": "Startle Shot",
         "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
+      "spell_reflect": {
+        "name": "Spell Reflect",
+        "description": "Raises your shield, reflecting the next hostile spell back at its caster."
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge for a time."
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all nearby enemies and dazes them, slowing their movement."
+      },
       "bear_charge": {
         "name": "Bruin Rush",
         "description": "Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only."

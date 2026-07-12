@@ -5683,6 +5683,51 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'incapacitate', duration: 4 }],
     description: 'A wild shot that disorients the target for $t sec. Any damage breaks the effect.',
   },
+  spell_reflect: {
+    id: 'spell_reflect',
+    name: 'Spell Reflect',
+    class: 'warrior',
+    learnLevel: 8,
+    cost: 15,
+    castTime: 0,
+    cooldown: 25,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    effects: [{ type: 'selfBuff', kind: 'spell_reflect', value: 1, duration: 5 }],
+    description:
+      'Raises your shield for 5 sec, reflecting the next hostile spell back at its caster.',
+  },
+  smoke_screen: {
+    id: 'smoke_screen',
+    name: 'Smoke Screen',
+    class: 'rogue',
+    learnLevel: 8,
+    cost: 25,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    requiresTarget: false,
+    school: 'physical',
+    effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.3, duration: 8 }],
+    description: 'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
+  },
+  typhoon: {
+    id: 'typhoon',
+    name: 'Typhoon',
+    class: 'druid',
+    learnLevel: 8,
+    cost: 30,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    requiresTarget: false,
+    school: 'nature',
+    effects: [{ type: 'aoeKnockback', radius: 8, distance: 6, dazeMult: 0.5, dazeDuration: 4 }],
+    description:
+      'A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec.',
+  },
+
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants

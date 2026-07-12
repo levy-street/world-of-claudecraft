@@ -6292,6 +6292,18 @@ export const ja_JP: EnTranslations = {
         "name": "驚愕射撃",
         "description": "荒々しい一射で対象を{duration}秒間混乱させる。ダメージを受けると解除される。"
       },
+      "spell_reflect": {
+        "name": "魔法反射",
+        "description": "盾を構え、次に受ける敵の呪文を術者へ跳ね返す。"
+      },
+      "smoke_screen": {
+        "name": "スモークスクリーン",
+        "description": "煙幕に紛れ、一定時間、回避率を上昇させる。"
+      },
+      "typhoon": {
+        "name": "タイフーン",
+        "description": "突風で周囲の敵をすべて吹き飛ばし、よろめかせて移動速度を下げる。"
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"

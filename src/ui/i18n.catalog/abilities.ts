@@ -1858,6 +1858,21 @@ const classAbilityNamesEn = {
         'Startle Shot',
         'A wild shot that disorients the target for {duration} sec. Any damage breaks the effect.',
       ],
+      [
+        'spell_reflect',
+        'Spell Reflect',
+        'Raises your shield, reflecting the next hostile spell back at its caster.',
+      ],
+      [
+        'smoke_screen',
+        'Smoke Screen',
+        'Vanish into a cloud of smoke, increasing your chance to dodge for a time.',
+      ],
+      [
+        'typhoon',
+        'Typhoon',
+        'A blast of wind knocks back all nearby enemies and dazes them, slowing their movement.',
+      ],
     ]),
   },
 };
