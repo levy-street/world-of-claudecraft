@@ -110,7 +110,7 @@ const bags = await page.evaluate(() => {
   g.sim.addItem('tunnelkings_spade', 1);
   g.hud.renderBags();
   document.getElementById('bags').style.display = 'flex';
-  const slots = document.querySelectorAll('#bags .item-cell').length;
+  const slots = document.querySelectorAll('#bags .bag-item').length;
   return {
     slots,
     hasLesser: g.sim.countItem('lesser_healing_potion') > 0,
@@ -121,8 +121,8 @@ check(bags.hasLesser && bags.hasStd, 'the new potion tiers appear in the bags');
 await sleep(400);
 // hover a Healing Potion to surface its tooltip
 await page.evaluate(() => {
-  const row = [...document.querySelectorAll('#bags .item-cell')].find((r) =>
-    /Lesser Healing Potion/.test(r.getAttribute('aria-label') || ''),
+  const row = [...document.querySelectorAll('#bags .bag-item')].find((r) =>
+    /Lesser Healing Potion/.test(r.textContent),
   );
   row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
   row?.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 900, clientY: 500 }));

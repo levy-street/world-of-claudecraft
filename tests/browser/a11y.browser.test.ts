@@ -12,7 +12,6 @@
 // by this painter-mount harness; their pixels get no faked per-marker aria.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Keybinds } from '../../src/game/keybinds';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ArenaWindow } from '../../src/ui/arena_window';
@@ -47,43 +46,6 @@ afterEach(cleanup);
 async function expectClean(el: HTMLElement): Promise<void> {
   const violations = await axeSeriousViolations(el);
   expect(violations, formatViolations(violations)).toEqual([]);
-}
-
-// The AAA window frame mounts the dialog identity on the host root's direct-child
-// .window-frame (renderWindowFrame stamps role/aria on the inner mount; only the
-// markDialogRoot windows, e.g. arena and market, keep it on the stable root).
-// These helpers assert the CONTRACT: a dialog node exists (root or frame mount),
-// its accessible name resolves, and a labelled close control is present. They
-// deliberately avoid echoing the exact attribute wiring so frame-internal aria
-// changes (tab aria-controls/aria-labelledby work) compose with this suite.
-function dialogNode(root: HTMLElement): HTMLElement {
-  const node =
-    root.getAttribute('role') === 'dialog'
-      ? root
-      : root.querySelector<HTMLElement>(':scope > .window-frame[role="dialog"]');
-  expect(node, 'a role=dialog node (the root or its .window-frame mount)').toBeTruthy();
-  return node as HTMLElement;
-}
-
-function expectLabelledDialog(root: HTMLElement): HTMLElement {
-  const dialog = dialogNode(root);
-  const labelledBy = dialog.getAttribute('aria-labelledby');
-  if (labelledBy) {
-    // The idref must resolve to a real element, else the dialog is nameless.
-    expect(
-      root.querySelector(`#${CSS.escape(labelledBy)}`),
-      `aria-labelledby "${labelledBy}" resolves`,
-    ).toBeTruthy();
-  } else {
-    expect(dialog.getAttribute('aria-label'), 'dialog carries an accessible name').toBeTruthy();
-  }
-  return dialog;
-}
-
-function expectLabelledClose(root: HTMLElement): void {
-  const close = root.querySelector<HTMLElement>('[data-window-close]');
-  expect(close, 'a [data-window-close] control').toBeTruthy();
-  expect(close?.getAttribute('aria-label'), 'the close control is labelled').toBeTruthy();
 }
 
 // ---------------------------------------------------------------------------
@@ -192,8 +154,8 @@ describe('axe: talents window', () => {
       }),
     );
     win.open();
-    expectLabelledDialog(root);
-    expectLabelledClose(root);
+    expect(root.getAttribute('role')).toBe('dialog');
+    expect(root.querySelector('button[data-close]')).toBeTruthy();
     await expectClean(root);
   });
 });
@@ -252,7 +214,7 @@ describe('axe: quest log window', () => {
       }),
     );
     win.toggle();
-    expectLabelledDialog(root);
+    expect(root.getAttribute('role')).toBe('dialog');
     await expectClean(root);
   });
 });
@@ -276,13 +238,13 @@ describe('axe: spellbook window', () => {
       }),
     );
     win.toggle();
-    expectLabelledDialog(root);
+    expect(root.getAttribute('role')).toBe('dialog');
     await expectClean(root);
   });
 });
 
 // ---------------------------------------------------------------------------
-// Options / Esc menu (#options-menu) - the category-rail settings window.
+// Options / Esc menu (#options-menu) - the main drill-down menu.
 // ---------------------------------------------------------------------------
 
 describe('axe: options menu', () => {
@@ -299,36 +261,36 @@ describe('axe: options menu', () => {
           }) as never,
         options: () => null,
         bugReport: () => null,
-        // The category rail computes the keybind-conflict dots from the live
-        // bindings on open, so the fixture needs a real (default-layout) table.
-        keybinds: () => new Keybinds(),
         captureFocus: () => null,
       }),
     );
     return { root, win };
   }
 
-  it('main menu is clean (a labelled dialog with a labelled close control)', async () => {
+  it('main menu is clean (dialog role, labelled title that resolves)', async () => {
     const { root, win } = optionsWindow();
     win.toggle();
-    expectLabelledDialog(root);
-    expectLabelledClose(root);
+    expect(root.getAttribute('aria-labelledby')).toBe('options-title');
+    // The idref must resolve to a real element, else the dialog is nameless (the arena
+    // test pins the same for its title; this strengthening would have caught the perf
+    // sub-view's dangling reference, the fix below).
+    expect(root.querySelector('#options-title')).toBeTruthy();
     await expectClean(root);
   });
 
-  it('System category is clean after a rail navigation (the frame title stays resolvable)', async () => {
+  it('Performance sub-view names the dialog with aria-label, no dangling idref', async () => {
     const { root, win } = optionsWindow();
-    win.toggle(); // lands on the Overview category
-    // Navigate the real way: click the System tab on the category rail. The old
-    // Performance drill-down sub-view (which renamed the dialog per view) is gone;
-    // the frame title is persistent, so the dialog name must still resolve after
-    // the detail pane repaints.
-    const systemTab = root.querySelector<HTMLElement>('.opt-tab[data-category="system"]');
-    expect(systemTab, 'System rail tab present').toBeTruthy();
-    systemTab?.click();
-    // The System pane rendered (the About block is hook-independent).
-    expect(root.querySelector('.opt-version')).toBeTruthy();
-    expectLabelledDialog(root);
+    win.toggle(); // main menu first
+    // Navigate to the Performance sub-view the real way: click its menu entry. Its title
+    // comes from the self-contained perf panel (no id=options-title), so the dialog must
+    // name itself via aria-label, NOT keep the now-dangling aria-labelledby.
+    const perfBtn = Array.from(root.querySelectorAll<HTMLElement>('.opt-btn')).find(
+      (b) => b.textContent === t('hudChrome.perf.title'),
+    );
+    expect(perfBtn, 'performance menu entry present').toBeTruthy();
+    perfBtn?.click();
+    expect(root.getAttribute('aria-label')).toBe(t('hudChrome.perf.title'));
+    expect(root.getAttribute('aria-labelledby')).toBeNull();
     await expectClean(root);
   });
 });
@@ -359,7 +321,7 @@ describe('axe: social window', () => {
       }),
     );
     win.toggle();
-    expectLabelledDialog(root);
+    expect(root.getAttribute('role')).toBe('dialog');
     await expectClean(root);
   });
 
@@ -450,20 +412,18 @@ describe('axe: social window', () => {
       }),
     );
     win.toggle();
-    // The single active tab on the shared frame rail (aria-selected is the contract;
-    // the frame tab buttons carry data-window-tab, not the old .soc-tab/.on classes).
+    // The single active tab (the styling `.on` and aria-selected stay in lockstep).
     const active = () =>
-      (root.querySelector('[data-window-tab][aria-selected="true"]') as HTMLElement | null)?.dataset
-        .windowTab;
-    const focused = () => (document.activeElement as HTMLElement | null)?.dataset.windowTab;
+      (root.querySelector('.soc-tab.on[aria-selected="true"]') as HTMLElement | null)?.dataset.tab;
+    const focused = () => (document.activeElement as HTMLElement | null)?.dataset.tab;
     const press = (key: string) =>
       (document.activeElement as HTMLElement | null)?.dispatchEvent(
         new KeyboardEvent('keydown', { key, bubbles: true }),
       );
     expect(active()).toBe('friends');
-    (root.querySelector('[data-window-tab="friends"]') as HTMLElement).focus();
-    // ArrowRight: friends -> guild; the frame's persistent tab buttons re-point their
-    // aria and focus follows (selection-follows-focus, the WAI-ARIA tabs pattern).
+    (root.querySelector('.soc-tab[data-tab="friends"]') as HTMLElement).focus();
+    // ArrowRight: friends -> guild; render() rebuilds the strip, so focus follows the
+    // freshly active tab (selection-follows-focus, the WAI-ARIA tabs pattern).
     press('ArrowRight');
     expect(active()).toBe('guild');
     expect(focused()).toBe('guild');
@@ -503,10 +463,10 @@ describe('axe: social window', () => {
     );
     win.toggle();
     const focusableTabs = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-      (el) => el.hasAttribute('data-window-tab'),
+      (el) => el.classList.contains('soc-tab'),
     );
     expect(focusableTabs).toHaveLength(1);
-    expect(focusableTabs[0]?.dataset.windowTab).toBe('friends');
+    expect(focusableTabs[0]?.dataset.tab).toBe('friends');
     expect(focusableTabs[0]?.getAttribute('aria-selected')).toBe('true');
   });
 });
@@ -546,8 +506,8 @@ describe('axe: character window', () => {
       }),
     );
     win.toggle();
-    expectLabelledDialog(root);
-    // The paperdoll identity block keeps its own #char-title node in the body.
+    expect(root.getAttribute('role')).toBe('dialog');
+    expect(root.getAttribute('aria-labelledby')).toBe('char-title');
     expect(root.querySelector('#char-title')).toBeTruthy();
     expect(root.querySelector('#char-model-preview')?.getAttribute('role')).toBe('img');
     // The role=img preview HOST carries its OWN name, not a duplicate of the

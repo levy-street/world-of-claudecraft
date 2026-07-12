@@ -149,24 +149,6 @@ export class NameplatePainter {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
-      // Distance scale rides inside the one transform write (transform is the
-      // sanctioned per-frame mover channel: no width/font-size layout writes).
-      // The write itself is deferred to the single post-declutter pass below, so
-      // the scale is remembered on the view for that pass to rebuild it.
-      v.nameplateScale = plan.scale;
-      // Distance fade: this per-frame writer is the ONLY style.opacity writer.
-      // The static pass stores the plate's base opacity (stealth etc.) on the
-      // view; outside the fade band the base string is reused verbatim, so the
-      // common case allocates nothing and elides the write.
-      const opacity =
-        plan.fade >= 1
-          ? v.nameplateBaseOpacity
-          : (Number(v.nameplateBaseOpacity) * plan.fade).toFixed(2);
-      if (opacity !== v.nameplateOpacity) {
-        v.nameplate.style.opacity = opacity;
-        v.nameplateOpacity = opacity;
-      }
-
       if (!fullPass && !plan.urgent) continue;
       const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
@@ -341,7 +323,7 @@ export class NameplatePainter {
       const anchor = this.anchorScratch[i];
       const v = this.views.get(anchor.id);
       if (v?.nameplateDisplay !== '') continue;
-      const transform = nameplateScreenTransform(anchor.sx, anchor.sy, v.nameplateScale);
+      const transform = nameplateScreenTransform(anchor.sx, anchor.sy);
       if (transform !== v.nameplateTransform) {
         v.nameplate.style.transform = transform;
         v.nameplateTransform = transform;
@@ -378,11 +360,7 @@ export class NameplatePainter {
     v.hpBar.classList.toggle('boss', frame === 'boss');
     v.markerEl.textContent = marker;
     v.markerEl.className = markerClass;
-    // Base opacity only: the per-frame distance-fade writer in update() owns
-    // the actual style.opacity write (single-writer, so fade and stealth never
-    // fight over the property). `opacity` stays in the sig above, so a base
-    // change (e.g. stealth) still lands here and the writer picks it up.
-    v.nameplateBaseOpacity = opacity;
+    v.nameplate.style.opacity = opacity;
     // guild tag rides in the sig (players only); empty for every other kind
     if (guild) {
       v.guildEl.textContent = `<${guild}>`;

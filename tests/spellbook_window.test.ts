@@ -18,17 +18,15 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
     expect(code).toContain('buildSpellbookView(');
   });
 
-  it('adopts the shared window frame (its builder sets role=dialog + the close control)', () => {
-    // The dialog identity + close control now come from the shared window-frame
-    // builder (window_frame.ts, unit-tested in window_frame_view.test.ts); the
-    // painter mounts it on an inner container and routes close back to close().
-    expect(code).toContain('renderWindowFrame(mount, SPELLBOOK_FRAME');
-    expect(code).toContain("titleKey: 'abilityUi.spellbook.title'");
-    expect(code).toContain("closeLabelKey: 'abilityUi.spellbook.close'");
-    expect(code).toContain('onClose: () => this.close()');
+  it('gives the close control a real button with an aria-label', () => {
+    expect(code).toContain('class="x-btn" data-close aria-label=');
+    expect(code).toContain("t('abilityUi.spellbook.close')");
   });
 
-  it('keeps the spell list + listitem roles inline', () => {
+  it('renders the dialog role + the spell list role', () => {
+    // the dialog identity is set via the shared markDialogRoot helper (its own writes
+    // are unit-tested in dialog_root.test.ts); the spell list/listitem roles stay inline.
+    expect(code).toContain("markDialogRoot(el, { label: t('abilityUi.spellbook.title') })");
     expect(code).toContain("list.setAttribute('role', 'list')");
     expect(code).toContain("setAttribute('role', 'listitem')");
   });
@@ -40,8 +38,8 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
     expect(code).toContain('this.deps.addToBar(id)');
   });
 
-  it('keeps the reset-bar button gated on the form-bars flag (now in the frame footer)', () => {
-    expect(code).toContain('if (view.hasFormBars)');
+  it('keeps the reset-bar button gated on the form-bars flag', () => {
+    expect(code).toContain('const resetBtnHtml = view.hasFormBars');
     expect(code).toContain('data-reset-bar');
     expect(code).toContain("t('abilityUi.spellbook.resetBar')");
   });
@@ -134,14 +132,13 @@ describe('spellbook_window: tooltip/summary reflect talent changes (tooltip pari
   });
 
   it('preserves scroll position and keyboard focus across the talent-driven rebuild', () => {
-    // render() rebuilds the list via innerHTML; the .window-body (the frame's
-    // bounded flex column) is the scroll container now, so the rebuild must restore
-    // its scrollTop and refocus the row/toggle the user was on (by ability id), or a
-    // talent change would jump the list to the top and drop focus (WCAG focus-loss).
+    // render() rebuilds the list via innerHTML and the window root is the scroll
+    // container, so the rebuild must restore scrollTop and refocus the row/toggle
+    // the user was on (by ability id), or a talent change would jump the list to
+    // the top and drop focus (a WCAG focus-loss regression).
     expect(code).toContain('rerenderPreservingView()');
-    expect(code).toContain("root.querySelector<HTMLElement>('.window-body')");
-    expect(code).toContain('const scrollTop = scroller?.scrollTop ?? 0');
-    expect(code).toContain('scrollerAfter.scrollTop = scrollTop');
+    expect(code).toContain('const scrollTop = root.scrollTop');
+    expect(code).toContain('root.scrollTop = scrollTop');
     expect(code).toContain('el.dataset.abilityId = row.abilityId');
     expect(code).toContain('(root.querySelector(refocus) as HTMLElement | null)?.focus()');
   });

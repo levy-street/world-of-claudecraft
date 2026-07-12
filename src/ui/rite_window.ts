@@ -5,46 +5,18 @@
 // reuses its `lp-ante-*` styling; renders all text through the delveRiteUi.* t() keys.
 // hud.ts owns open/close, focus, and routing the choice to IWorld; this module only
 // paints and reports the picked intensity through `deps`.
-//
-// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
-// whose display-font title is the ceremony moment (spec: sparse by design), a
-// close control, and a scrollable body carrying the blurb, guide, and the ante
-// grid. Sparse by design, so no footer (the ante choices are the actions). The
-// popup had no dialog role before, so the frame owns the dialog; Hud's focus trap
-// (root-scoped, focuses the first .lp-ante-btn) is unchanged. The frame mounts on
-// an inner container and is reused across repaints.
 
 import { RITE_INTENSITY, RITE_INTENSITY_ORDER } from '../sim/delves/rite_tuning';
 import type { RiteIntensity } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
+import { svgIcon } from './ui_icons';
 
 export interface RiteWindowDeps {
   /** Player picked a difficulty (sends the server-authoritative choose command). */
   onChoose(intensity: RiteIntensity): void;
   /** Dismiss the popup without choosing. */
   onClose(): void;
-}
-
-const RITE_FRAME: WindowFrameDescriptor = {
-  id: 'delve-rite-panel',
-  titleKey: 'delveRiteUi.title',
-  closeLabelKey: 'delveRiteUi.closeAria',
-};
-
-/** Stamp the shared window frame cold on an inner mount, then reuse it. */
-function ensureFrame(el: HTMLElement, onClose: () => void): WindowFrameParts {
-  const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-  const body = mounted?.querySelector<HTMLElement>('.window-body');
-  if (mounted && body) {
-    return { root: mounted, body, footer: null, tabButtons: [] };
-  }
-  const mount = document.createElement('div');
-  const parts = renderWindowFrame(mount, RITE_FRAME, { onClose });
-  el.replaceChildren(mount);
-  return parts;
 }
 
 const NUM0 = { maximumFractionDigits: 0 } as const;
@@ -71,7 +43,6 @@ export class RiteWindow {
   render(): void {
     const el = this.panel();
     if (!el) return;
-    const { body } = ensureFrame(el, () => this.deps.onClose());
     const buttons = OPTIONS.map((o) => {
       const shows =
         o.playbacks === 1
@@ -89,7 +60,9 @@ export class RiteWindow {
         `</button>`
       );
     }).join('');
-    body.innerHTML =
+    el.innerHTML =
+      `<div class="panel-title"><span>${esc(t('delveRiteUi.title'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('delveRiteUi.closeAria'))}">${svgIcon('close')}</button></div>` +
       `<div class="lp-blurb">${esc(t('delveRiteUi.blurb'))}</div>` +
       `<ol class="lp-blurb rite-guide">` +
       `<li>${esc(t('delveRiteUi.guideWatch'))}</li>` +
@@ -97,10 +70,11 @@ export class RiteWindow {
       `<li>${esc(t('delveRiteUi.guideStakes'))}</li>` +
       `</ol>` +
       `<div class="lp-ante-row">${buttons}</div>`;
-    body.querySelectorAll('[data-rite]').forEach((btn) => {
+    el.querySelectorAll('[data-rite]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.deps.onChoose((btn as HTMLElement).dataset.rite as RiteIntensity);
       });
     });
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.deps.onClose());
   }
 }
