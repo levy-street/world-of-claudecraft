@@ -17,6 +17,7 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import { NYTHRAXIS_LAYOUT } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -130,14 +131,16 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   // group's live instance instead of stranding the player in a fresh parallel
   // claim. The selected difficulty applies only when claiming a new instance.
   let inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === key);
-  // Nythraxis keeps its at-the-door lockout (even a live claim is barred after
-  // the kill), now scoped to the difficulty actually being entered: the live
-  // claim's when one exists, else the current selection. Normal and heroic
-  // never consume each other's lockout.
+  const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
+  const returningForLoot = inst !== undefined && corpseRunClaim === inst;
+  // Nythraxis keeps its at-the-door lockout, scoped to the difficulty actually
+  // being entered: the live claim's when one exists, else the current selection.
+  // A loot-eligible ghost may return to its party's defeated live claim for the
+  // normal corpse-run resurrection, but the lockout still bars every fresh claim.
   if (dungeonId === 'nythraxis_boss_arena') {
     const doorDifficulty = inst?.difficulty ?? difficulty;
     const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
-    if (isRaidLocked(ctx, r.meta, lockId)) {
+    if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot) {
       ctx.error(
         r.meta.entityId,
         doorDifficulty === 'heroic'
@@ -149,8 +152,8 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   }
   // A locked player may walk back into a LIVE heroic claim only when its final
   // boss is already down AND that kill is the one their lock came from (the
-  // claim's clearedBy set): the corpse-run / loot-retrieval path the kill
-  // lockout deliberately leaves open. Anything else bars the door. Without the
+  // claim's clearedBy set), or when the stricter Nythraxis corpse-run proof above
+  // binds them to that exact defeated claim. Anything else bars the door. Without the
   // boss-alive arm, one unlocked member (a fresh recruit, or a camper the kill
   // never locked) could claim a fresh heroic instance and ferry the whole
   // locked party into another full run; without the clearedBy arm, a player
@@ -159,6 +162,7 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   if (
     inst &&
     inst.difficulty === 'heroic' &&
+    !returningForLoot &&
     isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId)) &&
     (heroicFinalBossAlive(ctx, inst) || !inst.clearedBy.has(r.meta.entityId))
   ) {
@@ -201,7 +205,12 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   // A ghost that ran its spirit back and re-entered resurrects at the entrance,
   // penalty-free: the re-entry IS the corpse run under the instance death model (no
   // Spirit Healer inside an instance).
-  if (p.ghost) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
+  // Nythraxis has a nested entrance: a returning ghost must cross the approach crypt
+  // before reaching the royal door. Keep that spirit released through the outer
+  // transition and resurrect only after it reaches its defeated arena claim.
+  const passingThroughNythraxisCrypt =
+    dungeonId === 'nythraxis_crypt' && corpseRunClaim !== undefined;
+  if (p.ghost && !passingThroughNythraxisCrypt) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
 }
 
@@ -250,9 +259,50 @@ function nythraxisInstanceSealed(ctx: SimContext, inst: InstanceSlot): boolean {
   return false;
 }
 
+function isDefeatedNythraxisParticipant(ctx: SimContext, inst: InstanceSlot, pid: number): boolean {
+  for (const id of inst.mobIds) {
+    const boss = ctx.entities.get(id);
+    if (boss?.templateId === NYTHRAXIS_BOSS_ID && boss.dead && boss.lootRecipientIds?.includes(pid))
+      return true;
+  }
+  return false;
+}
+
+function nythraxisArenaContains(inst: InstanceSlot, pos: Vec3): boolean {
+  const floorHalfX = NYTHRAXIS_LAYOUT.floorHalfX;
+  if (floorHalfX === undefined) return false;
+  const origin = instanceOriginOf(inst);
+  const localX = pos.x - origin.x;
+  const localZ = pos.z - origin.z;
+  return (
+    Math.abs(localX) <= floorHalfX &&
+    localZ >= NYTHRAXIS_LAYOUT.zMin &&
+    localZ <= NYTHRAXIS_LAYOUT.zMax
+  );
+}
+
+function defeatedNythraxisCorpseRunClaim(
+  ctx: SimContext,
+  partyKey: string,
+  p: Entity,
+): InstanceSlot | undefined {
+  const corpsePos = p.corpsePos;
+  if (!p.ghost || !corpsePos) return undefined;
+  const inst = ctx.instances.find(
+    (candidate) =>
+      candidate.dungeonId === 'nythraxis_boss_arena' &&
+      candidate.partyKey === partyKey &&
+      nythraxisArenaContains(candidate, corpsePos),
+  );
+  if (!inst || !isDefeatedNythraxisParticipant(ctx, inst, p.id)) return undefined;
+  return inst;
+}
+
 export function leaveDungeon(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
-  if (!r || r.e.dead) return;
+  // A fresh corpse cannot move, but a released ghost crossing the nested Nythraxis
+  // approach must be able to backtrack outside if its arena claim becomes unavailable.
+  if (!r || (r.e.dead && !r.e.ghost)) return;
   const p = r.e;
   // not inside any instance: nothing to leave (no DUNGEON_LIST[0] fallback —
   // that silently teleported outdoor callers to the Hollow Crypt door)
