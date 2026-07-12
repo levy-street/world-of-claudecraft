@@ -118,6 +118,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.',
   'hudChrome.loot.chestTitle': '상자',
+  'hudChrome.loot.takeAllTooltip': '모두 가져가기: 이 전리품 창의 모든 돈과 아이템을 가져갑니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -182,6 +183,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '임무를 마쳤습니다. 레드브룩 원수에게 돌아가 사용 버튼을 눌러 완료하세요.',
   'hudChrome.tutorial.doneBodyTouch':
     '기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 더보기를 누른 뒤 퀘스트 기록을 눌러 언제든 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요.',
+  'hudChrome.tutorial.slayTargetHint':
+    '전투가 처음인가요? {targetKey} 를 누르거나 늑대를 클릭해 대상으로 지정한 뒤, 액션바 기술로 공격하세요.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    '전투가 처음인가요? 늑대를 탭해 대상으로 지정한 뒤, 액션바 기술을 탭해 공격하세요.',
+  'hudChrome.tutorial.nextTipsTitle': '다음으로 할 일',
+  'hudChrome.tutorial.nextTipQuestLog': '퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.',
+  'hudChrome.tutorial.nextTipMap': '월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.',
+  'hudChrome.tutorial.nextTipSocial': '소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요.',
   'hudChrome.raidLockout.title': '공격대 잠금',
   'hudChrome.raidLockout.allReady': '모든 공격대 준비됨',
   'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
@@ -231,6 +240,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '채집',
   'hudChrome.corpseHarvest.concentrateHint': '선택한 부위가 적을수록 부위당 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.alreadyHarvested': '이 시체는 이미 채집되었습니다.',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '채집: 이 시체에서 전리품과 별개로 제작 재료(가죽, 송곳니, 실크 등)를 모읍니다. 누구나 채집할 수 있지만, 하나의 시체는 한 명의 플레이어만 채집할 수 있습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',
   'hudChrome.corpseHarvest.components.hide': '가죽',
   'hudChrome.corpseHarvest.components.fang': '송곳니',

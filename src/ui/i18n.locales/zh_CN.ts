@@ -112,6 +112,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.loot.takeAllTooltip': '全部拾取：收取此战利品窗口中的所有金币和物品。',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
@@ -174,6 +175,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。',
   'hudChrome.tutorial.doneBodyTouch':
     '你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。',
+  'hudChrome.tutorial.slayTargetHint':
+    '第一次战斗？按下 {targetKey} 或点击狼来选中它，然后使用快捷栏技能攻击它。',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    '第一次战斗？点击狼来选中它，然后点击快捷栏技能攻击它。',
+  'hudChrome.tutorial.nextTipsTitle': '接下来去哪',
+  'hudChrome.tutorial.nextTipQuestLog': '打开任务日志（{key}）查找附近的下一个任务。',
+  'hudChrome.tutorial.nextTipMap': '查看世界地图（{key}）了解任务所在位置。',
+  'hudChrome.tutorial.nextTipSocial': '打开社交面板（{key}）寻找队伍应对更强的战斗。',
   'hudChrome.raidLockout.title': '团队副本锁定',
   'hudChrome.raidLockout.allReady': '所有团队副本就绪',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小时',
@@ -221,6 +230,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '采集',
   'hudChrome.corpseHarvest.concentrateHint': '选择的部位越少，每个部位的品质越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '这具尸体已经被采集过了。',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。',
   'hudChrome.corpseHarvest.componentAria': '采集{component}',
   'hudChrome.corpseHarvest.components.hide': '兽皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

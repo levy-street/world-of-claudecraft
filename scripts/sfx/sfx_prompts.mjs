@@ -1,11 +1,15 @@
 // Authoritative sound-effect catalog — consumed by scripts/gen_sfx.mjs.
-// Each entry: { key, prompt, duration (seconds 0.5–30), loop? }.
+// Each entry: { key, prompt, duration (seconds 0.5 to 30), loop?, generator?,
+// custom? }. Additional takes are discovered from <key>_1.mp3, <key>_2.mp3,
+// and so on. The runtime cycles those files in numeric order.
 // Human-readable design + spatial behaviour: docs/design/sound_effects.md.
 //
 // Keys map to public/audio/sfx/<key>.mp3 and to src/game/sfx_manifest.generated.ts.
 // Prompts are written for the ElevenLabs Sound Effects model: concise, concrete,
 // single-event, "no music, no speech" where it matters. Footsteps/impacts are ONE
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
+
+import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 
 const FOOT = (key, surface) => ({
   key,
@@ -193,7 +197,6 @@ export const SFX = [
     prompt:
       'Earthy nature magic growing: rustling leaves and a low primal hum building. Seamless loop, no music.',
   },
-
   // Per-ability cast loop override (custom recording, not ElevenLabs). See
   // castKeyForAbility in src/ui/hud.ts: lightning_bolt uses this clip instead
   // of its school default (arcane).
@@ -475,6 +478,11 @@ export const SFX = [
   { key: 'lockpick_slip', custom: true },
   { key: 'lockpick_success', custom: true },
   { key: 'lockpick_trap', custom: true },
+
+  // --- Interface and event feedback ----------------------------------------
+  // These are generated locally by scripts/gen_ui_sfx.mjs. Keeping them in the
+  // authoritative catalog makes every live GameAudio cue editable in SFX Studio.
+  ...UI_SFX_CATALOG,
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

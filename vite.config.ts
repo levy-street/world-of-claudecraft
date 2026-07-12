@@ -369,6 +369,7 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    globalSetup: ['./tests/global_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a

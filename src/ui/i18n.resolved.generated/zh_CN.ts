@@ -337,7 +337,13 @@ export const zh_CN: EnTranslations = {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
       "talkBodyTouch": "靠近雷德布鲁克元帅并点击“使用”按钮与他交谈，然后接受他的任务。",
       "returnBodyTouch": "任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。",
-      "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。"
+      "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。",
+      "slayTargetHint": "第一次战斗？按下 {targetKey} 或点击狼来选中它，然后使用快捷栏技能攻击它。",
+      "slayTargetHintTouch": "第一次战斗？点击狼来选中它，然后点击快捷栏技能攻击它。",
+      "nextTipsTitle": "接下来去哪",
+      "nextTipQuestLog": "打开任务日志（{key}）查找附近的下一个任务。",
+      "nextTipMap": "查看世界地图（{key}）了解任务所在位置。",
+      "nextTipSocial": "打开社交面板（{key}）寻找队伍应对更强的战斗。"
     },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
@@ -941,6 +947,7 @@ export const zh_CN: EnTranslations = {
     "corpseHarvest": {
       "title": "采集",
       "harvestButton": "采集",
+      "harvestButtonTooltip": "采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
@@ -1121,7 +1128,8 @@ export const zh_CN: EnTranslations = {
       "resetErrInvalid": "此重置链接无效或已过期。请重新申请一个。"
     },
     "loot": {
-      "chestTitle": "宝箱"
+      "chestTitle": "宝箱",
+      "takeAllTooltip": "全部拾取：收取此战利品窗口中的所有金币和物品。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",

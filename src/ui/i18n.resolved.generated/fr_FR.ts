@@ -337,7 +337,13 @@ export const fr_FR: EnTranslations = {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
       "talkBodyTouch": "Tiens-toi près du maréchal Redbrook et touche le bouton Utiliser pour lui parler, puis accepte sa mission.",
       "returnBodyTouch": "Ta mission est accomplie. Retourne voir le maréchal Redbrook et touche le bouton Utiliser pour la rendre.",
-      "doneBodyTouch": "Tu maîtrises les bases, {name}. Le Val est à toi : touche Plus, puis Journal de quêtes, pour consulter ton journal de quêtes à tout moment. Bonne chasse !"
+      "doneBodyTouch": "Tu maîtrises les bases, {name}. Le Val est à toi : touche Plus, puis Journal de quêtes, pour consulter ton journal de quêtes à tout moment. Bonne chasse !",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Heure locale - cliquez pour basculer 12/24 heures",
@@ -941,6 +947,7 @@ export const fr_FR: EnTranslations = {
     "corpseHarvest": {
       "title": "Dépeçage",
       "harvestButton": "Dépecer",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Moins vous choisissez de composants, plus la qualité de chacun est élevée.",
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
@@ -1121,7 +1128,8 @@ export const fr_FR: EnTranslations = {
       "resetErrInvalid": "Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau."
     },
     "loot": {
-      "chestTitle": "Coffre"
+      "chestTitle": "Coffre",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",

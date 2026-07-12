@@ -337,7 +337,13 @@ export const de_DE: EnTranslations = {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
       "talkBodyTouch": "Stell dich nah an Marschall Redbrook und tippe auf die Schaltfläche Benutzen, um mit ihm zu sprechen, und nimm dann seine Aufgabe an.",
       "returnBodyTouch": "Deine Aufgabe ist erledigt. Kehre zu Marschall Redbrook zurück und tippe auf die Schaltfläche Benutzen, um sie abzugeben.",
-      "doneBodyTouch": "Du beherrschst die Grundlagen, {name}. Das Eastbrook-Tal liegt bereit, von dir erkundet zu werden. Tippe auf Mehr und dann auf Questlog, um jederzeit dein Questlog einzusehen. Gute Jagd."
+      "doneBodyTouch": "Du beherrschst die Grundlagen, {name}. Das Eastbrook-Tal liegt bereit, von dir erkundet zu werden. Tippe auf Mehr und dann auf Questlog, um jederzeit dein Questlog einzusehen. Gute Jagd.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Ortszeit - klicken, um zwischen 12-/24-Stunden zu wechseln",
@@ -941,6 +947,7 @@ export const de_DE: EnTranslations = {
     "corpseHarvest": {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
@@ -1121,7 +1128,8 @@ export const de_DE: EnTranslations = {
       "resetErrInvalid": "Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an."
     },
     "loot": {
-      "chestTitle": "Truhe"
+      "chestTitle": "Truhe",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "{name} zur Aktionsleiste hinzufügen",

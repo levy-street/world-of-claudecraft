@@ -337,7 +337,13 @@ export const sv_SE: EnTranslations = {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
       "talkBodyTouch": "Ställ dig nära marskalk Redbrook och tryck på Använd-knappen för att tala, anta sedan hans uppgift.",
       "returnBodyTouch": "Din uppgift är klar. Återvänd till marskalk Redbrook och tryck på Använd-knappen för att lämna in den.",
-      "doneBodyTouch": "Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten."
+      "doneBodyTouch": "Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten.",
+      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
+      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
+      "nextTipsTitle": "Where to next",
+      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
+      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
+      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klicka för att växla mellan 12/24-timmar",
@@ -941,6 +947,7 @@ export const sv_SE: EnTranslations = {
     "corpseHarvest": {
       "title": "Skörda",
       "harvestButton": "Skörda",
+      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
       "concentrateHint": "Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.",
       "alreadyHarvested": "Det här kadavret har redan skördats.",
       "componentAria": "Skörda {component}",
@@ -1121,7 +1128,8 @@ export const sv_SE: EnTranslations = {
       "resetErrInvalid": "Den här återställningslänken är ogiltig eller har gått ut. Begär en ny."
     },
     "loot": {
-      "chestTitle": "Kista"
+      "chestTitle": "Kista",
+      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",

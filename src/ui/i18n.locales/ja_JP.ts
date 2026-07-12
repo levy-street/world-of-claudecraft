@@ -123,6 +123,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.loot.takeAllTooltip':
+    'すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -188,6 +190,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。',
   'hudChrome.tutorial.doneBodyTouch':
     '基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！',
+  'hudChrome.tutorial.slayTargetHint':
+    '戦闘は初めてですか？{targetKey} を押すか狼をクリックしてターゲットし、アクションバーのスキルで攻撃しましょう。',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    '戦闘は初めてですか？狼をタップしてターゲットし、アクションバーのスキルをタップして攻撃しましょう。',
+  'hudChrome.tutorial.nextTipsTitle': '次にすべきこと',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'クエストログ（{key}）を開いて近くの次のクエストを確認しましょう。',
+  'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
+  'hudChrome.tutorial.nextTipSocial':
+    'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -236,6 +248,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採取',
   'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    '採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
   'hudChrome.corpseHarvest.components.hide': '毛皮',
   'hudChrome.corpseHarvest.components.fang': '牙',

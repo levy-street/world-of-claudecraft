@@ -3954,6 +3954,16 @@
     right: max(14px, env(safe-area-inset-right));
     bottom: calc(10px + env(safe-area-inset-bottom));
   }
+  /* The 40px touch floor above is shorter than the toggle's natural scaled size,
+     so its border-box inner height (40px - 2 * 2px border = 36px) is tighter than
+     the standard/tablet tiers. The base page-indicator digit (20px text + a 2px
+     icon gap + a 15px icon = 37px) overflowed that by a hair, and the button's
+     circular overflow:hidden (added for the cooldown-sweep clip, see above)
+     clipped the digit's top pixels instead of showing it in full. Shrink the
+     digit to fit the compact floor with room to spare. */
+  body.mobile-touch.hud-mobile-compact #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 15px;
+  }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {
     left: max(14px, env(safe-area-inset-left));
     right: auto;
