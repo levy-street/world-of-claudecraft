@@ -76,10 +76,6 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     ],
     "loop": true
   },
-  "cast_chain_heal": {
-    "url": "/audio/sfx/cast_chain_heal.wav",
-    "loop": false
-  },
   "cast_fire": {
     "urls": [
       "/audio/sfx/cast_fire.mp3"
