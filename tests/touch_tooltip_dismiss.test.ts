@@ -61,6 +61,33 @@ describe('bindTouchTooltipDismiss', () => {
     expect(hide).not.toHaveBeenCalled();
   });
 
+  it('leaves the tooltip alone when the press lands on a tap-toggle owner', () => {
+    // A control that owns its tooltip via tap (data-tooltip-tap-toggle, the
+    // touch spellbook rows) swaps or toggles the box itself on pointerup:
+    // hiding at pointerdown blanked it for the press duration, a visible
+    // blink between two paints.
+    const pointer = fakePointerTarget();
+    const hide = vi.fn();
+    bindTouchTooltipDismiss(pointer.target, {
+      isTouchUi: () => true,
+      isVisible: () => true,
+      containsTarget: () => false,
+      hide,
+    });
+
+    const owner = {
+      closest: (sel: string) => (sel === '[data-tooltip-tap-toggle]' ? {} : null),
+    };
+    pointer.dispatch({ pointerType: 'touch', target: owner as unknown as EventTarget });
+    expect(hide).not.toHaveBeenCalled();
+
+    pointer.dispatch({
+      pointerType: 'touch',
+      target: { closest: () => null } as unknown as EventTarget,
+    });
+    expect(hide).toHaveBeenCalledTimes(1);
+  });
+
   it('ignores hidden tooltips and touches inside the tooltip itself', () => {
     const pointer = fakePointerTarget();
     const hide = vi.fn();

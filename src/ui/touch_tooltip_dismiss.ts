@@ -23,6 +23,14 @@ export function bindTouchTooltipDismiss(
     (event) => {
       if (event.pointerType !== 'touch' || !deps.isTouchUi() || !deps.isVisible()) return;
       if (deps.containsTarget(event.target)) return;
+      // A control that OWNS its tooltip via tap (data-tooltip-tap-toggle, the
+      // touch spellbook rows) swaps or toggles the box itself on pointerup:
+      // hiding at pointerdown would blank it for the whole press duration,
+      // which reads as a visible blink between two paints.
+      const pressed = event.target as Element | null;
+      if (pressed && typeof pressed.closest === 'function') {
+        if (pressed.closest('[data-tooltip-tap-toggle]')) return;
+      }
       deps.hide();
     },
     true,

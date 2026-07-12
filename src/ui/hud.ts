@@ -4210,9 +4210,12 @@ export class Hud {
       if (!mobile() || e.pointerType === 'mouse') return;
       clearTouchTimer();
       this.tooltipTouchPressAt = performance.now();
-      // A fresh press: drop any stale peek and dismiss a lingering tooltip.
+      // A fresh press: drop any stale peek and dismiss a lingering tooltip. A
+      // tap-toggle owner (the touch spellbook rows) swaps or toggles the box
+      // itself on pointerup, so hiding it here would blank the tooltip for
+      // the press duration, a visible blink between two paints.
       this.peekGuard.press();
-      this.tooltipEl.style.display = 'none';
+      if (!el.hasAttribute('data-tooltip-tap-toggle')) this.tooltipEl.style.display = 'none';
       const x = e.clientX,
         y = e.clientY;
       touchStartX = x;

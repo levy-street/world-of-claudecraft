@@ -333,6 +333,21 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(hud).toContain('this.tooltipTouchPressAt = performance.now();');
   });
 
+  it('keeps press-time dismissers off the tap-toggle rows (atomic swap)', () => {
+    // The tap paints the next description at pointerup; a press-time hide
+    // blanked the box for the whole press (a visible blink). Both dismissers
+    // skip the marked rows: the row itself swaps or toggles the tooltip.
+    expect(code).toContain("el.dataset.tooltipTapToggle = '1';");
+    expect(hud).toContain(
+      "if (!el.hasAttribute('data-tooltip-tap-toggle')) this.tooltipEl.style.display = 'none';",
+    );
+    const dismiss = readFileSync(
+      new URL('../src/ui/touch_tooltip_dismiss.ts', import.meta.url),
+      'utf8',
+    );
+    expect(dismiss).toContain("if (pressed.closest('[data-tooltip-tap-toggle]')) return;");
+  });
+
   it('keeps the touch-selected row seat readable on the panel gradient', () => {
     // The gradient bottoms out at the same color as the seat fill, so the
     // gold-dim inset ring is what makes the selection visible.

@@ -234,6 +234,20 @@ describe('SpellbookWindow touch description controls', () => {
     expect(abilityTooltip).not.toHaveBeenCalled();
   });
 
+  it('marks touch rows as tap-toggle owners so a press never blanks the box', () => {
+    // Both press-time dismissers (the capture-phase document dismisser and
+    // the attachTooltip press hide) skip elements carrying this marker: the
+    // row swaps or toggles its description itself on pointerup, atomically.
+    // Locked rows have no tap-driven description, so they stay unmarked and
+    // a press on them still dismisses a lingering tooltip.
+    const known = root.querySelectorAll<HTMLElement>('.spell-row:not(.locked)');
+    expect(known.length).toBeGreaterThan(0);
+    for (const row of known) expect(row.dataset.tooltipTapToggle).toBe('1');
+    for (const row of root.querySelectorAll<HTMLElement>('.spell-row.locked')) {
+      expect(row.dataset.tooltipTapToggle).toBeUndefined();
+    }
+  });
+
   it('closes an open description when the same row is tapped again', () => {
     const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
     tap(row, 11);

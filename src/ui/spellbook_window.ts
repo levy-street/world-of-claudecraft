@@ -363,6 +363,11 @@ export class SpellbookWindow {
         <div class="spell-sub">${locked ? esc(t('abilityUi.spellbook.trainableAtLevel', { level: learnLevel })) : esc(summary)}</div></div>`;
     if (known) {
       if (this.isTouch()) {
+        // The row owns its description via tap (show, swap, toggle off), so
+        // the shared press-time dismissers must not blank the tooltip first:
+        // both the capture-phase touch dismisser and the attachTooltip press
+        // hide skip elements carrying this marker.
+        el.dataset.tooltipTapToggle = '1';
         this.appendTouchControls(el, row, name);
         const showDescription = this.deps.attachTooltip(
           el,
