@@ -5989,6 +5989,14 @@ export const zh_TW: EnTranslations = {
         "name": "林地之歌",
         "description": "引導恢復之力，每秒治療附近的盟友。（德魯伊天賦）"
       },
+      "cleansing_verdict": {
+        "name": "淨化裁決",
+        "description": "淨化友方目標身上的一個有害魔法效果，並治療其{damage}點神聖傷害。"
+      },
+      "voidfeast": {
+        "name": "虛空盛宴",
+        "description": "吞噬一個魔法效果（敵人的增益或友方的減益），並治療自身相當於最大生命值6%的生命。"
+      },
       "bear_charge": {
         "name": "巨熊衝鋒",
         "description": "向敵人衝鋒，產生 9 點怒氣並將其昏迷 1 秒。射程 8-25 公尺。僅限巨熊形態。"

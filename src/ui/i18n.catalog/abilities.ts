@@ -1585,6 +1585,17 @@ const classAbilityNamesEn = {
         'Gladesong',
         'Channels for 4 sec, healing you and allies within 30 yd for 42 to 52 each second. (Druid talent)',
       ],
+      // Choice-row dispel spells.
+      [
+        'cleansing_verdict',
+        'Cleansing Verdict',
+        'Purges a harmful magic effect from a friendly target and heals them for {damage} Holy.',
+      ],
+      [
+        'voidfeast',
+        'Voidfeast',
+        'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health.',
+      ],
     ]),
   },
 };

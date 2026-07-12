@@ -5989,6 +5989,14 @@ export const da_DK: EnTranslations = {
         "name": "Lundens sang",
         "description": "Canaliza energía restauradora y sana a nærliggende allierede cada segundo. (druidentalent)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Bruin-storm",
         "description": "Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde. Kun i Bruin-form."

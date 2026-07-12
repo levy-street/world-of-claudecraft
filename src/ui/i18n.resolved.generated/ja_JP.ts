@@ -5989,6 +5989,14 @@ export const ja_JP: EnTranslations = {
         "name": "木立の歌",
         "description": "回復の力を注ぎ、毎秒周囲の味方を回復する。（ドルイドタレント）"
       },
+      "cleansing_verdict": {
+        "name": "浄化の裁き",
+        "description": "味方の有害な魔法効果を1つ浄化し、{damage}の神聖治癒を与える。"
+      },
+      "voidfeast": {
+        "name": "虚無の饗宴",
+        "description": "魔法効果（敵の有益な効果、または味方の有害な効果）を1つ喰らい、最大HPの6%回復する。"
+      },
       "bear_charge": {
         "name": "ブルーインラッシュ",
         "description": "敵に突進して激怒を9獲得し、1秒間スタンさせる。射程7～23メートル。ブルーインフォーム時のみ使用可能。"

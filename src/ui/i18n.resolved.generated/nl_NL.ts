@@ -5989,6 +5989,14 @@ export const nl_NL: EnTranslations = {
         "name": "Woudlied",
         "description": "Canaliza energía restauradora y sana a nabije bondgenoten cada segundo. (druïdetalent)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Bruin-stormloop",
         "description": "Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante."

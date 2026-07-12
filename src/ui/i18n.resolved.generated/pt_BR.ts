@@ -5989,6 +5989,14 @@ export const pt_BR: EnTranslations = {
         "name": "Canto do Bosque",
         "description": "Canaliza energía restauradora y sana a próximos aliados cada segundo. (talento de druida)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Investida de Bruin",
         "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8 a 25 m. Apenas Forma de Bruin."

@@ -5989,6 +5989,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Píseň háje",
         "description": "Canaliza energía restauradora y sana a blízké spojence cada segundo. (druidský talent)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Medvědí výpad",
         "description": "Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Dosah 8-25 yardů. Pouze v medvědí podobě."

@@ -6349,4 +6349,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
   'hudChrome.mobile.chatPlaceholder': '說點什麼...',
   'entities.mobs.yumi_cat.name': '由美',
+  // Choice-row dispel spells.
+  'entities.abilities.cleansing_verdict.name': '淨化裁決',
+  'entities.abilities.cleansing_verdict.description':
+    '淨化友方目標身上的一個有害魔法效果，並治療其{damage}點神聖傷害。',
+  'entities.abilities.voidfeast.name': '虛空盛宴',
+  'entities.abilities.voidfeast.description':
+    '吞噬一個魔法效果（敵人的增益或友方的減益），並治療自身相當於最大生命值6%的生命。',
 };

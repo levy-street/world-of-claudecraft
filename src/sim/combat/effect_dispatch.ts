@@ -15,6 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
+import { isDebuffAura } from '../aura_classify';
 import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -677,6 +678,30 @@ export function runEffects(
           sourceId: p.id,
           school,
         });
+        break;
+      }
+      case 'dispel': {
+        if (!target || target.dead) break;
+        // Direction follows the target relation: strip harmful MAGIC debuffs off an ally
+        // or yourself, or beneficial MAGIC buffs off a hostile target. Physical auras
+        // (bleeds, sunders) are never dispellable. Iterate back-to-front so splices are safe.
+        const offensive = ctx.isHostileTo(p, target);
+        let dispelled = 0;
+        for (let i = target.auras.length - 1; i >= 0 && dispelled < eff.count; i--) {
+          const a = target.auras[i];
+          if (a.school === 'physical') continue;
+          const harmful = isDebuffAura(a.kind, a.value);
+          if (offensive ? harmful : !harmful) continue;
+          target.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+          dispelled++;
+        }
+        // A stripped stat aura (a buff/debuff carrying stat mods) must re-derive stats.
+        if (dispelled > 0 && target.kind === 'player') {
+          const tmeta = ctx.players.get(target.id);
+          if (tmeta) recalcPlayerStats(target, tmeta.cls, tmeta.equipment, ctx.playerMods(tmeta));
+        }
+        if (dispelled === 0) ctx.error(p.id, 'Nothing to dispel.');
         break;
       }
       case 'silence': {

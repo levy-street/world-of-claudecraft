@@ -26,6 +26,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   directDamage: 'damage',
   chainDamage: 'damage',
   interrupt: 'other',
+  dispel: 'other',
   extendDot: 'other',
   consumeDot: 'damage',
   // Silence persists through damage in the sim, so an offensive silence can

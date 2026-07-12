@@ -6693,4 +6693,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
   'hudChrome.mobile.chatPlaceholder': '発言する...',
   'entities.mobs.yumi_cat.name': 'ユミ',
+  // Choice-row dispel spells.
+  'entities.abilities.cleansing_verdict.name': '浄化の裁き',
+  'entities.abilities.cleansing_verdict.description':
+    '味方の有害な魔法効果を1つ浄化し、{damage}の神聖治癒を与える。',
+  'entities.abilities.voidfeast.name': '虚無の饗宴',
+  'entities.abilities.voidfeast.description':
+    '魔法効果（敵の有益な効果、または味方の有害な効果）を1つ喰らい、最大HPの6%回復する。',
 };

@@ -6821,4 +6821,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
   'entities.mobs.yumi_cat.name': 'Юми',
+  // Choice-row dispel spells.
+  'entities.abilities.cleansing_verdict.name': 'Очищающий вердикт',
+  'entities.abilities.cleansing_verdict.description':
+    'Снимает вредный магический эффект с союзника и исцеляет его на {damage} Свят.',
+  'entities.abilities.voidfeast.name': 'Пир Бездны',
+  'entities.abilities.voidfeast.description':
+    'Пожирает магический эффект (полезный у врага или вредный у союзника) и исцеляет вас на 6% максимального здоровья.',
 };

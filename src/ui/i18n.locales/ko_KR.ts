@@ -6684,4 +6684,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
   'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
   'entities.mobs.yumi_cat.name': '유미',
+  // Choice-row dispel spells.
+  'entities.abilities.cleansing_verdict.name': '정화의 심판',
+  'entities.abilities.cleansing_verdict.description':
+    '아군의 해로운 마법 효과 하나를 정화하고 {damage}의 신성 치유를 부여합니다.',
+  'entities.abilities.voidfeast.name': '공허의 만찬',
+  'entities.abilities.voidfeast.description':
+    '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 집어삼키고 최대 생명력의 6%를 회복합니다.',
 };

@@ -5989,6 +5989,14 @@ export const es: EnTranslations = {
         "name": "Canto del Claro",
         "description": "Canaliza energía restauradora y sana a cercanos aliados cada segundo. (talento de druida)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Embestida de Bruin",
         "description": "Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Alcance de 7 a 23 m. Solo en forma de Bruin."

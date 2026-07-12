@@ -666,14 +666,15 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'justice',
-      decision: 'short interrupt vs banked stuns vs Holy Ground lockdown',
+      decision: 'ally dispel vs banked stuns vs Holy Ground lockdown',
       options: [
         {
-          id: 'pal_r8_rebuke',
-          name: 'Reproach',
-          description: 'Grants Reproach.',
-          icon: 'rebuke',
-          effect: { grant: { ability: 'rebuke' } },
+          id: 'pal_r8_cleansing_verdict',
+          name: 'Cleansing Verdict',
+          description:
+            'Grants Cleansing Verdict: purge a harmful magic effect off an ally and heal them.',
+          icon: 'cleansing_verdict',
+          effect: { grant: { ability: 'cleansing_verdict' } },
         },
         {
           id: 'pal_r8_fist_of_justice',
@@ -2122,14 +2123,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'control',
-      decision: 'spell lockout vs area fear vs sustained slow',
+      decision: 'magic devour vs area fear vs sustained slow',
       options: [
         {
-          id: 'wlk_r8_spell_lock',
-          name: 'Tonguebind',
-          description: 'Grants Tonguebind.',
-          icon: 'spell_lock',
-          effect: { grant: { ability: 'spell_lock' } },
+          id: 'wlk_r8_voidfeast',
+          name: 'Voidfeast',
+          description: 'Grants Voidfeast: devour a magic effect and heal yourself.',
+          icon: 'voidfeast',
+          effect: { grant: { ability: 'voidfeast' } },
         },
         {
           id: 'wlk_r8_howl_of_terror',

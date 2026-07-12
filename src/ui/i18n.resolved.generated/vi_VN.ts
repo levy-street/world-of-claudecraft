@@ -5989,6 +5989,14 @@ export const vi_VN: EnTranslations = {
         "name": "Khúc Ca Rừng Thưa",
         "description": "Canaliza energía restauradora y sana a gần đó đồng minh cada segundo. (thiên phú druid)"
       },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
+      },
       "bear_charge": {
         "name": "Cú Lao Bruin",
         "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form."

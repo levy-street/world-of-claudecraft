@@ -4806,6 +4806,46 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)',
   },
 
+  // Choice-row dispel spells (Talents 2.0 counterplay rows): granted by a row pick, not
+  // baseline. Each strips magic auras, direction chosen by target relation.
+  cleansing_verdict: {
+    id: 'cleansing_verdict',
+    name: 'Cleansing Verdict',
+    class: 'paladin',
+    learnLevel: 8,
+    cost: 25,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [
+      { type: 'dispel', count: 1 },
+      { type: 'heal', min: 40, max: 50 },
+    ],
+    description: 'Purges a harmful magic effect from a friendly target and heals them for $d Holy.',
+  },
+  voidfeast: {
+    id: 'voidfeast',
+    name: 'Voidfeast',
+    class: 'warlock',
+    learnLevel: 8,
+    cost: 35,
+    castTime: 0,
+    cooldown: 15,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    targetType: 'any',
+    effects: [
+      { type: 'dispel', count: 1 },
+      { type: 'selfHealPctMax', pct: 0.06 },
+    ],
+    description:
+      'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health.',
+  },
+
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants

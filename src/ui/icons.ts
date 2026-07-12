@@ -2238,6 +2238,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
+  // Choice-row dispel spells.
+  cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
+  voidfeast: r('shadow', 'venom', ['flame'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
