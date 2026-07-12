@@ -4084,7 +4084,7 @@ export class Hud {
     html: () => string,
     enabled?: () => boolean,
     directFocusOnly = false,
-  ): () => void {
+  ): (maxRightX?: number) => void {
     let touchTimer: number | undefined;
     let touchStartX = 0;
     let touchStartY = 0;
@@ -4113,9 +4113,18 @@ export class Hud {
       ttW = size.w;
       ttH = size.h;
     };
-    const showNearElement = () => {
+    const showNearElement = (maxRightX?: number) => {
       const rect = el.getBoundingClientRect();
       showAt(rect.right, rect.top + rect.height / 2, 'focus');
+      if (maxRightX === undefined || this.tooltipEl.style.display === 'none') return;
+      // A composite row (the touch spellbook) passes the left edge of its own
+      // controls strip: keep the tooltip's right edge at that boundary so the
+      // description never covers the row's buttons. Only ever pull the box
+      // LEFT of its default seat, and never past the viewport-left floor.
+      const z = getUiScale();
+      const clamped = Math.max(8, maxRightX / z - ttW - 6);
+      const current = Number.parseFloat(this.tooltipEl.style.left);
+      if (Number.isNaN(current) || clamped < current) this.tooltipEl.style.left = `${clamped}px`;
     };
     // A mouse click or a tap focuses the button as a side effect (the browser
     // moves focus to whatever was pressed), which used to fire showNearElement

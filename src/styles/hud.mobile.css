@@ -2470,10 +2470,15 @@
   }
   body.mobile-touch #spellbook {
     --spellbook-edge-padding: 8px;
+    /* Drive the compact edges through the shared window pad instead of a direct
+       padding override: the sticky header's negative margins and sticky top
+       mirror --window-pad (layout.css), so a direct padding-top override left
+       the title plate overshooting the frame on the top and both sides. The
+       bottom edge deliberately keeps the generic mobile .window reservation
+       (18px plus safe area), so the last row never rests on the lower frame. */
+    --window-pad: var(--spellbook-edge-padding);
     top: max(4px, env(safe-area-inset-top));
     bottom: max(4px, env(safe-area-inset-bottom));
-    padding-top: var(--spellbook-edge-padding);
-    padding-bottom: var(--spellbook-edge-padding);
     height: auto;
     max-height: none;
     container-type: inline-size;
@@ -2780,6 +2785,12 @@
     padding: 0;
     box-sizing: border-box;
     font-size: 16px;
+  }
+  /* Seat the header actions on the same column as the row +/x controls: the
+     rows sit --window-pad inside the frame and keep a 4px inner right padding,
+     so pinning the header cluster at pad + 4px lines both X columns up. */
+  body.mobile-touch #spellbook > .panel-title > .panel-title-actions {
+    inset-inline-end: calc(var(--window-pad) + 4px);
   }
   body.mobile-touch #spellbook > .panel-title {
     margin-top: 0;

@@ -56,6 +56,8 @@ describe('SpellbookWindow touch description controls', () => {
   let window: SpellbookWindow;
   let abilityTooltip: SpellbookWindowDeps['abilityTooltip'];
   let removeFromBar: SpellbookWindowDeps['removeFromBar'];
+  // The right-edge boundary each description show received (undefined = none).
+  let shownBoundaries: Array<number | undefined>;
 
   beforeEach(() => {
     document.body.innerHTML =
@@ -81,6 +83,7 @@ describe('SpellbookWindow touch description controls', () => {
     const hideTooltip = () => {
       tooltip.style.display = 'none';
     };
+    shownBoundaries = [];
     const deps: SpellbookWindowDeps = {
       root: () => root,
       world: () => ({ cfg: { playerClass: 'warrior' }, known }) as unknown as IWorld,
@@ -89,7 +92,8 @@ describe('SpellbookWindow touch description controls', () => {
       restoreFocus: vi.fn(),
       hideTooltip,
       attachTooltip: (el, html, enabled, directFocusOnly) => {
-        const show = () => {
+        const show = (maxRightX?: number) => {
+          shownBoundaries.push(maxRightX);
           if (enabled && !enabled()) {
             hideTooltip();
             return;
@@ -228,5 +232,64 @@ describe('SpellbookWindow touch description controls', () => {
     expect(removeFromBar).toHaveBeenCalledTimes(1);
     expect(tooltip.style.display).toBe('none');
     expect(abilityTooltip).not.toHaveBeenCalled();
+  });
+
+  it('closes an open description when the same row is tapped again', () => {
+    const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
+    tap(row, 11);
+    expect(tooltip.style.display).toBe('block');
+    expect(row.classList.contains('is-selected')).toBe(true);
+
+    // Second tap on the SAME row folds the description away and drops the seat.
+    tap(row, 12);
+    expect(tooltip.style.display).toBe('none');
+    expect(row.classList.contains('is-selected')).toBe(false);
+    expect(abilityTooltip).toHaveBeenCalledTimes(1);
+
+    // A third tap brings it back: a toggle, not a one-way dismissal.
+    tap(row, 13);
+    expect(tooltip.style.display).toBe('block');
+    expect(row.classList.contains('is-selected')).toBe(true);
+  });
+
+  it('shows the description again after the controls strip dismissed it', () => {
+    const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
+    tap(row, 14);
+    expect(tooltip.style.display).toBe('block');
+
+    const controls = required(
+      row.querySelector<HTMLElement>('.spell-touch-controls'),
+      'touch controls strip',
+    );
+    activateControl(controls, 15);
+    expect(tooltip.style.display).toBe('none');
+
+    // The dead-zone dismissal cleared the open flag, so this tap SHOWS the
+    // description again instead of reading as the closing half of a toggle.
+    tap(row, 16);
+    expect(tooltip.style.display).toBe('block');
+  });
+
+  it('keeps the description clear of the +/x column by passing its left boundary', () => {
+    const row = required(root.querySelector<HTMLElement>('.spell-row'), 'learned spell row');
+    const controls = required(
+      row.querySelector<HTMLElement>('.spell-touch-controls'),
+      'touch controls strip',
+    );
+    controls.getBoundingClientRect = () =>
+      ({
+        left: 321,
+        right: 405,
+        top: 0,
+        bottom: 40,
+        width: 84,
+        height: 40,
+        x: 321,
+        y: 0,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    tap(row, 17);
+    expect(tooltip.style.display).toBe('block');
+    expect(shownBoundaries.at(-1)).toBe(321);
   });
 });

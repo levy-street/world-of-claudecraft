@@ -1183,9 +1183,12 @@
     background: var(--color-primary-glow);
   }
   /* Touch selection: the row whose description or slot picker is active keeps a
-     steady dark seat (focus-visible never fires for a finger tap). */
+     steady dark seat (focus-visible never fires for a finger tap). The panel
+     gradient bottoms out at the same #08080d the seat fills with, so the fill
+     alone can vanish: the gold-dim inset ring is what keeps the seat readable. */
   .spell-row.is-selected {
     background: var(--color-bg-dark);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
   }
   .spell-row.locked .spell-icon {
     filter: grayscale(1) brightness(0.5);

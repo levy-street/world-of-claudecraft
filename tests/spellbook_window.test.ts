@@ -13,6 +13,10 @@ const src = readFileSync(new URL('../src/ui/spellbook_window.ts', import.meta.ur
 const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+);
 const hudChromeCatalog = readFileSync(
   new URL('../src/ui/i18n.catalog/hud_chrome.ts', import.meta.url),
   'utf8',
@@ -157,7 +161,17 @@ describe('spellbook_window: inline mobile slot picker', () => {
     expect(code).toContain('const showDescription = this.deps.attachTooltip(');
     expect(code).toContain('bindTouchTap(el, () => {');
     expect(code).toContain('if (this.pickerAbilityId !== null) return');
-    expect(code).toContain('showDescription()');
+    expect(code).toContain(
+      'showDescription(controls ? controls.getBoundingClientRect().left : undefined)',
+    );
+  });
+
+  it('clamps a boundary-passed description left of the touch controls column', () => {
+    // The spellbook passes the strip's left edge; the shared hud show clamps
+    // the tooltip's right edge to it (pulling left only, floored at 8px).
+    expect(code).toContain("el.querySelector<HTMLElement>('.spell-touch-controls')");
+    expect(hud).toContain('const showNearElement = (maxRightX?: number) => {');
+    expect(hud).toContain('const clamped = Math.max(8, maxRightX / z - ttW - 6);');
   });
 
   it('does not add a persistent selected/focused state to touch spell rows', () => {
@@ -236,12 +250,34 @@ describe('spellbook_window: inline mobile slot picker', () => {
     );
   });
 
-  it('uses the same compact inner padding at the top and bottom of the Spellbook', () => {
+  it('drives the compact spellbook edges through the shared window pad', () => {
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #spellbook\s*\{[^}]*--spellbook-edge-padding:\s*8px;[^}]*padding-top:\s*var\(--spellbook-edge-padding\);[^}]*padding-bottom:\s*var\(--spellbook-edge-padding\)/s,
+      /body\.mobile-touch #spellbook\s*\{[^}]*--spellbook-edge-padding:\s*8px;[^}]*--window-pad:\s*var\(--spellbook-edge-padding\)/s,
     );
+    // No direct padding override: the top edge follows --window-pad (which the
+    // sticky header's negative margins mirror, so the title plate stays inside
+    // the frame), and the bottom edge keeps the generic mobile .window
+    // scroll-end reservation (18px plus safe area) as the visible gap.
+    const block = mobileCss.match(/body\.mobile-touch #spellbook\s*\{[^}]*\}/s)?.[0] ?? '';
+    expect(block).not.toBe('');
+    expect(block).not.toContain('padding-top:');
+    expect(block).not.toContain('padding-bottom:');
     expect(mobileCss).toMatch(
       /body\.mobile-touch #spellbook > \.panel-title\s*\{[^}]*margin-top:\s*0/s,
+    );
+  });
+
+  it('aligns the header close cluster with the row +/x column', () => {
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #spellbook > \.panel-title > \.panel-title-actions\s*\{[^}]*inset-inline-end:\s*calc\(var\(--window-pad\) \+ 4px\)/s,
+    );
+  });
+
+  it('keeps the touch-selected row seat readable on the panel gradient', () => {
+    // The gradient bottoms out at the same color as the seat fill, so the
+    // gold-dim inset ring is what makes the selection visible.
+    expect(componentsCss).toMatch(
+      /\.spell-row\.is-selected\s*\{[^}]*background:\s*var\(--color-bg-dark\);[^}]*box-shadow:\s*inset 0 0 0 1px var\(--gold-dim\)/s,
     );
   });
 

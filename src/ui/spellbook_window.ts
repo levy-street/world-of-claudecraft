@@ -49,12 +49,15 @@ export interface SpellbookWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   hideTooltip(): void;
+  /** The returned show accepts an optional right-edge boundary (visual px):
+   *  the painted tooltip never extends past it (the touch rows pass the left
+   *  edge of their +/x controls strip so the description stays clear of it). */
   attachTooltip(
     el: HTMLElement,
     html: () => string,
     enabled?: () => boolean,
     directFocusOnly?: boolean,
-  ): () => void;
+  ): (maxRightX?: number) => void;
   /** describeAbilitySummary(known, player.resourceType), localized Hud-side. */
   abilitySummary(known: ResolvedAbility): string;
   /** The full ability tooltip markup (Hud-owned). */
@@ -103,6 +106,11 @@ export class SpellbookWindow {
   // whose slot picker is open. Tracked by ability id so it survives the
   // re-renders the picker and the hotbar refresh trigger.
   private selectedAbilityId: string | null = null;
+  // The row whose description tooltip is open right now (touch only): a second
+  // tap on the same row folds the description away instead of re-showing it.
+  // Cleared by every path that hides the tooltip (strip dead zone, picker,
+  // close), so a fresh tap after any of those shows again rather than toggling.
+  private descriptionAbilityId: string | null = null;
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
@@ -141,6 +149,7 @@ export class SpellbookWindow {
     }
     el.style.display = 'none';
     this.deps.hideTooltip();
+    this.descriptionAbilityId = null;
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.markSelectedRow(null);
@@ -348,8 +357,19 @@ export class SpellbookWindow {
         );
         bindTouchTap(el, () => {
           if (this.pickerAbilityId !== null) return;
+          if (this.descriptionAbilityId === row.abilityId) {
+            // Same row again: the tap toggles its open description closed.
+            this.descriptionAbilityId = null;
+            this.deps.hideTooltip();
+            this.markSelectedRow(null);
+            return;
+          }
+          this.descriptionAbilityId = row.abilityId;
           this.markSelectedRow(row.abilityId);
-          showDescription();
+          // The description stops at the +/x column: pass the strip's left
+          // boundary so the tooltip never covers the row's own buttons.
+          const controls = el.querySelector<HTMLElement>('.spell-touch-controls');
+          showDescription(controls ? controls.getBoundingClientRect().left : undefined);
         });
         list.appendChild(el);
         return;
@@ -442,6 +462,7 @@ export class SpellbookWindow {
     // mouse activation. Stop BOTH here (click in the bubble phase, so the
     // Add/assignment/Remove handlers underneath keep firing first).
     const dismissDescription = (event: Event) => {
+      this.descriptionAbilityId = null;
       this.deps.hideTooltip();
       event.stopPropagation();
     };
@@ -514,6 +535,7 @@ export class SpellbookWindow {
 
   private openPicker(abilityId: string, opener: HTMLElement): void {
     this.deps.hideTooltip();
+    this.descriptionAbilityId = null;
     this.markSelectedRow(abilityId);
     this.pickerAbilityId = abilityId;
     this.pickerBarToken = this.deps.barToken?.() ?? '';
