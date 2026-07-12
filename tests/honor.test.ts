@@ -164,19 +164,19 @@ describe('ranked Arena honor', () => {
     const repeat = Array.from({ length: 4 }, () =>
       awardRankedArenaWinHonor(sim.ctx, meta, '1v1', '["character:9"]'),
     );
-    expect(repeat).toEqual([100, 50, 25, 0]);
+    expect(repeat).toEqual([25, 0, 0, 0]);
 
     const fresh = world();
     fresh.utcDay = '2026-07-11';
     const freshPid = fresh.addPlayer('warrior', 'Taper');
     const freshMeta = fresh.meta(freshPid)!;
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
-      expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', `["character:${i}"]`)).toBe(100);
+      expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', `["character:${i}"]`)).toBe(25);
     }
-    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(50);
+    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(12);
 
     fresh.utcDay = '2026-07-12';
-    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(100);
+    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(25);
   });
 
   it('does not reset a persisted daily window when the host has no UTC day', () => {
@@ -185,9 +185,9 @@ describe('ranked Arena honor', () => {
     const pid = sim.addPlayer('warrior', 'Replay');
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
-    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(100);
+    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(25);
     sim.utcDay = '';
-    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(50);
+    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(0);
   });
 });
 

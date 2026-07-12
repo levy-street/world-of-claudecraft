@@ -18,6 +18,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterAndMarketState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+import { RANKED_ARENA_WIN_HONOR } from '../src/sim/pvp';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -194,13 +195,13 @@ describe('arena: online integration (GameServer)', () => {
     expect(server.sim.arenaMatchFor(sa.pid)?.state).toBe('active');
 
     await server.leave(sa, 'disconnect');
-    expect(server.sim.meta(sb.pid)!.honor).toBe(100);
+    expect(server.sim.meta(sb.pid)!.honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
     await server.leave(sb, 'disconnect');
 
     const victorSave = vi
       .mocked(saveCharacterAndMarketState)
       .mock.calls.find(([characterId]) => characterId === sb.characterId);
-    expect(victorSave?.[2].honor).toBe(100);
-    expect(victorSave?.[2].lifetimeHonor).toBe(100);
+    expect(victorSave?.[2].honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    expect(victorSave?.[2].lifetimeHonor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
   });
 });

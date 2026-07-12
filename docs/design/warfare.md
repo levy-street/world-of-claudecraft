@@ -40,13 +40,15 @@ independent of mitigation apart from the engine's integer-rounding boundary.
 
 Phase 1 starts with these owner-selected values:
 
-- Ranked 1v1 win: 100 Honor.
-- Ranked 2v2 win: 150 Honor.
+- Ranked 1v1 win: 25 Honor.
+- Ranked 2v2 win: 50 Honor per winning player.
 - Fiesta takedown: 20 Honor.
 - Completed Fiesta match: 20 Honor.
 - Fiesta win bonus: 40 Honor.
 
-Repeated rewards against the same opposition pay 100, 50, 25, then 0 percent.
+Only the first ranked Arena win against the same opponent or team pays Honor
+each UTC day. Repeated Fiesta rewards against the same opposition pay 100, 50,
+25, then 0 percent.
 Ranked wins also taper after 10 wins in one UTC day to 50 percent, then after 15
 wins to a 25 percent floor. These values are named constants and can be tuned
 without changing rating, matchmaking, or combat rules.

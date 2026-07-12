@@ -6,16 +6,18 @@ import type { SimContext } from '../sim_context';
 import type { ArenaFormat, HonorArenaDailyState, HonorReason } from '../types';
 
 export const RANKED_ARENA_WIN_HONOR = {
-  '1v1': 100,
-  '2v2': 150,
+  '1v1': 25,
+  '2v2': 50,
 } as const;
 
 export const FIESTA_KILL_HONOR = 20;
 export const FIESTA_COMPLETION_HONOR = 20;
 export const FIESTA_WIN_BONUS_HONOR = 40;
 
-// Repeated wins or takedowns against the same opposition pay 100%, 50%, 25%,
-// then 0. Integer rewards round down so the faucet never exceeds its tuning.
+// Arena is especially easy to coordinate in 1v1, so only the first win against
+// the same opponent/team pays each UTC day. Fiesta uses softer decay because its
+// takedown and completion rewards come from a longer, multi-kill match.
+export const ARENA_REPEAT_DR = [1, 0] as const;
 export const HONOR_REPEAT_DR = [1, 0.5, 0.25, 0] as const;
 export const ARENA_DAILY_TAPER_START = 10;
 export const ARENA_DAILY_TAPER_FLOOR_START = 15;
@@ -75,6 +77,10 @@ export function repeatHonorMultiplier(previousAwards: number): number {
   return HONOR_REPEAT_DR[Math.min(previousAwards, HONOR_REPEAT_DR.length - 1)];
 }
 
+export function arenaRepeatHonorMultiplier(previousAwards: number): number {
+  return ARENA_REPEAT_DR[Math.min(previousAwards, ARENA_REPEAT_DR.length - 1)];
+}
+
 function arenaDailyMultiplier(totalWins: number): number {
   if (totalWins < ARENA_DAILY_TAPER_START) return 1;
   if (totalWins < ARENA_DAILY_TAPER_FLOOR_START) return 0.5;
@@ -126,7 +132,7 @@ export function awardRankedArenaWinHonor(
   const repeats = daily.winsByOpponent[key] ?? 0;
   const amount = Math.floor(
     RANKED_ARENA_WIN_HONOR[format] *
-      repeatHonorMultiplier(repeats) *
+      arenaRepeatHonorMultiplier(repeats) *
       arenaDailyMultiplier(daily.totalWins),
   );
   daily.winsByOpponent[key] = repeats + 1;

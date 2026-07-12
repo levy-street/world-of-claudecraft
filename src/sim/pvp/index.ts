@@ -1,6 +1,8 @@
 export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,
+  ARENA_REPEAT_DR,
+  arenaRepeatHonorMultiplier,
   awardFiestaCompletionHonor,
   awardFiestaKillHonor,
   awardRankedArenaWinHonor,
