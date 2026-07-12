@@ -155,10 +155,12 @@ export const pl_PL: EnTranslations = {
       "banner": "Obserwujesz {name}"
     },
     "readyCheck": {
-      "prompt": "{name} has started a ready check. Are you ready?",
-      "ready": "Ready",
-      "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "prompt": "{name} rozpoczyna sprawdzenie gotowości. Czy wszystko gotowe?",
+      "ready": "Gotowość",
+      "notReady": "Brak gotowości",
+      "result": "Sprawdzenie gotowości: {ready} gotowych, {notReady} niegotowych, {noResponse} bez odpowiedzi.",
+      "notInPartyError": "Aby rozpocząć sprawdzenie gotowości, musisz należeć do grupy.",
+      "inProgressError": "Sprawdzenie gotowości już trwa."
     },
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
@@ -239,7 +241,7 @@ export const pl_PL: EnTranslations = {
         "no_wallet": "Podłącz portfel z co najmniej 20 USD w WOC.",
         "under_minimum": "Portfel jest poniżej minimum 20 USD w WOC.",
         "price_unavailable": "Cena WOC jest niedostępna, nagrody są tymczasowo zablokowane.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}"
       }
     },
     "theme": {
@@ -320,6 +322,8 @@ export const pl_PL: EnTranslations = {
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
       "toggleHaptics": "Przełącz wibracje",
+      "showMenuButtons": "Pokaż przyciski menu",
+      "hideMenuButtons": "Ukryj przyciski menu",
       "hotbarPage": "Umiejętności",
       "hotbarPageAria": "Pokaż następny zestaw umiejętności",
       "actionRing": "Działania bojowe",
@@ -404,12 +408,12 @@ export const pl_PL: EnTranslations = {
       "targetFriendlyNext": "Przełączaj przyjazny cel",
       "discord": "Discord",
       "valecup": "Puchar Doliny",
-      "categoryPet": "Pet",
-      "petAttack": "Pet: Attack",
-      "petStop": "Pet: Stop",
-      "petTaunt": "Pet: Taunt",
-      "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "categoryPet": "Zwierzę",
+      "petAttack": "Zwierzę: Atak",
+      "petStop": "Zwierzę: Zatrzymaj",
+      "petTaunt": "Zwierzę: Prowokacja",
+      "petDefensive": "Zwierzę: Obronne",
+      "petAggressive": "Zwierzę: Agresywne"
     },
     "vcup": {
       "title": "Puchar Doliny",
@@ -584,7 +588,84 @@ export const pl_PL: EnTranslations = {
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",
-      "mobileLeftHanded": "Układ leworęczny"
+      "mobileLeftHanded": "Układ leworęczny",
+      "ia": {
+        "railDisplay": "Wyświetlanie",
+        "railInput": "Sterowanie",
+        "railSystem": "Ustawienia systemu",
+        "catOverviewName": "Przegląd",
+        "catOverviewSub": "Przypięte podstawy, szybkie działania i wprowadzone zmiany.",
+        "catGraphicsSub": "Jakość, widok i wygląd świata.",
+        "catInterfaceSub": "Skala HUD, panele, czat i ramki jednostek.",
+        "catAccessibilityName": "Ułatwienia dostępu",
+        "catAccessibilitySub": "Ruch, kontrast i komfortowa zawartość.",
+        "catControlsName": "Sterowanie",
+        "catControlsSub": "Kamera, ruch, walka i informacje zwrotne.",
+        "catKeybindsSub": "Przypisz klawisze do każdej akcji.",
+        "catControllerSub": "Wrażenia z pada i układ przycisków.",
+        "catTouchName": "Sterowanie dotykowe",
+        "catTouchSub": "Drążki ekranowe, rozglądanie i przyciski.",
+        "catAudioSub": "Głośność i przełączniki dźwięku.",
+        "catSystemName": "Ustawienia systemu",
+        "catSystemSub": "Wydajność, pomoc i informacje."
+      },
+      "done": "Gotowe",
+      "resetAllTitle": "Wyzerować wszystkie ustawienia?",
+      "resetAllBody": "Spowoduje to przywrócenie wartości domyślnych wszystkich ustawień. Tej operacji nie można cofnąć.",
+      "searchPlaceholder": "Szukaj ustawień",
+      "searchScopeAll": "Wszystkie ustawienia",
+      "searchScopeThis": "Ta sekcja",
+      "searchEmpty": "Żadne ustawienia nie pasują do wyszukiwania.",
+      "searchGoTo": "Przejdź do {category}",
+      "modeOnline": "Tryb sieciowy",
+      "modeOffline": "Tryb bez połączenia",
+      "changed": "Zmieniono: {count}",
+      "changedSummary": "Zmieniono względem wartości domyślnych: {count}",
+      "legend": {
+        "category": "Kategoria",
+        "navigate": "Nawigacja",
+        "select": "Wybierz",
+        "back": "Wstecz",
+        "reset": "Wyzeruj",
+        "clear": "Wyczyść",
+        "page": "Strona"
+      },
+      "keybindCleared": "Usunięto przypisanie dla {action}",
+      "keybindRebinding": "Zmienianie przypisania {action}. Naciśnij klawisz albo Escape, aby anulować.",
+      "keybindEvicted": "Przypisano {key} do {action}; usunięto z {evicted}",
+      "keybindTaken": "Usunięto klawisz",
+      "keybindUnbound": "{action} nie ma przypisanego klawisza",
+      "keybindModifierHint": "Wskazówka: możesz przypisywać kombinacje z klawiszami modyfikującymi. Przytrzymaj Shift, Ctrl lub Alt podczas naciskania klawisza, aby przechwycić kombinację, na przykład Shift+1.",
+      "conflictDot": "Konflikt przypisania",
+      "overviewConflictAlert": "Niektóre przypisania klawiszy są w konflikcie lub ich brakuje.",
+      "sec": {
+        "quality": "Jakość",
+        "view": "Widok",
+        "general": "Ogólne",
+        "scaleText": "Skala i tekst",
+        "panels": "Panele",
+        "unitFrames": "Ramki jednostek",
+        "actionBars": "Paski akcji",
+        "chat": "Czat",
+        "combatTooltips": "Walka i podpowiedzi",
+        "hudExtras": "Dodatki HUD",
+        "motionContrast": "Ruch i kontrast",
+        "content": "Zawartość",
+        "camera": "Sterowanie kamerą",
+        "movement": "Poruszanie się",
+        "combat": "Walka",
+        "feedback": "Informacje zwrotne",
+        "inputMode": "Tryb sterowania",
+        "feel": "Odczucia",
+        "sticks": "Drążki",
+        "look": "Rozglądanie",
+        "buttons": "Przyciski",
+        "volume": "Głośność",
+        "toggles": "Przełączniki",
+        "performance": "Wydajność",
+        "support": "Pomoc",
+        "about": "Informacje"
+      }
     },
     "controller": {
       "title": "Kontroler",
@@ -596,7 +677,8 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
-      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
+      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego.",
+      "duplicate": "Przypisano również do {buttons}"
     },
     "perf": {
       "title": "Nakładka wydajności",
@@ -729,13 +811,17 @@ export const pl_PL: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Zestaw {n}"
+      "defaultBuildName": "Zestaw {n}",
+      "choicesTab": "Wybory",
+      "resetChoices": "Wyzeruj wybory",
+      "tierLevel": "Poziom {n}",
+      "tierLevelLabel": "Poziom"
     },
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROICZNY]",
+    "itemSoulbound": "Związany z duszą",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1082,10 +1168,10 @@ export const pl_PL: EnTranslations = {
       "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Kontynuuj przez Apple",
+      "appleError": "Nie udało się zalogować przez Apple. Spróbuj ponownie.",
+      "appleChoiceIntro": "Utwórz nowe konto albo połącz Apple z istniejącym kontem.",
+      "appleChoiceExpired": "To logowanie przez Apple wygasło. Zaloguj się ponownie przez Apple.",
       "forgotPrompt": "Nie pamiętasz hasła?",
       "forgotTitle": "Zresetuj hasło",
       "forgotHint": "Podaj nazwę użytkownika, a wyślemy link do resetowania na zapisany adres e-mail.",
@@ -1330,8 +1416,8 @@ export const pl_PL: EnTranslations = {
       "parcelsLabel": "Paczki",
       "parcelsHint": "Kliknij przedmiot w torbach, aby go załączyć.",
       "removeParcelAria": "Usuń {item} z listu",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Wyślij o jedną sztukę {item} mniej",
+      "parcelQtyIncreaseAria": "Wyślij o jedną sztukę {item} więcej",
       "sendButton": "Wyślij list",
       "postageNote": "Opłata pocztowa: {amount}. Kruk leci około {seconds} s.",
       "arrivedBanner": "Kruk wylądował: poczta od {name}.",
@@ -3938,14 +4024,14 @@ export const pl_PL: EnTranslations = {
     "reconnecting": "Połączenie utracone. Ponowne łączenie...",
     "connectionRejected": "Serwer zamknął połączenie.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
-      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
-      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
-      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "classes": "Wskazówka: każdą z 9 klas gra się inaczej. Wypróbuj kilka, zanim zdecydujesz się na jedną.",
+      "talents": "Wskazówka: poza walką możesz w każdej chwili wyzerować talenty, więc wczesny wybór nigdy nie jest pułapką.",
+      "dungeons": "Wskazówka: gdy twój ekwipunek stanie się zbyt dobry na zwykły poziom lochu, spróbuj poziomu heroicznego, aby stoczyć trudniejszą i bardziej opłacalną walkę.",
+      "market": "Wskazówka: na Rynku Świata możesz kupować i sprzedawać z graczami z całego królestwa.",
+      "guilds": "Wskazówka: dołączenie do gildii daje ci prywatny kanał czatu i wspólną listę członków gildii.",
+      "professions": "Wskazówka: profesje zbierackie i rzemieślnicze można szkolić równolegle z klasą bojową.",
+      "loadouts": "Wskazówka: zapisz więcej niż jeden zestaw talentów, aby przełączać się między konfiguracjami bez ponownego wydawania punktów.",
+      "pvp": "Wskazówka: wyzwij innego gracza na przyjazny pojedynek lub dołącz do kolejki na arenę Popielnego Koloseum, aby przetestować swoją konfigurację."
     }
   },
   "errors": {
@@ -4941,6 +5027,8 @@ export const pl_PL: EnTranslations = {
       "buybackTitle": "Odkup",
       "buybackEmpty": "Brak przedmiotów",
       "buybackAria": "Odkup {item} za {price}",
+      "sellItemAria": "Sprzedaj {item} za {price}",
+      "sellRolledWarning": "Losowych statystyk nie można odzyskać przez odkupienie przedmiotu.",
       "sellQuantityTitle": "Sprzedaj {item}",
       "sellQuantityInput": "Ilość do sprzedania",
       "sellQuantityConfirm": "Sprzedaj",
@@ -5865,7 +5953,7 @@ export const pl_PL: EnTranslations = {
         "name": "Kieł Starego Szaroszczękiego"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Kawałek rudy"
       },
       "weathered_ledger_page": {
         "name": "Zniszczona strona księgi"
@@ -7548,12 +7636,12 @@ export const pl_PL: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Fach dla każdej dłoni",
+        "text": "Każdy w Eastbrook para się jakimś fachem oprócz władania mieczem, {playerName}. Wokół miasta pełno żył rudy, więc chwyć za kilof i przynieś mi 5 kawałków. Wydobądź je własnoręcznie; poznam różnicę.",
+        "completion": "Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Kawałek rudy"
           }
         }
       },

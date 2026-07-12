@@ -1,9 +1,20 @@
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
-import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
+import { ensureWindowFrame } from './window_frame_mount';
+import type { WindowFrameDescriptor } from './window_frame_view';
+
+// A closable, tab-less frame: the reward summary, spin wheel, tasks, leaderboard,
+// and history stack in one scrollable body. The spin control stays coupled to its
+// in-body wheel visual (not lifted into a sticky footer), so the frame carries no
+// footer. Title + close keys are reused from the existing dailyRewards catalog.
+const DAILY_FRAME: WindowFrameDescriptor = {
+  id: 'daily-rewards-window',
+  titleKey: 'hudChrome.dailyRewards.title',
+  closeLabelKey: 'hudChrome.dailyRewards.close',
+};
 
 function reasonText(eligibility: DailyRewardStatus['eligibility']): string {
   switch (eligibility.reason) {
@@ -103,7 +114,8 @@ export class DailyRewardsWindow {
     const root = this.deps.root();
     const seq = ++this.renderSeq;
     this.ensureShell();
-    if (focus === 'open') (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
+    if (focus === 'open')
+      (root.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
     let status: DailyRewardStatus | null = null;
     let history: DailyRewardHistory = { payouts: [] };
     try {
@@ -123,10 +135,11 @@ export class DailyRewardsWindow {
 
   private ensureShell(): void {
     const root = this.deps.root();
-    markDialogRoot(root, { labelledBy: 'daily-rewards-title' });
-    if (root.querySelector('.dr-body')) return;
-    root.innerHTML = this.titleHtml() + this.loadingHtml();
-    root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    // The shared frame owns the titlebar + close (dialog role/aria live on the
+    // inner mount, so #daily-rewards-window stays a plain .window.panel); the
+    // reward body is repainted into its scrollable window-body.
+    const { body } = ensureWindowFrame(root, DAILY_FRAME, { onClose: () => this.close() });
+    if (!body.querySelector('.dr-body')) body.innerHTML = this.loadingHtml();
   }
 
   private paint(view: DailyRewardsView): void {
@@ -191,13 +204,6 @@ export class DailyRewardsWindow {
       await this.render(null);
       return;
     }
-  }
-
-  private titleHtml(): string {
-    return (
-      `<div class="panel-title"><span id="daily-rewards-title">${esc(t('hudChrome.dailyRewards.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.dailyRewards.close'))}">${svgIcon('close')}</button></div>`
-    );
   }
 
   private loadingHtml(): string {

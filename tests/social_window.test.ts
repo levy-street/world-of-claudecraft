@@ -29,36 +29,45 @@ describe('social_window: no magic values', () => {
   });
 });
 
-describe('social_window: WAI-ARIA tabs', () => {
-  it('renders the tab strip as a role=tablist with role=tab + aria-selected + roving tabindex', () => {
-    expect(painter).toContain('role="tablist"');
-    // Exactly four real tabs (friends / guild / ignore / raid), each a role=tab. The
-    // closing quote in /role="tab"/ does NOT match role="tablist" / role="tabpanel".
-    expect(painter.match(/role="tab"/g)?.length).toBe(4);
-    expect(painter).toContain('aria-selected="${tab ===');
-    expect(painter).toContain('tabindex="${tab ===');
-    expect(painter).toContain('aria-controls="soc-body-panel"');
+describe('social_window: frame tab rail (friends/guild/ignore/raid)', () => {
+  it('adopts the shared window frame with the four modes on the tab rail', () => {
+    // The role=tablist / role=tab / role=tabpanel markup now comes from the shared
+    // window-frame builder (window_frame.ts, unit-tested in window_frame_view.test.ts);
+    // this pins the descriptor + the close/tab-change wiring the painter supplies.
+    expect(painter).toContain('renderWindowFrame(');
+    expect(painter).toContain('SOCIAL_FRAME');
+    expect(painter).toContain("id: 'friends'");
+    expect(painter).toContain("id: 'guild'");
+    expect(painter).toContain("id: 'ignore'");
+    expect(painter).toContain("id: 'raid'");
+    expect(painter).toContain('onClose: () => this.close()');
+    expect(painter).toContain('onTabChange: (id) => this.onTabChange(id)');
   });
 
-  it('makes .soc-body the labelled tabpanel (refreshList still queries it by class)', () => {
-    expect(painter).toContain('id="soc-body-panel"');
-    expect(painter).toContain('role="tabpanel"');
-    expect(painter).toContain('class="soc-body"');
+  it('wires roving Arrow/Home/End across the frame tab rail via the shared core', () => {
+    expect(painter).toContain("from './roving_index'");
+    expect(painter).toContain('rovingTarget(');
+    expect(painter).toContain('private wireTabRoving(');
+  });
+
+  it('syncs the tab rail aria-selected + roving tabindex to the active tab', () => {
+    expect(painter).toContain('private syncTabState(');
+    expect(painter).toContain("b.setAttribute('aria-selected'");
+    expect(painter).toContain('b.tabIndex = sel ? 0 : -1');
   });
 
   it('drops aria-pressed entirely (a tab is not a toggle button)', () => {
     expect(painter).not.toContain('aria-pressed');
   });
 
-  it('wires the roving Arrow/Home/End handler via the shared roving_index core', () => {
-    expect(painter).toContain("from './roving_index'");
-    expect(painter).toContain('rovingTarget(');
+  it('keeps .soc-body as the delegated-click container (refreshList queries it by class)', () => {
+    expect(painter).toContain('class="soc-body"');
   });
 });
 
 describe('social_window: delegated row listeners (no per-tick churn)', () => {
   it('wires ONE delegated click listener on the body in render(), dispatched by onBodyClick', () => {
-    expect(painter).toMatch(/body\.addEventListener\('click'/);
+    expect(painter).toMatch(/socBody\.addEventListener\('click'/);
     expect(painter).toContain('private onBodyClick(');
   });
 

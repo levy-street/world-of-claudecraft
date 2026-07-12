@@ -131,37 +131,22 @@ A Services ID, website return URL, Sign in with Apple private key, Team ID, and 
 not required for this native-only implementation. Those become necessary if Sign in with
 Apple is later added to the website or another non-native authorization flow.
 
-## Over The Air Updates
+## Store Updates Only
 
-The native apps include the Ionic Appflow Capacitor Live Updates SDK. It is
-configured in `capacitor.config.ts` with:
+The native apps do not include the Ionic Appflow Capacitor Live Updates SDK and
+must not use Appflow over the air deployments. Every web or native change ships
+in a new App Store and Play Store binary.
 
-| Setting | Value |
-|---|---|
-| Appflow app ID | `9fa1b0c1` |
-| Channel | `Production` |
-| Update method | `background` |
+Always run `npm run native:sync` before creating an archive. This rebuilds the
+native web client and copies the current assets into both platform projects.
+Confirm the version and build shown by the installed app match the intended
+release before submission.
 
-Background updates are downloaded after app launch and become active on the next
-launch. Use this for web asset fixes only: HTML, CSS, JavaScript, bundled media,
-copy, and other client code already inside the Capacitor web build. Changes to
-native code, app icons, splash screens, permissions, entitlements, Capacitor
-config, or native plugin versions still require a new App Store or Play Store
-binary.
-
-After changing the Live Updates config or native dependencies, run:
-
-```sh
-npm run native:sync
-```
-
-To ship an OTA update after the app-store binary containing Live Updates has
-been approved:
-
-1. Build the web app in Appflow from the target Git commit.
-2. Assign the web build to the `Production` Live Update channel.
-3. Test on a store or TestFlight build by launching once to download the update,
-   then closing and relaunching the app to apply it.
+Release QA must cover both a fresh install and an update over an existing store
+installation. For the update test, preserve the existing app data, install the
+new build over the old one, force quit and relaunch it several times, and confirm
+the app always uses the web assets bundled with the new binary. Also test one
+offline launch to ensure startup does not depend on an update service.
 
 ## Store Review Notes
 

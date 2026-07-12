@@ -24,6 +24,7 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
+import { mergeSkinnedParts } from './rig_merge';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -403,9 +404,11 @@ function resolvedGltf(url: string): GLTF {
 }
 
 // ---------------------------------------------------------------------------
-// Per-url source optimization: KayKit characters ship six skinned body parts
+// Per-url source optimization: KayKit characters ship several skinned body parts
 // sharing one skeleton and one material — merge them into a single SkinnedMesh
-// once per asset so every instance costs ~1 body draw instead of ~6.
+// once per asset so every instance costs ~1 body draw instead of ~9 (and one
+// Skeleton / bone texture instead of ~9). See rig_merge.ts for why the parts'
+// per-primitive bind data has to be rebaked first.
 // ---------------------------------------------------------------------------
 
 const optimizedSceneCache = new Map<string, THREE.Object3D>();
@@ -417,66 +420,6 @@ function optimizedScene(url: string): THREE.Object3D {
   mergeSkinnedParts(root);
   optimizedSceneCache.set(url, root);
   return root;
-}
-
-const BIND_EPS = 1e-3;
-
-function sameBindData(a: THREE.SkinnedMesh, b: THREE.SkinnedMesh): boolean {
-  const ia = a.skeleton.boneInverses,
-    ib = b.skeleton.boneInverses;
-  if (ia.length !== ib.length) return false;
-  for (let m = 0; m < ia.length; m++) {
-    const ea = ia[m].elements,
-      eb = ib[m].elements;
-    for (let i = 0; i < 16; i++) if (Math.abs(ea[i] - eb[i]) > BIND_EPS) return false;
-  }
-  const ba = a.bindMatrix.elements,
-    bb = b.bindMatrix.elements;
-  for (let i = 0; i < 16; i++) if (Math.abs(ba[i] - bb[i]) > BIND_EPS) return false;
-  return true;
-}
-
-function mergeSkinnedParts(root: THREE.Object3D): void {
-  // bucket by bone set / material / parent / local transform, then split
-  // buckets by approximate bind-data equality (float noise must not block a
-  // merge, while genuinely different bind poses must never share vertices —
-  // the skeleton pack's parts carry per-part bind data)
-  const groups = new Map<string, THREE.SkinnedMesh[][]>();
-  root.traverse((o) => {
-    const sm = o as THREE.SkinnedMesh;
-    if (!sm.isSkinnedMesh || !sm.visible) return;
-    const mat = sm.material as THREE.Material;
-    if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
-    const bones = sm.skeleton.bones.map((b) => b.uuid).join(',');
-    const key = `${bones}|${mat.uuid}|${sm.parent?.uuid}|${sm.matrix.elements.join(',')}`;
-    let buckets = groups.get(key);
-    if (!buckets) {
-      buckets = [];
-      groups.set(key, buckets);
-    }
-    const bucket = buckets.find((b) => sameBindData(b[0], sm));
-    if (bucket) bucket.push(sm);
-    else buckets.push([sm]);
-  });
-  for (const parts of [...groups.values()].flat()) {
-    if (parts.length < 2) continue;
-    const names = new Set(parts.flatMap((p) => Object.keys(p.geometry.attributes)));
-    if (![...names].every((n) => parts.every((p) => p.geometry.getAttribute(n)))) continue;
-    const geo = mergeGeometries(
-      parts.map((p) => p.geometry),
-      false,
-    );
-    if (!geo) continue;
-    const first = parts[0];
-    const merged = new THREE.SkinnedMesh(geo, first.material);
-    merged.name = `${first.name}_bodymerged`;
-    merged.position.copy(first.position);
-    merged.quaternion.copy(first.quaternion);
-    merged.scale.copy(first.scale);
-    merged.bind(first.skeleton, first.bindMatrix);
-    first.parent!.add(merged);
-    for (const p of parts) p.removeFromParent();
-  }
 }
 
 // ---------------------------------------------------------------------------

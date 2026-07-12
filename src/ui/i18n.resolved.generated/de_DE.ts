@@ -155,10 +155,12 @@ export const de_DE: EnTranslations = {
       "banner": "{name} wird beobachtet"
     },
     "readyCheck": {
-      "prompt": "{name} has started a ready check. Are you ready?",
-      "ready": "Ready",
-      "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "prompt": "{name} hat einen Bereitschaftscheck gestartet. Bist du bereit?",
+      "ready": "Bereit",
+      "notReady": "Nicht bereit",
+      "result": "Bereitschaftscheck: {ready} bereit, {notReady} nicht bereit, {noResponse} ohne Antwort.",
+      "notInPartyError": "Du musst einer Gruppe angehören, um einen Bereitschaftscheck zu starten.",
+      "inProgressError": "Ein Bereitschaftscheck läuft bereits."
     },
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
@@ -239,7 +241,7 @@ export const de_DE: EnTranslations = {
         "no_wallet": "Verbinde eine Wallet mit mindestens 20 USD in WOC.",
         "under_minimum": "Deine Wallet liegt unter dem Mindestwert von 20 USD in WOC.",
         "price_unavailable": "Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}"
       }
     },
     "theme": {
@@ -320,6 +322,8 @@ export const de_DE: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
       "toggleHaptics": "Haptik umschalten",
+      "showMenuButtons": "Menütasten anzeigen",
+      "hideMenuButtons": "Menütasten ausblenden",
       "hotbarPage": "Fähigkeiten",
       "hotbarPageAria": "Nächste Fähigkeitengruppe anzeigen",
       "actionRing": "Kampfhandlungen",
@@ -404,12 +408,12 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "discord": "Discord",
       "valecup": "Talpokal",
-      "categoryPet": "Pet",
-      "petAttack": "Pet: Attack",
-      "petStop": "Pet: Stop",
-      "petTaunt": "Pet: Taunt",
-      "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "categoryPet": "Begleiter",
+      "petAttack": "Begleiter: Angreifen",
+      "petStop": "Begleiter: Stopp",
+      "petTaunt": "Begleiter: Verspotten",
+      "petDefensive": "Begleiter: Defensiv",
+      "petAggressive": "Begleiter: Aggressiv"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -584,7 +588,84 @@ export const de_DE: EnTranslations = {
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
-      "mobileLeftHanded": "Linkshänder-Layout"
+      "mobileLeftHanded": "Linkshänder-Layout",
+      "ia": {
+        "railDisplay": "Anzeige",
+        "railInput": "Eingabe",
+        "railSystem": "Systemeinstellungen",
+        "catOverviewName": "Übersicht",
+        "catOverviewSub": "Angeheftete Grundlagen, Schnellaktionen und Änderungen.",
+        "catGraphicsSub": "Qualität, Sichtweite und Weltdarstellung.",
+        "catInterfaceSub": "HUD-Skalierung, Fenster, Chat und Einheitenrahmen.",
+        "catAccessibilityName": "Barrierefreiheit",
+        "catAccessibilitySub": "Bewegung, Kontrast und angenehme Inhaltsdarstellung.",
+        "catControlsName": "Steuerung",
+        "catControlsSub": "Kamera, Bewegung, Kampf und Rückmeldungen.",
+        "catKeybindsSub": "Tasten für jede Aktion belegen.",
+        "catControllerSub": "Gamepad-Gefühl und Tastenbelegung.",
+        "catTouchName": "Touch-Steuerung",
+        "catTouchSub": "Bildschirmsticks, Blicksteuerung und Tasten.",
+        "catAudioSub": "Lautstärke und Soundoptionen.",
+        "catSystemName": "Systemeinstellungen",
+        "catSystemSub": "Leistung, Support und Info."
+      },
+      "done": "Fertig",
+      "resetAllTitle": "Alle Einstellungen zurücksetzen?",
+      "resetAllBody": "Dadurch werden alle Einstellungen auf ihre Standardwerte zurückgesetzt. Dies kann nicht rückgängig gemacht werden.",
+      "searchPlaceholder": "Einstellungen durchsuchen",
+      "searchScopeAll": "Alle Einstellungen",
+      "searchScopeThis": "Dieser Abschnitt",
+      "searchEmpty": "Keine Einstellungen entsprechen deiner Suche.",
+      "searchGoTo": "Zu {category} wechseln",
+      "modeOnline": "Mit Verbindung",
+      "modeOffline": "Ohne Verbindung",
+      "changed": "{count} geändert",
+      "changedSummary": "{count} gegenüber den Standardwerten geändert",
+      "legend": {
+        "category": "Kategorie",
+        "navigate": "Navigieren",
+        "select": "Auswählen",
+        "back": "Zurück",
+        "reset": "Zurücksetzen",
+        "clear": "Löschen",
+        "page": "Seite"
+      },
+      "keybindCleared": "Belegung für {action} gelöscht",
+      "keybindRebinding": "{action} neu belegen. Drücke eine Taste oder Escape zum Abbrechen.",
+      "keybindEvicted": "{key} an {action} gebunden und Belegung von {evicted} entfernt",
+      "keybindTaken": "Taste entfernt",
+      "keybindUnbound": "{action} hat keine Taste",
+      "keybindModifierHint": "Tipp: Du kannst Tastenkombinationen mit Modifikatoren belegen. Halte Umschalt, Strg oder Alt gedrückt, während du eine Taste drückst, um die Kombination zu erfassen, zum Beispiel Umschalt+1.",
+      "conflictDot": "Belegungskonflikt",
+      "overviewConflictAlert": "Einige Tastenbelegungen stehen im Konflikt oder sind nicht belegt.",
+      "sec": {
+        "quality": "Qualität",
+        "view": "Sicht",
+        "general": "Allgemein",
+        "scaleText": "Skalierung und Text",
+        "panels": "Fenster",
+        "unitFrames": "Einheitenrahmen",
+        "actionBars": "Aktionsleisten",
+        "chat": "Unterhaltung",
+        "combatTooltips": "Kampf und Tooltips",
+        "hudExtras": "HUD-Extras",
+        "motionContrast": "Bewegung und Kontrast",
+        "content": "Inhalte",
+        "camera": "Kamera",
+        "movement": "Bewegung",
+        "combat": "Kampf",
+        "feedback": "Rückmeldungen",
+        "inputMode": "Eingabemodus",
+        "feel": "Spielgefühl",
+        "sticks": "Steuerknüppel",
+        "look": "Blicksteuerung",
+        "buttons": "Tasten",
+        "volume": "Lautstärke",
+        "toggles": "Schalter",
+        "performance": "Leistung",
+        "support": "Hilfe",
+        "about": "Info"
+      }
     },
     "controller": {
       "title": "Controller",
@@ -596,7 +677,8 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
-      "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
+      "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden.",
+      "duplicate": "Auch an {buttons} gebunden"
     },
     "perf": {
       "title": "Leistungsanzeige",
@@ -729,13 +811,17 @@ export const de_DE: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Build {n}",
+      "choicesTab": "Auswahlmöglichkeiten",
+      "resetChoices": "Auswahl zurücksetzen",
+      "tierLevel": "Stufe {n}",
+      "tierLevelLabel": "Stufe"
     },
     "tips": {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROISCH]",
+    "itemSoulbound": "Seelengebunden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1082,10 +1168,10 @@ export const de_DE: EnTranslations = {
       "spawn": "{name} erhebt sich über den Thornpeak-Höhen!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Mit Apple fortfahren",
+      "appleError": "Die Anmeldung mit Apple ist fehlgeschlagen. Bitte versuche es erneut.",
+      "appleChoiceIntro": "Erstelle ein neues Konto oder verknüpfe Apple mit einem bestehenden Konto.",
+      "appleChoiceExpired": "Diese Apple-Anmeldung ist abgelaufen. Melde dich bitte erneut mit Apple an.",
       "forgotPrompt": "Passwort vergessen?",
       "forgotTitle": "Passwort zurücksetzen",
       "forgotHint": "Gib deinen Benutzernamen ein und wir senden einen Link zum Zurücksetzen an die hinterlegte E-Mail-Adresse.",
@@ -1330,8 +1416,8 @@ export const de_DE: EnTranslations = {
       "parcelsLabel": "Pakete",
       "parcelsHint": "Klicke einen Gegenstand in deinen Taschen an, um ihn beizulegen.",
       "removeParcelAria": "{item} aus dem Brief entfernen",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Ein Stück weniger von {item} senden",
+      "parcelQtyIncreaseAria": "Ein Stück mehr von {item} senden",
       "sendButton": "Brief senden",
       "postageNote": "Porto: {amount}. Der Rabe ist etwa {seconds}s unterwegs.",
       "arrivedBanner": "Der Rabe ist gelandet: Post von {name}.",
@@ -3938,14 +4024,14 @@ export const de_DE: EnTranslations = {
     "reconnecting": "Verbindung verloren. Verbindung wird wieder hergestellt...",
     "connectionRejected": "Der Server hat die Verbindung geschlossen.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
-      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
-      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
-      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "classes": "Tipp: Jede der 9 Klassen spielt sich anders. Probiere einige aus, bevor du dich für eine entscheidest.",
+      "talents": "Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.",
+      "dungeons": "Tipp: Versuche einen Dungeon auf heroischer Schwierigkeit, sobald du für den normalen Schwierigkeitsgrad zu gut ausgerüstet bist. Dich erwartet ein härterer und lohnenderer Kampf.",
+      "market": "Tipp: Auf dem Weltmarkt kannst du mit Spielern aus dem gesamten Reich kaufen und verkaufen.",
+      "guilds": "Tipp: Der Beitritt zu einer Gilde gibt dir einen privaten Chatkanal und eine gemeinsame Liste deiner Gildenmitglieder.",
+      "professions": "Tipp: Sammel- und Handwerksberufe können parallel zu deiner Kampfklasse erlernt werden.",
+      "loadouts": "Tipp: Speichere mehr als eine Talentausrüstung, um zwischen Builds zu wechseln, ohne Punkte doppelt auszugeben.",
+      "pvp": "Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen."
     }
   },
   "errors": {
@@ -4941,6 +5027,8 @@ export const de_DE: EnTranslations = {
       "buybackTitle": "Rückkauf",
       "buybackEmpty": "Keine Gegenstände",
       "buybackAria": "{item} für {price} zurückkaufen",
+      "sellItemAria": "{item} für {price} verkaufen",
+      "sellRolledWarning": "Zufällig erzeugte Werte können durch Rückkauf nicht wiederhergestellt werden.",
       "sellQuantityTitle": "{item} verkaufen",
       "sellQuantityInput": "Zu verkaufende Menge",
       "sellQuantityConfirm": "Verkaufen",
@@ -5865,7 +5953,7 @@ export const de_DE: EnTranslations = {
         "name": "Zahn des alten Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Erzbrocken"
       },
       "weathered_ledger_page": {
         "name": "Verwitterte Buchseite"
@@ -5898,13 +5986,13 @@ export const de_DE: EnTranslations = {
         "name": "Leinenfetzen"
       },
       "arcane_dust": {
-        "name": "Arcane Dust"
+        "name": "Arkanstaub"
       },
       "arcane_essence": {
-        "name": "Arcane Essence"
+        "name": "Arkanessenz"
       },
       "arcane_shard": {
-        "name": "Arcane Shard"
+        "name": "Arkansplitter"
       },
       "fen_muster_order": {
         "name": "Musterungsbefehl von Fenbridge"
@@ -7548,12 +7636,12 @@ export const de_DE: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Ein Handwerk für jede Hand",
+        "text": "Jeder in Eastbrook übt neben dem Schwert ein Handwerk aus, {playerName}. Rund um die Stadt gibt es Erzadern, also schwing die Spitzhacke und bring mir 5 Brocken. Bau sie selbst ab, wohlgemerkt; ich werde den Unterschied erkennen.",
+        "completion": "Siehst du? Erz in deinem Rucksack und Schwielen an deinen Händen. Bleib beim Bergbau, Holzfällen und Kräutersammeln, während du die Straßen bereist. Wenn du wieder in der Stadt bist, wirf einen Blick auf die Stadtfokus-Tafel am Markt und die Werkbank in der Nähe. In all dem wartet ein ehrlicher Verdienst, wenn du ihn willst.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Erzbrocken"
           }
         }
       },

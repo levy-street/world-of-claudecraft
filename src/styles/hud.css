@@ -29,6 +29,11 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
+    /* The painter's transform is translate3d(sx,sy) scale(distance)
+       translate(-50%,-100%); origin 0 0 keeps the plate's bottom-center anchor
+       exactly at (sx,sy) while the distance scale shrinks it toward that point
+       (the default 50% 50% origin would drift a scaled plate off its anchor). */
+    transform-origin: 0 0;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -4155,6 +4160,14 @@
   .trade-hint {
     font-size: 10.5px;
     color: #887c5c;
+    margin-top: 8px;
+  }
+  /* Primary action row (Accept / Cancel): one wrapper so the pair lays out as a
+     row on desktop (matching the old inline-button flow) and can ride sticky at
+     the window bottom on touch (hud.mobile.css). */
+  .trade-actions {
+    display: flex;
+    gap: 8px;
     margin-top: 8px;
   }
 

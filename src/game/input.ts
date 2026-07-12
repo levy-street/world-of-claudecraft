@@ -1,6 +1,7 @@
-// Default (Mouse Camera off): classic-MMO-style — WASD + A/D keyboard turn, Q/E strafe,
+// Default (Mouse Camera off): classic-MMO-style: WASD + A/D keyboard turn (strafe is
+// unbound by default and rebindable; Q/E belong to the action bar, slots 11 and 12),
 // left-drag orbits, right-drag mouselooks, both buttons run forward.
-// Optional Mouse Camera (on): OSRS-style — WASD is camera-relative, A/D strafe,
+// Optional Mouse Camera (on): OSRS-style: WASD is camera-relative, A/D strafe,
 // mouse drag rotates the orbit (no pointer lock), no keyboard turn.
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
@@ -395,8 +396,19 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
-  captureNextKey(cb: (code: string | null) => void): void {
+  // Arm a one-shot rebind capture: the next keydown is delivered to `cb` (Escape
+  // cancels with null). Returns a canceller the rebind UI calls for its OTHER two
+  // exits (an on-screen Cancel affordance, focus-loss/blur): invoking it fires
+  // `cb(null)` exactly once and disarms, so the capture can never trap. A no-op once
+  // the capture has already fired or been cancelled (the identity guard).
+  captureNextKey(cb: (code: string | null) => void): () => void {
     this.captureCb = cb;
+    return () => {
+      if (this.captureCb === cb) {
+        this.captureCb = null;
+        cb(null);
+      }
+    };
   }
 
   setCameraSpeed(mult: number): void {

@@ -158,7 +158,9 @@ export const zh_CN: EnTranslations = {
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",
       "notReady": "未准备",
-      "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。"
+      "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。",
+      "notInPartyError": "你必须加入队伍才能发起就绪确认。",
+      "inProgressError": "就绪确认已在进行中。"
     },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
@@ -320,6 +322,8 @@ export const zh_CN: EnTranslations = {
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈",
+      "showMenuButtons": "显示菜单按钮",
+      "hideMenuButtons": "隐藏菜单按钮",
       "hotbarPage": "技能",
       "hotbarPageAria": "显示下一组技能",
       "actionRing": "战斗动作",
@@ -584,7 +588,84 @@ export const zh_CN: EnTranslations = {
       "showSecondaryActionBar": "显示副动作条",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "ia": {
+        "railDisplay": "显示",
+        "railInput": "输入",
+        "railSystem": "系统",
+        "catOverviewName": "概览",
+        "catOverviewSub": "固定的常用项、快捷操作，以及已更改的内容。",
+        "catGraphicsSub": "画质、视野与世界画面。",
+        "catInterfaceSub": "界面缩放、面板、聊天与单位框体。",
+        "catAccessibilityName": "无障碍",
+        "catAccessibilitySub": "动态效果、对比度与内容舒适度。",
+        "catControlsName": "控制",
+        "catControlsSub": "镜头、移动、战斗与反馈。",
+        "catKeybindsSub": "为每个操作绑定按键。",
+        "catControllerSub": "手柄手感与按键布局。",
+        "catTouchName": "触控",
+        "catTouchSub": "屏幕摇杆、视角与按钮。",
+        "catAudioSub": "音量与声音开关。",
+        "catSystemName": "系统",
+        "catSystemSub": "性能、支持与关于。"
+      },
+      "done": "完成",
+      "resetAllTitle": "重置所有设置？",
+      "resetAllBody": "这会将每项设置恢复为默认值。此操作无法撤销。",
+      "searchPlaceholder": "搜索设置",
+      "searchScopeAll": "所有设置",
+      "searchScopeThis": "当前分区",
+      "searchEmpty": "没有符合搜索的设置。",
+      "searchGoTo": "前往{category}",
+      "modeOnline": "在线",
+      "modeOffline": "离线",
+      "changed": "已更改 {count} 项",
+      "changedSummary": "已更改 {count} 项（相对默认）",
+      "legend": {
+        "category": "分类",
+        "navigate": "导航",
+        "select": "选择",
+        "back": "返回",
+        "reset": "重置",
+        "clear": "清除",
+        "page": "页面"
+      },
+      "keybindCleared": "已清除 {action}",
+      "keybindRebinding": "正在重绑定 {action}。请按一个键，或按 Esc 取消。",
+      "keybindEvicted": "已将 {key} 绑定到 {action}；已从 {evicted} 移除。",
+      "keybindTaken": "按键已移除",
+      "keybindUnbound": "{action} 尚未绑定按键",
+      "keybindModifierHint": "提示：你可以绑定组合键。按住 Shift、Ctrl 或 Alt 的同时按下某个键即可录制组合键（例如 Shift+1）。",
+      "conflictDot": "按键冲突",
+      "overviewConflictAlert": "部分按键绑定存在冲突或未绑定。",
+      "sec": {
+        "quality": "画质",
+        "view": "视野",
+        "general": "通用",
+        "scaleText": "缩放与文字",
+        "panels": "面板",
+        "unitFrames": "单位框体",
+        "actionBars": "动作条",
+        "chat": "聊天",
+        "combatTooltips": "战斗与提示",
+        "hudExtras": "HUD 附加项",
+        "motionContrast": "动态与对比度",
+        "content": "内容",
+        "camera": "镜头",
+        "movement": "移动",
+        "combat": "战斗",
+        "feedback": "反馈",
+        "inputMode": "输入模式",
+        "feel": "操作感",
+        "sticks": "摇杆",
+        "look": "视角",
+        "buttons": "按钮",
+        "volume": "音量",
+        "toggles": "开关",
+        "performance": "性能",
+        "support": "支持",
+        "about": "关于"
+      }
     },
     "controller": {
       "title": "手柄",
@@ -596,7 +677,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
-      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
+      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。",
+      "duplicate": "也绑定到 {buttons}"
     },
     "perf": {
       "title": "性能监视器",
@@ -729,12 +811,16 @@ export const zh_CN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}"
+      "defaultBuildName": "配置 {n}",
+      "choicesTab": "天赋选择",
+      "resetChoices": "重置选择",
+      "tierLevel": "等级 {n}",
+      "tierLevelLabel": "等级"
     },
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -4941,6 +5027,8 @@ export const zh_CN: EnTranslations = {
       "buybackTitle": "回购",
       "buybackEmpty": "没有物品",
       "buybackAria": "以 {price} 回购 {item}",
+      "sellItemAria": "以 {price} 的价格出售 {item}",
+      "sellRolledWarning": "随机属性无法通过回购找回。",
       "sellQuantityTitle": "出售 {item}",
       "sellQuantityInput": "要出售的数量",
       "sellQuantityConfirm": "出售",
@@ -7550,7 +7638,7 @@ export const zh_CN: EnTranslations = {
       "q_prof_intro": {
         "title": "人人都有一技之长",
         "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
-        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，这里面都有正经买卖等着你。",
+        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，靠这些都能正经谋生。",
         "objectives": {
           "0": {
             "label": "矿石块"

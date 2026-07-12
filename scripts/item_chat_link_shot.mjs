@@ -54,8 +54,8 @@ await page.evaluate(() => {
 });
 await sleep(500);
 await page.evaluate(() => {
-  // The 3rd bag row is the uncommon (green) Cryptbone Helm: a colored link reads best.
-  const rows = document.querySelectorAll('#bags .bag-item');
+  // The 3rd bag cell is the uncommon (green) Cryptbone Helm: a colored link reads best.
+  const rows = document.querySelectorAll('#bags .item-cell');
   const row = rows[2] ?? rows[0];
   row.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }));
 });

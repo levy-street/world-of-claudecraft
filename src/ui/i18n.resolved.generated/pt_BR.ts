@@ -155,10 +155,12 @@ export const pt_BR: EnTranslations = {
       "banner": "Assistindo {name}"
     },
     "readyCheck": {
-      "prompt": "{name} has started a ready check. Are you ready?",
-      "ready": "Ready",
-      "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "prompt": "{name} iniciou uma verificação de prontidão. Você está pronto?",
+      "ready": "Pronto",
+      "notReady": "Não está pronto",
+      "result": "Verificação de prontidão: {ready} prontos, {notReady} não prontos e {noResponse} sem resposta.",
+      "notInPartyError": "Você precisa estar em um grupo para iniciar uma verificação de prontidão.",
+      "inProgressError": "Já há uma verificação de prontidão em andamento."
     },
     "death": {
       "resurrectAtCorpse": "Ressuscitar no Cadáver",
@@ -239,7 +241,7 @@ export const pt_BR: EnTranslations = {
         "no_wallet": "Conecte uma carteira com pelo menos $20 USD em WOC.",
         "under_minimum": "A carteira está abaixo do mínimo de $20 USD em WOC.",
         "price_unavailable": "O preço do WOC está indisponível; as recompensas estão temporariamente bloqueadas.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "Você está banido das Recompensas Diárias. Motivo: {reason}"
       }
     },
     "theme": {
@@ -320,6 +322,8 @@ export const pt_BR: EnTranslations = {
       "haptics": "Vibração",
       "hapticsOff": "Vibração desligada",
       "toggleHaptics": "Alternar vibração",
+      "showMenuButtons": "Mostrar botões do menu",
+      "hideMenuButtons": "Ocultar botões do menu",
       "hotbarPage": "Habilidades",
       "hotbarPageAria": "Mostrar o próximo conjunto de habilidades",
       "actionRing": "Ações de combate",
@@ -404,12 +408,12 @@ export const pt_BR: EnTranslations = {
       "targetFriendlyNext": "Alternar alvo aliado",
       "discord": "Discord",
       "valecup": "Copa do Vale",
-      "categoryPet": "Pet",
-      "petAttack": "Pet: Attack",
-      "petStop": "Pet: Stop",
-      "petTaunt": "Pet: Taunt",
-      "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "categoryPet": "Mascote",
+      "petAttack": "Mascote: atacar",
+      "petStop": "Mascote: parar",
+      "petTaunt": "Mascote: provocar",
+      "petDefensive": "Mascote: defensivo",
+      "petAggressive": "Mascote: agressivo"
     },
     "vcup": {
       "title": "A Copa do Vale",
@@ -584,7 +588,84 @@ export const pt_BR: EnTranslations = {
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",
-      "mobileLeftHanded": "Layout para canhotos"
+      "mobileLeftHanded": "Layout para canhotos",
+      "ia": {
+        "railDisplay": "Tela",
+        "railInput": "Entrada",
+        "railSystem": "Sistema",
+        "catOverviewName": "Visão geral",
+        "catOverviewSub": "Itens fixados, ações rápidas e alterações realizadas.",
+        "catGraphicsSub": "Qualidade, visão e elementos visuais do mundo.",
+        "catInterfaceSub": "Escala da interface, painéis, chat e quadros de unidades.",
+        "catAccessibilityName": "Acessibilidade",
+        "catAccessibilitySub": "Movimento, contraste e conforto do conteúdo.",
+        "catControlsName": "Controles",
+        "catControlsSub": "Câmera, movimento, combate e retorno.",
+        "catKeybindsSub": "Atribua teclas a todas as ações.",
+        "catControllerSub": "Resposta do controle e disposição dos botões.",
+        "catTouchName": "Toque",
+        "catTouchSub": "Controles na tela, visão e botões.",
+        "catAudioSub": "Volume e opções de som.",
+        "catSystemName": "Sistema",
+        "catSystemSub": "Desempenho, suporte e informações."
+      },
+      "done": "Concluído",
+      "resetAllTitle": "Redefinir todas as configurações?",
+      "resetAllBody": "Isso restaura todas as configurações aos valores padrão e não pode ser desfeito.",
+      "searchPlaceholder": "Pesquisar configurações",
+      "searchScopeAll": "Todas as configurações",
+      "searchScopeThis": "Esta seção",
+      "searchEmpty": "Nenhuma configuração corresponde à sua pesquisa.",
+      "searchGoTo": "Ir para {category}",
+      "modeOnline": "Em linha",
+      "modeOffline": "Fora de linha",
+      "changed": "Alterações: {count}",
+      "changedSummary": "{count} diferentes dos valores padrão",
+      "legend": {
+        "category": "Categoria",
+        "navigate": "Navegar",
+        "select": "Selecionar",
+        "back": "Voltar",
+        "reset": "Redefinir",
+        "clear": "Limpar",
+        "page": "Página"
+      },
+      "keybindCleared": "Atribuição de {action} removida",
+      "keybindRebinding": "Atribuindo nova tecla a {action}. Pressione uma tecla ou Esc para cancelar.",
+      "keybindEvicted": "{key} atribuída a {action} e removida de {evicted}",
+      "keybindTaken": "Tecla removida",
+      "keybindUnbound": "{action} não tem uma tecla atribuída",
+      "keybindModifierHint": "Dica: você pode atribuir combinações com teclas modificadoras. Segure Shift, Ctrl ou Alt enquanto pressiona uma tecla para registrar a combinação, por exemplo Shift+1.",
+      "conflictDot": "Conflito de atribuição",
+      "overviewConflictAlert": "Algumas atribuições de teclas estão em conflito ou sem uma tecla.",
+      "sec": {
+        "quality": "Qualidade",
+        "view": "Visão",
+        "general": "Geral",
+        "scaleText": "Escala e texto",
+        "panels": "Painéis",
+        "unitFrames": "Quadros de unidades",
+        "actionBars": "Barras de ação",
+        "chat": "Bate-papo",
+        "combatTooltips": "Combate e dicas de tela",
+        "hudExtras": "Extras da interface",
+        "motionContrast": "Movimento e contraste",
+        "content": "Conteúdo",
+        "camera": "Câmera",
+        "movement": "Movimento",
+        "combat": "Combate",
+        "feedback": "Retorno",
+        "inputMode": "Modo de entrada",
+        "feel": "Sensibilidade",
+        "sticks": "Controles direcionais",
+        "look": "Câmera",
+        "buttons": "Botões",
+        "volume": "Áudio",
+        "toggles": "Opções de ativação",
+        "performance": "Desempenho",
+        "support": "Suporte",
+        "about": "Sobre"
+      }
     },
     "controller": {
       "title": "Controle",
@@ -596,7 +677,8 @@ export const pt_BR: EnTranslations = {
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",
       "menuAction": "Menu do Jogo",
-      "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela."
+      "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela.",
+      "duplicate": "Também atribuído a {buttons}"
     },
     "perf": {
       "title": "Sobreposição de Desempenho",
@@ -729,13 +811,17 @@ export const pt_BR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Build {n}",
+      "choicesTab": "Escolhas",
+      "resetChoices": "Redefinir escolhas",
+      "tierLevel": "Nível {n}",
+      "tierLevelLabel": "Nível"
     },
     "tips": {
       "joinChannels": "Dica: digite /join world ou /join lfg para conversar com jogadores do mundo inteiro."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROICO]",
+    "itemSoulbound": "Vinculado à alma",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1082,10 +1168,10 @@ export const pt_BR: EnTranslations = {
       "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Continuar com a Apple",
+      "appleError": "Não foi possível entrar com a Apple. Tente novamente.",
+      "appleChoiceIntro": "Crie uma conta nova ou vincule a Apple a uma conta que você já possui.",
+      "appleChoiceExpired": "Esse início de sessão com a Apple expirou. Entre com a Apple novamente.",
       "forgotPrompt": "Esqueceu a senha?",
       "forgotTitle": "Redefinir sua senha",
       "forgotHint": "Digite seu nome de usuário e enviaremos um link de redefinição para o e-mail cadastrado.",
@@ -1330,8 +1416,8 @@ export const pt_BR: EnTranslations = {
       "parcelsLabel": "Encomendas",
       "parcelsHint": "Clique em um item nas suas bolsas para anexá-lo.",
       "removeParcelAria": "Remover {item} da carta",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Enviar um {item} a menos",
+      "parcelQtyIncreaseAria": "Enviar um {item} a mais",
       "sendButton": "Enviar carta",
       "postageNote": "Postagem: {amount}. O corvo voa por cerca de {seconds}s.",
       "arrivedBanner": "O corvo pousou: correspondência de {name}.",
@@ -3938,14 +4024,14 @@ export const pt_BR: EnTranslations = {
     "reconnecting": "Conexão perdida. Reconectando...",
     "connectionRejected": "O servidor encerrou a conexão.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
-      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
-      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
-      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "classes": "Dica: cada uma das 9 classes tem um estilo diferente. Experimente algumas antes de escolher uma.",
+      "talents": "Dica: você pode redefinir seus talentos sempre que estiver fora de combate, então uma escolha inicial nunca é definitiva.",
+      "dungeons": "Dica: tente uma masmorra na dificuldade heroica quando seu equipamento já tiver superado a normal para enfrentar uma batalha mais difícil e recompensadora.",
+      "market": "Dica: o Mercado Mundial permite comprar e vender com jogadores de qualquer parte do reino.",
+      "guilds": "Dica: entrar em uma guilda oferece um canal de chat privado e uma lista compartilhada dos seus companheiros de guilda.",
+      "professions": "Dica: profissões de coleta e criação podem ser aprendidas junto com sua classe de combate.",
+      "loadouts": "Dica: salve mais de uma configuração de talentos para alternar entre builds sem gastar os pontos duas vezes.",
+      "pvp": "Dica: desafie outro jogador para um duelo amistoso ou entre na fila da arena do Coliseu Cinzento para testar sua build."
     }
   },
   "errors": {
@@ -4941,6 +5027,8 @@ export const pt_BR: EnTranslations = {
       "buybackTitle": "Recompra",
       "buybackEmpty": "Sem itens",
       "buybackAria": "Recomprar {item} por {price}",
+      "sellItemAria": "Vender {item} por {price}",
+      "sellRolledWarning": "Atributos gerados aleatoriamente não podem ser recuperados pela recompra.",
       "sellQuantityTitle": "Vender {item}",
       "sellQuantityInput": "Quantidade para vender",
       "sellQuantityConfirm": "Vender",
@@ -5865,7 +5953,7 @@ export const pt_BR: EnTranslations = {
         "name": "Presa do velho Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Pedaço de Minério"
       },
       "weathered_ledger_page": {
         "name": "Página de livro-caixa gasta"
@@ -5898,13 +5986,13 @@ export const pt_BR: EnTranslations = {
         "name": "Retalho de linho"
       },
       "arcane_dust": {
-        "name": "Arcane Dust"
+        "name": "Pó Arcano"
       },
       "arcane_essence": {
-        "name": "Arcane Essence"
+        "name": "Essência Arcana"
       },
       "arcane_shard": {
-        "name": "Arcane Shard"
+        "name": "Fragmento Arcano"
       },
       "fen_muster_order": {
         "name": "Ordem de convocação de Fenbridge"
@@ -7548,12 +7636,12 @@ export const pt_BR: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Um ofício para cada mão",
+        "text": "Cada pessoa em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério espalhados pela cidade, então pegue uma picareta e traga 5 pedaços para mim. Extraia você mesmo, viu? Eu vou saber a diferença.",
+        "completion": "Viu só? Minério na mochila e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, preste atenção no quadro do Foco da Cidade perto do mercado e na bancada de criação ali ao lado. Dá para ganhar a vida honestamente com tudo isso, se você quiser.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Pedaço de Minério"
           }
         }
       },

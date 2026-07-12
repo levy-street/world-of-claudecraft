@@ -42,7 +42,8 @@ interface LoopSlot {
 class Sfx {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
-  private buffers = new Map<string, AudioBuffer>();
+  private variants = new Map<string, AudioBuffer[]>(); // single source of truth: key -> pool
+  private lastVariant = new Map<string, number>(); // last played index per key (no-repeat random)
   private vol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
@@ -95,25 +96,28 @@ class Sfx {
     if (!ctx) return;
     await Promise.all(
       Object.entries(SFX_CLIPS).map(async ([key, entry]) => {
-        try {
-          const res = await fetch(entry.url);
-          if (!res.ok) return;
-          const buf = await ctx.decodeAudioData(await res.arrayBuffer());
-          this.buffers.set(key, buf);
-        } catch {
-          /* missing/corrupt clip: that key just stays silent */
+        const bufs: AudioBuffer[] = [];
+        for (const url of entry.urls) {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) continue;
+            bufs.push(await ctx.decodeAudioData(await res.arrayBuffer()));
+          } catch {
+            /* missing/corrupt variant: skip it */
+          }
         }
+        if (bufs.length > 0) this.variants.set(key, bufs);
       }),
     );
     // Procedurally synthesized beds/one-shots (no clip files; the Vale Cup
     // crowd is generated, not recorded, keeping the shipped audio set as-is).
     try {
-      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
-      this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      this.variants.set('amb_crowd', [this.makeCrowdBuffer(ctx, 6, false)]);
+      this.variants.set('vcup_crowd_roar', [this.makeCrowdBuffer(ctx, 2.6, true)]);
     } catch {
       /* stub AudioContext in tests: the keys just stay silent */
     }
-    this.ready = this.buffers.size > 0;
+    this.ready = this.variants.size > 0;
   }
 
   /** Procedural crowd noise. Bed mode is a seamless 6s murmur loop (filtered
@@ -202,6 +206,33 @@ class Sfx {
     return p;
   }
 
+  /** No-repeat random variant selection. Picks a random variant each play,
+   *  never repeating the immediately previous one so the same sample never
+   *  double-hits back-to-back. First play is uniform over the full pool. */
+  private nextBuffer(key: string): AudioBuffer | undefined {
+    const pool = this.variants.get(key);
+    if (!pool || pool.length === 0) return undefined;
+    if (pool.length === 1) return pool[0];
+    const last = this.lastVariant.get(key) ?? -1;
+    let idx: number;
+    if (last < 0) {
+      // First play: uniform over the full pool (no variant to exclude yet).
+      idx = Math.floor(Math.random() * pool.length);
+    } else {
+      idx = Math.floor(Math.random() * (pool.length - 1));
+      if (idx >= last) idx++;
+    }
+    this.lastVariant.set(key, idx);
+    return pool[idx];
+  }
+
+  /** True if at least one variant is loaded for this key. Used by hud.ts to
+   *  prefer a subfamily key (mob_beast_wolf_attack) over the family fallback
+   *  (mob_beast_attack) when the more specific clip exists. */
+  hasVariants(key: string): boolean {
+    return (this.variants.get(key)?.length ?? 0) > 0;
+  }
+
   /** Squared distance from the listener — callers can pre-cull, but playAt also
    *  guards internally so a far event is a cheap no-op. */
   private tooFar(x: number, z: number): boolean {
@@ -216,7 +247,7 @@ class Sfx {
       master = this.master;
     if (!ctx || !master) return;
     if (this.tooFar(x, z)) return;
-    const buf = this.buffers.get(key);
+    const buf = this.nextBuffer(key);
     if (!buf || this.active >= MAX_VOICES) return;
     const now = ctx.currentTime;
     const cd = opts?.cooldown ?? 0.03;
@@ -281,7 +312,7 @@ class Sfx {
     const ctx = this.ctx,
       master = this.master;
     if (!ctx || !master) return;
-    const buf = this.buffers.get(key);
+    const buf = this.nextBuffer(key);
     if (!buf || this.active >= MAX_VOICES) return;
     const jitter = opts?.jitter !== false;
     const src = ctx.createBufferSource();
@@ -316,7 +347,9 @@ class Sfx {
       slot = undefined;
     }
     if (!slot) {
-      const buf = this.buffers.get(key);
+      // Loop slots always use variant[0] -- seamless looping beds are single-buffer
+      // by design; picking a different variant on each loop cycle would cause a click.
+      const buf = this.variants.get(key)?.[0];
       if (!buf) return;
       const src = ctx.createBufferSource();
       src.buffer = buf;

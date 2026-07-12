@@ -213,22 +213,35 @@ describe('delve_map_painter: no magic values', () => {
 // --- WCAG-chrome boundary over the vendor window the host now composes ----------
 // No DOM/axe in this Node suite, and the vendor change is purely compositional
 // (VendorWindowDeps composes PainterHostPresentation; the call site spreads the
-// same bag), so renderVendorWindow's accessible markup is byte-identical. This
+// same bag; the AAA restyle moved the close control into the shared
+// window_frame.ts builder the vendor wires with its own close label key). This
 // source scan is the axe-core-equivalent: it asserts the a11y-bearing structure
-// survives the composition. The delve schematic Canvas is the 3D-world-class
-// surface that is OUT of a11y scope; the '#zone-label' the painter writes stays a
-// real text node (setText -> textContent), which IS in scope.
+// survives the composition, following the close control across the builder seam.
+// The delve schematic Canvas is the 3D-world-class surface that is OUT of a11y
+// scope; the '#zone-label' the painter writes stays a real text node
+// (setText -> textContent), which IS in scope.
 
 describe('vendor window WCAG-chrome (compositional, markup intact)', () => {
   const vendor = readFileSync(new URL('../src/ui/vendor_window.ts', import.meta.url), 'utf8');
+  const frame = readFileSync(new URL('../src/ui/window_frame.ts', import.meta.url), 'utf8');
 
   it('composes the PainterHostPresentation base', () => {
     expect(vendor).toContain('extends PainterHostPresentation');
   });
 
   it('keeps the accessible vendor markup (focusable buttons + aria labels)', () => {
-    // Close control: a real button with an aria-label.
-    expect(vendor).toContain('data-close aria-label=');
+    // Close control, half 1: the vendor wires the shared frame builder with its
+    // own close aria-label key (dropping the key or the builder loses the label).
+    expect(vendor).toContain("closeLabelKey: 'itemUi.vendor.close'");
+    expect(vendor).toContain('renderWindowFrame(');
+    // Close control, half 2: the builder emits it as a real <button> with an
+    // aria-label (keyboard reachable, native target size, accessible name).
+    // data-label-key sits between the two since the relocalizable-chrome work
+    // (it lets a live language switch re-resolve the stamped label).
+    expect(frame).toMatch(/data-window-close[^>]*aria-label=/);
+    expect(frame).toMatch(
+      /<button type="button" class="\$\{model\.close\.className\}"[^>]*data-window-close/,
+    );
     // Item rows: real <button>s with per-row aria-labels (keyboard reachable,
     // native target size), unchanged by the composition.
     expect(vendor).toContain("row.type = 'button'");

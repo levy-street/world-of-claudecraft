@@ -5,6 +5,10 @@ const mobileCss = readFileSync(
   new URL('../src/styles/hud.mobile.css', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 
 describe('mobile window layout CSS', () => {
   it('clamps generic mobile windows to the app viewport and reserves bottom padding', () => {
@@ -30,11 +34,15 @@ describe('mobile window layout CSS', () => {
   });
 
   it('keeps mobile tab and filter rows scrollable instead of clipping labels', () => {
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
-    );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch #social-window \.soc-tabs \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
+    // Both behaviors moved with the AAA window grammar and now live in
+    // components.css: the shared frame tab rail (which replaced the social
+    // window's inline .soc-tabs strip) scrolls horizontally by design, and the
+    // bank-cluster chip filter row re-provides the one-row scroll the legacy
+    // body.mobile-touch .bag-chips rule protected (kept beside the grammar it
+    // modifies per its HOME NOTE, so hud.mobile.css carries no twin).
+    expect(componentsCss).toMatch(/\.tab-rail \{[^}]*overflow-x: auto;/);
+    expect(componentsCss).toMatch(
+      /body\.mobile-touch #bank-window \.window-frame \.filter-row,\n {2}body\.mobile-touch\.bank-open #bags \.window-frame \.filter-row \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
     );
   });
 

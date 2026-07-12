@@ -38,6 +38,7 @@ const steps = [
   ],
   ['malware scan', 'npm', ['run', 'security:gate']],
   ['biome (changed files)', 'npm', ['run', 'ci:changed']],
+  ['sfx check', 'npm', ['run', 'sfx:check']],
   ['vitest (full suite)', 'npm', ['test', '--', `--maxWorkers=${workers}`]],
   ['typecheck', 'npx', ['tsc', '--noEmit']],
   ['env build', 'npm', ['run', 'build:env']],

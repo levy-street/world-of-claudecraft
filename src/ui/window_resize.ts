@@ -34,7 +34,10 @@ export interface WindowResizeDeps {
 }
 
 // Windows whose body is not reflowable content: fixed-size boards/popups and
-// the modal prompts. Everything else gets the grip.
+// the modal prompts. Everything else gets the grip. The Esc options menu (the
+// Warden's Codex) is NO LONGER excluded: per maintainer direction it drags by its
+// titlebar and resizes by the corner band like every other grammar window (this
+// supersedes the esc-menu-redesign spec section 2 fixed-window ruling).
 const NON_RESIZABLE_WINDOW_IDS = new Set([
   'map-window',
   'loot-window',

@@ -3,18 +3,33 @@
 // screenshots of the in-world overlay + the Options > Performance panel to tmp/.
 // Captures the panel on desktop, mobile landscape, and mobile portrait so the
 // responsive layout (single column, full-width touch targets) can be eyeballed.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 fs.mkdirSync('tmp', { recursive: true });
 
 const ALL_METRICS = {
-  fps: true, frameTime: true, fps1Low: true, fps01Low: true, hitches: true,
-  ping: true, jitter: true, snapshot: true, connection: true,
-  drawCalls: true, triangles: true, geometries: true, textures: true,
-  programs: true, renderScale: true, gpu: true, memory: true, entities: true,
+  fps: true,
+  frameTime: true,
+  fps1Low: true,
+  fps01Low: true,
+  hitches: true,
+  ping: true,
+  jitter: true,
+  snapshot: true,
+  connection: true,
+  drawCalls: true,
+  triangles: true,
+  geometries: true,
+  textures: true,
+  programs: true,
+  renderScale: true,
+  gpu: true,
+  memory: true,
+  entities: true,
 };
 
 const browser = await puppeteer.launch({
@@ -26,7 +41,9 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (msg) => { if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text()); });
+page.on('console', (msg) => {
+  if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text());
+});
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 await page.waitForSelector('#btn-offline', { timeout: 15000 });
@@ -35,7 +52,10 @@ await new Promise((r) => setTimeout(r, 250));
 await page.type('#char-name', 'Adventurer');
 await page.click('#offline-select .mini-class[data-class="warrior"]');
 await page.click('#btn-start-offline');
-await page.waitForFunction(() => window.__game && window.__game.hud && window.__game.hud.optionsHooks, { timeout: 30000 });
+await page.waitForFunction(
+  () => window.__game && window.__game.hud && window.__game.hud.optionsHooks,
+  { timeout: 30000 },
+);
 await new Promise((r) => setTimeout(r, 1500));
 
 // Enable the overlay and turn on a rich set of metrics + the graph.
@@ -53,22 +73,32 @@ await page.screenshot({ path: 'tmp/perf_overlay_world.png' });
 const box = await page.evaluate(() => {
   const el = document.querySelector('#perf-overlay');
   const r = el.getBoundingClientRect();
-  return { x: r.x, y: r.y, width: r.width, height: r.height, visible: getComputedStyle(el).display };
+  return {
+    x: r.x,
+    y: r.y,
+    width: r.width,
+    height: r.height,
+    visible: getComputedStyle(el).display,
+  };
 });
 console.log('overlay box:', JSON.stringify(box));
 if (box.width > 0) {
   await page.screenshot({
     path: 'tmp/perf_overlay_crop.png',
-    clip: { x: Math.max(0, box.x - 6), y: Math.max(0, box.y - 6), width: box.width + 12, height: box.height + 12 },
+    clip: {
+      x: Math.max(0, box.x - 6),
+      y: Math.max(0, box.y - 6),
+      width: box.width + 12,
+      height: box.height + 12,
+    },
   });
 }
 
-// Open Options > Performance.
+// Open Options > System (the perf overlay settings live in the System category).
 await page.evaluate(() => window.__game.hud.toggleOptionsMenu());
 await new Promise((r) => setTimeout(r, 150));
 await page.evaluate(() => {
-  const btn = [...document.querySelectorAll('#options-menu .opt-btn')].find((b) => /Performance/i.test(b.textContent));
-  btn?.click();
+  document.querySelector('#options-menu .opt-tab[data-category="system"]')?.click();
 });
 await new Promise((r) => setTimeout(r, 250));
 
@@ -88,13 +118,25 @@ async function shotPanel(name, { width, height, touch }) {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     }
-    // Re-open Options > Performance if the resize dropped the menu.
-    const menu = document.querySelector('#options-menu');
-    if (!menu || getComputedStyle(menu).display === 'none' || !menu.classList.contains('perf-wide')) {
+    // Re-open Options > System if the resize dropped the menu or the pane. The
+    // wide layouts use the rail (data-category); the narrow back-stack shell has
+    // no rail, so fall back to the stacked category row (English-only run, so
+    // matching the aria-label is safe here).
+    let menu = document.querySelector('#options-menu');
+    if (
+      !menu ||
+      getComputedStyle(menu).display === 'none' ||
+      !menu.querySelector('.opt-perf-host')
+    ) {
       const hud = window.__game.hud;
       if (!menu || getComputedStyle(menu).display === 'none') hud.toggleOptionsMenu();
-      const btn = [...document.querySelectorAll('#options-menu .opt-btn')].find((b) => /Performance/i.test(b.textContent));
-      btn?.click();
+      const tab = document.querySelector('#options-menu .opt-tab[data-category="system"]');
+      if (tab) tab.click();
+      else
+        [...document.querySelectorAll('#options-menu .opt-mshell-cat')]
+          .find((b) => /system/i.test(b.getAttribute('aria-label') || ''))
+          ?.click();
+      menu = document.querySelector('#options-menu');
     }
     const el = document.querySelector('#options-menu');
     const r = el.getBoundingClientRect();
@@ -104,7 +146,8 @@ async function shotPanel(name, { width, height, touch }) {
   await page.screenshot({
     path: `tmp/${name}.png`,
     clip: {
-      x: Math.max(0, panel.x), y: Math.max(0, panel.y),
+      x: Math.max(0, panel.x),
+      y: Math.max(0, panel.y),
       width: Math.min(panel.width, width - Math.max(0, panel.x)),
       height: Math.min(panel.height, height - Math.max(0, panel.y)),
     },

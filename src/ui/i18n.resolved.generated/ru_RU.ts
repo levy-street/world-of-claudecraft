@@ -158,7 +158,9 @@ export const ru_RU: EnTranslations = {
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",
       "notReady": "Не готов",
-      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа."
+      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.",
+      "notInPartyError": "Чтобы начать проверку готовности, вы должны состоять в группе.",
+      "inProgressError": "Проверка готовности уже идёт."
     },
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
@@ -320,6 +322,8 @@ export const ru_RU: EnTranslations = {
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
       "toggleHaptics": "Вкл/выкл вибрацию",
+      "showMenuButtons": "Показать кнопки меню",
+      "hideMenuButtons": "Скрыть кнопки меню",
       "hotbarPage": "Навыки",
       "hotbarPageAria": "Показать следующий набор навыков",
       "actionRing": "Боевые действия",
@@ -584,7 +588,84 @@ export const ru_RU: EnTranslations = {
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей"
+      "mobileLeftHanded": "Раскладка для левшей",
+      "ia": {
+        "railDisplay": "Экран",
+        "railInput": "Ввод",
+        "railSystem": "Система",
+        "catOverviewName": "Обзор",
+        "catOverviewSub": "Закрепленные настройки, быстрые действия и что изменилось.",
+        "catGraphicsSub": "Качество, обзор и вид мира.",
+        "catInterfaceSub": "Масштаб интерфейса, панели, чат и рамки юнитов.",
+        "catAccessibilityName": "Доступность",
+        "catAccessibilitySub": "Анимация, контраст и комфорт контента.",
+        "catControlsName": "Управление",
+        "catControlsSub": "Камера, движение, бой и отклик.",
+        "catKeybindsSub": "Назначьте клавиши для всех действий.",
+        "catControllerSub": "Отклик геймпада и раскладка кнопок.",
+        "catTouchName": "Сенсор",
+        "catTouchSub": "Экранные стики, обзор и кнопки.",
+        "catAudioSub": "Громкость и переключатели звука.",
+        "catSystemName": "Система",
+        "catSystemSub": "Производительность, поддержка и о программе."
+      },
+      "done": "Готово",
+      "resetAllTitle": "Сбросить все настройки?",
+      "resetAllBody": "Все настройки вернутся к значениям по умолчанию. Это действие нельзя отменить.",
+      "searchPlaceholder": "Поиск настроек",
+      "searchScopeAll": "Все настройки",
+      "searchScopeThis": "Этот раздел",
+      "searchEmpty": "Нет настроек, соответствующих запросу.",
+      "searchGoTo": "Перейти к разделу «{category}»",
+      "modeOnline": "В сети",
+      "modeOffline": "Не в сети",
+      "changed": "Изменено: {count}",
+      "changedSummary": "Изменено относительно стандартных: {count}",
+      "legend": {
+        "category": "Категория",
+        "navigate": "Навигация",
+        "select": "Выбрать",
+        "back": "Назад",
+        "reset": "Сброс",
+        "clear": "Очистить",
+        "page": "Страница"
+      },
+      "keybindCleared": "Очищено: {action}",
+      "keybindRebinding": "Переназначение «{action}». Нажмите клавишу или Escape для отмены.",
+      "keybindEvicted": "{key} назначена на «{action}»; снята с «{evicted}».",
+      "keybindTaken": "Клавиша снята",
+      "keybindUnbound": "Для действия «{action}» не назначена клавиша",
+      "keybindModifierHint": "Совет: можно назначать сочетания с модификатором. Удерживайте Shift, Ctrl или Alt и нажмите клавишу, чтобы записать сочетание (например, Shift+1).",
+      "conflictDot": "Конфликт клавиш",
+      "overviewConflictAlert": "Некоторые привязки клавиш конфликтуют или не назначены.",
+      "sec": {
+        "quality": "Качество",
+        "view": "Обзор",
+        "general": "Основные",
+        "scaleText": "Масштаб и текст",
+        "panels": "Панели",
+        "unitFrames": "Рамки существ",
+        "actionBars": "Панели действий",
+        "chat": "Чат",
+        "combatTooltips": "Бой и подсказки",
+        "hudExtras": "Дополнения интерфейса",
+        "motionContrast": "Анимация и контраст",
+        "content": "Содержимое",
+        "camera": "Камера",
+        "movement": "Движение",
+        "combat": "Бой",
+        "feedback": "Отклик",
+        "inputMode": "Режим ввода",
+        "feel": "Ощущения",
+        "sticks": "Стики",
+        "look": "Обзор",
+        "buttons": "Кнопки",
+        "volume": "Громкость",
+        "toggles": "Переключатели",
+        "performance": "Производительность",
+        "support": "Поддержка",
+        "about": "О программе"
+      }
     },
     "controller": {
       "title": "Геймпад",
@@ -596,7 +677,8 @@ export const ru_RU: EnTranslations = {
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",
       "menuAction": "Игровое меню",
-      "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
+      "help": "Левый стик отвечает за движение, правый наводит камеру. Откройте окно, чтобы использовать экранный указатель.",
+      "duplicate": "Также назначено на {buttons}"
     },
     "perf": {
       "title": "Оверлей производительности",
@@ -729,12 +811,16 @@ export const ru_RU: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Билд {n}"
+      "defaultBuildName": "Билд {n}",
+      "choicesTab": "Выбор талантов",
+      "resetChoices": "Сбросить выбор",
+      "tierLevel": "Уровень {n}",
+      "tierLevelLabel": "Уровень"
     },
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -4941,6 +5027,8 @@ export const ru_RU: EnTranslations = {
       "buybackTitle": "Выкуп",
       "buybackEmpty": "Нет предметов",
       "buybackAria": "Выкупить {item} за {price}",
+      "sellItemAria": "Продать {item} за {price}",
+      "sellRolledWarning": "Случайные характеристики нельзя вернуть выкупом.",
       "sellQuantityTitle": "Продать {item}",
       "sellQuantityInput": "Количество для продажи",
       "sellQuantityConfirm": "Продать",

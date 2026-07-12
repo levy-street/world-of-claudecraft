@@ -18,6 +18,8 @@ export const hudChromeStrings = {
     ready: 'Ready',
     notReady: 'Not Ready',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
+    notInPartyError: 'You must be in a party to start a ready check.',
+    inProgressError: 'A ready check is already in progress.',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
@@ -247,6 +249,14 @@ export const hudChromeStrings = {
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
+    // The collapse handle for the top-left menu-button cluster (Chat/Social/
+    // Quests/Settings/More). Default collapsed so the round icons do not crowd
+    // the play field; the arrow chip stays visible so a player can reopen it.
+    // The accessible name reflects the action the tap performs, mirrored by
+    // aria-expanded. Both values are wordy prose (M16), so the five non-Latin
+    // locales are filled in the same change.
+    showMenuButtons: 'Show menu buttons',
+    hideMenuButtons: 'Hide menu buttons',
     // The v0.22.0 base's touch-hotbar paging button ("Skills", #mobile-hotbar-page):
     // superseded by the paged action ring below, whose page toggle owns ability
     // paging on touch. The keys stay (already filled in all 20 locales) per the
@@ -666,6 +676,114 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    // Esc menu redesign ("The Warden's Codex"): the category-rail information
+    // architecture, owned as data by options_ia.ts. Rail-group headers plus the
+    // per-category NAME (only where no existing category key is reused) and the
+    // one-line muted SUBHEAD. All wordy prose, so the five non-Latin fills
+    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) landed with the keys (M16). Rendered by
+    // options_window.ts: the rail groups/tabs and the per-category detail heads.
+    ia: {
+      railDisplay: 'Display',
+      railInput: 'Input',
+      railSystem: 'System',
+      catOverviewName: 'Overview',
+      catOverviewSub: 'Pinned essentials, quick actions, and what changed.',
+      catGraphicsSub: 'Quality, view, and world visuals.',
+      catInterfaceSub: 'HUD scale, panels, chat, and unit frames.',
+      catAccessibilityName: 'Accessibility',
+      catAccessibilitySub: 'Motion, contrast, and content comfort.',
+      catControlsName: 'Controls',
+      catControlsSub: 'Camera, movement, combat, and feedback.',
+      catKeybindsSub: 'Bind keys for every action.',
+      catControllerSub: 'Gamepad feel and button layout.',
+      catTouchName: 'Touch',
+      catTouchSub: 'On-screen sticks, look, and buttons.',
+      catAudioSub: 'Volume and sound toggles.',
+      catSystemName: 'System',
+      catSystemSub: 'Performance, support, and about.',
+    },
+    // Esc menu redesign P2 (desktop chrome): the shell search strip, footer
+    // "Done", the reset-all confirm, the Overview status block, and the
+    // section heads (one per structural section id, spec section 4). All wordy
+    // prose, so the five non-Latin fills (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in
+    // this same change (M16).
+    done: 'Done',
+    resetAllTitle: 'Reset all settings?',
+    resetAllBody: 'This restores every setting to its default. This cannot be undone.',
+    searchPlaceholder: 'Search settings',
+    searchScopeAll: 'All settings',
+    searchScopeThis: 'This section',
+    searchEmpty: 'No settings match your search.',
+    searchGoTo: 'Go to {category}',
+    modeOnline: 'Online',
+    modeOffline: 'Offline',
+    changed: '{count} changed',
+    changedSummary: '{count} changed from defaults',
+    // Esc menu redesign P3 (navigation): the controller button-legend strip shown
+    // in the footer while a pad is connected (spec section 5), each verb's menu
+    // meaning, plus the assertive announce for the X = clear-keybind verb. The
+    // physical button GLYPHS (A / LB / D-pad) stay hardware names in gamepad_map;
+    // only these MEANINGS are localized. All wordy prose except back/page, so the
+    // five non-Latin fills (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in this same change (M16).
+    legend: {
+      category: 'Category',
+      navigate: 'Navigate',
+      select: 'Select',
+      back: 'Back',
+      reset: 'Reset',
+      clear: 'Clear',
+      page: 'Page',
+    },
+    keybindCleared: 'Cleared {action}',
+    // Esc menu redesign P4 (rebind UX + conflicts): the assertive rebind-capture
+    // announce, the eviction announce/note (exact wording), the transient badge on
+    // a displaced row, the persistent unbound-action banner line, and the
+    // controller-duplicate chip. keybindRebinding / keybindEvicted / keybindTaken /
+    // controller.duplicate are wordy, so their five non-Latin fills
+    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in this same change (M16); keybindUnbound
+    // is short prose (no 4+ lowercase run) and English-fills at PR tier.
+    keybindRebinding: 'Rebinding {action}. Press a key, or Escape to cancel.',
+    keybindEvicted: 'Bound {key} to {action}; removed from {evicted}',
+    keybindTaken: 'Key removed',
+    keybindUnbound: '{action} has no key',
+    // Keybinds pane helper line (under the capture instructions): modifier combos
+    // are bindable. Wordy prose, so its five non-Latin fills (zh_CN/zh_TW/ja_JP/
+    // ko_KR/ru_RU) land in this same change (M16).
+    keybindModifierHint:
+      'Tip: you can bind modifier combinations. Hold Shift, Ctrl, or Alt while pressing a key to capture the combo (for example Shift+1).',
+    // The aggregate rail warning dot (spec section 7) and the Overview alert row
+    // (spec section 3) for a keybind conflict / fully-unbound action. Both wordy, so
+    // their five non-Latin fills land in this same change (M16).
+    conflictDot: 'Binding conflict',
+    overviewConflictAlert: 'Some key bindings conflict or are unbound.',
+    sec: {
+      quality: 'Quality',
+      view: 'View',
+      general: 'General',
+      scaleText: 'Scale and Text',
+      panels: 'Panels',
+      unitFrames: 'Unit Frames',
+      actionBars: 'Action Bars',
+      chat: 'Chat',
+      combatTooltips: 'Combat and Tooltips',
+      hudExtras: 'HUD Extras',
+      motionContrast: 'Motion and Contrast',
+      content: 'Content',
+      camera: 'Camera',
+      movement: 'Movement',
+      combat: 'Combat',
+      feedback: 'Feedback',
+      inputMode: 'Input Mode',
+      feel: 'Feel',
+      sticks: 'Sticks',
+      look: 'Look',
+      buttons: 'Buttons',
+      volume: 'Volume',
+      toggles: 'Toggles',
+      performance: 'Performance',
+      support: 'Support',
+      about: 'About',
+    },
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -682,6 +800,10 @@ export const hudChromeStrings = {
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
+    // Chip on a button row that shares its action with other buttons (spec section
+    // 6: a pad MAY map two buttons to one action, so this names the duplicate rather
+    // than preventing it). Wordy: its five non-Latin fills land in this same change.
+    duplicate: 'Also bound to {buttons}',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
@@ -846,9 +968,19 @@ export const hudChromeStrings = {
       talents: 'Talents and effects: {value}',
     },
   },
-  // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
+  // Talents window chrome for the tiered-choices layout (the rest of the panel's
+  // labels predate it and live in game.talents.*). defaultBuildName pre-fills the
+  // Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The CHOICES tab label, doubling as the status-strip "Choices: N / M" lead.
+    choicesTab: 'Choices',
+    // The Current-build action that clears every staged point.
+    resetChoices: 'Reset choices',
+    // Tier-row unlock level: the accessible label ("Level 12") and the small
+    // caption over the rail's big level number.
+    tierLevel: 'Level {n}',
+    tierLevelLabel: 'Level',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.

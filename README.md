@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.14.1-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.24.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
@@ -240,13 +240,13 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 | Input | Action |
 |---|---|
-| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
+| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held); dedicated strafe keys are unbound by default and rebindable |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
-| `1`-`9`, `0`, `-`, `=` | action bar |
+| `1`-`9`, `0`, `Q`, `E` | action bar (`-`/`=` as alternates; the secondary bar sits on the numpad or `Shift+1` to `Shift+0`) |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `G` | character, spellbook, quest log, world map, bags, arena |
-| `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
+| `V` / `Z` / `R` / `Esc` | nameplates, damage meters, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 

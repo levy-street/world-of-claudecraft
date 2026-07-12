@@ -158,7 +158,9 @@ export const ko_KR: EnTranslations = {
       "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
       "ready": "준비 완료",
       "notReady": "준비 안 됨",
-      "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답."
+      "result": "준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.",
+      "notInPartyError": "준비 확인을 시작하려면 파티에 속해 있어야 합니다.",
+      "inProgressError": "준비 확인이 이미 진행 중입니다."
     },
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
@@ -320,6 +322,8 @@ export const ko_KR: EnTranslations = {
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
       "toggleHaptics": "진동 전환",
+      "showMenuButtons": "메뉴 버튼 표시",
+      "hideMenuButtons": "메뉴 버튼 숨기기",
       "hotbarPage": "스킬",
       "hotbarPageAria": "다음 스킬 세트 표시",
       "actionRing": "전투 행동",
@@ -584,7 +588,84 @@ export const ko_KR: EnTranslations = {
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "ia": {
+        "railDisplay": "화면",
+        "railInput": "입력",
+        "railSystem": "시스템",
+        "catOverviewName": "개요",
+        "catOverviewSub": "고정한 필수 항목, 빠른 작업, 변경된 설정을 보여줍니다.",
+        "catGraphicsSub": "품질, 시야, 월드 그래픽.",
+        "catInterfaceSub": "HUD 배율, 패널, 채팅, 유닛 프레임.",
+        "catAccessibilityName": "접근성",
+        "catAccessibilitySub": "모션, 대비, 콘텐츠 편의성.",
+        "catControlsName": "조작",
+        "catControlsSub": "카메라, 이동, 전투, 피드백.",
+        "catKeybindsSub": "모든 동작에 키를 지정합니다.",
+        "catControllerSub": "게임패드 감도와 버튼 배치.",
+        "catTouchName": "터치",
+        "catTouchSub": "화면 스틱, 시점, 버튼.",
+        "catAudioSub": "음량과 사운드 토글.",
+        "catSystemName": "시스템",
+        "catSystemSub": "성능, 지원, 정보."
+      },
+      "done": "완료",
+      "resetAllTitle": "모든 설정을 초기화할까요?",
+      "resetAllBody": "모든 설정을 기본값으로 되돌립니다. 이 작업은 취소할 수 없습니다.",
+      "searchPlaceholder": "설정 검색",
+      "searchScopeAll": "모든 설정",
+      "searchScopeThis": "이 섹션",
+      "searchEmpty": "검색과 일치하는 설정이 없습니다.",
+      "searchGoTo": "{category}로 이동",
+      "modeOnline": "온라인",
+      "modeOffline": "오프라인",
+      "changed": "{count}개 변경됨",
+      "changedSummary": "기본값에서 {count}개 변경됨",
+      "legend": {
+        "category": "카테고리",
+        "navigate": "이동",
+        "select": "선택",
+        "back": "뒤로",
+        "reset": "초기화",
+        "clear": "지우기",
+        "page": "페이지"
+      },
+      "keybindCleared": "{action} 지움",
+      "keybindRebinding": "{action} 재설정 중입니다. 키를 누르거나 Esc로 취소하세요.",
+      "keybindEvicted": "{key}을 {action}에 지정했습니다. {evicted}에서는 해제되었습니다.",
+      "keybindTaken": "키 해제됨",
+      "keybindUnbound": "{action}에 지정된 키가 없습니다",
+      "keybindModifierHint": "팁: 조합 키를 지정할 수 있습니다. Shift, Ctrl 또는 Alt를 누른 채 키를 누르면 조합이 등록됩니다(예: Shift+1).",
+      "conflictDot": "키 충돌",
+      "overviewConflictAlert": "일부 키 지정이 충돌하거나 지정되지 않았습니다.",
+      "sec": {
+        "quality": "품질",
+        "view": "시야",
+        "general": "일반",
+        "scaleText": "배율 및 텍스트",
+        "panels": "패널",
+        "unitFrames": "유닛 프레임",
+        "actionBars": "액션 바",
+        "chat": "채팅",
+        "combatTooltips": "전투 및 툴팁",
+        "hudExtras": "HUD 부가 기능",
+        "motionContrast": "모션 및 대비",
+        "content": "콘텐츠",
+        "camera": "카메라",
+        "movement": "이동",
+        "combat": "전투",
+        "feedback": "피드백",
+        "inputMode": "입력 모드",
+        "feel": "조작감",
+        "sticks": "스틱",
+        "look": "시점",
+        "buttons": "버튼",
+        "volume": "볼륨",
+        "toggles": "켜기/끄기",
+        "performance": "성능",
+        "support": "지원",
+        "about": "정보"
+      }
     },
     "controller": {
       "title": "컨트롤러",
@@ -596,7 +677,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
-      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다.",
+      "duplicate": "{buttons}에도 지정됨"
     },
     "perf": {
       "title": "성능 오버레이",
@@ -729,12 +811,16 @@ export const ko_KR: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "빌드 {n}"
+      "defaultBuildName": "빌드 {n}",
+      "choicesTab": "선택",
+      "resetChoices": "선택 초기화",
+      "tierLevel": "레벨 {n}",
+      "tierLevelLabel": "레벨"
     },
     "tips": {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -4941,6 +5027,8 @@ export const ko_KR: EnTranslations = {
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
+      "sellItemAria": "{item}을(를) {price}에 판매",
+      "sellRolledWarning": "무작위 능력치는 되사기로 되돌릴 수 없습니다.",
       "sellQuantityTitle": "{item} 판매",
       "sellQuantityInput": "판매할 수량",
       "sellQuantityConfirm": "판매",
@@ -7550,7 +7638,7 @@ export const ko_KR: EnTranslations = {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
         "text": "이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.",
-        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.",
+        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.",
         "objectives": {
           "0": {
             "label": "광석 조각"

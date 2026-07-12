@@ -1,9 +1,12 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "license": "MIT",
-  "author": "levy-street",
+  "author": {
+    "name": "Levy Street",
+    "email": "woc@levystreet.com"
+  },
   "type": "module",
   "main": "electron/main.cjs",
   "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
@@ -74,6 +77,9 @@
     "voices:gen": "node scripts/gen_npc_voices.mjs",
     "voices:lines": "node scripts/gen_npc_lines.mjs",
     "sfx:gen": "node scripts/gen_sfx.mjs",
+    "sfx:manifest": "node scripts/gen_sfx.mjs --manifest",
+    "sfx:check": "node scripts/sfx_conform.mjs",
+    "sfx:conform": "node scripts/sfx_conform.mjs --fix",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
   },
@@ -81,7 +87,6 @@
     "@aws-sdk/client-sesv2": "^3.1084.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/browser": "^8.0.3",
-    "@capacitor/live-updates": "^0.5.0",
     "@noble/curves": "^1.9.7",
     "@solana/wallet-standard-chains": "^1.1.2",
     "@solana/wallet-standard-features": "^1.4.0",
@@ -119,6 +124,8 @@
     "electron": "^43.0.0",
     "electron-builder": "^26.15.6",
     "esbuild": "^0.28.1",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "jsdom": "^29.1.1",
     "lightningcss": "1.32.0",
     "playwright": "1.61.1",
@@ -233,6 +240,8 @@
     }
   },
   "allowScripts": {
-    "sharp@0.34.5": true
+    "sharp@0.34.5": true,
+    "ffmpeg-static@5.3.0": true,
+    "ffprobe-static@3.1.0": true
   }
 }

@@ -64,8 +64,6 @@ const baseEnTable = {
   'error.alreadyInParty': 'You are already in a party.',
   'error.notPartyLeader': 'You are not the party leader.',
   'error.raidMarkersParty': 'You must be in a party to use raid markers.',
-  'error.readyCheckNotInParty': 'You must be in a party to start a ready check.',
-  'error.readyCheckInProgress': 'A ready check is already in progress.',
   'error.nameSellQty': 'Name how many you wish to sell.',
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',

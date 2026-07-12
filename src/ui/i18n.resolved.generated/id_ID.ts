@@ -155,10 +155,12 @@ export const id_ID: EnTranslations = {
       "banner": "Menonton {name}"
     },
     "readyCheck": {
-      "prompt": "{name} has started a ready check. Are you ready?",
-      "ready": "Ready",
-      "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "prompt": "{name} memulai pemeriksaan kesiapan. Apakah kamu siap?",
+      "ready": "Siap",
+      "notReady": "Belum Siap",
+      "result": "Pemeriksaan kesiapan: {ready} siap, {notReady} belum siap, {noResponse} tidak merespons.",
+      "notInPartyError": "Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.",
+      "inProgressError": "Pemeriksaan kesiapan sedang berlangsung."
     },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
@@ -239,7 +241,7 @@ export const id_ID: EnTranslations = {
         "no_wallet": "Hubungkan dompet dengan setidaknya $20 USD dalam WOC.",
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
       }
     },
     "theme": {
@@ -320,6 +322,8 @@ export const id_ID: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
       "toggleHaptics": "Alihkan haptik",
+      "showMenuButtons": "Tampilkan tombol menu",
+      "hideMenuButtons": "Sembunyikan tombol menu",
       "hotbarPage": "Kemampuan",
       "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya",
       "actionRing": "Aksi tempur",
@@ -404,12 +408,12 @@ export const id_ID: EnTranslations = {
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
       "valecup": "Piala Lembah",
-      "categoryPet": "Pet",
-      "petAttack": "Pet: Attack",
-      "petStop": "Pet: Stop",
-      "petTaunt": "Pet: Taunt",
-      "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "categoryPet": "Peliharaan",
+      "petAttack": "Peliharaan: Serang",
+      "petStop": "Peliharaan: Berhenti",
+      "petTaunt": "Peliharaan: Ejek",
+      "petDefensive": "Peliharaan: Defensif",
+      "petAggressive": "Peliharaan: Agresif"
     },
     "vcup": {
       "title": "Piala Lembah",
@@ -584,7 +588,84 @@ export const id_ID: EnTranslations = {
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
-      "mobileLeftHanded": "Tata letak kidal"
+      "mobileLeftHanded": "Tata letak kidal",
+      "ia": {
+        "railDisplay": "Tampilan",
+        "railInput": "Masukan",
+        "railSystem": "Sistem",
+        "catOverviewName": "Ringkasan",
+        "catOverviewSub": "Hal penting yang disematkan, tindakan cepat, dan perubahan.",
+        "catGraphicsSub": "Kualitas, pandangan, dan visual dunia.",
+        "catInterfaceSub": "Skala HUD, panel, obrolan, dan bingkai unit.",
+        "catAccessibilityName": "Aksesibilitas",
+        "catAccessibilitySub": "Gerakan, kontras, dan kenyamanan konten.",
+        "catControlsName": "Kontrol",
+        "catControlsSub": "Kamera, gerakan, pertarungan, dan umpan balik.",
+        "catKeybindsSub": "Tetapkan tombol untuk setiap tindakan.",
+        "catControllerSub": "Respons gamepad dan tata letak tombol.",
+        "catTouchName": "Sentuh",
+        "catTouchSub": "Stik layar, pandangan, dan tombol.",
+        "catAudioSub": "Volume suara dan tombol alih audio.",
+        "catSystemName": "Sistem",
+        "catSystemSub": "Kinerja, dukungan, dan tentang."
+      },
+      "done": "Selesai",
+      "resetAllTitle": "Atur ulang semua pengaturan?",
+      "resetAllBody": "Ini mengembalikan semua pengaturan ke nilai bawaannya. Tindakan ini tidak dapat dibatalkan.",
+      "searchPlaceholder": "Cari pengaturan",
+      "searchScopeAll": "Semua pengaturan",
+      "searchScopeThis": "Bagian ini",
+      "searchEmpty": "Tidak ada pengaturan yang cocok dengan pencarianmu.",
+      "searchGoTo": "Buka {category}",
+      "modeOnline": "Daring",
+      "modeOffline": "Luring",
+      "changed": "{count} diubah",
+      "changedSummary": "{count} berbeda dari bawaan",
+      "legend": {
+        "category": "Kategori",
+        "navigate": "Navigasi",
+        "select": "Pilih",
+        "back": "Kembali",
+        "reset": "Atur Ulang",
+        "clear": "Hapus",
+        "page": "Halaman"
+      },
+      "keybindCleared": "{action} dikosongkan",
+      "keybindRebinding": "Menetapkan ulang {action}. Tekan tombol, atau Escape untuk membatalkan.",
+      "keybindEvicted": "{key} ditetapkan ke {action}; dihapus dari {evicted}",
+      "keybindTaken": "Tombol dihapus",
+      "keybindUnbound": "Tidak ada tombol untuk {action}",
+      "keybindModifierHint": "Kiat: kamu dapat menetapkan kombinasi tombol pengubah. Tahan Shift, Ctrl, atau Alt sambil menekan tombol untuk merekam kombinasinya (misalnya Shift+1).",
+      "conflictDot": "Konflik pintasan",
+      "overviewConflictAlert": "Beberapa pintasan tombol bertabrakan atau belum ditetapkan.",
+      "sec": {
+        "quality": "Kualitas",
+        "view": "Pandangan",
+        "general": "Umum",
+        "scaleText": "Skala dan Teks",
+        "panels": "Panel",
+        "unitFrames": "Bingkai Unit",
+        "actionBars": "Bilah Aksi",
+        "chat": "Obrolan",
+        "combatTooltips": "Pertarungan dan Keterangan Alat",
+        "hudExtras": "Ekstra HUD",
+        "motionContrast": "Gerakan dan Kontras",
+        "content": "Konten",
+        "camera": "Kamera",
+        "movement": "Gerakan",
+        "combat": "Pertarungan",
+        "feedback": "Umpan Balik",
+        "inputMode": "Mode Masukan",
+        "feel": "Respons",
+        "sticks": "Stik",
+        "look": "Arah Pandang",
+        "buttons": "Tombol",
+        "volume": "Volume Suara",
+        "toggles": "Tombol Alih",
+        "performance": "Kinerja",
+        "support": "Dukungan",
+        "about": "Tentang"
+      }
     },
     "controller": {
       "title": "Kontroler",
@@ -596,7 +677,8 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
-      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
+      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",
+      "duplicate": "Juga terikat ke {buttons}"
     },
     "perf": {
       "title": "Lapisan Performa",
@@ -729,13 +811,17 @@ export const id_ID: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Rakitan {n}"
+      "defaultBuildName": "Rakitan {n}",
+      "choicesTab": "Pilihan",
+      "resetChoices": "Atur Ulang Pilihan",
+      "tierLevel": "Tingkat {n}",
+      "tierLevelLabel": "Tingkat"
     },
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROIK]",
+    "itemSoulbound": "Terikat Jiwa",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1082,10 +1168,10 @@ export const id_ID: EnTranslations = {
       "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Lanjutkan dengan Apple",
+      "appleError": "Tidak dapat masuk dengan Apple. Silakan coba lagi.",
+      "appleChoiceIntro": "Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.",
+      "appleChoiceExpired": "Sesi masuk dengan Apple itu telah kedaluwarsa. Silakan masuk lagi dengan Apple.",
       "forgotPrompt": "Lupa kata sandi?",
       "forgotTitle": "Atur ulang kata sandimu",
       "forgotHint": "Masukkan nama penggunamu dan kami akan mengirim tautan pengaturan ulang ke alamat email yang terdaftar.",
@@ -1330,8 +1416,8 @@ export const id_ID: EnTranslations = {
       "parcelsLabel": "Bingkisan",
       "parcelsHint": "Klik barang di tasmu untuk melampirkannya.",
       "removeParcelAria": "Keluarkan {item} dari surat",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Kirim satu {item} lebih sedikit",
+      "parcelQtyIncreaseAria": "Kirim satu {item} lebih banyak",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",
@@ -3938,14 +4024,14 @@ export const id_ID: EnTranslations = {
     "reconnecting": "Koneksi terputus. Menyambungkan kembali...",
     "connectionRejected": "Server menutup koneksi.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
-      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
-      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
-      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "classes": "Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.",
+      "talents": "Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.",
+      "dungeons": "Kiat: cobalah ruang bawah tanah pada tingkat kesulitan heroik setelah perlengkapanmu melampaui tingkat normal, untuk pertarungan yang lebih sulit dan lebih menguntungkan.",
+      "market": "Kiat: Pasar Dunia memungkinkanmu membeli dan menjual dengan pemain di seluruh dunia.",
+      "guilds": "Kiat: bergabung dengan guild memberimu saluran obrolan pribadi dan daftar bersama anggota guildmu.",
+      "professions": "Kiat: profesi pengumpulan dan kerajinan dapat dilatih bersamaan dengan kelas tempurmu.",
+      "loadouts": "Kiat: simpan lebih dari satu set talenta agar dapat bertukar build tanpa menggunakan poin dua kali.",
+      "pvp": "Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu."
     }
   },
   "errors": {
@@ -4941,6 +5027,8 @@ export const id_ID: EnTranslations = {
       "buybackTitle": "Beli Kembali",
       "buybackEmpty": "Tidak ada barang",
       "buybackAria": "Beli kembali {item} seharga {price}",
+      "sellItemAria": "Jual {item} seharga {price}",
+      "sellRolledWarning": "Atribut acak tidak dapat dipulihkan dengan membeli kembali.",
       "sellQuantityTitle": "Jual {item}",
       "sellQuantityInput": "Jumlah yang dijual",
       "sellQuantityConfirm": "Jual",
@@ -5865,7 +5953,7 @@ export const id_ID: EnTranslations = {
         "name": "Taring Greyjaw Tua"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Bongkahan Bijih"
       },
       "weathered_ledger_page": {
         "name": "Halaman Buku Besar Lapuk"
@@ -7548,12 +7636,12 @@ export const id_ID: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Pekerjaan untuk Setiap Tangan",
+        "text": "Setiap orang di Eastbrook menekuni pekerjaan selain mengayunkan pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ayunkan beliung dan bawakan aku 5 bongkahan. Tambang sendiri, ingat, aku tahu bedanya.",
+        "completion": "Lihat? Bijih di tasmu dan kapalan di tanganmu. Teruslah menambang, menebang, dan memetik herba selama menjelajahi jalanan. Saat kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sebelahnya. Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Bongkahan Bijih"
           }
         }
       },

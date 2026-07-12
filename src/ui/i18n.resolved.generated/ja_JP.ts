@@ -158,7 +158,9 @@ export const ja_JP: EnTranslations = {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",
       "notReady": "準備未完了",
-      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。"
+      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。",
+      "notInPartyError": "準備確認を開始するにはパーティーに参加している必要があります。",
+      "inProgressError": "準備確認はすでに進行中です。"
     },
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
@@ -320,6 +322,8 @@ export const ja_JP: EnTranslations = {
       "haptics": "振動",
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
+      "showMenuButtons": "メニューボタンを表示",
+      "hideMenuButtons": "メニューボタンを非表示",
       "hotbarPage": "スキル",
       "hotbarPageAria": "次のスキルセットを表示",
       "actionRing": "戦闘アクション",
@@ -584,7 +588,84 @@ export const ja_JP: EnTranslations = {
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "ia": {
+        "railDisplay": "表示",
+        "railInput": "入力",
+        "railSystem": "システム",
+        "catOverviewName": "概要",
+        "catOverviewSub": "よく使う項目、クイック操作、変更点をまとめて表示します。",
+        "catGraphicsSub": "画質、視界、世界の見た目。",
+        "catInterfaceSub": "HUDの拡大率、パネル、チャット、ユニットフレーム。",
+        "catAccessibilityName": "アクセシビリティ",
+        "catAccessibilitySub": "モーション、コントラスト、コンテンツの快適さ。",
+        "catControlsName": "操作",
+        "catControlsSub": "カメラ、移動、戦闘、フィードバック。",
+        "catKeybindsSub": "すべての操作にキーを割り当てます。",
+        "catControllerSub": "ゲームパッドの操作感とボタン配置。",
+        "catTouchName": "タッチ",
+        "catTouchSub": "画面上のスティック、視点、ボタン。",
+        "catAudioSub": "音量とサウンドの切り替え。",
+        "catSystemName": "システム",
+        "catSystemSub": "パフォーマンス、サポート、バージョン情報。"
+      },
+      "done": "完了",
+      "resetAllTitle": "すべての設定をリセットしますか？",
+      "resetAllBody": "すべての設定を初期値に戻します。この操作は元に戻せません。",
+      "searchPlaceholder": "設定を検索",
+      "searchScopeAll": "すべての設定",
+      "searchScopeThis": "このセクション",
+      "searchEmpty": "検索に一致する設定はありません。",
+      "searchGoTo": "{category}へ移動",
+      "modeOnline": "オンライン",
+      "modeOffline": "オフライン",
+      "changed": "{count} 件変更",
+      "changedSummary": "初期値から {count} 件変更",
+      "legend": {
+        "category": "カテゴリ",
+        "navigate": "移動",
+        "select": "決定",
+        "back": "戻る",
+        "reset": "リセット",
+        "clear": "クリア",
+        "page": "ページ"
+      },
+      "keybindCleared": "{action} をクリアしました",
+      "keybindRebinding": "{action} を再割り当て中です。キーを押すか、Esc でキャンセルしてください。",
+      "keybindEvicted": "{key} を {action} に割り当てました。{evicted} からは解除されました。",
+      "keybindTaken": "キー解除",
+      "keybindUnbound": "{action}にキーが割り当てられていません",
+      "keybindModifierHint": "ヒント：修飾キーの組み合わせを割り当てられます。Shift、Ctrl、Alt のいずれかを押しながらキーを押すと、その組み合わせが登録されます（例：Shift+1）。",
+      "conflictDot": "キー競合",
+      "overviewConflictAlert": "一部のキー割り当てが競合しているか未設定です。",
+      "sec": {
+        "quality": "品質",
+        "view": "視野",
+        "general": "一般",
+        "scaleText": "拡大と文字",
+        "panels": "パネル",
+        "unitFrames": "ユニットフレーム",
+        "actionBars": "アクションバー",
+        "chat": "チャット",
+        "combatTooltips": "戦闘とツールチップ",
+        "hudExtras": "HUD の追加項目",
+        "motionContrast": "モーションとコントラスト",
+        "content": "コンテンツ",
+        "camera": "カメラ",
+        "movement": "移動",
+        "combat": "戦闘",
+        "feedback": "フィードバック",
+        "inputMode": "入力モード",
+        "feel": "操作感",
+        "sticks": "スティック",
+        "look": "視点",
+        "buttons": "ボタン",
+        "volume": "音量",
+        "toggles": "切り替え",
+        "performance": "パフォーマンス",
+        "support": "サポート",
+        "about": "情報"
+      }
     },
     "controller": {
       "title": "コントローラー",
@@ -596,7 +677,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。",
+      "duplicate": "{buttons} にも割り当て済み"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
@@ -729,12 +811,16 @@ export const ja_JP: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "ビルド {n}"
+      "defaultBuildName": "ビルド {n}",
+      "choicesTab": "選択",
+      "resetChoices": "選択をリセット",
+      "tierLevel": "レベル {n}",
+      "tierLevelLabel": "レベル"
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -4941,6 +5027,8 @@ export const ja_JP: EnTranslations = {
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",
+      "sellItemAria": "{item}を{price}で売却",
+      "sellRolledWarning": "ランダムな性能は買い戻しでは戻せません。",
       "sellQuantityTitle": "{item}を売却",
       "sellQuantityInput": "売却する数量",
       "sellQuantityConfirm": "売却",

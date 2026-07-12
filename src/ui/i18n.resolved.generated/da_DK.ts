@@ -155,10 +155,12 @@ export const da_DK: EnTranslations = {
       "banner": "Tilskuer til {name}"
     },
     "readyCheck": {
-      "prompt": "{name} has started a ready check. Are you ready?",
-      "ready": "Ready",
-      "notReady": "Not Ready",
-      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+      "prompt": "{name} har startet et klar-tjek. Er du klar?",
+      "ready": "Klar",
+      "notReady": "Ikke klar",
+      "result": "Klar-tjek: {ready} klar, {notReady} ikke klar, {noResponse} uden svar.",
+      "notInPartyError": "Du skal være i en gruppe for at starte et klar-tjek.",
+      "inProgressError": "Et klar-tjek er allerede i gang."
     },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
@@ -239,7 +241,7 @@ export const da_DK: EnTranslations = {
         "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
         "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
       }
     },
     "theme": {
@@ -320,6 +322,8 @@ export const da_DK: EnTranslations = {
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
       "toggleHaptics": "Slå haptik til/fra",
+      "showMenuButtons": "Vis menuknapper",
+      "hideMenuButtons": "Skjul menuknapper",
       "hotbarPage": "Evner",
       "hotbarPageAria": "Vis næste sæt evner",
       "actionRing": "Kamphandlinger",
@@ -404,12 +408,12 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
       "valecup": "Dalpokalen",
-      "categoryPet": "Pet",
-      "petAttack": "Pet: Attack",
-      "petStop": "Pet: Stop",
-      "petTaunt": "Pet: Taunt",
-      "petDefensive": "Pet: Defensive",
-      "petAggressive": "Pet: Aggressive"
+      "categoryPet": "Kæledyr",
+      "petAttack": "Kæledyr: Angrib",
+      "petStop": "Kæledyr: Stop",
+      "petTaunt": "Kæledyr: Hån",
+      "petDefensive": "Kæledyr: Defensiv",
+      "petAggressive": "Kæledyr: Aggressiv"
     },
     "vcup": {
       "title": "Dalpokalen",
@@ -584,7 +588,84 @@ export const da_DK: EnTranslations = {
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Venstrehånds layout"
+      "mobileLeftHanded": "Venstrehånds layout",
+      "ia": {
+        "railDisplay": "Visning",
+        "railInput": "Betjening",
+        "railSystem": "Systemindstillinger",
+        "catOverviewName": "Oversigt",
+        "catOverviewSub": "Fastgjorte grundindstillinger, hurtige handlinger og ændringer.",
+        "catGraphicsSub": "Kvalitet, udsyn og verdensgrafik.",
+        "catInterfaceSub": "HUD-skala, paneler, chat og enhedsrammer.",
+        "catAccessibilityName": "Tilgængelighed",
+        "catAccessibilitySub": "Bevægelse, kontrast og behageligt indhold.",
+        "catControlsName": "Styring",
+        "catControlsSub": "Kamera, bevægelse, kamp og respons.",
+        "catKeybindsSub": "Tildel taster til hver handling.",
+        "catControllerSub": "Følelse og knaplayout for gamepad.",
+        "catTouchName": "Berøringsstyring",
+        "catTouchSub": "Skærmstyrepinde, blikstyring og knapper.",
+        "catAudioSub": "Lydstyrke og lydindstillinger.",
+        "catSystemName": "Systemindstillinger",
+        "catSystemSub": "Ydeevne, hjælp og information."
+      },
+      "done": "Færdig",
+      "resetAllTitle": "Nulstil alle indstillinger?",
+      "resetAllBody": "Dette gendanner alle indstillinger til deres standardværdier. Det kan ikke fortrydes.",
+      "searchPlaceholder": "Søg i indstillinger",
+      "searchScopeAll": "Alle indstillinger",
+      "searchScopeThis": "Dette afsnit",
+      "searchEmpty": "Ingen indstillinger matcher din søgning.",
+      "searchGoTo": "Gå til {category}",
+      "modeOnline": "Forbundet",
+      "modeOffline": "Uden forbindelse",
+      "changed": "{count} ændret",
+      "changedSummary": "{count} ændret fra standardindstillingerne",
+      "legend": {
+        "category": "Kategori",
+        "navigate": "Naviger",
+        "select": "Vælg",
+        "back": "Tilbage",
+        "reset": "Nulstil",
+        "clear": "Ryd",
+        "page": "Side"
+      },
+      "keybindCleared": "Tildelingen for {action} blev ryddet",
+      "keybindRebinding": "Tildeler {action} igen. Tryk på en tast eller Escape for at annullere.",
+      "keybindEvicted": "Tildelte {key} til {action}; fjernede den fra {evicted}",
+      "keybindTaken": "Tast fjernet",
+      "keybindUnbound": "{action} har ingen tast",
+      "keybindModifierHint": "Tip: Du kan tildele kombinationer med modificeringstaster. Hold Shift, Ctrl eller Alt nede, mens du trykker på en tast, for at registrere kombinationen, for eksempel Shift+1.",
+      "conflictDot": "Tildelingskonflikt",
+      "overviewConflictAlert": "Nogle tastetildelinger er i konflikt eller mangler.",
+      "sec": {
+        "quality": "Kvalitet",
+        "view": "Udsyn",
+        "general": "Generelt",
+        "scaleText": "Skala og tekst",
+        "panels": "Paneler",
+        "unitFrames": "Enhedsrammer",
+        "actionBars": "Handlingsbjælker",
+        "chat": "Samtale",
+        "combatTooltips": "Kamp og værktøjstip",
+        "hudExtras": "Ekstra HUD-elementer",
+        "motionContrast": "Bevægelse og kontrast",
+        "content": "Indhold",
+        "camera": "Kamerastyring",
+        "movement": "Bevægelse",
+        "combat": "Kamp",
+        "feedback": "Respons",
+        "inputMode": "Betjeningstilstand",
+        "feel": "Følelse",
+        "sticks": "Styrepinde",
+        "look": "Blikstyring",
+        "buttons": "Knapper",
+        "volume": "Lydstyrke",
+        "toggles": "Til og fra-knapper",
+        "performance": "Ydeevne",
+        "support": "Hjælp",
+        "about": "Information"
+      }
     },
     "controller": {
       "title": "Controller",
@@ -596,7 +677,8 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
-      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
+      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren.",
+      "duplicate": "Også tildelt til {buttons}"
     },
     "perf": {
       "title": "Ydelsesoverlay",
@@ -729,13 +811,17 @@ export const da_DK: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Build {n}",
+      "choicesTab": "Valg",
+      "resetChoices": "Nulstil valg",
+      "tierLevel": "Niveau {n}",
+      "tierLevelLabel": "Niveau"
     },
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROISK]",
+    "itemSoulbound": "Sjælebundet",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1082,10 +1168,10 @@ export const da_DK: EnTranslations = {
       "spawn": "{name} rejser sig over Tornetop Højder!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Fortsæt med Apple",
+      "appleError": "Kunne ikke logge ind med Apple. Prøv igen.",
+      "appleChoiceIntro": "Opret en ny konto, eller knyt Apple til en konto, du allerede har.",
+      "appleChoiceExpired": "Dette Apple-login er udløbet. Log ind med Apple igen.",
       "forgotPrompt": "Glemt adgangskode?",
       "forgotTitle": "Nulstil din adgangskode",
       "forgotHint": "Indtast dit brugernavn, så sender vi et nulstillingslink til den registrerede e-mailadresse.",
@@ -1330,8 +1416,8 @@ export const da_DK: EnTranslations = {
       "parcelsLabel": "Pakker",
       "parcelsHint": "Klik på en genstand i dine tasker for at vedhæfte den.",
       "removeParcelAria": "Fjern {item} fra brevet",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Send én {item} mindre",
+      "parcelQtyIncreaseAria": "Send én {item} mere",
       "sendButton": "Send brev",
       "postageNote": "Porto: {amount}. Ravnen er undervejs i omtrent {seconds}s.",
       "arrivedBanner": "Ravnen er landet: post fra {name}.",
@@ -3938,14 +4024,14 @@ export const da_DK: EnTranslations = {
     "reconnecting": "Forbindelse mistet. Genopretter forbindelse...",
     "connectionRejected": "Serveren lukkede forbindelsen.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
-      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
-      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
-      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
-      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
-      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
-      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
-      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+      "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
+      "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
+      "dungeons": "Tip: Prøv en grotte på heroisk sværhedsgrad, når dit udstyr er blevet for godt til normal, og få en hårdere og mere givende kamp.",
+      "market": "Tip: På Verdensmarkedet kan du købe og sælge med spillere fra hele riget.",
+      "guilds": "Tip: Når du slutter dig til et laug, får du en privat chatkanal og en fælles liste over dine laugskammerater.",
+      "professions": "Tip: Indsamlings- og håndværksfag kan trænes sideløbende med din kampklasse.",
+      "loadouts": "Tip: Gem mere end én talentopsætning, så du kan skifte mellem varianter uden at bruge point to gange.",
+      "pvp": "Tip: Udfordr en anden spiller til en venskabelig duel, eller stil dig i kø til arenaen i Det Askegrå Colosseum for at afprøve din opbygning."
     }
   },
   "errors": {
@@ -4941,6 +5027,8 @@ export const da_DK: EnTranslations = {
       "buybackTitle": "Tilbagekøb",
       "buybackEmpty": "Ingen genstande",
       "buybackAria": "Køb {item} tilbage for {price}",
+      "sellItemAria": "Sælg {item} for {price}",
+      "sellRolledWarning": "Tilfældige egenskaber kan ikke gendannes ved tilbagekøb.",
       "sellQuantityTitle": "Sælg {item}",
       "sellQuantityInput": "Antal at sælge",
       "sellQuantityConfirm": "Sælg",
@@ -5865,7 +5953,7 @@ export const da_DK: EnTranslations = {
         "name": "Gamle Gråkæbes Hugtand"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Malmklump"
       },
       "weathered_ledger_page": {
         "name": "Forvitret Regnskabsside"
@@ -7548,12 +7636,12 @@ export const da_DK: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Et håndværk til hver hånd",
+        "text": "Alle i Østbæk har et håndværk ved siden af sværdet, {playerName}. Der ligger malmårer rundt om byen, så sving en hakke og bring mig 5 klumper. Bryd dem selv, vel at mærke; jeg kan kende forskel.",
+        "completion": "Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Malmklump"
           }
         }
       },

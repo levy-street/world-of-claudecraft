@@ -158,7 +158,9 @@ export const zh_TW: EnTranslations = {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",
       "notReady": "未準備",
-      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。"
+      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。",
+      "notInPartyError": "你必須加入隊伍才能發起就緒確認。",
+      "inProgressError": "就緒確認已在進行中。"
     },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
@@ -320,6 +322,8 @@ export const zh_TW: EnTranslations = {
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
       "toggleHaptics": "切換觸覺回饋",
+      "showMenuButtons": "顯示選單按鈕",
+      "hideMenuButtons": "隱藏選單按鈕",
       "hotbarPage": "技能",
       "hotbarPageAria": "顯示下一組技能",
       "actionRing": "戰鬥動作",
@@ -584,7 +588,84 @@ export const zh_TW: EnTranslations = {
       "showSecondaryActionBar": "顯示副動作列",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
-      "mobileLeftHanded": "左手配置"
+      "mobileLeftHanded": "左手配置",
+      "ia": {
+        "railDisplay": "顯示",
+        "railInput": "輸入",
+        "railSystem": "系統",
+        "catOverviewName": "總覽",
+        "catOverviewSub": "釘選的常用項、快捷操作，以及已變更的內容。",
+        "catGraphicsSub": "畫質、視野與世界畫面。",
+        "catInterfaceSub": "介面縮放、面板、聊天與單位框體。",
+        "catAccessibilityName": "無障礙",
+        "catAccessibilitySub": "動態效果、對比度與內容舒適度。",
+        "catControlsName": "控制",
+        "catControlsSub": "鏡頭、移動、戰鬥與回饋。",
+        "catKeybindsSub": "為每個操作綁定按鍵。",
+        "catControllerSub": "手把手感與按鍵配置。",
+        "catTouchName": "觸控",
+        "catTouchSub": "螢幕搖桿、視角與按鈕。",
+        "catAudioSub": "音量與聲音開關。",
+        "catSystemName": "系統",
+        "catSystemSub": "效能、支援與關於。"
+      },
+      "done": "完成",
+      "resetAllTitle": "重設所有設定？",
+      "resetAllBody": "這會將每項設定恢復為預設值。此操作無法復原。",
+      "searchPlaceholder": "搜尋設定",
+      "searchScopeAll": "所有設定",
+      "searchScopeThis": "目前區段",
+      "searchEmpty": "沒有符合搜尋的設定。",
+      "searchGoTo": "前往{category}",
+      "modeOnline": "線上",
+      "modeOffline": "離線",
+      "changed": "已更改 {count} 項",
+      "changedSummary": "已更改 {count} 項（相對預設）",
+      "legend": {
+        "category": "分類",
+        "navigate": "導覽",
+        "select": "選擇",
+        "back": "返回",
+        "reset": "重設",
+        "clear": "清除",
+        "page": "頁面"
+      },
+      "keybindCleared": "已清除 {action}",
+      "keybindRebinding": "正在重新綁定 {action}。請按一個按鍵，或按 Esc 取消。",
+      "keybindEvicted": "已將 {key} 綁定到 {action}；已從 {evicted} 移除。",
+      "keybindTaken": "按鍵已移除",
+      "keybindUnbound": "{action} 尚未綁定按鍵",
+      "keybindModifierHint": "提示：你可以綁定組合鍵。按住 Shift、Ctrl 或 Alt 的同時按下某個鍵即可錄製組合鍵（例如 Shift+1）。",
+      "conflictDot": "按鍵衝突",
+      "overviewConflictAlert": "部分按鍵綁定發生衝突或未綁定。",
+      "sec": {
+        "quality": "畫質",
+        "view": "視野",
+        "general": "一般",
+        "scaleText": "縮放與文字",
+        "panels": "面板",
+        "unitFrames": "單位框體",
+        "actionBars": "動作列",
+        "chat": "聊天",
+        "combatTooltips": "戰鬥與提示",
+        "hudExtras": "HUD 附加項",
+        "motionContrast": "動態與對比度",
+        "content": "內容",
+        "camera": "鏡頭",
+        "movement": "移動",
+        "combat": "戰鬥",
+        "feedback": "回饋",
+        "inputMode": "輸入模式",
+        "feel": "操作手感",
+        "sticks": "搖桿",
+        "look": "視角",
+        "buttons": "按鈕",
+        "volume": "音量",
+        "toggles": "開關",
+        "performance": "效能",
+        "support": "支援",
+        "about": "關於"
+      }
     },
     "controller": {
       "title": "手把",
@@ -596,7 +677,8 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
-      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
+      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。",
+      "duplicate": "也綁定到 {buttons}"
     },
     "perf": {
       "title": "效能監視器",
@@ -729,12 +811,16 @@ export const zh_TW: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}"
+      "defaultBuildName": "配置 {n}",
+      "choicesTab": "天賦選擇",
+      "resetChoices": "重置選擇",
+      "tierLevel": "等級 {n}",
+      "tierLevelLabel": "等級"
     },
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[英雄]",
     "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -4941,6 +5027,8 @@ export const zh_TW: EnTranslations = {
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",
+      "sellItemAria": "以 {price} 的價格出售 {item}",
+      "sellRolledWarning": "隨機屬性無法透過買回找回。",
       "sellQuantityTitle": "出售 {item}",
       "sellQuantityInput": "要出售的數量",
       "sellQuantityConfirm": "出售",
@@ -7550,7 +7638,7 @@ export const zh_TW: EnTranslations = {
       "q_prof_intro": {
         "title": "人人都有一技之長",
         "text": "伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。",
-        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。",
+        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，靠這些都能正經謀生。",
         "objectives": {
           "0": {
             "label": "礦石塊"
