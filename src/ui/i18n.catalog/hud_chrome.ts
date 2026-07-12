@@ -7,6 +7,8 @@
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
+import { armoryCollectionStrings, armorySkinStrings } from './armory';
+
 export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
@@ -128,13 +130,17 @@ export const hudChromeStrings = {
     confirmTitle: 'Confirm Cosmetic Purchase',
     confirmBody: 'Purchase {item} for {cost} Claudium?',
     confirmPurchase: 'Purchase',
-    // Season 1 Armory (weapon skins). Skin names, collections, looks, and lore
-    // are catalog content (src/sim/content/weapon_skins.ts), not chrome keys.
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Season 1 Armory (weapon skins). English copy comes from the dedicated
+    // Armory i18n catalog; the sim registry remains mechanical and locale-free.
     armoryEyebrow: 'Season 1',
     armoryTitle: 'The Armory',
     armoryBody:
       'Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.',
     collectionLine: '{collection} Collection',
+    collections: armoryCollectionStrings,
+    skins: armorySkinStrings,
     seasonOne: 'Season 1',
     rarity: {
       uncommon: 'Uncommon',

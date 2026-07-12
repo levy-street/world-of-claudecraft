@@ -36,7 +36,7 @@ export interface ClaudiumPriceResult {
 
 export interface ClaudiumNativePriceResult {
   rail: ClaudiumNativeRail;
-  claudium: number;
+  claudium: number | null;
   amountBase: string | null;
   reason?: string;
 }
@@ -46,7 +46,7 @@ export interface ClaudiumSolBalanceResult {
   lamports: string | null;
 }
 
-/** One rung of the $1..$10000 SKU ladder. usd/claudium both come from the service. */
+/** One rung of the SKU ladder. usd/claudium both come from the service. */
 export interface ClaudiumSku {
   sku: string;
   usd: number;
@@ -60,6 +60,7 @@ export interface ClaudiumSkusResult {
 }
 
 export type ClaudiumRail = 'stripe' | 'sol' | 'woc';
+export type ClaudiumPriceRail = 'stripe' | 'woc';
 export type ClaudiumNativeRail = 'sol' | 'woc';
 
 /** The stripe-rail purchase-intent leg (client uses clientSecret with Stripe.js). */
@@ -88,12 +89,6 @@ export interface ClaudiumPurchaseResult {
   claudium: number | null;
   stripe: ClaudiumStripeIntent | null;
   woc: ClaudiumWocIntent | null;
-  reason: string | null;
-}
-
-export interface ClaudiumConfirmResult {
-  credited: boolean;
-  balance: number | null;
   reason: string | null;
 }
 
@@ -130,9 +125,11 @@ export interface ClaudiumSpendResult {
 }
 
 export interface ClaudiumHistoryEntry {
-  id: string;
-  kind: string;
-  claudium: number;
+  entryId: string;
+  accountId: number;
+  delta: number;
+  reason: string;
+  ref: string;
   atMs: number;
 }
 
@@ -248,16 +245,16 @@ export async function claudiumStripeWebhook(
 }
 
 /** GET balance/:accountId. Balance null when the service is off. */
-export async function claudiumBalance(accountId: string): Promise<ClaudiumBalanceResult> {
+export async function claudiumBalance(accountId: number): Promise<ClaudiumBalanceResult> {
   const data = await callService<{ balance: number }>({
     method: 'GET',
-    path: `balance/${encodeURIComponent(accountId)}`,
+    path: `balance/${encodeURIComponent(String(accountId))}`,
   });
   return { balance: typeof data?.balance === 'number' ? data.balance : null };
 }
 
 /** GET price/:rail. Prices null when the service is off (buy disabled). */
-export async function claudiumPrice(rail: ClaudiumRail): Promise<ClaudiumPriceResult> {
+export async function claudiumPrice(rail: ClaudiumPriceRail): Promise<ClaudiumPriceResult> {
   const data = await callService<{
     rail: string;
     usdPerClaudium: number;
@@ -279,7 +276,7 @@ export async function claudiumPrice(rail: ClaudiumRail): Promise<ClaudiumPriceRe
 
 export async function claudiumNativePrice(
   rail: ClaudiumNativeRail,
-  claudium: number,
+  sku: string,
 ): Promise<ClaudiumNativePriceResult> {
   const data = await callService<{
     rail?: ClaudiumNativeRail;
@@ -288,11 +285,14 @@ export async function claudiumNativePrice(
     reason?: string;
   }>({
     method: 'GET',
-    path: `native/price/${encodeURIComponent(rail)}?claudium=${encodeURIComponent(String(claudium))}`,
+    path: `native/price/${encodeURIComponent(rail)}?sku=${encodeURIComponent(sku)}`,
   });
   return {
     rail: data?.rail ?? rail,
-    claudium: typeof data?.claudium === 'number' ? data.claudium : claudium,
+    claudium:
+      typeof data?.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
+        ? data.claudium
+        : null,
     amountBase: typeof data?.amountBase === 'string' ? data.amountBase : null,
     reason: data?.reason ?? (data ? undefined : 'unavailable'),
   };
@@ -340,15 +340,15 @@ export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
 
 /** POST purchase. Returns ok:false with a reason when the service is off. */
 export async function claudiumPurchase(input: {
-  accountId: string;
-  rail: ClaudiumRail;
+  accountId: number;
+  rail: 'stripe';
   sku: string;
   idempotencyKey: string;
 }): Promise<ClaudiumPurchaseResult> {
   const data = await callService<{
-    purchaseId: string;
-    rail: ClaudiumRail;
-    claudium: number;
+    purchaseId?: string;
+    rail?: ClaudiumRail;
+    claudium?: number;
     stripe?: ClaudiumStripeIntent;
     woc?: ClaudiumWocIntent;
     reason?: string;
@@ -364,59 +364,59 @@ export async function claudiumPurchase(input: {
       reason: 'unavailable',
     };
   }
+  const reason = typeof data.reason === 'string' ? data.reason : null;
+  const purchaseId =
+    typeof data.purchaseId === 'string' && data.purchaseId !== '' ? data.purchaseId : null;
+  const rail =
+    data.rail === 'stripe' || data.rail === 'sol' || data.rail === 'woc' ? data.rail : null;
+  const claudium =
+    typeof data.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
+      ? data.claudium
+      : null;
+  const stripe =
+    typeof data.stripe?.clientSecret === 'string' &&
+    data.stripe.clientSecret.trim() !== '' &&
+    typeof data.stripe.publishableKey === 'string' &&
+    data.stripe.publishableKey.trim() !== ''
+      ? {
+          clientSecret: data.stripe.clientSecret,
+          publishableKey: data.stripe.publishableKey,
+        }
+      : null;
+  const ok =
+    reason === null &&
+    purchaseId !== null &&
+    rail === input.rail &&
+    claudium !== null &&
+    stripe !== null;
+  if (!ok) {
+    return {
+      ok: false,
+      purchaseId: null,
+      rail: null,
+      claudium: null,
+      stripe: null,
+      woc: null,
+      reason: reason ?? 'unavailable',
+    };
+  }
   return {
     ok: true,
-    purchaseId: data.purchaseId,
-    rail: data.rail,
-    claudium: data.claudium,
-    stripe: data.stripe ?? null,
-    woc: data.woc ?? null,
-    reason: data.reason ?? null,
-  };
-}
-
-/** POST purchase/woc/confirm. credited:false when the service is off. */
-export async function claudiumConfirmWoc(input: {
-  purchaseId: string;
-  inboundSignature: string;
-}): Promise<ClaudiumConfirmResult> {
-  const data = await callService<{ credited: boolean; balance: number; reason?: string }>({
-    method: 'POST',
-    path: 'purchase/woc/confirm',
-    body: input,
-  });
-  if (!data) return { credited: false, balance: null, reason: 'unavailable' };
-  return {
-    credited: Boolean(data.credited),
-    balance: typeof data.balance === 'number' ? data.balance : null,
-    reason: data.reason ?? null,
+    purchaseId,
+    rail,
+    claudium,
+    stripe,
+    woc: null,
+    reason: null,
   };
 }
 
 export async function claudiumNativeQuote(input: {
-  accountId: string;
+  accountId: number;
   rail: ClaudiumNativeRail;
   sku: string;
   payer: string;
 }): Promise<ClaudiumNativeQuoteResult> {
-  const skus = await claudiumSkus();
-  const sku = skus.skus.find((row) => row.sku === input.sku);
-  if (!sku) {
-    return {
-      ok: false,
-      reference: null,
-      rail: null,
-      claudium: null,
-      amountBase: null,
-      destination: null,
-      mint: null,
-      memo: null,
-      quoteExpiryMs: null,
-      transactionBase64: null,
-      split: null,
-      reason: 'unknown_sku',
-    };
-  }
   const data = await callService<{
     reference?: string;
     rail?: ClaudiumNativeRail;
@@ -434,32 +434,43 @@ export async function claudiumNativeQuote(input: {
     path: 'native/quote',
     body: {
       rail: input.rail,
-      claudium: sku.claudium,
+      sku: input.sku,
       payer: input.payer,
-      fulfillment: { kind: 'credit', accountId: Number(input.accountId) },
+      fulfillment: { kind: 'credit', accountId: input.accountId },
     },
   });
-  if (!data?.reference || !data.transactionBase64) {
+  const refusalReason = typeof data?.reason === 'string' ? data.reason : null;
+  const creditedClaudium =
+    typeof data?.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
+      ? data.claudium
+      : null;
+  if (
+    !data?.reference ||
+    !data.transactionBase64 ||
+    creditedClaudium === null ||
+    refusalReason !== null ||
+    (data.rail !== undefined && data.rail !== input.rail)
+  ) {
     return {
       ok: false,
-      reference: data?.reference ?? null,
-      rail: data?.rail ?? null,
-      claudium: typeof data?.claudium === 'number' ? data.claudium : null,
-      amountBase: data?.amountBase ?? null,
-      destination: data?.destination ?? null,
-      mint: data?.mint ?? null,
-      memo: data?.memo ?? null,
-      quoteExpiryMs: typeof data?.quoteExpiryMs === 'number' ? data.quoteExpiryMs : null,
-      transactionBase64: data?.transactionBase64 ?? null,
-      split: data?.split ?? null,
-      reason: data?.reason ?? 'unavailable',
+      reference: null,
+      rail: null,
+      claudium: null,
+      amountBase: null,
+      destination: null,
+      mint: null,
+      memo: null,
+      quoteExpiryMs: null,
+      transactionBase64: null,
+      split: null,
+      reason: refusalReason ?? 'unavailable',
     };
   }
   return {
     ok: true,
     reference: data.reference,
     rail: data.rail ?? input.rail,
-    claudium: typeof data.claudium === 'number' ? data.claudium : sku.claudium,
+    claudium: creditedClaudium,
     amountBase: data.amountBase ?? null,
     destination: data.destination ?? null,
     mint: data.mint ?? null,
@@ -472,6 +483,7 @@ export async function claudiumNativeQuote(input: {
 }
 
 export async function claudiumNativeConfirm(input: {
+  accountId: number;
   reference: string;
   signature: string;
 }): Promise<ClaudiumNativeConfirmResult> {
@@ -495,9 +507,10 @@ export async function claudiumNativeConfirm(input: {
 
 /** POST spend. granted:false when the service is off. */
 export async function claudiumSpend(input: {
-  accountId: string;
+  accountId: number;
   itemId: string;
   kind: 'cosmetic' | 'skin' | 'item';
+  expectedCostClaudium: number;
   idempotencyKey: string;
 }): Promise<ClaudiumSpendResult> {
   const data = await callService<{
@@ -516,20 +529,29 @@ export async function claudiumSpend(input: {
 }
 
 /** GET history/:accountId. Empty when the service is off. */
-export async function claudiumHistory(accountId: string): Promise<ClaudiumHistoryResult> {
+export async function claudiumHistory(accountId: number): Promise<ClaudiumHistoryResult> {
   const data = await callService<ClaudiumHistoryEntry[]>({
     method: 'GET',
-    path: `history/${encodeURIComponent(accountId)}`,
+    path: `history/${encodeURIComponent(String(accountId))}`,
   });
   if (!Array.isArray(data)) return { entries: [] };
-  return { entries: data };
+  const entries = data.filter(
+    (entry): entry is ClaudiumHistoryEntry =>
+      typeof entry?.entryId === 'string' &&
+      entry.accountId === accountId &&
+      typeof entry.delta === 'number' &&
+      typeof entry.reason === 'string' &&
+      typeof entry.ref === 'string' &&
+      typeof entry.atMs === 'number',
+  );
+  return { entries };
 }
 
 /** GET store. The cosmetic catalog, priced in Claudium by the service. Empty when off. */
-export async function claudiumStore(accountId: string): Promise<ClaudiumStoreResult> {
+export async function claudiumStore(accountId: number): Promise<ClaudiumStoreResult> {
   const data = await callService<ClaudiumStoreItem[]>({
     method: 'GET',
-    path: `store/${encodeURIComponent(accountId)}`,
+    path: `store/${encodeURIComponent(String(accountId))}`,
   });
   if (!Array.isArray(data)) return { available: false, items: [] };
   const items = data.filter(

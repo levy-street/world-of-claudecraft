@@ -238,6 +238,7 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    attackAnimationStarted?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -294,6 +295,7 @@ export interface SimContextCallbacks {
     school: string,
     ability: string | null,
     kind: 'hit' | 'miss' | 'dodge',
+    attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
@@ -587,7 +589,13 @@ export interface SimContextCallbacks {
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
-  runEffects(p: Entity, meta: PlayerMeta, target: Entity | null, res: ResolvedAbility): void;
+  runEffects(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity | null,
+    res: ResolvedAbility,
+    attackAnimationStarted?: boolean,
+  ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
   // reach back for these. All STAY on Sim. `syncPetAspect` is pet-management (the P1b

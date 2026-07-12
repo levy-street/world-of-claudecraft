@@ -2886,8 +2886,29 @@ export class Sim {
       updateYumiActive: (match) => yumiMod.updateYumiActive(sim.ctx, match),
       yumiPlayerDown: (match, victim, killerPid) =>
         yumiMod.yumiPlayerDown(sim.ctx, match, victim, killerPid),
-      yumiCatDamaged: (match, source, cat, amount, crit, school, ability, kind) =>
-        yumiMod.yumiCatDamaged(sim.ctx, match, source, cat, amount, crit, school, ability, kind),
+      yumiCatDamaged: (
+        match,
+        source,
+        cat,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        attackAnimationStarted,
+      ) =>
+        yumiMod.yumiCatDamaged(
+          sim.ctx,
+          match,
+          source,
+          cat,
+          amount,
+          crit,
+          school,
+          ability,
+          kind,
+          attackAnimationStarted,
+        ),
       cleanupYumiMatch: (match) => yumiMod.cleanupYumiMatch(sim.ctx, match),
       // A2: isArenaCrossTeam/arenaTeamOf/endArenaMatch/endDuel (above) now forward to
       // social/arena.ts + social/duel.ts via Sim's thin delegates. The block below is
@@ -3127,7 +3148,8 @@ export class Sim {
       effectiveAttackPower: sim.effectiveAttackPower.bind(sim),
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
-      runEffects: (p, meta, target, res) => runEffectsImpl(sim.ctx, p, meta, target, res),
+      runEffects: (p, meta, target, res, attackAnimationStarted) =>
+        runEffectsImpl(sim.ctx, p, meta, target, res, attackAnimationStarted),
       applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
@@ -4372,6 +4394,7 @@ export class Sim {
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
+    attackAnimationStarted = false,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4385,6 +4408,7 @@ export class Sim {
       noRage,
       threatOpts,
       direct,
+      attackAnimationStarted,
     );
   }
 

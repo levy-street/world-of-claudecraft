@@ -3,39 +3,41 @@
 //
 // The hunter's authored attack is 2H_Ranged_Shoot, a crossbow shoulder-aim
 // (the class ranged visual is a crossbow). With a BOW skin displayed the shot
-// plays the pack's draw clip instead: 2H_Ranged_Reload reads as nock plus
-// string pull on the KayKit rig, shipped to the hunter via the bow_anims.glb
-// animUrls entry (scripts/build_bow_anims.mjs), slightly slower so the draw
-// reads. Crossbow skins keep the authored aim.
+// plays the purpose-built Bow_Draw_Shot clip instead. The clip is assembled
+// from KayKit donor poses and shipped to the hunter via the bow_anims.glb
+// animUrls entry (scripts/build_bow_anims.mjs). Crossbow skins keep the
+// authored shoulder-aim.
 //
 // Pure over the skin catalog: no DOM, no three, Node-tested directly
 // (tests/weapon_skins.test.ts). CharacterVisual is the one consumer.
 
 import { WEAPON_SKINS, type WeaponSkinDef } from '../../sim/content/weapon_skins';
-import { AUTO_SHOT_DRAW_S } from '../../sim/projectile_travel';
 
 export interface SkinAttackClips {
   clips: readonly string[];
   timeScale: number;
-  /** Seconds into the clip (at timeScale 1) when the projectile leaves: the
-   *  renderer delays the tracer to this moment so the arrow flies exactly at
-   *  the authored release keyframe. */
-  releaseAt: number;
 }
 
-// Bow_Draw_Shot is authored by scripts/build_bow_anims.mjs (raise + nock,
-// eased draw, anticipation hold, release snap, follow-through) with its
-// release keyframe at the sim's Auto Shot draw time: the arrow (tracer +
-// damage flight) launches sim-side at AUTO_SHOT_DRAW_S after the windup, so
-// the clip and the projectile are in lockstep by construction. The build
-// script's BOW_RELEASE_AT must equal this (pinned by
-// tests/weapon_skins.test.ts).
-export const BOW_RELEASE_AT = AUTO_SHOT_DRAW_S;
+/** Typed renderer-event correlation for player ranged attacks. The launch cue
+ * starts whichever attack clip the live CharacterVisual selects (bow override
+ * or authored crossbow/default); the matching impact marker prevents replay. */
+export function playerRangedAttackStartsAtLaunch(
+  sourceKind: string | undefined,
+  attackAnimation: string | undefined,
+): boolean {
+  return sourceKind === 'player' && attackAnimation === 'ranged-shot';
+}
+
+export function playerRangedAttackAlreadyStarted(
+  sourceKind: string | undefined,
+  attackAnimationStarted: boolean | undefined,
+): boolean {
+  return sourceKind === 'player' && attackAnimationStarted === true;
+}
 
 const BOW_ATTACK: SkinAttackClips = {
   clips: ['Bow_Draw_Shot'],
   timeScale: 1.0,
-  releaseAt: BOW_RELEASE_AT,
 };
 
 // Every clip a displayed weapon skin can substitute for the authored attack.

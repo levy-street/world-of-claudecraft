@@ -44,13 +44,17 @@ the returned quote and does not calculate token prices or discounts.
 
 ## Weapon cosmetic identifiers
 
-The game registry is `src/sim/content/weapon_skins.ts`. The companion economy-service deployment
-catalog is `catalogs/claudium_catalog.season1.json`. A storefront product is available only when
-the same `itemId` exists in both files. Every weapon cosmetic row in the service catalog must use
-`kind: "skin"`; legacy `kind: "item"` rows are not Season 1 Armory products and are filtered out
-by the game client.
+The game mechanical registry is `src/sim/content/weapon_skins.ts`. It owns IDs, models, rarity,
+and stable collection IDs, but no player copy or price. English names, looks, and lore live in
+`src/ui/i18n.catalog/armory.ts`. The companion economy-service deployment catalog is
+`catalogs/claudium_catalog.season1.json`; it is the sole authority for availability and Claudium
+cost. A storefront product is purchasable only when the same `itemId` exists in both files and the
+service returns a valid positive cost. A missing service row remains visible as unavailable and
+the game does not synthesize a fallback price. Every weapon cosmetic row in the service catalog
+must use `kind: "skin"`; legacy `kind: "item"` rows are not Season 1 Armory products and are
+filtered out by the game client.
 
-The current game and companion catalogs agree on these products and prices:
+The current companion service catalog publishes these tier prices for the game registry's products:
 
 | Collection | Claudium cost | Service `itemId` values |
 |---|---:|---|
@@ -60,6 +64,7 @@ The current game and companion catalogs agree on these products and prices:
 | Fallen Star | 5,000 | `solheim_sword`, `skyrender_axe`, `starfall_mace`, `astravyr_dagger`, `cosmarch_staff`, `emberwish_wand`, `encore_bow`, `meteorlatch_crossbow` |
 
 Do not copy the retired placeholder `purple_*`, `redskull_*`, or `emberfang_sword` rows into the
-weapon storefront. Keep the two source files in lockstep whenever a product ID or Claudium cost
-changes. The initial category is `weapons`; future catalog updates can add `outfits` and `mounts`
-without changing the purchase flow.
+weapon storefront. Keep product IDs in lockstep across both registries. Update Claudium costs only
+in the companion service catalog. The initial category is `weapons`. Future `outfits` or `mounts`
+require an explicit game registry, allowlist, and UI update plus matching service rows; adding a
+service-only row does not make a new category purchasable.

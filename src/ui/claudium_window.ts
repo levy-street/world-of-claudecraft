@@ -11,13 +11,7 @@
 // All strings are t() keys; all interpolation passes through esc(); colors/sizes
 // are CSS tokens (class names), no literal hex/px in this module.
 
-import {
-  buildClaudiumView,
-  type ClaudiumPriceInput,
-  type ClaudiumSkuInput,
-  type ClaudiumStoreItemInput,
-  type ClaudiumView,
-} from './claudium_view';
+import { buildClaudiumView, type ClaudiumSkuInput, type ClaudiumView } from './claudium_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
@@ -29,7 +23,6 @@ export type ClaudiumRail = 'stripe' | 'sol' | 'woc';
 export interface ClaudiumSnapshot {
   balance: number | null;
   skus: readonly ClaudiumSkuInput[];
-  price: ClaudiumPriceInput;
   nativeRails?: Partial<Record<'sol' | 'woc', boolean>>;
   walletBalances?: { solLamports: string | null; wocBaseUnits: string | null };
   nativePrices?: readonly {
@@ -37,12 +30,11 @@ export interface ClaudiumSnapshot {
     solAmountBase?: string | null;
     wocAmountBase?: string | null;
   }[];
-  storeItems: readonly ClaudiumStoreItemInput[];
 }
 
 /**
  * Hud-supplied glue. The window paints from what these return and reports clicks
- * back; it never reaches into Hud. balance()/skus()/price()/storeItems() are the
+ * back; it never reaches into Hud. balance()/skus()/price() are the
  * async service reads; buy() starts the client-signed purchase
  * flows; the focus pair comes from Hud.windowFocus().
  */
@@ -61,13 +53,10 @@ export interface ClaudiumWindowDeps {
 const EMPTY_SNAPSHOT: ClaudiumSnapshot = {
   balance: null,
   skus: [],
-  price: { usdPerClaudium: null, wocBaseUnitsPerClaudium: null },
-  storeItems: [],
 };
 
 const WOC_DECIMALS = 6;
-const WOC_ICON_URL =
-  'https://raw.githubusercontent.com/levy-street/world-of-claudecraft/refs/heads/main/build/icon.ico';
+const WOC_ICON_URL = '/woc_logo_square.webp';
 
 export class ClaudiumWindow {
   private openerFocus: HTMLElement | null = null;

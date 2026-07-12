@@ -1794,10 +1794,10 @@ async function startGame(
     const nativePriceCacheTtlMs = 60_000;
     const nativeAmountBase = (
       rail: 'sol' | 'woc',
-      claudium: number,
+      sku: string,
       amountBase: string | null | undefined,
     ): string | null => {
-      const key = `${rail}:${claudium}`;
+      const key = `${rail}:${sku}`;
       if (amountBase) {
         nativePriceCache.set(key, { amountBase, atMs: Date.now() });
         return amountBase;
@@ -1817,14 +1817,10 @@ async function startGame(
         };
       },
       snapshot: async () => {
-        const [balance, skus, price, nativeRails, storeItems] = await Promise.all([
+        const [balance, skus, nativeRails] = await Promise.all([
           economy.balance(),
           economy.skus(),
-          // The peg display uses the stripe rail's USD-per-Claudium; the woc oracle
-          // (base units per Claudium, null => oracle down) gates the woc rail only.
-          economy.price('woc'),
           economy.nativeRails(),
-          economy.store(),
         ]);
         const wallet = await loadWallet();
         const walletAddress = wallet.currentWallet().address;
@@ -1837,30 +1833,25 @@ async function startGame(
         const nativePrices = await Promise.all(
           skus.map(async (row) => {
             const [sol, woc] = await Promise.all([
-              nativeRails.rails.sol ? economy.nativePrice('sol', row.claudium) : null,
-              nativeRails.rails.woc ? economy.nativePrice('woc', row.claudium) : null,
+              nativeRails.rails.sol ? economy.nativePrice('sol', row.sku) : null,
+              nativeRails.rails.woc ? economy.nativePrice('woc', row.sku) : null,
             ]);
             return {
               sku: row.sku,
-              solAmountBase: nativeAmountBase('sol', row.claudium, sol?.amountBase),
-              wocAmountBase: nativeAmountBase('woc', row.claudium, woc?.amountBase),
+              solAmountBase: nativeAmountBase('sol', row.sku, sol?.amountBase),
+              wocAmountBase: nativeAmountBase('woc', row.sku, woc?.amountBase),
             };
           }),
         );
         return {
           balance: balance.balance,
           skus,
-          price: {
-            usdPerClaudium: price.usdPerClaudium,
-            wocBaseUnitsPerClaudium: price.wocBaseUnitsPerClaudium,
-          },
           nativeRails: nativeRails.rails,
           walletBalances: {
             solLamports: solBalance.lamports,
             wocBaseUnits: wocBalanceBaseUnits(wocBalance),
           },
           nativePrices,
-          storeItems,
         };
       },
       buy: async (rail, sku) => {
@@ -1914,10 +1905,11 @@ async function startGame(
           throw new Error(message || t('hudChrome.claudium.checkoutFailed'));
         });
       },
-      spend: async (itemId, kind) => {
+      spend: async (itemId, kind, expectedCostClaudium) => {
         const result = await economy.spend({
           itemId,
           kind,
+          expectedCostClaudium,
           idempotencyKey: newIdempotencyKey(),
         });
         return {

@@ -11,6 +11,7 @@ const claudiumWindow = readFileSync(
 );
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+const inspect = readFileSync(new URL('../src/ui/armory_inspect.ts', import.meta.url), 'utf8');
 
 describe('WOC Store window contract', () => {
   it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
@@ -23,7 +24,7 @@ describe('WOC Store window contract', () => {
     const purchase = storeWindow.slice(storeWindow.indexOf('private requestArmoryPurchase'));
     expect(purchase).toContain('if (!row.affordable)');
     expect(purchase).toContain("t('hudChrome.wocStore.needMoreTitle')");
-    expect(purchase).toContain('() => this.deps.openClaudium?.()');
+    expect(purchase).toContain('this.openClaudiumFromStore()');
   });
 
   it('uses the authoritative insufficient-balance response for the top-up flow', () => {
@@ -41,13 +42,28 @@ describe('WOC Store window contract', () => {
 
   it('marks owned skins and prevents another purchase attempt', () => {
     expect(storeWindow).toContain('armory-state');
-    expect(storeWindow).toContain('if (row.owned || !row.purchasable) return;');
+    expect(storeWindow).toContain(
+      'if (row.owned || !row.purchasable || row.costClaudium === null) return;',
+    );
   });
 
   it('sells only the Season 1 Armory (no legacy cosmetics grid)', () => {
     expect(storeWindow).not.toContain('woc-store-grid');
     expect(storeWindow).not.toContain('storeCardHtml');
     expect(storeWindow).not.toContain('buildWocStoreRows');
+  });
+
+  it('implements roving keyboard tabs with explicit tabpanel ownership', () => {
+    expect(storeWindow).toContain("rovingTarget(ke.key, i, tabs.length, 'horizontal')");
+    expect(storeWindow).toContain('aria-controls="woc-store-panel"');
+    expect(storeWindow).toContain('role="tabpanel"');
+    expect(storeWindow).toContain("panel?.setAttribute(\n      'aria-labelledby'");
+  });
+
+  it('keeps Escape scoped to the top Armory inspector and exposes toggle state', () => {
+    expect(inspect).toMatch(/event\.key === 'Escape'[\s\S]{0,180}event\.preventDefault\(\)/);
+    expect(inspect).toMatch(/event\.key === 'Escape'[\s\S]{0,220}event\.stopPropagation\(\)/);
+    expect(inspect).toContain("button.setAttribute('aria-pressed'");
   });
 
   it('keeps the Claudium window focused on currency purchases', () => {

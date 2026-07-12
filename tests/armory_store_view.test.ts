@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
-import {
-  buildArmorySections,
-  buildWocStoreRows,
-  type WocStoreItemInput,
-} from '../src/ui/woc_store_view';
+import { buildArmorySections, type WocStoreItemInput } from '../src/ui/woc_store_view';
 
 const noCosmetics = { weaponSkinIds: [], weaponSkinLoadout: {} };
 
 function serviceRow(itemId: string, costClaudium: number, owned = false): WocStoreItemInput {
-  return { itemId, name: WEAPON_SKINS[itemId]?.name ?? itemId, kind: 'skin', costClaudium, owned };
+  return { itemId, name: itemId, kind: 'skin', costClaudium, owned };
 }
 
 describe('buildArmorySections', () => {
@@ -21,17 +16,19 @@ describe('buildArmorySections', () => {
     });
     expect(sections.map((s) => s.rarity)).toEqual(['legendary', 'epic', 'rare', 'uncommon']);
     expect(sections.map((s) => s.collection)).toEqual([
-      'Fallen Star',
-      'Hoarfrost',
-      'Emberwrought',
-      'Guildmark',
+      'fallen_star',
+      'hoarfrost',
+      'emberwrought',
+      'guildmark',
     ]);
     // 7 per collection, plus the Fallen Star encore (the legendary bow slot).
     expect(sections.map((s) => s.rows.length)).toEqual([8, 7, 7, 7]);
-    // No service rows: catalog price shown, but nothing purchasable.
+    // No service rows: the game must not invent a price for a missing SKU.
     const ice = sections[1].rows.find((r) => r.skin.id === 'ice_fang_sword');
-    expect(ice?.costClaudium).toBe(3000);
+    expect(ice?.costClaudium).toBeNull();
     expect(ice?.purchasable).toBe(false);
+    expect(ice?.affordable).toBe(false);
+    expect(ice?.shortfall).toBeNull();
   });
 
   it('takes the live service price and purchasability when the SKU exists', () => {
@@ -112,19 +109,5 @@ describe('buildArmorySections', () => {
     const sword = rows.find((r) => r.skin.weaponType === 'sword');
     expect(sword?.eligibleClasses).toContain('warrior');
     expect(sword?.eligibleClasses).not.toContain('hunter');
-  });
-
-  it('leaves the legacy weapon-cosmetic grid untouched by skin rows', () => {
-    const rows = buildWocStoreRows(1000, [
-      serviceRow('ice_fang_sword', 3000),
-      {
-        itemId: 'purple_sword',
-        name: 'Aether Sword',
-        kind: 'item',
-        costClaudium: 500,
-        owned: false,
-      },
-    ]);
-    expect(rows.map((r) => r.itemId)).toEqual(['purple_sword']);
   });
 });

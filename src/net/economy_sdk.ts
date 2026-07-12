@@ -10,6 +10,7 @@
 import { apiUrl } from './online';
 
 export type ClaudiumRail = 'stripe' | 'sol' | 'woc';
+export type ClaudiumPriceRail = 'stripe' | 'woc';
 export type ClaudiumNativeRail = 'sol' | 'woc';
 
 export interface ClaudiumBalance {
@@ -67,19 +68,13 @@ export interface ClaudiumPurchase {
   reason: string | null;
 }
 
-export interface ClaudiumConfirm {
-  credited: boolean;
-  balance: number | null;
-  reason: string | null;
-}
-
 export interface ClaudiumNativeRails {
   rails: Record<ClaudiumNativeRail, boolean>;
 }
 
 export interface ClaudiumNativePrice {
   rail: ClaudiumNativeRail;
-  claudium: number;
+  claudium: number | null;
   amountBase: string | null;
   reason?: string;
 }
@@ -140,7 +135,6 @@ const OFF_PURCHASE: ClaudiumPurchase = {
   woc: null,
   reason: 'unavailable',
 };
-const OFF_CONFIRM: ClaudiumConfirm = { credited: false, balance: null, reason: 'unavailable' };
 const OFF_NATIVE_QUOTE: ClaudiumNativeQuote = {
   ok: false,
   reference: null,
@@ -171,12 +165,17 @@ const NATIVE_CONFIRM_RETRY_REASONS = new Set([
   'not_finalized',
   'cannot_verify',
   'unavailable',
+  'processing',
+  'post_verify_failed',
+  'fulfillment_failed',
 ]);
 const NATIVE_CONFIRM_RETRY_DELAYS_MS = [1000, 1500, 2500, 4000, 6000, 8000, 10_000];
+const NATIVE_CONFIRM_MAX_RETRY_MS = 12 * 60_000;
 
 export interface NativeConfirmRetryOptions {
   delayMs?(ms: number): Promise<void>;
   nowMs?(): number;
+  maxElapsedMs?: number;
 }
 
 export class EconomyClient {
@@ -220,7 +219,7 @@ export class EconomyClient {
     return this.get('/api/claudium/balance', OFF_BALANCE);
   }
 
-  price(rail: ClaudiumRail): Promise<ClaudiumPrice> {
+  price(rail: ClaudiumPriceRail): Promise<ClaudiumPrice> {
     return this.get(`/api/claudium/price/${rail}`, OFF_PRICE(rail));
   }
 
@@ -251,10 +250,10 @@ export class EconomyClient {
     return this.get('/api/claudium/native/rails', OFF_NATIVE_RAILS);
   }
 
-  nativePrice(rail: ClaudiumNativeRail, claudium: number): Promise<ClaudiumNativePrice> {
-    return this.get(`/api/claudium/native/price/${rail}?claudium=${claudium}`, {
+  nativePrice(rail: ClaudiumNativeRail, sku: string): Promise<ClaudiumNativePrice> {
+    return this.get(`/api/claudium/native/price/${rail}?sku=${encodeURIComponent(sku)}`, {
       rail,
-      claudium,
+      claudium: null,
       amountBase: null,
       reason: 'unavailable',
     });
@@ -268,15 +267,11 @@ export class EconomyClient {
   }
 
   purchase(input: {
-    rail: ClaudiumRail;
+    rail: 'stripe';
     sku: string;
     idempotencyKey: string;
   }): Promise<ClaudiumPurchase> {
     return this.post('/api/claudium/purchase', input, OFF_PURCHASE);
-  }
-
-  confirmWoc(input: { purchaseId: string; inboundSignature: string }): Promise<ClaudiumConfirm> {
-    return this.post('/api/claudium/purchase/woc/confirm', input, OFF_CONFIRM);
   }
 
   nativeQuote(input: {
@@ -294,6 +289,7 @@ export class EconomyClient {
   spend(input: {
     itemId: string;
     kind: 'cosmetic' | 'skin' | 'item';
+    expectedCostClaudium: number;
     idempotencyKey: string;
   }): Promise<ClaudiumSpend> {
     return this.post('/api/claudium/spend', input, OFF_SPEND);
@@ -319,16 +315,28 @@ export async function confirmNativeSettlement(
   client: Pick<EconomyClient, 'nativeConfirm'>,
   reference: string,
   signature: string,
-  quoteExpiryMs: number | null,
   opts: NativeConfirmRetryOptions = {},
 ): Promise<ClaudiumNativeConfirm> {
   const wait = opts.delayMs ?? delayMs;
   const now = opts.nowMs ?? (() => Date.now());
+  const maxElapsedMs = opts.maxElapsedMs ?? NATIVE_CONFIRM_MAX_RETRY_MS;
+  const startedAt = now();
+  let scheduledWaitMs = 0;
+  let retryIndex = 0;
   let result = await client.nativeConfirm({ reference, signature });
-  for (const delay of NATIVE_CONFIRM_RETRY_DELAYS_MS) {
-    if (!shouldRetryNativeConfirm(result)) return result;
-    if (quoteExpiryMs !== null && now() + delay >= quoteExpiryMs) return result;
+  while (shouldRetryNativeConfirm(result)) {
+    const wallElapsedMs = Math.max(0, now() - startedAt);
+    const elapsedMs = Math.max(wallElapsedMs, scheduledWaitMs);
+    if (elapsedMs >= maxElapsedMs) return result;
+    const configuredDelay =
+      NATIVE_CONFIRM_RETRY_DELAYS_MS[
+        Math.min(retryIndex, NATIVE_CONFIRM_RETRY_DELAYS_MS.length - 1)
+      ];
+    const delay = Math.min(configuredDelay, maxElapsedMs - elapsedMs);
+    if (delay <= 0) return result;
+    retryIndex += 1;
     await wait(delay);
+    scheduledWaitMs += delay;
     result = await client.nativeConfirm({ reference, signature });
   }
   return result;
@@ -341,9 +349,8 @@ export async function confirmNativeSettlement(
  *
  * - stripe: hand the returned clientSecret + publishableKey to Stripe.js and
  *   confirm the PaymentIntent client-side. Needs a live publishable key + Stripe.js.
- * - wocSignAndSend: build + sign the split transfer described by the woc intent
- *   via the Wallet Standard path (the repo's signAndSend), returning the inbound
- *   signature to post to confirmWoc. Needs a live wallet + a built transaction.
+ * - nativeSignAndSend: sign and send the service-built SOL or WOC transaction,
+ *   returning its signature to post to nativeConfirm. Needs a live wallet.
  */
 export interface ClaudiumSigners {
   stripe?(intent: ClaudiumStripeIntent, purchaseId: string): Promise<void>;
@@ -361,7 +368,7 @@ export async function startClaudiumPurchase(
   rail: ClaudiumRail,
   sku: string,
   signers: ClaudiumSigners = {},
-): Promise<ClaudiumPurchase | ClaudiumConfirm | ClaudiumNativeQuote | ClaudiumNativeConfirm> {
+): Promise<ClaudiumPurchase | ClaudiumNativeQuote | ClaudiumNativeConfirm> {
   if (rail === 'stripe') {
     const purchase = await client.purchase({ rail, sku, idempotencyKey: newIdempotencyKey() });
     if (!purchase.ok || !purchase.purchaseId) return purchase;
@@ -381,5 +388,9 @@ export async function startClaudiumPurchase(
   const quote = await client.nativeQuote({ rail, sku, payer });
   if (!quote.ok || !quote.reference || !quote.transactionBase64) return quote;
   const signature = await signers.nativeSignAndSend(quote.transactionBase64, rail);
-  return confirmNativeSettlement(client, quote.reference, signature, quote.quoteExpiryMs);
+  // Once the wallet has broadcast a signature, confirmation is bounded by its
+  // own recovery window rather than the quote's wall-clock expiry. The service
+  // validates the transfer's on-chain block time, so a payment broadcast on time
+  // remains eligible even if finality or downstream fulfillment lands later.
+  return confirmNativeSettlement(client, quote.reference, signature);
 }

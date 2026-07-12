@@ -13,6 +13,7 @@ vi.mock('../src/ui/armory_inspect', () => ({
 }));
 vi.mock('../src/ui/portrait_chip', () => ({ portraitChipHtml: () => '' }));
 
+import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { DailyRewardsWindow } from '../src/ui/daily_rewards_window';
 import type { ArmorySkinRow } from '../src/ui/woc_store_view';
 import type { IWorld } from '../src/world_api';
@@ -76,19 +77,21 @@ describe('DailyRewardsWindow store refresh behavior', () => {
   it('opens the top-up dialog from an authoritative insufficient-balance response', async () => {
     const root = rootStub();
     const dialog: { body: string; onOk?: () => void } = { body: '' };
-    const openClaudium = vi.fn();
+    const order: string[] = [];
+    const openClaudium = vi.fn(() => order.push('claudium'));
+    const spendStoreItem = vi.fn(async () => ({
+      granted: false,
+      balance: 100,
+      costClaudium: 1_000,
+      reason: 'insufficient_balance',
+    }));
     const window = new DailyRewardsWindow({
       root: () => root,
       world: worldStub,
       closeOthers: () => undefined,
       captureFocus: () => null,
       restoreFocus: () => undefined,
-      spendStoreItem: async () => ({
-        granted: false,
-        balance: 100,
-        costClaudium: 700,
-        reason: 'insufficient_balance',
-      }),
+      spendStoreItem,
       openClaudium,
       confirmDialog: (_title, body, _ok, _cancel, onOk) => {
         dialog.body = body;
@@ -96,19 +99,67 @@ describe('DailyRewardsWindow store refresh behavior', () => {
       },
     });
     const row = {
-      skin: { id: 'emberfang_sword', name: 'Emberfang' },
-      costClaudium: 500,
+      skin: WEAPON_SKINS.cinderbrand_sword,
+      costClaudium: 200,
     } as ArmorySkinRow;
+    Object.assign(window as unknown as Record<string, unknown>, {
+      armoryInspect: { close: () => order.push('inspect') },
+    });
 
     await (
       window as unknown as { purchaseArmorySkin(row: ArmorySkinRow): Promise<void> }
     ).purchaseArmorySkin(row);
 
+    expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
     expect((window as unknown as { storeBalance: number | null }).storeBalance).toBe(100);
-    expect(dialog.body).toContain('600');
-    expect(dialog.body).toContain('Emberfang');
+    expect(dialog.body).toContain('900');
+    expect(dialog.body).toContain('Cinderbrand');
     expect(dialog.onOk).toBeTypeOf('function');
     dialog.onOk?.();
     expect(openClaudium).toHaveBeenCalledOnce();
+    expect(order).toEqual(['inspect', 'claudium']);
+  });
+
+  it('refreshes and requires a new confirmation when the service price changed', async () => {
+    const confirmations: string[] = [];
+    const spendStoreItem = vi.fn(async () => ({
+      granted: false,
+      balance: 2_000,
+      costClaudium: 1_000,
+      reason: 'price_changed',
+    }));
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      spendStoreItem,
+      confirmDialog: (_title, body) => confirmations.push(body),
+    });
+    const original = {
+      skin: WEAPON_SKINS.cinderbrand_sword,
+      costClaudium: 200,
+      purchasable: true,
+      owned: false,
+      affordable: true,
+    } as ArmorySkinRow;
+    const current = { ...original, costClaudium: 1_000 } as ArmorySkinRow;
+    Object.assign(window as unknown as Record<string, unknown>, {
+      armorySections: [],
+      renderStore: async () => {
+        Object.assign(window as unknown as Record<string, unknown>, {
+          armorySections: [{ rows: [current] }],
+        });
+      },
+    });
+
+    await (
+      window as unknown as { purchaseArmorySkin(row: ArmorySkinRow): Promise<void> }
+    ).purchaseArmorySkin(original);
+
+    expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
+    expect(confirmations).toHaveLength(1);
+    expect(confirmations[0]).toContain('1,000');
   });
 });

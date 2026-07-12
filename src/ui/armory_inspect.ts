@@ -3,8 +3,8 @@
 // "tried on" the player's own character under a day / dusk / night scene, or the
 // weapon alone on a showcase turntable. Right is the codex side: collection,
 // rarity, the in-game look line, the full lore, the price, and the Buy / Apply /
-// Detach actions. Chrome strings are t() keys; skin names, collections, look and
-// lore render from the shared catalog exactly like service-fed store copy.
+// Detach actions. All player-visible strings, including skin names,
+// collections, look and lore, resolve through the runtime locale catalog.
 import {
   type ArmoryPreviewHandle,
   type ArmoryPreviewMode,
@@ -13,6 +13,13 @@ import {
 } from '../render/armory_preview';
 import type { PreviewAppearance } from '../render/characters';
 import type { WeaponSkinType } from '../sim/types';
+import {
+  badgeLabel,
+  localizeWeaponSkin,
+  rarityLabel,
+  sceneLabel,
+  weaponTypeLabel,
+} from './armory_labels';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
@@ -26,61 +33,6 @@ export interface ArmoryInspectDeps {
 }
 
 const SCENES: readonly ArmorySceneKey[] = ['day', 'dusk', 'night'];
-
-// Literal keys per case (never template keys): the static i18n scan must see
-// every key it registers.
-export function weaponTypeLabel(type: WeaponSkinType): string {
-  switch (type) {
-    case 'sword':
-      return t('hudChrome.wocStore.wtype.sword');
-    case 'axe':
-      return t('hudChrome.wocStore.wtype.axe');
-    case 'mace':
-      return t('hudChrome.wocStore.wtype.mace');
-    case 'dagger':
-      return t('hudChrome.wocStore.wtype.dagger');
-    case 'staff':
-      return t('hudChrome.wocStore.wtype.staff');
-    case 'wand':
-      return t('hudChrome.wocStore.wtype.wand');
-    case 'bow':
-      return t('hudChrome.wocStore.wtype.bow');
-    case 'crossbow':
-      return t('hudChrome.wocStore.wtype.crossbow');
-  }
-}
-
-export function rarityLabel(rarity: ArmorySkinRow['skin']['rarity']): string {
-  switch (rarity) {
-    case 'uncommon':
-      return t('hudChrome.wocStore.rarity.uncommon');
-    case 'rare':
-      return t('hudChrome.wocStore.rarity.rare');
-    case 'epic':
-      return t('hudChrome.wocStore.rarity.epic');
-    case 'legendary':
-      return t('hudChrome.wocStore.rarity.legendary');
-  }
-}
-
-function sceneLabel(scene: ArmorySceneKey): string {
-  switch (scene) {
-    case 'day':
-      return t('hudChrome.wocStore.scene.day');
-    case 'dusk':
-      return t('hudChrome.wocStore.scene.dusk');
-    case 'night':
-      return t('hudChrome.wocStore.scene.night');
-  }
-}
-
-function badgeLabel(badge: 'flagship' | 'hero'): string {
-  return badge === 'flagship'
-    ? t('hudChrome.wocStore.badge.flagship')
-    : t('hudChrome.wocStore.badge.hero');
-}
-
-export { badgeLabel };
 
 export class ArmoryInspect {
   private overlay: HTMLElement | null = null;
@@ -113,6 +65,8 @@ export class ArmoryInspect {
       // from under a live purchase prompt.
       if (document.getElementById('confirm-dialog')) return;
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
         this.close();
         return;
       }
@@ -135,8 +89,9 @@ export class ArmoryInspect {
       if (document.getElementById('confirm-dialog')) return;
       if (event.target === overlay) this.close();
     });
+    const copy = localizeWeaponSkin(row.skin);
     overlay.innerHTML =
-      `<div class="armory-inspect rarity-${esc(row.skin.rarity)}" role="dialog" aria-modal="true" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: row.skin.name }))}">` +
+      `<div class="armory-inspect rarity-${esc(row.skin.rarity)}" role="dialog" aria-modal="true" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: copy.name }))}">` +
       `<button type="button" class="x-btn armory-inspect-close" data-armory-close aria-label="${esc(t('hudChrome.wocStore.close'))}">${svgIcon('close')}</button>` +
       `<div class="armory-inspect-stage"><canvas data-armory-canvas></canvas>` +
       `<div class="armory-inspect-controls">` +
@@ -151,16 +106,16 @@ export class ArmoryInspect {
       `</div></div></div>` +
       `<div class="armory-inspect-panel">` +
       `<div class="armory-inspect-head">` +
-      `<span class="armory-collection">${esc(t('hudChrome.wocStore.collectionLine', { collection: row.skin.collection }))}</span>` +
+      `<span class="armory-collection">${esc(t('hudChrome.wocStore.collectionLine', { collection: copy.collection }))}</span>` +
       `<span class="armory-rarity-pill">${esc(rarityLabel(row.skin.rarity))}</span>` +
       (row.skin.badge
         ? `<span class="armory-badge">${esc(badgeLabel(row.skin.badge))}</span>`
         : '') +
       `</div>` +
-      `<h2>${esc(row.skin.name)}</h2>` +
+      `<h2>${esc(copy.name)}</h2>` +
       `<p class="armory-type-line">${esc(weaponTypeLabel(row.skin.weaponType))} · ${esc(t('hudChrome.wocStore.seasonOne'))}</p>` +
-      `<p class="armory-look">${esc(row.skin.look)}</p>` +
-      `<div class="armory-lore"><h3>${esc(t('hudChrome.wocStore.lore'))}</h3><p>${esc(row.skin.lore)}</p></div>` +
+      `<p class="armory-look">${esc(copy.look)}</p>` +
+      `<div class="armory-lore"><h3>${esc(t('hudChrome.wocStore.lore'))}</h3><p>${esc(copy.lore)}</p></div>` +
       `<div class="armory-inspect-actions" data-armory-actions></div>` +
       `</div></div>`;
     document.body.appendChild(overlay);
@@ -217,10 +172,14 @@ export class ArmoryInspect {
     const overlay = this.overlay;
     if (!overlay) return;
     overlay.querySelectorAll<HTMLButtonElement>('[data-armory-mode]').forEach((button) => {
-      button.classList.toggle('active', button.dataset.armoryMode === this.mode);
+      const active = button.dataset.armoryMode === this.mode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
     overlay.querySelectorAll<HTMLButtonElement>('[data-armory-scene]').forEach((button) => {
-      button.classList.toggle('active', button.dataset.armoryScene === this.sceneKey);
+      const active = button.dataset.armoryScene === this.sceneKey;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
 
@@ -228,17 +187,17 @@ export class ArmoryInspect {
     const host = this.overlay?.querySelector<HTMLElement>('[data-armory-actions]');
     const row = this.row;
     if (!host || !row) return;
-    const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
     const price =
-      `<span class="armory-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">` +
-      `<strong>${cost}</strong></span>`;
+      row.costClaudium === null
+        ? ''
+        : `<span class="armory-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">` +
+          `<strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
     let actions = '';
     if (!row.owned) {
-      const label = row.purchasable
-        ? t('hudChrome.wocStore.buySkin')
-        : t('hudChrome.wocStore.unavailable');
+      const canBuy = row.purchasable && row.costClaudium !== null;
+      const label = canBuy ? t('hudChrome.wocStore.buySkin') : t('hudChrome.wocStore.unavailable');
       actions =
-        `${price}<button type="button" class="armory-buy" data-armory-buy${row.purchasable ? '' : ' disabled'}>` +
+        `${price}<button type="button" class="armory-buy" data-armory-buy${canBuy ? '' : ' disabled'}>` +
         `${esc(label)}</button>`;
     } else if (row.applied) {
       actions =

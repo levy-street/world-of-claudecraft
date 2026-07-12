@@ -32,6 +32,7 @@ import {
   cardUploadRateLimited,
   characterMutationRateLimited,
   claudiumMutationRateLimited,
+  claudiumPreAuthRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
@@ -231,6 +232,42 @@ function claudiumMutationPolicy(
     tier2: 'global',
   };
 }
+
+function claudiumPreAuthPolicy(
+  name: string,
+  action: ClaudiumMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => claudiumPreAuthRateLimited(ctx.req, action),
+    tier2: 'global',
+  };
+}
+
+export const CLAUDIUM_PURCHASE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_purchase_pre_auth',
+  'purchase',
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_QUOTE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_quote_pre_auth',
+  'quote',
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_CONFIRM_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_confirm_pre_auth',
+  'confirm',
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_SPEND_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
+  'claudium_spend_pre_auth',
+  'spend',
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+);
 
 export const CLAUDIUM_PURCHASE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
   'claudium_purchase',

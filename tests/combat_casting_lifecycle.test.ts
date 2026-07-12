@@ -527,10 +527,19 @@ describe('casting_lifecycle: physical ranged shots resolve on projectile impact 
     drainCast(sim, p, meta); // run the 3s cast to completion (updateCasting only, no projectile step)
     // The shot is LAUNCHED at cast completion, not landed: no damage yet, a bolt is in flight.
     expect(mob.hp).toBe(hp0);
-    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(
+      events.some(
+        (e) => e.type === 'spellfx' && e.fx === 'projectile' && e.attackAnimation === 'ranged-shot',
+      ),
+    ).toBe(true);
     // Advance ticks so the arrow travels and connects.
     for (let i = 0; i < 60 && mob.hp === hp0; i++) sim.tick();
     expect(mob.hp).toBeLessThan(hp0);
-    expect(events.some((e) => e.type === 'damage' && e.ability === 'Long Draw')).toBe(true);
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'damage' && e.ability === 'Long Draw' && e.attackAnimationStarted === true,
+      ),
+    ).toBe(true);
   });
 });

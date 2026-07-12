@@ -15,9 +15,8 @@
 //               extrapolated on the left-arm chain), tiny torso kick
 //   0.60-0.95   follow-through, ease back to idle
 //
-// BOW_RELEASE_AT (0.55s) is the moment the arrow leaves: the renderer delays
-// the tracer to it (src/render/characters/skin_attack.ts re-exports the value
-// and tests/weapon_skins.test.ts pins the two against this file).
+// BOW_RELEASE_AT (0.55s) is the visual string-snap pose. Auto Shot gameplay
+// launches immediately; this authored timing is presentation-only.
 //
 // Source (CC0 1.0, no attribution required, already credited in CREDITS.md):
 //   KayKit Character Pack: Adventurers 1.0 - Kay Lousberg

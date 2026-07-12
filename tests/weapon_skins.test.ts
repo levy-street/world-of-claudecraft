@@ -13,11 +13,10 @@ import {
 import {
   WEAPON_SKIN_COLLECTIONS,
   WEAPON_SKIN_LIST,
-  WEAPON_SKIN_PRICE_USD,
   WEAPON_SKINS,
-  weaponSkinClaudiumCost,
 } from '../src/sim/content/weapon_skins';
 import { ITEMS } from '../src/sim/data';
+import { armoryCollectionStrings, armorySkinStrings } from '../src/ui/i18n.catalog/armory';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 import { armorySkinArt } from '../src/ui/woc_store_view';
 
@@ -28,24 +27,19 @@ describe('season 1 weapon skin catalog', () => {
     expect(WEAPON_SKIN_LIST.length).toBe(29);
     for (const collection of WEAPON_SKIN_COLLECTIONS) {
       const inCollection = WEAPON_SKIN_LIST.filter((s) => s.collection === collection);
-      expect(inCollection.length, collection).toBe(collection === 'Fallen Star' ? 8 : 7);
+      expect(inCollection.length, collection).toBe(collection === 'fallen_star' ? 8 : 7);
       // One skin per weapon type within a collection.
       expect(new Set(inCollection.map((s) => s.weaponType)).size).toBe(inCollection.length);
     }
   });
 
-  it('prices match the Season 1 sheet and the Claudium peg (1 = 0.01 USD)', () => {
-    for (const skin of WEAPON_SKIN_LIST) {
-      expect(skin.priceUsd, skin.id).toBe(WEAPON_SKIN_PRICE_USD[skin.rarity]);
-      expect(weaponSkinClaudiumCost(skin), skin.id).toBe(skin.priceUsd * 100);
-    }
-    expect(WEAPON_SKIN_PRICE_USD).toEqual({ uncommon: 2, rare: 10, epic: 30, legendary: 50 });
-  });
-
-  it('every skin id is its record key and no skin is free or common', () => {
+  it('keeps product pricing out of the game catalog', () => {
     for (const [key, skin] of Object.entries(WEAPON_SKINS)) {
       expect(skin.id).toBe(key);
-      expect(skin.priceUsd).toBeGreaterThan(0);
+      expect(skin).not.toHaveProperty('priceUsd');
+      expect(skin).not.toHaveProperty('name');
+      expect(skin).not.toHaveProperty('look');
+      expect(skin).not.toHaveProperty('lore');
       expect(skin.season).toBe(1);
     }
   });
@@ -88,10 +82,13 @@ describe('season 1 weapon skin catalog', () => {
   it('copy is free of em and en dashes (repo rule)', () => {
     // Unicode escapes, not literal dashes: the pre-push copy scan reads this
     // file too.
-    for (const skin of WEAPON_SKIN_LIST) {
-      for (const text of [skin.name, skin.collection, skin.look, skin.lore]) {
-        expect(text.includes('\u2014'), `${skin.id} em dash`).toBe(false);
-        expect(text.includes('\u2013'), `${skin.id} en dash`).toBe(false);
+    for (const copy of [
+      ...Object.values(armoryCollectionStrings),
+      ...Object.values(armorySkinStrings).flatMap((skin) => [skin.name, skin.look, skin.lore]),
+    ]) {
+      for (const text of [copy]) {
+        expect(text.includes('\u2014'), `${text.slice(0, 32)} em dash`).toBe(false);
+        expect(text.includes('\u2013'), `${text.slice(0, 32)} en dash`).toBe(false);
       }
     }
   });
@@ -181,19 +178,29 @@ describe('skin apply rule', () => {
 });
 
 describe('bow skin attack animation (hunter draw instead of crossbow aim)', () => {
-  it('bow skins substitute the authored draw clip; every other type keeps its attack', async () => {
-    const { weaponSkinAttackClips, SKIN_ATTACK_CLIP_NAMES, BOW_RELEASE_AT } = await import(
+  it('starts every typed player ranged shot at launch and suppresses its impact replay', async () => {
+    const { playerRangedAttackAlreadyStarted, playerRangedAttackStartsAtLaunch } = await import(
       '../src/render/characters/skin_attack'
     );
-    const { AUTO_SHOT_DRAW_S } = await import('../src/sim/projectile_travel');
+    expect(playerRangedAttackStartsAtLaunch('player', 'ranged-shot')).toBe(true);
+    expect(playerRangedAttackStartsAtLaunch('player', undefined)).toBe(false);
+    expect(playerRangedAttackStartsAtLaunch('mob', 'ranged-shot')).toBe(false);
+    expect(playerRangedAttackAlreadyStarted('player', true)).toBe(true);
+    expect(playerRangedAttackAlreadyStarted('player', undefined)).toBe(false);
+    expect(playerRangedAttackAlreadyStarted('mob', true)).toBe(false);
+  });
+
+  it('bow skins substitute the authored draw clip; every other type keeps its attack', async () => {
+    const { weaponSkinAttackClips, SKIN_ATTACK_CLIP_NAMES } = await import(
+      '../src/render/characters/skin_attack'
+    );
     const { weaponSkinHandling } = await import('../src/render/characters/skin_attack');
     for (const skin of WEAPON_SKIN_LIST) {
       const sub = weaponSkinAttackClips(skin.id);
       if (weaponSkinHandling(skin) === 'bow') {
         expect(sub?.clips, skin.id).toContain('Bow_Draw_Shot');
-        // The clip's release keyframe and the sim's arrow release are the
-        // same instant by construction.
-        expect(sub?.releaseAt).toBe(AUTO_SHOT_DRAW_S);
+        // This is a renderer-only substitution: it must not alter sim timing.
+        expect(sub).not.toHaveProperty('releaseAt');
         // Every substitute clip must be one the constructor binds.
         for (const clip of sub?.clips ?? []) expect(SKIN_ATTACK_CLIP_NAMES).toContain(clip);
       } else {
@@ -204,7 +211,6 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // keeps the shoulder-aim and the right hand.
     expect(weaponSkinHandling(WEAPON_SKINS.encore_bow)).toBe('crossbow');
     expect(weaponSkinAttackClips('encore_bow')).toBeNull();
-    expect(BOW_RELEASE_AT).toBe(AUTO_SHOT_DRAW_S);
     expect(weaponSkinAttackClips(null)).toBeNull();
     expect(weaponSkinAttackClips('not_a_skin')).toBeNull();
   });
@@ -253,13 +259,30 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(clips).toContain('Bow_Draw_Shot');
     // Mesh-free clip donor: nothing to render, just bones + tracks.
     expect(doc.meshes ?? []).toEqual([]);
-    // The authoring script's release keyframe must sit exactly at the sim's
-    // Auto Shot release (the arrow leaves when the string snaps).
-    const { AUTO_SHOT_DRAW_S } = await import('../src/sim/projectile_travel');
+    // The authored animation can carry a release pose without changing the
+    // server-authoritative Auto Shot timeline.
     const script = readFileSync(join(ROOT, 'scripts/build_bow_anims.mjs'), 'utf8');
     const m = script.match(/BOW_RELEASE_AT = ([0-9.]+)/);
     expect(m, 'build_bow_anims.mjs must declare BOW_RELEASE_AT').toBeTruthy();
-    expect(Number(m?.[1])).toBe(AUTO_SHOT_DRAW_S);
+    expect(Number(m?.[1])).toBeGreaterThan(0);
+  });
+
+  it('uses typed launch correlation instead of a gameplay-system label dependency', () => {
+    const renderer = readFileSync(join(ROOT, 'src/render/renderer.ts'), 'utf8');
+    const launch = renderer.slice(
+      renderer.indexOf("case 'spellfx':"),
+      renderer.indexOf("case 'spellfxAt':"),
+    );
+    const damage = renderer.slice(
+      renderer.indexOf("case 'damage':"),
+      renderer.indexOf("case 'heal2':"),
+    );
+    expect(renderer).not.toContain("from '../sim/combat/auto_attack'");
+    expect(launch).toContain("ev.attackAnimation === 'ranged-shot'");
+    expect(damage).toContain('playerRangedAttackAlreadyStarted(');
+    expect(damage).toContain('ev.attackAnimationStarted,');
+    expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
+    expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
   });
 });
 

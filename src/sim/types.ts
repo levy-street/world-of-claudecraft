@@ -2106,6 +2106,9 @@ export type SimEvent = { pid?: number } & (
       school: string;
       ability: string | null;
       kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      // Presentation-only correlation: this hit belongs to a ranged shot whose
+      // one-shot animation already began at projectile launch.
+      attackAnimationStarted?: true;
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -2340,6 +2343,9 @@ export type SimEvent = { pid?: number } & (
       targetId: number;
       school: string;
       fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning';
+      // Stable presentation discriminator; renderers must not infer a player
+      // attack animation from school or an English ability label.
+      attackAnimation?: 'ranged-shot';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

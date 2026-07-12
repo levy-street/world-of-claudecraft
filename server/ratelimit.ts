@@ -580,10 +580,11 @@ export function resetCharacterMutationRateLimits(): void {
 
 // Claudium writes can create payment sessions, persist on-chain quotes, poll a
 // settlement verifier, or debit the account ledger. Each action receives its own
-// fused IP AND account bucket so a confirm poll cannot consume the checkout or
-// cosmetic-spend allowance. Confirm is deliberately the roomiest because the
-// client retries pending chain settlement; purchase remains strict because every
-// accepted call can create a new provider-side payment object.
+// pre-auth IP bucket plus the existing post-auth fused IP AND account bucket, so
+// invalid-token floods stop before a DB lookup while authenticated account abuse
+// remains capped. Confirm is deliberately the roomiest because the client retries
+// pending chain settlement; purchase remains strict because every accepted call
+// can create a new provider-side payment object.
 export const CLAUDIUM_PURCHASE_MAX_PER_MINUTE = 10;
 export const CLAUDIUM_QUOTE_MAX_PER_MINUTE = 20;
 export const CLAUDIUM_CONFIRM_MAX_PER_MINUTE = 60;
@@ -593,6 +594,7 @@ export type ClaudiumMutationAction = 'purchase' | 'quote' | 'confirm' | 'spend';
 
 const claudiumMutationIpAttempts = new Map<string, number[]>();
 const claudiumMutationAccountAttempts = new Map<string, number[]>();
+const claudiumPreAuthIpAttempts = new Map<string, number[]>();
 
 export function claudiumMutationLimit(action: ClaudiumMutationAction): number {
   switch (action) {
@@ -605,6 +607,18 @@ export function claudiumMutationLimit(action: ClaudiumMutationAction): number {
     case 'spend':
       return CLAUDIUM_SPEND_MAX_PER_MINUTE;
   }
+}
+
+/** Per-IP monetary throttle that runs before bearer-token database resolution. */
+export function claudiumPreAuthRateLimited(
+  req: http.IncomingMessage,
+  action: ClaudiumMutationAction,
+): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    claudiumPreAuthIpAttempts,
+    `${action}:${requestIp(req)}`,
+    claudiumMutationLimit(action),
+  );
 }
 
 /** Fused per-IP and per-account throttle for one monetary mutation action. */
@@ -631,6 +645,7 @@ export function claudiumMutationRateLimited(
 export function resetClaudiumMutationRateLimits(): void {
   claudiumMutationIpAttempts.clear();
   claudiumMutationAccountAttempts.clear();
+  claudiumPreAuthIpAttempts.clear();
 }
 
 // Player-report creation had no dedicated limiter (it was gated only by the full

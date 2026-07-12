@@ -28,7 +28,7 @@
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
 import { CLASSES, isArenaPos, MOBS } from '../data';
-import { AUTO_SHOT_DRAW_S, scheduleProjectile } from '../projectile_travel';
+import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
@@ -173,9 +173,6 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
 }
 
-// The Auto Shot ability label: the renderer keys on it to skip re-triggering the
-// attack animation when the arrow's damage lands (the draw already played at the
-// windup telegraph). Stable sim string; the client ability-name matcher localizes it.
 export const AUTO_SHOT_LABEL = 'Auto Shot';
 
 export function rangedSwing(
@@ -186,33 +183,17 @@ export function rangedSwing(
 ): void {
   const school = ranged.wand ? (ranged.school ?? 'arcane') : 'physical';
   const label = ranged.wand ? 'Wand' : AUTO_SHOT_LABEL;
-  if (ranged.wand) {
-    // Wand bolts zap instantly: tracer now, flight begins this tick.
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: attacker.id,
-      targetId: target.id,
-      school,
-      fx: 'projectile',
-    });
-  } else {
-    // Auto Shot models the draw (classic aim time): the windup telegraph starts
-    // the shooter's draw animation NOW; the arrow (tracer + flight + damage
-    // resolution) releases AUTO_SHOT_DRAW_S later via the launchDelay below, at
-    // the animation's release keyframe. Like the pet windup, the shot commits
-    // at the swing tick: releasing is not re-gated on range, only on both ends
-    // staying alive (the fizzle guard in advancePendingProjectiles).
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: attacker.id,
-      targetId: target.id,
-      school,
-      fx: 'windup',
-    });
-  }
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: attacker.id,
+    targetId: target.id,
+    school,
+    fx: 'projectile',
+    ...(ranged.wand ? {} : { attackAnimation: 'ranged-shot' as const }),
+  });
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
-  const resolveShot = (atk: Entity, tgt: Entity) => {
+  scheduleProjectile(ctx, attacker, target, (atk, tgt) => {
     const missChance = swingMissChance(atk, tgt) + blindMissBonus(atk);
     if (ctx.rng.chance(missChance)) {
       ctx.emit({
@@ -224,6 +205,7 @@ export function rangedSwing(
         school,
         ability: label,
         kind: 'miss',
+        ...(ranged.wand ? {} : { attackAnimationStarted: true as const }),
       });
       ctx.enterCombat(atk, tgt);
       return;
@@ -241,7 +223,19 @@ export function rangedSwing(
     if (crit) dmg *= 2;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
-    ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+    ctx.dealDamage(
+      atk,
+      tgt,
+      Math.max(1, Math.round(dmg)),
+      crit,
+      school,
+      label,
+      'hit',
+      false,
+      undefined,
+      true,
+      !ranged.wand,
+    );
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -250,26 +244,7 @@ export function rangedSwing(
     // swing the mainhand, so casters never roll it. No-op (no rng draw) unless the
     // shooter wields a proc weapon with a weaponHit proc.
     if (!ranged.wand) runWeaponProcs(ctx, atk, tgt, 'weaponHit');
-  };
-  scheduleProjectile(
-    ctx,
-    attacker,
-    target,
-    resolveShot,
-    ranged.wand
-      ? undefined
-      : {
-          launchDelay: AUTO_SHOT_DRAW_S,
-          onLaunch: (atk, tgt) =>
-            ctx.emit({
-              type: 'spellfx',
-              sourceId: atk.id,
-              targetId: tgt.id,
-              school,
-              fx: 'projectile',
-            }),
-        },
-  );
+  });
 }
 
 // Returns true if the swing connected.

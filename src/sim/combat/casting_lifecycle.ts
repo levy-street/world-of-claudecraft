@@ -783,6 +783,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
       // jagged electric strike); the projectile MECHANIC below is unchanged.
       fx: ability.projectileFx ?? 'projectile',
+      ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
     // target (projectile_travel), not this tick. A target that dies before impact
@@ -805,7 +806,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
         ctx.enterCombat(src, tgt);
         return;
       }
-      ctx.runEffects(src, meta, tgt, res);
+      ctx.runEffects(src, meta, tgt, res, !isSpell);
     });
     // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
     // trigger name: the cast is done even though the bolt is still in flight (a

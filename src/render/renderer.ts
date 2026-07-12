@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
-import { AUTO_SHOT_LABEL } from '../sim/combat/auto_attack';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -53,6 +52,10 @@ import {
 } from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
+import {
+  playerRangedAttackAlreadyStarted,
+  playerRangedAttackStartsAtLaunch,
+} from './characters/skin_attack';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
@@ -2914,13 +2917,19 @@ export class Renderer {
     switch (ev.type) {
       case 'spellfx':
         if (ev.fx === 'windup') {
-          // A windup telegraph (petSpell throw, or a hunter Auto Shot's draw):
-          // start the attack animation NOW; the projectile follows later
-          // (petSpell.windup / AUTO_SHOT_DRAW_S), timed to the clip's release
-          // pose, so the bolt leaves the hand exactly when the animation lets
-          // go.
+          // A petSpell windup telegraph: start the throw animation now; the
+          // projectile for this throw follows petSpell.windup later, timed to
+          // the clip's release pose.
           this.triggerAttack(ev.sourceId);
           break;
+        }
+        // Player ranged attacks begin when their projectile launches. The live
+        // CharacterVisual chooses the authored crossbow/default clip or the bow
+        // skin's cosmetic draw override without changing the sim timeline.
+        if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
+            this.triggerAttack(ev.sourceId);
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
@@ -2956,12 +2965,16 @@ export class Renderer {
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         break;
       }
-      case 'damage':
-        // every melee swing animates the attacker for all to see; the ranged
-        // Auto Shot already played its draw at the windup telegraph, and its
-        // damage lands on ARRIVAL, so re-triggering here would restart the
-        // clip mid-follow-through
-        if (ev.school === 'physical' && ev.sourceId !== -1 && ev.ability !== AUTO_SHOT_LABEL)
+      case 'damage': {
+        // Every melee/ranged hit animates the attacker. A ranged projectile
+        // carrying the typed launch cue already began its cosmetic one-shot,
+        // so do not restart that same shot when its damage lands.
+        const source = this.sim.entities.get(ev.sourceId);
+        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
+          source?.kind,
+          ev.attackAnimationStarted,
+        );
+        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
           this.triggerAttack(ev.sourceId);
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
@@ -2969,6 +2982,7 @@ export class Renderer {
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
         break;
+      }
       case 'heal2':
         if (ev.amount > 0 || ev.crit) this.vfx.healGlow(ev.targetId);
         break;

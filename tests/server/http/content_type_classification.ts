@@ -134,7 +134,6 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/claudium/store': PROBLEM_JSON,
   '/api/claudium/history': PROBLEM_JSON,
   '/api/claudium/purchase': PROBLEM_JSON,
-  '/api/claudium/purchase/woc/confirm': PROBLEM_JSON,
   '/api/claudium/spend': PROBLEM_JSON,
   '/api/card': BINARY,
   '/api/referrals': PROBLEM_JSON,

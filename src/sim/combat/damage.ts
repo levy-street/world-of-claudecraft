@@ -75,6 +75,7 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  attackAnimationStarted = false,
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
@@ -85,6 +86,7 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
@@ -193,6 +195,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       ctx.endDuel(duel, sourcePlayer.id);
       return;
@@ -235,6 +238,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
@@ -261,6 +265,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
@@ -291,6 +296,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
@@ -307,7 +313,17 @@ export function dealDamage(
   if (target.kind === 'mob') {
     const ymatch = ctx.yumiCatMatches.get(target.id);
     if (ymatch) {
-      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
+      ctx.yumiCatDamaged(
+        ymatch,
+        source,
+        target,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        attackAnimationStarted,
+      );
       return;
     }
   }
@@ -322,6 +338,7 @@ export function dealDamage(
     school,
     ability,
     kind,
+    ...attackAnimation,
   });
 
   if (amount > 0) {

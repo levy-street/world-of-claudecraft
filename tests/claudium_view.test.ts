@@ -13,17 +13,12 @@ const funded: ClaudiumViewInput = {
     { sku: 's10', usd: 10, claudium: 1000 },
     { sku: 's100', usd: 100, claudium: 10000 },
   ],
-  price: { usdPerClaudium: 0.01, wocBaseUnitsPerClaudium: '42' },
   nativeRails: { sol: true, woc: true },
   walletBalances: { solLamports: '2000000000', wocBaseUnits: '20000000' },
   nativePrices: [
     { sku: 's1', solAmountBase: '10000000', wocAmountBase: '1000000' },
     { sku: 's10', solAmountBase: '100000000', wocAmountBase: '10000000' },
     { sku: 's100', solAmountBase: '10000000000', wocAmountBase: '100000000' },
-  ],
-  storeItems: [
-    { itemId: 'hat', name: 'Golden Hat', kind: 'cosmetic', costClaudium: 500, owned: false },
-    { itemId: 'skin', name: 'Ember Skin', kind: 'skin', costClaudium: 2000, owned: false },
   ],
 };
 
@@ -32,14 +27,11 @@ describe('buildClaudiumView disabled state (service off)', () => {
     const view = buildClaudiumView({
       balance: null,
       skus: [],
-      price: { usdPerClaudium: null, wocBaseUnitsPerClaudium: null },
-      storeItems: [],
     });
     expect(view.disabled).toBe(true);
     expect(view.hasBalance).toBe(false);
     expect(view.balance).toBeNull();
     expect(view.buyRows).toEqual([]);
-    expect(view.storeRows).toEqual([]);
     expect(view.rails).toEqual({ stripe: false, sol: false, woc: false });
     expect(view.buyDisabled).toBe(true);
   });
@@ -49,14 +41,9 @@ describe('buildClaudiumView disabled state (service off)', () => {
     const view = buildClaudiumView({
       balance: null,
       skus: [{ sku: 's1', usd: 1, claudium: 100 }],
-      price: { usdPerClaudium: 0.01, wocBaseUnitsPerClaudium: '42' },
-      storeItems: [
-        { itemId: 'hat', name: 'Hat', kind: 'cosmetic', costClaudium: 500, owned: false },
-      ],
     });
     expect(view.disabled).toBe(true);
     expect(view.buyRows).toEqual([]);
-    expect(view.storeRows).toEqual([]);
     expect(view.buyDisabled).toBe(true);
   });
 });
@@ -101,27 +88,7 @@ describe('buildClaudiumView funded state (service on)', () => {
     ]);
   });
 
-  it('maps the store catalog verbatim into store rows', () => {
-    const view = buildClaudiumView(funded);
-    expect(view.storeRows).toEqual([
-      {
-        itemId: 'hat',
-        name: 'Golden Hat',
-        kind: 'cosmetic',
-        costClaudium: 500,
-        affordable: true,
-      },
-      {
-        itemId: 'skin',
-        name: 'Ember Skin',
-        kind: 'skin',
-        costClaudium: 2000,
-        affordable: false,
-      },
-    ]);
-  });
-
-  it('enables both rails when there are skus and the woc oracle price is present', () => {
+  it('enables both native rails when the service exposes priced SKU quotes', () => {
     const view = buildClaudiumView(funded);
     expect(view.rails).toEqual({ stripe: true, sol: true, woc: true });
     expect(view.buyDisabled).toBe(false);
@@ -170,10 +137,9 @@ describe('buildClaudiumView funded state (service on)', () => {
     expect(view.buyRows[0].wocAffordable).toBe(false);
   });
 
-  it('disables the woc rail when the oracle price is null (oracle down)', () => {
+  it('disables native rails when the service reports them unavailable', () => {
     const view = buildClaudiumView({
       ...funded,
-      price: { usdPerClaudium: 0.01, wocBaseUnitsPerClaudium: null },
       nativeRails: { sol: false, woc: false },
     });
     expect(view.rails).toEqual({ stripe: true, sol: false, woc: false });

@@ -17,9 +17,8 @@ import type * as http from 'node:http';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   type ClaudiumNativeRail,
-  type ClaudiumRail,
+  type ClaudiumPriceRail,
   claudiumBalance,
-  claudiumConfirmWoc,
   claudiumHistory,
   claudiumNativeConfirm,
   claudiumNativePrice,
@@ -39,14 +38,22 @@ import { ctxAccountId } from './http/context';
 import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
 import {
   CLAUDIUM_CONFIRM_POLICY,
+  CLAUDIUM_CONFIRM_PRE_AUTH_POLICY,
   CLAUDIUM_PURCHASE_POLICY,
+  CLAUDIUM_PURCHASE_PRE_AUTH_POLICY,
   CLAUDIUM_QUOTE_POLICY,
+  CLAUDIUM_QUOTE_PRE_AUTH_POLICY,
   CLAUDIUM_SPEND_POLICY,
+  CLAUDIUM_SPEND_PRE_AUTH_POLICY,
   rateLimit,
 } from './http/middleware/rate_limit';
-import type { Ctx, RouteDef } from './http/types';
+import type { Ctx, RateLimitOutcome, RouteDef } from './http/types';
 import { json, readBinaryBody, readBody } from './http_util';
-import { type ClaudiumMutationAction, claudiumMutationRateLimited } from './ratelimit';
+import {
+  type ClaudiumMutationAction,
+  claudiumMutationRateLimited,
+  claudiumPreAuthRateLimited as claudiumPreAuthIpRateLimited,
+} from './ratelimit';
 
 const STRIPE_WEBHOOK_MAX_BYTES = 1024 * 1024;
 
@@ -76,8 +83,8 @@ export function resetClaudiumDbForTests(): void {
 /** Full active-session gate (mirrors the daily-rewards prefix arm). */
 const activeGuard = createActiveGuard(() => claudiumGuardDb());
 
-function parseRail(value: unknown): ClaudiumRail | null {
-  return value === 'stripe' || value === 'woc' || value === 'sol' ? value : null;
+function parseRail(value: unknown): ClaudiumPriceRail | null {
+  return value === 'stripe' || value === 'woc' ? value : null;
 }
 
 function parseNativeRail(value: unknown): ClaudiumNativeRail | null {
@@ -86,6 +93,30 @@ function parseNativeRail(value: unknown): ClaudiumNativeRail | null {
 
 function parseSpendKind(value: unknown): 'cosmetic' | 'skin' | 'item' | null {
   return value === 'cosmetic' || value === 'skin' || value === 'item' ? value : null;
+}
+
+function isKnownWeaponSkinId(itemId: string): boolean {
+  return Object.hasOwn(WEAPON_SKINS, itemId);
+}
+
+function claudiumMutationAction(req: http.IncomingMessage): ClaudiumMutationAction | null {
+  if (req.method !== 'POST') return null;
+  const path = new URL(req.url ?? '/', 'http://localhost').pathname;
+  if (path === '/api/claudium/purchase') return 'purchase';
+  if (path === '/api/claudium/native/quote') return 'quote';
+  if (path === '/api/claudium/native/confirm') {
+    return 'confirm';
+  }
+  if (path === '/api/claudium/spend') return 'spend';
+  return null;
+}
+
+/** Legacy-dispatch pre-auth guard, shared with the registered route policies. */
+export function claudiumPreAuthMutationRateLimited(
+  req: http.IncomingMessage,
+): RateLimitOutcome | null {
+  const action = claudiumMutationAction(req);
+  return action ? claudiumPreAuthIpRateLimited(req, action) : null;
 }
 
 /** Whether the economy service env is configured (does not confirm reachability). */
@@ -109,7 +140,7 @@ export function configureClaudiumRuntime(rt: ClaudiumGameHooks): void {
 }
 
 function noteWeaponSkinGrants(accountId: number, skinIds: string[]): void {
-  const known = skinIds.filter((id) => WEAPON_SKINS[id]);
+  const known = skinIds.filter(isKnownWeaponSkinId);
   if (known.length === 0) return;
   if (claudiumRuntime) {
     claudiumRuntime.grantWeaponSkins(accountId, known);
@@ -145,20 +176,8 @@ export async function handleClaudiumApi(
 ): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
   const path = url.pathname;
-  const account = String(accountId);
 
-  const mutationAction: ClaudiumMutationAction | null =
-    req.method !== 'POST'
-      ? null
-      : path === '/api/claudium/purchase'
-        ? 'purchase'
-        : path === '/api/claudium/native/quote'
-          ? 'quote'
-          : path === '/api/claudium/purchase/woc/confirm' || path === '/api/claudium/native/confirm'
-            ? 'confirm'
-            : path === '/api/claudium/spend'
-              ? 'spend'
-              : null;
+  const mutationAction = claudiumMutationAction(req);
   // The registered routes use the two-tier middleware. The retained legacy
   // dispatcher reaches this same core directly, so preserve rollback protection
   // with the identical tier-1 fused limiter instead of leaving that arm unlimited.
@@ -168,7 +187,7 @@ export async function handleClaudiumApi(
   }
 
   if (req.method === 'GET' && path === '/api/claudium/balance') {
-    return json(res, 200, await claudiumBalance(account));
+    return json(res, 200, await claudiumBalance(accountId));
   }
   // The one :param route in the family. The Match-regex idiom (a single capture
   // group over the :rail segment) is what the pipeline's route-inventory scanner
@@ -190,37 +209,41 @@ export async function handleClaudiumApi(
   const nativePriceMatch = /^\/api\/claudium\/native\/price\/(\w+)$/.exec(path);
   if (req.method === 'GET' && nativePriceMatch) {
     const rail = parseNativeRail(decodeURIComponent(nativePriceMatch[1]));
-    const claudium = Number(url.searchParams.get('claudium') ?? '1');
-    if (!rail || !Number.isInteger(claudium) || claudium <= 0) {
+    const sku = url.searchParams.get('sku')?.trim() ?? '';
+    if (!rail || sku === '') {
       return json(res, 200, {
         rail: rail ?? 'sol',
-        claudium,
+        claudium: null,
         amountBase: null,
         reason: 'invalid_request',
       });
     }
-    return json(res, 200, await claudiumNativePrice(rail, claudium));
+    return json(res, 200, await claudiumNativePrice(rail, sku));
   }
   const solBalanceMatch = /^\/api\/claudium\/native\/balance\/sol\/(\w+)$/.exec(path);
   if (req.method === 'GET' && solBalanceMatch) {
     return json(res, 200, await claudiumSolBalance(decodeURIComponent(solBalanceMatch[1])));
   }
   if (req.method === 'GET' && path === '/api/claudium/store') {
-    const store = await claudiumStore(account);
+    const store = await claudiumStore(accountId);
+    const supportedStore = {
+      ...store,
+      items: store.items.filter((item) => item.kind === 'skin' && isKnownWeaponSkinId(item.itemId)),
+    };
     // Reconcile: the service's grant ledger is authoritative for purchases, so
     // mirror any owned weapon skins the game DB does not know about yet.
     noteWeaponSkinGrants(
       accountId,
-      store.items.filter((i) => i.kind === 'skin' && i.owned).map((i) => i.itemId),
+      supportedStore.items.filter((item) => item.owned).map((item) => item.itemId),
     );
-    return json(res, 200, store);
+    return json(res, 200, supportedStore);
   }
   if (req.method === 'GET' && path === '/api/claudium/history') {
-    return json(res, 200, await claudiumHistory(account));
+    return json(res, 200, await claudiumHistory(accountId));
   }
   if (req.method === 'POST' && path === '/api/claudium/purchase') {
     const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
-    const rail = parseRail(body.rail);
+    const rail = body.rail === 'stripe' ? 'stripe' : null;
     const sku = typeof body.sku === 'string' ? body.sku : '';
     const idempotencyKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey : '';
     if (!rail || sku === '' || idempotencyKey === '') {
@@ -234,20 +257,7 @@ export async function handleClaudiumApi(
         reason: 'invalid_request',
       });
     }
-    return json(
-      res,
-      200,
-      await claudiumPurchase({ accountId: account, rail, sku, idempotencyKey }),
-    );
-  }
-  if (req.method === 'POST' && path === '/api/claudium/purchase/woc/confirm') {
-    const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
-    const purchaseId = typeof body.purchaseId === 'string' ? body.purchaseId : '';
-    const inboundSignature = typeof body.inboundSignature === 'string' ? body.inboundSignature : '';
-    if (purchaseId === '' || inboundSignature === '') {
-      return json(res, 200, { credited: false, balance: null, reason: 'invalid_request' });
-    }
-    return json(res, 200, await claudiumConfirmWoc({ purchaseId, inboundSignature }));
+    return json(res, 200, await claudiumPurchase({ accountId, rail, sku, idempotencyKey }));
   }
   if (req.method === 'POST' && path === '/api/claudium/native/quote') {
     const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
@@ -270,7 +280,7 @@ export async function handleClaudiumApi(
         reason: 'invalid_request',
       });
     }
-    return json(res, 200, await claudiumNativeQuote({ accountId: account, rail, sku, payer }));
+    return json(res, 200, await claudiumNativeQuote({ accountId, rail, sku, payer }));
   }
   if (req.method === 'POST' && path === '/api/claudium/native/confirm') {
     const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
@@ -279,14 +289,22 @@ export async function handleClaudiumApi(
     if (reference === '' || signature === '') {
       return json(res, 200, { settled: false, balance: null, reason: 'invalid_request' });
     }
-    return json(res, 200, await claudiumNativeConfirm({ reference, signature }));
+    return json(res, 200, await claudiumNativeConfirm({ accountId, reference, signature }));
   }
   if (req.method === 'POST' && path === '/api/claudium/spend') {
     const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
     const itemId = typeof body.itemId === 'string' ? body.itemId : '';
     const kind = parseSpendKind(body.kind);
+    const expectedCostClaudium =
+      typeof body.expectedCostClaudium === 'number' ? body.expectedCostClaudium : Number.NaN;
     const idempotencyKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey : '';
-    if (itemId === '' || !kind || idempotencyKey === '') {
+    if (
+      itemId === '' ||
+      !kind ||
+      !Number.isSafeInteger(expectedCostClaudium) ||
+      expectedCostClaudium <= 0 ||
+      idempotencyKey === ''
+    ) {
       return json(res, 200, {
         granted: false,
         balance: null,
@@ -294,14 +312,28 @@ export async function handleClaudiumApi(
         reason: 'invalid_request',
       });
     }
-    const result = await claudiumSpend({ accountId: account, itemId, kind, idempotencyKey });
+    if (kind !== 'skin' || !isKnownWeaponSkinId(itemId)) {
+      return json(res, 200, {
+        granted: false,
+        balance: null,
+        costClaudium: null,
+        reason: 'unknown_item',
+      });
+    }
+    const result = await claudiumSpend({
+      accountId,
+      itemId,
+      kind,
+      expectedCostClaudium,
+      idempotencyKey,
+    });
     // Never mirror the caller-supplied item from the spend response alone. Spend
     // idempotency belongs to the economy service, and a stale or cross-item replay
     // must not turn an arbitrary request body into a paid entitlement. Re-read the
     // authoritative grant ledger and mirror only this exact owned skin. A transient
     // store failure leaves the game mirror untouched; the next store open heals it.
-    if (kind === 'skin' && (result.granted || result.reason === 'already_granted')) {
-      const store = await claudiumStore(account);
+    if (result.granted || result.reason === 'already_granted') {
+      const store = await claudiumStore(accountId);
       const ownsRequestedSkin = store.items.some(
         (item) => item.kind === 'skin' && item.itemId === itemId && item.owned,
       );
@@ -391,35 +423,44 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/api/claudium/purchase',
     surface: 'api',
-    middleware: [activeGuard, rateLimit(CLAUDIUM_PURCHASE_POLICY)],
-    handler: claudiumHandler,
-  },
-  {
-    method: 'POST',
-    path: '/api/claudium/purchase/woc/confirm',
-    surface: 'api',
-    middleware: [activeGuard, rateLimit(CLAUDIUM_CONFIRM_POLICY)],
+    middleware: [
+      rateLimit(CLAUDIUM_PURCHASE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_PURCHASE_POLICY),
+    ],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/native/quote',
     surface: 'api',
-    middleware: [activeGuard, rateLimit(CLAUDIUM_QUOTE_POLICY)],
+    middleware: [
+      rateLimit(CLAUDIUM_QUOTE_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_QUOTE_POLICY),
+    ],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/native/confirm',
     surface: 'api',
-    middleware: [activeGuard, rateLimit(CLAUDIUM_CONFIRM_POLICY)],
+    middleware: [
+      rateLimit(CLAUDIUM_CONFIRM_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_CONFIRM_POLICY),
+    ],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/spend',
     surface: 'api',
-    middleware: [activeGuard, rateLimit(CLAUDIUM_SPEND_POLICY)],
+    middleware: [
+      rateLimit(CLAUDIUM_SPEND_PRE_AUTH_POLICY),
+      activeGuard,
+      rateLimit(CLAUDIUM_SPEND_POLICY),
+    ],
     handler: claudiumHandler,
   },
 ];

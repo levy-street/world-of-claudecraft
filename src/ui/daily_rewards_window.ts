@@ -1,12 +1,20 @@
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
-import { ArmoryInspect, badgeLabel, rarityLabel, weaponTypeLabel } from './armory_inspect';
+import { ArmoryInspect } from './armory_inspect';
+import {
+  badgeLabel,
+  localizeWeaponSkin,
+  rarityLabel,
+  weaponSkinCollectionLabel,
+  weaponTypeLabel,
+} from './armory_labels';
 import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
 import { portraitChipHtml } from './portrait_chip';
+import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
 import {
   type ArmorySection,
@@ -50,6 +58,7 @@ export interface DailyRewardsWindowDeps {
   spendStoreItem?(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
+    expectedCostClaudium: number,
   ): Promise<{
     granted: boolean;
     balance: number | null;
@@ -81,6 +90,7 @@ export class DailyRewardsWindow {
   private storeLoading = false;
   private storeReady = false;
   private storeError = false;
+  private storePriceChanged = false;
 
   private readonly wheelValues = [20, 30, 40, 50, 75, 100, 150, 250];
 
@@ -164,15 +174,40 @@ export class DailyRewardsWindow {
     if (!storeEnabled) this.tab = 'rewards';
     root.dataset.storeEnabled = String(storeEnabled);
     root.innerHTML =
-      this.titleHtml(storeEnabled) + (storeEnabled ? this.tabsHtml() : '') + this.loadingHtml();
+      this.titleHtml(storeEnabled) +
+      (storeEnabled ? this.tabsHtml() : '') +
+      this.loadingHtml(storeEnabled);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    root.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]').forEach((button) => {
+    if (storeEnabled) this.wireTabs(root);
+  }
+
+  private wireTabs(root: HTMLElement): void {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]'));
+    const select = (button: HTMLButtonElement, focus: boolean): void => {
+      const tab = button.dataset.wocStoreTab;
+      if (tab !== 'store' && tab !== 'rewards') return;
+      this.tab = tab;
+      this.syncTabs();
+      if (focus) button.focus();
+      void this.renderCurrent(null);
+    };
+    tabs.forEach((button, i) => {
       button.addEventListener('click', () => {
-        const tab = button.dataset.wocStoreTab;
-        if (tab !== 'store' && tab !== 'rewards') return;
-        this.tab = tab;
-        this.syncTabs();
-        void this.renderCurrent(null);
+        select(button, false);
+      });
+      button.addEventListener('keydown', (event) => {
+        const ke = event as KeyboardEvent;
+        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
+        if (next !== null) {
+          ke.preventDefault();
+          const target = tabs[next];
+          if (target) select(target, true);
+          return;
+        }
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
+          select(button, true);
+        }
       });
     });
   }
@@ -194,6 +229,11 @@ export class DailyRewardsWindow {
       return;
     }
     this.deps.root().classList.toggle('store-active', this.tab === 'store');
+    const panel = this.deps.root().querySelector<HTMLElement>('.woc-store-body');
+    panel?.setAttribute(
+      'aria-labelledby',
+      this.tab === 'store' ? 'woc-store-tab-store' : 'woc-store-tab-rewards',
+    );
     this.deps
       .root()
       .querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]')
@@ -280,12 +320,16 @@ export class DailyRewardsWindow {
     }
     const balance = formatNumber(this.storeBalance, { maximumFractionDigits: 0 });
     const armory = this.armorySections.map((section) => this.armorySectionHtml(section)).join('');
+    const notice = this.storePriceChanged
+      ? `<div class="woc-store-notice" role="status">${esc(t('hudChrome.wocStore.priceChanged'))}</div>`
+      : '';
     body.innerHTML =
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
+      notice +
       armory;
     body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
-      this.deps.openClaudium?.();
+      this.openClaudiumFromStore();
     });
     body.querySelectorAll<HTMLButtonElement>('[data-armory-skin]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -296,32 +340,39 @@ export class DailyRewardsWindow {
   }
 
   private armorySectionHtml(section: ArmorySection): string {
-    const price = formatNumber(section.rows[0]?.costClaudium ?? 0, { maximumFractionDigits: 0 });
+    const servicePrice =
+      section.rows.find((row) => row.costClaudium !== null)?.costClaudium ?? null;
+    const price =
+      servicePrice === null
+        ? `<span class="armory-section-price unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
+        : `<span class="armory-section-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${formatNumber(servicePrice, { maximumFractionDigits: 0 })}</span>`;
     const cards = section.rows.map((row) => this.armoryCardHtml(row)).join('');
     return (
       `<section class="armory-section rarity-${esc(section.rarity)}">` +
-      `<header><div><span>${esc(rarityLabel(section.rarity))}</span><h3>${esc(t('hudChrome.wocStore.collectionLine', { collection: section.collection }))}</h3></div>` +
-      `<span class="armory-section-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${price}</span></header>` +
+      `<header><div><span>${esc(rarityLabel(section.rarity))}</span><h3>${esc(t('hudChrome.wocStore.collectionLine', { collection: weaponSkinCollectionLabel(section.collection) }))}</h3></div>` +
+      `${price}</header>` +
       `<div class="armory-grid">${cards}</div></section>`
     );
   }
 
   private armoryCardHtml(row: ArmorySkinRow): string {
-    const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
+    const copy = localizeWeaponSkin(row.skin);
     const state = row.applied
       ? `<span class="armory-state applied">${esc(t('hudChrome.wocStore.applied'))}</span>`
       : row.owned
         ? `<span class="armory-state">${esc(t('hudChrome.wocStore.owned'))}</span>`
-        : `<span class="armory-cost"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><strong>${cost}</strong></span>`;
+        : row.costClaudium === null
+          ? `<span class="armory-state unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
+          : `<span class="armory-cost"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
     const badge = row.skin.badge
       ? `<span class="armory-badge">${esc(badgeLabel(row.skin.badge))}</span>`
       : '';
     return (
       `<article class="armory-card rarity-${esc(row.skin.rarity)}${row.owned ? ' owned' : ''}${row.applied ? ' applied' : ''}">` +
-      `<button type="button" data-armory-skin="${esc(row.skin.id)}" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: row.skin.name }))}">` +
+      `<button type="button" data-armory-skin="${esc(row.skin.id)}" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: copy.name }))}">` +
       `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy">${badge}${this.armoryClassChipsHtml(row)}</span>` +
       `<span class="armory-card-copy"><span class="armory-card-type">${esc(weaponTypeLabel(row.skin.weaponType))}</span>` +
-      `<h4>${esc(row.skin.name)}</h4>${state}</span>` +
+      `<h4>${esc(copy.name)}</h4>${state}</span>` +
       `</button></article>`
     );
   }
@@ -378,7 +429,8 @@ export class DailyRewardsWindow {
   }
 
   private requestArmoryPurchase(row: ArmorySkinRow): void {
-    if (row.owned || !row.purchasable) return;
+    if (row.owned || !row.purchasable || row.costClaudium === null) return;
+    const copy = localizeWeaponSkin(row.skin);
     const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
     if (!row.affordable) {
       this.openNeedMoreDialog(row, row.costClaudium, this.storeBalance);
@@ -386,7 +438,7 @@ export class DailyRewardsWindow {
     }
     this.deps.confirmDialog?.(
       t('hudChrome.wocStore.confirmTitle'),
-      t('hudChrome.wocStore.confirmBody', { item: row.skin.name, cost }),
+      t('hudChrome.wocStore.confirmBody', { item: copy.name, cost }),
       t('hudChrome.wocStore.confirmPurchase'),
       t('hudChrome.wocStore.cancel'),
       () => void this.purchaseArmorySkin(row),
@@ -394,7 +446,24 @@ export class DailyRewardsWindow {
   }
 
   private async purchaseArmorySkin(row: ArmorySkinRow): Promise<void> {
-    const result = await this.deps.spendStoreItem?.(row.skin.id, 'skin');
+    const expectedCostClaudium = row.costClaudium;
+    if (expectedCostClaudium === null) return;
+    this.storePriceChanged = false;
+    const result = await this.deps.spendStoreItem?.(row.skin.id, 'skin', expectedCostClaudium);
+    if (result?.reason === 'price_changed') {
+      this.storePriceChanged = true;
+      if (result.balance !== null) this.storeBalance = result.balance;
+      await this.renderStore(null);
+      const current = this.armoryRowById(row.skin.id);
+      if (
+        current &&
+        current.costClaudium !== null &&
+        current.costClaudium !== expectedCostClaudium
+      ) {
+        this.requestArmoryPurchase(current);
+      }
+      return;
+    }
     if (result?.reason === 'insufficient_balance') {
       if (result.balance !== null) {
         this.storeBalance = result.balance;
@@ -408,7 +477,9 @@ export class DailyRewardsWindow {
         result.costClaudium > 0
           ? result.costClaudium
           : row.costClaudium;
-      this.openNeedMoreDialog(row, authoritativeCost, result.balance);
+      if (authoritativeCost !== null) {
+        this.openNeedMoreDialog(row, authoritativeCost, result.balance);
+      }
       return;
     }
     if (!result?.granted) {
@@ -435,16 +506,22 @@ export class DailyRewardsWindow {
     balance: number | null,
   ): void {
     const knownBalance = balance ?? this.storeBalance;
+    const copy = localizeWeaponSkin(row.skin);
     const shortfall = formatNumber(Math.max(0, costClaudium - (knownBalance ?? 0)), {
       maximumFractionDigits: 0,
     });
     this.deps.confirmDialog?.(
       t('hudChrome.wocStore.needMoreTitle'),
-      t('hudChrome.wocStore.needMoreBody', { item: row.skin.name, shortfall }),
+      t('hudChrome.wocStore.needMoreBody', { item: copy.name, shortfall }),
       t('hudChrome.wocStore.buyClaudium'),
       t('hudChrome.wocStore.cancel'),
-      () => this.deps.openClaudium?.(),
+      () => this.openClaudiumFromStore(),
     );
+  }
+
+  private openClaudiumFromStore(): void {
+    this.armoryInspect?.close();
+    this.deps.openClaudium?.();
   }
 
   private paint(view: DailyRewardsView): void {
@@ -504,14 +581,16 @@ export class DailyRewardsWindow {
   private tabsHtml(): string {
     return (
       `<div class="woc-store-tabs" role="tablist" aria-label="${esc(t('hudChrome.wocStore.tabsLabel'))}">` +
-      `<button type="button" role="tab" data-woc-store-tab="store">${esc(t('hudChrome.wocStore.storeTab'))}</button>` +
-      `<button type="button" role="tab" data-woc-store-tab="rewards">${esc(t('hudChrome.wocStore.rewardsTab'))}</button>` +
+      `<button id="woc-store-tab-store" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="store">${esc(t('hudChrome.wocStore.storeTab'))}</button>` +
+      `<button id="woc-store-tab-rewards" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="rewards">${esc(t('hudChrome.wocStore.rewardsTab'))}</button>` +
       `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span></div>`
     );
   }
 
-  private loadingHtml(): string {
-    return '<div class="dr-body woc-store-body"></div>';
+  private loadingHtml(storeEnabled: boolean): string {
+    return storeEnabled
+      ? '<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store"></div>'
+      : '<div class="dr-body woc-store-body"></div>';
   }
 
   private syncStoreLoading(): void {

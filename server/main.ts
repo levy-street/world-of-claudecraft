@@ -61,6 +61,7 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
 import {
+  claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
@@ -1736,6 +1737,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleClaudiumStripeWebhook(req, res);
     }
     if (url.startsWith('/api/claudium')) {
+      const preAuthLimit = claudiumPreAuthMutationRateLimited(req);
+      if (preAuthLimit && !preAuthLimit.allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleClaudiumApi(req, res, accountId);

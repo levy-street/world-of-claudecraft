@@ -23,10 +23,10 @@ describe('EconomyClient store snapshot', () => {
             JSON.stringify({
               items: [
                 {
-                  itemId: 'emberfang_sword',
-                  name: 'Emberfang',
+                  itemId: 'ice_fang_sword',
+                  name: 'Ice Fang',
                   kind: 'skin',
-                  costClaudium: 500,
+                  costClaudium: 3000,
                   owned: false,
                 },
               ],
@@ -48,10 +48,10 @@ describe('EconomyClient store snapshot', () => {
       balance: 750,
       items: [
         {
-          itemId: 'emberfang_sword',
-          name: 'Emberfang',
+          itemId: 'ice_fang_sword',
+          name: 'Ice Fang',
           kind: 'skin',
-          costClaudium: 500,
+          costClaudium: 3000,
           owned: false,
         },
       ],
@@ -119,7 +119,7 @@ describe('confirmNativeSettlement', () => {
     };
     const waits: number[] = [];
 
-    const result = await confirmNativeSettlement(client, 'CLM_ref', 'SIG', Date.now() + 60_000, {
+    const result = await confirmNativeSettlement(client, 'CLM_ref', 'SIG', {
       delayMs: async (ms) => {
         waits.push(ms);
       },
@@ -140,7 +140,7 @@ describe('confirmNativeSettlement', () => {
     };
     const waits: number[] = [];
 
-    const result = await confirmNativeSettlement(client, 'CLM_ref', 'SIG', Date.now() + 60_000, {
+    const result = await confirmNativeSettlement(client, 'CLM_ref', 'SIG', {
       delayMs: async (ms) => {
         waits.push(ms);
       },
@@ -148,5 +148,56 @@ describe('confirmNativeSettlement', () => {
 
     expect(result.reason).toBe('wrong_destination');
     expect(waits).toEqual([]);
+  });
+
+  it('retries settlement work that another service worker can finish', async () => {
+    const results: ClaudiumNativeConfirm[] = [
+      { settled: false, balance: null, reason: 'processing' },
+      { settled: false, balance: null, reason: 'post_verify_failed' },
+      { settled: false, balance: null, reason: 'fulfillment_failed' },
+      { settled: true, balance: 13_000, reason: null },
+    ];
+    const waits: number[] = [];
+    const result = await confirmNativeSettlement(
+      {
+        nativeConfirm: async () =>
+          results.shift() ?? { settled: false, balance: null, reason: 'unavailable' },
+      },
+      'CLM_ref',
+      'SIG',
+      {
+        delayMs: async (ms) => {
+          waits.push(ms);
+        },
+      },
+    );
+
+    expect(result).toEqual({ settled: true, balance: 13_000, reason: null });
+    expect(waits).toEqual([1000, 1500, 2500]);
+  });
+
+  it('bounds retry independently after a payment signature has been broadcast', async () => {
+    const calls: Array<{ reference: string; signature: string }> = [];
+    const waits: number[] = [];
+    const result = await confirmNativeSettlement(
+      {
+        nativeConfirm: async (input) => {
+          calls.push(input);
+          return { settled: false, balance: null, reason: 'processing' };
+        },
+      },
+      'CLM_ref',
+      'SIG',
+      {
+        delayMs: async (ms) => {
+          waits.push(ms);
+        },
+        maxElapsedMs: 2500,
+      },
+    );
+
+    expect(result.reason).toBe('processing');
+    expect(waits).toEqual([1000, 1500]);
+    expect(calls).toHaveLength(3);
   });
 });

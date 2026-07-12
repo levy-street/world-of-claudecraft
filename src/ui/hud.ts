@@ -14,6 +14,7 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
+import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -465,14 +466,17 @@ export interface ReportHooks {
  */
 export interface ClaudiumHooks {
   balance(): Promise<number | null>;
-  storeSnapshot(): Promise<
-    Pick<ClaudiumSnapshot, 'balance' | 'storeItems'> & { available: boolean }
-  >;
+  storeSnapshot(): Promise<{
+    available: boolean;
+    balance: number | null;
+    storeItems: readonly ClaudiumStoreItem[];
+  }>;
   snapshot(): Promise<ClaudiumSnapshot>;
   buy(rail: ClaudiumRail, sku: string): Promise<void>;
   spend(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
+    expectedCostClaudium: number,
   ): Promise<{
     granted: boolean;
     balance: number | null;
@@ -3902,8 +3906,8 @@ export class Hud {
         items: [...snapshot.storeItems],
       };
     },
-    spendStoreItem: async (itemId, kind) => {
-      const result = await this.claudiumHooks?.spend(itemId, kind);
+    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
+      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
       if (result?.balance !== null && result?.balance !== undefined) {
         this.setClaudiumLauncherBalance(result.balance);
       }
@@ -3940,9 +3944,7 @@ export class Hud {
         ({
           balance: null,
           skus: [],
-          price: { usdPerClaudium: null, wocBaseUnitsPerClaudium: null },
           nativeRails: { sol: false, woc: false },
-          storeItems: [],
         } satisfies ClaudiumSnapshot);
       this.setClaudiumLauncherBalance(snapshot.balance);
       return snapshot;

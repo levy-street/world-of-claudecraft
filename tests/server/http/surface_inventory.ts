@@ -1004,16 +1004,6 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',
-    path: '/api/claudium/purchase/woc/confirm',
-    handler: 'handleClaudiumApi arm: /api/claudium/purchase/woc/confirm',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.full,
-    limiter: 'claudiumMutationRateLimited',
-    requireOwnedExpected: null,
-  },
-  {
-    dispatcher: DISPATCH.mainApi,
-    method: 'POST',
     path: '/api/claudium/native/quote',
     handler: 'handleClaudiumApi arm: /api/claudium/native/quote',
     contentType: PROBLEM_JSON,
