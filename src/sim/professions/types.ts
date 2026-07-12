@@ -51,6 +51,12 @@ export interface ProfessionRecipeRecord {
   // quality roll and gate access. A common-tier recipe always has skillReq 0
   // per the free-floor rule.
   itemLevelBudget: number;
+  // Effective content level for the profession-XP green/gray curve
+  // (professions/profession_xp.ts craftActionXp). Seeded from
+  // itemLevelBudget at authoring time (same numeric scale as character
+  // level) and hand-adjusted where a recipe's intended character level
+  // clearly diverges from its gold-sink budget.
+  level: number;
   // Dual-craft requirement (issue #1132): a combo recipe exclusive to one
   // specific adjacent pair on the CRAFT_RING (src/sim/content/professions.ts
   // adjacentCrafts). When present, the crafting player must hold BOTH

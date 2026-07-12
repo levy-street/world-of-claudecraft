@@ -222,6 +222,43 @@ For off-box safety, sync the directory to S3 occasionally:
   start. Everything lives in Docker plus one EBS volume, so nothing
   else changes.
 
+## Deploying an SFX Studio export
+
+Follow the full local authoring and pre-export checklist in the
+[SFX Studio tutorial](docs/sfx-studio-tutorial.md).
+
+Deploy the game code containing the runtime SFX pack loader once, including a
+store or OTA rollout for native clients. After that, audio-only Studio exports
+for the same compiled catalog do not require another web or native client build.
+Native clients fetch compatible packs from their configured production origin;
+if that request fails, they keep using the SFX bundled with the app.
+
+1. In SFX Studio, publish each finished audio master and apply the playback mix.
+2. Click Export All and extract the downloaded ZIP on the production host.
+3. Ensure the persistent overlay belongs to the deploy user, then run the
+   installer from the extracted artifact:
+
+   ```bash
+   sudo mkdir -p /opt/eastbrook/sfx-runtime
+   sudo chown "$USER":"$(id -gn)" /opt/eastbrook/sfx-runtime
+   sh install.sh /opt/eastbrook/sfx-runtime
+   ```
+
+4. Keep the overlay persistent and set `SFX_PACK_DIR` to its `audio/sfx`
+   directory. Docker Compose does this with `EASTBROOK_SFX_DIR`, which defaults
+   to `./sfx-runtime` beside the compose file.
+
+The POSIX installer needs only `/bin/sh` and either `sha256sum` or `shasum`; the
+bootstrap installs `unzip` for extracting the artifact. A Node-based
+`install.mjs` alternative is included too. The installer verifies every
+content-addressed MP3, installs immutable blobs first, and atomically replaces
+`runtime-pack.json` last. It does not delete old
+blobs, because already-open clients and rollback may still reference them. An
+artifact with a different compiled catalog hash, a missing fixed key, or an
+unsupported extra key is rejected by the client and needs a normal game
+deployment instead. Compatible constrained mob-subfamily keys may be added by
+an artifact.
+
 ## Admin dashboard
 
 The admin dashboard (account/character/session metrics, live players,

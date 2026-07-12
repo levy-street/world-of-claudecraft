@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "es_ES": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "fr_FR": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "fr_CA": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "de_DE": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "nl_NL": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "pl_PL": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "id_ID": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "tr_TR": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "sv_SE": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "vi_VN": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ],
+  "da_DK": [
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
+  ]
 };

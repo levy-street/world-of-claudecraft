@@ -1,4 +1,13 @@
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import ffmpegPath from 'ffmpeg-static';
+import ffprobeStatic from 'ffprobe-static';
 import { describe, expect, it } from 'vitest';
+// @ts-expect-error scripts use the repository's untyped Node ESM convention
+import * as conformAudioModule from '../scripts/sfx/conform_audio.mjs';
 import {
   classify,
   LOSSLESS_EXTENSIONS,
@@ -9,6 +18,14 @@ import {
   TARGET_PEAK_DBFS,
   TARGET_SAMPLE_RATE,
 } from '../scripts/sfx/sfx_conform_rules.mjs';
+
+const { buildSfxConformArgs, conformSfxAudio, inspectSfxConformance, measureSfxTruePeakDb } =
+  conformAudioModule;
+
+// @ts-expect-error scripts use the repository's untyped Node ESM convention
+import { UI_SFX_SPECS } from '../scripts/sfx/ui_sfx.mjs';
+
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 // A file already at every spec dimension.
 const AT_SPEC = { duration: 2.0, bitrate: TARGET_BITRATE, sampleRate: TARGET_SAMPLE_RATE };
@@ -71,7 +88,115 @@ describe('classify: normalization branch routing', () => {
   });
 });
 
+describe('shared conform command', () => {
+  it('measures and conforms short clips by true peak', () => {
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    const directory = mkdtempSync(join(tmpdir(), 'wocc-sfx-true-peak-'));
+    const inputFile = join(directory, 'source.wav');
+    const outputFile = join(directory, 'output.mp3');
+
+    try {
+      // The samples peak at -6 dBFS, but band-limited reconstruction peaks at
+      // about -3.9 dBFS. This catches accidental sample-peak measurement.
+      execFileSync(
+        ffmpegPath,
+        [
+          '-hide_banner',
+          '-loglevel',
+          'error',
+          '-nostdin',
+          '-y',
+          '-f',
+          'lavfi',
+          '-i',
+          'aevalsrc=0.5*sgn(sin(2*PI*1000*t)):s=44100:d=0.5',
+          '-c:a',
+          'pcm_f32le',
+          inputFile,
+        ],
+        { stdio: 'ignore' },
+      );
+
+      const inputTruePeak = measureSfxTruePeakDb(inputFile, ffmpegPath);
+      expect(inputTruePeak).toBeCloseTo(-3.9, 1);
+
+      const result = conformSfxAudio({
+        inputFile,
+        outputFile,
+        duration: 0.5,
+        ffmpegPath,
+      });
+      expect(result.normBranch).toBe('peak');
+      expect(result.inputLevel).toBe(inputTruePeak);
+      expect(Math.abs(result.outputLevel - TARGET_PEAK_DBFS)).toBeLessThanOrEqual(NORM_TOLERANCE);
+
+      const report = inspectSfxConformance(outputFile, {
+        ffmpegPath,
+        ffprobePath: ffprobeStatic.path,
+      });
+      expect(report.peakDb).toBe(result.outputLevel);
+      expect(report.problems.filter((problem: string) => problem.includes('dBFS'))).toEqual([]);
+    } finally {
+      rmSync(directory, { force: true, recursive: true });
+    }
+  });
+
+  it('builds the fixed peak branch for clips below one second', () => {
+    const plan = buildSfxConformArgs({
+      inputFile: '/tmp/source.wav',
+      outputFile: '/tmp/output.mp3',
+      duration: 0.999,
+      gainDb: 6,
+    });
+
+    expect(plan.normBranch).toBe('peak');
+    expect(plan.args[plan.args.indexOf('-af') + 1]).toBe(
+      `volume=6dB,aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
+    );
+    expect(plan.args[plan.args.indexOf('-b:a') + 1]).toBe(`${TARGET_BITRATE}k`);
+    expect(plan.args[plan.args.indexOf('-ar') + 1]).toBe(String(TARGET_SAMPLE_RATE));
+  });
+
+  it('builds the fixed LUFS branch at exactly one second', () => {
+    const plan = buildSfxConformArgs({
+      inputFile: '/tmp/source.wav',
+      outputFile: '/tmp/output.mp3',
+      duration: 1,
+      gainDb: 3,
+    });
+
+    expect(plan.normBranch).toBe('lufs');
+    expect(plan.args[plan.args.indexOf('-af') + 1]).toContain('volume=3dB,alimiter=');
+    expect(plan.args[plan.args.indexOf('-af') + 1]).toContain(
+      `aformat=sample_rates=${TARGET_SAMPLE_RATE}`,
+    );
+  });
+
+  it('ships every deterministic UI cue through the fixed conform contract', () => {
+    if (!ffmpegPath) throw new Error('ffmpeg-static is unavailable');
+    for (const spec of UI_SFX_SPECS) {
+      const report = inspectSfxConformance(join(ROOT, 'public/audio/sfx', `${spec.key}.mp3`), {
+        ffmpegPath,
+        ffprobePath: ffprobeStatic.path,
+      });
+      expect(report.reject, spec.key).toBe(false);
+      expect(report.problems, spec.key).toEqual([]);
+      expect(report.sampleRate, spec.key).toBe(TARGET_SAMPLE_RATE);
+      expect(report.bitrate, spec.key).toBe(TARGET_BITRATE);
+    }
+  });
+});
+
 describe('classify: loudness gate', () => {
+  it('pins sustained masters to -14 LUFS', () => {
+    expect(TARGET_LUFS).toBe(-14);
+    expect(classify({ ...AT_SPEC, duration: 2, lufs: -14 })).toMatchObject({
+      reject: false,
+      normBranch: 'lufs',
+      problems: [],
+    });
+  });
+
   it('flags peak loudness out of spec for short clips', () => {
     const { problems } = classify({ ...AT_SPEC, duration: 0.5, peakDb: TARGET_PEAK_DBFS - 6 });
     expect(problems.some((p) => p.includes('dBFS'))).toBe(true);

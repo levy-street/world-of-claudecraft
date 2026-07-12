@@ -8,7 +8,23 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildManifest, MOB_ACTIONS } from '../scripts/sfx/sfx_manifest_builder.mjs';
+// @ts-expect-error scripts use the repository's untyped Node ESM convention
+import * as manifestModule from '../scripts/sfx/manifest.mjs';
+
+const {
+  catalogHashForEntries,
+  isSfxMobExtensionKey,
+  SFX_FIXED_CATALOG_KEYS,
+  SFX_MOB_EXTENSION_FAMILIES,
+  SFX_MOB_EXTENSION_KEY_PATTERN,
+  serializeSfxManifest,
+} = manifestModule;
+
+import {
+  buildManifest,
+  discoverSfxTracks,
+  MOB_ACTIONS,
+} from '../scripts/sfx/sfx_manifest_builder.mjs';
 import { SFX } from '../scripts/sfx/sfx_prompts.mjs';
 
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -50,7 +66,7 @@ describe('buildManifest', () => {
     const manifest = readFileSync(manifestPath, 'utf8');
     // Only the mp3 entry should appear; wav should not since mp3 is probed first.
     const urls = JSON.parse(manifest.split('=\n')[1].replace(/ as const;/, ''));
-    expect(urls['melee_swing'].urls).toEqual(['/audio/sfx/melee_swing.mp3']);
+    expect(urls.melee_swing.urls).toEqual(['/audio/sfx/melee_swing.mp3']);
   });
 
   it('groups numbered variants under their base key', () => {
@@ -63,6 +79,45 @@ describe('buildManifest', () => {
     expect(manifest).toContain('foot_grass_2.mp3');
   });
 
+  it('uses numbered variants instead of a bare file when both exist', () => {
+    writeFileSync(path.join(sfxDir, 'foot_grass.mp3'), 'bare');
+    writeFileSync(path.join(sfxDir, 'foot_grass_1.mp3'), 'one');
+    writeFileSync(path.join(sfxDir, 'foot_grass_2.mp3'), 'two');
+
+    const discovered = discoverSfxTracks([{ key: 'foot_grass' }], sfxDir);
+
+    expect(discovered.entries.foot_grass.tracks).toEqual([
+      {
+        id: '1',
+        filename: 'foot_grass_1.mp3',
+        url: '/audio/sfx/foot_grass_1.mp3',
+      },
+      {
+        id: '2',
+        filename: 'foot_grass_2.mp3',
+        url: '/audio/sfx/foot_grass_2.mp3',
+      },
+    ]);
+  });
+
+  it('rejects gapped or noncanonical fixed-catalog take ids instead of dropping files', () => {
+    writeFileSync(path.join(sfxDir, 'foot_grass.mp3'), 'bare');
+    writeFileSync(path.join(sfxDir, 'foot_grass_2.mp3'), 'orphan');
+    writeFileSync(path.join(sfxDir, 'foot_grass_03.mp3'), 'noncanonical');
+
+    const discovered = discoverSfxTracks([{ key: 'foot_grass' }], sfxDir);
+
+    expect(discovered.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('invalid SFX variant id'),
+        expect.stringContaining('noncontiguous SFX variants'),
+      ]),
+    );
+    expect(discovered.entries.foot_grass.tracks.map((take) => take.filename)).toEqual([
+      'foot_grass_2.mp3',
+    ]);
+  });
+
   it('omits keys with no matching file on disk', () => {
     const { count } = buildManifest([{ key: 'ghost_key' }], sfxDir, manifestPath);
     expect(count).toBe(0);
@@ -73,7 +128,7 @@ describe('buildManifest', () => {
     buildManifest([{ key: 'amb_wind', loop: true }], sfxDir, manifestPath);
     const manifest = readFileSync(manifestPath, 'utf8');
     const data = JSON.parse(manifest.split('=\n')[1].replace(/ as const;/, ''));
-    expect(data['amb_wind'].loop).toBe(true);
+    expect(data.amb_wind.loop).toBe(true);
   });
 
   // Decisive regression pin: a key present on disk but missing from the SFX
@@ -86,6 +141,24 @@ describe('buildManifest', () => {
     expect(count).toBeGreaterThan(0);
     const manifest = readFileSync(manifestPath, 'utf8');
     expect(manifest).toContain('cast_lightning_bolt');
+  });
+
+  it('keeps the release catalog and all 26 UI cues in one 137-key inventory', () => {
+    const keys = new Set(SFX.map((entry) => entry.key));
+    expect(keys.size).toBe(137);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
+    for (const key of [
+      'cast_lightning_bolt',
+      'mob_mudfin_attack',
+      'mob_burrower_attack',
+      'quest_ready',
+      'lockpick_success',
+    ]) {
+      expect(keys.has(key), key).toBe(true);
+    }
+    expect(keys.has('mob_murloc_attack')).toBe(false);
+    expect(keys.has('mob_kobold_attack')).toBe(false);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(137);
   });
 });
 
@@ -121,6 +194,35 @@ describe('mob subfamily scanning', () => {
     ]);
   });
 
+  it('sorts subfamily takes numerically and preserves multi-token subfamilies', () => {
+    writeFileSync(path.join(sfxDir, 'mob_beast_dire_wolf_hurt_10.mp3'), 'ten');
+    writeFileSync(path.join(sfxDir, 'mob_beast_dire_wolf_hurt_2.mp3'), 'two');
+    writeFileSync(path.join(sfxDir, 'mob_beast_dire_wolf_hurt_1.mp3'), 'one');
+
+    const discovered = discoverSfxTracks([], sfxDir);
+
+    expect(discovered.errors).toEqual([]);
+    expect(discovered.entries.mob_beast_dire_wolf_hurt.tracks.map((track) => track.id)).toEqual([
+      '1',
+      '2',
+      '10',
+    ]);
+  });
+
+  it('rejects noncanonical or unsafe mob extension variant ids', () => {
+    for (const id of ['0', '01', String(Number.MAX_SAFE_INTEGER + 1)]) {
+      writeFileSync(path.join(sfxDir, `mob_beast_wolf_hurt_${id}.mp3`), id);
+    }
+
+    const discovered = discoverSfxTracks([], sfxDir);
+
+    expect(discovered.entries).toEqual({});
+    expect(discovered.errors).toHaveLength(3);
+    expect(discovered.errors.every((error) => error.includes('invalid mob sfx variant id'))).toBe(
+      true,
+    );
+  });
+
   it('reports an error and sets errors[] for an unrecognized action token', () => {
     writeFileSync(path.join(sfxDir, 'mob_beast_wolf_bogus_1.mp3'), '');
     const { count, errors } = buildManifest([], sfxDir, manifestPath);
@@ -150,5 +252,36 @@ describe('mob subfamily scanning', () => {
     expect(MOB_ACTIONS.has('death')).toBe(true);
     expect(MOB_ACTIONS.has('hurt')).toBe(true);
     expect(MOB_ACTIONS.size).toBe(4);
+  });
+
+  it('exports one constrained grammar for runtime mob extension keys', () => {
+    expect(SFX_MOB_EXTENSION_FAMILIES).toContain('beast');
+    expect(SFX_MOB_EXTENSION_KEY_PATTERN.source).toBe(
+      '^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$',
+    );
+    expect(isSfxMobExtensionKey('mob_beast_dire_wolf_hurt')).toBe(true);
+    expect(isSfxMobExtensionKey('mob_unknown_dire_wolf_hurt')).toBe(false);
+    expect(isSfxMobExtensionKey('mob_beast_attack')).toBe(false);
+    expect(isSfxMobExtensionKey('mob_beast_dire_wolf_bogus')).toBe(false);
+  });
+
+  it('keeps the fixed catalog hash stable when mob extensions change', () => {
+    const fixed = catalogHashForEntries({});
+    const withExtension = catalogHashForEntries({
+      mob_beast_dire_wolf_hurt: {
+        loop: false,
+        category: 'voices',
+        preload: 'lazy',
+        spatial: true,
+      },
+    });
+    expect(withExtension).toBe(fixed);
+  });
+
+  it('emits the fixed-key and mob-extension contract for the browser loader', () => {
+    const serialized = serializeSfxManifest({});
+    expect(serialized).toContain('export const SFX_FIXED_CATALOG_KEYS =');
+    expect(serialized).toContain('export const SFX_MOB_EXTENSION_FAMILIES =');
+    expect(serialized).toContain('export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)');
   });
 });

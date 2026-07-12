@@ -74,6 +74,7 @@ import {
   type MaterialRarity,
   rollMaterialRarity,
 } from './gathering';
+import { craftActionXp } from './profession_xp';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import {
   type CraftSkillState,
@@ -395,6 +396,11 @@ export function resolveCraftForRecipe(
         : tierProgressMultiplier(tierCapability(meta.craftSkills, recipe.professionId), recipeTier);
     gainCraftSkill(meta.craftSkills, recipe.professionId, CRAFT_SKILL_GAIN * multiplier);
     meta.craftThrottle.count += 1;
+    // Character XP for the craft (profession_xp.ts), tier-scaled and
+    // level-gated the same way gathering/kill XP are: a max-level player
+    // spamming a trivial (gray) recipe gets zero.
+    const entity = ctx.entities.get(pid);
+    if (entity) ctx.grantXp(craftActionXp(recipe.level, entity.level), meta);
   }
   return {
     ok: true,

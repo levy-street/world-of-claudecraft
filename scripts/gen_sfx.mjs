@@ -1,38 +1,34 @@
-// Generate every sound effect via the ElevenLabs Sound Effects API
-// (POST /v1/sound-generation) from the catalog in scripts/sfx/sfx_prompts.mjs.
+// Generate sampled SFX through the ElevenLabs Sound Effects API, then pass each
+// successful response through the same fixed conform path used by local sources.
 //
-//   ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]
-//
-// Output:
-//   public/audio/sfx/<key>.mp3            the audio (served at /audio/sfx/…)
-//   src/game/sfx_manifest.generated.ts    key -> public path + loop flag
-//
-// Idempotent: existing files are skipped unless --force. Offline-only; the key is
-// read from the environment / local .env and never committed.
+//   ELEVENLABS_API_KEY=... node scripts/gen_sfx.mjs [--force]
+//   node scripts/gen_sfx.mjs --manifest
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+// Existing files are skipped unless --force. Custom recordings and deterministic
+// UI cues are never replaced by paid generation, including during a force run.
+
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { buildManifest } from './sfx/sfx_manifest_builder.mjs';
+import { conformSfxAudio } from './sfx/conform_audio.mjs';
+import { buildSfxGenerationPlan } from './sfx/generation_plan.mjs';
+import { writeSfxManifest } from './sfx/manifest.mjs';
 import { SFX } from './sfx/sfx_prompts.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const OUTPUT_FORMAT = 'mp3_44100_128';
-const PROMPT_INFLUENCE = 0.4; // adhere to the prompt but allow some character
+const PROMPT_INFLUENCE = 0.4;
 const root = process.cwd();
-const sfxDir = path.join(root, 'public/audio/sfx');
-const manifestPath = path.join(root, 'src/game/sfx_manifest.generated.ts');
-
+const sfxDirectory = path.join(root, 'public/audio/sfx');
 const force = process.argv.includes('--force');
 const manifestOnly = process.argv.includes('--manifest');
 
 try {
   process.loadEnvFile();
 } catch {
-  /* no .env — rely on the ambient env */
+  /* no local env file, rely on the ambient environment */
 }
-const KEY = process.env.ELEVENLABS_API_KEY;
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const apiKey = process.env.ELEVENLABS_API_KEY;
+const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function generate(entry, { retries = 4 } = {}) {
   const body = {
@@ -43,80 +39,101 @@ async function generate(entry, { retries = 4 } = {}) {
   };
   if (entry.loop) body.loop = true;
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${API}/v1/sound-generation`, {
+    const response = await fetch(`${API}/v1/sound-generation`, {
       method: 'POST',
-      headers: { 'xi-api-key': KEY, 'content-type': 'application/json' },
+      headers: { 'xi-api-key': apiKey, 'content-type': 'application/json' },
       body: JSON.stringify(body),
     });
-    if (res.ok) return Buffer.from(await res.arrayBuffer());
-    const detail = await res.text().catch(() => '');
-    const retryable = res.status === 429 || res.status >= 500;
+    if (response.ok) return Buffer.from(await response.arrayBuffer());
+    const detail = await response.text().catch(() => '');
+    const retryable = response.status === 429 || response.status >= 500;
     if (retryable && attempt < retries) {
       const wait = 1500 * (attempt + 1);
-      console.warn(`  ${entry.key} -> ${res.status}; retrying in ${wait}ms`);
+      console.warn(`  ${entry.key} -> ${response.status}; retrying in ${wait}ms`);
       await sleep(wait);
       continue;
     }
-    throw new Error(`${entry.key} -> ${res.status} ${detail.slice(0, 200)}`);
+    throw new Error(`${entry.key} -> ${response.status} ${detail.slice(0, 200)}`);
   }
 }
 
 if (manifestOnly) {
-  const { count, errors } = buildManifest(SFX, sfxDir, manifestPath);
-  console.log(`Manifest rebuilt: ${path.relative(root, manifestPath)} (${count} keys).`);
-  if (errors.length) {
-    for (const e of errors) console.error(e);
-    process.exit(1);
-  }
+  const manifest = writeSfxManifest(root);
+  console.log(
+    `Manifest rebuilt: ${path.relative(root, manifest.path)} and ${path.relative(root, manifest.runtimePath)} (${Object.keys(manifest.entries).length} keys).`,
+  );
   process.exit(0);
 }
 
-mkdirSync(sfxDir, { recursive: true });
+mkdirSync(sfxDirectory, { recursive: true });
+const generationPlan = buildSfxGenerationPlan(SFX);
+const pendingTracks = generationPlan.flatMap(({ tracks }) =>
+  tracks.filter((track) => {
+    if (track.generator === 'ffmpeg' || track.custom) return false;
+    return force || !existsSync(path.join(sfxDirectory, track.filename));
+  }),
+);
+if (pendingTracks.length > 0 && !apiKey) {
+  console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
+  process.exit(1);
+}
+
+let ffmpegPath = null;
+if (pendingTracks.length > 0) {
+  ffmpegPath = (await import('ffmpeg-static')).default;
+  if (!ffmpegPath) throw new Error('ffmpeg-static did not provide an FFmpeg binary');
+}
+
 let made = 0;
 let skipped = 0;
 let seconds = 0;
 const failed = [];
 
-// Only the generation step needs the API key; the manifest rebuild runs from
-// whatever .mp3 files are already on disk and works without a key.
-const needsKey = SFX.some(
-  (e) => !e.custom && (!existsSync(path.join(sfxDir, `${e.key}.mp3`)) || force),
-);
-if (needsKey && !KEY) {
-  console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
-  process.exit(1);
+for (const { entry, tracks } of generationPlan) {
+  for (const track of tracks) {
+    if (track.generator === 'ffmpeg' || track.custom) {
+      skipped++;
+      continue;
+    }
+    const destination = path.join(sfxDirectory, track.filename);
+    if (existsSync(destination) && !force) {
+      skipped++;
+      continue;
+    }
+
+    const label = track.trackId === 'main' ? entry.key : `${entry.key}:${track.trackId}`;
+    const raw = path.join(sfxDirectory, `.${entry.key}.${process.pid}.source.mp3`);
+    process.stdout.write(`sfx  ${label} (${track.duration}s${track.loop ? ', loop' : ''})... `);
+    rmSync(raw, { force: true });
+    try {
+      const bytes = await generate({ ...track, key: label });
+      writeFileSync(raw, bytes, { flag: 'wx' });
+      conformSfxAudio({
+        inputFile: raw,
+        outputFile: destination,
+        duration: track.duration,
+        ffmpegPath,
+      });
+      seconds += track.duration;
+      made++;
+      console.log('ok');
+      await sleep(200);
+    } catch (error) {
+      console.log('FAILED');
+      console.error(`  ${error.message ?? error}`);
+      failed.push(label);
+      process.exitCode = 1;
+    } finally {
+      rmSync(raw, { force: true });
+    }
+  }
 }
 
-for (const entry of SFX) {
-  const dest = path.join(sfxDir, `${entry.key}.mp3`);
-  if (entry.custom) {
-    skipped++;
-    continue;
-  } // custom recording, never regenerate via API
-  if (existsSync(dest) && !force) {
-    skipped++;
-    continue;
-  }
-  process.stdout.write(`sfx  ${entry.key} (${entry.duration}s${entry.loop ? ', loop' : ''})… `);
-  try {
-    const mp3 = await generate(entry);
-    writeFileSync(dest, mp3);
-    seconds += entry.duration;
-    made++;
-    console.log('ok');
-    await sleep(200);
-  } catch (err) {
-    // One bad clip shouldn't abort the whole run: record it and continue.
-    console.log('FAILED');
-    console.error(`  ${err.message}`);
-    failed.push(entry.key);
-    process.exitCode = 1;
-  }
-}
-
-const { count: n } = buildManifest(SFX, sfxDir, manifestPath);
-console.log(`\nDone: ${made} generated, ${skipped} skipped, ${n}/${SFX.length} clips on disk.`);
+const manifest = writeSfxManifest(root);
 console.log(
-  `Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`,
+  `\nDone: ${made} generated, ${skipped} skipped, ${Object.keys(manifest.entries).length}/${SFX.length} catalog clips on disk.`,
 );
-if (failed.length) console.log(`Failed (${failed.length}): ${failed.join(', ')}`);
+console.log(
+  `Billed about ${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifest.path)}`,
+);
+if (failed.length > 0) console.log(`Failed (${failed.length}): ${failed.join(', ')}`);

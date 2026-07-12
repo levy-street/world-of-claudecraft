@@ -337,7 +337,13 @@ export const zh_TW: EnTranslations = {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
       "talkBodyTouch": "靠近雷德布魯克元帥並點按「使用」按鈕與他交談，然後接受他的任務。",
       "returnBodyTouch": "任務已完成。返回雷德布魯克元帥處並點按「使用」按鈕繳交任務。",
-      "doneBodyTouch": "你已掌握基礎，{name}。東溪谷任你探索。點按「更多」再選「任務日誌」即可隨時查看任務。祝你狩獵順利。"
+      "doneBodyTouch": "你已掌握基礎，{name}。東溪谷任你探索。點按「更多」再選「任務日誌」即可隨時查看任務。祝你狩獵順利。",
+      "slayTargetHint": "第一次戰鬥嗎？按下 {targetKey} 或點擊狼來選定牠，然後使用快捷欄技能攻擊牠。",
+      "slayTargetHintTouch": "第一次戰鬥嗎？點擊狼來選定牠，然後點擊快捷欄技能攻擊牠。",
+      "nextTipsTitle": "接下來去哪",
+      "nextTipQuestLog": "開啟任務日誌（{key}）尋找附近的下一個任務。",
+      "nextTipMap": "查看世界地圖（{key}）了解任務所在位置。",
+      "nextTipSocial": "開啟社交面板（{key}）尋找隊伍應對更強的戰鬥。"
     },
     "widgets": {
       "clockTitle": "本地時間 - 點擊切換 12／24 小時制",
@@ -924,6 +930,7 @@ export const zh_TW: EnTranslations = {
     "corpseHarvest": {
       "title": "採集",
       "harvestButton": "採集",
+      "harvestButtonTooltip": "採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。",
       "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
@@ -1104,7 +1111,8 @@ export const zh_TW: EnTranslations = {
       "resetErrInvalid": "此重設連結無效或已過期。請重新申請一個。"
     },
     "loot": {
-      "chestTitle": "寶箱"
+      "chestTitle": "寶箱",
+      "takeAllTooltip": "全部拾取：收取此戰利品視窗中的所有金幣和物品。"
     },
     "spellbook": {
       "addToBarAria": "將 {name} 加入動作列",
