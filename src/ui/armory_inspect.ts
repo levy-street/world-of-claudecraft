@@ -13,7 +13,6 @@ import {
 } from '../render/armory_preview';
 import type { PreviewAppearance } from '../render/characters';
 import type { WeaponSkinType } from '../sim/types';
-import { badgeLabel, rarityLabel, weaponTypeLabel } from './armory_labels';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
@@ -28,6 +27,42 @@ export interface ArmoryInspectDeps {
 
 const SCENES: readonly ArmorySceneKey[] = ['day', 'dusk', 'night'];
 
+// Literal keys per case (never template keys): the static i18n scan must see
+// every key it registers.
+export function weaponTypeLabel(type: WeaponSkinType): string {
+  switch (type) {
+    case 'sword':
+      return t('hudChrome.wocStore.wtype.sword');
+    case 'axe':
+      return t('hudChrome.wocStore.wtype.axe');
+    case 'mace':
+      return t('hudChrome.wocStore.wtype.mace');
+    case 'dagger':
+      return t('hudChrome.wocStore.wtype.dagger');
+    case 'staff':
+      return t('hudChrome.wocStore.wtype.staff');
+    case 'wand':
+      return t('hudChrome.wocStore.wtype.wand');
+    case 'bow':
+      return t('hudChrome.wocStore.wtype.bow');
+    case 'crossbow':
+      return t('hudChrome.wocStore.wtype.crossbow');
+  }
+}
+
+export function rarityLabel(rarity: ArmorySkinRow['skin']['rarity']): string {
+  switch (rarity) {
+    case 'uncommon':
+      return t('hudChrome.wocStore.rarity.uncommon');
+    case 'rare':
+      return t('hudChrome.wocStore.rarity.rare');
+    case 'epic':
+      return t('hudChrome.wocStore.rarity.epic');
+    case 'legendary':
+      return t('hudChrome.wocStore.rarity.legendary');
+  }
+}
+
 function sceneLabel(scene: ArmorySceneKey): string {
   switch (scene) {
     case 'day':
@@ -38,6 +73,14 @@ function sceneLabel(scene: ArmorySceneKey): string {
       return t('hudChrome.wocStore.scene.night');
   }
 }
+
+function badgeLabel(badge: 'flagship' | 'hero'): string {
+  return badge === 'flagship'
+    ? t('hudChrome.wocStore.badge.flagship')
+    : t('hudChrome.wocStore.badge.hero');
+}
+
+export { badgeLabel };
 
 export class ArmoryInspect {
   private overlay: HTMLElement | null = null;

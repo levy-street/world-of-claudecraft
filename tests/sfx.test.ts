@@ -124,6 +124,37 @@ describe('footstep audio', () => {
   });
 });
 
+// hasVariants() is the predicate that drives mobSfxKey() in hud.ts:
+// mob_${fam}_${templateId}_${action} is preferred when hasVariants() returns
+// true, otherwise the family-level key mob_${fam}_${action} is used.
+describe('hasVariants', () => {
+  it('returns false for an unloaded key', () => {
+    expect(sfx.hasVariants('mob_beast_wolf_attack')).toBe(false);
+  });
+
+  it('returns true once a pool is injected for the key', () => {
+    (sfx as unknown as { variants: Map<string, { duration: number }[]> }).variants.set(
+      'mob_beast_wolf_attack',
+      [{ duration: 0.8 }],
+    );
+    expect(sfx.hasVariants('mob_beast_wolf_attack')).toBe(true);
+  });
+
+  it('subfamily key true + family key absent models the preferred-then-fallback flow', () => {
+    // When subfamily clips are deployed, hasVariants(subKey) is true and
+    // mobSfxKey returns the subfamily key.  Before deployment, hasVariants
+    // returns false and mobSfxKey falls back to the family key.
+    const subKey = 'mob_beast_bear_attack'; // distinct key so prior tests don't leak
+    const famKey = 'mob_beast_attack';
+    const variants = (sfx as unknown as { variants: Map<string, { duration: number }[]> }).variants;
+    variants.delete(subKey);
+    expect(sfx.hasVariants(subKey)).toBe(false); // no variants loaded yet
+    variants.set(subKey, [{ duration: 0.8 }]);
+    expect(sfx.hasVariants(subKey)).toBe(true);
+    expect(sfx.hasVariants(famKey)).toBe(false); // family key unrelated
+  });
+});
+
 // No-repeat random: the variant selection algorithm must never repeat the last
 // index back-to-back and must include every index on first play.
 describe('variant selection (nextBuffer)', () => {

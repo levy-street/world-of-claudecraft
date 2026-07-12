@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  AUTO_SHOT_DRAW_S,
   advancePendingProjectiles,
   PROJECTILE_REACH,
   PROJECTILE_SPEED,
@@ -184,6 +185,79 @@ describe('scheduleProjectile + advancePendingProjectiles', () => {
       advancePendingProjectiles(ctx as any);
     }
     expect(landed.n).toBe(1);
+    expect(ctx.pendingProjectiles.length).toBe(0);
+  });
+});
+
+describe('delayed launch (the Auto Shot draw)', () => {
+  const DRAW_TICKS = Math.round(AUTO_SHOT_DRAW_S / DT);
+
+  it('waits out the draw, re-anchors to the shooter, then flies', () => {
+    const ctx = fakeCtx();
+    const src = ent(1, 0, 0);
+    const tgt = ent(2, 0, 26);
+    ctx.entities.set(1, src);
+    ctx.entities.set(2, tgt);
+    const landed = { n: 0 };
+    let launchedAt = -1;
+    let launchedFrom: number | null = null;
+    let tick = 0;
+    scheduleProjectile(
+      ctx as any,
+      src,
+      tgt,
+      () => {
+        landed.n++;
+      },
+      {
+        launchDelay: AUTO_SHOT_DRAW_S,
+        onLaunch: () => {
+          launchedAt = tick;
+          launchedFrom = ctx.pendingProjectiles[0].x;
+        },
+      },
+    );
+    // The shooter strafes during the draw: the arrow must leave from the LIVE
+    // position, not the swing-tick position.
+    for (tick = 1; tick <= DRAW_TICKS + 40 && landed.n === 0; tick++) {
+      if (tick === 3) src.pos.x = 4;
+      advancePendingProjectiles(ctx as any);
+    }
+    expect(launchedAt).toBe(DRAW_TICKS);
+    expect(launchedFrom).toBe(4);
+    expect(landed.n).toBe(1);
+    // Flight starts AT the release: ~sqrt(4^2 + 26^2) yd at 1.3 yd per tick
+    // lands ~20 ticks after the draw, never during it.
+    expect(tick - 1).toBeGreaterThan(DRAW_TICKS + 15);
+  });
+
+  it('fizzles with no launch at all if the target dies during the draw', () => {
+    const ctx = fakeCtx();
+    const src = ent(1, 0, 0);
+    const tgt = ent(2, 0, 20);
+    ctx.entities.set(1, src);
+    ctx.entities.set(2, tgt);
+    const landed = { n: 0 };
+    let launches = 0;
+    scheduleProjectile(
+      ctx as any,
+      src,
+      tgt,
+      () => {
+        landed.n++;
+      },
+      {
+        launchDelay: AUTO_SHOT_DRAW_S,
+        onLaunch: () => {
+          launches++;
+        },
+      },
+    );
+    advancePendingProjectiles(ctx as any);
+    tgt.dead = true; // dies mid-draw: the shot is never fired
+    for (let i = 0; i < DRAW_TICKS + 5; i++) advancePendingProjectiles(ctx as any);
+    expect(launches).toBe(0);
+    expect(landed.n).toBe(0);
     expect(ctx.pendingProjectiles.length).toBe(0);
   });
 });

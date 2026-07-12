@@ -900,6 +900,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   // session); price/:rail is a public enum param, not an account-owned resource.
   {
     dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/claudium/stripe/webhook',
+    handler: 'handleClaudiumStripeWebhook',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
     method: 'GET',
     path: '/api/claudium/balance',
     handler: 'handleClaudiumApi arm: /api/claudium/balance',

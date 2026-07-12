@@ -24,13 +24,13 @@ import { armorySkinArt } from '../src/ui/woc_store_view';
 const ROOT = join(__dirname, '..');
 
 describe('season 1 weapon skin catalog', () => {
-  it('ships exactly the 28 paid skins: 7 per collection, 4 collections', () => {
-    expect(WEAPON_SKIN_LIST.length).toBe(28);
+  it('ships exactly the 29 paid skins: 7 per collection plus the Fallen Star encore', () => {
+    expect(WEAPON_SKIN_LIST.length).toBe(29);
     for (const collection of WEAPON_SKIN_COLLECTIONS) {
       const inCollection = WEAPON_SKIN_LIST.filter((s) => s.collection === collection);
-      expect(inCollection.length, collection).toBe(7);
+      expect(inCollection.length, collection).toBe(collection === 'Fallen Star' ? 8 : 7);
       // One skin per weapon type within a collection.
-      expect(new Set(inCollection.map((s) => s.weaponType)).size).toBe(7);
+      expect(new Set(inCollection.map((s) => s.weaponType)).size).toBe(inCollection.length);
     }
   });
 
@@ -177,6 +177,89 @@ describe('skin apply rule', () => {
     for (const skin of WEAPON_SKIN_LIST) {
       expect(reachable.has(skin.weaponType), `${skin.id} (${skin.weaponType})`).toBe(true);
     }
+  });
+});
+
+describe('bow skin attack animation (hunter draw instead of crossbow aim)', () => {
+  it('bow skins substitute the authored draw clip; every other type keeps its attack', async () => {
+    const { weaponSkinAttackClips, SKIN_ATTACK_CLIP_NAMES, BOW_RELEASE_AT } = await import(
+      '../src/render/characters/skin_attack'
+    );
+    const { AUTO_SHOT_DRAW_S } = await import('../src/sim/projectile_travel');
+    const { weaponSkinHandling } = await import('../src/render/characters/skin_attack');
+    for (const skin of WEAPON_SKIN_LIST) {
+      const sub = weaponSkinAttackClips(skin.id);
+      if (weaponSkinHandling(skin) === 'bow') {
+        expect(sub?.clips, skin.id).toContain('Bow_Draw_Shot');
+        // The clip's release keyframe and the sim's arrow release are the
+        // same instant by construction.
+        expect(sub?.releaseAt).toBe(AUTO_SHOT_DRAW_S);
+        // Every substitute clip must be one the constructor binds.
+        for (const clip of sub?.clips ?? []) expect(SKIN_ATTACK_CLIP_NAMES).toContain(clip);
+      } else {
+        expect(sub, `${skin.id} (${skin.weaponType}) must keep the authored attack`).toBeNull();
+      }
+    }
+    // The encore star-cannon is a bow-slot skin HANDLED like a crossbow: it
+    // keeps the shoulder-aim and the right hand.
+    expect(weaponSkinHandling(WEAPON_SKINS.encore_bow)).toBe('crossbow');
+    expect(weaponSkinAttackClips('encore_bow')).toBeNull();
+    expect(BOW_RELEASE_AT).toBe(AUTO_SHOT_DRAW_S);
+    expect(weaponSkinAttackClips(null)).toBeNull();
+    expect(weaponSkinAttackClips('not_a_skin')).toBeNull();
+  });
+
+  it('bow handling sits in the LEFT hand (the draw front arm); crossbow handling stays right', async () => {
+    const { weaponSkinAttachBone, weaponSkinHandling } = await import(
+      '../src/render/characters/skin_attack'
+    );
+    expect(weaponSkinAttachBone('bow', 'handslot.r')).toBe('handslot.l');
+    expect(weaponSkinAttachBone('crossbow', 'handslot.r')).toBe('handslot.r');
+    // Slot vs handling: winterbite draws left-handed, the encore cannon
+    // shoulders right-handed, both from the bow store slot.
+    expect(weaponSkinAttachBone(weaponSkinHandling(WEAPON_SKINS.winterbite), 'handslot.r')).toBe(
+      'handslot.l',
+    );
+    expect(weaponSkinAttachBone(weaponSkinHandling(WEAPON_SKINS.encore_bow), 'handslot.r')).toBe(
+      'handslot.r',
+    );
+  });
+
+  it('orientation pins: bows aim during the shot, bow-slot guns carry outside it', async () => {
+    const { weaponSkinOrientPin } = await import('../src/render/characters/skin_attack');
+    expect(weaponSkinOrientPin('winterbite')).toBe('aimDuringShot');
+    expect(weaponSkinOrientPin('fletcher_s_guild_bow')).toBe('aimDuringShot');
+    expect(weaponSkinOrientPin('encore_bow')).toBe('carryOutsideShot');
+    expect(weaponSkinOrientPin('meteorlatch_crossbow')).toBeNull();
+    expect(weaponSkinOrientPin('solheim_sword')).toBeNull();
+    expect(weaponSkinOrientPin(null)).toBeNull();
+  });
+
+  it('the hunter ships the bow clip via animUrls and the GLB carries it', async () => {
+    // Source scan, not an import: pulling the manifest into Node would kick
+    // the module-import GLB preloads (assets.ts loading contract).
+    const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
+    const hunterBlock = manifestSrc.slice(
+      manifestSrc.indexOf('player_hunter: {'),
+      manifestSrc.indexOf('player_rogue: {'),
+    );
+    expect(hunterBlock).toContain('bow_anims.glb');
+    // Parse the shipped GLB's JSON chunk and assert the clips are inside
+    // (scripts/build_bow_anims.mjs output; regenerate from the CC0 pack).
+    const glb = readFileSync(join(ROOT, 'public/models/chars/players/bow_anims.glb'));
+    const jsonLen = glb.readUInt32LE(12);
+    const doc = JSON.parse(glb.subarray(20, 20 + jsonLen).toString('utf8'));
+    const clips = (doc.animations ?? []).map((a: { name?: string }) => a.name);
+    expect(clips).toContain('Bow_Draw_Shot');
+    // Mesh-free clip donor: nothing to render, just bones + tracks.
+    expect(doc.meshes ?? []).toEqual([]);
+    // The authoring script's release keyframe must sit exactly at the sim's
+    // Auto Shot release (the arrow leaves when the string snaps).
+    const { AUTO_SHOT_DRAW_S } = await import('../src/sim/projectile_travel');
+    const script = readFileSync(join(ROOT, 'scripts/build_bow_anims.mjs'), 'utf8');
+    const m = script.match(/BOW_RELEASE_AT = ([0-9.]+)/);
+    expect(m, 'build_bow_anims.mjs must declare BOW_RELEASE_AT').toBeTruthy();
+    expect(Number(m?.[1])).toBe(AUTO_SHOT_DRAW_S);
   });
 });
 

@@ -160,6 +160,17 @@ export const WEAPON_VFX_TUNING: Record<string, Partial<WeaponVfxTuning>> = {
     sparkle: 2,
     shell: 2,
   },
+  encore_the_second_falling_star: {
+    glow: 2,
+    bloom: 0.65,
+    light: 0.25,
+    core: 0.7,
+    motes: 2,
+    aurora: 2,
+    mist: 2,
+    sparkle: 2,
+    shell: 2,
+  },
 };
 
 /** Effective in-game tuning for a skinned weapon: the hand-saved per-weapon

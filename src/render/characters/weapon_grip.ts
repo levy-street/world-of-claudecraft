@@ -96,6 +96,14 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     rot: [94.6767, -12.6224, 138.9958],
     scale: 0.65,
   },
+  // The encore star-cannon reads correctly at the family default grip (muzzle
+  // forward off the right hand); the scale-up is the point, a legendary gun
+  // longer than the hunter is tall.
+  encore_the_second_falling_star: {
+    pos: [-0.0268, 0.0704, -0.0141],
+    rot: [-140.4492, 5.0614, 104.6019],
+    scale: 1.2,
+  },
   emberbite: { pos: [-0.0061, 0.1097, 0] },
   smoulderfall: { rot: [0, 0, -12.429], scale: 0.9 },
   ashspark_shiv: { pos: [0, -0.0745, 0.0717], rot: [14.7156, 0, 0] },

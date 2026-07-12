@@ -31,6 +31,11 @@ export interface WeaponSkinDef {
   season: 1;
   /** Collection flagship (epic) or hero (legendary) callout. */
   badge?: 'flagship' | 'hero';
+  /** Ranged handling override: a bow-slot skin held and fired like a crossbow
+   *  (the class's authored shoulder-aim attack, right-hand attach) instead of
+   *  the drawn bow. Guns and launchers aim; they are not drawn. Cosmetic only:
+   *  the sim never reads it (the Auto Shot draw time is skin-agnostic). */
+  handling?: 'crossbow';
   /** In-game look, one line (inspect panel subtitle). */
   look: string;
   /** Armory codex lore (inspect panel body). */
@@ -409,6 +414,19 @@ export const WEAPON_SKINS: Record<string, WeaponSkinDef> = {
     season: 1,
     look: 'Captive molten-gold dying-star mote wreathed in orbiting sparks, cosmos-black shaft etched with glowing constellations.',
     lore: 'Not the fallen star itself but the last mote of a dying one: a single molten-gold ember of a sun already gone out, wreathed in the sparks that were its final light. Its cosmos-black shaft is etched with the constellations that watched it die. The Mirefen crofters say it grants one wish to whoever holds it at true dusk; they also say every soul who held it wished for more time, and that the Drowned Moon granted none of them any.',
+  },
+  encore_bow: {
+    id: 'encore_bow',
+    name: 'Encore, the Second Falling Star',
+    collection: S1.fallenStar,
+    rarity: 'legendary',
+    weaponType: 'bow',
+    model: 'encore_the_second_falling_star',
+    handling: 'crossbow',
+    priceUsd: 50,
+    season: 1,
+    look: 'Comically oversized star-cannon: a cosmos-black barrel etched with glowing golden constellations, a flared bell muzzle with a molten-gold comet shell seated inside, brass fittings, a wooden shoulder stock.',
+    lore: "The smiths who worked the fallen star made six relics of it and still had a barrel's worth of star-metal left over, and by then the apprentices had opinions. What came off the anvil is either the realm's first gun or its smallest siege engine: a shoulder cannon that does not so much loose a shot as request a second star, aimed. Brother Aldric declined to bless it, reasoning that anything that loud has already been noticed by heaven. Hunters adore it. Nothing downrange ever has.",
   },
   meteorlatch_crossbow: {
     id: 'meteorlatch_crossbow',

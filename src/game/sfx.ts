@@ -226,6 +226,13 @@ class Sfx {
     return pool[idx];
   }
 
+  /** True if at least one variant is loaded for this key. Used by hud.ts to
+   *  prefer a subfamily key (mob_beast_wolf_attack) over the family fallback
+   *  (mob_beast_attack) when the more specific clip exists. */
+  hasVariants(key: string): boolean {
+    return (this.variants.get(key)?.length ?? 0) > 0;
+  }
+
   /** Squared distance from the listener — callers can pre-cull, but playAt also
    *  guards internally so a far event is a cheap no-op. */
   private tooFar(x: number, z: number): boolean {

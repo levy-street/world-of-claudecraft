@@ -1,7 +1,7 @@
 // Manifest builder extracted from gen_sfx.mjs so it can be imported by tests
 // without triggering gen_sfx.mjs's top-level API-key / process.exit logic.
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 // Preference order when probing a bare key (no numbered variants).
@@ -9,6 +9,11 @@ import path from 'node:path';
 // every other extension; WAV/FLAC next so custom lossless recordings survive a
 // manifest rebuild without being silently dropped.
 const PROBE_EXTS = ['.mp3', '.wav', '.flac', '.ogg'];
+
+// Valid mob vocalization actions, anchor for parsing subfamily filenames.
+// mob_beast_wolf_aggro_1.mp3 -> family=beast, subfamily=wolf, action=aggro, variant=1
+// mob_beast_aggro_1.mp3      -> family=beast, action=aggro, variant=1 (family-level)
+export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt']);
 
 /**
  * Rebuild the SFX manifest from the files actually on disk.
@@ -49,6 +54,44 @@ export function buildManifest(catalog, sfxDir, manifestPath) {
 
     if (urls.length > 0) entries[entry.key] = { urls, loop: !!entry.loop };
   }
+
+  // Scan for mob subfamily variant files not in the catalog.
+  // Pattern: mob_<family>_<sub>_<action>_<N>.mp3 where action is in MOB_ACTIONS.
+  // The action token anchors the parse; everything between family and action is
+  // the subfamily (per-creature subtype, e.g. wolf, bear, ghoul).
+  const mobFiles = existsSync(sfxDir)
+    ? readdirSync(sfxDir).filter((f) => f.startsWith('mob_') && f.endsWith('.mp3'))
+    : [];
+  for (const file of mobFiles) {
+    const stem = file.slice(0, -4); // strip .mp3
+    const parts = stem.split('_');
+    // Minimum shape: mob + family + sub + action + N (5 parts)
+    if (parts.length < 5 || !/^\d+$/.test(parts[parts.length - 1])) continue;
+    const family = parts[1];
+    const body = parts.slice(2, -1); // tokens between family and variant number
+    // Scan body right-to-left for the action token.
+    let actionIdx = -1;
+    for (let i = body.length - 1; i >= 0; i--) {
+      if (MOB_ACTIONS.has(body[i])) {
+        actionIdx = i;
+        break;
+      }
+    }
+    if (actionIdx === -1) {
+      errors.push(`invalid mob sfx filename (no recognized action): ${file}`);
+      continue;
+    }
+    const subParts = body.slice(0, actionIdx);
+    if (subParts.length === 0) continue; // family-level variant, already handled by catalog loop
+    const action = body[actionIdx];
+    const sub = subParts.join('_');
+    const key = `mob_${family}_${sub}_${action}`;
+    if (!entries[key]) entries[key] = { urls: [], loop: false };
+    entries[key].urls.push(`/audio/sfx/${file}`);
+  }
+
+  // Sort variant URLs within each entry for deterministic ordering.
+  for (const entry of Object.values(entries)) entry.urls.sort();
 
   const sorted = Object.fromEntries(
     Object.keys(entries)

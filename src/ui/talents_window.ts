@@ -2,18 +2,10 @@
 //
 // The consumer half of the pure-core + thin-painter split: it paints
 // #talents-window from the structured TalentsView (talents_view.ts) and owns the
-// interactive wiring (the frame tab rail, the spec radiogroup, the tiered talent
-// cards, the choice flyout, and the build/loadout footer). It composes the shared
+// interactive wiring (class/spec tabs, the spec radiogroup, the shape-coded tree
+// nodes, the choice flyout, and the build/loadout footer). It composes the shared
 // PainterHostPresentation bag (only attachTooltip is relevant for this window) plus
 // the talents-specific glue Hud injects.
-//
-// TIERED-CHOICES LAYOUT: the window is a classic tiered picker. The titlebar reads
-// "Talents" plus the class name; a status strip shows the staged choice count and
-// the chosen specialization; the shared frame tab rail switches between the
-// CHOICES tab (the class tree as unlock-level tier rows of talent cards) and the
-// SPECIALIZATION tab (the spec radiogroup plus the chosen spec's tier rows); the
-// build/loadout panels close the body. COLD PATH: everything repaints on
-// open/change only, never per frame.
 //
 // STAGED-EDIT MODEL: the user edits a LOCAL mutable buffer (a `cloneAllocation` of
 // the live IWorld.talents). Hud owns that single buffer; this painter reads it via
@@ -23,9 +15,9 @@
 // IWorld on save / loadout-switch / delete (deps.saveLoadout / switchLoadout /
 // deleteLoadout), never inline. The painter never clones a second buffer of its own.
 //
-// No raw hex: the inline tooltip colors reference --color-* custom properties via
-// TAL_COLOR; every layout color lives in the stylesheet (tokens only). No em dashes
-// anywhere (the mastery / choice separator is ASCII " - ").
+// No raw hex: the SVG/inline colors reference --color-* custom
+// properties via TAL_COLOR; the tree geometry comes from the core's named layout
+// constants. No em dashes anywhere (the mastery / choice separator is ASCII " - ").
 
 import {
   cloneAllocation,
@@ -40,22 +32,17 @@ import {
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
 import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { formatNumber, t } from './i18n';
+import { t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
-import {
-  buildTalentsView,
-  type TalentNodeVM,
-  type TalentsView,
-  type TalentTreeVM,
-} from './talents_view';
+import { talentTreeFitScale } from './talent_tree_fit';
+import { buildTalentsView, type TalentsView, type TalentTreeVM } from './talents_view';
 import { svgIcon } from './ui_icons';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
 
 /**
  * Hud-supplied glue. attachTooltip comes from the shared PainterHostPresentation
@@ -118,10 +105,14 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
 }
 
-// Talent palette: CSS custom properties (no raw hex in the painter). These color
-// the tooltip accent lines; every layout color lives in components.css as tokens.
+// Talent palette: CSS custom properties (no raw hex in the painter).
+// classAccent/signature reuse existing tokens; the rest are --color-talent-* tokens
+// added in tokens.css with the exact pre-existing hex so render stays byte-identical.
 const TAL_COLOR = {
+  classAccent: 'var(--color-text-muted)',
   signature: 'var(--gold)',
+  arrow: 'var(--color-talent-arrow)',
+  arrowDim: 'var(--color-talent-arrow-dim)',
   choiceSel: 'var(--gold)',
   choiceDim: 'var(--color-talent-opt-dim)',
   hint: 'var(--color-talent-hint)',
@@ -135,29 +126,8 @@ function signatureName(abilityId: string): string {
     : abilityId;
 }
 
-function num(n: number): string {
-  return formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
-}
-
-// The talents window is a closable, footer-less frame with the shared tab rail:
-// CHOICES (the class tree as tier rows) and SPECIALIZATION (spec picker + spec
-// tiers). The staged-edit build panels stay inside the body (NOT lifted to the
-// frame's sticky .window-footer): they are a rich multi-action block, not a single
-// trailing action. Title + close reuse the existing game.talents.* keys; the
-// CHOICES tab label is the one new chrome key. The frame IS the dialog (role +
-// aria-labelledby on the inner mount).
-const TALENTS_FRAME: WindowFrameDescriptor = {
-  id: 'talents-window',
-  titleKey: 'game.talents.title',
-  closeLabelKey: 'game.talents.close',
-  tabs: [
-    { id: 'choices', labelKey: 'hudChrome.talents.choicesTab' },
-    { id: 'spec', labelKey: 'game.talents.specTab' },
-  ],
-};
-
 export class TalentsWindow {
-  private tab: 'choices' | 'spec' = 'choices';
+  private tab: 'class' | 'spec' = 'class';
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
 
@@ -182,114 +152,27 @@ export class TalentsWindow {
     this.deps.restoreFocus(target);
   }
 
-  /**
-   * Stamp the shared window frame cold at first open, then reuse it. The frame
-   * mounts on an INNER container (never on the shared #talents-window root), so
-   * the root stays a pristine `.window.panel`: the id-scoped viewport clamp, the
-   * resize grip, and the mobile inset rule all keep matching it. An intact mounted
-   * frame (its body present) is the reuse marker; only the body repaints per
-   * render. The cold stamp also adds the two persistent chrome bits: the class
-   * name beside the title, and the point pips + arrow-key roving on the tab rail.
-   */
-  private ensureFrame(el: HTMLElement): WindowFrameParts {
-    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-    const body = mounted?.querySelector<HTMLElement>('.window-body');
-    if (mounted && body) {
-      return {
-        root: mounted,
-        body,
-        footer: null,
-        tabButtons: Array.from(mounted.querySelectorAll<HTMLButtonElement>('[data-window-tab]')),
-      };
-    }
-    const mount = document.createElement('div');
-    const parts = renderWindowFrame(
-      mount,
-      TALENTS_FRAME,
-      {
-        onClose: () => this.close(),
-        onTabChange: (tabId) => {
-          this.tab = tabId === 'spec' ? 'spec' : 'choices';
-          this.render();
-        },
-      },
-      this.tab,
-    );
-    // Titlebar: "Talents" plus the class name (the classic titlebar pairing).
-    const sub = document.createElement('span');
-    sub.className = 'tal-class-sub';
-    sub.textContent = classDisplayName(this.deps.playerClass());
-    parts.root.querySelector('.window-title')?.after(sub);
-    // Tab rail: a points pip per tab (updated each render) and WAI-ARIA arrow-key
-    // roving (Left/Right/Home/End). The buttons persist with the frame, so this
-    // wiring is cold; activating a tab routes through the frame's own click path.
-    parts.tabButtons.forEach((btn, i) => {
-      const pip = document.createElement('span');
-      pip.className = 'tt-pts';
-      btn.appendChild(pip);
-      btn.addEventListener('keydown', (e) => {
-        const next = rovingTarget(e.key, i, parts.tabButtons.length, 'horizontal');
-        if (next === null || next === i) return;
-        e.preventDefault();
-        const target = parts.tabButtons[next];
-        target.click();
-        target.focus();
-      });
-    });
-    el.replaceChildren(mount);
-    return parts;
-  }
-
-  /**
-   * Re-affirm the rail against this.tab (roving tabindex, aria-selected, the
-   * body's tabpanel id) and refresh the per-tab spent pips. The frame's click
-   * handler already does the aria half on a click; a Hud-driven repaint against
-   * the reused frame must re-assert it.
-   */
-  private syncTabs(parts: WindowFrameParts, view: TalentsView): void {
-    for (const btn of parts.tabButtons) {
-      const key = btn.dataset.windowTab;
-      const selected = key === this.tab;
-      btn.setAttribute('aria-selected', String(selected));
-      btn.tabIndex = selected ? 0 : -1;
-      if (selected) {
-        const panelId = btn.getAttribute('aria-controls');
-        if (panelId) parts.body.id = panelId;
-      }
-      const pip = btn.querySelector('.tt-pts');
-      if (pip) pip.textContent = num(key === 'spec' ? view.specSpent : view.classSpent);
-    }
-  }
-
-  /** The status strip: staged choices spent / total (left), chosen spec (right). */
-  private statusHtml(view: TalentsView): string {
-    const specName = view.selectedSpec
-      ? tTalent({ kind: 'talentSpec', spec: view.selectedSpec, field: 'name' })
-      : null;
-    return (
-      `<div class="tal-status">` +
-      `<span class="tal-status-choices">${t('hudChrome.talents.choicesTab')}: <b>${num(view.spent)}</b> / ${num(view.total)}</span>` +
-      `<span class="tal-status-spec">${t('game.talents.specTab')}: <b>${specName ? esc(specName) : t('game.talents.chooseSpec')}</b></span>` +
-      `</div>`
-    );
-  }
-
   render(): void {
     const el = this.deps.root();
     // Early-return when hidden AND no staged buffer (nothing to repaint).
     if (el.style.display !== 'block' && this.deps.getStage() === null) return;
-    // The shared frame carries the dialog role + aria-labelledby (its "Talents"
-    // title) and the tab rail; the body repaints below. The close routes to
-    // this.close() via the frame's onClose, wired once when the frame is stamped.
-    const parts = this.ensureFrame(el);
-    const body = parts.body;
+    // WCAG 2.2 AA: name the focus-trapped root so AT users entering the trap
+    // land on a labeled dialog, not an anonymous group. innerHTML below replaces the
+    // children, not these own-element attributes, so setting them once per render is
+    // idempotent and covers both the coming-soon and the populated branch.
+    markDialogRoot(el, { label: t('game.talents.title') });
     const cls = this.deps.playerClass();
+    // A real <button> close (was a non-focusable <span>): keyboard-reachable and named,
+    // matching the sibling cold windows. focusFirst skips [data-close] on open.
+    const close = `<button type="button" class="x-btn" data-close aria-label="${esc(t('game.talents.close'))}">${svgIcon('close')}</button>`;
     if (!talentsFor(cls)) {
-      body.innerHTML =
+      el.innerHTML =
+        `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
         `<div class="tal-empty tal-coming-soon" data-talents-coming-soon>` +
         `<b>${t('game.talents.comingSoonTitle')}</b>` +
         `<span>${t('game.talents.comingSoonBody')}</span>` +
         `</div>`;
+      el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
     // Create-on-first-open: ensure the staged buffer exists, seeded from the live build.
@@ -300,21 +183,54 @@ export class TalentsWindow {
     }
     const total = this.deps.totalPoints();
     const view = buildTalentsView(stage, cls, total);
-    this.syncTabs(parts, view);
 
-    body.innerHTML = this.statusHtml(view) + `<div id="tal-body"></div>` + this.footerHtml(view);
+    el.innerHTML =
+      `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
+      `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
+      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
+      `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
+      `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
+      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
+      `</div><div id="tal-body" role="tabpanel"></div>` +
+      this.footerHtml(view);
 
-    const panel = body.querySelector('#tal-body') as HTMLElement;
-    if (this.tab === 'choices') {
-      this.paintTiers(panel, view.classTree, stage);
-      panel.insertAdjacentHTML(
-        'beforeend',
-        `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>`,
-      );
+    const switchTab = (tab: HTMLElement): void => {
+      this.tab = tab.dataset.tab as 'class' | 'spec';
+      this.render();
+    };
+    // WAI-ARIA tabs: roving arrow navigation (Left/Right/Home/End) plus Enter/Space.
+    // switchTab re-renders the window; the root persists, so focus the freshly active
+    // tab afterward to keep the roving-tabindex focus on the selected tab.
+    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.tal-tab'));
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => switchTab(tab));
+      tab.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
+        if (next !== null) {
+          ke.preventDefault();
+          const target = tabs[next];
+          if (target && target !== tab) {
+            switchTab(target);
+            (el.querySelector('.tal-tab.active') as HTMLElement | null)?.focus();
+          }
+          return;
+        }
+        this.keyboardActivate(ke, () => switchTab(tab));
+      });
+    });
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+
+    const body = el.querySelector('#tal-body') as HTMLElement;
+    if (this.tab === 'class') {
+      const tree = document.createElement('div');
+      tree.className = 'tal-tree';
+      body.appendChild(tree);
+      this.paintTree(tree, view.classTree, stage);
     } else {
-      this.paintSpecTab(panel, view, stage);
+      this.paintSpecTab(body, view, stage);
     }
-    this.wireFooter(body, stage, total);
+    this.wireFooter(el, stage, total);
   }
 
   private paintSpecTab(body: HTMLElement, view: TalentsView, stage: TalentAllocation): void {
@@ -375,118 +291,115 @@ export class TalentsWindow {
     m.className = 'tal-mastery';
     m.innerHTML = `<b>${t('game.talents.mastery')}: ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> - ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}`;
     body.appendChild(m);
-    if (view.specTree) this.paintTiers(body, view.specTree, stage);
+    const tree = document.createElement('div');
+    tree.className = 'tal-tree';
+    body.appendChild(tree);
+    if (view.specTree) this.paintTree(tree, view.specTree, stage);
   }
 
-  /**
-   * Paint a tree as classic tier rows: a level number on the left rail, then the
-   * row's talent cards on a three-column grid (column identity from the content
-   * `col`, so a two-card row keeps its middle gap). A level-locked tier (the
-   * point budget cannot open it yet) dims and carries a lock on its rail.
-   */
-  private paintTiers(host: HTMLElement, treeVM: TalentTreeVM, stage: TalentAllocation): void {
+  private paintTree(host: HTMLElement, treeVM: TalentTreeVM, stage: TalentAllocation): void {
     if (treeVM.empty) {
-      host.insertAdjacentHTML(
-        'beforeend',
-        `<div class="tal-empty">${t('game.talents.pickSpecFirst')}</div>`,
-      );
+      host.innerHTML = `<div class="tal-empty">${t('game.talents.pickSpecFirst')}</div>`;
       return;
     }
-    const tiers = document.createElement('div');
-    tiers.className = 'tal-tiers';
-    for (const tier of treeVM.tiers) {
-      const row = document.createElement('section');
-      row.className = `tal-tier${tier.levelLocked ? ' level-locked' : ''}`;
-      // The content row this tier band renders. Every card inside carries the
-      // same stamp, so a test can pin that a card never leaves its tier's band
-      // (the one-horizontal-row-per-tier alignment contract; the row placement
-      // itself is the explicit `.tal-tier-cards > .tal-card { grid-row: 1 }`
-      // stylesheet rule, released only by the narrow-container collapse).
-      row.dataset.tierRow = String(tier.row);
-      row.setAttribute('aria-label', t('hudChrome.talents.tierLevel', { n: num(tier.level) }));
-      const rail = document.createElement('div');
-      rail.className = 'tal-tier-rail';
-      rail.innerHTML =
-        `<span class="tal-tier-caption">${t('hudChrome.talents.tierLevelLabel')}</span>` +
-        `<span class="tal-tier-num">${num(tier.level)}</span>` +
-        (tier.levelLocked ? svgIcon('lock', { cls: 'tal-tier-lock' }) : '');
-      row.appendChild(rail);
-      const cards = document.createElement('div');
-      cards.className = 'tal-tier-cards';
-      for (const vm of tier.nodes) {
-        const card = this.buildCard(vm, stage);
-        card.dataset.tierRow = String(tier.row);
-        cards.appendChild(card);
-      }
-      row.appendChild(cards);
-      tiers.appendChild(row);
-    }
-    host.appendChild(tiers);
-  }
+    host.style.width = `${treeVM.width}px`;
+    host.style.height = `${treeVM.height}px`;
 
-  /** One selectable talent card: icon + name (+ chosen option), state-classed. */
-  private buildCard(vm: TalentNodeVM, stage: TalentAllocation): HTMLElement {
-    const n = vm.node;
-    const div = document.createElement('div');
-    div.className = `tal-card ${vm.shape} ${vm.state} tal-col-${vm.col}`;
-    div.setAttribute('role', 'button');
-    div.setAttribute('tabindex', '0');
-    div.setAttribute('aria-pressed', String(vm.ranks > 0));
-    if (vm.disabled) div.setAttribute('aria-disabled', 'true');
-    const nodeName = tTalent({ kind: 'talentNode', node: n, field: 'name' });
-    const chosenName = vm.chosen
-      ? tTalent({ kind: 'talentChoice', choice: vm.chosen, field: 'name' })
-      : null;
-    div.setAttribute(
-      'aria-label',
-      `${nodeName}${chosenName ? `, ${chosenName}` : ''}, ${t('game.talents.rank')} ${vm.ranks}/${vm.maxRank}`,
-    );
-    const icon = document.createElement('span');
-    icon.className = 'tal-icon';
-    icon.style.backgroundImage = `url(${vm.chosen ? talentChoiceIconDataUrl(vm.chosen) : talentNodeIconDataUrl(n)})`;
-    div.appendChild(icon);
-    const text = document.createElement('span');
-    text.className = 'tal-card-text';
-    const name = document.createElement('span');
-    name.className = 'tal-card-name';
-    name.textContent = nodeName;
-    text.appendChild(name);
-    if (chosenName) {
-      const sub = document.createElement('span');
-      sub.className = 'tal-card-sub';
-      sub.textContent = chosenName;
-      text.appendChild(sub);
-    }
-    div.appendChild(text);
-    if (vm.ranks > 0 || n.maxRank > 1) {
-      const badge = document.createElement('span');
-      badge.className = 'tal-rank';
-      badge.textContent = `${vm.ranks}/${vm.maxRank}`;
-      div.appendChild(badge);
-    }
-    this.deps.attachTooltip(div, () => this.talentTooltip(n, stage, vm.state === 'dormant'));
-    div.addEventListener('click', () => {
-      // octagon choice cards open a classic-MMO-style option flyout; others add a rank
-      if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
-      else this.nodeClick(stage, n);
-    });
-    div.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      if (ke.key === 'Backspace' || ke.key === 'Delete') {
-        ke.preventDefault();
-        this.nodeRemove(stage, n);
-        return;
+    let svg = `<svg class="tal-arrows" width="${treeVM.width}" height="${treeVM.height}">`;
+    for (const a of treeVM.arrows)
+      svg += `<line x1="${a.x1}" y1="${a.y1}" x2="${a.x2}" y2="${a.y2}" style="stroke:${a.filled ? TAL_COLOR.arrow : TAL_COLOR.arrowDim};stroke-width:2"/>`;
+    host.insertAdjacentHTML('beforeend', `${svg}</svg>`);
+
+    for (const vm of treeVM.nodes) {
+      const n = vm.node;
+      const div = document.createElement('div');
+      div.className = `tal-node ${vm.shape} ${vm.state}`;
+      div.setAttribute('role', 'button');
+      div.setAttribute('tabindex', '0');
+      div.setAttribute('aria-pressed', String(vm.ranks > 0));
+      if (vm.disabled) div.setAttribute('aria-disabled', 'true');
+      const nodeName = tTalent({ kind: 'talentNode', node: n, field: 'name' });
+      const chosenLabel = vm.chosen
+        ? `, ${tTalent({ kind: 'talentChoice', choice: vm.chosen, field: 'name' })}`
+        : '';
+      div.setAttribute(
+        'aria-label',
+        `${nodeName}${chosenLabel}, ${t('game.talents.rank')} ${vm.ranks}/${vm.maxRank}`,
+      );
+      div.style.left = `${vm.left}px`;
+      div.style.top = `${vm.top}px`;
+      const icon = document.createElement('span');
+      icon.className = 'tal-icon';
+      icon.style.backgroundImage = `url(${vm.chosen ? talentChoiceIconDataUrl(vm.chosen) : talentNodeIconDataUrl(n)})`;
+      div.appendChild(icon);
+      if (vm.ranks > 0 || n.maxRank > 1) {
+        const badge = document.createElement('span');
+        badge.className = 'tal-rank';
+        badge.textContent = `${vm.ranks}/${vm.maxRank}`;
+        div.appendChild(badge);
       }
-      this.keyboardActivate(ke, () => {
+      this.deps.attachTooltip(div, () => this.talentTooltip(n, stage, vm.state === 'dormant'));
+      div.addEventListener('click', () => {
+        // octagon choice nodes open a classic-MMO-style option flyout; others add a rank
         if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
         else this.nodeClick(stage, n);
       });
-    });
-    div.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      this.nodeRemove(stage, n);
-    });
-    return div;
+      div.addEventListener('keydown', (e) => {
+        const ke = e as KeyboardEvent;
+        if (ke.key === 'Backspace' || ke.key === 'Delete') {
+          ke.preventDefault();
+          this.nodeRemove(stage, n);
+          return;
+        }
+        this.keyboardActivate(ke, () => {
+          if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
+          else this.nodeClick(stage, n);
+        });
+      });
+      div.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.nodeRemove(stage, n);
+      });
+      host.appendChild(div);
+    }
+    this.fitTreeToMobileViewport(host, treeVM.width, treeVM.height);
+  }
+
+  // Char/talents mobile landscape redo (issue 1577 follow-up): the tree is a
+  // fixed pixel grid (host.style.width/height above), so on a mobile-touch
+  // landscape phone we scale the whole grid down to whatever room #tal-body
+  // actually has, via the pure talentTreeFitScale, so a full tree reads in one
+  // view instead of needing an internal scroll to see it. Desktop is untouched
+  // (early-return keeps host at its native, unscaled size there).
+  private fitTreeToMobileViewport(host: HTMLElement, width: number, height: number): void {
+    if (!document.body.classList.contains('mobile-touch')) return;
+    const body = host.parentElement;
+    if (!body) return;
+    // #tal-body sizes to its OWN content (it is not a flex child with a capped
+    // height), so its bounding rect grows with the tree instead of reporting
+    // the room actually left in the viewport. The scrollable box on mobile is
+    // the whole #talents-window (inset:0 in hud.mobile.css), so measure the
+    // remaining space below tal-body's own top, clipped to the visible window.
+    const win = this.deps.root();
+    const winRect = win.getBoundingClientRect();
+    const bodyTop = body.getBoundingClientRect().top;
+    const availableWidth = body.clientWidth || winRect.width;
+    const availableHeight = Math.min(winRect.bottom, window.innerHeight) - bodyTop;
+    if (availableWidth <= 0 || availableHeight <= 0) return;
+    const scale = talentTreeFitScale(width, height, availableWidth, availableHeight);
+    host.style.transformOrigin = 'top left';
+    host.style.transform = scale < 1 ? `scale(${scale})` : '';
+    // .tal-tree's base rule is `margin: 6px auto` (desktop centers it); auto
+    // horizontal centering measures the tree's UNSCALED width, so left it alone
+    // it would push the shrunk tree off to the right. Pin both margins
+    // explicitly and collapse the now-empty right/bottom margin box back to
+    // the scaled visual size, so the window doesn't reserve the tree's full
+    // unscaled footprint and force a scrollbar anyway (transform never changes
+    // the layout box it applies to).
+    host.style.marginLeft = scale < 1 ? '0' : '';
+    host.style.marginTop = scale < 1 ? '0' : '';
+    host.style.marginRight = scale < 1 ? `${-(width * (1 - scale))}px` : '';
+    host.style.marginBottom = scale < 1 ? `${-(height * (1 - scale))}px` : '';
   }
 
   private setSpec(stage: TalentAllocation, specId: string): void {
@@ -555,9 +468,9 @@ export class TalentsWindow {
     return html;
   }
 
-  // classic-MMO-style choice-node picker: clicking an octagon card opens a flyout of
+  // classic-MMO-style choice-node picker: clicking an octagon node opens a flyout of
   // its options; selecting one assigns it (spending a point if needed). Anchored to
-  // the card, closes on click-away.
+  // the node, closes on click-away.
   private openChoicePopup(anchor: HTMLElement, node: TalentNode, stage: TalentAllocation): void {
     document.getElementById('tal-choice-pop')?.remove();
     const cls = this.deps.playerClass();
@@ -611,7 +524,7 @@ export class TalentsWindow {
         cand.ranks[node.id] = 1;
         cand.choices[node.id] = optId;
         if (!validateAllocation(cls, cand, total).ok) {
-          dismiss(true); // can't afford / gated: no re-render, so return focus to the card
+          dismiss(true); // can't afford / gated: no re-render, so return focus to the node
           return;
         }
         stage.ranks[node.id] = 1;
@@ -686,18 +599,18 @@ export class TalentsWindow {
       `<section class="tal-build-card tal-build-current" aria-label="${esc(t('game.talents.currentBuild'))}">` +
       `<div class="tal-build-head"><span>${t('game.talents.currentBuild')}</span><span class="tal-loadslot"></span></div>` +
       `<div class="tal-build-actions">` +
-      `<button class="btn is-primary" data-act="save"${valid ? '' : ' disabled'}>${t('game.talents.saveBuild')}</button>` +
-      `<button class="btn" data-act="export">${t('game.talents.export')}</button>` +
-      `<button class="btn is-danger" data-act="del"${this.deps.activeLoadout() >= 0 ? '' : ' disabled'}>${t('game.talents.deleteBuild')}</button>` +
-      `<button class="btn" data-act="clear"${view.spent > 0 ? '' : ' disabled'}>${t('hudChrome.talents.resetChoices')}</button>` +
+      `<button class="btn tal-primary" data-act="save"${valid ? '' : ' disabled'}>${t('game.talents.saveBuild')}</button>` +
+      `<button class="btn tal-secondary" data-act="export">${t('game.talents.export')}</button>` +
+      `<button class="btn tal-secondary" data-act="del"${this.deps.activeLoadout() >= 0 ? '' : ' disabled'}>${t('game.talents.deleteBuild')}</button>` +
+      `<button class="btn tal-secondary" data-act="clear"${view.spent > 0 ? '' : ' disabled'}>${t('game.talents.clear')}</button>` +
       `</div>` +
       `<div class="tal-build-help">${t('game.talents.currentBuildHint')}</div>` +
       `</section>` +
       `<section class="tal-build-card tal-build-create" aria-label="${esc(t('game.talents.createBuild'))}">` +
       `<div class="tal-build-head"><span>${t('game.talents.createBuild')}</span></div>` +
       `<div class="tal-build-actions">` +
-      `<button class="btn is-primary" data-act="new"${valid ? '' : ' disabled'}>${t('game.talents.newBuild')}</button>` +
-      `<button class="btn" data-act="import">${t('game.talents.import')}</button>` +
+      `<button class="btn tal-primary" data-act="new"${valid ? '' : ' disabled'}>${t('game.talents.newBuild')}</button>` +
+      `<button class="btn tal-secondary" data-act="import">${t('game.talents.import')}</button>` +
       `</div>` +
       `<div class="tal-build-help">${t('game.talents.createBuildHint')}</div>` +
       `</section>` +

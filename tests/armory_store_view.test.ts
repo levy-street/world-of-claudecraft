@@ -13,7 +13,7 @@ function serviceRow(itemId: string, costClaudium: number, owned = false): WocSto
 }
 
 describe('buildArmorySections', () => {
-  it('always lists all 28 skins in 4 sections, highest rarity first', () => {
+  it('always lists all 29 skins in 4 sections, highest rarity first', () => {
     const sections = buildArmorySections(0, [], {
       cosmetics: noCosmetics,
       cls: 'warrior',
@@ -26,7 +26,8 @@ describe('buildArmorySections', () => {
       'Emberwrought',
       'Guildmark',
     ]);
-    expect(sections.every((s) => s.rows.length === 7)).toBe(true);
+    // 7 per collection, plus the Fallen Star encore (the legendary bow slot).
+    expect(sections.map((s) => s.rows.length)).toEqual([8, 7, 7, 7]);
     // No service rows: catalog price shown, but nothing purchasable.
     const ice = sections[1].rows.find((r) => r.skin.id === 'ice_fang_sword');
     expect(ice?.costClaudium).toBe(3000);

@@ -27,6 +27,7 @@ import {
   weaponSkinModelUrl,
 } from './manifest';
 import { mergeSkinnedParts } from './rig_merge';
+import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
@@ -144,6 +145,9 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   lacquered_rod: 'VAR_WAND',
   fletcher_s_guild_bow: 'VAR_BOW',
   rude_awakening_sword: 'VAR_SWORD',
+  // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
+  // grip family follows the handling, like the attach bone below.
+  encore_the_second_falling_star: 'VAR_CROSSBOW',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -370,13 +374,16 @@ function isRangedSwapAttach(att: AttachDef): boolean {
 }
 
 // The fixed ranged attach with a bow/crossbow skin substituted, or null to keep
-// the base def (no skin, or a skin of a non-ranged type).
+// the base def (no skin, or a skin of a non-ranged type). The bone follows the
+// skin's HANDLING: drawn bows move to the left handslot (the draw animation's
+// front arm); crossbow handling (real crossbows, and bow-slot guns that aim
+// like them) keeps the base bone.
 function rangedSkinAttachDef(base: AttachDef, weaponSkinId: string | null): AttachDef | null {
   if (!weaponSkinId) return null;
   const def = WEAPON_SKINS[weaponSkinId];
   if (!def || (def.weaponType !== 'bow' && def.weaponType !== 'crossbow')) return null;
   const url = weaponSkinModelUrl(weaponSkinId);
-  return url ? { url, bone: base.bone } : null;
+  return url ? { url, bone: weaponSkinAttachBone(weaponSkinHandling(def), base.bone) } : null;
 }
 
 function resolveBone(root: THREE.Object3D, name: string): THREE.Object3D | null {

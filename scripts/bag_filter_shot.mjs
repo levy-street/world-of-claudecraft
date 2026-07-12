@@ -72,7 +72,7 @@ await page.screenshot({ path: 'tmp/bag-filter-1-all.png' });
 
 // Activate the Weapons category chip.
 await page.evaluate(() => {
-  const chips = [...document.querySelectorAll('#bags .filter-row .chip')];
+  const chips = [...document.querySelectorAll('#bags .bag-chip')];
   const weapons = chips.find((c) => /weapon/i.test(c.textContent || ''));
   weapons?.click();
 });
@@ -81,7 +81,7 @@ await page.screenshot({ path: 'tmp/bag-filter-2-weapons.png' });
 
 // Reset to All, then type a live search.
 await page.evaluate(() => {
-  const chips = [...document.querySelectorAll('#bags .filter-row .chip')];
+  const chips = [...document.querySelectorAll('#bags .bag-chip')];
   chips.find((c) => /^all$/i.test((c.textContent || '').trim()))?.click();
 });
 await sleep(300);
@@ -90,12 +90,8 @@ await sleep(400);
 await page.screenshot({ path: 'tmp/bag-filter-3-search.png' });
 
 const report = await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .item-cell')].map((r) =>
-    (r.getAttribute('aria-label') || '').trim(),
-  );
-  const chips = [...document.querySelectorAll('#bags .filter-row .chip')].map((c) =>
-    c.textContent.trim(),
-  );
+  const rows = [...document.querySelectorAll('#bags .bag-item')].map((r) => r.textContent.trim());
+  const chips = [...document.querySelectorAll('#bags .bag-chip')].map((c) => c.textContent.trim());
   return { chips, searchRows: rows };
 });
 console.log('REPORT', JSON.stringify(report));

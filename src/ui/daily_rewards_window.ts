@@ -1,31 +1,19 @@
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
-import type { ArmoryInspect } from './armory_inspect';
-import { badgeLabel, rarityLabel, weaponTypeLabel } from './armory_labels';
+import { ArmoryInspect, badgeLabel, rarityLabel, weaponTypeLabel } from './armory_inspect';
 import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
+import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
 import { portraitChipHtml } from './portrait_chip';
 import { svgIcon } from './ui_icons';
-import { ensureWindowFrame } from './window_frame_mount';
-import type { WindowFrameDescriptor } from './window_frame_view';
 import {
   type ArmorySection,
   type ArmorySkinRow,
   buildArmorySections,
   type WocStoreItemInput,
 } from './woc_store_view';
-
-// A closable, tab-less frame: the reward summary, spin wheel, tasks, leaderboard,
-// and history stack in one scrollable body. The spin control stays coupled to its
-// in-body wheel visual (not lifted into a sticky footer), so the frame carries no
-// footer. Title + close keys are reused from the existing dailyRewards catalog.
-const DAILY_FRAME: WindowFrameDescriptor = {
-  id: 'daily-rewards-window',
-  titleKey: 'hudChrome.wocStore.title',
-  closeLabelKey: 'hudChrome.wocStore.close',
-};
 
 function reasonText(eligibility: DailyRewardStatus['eligibility']): string {
   switch (eligibility.reason) {
@@ -80,7 +68,6 @@ export class DailyRewardsWindow {
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
   private armoryInspect: ArmoryInspect | null = null;
-  private armoryInspectPromise: Promise<ArmoryInspect> | null = null;
   private storeLoading = false;
   private storeReady = false;
   private storeError = false;
@@ -139,8 +126,7 @@ export class DailyRewardsWindow {
     const root = this.deps.root();
     const seq = ++this.renderSeq;
     this.ensureShell();
-    if (focus === 'open')
-      (root.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+    if (focus === 'open') (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
     let status: DailyRewardStatus | null = null;
     let history: DailyRewardHistory = { payouts: [] };
     try {
@@ -160,13 +146,11 @@ export class DailyRewardsWindow {
 
   private ensureShell(): void {
     const root = this.deps.root();
-    // The shared frame owns the titlebar + close (dialog role/aria live on the
-    // inner mount, so #daily-rewards-window stays a plain .window.panel); the
-    // store tabs and active panel live in its scrollable window-body.
-    const { body } = ensureWindowFrame(root, DAILY_FRAME, { onClose: () => this.close() });
-    if (body.querySelector('.woc-store-body')) return;
-    body.innerHTML = this.tabsHtml() + this.loadingHtml();
-    body.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]').forEach((button) => {
+    markDialogRoot(root, { labelledBy: 'daily-rewards-title' });
+    if (root.querySelector('.woc-store-body')) return;
+    root.innerHTML = this.titleHtml() + this.tabsHtml() + this.loadingHtml();
+    root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    root.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]').forEach((button) => {
       button.addEventListener('click', () => {
         const tab = button.dataset.wocStoreTab;
         if (tab !== 'store' && tab !== 'rewards') return;
@@ -277,7 +261,7 @@ export class DailyRewardsWindow {
     body.querySelectorAll<HTMLButtonElement>('[data-armory-skin]').forEach((button) => {
       button.addEventListener('click', () => {
         const row = this.armoryRowById(button.dataset.armorySkin ?? '');
-        if (row) void this.openArmoryInspect(row);
+        if (row) this.openArmoryInspect(row);
       });
     });
   }
@@ -327,35 +311,30 @@ export class DailyRewardsWindow {
     return chips ? `<span class="armory-classes">${chips}</span>` : '';
   }
 
-  private async openArmoryInspect(row: ArmorySkinRow): Promise<void> {
-    if (!this.armoryInspectPromise) {
-      this.armoryInspectPromise = import('./armory_inspect').then(
-        ({ ArmoryInspect }) =>
-          new ArmoryInspect({
-            appearance: () => {
-              const player = this.deps.world().player;
-              return {
-                cls: player.templateId as PlayerClass,
-                skin: player.skin,
-                skinCatalog: player.skinCatalog,
-                mainhandItemId: player.mainhandItemId,
-              };
-            },
-            requestBuy: (target) => this.requestArmoryPurchase(target),
-            applySkin: (skinId) => {
-              this.deps.world().changeWeaponSkin(skinId);
-              this.afterArmoryChange(skinId);
-            },
-            detachSkin: (weaponType: WeaponSkinType) => {
-              this.deps.world().changeWeaponSkin(null, weaponType);
-              const open = this.armoryInspect?.openSkinId;
-              if (open) this.afterArmoryChange(open);
-            },
-          }),
-      );
+  private openArmoryInspect(row: ArmorySkinRow): void {
+    if (!this.armoryInspect) {
+      this.armoryInspect = new ArmoryInspect({
+        appearance: () => {
+          const player = this.deps.world().player;
+          return {
+            cls: player.templateId as PlayerClass,
+            skin: player.skin,
+            skinCatalog: player.skinCatalog,
+            mainhandItemId: player.mainhandItemId,
+          };
+        },
+        requestBuy: (target) => this.requestArmoryPurchase(target),
+        applySkin: (skinId) => {
+          this.deps.world().changeWeaponSkin(skinId);
+          this.afterArmoryChange(skinId);
+        },
+        detachSkin: (weaponType: WeaponSkinType) => {
+          this.deps.world().changeWeaponSkin(null, weaponType);
+          const open = this.armoryInspect?.openSkinId;
+          if (open) this.afterArmoryChange(open);
+        },
+      });
     }
-    this.armoryInspect = await this.armoryInspectPromise;
-    if (!this.isOpen || this.tab !== 'store') return;
     this.armoryInspect.open(row);
   }
 
@@ -457,6 +436,13 @@ export class DailyRewardsWindow {
     }
   }
 
+  private titleHtml(): string {
+    return (
+      `<div class="panel-title"><span id="daily-rewards-title">${esc(t('hudChrome.wocStore.title'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.wocStore.close'))}">${svgIcon('close')}</button></div>`
+    );
+  }
+
   private tabsHtml(): string {
     return (
       `<div class="woc-store-tabs" role="tablist" aria-label="${esc(t('hudChrome.wocStore.tabsLabel'))}">` +
@@ -465,6 +451,7 @@ export class DailyRewardsWindow {
       `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span></div>`
     );
   }
+
   private loadingHtml(): string {
     return '<div class="dr-body woc-store-body"></div>';
   }

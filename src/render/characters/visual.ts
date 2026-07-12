@@ -27,6 +27,7 @@ import {
   tintedFarMaterials,
 } from './assets';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -51,9 +52,29 @@ export function weaponVfxSpriteScaleForFov(fovDeg: number): number {
 // World camera default (CAMERA_BASE_FOV = 60 in renderer.ts).
 const WORLD_FOV_SPRITE_SCALE = weaponVfxSpriteScaleForFov(60);
 
+// Scratch quaternions for the per-frame bow orientation pin (no allocation).
+const BOW_Q_ROOT = new THREE.Quaternion();
+const BOW_Q_B = new THREE.Quaternion();
+const BOW_Q_TARGET = new THREE.Quaternion();
+// Root-relative aim orientation a firing bow blends to: upright limbs (the
+// variant convention authors limbs along +Y), STRING toward the archer (the
+// belly faces the target), the full profile square to the aim.
+const BOW_AIM_QUAT = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, -Math.PI / 2, 0, 'XYZ'),
+);
+// Root-relative carry for a bow-slot gun outside the shot: muzzle (authored
+// along +Y) pitched forward to the horizon, then rolled a quarter turn about
+// the barrel so the handle lies parallel to the hunter's body instead of
+// jutting out sideways. The shot itself keeps the hand-tuned grip.
+const GUN_CARRY_QUAT = new THREE.Quaternion()
+  .setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0, 'XYZ'))
+  .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2));
+const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
+
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
 const HIT_REACT_COOLDOWN = 0.9;
+
 // Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
@@ -105,6 +126,15 @@ export class CharacterVisual {
   private weaponItemId: string | null;
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
+  // Skin payloads whose orientation blends to a root-relative pin (see
+  // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
+  // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
+  private orientPins: {
+    payload: THREE.Object3D;
+    qGrip: THREE.Quaternion;
+    blend: number;
+    duringShot: boolean;
+  }[] = [];
   private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private disposed = false;
   private ghosted = false;
@@ -219,7 +249,7 @@ export class CharacterVisual {
     this.root.add(this.clickProxy);
 
     this.mixer = new THREE.AnimationMixer(this.model);
-    for (const name of clipNamesOf(prep.def)) {
+    for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
       const clip = prep.clips.get(name);
       if (clip) this.actions.set(name, this.mixer.clipAction(clip));
     }
@@ -311,10 +341,11 @@ export class CharacterVisual {
 
   playAttack(): void {
     if (this.deadLock) return;
-    const clips = this.def.clips.attack;
+    const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
+    const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
-    this.playOneShot(name, this.def.attackTimeScale ?? 1.3);
+    this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
   }
 
   playHit(): void {
@@ -510,6 +541,23 @@ export class CharacterVisual {
   private reattachHeldWeapon(): void {
     this.disposeWeaponVfx();
     const payloads = setHeldWeapon(this.model, this.def, this.weaponItemId, this.weaponSkinId);
+    // Ranged skins take a root-relative orientation pin (position always rides
+    // the hand): a bow aims upright WHILE the shot one-shot plays (the string
+    // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
+    // forward OUTSIDE the shot (the hanging idle arm points it at the ground)
+    // and keeps the hand-tuned grip during the shouldered aim
+    // (applySkinOrientation each frame).
+    {
+      const mode = weaponSkinOrientPin(this.weaponSkinId);
+      this.orientPins = mode
+        ? payloads.map((payload) => ({
+            payload,
+            qGrip: payload.quaternion.clone(),
+            blend: 0,
+            duringShot: mode === 'aimDuringShot',
+          }))
+        : [];
+    }
     applyMaterials(
       this.model,
       this.def,
@@ -570,9 +618,39 @@ export class CharacterVisual {
   }
 
   /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
-   *  without an active skin; the renderer calls it once per entity per frame. */
+   *  without an active skin; the renderer calls it once per entity per frame.
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
   updateWeaponVfx(dt: number): void {
+    this.applySkinOrientation(dt);
     for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  /** Blend pinned skin payloads between the authored grip glue and their
+   *  root-relative pin: a bow to BOW_AIM_QUAT while the shot one-shot plays, a
+   *  bow-slot gun to GUN_CARRY_QUAT everywhere BUT the shot (and never while
+   *  dead: a corpse's weapon just lies with the hand). Position always follows
+   *  the hand. No-op without pinned payloads. */
+  private applySkinOrientation(dt: number): void {
+    if (this.orientPins.length === 0) return;
+    const shot = this.currentIsOneShot && !this.currentOneShotIsEmote;
+    const step = dt / BOW_PIN_BLEND_S;
+    this.root.getWorldQuaternion(BOW_Q_ROOT);
+    for (const entry of this.orientPins) {
+      const parent = entry.payload.parent;
+      if (!parent) continue;
+      const engaged = !this.deadLock && (entry.duringShot ? shot : !shot);
+      entry.blend = Math.min(1, Math.max(0, entry.blend + (engaged ? step : -step)));
+      if (entry.blend === 0) {
+        entry.payload.quaternion.copy(entry.qGrip);
+        continue;
+      }
+      // pinned local = parentWorld^-1 * rootWorld * pin target
+      parent.getWorldQuaternion(BOW_Q_B).invert();
+      BOW_Q_TARGET.copy(BOW_Q_B)
+        .multiply(BOW_Q_ROOT)
+        .multiply(entry.duringShot ? BOW_AIM_QUAT : GUN_CARRY_QUAT);
+      entry.payload.quaternion.copy(entry.qGrip).slerp(BOW_Q_TARGET, entry.blend);
+    }
   }
 
   /** Re-scale VFX point sprites after a viewport/pixel-ratio change. */

@@ -1,3 +1,5 @@
+export declare const MOB_ACTIONS: Set<string>;
+
 export interface CatalogEntry {
   key: string;
   loop?: boolean;

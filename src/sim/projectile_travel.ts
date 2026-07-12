@@ -40,6 +40,14 @@ export const PROJECTILE_REACH = 0.7;
 // the bolt's ttl in src/render/vfx.ts, so the damage lands as the visual gives up.
 export const PROJECTILE_MAX_FLIGHT = 3;
 
+// Seconds between a hunter Auto Shot's swing tick (the draw starts, fx:'windup')
+// and the arrow's release (fx:'projectile' + flight begins): the classic aim
+// time. The renderer's bow draw clip is authored so its release keyframe sits
+// exactly here (scripts/build_bow_anims.mjs BOW_RELEASE_AT; pinned by
+// tests/weapon_skins.test.ts), so the arrow leaves the hand the moment the
+// string snaps, and the crossbow shoulder-aim reads aim-then-fire.
+export const AUTO_SHOT_DRAW_S = 0.55;
+
 /** One tick of homing: move (x, z) toward (tx, tz) by `step` yards. Returns the new
  *  position and whether the bolt is now within reach (it impacts this tick). Pure:
  *  same inputs give the same output, so a bolt's whole flight is deterministic. */
@@ -61,6 +69,9 @@ export function stepProjectile(
 // A projectile in flight: re-resolved by id at the landing tick so a stale Entity ref
 // can never be hit. `resolve` runs only when both ends are still alive (see advance).
 // `x`/`z` are the bolt's live horizontal position, stepped toward the target each tick.
+// A `launchDelay` bolt (the Auto Shot draw) is committed but not yet released: it
+// waits at the shooter, then `onLaunch` fires (the caller emits the tracer there),
+// its position re-anchors to the shooter's LIVE spot, and flight begins.
 export type PendingProjectile = {
   x: number;
   z: number;
@@ -68,16 +79,21 @@ export type PendingProjectile = {
   targetId: number;
   ttl: number; // seconds of flight remaining before the bolt gives up and fizzles
   resolve: (source: Entity, target: Entity) => void;
+  launchTicks?: number; // whole ticks of draw left before the bolt exists (integer: no float drift)
+  onLaunch?: (source: Entity, target: Entity) => void;
 };
 
 /** Queue a projectile launched now from `source` at `target`; `resolve` runs at the
  *  landing tick with the still-live source and target. The caller emits the
- *  `fx:'projectile'` visual itself (the renderer needs it immediately at launch). */
+ *  `fx:'projectile'` visual itself (the renderer needs it immediately at launch),
+ *  EXCEPT for a delayed launch: pass `launchDelay` + `onLaunch` and emit the visual
+ *  in `onLaunch` instead, so the tracer appears exactly when flight begins. */
 export function scheduleProjectile(
   ctx: SimContext,
   source: Entity,
   target: Entity,
   resolve: (source: Entity, target: Entity) => void,
+  opts?: { launchDelay: number; onLaunch: (source: Entity, target: Entity) => void },
 ): void {
   ctx.pendingProjectiles.push({
     x: source.pos.x,
@@ -86,6 +102,8 @@ export function scheduleProjectile(
     targetId: target.id,
     ttl: PROJECTILE_MAX_FLIGHT,
     resolve,
+    launchTicks: opts ? Math.max(1, Math.round(opts.launchDelay / DT)) : undefined,
+    onLaunch: opts?.onLaunch,
   });
 }
 
@@ -104,6 +122,21 @@ export function advancePendingProjectiles(ctx: SimContext): void {
     const source = ctx.entities.get(proj.sourceId);
     const target = ctx.entities.get(proj.targetId);
     if (!source || source.dead || !target || target.dead) continue; // fizzle
+    // Draw phase: a committed-but-unreleased Auto Shot waits at the shooter.
+    // At release it re-anchors to the shooter's LIVE position (they may have
+    // moved during the draw), fires onLaunch (the tracer), and starts flying
+    // on this same tick so the sim bolt and the visual leave together. Death
+    // on either end during the draw fizzles above: the shot is never fired.
+    if (proj.launchTicks !== undefined && proj.launchTicks > 0) {
+      proj.launchTicks -= 1;
+      if (proj.launchTicks > 0) {
+        stillFlying.push(proj);
+        continue;
+      }
+      proj.x = source.pos.x;
+      proj.z = source.pos.z;
+      proj.onLaunch?.(source, target);
+    }
     const next = stepProjectile(proj.x, proj.z, target.pos.x, target.pos.z, step);
     if (next.hit) {
       proj.resolve(source, target);

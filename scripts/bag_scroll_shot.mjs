@@ -102,8 +102,8 @@ await page.screenshot({ path: `tmp/bag-scroll-${TAG}-1-scrolled.png` });
 
 // Consume a mana potion the same way a player would: click its bag row.
 const used = await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .item-cell')];
-  const row = rows.find((r) => /Mana Potion/i.test(r.getAttribute('aria-label') || ''));
+  const rows = [...document.querySelectorAll('#bags .bag-item')];
+  const row = rows.find((r) => /Mana Potion/i.test(r.textContent || ''));
   if (!row) return false;
   row.click();
   return true;

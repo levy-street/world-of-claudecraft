@@ -165,6 +165,9 @@ describe('i18n whole-catalog completeness', () => {
       'hudChrome.discord.panelTitle', // "World of ClaudeCraft" - brand
       'hudChrome.discord.linkedTitle', // "Discord: {name}" - brand + player name
       'hudChrome.keybinds.discord', // "Discord" - brand (Key Bindings action label)
+      'hudChrome.claudium.title', // "Claudium" - in-game currency brand
+      'hudChrome.claudium.balanceUnit', // "{amount} Claudium" - currency brand
+      'hudChrome.claudium.storeCost', // "{amount} Claudium" - currency brand
       'desktop.crash.title', // "World of ClaudeCraft" - brand (desktop crash dialog title)
       'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim
     ]);

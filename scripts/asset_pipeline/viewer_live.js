@@ -151,11 +151,11 @@ function applyAtlas(obj, tex) {
   });
 }
 
-function findHandslot(rig) {
+function findHandslot(rig, side = 'r') {
   let bone = null;
   rig.traverse((o) => {
     const n = o.name.replace(/[[\].:/]/g, '');
-    if (n === 'handslotr') bone = o;
+    if (n === `handslot${side}`) bone = o;
   });
   return bone;
 }
@@ -164,13 +164,14 @@ const DEG2RAD = Math.PI / 180;
 const IDENTITY_GRIP = { mx: 0, my: 0, mz: 0, rx: 0, ry: 0, rz: 0, scale: 1 };
 
 // Mirror of variantGripTransform in src/render/characters/weapon_grip.ts: the
-// family grip (Y lift + shrink-only clamp + right-hand 180-degree flip) with an
-// optional per-weapon fine-tune layered on top (move, rot in DEGREES, scale
-// multiplier). `clampScale` is measured ONCE from the native model so live slider
-// changes never feed back into the bounding box. This runs on handslot.r only.
-function applyGrip(weaponScene, grip, clampScale, s) {
+// family grip (Y lift + shrink-only clamp + the hand-side base: 180-degree flip
+// on the right hand, identity on the left) with an optional per-weapon fine-tune
+// layered on top (move, rot in DEGREES, scale multiplier). `clampScale` is
+// measured ONCE from the native model so live slider changes never feed back
+// into the bounding box.
+function applyGrip(weaponScene, grip, clampScale, s, left = false) {
   weaponScene.position.set(s.mx, grip.lift + s.my, s.mz);
-  weaponScene.quaternion.set(0, 1, 0, 0);
+  weaponScene.quaternion.set(0, left ? 0 : 1, 0, left ? 1 : 0);
   weaponScene.quaternion.multiply(
     new THREE.Quaternion().setFromEuler(
       new THREE.Euler(s.rx * DEG2RAD, s.ry * DEG2RAD, s.rz * DEG2RAD),
@@ -179,19 +180,22 @@ function applyGrip(weaponScene, grip, clampScale, s) {
   weaponScene.scale.setScalar(clampScale * s.scale);
 }
 
-// Attach a weapon scene to a rig's handslot.r with the game's variant grip plus
-// the given fine-tune state. Returns { grip, clampScale } for later re-application
-// (live tuning), or null when the rig has no handslot.r bone.
+// Attach a weapon scene to a rig's handslot with the game's variant grip plus
+// the given fine-tune state. Bows sit in the LEFT hand (the draw animation's
+// front arm, matching rangedSkinAttachDef in the game); everything else in the
+// right. Returns { grip, clampScale, left } for later re-application (live
+// tuning), or null when the rig has no matching handslot bone.
 function attachWeapon(rig, weaponScene, family, state) {
-  const slot = findHandslot(rig);
+  const left = family === 'bow';
+  const slot = findHandslot(rig, left ? 'l' : 'r');
   if (!slot) return null;
   const grip = FAMILY_GRIPS[family] ?? FAMILY_GRIPS.sword;
   const box = new THREE.Box3().setFromObject(weaponScene);
   const h = box.max.y - box.min.y;
   const clampScale = h > 1e-3 ? Math.min(1, grip.maxHeight / h) : 1;
-  applyGrip(weaponScene, grip, clampScale, state);
+  applyGrip(weaponScene, grip, clampScale, state, left);
   slot.add(weaponScene);
-  return { grip, clampScale };
+  return { grip, clampScale, left };
 }
 
 // Slider state <-> the WEAPON_GRIP_OVERRIDE shape the engine registry stores.
@@ -674,7 +678,13 @@ window.LiveViewer = {
       };
       const reapplyGrip = () => {
         if (heldWeapon)
-          applyGrip(heldWeapon.scene, heldWeapon.grip, heldWeapon.clampScale, gripState);
+          applyGrip(
+            heldWeapon.scene,
+            heldWeapon.grip,
+            heldWeapon.clampScale,
+            gripState,
+            heldWeapon.left,
+          );
       };
       if (gripInputs) {
         for (const [k, dflt] of [
@@ -766,7 +776,8 @@ window.LiveViewer = {
         gripState.mx = round4(w.position.x);
         gripState.my = round4(w.position.y - heldWeapon.grip.lift);
         gripState.mz = round4(w.position.z);
-        _gq.copy(BASE_FLIP).multiply(w.quaternion);
+        if (heldWeapon.left) _gq.copy(w.quaternion);
+        else _gq.copy(BASE_FLIP).multiply(w.quaternion);
         _ge.setFromQuaternion(_gq, 'XYZ');
         gripState.rx = round4(_ge.x / DEG2RAD);
         gripState.ry = round4(_ge.y / DEG2RAD);
@@ -870,8 +881,8 @@ window.LiveViewer = {
         reattachGizmo(); // re-point the gizmo at the newly attached weapon
         setStatus(
           attached
-            ? `held via handslot.r - ${active.clips.length} animations`
-            : 'character has NO handslot.r bone (weapon not attached)',
+            ? `held via handslot.${heldWeapon?.left ? 'l' : 'r'} - ${active.clips.length} animations`
+            : 'character has NO matching handslot bone (weapon not attached)',
         );
       };
       if (heldBySelect) {

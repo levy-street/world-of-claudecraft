@@ -116,11 +116,11 @@ describe('weapon skin held models', () => {
     expect(weaponSkinModelUrl(undefined)).toBeNull();
   });
 
-  it('ships 28 distinct skin model urls, all in the boot preload manifest', () => {
+  it('ships 29 distinct skin model urls, all in the boot preload manifest', () => {
     const urls = weaponSkinModelUrls();
     expect(urls.length).toBe(WEAPON_SKIN_LIST.length);
-    expect(urls.length).toBe(28);
-    expect(new Set(urls).size).toBe(28);
+    expect(urls.length).toBe(29);
+    expect(new Set(urls).size).toBe(29);
     const manifest = new Set(manifestUrls());
     for (const url of urls) {
       expect(url.startsWith('models/weapons/'), url).toBe(true);

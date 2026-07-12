@@ -16,9 +16,9 @@ import {
 } from '../src/sim/combat/auto_attack';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { advancePendingProjectiles } from '../src/sim/projectile_travel';
+import { AUTO_SHOT_DRAW_S, advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { DT, type Entity, type PlayerClass } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -26,6 +26,7 @@ type Ev = {
   type?: string;
   kind?: string;
   school?: string;
+  fx?: string;
   ability?: string | null;
   sourceId?: number;
   targetId?: number;
@@ -159,6 +160,41 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     expect(events.some((e) => e.type === 'spellfx' && e.school === 'physical')).toBe(true);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+  });
+
+  it('Auto Shot telegraphs the draw, then releases the arrow at AUTO_SHOT_DRAW_S exactly', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 8, 20);
+    void mob;
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
+    // The swing tick emits ONLY the windup telegraph (the draw animation cue);
+    // the tracer waits for the release so the arrow leaves at the clip's
+    // release keyframe.
+    expect(
+      events.some((e) => e.type === 'spellfx' && e.fx === 'windup' && e.sourceId === p.id),
+    ).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
+    const drawTicks = Math.round(AUTO_SHOT_DRAW_S / DT);
+    let released = -1;
+    for (let i = 1; i <= drawTicks + 5 && released === -1; i++) {
+      sim.tick();
+      if (events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')) released = i;
+    }
+    expect(released).toBe(drawTicks);
+    // Damage still lands on ARRIVAL (flight after the release), never at release.
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+  });
+
+  it('Wand keeps its instant tracer: projectile fx on the swing tick, no windup', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 8, 15);
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 3, max: 6, speed: 1.8, wand: true, school: 'arcane' });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
   });
 
   it('Wand is an arcane bolt (no dead zone, ignores armor)', () => {
