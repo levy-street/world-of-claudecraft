@@ -1766,6 +1766,50 @@ describe('held weapon wire (mainhandItemId)', () => {
 // so an apply AND a detach must each produce a fresh full record for viewers;
 // lite records leave the decoded value untouched.
 describe('weapon skin wire (weaponSkinId)', () => {
+  it('keeps the online optimistic bow and crossbow loadout mutually exclusive', () => {
+    const client = bareClient(99);
+    const internals = client as any;
+    internals.connected = false;
+    internals.accountCosmetics = {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: ['winterbite', 'meteorlatch_crossbow'],
+      weaponSkinLoadout: {},
+    };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 99,
+        k: 'player',
+        tid: 'hunter',
+        nm: 'Ranger',
+        lv: 5,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        mh: 'rusty_hatchet',
+        res: 0,
+        mres: 100,
+        rtype: 'focus',
+      },
+    });
+
+    client.changeWeaponSkin('winterbite', 'bow');
+    client.changeWeaponSkin('meteorlatch_crossbow', 'crossbow');
+    expect(client.player.weaponSkinLoadout).toEqual({ crossbow: 'meteorlatch_crossbow' });
+    expect(client.accountCosmetics.weaponSkinLoadout).toEqual({
+      crossbow: 'meteorlatch_crossbow',
+    });
+
+    client.changeWeaponSkin('winterbite', 'bow');
+    expect(client.player.weaponSkinLoadout).toEqual({ bow: 'winterbite' });
+    expect(client.accountCosmetics.weaponSkinLoadout).toEqual({ bow: 'winterbite' });
+  });
+
   it('carries the active skin through wireEntity only while one is applied', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Thaldrin');

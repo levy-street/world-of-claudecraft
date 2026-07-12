@@ -4,6 +4,7 @@ import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
+import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
@@ -952,6 +953,10 @@ export class GameServer {
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  // Weapon-skin loadouts are whole-record replacements in their dedicated paid
+  // state row. Keep one FIFO per account so rapid apply/detach commands cannot
+  // commit on separate pool clients in reverse order and resurrect stale state.
+  private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -2046,7 +2051,7 @@ export class GameServer {
       if (!def) return;
       if (!current.weaponSkinIds.includes(skinId)) return; // must own it (anti-forge)
       if (!this.sim.setWeaponSkin(session.pid, skinId)) return; // type-match gate
-      weaponSkinLoadout = { ...current.weaponSkinLoadout, [def.weaponType]: skinId };
+      weaponSkinLoadout = withWeaponSkinApplied(current.weaponSkinLoadout, skinId) ?? {};
     } else {
       if (!wtype || !isWeaponSkinType(wtype)) return;
       if (!current.weaponSkinLoadout[wtype]) return;
@@ -2055,13 +2060,28 @@ export class GameServer {
       delete weaponSkinLoadout[wtype];
     }
     this.updateLiveAccountCosmetics(session.accountId, { ...current, weaponSkinLoadout });
-    // Fire-and-forget: the optimistic state above IS the new truth and the DB
-    // write is a single atomic jsonb_set. Re-applying the RETURNING here could
-    // resurrect a detached skin when two rapid apply/detach round trips resolve
-    // out of order (the older RETURNING re-applied last).
-    void setAccountWeaponSkinLoadout(session.accountId, weaponSkinLoadout).catch((err) =>
-      console.error('failed to save weapon skin loadout:', err),
-    );
+    this.enqueueWeaponSkinLoadoutSave(session.accountId, weaponSkinLoadout);
+  }
+
+  private enqueueWeaponSkinLoadoutSave(
+    accountId: number,
+    weaponSkinLoadout: Record<string, string>,
+  ): void {
+    const snapshot = { ...weaponSkinLoadout };
+    const previous = this.weaponSkinLoadoutSaveQueues.get(accountId);
+    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      await setAccountWeaponSkinLoadout(accountId, snapshot);
+    });
+    this.weaponSkinLoadoutSaveQueues.set(accountId, run);
+    const cleanup = (): void => {
+      if (this.weaponSkinLoadoutSaveQueues.get(accountId) === run) {
+        this.weaponSkinLoadoutSaveQueues.delete(accountId);
+      }
+    };
+    void run.then(cleanup, (err) => {
+      console.error('failed to save weapon skin loadout:', err);
+      cleanup();
+    });
   }
 
   join(

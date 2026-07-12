@@ -29,6 +29,7 @@ import {
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
+import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -637,6 +638,7 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
       ? mesh.material.map((m) => m.clone())
       : mesh.material.clone();
   });
+  markOwnedWeaponSkinMaterials(payload);
   return payload;
 }
 

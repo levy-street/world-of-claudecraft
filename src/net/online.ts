@@ -21,7 +21,7 @@ import {
   talentPointsAtLevel,
 } from '../sim/content/talents';
 import { resolveSportKit } from '../sim/content/vale_cup';
-import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
+import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
@@ -2301,12 +2301,16 @@ export class ClientWorld implements IWorld {
     const type = def ? def.weaponType : weaponType;
     if (p && type) {
       const next = { ...p.weaponSkinLoadout };
-      if (def) next[def.weaponType] = def.id;
-      else delete next[type];
-      p.weaponSkinLoadout = next;
-      p.weaponSkinId = resolveActiveWeaponSkin(p.templateId, p.mainhandItemId, next);
+      if (def) {
+        const applied = withWeaponSkinApplied(next, def.id);
+        if (!applied) return;
+        p.weaponSkinLoadout = applied;
+      } else delete next[type];
+      if (!def) p.weaponSkinLoadout = next;
+      const appliedLoadout = p.weaponSkinLoadout;
+      p.weaponSkinId = resolveActiveWeaponSkin(p.templateId, p.mainhandItemId, appliedLoadout);
       const loadout: Record<string, string> = {};
-      for (const [t, id] of Object.entries(next)) if (id) loadout[t] = id;
+      for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
       this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };
       this.cosmeticsChanged = true;
     }

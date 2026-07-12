@@ -973,16 +973,6 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   },
   {
     dispatcher: DISPATCH.mainApi,
-    method: 'POST',
-    path: '/api/claudium/stripe/webhook',
-    handler: 'handleClaudiumStripeWebhook route',
-    contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.public,
-    limiter: null,
-    requireOwnedExpected: null,
-  },
-  {
-    dispatcher: DISPATCH.mainApi,
     method: 'GET',
     path: '/api/claudium/store',
     handler: 'handleClaudiumApi arm: /api/claudium/store',
@@ -1008,7 +998,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleClaudiumApi arm: /api/claudium/purchase',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'claudiumMutationRateLimited',
     requireOwnedExpected: null,
   },
   {
@@ -1018,7 +1008,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleClaudiumApi arm: /api/claudium/purchase/woc/confirm',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'claudiumMutationRateLimited',
     requireOwnedExpected: null,
   },
   {
@@ -1028,7 +1018,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleClaudiumApi arm: /api/claudium/native/quote',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'claudiumMutationRateLimited',
     requireOwnedExpected: null,
   },
   {
@@ -1038,7 +1028,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleClaudiumApi arm: /api/claudium/native/confirm',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'claudiumMutationRateLimited',
     requireOwnedExpected: null,
   },
   {
@@ -1048,7 +1038,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleClaudiumApi arm: /api/claudium/spend',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    limiter: 'claudiumMutationRateLimited',
     requireOwnedExpected: null,
   },
   {

@@ -40,7 +40,7 @@ provided as a courtesy.
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
 | Season 1 Armory weapon models + icons (Wrought Iron, Guildmark, Emberwrought, Hoarfrost, and Fallen Star collections plus the rude_awakening_sword flagship, in `public/models/weapons/` + `public/ui/weapons/`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 
-| Claudium visual asset set (`public/claudium/`: coin + UI icons, denomination stacks, UI animations, gift-card faces, gift send/receive/redeem flow) | World of ClaudeCraft | Project-generated via the Higgsfield MCP connector (Recraft V4.1 stills, Seedance 2.0 motion), composited and web-optimized locally; owned under the Higgsfield paid-plan license | Project asset |
+| Claudium visual asset set (`public/claudium/`: coin, UI icons, and denomination stacks) | World of ClaudeCraft | Project-generated via the Higgsfield MCP connector (Recraft V4.1 stills), composited and web-optimized locally; owned under the Higgsfield paid-plan license | Project asset |
 
 ## Audio
 

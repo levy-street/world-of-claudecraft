@@ -2816,6 +2816,9 @@ export function createWeaponVfx(
     ...(spec.light ?? {}),
   };
   const light = new THREE.PointLight(lightSpec.color, lightSpec.intensity, lightSpec.distance, 2);
+  // World-rendered weapon lights move with the held model and drive their own
+  // flicker. The renderer still ranks them inside its fixed point-light count.
+  light.userData.budgetDynamic = true;
   light.position.copy(resolvePoint(b, lightSpec.at ?? { yF: 0.7 }));
   group.add(light);
 

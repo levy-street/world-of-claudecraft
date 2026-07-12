@@ -44,25 +44,22 @@ the returned quote and does not calculate token prices or discounts.
 
 ## Weapon cosmetic identifiers
 
-The first store catalog supports these service item IDs:
+The game registry is `src/sim/content/weapon_skins.ts`. The companion economy-service deployment
+catalog is `catalogs/claudium_catalog.season1.json`. A storefront product is available only when
+the same `itemId` exists in both files. Every weapon cosmetic row in the service catalog must use
+`kind: "skin"`; legacy `kind: "item"` rows are not Season 1 Armory products and are filtered out
+by the game client.
 
-```text
-emberfang_sword
-redskull_sword
-redskull_dagger
-redskull_staff
-redskull_wand
-redskull_hammer
-purple_sword
-purple_dagger
-purple_axe
-purple_staff
-purple_wand
-```
+The current game and companion catalogs agree on these products and prices:
 
-Each row should use `kind: "item"` and a positive integer `costClaudium`. Unknown items and the
-old placeholder cosmetics are deliberately omitted from the weapon storefront.
+| Collection | Claudium cost | Service `itemId` values |
+|---|---:|---|
+| Guildmark | 200 | `guildmark_arming_sword`, `brasscap_axe`, `tempered_flanged_mace`, `guildmark_dirk`, `brasscrown_staff`, `lacquered_wand`, `fletcher_s_guild_bow` |
+| Emberwrought | 1,000 | `cinderbrand_sword`, `emberbite_axe`, `smoulderfall_mace`, `ashspark_dagger`, `forgeheart_staff`, `emberwrought_wand`, `cinderlatch_crossbow` |
+| Hoarfrost | 3,000 | `ice_fang_sword`, `glaciersplit_axe`, `rimecrusher_mace`, `frostbite_dagger`, `hoarfrost_vigil_staff`, `everwinter_wand`, `winterbite` |
+| Fallen Star | 5,000 | `solheim_sword`, `skyrender_axe`, `starfall_mace`, `astravyr_dagger`, `cosmarch_staff`, `emberwish_wand`, `encore_bow`, `meteorlatch_crossbow` |
 
-The launch collection prices every weapon cosmetic at 500 Claudium. The client asset registry
-also assigns each product to a store category. The initial category is `weapons`; future catalog
-updates can add `outfits` and `mounts` without changing the purchase flow.
+Do not copy the retired placeholder `purple_*`, `redskull_*`, or `emberfang_sword` rows into the
+weapon storefront. Keep the two source files in lockstep whenever a product ID or Claudium cost
+changes. The initial category is `weapons`; future catalog updates can add `outfits` and `mounts`
+without changing the purchase flow.

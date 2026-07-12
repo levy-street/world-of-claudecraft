@@ -41,11 +41,21 @@ export interface DailyRewardsWindowDeps {
   onVisibilityChange?(): void;
   onStatus?(status: DailyRewardStatus): void;
   onWalletConnect?(): void;
-  storeSnapshot?(): Promise<{ balance: number | null; items: WocStoreItemInput[] }>;
+  storeEnabled?(): boolean;
+  storeSnapshot?(): Promise<{
+    available: boolean;
+    balance: number | null;
+    items: WocStoreItemInput[];
+  }>;
   spendStoreItem?(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
-  ): Promise<{ granted: boolean; balance: number | null }>;
+  ): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
   openClaudium?(): void;
   confirmDialog?(
     title: string,
@@ -88,6 +98,7 @@ export class DailyRewardsWindow {
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     const root = this.deps.root();
+    if (!this.storeEnabled()) this.tab = 'rewards';
     root.style.display = 'block';
     this.deps.onVisibilityChange?.();
     this.ensureShell();
@@ -146,9 +157,14 @@ export class DailyRewardsWindow {
 
   private ensureShell(): void {
     const root = this.deps.root();
+    const storeEnabled = this.storeEnabled();
     markDialogRoot(root, { labelledBy: 'daily-rewards-title' });
-    if (root.querySelector('.woc-store-body')) return;
-    root.innerHTML = this.titleHtml() + this.tabsHtml() + this.loadingHtml();
+    if (root.querySelector('.woc-store-body') && root.dataset.storeEnabled === String(storeEnabled))
+      return;
+    if (!storeEnabled) this.tab = 'rewards';
+    root.dataset.storeEnabled = String(storeEnabled);
+    root.innerHTML =
+      this.titleHtml(storeEnabled) + (storeEnabled ? this.tabsHtml() : '') + this.loadingHtml();
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     root.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -162,6 +178,7 @@ export class DailyRewardsWindow {
   }
 
   private async renderCurrent(focus: 'open' | null): Promise<void> {
+    if (!this.storeEnabled()) this.tab = 'rewards';
     this.syncTabs();
     if (this.tab === 'store') {
       await this.renderStore(focus);
@@ -171,6 +188,11 @@ export class DailyRewardsWindow {
   }
 
   private syncTabs(): void {
+    if (!this.storeEnabled()) {
+      this.tab = 'rewards';
+      this.deps.root().classList.remove('store-active');
+      return;
+    }
     this.deps.root().classList.toggle('store-active', this.tab === 'store');
     this.deps
       .root()
@@ -193,8 +215,15 @@ export class DailyRewardsWindow {
     this.storeError = false;
     this.syncStoreLoading();
     try {
-      const snapshot = (await this.deps.storeSnapshot?.()) ?? { balance: null, items: [] };
+      const snapshot = (await this.deps.storeSnapshot?.()) ?? {
+        available: false,
+        balance: null,
+        items: [],
+      };
       if (!this.isOpen || this.tab !== 'store') return;
+      if (!snapshot.available || snapshot.balance === null) {
+        throw new Error('store snapshot unavailable');
+      }
       this.storeBalance = snapshot.balance;
       this.storeItems = snapshot.items;
       this.rebuildArmorySections();
@@ -352,14 +381,7 @@ export class DailyRewardsWindow {
     if (row.owned || !row.purchasable) return;
     const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
     if (!row.affordable) {
-      const shortfall = formatNumber(row.shortfall, { maximumFractionDigits: 0 });
-      this.deps.confirmDialog?.(
-        t('hudChrome.wocStore.needMoreTitle'),
-        t('hudChrome.wocStore.needMoreBody', { item: row.skin.name, shortfall }),
-        t('hudChrome.wocStore.buyClaudium'),
-        t('hudChrome.wocStore.cancel'),
-        () => this.deps.openClaudium?.(),
-      );
+      this.openNeedMoreDialog(row, row.costClaudium, this.storeBalance);
       return;
     }
     this.deps.confirmDialog?.(
@@ -373,6 +395,22 @@ export class DailyRewardsWindow {
 
   private async purchaseArmorySkin(row: ArmorySkinRow): Promise<void> {
     const result = await this.deps.spendStoreItem?.(row.skin.id, 'skin');
+    if (result?.reason === 'insufficient_balance') {
+      if (result.balance !== null) {
+        this.storeBalance = result.balance;
+        this.rebuildArmorySections();
+        const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+        if (body) this.paintStore(body);
+      }
+      const authoritativeCost =
+        result.costClaudium !== null &&
+        Number.isFinite(result.costClaudium) &&
+        result.costClaudium > 0
+          ? result.costClaudium
+          : row.costClaudium;
+      this.openNeedMoreDialog(row, authoritativeCost, result.balance);
+      return;
+    }
     if (!result?.granted) {
       // Re-check before declaring an outage: a double-submit lands as the
       // service's already_granted (not granted), yet the skin IS owned.
@@ -389,6 +427,24 @@ export class DailyRewardsWindow {
     }
     const fresh = this.armoryRowById(row.skin.id);
     if (fresh) this.armoryInspect?.refresh(fresh);
+  }
+
+  private openNeedMoreDialog(
+    row: ArmorySkinRow,
+    costClaudium: number,
+    balance: number | null,
+  ): void {
+    const knownBalance = balance ?? this.storeBalance;
+    const shortfall = formatNumber(Math.max(0, costClaudium - (knownBalance ?? 0)), {
+      maximumFractionDigits: 0,
+    });
+    this.deps.confirmDialog?.(
+      t('hudChrome.wocStore.needMoreTitle'),
+      t('hudChrome.wocStore.needMoreBody', { item: row.skin.name, shortfall }),
+      t('hudChrome.wocStore.buyClaudium'),
+      t('hudChrome.wocStore.cancel'),
+      () => this.deps.openClaudium?.(),
+    );
   }
 
   private paint(view: DailyRewardsView): void {
@@ -436,10 +492,12 @@ export class DailyRewardsWindow {
     }
   }
 
-  private titleHtml(): string {
+  private titleHtml(storeEnabled: boolean): string {
+    const title = storeEnabled ? t('hudChrome.wocStore.title') : t('hudChrome.dailyRewards.title');
+    const close = storeEnabled ? t('hudChrome.wocStore.close') : t('hudChrome.dailyRewards.close');
     return (
-      `<div class="panel-title"><span id="daily-rewards-title">${esc(t('hudChrome.wocStore.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.wocStore.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title"><span id="daily-rewards-title">${esc(title)}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(close)}">${svgIcon('close')}</button></div>`
     );
   }
 
@@ -461,6 +519,10 @@ export class DailyRewardsWindow {
     if (!indicator) return;
     indicator.classList.toggle('active', this.storeLoading);
     indicator.setAttribute('aria-busy', this.storeLoading ? 'true' : 'false');
+  }
+
+  private storeEnabled(): boolean {
+    return this.deps.storeEnabled?.() ?? this.deps.storeSnapshot !== undefined;
   }
 
   private summaryHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {

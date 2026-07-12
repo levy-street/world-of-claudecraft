@@ -35,5 +35,5 @@ moves (credit/redeem), never anxious (pending/loading stays serene).
 
 ## Consistency rule
 Generate ONE hero coin first, lock it, then use it as the reference image for the icon
-family, denomination stacks, animations (image-to-video), and gift-card faces so the SAME
-coin appears everywhere. Same bezel, same sigil, same blue-cyan core, same platinum.
+family and denomination stacks so the SAME coin appears everywhere. Same bezel, same sigil,
+same blue-cyan core, same platinum.

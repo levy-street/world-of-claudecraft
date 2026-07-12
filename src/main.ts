@@ -177,7 +177,7 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { Hud } from './ui/hud';
+import { type ClaudiumHooks, Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
   formatDateTime,
@@ -962,7 +962,7 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds);
+    hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -1778,6 +1778,8 @@ async function startGame(
           meta: payload.meta,
         }),
     });
+    // Native iOS and Android expose neither Daily Rewards nor the WOC Store.
+    // Every Claudium purchase surface stays absent until native billing is implemented.
     // Claudium store, online only. The client SDK hits the game server's
     // same-origin /api/claudium/* routes, which proxy to the economy service and
     // fail closed; the SDK itself returns typed unavailable states, never throws.
@@ -1804,11 +1806,15 @@ async function startGame(
       if (!cached || Date.now() - cached.atMs > nativePriceCacheTtlMs) return null;
       return cached.amountBase;
     };
-    hud.attachClaudium({
+    const claudiumHooks: ClaudiumHooks = {
       balance: async () => (await economy.balance()).balance,
       storeSnapshot: async () => {
-        const [balance, storeItems] = await Promise.all([economy.balance(), economy.store()]);
-        return { balance: balance.balance, storeItems };
+        const snapshot = await economy.storeSnapshot();
+        return {
+          available: snapshot.available,
+          balance: snapshot.balance,
+          storeItems: snapshot.items,
+        };
       },
       snapshot: async () => {
         const [balance, skus, price, nativeRails, storeItems] = await Promise.all([
@@ -1914,9 +1920,15 @@ async function startGame(
           kind,
           idempotencyKey: newIdempotencyKey(),
         });
-        return { granted: result.granted, balance: result.balance };
+        return {
+          granted: result.granted,
+          balance: result.balance,
+          costClaudium: result.costClaudium,
+          reason: result.reason,
+        };
       },
-    });
+    };
+    if (!NATIVE_APP) hud.attachClaudium(claudiumHooks);
   }
   function interactKey(): void {
     const p = world.player;

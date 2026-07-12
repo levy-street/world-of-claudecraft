@@ -294,7 +294,6 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/native/balance/sol/:owner' },
     { method: 'GET', path: '/api/claudium/store' },
     { method: 'GET', path: '/api/claudium/history' },
-    { method: 'POST', path: '/api/claudium/stripe/webhook' },
     { method: 'POST', path: '/api/claudium/purchase' },
     { method: 'POST', path: '/api/claudium/purchase/woc/confirm' },
     { method: 'POST', path: '/api/claudium/native/quote' },

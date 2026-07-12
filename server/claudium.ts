@@ -37,8 +37,16 @@ import {
 import { accountAndScopeForToken, grantAccountWeaponSkins, moderationStatusForAccount } from './db';
 import { ctxAccountId } from './http/context';
 import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
+import {
+  CLAUDIUM_CONFIRM_POLICY,
+  CLAUDIUM_PURCHASE_POLICY,
+  CLAUDIUM_QUOTE_POLICY,
+  CLAUDIUM_SPEND_POLICY,
+  rateLimit,
+} from './http/middleware/rate_limit';
 import type { Ctx, RouteDef } from './http/types';
 import { json, readBinaryBody, readBody } from './http_util';
+import { type ClaudiumMutationAction, claudiumMutationRateLimited } from './ratelimit';
 
 const STRIPE_WEBHOOK_MAX_BYTES = 1024 * 1024;
 
@@ -88,8 +96,9 @@ export function claudiumConfigured(): boolean {
 // Live-game hooks, injected from server/main.ts exactly like configureDiscordRuntime
 // so `export const routes` stays a static array. The economy service is the
 // ownership source of truth for Claudium purchases; these hooks mirror weapon-skin
-// grants into accounts.cosmetics so the in-game equip gate and the identity wire
-// see them immediately (and the self-snapshot pushes to any live session).
+// grants into the rollback-safe game entitlement table so the in-game equip gate
+// and identity wire see them immediately (and the self-snapshot pushes to any live
+// session).
 interface ClaudiumGameHooks {
   grantWeaponSkins(accountId: number, skinIds: string[]): void;
 }
@@ -132,10 +141,31 @@ export async function handleClaudiumApi(
   req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
+  options: { rateLimitApplied?: boolean } = {},
 ): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
   const path = url.pathname;
   const account = String(accountId);
+
+  const mutationAction: ClaudiumMutationAction | null =
+    req.method !== 'POST'
+      ? null
+      : path === '/api/claudium/purchase'
+        ? 'purchase'
+        : path === '/api/claudium/native/quote'
+          ? 'quote'
+          : path === '/api/claudium/purchase/woc/confirm' || path === '/api/claudium/native/confirm'
+            ? 'confirm'
+            : path === '/api/claudium/spend'
+              ? 'spend'
+              : null;
+  // The registered routes use the two-tier middleware. The retained legacy
+  // dispatcher reaches this same core directly, so preserve rollback protection
+  // with the identical tier-1 fused limiter instead of leaving that arm unlimited.
+  if (mutationAction && !options.rateLimitApplied) {
+    const outcome = claudiumMutationRateLimited(req, accountId, mutationAction);
+    if (!outcome.allowed) return json(res, 429, { error: 'rate_limited' });
+  }
 
   if (req.method === 'GET' && path === '/api/claudium/balance') {
     return json(res, 200, await claudiumBalance(account));
@@ -265,10 +295,17 @@ export async function handleClaudiumApi(
       });
     }
     const result = await claudiumSpend({ accountId: account, itemId, kind, idempotencyKey });
-    // A granted (or replayed already-granted) weapon-skin spend also unlocks the
-    // skin account-wide in the game DB and on every live session.
+    // Never mirror the caller-supplied item from the spend response alone. Spend
+    // idempotency belongs to the economy service, and a stale or cross-item replay
+    // must not turn an arbitrary request body into a paid entitlement. Re-read the
+    // authoritative grant ledger and mirror only this exact owned skin. A transient
+    // store failure leaves the game mirror untouched; the next store open heals it.
     if (kind === 'skin' && (result.granted || result.reason === 'already_granted')) {
-      noteWeaponSkinGrants(accountId, [itemId]);
+      const store = await claudiumStore(account);
+      const ownsRequestedSkin = store.items.some(
+        (item) => item.kind === 'skin' && item.itemId === itemId && item.owned,
+      );
+      if (ownsRequestedSkin) noteWeaponSkinGrants(accountId, [itemId]);
     }
     return json(res, 200, result);
   }
@@ -278,7 +315,7 @@ export async function handleClaudiumApi(
 
 /** A player route: the guard resolved the account; the shared core dispatches. */
 function claudiumHandler(ctx: Ctx): Promise<void> {
-  return handleClaudiumApi(ctx.req, ctx.res, ctxAccountId(ctx));
+  return handleClaudiumApi(ctx.req, ctx.res, ctxAccountId(ctx), { rateLimitApplied: true });
 }
 
 export const routes: RouteDef[] = [
@@ -354,35 +391,35 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/api/claudium/purchase',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(CLAUDIUM_PURCHASE_POLICY)],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/purchase/woc/confirm',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(CLAUDIUM_CONFIRM_POLICY)],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/native/quote',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(CLAUDIUM_QUOTE_POLICY)],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/native/confirm',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(CLAUDIUM_CONFIRM_POLICY)],
     handler: claudiumHandler,
   },
   {
     method: 'POST',
     path: '/api/claudium/spend',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(CLAUDIUM_SPEND_POLICY)],
     handler: claudiumHandler,
   },
 ];

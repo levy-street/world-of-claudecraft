@@ -66,7 +66,7 @@ describe('weapon skin sim behavior', () => {
     expect(sim.setWeaponSkin(pid, null, 'sword')).toBe(false);
   });
 
-  it('lets a hunter apply bow and crossbow skins over the fixed ranged visual', () => {
+  it('lets a hunter apply bow and crossbow skins, with the latest family displacing the other', () => {
     const { sim, pid, e } = newSim('hunter');
     expect(e.mainhandItemId).toBe('rusty_hatchet');
     // an axe skin does NOT apply: the hunter never displays the axe
@@ -74,10 +74,11 @@ describe('weapon skin sim behavior', () => {
     expect(sim.setWeaponSkin(pid, 'winterbite')).toBe(true); // bow
     expect(e.weaponSkinId).toBe('winterbite');
     expect(sim.setWeaponSkin(pid, 'meteorlatch_crossbow')).toBe(true);
-    // crossbow is the hunter's native visual family, so it wins resolution
     expect(e.weaponSkinId).toBe('meteorlatch_crossbow');
-    sim.setWeaponSkin(pid, null, 'crossbow');
+    expect(e.weaponSkinLoadout).toEqual({ crossbow: 'meteorlatch_crossbow' });
+    expect(sim.setWeaponSkin(pid, 'winterbite')).toBe(true);
     expect(e.weaponSkinId).toBe('winterbite');
+    expect(e.weaponSkinLoadout).toEqual({ bow: 'winterbite' });
   });
 
   it('seeds a whole loadout (server join path) and drops mismatched entries', () => {

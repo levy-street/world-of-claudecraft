@@ -151,6 +151,7 @@ export interface ClaudiumStoreItem {
 
 /** The cosmetic store catalog, empty when the service is off. */
 export interface ClaudiumStoreResult {
+  available: boolean;
   items: ClaudiumStoreItem[];
 }
 
@@ -530,7 +531,7 @@ export async function claudiumStore(accountId: string): Promise<ClaudiumStoreRes
     method: 'GET',
     path: `store/${encodeURIComponent(accountId)}`,
   });
-  if (!Array.isArray(data)) return { items: [] };
+  if (!Array.isArray(data)) return { available: false, items: [] };
   const items = data.filter(
     (i): i is ClaudiumStoreItem =>
       typeof i?.itemId === 'string' &&
@@ -539,5 +540,5 @@ export async function claudiumStore(accountId: string): Promise<ClaudiumStoreRes
       typeof i.owned === 'boolean' &&
       (i.kind === 'cosmetic' || i.kind === 'skin' || i.kind === 'item'),
   );
-  return { items };
+  return { available: true, items };
 }

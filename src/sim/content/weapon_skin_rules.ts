@@ -171,6 +171,24 @@ export function weaponSkinTypeMatches(
   return skinnableWeaponTypesFor(cls, mainhandItemId).includes(skinType);
 }
 
+/**
+ * Return a validated loadout with `skinId` applied. Bow and crossbow occupy the
+ * same hunter ranged-weapon display slot, so applying either one removes the
+ * other. Other weapon types remain parked independently for gear swaps.
+ */
+export function withWeaponSkinApplied(
+  loadout: WeaponSkinLoadout | null | undefined,
+  skinId: string,
+): WeaponSkinLoadout | null {
+  const def = WEAPON_SKINS[skinId];
+  if (!def) return null;
+  const next = { ...(loadout ?? {}) };
+  if (def.weaponType === 'bow') delete next.crossbow;
+  else if (def.weaponType === 'crossbow') delete next.bow;
+  next[def.weaponType] = skinId;
+  return next;
+}
+
 // Canonical class display order for the eligibility chips (the PlayerClass
 // union order in ../types.ts).
 const CLASS_ORDER: readonly PlayerClass[] = [

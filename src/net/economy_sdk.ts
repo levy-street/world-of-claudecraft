@@ -37,6 +37,12 @@ export interface ClaudiumStoreItem {
   owned: boolean;
 }
 
+export interface ClaudiumStoreSnapshot {
+  available: boolean;
+  balance: number | null;
+  items: ClaudiumStoreItem[];
+}
+
 export interface ClaudiumStripeIntent {
   clientSecret: string;
   publishableKey: string;
@@ -176,18 +182,22 @@ export interface NativeConfirmRetryOptions {
 export class EconomyClient {
   constructor(private readonly cfg: EconomyClientConfig) {}
 
-  private async get<T>(path: string, fallback: T): Promise<T> {
+  private async getResult<T>(path: string, fallback: T): Promise<{ ok: boolean; value: T }> {
     const token = this.cfg.token();
-    if (!token) return fallback;
+    if (!token) return { ok: false, value: fallback };
     try {
       const res = await fetch(apiUrl(path, this.cfg.base ?? ''), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) return fallback;
-      return (await res.json()) as T;
+      if (!res.ok) return { ok: false, value: fallback };
+      return { ok: true, value: (await res.json()) as T };
     } catch {
-      return fallback;
+      return { ok: false, value: fallback };
     }
+  }
+
+  private async get<T>(path: string, fallback: T): Promise<T> {
+    return (await this.getResult(path, fallback)).value;
   }
 
   private async post<T>(path: string, body: unknown, fallback: T): Promise<T> {
@@ -220,6 +230,21 @@ export class EconomyClient {
 
   store(): Promise<ClaudiumStoreItem[]> {
     return this.get('/api/claudium/store', { items: OFF_STORE }).then((r) => r.items ?? OFF_STORE);
+  }
+
+  async storeSnapshot(): Promise<ClaudiumStoreSnapshot> {
+    const [balance, store] = await Promise.all([
+      this.getResult('/api/claudium/balance', OFF_BALANCE),
+      this.getResult<{ available?: boolean; items: ClaudiumStoreItem[] }>('/api/claudium/store', {
+        available: false,
+        items: OFF_STORE,
+      }),
+    ]);
+    return {
+      available: balance.ok && store.ok && store.value.available !== false,
+      balance: balance.value.balance,
+      items: store.value.items ?? OFF_STORE,
+    };
   }
 
   nativeRails(): Promise<ClaudiumNativeRails> {

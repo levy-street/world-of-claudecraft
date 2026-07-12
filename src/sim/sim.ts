@@ -86,7 +86,11 @@ import {
   type TalentModifiers,
   talentPointsAtLevel,
 } from './content/talents';
-import { resolveActiveWeaponSkin, weaponSkinTypeMatches } from './content/weapon_skin_rules';
+import {
+  resolveActiveWeaponSkin,
+  weaponSkinTypeMatches,
+  withWeaponSkinApplied,
+} from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
@@ -2304,7 +2308,7 @@ export class Sim {
       const def = WEAPON_SKINS[skinId];
       if (!def) return false;
       if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType)) return false;
-      e.weaponSkinLoadout = { ...e.weaponSkinLoadout, [def.weaponType]: skinId };
+      e.weaponSkinLoadout = withWeaponSkinApplied(e.weaponSkinLoadout, skinId) ?? {};
     } else {
       const t = weaponType;
       if (!t || !e.weaponSkinLoadout[t]) return false;

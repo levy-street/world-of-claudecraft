@@ -24,8 +24,14 @@ import {
   CARD_UPLOAD_MAX_PER_MINUTE,
   CHARACTER_MUTATION_MAX_PER_MINUTE,
   type CharacterMutationAction,
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+  type ClaudiumMutationAction,
   cardUploadRateLimited,
   characterMutationRateLimited,
+  claudiumMutationRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
@@ -210,6 +216,42 @@ export const WALLET_LINK_POLICY: RateLimitPolicy = {
   tier1: (ctx) => walletLinkRateLimited(ctx.req, ctxAccountId(ctx)),
   tier2: 'global',
 };
+
+function claudiumMutationPolicy(
+  name: string,
+  action: ClaudiumMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip+account',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => claudiumMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
+    tier2: 'global',
+  };
+}
+
+export const CLAUDIUM_PURCHASE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_purchase',
+  'purchase',
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_QUOTE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_quote',
+  'quote',
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_CONFIRM_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_confirm',
+  'confirm',
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+);
+export const CLAUDIUM_SPEND_POLICY: RateLimitPolicy = claudiumMutationPolicy(
+  'claudium_spend',
+  'spend',
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+);
 
 // The character-mutation policies. Each is 'ip+account' (so it must be
 // mounted BEHIND the route's auth guard, which populates ctx.account) and runs the

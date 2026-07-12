@@ -28,6 +28,10 @@ import {
 } from './assets';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import {
+  disposeOwnedWeaponSkinMaterials,
+  markOwnedWeaponSkinMaterials,
+} from './weapon_skin_materials';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -540,6 +544,7 @@ export class CharacterVisual {
 
   private reattachHeldWeapon(): void {
     this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
     const payloads = setHeldWeapon(this.model, this.def, this.weaponItemId, this.weaponSkinId);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
@@ -579,6 +584,7 @@ export class CharacterVisual {
             ? mesh.material.map((m) => m.clone())
             : mesh.material.clone();
           mesh.userData.weaponSkinIsolated = true;
+          markOwnedWeaponSkinMaterials(mesh);
         });
       }
     }
@@ -671,6 +677,23 @@ export class CharacterVisual {
     this.weaponVfx.length = 0;
   }
 
+  private disposeWeaponSkinMaterials(): void {
+    disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
+      this.ghostMaterials,
+      this.soulRendMaterials,
+    ]);
+  }
+
+  private disposeEffectMaterials(): void {
+    const materials = new Set<THREE.Material>([
+      ...this.ghostMaterials.values(),
+      ...this.soulRendMaterials.values(),
+    ]);
+    for (const material of materials) material.dispose();
+    this.ghostMaterials.clear();
+    this.soulRendMaterials.clear();
+  }
+
   /** Rebuild the shadow-caster list and original-material snapshot after the model
    *  graph changes (a weapon swap adds/removes bone-child meshes). */
   private rebuildCasters(): void {
@@ -689,6 +712,8 @@ export class CharacterVisual {
   dispose(): void {
     this.disposed = true;
     this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
+    this.disposeEffectMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();

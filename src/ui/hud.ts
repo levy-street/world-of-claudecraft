@@ -465,13 +465,24 @@ export interface ReportHooks {
  */
 export interface ClaudiumHooks {
   balance(): Promise<number | null>;
-  storeSnapshot(): Promise<Pick<ClaudiumSnapshot, 'balance' | 'storeItems'>>;
+  storeSnapshot(): Promise<
+    Pick<ClaudiumSnapshot, 'balance' | 'storeItems'> & { available: boolean }
+  >;
   snapshot(): Promise<ClaudiumSnapshot>;
   buy(rail: ClaudiumRail, sku: string): Promise<void>;
   spend(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
-  ): Promise<{ granted: boolean; balance: number | null }>;
+  ): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
+}
+
+export interface HudFeatures {
+  dailyRewardsEnabled: boolean;
 }
 
 export interface BugReportPayload {
@@ -1369,6 +1380,7 @@ export class Hud {
     private sim: IWorld,
     private renderer: Renderer,
     private keybinds: Keybinds,
+    private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.ignoredChatNames = this.loadIgnoredChatNames();
     this.meters = new Meters(sim);
@@ -1516,6 +1528,7 @@ export class Hud {
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
@@ -3878,20 +3891,32 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
+    storeEnabled: () => this.claudiumHooks !== null,
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
-      if (!snapshot) return { balance: null, items: [] };
+      if (!snapshot) return { available: false, balance: null, items: [] };
       this.setClaudiumLauncherBalance(snapshot.balance);
-      return { balance: snapshot.balance, items: [...snapshot.storeItems] };
+      return {
+        available: snapshot.available,
+        balance: snapshot.balance,
+        items: [...snapshot.storeItems],
+      };
     },
     spendStoreItem: async (itemId, kind) => {
       const result = await this.claudiumHooks?.spend(itemId, kind);
       if (result?.balance !== null && result?.balance !== undefined) {
         this.setClaudiumLauncherBalance(result.balance);
       }
-      return result ?? { granted: false, balance: null };
+      return (
+        result ?? {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        }
+      );
     },
-    openClaudium: () => this.claudiumWindow.toggle(),
+    openClaudium: () => this.toggleClaudium(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
@@ -4676,6 +4701,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.syncDailyRewardsSurfaceLabels();
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -6521,10 +6547,26 @@ export class Hud {
   }
 
   private dailyRewardsEnabled(): boolean {
-    return !(
-      document.body.classList.contains('native-app') &&
-      document.body.classList.contains('mobile-touch')
-    );
+    return this.features.dailyRewardsEnabled;
+  }
+
+  private syncDailyRewardsSurfaceLabels(): void {
+    const storeEnabled = this.claudiumHooks !== null;
+    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
+    const title = t(titleKey);
+    for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
+      if (!button) continue;
+      button.setAttribute('data-i18n-title', titleKey);
+      button.setAttribute('data-i18n-aria', titleKey);
+      button.title = title;
+      button.setAttribute('aria-label', title);
+    }
+    const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
+    if (label) {
+      label.setAttribute('data-i18n', labelKey);
+      label.textContent = t(labelKey);
+    }
   }
 
   private showDailyRewardsChestButton(): boolean {
@@ -13238,6 +13280,7 @@ export class Hud {
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
+    this.syncDailyRewardsSurfaceLabels();
     this.claudiumLauncherBalance = null;
     this.claudiumLauncherBalanceLastMs = 0;
     this.claudiumLauncherBalanceSeq++;
@@ -13250,6 +13293,7 @@ export class Hud {
    * service off) the window shows its clean disabled state, never a boot crash.
    */
   toggleClaudium(): void {
+    if (!this.claudiumHooks) return;
     this.claudiumWindow.toggle();
   }
 

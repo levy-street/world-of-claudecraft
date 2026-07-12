@@ -15,6 +15,7 @@ import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { CharacterVisual } from './characters';
 import { weaponSkinDisplayModel } from './characters/assets';
 import { type PreviewAppearance, previewAppearanceVisual } from './characters/preview_appearance';
+import { disposeOwnedWeaponSkinMaterials } from './characters/weapon_skin_materials';
 import { trackWebGLContext } from './context_release';
 import {
   createWeaponVfx,
@@ -184,6 +185,7 @@ export function createArmoryPreview(
       weaponExtras = null;
     }
     if (weaponModel) {
+      disposeOwnedWeaponSkinMaterials(weaponModel);
       weaponModel.removeFromParent();
       weaponModel = null;
     }

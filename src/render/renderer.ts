@@ -96,6 +96,11 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import {
+  applyPointLightBudget,
+  type RankedPointLight,
+  reconcileViewPointLights,
+} from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
@@ -920,12 +925,7 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: {
-    light: THREE.PointLight;
-    d2: number;
-    worldPos: THREE.Vector3;
-    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
-  }[] = [];
+  private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -3521,22 +3521,12 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
-    const viewLights: THREE.PointLight[] = [];
-    group.traverse((o) => {
-      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
-    });
-    if (viewLights.length > 0) {
-      for (const light of viewLights) {
-        // Remember the design intensity ONCE: pooled object views are reused, and by
-        // the time one is re-taken the budget may have dimmed the light to 0, so
-        // reading it again would stick it dark. userData persists on the pooled light.
-        if (typeof light.userData.budgetBase !== 'number')
-          light.userData.budgetBase = light.intensity;
-        this.viewLights.push(light);
-      }
+    const reconciledLights = reconcileViewPointLights(group, [], this.viewLights);
+    const viewLights = reconciledLights.lights;
+    if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light-budget rebuild caches light.getWorldPosition, and r165's
+      // the light budget reads light.getWorldPosition, and r165's
       // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
       // ancestor, so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
@@ -3673,6 +3663,16 @@ export class Renderer {
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
     v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.group.add(next.root);
+    this.reconcileViewLights(v);
+  }
+
+  private reconcileViewLights(v: EntityView): void {
+    const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
+    if (!reconciled.changed) return;
+    v.viewLights = reconciled.lights;
+    this.lightRankDirty = true;
+    if (v.viewLights.length > 0) this.lightOwnerGroups.add(v.group);
+    else this.lightOwnerGroups.delete(v.group);
   }
 
   triggerAttack(entityId: number): void {
@@ -4033,6 +4033,7 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
         const i = this.viewLights.indexOf(light);
@@ -4437,6 +4438,7 @@ export class Renderer {
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         v.visual.setWeapon(e.mainhandItemId);
+        this.reconcileViewLights(v);
       }
 
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
@@ -4444,6 +4446,7 @@ export class Renderer {
       if (e.weaponSkinId !== v.weaponSkinId) {
         v.weaponSkinId = e.weaponSkinId;
         v.visual.setWeaponSkin(e.weaponSkinId);
+        this.reconcileViewLights(v);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
@@ -5075,9 +5078,9 @@ export class Renderer {
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
   // but only the nearest GFX.maxPointLights within range shine each frame.
-  // Rank entries are pooled (extended only when interiors add lights) and
-  // world positions cached once — the lights never move — so this hot loop
-  // allocates nothing and skips the sort while the budget isn't contended.
+  // Rank entries are pooled (extended only when interiors or view lights change).
+  // Static world positions stay cached; moving weapon VFX refresh into their
+  // existing vectors, so this hot loop allocates nothing.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
     // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
@@ -5085,7 +5088,8 @@ export class Renderer {
     // numPointLights would change as it streams in/out and recompile every lit
     // material. Rebuild only when the set changes (dirty), or when fire lights grow
     // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. View positions are cached at rebuild; lights never move.
+    // refreshes distances. Static positions are cached; dynamic weapon-light
+    // positions refresh in applyPointLightBudget.
     const want = this.fireLights.length + this.viewLights.length;
     if (this.lightRankDirty || ranked.length !== want) {
       ranked.length = 0;
@@ -5095,19 +5099,22 @@ export class Renderer {
           d2: 0,
           worldPos: light.getWorldPosition(new THREE.Vector3()),
           base: null,
+          dynamic: false,
         });
       }
       for (const light of this.viewLights) {
         const stored = light.userData.budgetBase;
         const base = typeof stored === 'number' ? stored : light.intensity;
-        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+        const dynamic = light.userData.budgetDynamic === true;
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: dynamic ? null : base,
+          dynamic,
+        });
       }
       this.lightRankDirty = false;
-    }
-    for (const entry of ranked) {
-      const dx = entry.worldPos.x - px,
-        dz = entry.worldPos.z - pz;
-      entry.d2 = dx * dx + dz * dz;
     }
     // Keep a CONSTANT number of point lights `visible` so numPointLights in every
     // material's program cache key never changes as the player travels. Three counts
@@ -5120,19 +5127,7 @@ export class Renderer {
     // governor (effectivePointLights) only changes how many SHINE, not the count.
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
-    for (let i = 0; i < ranked.length; i++) {
-      const entry = ranked[i];
-      const counted = i < visibleCount;
-      entry.light.visible = counted;
-      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
-      if (entry.base !== null) {
-        // view light: no flicker pass restores it, so drive its intensity directly
-        entry.light.intensity = shine ? entry.base : 0;
-      } else if (counted && !shine) {
-        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
-      }
-    }
+    applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only
