@@ -71,7 +71,7 @@ export const REVENGE_FREE_ABILITIES: ReadonlySet<string> = new Set(['revenge']);
 /** Pure aura-list predicate: is `abilityId`'s cost covered by a free-cost
  *  proc? Structural input so the UI drives it with a mirrored aura list. */
 export function freeCostAuraActive(
-  auras: readonly { kind: string; empowerAbilities?: string[] }[],
+  auras: readonly { kind: string; empowerAbilities?: readonly string[] }[],
   abilityId: string,
 ): boolean {
   for (const a of auras) {
