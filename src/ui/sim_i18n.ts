@@ -135,7 +135,7 @@ const baseEnTable = {
   'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
   'log.talentsUpdated': 'Talents updated.',
   'log.talentsReset': 'Talents reset.',
-  'log.cheatDeathSave': 'Cheat Death saves you!',
+  'log.cheatDeathSave': 'A deathward saves you!',
   'log.savedBuild': 'Saved build “{name}”.',
   'log.loadoutApplied': 'Loadout “{name}” applied.',
   'log.deletedBuild': 'Deleted build “{name}”.',

@@ -4,7 +4,8 @@ import { ABILITIES } from '../src/sim/content/classes';
 import { TALENTS } from '../src/sim/content/talents';
 import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
+import { classAbilityNames } from '../src/ui/i18n.catalog/abilities';
+import { grantAbilityMetadata, grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 // Talent descriptions are generated from effect data outside English. English remains
 // authored source text, so this suite keeps it numerically honest against the effect
@@ -119,12 +120,63 @@ function legitNumbers(effect: unknown): Set<number> {
     }
   };
   walk(effect);
+  // Authored English may state the player-facing result of a modifier rather
+  // than only its storage representation. Keep those derived values legitimate:
+  // a 66% cost cut on a 10-rage spell is a 3-rage spell, and a 50% increase to
+  // a 5% party buff is 7.5% (rounded to 8 by descriptionNumbers).
+  const shaped = effect as {
+    ability?: Array<{ ability: string; costPct?: number; buffPct?: number }>;
+    proc?: {
+      trigger?: { on?: string; abilities?: string[] };
+      responses?: Array<{ kind?: string; amount?: number }>;
+    };
+  };
+  for (const mod of shaped.ability ?? []) {
+    const def = ABILITIES[mod.ability];
+    if (!def) continue;
+    if (mod.costPct !== undefined) {
+      const resolved = def.cost * (1 + mod.costPct);
+      out.add(Math.round(resolved));
+      out.add(Math.ceil(resolved));
+    }
+    if (mod.buffPct !== undefined) {
+      for (const abilityEffect of def.effects) {
+        if (
+          (abilityEffect.type === 'selfBuff' || abilityEffect.type === 'buffTarget') &&
+          typeof abilityEffect.value === 'number'
+        ) {
+          out.add(Math.round(Math.abs(abilityEffect.value)));
+          out.add(Math.round(Math.abs(abilityEffect.value * (1 + mod.buffPct))));
+        }
+      }
+    }
+  }
+  const triggerAbility = shaped.proc?.trigger?.abilities?.[0];
+  const triggerCost = triggerAbility ? ABILITIES[triggerAbility]?.cost : undefined;
+  if (triggerCost !== undefined) {
+    for (const response of shaped.proc?.responses ?? []) {
+      if (response.kind !== 'resource' || response.amount === undefined) continue;
+      out.add(triggerCost);
+      out.add(Math.abs(response.amount - triggerCost));
+    }
+  }
   // A grant option's tooltip appends the granted ability's own description with
   // its base (rank-1) values resolved, so every number the granted ability
   // produces (damage min/max, buff, duration, absorb amount, dot total) is
   // legitimate, not a contradiction. Walk the granted ability's effects too.
   const grantId = (effect as { grant?: { ability?: string } })?.grant?.ability;
   if (grantId && ABILITIES[grantId]) {
+    const def = ABILITIES[grantId];
+    for (const value of [
+      def.cost,
+      def.castTime,
+      def.cooldown,
+      def.range,
+      def.minRange,
+      def.channel?.duration,
+    ]) {
+      if (value !== undefined && value !== 0) out.add(Math.abs(value));
+    }
     // Render the granted ability description exactly as the tooltip does (base
     // values), so every number it actually shows counts as legitimate.
     const { pcts, bare } = descriptionNumbers(
@@ -226,6 +278,7 @@ const NO_EFFECT = 'Provides a specialization benefit.';
 describe('talent tooltip accuracy for specs, masteries, and choice rows', () => {
   beforeAll(async () => {
     await ensureLocaleLoaded('en');
+    await ensureLocaleLoaded('es');
     setLanguage('en');
   });
 
@@ -315,10 +368,139 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     };
 
     expect(render('warrior', 'war_r5_crushing_onrush')).toContain('50%');
-    expect(render('warrior', 'war_r17_red_harvest')).toContain('25%');
+    expect(render('warrior', 'war_r17_red_harvest')).toContain('any health');
     const survival = render('hunter', 'survival.mastery');
     expect(survival).toContain('Agility');
     expect(survival).toContain('15%');
     expect(survival).toContain('physical ability damage');
+  });
+
+  it('grant tooltips include localized cost, cast or channel, range, and cooldown metadata', () => {
+    setLanguage('en');
+    expect(grantAbilityMetadata('stormthrow')).toBe(
+      '20 Rage · Instant · 20 yd range · 30 sec cooldown',
+    );
+    expect(grantAbilityMetadata('bladestorm')).toBe(
+      '25 Rage · Channeled (4 sec) · 60 sec cooldown',
+    );
+    expect(grantAbilityMetadata('counter_shot')).toBe(
+      '35 Mana · Instant · 8-35 yd range · 20 sec cooldown',
+    );
+
+    const option = CHOICE_ROWS.warrior.rows
+      .flatMap((row) => row.options)
+      .find((choice) => choice.id === 'war_r11_stormthrow');
+    if (!option) throw new Error('missing Stormthrow choice');
+    expect(tTalent({ kind: 'talentChoice', choice: option, field: 'description' })).toContain(
+      grantAbilityMetadata('stormthrow'),
+    );
+  });
+
+  it('extracts every defining value used by complex granted-ability descriptions', () => {
+    setLanguage('en');
+    expect(grantAbilityValues('holy_shield')).toMatchObject({
+      min: '90',
+      max: '110',
+      damage: '90 to 110',
+      jumps: '2',
+      falloff: '70%',
+      radius: '10',
+    });
+    expect(grantAbilityValues('aura_surge')).toMatchObject({
+      min: '100',
+      max: '120',
+      damage: '100 to 120',
+      jumps: '2',
+      falloff: '75%',
+      radius: '10',
+      duration: '2',
+    });
+    expect(grantAbilityValues('evocation')).toMatchObject({ amount: '220' });
+    expect(grantAbilityValues('meteor')).toMatchObject({
+      damage: '100 to 130',
+      overTime: '12 to 18',
+      interval: '2',
+      duration: '6',
+      radius: '8',
+    });
+    expect(grantAbilityValues('avenging_wrath')).toMatchObject({
+      attackPower: '60',
+      spellPower: '30',
+      duration: '20',
+    });
+    expect(grantAbilityValues('bloodlust')).toMatchObject({ buff: '30%', duration: '15' });
+    expect(grantAbilityValues('aspect_of_the_wild')).toMatchObject({
+      buff: '45',
+      duration: '300',
+      radius: '30',
+    });
+    expect(grantAbilityValues('frenzied_regeneration')).toMatchObject({
+      damage: '180',
+      duration: '10',
+    });
+  });
+
+  it('falls back atomically when generated locale prose cannot express the complete effect', () => {
+    const option = (cls: 'warrior' | 'hunter' | 'rogue', id: string) => {
+      const found = CHOICE_ROWS[cls].rows
+        .flatMap((row) => row.options)
+        .find((choice) => choice.id === id);
+      if (!found) throw new Error(`missing ${id}`);
+      return found;
+    };
+
+    setLanguage('es');
+    for (const choice of [
+      option('warrior', 'war_r8_crippling_strikes'),
+      option('hunter', 'hun_r5_improved_serpent_sting'),
+      option('rogue', 'rog_r5_opportunist'),
+    ]) {
+      expect(tTalent({ kind: 'talentChoice', choice, field: 'description' })).toBe(
+        choice.description,
+      );
+    }
+
+    setLanguage('en');
+  });
+
+  it('English grant catalog states the complete shipped mechanics', () => {
+    const abilities = classAbilityNames.en.entities.abilities;
+    const renderCatalogDescription = (id: string) => {
+      const template = abilities[id]?.description;
+      if (!template) throw new Error(`missing English ability catalog entry for ${id}`);
+      const values = grantAbilityValues(id);
+      return template.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
+        const value = values[name];
+        return value === undefined ? match : String(value);
+      });
+    };
+    expect(abilities.aura_surge).toEqual({
+      name: 'Dawnward Ricochet',
+      description:
+        'Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)',
+    });
+    expect(abilities.lingering_dread).toEqual({
+      name: 'Lingering Dread',
+      description:
+        "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)",
+    });
+    expect(abilities.evocation.description).toBe('Instantly restores 220 mana. (Mage talent)');
+    expect(abilities.meteor.description).toContain('12 to 18 Fire damage every 2 sec for 6 sec');
+    expect(abilities.frenzied_regeneration.description).toBe(
+      'Regenerates 180 health over 10 sec. Bruin Form only. (Druid talent)',
+    );
+    expect(abilities.tranquility.description).toBe(
+      'Channels for 4 sec, healing you and allies within 30 yd for 42 to 52 each second. (Druid talent)',
+    );
+
+    expect(renderCatalogDescription('frenzied_regeneration')).toBe(
+      'Regenerates 180 health over 10 sec. Bruin Form only. (Druid talent)',
+    );
+    expect(renderCatalogDescription('healing_stream')).toBe(
+      'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+    );
+    expect(renderCatalogDescription('tranquility')).toBe(
+      'Channels for 4 sec, healing you and allies within 30 yd for 42 to 52 each second. (Druid talent)',
+    );
   });
 });

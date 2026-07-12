@@ -5654,8 +5654,8 @@ export const zh_CN: EnTranslations = {
         "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
       },
       "aura_surge": {
-        "name": "光辉涌动",
-        "description": "过载你的光环，使你在10秒内获得160点护甲。（圣骑士天赋）"
+        "name": "黎明圣盾弹射",
+        "description": "掷出黎明铸造的圣盾，造成 {damage} 点神圣伤害，并使主要目标沉默 2 秒，随后弹向 {radius} 码内最多 {jumps} 个额外敌人。每次弹射造成上一次伤害的 {falloff}。（圣骑士天赋）"
       },
       "holy_shock": {
         "name": "神圣震击",
@@ -5788,6 +5788,10 @@ export const zh_CN: EnTranslations = {
       "razor_howl": {
         "name": "锐刃怒吼",
         "description": "使 15 码内的敌人减速 50%，持续 8 秒。（战士天赋）"
+      },
+      "lingering_dread": {
+        "name": "萦绕恐惧",
+        "description": "发出战吼，使 10 码内的敌人恐惧 4 秒。每个恐惧效果承受相当于目标最大生命值 20% 的伤害后才会打破。（战士天赋）"
       },
       "stormthrow": {
         "name": "风暴投掷",

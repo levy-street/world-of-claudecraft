@@ -7,7 +7,7 @@
 // no rng, nothing persisted, so replay determinism is untouched.
 
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Entity, ResourceType } from '../types';
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
@@ -16,19 +16,20 @@ export type ProcTrigger =
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
   | { on: 'meleeSwingWhile'; auraKind: string }
-  // The player's charge-limited thorns aura (Thunder Ward) reflected a hit.
-  | { on: 'thornsReflect' };
+  // A thorns aura reflected a hit. `ability` scopes the trigger to the
+  // originating aura id (for example, Thunder Ward / lightning_shield).
+  | { on: 'thornsReflect'; ability: string };
 
 export type ProcResponse =
   | {
       kind: 'empowerNext';
-      aura: 'next_cast_free' | 'next_cast_instant' | 'next_cast_cheap';
+      aura: 'next_cast_free' | 'next_execute_free' | 'next_cast_instant' | 'next_cast_cheap';
       abilities?: string[]; // which casts may consume it (undefined = any)
       duration: number;
       costPct?: number; // next_cast_cheap: fraction of the cost removed (0.5 = half off)
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
-  | { kind: 'resource'; amount: number }
+  | { kind: 'resource'; amount: number; resourceType?: ResourceType }
   | { kind: 'heal'; amount: number }
   | { kind: 'absorb'; amount: number; duration: number; name: string }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };
@@ -113,6 +114,7 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
       break;
     }
     case 'resource':
+      if (r.resourceType !== undefined && p.resourceType !== r.resourceType) break;
       p.resource = Math.min(p.maxResource, p.resource + r.amount);
       break;
     case 'heal':
@@ -138,19 +140,19 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
       });
       break;
     case 'echo':
-      if (!subject.auras.some((a) => a.id === def.id)) {
-        ctx.applyAura(subject, {
-          id: def.id,
-          name: def.name,
-          kind: 'heal_echo',
-          remaining: r.window,
-          duration: r.window,
-          value: r.heal,
-          value2: r.belowFrac,
-          sourceId: p.id,
-          school: 'holy',
-        });
-      }
+      // applyAura replaces the same source+id, so repeated qualifying casts
+      // refresh the echo's window and payload without stacking duplicates.
+      ctx.applyAura(subject, {
+        id: def.id,
+        name: def.name,
+        kind: 'heal_echo',
+        remaining: r.window,
+        duration: r.window,
+        value: r.heal,
+        value2: r.belowFrac,
+        sourceId: p.id,
+        school: 'holy',
+      });
       break;
   }
 }
@@ -175,20 +177,27 @@ export function onCastCompleted(
   }
 }
 
-/** The player's charge-limited thorns aura reflected a melee hit. */
-export function onThornsReflect(ctx: SimContext, p: Entity): void {
+/** One of the player's thorns auras reflected a melee hit. */
+export function onThornsReflect(ctx: SimContext, p: Entity, abilityId: string): void {
   for (const def of procsFor(ctx, p)) {
-    if (def.trigger.on !== 'thornsReflect') continue;
+    const trigger = def.trigger;
+    if (trigger.on !== 'thornsReflect') continue;
+    if (trigger.ability !== abilityId) continue;
     fire(ctx, p, def, p);
   }
 }
 
 /** A spell (damage or heal) critically hit (dealDamage/applyHeal crit paths). */
-export function onSpellCrit(ctx: SimContext, p: Entity, abilityId: string, target: Entity): void {
+export function onSpellCrit(
+  ctx: SimContext,
+  p: Entity,
+  abilityId: string | null,
+  target: Entity,
+): void {
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
     if (t.on !== 'spellCrit') continue;
-    if (t.abilities && !t.abilities.includes(abilityId)) continue;
+    if (t.abilities && (abilityId === null || !t.abilities.includes(abilityId))) continue;
     fire(ctx, p, def, target);
   }
 }

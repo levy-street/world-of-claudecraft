@@ -53,11 +53,11 @@ describe('priest redesign', () => {
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(false); // consumed
   });
 
-  it('Lingering Grace ward: a full-duration Renew hardens into an absorb', () => {
+  it('Improved Whispered Prayer: every third cast wards its target', () => {
     const { sim, p } = rig('priest', 20, { 5: 'pri_r5_improved_renew' });
     p.hp = Math.round(p.maxHp * 0.5);
     sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'renew', 20); // well past the full HoT duration
+    for (let i = 0; i < 3; i++) castAndSettle(sim, 'lesser_heal', 3);
     expect(p.auras.some((a) => a.kind === 'absorb' && a.id === 'pri_lingering_ward')).toBe(true);
   });
 
@@ -167,7 +167,8 @@ describe('shaman redesign', () => {
     addTargetMob(sim, 100000, 8);
     for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    const before = (p.resource = p.maxResource);
+    p.resource = p.maxResource;
+    const before = p.resource;
     sim.castAbility('earth_shock');
     for (let i = 0; i < 20; i++) sim.tick();
     expect(p.resource).toBe(before);
@@ -207,19 +208,19 @@ describe('shaman redesign', () => {
     expect(before! - after).toBeGreaterThan(0.5);
   });
 
-  it('Tidal Waves: every 3rd Mending Waters makes the next one instant', () => {
-    // Self-contained: triggers off baseline Healing Wave (Mending Waters), not
-    // the unobtainable Chain Heal.
+  it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
     const { sim, p } = rig('shaman', 20, { 20: 'sha_r20_tidal_waves' });
-    p.hp = Math.round(p.maxHp * 0.5);
+    p.hp = 1;
     sim.targetEntity(sim.playerId);
     for (let i = 0; i < 3; i++) castAndSettle(sim, 'healing_wave', 5);
-    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
-    p.resource = p.maxResource;
-    sim.castAbility('healing_wave');
-    sim.tick();
-    // Instant: no cast bar, the heal resolved immediately.
-    expect(p.castingAbility).toBe(null);
+    expect(p.auras.some((a) => a.id === 'sha_undertow_promise' && a.kind === 'heal_echo')).toBe(
+      true,
+    );
+    p.hp = Math.ceil(p.maxHp * 0.4);
+    const before = p.hp;
+    sim.ctx.dealDamage(null, p, Math.ceil(p.maxHp * 0.1), false, 'physical', null, 'hit');
+    expect(p.hp).toBeGreaterThan(before - Math.ceil(p.maxHp * 0.1));
+    expect(p.auras.some((a) => a.id === 'sha_undertow_promise')).toBe(false);
   });
 });
 
@@ -253,6 +254,29 @@ describe('paladin redesign', () => {
     expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
   });
 
+  it("Guardian's Favor turns a consumed Ward of Faith into Last Rite recovery", () => {
+    const { sim, p } = rig('paladin', 20, { 11: 'pal_r11_guardians_favor' });
+    p.cooldowns.set('lay_on_hands', 300);
+    castAndSettle(sim, 'divine_protection', 1);
+    const ward = p.auras.find((a) => a.kind === 'absorb' && a.id === 'divine_protection');
+    expect(ward).toBeTruthy();
+    const before = p.cooldowns.get('lay_on_hands') ?? 0;
+    sim.ctx.dealDamage(null, p, ward?.value ?? 0, false, 'physical', null, 'hit');
+    expect(p.auras.some((a) => a.id === 'divine_protection')).toBe(false);
+    expect(p.cooldowns.get('lay_on_hands') ?? 0).toBeCloseTo(before - 120, 5);
+  });
+
+  it('Greater Blessing turns a critical paladin heal into a ward on its target', () => {
+    const { sim, p } = rig('paladin', 20, { 11: 'pal_r11_greater_blessing' });
+    p.hp = Math.round(p.maxHp * 0.5);
+    p.stats.int = 10_000; // spellCrit is guaranteed above 100% for this focused test
+    sim.targetEntity(p.id);
+    castAndSettle(sim, 'flash_of_light', 3);
+    const ward = p.auras.find((a) => a.kind === 'absorb' && a.id === 'pal_greater_blessing');
+    expect(ward?.value).toBe(60);
+    expect(ward?.remaining).toBeGreaterThan(7);
+  });
+
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
     const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_ardent_defender' });
     const deal = (
@@ -273,14 +297,6 @@ describe('paladin redesign', () => {
     expect(p.hp).toBe(1);
     deal(null, p, 50, false, 'physical', null, 'hit'); // inside the ICD: dies
     expect(p.dead).toBe(true);
-  });
-
-  it('Radiant Swell casts and hardens the paladin', () => {
-    const { sim, p } = rig('paladin', 20, { 20: 'pal_r20_aura_mastery' });
-    castAndSettle(sim, 'aura_surge', 1);
-    const swell = p.auras.find((a) => a.kind === 'buff_armor' && a.id === 'aura_surge');
-    expect(swell).toBeTruthy();
-    expect(swell?.value).toBe(160);
   });
 
   it('replay determinism: the proc-heavy priest run is bit-identical', () => {

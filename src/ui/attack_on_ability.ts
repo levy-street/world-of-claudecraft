@@ -24,10 +24,13 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponDamage: 'damage',
   weaponStrike: 'damage',
   directDamage: 'damage',
+  chainDamage: 'damage',
   interrupt: 'other',
   extendDot: 'other',
   consumeDot: 'damage',
-  silence: 'breakCC',
+  // Silence persists through damage in the sim, so an offensive silence can
+  // safely engage auto-attack. Only damage-breakable CC belongs in breakCC.
+  silence: 'other',
   aoeFear: 'breakCC',
   clearCooldowns: 'other',
   breakControl: 'other',

@@ -255,6 +255,10 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  // Grave Omen: one ability-scoped Early Grave is both free and exempt from
+  // its normal wounded-target gate. Kept distinct so no other free-cast proc
+  // accidentally bypasses an execute restriction.
+  | 'next_execute_free'
   | 'next_cast_cheap'
   // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
   // any resource type, combat or not, carried across form shifts.
@@ -1358,6 +1362,17 @@ export type AbilityEffect =
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  // Chain damage: strike the primary hostile, then bounce to the nearest
+  // not-yet-hit hostile within `radius` of the previous target. `jumps` counts
+  // additional targets and each hop deals `falloff` times the previous hit.
+  | {
+      type: 'chainDamage';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
   | { type: 'interrupt'; lockout: number }
   // Channel-tick rider: each application extends the caster's named DoT on the
   // target by `seconds`, up to `maxBonus` total added per DoT application.
@@ -1396,7 +1411,14 @@ export type AbilityEffect =
       party?: boolean;
     } // fortitude/might/mark on a friendly target
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
+  | {
+      type: 'dot';
+      total: number;
+      duration: number;
+      interval: number;
+      leechPct?: number;
+      school?: Aura['school'];
+    }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
@@ -1883,6 +1905,7 @@ export interface Entity {
   cooldowns: Map<string, number>;
   queuedOnSwing: string | null; // heroic strike
   queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
+  queuedOnSwingCostMultiplier?: number; // next_cast_cheap consumed at queue time
   // single-slot spell queue: a press during the tail of the current cast (see
   // CAST_QUEUE_WINDOW_SEC), fired by updateCasting on cast completion. Distinct
   // from queuedOnSwing (a melee on-next-swing queue, not a cast queue).

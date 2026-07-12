@@ -2256,9 +2256,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Оживление питомца',
   'entities.abilities.revive_pet.description':
     'Оживляет вашего павшего питомца и возвращает его к вам.',
-  'entities.abilities.aura_surge.name': 'Лучезарная волна',
+  'entities.abilities.aura_surge.name': 'Рикошет рассветного щита',
   'entities.abilities.aura_surge.description':
-    'Перегружает вашу ауру, укрепляя вас 160 ед. брони на 10 сек. (талант паладина)',
+    'Бросает выкованный рассветом щит, наносящий {damage} ед. урона от Света и лишающий основную цель возможности колдовать на 2 сек. Затем щит отскакивает еще к {jumps} противникам в радиусе {radius} м, нанося при каждом отскоке {falloff} от предыдущего урона. (талант паладина)',
   'entities.abilities.holy_shock.name': 'Шок небес',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
@@ -2340,6 +2340,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.description':
     'Вы становитесь стальным вихрем, каждую секунду нанося ближайшим врагам {damage} ед. урона. (Талант воина)',
   'entities.abilities.razor_howl.name': 'Бритвенный рев',
+  'entities.abilities.lingering_dread.name': 'Неугасающий ужас',
+  'entities.abilities.lingering_dread.description':
+    'Боевой клич обращает врагов в радиусе 10 м в бегство на 4 сек. Каждый эффект страха выдерживает урон в размере 20% от максимального здоровья цели. (талант воина)',
   'entities.abilities.razor_howl.description':
     'Замедляет врагов в радиусе 15 м на 50% на 8 сек. (Талант воина)',
   'entities.abilities.stormthrow.name': 'Штормовой бросок',

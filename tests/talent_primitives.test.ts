@@ -422,6 +422,36 @@ describe('talent primitive P3: empower next', () => {
     ).toBe(true);
   });
 
+  it('next_cast_cheap rides an on-next-swing queue and bills the discounted cost', () => {
+    const { sim, p } = makeSim('warrior');
+    spawnTarget(sim, p);
+    const cheap = aura('next_cast_cheap');
+    cheap.value = 0.5;
+    cheap.empowerAbilities = ['heroic_strike'];
+    p.auras.push(cheap);
+    const fullCost = sim.resolvedAbility('heroic_strike')?.cost;
+    if (fullCost === undefined) throw new Error('missing Reaver Strike');
+    const discountedCost = Math.ceil(fullCost * 0.5);
+    p.resource = discountedCost;
+
+    sim.castAbility('heroic_strike');
+    expect(p.auras.some((a) => a.kind === 'next_cast_cheap')).toBe(false);
+    expect(p.queuedOnSwing).toBe('heroic_strike');
+    expect(p.queuedOnSwingCostMultiplier).toBe(0.5);
+
+    const events = [];
+    for (let i = 0; i < 100 && p.queuedOnSwing; i++) events.push(...sim.tick());
+    // The strike itself may immediately generate a small amount of rage from
+    // damage dealt, but the discounted bill must have consumed most of the pool.
+    expect(p.resource).toBeLessThan(discountedCost);
+    expect(p.queuedOnSwingCostMultiplier).toBeUndefined();
+    expect(
+      events.some(
+        (e) => e.type === 'damage' && e.sourceId === p.id && e.ability === 'Reaver Strike',
+      ),
+    ).toBe(true);
+  });
+
   it('a free conjure consumes the charge where the bill lands (early-return branch)', () => {
     const { sim, p } = makeSim('mage');
     p.resource = 0;

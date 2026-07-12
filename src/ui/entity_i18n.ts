@@ -14,6 +14,7 @@ import {
 import type { ItemDef, PlayerClass } from '../sim/types';
 import {
   en,
+  formatNumber,
   getLanguage,
   hasTranslation,
   type InterpolationValues,
@@ -150,6 +151,159 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
 };
 
 const fallbackLog = new Map<string, EntityTranslationFallback>();
+
+// These ability descriptions changed mechanics, so their older localized prose
+// is unsafe to show until it is retranslated. Use the current English catalog
+// atomically instead of displaying a fluent but mechanically false tooltip.
+const INVALIDATED_LOCALIZED_ABILITY_DESCRIPTIONS = new Set([
+  'aspect_of_the_wild',
+  'aura_surge',
+  'avenging_wrath',
+  'berserk',
+  'bloodlust',
+  'cloak_of_shadows',
+  'divine_shield',
+  'evocation',
+  'frenzied_regeneration',
+  'healing_stream',
+  'holy_nova',
+  'holy_shield',
+  'ice_block',
+  'innervate',
+  'meteor',
+  'multi_shot',
+  'tranquility',
+]);
+
+// These abilities were renamed as part of the choice-row quality pass. Older
+// locale entries still contain the discarded Warcraft-derived names, so Latin
+// locales use the new canonical proper name until their next translation sweep.
+// CJK and Russian use explicit native names to avoid an unreadable Latin fallback.
+const RENAMED_ABILITY_NAME_IDS = new Set([
+  'aura_surge',
+  'smite',
+  'volley',
+  'hurricane',
+  'claw',
+  'rip',
+  'holy_nova',
+  'aspect_of_the_wild',
+  'avatar',
+  'bloodlust',
+  'chain_lightning',
+  'death_coil',
+  'howl_of_terror',
+  'psychic_scream',
+  'silence',
+  'spell_lock',
+]);
+
+const RENAMED_ABILITY_NATIVE_NAMES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  zh_CN: {
+    aura_surge: '黎明圣盾弹射',
+    smite: '涤罪圣咏',
+    volley: '箭陨',
+    hurricane: '狂风之心',
+    claw: '裂创之爪',
+    rip: '血裂',
+    holy_nova: '耀阳圣咏',
+    aspect_of_the_wild: '野牙号令',
+    avatar: '围城之裔',
+    bloodlust: '风暴齐颂',
+    chain_lightning: '苍穹雷枝',
+    death_coil: '晓劫鞭',
+    howl_of_terror: '惊惧齐鸣',
+    psychic_scream: '惊魂圣咏',
+    silence: '缄言',
+    spell_lock: '缚舌咒',
+  },
+  zh_TW: {
+    aura_surge: '黎明聖盾彈射',
+    smite: '滌罪聖詠',
+    volley: '箭隕',
+    hurricane: '狂風之心',
+    claw: '裂創之爪',
+    rip: '血裂',
+    holy_nova: '耀陽聖詠',
+    aspect_of_the_wild: '野牙號令',
+    avatar: '圍城之裔',
+    bloodlust: '風暴齊頌',
+    chain_lightning: '蒼穹雷枝',
+    death_coil: '曉劫鞭',
+    howl_of_terror: '驚懼齊鳴',
+    psychic_scream: '驚魂聖詠',
+    silence: '緘言',
+    spell_lock: '縛舌咒',
+  },
+  ja_JP: {
+    aura_surge: '暁の盾の跳弾',
+    smite: '浄罪の聖歌',
+    volley: '矢雨',
+    hurricane: '疾風の心',
+    claw: '裂き爪',
+    rip: '血裂',
+    holy_nova: '陽光炸裂の聖歌',
+    aspect_of_the_wild: '野牙の号令',
+    avatar: '攻城の申し子',
+    bloodlust: '嵐の唱和',
+    chain_lightning: '天空の枝',
+    death_coil: '終焉の鞭',
+    howl_of_terror: '恐怖の合唱',
+    psychic_scream: '戦慄の頌歌',
+    silence: '静寂の言霊',
+    spell_lock: '舌縛り',
+  },
+  ko_KR: {
+    aura_surge: '여명 방패 도탄',
+    smite: '정죄의 성가',
+    volley: '화살비',
+    hurricane: '질풍의 심장',
+    claw: '찢는 발톱',
+    rip: '핏빛 균열',
+    holy_nova: '태양섬광의 성가',
+    aspect_of_the_wild: '야생송곳니의 함성',
+    avatar: '공성의 후예',
+    bloodlust: '폭풍의 합창',
+    chain_lightning: '천공의 가지',
+    death_coil: '종말의 채찍',
+    howl_of_terror: '공포의 합창',
+    psychic_scream: '전율의 성가',
+    silence: '고요의 언령',
+    spell_lock: '혀의 속박',
+  },
+  ru_RU: {
+    aura_surge: 'Рикошет рассветного щита',
+    smite: 'Очищающий гимн',
+    volley: 'Стрелопад',
+    hurricane: 'Сердце бури',
+    claw: 'Раздирающий коготь',
+    rip: 'Кровавый разлом',
+    holy_nova: 'Солнцезарная песнь',
+    aspect_of_the_wild: 'Клич Дикого Клыка',
+    avatar: 'Осаднорождённый',
+    bloodlust: 'Хор бури',
+    chain_lightning: 'Небесная ветвь',
+    death_coil: 'Плеть скорби',
+    howl_of_terror: 'Хор страха',
+    psychic_scream: 'Песнь ужаса',
+    silence: 'Слово безмолвия',
+    spell_lock: 'Оковы языка',
+  },
+};
+
+function localizeTooltipUnits(value: string, lang: SupportedLanguage): string {
+  return value.replace(/\b(\d+(?:\.\d+)?) yd\b/gi, (_match, raw: string) =>
+    formatNumber(
+      Number(raw),
+      {
+        style: 'unit',
+        unit: 'yard',
+        unitDisplay: 'long',
+      },
+      lang,
+    ),
+  );
+}
 
 // Ravenpost authored letters by letterId (the welcome letter + the quest
 // thank-you letters), the canonical English source the 'letter' kind reads.
@@ -340,8 +494,41 @@ function recordFallback(request: EntityTranslationRequest, value: string): void 
 
 export function tEntity(request: EntityTranslationRequest): string {
   const key = entityTranslationKey(request);
+  if (
+    request.kind === 'ability' &&
+    request.field === 'name' &&
+    RENAMED_ABILITY_NAME_IDS.has(request.id)
+  ) {
+    const language = getLanguage();
+    if (language === 'en' || language === 'en_CA') {
+      return tOptional(key, request.values) ?? canonicalEntityText(request);
+    }
+    return RENAMED_ABILITY_NATIVE_NAMES[language]?.[request.id] ?? canonicalEntityText(request);
+  }
+  if (
+    request.kind === 'ability' &&
+    request.field === 'description' &&
+    INVALIDATED_LOCALIZED_ABILITY_DESCRIPTIONS.has(request.id) &&
+    getLanguage() !== 'en' &&
+    getLanguage() !== 'en_CA'
+  ) {
+    const currentEnglish = tOptional(key, request.values, 'en');
+    if (currentEnglish !== null) {
+      return localizeTooltipUnits(currentEnglish, getLanguage());
+    }
+  }
   const translated = tOptional(key, request.values);
-  if (translated !== null) return translated;
+  if (translated !== null) {
+    if (
+      request.kind === 'ability' &&
+      request.field === 'description' &&
+      getLanguage() !== 'en' &&
+      getLanguage() !== 'en_CA'
+    ) {
+      return localizeTooltipUnits(translated, getLanguage());
+    }
+    return translated;
+  }
   const fallback = interpolateSource(canonicalEntityText(request), request.values);
   recordFallback(request, fallback);
   return fallback;

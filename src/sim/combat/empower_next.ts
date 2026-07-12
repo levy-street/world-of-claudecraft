@@ -22,15 +22,41 @@ function consumeAuraKind(
 }
 
 export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
-  return e.auras.some((a) => a.kind === 'next_cast_free' && matches(a, abilityId));
+  return e.auras.some(
+    (a) => (a.kind === 'next_cast_free' || a.kind === 'next_execute_free') && matches(a, abilityId),
+  );
+}
+
+export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
+  return e.auras.some((a) => a.kind === 'next_execute_free' && matches(a, abilityId));
+}
+
+/** Returns a matching cheap-cast multiplier without consuming its aura. */
+export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
+  const aura = e.auras.find((a) => a.kind === 'next_cast_cheap' && matches(a, abilityId));
+  return aura?.value ?? null;
 }
 
 export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null;
+  return (
+    consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null ||
+    consumeAuraKind(ctx, e, 'next_execute_free', abilityId) !== null
+  );
 }
 
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
   return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+}
+
+// Unscoped instant-cast effects remain spell-only, but a talent proc that names a
+// specific physical cast-time ability (Long Draw) is allowed to empower it.
+export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {
+  return e.auras.some(
+    (a) =>
+      a.kind === 'next_cast_instant' &&
+      a.empowerAbilities !== undefined &&
+      a.empowerAbilities.includes(abilityId),
+  );
 }
 
 /** Returns the cost multiplier (e.g. 0.5) or null when no cheap charge matches. */

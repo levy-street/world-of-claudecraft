@@ -43,7 +43,7 @@ import {
   normAngle,
   swingMissChance,
 } from '../types';
-import { spendResource } from './casting_lifecycle';
+import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -153,9 +153,13 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
     if (queued) {
       const eff = queued.effects.find((e) => e.type === 'weaponDamage');
-      const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
+      const queuedCost =
+        p.queuedOnSwingFree === true
+          ? 0
+          : Math.ceil(queued.cost * (p.queuedOnSwingCostMultiplier ?? 1));
       if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
         spendResource(p, queuedCost);
+        applyRageSpendCooldownRefund(ctx, p, meta, p.resourceType === 'rage' ? queuedCost : 0);
         // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
         // in castAbility, so their cooldown must be applied on the swing too (#56)
         if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
@@ -167,6 +171,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     }
     p.queuedOnSwing = null;
     delete p.queuedOnSwingFree;
+    delete p.queuedOnSwingCostMultiplier;
   }
   meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
   // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's

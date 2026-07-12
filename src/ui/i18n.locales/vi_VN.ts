@@ -1749,8 +1749,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.name': 'Nhát Chém Xiềng Xích',
   'entities.abilities.wrath.description': 'Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên.',
   'entities.abilities.wrath.name': 'Tia Hoang Dã',
-  'entities.abilities.aura_surge.name': 'Sóng Hào Quang',
-  'entities.abilities.aura_surge.description': 'Quá tải hào quang của bạn, gia cố 160 giáp trong 10 giây. (thiên phú Paladin)',
   'entities.abilities.holy_shock.name': 'Sốc Thánh',
   'entities.abilities.holy_shock.description': 'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
   'entities.abilities.holy_shield.name': 'Khiên Thánh',

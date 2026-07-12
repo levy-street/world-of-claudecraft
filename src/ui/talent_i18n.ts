@@ -8,7 +8,7 @@ import {
   TALENTS,
   type TalentEffect,
 } from '../sim/content/talents';
-import { ABILITIES } from '../sim/data';
+import { ABILITIES, CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
@@ -8459,17 +8459,503 @@ function statAmount(stat: StatKey, value: number, lang: SupportedLanguage): stri
     : formatNumber(Math.abs(value), lang);
 }
 
+// Choice-row titles introduced by the all-class quality pass. Latin-script
+// locales deliberately keep the new original proper names until their next
+// translation sweep, which is still an explicit override and never revives the
+// discarded Warcraft title. CJK locales provide native titles below because a
+// raw Latin fallback is unreadable in those talent trees.
+const ALL_CLASS_CHOICE_TITLE_NAMES = new Set([
+  'Ragebound Entry',
+  "Miser's Maim",
+  'Bloodtrail',
+  "Headsman's Due",
+  'Grave Omen',
+  'Ragewheel',
+  'Oath Returned',
+  "Pilgrim's Light",
+  'Ashen Sentence',
+  'Twin Gavels',
+  'Hallowed Snare',
+  'Third Benediction',
+  'Mercy from Ruin',
+  'Afterglow Aegis',
+  'Twin Verdicts',
+  'Oathwheel',
+  "Rite's Afterglow",
+  'Venom Relay',
+  'Twin Fletching',
+  'Guisecraft',
+  'Pinning Barb',
+  'Full-Draw Rhythm',
+  'Viperfletch',
+  'Bloodbond',
+  'Afterfall',
+  'Redline Draw',
+  "Knife's Dividend",
+  'Dusk Dividend',
+  'Blindside Opening',
+  'Paid in Pain',
+  'Second Exit',
+  'Borrowed Tempo',
+  'Venom Dividend',
+  'Ghostfoot Gambit',
+  'Borrowed Breath',
+  'Redline Habit',
+  'First Cut, Last Word',
+  'Third Verse',
+  'Warding Refrain',
+  'Dirgebound Thought',
+  'Shattered Psalm',
+  'Measured Mercy',
+  'Gloam Siphon',
+  'Twin Fracture',
+  'Mercy Deferred',
+  'Endless Dirge',
+  'Resolve Unbroken',
+  'Wounded Halo',
+  'Halo Aftershock',
+  'Rebounding Current',
+  'Imbued Lifeblood',
+  'Fault Rebuke',
+  'Rime Lock',
+  'Returning Current',
+  'Sky Echo',
+  'Cinder Rupture',
+  'Imbued Tempo',
+  'Wolfstep',
+  'Stonewake Shell',
+  'Storm Recall',
+  'Undertow Promise',
+  'Cinder Reprise',
+  'Twin Embers',
+  'Third Current',
+  'Rime Ambush',
+  "Witch's Opening",
+  'Brittle Moment',
+  'Dartstride',
+  'Glassward Reflex',
+  'Grave Rhythm',
+  'Blacktide',
+  'Pact Reversal',
+  'Blood Credit',
+  'Walking Hunger',
+  'Fiendward',
+  'Ashen Relay',
+  'Shadow Credit',
+  'Cruel Awakening',
+  'Hellglass Ward',
+  'Hexstorm',
+  'Moonkindle',
+  "Bloom's End",
+  'Briar Ambush',
+  'Bruin Rebound',
+  'Formrush',
+  'Grove Covenant',
+  'Redtooth Rhythm',
+  'Mercy Seed',
+  'Oaken Reflex',
+  'Ironhide Reflex',
+  'Storm Refrain',
+]);
+
+const ALL_CLASS_CHOICE_CJK_TITLES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  zh_CN: {
+    'Ragebound Entry': '怒契冲阵',
+    "Miser's Maim": '惜怒断筋',
+    Bloodtrail: '血痕',
+    "Headsman's Due": '刽子手之债',
+    'Grave Omen': '墓冢凶兆',
+    Ragewheel: '怒轮不息',
+    'Oath Returned': '誓约回赐',
+    "Pilgrim's Light": '朝圣者之光',
+    'Ashen Sentence': '灰烬判词',
+    'Twin Gavels': '双槌律令',
+    'Hallowed Snare': '圣域禁足',
+    'Third Benediction': '三叠圣祷',
+    'Mercy from Ruin': '劫后慈恩',
+    'Afterglow Aegis': '余晖神盾',
+    'Twin Verdicts': '双重裁决',
+    Oathwheel: '誓轮流转',
+    "Rite's Afterglow": '仪式余晖',
+    'Venom Relay': '毒脉接续',
+    'Twin Fletching': '双羽箭术',
+    Guisecraft: '化形秘术',
+    'Pinning Barb': '钉身倒刺',
+    'Full-Draw Rhythm': '满弦律动',
+    Viperfletch: '蝰羽箭艺',
+    Bloodbond: '血契羁绊',
+    Afterfall: '箭落余势',
+    'Redline Draw': '赤弦极限',
+    "Knife's Dividend": '刀口分赃',
+    'Dusk Dividend': '暮影分赃',
+    'Blindside Opening': '死角先机',
+    'Paid in Pain': '以痛偿付',
+    'Second Exit': '第二退路',
+    'Borrowed Tempo': '借势节拍',
+    'Venom Dividend': '毒酿分赃',
+    'Ghostfoot Gambit': '鬼步赌局',
+    'Borrowed Breath': '借命一息',
+    'Redline Habit': '搏命恶习',
+    'First Cut, Last Word': '首刃定终局',
+    'Third Verse': '第三诗节',
+    'Warding Refrain': '护佑复唱',
+    'Dirgebound Thought': '挽歌缚念',
+    'Shattered Psalm': '碎裂圣诗',
+    'Measured Mercy': '有度慈悲',
+    'Gloam Siphon': '暮色汲取',
+    'Twin Fracture': '双重心裂',
+    'Mercy Deferred': '慈悲暂寄',
+    'Endless Dirge': '无尽挽歌',
+    'Resolve Unbroken': '不屈决意',
+    'Wounded Halo': '创痕光轮',
+    'Halo Aftershock': '光轮余震',
+    'Rebounding Current': '反涌雷流',
+    'Imbued Lifeblood': '附灵命血',
+    'Fault Rebuke': '裂地斥责',
+    'Rime Lock': '霜锁',
+    'Returning Current': '灵流回返',
+    'Sky Echo': '天穹回响',
+    'Cinder Rupture': '烬痕爆裂',
+    'Imbued Tempo': '灵契节律',
+    Wolfstep: '狼影瞬步',
+    'Stonewake Shell': '岩醒之壳',
+    'Storm Recall': '风暴回召',
+    'Undertow Promise': '暗流之诺',
+    'Cinder Reprise': '烬火复奏',
+    'Twin Embers': '双生余烬',
+    'Third Current': '三叠秘流',
+    'Rime Ambush': '寒霜伏袭',
+    "Witch's Opening": '巫术先机',
+    'Brittle Moment': '脆裂一瞬',
+    Dartstride: '秘矢疾步',
+    'Glassward Reflex': '琉璃瞬护',
+    'Grave Rhythm': '墓冢节律',
+    Blacktide: '黑潮',
+    'Pact Reversal': '契约逆转',
+    'Blood Credit': '血契赊账',
+    'Walking Hunger': '饥渴随行',
+    Fiendward: '邪魔护障',
+    'Ashen Relay': '烬火接续',
+    'Shadow Credit': '暗影赊账',
+    'Cruel Awakening': '残酷惊醒',
+    'Hellglass Ward': '狱璃护障',
+    Hexstorm: '邪咒风暴',
+    Moonkindle: '月辉初燃',
+    "Bloom's End": '花期终章',
+    'Briar Ambush': '荆棘伏袭',
+    'Bruin Rebound': '熊灵回势',
+    Formrush: '化形奔袭',
+    'Grove Covenant': '林地盟约',
+    'Redtooth Rhythm': '赤牙节律',
+    'Mercy Seed': '慈悲之种',
+    'Oaken Reflex': '橡木瞬应',
+    'Ironhide Reflex': '铁甲瞬应',
+    'Storm Refrain': '风暴复唱',
+  },
+  zh_TW: {
+    'Ragebound Entry': '怒契衝陣',
+    "Miser's Maim": '惜怒斷筋',
+    Bloodtrail: '血痕',
+    "Headsman's Due": '劊子手之債',
+    'Grave Omen': '墓塚凶兆',
+    Ragewheel: '怒輪不息',
+    'Oath Returned': '誓約回賜',
+    "Pilgrim's Light": '朝聖者之光',
+    'Ashen Sentence': '灰燼判詞',
+    'Twin Gavels': '雙槌律令',
+    'Hallowed Snare': '聖域禁足',
+    'Third Benediction': '三疊聖禱',
+    'Mercy from Ruin': '劫後慈恩',
+    'Afterglow Aegis': '餘暉神盾',
+    'Twin Verdicts': '雙重裁決',
+    Oathwheel: '誓輪流轉',
+    "Rite's Afterglow": '儀式餘暉',
+    'Venom Relay': '毒脈接續',
+    'Twin Fletching': '雙羽箭術',
+    Guisecraft: '化形祕術',
+    'Pinning Barb': '釘身倒刺',
+    'Full-Draw Rhythm': '滿弦律動',
+    Viperfletch: '蝰羽箭藝',
+    Bloodbond: '血契羈絆',
+    Afterfall: '箭落餘勢',
+    'Redline Draw': '赤弦極限',
+    "Knife's Dividend": '刀口分贓',
+    'Dusk Dividend': '暮影分贓',
+    'Blindside Opening': '死角先機',
+    'Paid in Pain': '以痛償付',
+    'Second Exit': '第二退路',
+    'Borrowed Tempo': '借勢節拍',
+    'Venom Dividend': '毒釀分贓',
+    'Ghostfoot Gambit': '鬼步賭局',
+    'Borrowed Breath': '借命一息',
+    'Redline Habit': '搏命惡習',
+    'First Cut, Last Word': '首刃定終局',
+    'Third Verse': '第三詩節',
+    'Warding Refrain': '護佑複唱',
+    'Dirgebound Thought': '輓歌縛念',
+    'Shattered Psalm': '碎裂聖詩',
+    'Measured Mercy': '有度慈悲',
+    'Gloam Siphon': '暮色汲取',
+    'Twin Fracture': '雙重心裂',
+    'Mercy Deferred': '慈悲暫寄',
+    'Endless Dirge': '無盡輓歌',
+    'Resolve Unbroken': '不屈決意',
+    'Wounded Halo': '創痕光輪',
+    'Halo Aftershock': '光輪餘震',
+    'Rebounding Current': '反湧雷流',
+    'Imbued Lifeblood': '附靈命血',
+    'Fault Rebuke': '裂地斥責',
+    'Rime Lock': '霜鎖',
+    'Returning Current': '靈流回返',
+    'Sky Echo': '天穹迴響',
+    'Cinder Rupture': '燼痕爆裂',
+    'Imbued Tempo': '靈契節律',
+    Wolfstep: '狼影瞬步',
+    'Stonewake Shell': '岩醒之殼',
+    'Storm Recall': '風暴回召',
+    'Undertow Promise': '暗流之諾',
+    'Cinder Reprise': '燼火複奏',
+    'Twin Embers': '雙生餘燼',
+    'Third Current': '三疊祕流',
+    'Rime Ambush': '寒霜伏襲',
+    "Witch's Opening": '巫術先機',
+    'Brittle Moment': '脆裂一瞬',
+    Dartstride: '祕矢疾步',
+    'Glassward Reflex': '琉璃瞬護',
+    'Grave Rhythm': '墓塚節律',
+    Blacktide: '黑潮',
+    'Pact Reversal': '契約逆轉',
+    'Blood Credit': '血契賒帳',
+    'Walking Hunger': '飢渴隨行',
+    Fiendward: '邪魔護障',
+    'Ashen Relay': '燼火接續',
+    'Shadow Credit': '暗影賒帳',
+    'Cruel Awakening': '殘酷驚醒',
+    'Hellglass Ward': '獄璃護障',
+    Hexstorm: '邪咒風暴',
+    Moonkindle: '月輝初燃',
+    "Bloom's End": '花期終章',
+    'Briar Ambush': '荊棘伏襲',
+    'Bruin Rebound': '熊靈回勢',
+    Formrush: '化形奔襲',
+    'Grove Covenant': '林地盟約',
+    'Redtooth Rhythm': '赤牙節律',
+    'Mercy Seed': '慈悲之種',
+    'Oaken Reflex': '橡木瞬應',
+    'Ironhide Reflex': '鐵甲瞬應',
+    'Storm Refrain': '風暴複唱',
+  },
+  ja_JP: {
+    'Ragebound Entry': '怒気の先陣',
+    "Miser's Maim": '吝嗇の裂傷',
+    Bloodtrail: '血の軌跡',
+    "Headsman's Due": '首斬り役の報酬',
+    'Grave Omen': '墓場の予兆',
+    Ragewheel: '怒気輪転',
+    'Oath Returned': '還る誓約',
+    "Pilgrim's Light": '巡礼者の灯',
+    'Ashen Sentence': '灰燼の宣告',
+    'Twin Gavels': '双槌の裁き',
+    'Hallowed Snare': '聖域の戒縛',
+    'Third Benediction': '三度目の祝祷',
+    'Mercy from Ruin': '破滅よりの慈悲',
+    'Afterglow Aegis': '残光の守護',
+    'Twin Verdicts': '二重の審判',
+    Oathwheel: '誓約輪転',
+    "Rite's Afterglow": '儀式の残光',
+    'Venom Relay': '毒矢の継走',
+    'Twin Fletching': '双矢の仕立て',
+    Guisecraft: '獣装の妙技',
+    'Pinning Barb': '縫い留めの棘',
+    'Full-Draw Rhythm': '引き絞りの律動',
+    Viperfletch: '毒蛇の矢羽',
+    Bloodbond: '血の絆',
+    Afterfall: '矢雨の余韻',
+    'Redline Draw': '死線の引き絞り',
+    "Knife's Dividend": '刃の配当',
+    'Dusk Dividend': '宵闇の配当',
+    'Blindside Opening': '死角の好機',
+    'Paid in Pain': '痛みの代価',
+    'Second Exit': '第二の逃げ道',
+    'Borrowed Tempo': '借りた律動',
+    'Venom Dividend': '毒の配当',
+    'Ghostfoot Gambit': '幽歩の賭け',
+    'Borrowed Breath': '借り物の命',
+    'Redline Habit': '死線の習性',
+    'First Cut, Last Word': '初太刀、最後の言葉',
+    'Third Verse': '第三の聖句',
+    'Warding Refrain': '守護の反唱',
+    'Dirgebound Thought': '葬歌に囚われた思念',
+    'Shattered Psalm': '砕け散る聖詠',
+    'Measured Mercy': '律された慈悲',
+    'Gloam Siphon': '薄闇の吸命',
+    'Twin Fracture': '二重の亀裂',
+    'Mercy Deferred': '留め置く慈悲',
+    'Endless Dirge': '果てなき葬歌',
+    'Resolve Unbroken': '不屈の決意',
+    'Wounded Halo': '傷ついた光輪',
+    'Halo Aftershock': '光輪の余震',
+    'Rebounding Current': '跳ね返る電流',
+    'Imbued Lifeblood': '付呪の命脈',
+    'Fault Rebuke': '断層の叱責',
+    'Rime Lock': '霧氷の封縛',
+    'Returning Current': '還流',
+    'Sky Echo': '天空の残響',
+    'Cinder Rupture': '熾火の破裂',
+    'Imbued Tempo': '付呪の律動',
+    Wolfstep: '狼歩',
+    'Stonewake Shell': '目覚める岩殻',
+    'Storm Recall': '嵐の呼び戻し',
+    'Undertow Promise': '底流の約束',
+    'Cinder Reprise': '熾火の反唱',
+    'Twin Embers': '双つの熾火',
+    'Third Current': '第三の奔流',
+    'Rime Ambush': '霧氷の奇襲',
+    "Witch's Opening": '魔女の好機',
+    'Brittle Moment': '脆き一瞬',
+    Dartstride: '魔矢の歩法',
+    'Glassward Reflex': '玻璃結界の即応',
+    'Grave Rhythm': '墓場の律動',
+    Blacktide: '黒き潮',
+    'Pact Reversal': '契約の逆転',
+    'Blood Credit': '血の貸し',
+    'Walking Hunger': '歩く飢餓',
+    Fiendward: '悪鬼の結界',
+    'Ashen Relay': '灰燼の連唱',
+    'Shadow Credit': '影の貸し',
+    'Cruel Awakening': '残酷な目覚め',
+    'Hellglass Ward': '地獄硝子の結界',
+    Hexstorm: '呪嵐',
+    Moonkindle: '月の火種',
+    "Bloom's End": '花散りの恵み',
+    'Briar Ambush': '茨の奇襲',
+    'Bruin Rebound': '熊の巻き返し',
+    Formrush: '変身の猛進',
+    'Grove Covenant': '木立の盟約',
+    'Redtooth Rhythm': '赤牙の律動',
+    'Mercy Seed': '慈悲の種',
+    'Oaken Reflex': '樫皮の即応',
+    'Ironhide Reflex': '鉄皮の即応',
+    'Storm Refrain': '嵐の反唱',
+  },
+  ko_KR: {
+    'Ragebound Entry': '분노의 선봉',
+    "Miser's Maim": '수전노의 난도질',
+    Bloodtrail: '핏빛 자취',
+    "Headsman's Due": '처형인의 몫',
+    'Grave Omen': '무덤의 전조',
+    Ragewheel: '분노의 수레바퀴',
+    'Oath Returned': '돌아온 맹세',
+    "Pilgrim's Light": '순례자의 빛',
+    'Ashen Sentence': '잿빛 선고',
+    'Twin Gavels': '쌍둥이 심판봉',
+    'Hallowed Snare': '성역의 결박',
+    'Third Benediction': '세 번째 축도',
+    'Mercy from Ruin': '파멸에서 온 자비',
+    'Afterglow Aegis': '잔광의 수호',
+    'Twin Verdicts': '이중 판결',
+    Oathwheel: '맹세의 수레바퀴',
+    "Rite's Afterglow": '의식의 잔광',
+    'Venom Relay': '맹독 연계',
+    'Twin Fletching': '쌍화살깃',
+    Guisecraft: '야수 형상술',
+    'Pinning Barb': '옭아매는 가시',
+    'Full-Draw Rhythm': '만작의 율동',
+    Viperfletch: '독사의 화살깃',
+    Bloodbond: '피의 결속',
+    Afterfall: '화살비의 여운',
+    'Redline Draw': '한계의 만작',
+    "Knife's Dividend": '칼날의 배당',
+    'Dusk Dividend': '황혼의 배당',
+    'Blindside Opening': '사각의 틈',
+    'Paid in Pain': '고통의 대가',
+    'Second Exit': '두 번째 퇴로',
+    'Borrowed Tempo': '빌린 박자',
+    'Venom Dividend': '맹독의 배당',
+    'Ghostfoot Gambit': '유령걸음의 승부수',
+    'Borrowed Breath': '빌린 목숨',
+    'Redline Habit': '사선의 버릇',
+    'First Cut, Last Word': '첫 베기, 마지막 말',
+    'Third Verse': '세 번째 성구',
+    'Warding Refrain': '수호의 후렴',
+    'Dirgebound Thought': '장송곡에 묶인 사념',
+    'Shattered Psalm': '부서지는 성가',
+    'Measured Mercy': '절제된 자비',
+    'Gloam Siphon': '땅거미의 흡혼',
+    'Twin Fracture': '이중 균열',
+    'Mercy Deferred': '미뤄 둔 자비',
+    'Endless Dirge': '끝없는 장송곡',
+    'Resolve Unbroken': '꺾이지 않는 결의',
+    'Wounded Halo': '상처 입은 후광',
+    'Halo Aftershock': '후광의 여진',
+    'Rebounding Current': '되튀는 전류',
+    'Imbued Lifeblood': '주입된 생명혈',
+    'Fault Rebuke': '단층의 질책',
+    'Rime Lock': '서리 봉쇄',
+    'Returning Current': '돌아오는 전류',
+    'Sky Echo': '하늘의 메아리',
+    'Cinder Rupture': '잉걸불 파열',
+    'Imbued Tempo': '주입된 박자',
+    Wolfstep: '늑대걸음',
+    'Stonewake Shell': '깨어난 돌껍질',
+    'Storm Recall': '폭풍의 회귀',
+    'Undertow Promise': '저류의 약속',
+    'Cinder Reprise': '잉걸불의 재현',
+    'Twin Embers': '쌍둥이 불씨',
+    'Third Current': '세 번째 마력류',
+    'Rime Ambush': '서리 기습',
+    "Witch's Opening": '마녀의 틈',
+    'Brittle Moment': '깨질 듯한 순간',
+    Dartstride: '마탄 보법',
+    'Glassward Reflex': '유리 결계의 즉응',
+    'Grave Rhythm': '무덤의 율동',
+    Blacktide: '검은 파도',
+    'Pact Reversal': '계약의 역전',
+    'Blood Credit': '피의 외상',
+    'Walking Hunger': '걸어 다니는 허기',
+    Fiendward: '악마의 결계',
+    'Ashen Relay': '잿불의 연계',
+    'Shadow Credit': '그림자의 외상',
+    'Cruel Awakening': '잔혹한 각성',
+    'Hellglass Ward': '지옥 유리의 결계',
+    Hexstorm: '사술폭풍',
+    Moonkindle: '달빛 불씨',
+    "Bloom's End": '낙화의 은총',
+    'Briar Ambush': '가시덤불 기습',
+    'Bruin Rebound': '곰의 되치기',
+    Formrush: '변신 돌진',
+    'Grove Covenant': '수풀의 맹약',
+    'Redtooth Rhythm': '붉은 송곳니의 율동',
+    'Mercy Seed': '자비의 씨앗',
+    'Oaken Reflex': '참나무껍질의 즉응',
+    'Ironhide Reflex': '무쇠가죽의 즉응',
+    'Storm Refrain': '폭풍의 후렴',
+  },
+};
+
+function allClassChoiceTitleOverride(lang: SupportedLanguage, source: string): string | undefined {
+  if (!ALL_CLASS_CHOICE_TITLE_NAMES.has(source)) return undefined;
+  const localized = ALL_CLASS_CHOICE_CJK_TITLES[lang]?.[source];
+  if (localized !== undefined) return localized;
+  if (lang === 'zh_CN' || lang === 'zh_TW' || lang === 'ja_JP' || lang === 'ko_KR') {
+    return undefined;
+  }
+  return source;
+}
+
 function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
   const abilityId = abilityIdByName.get(source);
   if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
   const warriorPortOverride = warriorPortTitleOverride(lang, source);
   if (warriorPortOverride !== undefined) return warriorPortOverride;
+  const allClassChoiceOverride = allClassChoiceTitleOverride(lang, source);
+  if (allClassChoiceOverride !== undefined) return allClassChoiceOverride;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
-  // talent that still needs a localized override — clean English is preferable to a
+  // talent that still needs a localized override. Clean English is preferable to a
   // broken word-by-word guess, and the leak-guard test flags it for translation.
   return source;
 }
@@ -8559,44 +9045,216 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+type GrantEffectShape = {
+  type: string;
+  min?: number;
+  max?: number;
+  amount?: number;
+  total?: number;
+  value?: number;
+  mult?: number;
+  duration?: number;
+  interval?: number;
+  radius?: number;
+  jumps?: number;
+  falloff?: number;
+  kind?: string;
+};
+
+function grantAmountRange(min: number, max: number, lang: SupportedLanguage): string {
+  const minText = formatNumber(min, lang);
+  const maxText = formatNumber(max, lang);
+  return min === max ? minText : t('abilityUi.tooltip.damageRange', { min: minText, max: maxText });
+}
+
+function percentText(value: number, lang: SupportedLanguage): string {
+  return formatPercent(value, lang);
+}
+
 // Base (rank-1, no player scaling) values for a granted ability's description
-// placeholders, so a grant tooltip on the planning screen resolves {damage}/
-// {buff}/{duration} instead of showing raw braces. 37 of 54 granted abilities
-// have static descriptions and skip this; the 17 with placeholders use it.
+// placeholders. Keep this exhaustive over the effect shapes used by grants: the
+// talent picker is a planning screen, so every defining number must be visible
+// before the player commits the row.
 export function grantAbilityValues(id: string): InterpolationValues {
   const def = ABILITIES[id];
-  const effs = def?.effects ?? [];
+  const effs = (def?.effects ?? []) as GrantEffectShape[];
+  const lang = getLanguage();
   const values: Record<string, string> = {};
+  const chainEff = effs.find((e) => e.type === 'chainDamage');
   const damageEff = effs.find((e) =>
     ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(e.type),
-  ) as { min?: number; max?: number } | undefined;
-  const absorbEff = effs.find((e) => e.type === 'absorb') as { amount?: number } | undefined;
-  const dotEff = effs.find((e) => e.type === 'dot' || e.type === 'hot') as
-    | { total?: number }
-    | undefined;
-  const buffEff = effs.find((e) => e.type === 'selfBuff' || e.type === 'buffTarget') as
-    | { value?: number }
-    | undefined;
-  const durEff = effs.find(
-    (e) => 'duration' in e && typeof (e as { duration?: number }).duration === 'number',
-  ) as { duration?: number } | undefined;
-  if (damageEff?.min !== undefined) {
-    values.damage =
-      damageEff.min === damageEff.max
-        ? String(damageEff.min)
-        : `${damageEff.min} to ${damageEff.max}`;
-  } else if (absorbEff?.amount !== undefined) values.damage = String(absorbEff.amount);
-  else if (dotEff?.total !== undefined) values.damage = String(dotEff.total);
-  if (buffEff?.value !== undefined) values.buff = String(buffEff.value);
-  if (durEff?.duration !== undefined) values.duration = String(durEff.duration);
+  );
+  const groundEff = effs.find((e) => e.type === 'groundAoE');
+  const absorbEff = effs.find((e) => e.type === 'absorb');
+  const dotEff = effs.find((e) => e.type === 'dot' || e.type === 'hot');
+  const resourceEff = effs.find((e) => e.type === 'gainResource');
+  const buffEff = effs.find((e) => e.type === 'selfBuff' || e.type === 'buffTarget');
+  const allyAttackPowerEff = effs.find((e) => e.type === 'aoeAllyAttackPower');
+  const allyHasteEff = effs.find((e) => e.type === 'aoeAllyHaste');
+  const durEff = effs.find((e) => typeof e.duration === 'number');
+
+  if (chainEff?.min !== undefined && chainEff.max !== undefined) {
+    values.min = formatNumber(chainEff.min, lang);
+    values.max = formatNumber(chainEff.max, lang);
+    values.damage = grantAmountRange(chainEff.min, chainEff.max, lang);
+    if (chainEff.jumps !== undefined) values.jumps = formatNumber(chainEff.jumps, lang);
+    if (chainEff.falloff !== undefined) values.falloff = percentText(chainEff.falloff, lang);
+    if (chainEff.radius !== undefined) values.radius = formatNumber(chainEff.radius, lang);
+  } else if (damageEff?.min !== undefined && damageEff.max !== undefined) {
+    values.min = formatNumber(damageEff.min, lang);
+    values.max = formatNumber(damageEff.max, lang);
+    values.damage = grantAmountRange(damageEff.min, damageEff.max, lang);
+  }
+
+  if (absorbEff?.amount !== undefined) {
+    const amount = formatNumber(absorbEff.amount, lang);
+    values.amount = amount;
+    if (values.damage === undefined) values.damage = amount;
+  }
+  if (dotEff?.total !== undefined) {
+    const total = formatNumber(dotEff.total, lang);
+    values.overTime = total;
+    if (values.damage === undefined) values.damage = total;
+  }
+  if (groundEff?.min !== undefined && groundEff.max !== undefined) {
+    values.overTime = grantAmountRange(groundEff.min, groundEff.max, lang);
+  }
+  if (resourceEff?.amount !== undefined) {
+    values.amount = formatNumber(resourceEff.amount, lang);
+  }
+
+  if (buffEff?.value !== undefined) values.buff = formatNumber(buffEff.value, lang);
+  if (allyAttackPowerEff?.amount !== undefined) {
+    values.buff = formatNumber(allyAttackPowerEff.amount, lang);
+  }
+  if (allyHasteEff?.mult !== undefined) {
+    values.buff = percentText(allyHasteEff.mult - 1, lang);
+  }
+  for (const eff of effs) {
+    if (eff.type !== 'selfBuff' || eff.value === undefined) continue;
+    if (eff.kind === 'buff_ap') values.attackPower = formatNumber(eff.value, lang);
+    if (eff.kind === 'buff_spellpower') values.spellPower = formatNumber(eff.value, lang);
+  }
+
+  const duration = durEff?.duration ?? def?.channel?.duration;
+  if (duration !== undefined) values.duration = formatNumber(duration, lang);
+  const interval = groundEff?.interval ?? dotEff?.interval;
+  if (interval !== undefined) values.interval = formatNumber(interval, lang);
+  const radius =
+    chainEff?.radius ??
+    groundEff?.radius ??
+    allyAttackPowerEff?.radius ??
+    allyHasteEff?.radius ??
+    damageEff?.radius;
+  if (radius !== undefined) values.radius = formatNumber(radius, lang);
   return values;
+}
+
+function grantResourceName(id: string): string | null {
+  const cls = ABILITIES[id]?.class;
+  const resource = cls ? CLASSES[cls]?.resourceType : null;
+  if (resource === 'mana') return t('abilityUi.resources.mana');
+  if (resource === 'rage') return t('abilityUi.resources.rage');
+  if (resource === 'energy') return t('abilityUi.resources.energy');
+  return null;
+}
+
+export function grantAbilityMetadata(id: string): string {
+  const def = ABILITIES[id];
+  if (!def) return '';
+  const lang = getLanguage();
+  const parts: string[] = [];
+  const resource = grantResourceName(id);
+  if (def.cost > 0 && resource) {
+    parts.push(t('abilityUi.tooltip.cost', { cost: formatNumber(def.cost, lang), resource }));
+  }
+  if (def.channel) {
+    parts.push(
+      t('abilityUi.tooltip.channeledSeconds', {
+        seconds: formatNumber(def.channel.duration, lang),
+      }),
+    );
+  } else if (def.castTime > 0) {
+    parts.push(t('abilityUi.tooltip.castSeconds', { seconds: formatNumber(def.castTime, lang) }));
+  } else {
+    parts.push(t('abilityUi.tooltip.instant'));
+  }
+  if (def.range > 0) {
+    parts.push(
+      def.minRange !== undefined
+        ? t('abilityUi.tooltip.rangeWithMin', {
+            min: formatNumber(def.minRange, lang),
+            max: formatNumber(def.range, lang),
+          })
+        : t('abilityUi.tooltip.range', { range: formatNumber(def.range, lang) }),
+    );
+  }
+  if (def.cooldown > 0) {
+    parts.push(
+      t('abilityUi.tooltip.cooldownSeconds', {
+        seconds: formatNumber(def.cooldown, lang),
+      }),
+    );
+  }
+  return parts.join(' · ');
 }
 
 // The granted ability's own description, so a grant option's tooltip tells the
 // player what the spell DOES instead of a dead-end "Grants X." Localized by
 // tEntity; placeholders resolve to base values (grantAbilityValues).
 function abilityDescription(id: string): string {
-  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) });
+  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) })
+    .replace(/\s*\([^)]*(?:talent|signature)[^)]*\)\.?\s*$/i, '')
+    .trim();
+}
+
+function authoredChoiceDescription(choice: ChoiceRowOption): string {
+  const grantId = choice.effect.grant?.ability;
+  if (!grantId) return choice.description;
+  // The granted spell is the choice. Its catalog description is the single
+  // source of behavioral truth, followed by live planning metadata. Repeating
+  // "Grants X" or a second hand-authored paraphrase made these tooltips noisy
+  // and, worse, let the two copies drift apart.
+  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+}
+
+const GENERATED_GLOBAL_KEYS = new Set<keyof GlobalModEffect>([
+  'meleeDmgPct',
+  'spellDmgPct',
+  'healPct',
+  'dotDmgPct',
+  'hotHealPct',
+  'absorbPct',
+  'meleeHastePct',
+  'petDmgPct',
+  'petDmgSharePct',
+  'threatPct',
+  'critDmgPct',
+  'spellHastePct',
+]);
+
+const GENERATED_ABILITY_MOD_KEYS = new Set([
+  'ability',
+  'costPct',
+  'cooldownPct',
+  'castPct',
+  'buffPct',
+]);
+
+function canFaithfullyGenerateEffect(effect: TalentEffect): boolean {
+  if (effect.proc) return false;
+  if (
+    effect.global &&
+    Object.keys(effect.global).some(
+      (key) => !GENERATED_GLOBAL_KEYS.has(key as keyof GlobalModEffect),
+    )
+  ) {
+    return false;
+  }
+  for (const mod of effect.ability ?? []) {
+    if (Object.keys(mod).some((key) => !GENERATED_ABILITY_MOD_KEYS.has(key))) return false;
+  }
+  return true;
 }
 
 // True when a talent title has an explicit per-locale translation override. The
@@ -8606,6 +9264,7 @@ function abilityDescription(id: string): string {
 export function hasTalentTitleOverride(lang: SupportedLanguage, source: string): boolean {
   return (
     warriorPortTitleOverride(lang, source) !== undefined ||
+    allClassChoiceTitleOverride(lang, source) !== undefined ||
     titleOverrides[lang]?.[source] !== undefined
   );
 }
@@ -8635,6 +9294,8 @@ function effectDescription(
     parts.push(text.grant(abilityName(effect.grant.ability)));
     const granted = abilityDescription(effect.grant.ability);
     if (granted) parts.push(granted);
+    const metadata = grantAbilityMetadata(effect.grant.ability);
+    if (metadata) parts.push(metadata);
   }
 
   const stats = effect.stats ?? {};
@@ -8725,8 +9386,8 @@ export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
   // English is the authored source of truth: the hand-written `description` strings carry
   // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
-  // The other 12 locales GENERATE from the effect data (effectDescription), so they cannot
-  // drift and need no per-string translation.
+  // Non-English locales generate only effects the renderer can express completely. Complex
+  // mechanics fall back atomically to that authored source instead of dropping one effect arm.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {
       return request.field === 'name'
@@ -8743,15 +9404,9 @@ export function tTalent(request: TalentTranslationRequest): string {
     }
     if (request.kind === 'talentChoice') {
       if (request.field === 'name') return request.choice.name;
-      // A grant option's authored description is a bare "Grants X."; append the
-      // granted ability's own description so the tooltip tells the player what
-      // the spell actually does.
-      const grantId = request.choice.effect.grant?.ability;
-      if (grantId) {
-        const gd = abilityDescription(grantId);
-        return gd ? `${request.choice.description} ${gd}` : request.choice.description;
-      }
-      return request.choice.description;
+      // A grant option's authored description is usually a bare "Grants X.";
+      // append the granted ability's own behavior and planning metadata.
+      return authoredChoiceDescription(request.choice);
     }
     const exhaustive: never = request;
     return exhaustive;
@@ -8773,9 +9428,12 @@ export function tTalent(request: TalentTranslationRequest): string {
   }
   if (request.kind === 'talentChoice') {
     if (request.field === 'name') return translateTitle(request.choice.name, lang);
-    // Proc and rider mechanics have no generated form yet: fall back to the
-    // authored English description (the standard English-fill model) rather
-    // than rendering an empty "no effect" tooltip.
+    // Generation is all-or-nothing. If any arm lacks a faithful localized form,
+    // keep the authored semantically-complete source rather than translating one
+    // scalar while silently dropping a proc, rider, charge, or conditional.
+    if (!canFaithfullyGenerateEffect(request.choice.effect)) {
+      return authoredChoiceDescription(request.choice);
+    }
     const generated = effectDescription(request.choice.effect, 1, lang);
     return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }

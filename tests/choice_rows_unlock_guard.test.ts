@@ -36,4 +36,47 @@ describe('choice row unlock ability guards', () => {
 
     expect(failures).toEqual([]);
   });
+
+  it('every proc has a trigger and payoff that are usable when its row unlocks', () => {
+    const failures: string[] = [];
+
+    for (const cls of Object.keys(CLASSES) as PlayerClass[]) {
+      const baseline = new Set(CLASSES[cls].abilities);
+      for (const row of CHOICE_ROWS[cls].rows) {
+        for (const option of row.options) {
+          const proc = option.effect.proc;
+          if (!proc) continue;
+          const granted = option.effect.grant?.ability;
+          const usable = (id: string) =>
+            id === granted ||
+            (baseline.has(id) && (ABILITIES[id]?.learnLevel ?? Infinity) <= row.level);
+          const trigger = proc.trigger;
+          let triggerAbilities: string[] = [];
+          if (trigger.on === 'castNth' || trigger.on === 'spellCrit') {
+            triggerAbilities = trigger.abilities ?? [];
+          } else if (trigger.on === 'shieldConsumed' || trigger.on === 'hotExpired') {
+            triggerAbilities = [trigger.ability];
+          }
+          if (triggerAbilities.length > 0 && !triggerAbilities.some(usable)) {
+            failures.push(
+              `${cls} row ${row.level} option ${option.id} has no usable proc trigger at unlock: ${triggerAbilities.join(', ')}`,
+            );
+          }
+
+          const payoffAbilities = proc.responses.flatMap((response) => {
+            if (response.kind === 'empowerNext') return response.abilities ?? [];
+            if (response.kind === 'cooldownRefund') return [response.ability];
+            return [];
+          });
+          if (payoffAbilities.length > 0 && !payoffAbilities.some(usable)) {
+            failures.push(
+              `${cls} row ${row.level} option ${option.id} has no usable proc payoff at unlock: ${payoffAbilities.join(', ')}`,
+            );
+          }
+        }
+      }
+    }
+
+    expect(failures).toEqual([]);
+  });
 });

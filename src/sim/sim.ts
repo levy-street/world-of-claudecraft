@@ -3824,8 +3824,14 @@ export class Sim {
     return critVulnBonusImpl(this.ctx, target);
   }
 
-  private applyHeal(source: Entity, target: Entity, amount: number, ability: string): void {
-    applyHealImpl(this.ctx, source, target, amount, ability);
+  private applyHeal(
+    source: Entity,
+    target: Entity,
+    amount: number,
+    ability: string,
+    abilityId: string | null = null,
+  ): void {
+    applyHealImpl(this.ctx, source, target, amount, ability, abilityId);
   }
 
   private healingThreat(source: Entity, target: Entity, healed: number): void {
@@ -4222,6 +4228,7 @@ export class Sim {
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
+    abilityId: string | null = null,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4235,6 +4242,7 @@ export class Sim {
       noRage,
       threatOpts,
       direct,
+      abilityId,
     );
   }
 

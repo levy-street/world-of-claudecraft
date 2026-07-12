@@ -5654,8 +5654,8 @@ export const zh_TW: EnTranslations = {
         "description": "化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）"
       },
       "aura_surge": {
-        "name": "光輝湧動",
-        "description": "過載你的光環，使你在10秒內獲得160點護甲。（聖騎士天賦）"
+        "name": "黎明聖盾彈射",
+        "description": "擲出黎明鑄造的聖盾，造成 {damage} 點神聖傷害，並使主要目標沉默 2 秒，隨後彈向 {radius} 碼內最多 {jumps} 個額外敵人。每次彈射造成上一次傷害的 {falloff}。（聖騎士天賦）"
       },
       "holy_shock": {
         "name": "神聖震擊",
@@ -5788,6 +5788,10 @@ export const zh_TW: EnTranslations = {
       "razor_howl": {
         "name": "銳刃怒吼",
         "description": "使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）"
+      },
+      "lingering_dread": {
+        "name": "縈繞恐懼",
+        "description": "發出戰吼，使 10 碼內的敵人恐懼 4 秒。每個恐懼效果承受相當於目標最大生命值 20% 的傷害後才會打破。（戰士天賦）"
       },
       "stormthrow": {
         "name": "風暴投擲",

@@ -60,6 +60,7 @@ const COOLDOWN_TEXT_THRESHOLD = 1;
 // bound (the former `hotbarActions.filter(a => a !== null).length > 10`).
 const MANY_SPELLS_THRESHOLD = 10;
 const NEXT_CAST_FREE: AuraKind = 'next_cast_free';
+const NEXT_EXECUTE_FREE: AuraKind = 'next_execute_free';
 const NEXT_CAST_INSTANT: AuraKind = 'next_cast_instant';
 const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 
@@ -205,7 +206,12 @@ function makeSlotState(): ActionBarSlotState {
 }
 
 export function isNextCastEmpowerKind(kind: AuraKind): boolean {
-  return kind === NEXT_CAST_FREE || kind === NEXT_CAST_INSTANT || kind === NEXT_CAST_CHEAP;
+  return (
+    kind === NEXT_CAST_FREE ||
+    kind === NEXT_EXECUTE_FREE ||
+    kind === NEXT_CAST_INSTANT ||
+    kind === NEXT_CAST_CHEAP
+  );
 }
 
 function empowermentScopeMatches(aura: ActionBarAuraInput, abilityId: string): boolean {

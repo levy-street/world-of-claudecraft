@@ -5654,8 +5654,8 @@ export const ja_JP: EnTranslations = {
         "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
       },
       "aura_surge": {
-        "name": "光輝の高まり",
-        "description": "オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)"
+        "name": "暁の盾の跳弾",
+        "description": "暁鍛えの盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、{radius}メートル以内の敵最大{jumps}体へ跳ね、跳ねるたびに直前の{falloff}のダメージを与える。（パラディンタレント）"
       },
       "holy_shock": {
         "name": "ホーリーショック",
@@ -5788,6 +5788,10 @@ export const ja_JP: EnTranslations = {
       "razor_howl": {
         "name": "刃の咆哮",
         "description": "15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）"
+      },
+      "lingering_dread": {
+        "name": "消えぬ恐怖",
+        "description": "戦叫で10メートル以内の敵を4秒間恐怖させる。各恐怖は対象の最大体力の20%に相当するダメージを受けるまで解除されない。（ウォリアータレント）"
       },
       "stormthrow": {
         "name": "嵐投げ",

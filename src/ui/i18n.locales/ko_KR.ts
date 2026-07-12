@@ -2216,9 +2216,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
   'entities.abilities.revive_pet.name': '소환수 소생',
   'entities.abilities.revive_pet.description': '죽은 소환수를 되살려 당신의 곁으로 되돌립니다.',
-  'entities.abilities.aura_surge.name': '광휘의 파동',
+  'entities.abilities.aura_surge.name': '여명 방패 도탄',
   'entities.abilities.aura_surge.description':
-    '오라를 과충전하여 10초 동안 방어도 160으로 몸을 단단히 합니다. (성기사 특성)',
+    '여명벼림 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, {radius}미터 안의 적 최대 {jumps}명에게 튕깁니다. 튕길 때마다 이전 피해의 {falloff}를 입힙니다. (성기사 특성)',
   'entities.abilities.holy_shock.name': '신성 충격',
   'entities.abilities.holy_shock.description':
     '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
@@ -2301,6 +2301,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.description':
     '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)',
   'entities.abilities.razor_howl.name': '칼날 포효',
+  'entities.abilities.lingering_dread.name': '잔존하는 공포',
+  'entities.abilities.lingering_dread.description':
+    '전투의 함성으로 10미터 안의 적을 4초 동안 공포에 빠뜨립니다. 각 공포는 대상 최대 생명력의 20%만큼 피해를 받아야 풀립니다. (전사 특성)',
   'entities.abilities.razor_howl.description':
     '15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)',
   'entities.abilities.stormthrow.name': '폭풍 투척',

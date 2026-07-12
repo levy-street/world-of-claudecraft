@@ -2127,9 +2127,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
   'entities.abilities.revive_pet.name': '復活寵物',
   'entities.abilities.revive_pet.description': '復活你已死亡的寵物，並使其重回你身邊。',
-  'entities.abilities.aura_surge.name': '光輝湧動',
+  'entities.abilities.aura_surge.name': '黎明聖盾彈射',
   'entities.abilities.aura_surge.description':
-    '過載你的光環，使你在10秒內獲得160點護甲。（聖騎士天賦）',
+    '擲出黎明鑄造的聖盾，造成 {damage} 點神聖傷害，並使主要目標沉默 2 秒，隨後彈向 {radius} 碼內最多 {jumps} 個額外敵人。每次彈射造成上一次傷害的 {falloff}。（聖騎士天賦）',
   'entities.abilities.holy_shock.name': '神聖震擊',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
@@ -2211,6 +2211,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.description':
     '化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）',
   'entities.abilities.razor_howl.name': '銳刃怒吼',
+  'entities.abilities.lingering_dread.name': '縈繞恐懼',
+  'entities.abilities.lingering_dread.description':
+    '發出戰吼，使 10 碼內的敵人恐懼 4 秒。每個恐懼效果承受相當於目標最大生命值 20% 的傷害後才會打破。（戰士天賦）',
   'entities.abilities.razor_howl.description': '使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）',
   'entities.abilities.stormthrow.name': '風暴投擲',
   'entities.abilities.stormthrow.description': '投擲武器，使目標昏迷 3 秒。（戰士天賦）',

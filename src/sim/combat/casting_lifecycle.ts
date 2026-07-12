@@ -56,6 +56,9 @@ import {
   consumeNextCastFree,
   consumeNextCastInstant,
   hasNextCastFree,
+  hasNextExecuteFree,
+  hasScopedNextCastInstant,
+  nextCastCheapMultiplier,
 } from './empower_next';
 import {
   hasCastShield,
@@ -76,6 +79,7 @@ const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'red_banner',
   'bloodthirst',
   'mortal_strike',
+  'shield_slam',
 ]);
 
 function isFormToggle(ability: AbilityDef): boolean {
@@ -354,7 +358,9 @@ export function castAbility(
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
-  if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
+  const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
+  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
       p.resourceType === 'rage'
@@ -458,7 +464,8 @@ export function castAbility(
     // execute-style gate: only usable while the target is nearly dead
     if (
       ability.requiresTargetHpBelow !== undefined &&
-      target.hp > target.maxHp * ability.requiresTargetHpBelow
+      target.hp > target.maxHp * ability.requiresTargetHpBelow &&
+      !hasNextExecuteFree(p, ability.id)
     ) {
       ctx.error(
         p.id,
@@ -558,8 +565,12 @@ export function castAbility(
     p.queuedOnSwing = toggledOff ? null : ability.id;
     if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p, ability.id)) {
       p.queuedOnSwingFree = true;
+      delete p.queuedOnSwingCostMultiplier;
     } else {
       delete p.queuedOnSwingFree;
+      const cheap = toggledOff ? null : consumeNextCastCheap(ctx, p, ability.id);
+      if (cheap === null) delete p.queuedOnSwingCostMultiplier;
+      else p.queuedOnSwingCostMultiplier = cheap;
     }
     if (!p.autoAttack && target) ctx.startAutoAttack(p.id);
     return;
@@ -571,7 +582,7 @@ export function castAbility(
   const castTime =
     !ability.channel &&
     res.castTime > 0 &&
-    ability.school !== 'physical' &&
+    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
@@ -654,6 +665,23 @@ function formShiftKind(p: Entity, ability: AbilityDef): 'off' | 'cross' | null {
   return null;
 }
 
+export function applyRageSpendCooldownRefund(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  spentRage: number,
+): void {
+  const rate = ctx.playerMods(meta).global.cdrPerRage;
+  if (spentRage <= 0 || rate <= 0) return;
+  const refund = spentRage * rate;
+  for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
+    const cur = p.cooldowns.get(id);
+    if (cur === undefined) continue;
+    if (cur <= refund) p.cooldowns.delete(id);
+    else p.cooldowns.set(id, cur - refund);
+  }
+}
+
 function spendAbilityCost(
   ctx: SimContext,
   p: Entity,
@@ -669,15 +697,7 @@ function spendAbilityCost(
     return;
   }
   spendResource(p, res.cost);
-  const rate = ctx.playerMods(meta).global.cdrPerRage;
-  if (spentRage <= 0 || rate <= 0) return;
-  const refund = spentRage * rate;
-  for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
-    const cur = p.cooldowns.get(id);
-    if (cur === undefined) continue;
-    if (cur <= refund) p.cooldowns.delete(id);
-    else p.cooldowns.set(id, cur - refund);
-  }
+  applyRageSpendCooldownRefund(ctx, p, meta, spentRage);
 }
 
 function armAbilityCooldown(
@@ -762,6 +782,34 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
+  // Self-centered healing channel (Gladesong): pulse each tick around the live
+  // caster position. This is distinct from an instant aoeHeal, which resolves
+  // through effect_dispatch once, and from hostile target channels below.
+  if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeHeal')) {
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    for (const eff of res.effects) {
+      if (eff.type !== 'aoeHeal') continue;
+      ctx.emit({
+        type: 'spellfxAt',
+        x: p.pos.x,
+        z: p.pos.z,
+        school: res.def.school,
+        fx: 'nova',
+        radius: eff.radius,
+      });
+      const radiusSq = eff.radius * eff.radius;
+      for (const ally of ctx.entities.values()) {
+        if (ally.dead || (ally.id !== p.id && !ctx.isFriendlyTo(p, ally))) continue;
+        const dx = ally.pos.x - p.pos.x;
+        const dz = ally.pos.z - p.pos.z;
+        if (dx * dx + dz * dz > radiusSq || !ctx.hasLineOfSight(p, ally)) continue;
+        const amount = ctx.rng.range(eff.min, eff.max) + channelSp;
+        ctx.applyHeal(p, ally, amount, res.def.name, res.def.id);
+      }
+    }
+    return;
+  }
+
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);
@@ -795,7 +843,19 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
         dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
-        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        ctx.dealDamage(
+          src,
+          tgt,
+          Math.round(dmg),
+          crit,
+          res.def.school,
+          res.def.name,
+          'hit',
+          false,
+          undefined,
+          true,
+          res.def.id,
+        );
         noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
@@ -842,6 +902,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     }
     spendResource(p, billableCost());
     ctx.addItem(waterId, 2, p.id);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
   if (ability.id === 'conjure_food') {
@@ -854,6 +915,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     }
     spendResource(p, billableCost());
     ctx.addItem(foodId, 2, p.id);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
   if (ability.id === 'revive_pet') {
@@ -921,7 +983,9 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     }
   }
   const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
-  if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
+  const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
+  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }

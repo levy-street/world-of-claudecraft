@@ -32,6 +32,12 @@ describe('choice row engine', () => {
       expect(rows.map((r) => r.level)).toEqual([5, 8, 11, 14, 17, 20]);
       for (const row of rows) {
         expect(row.options.length).toBe(3);
+        const lanes = row.decision.split(' vs ').map((lane) => lane.trim());
+        expect(lanes, `${cls} row ${row.level} must state three tradeoff lanes`).toHaveLength(3);
+        expect(lanes.every(Boolean), `${cls} row ${row.level} has a blank tradeoff lane`).toBe(
+          true,
+        );
+        expect(new Set(lanes).size, `${cls} row ${row.level} repeats a tradeoff lane`).toBe(3);
         for (const o of row.options) {
           expect(seen.has(o.id), `duplicate option id ${o.id}`).toBe(false);
           seen.add(o.id);

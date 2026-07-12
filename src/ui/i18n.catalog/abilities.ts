@@ -609,13 +609,13 @@ const classAbilityNamesEn = {
       ],
       [
         'volley',
-        'Volley',
-        'Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it.',
+        'Arrowfall',
+        'Channels a rain of arrows at the target area for 3 sec, dealing {damage} Physical damage every 0.5 sec to enemies within 8 yd.',
       ],
       [
         'hurricane',
-        'Hurricane',
-        'Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second.',
+        'Galeheart',
+        'Channels a violent gale at the target area for 6 sec, dealing {damage} Nature damage each second to enemies within 8 yd.',
       ],
       [
         'earthquake',
@@ -757,7 +757,7 @@ const classAbilityNamesEn = {
       [
         'backstab',
         'Craven Thrust',
-        'Backstab the target for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.',
+        'Drive a dagger into the target from behind for 150% weapon damage plus {damage}. Requires a dagger. Awards 1 combo point.',
       ],
       [
         'gouge',
@@ -779,7 +779,7 @@ const classAbilityNamesEn = {
       [
         'ambush',
         "Lurker's Strike",
-        'Ambush the target for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+        'Strike from Duskveil for 250% weapon damage plus {damage}. Must be behind the target and requires a dagger. Awards 1 combo point.',
       ],
       [
         'stealth',
@@ -790,7 +790,7 @@ const classAbilityNamesEn = {
       [
         'garrote',
         'Throat Wire',
-        'Garrote the enemy, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.',
+        'Snare the enemy with Throat Wire, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be in Duskveil. Awards 1 combo point.',
       ],
       [
         'cheap_shot',
@@ -943,7 +943,7 @@ const classAbilityNamesEn = {
       ],
       ['aimed_shot', 'Long Draw', 'A carefully drawn shot that deals {damage} damage.'],
       ['rapid_fire', 'Fevered Draw', 'Increases your attack speed by 40% for 15 sec.'],
-      ['smite', 'Smite', 'Smites the enemy for {damage} Holy damage.'],
+      ['smite', 'Scouring Hymn', 'Scours the enemy for {damage} Holy damage.'],
       ['lesser_heal', 'Whispered Prayer', 'Heals a friendly target for {damage}.'],
       [
         'power_word_fortitude',
@@ -1103,8 +1103,8 @@ const classAbilityNamesEn = {
       ],
       [
         'claw',
-        'Claw',
-        'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.',
+        'Rendclaw',
+        'Rend the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.',
       ],
       ['ferocious_bite', 'Gorebite', 'Finishing move that causes {damage}. Wolf Form only.'],
       [
@@ -1154,7 +1154,7 @@ const classAbilityNamesEn = {
       ['tigers_fury', 'Wolfsblood', 'Increases attack power by 40 for 6 sec. Wolf Form only.'],
       [
         'rip',
-        'Rip',
+        'Bloodrift',
         'Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
       ],
       [
@@ -1175,7 +1175,7 @@ const classAbilityNamesEn = {
       [
         'whirlwind',
         'Bladed Gyre',
-        'Spin in a deadly arc, striking all nearby enemies for {damage}. (Fury talent)',
+        'Spin through enemies within 8 yd, dealing {damage} Physical damage. (Warrior talent)',
       ],
       [
         'berserker_rage',
@@ -1199,8 +1199,8 @@ const classAbilityNamesEn = {
       ],
       [
         'aura_surge',
-        'Radiant Swell',
-        'Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)',
+        'Dawnward Ricochet',
+        'Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)',
       ],
       [
         'holy_shock',
@@ -1210,7 +1210,7 @@ const classAbilityNamesEn = {
       [
         'holy_shield',
         'Hallowed Wall',
-        'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+        'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to up to 2 additional enemies within 10 yards for 70% damage per bounce. (Protection signature)',
       ],
       [
         'bestial_wrath',
@@ -1264,8 +1264,8 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_nova',
-        'Holy Nova',
-        'Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+        'Sunburst Canticle',
+        'Bursts around you, healing nearby allies for {damage} and dealing 24 to 30 Holy damage to nearby enemies. (Holy signature)',
       ],
       [
         'shadowform',
@@ -1339,20 +1339,24 @@ const classAbilityNamesEn = {
       ],
       [
         'aspect_of_the_wild',
-        'Wildfang Guise',
-        'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
+        'Wildfang Rally',
+        'Inspires you and party members within 30 yd, increasing attack power by 45 for 5 min. (Hunter talent)',
       ],
       [
         'avatar',
-        'Colossus',
-        'Break control effects and become a colossus, increasing damage dealt by 20% for 20 sec. (Warrior talent)',
+        'Siegeborn',
+        'Break control effects and grow to 125% size, increasing damage dealt by 20% for 20 sec. (Warrior talent)',
       ],
       [
         'avenging_wrath',
         'Wrathwing',
-        'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
+        'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
       ],
-      ['berserk', 'Red Haze', 'Increases attack power for 15 sec. (Druid talent)'],
+      [
+        'berserk',
+        'Red Haze',
+        'Increases attack power by 70 for 15 sec. Usable in any form. (Druid talent)',
+      ],
       [
         'bladestorm',
         'Steel Cyclone',
@@ -1363,6 +1367,11 @@ const classAbilityNamesEn = {
         'Razor Howl',
         'A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)',
       ],
+      [
+        'lingering_dread',
+        'Lingering Dread',
+        "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)",
+      ],
       ['stormthrow', 'Stormthrow', 'Hurl your weapon to stun a target for 3 sec. (Warrior talent)'],
       [
         'reckless_vow',
@@ -1372,18 +1381,18 @@ const classAbilityNamesEn = {
       [
         'red_banner',
         'Red Banner',
-        'You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)',
+        'You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)',
       ],
       ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
       [
         'bloodlust',
-        'War Drums',
-        'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
+        'Storm Chorus',
+        'Whips you and party members within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)',
       ],
       [
         'chain_lightning',
-        'Forked Lightning',
-        'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+        'Skybranch',
+        'Calls branching lightning onto the target area, dealing {damage} Nature damage to enemies within 8 yd. (Shaman talent)',
       ],
       [
         'chaos_bolt',
@@ -1393,12 +1402,12 @@ const classAbilityNamesEn = {
       [
         'cloak_of_shadows',
         'Shadecloak',
-        'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
+        'Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)',
       ],
       [
         'cone_of_cold',
         'Frostsweep',
-        'Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)',
+        'Blasts enemies within 8 yd for {damage} Frost damage. (Mage talent)',
       ],
       [
         'counter_shot',
@@ -1413,17 +1422,17 @@ const classAbilityNamesEn = {
       [
         'curse_of_exhaustion',
         'Leaden Hex',
-        'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
+        'Burdens the target, slowing movement by 30% for 12 sec. (Warlock talent)',
       ],
       [
         'death_coil',
-        'Grave Coil',
-        'Blasts the enemy for {damage} Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)',
+        'Morrowlash',
+        'Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)',
       ],
       [
         'deep_freeze',
         'Deadfrost',
-        'Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)',
+        'Strikes the target for {damage} Frost damage and stuns it for 4 sec. (Mage talent)',
       ],
       ['desperate_prayer', 'Last Prayer', 'Instantly heals you for {damage}. (Priest talent)'],
       [
@@ -1434,18 +1443,14 @@ const classAbilityNamesEn = {
       [
         'divine_shield',
         'Lightward',
-        'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
+        'Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)',
       ],
-      [
-        'earthbind',
-        'Gripping Earth',
-        'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-      ],
-      ['evocation', 'Aetherwell', 'Rapidly restores mana. (Mage talent)'],
+      ['earthbind', 'Gripping Earth', 'Roots enemies within 8 yd for 2 sec. (Shaman talent)'],
+      ['evocation', 'Aetherwell', 'Instantly restores 220 mana. (Mage talent)'],
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Regenerates health over 10 sec. Bruin Form only. (Druid talent)',
+        'Regenerates 180 health over 10 sec. Bruin Form only. (Druid talent)',
       ],
       [
         'frost_trap',
@@ -1455,14 +1460,18 @@ const classAbilityNamesEn = {
       [
         'ghostly_strike',
         'Wraith Strike',
-        'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+        'Strikes the enemy for weapon damage plus {damage}, increases dodge by 15% for 7 sec, and awards 1 combo point. (Rogue talent)',
       ],
       [
         'hammer_of_wrath',
         'Tolling Hammer',
         'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
       ],
-      ['healing_stream', 'Springwell', 'Restores a friendly target over 12 sec. (Shaman talent)'],
+      [
+        'healing_stream',
+        'Springwell',
+        'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+      ],
       [
         'heroic_leap',
         'Warleap',
@@ -1471,23 +1480,23 @@ const classAbilityNamesEn = {
       [
         'holy_wrath',
         "Saint's Ire",
-        'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
+        'Deals {damage} Holy damage to enemies within 10 yd. (Paladin talent)',
       ],
       [
         'howl_of_terror',
-        'Dread Howl',
+        'Dread Chorus',
         'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
       ],
       [
         'ice_block',
         'Cold Coffin',
-        'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+        'Encases you in ice for up to 8 sec, absorbing 600 damage and preventing you from acting. Cast again to end it early. (Mage talent)',
       ],
       ['inner_focus', 'Stilled Mind', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
       [
         'innervate',
         'Lifesap',
-        'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+        'For 10 sec, restores 20 of your current resource every 2 sec, even while shapeshifted. Stuns, fear, sleep, Bewitch, and stasis pause the restoration. (Druid talent)',
       ],
       [
         'kick',
@@ -1503,23 +1512,27 @@ const classAbilityNamesEn = {
       [
         'meteor',
         'Skystone',
-        'Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)',
+        'Tears a burning stone from the sky at the target area, dealing {damage} Fire damage, then scorching enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)',
       ],
       [
         'mind_sear',
         'Thoughtburn',
-        'Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)',
+        'Channels at a chosen area for 3 sec, dealing {damage} Shadow damage each second to enemies within 8 yd. (Priest talent)',
       ],
       [
         'multi_shot',
         'Splitshot',
-        'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
+        'Looses a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
       ],
-      ['prayer_of_healing', 'Choirmend', 'Heals nearby allies for {damage}. (Priest talent)'],
+      [
+        'prayer_of_healing',
+        'Choirmend',
+        'Heals you and allies within 30 yd for {damage}. (Priest talent)',
+      ],
       [
         'preparation',
         'Contingency',
-        'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
+        'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)',
       ],
       [
         'presence_of_mind',
@@ -1528,7 +1541,7 @@ const classAbilityNamesEn = {
       ],
       [
         'psychic_scream',
-        'Terror Shriek',
+        'Terror Canticle',
         'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
       ],
       [
@@ -1546,27 +1559,31 @@ const classAbilityNamesEn = {
         'Reproach',
         'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
       ],
-      ['shadowstep', 'Shadeslip', 'Steps through the shadows toward your target. (Rogue talent)'],
+      [
+        'shadowstep',
+        'Shadeslip',
+        'Slip through shadow toward a target up to 24 yd away, stopping within melee range. (Rogue talent)',
+      ],
       [
         'shield_wall',
         'Bulwark',
         'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
       ],
-      ['silence', 'Silent Treatment', 'Silences the target for 4 sec. (Priest talent)'],
+      ['silence', 'Hushword', 'Prevents the target from casting spells for 4 sec. (Priest talent)'],
       [
         'skull_bash',
         'Headbutt',
-        'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
+        'Interrupts spellcasting and locks that spell school for 4 sec. Usable in any form. (Druid talent)',
       ],
       [
         'spell_lock',
-        'Gag Order',
+        'Tonguebind',
         'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
       ],
       [
         'tranquility',
         'Gladesong',
-        'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+        'Channels for 4 sec, healing you and allies within 30 yd for 42 to 52 each second. (Druid talent)',
       ],
     ]),
   },

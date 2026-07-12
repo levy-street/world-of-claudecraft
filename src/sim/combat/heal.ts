@@ -91,6 +91,7 @@ export function applyHeal(
   target: Entity,
   amount: number,
   ability: string,
+  abilityId: string | null = null,
 ): void {
   if (target.dead) return;
   const crit = ctx.rng.chance(ctx.spellCrit(source));
@@ -113,7 +114,7 @@ export function applyHeal(
   });
   healingThreat(ctx, source, target, healed);
   // Talent procs listening for critical heals (deterministic, no rng draw).
-  if (crit && source.kind === 'player') onSpellCrit(ctx, source, ability, target);
+  if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   runWeaponProcs(ctx, source, target, 'heal');

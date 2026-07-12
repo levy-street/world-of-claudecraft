@@ -2956,8 +2956,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.revive_pet.name': 'Begleiter wiederbeleben',
   'entities.abilities.revive_pet.description': 'Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück.',
-  'entities.abilities.aura_surge.name': 'Strahlende Woge',
-  'entities.abilities.aura_surge.description': 'Überlädt Eure Aura und härtet Euch mit 160 Rüstung für 10 Sek. (Paladintalent)',
   'entities.abilities.holy_shock.name': 'Heiliger Schock',
   'entities.abilities.holy_shock.description': 'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
   'entities.abilities.holy_shield.name': 'Heiliger Schild',

@@ -10,8 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -25,8 +29,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "es_ES": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -40,8 +48,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "fr_FR": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -55,8 +67,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "fr_CA": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -71,8 +87,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -86,8 +106,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "de_DE": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -105,8 +129,12 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -153,6 +181,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.holy_shock.name",
     "entities.abilities.icy_veins.description",
     "entities.abilities.icy_veins.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.metamorphosis.description",
     "entities.abilities.metamorphosis.name",
     "entities.abilities.moonkin_form.description",
@@ -185,8 +215,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "nl_NL": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -203,8 +237,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "pl_PL": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -221,8 +259,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "id_ID": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -239,8 +281,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "tr_TR": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -257,8 +303,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "sv_SE": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -275,8 +325,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "vi_VN": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",
@@ -293,8 +347,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.fct.cheap"
   ],
   "da_DK": [
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.lingering_dread.description",
+    "entities.abilities.lingering_dread.name",
     "entities.abilities.razor_howl.description",
     "entities.abilities.razor_howl.name",
     "entities.abilities.reckless_vow.description",

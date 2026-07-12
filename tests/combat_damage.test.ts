@@ -135,7 +135,7 @@ describe('combat/damage dealDamage (post-mitigation)', () => {
       events.some((e) => e.type === 'spellfx' && e.fx === 'wardBloom' && e.targetId === p.id),
     ).toBe(true);
     expect(
-      events.some((e) => e.type === 'log' && e.pid === p.id && e.text === 'Cheat Death saves you!'),
+      events.some((e) => e.type === 'log' && e.pid === p.id && e.text === 'A deathward saves you!'),
     ).toBe(true);
   });
 

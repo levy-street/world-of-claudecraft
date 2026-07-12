@@ -5654,8 +5654,8 @@ export const da_DK: EnTranslations = {
         "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"
       },
       "aura_surge": {
-        "name": "Strålende Svulmen",
-        "description": "Overbelaster din aura og hærder dig med 160 rustning i 10 sek. (Paladintalent)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
       },
       "holy_shock": {
         "name": "Hellig chok",
@@ -5789,6 +5789,10 @@ export const da_DK: EnTranslations = {
         "name": "Razor Howl",
         "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
       },
+      "lingering_dread": {
+        "name": "Lingering Dread",
+        "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
+      },
       "stormthrow": {
         "name": "Stormthrow",
         "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
@@ -5799,7 +5803,7 @@ export const da_DK: EnTranslations = {
       },
       "red_banner": {
         "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
       },
       "blink": {
         "name": "Flimmertrin",

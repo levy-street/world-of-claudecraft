@@ -22,6 +22,7 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack(effectsOf('mortal_strike'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('fireball'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('eviscerate'))).toBe(true);
+    expect(abilityStartsAutoAttack(effectsOf('aura_surge'))).toBe(true);
   });
 
   it('does not engage on heals or self/ally buffs', () => {

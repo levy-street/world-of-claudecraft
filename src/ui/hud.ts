@@ -86,13 +86,11 @@ import type {
   Stats,
 } from '../sim/types';
 import {
-  type AbilityEffect,
   type AuraKind,
   CONSUME_DURATION,
   canPrestige,
   dist2d,
   type Entity,
-  FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   type ItemDef,
   isQuestTurnInNpc,
@@ -101,7 +99,6 @@ import {
   MILESTONES,
   type RiteIntensity,
   type SimEvent,
-  SUNDER_ARMOR_PCT_PER_STACK,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -116,15 +113,12 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
+import type { AbilityScaling } from './ability_damage';
 import {
-  type AbilityScaling,
-  abilityBuffValue,
-  abilityDamageBonus,
-  abilityDurationValue,
-  abilityOverTimeEffect,
-  abilityPrimaryEffect,
-  abilitySecondaryEffect,
-} from './ability_damage';
+  abilityDisplayDescription,
+  abilityEffectText,
+  formatAbilityNumber,
+} from './ability_description';
 import { isSelfOnlyAbility } from './ability_self_only';
 import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
 import {
@@ -820,7 +814,7 @@ function yellVoiceKey(text: string): string {
     .slice(0, 60)}`;
 }
 
-const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
+const CHEAT_DEATH_SAVE_TEXT = 'A deathward saves you!';
 
 export class Hud {
   // Ability slots across both rows: 1..11 on the primary bar, 12..22 on the
@@ -14230,30 +14224,6 @@ function abilityDisplayName(def: AbilityDef): string {
   return tEntity({ kind: 'ability', id: def.id, field: 'name' });
 }
 
-// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
-// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
-// first buff's value, {duration} ($t) the first timed effect's duration. All are
-// rank- and talent-resolved, so the prose can never drift from what a cast does.
-function abilityDisplayDescription(
-  res: ResolvedAbility,
-  damageText: string,
-  scaling?: AbilityScaling,
-): string {
-  const buff = abilityBuffValue(res);
-  const duration = abilityDurationValue(res);
-  return tEntity({
-    kind: 'ability',
-    id: res.def.id,
-    field: 'description',
-    values: {
-      damage: damageText,
-      overTime: abilityOverTimeText(res, scaling),
-      buff: buff === null ? '' : formatAbilityNumber(buff),
-      duration: duration === null ? '' : formatAbilityNumber(duration),
-    },
-  });
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -14387,10 +14357,6 @@ function parseSimMoney(text: string): number | null {
   return matched ? copper : null;
 }
 
-function formatAbilityNumber(value: number): string {
-  return formatNumber(value, { maximumFractionDigits: 1 });
-}
-
 function abilityRangeLine(def: AbilityDef): string | null {
   if (def.range <= 0) return null;
   if (def.minRange !== undefined) {
@@ -14450,98 +14416,6 @@ export function abilityRequirementLines(def: AbilityDef): string[] {
   else if (def.requiresTarget) lines.push(t('abilityUi.tooltip.enemyTarget'));
   else if (isSelfOnlyAbility(def)) lines.push(t('abilityUi.tooltip.selfOnly'));
   return lines;
-}
-
-// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
-// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
-// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
-// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
-// Power adds, and watches it climb as gear changes.
-function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
-  // omitted when there is none. Punctuation + formatted number only (no words).
-  const suffix = (eff: AbilityEffect) => {
-    const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-    return b > 0
-      ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
-      : '';
-  };
-  // The pickers live in ability_damage.ts so the consistency guard test shares
-  // them; this function only formats the picked effect.
-  const primary = abilityPrimaryEffect(res);
-  if (primary) {
-    switch (primary.type) {
-      case 'directDamage':
-      case 'heal':
-      case 'aoeDamage':
-      case 'aoeHeal':
-      case 'aoeRoot':
-      case 'groundAoE':
-      case 'drainTick':
-        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
-      case 'consumeAura':
-        if (primary.deal) {
-          return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);
-        }
-        if (primary.heal) {
-          return abilityAmountRange(primary.heal.min, primary.heal.max) + suffix(primary);
-        }
-        return '';
-      case 'weaponDamage':
-      case 'weaponStrike':
-        return formatAbilityNumber(primary.bonus);
-      case 'sunder':
-        return formatAbilityNumber(
-          SUNDER_ARMOR_PCT_PER_STACK * (primary.full ? primary.maxStacks : 1) * 100,
-        );
-      case 'faerieFire':
-        return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);
-      case 'lifeTap':
-        return formatAbilityNumber(primary.hp);
-      case 'finisherDamage':
-        return (
-          t('abilityUi.tooltip.finisherDamage', {
-            base: formatAbilityNumber(primary.base),
-            perCombo: formatAbilityNumber(primary.perCombo),
-          }) + suffix(primary)
-        );
-    }
-  }
-
-  const secondary = abilitySecondaryEffect(res);
-  if (!secondary) return '';
-  switch (secondary.type) {
-    case 'dot':
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
-    case 'hot':
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
-    case 'absorb':
-      return formatAbilityNumber(secondary.amount);
-    case 'imbue':
-      return formatAbilityNumber(secondary.bonus);
-    default:
-      return '';
-  }
-}
-
-// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
-// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
-// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
-function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const eff = abilityOverTimeEffect(res);
-  if (!eff) return '';
-  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-  const bonus =
-    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
-  return formatAbilityNumber(eff.total) + bonus;
-}
-
-function abilityAmountRange(min: number, max: number): string {
-  if (min === max) return formatAbilityNumber(min);
-  return t('abilityUi.tooltip.damageRange', {
-    min: formatAbilityNumber(min),
-    max: formatAbilityNumber(max),
-  });
 }
 
 function cap(s: string): string {

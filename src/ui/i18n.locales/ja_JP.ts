@@ -2230,9 +2230,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
   'entities.abilities.revive_pet.name': 'ペット蘇生',
   'entities.abilities.revive_pet.description': '死んだペットを蘇生させ、自分のそばに呼び戻す。',
-  'entities.abilities.aura_surge.name': '光輝の高まり',
+  'entities.abilities.aura_surge.name': '暁の盾の跳弾',
   'entities.abilities.aura_surge.description':
-    'オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)',
+    '暁鍛えの盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、{radius}メートル以内の敵最大{jumps}体へ跳ね、跳ねるたびに直前の{falloff}のダメージを与える。（パラディンタレント）',
   'entities.abilities.holy_shock.name': 'ホーリーショック',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
@@ -2314,6 +2314,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.description':
     '鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。（ウォリアータレント）',
   'entities.abilities.razor_howl.name': '刃の咆哮',
+  'entities.abilities.lingering_dread.name': '消えぬ恐怖',
+  'entities.abilities.lingering_dread.description':
+    '戦叫で10メートル以内の敵を4秒間恐怖させる。各恐怖は対象の最大体力の20%に相当するダメージを受けるまで解除されない。（ウォリアータレント）',
   'entities.abilities.razor_howl.description':
     '15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）',
   'entities.abilities.stormthrow.name': '嵐投げ',

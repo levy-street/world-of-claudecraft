@@ -1720,8 +1720,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.name': 'Fjättrande hugg',
   'entities.abilities.wrath.description': 'Slungar en pil av naturenergi för {damage} naturskada.',
   'entities.abilities.wrath.name': 'Vildbult',
-  'entities.abilities.aura_surge.name': 'Strålande Svall',
-  'entities.abilities.aura_surge.description': 'Överladdar din aura och härdar dig med 160 rustning i 10 sek. (Paladintalang)',
   'entities.abilities.holy_shock.name': 'Helig chock',
   'entities.abilities.holy_shock.description': 'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
   'entities.abilities.holy_shield.name': 'Helig sköld',

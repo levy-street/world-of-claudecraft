@@ -297,6 +297,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
   e.comboPoints = 0;

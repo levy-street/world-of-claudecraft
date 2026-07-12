@@ -2975,8 +2975,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une attaque d\'ouverture en camouflage qui lacère l\'ennemi pour les dégâts de l\'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.',
   'entities.abilities.revive_pet.name': 'Ranimer le familier',
   'entities.abilities.revive_pet.description': 'Ranime votre familier mort et le ramène à vos côtés.',
-  'entities.abilities.aura_surge.name': 'Houle radieuse',
-  'entities.abilities.aura_surge.description': 'Surcharge votre aura et vous renforce de 160 points d\'armure pendant 10 s. (talent de Paladin)',
   'entities.abilities.holy_shock.name': 'Horion sacré',
   'entities.abilities.holy_shock.description':
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',

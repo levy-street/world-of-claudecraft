@@ -79,6 +79,9 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  // Stable content id for talent-proc filters. `ability` above remains the
+  // player-facing combat-log label and must never be used as an id.
+  abilityId: string | null = null,
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
@@ -367,7 +370,7 @@ export function dealDamage(
         ctx.emit({
           type: 'log',
           pid: target.id,
-          text: 'Cheat Death saves you!',
+          text: 'A deathward saves you!',
           color: '#ffd100',
         });
       }
@@ -493,7 +496,7 @@ export function dealDamage(
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
     // Talent procs listening for spell crits (deterministic, no rng draw).
-    if (crit && school !== 'physical' && ability) onSpellCrit(ctx, source, ability, target);
+    if (crit && school !== 'physical' && ability) onSpellCrit(ctx, source, abilityId, target);
     if (meta && source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
       const mods = ctx.playerMods(meta).global;
       const auraMult = source.auras.reduce(
@@ -685,6 +688,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
+    delete e.queuedOnSwingCostMultiplier;
     e.queuedCastAbility = null;
     e.queuedCastAim = null;
     e.comboPoints = 0;

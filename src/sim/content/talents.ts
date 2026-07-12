@@ -74,6 +74,9 @@ export interface AbilityModEffect {
   // effect is ticking on the target (priest Twisted Faith). Applied in
   // effect_dispatch at hit time, never baked into the resolved min/max.
   dmgPctVsDotted?: number;
+  // When present, the conditional bonus above requires this exact caster-owned
+  // DoT rather than any DoT from the caster.
+  dmgPctVsDottedAbility?: string;
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
   bonusCharges?: number; // extra stored uses for cooldown abilities (1 = two total charges)
   addEffects?: AbilityEffect[];
@@ -175,6 +178,7 @@ export const SAVED_LOADOUT_BAR_SLOTS = 22;
 export interface ResolvedAbilityMod {
   dmgPct: number;
   dmgPctVsDotted: number;
+  dmgPctVsDottedAbility?: string;
   flatDmg: number;
   costPct: number;
   cooldownPct: number;
@@ -469,6 +473,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     }
     cur.dmgPct += (am.dmgPct ?? 0) * mult;
     cur.dmgPctVsDotted += (am.dmgPctVsDotted ?? 0) * mult;
+    if (am.dmgPctVsDottedAbility) cur.dmgPctVsDottedAbility = am.dmgPctVsDottedAbility;
     cur.flatDmg += (am.flatDmg ?? 0) * mult;
     cur.costPct += (am.costPct ?? 0) * mult;
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;

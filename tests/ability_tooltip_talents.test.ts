@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { ABILITIES } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import { abilityDisplayDescription, abilityEffectText } from '../src/ui/ability_description';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 
 // The ability/spell tooltip (hud.ts abilityTooltip / describeAbilitySummary) renders
 // the RESOLVED ability (res.cost / res.castTime / res.cooldown / res.effects), not the
@@ -81,5 +84,65 @@ describe('ability tooltip data reflects selected talents', () => {
       max: number;
     };
     expect(primary.max).toBeGreaterThan(basePrimary!.max);
+  });
+
+  it('normal action tooltips resolve every extended grant placeholder', async () => {
+    await ensureLocaleLoaded('en');
+    setLanguage('en');
+    const tooltip = (sim: Sim, id: string) => {
+      const ability = sim.resolvedAbility(id);
+      if (!ability) throw new Error(`missing ${id}`);
+      return abilityDisplayDescription(ability, abilityEffectText(ability), {
+        spellPower: 0,
+        rangedPower: 0,
+        attackPower: 0,
+      });
+    };
+    const selected = (cls: Parameters<typeof abilitiesKnownAt>[0], row: number, choice: string) => {
+      const sim = new Sim({ seed: 3, playerClass: cls });
+      sim.setPlayerLevel(20);
+      expect(sim.applyTalents({ spec: null, rows: { [row]: choice } })).toBe(true);
+      return sim;
+    };
+
+    const protection = new Sim({ seed: 3, playerClass: 'paladin' });
+    protection.setPlayerLevel(20);
+    expect(protection.setSpec('protection')).toBe(true);
+    const cases = [
+      tooltip(protection, 'holy_shield'),
+      tooltip(selected('paladin', 20, 'pal_r20_aura_mastery'), 'aura_surge'),
+      tooltip(selected('paladin', 20, 'pal_r20_avenging_wrath'), 'avenging_wrath'),
+      tooltip(selected('hunter', 20, 'hun_r20_aspect_of_the_wild'), 'aspect_of_the_wild'),
+      tooltip(selected('shaman', 20, 'sha_r20_bloodlust'), 'bloodlust'),
+      tooltip(selected('mage', 20, 'mag_r20_evocation'), 'evocation'),
+      tooltip(selected('mage', 20, 'mag_r20_meteor'), 'meteor'),
+      tooltip(selected('druid', 20, 'dru_r20_tranquility'), 'tranquility'),
+    ];
+    expect(cases.every((description) => !/\{[A-Za-z]/.test(description))).toBe(true);
+    expect(cases[0]).toContain('90 to 110');
+    expect(cases[0]).toContain('70%');
+    expect(cases[1]).toContain('100 to 120');
+    expect(cases[1]).toContain('75%');
+    expect(cases[2]).toContain('60');
+    expect(cases[2]).toContain('30');
+    expect(cases[3]).toContain('45');
+    expect(cases[4]).toContain('30%');
+    expect(cases[5]).toContain('220');
+    expect(cases[6]).toContain('12 to 18');
+    expect(cases[7]).toContain('42 to 52');
+
+    const combat = new Sim({ seed: 3, playerClass: 'rogue' });
+    combat.setPlayerLevel(20);
+    expect(combat.setSpec('combat')).toBe(true);
+    const cravenThrust = tooltip(combat, 'backstab');
+    expect(cravenThrust).toContain('135% weapon damage');
+    expect(cravenThrust).not.toContain('150% weapon damage');
+    const wickedSlash = combat.resolvedAbility('sinister_strike');
+    if (!wickedSlash) throw new Error('missing Wicked Slash');
+    const strike = wickedSlash.effects.find((effect) => effect.type === 'weaponStrike');
+    if (!strike || strike.type !== 'weaponStrike') throw new Error('missing weapon strike');
+    expect(tooltip(combat, 'sinister_strike')).toContain(
+      `${Math.round((strike.weaponMult ?? 1) * 100)}% weapon damage`,
+    );
   });
 });

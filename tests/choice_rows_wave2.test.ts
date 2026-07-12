@@ -88,6 +88,12 @@ describe('mage wave 2 choice rows', () => {
     expect(p.auras.find((a) => a.id === 'mag_slow_burn')?.kind).toBe('next_cast_instant');
   });
 
+  it('Mana Attunement counts successful Waterbind casts', () => {
+    const { sim, p } = rig('mage', 20, { 5: 'mag_r5_mana_attunement' });
+    for (let i = 0; i < 3; i++) castAndSettle(sim, 'conjure_water');
+    expect(p.auras.some((a) => a.id === 'mag_mana_attunement')).toBe(true);
+  });
+
   it('Deep Rime and Battlemage Armor apply shields from their triggers', () => {
     const { sim, p } = rig('mage', 20, {
       11: 'mag_r11_permafrost',
@@ -102,38 +108,66 @@ describe('mage wave 2 choice rows', () => {
 });
 
 describe('hunter wave 2 choice rows', () => {
-  it('shot rhythm procs grant free or instant followups', () => {
+  it('shot rhythm procs reset, accelerate, and hand off to free followups', () => {
+    const resetRig = rig('hunter', 20, { 5: 'hun_r5_improved_serpent_sting' });
+    addTargetMob(resetRig.sim, 100000, 10);
+    castAndSettle(resetRig.sim, 'arcane_shot', 1);
+    expect(resetRig.p.cooldowns.get('arcane_shot')).toBeGreaterThan(0);
+    completeCast(resetRig.sim, 'serpent_sting');
+    expect(resetRig.p.cooldowns.has('arcane_shot')).toBe(false);
+
     const { sim, p } = rig('hunter', 20, {
-      5: 'hun_r5_improved_serpent_sting',
       11: 'hun_r11_efficiency',
       14: 'hun_r14_sniper_training',
     });
-    p.resource = p.maxResource - 30;
+    const cadenceTarget = addTargetMob(sim, 100000, 10);
+    cadenceTarget.moveSpeed = 0;
     for (let i = 0; i < 3; i++) completeCast(sim, 'serpent_sting');
-    expect(p.auras.some((a) => a.id === 'hun_improved_venom_barb')).toBe(true);
     expect(p.auras.some((a) => a.id === 'hun_lean_quiver')).toBe(true);
-    expect(p.resource).toBe(p.maxResource - 10);
-    // Sniper Training is now an ability-mod (Long Draw casts faster + hits harder),
-    // not a proc.
-    const base = new Sim({ seed: 17, playerClass: 'hunter', autoEquip: true });
-    base.setPlayerLevel(20);
-    const modded = sim.resolvedAbility('aimed_shot')!;
-    const baseline = base.resolvedAbility('aimed_shot')!;
-    expect(modded.castTime).toBeLessThan(baseline.castTime);
-    expect(modded.castTime).toBeCloseTo(baseline.castTime * 0.7, 5);
+    p.resource = p.maxResource;
+    sim.castAbility('aimed_shot');
+    expect(p.castingAbility).toBeNull();
+    expect(p.auras.some((a) => a.id === 'hun_lean_quiver')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'hun_full_draw_rhythm')).toBe(true);
+    for (let i = 0; i < 40; i++) sim.tick();
+    p.resource = 0;
+    sim.castAbility('arcane_shot');
+    expect(p.resource).toBe(0);
+    expect(p.auras.some((a) => a.id === 'hun_full_draw_rhythm')).toBe(false);
   });
 
-  it('Master Tamer, Deathless Will, and Volley use HoT, big-hit, and channel hooks', () => {
+  it('Calloused Hide makes the scoped physical Long Draw cast instant', () => {
+    const { sim, p } = rig('hunter', 20, { 17: 'hun_r17_thick_hide' });
+    addTargetMob(sim, 100000, 10);
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.2));
+    expect(p.auras.some((a) => a.id === 'hun_calloused_hide')).toBe(true);
+    p.resource = p.maxResource;
+    sim.castAbility('aimed_shot');
+    expect(p.castingAbility).toBeNull();
+    expect(p.auras.some((a) => a.id === 'hun_calloused_hide')).toBe(false);
+  });
+
+  it('Master Tamer, Deathless Will, and Volley use pet-share, big-hit, and channel hooks', () => {
     const { sim, p } = rig('hunter', 20, {
       11: 'hun_r11_mend_pet',
       17: 'hun_r17_master_tamer',
       20: 'hun_r20_improved_volley',
     });
-    // Master Tamer is now a self-contained defensive proc (big hit -> shield),
-    // no longer contingent on the Patch Up (mend_pet) talent.
+    const pet = createMob(9300, MOBS.forest_wolf, 20, {
+      x: p.pos.x + 2,
+      y: p.pos.y,
+      z: p.pos.z,
+    });
+    pet.hostile = false;
+    pet.ownerId = p.id;
+    pet.maxHp = pet.hp = 1000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
     p.hp = p.maxHp;
-    dealDamage(sim, p, Math.ceil(p.maxHp * 0.35));
-    expect(p.auras.some((a) => a.id === 'hun_master_tamer')).toBe(true);
+    const playerBefore = p.hp;
+    const petBefore = pet.hp;
+    dealDamage(sim, p, 100);
+    expect(playerBefore - p.hp).toBe(80);
+    expect(petBefore - pet.hp).toBe(20);
     completeCast(sim, 'volley');
     expect(p.auras.some((a) => a.id === 'hun_improved_volley')).toBe(true);
 
@@ -177,8 +211,8 @@ describe('druid wave 2 choice rows', () => {
     castAndSettle(sim, 'cat_form', 1);
     expect(p.auras.some((a) => a.id === 'dru_redmaw')).toBe(true);
 
-    // Nature's Bounty is now self-contained: a full-duration Rejuvenation
-    // empowers the next Regrowth (baseline) instead of resetting Swiftmend.
+    // Nature's Bounty is self-contained at unlock: a full Wildbloom empowers
+    // baseline Wildmend rather than waiting for a later spell.
     const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' });
     healer.p.hp = Math.round(healer.p.maxHp * 0.5);
     expireHot(healer.sim, 'rejuvenation', healer.p);
@@ -201,6 +235,8 @@ describe('druid wave 2 choice rows', () => {
     });
     // Survival of the Fittest is now self-contained: a big hit restores rage
     // and grants a shield, instead of refunding the same-row Savage Mending.
+    castAndSettle(bear.sim, 'bear_form', 1);
+    expect(bear.p.resourceType).toBe('rage');
     bear.p.resource = 0;
     dealDamage(bear.sim, bear.p, Math.ceil(bear.p.maxHp * 0.25));
     expect(bear.p.resource).toBe(20);

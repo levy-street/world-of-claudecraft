@@ -5,7 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
 
 function rig(rows: Record<number, string>) {
   const sim = new Sim({ seed: 41, playerClass: 'warrior', autoEquip: true });
@@ -30,37 +30,25 @@ function addMob(sim: Sim, hp = 1000, dist = 3): Entity {
   return mob;
 }
 
-function dealDamage(sim: Sim, source: Entity | null, target: Entity, amount: number): void {
-  (
-    sim as unknown as {
-      dealDamage(
-        s: Entity | null,
-        t: Entity,
-        n: number,
-        c: boolean,
-        sc: string,
-        a: string | null,
-        k: string,
-      ): void;
-    }
-  ).dealDamage(source, target, amount, false, 'physical', null, 'hit');
-}
-
 describe('Blaine1705 warrior row mechanics', () => {
   it('Twin Onrush resolves to two stored Onrush uses', () => {
     const { sim } = rig({ 5: 'war_r5_twin_onrush' });
     expect(sim.resolvedAbility('charge')?.bonusCharges).toBe(1);
   });
 
-  it('Red Harvest stacks apply on credited kills', () => {
+  it('Grave Omen arms a free full-health Early Grave after three melee abilities', () => {
     const { sim, p } = rig({ 17: 'war_r17_red_harvest' });
-    const first = addMob(sim, 10);
-    dealDamage(sim, p, first, 20);
-    expect(p.auras.find((a) => a.id === 'war_bloodbath_dmg')?.stacks).toBe(1);
-
-    const second = addMob(sim, 10);
-    dealDamage(sim, p, second, 20);
-    expect(p.auras.find((a) => a.id === 'war_bloodbath_dmg')?.stacks).toBe(2);
+    const target = addMob(sim, 1000);
+    for (let cast = 0; cast < 3; cast++) {
+      p.resource = p.maxResource;
+      sim.castAbility('hamstring');
+      for (let tick = 0; tick < Math.ceil(2 / DT); tick++) sim.tick();
+    }
+    expect(p.auras.some((a) => a.kind === 'next_execute_free')).toBe(true);
+    p.resource = 0;
+    sim.castAbility('execute');
+    expect(target.hp).toBeLessThan(target.maxHp);
+    expect(p.auras.some((a) => a.kind === 'next_execute_free')).toBe(false);
   });
 
   it('area echo and sure-crit charges consume deterministically without rng', () => {

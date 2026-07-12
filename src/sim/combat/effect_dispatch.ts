@@ -19,6 +19,7 @@ import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -219,9 +220,20 @@ export function runEffects(
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Conditional talent damage vs a target carrying the CASTER'S DoT
         // (Twisted Faith style). Deterministic aura scan, no rng.
-        const vsDotted = mods.abilities[ability.id]?.dmgPctVsDotted ?? 0;
-        if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
+        const abilityMod = mods.abilities[ability.id];
+        const vsDotted = abilityMod?.dmgPctVsDotted ?? 0;
+        const requiredDot = abilityMod?.dmgPctVsDottedAbility;
+        if (
+          vsDotted > 0 &&
+          target.auras.some(
+            (a) =>
+              a.kind === 'dot' &&
+              a.sourceId === p.id &&
+              (requiredDot === undefined || a.id === requiredDot),
+          )
+        ) {
           dmg *= 1 + vsDotted;
+        }
         const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
         const crit = forceCrit || rolledCrit;
         if (forceCrit) spentSureCrit = true;
@@ -239,6 +251,8 @@ export function runEffects(
           'hit',
           false,
           threatOpts,
+          true,
+          ability.id,
         );
         if (canAreaEcho && finalDamage > 0 && !target.dead) {
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -254,6 +268,80 @@ export function runEffects(
         // routed through this same case does not. No-op (no rng draw) unless the
         // caster wields a proc weapon with a spellDamage proc.
         if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
+        break;
+      }
+      case 'chainDamage': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        const baseDamage =
+          ctx.rng.range(eff.min, eff.max) +
+          directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        const hitIds = new Set<number>();
+
+        const hitAndBounce = (victim: Entity, hop: number): void => {
+          if (victim.dead || !ctx.isHostileTo(p, victim) || hitIds.has(victim.id)) return;
+          hitIds.add(victim.id);
+
+          const critChance = isSpell ? ctx.spellCrit(p) : p.critChance;
+          const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+          const crit = hop === 0 && forceCrit ? true : rolledCrit;
+          if (hop === 0 && forceCrit) spentSureCrit = true;
+          let dmg = baseDamage * eff.falloff ** hop;
+          if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(victim), p.level);
+          ctx.dealDamage(
+            p,
+            victim,
+            Math.round(dmg),
+            crit,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+            true,
+            ability.id,
+          );
+          if (isSpell) noteSpellHit(ctx, p, crit);
+          // A chain is one damaging spell cast. Roll equipment procs once on the
+          // primary impact, never once per bounce.
+          if (isSpell && hop === 0) runWeaponProcs(ctx, p, victim, 'spellDamage');
+          if (hop >= eff.jumps || p.dead) return;
+
+          const radiusSq = eff.radius * eff.radius;
+          let next: Entity | null = null;
+          let nextDistanceSq = Infinity;
+          for (const candidate of ctx.entities.values()) {
+            if (candidate.dead || hitIds.has(candidate.id) || !ctx.isHostileTo(p, candidate)) {
+              continue;
+            }
+            const dx = candidate.pos.x - victim.pos.x;
+            const dz = candidate.pos.z - victim.pos.z;
+            const distanceSq = dx * dx + dz * dz;
+            if (distanceSq > radiusSq || !ctx.hasLineOfSight(victim, candidate)) continue;
+            if (
+              next === null ||
+              distanceSq < nextDistanceSq ||
+              (distanceSq === nextDistanceSq && candidate.id < next.id)
+            ) {
+              next = candidate;
+              nextDistanceSq = distanceSq;
+            }
+          }
+          if (next === null) return;
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: victim.id,
+            targetId: next.id,
+            school: ability.school,
+            fx: 'projectile',
+          });
+          scheduleProjectile(ctx, p, next, (_source, landed) => hitAndBounce(landed, hop + 1), {
+            ...victim.pos,
+          });
+        };
+
+        hitAndBounce(target, 0);
         break;
       }
       case 'finisherDamage': {
@@ -326,7 +414,7 @@ export function runEffects(
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
-        ctx.applyHeal(p, healTarget, healAmount, ability.name);
+        ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
         break;
       }
       case 'chainHeal': {
@@ -381,7 +469,7 @@ export function runEffects(
             fx: 'chainHeal',
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
-          ctx.applyHeal(p, chain[i], hopAmount, ability.name);
+          ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
         }
         break;
       }
@@ -485,7 +573,19 @@ export function runEffects(
         const crit = forceCrit || rolledCrit;
         if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 1.5 + p.critDmgBonus;
-        ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
+        ctx.dealDamage(
+          p,
+          target,
+          Math.round(dmg),
+          crit,
+          'holy',
+          ability.name,
+          'hit',
+          false,
+          undefined,
+          true,
+          ability.id,
+        );
         noteSpellHit(ctx, p, crit);
         break;
       }
@@ -516,7 +616,11 @@ export function runEffects(
         if (di < 0) break;
         const dot = target.auras[di];
         const interval = dot.tickInterval ?? 1;
-        const ticksLeft = Math.max(0, Math.floor(dot.remaining / interval));
+        const untilNextTick = dot.tickTimer ?? interval;
+        const ticksLeft =
+          untilNextTick <= dot.remaining
+            ? 1 + Math.max(0, Math.floor((dot.remaining - untilNextTick) / interval))
+            : 0;
         const remainingDmg = Math.round(dot.value * ticksLeft);
         target.auras.splice(di, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
@@ -760,7 +864,11 @@ export function runEffects(
         // scaling the rider too would double-dip and over-reward hybrids. Only pure
         // DoTs (Corruption, SW:P, Serpent Sting) scale through this path.
         const hybrid = res.effects.some(
-          (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'aoeRoot',
+          (e) =>
+            e.type === 'directDamage' ||
+            e.type === 'chainDamage' ||
+            e.type === 'aoeDamage' ||
+            e.type === 'aoeRoot',
         );
         const dotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
@@ -779,7 +887,7 @@ export function runEffects(
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
-          school: ability.school,
+          school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
         ctx.enterCombat(p, target);
@@ -944,7 +1052,7 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, p, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          ctx.applyHeal(p, m, healAmount, ability.name);
+          ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
         }
         break;
       }
@@ -1191,12 +1299,14 @@ export function runEffects(
             'hit',
             false,
             threatOpts,
+            true,
+            ability.id,
           );
         }
         if (eff.heal) {
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
-          ctx.applyHeal(p, target, healAmount, ability.name);
+          ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
         break;
       }

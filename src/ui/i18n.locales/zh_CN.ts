@@ -2125,9 +2125,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
   'entities.abilities.revive_pet.name': '复活宠物',
   'entities.abilities.revive_pet.description': '复活你死去的宠物，并将其召回身边。',
-  'entities.abilities.aura_surge.name': '光辉涌动',
+  'entities.abilities.aura_surge.name': '黎明圣盾弹射',
   'entities.abilities.aura_surge.description':
-    '过载你的光环，使你在10秒内获得160点护甲。（圣骑士天赋）',
+    '掷出黎明铸造的圣盾，造成 {damage} 点神圣伤害，并使主要目标沉默 2 秒，随后弹向 {radius} 码内最多 {jumps} 个额外敌人。每次弹射造成上一次伤害的 {falloff}。（圣骑士天赋）',
   'entities.abilities.holy_shock.name': '神圣震击',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
@@ -2208,6 +2208,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.description':
     '化为钢铁旋风，每秒攻击附近敌人，造成 {damage} 点伤害。（战士天赋）',
   'entities.abilities.razor_howl.name': '锐刃怒吼',
+  'entities.abilities.lingering_dread.name': '萦绕恐惧',
+  'entities.abilities.lingering_dread.description':
+    '发出战吼，使 10 码内的敌人恐惧 4 秒。每个恐惧效果承受相当于目标最大生命值 20% 的伤害后才会打破。（战士天赋）',
   'entities.abilities.razor_howl.description': '使 15 码内的敌人减速 50%，持续 8 秒。（战士天赋）',
   'entities.abilities.stormthrow.name': '风暴投掷',
   'entities.abilities.stormthrow.description': '投掷武器，使目标昏迷 3 秒。（战士天赋）',

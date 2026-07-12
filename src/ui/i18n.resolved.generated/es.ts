@@ -5654,8 +5654,8 @@ export const es: EnTranslations = {
         "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
       },
       "aura_surge": {
-        "name": "Oleada Radiante",
-        "description": "Sobrecarga tu aura y te endurece con 160 de armadura durante 10 s. (talento de Paladín)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
       },
       "holy_shock": {
         "name": "Choque Sagrado",
@@ -5789,6 +5789,10 @@ export const es: EnTranslations = {
         "name": "Razor Howl",
         "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
       },
+      "lingering_dread": {
+        "name": "Lingering Dread",
+        "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
+      },
       "stormthrow": {
         "name": "Stormthrow",
         "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
@@ -5799,7 +5803,7 @@ export const es: EnTranslations = {
       },
       "red_banner": {
         "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
       },
       "blink": {
         "name": "Paso Fugaz",

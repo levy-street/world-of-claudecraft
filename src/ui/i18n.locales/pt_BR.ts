@@ -2912,8 +2912,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 s. Concede 1 ponto de combo. Apenas Forma de Lobo.',
   'entities.abilities.revive_pet.name': 'Reviver Mascote',
   'entities.abilities.revive_pet.description': 'Revive seu mascote morto e o traz de volta ao seu lado.',
-  'entities.abilities.aura_surge.name': 'Onda Radiante',
-  'entities.abilities.aura_surge.description': 'Sobrecarrega sua aura, fortalecendo você com 160 de armadura por 10 s. (talento de Paladino)',
   'entities.abilities.holy_shock.name': 'Choque Sagrado',
   'entities.abilities.holy_shock.description': 'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',

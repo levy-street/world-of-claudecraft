@@ -5654,8 +5654,8 @@ export const ko_KR: EnTranslations = {
         "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"
       },
       "aura_surge": {
-        "name": "광휘의 파동",
-        "description": "오라를 과충전하여 10초 동안 방어도 160으로 몸을 단단히 합니다. (성기사 특성)"
+        "name": "여명 방패 도탄",
+        "description": "여명벼림 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, {radius}미터 안의 적 최대 {jumps}명에게 튕깁니다. 튕길 때마다 이전 피해의 {falloff}를 입힙니다. (성기사 특성)"
       },
       "holy_shock": {
         "name": "신성 충격",
@@ -5788,6 +5788,10 @@ export const ko_KR: EnTranslations = {
       "razor_howl": {
         "name": "칼날 포효",
         "description": "15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)"
+      },
+      "lingering_dread": {
+        "name": "잔존하는 공포",
+        "description": "전투의 함성으로 10미터 안의 적을 4초 동안 공포에 빠뜨립니다. 각 공포는 대상 최대 생명력의 20%만큼 피해를 받아야 풀립니다. (전사 특성)"
       },
       "stormthrow": {
         "name": "폭풍 투척",

@@ -5654,8 +5654,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
       },
       "aura_surge": {
-        "name": "Radiant Swell",
-        "description": "Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
       },
       "holy_shock": {
         "name": "Holy Shock",
@@ -5663,7 +5663,7 @@ export const cs_CZ: EnTranslations = {
       },
       "holy_shield": {
         "name": "Hallowed Wall",
-        "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
+        "description": "Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to up to 2 additional enemies within 10 yards for 70% damage per bounce. (Protection signature)"
       },
       "bestial_wrath": {
         "name": "Howling Rage",
@@ -5706,8 +5706,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
       },
       "holy_nova": {
-        "name": "Holy Nova",
-        "description": "Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+        "name": "Sunburst Canticle",
+        "description": "Bursts around you, healing nearby allies for {damage} and dealing 24 to 30 Holy damage to nearby enemies. (Holy signature)"
       },
       "shadowform": {
         "name": "Gloamveil Form",
@@ -5789,6 +5789,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Razor Howl",
         "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
       },
+      "lingering_dread": {
+        "name": "Lingering Dread",
+        "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
+      },
       "stormthrow": {
         "name": "Stormthrow",
         "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
@@ -5799,7 +5803,7 @@ export const cs_CZ: EnTranslations = {
       },
       "red_banner": {
         "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
       },
       "blink": {
         "name": "Mihokrok",

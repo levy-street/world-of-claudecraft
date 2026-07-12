@@ -78,10 +78,11 @@ export function scheduleProjectile(
   source: Entity,
   target: Entity,
   resolve: (source: Entity, target: Entity) => void,
+  origin: { x: number; z: number } = source.pos,
 ): void {
   ctx.pendingProjectiles.push({
-    x: source.pos.x,
-    z: source.pos.z,
+    x: origin.x,
+    z: origin.z,
     sourceId: source.id,
     targetId: target.id,
     ttl: PROJECTILE_MAX_FLIGHT,
@@ -99,8 +100,14 @@ export function scheduleProjectile(
 export function advancePendingProjectiles(ctx: SimContext): void {
   if (ctx.pendingProjectiles.length === 0) return;
   const step = PROJECTILE_SPEED * DT;
+  // Resolve only the projectiles that existed at the start of this tick. A resolver
+  // may launch a follow-up projectile (chain spells); that new hop begins moving on
+  // the next tick instead of being appended to, and immediately consumed by, this
+  // same iteration.
+  const launchedBeforeTick = ctx.pendingProjectiles;
+  ctx.pendingProjectiles = [];
   const stillFlying: PendingProjectile[] = [];
-  for (const proj of ctx.pendingProjectiles) {
+  for (const proj of launchedBeforeTick) {
     const source = ctx.entities.get(proj.sourceId);
     const target = ctx.entities.get(proj.targetId);
     if (!source || source.dead || !target || target.dead) continue; // fizzle
@@ -122,5 +129,5 @@ export function advancePendingProjectiles(ctx: SimContext): void {
     proj.z = next.z;
     stillFlying.push(proj);
   }
-  ctx.pendingProjectiles = stillFlying;
+  ctx.pendingProjectiles = [...stillFlying, ...ctx.pendingProjectiles];
 }

@@ -1748,8 +1748,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.name': 'Pętające cięcie',
   'entities.abilities.wrath.description': 'Ciska pocisk energii natury, zadając {damage} obrażeń od Natury.',
   'entities.abilities.wrath.name': 'Dziki pocisk',
-  'entities.abilities.aura_surge.name': 'Promienna Fala',
-  'entities.abilities.aura_surge.description': 'Przeciąża twoją aurę, wzmacniając cię 160 pkt. pancerza na 10 sek. (talent Paladyna)',
   'entities.abilities.holy_shock.name': 'Święty wstrząs',
   'entities.abilities.holy_shock.description': 'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
   'entities.abilities.holy_shield.name': 'Święta tarcza',
