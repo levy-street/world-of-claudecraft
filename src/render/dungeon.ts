@@ -52,8 +52,12 @@ const FLAME_EMISSIVE_HIGH = 2.2;
 const DUNGEON_LIGHT_Y = 6.4;
 const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
+// Dark warm basalt: the floor field stays scorched and legible while the lava
+// veins and molten props carry the glow (a uniformly glowing floor reads flat
+// and sandy, not like a forge bed).
+const UNDERMOUNT_FLOOR_TINT = 0x2e2620;
 const UNDERMOUNT_FLOOR_EMISSIVE = 0xff5a1e;
-const UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY = 1.2;
+const UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY = 0.35;
 const UNDERMOUNT_LAVA_BASE = 0x260603;
 const UNDERMOUNT_LAVA_EMISSIVE = 0xff5a10;
 const UNDERMOUNT_LAVA_EMISSIVE_INTENSITY = 2.2;
@@ -323,6 +327,14 @@ const BITS_MODELS = [
   'arch',
 ] as const;
 
+const FORGE_PROPS = ['forge_hearth', 'cauldron', 'anvil', 'bonfire', 'ore_rocks', 'weapon_stand'] as const;
+const forgeScenes = new Map<string, THREE.Group>();
+function loadForgeProp(name: string): Promise<void> {
+  return loadGltf(`models/props/${name}.glb`).then((g) => {
+    forgeScenes.set(name, g.scene);
+  });
+}
+
 type Pack = 'kit' | 'bits';
 
 interface ModuleAsset {
@@ -386,6 +398,7 @@ export function ensureDungeonAssets(): Promise<void> {
   dungeonAssetsPromise ??= Promise.all([
     ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
+    ...FORGE_PROPS.map((name) => loadForgeProp(name)),
   ]).then(() => undefined);
   return dungeonAssetsPromise;
 }
@@ -765,6 +778,7 @@ export class DungeonInteriors {
     this.placeDais(group, p, layout, variant);
     if (variant === 'undermount') {
       this.placeUndermountLava(group, layout);
+      this.placeUndermountForge(group, layout);
     } else {
       this.placeAisleClutter(p, layout, variant);
       this.placeWallDressing(p, layout, variant, arenaWalls);
@@ -886,6 +900,66 @@ export class DungeonInteriors {
     pools.computeBoundingSphere();
     pools.renderOrder = 1;
     group.add(pools);
+  }
+
+  // Fixed, authored forge dressing for the Undermount raid interior: hearths,
+  // cauldrons, anvils, bonfires, ore piles, and weapon stands flanking the
+  // central fight lane (all placements keep |x| >= 18 and stay out of the boss
+  // box at z 30..50, |x| < 16). Deterministic, no rng; scenes are cloned from
+  // the immutable loader cache and emissive materials are cloned before mutation.
+  private placeUndermountForge(group: THREE.Group, _layout: DungeonLayout): void {
+    const FORGE_LAYOUT: Array<{
+      prop: (typeof FORGE_PROPS)[number];
+      x: number;
+      z: number;
+      scale: number;
+      yaw: number;
+      emissive?: number;
+      glow?: number; // glow = torch-glow scale
+    }> = [
+      { prop: 'forge_hearth', x: -46, z: 72, scale: 2.2, yaw: Math.PI / 2, emissive: 0xff5a10, glow: 2.2 },
+      { prop: 'forge_hearth', x: 46, z: 72, scale: 2.2, yaw: -Math.PI / 2, emissive: 0xff5a10, glow: 2.2 },
+      { prop: 'cauldron', x: -24, z: 96, scale: 7, yaw: 0, emissive: 0xff7a12, glow: 1.3 },
+      { prop: 'cauldron', x: 24, z: 96, scale: 7, yaw: 0, emissive: 0xff7a12, glow: 1.3 },
+      { prop: 'cauldron', x: 0, z: 108, scale: 8, yaw: 0, emissive: 0xff7a12, glow: 1.5 },
+      { prop: 'anvil', x: -38, z: 62, scale: 2.4, yaw: Math.PI / 3, glow: 0 },
+      { prop: 'anvil', x: 38, z: 62, scale: 2.4, yaw: -Math.PI / 3, glow: 0 },
+      { prop: 'bonfire', x: -58, z: 34, scale: 2.2, yaw: 0, glow: 1.6 },
+      { prop: 'bonfire', x: 58, z: 34, scale: 2.2, yaw: 0, glow: 1.6 },
+      { prop: 'ore_rocks', x: -56, z: 90, scale: 2.4, yaw: 0.4, glow: 0 },
+      { prop: 'ore_rocks', x: 56, z: 90, scale: 2.4, yaw: -0.4, glow: 0 },
+      { prop: 'weapon_stand', x: -50, z: 18, scale: 2.2, yaw: Math.PI / 2, glow: 0 },
+      { prop: 'weapon_stand', x: 50, z: 18, scale: 2.2, yaw: -Math.PI / 2, glow: 0 },
+    ];
+    for (const entry of FORGE_LAYOUT) {
+      const src = forgeScenes.get(entry.prop);
+      if (!src) continue;
+      const obj = src.clone(true);
+      obj.position.set(entry.x, 0, entry.z);
+      obj.rotation.y = entry.yaw;
+      obj.scale.setScalar(entry.scale);
+      if (entry.emissive !== undefined) {
+        const applyEmissive = (mat: THREE.Material): THREE.Material => {
+          const m = mat.clone() as THREE.MeshStandardMaterial;
+          if ('emissive' in m && m.emissive) {
+            m.emissive.setHex(entry.emissive!);
+            m.emissiveIntensity = 1.4;
+          }
+          return m;
+        };
+        obj.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map(applyEmissive)
+            : applyEmissive(mesh.material);
+        });
+      }
+      group.add(obj);
+      if (entry.glow && entry.glow > 0) {
+        this.addTorchGlow(group, entry.x, entry.z, entry.emissive ?? 0xff5a10, 0.09, entry.glow);
+      }
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -1100,11 +1174,14 @@ export class DungeonInteriors {
   private undermountFloorMaterial(pack: Pack): THREE.Material {
     let mat = this.undermountFloorMats.get(pack);
     if (mat) return mat;
-    // Keep the KayKit atlas detail while making every floor tile visible
-    // without relying on the underground torch rig.
+    // Keep the KayKit atlas tile detail (via the map) but drive the tint dark:
+    // a warm basalt charcoal so the wing floor reads as a scorched forge bed,
+    // not the light sandstone the raw crypt tile color gives. The map modulates
+    // this color, so the tile grooves stay legible while the field goes dark and
+    // the lava veins / molten props glow against it.
     const src = packSourceMaterial.get(pack);
     mat = surfaceMat({
-      color: src?.color.getHex() ?? 0x777788,
+      color: UNDERMOUNT_FLOOR_TINT,
       map: src?.map ?? undefined,
       roughness: Math.max(0.9, src?.roughness ?? 0.95),
       metalness: 0,

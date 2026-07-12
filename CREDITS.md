@@ -1,9 +1,11 @@
 # Asset Credits
 
 Bundled third-party art assets are CC0 (public domain dedication) except the
-three.js water normal maps (MIT) and the CraftPix skill-icon packs. The CraftPix
+three.js water normal maps (MIT), the CraftPix skill-icon packs, and one
+CC-BY 3.0 model (the Undermount forge hearth, attributed below). The CraftPix
 icon packs were **purchased by the Levy Street account (callum@levystreet.com)**
-and are used under the CraftPix premium royalty-free license. Attribution is
+and are used under the CraftPix premium royalty-free license. The CC-BY 3.0
+model requires attribution, given in its row below. Other CC0 attributions are
 provided as a courtesy.
 
 | Assets | Author | Source | License |
@@ -11,6 +13,8 @@ provided as a courtesy.
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 |
 | Skeleton character models + animations, bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 |
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 |
+| Undermount raid molten cauldron | Quaternius | https://poly.pizza/m/QaWJOPa6Gt | CC0 1.0 |
+| Undermount raid forge hearth | Don Carson | https://poly.pizza/m/2ZnLsJJL4Pe | CC-BY 3.0 |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 |
 | Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 |
 | Animated creatures (wolf, bull, fox, stag, alpaca, spider, frog, goblin, orc, yeti, giant, demon, ghost, goleling, glub, tribal, velociraptor, dragon) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 |
