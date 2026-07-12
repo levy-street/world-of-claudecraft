@@ -41,7 +41,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
   ],
-  welcome: 'Find Marshal Redbrook in town — he has work for you.',
+  welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
 };
 
