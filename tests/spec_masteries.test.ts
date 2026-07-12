@@ -174,8 +174,10 @@ describe('spec masteries', () => {
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
     expect(paladin.player.hp).toBe(150);
     paladin.player.hp = 0;
-    paladin.player.critDmgHealBonus =
-      metaOf(paladin, paladin.player).talentMods.global.critDmgHealPct;
+    paladin.player.critDmgHealBonus = metaOf(
+      paladin,
+      paladin.player,
+    ).talentMods.global.critDmgHealPct;
     (
       paladin as unknown as { applyHeal(s: Entity, t: Entity, a: number, n: string): void }
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
