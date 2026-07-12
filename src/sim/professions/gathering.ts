@@ -16,11 +16,43 @@ import {
   type GatheringProfessionId,
   HARVEST_COMPONENT_ITEMS,
 } from '../content/professions';
+import { QUESTS } from '../data';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type GatherNodeDef, type GatherNodeType, INTERACT_RANGE, type ItemDef } from '../types';
 import type { PlayerProfessionSkill } from './types';
+
+// Quest-gated bonus grant (#1701 follow-up review): while the paired quest is
+// active and short of its collect objective, a harvest of this node type also
+// grants the quest's own dedicated item, never NODE_HARVEST_TABLE's shared
+// junk/reagent material. That material (e.g. bone_fragments) drops from mobs,
+// salvage, and the market, so a collect objective targeting it is satisfied by
+// anything but mining; the dedicated item can only ever come from here. Mirrors
+// the mob-loot questId gate (loot_roll.ts needsQuestDrop) but unconditional: a
+// gathering action has no miss chance, so a harvest that clears the node's own
+// respawn gate always also clears the quest need.
+const NODE_QUEST_GRANT: Partial<Record<GatherNodeType, { questId: string; itemId: string }>> = {
+  ore: { questId: 'q_prof_intro', itemId: 'chunk_of_ore' },
+};
+
+function neededNodeQuestItem(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  node: GatherNodeDef,
+): string | undefined {
+  const grant = NODE_QUEST_GRANT[node.type];
+  if (!grant) return undefined;
+  if (meta.questLog.get(grant.questId)?.state !== 'active') return undefined;
+  const quest = QUESTS[grant.questId];
+  const objIdx = quest.objectives.findIndex(
+    (o) => o.type === 'collect' && o.itemId === grant.itemId,
+  );
+  if (objIdx < 0) return undefined;
+  return ctx.countItem(grant.itemId, meta.entityId) < quest.objectives[objIdx].count
+    ? grant.itemId
+    : undefined;
+}
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
 
@@ -189,6 +221,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
+  const questItemId = neededNodeQuestItem(ctx, meta, node);
   const result = resolveHarvest(meta, node, ctx.time, ctx.rng);
   if (!result.granted) {
     // Unreachable in practice (the readiness check above already gates this),
@@ -198,6 +231,12 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     return;
   }
   ctx.addItem(result.itemId!, 1, meta.entityId);
+  // Resolved against the timer/bags gates above, before the timer-consuming
+  // resolveHarvest call, so a full-bags quest item never eats the node's
+  // per-player respawn timer on its own.
+  if (questItemId && ctx.canAddItem(questItemId, 1, meta.entityId)) {
+    ctx.addItem(questItemId, 1, meta.entityId);
+  }
 }
 
 export interface PendingGatherGrant {

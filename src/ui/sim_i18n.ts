@@ -198,6 +198,7 @@ const baseEnTable = {
   'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
   'log.mobChannels': '{name} channels {mechanic}.',
+  'log.channelInterrupted': '{mechanic} is interrupted!',
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
@@ -329,6 +330,9 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  'aura.bladedEcho': 'Bladed Echo',
+  'aura.emboldened': 'Emboldened',
+  'aura.enraged': 'Enraged',
 } as const;
 
 const petEnTable = {
@@ -554,6 +558,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   es: {
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
+    'aura.enraged': 'Enfurecido',
     'groundPickup.supplyCrateDeny': 'El cajón está cerrado con clavos.',
     'groundPickup.gravecallerSigilDeny': 'El sigilo repele tu tacto.',
     'groundPickup.ledgerPageDeny':
@@ -706,7 +711,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Esa poción aún no está lista.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'No hay nada que consumir.',
     'error.merchantUnavailable': 'Ese vendedor no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
     'error.noMerchant': 'No hay ningún vendedor cerca.',
@@ -742,6 +747,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
+    'log.cheatDeathSave': '¡Burlar la muerte te salva!',
     'log.savedBuild': 'Configuración “{name}” guardada.',
     'log.loadoutApplied': 'Configuración “{name}” aplicada.',
     'log.deletedBuild': 'Configuración “{name}” eliminada.',
@@ -951,7 +957,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Esa poción aún no está lista.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'No hay nada que consumir.',
     'error.merchantUnavailable': 'Ese mercader no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
     'error.noMerchant': 'No hay ningún mercader cerca.',
@@ -987,6 +993,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
+    'log.cheatDeathSave': '¡Burlar la muerte te salva!',
     'log.savedBuild': 'Configuración “{name}” guardada.',
     'log.loadoutApplied': 'Configuración “{name}” aplicada.',
     'log.deletedBuild': 'Configuración “{name}” eliminada.',
@@ -1197,7 +1204,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
     'error.fullHealth': 'Vous êtes déjà à pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Rien à consommer.',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
@@ -1234,6 +1241,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
+    'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
     'log.savedBuild': 'Distribution « {name} » enregistrée.',
     'log.loadoutApplied': 'Configuration « {name} » appliquée.',
     'log.deletedBuild': 'Distribution « {name} » supprimée.',
@@ -1443,7 +1451,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
     'error.fullHealth': 'Vous êtes déjà en pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Rien à consommer.',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
@@ -1481,6 +1489,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
+    'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
     'log.savedBuild': 'Spécialisation “{name}” enregistrée.',
     'log.loadoutApplied': 'Configuration “{name}” appliquée.',
     'log.deletedBuild': 'Spécialisation “{name}” supprimée.',
@@ -1856,7 +1865,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Quella pozione non è ancora pronta.',
     'error.fullHealth': 'Sei già al massimo della salute.',
     'error.nothingRestore': 'Niente da ripristinare.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Niente da consumare.',
     'error.merchantUnavailable': 'Quel mercante non è disponibile.',
     'error.notForSale': "Quell'oggetto non è in vendita.",
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
@@ -1891,6 +1900,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': 'I campi di allenamento sono tutti occupati. Riprova tra poco.',
     'log.talentsUpdated': 'Talenti aggiornati.',
     'log.talentsReset': 'Talenti azzerati.',
+    'log.cheatDeathSave': 'Ingannare la morte ti salva!',
     'log.savedBuild': 'Build “{name}” salvata.',
     'log.loadoutApplied': 'Configurazione “{name}” applicata.',
     'log.deletedBuild': 'Build “{name}” eliminata.',
@@ -2097,7 +2107,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Dieser Trank ist noch nicht bereit.',
     'error.fullHealth': 'Ihr habt bereits volle Gesundheit.',
     'error.nothingRestore': 'Nichts wiederherzustellen.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Nichts zu verbrauchen.',
     'error.merchantUnavailable': 'Dieser Händler ist nicht verfügbar.',
     'error.notForSale': 'Dieser Gegenstand ist nicht zu verkaufen.',
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
@@ -2135,6 +2145,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Alle Trainingsplätze sind gerade belegt. Versucht es gleich noch einmal.',
     'log.talentsUpdated': 'Talente aktualisiert.',
     'log.talentsReset': 'Talente zurückgesetzt.',
+    'log.cheatDeathSave': 'Tod überlisten rettet Euch!',
     'log.savedBuild': 'Skillung „{name}“ gespeichert.',
     'log.loadoutApplied': 'Vorlage „{name}“ angewendet.',
     'log.deletedBuild': 'Skillung „{name}“ gelöscht.',
@@ -2404,7 +2415,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '那瓶药水尚未冷却完毕。',
     'error.fullHealth': '你的生命值已满。',
     'error.nothingRestore': '没有可恢复的东西。',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': '没有可消耗的东西。',
     'error.merchantUnavailable': '该商人无法提供服务。',
     'error.notForSale': '该物品不出售。',
     'error.noMerchant': '附近没有商人。',
@@ -2439,6 +2450,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': '练习场地已全部占用。请稍后再试。',
     'log.talentsUpdated': '天赋已更新。',
     'log.talentsReset': '天赋已重置。',
+    'log.cheatDeathSave': '死里逃生救了你！',
     'log.savedBuild': '已保存配置“{name}”。',
     'log.loadoutApplied': '已应用配置“{name}”。',
     'log.deletedBuild': '已删除配置“{name}”。',
@@ -2693,7 +2705,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '那瓶藥水尚未準備好。',
     'error.fullHealth': '你的生命值已滿。',
     'error.nothingRestore': '沒有可恢復的東西。',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': '沒有可消耗的東西。',
     'error.merchantUnavailable': '那名商人無法使用。',
     'error.notForSale': '那件物品非賣品。',
     'error.noMerchant': '附近沒有商人。',
@@ -2728,6 +2740,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': '練習場地已全部佔用。請稍後再試。',
     'log.talentsUpdated': '天賦已更新。',
     'log.talentsReset': '天賦已重置。',
+    'log.cheatDeathSave': '死裡逃生救了你！',
     'log.savedBuild': '已儲存配置「{name}」。',
     'log.loadoutApplied': '已套用配置「{name}」。',
     'log.deletedBuild': '已刪除配置「{name}」。',
@@ -2987,7 +3000,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '그 물약은 아직 사용할 수 없습니다.',
     'error.fullHealth': '이미 생명력이 가득 찼습니다.',
     'error.nothingRestore': '회복할 것이 없습니다.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': '소비할 것이 없습니다.',
     'error.merchantUnavailable': '그 상인은 지금 이용할 수 없습니다.',
     'error.notForSale': '그 아이템은 판매하지 않습니다.',
     'error.noMerchant': '근처에 상인이 없습니다.',
@@ -3022,6 +3035,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': '연습 경기장이 모두 사용 중입니다. 잠시 후 다시 시도하세요.',
     'log.talentsUpdated': '특성이 갱신되었습니다.',
     'log.talentsReset': '특성이 초기화되었습니다.',
+    'log.cheatDeathSave': '죽음 기만이 당신을 구했습니다!',
     'log.savedBuild': '구성 “{name}”을(를) 저장했습니다.',
     'log.loadoutApplied': '특성 묶음 “{name}”을(를) 적용했습니다.',
     'log.deletedBuild': '구성 “{name}”을(를) 삭제했습니다.',
@@ -3288,7 +3302,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'そのポーションはまだ使用できません。',
     'error.fullHealth': 'すでに体力は全快です。',
     'error.nothingRestore': '回復するものがありません。',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': '消費するものがありません。',
     'error.merchantUnavailable': 'その商人は利用できません。',
     'error.notForSale': 'そのアイテムは売り物ではありません。',
     'error.noMerchant': '近くに商人がいません。',
@@ -3324,6 +3338,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': '練習ピッチはすべて使用中です。しばらくして再度お試しください。',
     'log.talentsUpdated': 'タレントを更新しました。',
     'log.talentsReset': 'タレントをリセットしました。',
+    'log.cheatDeathSave': '死の欺きがあなたを救いました！',
     'log.savedBuild': 'ビルド「{name}」を保存しました。',
     'log.loadoutApplied': 'ロードアウト「{name}」を適用しました。',
     'log.deletedBuild': 'ビルド「{name}」を削除しました。',
@@ -3519,7 +3534,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Essa poção ainda não está pronta.',
     'error.fullHealth': 'Você já está com a vida cheia.',
     'error.nothingRestore': 'Nada a restaurar.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Nada para consumir.',
     'error.merchantUnavailable': 'Esse comerciante não está disponível.',
     'error.notForSale': 'Esse item não está à venda.',
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
@@ -3555,6 +3570,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Os campos de treino estão todos ocupados. Tente novamente em instantes.',
     'log.talentsUpdated': 'Talentos atualizados.',
     'log.talentsReset': 'Talentos redefinidos.',
+    'log.cheatDeathSave': 'Enganar a morte salva você!',
     'log.savedBuild': 'Estrutura “{name}” salva.',
     'log.loadoutApplied': 'Conjunto “{name}” aplicado.',
     'log.deletedBuild': 'Estrutura “{name}” excluída.',
@@ -3835,7 +3851,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Это зелье ещё не готово к использованию.',
     'error.fullHealth': 'У вас и так полное здоровье.',
     'error.nothingRestore': 'Восстанавливать нечего.',
-    'error.nothingToConsume': 'Nothing to consume.',
+    'error.nothingToConsume': 'Нечего использовать.',
     'error.merchantUnavailable': 'Этот торговец недоступен.',
     'error.notForSale': 'Этот предмет не продаётся.',
     'error.noMerchant': 'Поблизости нет торговца.',
@@ -3870,6 +3886,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vcupPracticeFull': 'Все тренировочные поля заняты. Повторите попытку позже.',
     'log.talentsUpdated': 'Таланты обновлены.',
     'log.talentsReset': 'Таланты сброшены.',
+    'log.cheatDeathSave': 'Обман смерти спасает вас!',
     'log.savedBuild': 'Сборка «{name}» сохранена.',
     'log.loadoutApplied': 'Набор «{name}» применён.',
     'log.deletedBuild': 'Сборка «{name}» удалена.',
@@ -3914,6 +3931,46 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'mechanic.siltWard': 'Иловый оберег',
   },
   ...BASE_NEW,
+  cs_CZ: {
+    ...BASE_NEW.cs_CZ,
+    'error.nothingToConsume': 'Není co spotřebovat.',
+    'log.cheatDeathSave': 'Oklamání smrti tě zachránilo!',
+  },
+  nl_NL: {
+    ...BASE_NEW.nl_NL,
+    'error.nothingToConsume': 'Niets om te gebruiken.',
+    'log.cheatDeathSave': 'De dood bedriegen redt je!',
+  },
+  pl_PL: {
+    ...BASE_NEW.pl_PL,
+    'error.nothingToConsume': 'Nie ma czego użyć.',
+    'log.cheatDeathSave': 'Oszukanie śmierci cię ratuje!',
+  },
+  id_ID: {
+    ...BASE_NEW.id_ID,
+    'error.nothingToConsume': 'Tidak ada yang bisa dikonsumsi.',
+    'log.cheatDeathSave': 'Tipu Maut menyelamatkanmu!',
+  },
+  tr_TR: {
+    ...BASE_NEW.tr_TR,
+    'error.nothingToConsume': 'Tüketecek bir şey yok.',
+    'log.cheatDeathSave': 'Ölümü Aldatmak seni kurtardı!',
+  },
+  sv_SE: {
+    ...BASE_NEW.sv_SE,
+    'error.nothingToConsume': 'Inget att förbruka.',
+    'log.cheatDeathSave': 'Lura döden räddar dig!',
+  },
+  vi_VN: {
+    ...BASE_NEW.vi_VN,
+    'error.nothingToConsume': 'Không có gì để tiêu thụ.',
+    'log.cheatDeathSave': 'Lừa Tử thần cứu bạn!',
+  },
+  da_DK: {
+    ...BASE_NEW.da_DK,
+    'error.nothingToConsume': 'Intet at indtage.',
+    'log.cheatDeathSave': 'Snyd døden redder dig!',
+  },
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -4456,7 +4513,7 @@ export function tSim(
 
 // Reverse maps: the sim splices English item/mob names into its text; localize them.
 const itemNameToId = new Map<string, string>();
-for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, id);
+for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, it.heroicOf ?? id);
 const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
@@ -4593,6 +4650,15 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
+  // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
+  // src/sim/content/classes.ts); shown on the buff bar and combat log.
+  'Bladed Echo': 'aura.bladedEcho',
+  // Emboldening Roar's armed guaranteed-crit buff (the aoeAllySureCrit case in
+  // src/sim/combat/effect_dispatch.ts); shown on the buff bar and combat log.
+  Emboldened: 'aura.emboldened',
+  // Fury Enrage buff (the enrageChance case in src/sim/combat/effect_dispatch.ts),
+  // procced by Bloodletting and Desenfreno / Rampage; shown on the buff bar.
+  Enraged: 'aura.enraged',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',
@@ -6179,6 +6245,7 @@ const RULES: Rule[] = [
   { re: /^The door is locked\.$/, build: () => t('sim.delve.doorLocked') },
   { re: /^Strike the wall to break through\.$/, build: () => t('sim.delve.strikeWall') },
   { re: /^Nothing happens\.$/, build: () => t('sim.delve.nothingHappens') },
+  { re: /^Nothing to consume\.$/, build: () => t('hud.errors.nothingToConsume') },
   { re: /^Unknown companion\.$/, build: () => t('sim.delve.unknownCompanion') },
   {
     re: /^This companion is already fully upgraded\.$/,
@@ -6344,6 +6411,11 @@ const RULES: Rule[] = [
   {
     re: /^(.+) channels (.+)\.$/,
     build: (m) => tSim('log.mobChannels', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
+  },
+  // "{mechanic} is interrupted!" (a channeled mob heal broken by a stun/silence).
+  {
+    re: /^(.+) is interrupted!$/,
+    build: (m) => tSim('log.channelInterrupted', { mechanic: locBossMechanic(m[1]) }),
   },
   {
     re: /^(.+) unleashes (.+)!$/,

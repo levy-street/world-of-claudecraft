@@ -5,6 +5,7 @@ import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { type Aura, dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -181,6 +182,41 @@ describe('Nythraxis raid encounter', () => {
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
+    expect(MOBS.nythraxis_heroic_warrior_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      dmgBase: 26,
+      dmgPerLevel: 5.6,
+    });
+    // Malric: CC-able (must be stunned/silenced to break his heal channel), squishy,
+    // and channels an escalating heal on the boss instead of a shield.
+    expect(MOBS.nythraxis_heroic_priest_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      channelHeal: expect.objectContaining({
+        every: 4,
+        baseHeal: 320,
+        rampAdd: 240,
+        maxHeal: 1440,
+      }),
+    });
+    expect(MOBS.nythraxis_heroic_priest_add.wardAllies).toBeUndefined();
+    // Voss: untauntable but CC-able, medium damage, low health.
+    expect(MOBS.nythraxis_heroic_rogue_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      ignoreTaunt: true,
+      dmgBase: 16,
+    });
 
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
@@ -191,6 +227,15 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.weapon.min).toBe(325);
     expect(boss.weapon.max).toBe(507);
     expect(visualKeyFor(boss)).toBe('skel_golem');
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
+    ).toBe('skel_warrior');
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_priest_add' } as Entity)).toBe(
+      'skel_necromancer',
+    );
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_rogue_add' } as Entity)).toBe(
+      'skel_rogue',
+    );
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
     const wards = objects(sim, 'bastion_ward_stone', origin);
@@ -280,10 +325,57 @@ describe('Nythraxis raid encounter', () => {
 
     expect(ITEMS.crownforged_dreadhelm.requiredClass).toEqual(['warrior', 'paladin']);
     expect(ITEMS.crownforged_warspaulders.requiredClass).toEqual(['warrior', 'paladin']);
-    expect(ITEMS.soulflame_cowl.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
-    expect(ITEMS.soulflame_mantle.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
+    // Caster cloth carries the full six-class caster group (the mail casters,
+    // elemental/resto shaman and holy paladin, wear cloth down-rank).
+    expect(ITEMS.soulflame_cowl.requiredClass).toEqual([
+      'mage',
+      'priest',
+      'warlock',
+      'shaman',
+      'paladin',
+      'druid',
+    ]);
+    expect(ITEMS.soulflame_mantle.requiredClass).toEqual([
+      'mage',
+      'priest',
+      'warlock',
+      'shaman',
+      'paladin',
+      'druid',
+    ]);
     expect(ITEMS.stormcallers_crown.requiredClass).toEqual(['shaman']);
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
+  });
+
+  it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+    for (const id of [
+      'bonewrought_greatsword',
+      'direfang_greatblade',
+      'bonewrought_bulwark',
+      'wraithfire_orb',
+    ]) {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('epic');
+      // Raid source: 20 (boss level) + 6 (epic) + 3 (raid bonus) = item level 29,
+      // with the realized primary stats exactly on that tier's budget (the 2H
+      // weapons carry the doubled TWOHAND_STAT_MULT mainhand budget).
+      expect(itemLevel(item), id).toBe(29);
+      expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
+      expect(
+        loot.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(true);
+    }
+    // The two-handers occupy both hands; the offhand pieces fill the slot the
+    // set never covered.
+    expect(ITEMS.bonewrought_greatsword).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    expect(ITEMS.direfang_greatblade).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    expect(ITEMS.bonewrought_bulwark).toMatchObject({ kind: 'shield', slot: 'offhand' });
+    expect(ITEMS.wraithfire_orb).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    expect(
+      ITEMS.bonewrought_bulwark.kind === 'shield' && ITEMS.bonewrought_bulwark.blockValue,
+    ).toBe(30);
   });
 
   it('keeps Nythraxis fixed at his throne facing the entrance before pull', () => {

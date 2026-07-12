@@ -105,8 +105,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       gcdRemaining: opts.gcdRemaining ?? 0,
       potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
-      auras: opts.auras,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
+      auras: opts.auras ?? [],
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -200,6 +200,27 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const near = view.tick(world({ resource: 60, targetPos: { x: 1, y: 1, z: 1 } })).slots[0];
     expect(near.usable).toBe(true);
     expect(near.outOfRange).toBe(false);
+  });
+
+  it('respects both range boundaries for an ability with a minimum range', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('charge', { requiresTarget: true, range: 25, minRange: 8 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    // Snapshot each primitive: the core reuses the slot object across ticks.
+    const tooClose = view.tick(world({ targetPos: { x: 5, y: 0, z: 0 } })).slots[0].outOfRange;
+    const atMinimum = view.tick(world({ targetPos: { x: 8, y: 0, z: 0 } })).slots[0].outOfRange;
+    const atMaximum = view.tick(world({ targetPos: { x: 25, y: 0, z: 0 } })).slots[0].outOfRange;
+    const tooFar = view.tick(world({ targetPos: { x: 26, y: 0, z: 0 } })).slots[0].outOfRange;
+
+    expect(tooClose).toBe(true);
+    expect(atMinimum).toBe(false);
+    expect(atMaximum).toBe(false);
+    expect(tooFar).toBe(true);
   });
 
   it('a range-0 targeted ability falls back to MELEE_RANGE for the range check', () => {

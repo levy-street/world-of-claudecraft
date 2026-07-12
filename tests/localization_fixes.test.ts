@@ -808,6 +808,8 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   }
   const s2 = new RegExp(`sendChatNotice\\([^,]+,\\s*${lit}`, 'g');
   for (const m of serverSrc.matchAll(s2)) cands.push({ type: 'error', tmpl: unq(m[1]) });
+  const s3 = new RegExp(`sendSystemNotice\\([^,]+,\\s*${lit}`, 'g');
+  for (const m of serverSrc.matchAll(s3)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   const seen = new Set<string>();
   return cands.filter((c) => {
     const k = `${c.type} ${c.tmpl}`;
@@ -1093,7 +1095,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
 
 // Regression for the S3 hardening: prove the scanner ENUMERATES each emit form it was
 // hardened to cover, by feeding it synthetic source. If a future refactor drops one of
-// the regexes (s1/s1t/s2/nr/ert/e3), the matching assertion bites - so the drift guard
+// the regexes (s1/s1t/s2/s3/nr/ert/e3), the matching assertion bites - so the drift guard
 // cannot silently lose coverage of a whole emit shape.
 describe('S3 scanner enumerates each hardened emit form (regression)', () => {
   const synthSim = [
@@ -1115,6 +1117,7 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     "this.send({ type: 'error', text: 'SYNTH_SERVER_INLINE' });", // s1
     "this.send({ type: 'log', text: flag ? 'SYNTH_SRV_TERN_A' : 'SYNTH_SRV_TERN_B' });", // s1t
     "sendChatNotice(session, 'SYNTH_CHATNOTICE');", // s2
+    "sendSystemNotice(session, 'SYNTH_SYSNOTICE');", // s3
   ].join('\n');
 
   // [label, expected type, expected tmpl] - every entry must be enumerated.
@@ -1135,6 +1138,7 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
     ['server sendChatNotice (s2)', 'error', 'SYNTH_CHATNOTICE'],
+    ['server sendSystemNotice (s3)', 'log', 'SYNTH_SYSNOTICE'],
   ];
 
   it('every hardened emit form is enumerated by scanEmitCandidates()', () => {

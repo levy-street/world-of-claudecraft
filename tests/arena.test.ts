@@ -634,7 +634,9 @@ describe('arena: class ability target filters', () => {
     level: number;
     setup?: (sim: Sim, pid: number) => void;
   }> = [
-    { cls: 'warrior', ability: 'thunder_clap', level: 20 },
+    // NOTE: the warrior's only arena AoE, Quaking Blow (thunder_clap), is now
+    // Protection-only (2026-07-08) and spec is locked once queued into a match, so it
+    // needs a dedicated case (below) that commits prot BEFORE matchmaking.
     { cls: 'mage', ability: 'arcane_explosion', level: 20 },
     { cls: 'paladin', ability: 'consecration', level: 20 },
     {
@@ -669,6 +671,35 @@ describe('arena: class ability target filters', () => {
 
     const startHp = target.hp;
     sim.castAbility(ability, a);
+
+    expect(target.hp).toBeLessThan(startHp);
+  });
+
+  it('lets a committed-Protection warrior Quaking Blow (thunder_clap) hit active arena opponents', () => {
+    // Quaking Blow is Protection-only (2026-07-08) and spec is locked once queued into
+    // a match, so level up and commit prot BEFORE matchmaking (queueDuo's tick), then
+    // start the bout.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('warrior', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 6, -40);
+    sim.setPlayerLevel(20, a);
+    sim.setPlayerLevel(20, b);
+    expect(sim.setSpec('prot', a)).toBe(true);
+    sim.arenaQueueJoin(a);
+    sim.arenaQueueJoin(b);
+    sim.tick(); // updateArena() matchmakes the pair
+    startBout(sim);
+
+    const caster = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    teleport(sim, b, caster.pos.x, caster.pos.z + 3);
+    caster.resource = caster.maxResource;
+    caster.gcdRemaining = 0;
+
+    const startHp = target.hp;
+    sim.castAbility('thunder_clap', a);
 
     expect(target.hp).toBeLessThan(startHp);
   });

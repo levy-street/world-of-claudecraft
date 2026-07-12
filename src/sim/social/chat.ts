@@ -17,7 +17,9 @@ import { type AssistCandidate, resolveAssist } from '../assist';
 import { GATHERING_PROFESSIONS } from '../content/professions';
 import { CLASSES, ITEMS, zoneAt } from '../data';
 import { graveyardReadout } from '../entity_roster';
+import { enterDungeon } from '../instances/dungeons';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
+import { completeAllQuestsForDev } from '../quests/dev_quest_commands';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -420,6 +422,26 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     if (h || m) parts.push(`${m}m`);
     parts.push(`${s}s`);
     ctx.error(r.meta.entityId, `Time played this session: ${parts.join(' ')}.`);
+    return null;
+  }
+
+  // "/playtime": report this character's LIFETIME played time, accumulated
+  // across every session and persisted server-side (see PlayerMeta.
+  // totalPlayedSeconds + serializeCharacter). Unlike /played (session-only,
+  // resets on relog), this figure only ever grows while the character is
+  // actually in the world.
+  if (/^\/playtime(?:\s|$)/i.test(raw)) {
+    const secs = Math.max(0, Math.floor(r.meta.totalPlayedSeconds + (ctx.time - r.meta.joinedAt)));
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    const parts: string[] = [];
+    if (d) parts.push(`${d}d`);
+    if (d || h) parts.push(`${h}h`);
+    if (d || h || m) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    ctx.error(r.meta.entityId, `Total time played: ${parts.join(' ')}.`);
     return null;
   }
 
@@ -963,6 +985,45 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
+    // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
+    completeAllQuestsForDev(ctx, pid);
+    return null;
+  }
+  // [dev] /dev raid [heroic|normal|reset] (also accepts "/dev tp raid <n> heroic").
+  // Zones a lone tester straight into the Nythraxis raid, bypassing the raid-group
+  // and attunement gates; "reset" clears the raid lockouts so it can be re-run.
+  const raidM = /^\/(?:dev\s+)(?:tp\s+)?raid\b\s*(.*)$/i.exec(raw);
+  if (raidM) {
+    const rest = raidM[1].toLowerCase();
+    const meta = ctx.players.get(pid);
+    if (/\breset\b/.test(rest)) {
+      if (meta) meta.raidLockouts.clear();
+      ctx.emit({ type: 'log', text: '[dev] Raid lockouts cleared.', pid });
+      return null;
+    }
+    const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
+    ctx.setDungeonDifficulty(difficulty, pid);
+    enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
+    ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
+    return null;
+  }
+  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
+    // [dev] Toggle god mode: invulnerable (target.devGod in dealDamage) and 100x
+    // outgoing damage (dev-gated), so a solo tester can survive and down raid bosses
+    // to inspect their drops. Enabling also tops off health and resource. Uses its
+    // OWN devGod flag, never the production gm flag, so it can never touch a real GM.
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.devGod = !e.devGod;
+      if (e.devGod) {
+        e.hp = e.maxHp;
+        e.resource = e.maxResource;
+      }
+      ctx.emit({ type: 'log', text: `[dev] God mode ${e.devGod ? 'ON' : 'OFF'}.`, pid });
+    }
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -974,7 +1035,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev god, /dev raid [heroic|normal|reset], /dev kill',
     );
     return null;
   }
@@ -1077,7 +1138,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',

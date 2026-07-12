@@ -82,6 +82,9 @@ export const DELVE_COMPANION_HEAL_INTERVAL = 3;
 
 export type PlayerClass =
   | 'warrior'
+  // The pre-overhaul warrior kit, kept as its own class on the PTR branch so
+  // testers can compare the two warrior designs side by side (owner 2026-07-11).
+  | 'warrior_classic'
   | 'paladin'
   | 'hunter'
   | 'rogue'
@@ -136,6 +139,7 @@ export interface ArenaCombatant {
 }
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
+  'warrior_classic',
   'paladin',
   'hunter',
   'rogue',
@@ -194,15 +198,12 @@ export type AuraKind =
   | 'buff_speed'
   | 'buff_haste'
   | 'buff_spellpower'
+  // Rallying Cry: value = fraction added to maximum health while worn (the
+  // recalc keeps the hp fraction, so current health scales with it).
+  | 'buff_maxhp_pct'
   | 'buff_spellcrit'
   | 'buff_spelldmg'
   | 'buff_spellhaste'
-  | 'buff_crit'
-  | 'buff_dmg_done'
-  | 'buff_rage_gen'
-  | 'die_by_sword'
-  | 'aoe_echo'
-  | 'sure_crit'
   | 'cast_shield'
   | 'hot'
   | 'absorb'
@@ -226,6 +227,20 @@ export type AuraKind =
   | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
+  // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
+  // (up to 2); the next Maiming Strike consumes it for +value damage per stack.
+  // `sweeping_strikes`: while worn, a single-target damaging ability also strikes
+  // one nearby enemy for a reduced fraction (like a timed Bladed Echo).
+  | 'overpower_charge'
+  | 'sweeping_strikes'
+  // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
+  // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
+  // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.
+  // `berserker_stance`: the Fury-only offensive default; a pure bonus with no
+  // downside: +BERSERKER_CRIT_CHANCE crit chance (folded in recalcPlayerStats)
+  // and +BERSERKER_CRIT_DAMAGE crit damage (folded once in combat/damage.ts).
+  | 'battle_stance'
+  | 'berserker_stance'
   | 'righteous_fury'
   // Warrior/rogue armor debuff. Now a PERCENTAGE reduction (2% per stack via
   // effectiveArmor), not a flat armor subtraction. Does not stack with faerie_fire
@@ -248,6 +263,11 @@ export type AuraKind =
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
+  // Source-scoped damage vulnerability (Breachmaker): unlike raid-wide
+  // 'vulnerability', this only amplifies damage dealt BY the caster whose id is
+  // in the aura's `sourceId`. `value` = the additive fraction (0.2 = +20%). Read
+  // in combat/damage.ts right after the raid-wide vulnerability fold.
+  | 'vuln_source'
   | 'hex'
   | 'tongues'
   | 'cost_tax'
@@ -284,7 +304,82 @@ export type AuraKind =
   | 'buff_int_pct'
   | 'buff_sta_pct'
   | 'buff_armor_pct'
-  | 'buff_ap_pct';
+  | 'buff_ap_pct'
+  // Choice-row talent primitives. `buff_dmg_done` value = additive fraction of
+  // extra outgoing damage (0.2 = +20%), summed across auras in dealDamage;
+  // `buff_crit` value = additive crit chance folded by recalcPlayerStats. Worn
+  // by talent cooldowns (Avatar / Battle Rhythm's empowered-cast blink).
+  | 'buff_dmg_done'
+  | 'buff_crit'
+  // `buff_rage_gen` value = additive fraction of extra rage generation while
+  // worn (Battle Rhythm's empowered cast), summed by rageGenAuraMult below.
+  | 'buff_rage_gen'
+  // Recklessness: one aura carrying both halves of the enrage. value = the
+  // additive crit chance (0.20); the rage-generation bonus is the fixed
+  // RECKLESSNESS_RAGE_GEN read by rageGenAuraMult.
+  | 'buff_reckless'
+  // Fury Enrage: one self-buff. value = the additive outgoing-damage fraction
+  // (ENRAGE_DMG_DONE, summed in dealDamage beside buff_dmg_done). The +25% HASTE
+  // half is folded into meleeHaste/spellHaste in recalcPlayerStats (ENRAGE_HASTE_PCT),
+  // and the +10% move-speed half is ENRAGE_MOVE_MULT read in moveSpeedMult.
+  // Procced by Bloodletting (30% chance) and Desenfreno / Rampage (always).
+  | 'enrage'
+  // Bloodbath: the on-kill stacking buff. value = per-stack fraction times the
+  // current stacks (crit AND damage-dealt share the same number); `stacks`
+  // carries the count for the buff-icon badge.
+  | 'bloodbath'
+  // Die by the Sword: while worn, incoming damage is cut 10% (20% below 30%
+  // health); the cut itself lives in dealDamage, keyed off the kind alone.
+  | 'die_by_sword'
+  // Avatar's transform, ONE aura carrying both halves (two selfBuffs would
+  // overwrite each other, applyAura replaces by id): value = the damage-done
+  // amp; the colossus body scale is the fixed AVATAR_SCALE in recalc.
+  | 'buff_avatar'
+  // Sanguine Aura's war-leader buff, ONE aura for both halves so the buff
+  // frame shows one icon with one two-part tooltip: value = the swing-interval
+  // multiplier (< 1 = faster, read by swingIntervalMult), value2 = the
+  // damage-done fraction (read by the dealDamage amp loop).
+  | 'sanguine'
+  // Battle Trance (warrior baseline proc): the next Reaver Strike or Brute
+  // Swing costs no rage. An ability-scoped sibling of next_cast_free, armed by
+  // connected auto-attack swings and consumed by combat/empower_next.ts.
+  | 'battle_trance'
+  // Revenge free-cost proc (Protection): a dodge or parry against the warrior
+  // has a chance to make the next Revenge cost no rage. Scoped like Battle Trance
+  // (only Revenge consumes it), applied in mobSwing and consumed by
+  // combat/empower_next.ts; the action bar reads the same free-cost predicate.
+  | 'revenge_free'
+  // Sudden Death (Arms passive): a connected auto swing has a chance to arm a
+  // window in which Early Grave (execute) may be cast on a target at ANY health
+  // and for no rage. Consumed by combat/empower_next.ts (free cost) and gates the
+  // execute HP requirement in casting_lifecycle; the action bar reads the same free
+  // predicate. Owner 2026-07-09.
+  | 'sudden_death'
+  // Victory Rush's on-kill window: worn for VICTORY_RUSH_WINDOW seconds after
+  // a credited kill; the granted strike requires it and consumes it on cast.
+  | 'victory_rush'
+  // Bladed Echo (Bladed Gyre's rider): the caster's next N single-target
+  // damaging ability CASTS also strike enemies near their primary target for
+  // the same resolved amounts. `charges` counts the remaining casts (the buff
+  // badge shows it); armed by whirlwind's selfBuff, consumed once per cast by
+  // combat/area_echo.ts after the cast actually dealt single-target damage.
+  | 'aoe_echo'
+  // Emboldening Roar's 'Emboldened': the carrier's next `charges` damaging
+  // ability CASTS are guaranteed critical strikes. The normal crit rng is
+  // still drawn at every roll site exactly as before; combat/sure_crit.ts only
+  // OVERRIDES the outcome and spends ONE charge per cast (a multi-strike cast
+  // like Red Harvest crits every strike on one charge). Plain auto-attack
+  // swings neither benefit nor consume.
+  | 'sure_crit'
+  // Furious Mending's damage-reduction half: the wearer takes `value` fraction
+  // less damage from any external source while worn (summed across auras,
+  // floored at a zero multiplier; the cut lives in combat/damage.ts beside the
+  // Die by the Sword arm).
+  | 'buff_dr'
+  // Raised Guard's physical-only sibling of buff_dr: the wearer takes `value`
+  // fraction less PHYSICAL damage while worn (other schools untouched). Same
+  // fold site in combat/damage.ts, gated on the damage school.
+  | 'buff_dr_phys';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -300,10 +395,14 @@ export interface Aura {
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
+  // Lingering Dread: a break-on-damage aura with a threshold soaks this much
+  // damage before breaking (undefined = classic break on ANY damage).
   breakThreshold?: number;
   damageAccrued?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
-  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  // thorns: remaining reflect charges (Lightning Shield); aoe_echo/sure_crit:
+  // remaining ability CASTS. undefined => unlimited
+  charges?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
   // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
@@ -347,6 +446,7 @@ export interface WeaponInfo {
 
 export type EquipSlot =
   | 'mainhand'
+  | 'offhand'
   | 'helmet'
   | 'neck'
   | 'shoulder'
@@ -362,6 +462,7 @@ export type EquipSlot =
 // the entity loop and the server's unequip-command validation.
 export const EQUIP_SLOTS: readonly EquipSlot[] = [
   'mainhand',
+  'offhand',
   'helmet',
   'neck',
   'shoulder',
@@ -399,10 +500,13 @@ export type ItemUse =
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
+export type WeaponHand = 'mainhand' | 'onehand' | 'twohand';
 
 type ItemKind =
   | 'weapon'
   | 'armor'
+  | 'shield'
+  | 'held_offhand'
   | 'quest'
   | 'junk'
   | 'food'
@@ -432,6 +536,12 @@ interface BaseItemDef {
   noVendorSell?: boolean;
   noDiscard?: boolean;
   noMarketList?: boolean;
+  // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
+  // listed on the World Market, or destroyed (right-click discard). Currency-like
+  // reward tokens (heroic_mark) use this so they can only be spent at their vendor,
+  // never handed off or thrown away. Enforced in social/trade.ts, mail/post_office.ts,
+  // market.ts, and items.ts (discardItem/sellItem/sellAllJunk).
+  soulbound?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */
@@ -460,6 +570,15 @@ interface BaseItemDef {
   requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
+  // Heroic upgraded variant: the base item id this "Heroic X" copy was generated
+  // from (content/heroic_variants.ts). Set only on the generated variants, which
+  // drop in place of their base from a heroic dungeon's normal loot table. The
+  // client composes the display name as "Heroic {base name}" from this (see
+  // itemDisplayName), so a variant carries no translated name key of its own.
+  heroicOf?: string;
+  // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
+  // tooltip chrome; these keep their own name key, unlike heroicOf variants.
+  heroic?: boolean;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
@@ -523,7 +642,7 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'offhand' | 'neck' | 'ring1' | 'ring2'>;
   armorType: ArmorType;
   weapon?: never;
 }
@@ -543,6 +662,7 @@ export interface WeaponItemDef extends BaseItemDef {
   kind: 'weapon';
   slot: 'mainhand';
   weapon: WeaponInfo;
+  hand?: WeaponHand;
   armorType?: never;
   // Legendary "chance on action" procs; see WeaponProc below.
   weaponProcs?: WeaponProc[];
@@ -592,12 +712,33 @@ export interface WeaponProc {
   effects: WeaponProcEffect[];
 }
 
+export interface ShieldItemDef extends BaseItemDef {
+  kind: 'shield';
+  slot: 'offhand';
+  blockValue?: number;
+  armorType?: never;
+  weapon?: never;
+}
+
+export interface HeldOffhandItemDef extends BaseItemDef {
+  kind: 'held_offhand';
+  slot: 'offhand';
+  armorType?: never;
+  weapon?: never;
+}
+
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'shield' | 'held_offhand'>;
   armorType?: never;
 }
 
-export type ItemDef = ArmorItemDef | WeaponItemDef | JewelryItemDef | OtherItemDef;
+export type ItemDef =
+  | ArmorItemDef
+  | WeaponItemDef
+  | JewelryItemDef
+  | ShieldItemDef
+  | HeldOffhandItemDef
+  | OtherItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -624,12 +765,13 @@ export interface InvSlot {
   instance?: ItemInstancePayload;
 }
 
-// A shallow `{ ...slot }` aliases `instance` (and its mutable `charges`/`rolled.stats`
-// maps) between the live slot and a serialized/loaded copy: decrementing a charge on
-// one would silently mutate the other. Deep-clone at every save/load boundary instead.
-export function cloneInvSlot<T extends InvSlot>(slot: T): T {
-  if (!slot.instance) return { ...slot };
-  const src = slot.instance;
+// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats` maps
+// between a live payload and a serialized/loaded copy: decrementing a charge on
+// one would silently mutate the other. Deep-clones at every save/load boundary
+// instead. Shared by cloneInvSlot below and the equipped-instance map (an
+// enchanted piece's payload, src/sim/professions/enchanting.ts), so both copy
+// through the exact same rules.
+export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
   if (src.charges) instance.charges = { ...src.charges };
   if (src.rolled)
@@ -637,7 +779,15 @@ export function cloneInvSlot<T extends InvSlot>(slot: T): T {
       ...src.rolled,
       ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
     };
-  return { ...slot, instance };
+  return instance;
+}
+
+// A shallow `{ ...slot }` aliases `instance` between the live slot and a
+// serialized/loaded copy; see cloneItemInstancePayload above for why that is
+// unsafe and what this clones instead.
+export function cloneInvSlot<T extends InvSlot>(slot: T): T {
+  if (!slot.instance) return { ...slot };
+  return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
 }
 
 export interface LootSlot extends InvSlot {
@@ -645,6 +795,10 @@ export interface LootSlot extends InvSlot {
   personalFor?: number[];
   // Need/greed loot that everyone passed on becomes free-for-all corpse loot.
   openToAll?: boolean;
+  // Shared personal (participation tokens, e.g. Heroic Marks): a single loot
+  // action by ANY listed player grants `count` copies to EVERY player in
+  // `personalFor`, then consumes the slot. No one has to loot their own copy.
+  sharedPersonal?: boolean;
 }
 
 export interface CorpseLoot {
@@ -767,6 +921,11 @@ export interface MobTemplate {
   // who damaged it (gated to once per day per boss). The spawn schedule + location
   // live in src/sim/world_boss.ts; the loot roll runs through rollWorldBossLoot.
   worldBoss?: boolean;
+  // Suppresses the per-mechanic combat-log barks ("<Name> unleashes <Mechanic>!"
+  // and "<Name> becomes enraged!") for a mob whose only voice should be its
+  // periodic zone-wide battle cry (a world boss). The mechanics still fire, with
+  // their spellfx and damage: only the noisy log line is silenced.
+  quietMechanics?: boolean;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
   // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
@@ -784,11 +943,13 @@ export interface MobTemplate {
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
   // leaves snares landing so most elites can still be kited; a raid boss sets both.
   slowImmune?: boolean;
+  // Ignores taunt/growl forced-target windows. Used by special add AI only.
+  ignoreTaunt?: boolean;
   respawnMult?: number;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
   respawnSeconds?: number;
-  // Training dummy: a stationary practice target — attackable (so it counts for
+  // Training dummy: a stationary practice target, attackable (so it counts for
   // damage and the combat meters) but never moves, aggros, or retaliates; drops
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
@@ -875,6 +1036,23 @@ export interface MobTemplate {
     every: number;
     amount: number;
     duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
+  // Channeled ESCALATING heal ("Hierophant's Mending"): every `every`s the caster
+  // heals the highest-max-hp friendly mob in `radius` (its protector, e.g. a raid
+  // boss) for `baseHeal` plus a ramp that GROWS by `rampAdd` each uninterrupted
+  // tick, capped so a tick never exceeds `maxHeal`. Any stun/incapacitate/silence
+  // (see combat/cc.ts) breaks the channel and RESETS the ramp to zero, so a raid
+  // that fails to lock the caster down watches the boss heal for more and more.
+  // The caster must be CC-able (template `ccImmune: false`) for the reset to
+  // matter. Rides applyHeal; no new aura kind. Resets on evade/respawn.
+  channelHeal?: {
+    radius: number;
+    every: number;
+    baseHeal: number;
+    rampAdd: number;
+    maxHeal: number;
     name: string;
     school?: Aura['school'];
   };
@@ -1362,6 +1540,9 @@ export type AbilityEffect =
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
+  // incentive design), scaled like ability-granted rage; never on a whiff.
+  | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   // Chain damage: strike the primary hostile, then bounce to the nearest
   // not-yet-hit hostile within `radius` of the previous target. `jumps` counts
   // additional targets and each hop deals `falloff` times the previous hit.
@@ -1373,7 +1554,6 @@ export type AbilityEffect =
       falloff: number;
       radius: number;
     }
-  | { type: 'interrupt'; lockout: number }
   // Dispel: strip up to `count` MAGIC (non-physical) auras, direction chosen by the
   // target relation: harmful debuffs off a friendly target/self, or beneficial buffs off
   // a hostile target. With `steal`, a beneficial buff stripped off an enemy is re-applied
@@ -1387,18 +1567,35 @@ export type AbilityEffect =
   // instantly as this ability's school and the DoT is removed.
   | { type: 'consumeDot'; dot: string }
   | { type: 'silence'; duration: number }
-  | { type: 'aoeFear'; duration: number; radius: number }
+  // `maxTargets` (Intimidating Shout) caps how many hostiles within radius are
+  // feared; absent = fear every hostile in radius (the warlock-style AoE fear).
+  | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
   | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'breakControl' }
   // Swept teleports: reposition along the line, stopping at walls/fences/steep
   // slopes/deep water (never clips through). repositionToAim uses the ground-target
   // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
-  | { type: 'repositionToAim'; breakRoots?: boolean }
+  // `landingAoe` (Heroic Leap) defers a blast to touchdown (updateLeapMovement) so
+  // it slams down where the caster lands instead of firing at cast time.
+  | {
+      type: 'repositionToAim';
+      breakRoots?: boolean;
+      landingAoe?: { min: number; max: number; radius: number };
+    }
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
-  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
-  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
-  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
+  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
+  // nearby allies, each hop healing `falloff` of the previous hop's amount. The
+  // arc reach is given as `jumpRange` on some variants and `radius` on others.
+  | {
+      type: 'chainHeal';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      jumpRange?: number;
+      radius?: number;
+    }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -1416,7 +1613,22 @@ export type AbilityEffect =
       // Intellect, Power Word: Fortitude, Blessing of Might, Battle Shout, Devotion Aura.
       party?: boolean;
     } // fortitude/might/mark on a friendly target
+  // Source-scoped debuff on the target (Breachmaker): applies an aura carrying
+  // the CASTER's id in `sourceId`, so a source-scoped fold (e.g. vuln_source in
+  // combat/damage.ts) only amplifies what THIS caster deals. Distinct auraId /
+  // auraName let the debuff read apart from the granting ability. Draws no rng.
+  | {
+      type: 'debuffTargetSource';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      auraId: string;
+      auraName: string;
+    }
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
+  // `auraId` overrides the applied dot aura's id (default: the ability id) so a
+  // rider bleed does not collide with another same-id aura the same cast applies
+  // (Maiming Strike's Deep Wounds bleed vs its mortal_wound debuff).
   | {
       type: 'dot';
       total: number;
@@ -1427,13 +1639,33 @@ export type AbilityEffect =
       // A direct-hit rider whose total snapshots this fraction of the preceding
       // directDamage result, including scaling and critical damage.
       directPct?: number;
+      auraId?: string;
     }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
-  | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  // `frontal` restricts the blast to enemies within the melee facing arc
+  // (MELEE_ARC, the castAbility facing gate); `stunSec` is a paired stun rider
+  // applied to each enemy actually hit (Faultline). Neither draws extra rng.
+  | {
+      type: 'aoeDamage';
+      min: number;
+      max: number;
+      radius: number;
+      frontal?: boolean;
+      stunSec?: number;
+      // Classic AoE soft target cap (Revenge): once more than `softCap` targets
+      // are struck, each rolled hit is scaled by softCap/targets so the TOTAL
+      // damage caps at softCap x per-target. Scales the already-rolled amount, so
+      // it draws no extra rng.
+      softCap?: number;
+      // Rage-generating AoE (Bladed Gyre): after the blast, the caster gains
+      // `base + perTarget * min(targetsHit, capTargets)` rage (e.g. 5 + 1 per
+      // enemy struck, capped at +5). Deterministic state change, no extra rng.
+      rageOnHit?: { base: number; perTarget: number; capTargets: number };
+    }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
@@ -1444,7 +1676,11 @@ export type AbilityEffect =
       interval: number;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
-  | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
+  // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
+  // (debuff_ap); `pct` = a percentage cut to ALL damage the victims deal (a
+  // negative buff_dmg_done aura), the owner's Direhowl rework: mobs carry most
+  // of their damage on the weapon roll, so a flat AP drain barely dents them.
+  | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
   // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
   | {
       type: 'aoeAllyAttackPower';
@@ -1494,16 +1730,34 @@ export type AbilityEffect =
       duration: number;
       // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
       // many melee hits reflect, gated by an internal cooldown between reflects.
+      // aoe_echo reuses charges as its remaining-casts counter.
       charges?: number;
       internalCooldown?: number;
+      // Optional distinct buff identity (aoe_echo: Bladed Gyre arms 'Bladed
+      // Echo', id 'bladed_echo'): lets the HUD name/icon the armed buff apart
+      // from the granting ability. Absent, the aura reuses the ability id/name.
+      auraId?: string;
+      auraName?: string;
     }
   | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
+  | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
-  | { type: 'selfHealPctMax'; pct: number }
+  | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
+  // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
+  // fraction of the caster's MAXIMUM health over the duration (the pct-of-max
+  // sibling of the flat 'hot' effect; carries no spell-power rider).
+  | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
+  // Rallying Cry (owner rework): the caster and party members within radius
+  // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
+  // hp FRACTION, so current health rises and falls with the buff, WoW-style).
+  | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
+  // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
+  // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
+  | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
   // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
   // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
@@ -1514,6 +1768,15 @@ export type AbilityEffect =
   // `armor` is retained for the threat value; the reduction percent is a fixed constant.
   | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
   | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
+  // Iron Resolve: a damage-absorb shield (the priest-style 'absorb' aura kind)
+  // sized from the resource ACTUALLY spent by the cast (`mult` damage soaked
+  // per point). Pairs with AbilityDef.spendsAllResource, which snapshots the
+  // spend-all bill into the resolved cost the effect reads.
+  | { type: 'absorbSpentResource'; mult: number; duration: number }
+  // Defiant Bellow: taunt every hostile mob within radius through the shared
+  // applyTaunt entry (threat to top + forced attack), the aoe fan-out of the
+  // single-target 'taunt' effect. Draws no rng.
+  | { type: 'aoeTaunt'; radius: number }
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
@@ -1543,6 +1806,12 @@ export interface AbilityDef {
   fearDr?: boolean; // incapacitate effects use fear PvP diminishing returns
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
+  // Stored uses for a charge-limited BASE-KIT ability (Twinstrike): `cooldown`
+  // becomes the per-charge RECHARGE timer. Resolved into KnownAbility.charges by
+  // abilitiesKnownAt, exactly like the Double Charge talent's bonusCharges (the
+  // combat gate + sequential recharge live in casting_lifecycle / updateTimers).
+  // undefined = 1 (a plain cooldown).
+  maxCharges?: number;
   range: number; // yards; 0 = melee range
   minRange?: number;
   // The attack travels to its target as a projectile, so its damage and effects
@@ -1556,6 +1825,12 @@ export interface AbilityDef {
   // unchanged): 'lightning' draws a jagged electric bolt from caster to target
   // instead of the default glowing bolt. Renderer-only; the sim just forwards it.
   projectileFx?: 'lightning';
+  // Instant-cast VISUAL cue (renderer-only; the sim just emits a spellfx with it):
+  // 'shout' plays the caster's roar one-shot + an expanding ground shockwave ring
+  // (the warrior shouts); 'flourish' plays the ability-mapped one-shot clip
+  // (manifest attackByAbility) with no particles: a pure cast gesture. Emitted on
+  // the successful instant resolution.
+  castFx?: 'shout' | 'weaponAura' | 'flourish';
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
   // non-physical damage scales with Spell Power; physical damage scales with melee
@@ -1564,17 +1839,44 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
-  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
+  // Passive ability (Measured Fury): known and shown in the spellbook, but never
+  // castable and never auto-placed on the action bar. Its benefit is folded
+  // wherever the flat known list is read (e.g. the cost choke point in
+  // resolvedAbility); castAbility refuses it silently.
+  passive?: boolean;
+  // Spec-gated base kit: when set, only players whose CHOSEN spec id is in the
+  // list keep this ability in their known list (abilitiesKnownAt). A player who
+  // has not committed to a spec keeps the full kit, and talent/row GRANTS are
+  // never filtered (the tree they come from is already spec-scoped).
+  specs?: readonly string[];
+  // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
+  // spec id is in the list DROPS this ability from their known list, even though
+  // it is otherwise ungated. Used to swap one ability for a spec-exclusive
+  // replacement (heroic_strike excludeSpecs ['prot'], since prot uses revenge).
+  // A no-spec player and any non-listed spec keep it. Grants are never filtered.
+  excludeSpecs?: readonly string[];
+  // When set alongside excludeSpecs, the exclusion only kicks in at this player
+  // level: below it the listed specs still know the ability. Models a kit
+  // hand-off (Redhand serves committed Fury as its rage spender until Red
+  // Harvest arrives, then retires). Without it exclusion applies at any level.
+  excludeSpecsAtLevel?: number;
+  // friendly = self or allied player; 'any' = either (defaults to enemy)
+  targetType?: 'enemy' | 'friendly' | 'any';
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
   targetMode?: 'position';
+  // A `targetMode: 'position'` channel that follows the CASTER instead of a
+  // fixed aimed point (Bladestorm): each tick recenters on the live position
+  // and the client never opens the ground-aim reticle for it.
+  selfCentered?: boolean;
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
   offGcd?: boolean;
   awardsCombo?: number; // rogue builders
   spendsCombo?: boolean; // rogue finishers
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
+  requiresShield?: boolean; // Protection shield abilities: need a shield in the offhand
   // Classic threat riders: flat bonus threat on a successful use and/or a
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
@@ -1589,6 +1891,17 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // Usable only while the caster wears an aura of this kind (Victory Rush's
+  // on-kill window); runEffects consumes the enabling aura on a successful cast.
+  requiresAuraKind?: AuraKind;
+  // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
+  // actual bill is the caster's resource bar (capped by spendResourceCap when
+  // set), snapshotted into the resolved cost at apply time so both the spend and
+  // the effects (e.g. absorbSpentResource) read the true spent amount.
+  spendsAllResource?: boolean;
+  // Optional ceiling on a spendsAllResource bill: the ability spends at most this
+  // much resource (Iron Resolve caps at 40 rage), keeping the effect it feeds bounded.
+  spendResourceCap?: number;
   learnLevel: number;
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
@@ -1820,6 +2133,20 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
+// Heroic Leap flight (owner 2026-07-09): the caster arcs from `from` to `to` over
+// `dur` seconds instead of teleporting. `elapsed` advances by DT each tick; at the
+// apex the entity is `apex` yards above the straight-line ground. On touchdown the
+// stored `aoe` fires at `to` (attributed to `ability`).
+export interface LeapFlight {
+  from: Vec3;
+  to: Vec3;
+  elapsed: number;
+  dur: number;
+  apex: number;
+  aoe: { min: number; max: number; radius: number } | null;
+  ability: string;
+}
+
 export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
@@ -1866,6 +2193,7 @@ export interface Entity {
   overheadEmoteSeq: number;
   stats: Stats;
   weapon: WeaponInfo;
+  offhandWeapon: WeaponInfo | null;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
@@ -1883,6 +2211,9 @@ export interface Entity {
   // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
   critDmgBonus: number;
   dodgeChance: number;
+  parryChance: number; // 0..1: chance to fully avoid a FRONTAL melee attack (parry classes only)
+  blockChance: number; // 0..1: passive shield block chance against FRONTAL physical melee hits
+  blockValue: number; // flat damage prevented by a successful shield block
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
   moveSpeed: number;
@@ -1891,6 +2222,8 @@ export interface Entity {
   targetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
+  offhandSwingTimer: number;
+  dualWielding: boolean;
   /** petSpell windup in flight: sim tick the committed release fires on
    *  (transient combat state like swingTimer; never persisted or wired). */
   rangedWindupReleaseTick?: number | null;
@@ -1906,10 +2239,12 @@ export interface Entity {
   castRemaining: number;
   castTotal: number;
   // Entity-targeted casting: the target captured at cast start for entity-targeted
-  // casts (hostile and friendly) and channels. Timed casts and channel ticks resolve
-  // against this id, so retargeting mid-cast/mid-channel cannot redirect the spell,
-  // and clearing your target no longer cancels a channel. The channel still cancels
-  // if the locked target dies or turns non-hostile.
+  // casts (hostile and friendly) and channels; also carries the mouseover-cast
+  // (Clique-style) friendly override set by castAbilityOn. Timed casts and channel
+  // ticks resolve against this id, so retargeting mid-cast/mid-channel cannot
+  // redirect the spell, and clearing your target no longer cancels a channel. The
+  // channel still cancels if the locked target dies or turns non-hostile. Runtime
+  // combat state only: never serialized, never on the wire.
   castTargetId: number | null;
   // Ground-targeted casting: the world point a `targetMode: 'position'` ability is
   // aimed at, captured (server-clamped to range) when the cast begins and read by
@@ -1920,6 +2255,12 @@ export interface Entity {
   channelTickEvery: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
+  // Charge-limited abilities (Double Charge): per-ability spent count plus the
+  // full recharge duration. While spent > 0 the ability's cooldowns entry is
+  // the RECHARGE timer; expiry refunds one charge and re-arms (updateTimers).
+  // Created lazily on first charged cast (undefined = no charge bookkeeping),
+  // so entities without the talent serialize/trace exactly as before.
+  charges?: Map<string, { spent: number; cdMax: number }>;
   queuedOnSwing: string | null; // heroic strike
   queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
   queuedOnSwingCostMultiplier?: number; // next_cast_cheap consumed at queue time
@@ -1941,6 +2282,10 @@ export interface Entity {
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
   chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
+  // Heroic Leap flight: while non-null the entity is arcing from `from` to `to`
+  // over `dur` seconds (updateLeapMovement); the landing AoE fires on touchdown so
+  // the jump reads as a real leap, not an instant teleport.
+  leap: LeapFlight | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
@@ -1961,6 +2306,7 @@ export interface Entity {
   bossDamagers: Set<number>;
   forcedTargetId: number | null; // taunt/growl: attack this target while the timer runs
   forcedTargetTimer: number; // seconds left on the forced-attack window
+  shuffleTargetTimer?: number; // seconds until a special AI may reroll its preferred target
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
@@ -1980,6 +2326,9 @@ export interface Entity {
   detonateTimer: number; // Death Throes fuse on a volatile corpse; Infinity = no pending detonation
   mendTimer: number; // mendAlly support-heal cast countdown
   wardTimer: number; // wardAllies support-shield cast countdown
+  channelTimer: number; // channelHeal escalating-heal tick countdown
+  channelRamp: number; // channelHeal accumulated bonus heal; reset to 0 on interrupt (CC)
+  healProtecteeId?: number | null; // channelHeal: cached protectee (the ally healed), re-scanned lazily
   rallyTimer: number; // rally commander-buff cast countdown
   warcryTimer: number; // warcry ally-haste pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
@@ -2012,6 +2361,13 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
+  // real game master (who could otherwise deal 100x or have their invuln toggled).
+  devGod?: boolean;
+  /** Moderation-jailed player: prisoners are mutually hostile (the jail brawl,
+   *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
+   *  restore; never true offline, never user-settable. */
+  jailed?: boolean;
   /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */
@@ -2058,11 +2414,22 @@ export interface Entity {
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
   mainhandItemId: string | null;
+  // Equipped offhand item id (players only; null otherwise). Render-only: the
+  // client maps it to a held offhand model. Recomputed in recalcPlayerStats and
+  // synced in identity fields (terse `oh`). The sim never reads it for gameplay.
+  offhandItemId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,
   // the sim never reads it for gameplay (no effect on stats).
   equippedItems: Partial<Record<EquipSlot, string>>;
+  // Render-only mirror of PlayerMeta.equipmentInstance (Enchanting): the per-slot
+  // ItemInstancePayload of whichever equipped piece carries one (an enchanted
+  // item's `rolled.stats`), keyed the same as equippedItems. Sparse: a slot with
+  // a plain (unenchanted) piece, or nothing equipped, has no entry. Recomputed in
+  // recalcPlayerStats alongside equippedItems; the sim reads the SOURCE
+  // (PlayerMeta.equipmentInstance) for the actual stat bonus, never this mirror.
+  equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
   // Set server-side from the player's connected-wallet balance and synced in
   // identity fields like skin. The sim never reads it (no gameplay effect).
@@ -2125,6 +2492,10 @@ export interface NythraxisEncounterState {
   deathlessTimer: number;
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
+  heroicSummonChannelRemaining?: number;
+  dreadCurseTimer?: number;
+  dreadCurseTargetId?: number | null;
+  dreadCurseStacks?: number;
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
@@ -2143,6 +2514,7 @@ export type MailResultCode =
   | 'noRecipient'
   | 'tooManyParcels'
   | 'noMailQuestItems'
+  | 'noMailSoulbound'
   | 'notEnoughItems'
   | 'cantAffordPostage'
   | 'recipientBoxFull'
@@ -2408,9 +2780,12 @@ export type SimEvent = { pid?: number } & (
         | 'beam'
         | 'tick'
         | 'nova'
+        | 'chainHeal'
         | 'windup'
         | 'lightning'
-        | 'chainHeal'
+        | 'shout'
+        | 'weaponAura'
+        | 'flourish'
         // Talent-moment effects: a proc arming (procSurge), a ward appearing
         // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
         // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
@@ -2418,6 +2793,9 @@ export type SimEvent = { pid?: number } & (
         | 'wardBloom'
         | 'echoBurst'
         | 'detonate';
+      // The casting ability's id, carried only by fx kinds whose visual varies per
+      // ability (shouts pick their wave colour; weapon auras identify the buff).
+      ability?: string;
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
@@ -2867,14 +3245,138 @@ export function rageConversion(level: number): number {
 
 // Rage from dealing damage uses the classic outgoing-damage scale.
 export function rageFromDealing(damage: number, level: number): number {
-  return (7.5 * damage) / rageConversion(level);
+  // Coefficient tuned toward the classic-era ~7.5 to 9 range (was 18, which roughly
+  // doubled real classic rage income and flooded the bar at low levels).
+  return (9 * damage) / rageConversion(level);
 }
 
 // Rage from taking damage scales with the attacker's level so dungeon tanks get
 // useful rage from being hit without hard-coding the current level cap.
 export function rageFromTaking(damage: number, attackerLevel: number): number {
+  return damage / Math.max(1, attackerLevel);
+}
+
+// The pre-overhaul rage model, kept verbatim for the classic warrior (the
+// side-by-side test class): the overhaul raised the dealing coefficient
+// 7.5 -> 9 and removed the 1.5x attacker-level divisor on taken damage.
+export function rageFromDealingClassic(damage: number, level: number): number {
+  return (7.5 * damage) / rageConversion(level);
+}
+
+export function rageFromTakingClassic(damage: number, attackerLevel: number): number {
   return damage / (Math.max(1, attackerLevel) * 1.5);
 }
+
+// Choice-row warrior talents: aura-driven rage-generation multiplier, applied
+// at every rage mint site (auto-attack dealing, taking, gainResource, Charge's
+// burst) on top of the talent-static autoRagePct/abilityRagePct globals. A
+// Recklessness enrage adds the fixed bonus; Battle Rhythm's empowered-cast
+// blink adds its buff_rage_gen value. 1 (a no-op) with no such aura worn.
+export const RECKLESSNESS_RAGE_GEN = 0.5;
+// Warrior stance tuning (owner-tunable, docs/prd/warrior-talents.md). Battle
+// Stance mints extra rage; Berserker Stance is a pure crit bonus for Fury.
+export const STANCE_RAGE_GEN = 0.1; // Battle Stance: +10% rage generation
+export const BERSERKER_CRIT_CHANCE = 0.03; // Berserker Stance: +3% crit chance
+export const BERSERKER_CRIT_DAMAGE = 0.03; // Berserker Stance: +3% crit damage
+
+// Fury Enrage: a short self-buff (Bloodletting has a 30% chance, Desenfreno /
+// Rampage always). One 'enrage' aura carries all three halves: outgoing damage
+// +7% (the aura's value, summed in dealDamage; balance pass 2026-07-10, was 11%), +25% HASTE (ENRAGE_HASTE_PCT is
+// folded into meleeHaste/rangedHaste/spellHaste in recalcPlayerStats, so it reads
+// as real haste: faster swings AND casts, and it shows in the Haste stat), and
+// move speed +10% (ENRAGE_MOVE_MULT). Note: haste never shortens the GCD here.
+export const ENRAGE_DMG_DONE = 0.07;
+export const ENRAGE_HASTE_PCT = 0.25;
+export const ENRAGE_MOVE_MULT = 1.1;
+export const ENRAGE_DURATION = 4; // seconds
+export function rageGenAuraMult(e: Entity): number {
+  let mult = 1;
+  for (const a of e.auras) {
+    if (a.kind === 'buff_rage_gen') mult += a.value;
+    else if (a.kind === 'buff_reckless') mult += RECKLESSNESS_RAGE_GEN;
+    // Battle Stance's rage-generation bonus applies at every mint site.
+    else if (a.kind === 'battle_stance') mult += STANCE_RAGE_GEN;
+  }
+  return mult;
+}
+
+// Combat Mastery (choice-row talent): each stance gains an extra effect while
+// the talent is picked (global stanceMastery). Battle: ability CRITICALS deal
+// an extra fraction (never plain auto swings; folded in combat/damage.ts beside
+// the Berserker Stance crit amp). Berserker: auto-attack swings come faster
+// (auto-attack swing timers only, never casts or the GCD). Guarded: a heavy
+// blow, one that would take at least GUARDED_HP_PCT of the wearer's maximum
+// health BEFORE this cut, deals GUARDED_CUT less damage (combat/damage.ts,
+// after every other reduction so the threshold reads the real incoming hit).
+export const STANCE_MASTERY_BATTLE_CRIT_DMG = 0.15;
+export const STANCE_MASTERY_BERSERKER_HASTE = 0.05;
+export const STANCE_MASTERY_GUARDED_HP_PCT = 0.2;
+export const STANCE_MASTERY_GUARDED_CUT = 0.15;
+
+// Berserker Stance's crit-damage bonus: an extra fraction on a CRITICAL hit,
+// folded once in combat/damage.ts (mirroring the critVuln amp). 0 when the
+// source is not in Berserker Stance.
+export function berserkerCritDamage(e: Entity): number {
+  return e.auras.some((a) => a.kind === 'berserker_stance') ? BERSERKER_CRIT_DAMAGE : 0;
+}
+
+// Sanguine Aura's melee filter: the classes whose party members receive the
+// attack-speed + damage buff. Class-level v1 (spec-aware filtering can refine
+// it later); deliberately excludes the pure casters so the buff never replaces
+// a universal haste. Owner-tunable.
+export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
+  'warrior',
+  'paladin',
+  'rogue',
+  'shaman',
+  'druid',
+]);
+
+// Parry (owner 2026-07-08): a chance to FULLY avoid a frontal melee attack, like
+// dodge but strength-driven and front-only (you cannot parry a blow from behind).
+// Only weapon classes parry; pure casters (mage/priest/warlock) never do. Hunter
+// is included (WoW hunters parry) even though it is not in MELEE_CLASSES.
+export const PARRY_CLASSES: ReadonlySet<PlayerClass> = new Set([
+  'warrior',
+  'warrior_classic',
+  'paladin',
+  'rogue',
+  'hunter',
+  'shaman',
+  'druid',
+]);
+export const PARRY_BASE = 0.05; // base parry chance for a parry-capable class
+export const PARRY_STR_PER = 0.0005; // + per point of Strength (mirrors dodge/agi)
+export const PARRY_FRONT_ARC = Math.PI / 2; // half-arc: attacker within 180 deg front
+export const SHIELD_BLOCK_BASE = 0.05; // classic-style passive shield block baseline
+
+// Die by the Sword (Arms defensive, owner restructure 2026-07-08): a flat 30%
+// incoming-damage cut (take-fraction multiplier) plus a big dodge boost standing
+// in for its "+100% parry" (avoidance is modelled as dodge). Second Wind's
+// activation threshold rides alongside.
+export const DIE_BY_SWORD_CUT = 0.7;
+export const DIE_BY_SWORD_LOW_CUT = 0.7;
+export const DIE_BY_SWORD_LOW_HP = 0.3;
+export const DIE_BY_SWORD_DODGE = 0.3;
+export const SECOND_WIND_THRESHOLD = 0.35;
+// Avatar's colossus body-size multiplier while the buff_avatar aura is worn.
+export const AVATAR_SCALE = 1.15;
+// Battle Trance (warrior baseline): a connected auto-attack swing has this
+// chance to make the next Reaver Strike or Brute Swing free, for this many
+// seconds. No stacking: a re-proc refreshes the one aura (applyAura by id).
+export const BATTLE_TRANCE_CHANCE = 0.2;
+export const BATTLE_TRANCE_DURATION = 10;
+// Sudden Death (Arms passive): a connected auto swing has this chance to arm the
+// free, no-health-requirement Early Grave (execute) window, lasting this long.
+export const SUDDEN_DEATH_CHANCE = 0.1;
+export const SUDDEN_DEATH_DURATION = 10;
+// Revenge (Protection): a dodge or parry against the warrior has this chance to
+// make the next Revenge free, for this many seconds. No stacking: a re-proc
+// refreshes the one aura (applyAura by id).
+export const REVENGE_FREE_CHANCE = 0.3;
+export const REVENGE_FREE_DURATION = 10;
+// Victory Rush (choice row): how long the on-kill window stays open.
+export const VICTORY_RUSH_WINDOW = 20;
 
 // Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
 // tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant

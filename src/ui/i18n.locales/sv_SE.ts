@@ -2,9 +2,170 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.sport_boot.description': 'En lång, hög spark mot siktpunkten. Publiken älskar den.',
+  'entities.abilities.cw_heroic_strike.name': 'Plundrarhugg',
+  'entities.abilities.cw_heroic_strike.description':
+    'Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg.',
+  'entities.abilities.cw_battle_shout.name': 'Järnvrål',
+  'entities.abilities.cw_battle_shout.description': 'Ökar din attackkraft med {buff} i 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Stärkande rop',
+  'entities.abilities.cw_commanding_shout.description': 'Ökar din uthållighet med {buff} i 2 min.',
+  'entities.abilities.cw_charge.name': 'Anstormning',
+  'entities.abilities.cw_charge.description':
+    'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
+  'entities.abilities.cw_rend.name': 'Djup skåra',
+  'entities.abilities.cw_rend.description':
+    'Sårar målet och får det att blöda för {damage} skada över {duration} sek.',
+  'entities.abilities.cw_thunder_clap.name': 'Skälvande slag',
+  'entities.abilities.cw_thunder_clap.description':
+    'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
+  'entities.abilities.cw_hamstring.name': 'Haltande hugg',
+  'entities.abilities.cw_hamstring.description':
+    'Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek.',
+  'entities.abilities.cw_bloodrage.name': 'Blodstull',
+  'entities.abilities.cw_bloodrage.description': 'Genererar 10 raseri på bekostnad av hälsa.',
+  'entities.abilities.cw_overpower.name': 'Rödhand',
+  'entities.abilities.cw_overpower.description':
+    'Omedelbart anfall för vapenskada plus {damage}. Endast användbart efter att målet väjt undan. Kan inte väjas undan.',
+  'entities.abilities.cw_execute.name': 'Tidig grav',
+  'entities.abilities.cw_execute.description':
+    'Försöker göra slut på en sårad fiende och vållar {damage} skada. Endast användbar på fiender under 20 % hälsa.',
+  'entities.abilities.cw_slam.name': 'Brutalt sving',
+  'entities.abilities.cw_slam.description':
+    'Smäller till motståndaren för vapenskada plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Skördebåge',
+  'entities.abilities.cw_cleave.description':
+    'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
+  'entities.abilities.cw_defensive_stance.name': 'Gardställning',
+  'entities.abilities.cw_defensive_stance.description':
+    'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Fasans tjut',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek.',
+  'entities.abilities.cw_sunder_armor.name': 'Rustningsklipp',
+  'entities.abilities.cw_sunder_armor.description':
+    'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
+  'entities.abilities.cw_taunt.name': 'Egga',
+  'entities.abilities.cw_taunt.description':
+    'Hånar målet: ditt hot stiger till nivå med dess mest hatade fiende och det tvingas anfalla dig i 3 sek.',
+  'entities.abilities.cw_bloodthirst.name': 'Åderlåtning',
+  'entities.abilities.cw_bloodthirst.description':
+    'Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)',
+  'entities.abilities.cw_mortal_strike.name': 'Stympande hugg',
+  'entities.abilities.cw_mortal_strike.description':
+    'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
+  'entities.abilities.cw_shield_slam.name': 'Sköldkross',
+  'entities.abilities.cw_shield_slam.description':
+    'Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)',
+  'entities.abilities.cw_whirlwind.name': 'Klingvirvel',
+  'entities.abilities.cw_whirlwind.description':
+    'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',
+  'entities.abilities.cw_berserker_rage.name': 'Sjudande raseri',
+  'entities.abilities.cw_berserker_rage.description':
+    'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
+  'entities.abilities.battle_stance.name': 'Stridsställning',
+  'entities.abilities.battle_stance.description':
+    'En aggressiv stridsställning: du genererar 10 % mer raseri. Standardställningen för Vapen och Beskydd.',
+  'entities.abilities.berserker_stance.name': 'Bärsärkaställning',
+  'entities.abilities.berserker_stance.description':
+    'En dumdristig stridsställning: dina kritiska träffar sker 3 % oftare och slår 3 % hårdare. Raserikrigaren strider alltid i den här ställningen.',
+  'entities.abilities.breachmaker.name': 'Bräschbrytare',
+  'entities.abilities.breachmaker.description':
+    'Slå målet för vapenskada plus {damage} och spräck dess gard: dina egna attacker mot det vållar 20 % mer skada i 8 sek. (Vapen)',
+  'entities.abilities.chain_heal.description':
+    'Läker målet för {damage} och hoppar sedan vidare till upp till 2 närliggande allierade, där varje hopp läker hälften av föregående mängd.',
+  'entities.abilities.cleaving_blows.name': 'Klyvande hugg',
+  'entities.abilities.cleaving_blows.description':
+    'Röd skörd återger alltid en laddning av Tvillingslag. (Raseri)',
+  'entities.abilities.deep_wounds.name': 'Gapande sår',
+  'entities.abilities.deep_wounds.description':
+    'Passiv: ditt Stympande hugg får målet att blöda för fysisk skada över 6 sek. (Vapen)',
+  'entities.abilities.defiant_bellow.name': 'Trotsigt vrål',
+  'entities.abilities.defiant_bellow.description':
+    'Ett trotsigt vrål: varje fiende inom 10 meter eggas och tvingas anfalla dig i 3 sek. (Beskydd)',
+  'entities.abilities.diabolical_twinstrike.name': 'Diaboliskt tvillingslag',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Medan du är rasande vållar ditt Tvillingslag 15 % mer skada. (Raseri)',
+  'entities.abilities.die_by_sword.name': 'Dö för svärdet',
+  'entities.abilities.die_by_sword.description':
+    'Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker.',
+  'entities.abilities.emboldening_roar.name': 'Uppeldande vrål',
+  'entities.abilities.emboldening_roar.description':
+    'Släpper loss ett uppeldande vrål: du och vänligt sinnade spelare inom 40 meter blir uppeldade, och era nästa 3 förmågor blir garanterat kritiska träffar. (Raseri)',
+  'entities.abilities.enrage_passive.name': 'Kalabalik',
+  'entities.abilities.enrage_passive.description':
+    'Passiv: medan du är rasande vållar du 7 % mer skada, attackerar 25 % snabbare och rör dig 10 % snabbare i 4 sek. Åderlåtning har 30 % chans att göra dig rasande; Röd skörd gör det alltid. (Raseri)',
+  'entities.abilities.faultline.name': 'Förkastningslinje',
+  'entities.abilities.faultline.description':
+    'Skicka en chockvåg genom marken: fiender framför dig inom 8 meter tar {damage} skada och bedövas i 3 sek. (Beskydd)',
+  'entities.abilities.fel_domination.name': 'Demonisk dominans',
+  'entities.abilities.fel_domination.description':
+    'Behärskar demoniska energier och gör din nästa besvärjelse omedelbar. (Demonologisignatur)',
+  'entities.abilities.furious_mending.name': 'Rasande läkning',
+  'entities.abilities.furious_mending.description':
+    'I 10 sek tar du 20 % mindre skada, och medan det varar läker din Åderlåtning dig för 20 % av din maximala hälsa. (Raseri)',
+  'entities.abilities.intimidating_shout.name': 'Skräckinjagande rop',
+  'entities.abilities.intimidating_shout.description':
+    'Ett skräckinjagande rop som får upp till 5 fiender inom 8 meter att fly i skräck i 8 sek. Skada kan bryta effekten.',
+  'entities.abilities.iron_resolve.name': 'Järnvilja',
+  'entities.abilities.iron_resolve.description':
+    'Bit ihop och strunta i smärtan: förbrukar allt ditt raseri (minst 20) för att absorbera 4 skada per spenderat raseri, i upp till 10 sek. (Beskydd)',
+  'entities.abilities.measured_fury.name': 'Avmätt raseri',
+  'entities.abilities.measured_fury.description':
+    'Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)',
+  'entities.abilities.natures_swiftness.name': 'Naturens snabbhet',
+  'entities.abilities.natures_swiftness.description':
+    'Åkallar naturen för att göra din nästa besvärjelse omedelbar. (Återställningssignatur)',
+  'entities.abilities.piercing_howl.name': 'Genomträngande tjut',
+  'entities.abilities.piercing_howl.description':
+    'Ett genomträngande rop som saktar ner alla fiender inom 15 meter med 50 % i 8 sek.',
+  'entities.abilities.raging_gale.name': 'Tvillingslag',
+  'entities.abilities.raging_gale.description':
+    'Slå omedelbart två gånger med ditt vapen, där varje träff vållar 40 % vapenskada plus {damage}, och generera {rage} raseri. Lagrar upp till 2 laddningar. (Raseri)',
+  'entities.abilities.raised_guard.name': 'Höjd gard',
+  'entities.abilities.raised_guard.description':
+    'Förskansa dig bakom din sköld: du tar 50 % mindre fysisk skada i 6 sek. Lagrar upp till 2 laddningar. (Beskydd)',
+  'entities.abilities.recklessness.name': 'Hänsynslöshet',
+  'entities.abilities.recklessness.description':
+    'Försätter dig i raseri: din raserigenerering ökar med 50 % och din kritiska träffchans med 20 % i 12 sek.',
+  'entities.abilities.red_harvest.name': 'Röd skörd',
+  'entities.abilities.red_harvest.description':
+    'Satsa allt: slå tre gånger i vilt raseri för 65 % vapenskada plus {damage} vardera, vilket alltid gör dig rasande. (Raseri)',
+  'entities.abilities.repentance.name': 'Ånger',
+  'entities.abilities.repentance.description':
+    'Försätter fienden i ett meditativt tillstånd i upp till 6 sek. All skada bryter effekten. (Vedergällningssignatur)',
+  'entities.abilities.revenge.name': 'Hämnd',
+  'entities.abilities.revenge.description':
+    'Anfall i en vid båge och vålla fysisk skada mot alla fiender framför dig. Över 5 mål minskas skadan. När du väjer undan eller parerar kan din nästa Hämnd kosta inget raseri.',
+  'entities.abilities.sanguine_aura.name': 'Blodröd aura',
+  'entities.abilities.sanguine_aura.description':
+    'Besjäla ditt vapen med dina fienders blod: du och dina närstridsallierade får 10 % attackhastighet och 10 % skada i 20 sek.',
+  'entities.abilities.seasoned_soldier.name': 'Härdad soldat',
+  'entities.abilities.seasoned_soldier.description':
+    'Dina kritiska autoattacker genererar 10 % mer raseri. (Vapen)',
+  'entities.abilities.shamanistic_rage.name': 'Schamanistiskt raseri',
+  'entities.abilities.shamanistic_rage.description':
+    'Släpper lös schamanistiskt raseri och återställer 160 mana. (Förstärkningssignatur)',
+  'entities.abilities.storm_bolt.name': 'Stormbult',
+  'entities.abilities.storm_bolt.description':
+    'Slunga ditt vapen mot målet för {damage} och bedöva det i 3 sek.',
+  'entities.abilities.sudden_death.name': 'Plötslig död',
+  'entities.abilities.sudden_death.description':
+    'Dina autoattacker har en chans att låta dig använda Tidig grav på ett mål oavsett hälsa, utan raserikostnad. (Vapen)',
+  'entities.abilities.sweeping_strikes.name': 'Vidgande båge',
+  'entities.abilities.sweeping_strikes.description':
+    'I 12 sek träffar dina enmålsattacker även 1 närliggande fiende för full skada. (Vapen)',
+  'entities.abilities.victory_rush.name': 'Segerrus',
+  'entities.abilities.victory_rush.description':
+    'Slå för vapenskada plus {damage} och läk 20 % av din maximala hälsa. Kan endast användas inom 20 sek efter att du dödat en fiende.',
+  'classDetails.roles.warriorClassic': 'Tank / Närstrids-DPS',
+  'classes.warriorClassic': 'Krigare',
+  'classDetails.lore.warriorClassic':
+    'Krigaren precis som den spelades före stridsomarbetningen: den ursprungliga uppsättningen förmågor och det gamla raseritempot, bevarad vid sidan av den nya krigaren så att du kan prova båda och berätta för oss vilken som känns bäst.',
+  'entities.abilities.sport_boot.description':
+    'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',
-  'entities.abilities.sport_dive.description': 'Kasta dig mot siktpunkten. Ett inlägg fastnar i famnen på dig.',
+  'entities.abilities.sport_dive.description':
+    'Kasta dig mot siktpunkten. Ett inlägg fastnar i famnen på dig.',
   'entities.abilities.sport_dive.name': 'Dyk',
   'entities.abilities.sport_feint.description': 'En snabb rusch i sidled mot siktpunkten.',
   'entities.abilities.sport_feint.name': 'Fint',
@@ -12,7 +173,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_hoof.name': 'Rensning',
   'entities.abilities.sport_kick.description': 'Peta bollen längs marken mot siktpunkten.',
   'entities.abilities.sport_kick.name': 'Spark',
-  'entities.abilities.sport_pass.description': 'Rulla en fast passning till din markerade lagkamrat, lagd i löpriktningen.',
+  'entities.abilities.sport_pass.description':
+    'Rulla en fast passning till din markerade lagkamrat, lagd i löpriktningen.',
   'entities.abilities.sport_pass.name': 'Passning',
   'entities.abilities.sport_punt.description': 'En målvaktsutspark, hög och lång.',
   'entities.abilities.sport_punt.name': 'Lång utspark',
@@ -21,7 +183,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sport_shoot.description':
     'Håll inne för att ladda kraft, släpp för att skjuta mot mål. Med för mycket kraft seglar bollen över.',
   'entities.abilities.sport_shoot.name': 'Skott',
-  'entities.abilities.sport_shoulder.description': 'En ärlig axeltackling i skördefredens anda. Skickar dem tumlande bort från bollen.',
+  'entities.abilities.sport_shoulder.description':
+    'En ärlig axeltackling i skördefredens anda. Skickar dem tumlande bort från bollen.',
   'entities.abilities.sport_shoulder.name': 'Axeltackling',
   'entities.npcs.groundskeeper_bram.greeting':
     'Freden håller på Suggfältet, {className}: bara sparkar och axeltacklingar. Vill du spela om Kopparspannen?',
@@ -77,7 +240,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Vid avspark byts din klassuppsättning ut mot en sportuppsättning och återställs exakt efteråt. Sparkar siktar mot marksiktet, bollen studsar mot sargen, och att dribbla är bara att springa med bollen. Gör fler mål än motståndarna före full tid; oavgjort går till gyllene mål.',
   'guide.valeCupPage.howQueue':
     'Ställ dig i kö varifrån som helst via Dalcupsfönstret, eller prata med Vaktmästare Bram vid Suggfältets port. Välj en spelform från en mot en upp till fem mot fem, en banérnation och en sportroll; köa ensam eller ta med ditt sällskap.',
-  'guide.valeCupPage.howTruce': 'Ingen blöder på Suggfältet: tacklingar tumlar, inget gör ont, och husdjur sitter över matchen.',
+  'guide.valeCupPage.howTruce':
+    'Ingen blöder på Suggfältet: tacklingar tumlar, inget gör ont, och husdjur sitter över matchen.',
   'guide.valeCupPage.intro':
     'Vildsvinsboll på Suggfältet: välj ett banér, välj en roll och sparka en uppstoppad vildsvinshud förbi en målvakt i kampen om Kopparspannen. Inget blod, inget byte, bara vrålet från läktarna.',
   'guide.valeCupPage.loreHeading': 'Vildsvinsboll och skördefreden',
@@ -85,23 +249,32 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Långt innan de döda vaknade spelade Östbäcks lantarbetare vildsvinsboll på stubbåkrarna efter skörden: två hopar, en vildsvinshud fylld med halm och två vagnsgrindar släpade till var sin ände av ängen. Den första bollen, Gamla suggan, hänger bronserad ovanför värdshusets härd.',
   'guide.valeCupPage.loreTruce':
     'När Askgrå kolosseum började sanktionera krigslekar svarade marskalk Redbrook med något mildare: en stående skördefred på den gamla ängen. Vagnsgrindarna blev målstolpar, ängen fick väggar, läktare och ett namn, Suggfältet, och priset var alltid samma buckliga mjölkspann som vinnarna drack ur: Kopparspannen.',
-  'guide.valeCupPage.nationChoir': 'Blekblått och silver under klockan: kusliga, precisa och mycket tysta.',
-  'guide.valeCupPage.nationColiseum': 'Rött och svart med korsade svärd: de spelar som om det fortfarande vore en krigslek.',
-  'guide.valeCupPage.nationCopperdig': 'Koppar och brunt med hackan: grävare som aldrig slutar springa.',
-  'guide.valeCupPage.nationMirefen': 'Blågrönt och grått under hägern: tålmodiga, långbenta, aldrig jäktade.',
-  'guide.valeCupPage.nationMoon': 'Violett och silver under månskäran: nattspelare, lätta på foten.',
+  'guide.valeCupPage.nationChoir':
+    'Blekblått och silver under klockan: kusliga, precisa och mycket tysta.',
+  'guide.valeCupPage.nationColiseum':
+    'Rött och svart med korsade svärd: de spelar som om det fortfarande vore en krigslek.',
+  'guide.valeCupPage.nationCopperdig':
+    'Koppar och brunt med hackan: grävare som aldrig slutar springa.',
+  'guide.valeCupPage.nationMirefen':
+    'Blågrönt och grått under hägern: tålmodiga, långbenta, aldrig jäktade.',
+  'guide.valeCupPage.nationMoon':
+    'Violett och silver under månskäran: nattspelare, lätta på foten.',
   'guide.valeCupPage.nationOgre': 'Orange och umbra bakom näven: axeln först och stolta över det.',
-  'guide.valeCupPage.nationThornpeak': 'Isblått och vitt under bergstoppen: stadiga på foten och envisa.',
-  'guide.valeCupPage.nationVale': 'Grönt och guld under vetekärven: hemmalaget, lantarbetare in i märgen.',
+  'guide.valeCupPage.nationThornpeak':
+    'Isblått och vitt under bergstoppen: stadiga på foten och envisa.',
+  'guide.valeCupPage.nationVale':
+    'Grönt och guld under vetekärven: hemmalaget, lantarbetare in i märgen.',
   'guide.valeCupPage.nationsBody':
     'Varje lag spelar under ett banér. Kaptenen väljer nation, och om båda sidor för samma banér spelar bortalaget i inverterade färger.',
   'guide.valeCupPage.nationsHeading': 'De åtta banérnationerna',
   'guide.valeCupPage.rewardsBody':
     'Fredsreglerna innebär ingen erfarenhet och inget byte: en avgjord match räknas in i ditt facit och på vinnartavlan, och poäng till dagliga belöningar följer med. Att överge en match bänkar din plats, och Vaktmästaren minns.',
   'guide.valeCupPage.rewardsHeading': 'Fredsregler',
-  'guide.valeCupPage.rolesBody': 'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament.',
+  'guide.valeCupPage.rolesBody':
+    'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament.',
   'guide.valeCupPage.rolesHeading': 'Sportroller',
-  'guide.valeCupPage.spectateBody': 'En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.',
+  'guide.valeCupPage.spectateBody':
+    'En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.',
   'hudChrome.keybinds.valecup': 'Dalcupen',
   'hudChrome.mobile.dailyRewards': 'Belöningar',
   'hudChrome.perf.labels.predLead': 'Prediktionsförsprång',
@@ -113,7 +286,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Du måste vara i staden för att ställa in ditt fokus.',
   'hudChrome.townFocus.saveButton': 'Spara fokus',
   'hudChrome.townFocus.title': 'Stadsfokus',
-  'hudChrome.vcup.awayNote': 'Om båda sidor för samma banér spelar bortalaget i inverterade färger.',
+  'hudChrome.vcup.awayNote':
+    'Om båda sidor för samma banér spelar bortalaget i inverterade färger.',
   'hudChrome.vcup.bannerCountdown': 'Avspark om {seconds}...',
   'hudChrome.vcup.bannerDraw': 'Oavgjort på Suggfältet.',
   'hudChrome.vcup.bannerEnd': 'Full tid: {nationA} {scoreA}, {nationB} {scoreB}',
@@ -158,10 +332,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.readyCount': '{ready} av {total} redo',
   'hudChrome.vcup.briefing.readyDone': 'Redo',
   'hudChrome.vcup.briefing.rosterHeading': 'Laguppställningen',
-  'hudChrome.vcup.briefing.rule1': 'Sparka eller passa in bollen i motståndarnas mål för att göra poäng.',
-  'hudChrome.vcup.briefing.rule2': 'Först till 5 mål vinner, eller flest mål när det blåses för full tid.',
-  'hudChrome.vcup.briefing.rule3': 'En jämn match vid full tid går till gyllene mål: nästa mål vinner.',
-  'hudChrome.vcup.briefing.rule4': 'Tacklingar får dig bara att tumla omkull. Ingen kommer till skada under skördefreden.',
+  'hudChrome.vcup.briefing.rule1':
+    'Sparka eller passa in bollen i motståndarnas mål för att göra poäng.',
+  'hudChrome.vcup.briefing.rule2':
+    'Först till 5 mål vinner, eller flest mål när det blåses för full tid.',
+  'hudChrome.vcup.briefing.rule3':
+    'En jämn match vid full tid går till gyllene mål: nästa mål vinner.',
+  'hudChrome.vcup.briefing.rule4':
+    'Tacklingar får dig bara att tumla omkull. Ingen kommer till skada under skördefreden.',
   'hudChrome.vcup.briefing.rule5': 'Vem som helst kan gå fram och heja på dig från läktarna.',
   'hudChrome.vcup.briefing.rulesHeading': 'Så spelar du',
   'hudChrome.vcup.briefing.subtitle': 'Genomgång före matchen',
@@ -245,13 +423,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.leatherworking': 'Garvare',
   'entities.itemSets.crownforged.bonus4':
     'Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.',
-  'entities.itemSets.deathlord.bonus4': 'Dina kritiska vapenträffar har 50% chans att ge Gravmakt och öka attackkraften med 60 i 10 sek.',
-  'entities.itemSets.necromancers.bonus4': 'Dina besvärjelser har 10% chans att ge Klarsyn, vilket gör din nästa besvärjelse gratis.',
+  'entities.itemSets.deathlord.bonus4':
+    'Dina kritiska vapenträffar har 50% chans att ge Gravmakt och öka attackkraften med 60 i 10 sek.',
+  'entities.itemSets.necromancers.bonus4':
+    'Dina besvärjelser har 10% chans att ge Klarsyn, vilket gör din nästa besvärjelse gratis.',
   'entities.itemSets.nighttalon.bonus4':
     'Dina kritiska vapenträffar river upp ett Rivsår och får målet att blöda för 6 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.',
-  'entities.itemSets.soulflame.bonus4': 'Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.',
-  'entities.itemSets.stormcallers.bonus4': 'Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.',
-  'entities.itemSets.wyrmshadow.bonus4': 'Dina kritiska vapenträffar har 50% chans att ge Betrus och öka attackhastigheten med 25% i 8 sek.',
+  'entities.itemSets.soulflame.bonus4':
+    'Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    'Dina kritiska vapenträffar har 50% chans att ge Betrus och öka attackhastigheten med 25% i 8 sek.',
   'entities.items.architects_cornerstone.name': 'Arkitektens hörnsten',
   'entities.items.bonechill_cord.name': 'Benfrostlina',
   'entities.items.bonechill_striders.name': 'Benfroststeg',
@@ -259,7 +442,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Körmoderns hjälm',
   'entities.items.cryptplate_helm.name': 'Kryptplåtshjälm',
   'entities.items.deathless_greatblade.name': 'Odödlig storklinga',
-  'entities.items.deathless_warguard_legmail.name': 'Odödlig krigsvakts benbrynja',
   'entities.items.gravescale_girdle.name': 'Gravfjällsgördel',
   'entities.items.gravewyrm_claws.name': 'Gravlindormsklor',
   'entities.items.gravewyrm_cleaver.name': 'Gravlindormsklyva',
@@ -275,13 +457,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Helgedomssmygarens handskar',
   'entities.items.sash_of_the_sunken_court.name': 'Sjunkna hovets skärp',
   'entities.items.scepter_of_the_deathless_court.name': 'Odödliga hovets spira',
-  'entities.items.scourgehide_carapace.name': 'Gisselhudspansar',
   'entities.items.seal_of_the_nine_oaths.name': 'De nio edernas sigill',
   'entities.items.shadowpulse_handwraps.name': 'Skuggpulshandlindor',
   'entities.items.shadowpulse_slippers.name': 'Skuggpulstofflor',
   'entities.items.shroud_of_the_gravewyrm.name': 'Gravlindormens svepning',
-  'entities.items.soulforged_warplate.name': 'Själssmidd krigsplåt',
-  'entities.items.soulrend_diadem.name': 'Själsrivardiadem',
   'entities.items.stormcallers_focus.name': 'Stormkallarens fokus',
   'entities.items.sunken_court_mantle.name': 'Sjunkna hovets mantel',
   'entities.items.sutils_gambit.name': 'Sutils gambit',
@@ -294,22 +473,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.yumis_keepsake_locket.name': 'Yumis minnesmedaljong',
   'entities.items.zense_meridian.name': 'Zenses meridian',
   'entities.items.zyzzs_deathless_signet.name': 'Zyzz odödliga signetring',
-  'entities.npcs.heroic_quartermaster.greeting': 'Bevis från de heroiska djupen köper de finaste ringar och hängen i Högvakt. Visa mig dina märken.',
+  'entities.npcs.heroic_quartermaster.greeting':
+    'Bevis från de heroiska djupen köper de finaste ringar och hängen i Högvakt. Visa mig dina märken.',
   'entities.npcs.heroic_quartermaster.name': 'Kvartersmästare Vex',
   'entities.npcs.heroic_quartermaster.title': 'Heroisk kvartersmästare',
   'heroicShop.balance': 'Heroiska märken: {count}',
   'heroicShop.buyAria': 'Köp {item} för {marks} heroiska märken',
   'hudChrome.bags.cannotDestroy': 'Det här föremålet kan inte förstöras.',
   'hudChrome.bags.rightClickDestroy': 'Högerklicka för att förstöra',
-  'hudChrome.crafting.comboRequirementUnmet': 'Du har inte båda de hantverk som krävs på den nivå receptet kräver.',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'Du har inte båda de hantverk som krävs på den nivå receptet kräver.',
   'hudChrome.discord.roleTag.coredevs': 'Kärnutvecklare',
   'hudChrome.dungeonDifficulty.setHeroic': 'Ställ in fängelsehålans svårighetsgrad: Heroisk',
   'hudChrome.dungeonDifficulty.setNormal': 'Ställ in fängelsehålans svårighetsgrad: Normal',
   'hudChrome.itemProc.attackSlow': 'och saktar målets attackhastighet med {pct}% i {duration} sek',
   'hudChrome.itemProc.chainArc':
     'träffar målet med en {school} {name} ({damage}) som hoppar till {jumps} närliggande fiender med avtagande skada',
-  'hudChrome.itemProc.dot': 'sätter {name}, en {school} skada över tid som vållar {total} över {duration} sek',
-  'hudChrome.itemProc.hot': 'blommar {name}, en läkning över tid som återställer {total} över {duration} sek',
+  'hudChrome.itemProc.dot':
+    'sätter {name}, en {school} skada över tid som vållar {total} över {duration} sek',
+  'hudChrome.itemProc.hot':
+    'blommar {name}, en läkning över tid som återställer {total} över {duration} sek',
   'hudChrome.itemProc.onHeal': 'Chans vid dina läkningar ({chance}%): {effect}',
   'hudChrome.itemProc.onMeleeHit': 'Chans vid träff ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Chans vid dina skadebesvärjelser ({chance}%): {effect}',
@@ -320,8 +503,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kritvärde från din utrustning och setbonusar, som höjer din chans till kritisk träff. Ungefär 10 i värde ger 1% krit.',
   'hudChrome.statInfo.desc.hasteRating':
     'Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.',
+  'hudChrome.statInfo.desc.haste':
+    'Snabbar upp dina vapensvingar och besvärjelsekast. Den minskar inte den globala nedkylningen.',
+  'hudChrome.statInfo.desc.parry':
+    'Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.',
   'hudChrome.statInfo.names.critRating': 'Kritvärde',
+  'hudChrome.statInfo.names.haste': 'Snabbhet',
   'hudChrome.statInfo.names.hasteRating': 'Snabbhetsvärde',
+  'hudChrome.statInfo.names.parry': 'Parering',
   'itemUi.slots.neck': 'Hals',
   'itemUi.slots.ring': 'Finger',
   'auth.email': 'E-post',
@@ -338,10 +527,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Helgedomarna tänds i tur och ordning. Upprepa sekvensen genom att aktivera varje helgedom i samma följd. En felaktig beröring förfelar försöket och spelar upp sekvensen igen, ett felfritt försök ger det rikaste bytet, och tar försöken slut öppnas relikvariet på sin snålaste nivå. Välj hur riten ska pröva dig.',
   'delveRiteUi.closeAria': 'Stäng',
   'delveRiteUi.easy': 'Lätt',
-  'delveRiteUi.guideRepeat': 'När helgedomarna slocknar, gå till varje helgedom och tryck på F (Interagera) i samma ordning.',
+  'delveRiteUi.guideRepeat':
+    'När helgedomarna slocknar, gå till varje helgedom och tryck på F (Interagera) i samma ordning.',
   'delveRiteUi.guideStakes':
     'Fel helgedom stänker svartvatten på dig och kostar ett försök. Slutför sekvensen för att öppna relikvariet.',
-  'delveRiteUi.guideWatch': 'När du har valt tänds de fyra helgedomarna en i taget. Memorera ordningen.',
+  'delveRiteUi.guideWatch':
+    'När du har valt tänds de fyra helgedomarna en i taget. Memorera ordningen.',
   'delveRiteUi.hard': 'Svår',
   'delveRiteUi.medium': 'Medel',
   'delveRiteUi.reward.easy': 'Blygsamt byte',
@@ -358,28 +549,36 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.edda': 'Edda Reedhand',
   'delveUi.board.partyTooLarge': 'Endast solo eller duo (högst {max} spelare)',
   'delveUi.companion.edda.ally_revive': 'Upp med dig. Kärret får dig inte i dag.',
-  'delveUi.companion.edda.boss_pull': 'Den där lovsången kan ditt namn, {playerName}. Sjung inte tillbaka.',
+  'delveUi.companion.edda.boss_pull':
+    'Den där lovsången kan ditt namn, {playerName}. Sjung inte tillbaka.',
   'delveUi.companion.edda.combat_start': 'Akta svartvattnet, {playerName}. Kärret lyssnar.',
   'delveUi.companion.edda.completion': 'Kärret får svälja sina hemligheter ännu en natt.',
   'delveUi.companion.edda.low_hp': 'Lugn. Min lykta har inte slocknat än.',
   'delveUi.companion.edda.rank.1': 'Lyktbärare',
   'delveUi.companion.edda.rank.2': 'Vassvakt',
   'delveUi.companion.edda.rank.3': 'Kärrbroakolyt',
-  'delveUi.companion.edda.run_start': 'Håll dig till plankraden, {playerName}. Slammet tar den som kliver för stolt.',
+  'delveUi.companion.edda.run_start':
+    'Håll dig till plankraden, {playerName}. Slammet tar den som kliver för stolt.',
   'delveUi.companion.edda.trap_spotted': 'Vänta. Det är något fel på vassen här.',
   'delveUi.companion.tessa.ally_revive': 'Upp med dig. Nattens liggare bär inte ditt namn.',
-  'delveUi.companion.tessa.run_start': 'Jag har mitt ljus och min liggare, {playerName}. Led vägen.',
+  'delveUi.companion.tessa.run_start':
+    'Jag har mitt ljus och min liggare, {playerName}. Led vägen.',
   'delveUi.intro.litanyHeroic':
     'Svartvatten kluckar mot vägbankens stenar. Eddas låga fladdrar grönt. "De sjunger igen där nere, {playerName}. Svara inte kören."',
   'delveUi.intro.litanyNormal':
     'Vasskvävda trappor stupar ner under Kärrbron. Edda Reedhand lyfter sin lykta. "Kärret minns varje namn de dränkte, {playerName}. Håll dig i ljuset."',
   'delveUi.module.litany_apse': 'Den dränkta absiden öppnar sig mot Syster Nhalias altarö.',
-  'delveUi.module.litany_baptistry': 'Ett slukhålsbaptisterium gapar under spruckna helgonstenar och äggsäckar.',
+  'delveUi.module.litany_baptistry':
+    'Ett slukhålsbaptisterium gapar under spruckna helgonstenar och äggsäckar.',
   'delveUi.module.litany_causeway': 'En Y-delad vägbank grenar sig över midjedjupt kärrvatten.',
-  'delveUi.module.litany_choir_loft': 'Solfjäderformade körläktare ekar av rephängda klockor som aldrig riktigt tystnar.',
-  'delveUi.module.litany_ledger': 'Liggaröar reser sig ur översvämmade kanaler, och bläcket blöder ut i kärret.',
-  'delveUi.module.litany_ring': 'En relikvariering löper runt en förseglad central dopfunt av svart vatten.',
-  'delveUi.module.litany_sluice': 'Mossiga slussportar dryper svartvatten ner i den gamla körkryptan.',
+  'delveUi.module.litany_choir_loft':
+    'Solfjäderformade körläktare ekar av rephängda klockor som aldrig riktigt tystnar.',
+  'delveUi.module.litany_ledger':
+    'Liggaröar reser sig ur översvämmade kanaler, och bläcket blöder ut i kärret.',
+  'delveUi.module.litany_ring':
+    'En relikvariering löper runt en förseglad central dopfunt av svart vatten.',
+  'delveUi.module.litany_sluice':
+    'Mossiga slussportar dryper svartvatten ner i den gamla körkryptan.',
   'delveUi.moduleName.litany_apse': 'Den dränkta absiden',
   'delveUi.moduleName.litany_baptistry': 'Slukhålsbaptisteriet',
   'delveUi.moduleName.litany_causeway': 'Den Y-delade vägbanken',
@@ -393,8 +592,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.object.corpse_candle': 'Likljus',
   'delveUi.object.grave_tablet': 'Gravtavla',
   'delveUi.object.sluice_valve': 'Slussventil',
-  'delveUi.tracker.riteChoose': 'Gå fram till Det dränkta relikvariet och tryck på F för att inleda riten',
-  'delveUi.tracker.riteInput': 'Tryck på F vid varje helgedom i den ordning de tändes ({current}/{total})',
+  'delveUi.tracker.riteChoose':
+    'Gå fram till Det dränkta relikvariet och tryck på F för att inleda riten',
+  'delveUi.tracker.riteInput':
+    'Tryck på F vid varje helgedom i den ordning de tändes ({current}/{total})',
   'delveUi.tracker.riteOpen': 'Relikvariet är öppet: tryck på F på det för att hämta ditt byte',
   'delveUi.tracker.ritePlayback': 'Se på helgedomarna: memorera ordningen de tänds i',
   'editor.a11y.dialog': 'Redigerardialog',
@@ -413,7 +614,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.assets.category.weapons': 'Vapen',
   'editor.assets.categoryTab': '{category} ({count})',
   'editor.assets.deleteAsset': 'Radera uppladdad resurs',
-  'editor.assets.deleteAssetConfirm': 'Radera den uppladdade resursen "{name}"? Kartor som använder den förlorar modellen.',
+  'editor.assets.deleteAssetConfirm':
+    'Radera den uppladdade resursen "{name}"? Kartor som använder den förlorar modellen.',
   'editor.assets.empty': 'Inga matchande resurser.',
   'editor.assets.label': 'Resursbläddrare',
   'editor.assets.pick': 'Placera {name}',
@@ -423,7 +625,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.assets.uploadedEmpty':
     'Inga uppladdade resurser ännu. Använd Ladda upp resurs för att lägga till en GLB-modell (upp till 8 MiB).',
   'editor.assets.uploadedLoadFailed': 'Det gick inte att ladda dina uppladdade resurser.',
-  'editor.assets.uploadedSignIn': 'Logga in från spelet för att ladda upp och placera dina egna GLB-modeller.',
+  'editor.assets.uploadedSignIn':
+    'Logga in från spelet för att ladda upp och placera dina egna GLB-modeller.',
   'editor.assets.uploadedTab': 'Uppladdade',
   'editor.biome.beach': 'Strand',
   'editor.biome.cave': 'Grotta',
@@ -444,7 +647,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.blockerTool.title': 'Spärrvägg',
   'editor.brush.editCount': 'Terrängändringar: {count} / {max}',
   'editor.brush.size': 'Penselstorlek',
-  'editor.brush.sizeHint': 'Tangenter: [ och ] ändrar penselns storlek; Shift+[ och Shift+] ändrar styrkan.',
+  'editor.brush.sizeHint':
+    'Tangenter: [ och ] ändrar penselns storlek; Shift+[ och Shift+] ändrar styrkan.',
   'editor.brush.strength': 'Styrka',
   'editor.brush.title': 'Pensel',
   'editor.camp.count': 'Antal',
@@ -477,22 +681,33 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.frame.title': 'Rama in',
   'editor.help.beginTutorial': 'Starta handledningen',
   'editor.help.close': 'Stäng',
-  'editor.help.flow.draft': 'Medan du har osparade ändringar autosparas ett utkast var 30:e sekund; Öppna återställer det.',
-  'editor.help.flow.playtest': 'Speltest startar det riktiga spelet på den här kartan, inklusive dina osparade ändringar.',
-  'editor.help.flow.save': 'Spara behåller kartan i den här webbläsaren, och på servern när du är inloggad.',
+  'editor.help.flow.draft':
+    'Medan du har osparade ändringar autosparas ett utkast var 30:e sekund; Öppna återställer det.',
+  'editor.help.flow.playtest':
+    'Speltest startar det riktiga spelet på den här kartan, inklusive dina osparade ändringar.',
+  'editor.help.flow.save':
+    'Spara behåller kartan i den här webbläsaren, och på servern när du är inloggad.',
   'editor.help.flowTitle': 'Spara och speltesta',
-  'editor.help.key.brush': '[ och ] ändrar penselns storlek; Shift+[ och Shift+] ändrar dess styrka.',
+  'editor.help.key.brush':
+    '[ och ] ändrar penselns storlek; Shift+[ och Shift+] ändrar dess styrka.',
   'editor.help.key.delete': 'Delete tar bort den markerade resursen eller lägret.',
   'editor.help.key.duplicate': 'Ctrl+D duplicerar den markerade resursen.',
-  'editor.help.key.escape': 'Esc rensar först markeringen och återgår sedan till verktyget Markera.',
-  'editor.help.key.nudge': 'Piltangenterna knuffar den markerade resursen 0,5 yard; håll Shift för 2 yard.',
+  'editor.help.key.escape':
+    'Esc rensar först markeringen och återgår sedan till verktyget Markera.',
+  'editor.help.key.nudge':
+    'Piltangenterna knuffar den markerade resursen 0,5 yard; håll Shift för 2 yard.',
   'editor.help.key.save': 'Ctrl+S sparar kartan.',
-  'editor.help.key.tools': 'Varje verktyg har ett kortkommando på en bokstav, visat på dess knapp i verktygsraden.',
-  'editor.help.key.undo': 'Ctrl+Z ångrar den senaste ändringen; Ctrl+Y eller Ctrl+Shift+Z gör om den.',
+  'editor.help.key.tools':
+    'Varje verktyg har ett kortkommando på en bokstav, visat på dess knapp i verktygsraden.',
+  'editor.help.key.undo':
+    'Ctrl+Z ångrar den senaste ändringen; Ctrl+Y eller Ctrl+Shift+Z gör om den.',
   'editor.help.key.wheel': 'Shift+skroll roterar den markerade resursen; Alt+skroll skalar den.',
-  'editor.help.mouse.fly3d': 'Medan du håller ett drag i 3D flyger du kameran med WASD, och Q/E ändrar höjden.',
-  'editor.help.mouse.move': 'Med Markera aktivt drar du en placerad resurs för att flytta den längs marken.',
-  'editor.help.mouse.orbit3d': '3D-vy: dra för att kretsa och skrolla för att zooma; mittendrag eller Shift+drag panorerar.',
+  'editor.help.mouse.fly3d':
+    'Medan du håller ett drag i 3D flyger du kameran med WASD, och Q/E ändrar höjden.',
+  'editor.help.mouse.move':
+    'Med Markera aktivt drar du en placerad resurs för att flytta den längs marken.',
+  'editor.help.mouse.orbit3d':
+    '3D-vy: dra för att kretsa och skrolla för att zooma; mittendrag eller Shift+drag panorerar.',
   'editor.help.mouse.pan2d': '2D-vy: dra för att panorera och skrolla för att zooma.',
   'editor.help.mouseTitle': 'Mus och navigering',
   'editor.help.shortcutsTitle': 'Kortkommandon',
@@ -505,7 +720,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.help.tool.paint': 'Måla biommarktäcke över zonens standard.',
   'editor.help.tool.place': 'Placera katalogresurser eller uppladdade resurser på marken.',
   'editor.help.tool.raise': 'Höj terrängen under penseln.',
-  'editor.help.tool.region': 'Markera terräng och resurser med en ruta för att kopiera och klistra in.',
+  'editor.help.tool.region':
+    'Markera terräng och resurser med en ruta för att kopiera och klistra in.',
   'editor.help.tool.select':
     'Välj placerade resurser för att flytta, rotera och skala dem; klicka på en 2D-markör för att redigera den.',
   'editor.help.tool.smooth': 'Jämna ut ojämnheter mot den lokala medelhöjden.',
@@ -536,8 +752,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.deleteLocalConfirm': 'Radera den lokala kartan "{name}"?',
   'editor.openDrawer.deleteServerConfirm': 'Radera serverkartan "{name}"? Detta kan inte ångras.',
   'editor.openDrawer.draft': 'Autosparat utkast',
-  'editor.openDrawer.emptyLocal': 'Inga kartor sparade i den här webbläsaren ännu. Spara en så visas den här.',
-  'editor.openDrawer.emptyMine': 'Inga kartor på servern ännu. Spara medan du är inloggad för att skapa en.',
+  'editor.openDrawer.emptyLocal':
+    'Inga kartor sparade i den här webbläsaren ännu. Spara en så visas den här.',
+  'editor.openDrawer.emptyMine':
+    'Inga kartor på servern ännu. Spara medan du är inloggad för att skapa en.',
   'editor.openDrawer.emptyPublic': 'Inga offentliga kartor ännu.',
   'editor.openDrawer.fork': 'Förgrena',
   'editor.openDrawer.loadFailed': 'Det gick inte att ladda kartor från servern.',
@@ -547,7 +765,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.page': 'Sida {page}',
   'editor.openDrawer.prev': 'Föregående sida',
   'editor.openDrawer.publish': 'Publicera',
-  'editor.openDrawer.signInHint': 'Logga in från spelet för att bläddra bland, spara och förgrena serverkartor.',
+  'editor.openDrawer.signInHint':
+    'Logga in från spelet för att bläddra bland, spara och förgrena serverkartor.',
   'editor.openDrawer.statusPrivate': 'Privat',
   'editor.openDrawer.statusPublic': 'Offentlig',
   'editor.openDrawer.tabLocal': 'Den här webbläsaren',
@@ -557,8 +776,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.unpublish': 'Avpublicera',
   'editor.place.chosen': 'Placerar: {name}',
   'editor.place.collide': 'Blockerar rörelse',
-  'editor.place.collideHint': 'En blockerande resurs får ett kollisionsavtryck som spelare inte kan gå igenom.',
-  'editor.place.none': 'Välj en resurs i bläddraren nedan och klicka sedan på marken för att placera den.',
+  'editor.place.collideHint':
+    'En blockerande resurs får ett kollisionsavtryck som spelare inte kan gå igenom.',
+  'editor.place.none':
+    'Välj en resurs i bläddraren nedan och klicka sedan på marken för att placera den.',
   'editor.place.randomRotation': 'Slumpmässig rotation',
   'editor.place.scale': 'Skala',
   'editor.place.title': 'Placera resurs',
@@ -576,7 +797,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.region.copy': 'Kopiera region',
   'editor.region.hint':
     'Dra en ruta för att markera placeringar och terrängändringar. Kopiera, klicka sedan för att klistra in.',
-  'editor.region.hint3d': 'Regionrutor ritas i 2D-vyn; kopiera och klistra in fungerar i båda vyerna.',
+  'editor.region.hint3d':
+    'Regionrutor ritas i 2D-vyn; kopiera och klistra in fungerar i båda vyerna.',
   'editor.region.needBox': 'Rita en regionruta först.',
   'editor.region.needClipboard': 'Kopiera en region först.',
   'editor.region.pasteBeside': 'Klistra in bredvid',
@@ -593,31 +815,40 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.selection.none': 'Inget markerat. Använd Markera och klicka på en placerad resurs.',
   'editor.selection.radius': 'Kollisionsradie',
   'editor.selection.radiusAuto': 'Auto',
-  'editor.selection.radiusAutoTitle': 'Återställ kollisionsradien så att den följer resursens skala',
-  'editor.selection.radiusHint': 'Auto härleder kollisionsradien från resursens skala; dra i reglaget för att åsidosätta den.',
+  'editor.selection.radiusAutoTitle':
+    'Återställ kollisionsradien så att den följer resursens skala',
+  'editor.selection.radiusHint':
+    'Auto härleder kollisionsradien från resursens skala; dra i reglaget för att åsidosätta den.',
   'editor.selection.rotation': 'Rotation',
   'editor.selection.scale': 'Skala',
   'editor.selection.title': 'Markering',
-  'editor.selection.wheelHint': 'Shift+skroll roterar resursen, Alt+skroll skalar den, Ctrl+D duplicerar den.',
+  'editor.selection.wheelHint':
+    'Shift+skroll roterar resursen, Alt+skroll skalar den, Ctrl+D duplicerar den.',
   'editor.selection.x': 'X',
   'editor.selection.z': 'Z',
   'editor.serverError.asset_blocked': 'Den resursen har blockerats av modereringen.',
-  'editor.serverError.asset_limit_reached': 'Du har nått gränsen för uppladdade resurser. Radera en för att ladda upp fler.',
+  'editor.serverError.asset_limit_reached':
+    'Du har nått gränsen för uppladdade resurser. Radera en för att ladda upp fler.',
   'editor.serverError.asset_not_found': 'Den resursen finns inte längre på servern.',
-  'editor.serverError.asset_storage_limit_reached': 'Ditt lagringsutrymme för resurser är slut. Radera en resurs först.',
+  'editor.serverError.asset_storage_limit_reached':
+    'Ditt lagringsutrymme för resurser är slut. Radera en resurs först.',
   'editor.serverError.asset_too_large': 'Den modellen överskrider storleksgränsen för uppladdning.',
   'editor.serverError.invalid_glb': 'Den filen är inte en giltig GLB-modell.',
   'editor.serverError.invalid_map_doc': 'Servern avvisade kartdokumentet.',
   'editor.serverError.invalid_map_name':
     'Det kartnamnet är inte tillåtet. Använd bokstäver, siffror, mellanslag, apostrofer eller bindestreck.',
-  'editor.serverError.invalid_version': 'Sparförfrågan var felaktigt utformad. Ladda om och försök igen.',
-  'editor.serverError.map_limit_reached': 'Du har nått gränsen för serverkartor. Radera en karta för att spara fler.',
+  'editor.serverError.invalid_version':
+    'Sparförfrågan var felaktigt utformad. Ladda om och försök igen.',
+  'editor.serverError.map_limit_reached':
+    'Du har nått gränsen för serverkartor. Radera en karta för att spara fler.',
   'editor.serverError.map_name_not_allowed': 'Det kartnamnet är inte tillåtet.',
   'editor.serverError.map_not_found': 'Den kartan finns inte längre på servern.',
   'editor.serverError.map_too_large': 'Kartdokumentet är för stort för att sparas på servern.',
-  'editor.serverError.network': 'Det gick inte att nå servern. Kontrollera din anslutning och försök igen.',
+  'editor.serverError.network':
+    'Det gick inte att nå servern. Kontrollera din anslutning och försök igen.',
   'editor.serverError.rate_limited': 'Sakta ner lite och försök igen.',
-  'editor.serverError.slug_unavailable': 'Servern kunde inte skapa en länk för det namnet. Prova ett annat namn.',
+  'editor.serverError.slug_unavailable':
+    'Servern kunde inte skapa en länk för det namnet. Prova ett annat namn.',
   'editor.serverError.timeout': 'Servern tog för lång tid på sig att svara. Försök igen.',
   'editor.serverError.unauthorized': 'Din session har gått ut. Logga in från spelet igen.',
   'editor.serverError.unknown': 'Något gick fel i kontakten med servern.',
@@ -630,8 +861,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.status.assetPlacedFirst': 'Välj först en resurs i bläddraren.',
   'editor.status.autosaveFailed':
     'Autospar misslyckades (webbläsarens lagring är full eller blockerad). Exportera kartan för att behålla en säkerhetskopia.',
-  'editor.status.autosaveOff': 'Autospar avstängt: {reason} Spara manuellt och slå sedan på det igen.',
-  'editor.status.blockerCapReached': 'Gränsen för spärrväggar nådd ({max}). Den nya väggen lades inte till.',
+  'editor.status.autosaveOff':
+    'Autospar avstängt: {reason} Spara manuellt och slå sedan på det igen.',
+  'editor.status.blockerCapReached':
+    'Gränsen för spärrväggar nådd ({max}). Den nya väggen lades inte till.',
   'editor.status.deleted': 'Kartan raderad.',
   'editor.status.draftRestored': 'Återställde det autosparade utkastet.',
   'editor.status.draftSaved': 'Utkast autosparat.',
@@ -642,15 +875,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.status.loading3d': 'Laddar världen...',
   'editor.status.newMap': 'Ny karta startad från den inbyggda världen.',
   'editor.status.opened': 'Öppnade "{name}".',
-  'editor.status.placementCapReached': 'Placeringsgränsen nådd ({max}). Extra resurser lades inte till.',
+  'editor.status.placementCapReached':
+    'Placeringsgränsen nådd ({max}). Extra resurser lades inte till.',
   'editor.status.playtestFailed': 'Det gick inte att starta speltestet (lagring blockerad).',
   'editor.status.playtestLaunch': 'Startar speltest...',
   'editor.status.published': 'Kartan publicerad. Vem som helst kan nu hitta och förgrena den.',
   'editor.status.saveFailedLocal': 'Lokal sparning misslyckades (lagring blockerad).',
   'editor.status.savedLocal': 'Sparade "{name}" i den här webbläsaren.',
-  'editor.status.savedLocalOnly': 'Sparade "{name}" i den här webbläsaren. Logga in för att spara online.',
+  'editor.status.savedLocalOnly':
+    'Sparade "{name}" i den här webbläsaren. Logga in för att spara online.',
   'editor.status.savedServer': 'Sparade "{name}" på servern (v{version}).',
-  'editor.status.terrainCapReached': 'Gränsen för terrängändringar nådd ({max}). Extra skulpteringsstämplar lades inte till.',
+  'editor.status.terrainCapReached':
+    'Gränsen för terrängändringar nådd ({max}). Extra skulpteringsstämplar lades inte till.',
   'editor.status.unpublished': 'Kartan avpublicerad.',
   'editor.tool.blocker': 'Spärrvägg',
   'editor.tool.camp': 'Läger',
@@ -693,13 +929,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.open': 'Öppna',
   'editor.topbar.openTitle': 'Öppna en sparad karta (webbläsare eller server)',
   'editor.topbar.playtest': 'Speltesta',
-  'editor.topbar.playtestTitle': 'Starta spelet på den här kartan (offline, aktuella ändringar ingår)',
+  'editor.topbar.playtestTitle':
+    'Starta spelet på den här kartan (offline, aktuella ändringar ingår)',
   'editor.topbar.redo': 'Gör om',
   'editor.topbar.redoTitle': 'Gör om den senast ångrade ändringen (Ctrl+Y)',
   'editor.topbar.save': 'Spara',
   'editor.topbar.saveAs': 'Spara som',
   'editor.topbar.saveAsTitle': 'Spara en kopia under ett nytt namn',
-  'editor.topbar.saveTitle': 'Spara i den här webbläsaren, och på servern när du är inloggad (Ctrl+S)',
+  'editor.topbar.saveTitle':
+    'Spara i den här webbläsaren, och på servern när du är inloggad (Ctrl+S)',
   'editor.topbar.savedLocal': 'Sparad i den här webbläsaren',
   'editor.topbar.savedServer': 'Sparad på servern (v{version})',
   'editor.topbar.saving': 'Sparar...',
@@ -707,11 +945,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.signInTitle': 'Öppna spelets inloggningsskärm i en ny flik',
   'editor.topbar.undo': 'Ångra',
   'editor.topbar.undoCount': 'Ångra: {count}',
-  'editor.topbar.undoCountTitle': '{count} steg kan ångras (Ctrl+Z för att ångra, Ctrl+Y för att göra om)',
+  'editor.topbar.undoCountTitle':
+    '{count} steg kan ångras (Ctrl+Z för att ångra, Ctrl+Y för att göra om)',
   'editor.topbar.undoTitle': 'Ångra den senaste ändringen (Ctrl+Z)',
   'editor.topbar.uploadAsset': 'Ladda upp resurs',
   'editor.topbar.uploadAssetDisabledTitle': 'Logga in från spelet för att ladda upp resurser',
-  'editor.topbar.uploadAssetTitle': 'Ladda upp en GLB-modell (upp till 8 MiB) att placera i dina kartor',
+  'editor.topbar.uploadAssetTitle':
+    'Ladda upp en GLB-modell (upp till 8 MiB) att placera i dina kartor',
   'editor.topbar.view2d': '2D',
   'editor.topbar.view2dTitle': 'Redigera på den symboliska översiktskartan',
   'editor.topbar.view3d': '3D',
@@ -755,8 +995,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'editor.water.level': 'Vattennivå',
   'editor.water.reset': 'Återställ till den inbyggda nivån',
   'editor.water.title': 'Vattennivå',
-  'entities.delves.drowned_litany.enterText': 'Du stiger ner i den dränkta helgedomen vid kärrets rand.',
-  'entities.delves.drowned_litany.leaveText': 'Du klättrar tillbaka till Broder Halven vid kärrets rand.',
+  'entities.delves.drowned_litany.enterText':
+    'Du stiger ner i den dränkta helgedomen vid kärrets rand.',
+  'entities.delves.drowned_litany.leaveText':
+    'Du klättrar tillbaka till Broder Halven vid kärrets rand.',
   'entities.delves.drowned_litany.name': 'Den dränkta litanian',
   'entities.items.blackwater_vanguard_chest.name': 'Svartvattenförtruppens bröstskydd',
   'entities.items.bulwark_rusted_pauldrons.name': 'Bålverksrostiga skuldror',
@@ -797,7 +1039,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Spåret ledde norrut. Ännu ett relikvarium, ännu en rit. Välj din svårighetsgrad, så håller jag repet tills du kommer tillbaka.',
   'entities.npcs.brother_halven_marsh.name': 'Broder Halven',
   'entities.npcs.brother_halven_marsh.title': 'Relikvarieväktare',
-  'entities.npcs.spirit_healer.greeting': 'Vila nu, ande. Jag kan återbörda dig till din kropp, men överfarten tillbaka lämnar dig svag.',
+  'entities.npcs.spirit_healer.greeting':
+    'Vila nu, ande. Jag kan återbörda dig till din kropp, men överfarten tillbaka lämnar dig svag.',
   'entities.npcs.spirit_healer.name': 'Den bleka väktaren',
   'entities.npcs.spirit_healer.title': 'De dödas väktare',
   'entities.quests.q_old_cragmaw.completion':
@@ -832,19 +1075,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.close': 'Stäng kalendern',
   'hudChrome.calendar.dayAria': '{date}: {count} evenemang',
   'hudChrome.calendar.deleteAria': 'Ta bort evenemanget {title}',
-  'hudChrome.calendar.events.arenaClash.note': 'Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen.',
+  'hudChrome.calendar.events.arenaClash.note':
+    'Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen.',
   'hudChrome.calendar.events.arenaClash.title': 'Arenadrabbning',
-  'hudChrome.calendar.events.delveDay.note': 'Broder Halven markerar i sina tabeller: en fin dag att trotsa Det rasade relikvariet.',
+  'hudChrome.calendar.events.delveDay.note':
+    'Broder Halven markerar i sina tabeller: en fin dag att trotsa Det rasade relikvariet.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-dag',
-  'hudChrome.calendar.events.fiestaNight.note': '2v2-fiestans ring drar sin högljuddaste publik i kväll.',
+  'hudChrome.calendar.events.fiestaNight.note':
+    '2v2-fiestans ring drar sin högljuddaste publik i kväll.',
   'hudChrome.calendar.events.fiestaNight.title': 'Fiestanatt',
-  'hudChrome.calendar.events.fishingDerby.note': 'Metare kantar sjöarna. Ta med ett spö och byt fiskehistorier.',
+  'hudChrome.calendar.events.fishingDerby.note':
+    'Metare kantar sjöarna. Ta med ett spö och byt fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fisketävling',
-  'hudChrome.calendar.events.marketDay.note': 'Köpmannen väntar färska varor. En fin dag att botanisera på Världsmarknaden.',
+  'hudChrome.calendar.events.marketDay.note':
+    'Köpmannen väntar färska varor. En fin dag att botanisera på Världsmarknaden.',
   'hudChrome.calendar.events.marketDay.title': 'Marknadsdag',
-  'hudChrome.calendar.events.moongateCommunion.note': 'Pilgrimer samlas vid templets månport under midmånadens måne.',
+  'hudChrome.calendar.events.moongateCommunion.note':
+    'Pilgrimer samlas vid templets månport under midmånadens måne.',
   'hudChrome.calendar.events.moongateCommunion.title': 'Månportskommunion',
-  'hudChrome.calendar.events.raidCall.note': 'Väktare blåser i hornet: samla ett följe till kryptorna och raiden.',
+  'hudChrome.calendar.events.raidCall.note':
+    'Väktare blåser i hornet: samla ett följe till kryptorna och raiden.',
   'hudChrome.calendar.events.raidCall.title': 'Raidkallelse',
   'hudChrome.calendar.guildOnlyNote': 'Gå med i ett gille för att planera evenemang tillsammans.',
   'hudChrome.calendar.hourAllDay': 'Hela dagen',
@@ -859,7 +1109,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.created': 'Evenemanget står nu i gilleskalendern.',
   'hudChrome.calendar.result.eventGone': 'Det evenemanget finns inte längre i kalendern.',
   'hudChrome.calendar.result.notInGuild': 'Du är inte med i något gille.',
-  'hudChrome.calendar.result.notOfficer': 'Endast officerare och Gillesmästaren får hantera gillesevenemang.',
+  'hudChrome.calendar.result.notOfficer':
+    'Endast officerare och Gillesmästaren får hantera gillesevenemang.',
   'hudChrome.calendar.result.removed': 'Evenemanget togs bort från kalendern.',
   'hudChrome.calendar.title': 'Evenemangskalender',
   'hudChrome.calendar.titlePlaceholder': 'Evenemangstitel',
@@ -876,7 +1127,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.totalPlayers': '{count} spelare i dag',
   'hudChrome.death.resurrectAtCorpse': 'Återuppstå vid liket',
   'hudChrome.death.resurrectAtHealer': 'Den bleka väktaren (Väktartullen)',
-  'hudChrome.death.spiritHealerAlive': 'Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.',
+  'hudChrome.death.spiritHealerAlive':
+    'Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.',
   'hudChrome.discord.roleTag.admin': 'Admin',
   'hudChrome.frameReset.label': 'Återställ ramarnas positioner',
   'hudChrome.mailbox.arrivedBanner': 'Korpen har landat: post från {name}.',
@@ -892,7 +1144,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.deleteAria': 'Radera brevet {subject}',
   'hudChrome.mailbox.empty': 'Din brevlåda är tom.',
   'hudChrome.mailbox.indicatorAria': 'Oläst post: {count}',
-  'hudChrome.mailbox.indicatorTip': 'Du har {count} olästa brev. Besök en brevlåda för att läsa dem.',
+  'hudChrome.mailbox.indicatorTip':
+    'Du har {count} olästa brev. Besök en brevlåda för att läsa dem.',
   'hudChrome.mailbox.noSubject': '(inget ämne)',
   'hudChrome.mailbox.openAria': 'Läs brevet {subject} från {name}',
   'hudChrome.mailbox.parcelsHint': 'Klicka på ett föremål i dina väskor för att bifoga det.',
@@ -928,11 +1181,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': 'Fientlig',
   'hudChrome.mobTooltip.levelFamily': 'Nivå {level} {family}',
   'hudChrome.options.aurasOnPlayerFrame': 'Förstärkningar på spelarramen',
+  'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.playerFrameScale': 'Spelarramens skala',
   'hudChrome.options.showDailyRewardsChest': 'Visa kistan för dagliga belöningar',
   'hudChrome.options.showOwnNameplate': 'Visa min namnskylt',
+  'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
   'hudChrome.options.targetFrameScale': 'Målramens skala',
   'hudChrome.options.walkByAutoloot': 'Automatisk plundring i förbifarten',
+  'hudChrome.specPanel.complexity': 'Komplexitet',
+  'hudChrome.specPanel.complexityHigh': 'Hög',
+  'hudChrome.specPanel.complexityLow': 'Låg',
+  'hudChrome.specPanel.complexityMedium': 'Medel',
+  'hudChrome.specPanel.exampleAbilities': 'Exempel på förmågor',
+  'hudChrome.specPanel.primaryAttr': 'Primärt attribut',
+  'hudChrome.specPanel.selectSpec': 'Välj specialisering',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisering upplåst!',
+  'hudChrome.specPanel.specUnlockHint': 'Tryck på N för att välja din specialisering.',
+  'hudChrome.specPanel.viewTalents': 'Visa talanger',
+  'hudChrome.talentRows.comingSoon': 'Kommer snart',
+  'hudChrome.talentRows.defaultLoadout': 'Standarduppsättning',
+  'hudChrome.talentRows.tab': 'Val',
   'hudChrome.party.inviteUsage': 'Bjud in vem? Användning: /invite <namn>.',
   'hudChrome.playerFrame.lock': 'Lås spelarramen',
   'hudChrome.playerFrame.unlock': 'Flytta spelarramen',
@@ -943,6 +1211,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
   'hudChrome.worldBoss.spawn': '{name} reser sig över Törntoppshöjderna!',
   'itemUi.kind.bag': 'Väska',
   'itemUi.tooltip.bagSlots': 'Väska med {slots} platser',
@@ -951,15 +1220,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryEggs': 'Baptisteriet tystnar. Spindeläggsäckar klänger våta längs kanten.',
   'sim.delve.baptistrySpidersSealed': 'Du borde försöka förstöra spindelsäckarna.',
   'sim.delve.baptistryWave': 'Något rör sig i baptisteriets svarta vatten.',
-  'sim.delve.bellRopeShock': 'Klockrepet spänns med ett ryck. Drunknade kantorer vacklar av chocken.',
+  'sim.delve.bellRopeShock':
+    'Klockrepet spänns med ett ryck. Drunknade kantorer vacklar av chocken.',
   'sim.delve.drownedLitanyReliquaryRise':
     'Syster Nhalia tystnar. Det dränkta relikvariet reser sig ur svartvattnet. Gå fram till det för att inleda riten.',
   'sim.delve.eggSacBurst': 'Äggsäcken brister. Spindelyngel kilar fritt över baptisteriets kant.',
   'sim.delve.moveCloserReliquary': 'Gå närmare relikvariet.',
   'sim.delve.nhaliaBlackwaterMark': '{name} märker {player} med Svartvatten!',
   'sim.delve.nhaliaCantorShield': 'Kantorer, håll tonen!',
-  'sim.delve.partyTooLarge': '{name} är avsedd för fördjupningar solo eller i duo. Grupper på {max} eller fler får inte gå in.',
-  'sim.delve.puzzleSealed': 'Du behöver öppna förseglingen genom att lägga tryck någonstans i rummet.',
+  'sim.delve.partyTooLarge':
+    '{name} är avsedd för fördjupningar solo eller i duo. Grupper på {max} eller fler får inte gå in.',
+  'sim.delve.puzzleSealed':
+    'Du behöver öppna förseglingen genom att lägga tryck någonstans i rummet.',
   'sim.delve.riteCorrect': 'En mjuk klang svarar på din beröring.',
   'sim.delve.riteReliquaryEmpty': 'Relikvariet är tomt.',
   'sim.delve.riteReliquaryLocked': 'Slutför helgedomsriten för att öppna relikvariet.',
@@ -968,7 +1240,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.riteSequenceReady': 'Helgedomarna slocknar. Upprepa sekvensen.',
   'sim.delve.riteWrong': 'Ett skarpt, sprucket klockslag. Svart vatten stänker vid dina fötter.',
   'sim.delve.ropesSealed': 'Du borde pröva att dra i klockrepen.',
-  'wallet.extensionHelp': 'För att se en plånbok här, håll ett webbläsartillägg för plånböcker som Solflare Wallet aktivt.',
+  'wallet.extensionHelp':
+    'För att se en plånbok här, håll ett webbläsartillägg för plånböcker som Solflare Wallet aktivt.',
   'worldContent.delveReliquaryInteract': 'Det dränkta relikvariet: Tryck på F för att inleda riten',
   'worldContent.delveRiteShrineBellInteract': 'Klockhelgedom: Tryck på F för att ringa i den',
   'worldContent.delveRiteShrineCandleInteract': 'Ljushelgedom: Tryck på F för att röra vid den',
@@ -981,11 +1254,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.auctioneer_voss.title': 'Väktare av världsmarknaden',
   'hudChrome.devBadge.badgeTitle': 'Utvecklare: {tier}',
   'hudChrome.devBadge.contributor': 'Bidragsgivare med öppen källkod',
-  'hudChrome.devBadge.flavors.architect': 'En arkitekt av riket: 30 sammanslagna pull-förfrågningar.',
-  'hudChrome.devBadge.flavors.artificer': 'Fem pull-förfrågningar in, och världen böjer sig efter din kod.',
-  'hudChrome.devBadge.flavors.runesmith': 'Femton pull-förfrågningar smidda in i det körande spelet.',
+  'hudChrome.devBadge.flavors.architect':
+    'En arkitekt av riket: 30 sammanslagna pull-förfrågningar.',
+  'hudChrome.devBadge.flavors.artificer':
+    'Fem pull-förfrågningar in, och världen böjer sig efter din kod.',
+  'hudChrome.devBadge.flavors.runesmith':
+    'Femton pull-förfrågningar smidda in i det körande spelet.',
   'hudChrome.devBadge.flavors.tinkerer': 'Din första pull-förfrågan landade i riket.',
-  'hudChrome.devBadge.flavors.worldwright': 'En världsbyggare: 70 pull-förfrågningar formar spelet.',
+  'hudChrome.devBadge.flavors.worldwright':
+    'En världsbyggare: 70 pull-förfrågningar formar spelet.',
   'hudChrome.devBadge.link.benefits':
     'Länka din GitHub för att förtjäna ett utvecklarmärke för de pull-förfrågningar du har fått sammanslagna i förrådet med öppen källkod.',
   'hudChrome.devBadge.link.cta': 'Länka GitHub',
@@ -1020,7 +1297,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.looterChanged': 'Bytesmästare är nu {name}.',
   'hudChrome.masterLoot.rollingFor': 'Slår tärning om {item}.',
   'hudChrome.masterLoot.summaryGroup': 'Byteinställningar: Gruppbyte.',
-  'hudChrome.masterLoot.summaryMaster': 'Byteinställningar: Mästarbyte, bytesmästare {name}, tröskel {threshold}.',
+  'hudChrome.masterLoot.summaryMaster':
+    'Byteinställningar: Mästarbyte, bytesmästare {name}, tröskel {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Bytest. tröskel satt till {threshold}.',
   'hudChrome.options.showDevBadges': 'Visa utvecklarmärken',
   'hudChrome.options.groundReticle': 'Markriktmedel',
@@ -1049,7 +1327,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'a11y.mainNavigation': 'Huvudnavigering',
   'a11y.toggleMenu': 'Växla meny',
   'abilityUi.actionBar.attackName': 'Anfall',
-  'abilityUi.actionBar.attackTooltip': 'Växla automatiskt anfall mot ditt mål. Att högerklicka på en fiende anfaller också.',
+  'abilityUi.actionBar.attackTooltip':
+    'Växla automatiskt anfall mot ditt mål. Att högerklicka på en fiende anfaller också.',
   'abilityUi.actionBar.clearHint': 'Skift-högerklicka eller Skift-Delete för att rensa',
   'abilityUi.actionBar.emptySlot': 'Tom plats',
   'abilityUi.actionBar.emptySlotAria': 'Handlingsplats {slot}: tom',
@@ -1070,7 +1349,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.spellbook.knownAbilityAria': '{name}, rang {rank}. {summary}',
   'abilityUi.spellbook.learnAtLevel': 'Du lär dig detta på nivå {level}.',
   'abilityUi.spellbook.resetBar': 'Återställ rad',
-  'abilityUi.spellbook.resetBarAria': 'Återställ den aktuella handlingsraden till dess förvalda förmågor',
+  'abilityUi.spellbook.resetBarAria':
+    'Återställ den aktuella handlingsraden till dess förvalda förmågor',
   'abilityUi.spellbook.title': 'Trollformelbok',
   'abilityUi.spellbook.trainableAtLevel': 'Tränbar på nivå {level}',
   'abilityUi.spellbook.unlearnedAbilityAria': '{name}. Lär dig på nivå {level}.',
@@ -1124,7 +1404,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'auth.realm': 'Värld',
   'auth.realmList': 'Världslista',
   'auth.showPassword': 'Visa lösenord',
-  'auth.twoFactorHint': 'Ange koden från din autentiseringsapp, eller en av dina återställningskoder.',
+  'auth.twoFactorHint':
+    'Ange koden från din autentiseringsapp, eller en av dina återställningskoder.',
   'auth.twoFactorLabel': 'Autentiseringskod',
   'auth.twoFactorPlaceholder': '6-siffrig eller återställningskod',
   'auth.username': 'Användarnamn',
@@ -1152,7 +1433,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'character.tabCharacters': 'Karaktärer',
   'character.tabCreate': 'Skapa',
   'character.takeOver': 'Ta över',
-  'character.takeOverConfirm': 'Detta kopplar bort denna karaktär från en annan session och hämtar hit den. Fortsätta?',
+  'character.takeOverConfirm':
+    'Detta kopplar bort denna karaktär från en annan session och hämtar hit den. Fortsätta?',
   'character.viewProfile': 'Visa profil',
   'classDetails.aria':
     'Klassdetaljer för {className}: roll {role}. Startvärden: Styrka {str}, Smidighet {agi}, Uthållighet {sta}, Intellekt {int}, Ande {spi}.',
@@ -1268,13 +1550,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.affix.restless_graves': 'Rastlösa gravar',
   'delveUi.affix.unstable_roof': 'Instabilt tak',
   'delveUi.blessing.chapel_candle': 'Kapelljus: säkrare runda, ett märke mindre vid slutförande.',
-  'delveUi.board.companion.boon': 'Läker gruppen mellan strider. Rang 3 återupplivar en fallen allierad en gång per runda.',
+  'delveUi.board.companion.boon':
+    'Läker gruppen mellan strider. Rang 3 återupplivar en fallen allierad en gång per runda.',
   'delveUi.board.companion.maxRank': 'Fullt uppgraderad',
   'delveUi.board.companion.pick': 'Välj en följeslagare',
   'delveUi.board.companion.rank': 'Rang {rank}',
   'delveUi.board.companion.tessa': 'Akolyten Tessa',
   'delveUi.board.companion.upgrade': 'Uppgradera till rang {rank} ({marks} Märken)',
-  'delveUi.board.companion.upgradeAria': 'Uppgradera {name} till rang {rank} för {marks} Delve-märken',
+  'delveUi.board.companion.upgradeAria':
+    'Uppgradera {name} till rang {rank} för {marks} Delve-märken',
   'delveUi.board.enter': 'Gå in i delven',
   'delveUi.board.enterAria': 'Gå in i {delve} på svårighetsgraden {tier}',
   'delveUi.board.marks': 'Delve-märken: {count}',
@@ -1288,7 +1572,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.title': 'Delve-tavla',
   'delveUi.boss.varric.bell.emote': 'Diakon Varric griper den begravda klockan med båda händerna!',
   'delveUi.boss.varric.bell.impact': 'Klockans klang spräcker kammargolvet!',
-  'delveUi.boss.varric.bell.lesson': 'Klockklang: en markslagning var tolfte sekund. Förflytta dig undan innan den landar.',
+  'delveUi.boss.varric.bell.lesson':
+    'Klockklang: en markslagning var tolfte sekund. Förflytta dig undan innan den landar.',
   'delveUi.boss.varric.bell.log': 'Diakon Varric börjar ringa i begravningsklockan.',
   'delveUi.boss.varric.bell.warning': 'Förflytta dig bort från Diakon Varric!',
   'delveUi.boss.varric.defeat': 'Nej... jag hade namnen... jag hade dem alla...',
@@ -1299,7 +1584,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.boss.varric.raise.emote': 'Diakon Varric ropar namn ur de krossade gravarna!',
   'delveUi.boss.varric.raise.interrupt_fail': 'De döda svarar på Diakon Varrics rop!',
   'delveUi.boss.varric.raise.interrupt_ok': 'Gravriten vacklar.',
-  'delveUi.boss.varric.raise.lesson': 'Avbryt den spruckna graven inom fem sekunder, annars reser sig de döda på hans rop.',
+  'delveUi.boss.varric.raise.lesson':
+    'Avbryt den spruckna graven inom fem sekunder, annars reser sig de döda på hans rop.',
   'delveUi.boss.varric.raise.log': 'Diakon Varric börjar Väck de döda.',
   'delveUi.boss.varric.raise.object': 'Den spruckna graven skälver av stulen andedräkt.',
   'delveUi.boss.varric.raise.warning': 'Stoppa gravriten!',
@@ -1330,10 +1616,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett sigill skrapat i kistträ, inte Morthens sigill, utan ett äldre gravropsmärke äldre än Den ihåliga kryptan.',
   'delveUi.lore.tessa_note':
     'Hopvikt papperslapp med Tessas handstil: "Om liggarna ändras medan vi är där nere, lita på ljuset, inte rösterna."',
-  'delveUi.module.reliquary_bell_niche': 'Dussintals handklockor hänger i tystnad, var och en knuten med begravningstyg.',
+  'delveUi.module.reliquary_bell_niche':
+    'Dussintals handklockor hänger i tystnad, var och en knuten med begravningstyg.',
   'delveUi.module.reliquary_finale': 'Den begravda klockan ringer en gång under dina stövlar.',
-  'delveUi.module.reliquary_saintless_hall': 'Statyer med ansikten bortmejslade med omsorgsfullt hat.',
-  'delveUi.module.reliquary_sunken_ossuary': 'Vatten sipprar genom gravhyllorna och bär gammal aska i silversvarta strömmar.',
+  'delveUi.module.reliquary_saintless_hall':
+    'Statyer med ansikten bortmejslade med omsorgsfullt hat.',
+  'delveUi.module.reliquary_sunken_ossuary':
+    'Vatten sipprar genom gravhyllorna och bär gammal aska i silversvarta strömmar.',
   'delveUi.moduleName.reliquary_bell_niche': 'Klocknischen',
   'delveUi.moduleName.reliquary_finale': 'Den klockbegravda kammaren',
   'delveUi.moduleName.reliquary_saintless_hall': 'Den helgonlösa hallen',
@@ -1365,82 +1654,105 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'download.title': 'Ladda ner skrivbordsstartaren',
   'download.macCta': 'Ladda ner för macOS',
   'download.windowsPending': 'Windows-bygge väntar.',
-  'entities.abilities.adrenaline_rush.description': 'Ditt blod hettar upp och återställer omedelbart 60 energi.',
+  'entities.abilities.adrenaline_rush.description':
+    'Ditt blod hettar upp och återställer omedelbart 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Kvickat blod',
-  'entities.abilities.aimed_shot.description': 'Ett omsorgsfullt draget skott som vållar {damage} skada.',
+  'entities.abilities.aimed_shot.description':
+    'Ett omsorgsfullt draget skott som vållar {damage} skada.',
   'entities.abilities.aimed_shot.name': 'Långt drag',
   'entities.abilities.ambush.description':
     'Lägg bakhåll för målet för 250 % vapenskada plus {damage}. Måste vara smygande och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.ambush.name': 'Smygarens hugg',
-  'entities.abilities.arcane_explosion.description': 'Ett utbrott av arkanenergi träffar alla närliggande fiender för {damage} arkanskada.',
+  'entities.abilities.arcane_explosion.description':
+    'Ett utbrott av arkanenergi träffar alla närliggande fiender för {damage} arkanskada.',
   'entities.abilities.arcane_explosion.name': 'Etersalva',
   'entities.abilities.arcane_intellect.description': 'Ökar intellekt med {buff} i 30 min.',
   'entities.abilities.arcane_intellect.name': 'Eterinsikt',
-  'entities.abilities.arcane_missiles.description': 'Skickar Eterpilar mot fienden och vållar {damage} arkanskada varje sekund i 3 sek.',
+  'entities.abilities.arcane_missiles.description':
+    'Skickar Eterpilar mot fienden och vållar {damage} arkanskada varje sekund i 3 sek.',
   'entities.abilities.arcane_missiles.name': 'Eterpilar',
-  'entities.abilities.arcane_shot.description': 'Ett omedelbart skott som vållar {damage} arkanskada.',
+  'entities.abilities.arcane_shot.description':
+    'Ett omedelbart skott som vållar {damage} arkanskada.',
   'entities.abilities.arcane_shot.name': 'Ondskeskott',
-  'entities.abilities.aspect_of_the_cheetah.description': 'Anta springarens skepnad och öka förflyttningshastigheten med 30 % i 30 min.',
+  'entities.abilities.aspect_of_the_cheetah.description':
+    'Anta springarens skepnad och öka förflyttningshastigheten med 30 % i 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Springarens skepnad',
-  'entities.abilities.aspect_of_the_hawk.description': 'Anta kärrhökens skepnad och öka attackkraften med {buff} i 30 min.',
+  'entities.abilities.aspect_of_the_hawk.description':
+    'Anta kärrhökens skepnad och öka attackkraften med {buff} i 30 min.',
   'entities.abilities.aspect_of_the_hawk.name': 'Kärrhökens skepnad',
-  'entities.abilities.aspect_of_the_monkey.description': 'Anta mårdens skepnad och öka din chans att väja med 8 % i 30 min.',
+  'entities.abilities.aspect_of_the_monkey.description':
+    'Anta mårdens skepnad och öka din chans att väja med 8 % i 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Mårdens skepnad',
   'entities.abilities.backstab.description':
     'Ryggdolka målet för 150 % vapenskada plus {damage}. Måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.backstab.name': 'Feg stöt',
-  'entities.abilities.barkskin.description': 'Din hud hårdnar som bark och ökar rustning med 150 i 15 sek.',
+  'entities.abilities.barkskin.description':
+    'Din hud hårdnar som bark och ökar rustning med 150 i 15 sek.',
   'entities.abilities.barkskin.name': 'Ekhud',
   'entities.abilities.bash.description': 'Bedövar målet i 2 sek. Endast i Bruinform.',
   'entities.abilities.bash.name': 'Omtumla',
   'entities.abilities.battle_shout.description': 'Ökar din attackkraft med {buff} i 2 min.',
   'entities.abilities.battle_shout.name': 'Järnvrål',
-  'entities.abilities.bear_charge.description': 'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
+  'entities.abilities.bear_charge.description':
+    'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
     'Skiftar gestalt till en björn: rustning +90 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
-  'entities.abilities.berserker_rage.description': 'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
+  'entities.abilities.berserker_rage.description':
+    'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
   'entities.abilities.berserker_rage.name': 'Sjudande raseri',
-  'entities.abilities.blessing_of_might.description': 'Lägger en välsignelse på ett vänligt mål och ökar attackkraften med {buff} i 5 min.',
+  'entities.abilities.blessing_of_might.description':
+    'Lägger en välsignelse på ett vänligt mål och ökar attackkraften med {buff} i 5 min.',
   'entities.abilities.blessing_of_might.name': 'Järnets ed',
-  'entities.abilities.blind.description': 'Förblindar målet och får det att vandra desorienterat i 8 sek. All skada bryter effekten.',
+  'entities.abilities.blind.description':
+    'Förblindar målet och får det att vandra desorienterat i 8 sek. All skada bryter effekten.',
   'entities.abilities.blind.name': 'Gruskast',
   'entities.abilities.bloodrage.description': 'Genererar 10 raseri på bekostnad av hälsa.',
   'entities.abilities.bloodrage.name': 'Blodstull',
-  'entities.abilities.bloodthirst.description': 'Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)',
+  'entities.abilities.bloodthirst.description':
+    'Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)',
   'entities.abilities.bloodthirst.name': 'Åderlåtning',
   'entities.abilities.cat_form.description':
     'Skiftar gestalt till en varg: attackkraften stiger med din nivå, dina attacker använder energi och kombopoäng, och du genererar 29 % mindre hot. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.cat_form.name': 'Vargform',
-  'entities.abilities.charge.description': 'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
+  'entities.abilities.charge.description':
+    'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
   'entities.abilities.charge.name': 'Anstormning',
-  'entities.abilities.cheap_shot.description': 'Slå målet för {damage} skada och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng.',
+  'entities.abilities.cheap_shot.description':
+    'Slå målet för {damage} skada och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng.',
   'entities.abilities.cheap_shot.name': 'Magslag',
-  'entities.abilities.claw.description': 'Klö fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i vargform.',
+  'entities.abilities.claw.description':
+    'Klö fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.claw.name': 'Klo',
-  'entities.abilities.cleave.description': 'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
+  'entities.abilities.cleave.description':
+    'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
   'entities.abilities.cleave.name': 'Skördebåge',
   'entities.abilities.commanding_shout.description': 'Ökar din uthållighet med {buff} i 2 min.',
   'entities.abilities.commanding_shout.name': 'Stärkande rop',
-  'entities.abilities.concussive_shot.description': 'Omtöcknar målet för {damage} skada och saktar förflyttningen med 50 % i 4 sek.',
+  'entities.abilities.concussive_shot.description':
+    'Omtöcknar målet för {damage} skada och saktar förflyttningen med 50 % i 4 sek.',
   'entities.abilities.concussive_shot.name': 'Skakande skott',
   'entities.abilities.conjure_food.description':
     'Frammanar 2 portioner bröd som återställer hälsa när de äts. Högre rang frammanar matnyttigare kost.',
   'entities.abilities.conjure_food.name': 'Brödbindning',
-  'entities.abilities.conjure_water.description': 'Frammanar 2 flaskor vatten som återställer mana när de dricks. Högre rang frammanar renare vatten.',
+  'entities.abilities.conjure_water.description':
+    'Frammanar 2 flaskor vatten som återställer mana när de dricks. Högre rang frammanar renare vatten.',
   'entities.abilities.conjure_water.name': 'Vattenbindning',
   'entities.abilities.consecration.description':
     'Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek.',
   'entities.abilities.consecration.name': 'Helig mark',
-  'entities.abilities.corruption.description': 'Fördärvar målet och vållar {damage} skuggskada under 18 sek.',
+  'entities.abilities.corruption.description':
+    'Fördärvar målet och vållar {damage} skuggskada under 18 sek.',
   'entities.abilities.corruption.name': 'Svartröta',
   'entities.abilities.crippling_poison.description':
     'Träffar målet med ett blytungt gift som vållar {damage} naturskada och saktar dess förflyttningshastighet med 50 % i 12 sek.',
   'entities.abilities.crippling_poison.name': 'Blytungt gift',
-  'entities.abilities.curse_of_agony.description': 'Förbannar målet med plåga: {damage} skuggskada över 24 sek.',
+  'entities.abilities.curse_of_agony.description':
+    'Förbannar målet med plåga: {damage} skuggskada över 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Våndans häxkonst',
-  'entities.abilities.dash.description': 'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i vargform.',
+  'entities.abilities.dash.description':
+    'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i vargform.',
   'entities.abilities.dash.name': 'Rusa',
   'entities.abilities.deadly_poison.description':
     'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 14 extra naturskada.',
@@ -1448,7 +1760,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defensive_stance.description':
     'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
   'entities.abilities.defensive_stance.name': 'Gardställning',
-  'entities.abilities.demon_skin.description': 'Demonisk hud ökar din rustning med {buff} i 30 min.',
+  'entities.abilities.demon_skin.description':
+    'Demonisk hud ökar din rustning med {buff} i 30 min.',
   'entities.abilities.demon_skin.name': 'Djävulshud',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i Bruinform.',
@@ -1460,15 +1773,19 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.devotion_aura.name': 'Ståndaktig aura',
   'entities.abilities.dismiss_pet.description': 'Släpper tillbaka ditt djur ut i vildmarken.',
   'entities.abilities.dismiss_pet.name': 'Släpp följeslagare',
-  'entities.abilities.divine_protection.description': 'Ett heligt värn absorberar {damage} skada i 10 sek.',
+  'entities.abilities.divine_protection.description':
+    'Ett heligt värn absorberar {damage} skada i 10 sek.',
   'entities.abilities.divine_protection.name': 'Trons värn',
-  'entities.abilities.drain_life.description': 'Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek.',
+  'entities.abilities.drain_life.description':
+    'Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek.',
   'entities.abilities.drain_life.name': 'Förtär',
-  'entities.abilities.earth_shock.description': 'Chockar omedelbart målet med dånande kraft för {damage} naturskada.',
+  'entities.abilities.earth_shock.description':
+    'Chockar omedelbart målet med dånande kraft för {damage} naturskada.',
   'entities.abilities.earth_shock.name': 'Jordstöt',
   'entities.abilities.enrage.description': 'Genererar omedelbart 20 raseri. Endast i Bruinform.',
   'entities.abilities.enrage.name': 'Elda på',
-  'entities.abilities.entangling_roots.description': 'Rotfäster målet på platsen i upp till 12 sek.',
+  'entities.abilities.entangling_roots.description':
+    'Rotfäster målet på platsen i upp till 12 sek.',
   'entities.abilities.entangling_roots.name': 'Gripande rötter',
   'entities.abilities.evasion.description': 'Ökar din chans att väja undan med 50 % i 15 sek.',
   'entities.abilities.evasion.name': 'Spökfot',
@@ -1477,18 +1794,23 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     'Försöker göra slut på en sårad fiende och vållar {damage} skada. Endast användbar på fiender under 20 % hälsa.',
   'entities.abilities.execute.name': 'Tidig grav',
-  'entities.abilities.exorcism.description': 'Förvisar de ondskefulla med helig vrede och vållar {damage} helig skada.',
+  'entities.abilities.exorcism.description':
+    'Förvisar de ondskefulla med helig vrede och vållar {damage} helig skada.',
   'entities.abilities.exorcism.name': 'Utdrivningens rit',
-  'entities.abilities.expose_armor.description': 'Avslutande manöver som blottar målet och sänker dess rustning med {damage} i 30 sek.',
+  'entities.abilities.expose_armor.description':
+    'Avslutande manöver som blottar målet och sänker dess rustning med {damage} i 30 sek.',
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
   'entities.abilities.faerie_fire.name': 'Häxljus',
-  'entities.abilities.fear.description': 'Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten.',
+  'entities.abilities.fear.description':
+    'Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
-  'entities.abilities.ferocious_bite.description': 'Avslutande manöver som vållar {damage}. Endast i vargform.',
+  'entities.abilities.ferocious_bite.description':
+    'Avslutande manöver som vållar {damage}. Endast i vargform.',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
   'entities.abilities.fire_blast.name': 'Glödfall',
-  'entities.abilities.fireball.description': 'Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid.',
+  'entities.abilities.fireball.description':
+    'Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid.',
   'entities.abilities.fireball.name': 'Glödbult',
   'entities.abilities.rain_of_fire.name': 'Eldregn',
   'entities.abilities.rain_of_fire.description':
@@ -1500,33 +1822,43 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hurricane.description':
     'Släpper lös en orkan över målområdet i 6 sek och slår fiender för {damage} naturskada varje sekund.',
   'entities.abilities.earthquake.name': 'Jordbävning',
-  'entities.abilities.earthquake.description': 'Skakar målområdet i 6 sek och slår fiender för {damage} naturskada var 1.5 sek.',
+  'entities.abilities.earthquake.description':
+    'Skakar målområdet i 6 sek och slår fiender för {damage} naturskada var 1.5 sek.',
   'entities.abilities.flamestrike.name': 'Flamslag',
   'entities.abilities.flamestrike.description':
     'Kallar ner en eldexplosion på målområdet som ger {damage} Eldskada till fiender som fångas i explosionen.',
-  'entities.abilities.flame_shock.description': 'Sveder målet med eld för {damage} skada plus {overTime} över 12 sek.',
+  'entities.abilities.flame_shock.description':
+    'Sveder målet med eld för {damage} skada plus {overTime} över 12 sek.',
   'entities.abilities.flame_shock.name': 'Glödstöt',
-  'entities.abilities.flametongue_weapon.description': 'Förlänar ditt vapen elementarisk eld: varje hugg vållar {damage} extra eldskada i 5 min.',
+  'entities.abilities.flametongue_weapon.description':
+    'Förlänar ditt vapen elementarisk eld: varje hugg vållar {damage} extra eldskada i 5 min.',
   'entities.abilities.flametongue_weapon.name': 'Pyrobrandsvapen',
-  'entities.abilities.flash_heal.description': 'En snabb bön som läker ett vänligt mål för {damage}.',
+  'entities.abilities.flash_heal.description':
+    'En snabb bön som läker ett vänligt mål för {damage}.',
   'entities.abilities.flash_heal.name': 'Brådskande bön',
-  'entities.abilities.flash_of_light.description': 'En snabb, effektiv ljusskur som läker ett vänligt mål för {damage}.',
+  'entities.abilities.flash_of_light.description':
+    'En snabb, effektiv ljusskur som läker ett vänligt mål för {damage}.',
   'entities.abilities.flash_of_light.name': 'Ljuslagning',
-  'entities.abilities.frost_armor.description': 'Omsluter dig i frost och ökar rustningen med {buff} i 30 min.',
+  'entities.abilities.frost_armor.description':
+    'Omsluter dig i frost och ökar rustningen med {buff} i 30 min.',
   'entities.abilities.frost_armor.name': 'Rimfrostmantel',
-  'entities.abilities.frost_nova.description': 'Fryser fast alla närliggande fiender på platsen i upp till 8 sek och vållar {damage} frostskada.',
+  'entities.abilities.frost_nova.description':
+    'Fryser fast alla närliggande fiender på platsen i upp till 8 sek och vållar {damage} frostskada.',
   'entities.abilities.frost_nova.name': 'Isbindning',
   'entities.abilities.frost_shock.description':
     'Chockar omedelbart målet med frost för {damage} frostskada och saktar dess förflyttning med 50 % i 8 sek.',
   'entities.abilities.frost_shock.name': 'Rimstöt',
-  'entities.abilities.frostbolt.description': 'Avfyrar en frostpil som vållar {damage} frostskada och saktar förflyttningen med 40 %.',
+  'entities.abilities.frostbolt.description':
+    'Avfyrar en frostpil som vållar {damage} frostskada och saktar förflyttningen med 40 %.',
   'entities.abilities.frostbolt.name': 'Rimlans',
-  'entities.abilities.frostbrand_weapon.description': 'Förlänar ditt vapen bitande frost: varje hugg vållar {damage} extra skada i 5 min.',
+  'entities.abilities.frostbrand_weapon.description':
+    'Förlänar ditt vapen bitande frost: varje hugg vållar {damage} extra skada i 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rimbundet vapen',
   'entities.abilities.garrote.description':
     'Stryper fienden, vållar {damage} skada nu och får den att blöda för {overTime} över 18 sek. Måste vara i smyg. Ger 1 kombopoäng.',
   'entities.abilities.garrote.name': 'Strupvajer',
-  'entities.abilities.ghost_wolf.description': 'Förvandlar dig till en Shadewolf och ökar förflyttningshastigheten med 40 % i 10 min.',
+  'entities.abilities.ghost_wolf.description':
+    'Förvandlar dig till en Shadewolf och ökar förflyttningshastigheten med 40 % i 10 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
     'Slår till målet för {damage} skada och gör det stridsodugligt i 4 sek. All skada bryter effekten. Ger 1 kombopoäng.',
@@ -1536,34 +1868,44 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.growl.name': 'Hota',
   'entities.abilities.hammer_of_justice.description': 'Bedövar målet i {duration} sek.',
   'entities.abilities.hammer_of_justice.name': 'Klyvande domarklubba',
-  'entities.abilities.hamstring.description': 'Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek.',
+  'entities.abilities.hamstring.description':
+    'Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek.',
   'entities.abilities.hamstring.name': 'Haltande hugg',
-  'entities.abilities.heal.description': 'En långsam men kraftfull bön som läker ett vänligt mål för {damage}.',
+  'entities.abilities.heal.description':
+    'En långsam men kraftfull bön som läker ett vänligt mål för {damage}.',
   'entities.abilities.heal.name': 'Högtidlig bön',
   'entities.abilities.healing_touch.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.healing_touch.name': 'Vildläkning',
   'entities.abilities.healing_wave.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.healing_wave.name': 'Lagande vatten',
-  'entities.abilities.heroic_strike.description': 'Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg.',
+  'entities.abilities.heroic_strike.description':
+    'Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg.',
   'entities.abilities.heroic_strike.name': 'Plundrarhugg',
-  'entities.abilities.hibernate.description': 'Tvingar målet i en djup sömn i upp till 8 sek. All skada väcker det.',
+  'entities.abilities.hibernate.description':
+    'Tvingar målet i en djup sömn i upp till 8 sek. All skada väcker det.',
   'entities.abilities.hibernate.name': 'Slummer',
   'entities.abilities.holy_light.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.holy_light.name': 'Lagande ljus',
-  'entities.abilities.ice_barrier.description': 'Skyddar dig i is och absorberar {damage} skada i 60 sek.',
+  'entities.abilities.ice_barrier.description':
+    'Skyddar dig i is och absorberar {damage} skada i 60 sek.',
   'entities.abilities.ice_barrier.name': 'Frostslöja',
-  'entities.abilities.immolate.description': 'Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek.',
+  'entities.abilities.immolate.description':
+    'Bränner fienden för {damage} eldskada och ytterligare {overTime} över 15 sek.',
   'entities.abilities.immolate.name': 'Brinnande pakt',
-  'entities.abilities.insect_swarm.description': 'Fienden svärmas av insekter och tar {damage} naturskada över 12 sek.',
+  'entities.abilities.insect_swarm.description':
+    'Fienden svärmas av insekter och tar {damage} naturskada över 12 sek.',
   'entities.abilities.insect_swarm.name': 'Stickande svärm',
-  'entities.abilities.instant_poison.description': 'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 8 extra naturskada.',
+  'entities.abilities.instant_poison.description':
+    'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 8 extra naturskada.',
   'entities.abilities.instant_poison.name': 'Huggormens bett',
   'entities.abilities.judgement.description':
     'Släpper lös ditt aktiva sigill mot fienden och förbrukar det för att vålla dess lagrade heliga skada.',
   'entities.abilities.judgement.name': 'Utslag',
-  'entities.abilities.kidney_shot.description': 'Avslutande manöver som bedövar målet. Varar 1 sek längre per kombopoäng.',
+  'entities.abilities.kidney_shot.description':
+    'Avslutande manöver som bedövar målet. Varar 1 sek längre per kombopoäng.',
   'entities.abilities.kidney_shot.name': 'Lågt slag',
-  'entities.abilities.lay_on_hands.description': 'En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning.',
+  'entities.abilities.lay_on_hands.description':
+    'En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning.',
   'entities.abilities.lay_on_hands.name': 'Sista smörjelsen',
   'entities.abilities.lesser_heal.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
@@ -1574,20 +1916,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_shield.description':
     'Omger dig med knastrande blixtar: närstridsanfallare tar {buff} naturskada, upp till 3 laddningar och högst en gång var 5 sek.',
   'entities.abilities.lightning_shield.name': 'Åskvärn',
-  'entities.abilities.mark_of_the_wild.description': 'Placerar Wildward på ett vänligt mål och ökar rustningen med {buff} i 30 min.',
+  'entities.abilities.mark_of_the_wild.description':
+    'Placerar Wildward på ett vänligt mål och ökar rustningen med {buff} i 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.maul.description':
     'Ett mörbultande anfall som ökar närstridsskadan med {damage} och vållar en stor mängd hot. Aktiveras vid ditt nästa hugg. Endast i Bruinform.',
   'entities.abilities.maul.name': 'Benkross',
   'entities.abilities.mind_blast.description': 'Spränger målets sinne för {damage} skuggskada.',
   'entities.abilities.mind_blast.name': 'Sinnessplittring',
-  'entities.abilities.mind_flay.description': 'Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek.',
+  'entities.abilities.mind_flay.description':
+    'Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek.',
   'entities.abilities.mind_flay.name': 'Sorgens litania',
-  'entities.abilities.mongoose_bite.description': 'Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan.',
+  'entities.abilities.mongoose_bite.description':
+    'Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan.',
   'entities.abilities.mongoose_bite.name': 'Mothugg',
-  'entities.abilities.moonfire.description': 'Bränner fienden med måneld för {damage} arkanskada plus skada över tid.',
+  'entities.abilities.moonfire.description':
+    'Bränner fienden med måneld för {damage} arkanskada plus skada över tid.',
   'entities.abilities.moonfire.name': 'Månstorm',
-  'entities.abilities.mortal_strike.description': 'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
+  'entities.abilities.mortal_strike.description':
+    'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
   'entities.abilities.mortal_strike.name': 'Stympande hugg',
   'entities.abilities.overpower.description':
     'Omedelbart anfall för vapenskada plus {damage}. Endast användbart efter att målet väjt undan. Kan inte väjas undan.',
@@ -1595,13 +1942,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.polymorph.description':
     'Förvandlar fienden till en padda i upp till {duration} sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',
   'entities.abilities.polymorph.name': 'Förhäxa',
-  'entities.abilities.pounce.description': 'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i vargform.',
+  'entities.abilities.pounce.description':
+    'En smygöppnare som bedövar målet i 2 sek. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.pounce.name': 'Smyghugg',
-  'entities.abilities.power_word_fortitude.description': 'Ökar målets uthållighet med {buff} i 30 min.',
+  'entities.abilities.power_word_fortitude.description':
+    'Ökar målets uthållighet med {buff} i 30 min.',
   'entities.abilities.power_word_fortitude.name': 'Beslutsamhetens litania',
-  'entities.abilities.power_word_shield.description': 'Skyddar målet och absorberar {damage} skada i 30 sek.',
+  'entities.abilities.power_word_shield.description':
+    'Skyddar målet och absorberar {damage} skada i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Värnpsalm',
-  'entities.abilities.prowl.description': 'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
+  'entities.abilities.prowl.description':
+    'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smygjaga',
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
@@ -1611,66 +1962,85 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Flå',
   'entities.abilities.rapid_fire.description': 'Ökar din anfallshastighet med 40 % i 15 sek.',
   'entities.abilities.rapid_fire.name': 'Febrigt drag',
-  'entities.abilities.raptor_strike.description': 'Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg.',
+  'entities.abilities.raptor_strike.description':
+    'Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg.',
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
-  'entities.abilities.regrowth.description': 'Läker ett vänligt mål för {damage} och en ytterligare mängd över 21 sek.',
+  'entities.abilities.regrowth.description':
+    'Läker ett vänligt mål för {damage} och en ytterligare mängd över 21 sek.',
   'entities.abilities.regrowth.name': 'Andra blomningen',
   'entities.abilities.rejuvenation.description': 'Läker målet för {damage} över 12 sek.',
   'entities.abilities.rejuvenation.name': 'Vildblomning',
-  'entities.abilities.rend.description': 'Sårar målet och får det att blöda för {damage} skada över {duration} sek.',
+  'entities.abilities.rend.description':
+    'Sårar målet och får det att blöda för {damage} skada över {duration} sek.',
   'entities.abilities.rend.name': 'Djup skåra',
   'entities.abilities.renew.description': 'Läker målet för {damage} under 15 sek.',
   'entities.abilities.renew.name': 'Dröjande nåd',
   'entities.abilities.retribution_aura.description':
     'Omger dig med helig energi i 30 min och tillfogar 5 helig skada till varje fiende som slår dig i närstrid.',
   'entities.abilities.retribution_aura.name': 'Vedergällningsaura',
-  'entities.abilities.revive_pet.description': 'Återupplivar ditt döda djur och kallar det till din sida.',
+  'entities.abilities.revive_pet.description':
+    'Återupplivar ditt döda djur och kallar det till din sida.',
   'entities.abilities.revive_pet.name': 'Återuppliva djur',
-  'entities.abilities.righteous_fury.description': 'Ökar hotet som din heliga skada genererar med 60 % i 30 min. Hörnstenen för paladinen som tankar.',
+  'entities.abilities.righteous_fury.description':
+    'Ökar hotet som din heliga skada genererar med 60 % i 30 min. Hörnstenen för paladinen som tankar.',
   'entities.abilities.righteous_fury.name': 'Brinnande ed',
   'entities.abilities.rip.description':
     'Avslutande manöver som tillfogar {damage} blödningsskada över 12 sek. Förbrukar kombopoäng. Endast vargform.',
   'entities.abilities.rip.name': 'Riv upp',
-  'entities.abilities.rockbiter_weapon.description': 'Genomsyrar ditt vapen med stenens raseri: varje slag gör {damage} extra skada i 5 min.',
+  'entities.abilities.rockbiter_weapon.description':
+    'Genomsyrar ditt vapen med stenens raseri: varje slag gör {damage} extra skada i 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet vapen',
-  'entities.abilities.rupture.description': 'Avslutande manöver som sårar målet och får det att blöda för {damage} under 16 sek.',
+  'entities.abilities.rupture.description':
+    'Avslutande manöver som sårar målet och får det att blöda för {damage} under 16 sek.',
   'entities.abilities.rupture.name': 'Förblöda',
   'entities.abilities.sap.description':
     'Slår målet medvetslöst i 8 sek. Du måste vara smygande och utanför strid. All skada bryter effekten.',
   'entities.abilities.sap.name': 'Klubba ner',
-  'entities.abilities.scorch.description': 'Svedjer fienden för {damage} eldskada. Snabb att kasta.',
+  'entities.abilities.scorch.description':
+    'Svedjer fienden för {damage} eldskada. Snabb att kasta.',
   'entities.abilities.scorch.name': 'Skålla',
   'entities.abilities.seal_of_righteousness.description':
     'Fyller dig med helig kraft i 30 sek, vilket får vart och ett av dina närstridsslag att göra {damage} extra helig skada. Släpp loss den med domslut.',
   'entities.abilities.seal_of_righteousness.name': 'Edsbrand',
-  'entities.abilities.searing_pain.description': 'Bränner fienden med plågsam eld för {damage} eldskada. Snabb att kasta.',
+  'entities.abilities.searing_pain.description':
+    'Bränner fienden med plågsam eld för {damage} eldskada. Snabb att kasta.',
   'entities.abilities.searing_pain.name': 'Sveda',
-  'entities.abilities.serpent_sting.description': 'Sticker målet och tillfogar {damage} naturskada under 15 sek.',
+  'entities.abilities.serpent_sting.description':
+    'Sticker målet och tillfogar {damage} naturskada under 15 sek.',
   'entities.abilities.serpent_sting.name': 'Gifthulling',
-  'entities.abilities.shadow_bolt.description': 'Skickar en skuggpil mot fienden för {damage} skuggskada.',
+  'entities.abilities.shadow_bolt.description':
+    'Skickar en skuggpil mot fienden för {damage} skuggskada.',
   'entities.abilities.shadow_bolt.name': 'Dysterbult',
-  'entities.abilities.shadow_word_pain.description': 'Ett mörkrets ord tillfogar {damage} skuggskada under 18 sek.',
+  'entities.abilities.shadow_word_pain.description':
+    'Ett mörkrets ord tillfogar {damage} skuggskada under 18 sek.',
   'entities.abilities.shadow_word_pain.name': 'Förruttnelsens klagosång',
-  'entities.abilities.shadowburn.description': 'Spränger omedelbart målet med brännande skugga för {damage} skuggskada.',
+  'entities.abilities.shadowburn.description':
+    'Spränger omedelbart målet med brännande skugga för {damage} skuggskada.',
   'entities.abilities.shadowburn.name': 'Skymningseld',
-  'entities.abilities.shield_slam.description': 'Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)',
+  'entities.abilities.shield_slam.description':
+    'Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)',
   'entities.abilities.shield_slam.name': 'Sköldkross',
-  'entities.abilities.sinister_strike.description': 'Ett omedelbart hugg för vapenskada plus {damage}. Ger 1 kombopoäng.',
+  'entities.abilities.sinister_strike.description':
+    'Ett omedelbart hugg för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.name': 'Ondsint hugg',
-  'entities.abilities.slam.description': 'Smäller till motståndaren för vapenskada plus {damage}.',
+  'entities.abilities.slam.description':
+    'Smäller till motståndaren för 50 % vapenskada plus {damage} och genererar {rage} raseri.',
   'entities.abilities.slam.name': 'Brutalt sving',
-  'entities.abilities.slice_and_dice.description': 'Avslutande manöver som ökar attackhastigheten i närstrid med 30 %. Varar längre per kombopoäng.',
+  'entities.abilities.slice_and_dice.description':
+    'Avslutande manöver som ökar attackhastigheten i närstrid med 30 %. Varar längre per kombopoäng.',
   'entities.abilities.slice_and_dice.name': 'Skoningslöst tempo',
   'entities.abilities.smite.description': 'Tuktar fienden för {damage} helig skada.',
   'entities.abilities.smite.name': 'Tukta',
   'entities.abilities.sprint.description': 'Ökar din förflyttningshastighet med 70 % i 15 sek.',
   'entities.abilities.sprint.name': 'Snabba hälar',
-  'entities.abilities.starfire.description': 'Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada.',
+  'entities.abilities.starfire.description':
+    'Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada.',
   'entities.abilities.starfire.name': 'Himlafall',
   'entities.abilities.stealth.description':
     'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50 % långsammare. Att anfalla eller ta skada bryter Duskveil. Kasta igen för att kliva fram.',
   'entities.abilities.stealth.name': 'Duskveil',
-  'entities.abilities.stormstrike.description': 'Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}.',
+  'entities.abilities.stormstrike.description':
+    'Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}.',
   'entities.abilities.stormstrike.name': 'Anfäders hugg',
   'entities.abilities.summon_doomguard.description':
     'Binder en Wraithborn till din vilja, en elitdemon som öser tung skuggskada från avstånd. En lång nedkylning hindrar dess förödande kraft. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
@@ -1694,7 +2064,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammanar en Gloomshade under häxmästarens befäl. Gloomshade är en robust demon som hånar dina fiender och suger upp stryk. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
   'entities.abilities.summon_voidwalker.name': 'Frammana Gloomshade',
   'entities.abilities.sunder_armor.name': 'Rustningsklipp',
-  'entities.abilities.swipe.description': 'Svep mot närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
+  'entities.abilities.swipe.description':
+    'Svep mot närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.name': 'Svepande klor',
   'entities.abilities.tame_beast.description':
     'Börjar tämja en best till din följeslagare. Den måste vara på din nivå eller lägre och inte en elit. Ditt djur följer dig, anfaller dina fiender och håller eget hot. Du kan ha ett djur åt gången.',
@@ -1702,11 +2073,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Hånar målet: ditt hot stiger till nivå med dess mest hatade fiende och det tvingas anfalla dig i 3 sek.',
   'entities.abilities.taunt.name': 'Egga',
-  'entities.abilities.thorns.description': 'Törnen skjuter ut ur målet: närstridsanfallare tar {buff} naturskada.',
+  'entities.abilities.thorns.description':
+    'Törnen skjuter ut ur målet: närstridsanfallare tar {buff} naturskada.',
   'entities.abilities.thorns.name': 'Törnvärn',
-  'entities.abilities.thunder_clap.description': 'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
+  'entities.abilities.thunder_clap.description':
+    'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Skälvande slag',
-  'entities.abilities.tigers_fury.description': 'Ökar attackstyrkan med 40 i 6 sek. Endast vargform.',
+  'entities.abilities.tigers_fury.description':
+    'Ökar attackstyrkan med 40 i 6 sek. Endast vargform.',
   'entities.abilities.tigers_fury.name': 'Vargblod',
   'entities.abilities.travel_form.description':
     'Skiftar omedelbart till en snabb Fleetform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt.',
@@ -1714,34 +2088,47 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vanish.description':
     'Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek.',
   'entities.abilities.vanish.name': 'Rökssteg',
-  'entities.abilities.whirlwind.description': 'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',
+  'entities.abilities.whirlwind.description':
+    'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',
   'entities.abilities.whirlwind.name': 'Klingvirvel',
-  'entities.abilities.wing_clip.description': 'Tillfogar ett sår för {damage} skada och saktar ner fienden med 40 % i 10 sek.',
+  'entities.abilities.wing_clip.description':
+    'Tillfogar ett sår för {damage} skada och saktar ner fienden med 40 % i 10 sek.',
   'entities.abilities.wing_clip.name': 'Fjättrande hugg',
   'entities.abilities.wrath.description': 'Slungar en pil av naturenergi för {damage} naturskada.',
   'entities.abilities.wrath.name': 'Vildbult',
+  'entities.abilities.aura_surge.name': 'Gryningsrikoschett',
+  'entities.abilities.aura_surge.description':
+    'Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till {jumps} ytterligare fiender inom {radius} meter för {falloff} skada per studs. (Paladintalang)',
   'entities.abilities.holy_shock.name': 'Helig chock',
-  'entities.abilities.holy_shock.description': 'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
+  'entities.abilities.holy_shock.description':
+    'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
   'entities.abilities.holy_shield.name': 'Helig sköld',
   'entities.abilities.holy_shield.description':
     'Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)',
   'entities.abilities.bestial_wrath.name': 'Bestialisk vrede',
-  'entities.abilities.bestial_wrath.description': 'Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)',
+  'entities.abilities.bestial_wrath.description':
+    'Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)',
   'entities.abilities.trueshot_aura.name': 'Träffsäkerhetsaura',
-  'entities.abilities.trueshot_aura.description': 'Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)',
+  'entities.abilities.trueshot_aura.description':
+    'Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)',
   'entities.abilities.wyvern_sting.name': 'Wyvernsting',
   'entities.abilities.wyvern_sting.description':
     'Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)',
   'entities.abilities.arcane_power.name': 'Arkan kraft',
-  'entities.abilities.arcane_power.description': 'Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)',
+  'entities.abilities.arcane_power.description':
+    'Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)',
   'entities.abilities.combustion.name': 'Förbränning',
-  'entities.abilities.combustion.description': 'Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)',
+  'entities.abilities.combustion.description':
+    'Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)',
   'entities.abilities.icy_veins.name': 'Isiga Ådror',
-  'entities.abilities.icy_veins.description': 'Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)',
+  'entities.abilities.icy_veins.description':
+    'Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)',
   'entities.abilities.cold_blood.name': 'Kallt blod',
-  'entities.abilities.cold_blood.description': 'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
+  'entities.abilities.cold_blood.description':
+    'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
   'entities.abilities.blade_flurry.name': 'Klingflod',
-  'entities.abilities.blade_flurry.description': 'Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)',
+  'entities.abilities.blade_flurry.description':
+    'Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)',
   'entities.abilities.hemorrhage.name': 'Blödning',
   'entities.abilities.hemorrhage.description':
     'Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)',
@@ -1755,7 +2142,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowform.description':
     'Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)',
   'entities.abilities.elemental_mastery.name': 'Elementär mästerskap',
-  'entities.abilities.elemental_mastery.description': 'Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)',
+  'entities.abilities.elemental_mastery.description':
+    'Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)',
   'entities.abilities.siphon_life.name': 'Livssifon',
   'entities.abilities.siphon_life.description':
     'Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)',
@@ -1766,28 +2154,34 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.description':
     'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
   'entities.abilities.feral_charge.name': 'Vild rusning',
-  'entities.abilities.feral_charge.description': 'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
+  'entities.abilities.feral_charge.description':
+    'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
   'entities.abilities.swiftmend.name': 'Snabb läkning',
   'entities.abilities.swiftmend.description':
     'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)',
   'entities.abilities.crusader_strike.name': 'Korsfararslag',
-  'entities.abilities.crusader_strike.description': 'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
+  'entities.abilities.crusader_strike.description':
+    'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
   'entities.abilities.metamorphosis.name': 'Metamorfos',
-  'entities.abilities.metamorphosis.description': 'Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)',
+  'entities.abilities.metamorphosis.description':
+    'Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)',
   'entities.delves.collapsed_reliquary.enterText': 'Du stiger ner i det rasade relikvariet.',
-  'entities.delves.collapsed_reliquary.leaveText': 'Du klättrar tillbaka till broder Halven vid relikvarieruinen.',
+  'entities.delves.collapsed_reliquary.leaveText':
+    'Du klättrar tillbaka till broder Halven vid relikvarieruinen.',
   'entities.delves.collapsed_reliquary.name': 'Det rasade relikvariet',
   'entities.dungeons.drowned_temple.enterText':
     'Du kliver genom månporten, luften förvandlas till kallt vatten och blekt ljus, och sången sluter sig över ditt huvud.',
   'entities.dungeons.drowned_temple.leaveText': 'Du bryter ytan genom månporten ut i bergsnatten.',
   'entities.dungeons.drowned_temple.name': 'Det dränkta templet',
-  'entities.dungeons.gravewyrm_sanctum.enterText': 'Luften blir kall. Något väldigt andas där nere ...',
+  'entities.dungeons.gravewyrm_sanctum.enterText':
+    'Luften blir kall. Något väldigt andas där nere ...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': 'Du raglar tillbaka ut i bergsvinden.',
   'entities.dungeons.gravewyrm_sanctum.name': 'Gravlindormens helgedom',
   'entities.dungeons.hollow_crypt.enterText': 'Du stiger ner i Den ihåliga kryptan ...',
   'entities.dungeons.hollow_crypt.leaveText': 'Du klättrar tillbaka upp i dagsljuset.',
   'entities.dungeons.hollow_crypt.name': 'Den ihåliga kryptan',
-  'entities.dungeons.nythraxis_boss_arena.enterText': 'Du passerar genom den förseglade kungliga dörren.',
+  'entities.dungeons.nythraxis_boss_arena.enterText':
+    'Du passerar genom den förseglade kungliga dörren.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': 'Du återvänder till Törntopps kalla luft.',
   'entities.dungeons.nythraxis_boss_arena.name': 'Nythraxis raidarena',
   'entities.dungeons.nythraxis_crypt.enterText': 'Du korsar tröskeln till Den övergivna kryptan.',
@@ -1814,6 +2208,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.bogiron_mace.name': 'Kärrjärnsspira',
   'entities.items.bogiron_nugget.name': 'Kärrjärnsklimp',
   'entities.items.bone_fragments.name': 'Benfragment',
+  'entities.items.arcane_dust.name': 'Arkanstoft',
+  'entities.items.arcane_essence.name': 'Arkanessens',
+  'entities.items.arcane_shard.name': 'Arkanskärva',
   'entities.items.boneguard_breastplate.name': 'Benväktarens bröstplåt',
   'entities.items.boneplate_vest.name': 'Benplåtsväst',
   'entities.items.boundstone_girdle.name': 'Bundstensgördel',
@@ -1847,7 +2244,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.crimson_amber_armor_plate.name': 'Karmosinbärnsten',
   'entities.items.crossroads_saber.name': 'Vägskälssabel',
   'entities.items.crownforged_dreadhelm.name': 'Bonewrought skräckhjälm',
+  'entities.items.crownforged_dreadhelm_heroic.name': 'Bonewrought skräckhjälm',
   'entities.items.crownforged_warspaulders.name': 'Bonewrought krigsskuldror',
+  'entities.items.crownforged_warspaulders_heroic.name': 'Bonewrought krigsskuldror',
   'entities.items.crypt_keystone.name': 'Kryptans slutsten',
   'entities.items.crypt_ritual_circle.name': 'Ritualcirkel',
   'entities.items.cryptbone_greaves.name': 'Kryptbensbenskenor',
@@ -1860,6 +2259,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.deacon_reliquary_helm.name': 'Diakonens relikhjälm',
   'entities.items.deacons_cleaver.name': 'Diakonens klyvare',
   'entities.items.deathless_heartwood.name': 'Kärnved från den odödliga kronan',
+  'entities.items.deathless_heartwood_heroic.name': 'Kärnved från den odödliga kronan',
   'entities.items.deathlord_legguards.name': 'Barrowlords benskydd',
   'entities.items.deathlord_sabatons.name': 'Barrowlords sabatoner',
   'entities.items.deathlord_warplate.name': 'Barrowlords krigsplåt',
@@ -1880,7 +2280,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.drownstep_slippers.name': 'Dränkstegstofflor',
   'entities.items.drownstep_treads.name': 'Dränkstegsskor',
   'entities.items.eastbrook_arming_sword.name': 'Östbäcks väpnarsvärd',
+  'entities.items.eastbrook_buckler.name': 'Östbäcks rundsköld',
   'entities.items.eastbrook_chain_vest.name': 'Östbäcks ringbrynjeväst',
+  'entities.items.eastbrook_greatsword.name': 'Östbäcks storsvärd',
   'entities.items.eastbrook_wool_trousers.name': 'Östbäcks ullbyxor',
   'entities.items.eelscale_leggings.name': 'Ålfjällsbyxor',
   'entities.items.eelscale_treads.name': 'Ålfjällsskor',
@@ -1933,7 +2335,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.healing_potion.name': 'Läkedryck',
   'entities.items.hickory_shortstaff.name': 'Hickory-kortstav',
   'entities.items.highwatch_breastplate.name': 'Högvakts bröstharnesk',
+  'entities.items.highwatch_greatsword.name': 'Högvakts storsvärd',
   'entities.items.highwatch_summons.name': 'Högvakts kallelse',
+  'entities.items.highwatch_wallshield.name': 'Högvakts mursköld',
   'entities.items.highwatch_warblade.name': 'Högvakts krigsklinga',
   'entities.items.hobnail_boots.name': 'Spikbeslagna stövlar',
   'entities.items.hollow_vigil_staff.name': 'Stav från den ihåliga vakan',
@@ -1950,6 +2354,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.keen_dirk.name': 'Vass dolk',
   'entities.items.kings_signet.name': 'Kungens signetring',
   'entities.items.kingsbane_last_oath.name': 'Tronbane, Törntoppens sista ed',
+  'entities.items.kingsbane_last_oath_heroic.name': 'Tronbane, Törntoppens sista ed',
   'entities.items.knight_commanders_greaves.name': 'Riddarkommendörens benskenor',
   'entities.items.korgaths_chainwraps.name': 'Korgaths ringbrynjelindor',
   'entities.items.lesser_healing_potion.name': 'Mindre läkedryck',
@@ -2019,7 +2424,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.nhalias_dirgeblade.name': 'Nhalias sorgeklinga',
   'entities.items.nhalias_funeral_wraps.name': 'Nhalias begravningslindor',
   'entities.items.nighttalon_crown.name': 'Direfang-krona',
+  'entities.items.nighttalon_crown_heroic.name': 'Direfang-krona',
   'entities.items.nighttalon_shoulderguards.name': 'Direfang-axelskydd',
+  'entities.items.nighttalon_shoulderguards_heroic.name': 'Direfang-axelskydd',
   'entities.items.nightwalk_jerkin.name': 'Nattvandrarväst',
   'entities.items.oathbound_greaves.name': 'Edbundna benskenor',
   'entities.items.ogre_bonecharm_staff.name': 'Ogerns benamulettstav',
@@ -2090,7 +2497,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.soggy_boot.name': 'Genomblöt stövel',
   'entities.items.soggy_moccasin.name': 'Genomblöt mockasin',
   'entities.items.soulflame_cowl.name': 'Wraithfire-huva',
+  'entities.items.soulflame_cowl_heroic.name': 'Wraithfire-huva',
   'entities.items.soulflame_mantle.name': 'Wraithfire-mantel',
+  'entities.items.soulflame_mantle_heroic.name': 'Wraithfire-mantel',
   'entities.items.spider_leg.name': 'Ryckande spindelben',
   'entities.items.spring_water.name': 'Kallt brunnsvatten',
   'entities.items.staff_of_drowned_prayers.name': 'De dränkta bönernas stav',
@@ -2101,6 +2510,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.steel_orange_armor_plate.name': 'Stålorange',
   'entities.items.storm_core.name': 'Stormkärna',
   'entities.items.stormcallers_crown.name': 'Galecall-krona',
+  'entities.items.stormcallers_crown_heroic.name': 'Galecall-krona',
   'entities.items.crownforged_gauntlets.name': 'Kronsmidda handskar',
   'entities.items.nighttalon_grips.name': 'Nattklogrepp',
   'entities.items.soulflame_gloves.name': 'Själslågshandskar',
@@ -2110,6 +2520,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Själslågssnöre',
   'entities.items.stormcallers_waistguard.name': 'Stormkallarens midjeskydd',
   'entities.items.stormcallers_spaulders.name': 'Galecall-axelskydd',
+  'entities.items.stormcallers_spaulders_heroic.name': 'Galecall-axelskydd',
+  'entities.items.bonewrought_greatsword.name': 'Bonewrought storsvärd',
+  'entities.items.direfang_greatblade.name': 'Direfang-storklinga',
+  'entities.items.bonewrought_bulwark.name': 'Bonewrought bålverk',
+  'entities.items.wraithfire_orb.name': 'Wraithfire-sfär',
   'entities.items.stormshard_leggings.name': 'Stormskärvebenkläder',
   'entities.items.sturdy_belt.name': 'Stadigt resenärsbälte',
   'entities.items.supply_crate.name': 'Stulen förrådslåda',
@@ -2159,33 +2574,43 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira a närliggande allierade con fuerza salvaje, aumentando attackkraft durante 5 min. (jägartalang)',
   'entities.abilities.avatar.name': 'Koloss',
-  'entities.abilities.avatar.description': 'Te transforma en un coloso y aumenta attackkraft durante 20 sek. (krigartalang)',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta attackkraft durante 20 sek. (krigartalang)',
   'entities.abilities.avenging_wrath.name': 'Hämndvinge',
-  'entities.abilities.avenging_wrath.description': 'Invoca poder vengador y aumenta attackkraft y besvärjelsekraft durante 20 sek. (paladintalang)',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta attackkraft y besvärjelsekraft durante 20 sek. (paladintalang)',
   'entities.abilities.berserk.name': 'Röd dimma',
   'entities.abilities.berserk.description': 'Aumenta attackkraft durante 15 sek. (druidtalang)',
   'entities.abilities.bladestorm.name': 'Stålcyklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a närliggande fiender cada segundo por {damage}. (krigartalang)',
   'entities.abilities.blink.name': 'Flimmersteg',
-  'entities.abilities.blink.description': 'Te teletransporta 15 m hacia delante y rompe raíces. (magikertalang)',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (magikertalang)',
   'entities.abilities.bloodlust.name': 'Krigstrummor',
   'entities.abilities.bloodlust.description':
     'Lleva a närliggande allierade al frenesí y aumenta su velocidad de ataque durante 15 sek. (shamantalang)',
   'entities.abilities.chain_lightning.name': 'Gaffelblixt',
-  'entities.abilities.chain_lightning.description': 'Lanza relámpagos al área objetivo e inflige {damage} de daño a närliggande fiender. (shamantalang)',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a närliggande fiender. (shamantalang)',
   'entities.abilities.chaos_bolt.name': 'Fördärvsbult',
-  'entities.abilities.chaos_bolt.description': 'Lanza una descarga de fuego caótico que inflige {damage} de daño de Eld. (häxmästartalang)',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Eld. (häxmästartalang)',
   'entities.abilities.cloak_of_shadows.name': 'Skuggmantel',
-  'entities.abilities.cloak_of_shadows.description': 'Te envuelve en sombras y absorbe daño durante 5 sek. (skurk talang)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 sek. (skurk talang)',
   'entities.abilities.cone_of_cold.name': 'Frostsvep',
-  'entities.abilities.cone_of_cold.description': 'Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)',
   'entities.abilities.counter_shot.name': 'Tystande skott',
-  'entities.abilities.counter_shot.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (jägartalang)',
+  'entities.abilities.counter_shot.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (jägartalang)',
   'entities.abilities.counterspell.name': 'Trollbrott',
-  'entities.abilities.counterspell.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 6 sek. (magikertalang)',
+  'entities.abilities.counterspell.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 6 sek. (magikertalang)',
   'entities.abilities.curse_of_exhaustion.name': 'Blytung förbannelse',
-  'entities.abilities.curse_of_exhaustion.description': 'Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (häxmästartalang)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (häxmästartalang)',
   'entities.abilities.death_coil.name': 'Gravspiral',
   'entities.abilities.death_coil.description':
     'Golpea a målet por {damage} de daño de Skugga y luego lo aterroriza durante 3 sek. Esta versión no sana al lanzador. (häxmästartalang)',
@@ -2193,19 +2618,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalang)',
   'entities.abilities.desperate_prayer.name': 'Sista bön',
-  'entities.abilities.desperate_prayer.description': 'Te sana al instante por {damage}. (prästtalang)',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (prästtalang)',
   'entities.abilities.deterrence.name': 'Borstvakt',
-  'entities.abilities.deterrence.description': 'Aumenta tu undvikelschans un 50% durante 10 sek. (jägartalang)',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu undvikelschans un 50% durante 10 sek. (jägartalang)',
   'entities.abilities.divine_shield.name': 'Ljusvärn',
-  'entities.abilities.divine_shield.description': 'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalang)',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalang)',
   'entities.abilities.earthbind.name': 'Gripande jord',
-  'entities.abilities.earthbind.description': 'Ata a la tierra a närliggande fiender y los inmoviliza durante 2 sek. (shamantalang)',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a närliggande fiender y los inmoviliza durante 2 sek. (shamantalang)',
   'entities.abilities.evocation.name': 'Eterbrunn',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
   'entities.abilities.frenzied_regeneration.name': 'Vild läkning',
-  'entities.abilities.frenzied_regeneration.description': 'Regenera salud durante 10 sek. Solo en Forma de oso. (druidtalang)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 sek. Solo en Forma de oso. (druidtalang)',
   'entities.abilities.frost_trap.name': 'Rimfälla',
-  'entities.abilities.frost_trap.description': 'Congela a los fiender en el área objetivo durante 3 sek. (jägartalang)',
+  'entities.abilities.frost_trap.description':
+    'Congela a los fiender en el área objetivo durante 3 sek. (jägartalang)',
   'entities.abilities.ghostly_strike.name': 'Vålnadsslag',
   'entities.abilities.ghostly_strike.description':
     'Golpea a målet por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (skurk talang)',
@@ -2213,26 +2644,35 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Helig. Solo se usa por debajo del 20% de salud. (paladintalang)',
   'entities.abilities.healing_stream.name': 'Källbrunn',
-  'entities.abilities.healing_stream.description': 'Restaura a vänligt mål durante 12 sek. (shamantalang)',
+  'entities.abilities.healing_stream.description':
+    'Restaura a vänligt mål durante 12 sek. (shamantalang)',
   'entities.abilities.heroic_leap.name': 'Krigssprång',
-  'entities.abilities.heroic_leap.description': 'Saltas al área objetivo e infliges {damage} de daño Fysisk a närliggande fiender. (krigartalang)',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Fysisk a närliggande fiender. (krigartalang)',
   'entities.abilities.holy_wrath.name': 'Helgonvrede',
-  'entities.abilities.holy_wrath.description': 'Desata poder sagrado e inflige {damage} de daño a närliggande fiender. (paladintalang)',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a närliggande fiender. (paladintalang)',
   'entities.abilities.howl_of_terror.name': 'Skräckyl',
-  'entities.abilities.howl_of_terror.description': 'Aterroriza a närliggande fiender hasta 3 sek. El daño puede romper el efecto. (häxmästartalang)',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a närliggande fiender hasta 3 sek. El daño puede romper el efecto. (häxmästartalang)',
   'entities.abilities.ice_block.name': 'Kall kista',
-  'entities.abilities.ice_block.description': 'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)',
   'entities.abilities.inner_focus.name': 'Stillat sinne',
-  'entities.abilities.inner_focus.description': 'Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (prästtalang)',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (prästtalang)',
   'entities.abilities.innervate.name': 'Livssav',
   'entities.abilities.innervate.description':
     'Levande sav väller upp i dig i 10 sek och återställer 20 av din nuvarande resurs i vågor: mana, raseri eller energi; att byta form avbryter den inte. (Druidtalang)',
   'entities.abilities.kick.name': 'Spark',
-  'entities.abilities.kick.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (skurk talang)',
+  'entities.abilities.kick.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (skurk talang)',
   'entities.abilities.last_stand.name': 'Elfte timmen',
-  'entities.abilities.last_stand.description': 'Aumenta temporalmente Uthållighet durante 15 sek, aumentando la salud máxima. (krigartalang)',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Uthållighet durante 15 sek, aumentando la salud máxima. (krigartalang)',
   'entities.abilities.mend_pet.name': 'Lappa ihop',
-  'entities.abilities.mend_pet.description': 'Sana a vänligt mål por {damage} durante 15 sek. (jägartalang)',
+  'entities.abilities.mend_pet.description':
+    'Sana a vänligt mål por {damage} durante 15 sek. (jägartalang)',
   'entities.abilities.meteor.name': 'Himmelsten',
   'entities.abilities.meteor.description':
     'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Eld y quema el suelo. (magikertalang)',
@@ -2240,34 +2680,46 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Canaliza energía de Skugga en el área objetivo e inflige {damage} cada segundo a närliggande fiender. (prästtalang)',
   'entities.abilities.multi_shot.name': 'Splitterskott',
-  'entities.abilities.multi_shot.description': 'Dispara varios proyectiles e inflige {damage} a närliggande fiender. (jägartalang)',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a närliggande fiender. (jägartalang)',
   'entities.abilities.prayer_of_healing.name': 'Körläkning',
-  'entities.abilities.prayer_of_healing.description': 'Sana a närliggande allierade por {damage}. (prästtalang)',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a närliggande allierade por {damage}. (prästtalang)',
   'entities.abilities.preparation.name': 'Reservplan',
-  'entities.abilities.preparation.description': 'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (skurk talang)',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (skurk talang)',
   'entities.abilities.presence_of_mind.name': 'Rusande sinne',
-  'entities.abilities.presence_of_mind.description': 'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)',
   'entities.abilities.psychic_scream.name': 'Psykiskt skrik',
-  'entities.abilities.psychic_scream.description': 'Aterroriza a närliggande fiender hasta 4 sek. El daño puede romper el efecto. (prästtalang)',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a närliggande fiender hasta 4 sek. El daño puede romper el efecto. (prästtalang)',
   'entities.abilities.pummel.name': 'Mörbulta',
-  'entities.abilities.pummel.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (krigartalang)',
+  'entities.abilities.pummel.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (krigartalang)',
   'entities.abilities.rallying_cry.name': 'Mönstring',
   'entities.abilities.rallying_cry.description':
     'Lanza un grito de reunión y aumenta attackkraft de närliggande allierade durante 10 sek. (krigartalang)',
   'entities.abilities.rebuke.name': 'Tillrättavisning',
-  'entities.abilities.rebuke.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (paladintalang)',
+  'entities.abilities.rebuke.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (paladintalang)',
   'entities.abilities.shadowstep.name': 'Skuggkliv',
-  'entities.abilities.shadowstep.description': 'Das un paso entre las sombras hacia tu målet. (skurk talang)',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu målet. (skurk talang)',
   'entities.abilities.shield_wall.name': 'Bålverk',
-  'entities.abilities.shield_wall.description': 'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigartalang)',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigartalang)',
   'entities.abilities.silence.name': 'Tystnad',
   'entities.abilities.silence.description': 'Silencia a målet durante 4 sek. (prästtalang)',
   'entities.abilities.skull_bash.name': 'Skallskall',
-  'entities.abilities.skull_bash.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (druidtalang)',
+  'entities.abilities.skull_bash.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (druidtalang)',
   'entities.abilities.spell_lock.name': 'Munkavleorder',
-  'entities.abilities.spell_lock.description': 'Avbryter kastandet och hindrar besvärjelser av den skolan i 5 sek. (häxmästartalang)',
+  'entities.abilities.spell_lock.description':
+    'Avbryter kastandet och hindrar besvärjelser av den skolan i 5 sek. (häxmästartalang)',
   'entities.abilities.tranquility.name': 'Gläntsång',
-  'entities.abilities.tranquility.description': 'Canaliza energía restauradora y sana a närliggande allierade cada segundo. (druidtalang)',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a närliggande allierade cada segundo. (druidtalang)',
   'entities.items.worn_sword.name': 'Frätt kortsvärd',
   'entities.items.woven_robe.name': 'Dalvävd robe',
   'entities.items.wyrmcult_grand_robe.name': 'Lindormskultens praktrobe',
@@ -2380,16 +2832,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wyrmcult_necromancer.name': 'Lindormskultsnekromantiker',
   'entities.mobs.wyrmcult_zealot.name': 'Lindormskultsfanatiker',
   'entities.mobs.ysolei.name': 'Ysolei, den dränkta månens avatar',
-  'entities.npcs.apothecary_lin.greeting': 'Se dig för var du sätter foten i de östra skogarna, vän.',
+  'entities.npcs.apothecary_lin.greeting':
+    'Se dig för var du sätter foten i de östra skogarna, vän.',
   'entities.npcs.apothecary_lin.name': 'Apotekare Lin',
   'entities.npcs.apothecary_lin.title': 'Örtkännare',
-  'entities.npcs.armorer_hode.greeting': 'Smedjan är het och slipstenen snurrar. Om det skär så säljer jag det.',
+  'entities.npcs.armorer_hode.greeting':
+    'Smedjan är het och slipstenen snurrar. Om det skär så säljer jag det.',
   'entities.npcs.armorer_hode.name': 'Rustningssmed Hode',
   'entities.npcs.armorer_hode.title': 'Mästerrustningssmed',
-  'entities.npcs.brother_aldric.greeting': 'Ljuset bevare dig. Till och med de döda finner ingen ro här på sistone.',
+  'entities.npcs.brother_aldric.greeting':
+    'Ljuset bevare dig. Till och med de döda finner ingen ro här på sistone.',
   'entities.npcs.brother_aldric.name': 'Broder Aldric',
   'entities.npcs.brother_aldric.title': 'Dalens präst',
-  'entities.npcs.brother_aldric_fen.greeting': 'Ljuset hålle dig ovan vattnet, {playerName}. De döda i detta kärr sover inte - de vadar.',
+  'entities.npcs.brother_aldric_fen.greeting':
+    'Ljuset hålle dig ovan vattnet, {playerName}. De döda i detta kärr sover inte - de vadar.',
   'entities.npcs.brother_aldric_fen.name': 'Broder Aldric',
   'entities.npcs.brother_aldric_fen.title': 'Dalens präst',
   'entities.npcs.brother_aldric_highwatch.greeting':
@@ -2403,29 +2859,36 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.brother_halven.greeting': 'Relikvariet där nere har förskjutits igen.',
   'entities.npcs.brother_halven.name': 'Broder Halven',
   'entities.npcs.brother_halven.title': 'Relikvarievaktare',
-  'entities.npcs.captain_thessaly.greeting': 'Tvåhundra år har denna mur hållit, {className}. Den ska inte brista på min vakt - men den knakar.',
+  'entities.npcs.captain_thessaly.greeting':
+    'Tvåhundra år har denna mur hållit, {className}. Den ska inte brista på min vakt - men den knakar.',
   'entities.npcs.captain_thessaly.name': 'Kapten Thessaly',
   'entities.npcs.captain_thessaly.title': 'Högvaktens kapten',
-  'entities.npcs.fisherman_brandt.greeting': 'Blrb-glub- ursäkta, har lyssnat på de där fiskmännen för länge.',
+  'entities.npcs.fisherman_brandt.greeting':
+    'Blrb-glub- ursäkta, har lyssnat på de där fiskmännen för länge.',
   'entities.npcs.fisherman_brandt.name': 'Fiskare Brandt',
   'entities.npcs.fisherman_brandt.title': 'Gammal sjöbjörn',
-  'entities.npcs.foreman_odell.greeting': 'Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!',
+  'entities.npcs.foreman_odell.greeting':
+    'Hela utgrävningen kryllar av de där lerinkrustade skadedjuren!',
   'entities.npcs.foreman_odell.name': 'Förman Odell',
   'entities.npcs.foreman_odell.title': 'Gruvförman',
-  'entities.npcs.herbalist_yara.greeting': 'Akta dig för snåret väster om vägen. Spindelväven är tjock som segelduk den här årstiden.',
+  'entities.npcs.herbalist_yara.greeting':
+    'Akta dig för snåret väster om vägen. Spindelväven är tjock som segelduk den här årstiden.',
   'entities.npcs.herbalist_yara.name': 'Örtkännare Yara',
   'entities.npcs.herbalist_yara.title': 'Örtkännare',
   'entities.npcs.loremaster_caddis.greeting':
     'Akta den lösa skiffern, {className}. Berget har varit... rastlöst på sistone. Jag ämnar ta reda på varför.',
   'entities.npcs.loremaster_caddis.name': 'Läromästare Caddis',
   'entities.npcs.loremaster_caddis.title': 'Läromästare',
-  'entities.npcs.marshal_redbrook.greeting': 'Håll ditt svärd nära, {className}. Dalen är inte vad den en gång var.',
+  'entities.npcs.marshal_redbrook.greeting':
+    'Håll ditt svärd nära, {className}. Dalen är inte vad den en gång var.',
   'entities.npcs.marshal_redbrook.name': 'Marskalk Redbrook',
   'entities.npcs.marshal_redbrook.title': 'Stadsmarskalk',
-  'entities.npcs.provisioner_hale.greeting': 'Torra stövlar, torrt bröd, torrt krut - vid Kärrbron får du två av tre en bra dag.',
+  'entities.npcs.provisioner_hale.greeting':
+    'Torra stövlar, torrt bröd, torrt krut - vid Kärrbron får du två av tre en bra dag.',
   'entities.npcs.provisioner_hale.name': 'Proviantmästare Hale',
   'entities.npcs.provisioner_hale.title': 'Proviantmästare',
-  'entities.npcs.quartermaster_bree.greeting': 'Ull, skeppsskorpor och stålskodda stövlar - Högvakten går på alla tre, och jag har brist på allt.',
+  'entities.npcs.quartermaster_bree.greeting':
+    'Ull, skeppsskorpor och stålskodda stövlar - Högvakten går på alla tre, och jag har brist på allt.',
   'entities.npcs.quartermaster_bree.name': 'Kvartersmästare Bree',
   'entities.npcs.quartermaster_bree.title': 'Högvaktens kvartersmästare',
   'entities.npcs.scout_maren.greeting':
@@ -2436,7 +2899,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Jag spårade kultister genom kärret vid din sida, och spåret ledde hit. Topparna är värre, {className}. Var på din vakt.',
   'entities.npcs.scout_maren_highwatch.name': 'Spejare Maren',
   'entities.npcs.scout_maren_highwatch.title': 'Marskalkens spejare',
-  'entities.npcs.smith_haldren.greeting': 'Akta gnistorna, {className}. Gott stål är skillnaden mellan ett ärr och en grav.',
+  'entities.npcs.smith_haldren.greeting':
+    'Akta gnistorna, {className}. Gott stål är skillnaden mellan ett ärr och en grav.',
   'entities.npcs.smith_haldren.name': 'Smed Haldren',
   'entities.npcs.smith_haldren.title': 'Rustnings- och vapensmed',
   'entities.npcs.the_merchant.greeting':
@@ -2447,10 +2911,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tjärnen dricker månljuset, {className}, och ger tillbaka de drunknade. Jag har vaktat den porten i trettio nätter - och i natt står den öppen.',
   'entities.npcs.tidewatcher_ondrel.name': 'Ondrel Vane',
   'entities.npcs.tidewatcher_ondrel.title': 'Tidvattenväktare',
-  'entities.npcs.trader_wilkes.greeting': 'Färskt bröd, rent vatten, rättvisa priser. Vad kan jag erbjuda dig?',
+  'entities.npcs.trader_wilkes.greeting':
+    'Färskt bröd, rent vatten, rättvisa priser. Vad kan jag erbjuda dig?',
   'entities.npcs.trader_wilkes.name': 'Handlaren Wilkes',
   'entities.npcs.trader_wilkes.title': 'Proviantör',
-  'entities.npcs.warden_fenwick.greeting': 'Stanna vid porten, {className}. Bortom de där vassen sköter kärret dödandet åt oss.',
+  'entities.npcs.warden_fenwick.greeting':
+    'Stanna vid porten, {className}. Bortom de där vassen sköter kärret dödandet åt oss.',
   'entities.npcs.warden_fenwick.name': 'Väktaren Fenwick',
   'entities.npcs.warden_fenwick.title': 'Väktare av Fenbridge',
   'entities.quests.q_aldrics_fallen_star.completion':
@@ -2459,22 +2925,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_aldrics_fallen_star.text':
     'Jag såg en sten falla ur den västra himlen, {playerName}. Den slog ner i kärrmuren och brast som en smedja, långt bortom änkesnåret. Gå västerut, finn det som överlevde explosionen, och hämta mig allt som inte hör till denna värld.',
   'entities.quests.q_aldrics_fallen_star.title': 'Aldrics fallna stjärna',
-  'entities.quests.q_bandits.completion': 'Tio knivar färre i mörkret. Ta detta - du har förtjänat det.',
+  'entities.quests.q_bandits.completion':
+    'Tio knivar färre i mörkret. Ta detta - du har förtjänat det.',
   'entities.quests.q_bandits.objectives.0.label': 'Dalbandit dräpt',
   'entities.quests.q_bandits.text':
     'En flock banditer har slagit läger i de sydvästra kullarna. De har rånat tre vagnar denna vecka. Driv ut dem - dräp 10 Dalbanditer.',
   'entities.quests.q_bandits.title': 'Dalens banditer',
-  'entities.quests.q_bastion_door.completion': 'Skyddsväven brister som ruttet rep. Dörren står öppen... och mörkret där nere lyssnar.',
+  'entities.quests.q_bastion_door.completion':
+    'Skyddsväven brister som ruttet rep. Dörren står öppen... och mörkret där nere lyssnar.',
   'entities.quests.q_bastion_door.objectives.0.label': 'Bastionens skyddssten',
   'entities.quests.q_bastion_door.text':
     'Den sjunkna bastionen - en riddarborg som drunknade i kärret för ett sekel sedan - är dit Voss brev pekar, och där denne Fogbinder sjunger sina drunkningshymner. Kulten har skyddat dörren med gravstenar. Hämta mig en av skyddsstenarna, {playerName}, så ska jag lösa upp förseglingen.',
   'entities.quests.q_bastion_door.title': 'Den sjunkna bastionen',
-  'entities.quests.q_boars.completion': 'Ah, fina borstiga skinn! Dessa kommer att inbringa ett bra pris.',
+  'entities.quests.q_boars.completion':
+    'Ah, fina borstiga skinn! Dessa kommer att inbringa ett bra pris.',
   'entities.quests.q_boars.objectives.0.label': 'Borstigt vildsvinsskinn',
   'entities.quests.q_boars.text':
     'Vildsvinsskinn ger de bästa färdväskorna, och ängarna väster om staden kryllar av bestarna. Hämta mig 5 Borstiga vildsvinsskinn så ska jag göra det värt din tid.',
   'entities.quests.q_boars.title': 'Borstiga vildsvinsskinn',
-  'entities.quests.q_bones.completion': 'Må de vila nu, och må Ljuset förlåta vad som än väckte dem.',
+  'entities.quests.q_bones.completion':
+    'Må de vila nu, och må Ljuset förlåta vad som än väckte dem.',
   'entities.quests.q_bones.objectives.0.label': 'Rastlösa ben lagda till ro',
   'entities.quests.q_bones.text':
     'Den gamla ruinen på den nordvästra kullen var en gång ett kapell, och dess gård en viloplats. Något har stört de döda ur deras sömn. Skänk dem frid, {playerName} - återlämna 8 Rastlösa ben till jorden.',
@@ -2485,18 +2955,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_breaking_the_seal.text':
     'Förseglingen på helgedomen smiddes med bergseld, och endast bergseld låter oss passera utan att slita upp den på vid gavel. Stormklippselementarerna bär glöd av den första smidningen i sina kärnor. Hämta mig fem Välsignade glöd, {playerName} - för om kulten öppnar den porten först, kommer de inte att vara försiktiga, och Lindormen kommer inte att vakna milt.',
   'entities.quests.q_breaking_the_seal.title': 'Att bryta förseglingen',
-  'entities.quests.q_broodmother.completion': 'Död? Verkligen död? Då är snåret bara träd igen. Må Ljuset välsigna ditt blad, {playerName}.',
+  'entities.quests.q_broodmother.completion':
+    'Död? Verkligen död? Då är snåret bara träd igen. Må Ljuset välsigna ditt blad, {playerName}.',
   'entities.quests.q_broodmother.objectives.0.label': 'Dykärrsänka dräpt',
   'entities.quests.q_broodmother.objectives.1.label': 'Yngelmodern dräpt',
   'entities.quests.q_broodmother.text':
     'Du har sett spindelväven - fråga dig nu vad som spinner kablar tjocka som en mans handled. Väktarna kallar henne Yngelmodern, och hennes kull hänger över Änkesnåret som ett andra valv. Bränn dig igenom 8 änkor till och lägg den gamla modern död innan den kullen kläcks.',
   'entities.quests.q_broodmother.title': 'Yngelmodern',
-  'entities.quests.q_crushers.completion': 'Tio krossare fällda. Krigslägret är en kropp utan ryggrad - dags att ta huvudet.',
+  'entities.quests.q_crushers.completion':
+    'Tio krossare fällda. Krigslägret är en kropp utan ryggrad - dags att ta huvudet.',
   'entities.quests.q_crushers.objectives.0.label': 'Törntoppskrossare dräpt',
   'entities.quests.q_crushers.text':
     'Drogmars krigsläger ruvar i de östra klipporna, och hans krossare är ryggraden i det - var och en värd tre av mina soldater. Ta med dig följeslagare; detta är inget ärende för ett enda blad. Bryt tio krossare och krigsherrens uppbåd bryts med dem.',
   'entities.quests.q_crushers.title': 'Krossa krigslägret',
-  'entities.quests.q_cult_camp.completion': 'Tolv kåpor ansikten ner i gyttjan. Nu vet de att kärret vakar tillbaka.',
+  'entities.quests.q_cult_camp.completion':
+    'Tolv kåpor ansikten ner i gyttjan. Nu vet de att kärret vakar tillbaka.',
   'entities.quests.q_cult_camp.objectives.0.label': 'Gravkallarkultist dräpt',
   'entities.quests.q_cult_camp.text':
     'Där - norrut förbi den tredje sjön, där dimman aldrig lättar. Grå kåpor, grå baner: Gravkallare, lägrade i öppen dager som om de redan ägde kärret. De har slutat gömma sig, {playerName}, vilket betyder att de tror att de redan har vunnit. Bevisa att de har fel. Hugg ner 12 av deras kultister.',
@@ -2520,7 +2993,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_deepfen.text':
     'Djupkärrets Mudfiner höll sig till sina grundvatten i tjugo år. Nu svärmar de över östra stranden som flugor på ett kadaver - och mina väktare säger att de drar upp saker från sjöbotten. Vad det än är som har stört dem, så vill jag att det stoppas. Gallra ut 12 av huggarna.',
   'entities.quests.q_deepfen.title': 'Djupkärret rör sig',
-  'entities.quests.q_deepfen_purge.completion': 'Skoningslös och grundlig. Om detta träsk någonsin torkar ut väntar väktararbete på dig.',
+  'entities.quests.q_deepfen_purge.completion':
+    'Skoningslös och grundlig. Om detta träsk någonsin torkar ut väntar väktararbete på dig.',
   'entities.quests.q_deepfen_purge.objectives.0.label': 'Djupkärrshuggare dräpt',
   'entities.quests.q_deepfen_purge.text':
     'Aldric säger att de där avgudarna är kultmakade - vilket betyder att Mudfiner hissar upp kärrets gamla ondska en famn i taget. Jag tänker inte ha det sköljande upp på min vägbank. Gå tillbaka till grundvattnen och bryt muddringen för gott: 14 huggare till.',
@@ -2538,7 +3012,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Resenärer som drunknat på vägbanken vandrar ut ur sjöarna, {playerName} - fortfarande behängda med vassen de dog i. Detta är ingen rastlös hemsökelse. Drunkning lämnar inga märken; den gör lydiga lik. Någon fyller detta kärr som en tiondelåda. Återlämna 12 av de Drunknade döda till deras vila.',
   'entities.quests.q_drowned.title': 'De drunknade döda',
   'entities.quests.q_drowned_censers.completion':
-    'Som jag fruktade. Dessa rökelsekar brände gravaska, inte rökelse. Någon invigde det kapellet åt drunkningen - och riten är signerad \'Voss.\'',
+    "Som jag fruktade. Dessa rökelsekar brände gravaska, inte rökelse. Någon invigde det kapellet åt drunkningen - och riten är signerad 'Voss.'",
   'entities.quests.q_drowned_censers.objectives.0.label': 'Rostat rökelsekar',
   'entities.quests.q_drowned_censers.text':
     'Norr om änkesjön står ett kapell som drunknade med sin församling när kärret steg. De döda där bär rostiga rökelsekar - begravningskar, av det slag som svängs vid en Gravkallarrit. Samla 4 från kapellgården så ska jag läsa vilken rit som sjöngs över det vattnet.',
@@ -2556,7 +3030,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_moon.text':
     'Jag har läst det sista av avgnidningarna, {playerName}, och jag förstår nu vad kulten drunknade sig själva för att hålla sovande. Ysolei - den drunknade månen som blev kött - ringlar sig på altaret i templets hjärta, och den stulna värmen från varje liv som tjärnen tog strömmar in i hennes uppvaknande. När månen står full reser hon sig, och vattnet reser sig med henne - tjärnen, muren, hela berget under den. Samla de starkaste du kan finna och försätt henne i sömn igen. För gott, denna gång.',
   'entities.quests.q_drowned_moon.title': 'Den drunknade månen',
-  'entities.quests.q_elementals.completion': 'Fragmenten hummar som slagna klockor. Berget är inte vredgat, {playerName}... det blir stört.',
+  'entities.quests.q_elementals.completion':
+    'Fragmenten hummar som slagna klockor. Berget är inte vredgat, {playerName}... det blir stört.',
   'entities.quests.q_elementals.objectives.0.label': 'Stormklippselementar dräpt',
   'entities.quests.q_elementals.text':
     'Stormklippan har stått tyst i tusen år, och nu reser sig själva stenarna i den och vandrar. Elementarer vaknar inte bara, {playerName} - något under detta berg vänder sig i sin sömn. Lägg tolv av dem döda så att jag kan studera det som återstår.',
@@ -2571,7 +3046,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Aldrics sigill, är det? Då duger du. Kärret har slukat mina patruller hela, och jag behöver varje blad som flyter.',
   'entities.quests.q_fenbridge_muster.objectives.0.label': 'Fenbridges uppbådsorder',
   'entities.quests.q_fenbridge_muster.text':
-    'Morthens skrifter namngav en mästare i det norra kärret - en \'Fogbinder.\' Nu har Väktaren Fenwick blåst i uppbådshornet vid Fenbridge, och jag tror inte på sammanträffanden, {playerName}. Ta vägbanken norrut, dra uppbådsordern från portstolpen, och överlämna den till Väktaren.',
+    "Morthens skrifter namngav en mästare i det norra kärret - en 'Fogbinder.' Nu har Väktaren Fenwick blåst i uppbådshornet vid Fenbridge, och jag tror inte på sammanträffanden, {playerName}. Ta vägbanken norrut, dra uppbådsordern från portstolpen, och överlämna den till Väktaren.",
   'entities.quests.q_fenbridge_muster.title': 'Uppbåd vid Fenbridge',
   'entities.quests.q_glimmermere_light.completion':
     'En uppväckelsebön... till något de kallade den drunknade månen. Och under den, i en stadigare hand: "Den sover bara." Vattnet har lyssnat länge, {playerName}.',
@@ -2586,7 +3061,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Caddis visade mig en vaxklump tagen från en av de där tunnelgrävarna - den glöder, {playerName}, och den är varm som ett hjärtslag. Han vill ha mer för studier, och jag vill ha det av min rekvisitionslista. Hämta tillbaka sex klumpar av det glödande vaxet.',
   'entities.quests.q_glowing_wax.title': 'Sällsamt vax',
   'entities.quests.q_gravecallers_trail.completion':
-    'Morthen skrev till en \'Fogbinder\' i det norra kärret. Sekten är inte död, {playerName} - den har bara varit tålmodig.',
+    "Morthen skrev till en 'Fogbinder' i det norra kärret. Sekten är inte död, {playerName} - den har bara varit tålmodig.",
   'entities.quests.q_gravecallers_trail.objectives.0.label': 'Morthens grimoar',
   'entities.quests.q_gravecallers_trail.text':
     'Morthen är död, men en fråga gnager i mig: en sekt som gömt sig i ett sekel slösar inte bort sig själv på ett enda bykapell. Han höll en grimoar - sina riter, sin korrespondens. Om något av den överlever, ligger den i sakristian i det ödelagda kapellet ovanför kryptan. Genomsök ruinen och hämta mig vad som än återstår av hans skrifter, {playerName}.',
@@ -2603,7 +3078,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.text':
     'Det finns en varg som ingen fälla har hållit: Gamle Gråkäft. Han har tagit tre hundar och en stalldrängs arm. Han stryker omkring i de djupa skogarna norr om varggångarna. Hämta mig hans huggtand.',
   'entities.quests.q_greyjaw.title': 'Den gamla vargen',
-  'entities.quests.q_grubjaw.completion': 'Den beten är lång som min underarm! Mulåsnorna är hämnade, och Fenbridge är dig en omgång skyldig.',
+  'entities.quests.q_grubjaw.completion':
+    'Den beten är lång som min underarm! Mulåsnorna är hämnade, och Fenbridge är dig en omgång skyldig.',
   'entities.quests.q_grubjaw.objectives.0.label': 'Glufskäftens bete',
   'entities.quests.q_grubjaw.text':
     'Det finns ett troll de andra inte vill gräva bredvid - Glufskäft, Frossaren. Han åt mina sista två packmulåsnor, sele och allt, och min försäkringsman drunknade för flera år sedan. Han stryker omkring i de bortre östra högarna, {playerName}. Hämta mig hans bete så ska jag utrusta dig ordentligt.',
@@ -2644,13 +3120,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_korgath.text':
     'Min senaste svepning av helgedomens mynning fann kedjor, {playerName} - kedjor tjocka som en skeppsmast, och något ogreformat som spände sig inuti dem. Kulten band en mästare vid tröskeln: Korgath, närd på raseri längre än någon av oss har varit vid liv. Ta fyra följeslagare och lägg honom död - och när kedjorna lossnar, låt honom inte tränga in dig i ett hörn.',
   'entities.quests.q_korgath.title': 'Den bundna väktaren',
-  'entities.quests.q_mine.completion': 'Ha! Tillbaka till arbetet, gossar! Du har min tacksamhet - och mina mynt.',
+  'entities.quests.q_mine.completion':
+    'Ha! Tillbaka till arbetet, gossar! Du har min tacksamhet - och mina mynt.',
   'entities.quests.q_mine.objectives.0.label': 'Djupbergsgrävare dräpt',
   'entities.quests.q_mine.text':
     'Vi stötte på en fin kopparåder och sedan kom de där grävande skadedjuren forsande ut ur bergssidan. Min besättning sätter inte sin fot i schaktet förrän det är rensat. Lägg 10 Djupbergsgrävare döda.',
   'entities.quests.q_mine.title': 'Råttor i gruvan',
   'entities.quests.q_mistcaller.completion':
-    'Vael är död, och dimman lättar för första gången på flera år. Men Maren hörde hans sista ord, och de får mitt blod att frysa: \'Lindormen rör sig under topparna.\' Sekten tjänar något äldre än vi någonsin anat, {playerName}. Vila medan du kan - bergen står på tur.',
+    "Vael är död, och dimman lättar för första gången på flera år. Men Maren hörde hans sista ord, och de får mitt blod att frysa: 'Lindormen rör sig under topparna.' Sekten tjänar något äldre än vi någonsin anat, {playerName}. Vila medan du kan - bergen står på tur.",
   'entities.quests.q_mistcaller.objectives.0.label': 'Vael Fogbindern dräpt',
   'entities.quests.q_mistcaller.text':
     'På botten av bastionen väntar Vael Fogbindern - Morthens mästare, Voss mästare, rösten som har dränkt hundra resenärer för att resa sig en armé. Han är långt bortom en ensam hjälte: ta med fyra följeslagare, inte färre. Gör slut på honom, {playerName}, så kan kärrets döda äntligen ligga stilla.',
@@ -2679,14 +3156,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.text':
     'Orderna talar om en "ring av fylakterier" - själsbehållare, {playerName}, utplacerade runt helgedomen för att nära den. Sektens nekromanter bär dem som heliga reliker. Döda åtta nekromanter och hämta tre oskadda fylakterier åt mig. Jag måste veta vilka själar de rymmer.',
   'entities.quests.q_necromancers.title': 'Fylakteriernas ring',
-  'entities.quests.q_no_rest.completion': 'Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.',
+  'entities.quests.q_no_rest.completion':
+    'Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.',
   'entities.quests.q_no_rest.objectives.0.label': 'Dränkt död lagd till ro',
   'entities.quests.q_no_rest.text':
     'Riten på de där rökelsekaren binder de dränkta att resa sig var än kärret rör vid dem - och kärret rör vid allt. Det finns ingen ro i dessa vassar förrän de döda är fler än de levande. Vi kan inte upphäva riten ännu, men vi kan tömma den på soldater. Lägg ytterligare 14 av de dränkta döda till ro.',
   'entities.quests.q_no_rest.title': 'Ingen ro i vassen',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte stoppa det som följde. Sigillet försvagas, och denna signetring är nyckeln till Nythraxis grav. Du är nu invigd att träda in i Nythraxis krypta. Återvänd till den övergivna kryptan, lås upp den kungliga dörren, och möt Nythraxis innan den gamle kungens vrede svämmar bortom Törntopp.',
-  'entities.quests.q_nythraxis_bound_guardian.objectives.0.label': 'Kryptans slutsten använd vid ritualcirkeln',
+  'entities.quests.q_nythraxis_bound_guardian.objectives.0.label':
+    'Kryptans slutsten använd vid ritualcirkeln',
   'entities.quests.q_nythraxis_bound_guardian.objectives.1.label': 'Den bundne väktaren besegrad',
   'entities.quests.q_nythraxis_bound_guardian.objectives.2.label': 'Kungens signetring',
   'entities.quests.q_nythraxis_bound_guardian.text':
@@ -2750,12 +3229,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_palecoil.text':
     'En gestalt i tjärnen är ingen dränkt man. En orm i benets färg glider längs den djupa avsatsen där trappan börjar — Sethrael, kallar avgnidningarna den, Blekslingan, månens egen vaktbest. Så länge den vaktar det vattnet når ingen porten levande. Gå ner till avsatsen och döda den, {playerName}. Ta dess hjärtfjäll så att jag vet att dådet är gjort.',
   'entities.quests.q_palecoil.title': 'Sethrael Blekslingan',
-  'entities.quests.q_prowler_pelts.completion': 'Bra tjocka skinn, dessa. Vägbanken kommer att överleva oss båda nu.',
+  'entities.quests.q_prowler_pelts.completion':
+    'Bra tjocka skinn, dessa. Vägbanken kommer att överleva oss båda nu.',
   'entities.quests.q_prowler_pelts.objectives.0.label': 'Kärrströvarskinn',
   'entities.quests.q_prowler_pelts.text':
     'Varje planka på den vägbanken vilar på pålar inlindade i oljad strövarhud - det enda rötan inte tuggar sig igenom. Mitt lager är slut och de södra spannen sjunker redan. Hämta 8 oförstörda skinn åt mig, {playerName}, innan vi alla får vada till Östbäck.',
   'entities.quests.q_prowler_pelts.title': 'Skinn till vägbanken',
-  'entities.quests.q_prowlers.completion': 'Tolv, och inte ett bett på dig? Vägbanken andas lättare i natt.',
+  'entities.quests.q_prowlers.completion':
+    'Tolv, och inte ett bett på dig? Vägbanken andas lättare i natt.',
   'entities.quests.q_prowlers.objectives.0.label': 'Kärrströvare dräpt',
   'entities.quests.q_prowlers.text':
     'Kärrströvarna har lärt sig hur en packmula låter, och nu jagar de själva vägbanken. Förra veckan släpade de en kurir in i vassen knappt femtio steg från den här porten. Gallra ut dem, {playerName} - tolv döda strövare borde lära resten att frukta.',
@@ -2772,7 +3253,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_revenants.text':
     'Öster om helgedomsvägen ligger ett gammalt slagfält - förtruppen från den sista armé som försökte inta detta berg, begravd i tvåhundra år. Sekten har kallat upp dem, ben i rostig plåt. Lägg tolv gengångare tillbaka i jorden, {playerName}.',
   'entities.quests.q_revenants.title': 'Gengångarnas fält',
-  'entities.quests.q_ringleader.completion': 'Är Gorrak död? Då är dalen fri från hans skugga. Du har gjort Östbäck en stor tjänst.',
+  'entities.quests.q_ringleader.completion':
+    'Är Gorrak död? Då är dalen fri från hans skugga. Du har gjort Östbäck en stor tjänst.',
   'entities.quests.q_ringleader.objectives.0.label': 'Gorrak den Skoningslöse dräpt',
   'entities.quests.q_ringleader.text':
     'Banditerna lyder under en enda man: Gorrak den Skoningslöse. Hugg av huvudet så skingras kroppen. Han lurar i hjärtat av deras läger. Gör slut på honom, {playerName}.',
@@ -2790,7 +3272,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_sanctum_gate.text':
     'Detta är den sista tröskeln, {playerName}. Porten till Gravlindormens helgedom låstes med en slutsten, och sekten krossade den till skärvor hellre än att se den vändas mot dem. Skärvorna ligger spridda på portplatsen, under de benklädda dödas blickar. Hämta tre åt mig, så öppnar jag vägen som Ljuset avsåg - i tysthet.',
   'entities.quests.q_sanctum_gate.title': 'Helgedomens port',
-  'entities.quests.q_sexton.completion': 'Så Marrow är äntligen fri. Ring ingen klocka för honom - han hörde tillräckligt av dem i livet.',
+  'entities.quests.q_sexton.completion':
+    'Så Marrow är äntligen fri. Ring ingen klocka för honom - han hörde tillräckligt av dem i livet.',
   'entities.quests.q_sexton.objectives.0.label': 'Klockare Marrow lagd till ro',
   'entities.quests.q_sexton.text':
     'Liggaren namngav honom och kryptan rymmer honom: klockare Marrow, kapellets vårdare, den förste man Morthen reste - vaktande sin mästares dörr i döden lika troget som han skötte kapellet i livet. Ta med fyra följeslagare in i Den ihåliga kryptan och skänk den gamle klockaren den ro han berövades, {playerName}.',
@@ -2813,24 +3296,27 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_silence_the_choir.text':
     'Sången kommer nu nerifrån porten, och en röst leder den: körmoder Selthe, som först lärde sekten att drunkna utan att dö. Så länge hon håller bönen vid liv kommer templet aldrig att sova — och tjärnen kommer aldrig att sluta lämna ifrån sig sina döda. Ta med följeslagare genom porten och gör slut på henne. Detta är inget uppdrag för ett ensamt svärd, {playerName}.',
   'entities.quests.q_silence_the_choir.title': 'Tysta kören',
-  'entities.quests.q_spiders.completion': 'Usch, rycker fortfarande. Perfekt. Här, du har förtjänat detta.',
+  'entities.quests.q_spiders.completion':
+    'Usch, rycker fortfarande. Perfekt. Här, du har förtjänat detta.',
   'entities.quests.q_spiders.objectives.0.label': 'Sableweb-lurkare dräpt',
   'entities.quests.q_spiders.objectives.1.label': 'Sablewebs silkeskörtel',
   'entities.quests.q_spiders.text':
     'Lurkarna i de östra skogarna spinner ett silke jag behöver till mina omslag - och de har dessutom blivit alldeles för talrika. Gallra 6 Sableweb-lurkare och skär ut 4 silkeskörtlar ur deras bukar.',
   'entities.quests.q_spiders.title': 'Sablewebs plåga',
-  'entities.quests.q_stalker_pelts.completion': 'Tjocka som min arm, dessa. Vakten kommer inte att frysa i år - ta dessa kängor för besväret.',
+  'entities.quests.q_stalker_pelts.completion':
+    'Tjocka som min arm, dessa. Vakten kommer inte att frysa i år - ta dessa kängor för besväret.',
   'entities.quests.q_stalker_pelts.objectives.0.label': 'Bergskamssmygarskinn',
   'entities.quests.q_stalker_pelts.text':
     'Vintern på det här berget knackar inte på, {playerName} - den sparkar in dörren. Åtta bergskamssmygarskinn fodrar nog med mantlar för att se muren genom de första snöfallen. Bestarna stryker omkring på bergskammarna längs vägen söderut.',
   'entities.quests.q_stalker_pelts.title': 'Vintern kommer till Högvakten',
-  'entities.quests.q_stalkers.completion': 'Tolv färre skuggor på bergskammen. Patrullerna andas lättare i natt.',
+  'entities.quests.q_stalkers.completion':
+    'Tolv färre skuggor på bergskammen. Patrullerna andas lättare i natt.',
   'entities.quests.q_stalkers.objectives.0.label': 'Bergskamssmygare dräpt',
   'entities.quests.q_stalkers.text':
     'Bergskamskatterna har kommit ner från de höga snöfälten hungriga, och mina patruller blöder för det. Varje smygare du fäller är en soldat jag behåller på muren. Gallra dem, {playerName} - tolv, till att börja med.',
   'entities.quests.q_stalkers.title': 'Smygare på bergskammen',
   'entities.quests.q_summoners.completion':
-    'Varje chiffer är kontrasignerat \'Diakon Voss\' - och vidareadresserat till en \'Fogbinder\' i bastionen. Morthens mästare, {playerName}. Vi har funnit honom.',
+    "Varje chiffer är kontrasignerat 'Diakon Voss' - och vidareadresserat till en 'Fogbinder' i bastionen. Morthens mästare, {playerName}. Vi har funnit honom.",
   'entities.quests.q_summoners.objectives.0.label': 'Gravkallarmanare dräpt',
   'entities.quests.q_summoners.objectives.1.label': 'Gravkallarchiffer',
   'entities.quests.q_summoners.text':
@@ -2884,7 +3370,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_whispers.text':
     'Du har lagt de döda till ro, men de förblir inte vilande - något kallar tillbaka dem. Genomsök kapellruinen efter varje spår av den som kallar. Om du hittar ett sigill eller insegel, ta det till mig orört.',
   'entities.quests.q_whispers.title': 'Viskningar där nere',
-  'entities.quests.q_widows.completion': 'Hela säckar, varenda en. Du har stadigare händer än hälften av kirurgerna i söder, {playerName}.',
+  'entities.quests.q_widows.completion':
+    'Hela säckar, varenda en. Du har stadigare händer än hälften av kirurgerna i söder, {playerName}.',
   'entities.quests.q_widows.objectives.0.label': 'Dykärrsänka dödad',
   'entities.quests.q_widows.objectives.1.label': 'Änkans giftsäck',
   'entities.quests.q_widows.text':
@@ -2918,7 +3405,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Det fallna kapellet',
   'entities.zones.eastbrook_vale.pois.8.label': 'Relikkullen',
   'entities.zones.eastbrook_vale.pois.9.label': 'Ljusskogsgläntan',
-  'entities.zones.eastbrook_vale.welcome': 'Hitta marskalk Redbrook i staden - han har arbete åt dig.',
+  'entities.zones.eastbrook_vale.welcome':
+    'Hitta marskalk Redbrook i staden - han har arbete åt dig.',
   'entities.zones.mirefen_marsh.name': 'Dykärrsträsket',
   'entities.zones.mirefen_marsh.pois.0.label': 'Kärrbron',
   'entities.zones.mirefen_marsh.pois.1.label': 'Smygjägarvassen',
@@ -2940,7 +3428,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lindormskultens tält',
   'entities.zones.thornpeak_heights.pois.8.label': 'Gengångarfälten',
   'entities.zones.thornpeak_heights.pois.9.label': 'Gravlindormens helgedom',
-  'entities.zones.thornpeak_heights.welcome': 'Kapten Thessaly håller muren vid Högvakten - knappt.',
+  'entities.zones.thornpeak_heights.welcome':
+    'Kapten Thessaly håller muren vid Högvakten - knappt.',
   'errors.api.accountBanned': 'Detta konto har bannlysts.',
   'errors.api.accountSuspended': 'Detta konto är avstängt till {date}.',
   'errors.api.alreadyInWorld': 'Karaktären är redan i världen.',
@@ -2960,7 +3449,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'errors.api.takenOver': 'Din karaktär togs över av en annan session.',
   'errors.api.tooManyAttempts': 'För många försök. Vänta en minut och försök igen.',
   'errors.api.usernameNotAllowed': 'Det användarnamnet är inte tillåtet.',
-  'errors.api.usernameShape': 'Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.',
+  'errors.api.usernameShape':
+    'Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.',
   'errors.api.usernameTaken': 'Det användarnamnet är redan upptaget.',
   'errors.api.verificationFailed': 'Verifieringen misslyckades. Försök igen.',
   'errors.api.webLoginOnly': 'Inloggningar är endast tillåtna från spelklienten.',
@@ -2972,11 +3462,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'errors.pickClass': 'Välj en klass.',
   'errors.returnToLogin': 'Återgå till inloggning',
   'errors.selectClass': 'Var god välj en klass.',
-  'fiesta.augment.aug_apex_predator.desc': '+40% fysisk skada, +15% kritisk träff, läker för 12% av tillfogad skada.',
+  'fiesta.augment.aug_apex_predator.desc':
+    '+40% fysisk skada, +15% kritisk träff, läker för 12% av tillfogad skada.',
   'fiesta.augment.aug_apex_predator.name': 'Topprovdjur',
-  'fiesta.augment.aug_arcane_surge.desc': '+25% besvärjelseskada och +10% kritisk träff. Lys upp dem.',
+  'fiesta.augment.aug_arcane_surge.desc':
+    '+25% besvärjelseskada och +10% kritisk träff. Lys upp dem.',
   'fiesta.augment.aug_arcane_surge.name': 'Arkant svall',
-  'fiesta.augment.aug_archmage.desc': '+45% besvärjelseskada, +15% kritisk träff, +15% maximalt liv.',
+  'fiesta.augment.aug_archmage.desc':
+    '+45% besvärjelseskada, +15% kritisk träff, +15% maximalt liv.',
   'fiesta.augment.aug_archmage.name': 'Ärkemagiker',
   'fiesta.augment.aug_ascendant.desc': '+45% läkning, +25% besvärjelseskada, +20% maximalt liv.',
   'fiesta.augment.aug_ascendant.name': 'Uppstigen',
@@ -2984,11 +3477,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_avatar.name': 'Krigets avatar',
   'fiesta.augment.aug_bloodhunter.desc': '+18% skada av alla slag och +12% förflyttningshastighet.',
   'fiesta.augment.aug_bloodhunter.name': 'Blodsjägare',
-  'fiesta.augment.aug_bounty_hunter.desc': 'Dina dödar ger +1 bonuspoäng till laget. Korta avståndet snabbt.',
+  'fiesta.augment.aug_bounty_hunter.desc':
+    'Dina dödar ger +1 bonuspoäng till laget. Korta avståndet snabbt.',
   'fiesta.augment.aug_bounty_hunter.name': 'Prisjägare',
   'fiesta.augment.aug_brutality.desc': 'Dina fysiska slag träffar 15% hårdare.',
   'fiesta.augment.aug_brutality.name': 'Brutalitet',
-  'fiesta.augment.aug_fleetfoot.desc': 'Rör dig 15% snabbare. Spring ifatt dem - eller spring undan.',
+  'fiesta.augment.aug_fleetfoot.desc':
+    'Rör dig 15% snabbare. Spring ifatt dem - eller spring undan.',
   'fiesta.augment.aug_fleetfoot.name': 'Snabbfotad',
   'fiesta.augment.aug_ironhide.desc': 'Få 250 rustning och 5% undvikning.',
   'fiesta.augment.aug_ironhide.name': 'Järnhud',
@@ -3000,17 +3495,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_lightwell.name': 'Gravljus',
   'fiesta.augment.aug_mending.desc': 'Din läkning är 20% kraftfullare.',
   'fiesta.augment.aug_mending.name': 'Lagning',
-  'fiesta.augment.aug_overdrive.desc': '+30% all skada, +20% kritisk träff, +20% förflyttningshastighet. FIESTA!',
+  'fiesta.augment.aug_overdrive.desc':
+    '+30% all skada, +20% kritisk träff, +20% förflyttningshastighet. FIESTA!',
   'fiesta.augment.aug_overdrive.name': 'Övervarv',
   'fiesta.augment.aug_spellfire.desc': 'Dina besvärjelser gör 15% mer skada.',
   'fiesta.augment.aug_spellfire.name': 'Dystereld',
   'fiesta.augment.aug_toughness.desc': 'Få 12% maximalt liv.',
   'fiesta.augment.aug_toughness.name': 'Tålighet',
-  'fiesta.augment.aug_unkillable.desc': '+40% maximalt liv, +600 rustning, läker för 10% av tillfogad skada.',
+  'fiesta.augment.aug_unkillable.desc':
+    '+40% maximalt liv, +600 rustning, läker för 10% av tillfogad skada.',
   'fiesta.augment.aug_unkillable.name': 'Odräplig',
-  'fiesta.augment.aug_vampirism.desc': 'Läk för 15% av all skada du tillfogar. Håll dig vid liv i kaoset.',
+  'fiesta.augment.aug_vampirism.desc':
+    'Läk för 15% av all skada du tillfogar. Håll dig vid liv i kaoset.',
   'fiesta.augment.aug_vampirism.name': 'Vampyrism',
-  'fiesta.augment.aug_warlords_might.desc': '+25% fysisk skada och +10% kritisk träff. Bli själva hotet.',
+  'fiesta.augment.aug_warlords_might.desc':
+    '+25% fysisk skada och +10% kritisk träff. Bli själva hotet.',
   'fiesta.augment.aug_warlords_might.name': 'Krigsherrens makt',
   'fiesta.augment.choose': 'Välj en förstärkning',
   'fiesta.banner.augmentGained': 'Förstärkning erhållen: {name}!',
@@ -3035,7 +3534,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.log.go': 'FIESTA - KÖR!',
   'fiesta.log.over': 'FIESTA SLUT! Vilket kalas. Återvänder till världen…',
   'fiesta.log.powerup': '{player} tog {name}!',
-  'fiesta.log.welcome': 'Välkommen till 2v2-FIESTAN! Fäll fiender, ta förstärkningar, överlev ringen!',
+  'fiesta.log.welcome':
+    'Välkommen till 2v2-FIESTAN! Fäll fiender, ta förstärkningar, överlev ringen!',
   'fiesta.pending.label': 'Förstärkning redo - välj den vid din nästa död!',
   'fiesta.powerup.pow_berserker.name': 'Bärsärk',
   'fiesta.powerup.pow_colossus.name': 'Koloss',
@@ -3049,7 +3549,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.queue.teamLeave': 'Ditt lag lämnar 2v2-Fiestans kö.',
   'fiesta.respawn.sub': 'Tillbaka i striden om…',
   'fiesta.respawn.title': 'NEDSLAGEN!',
-  'fiesta.score.aria': 'Fiestapoäng: ditt lag {mine}, fiendelaget {theirs}, först till {limit} vinner.',
+  'fiesta.score.aria':
+    'Fiestapoäng: ditt lag {mine}, fiendelaget {theirs}, först till {limit} vinner.',
   'fiesta.score.title': 'FIESTA',
   'fiesta.score.toWin': 'Först till {n}',
   'fiesta.tier.gold': 'Guld',
@@ -3114,7 +3615,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.settings.weather': 'Vädereffekter',
   'game.talents.apply': 'Tillämpa ändringar',
   'game.talents.available': 'Tillgänglig',
-  'game.talents.buildHint': 'Välj ett sparat bygge, uppdatera det med Spara nuvarande, eller skapa ett nytt med Nytt bygge.',
+  'game.talents.buildHint':
+    'Välj ett sparat bygge, uppdatera det med Spara nuvarande, eller skapa ett nytt med Nytt bygge.',
   'game.talents.buildInvalid': 'Detta bygge är inte giltigt än.',
   'game.talents.cancel': 'Avbryt',
   'game.talents.chooseSpec': 'Välj en specialisering',
@@ -3154,7 +3656,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.noSpec': 'Ingen specialisering vald',
   'game.talents.nothingStaged': 'Inga ändringar att tillämpa.',
   'game.talents.pickSpecFirst': 'Välj en specialisering för att komma åt detta träd.',
-  'game.talents.pointSource': 'Tjäna 1 talangpoäng per nivå från nivå {first} till {cap}. Gå upp i nivå för att få fler poäng.',
+  'game.talents.pointSource':
+    'Tjäna 1 talangpoäng per nivå från nivå {first} till {cap}. Gå upp i nivå för att få fler poäng.',
   'game.talents.pointsGate': 'poäng spenderade i trädet',
   'game.talents.rank': 'Rang',
   'game.talents.readout.breakdownClass': 'Klass {classPts}',
@@ -3179,65 +3682,120 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Lagda',
   'game.talents.title': 'Talanger',
   'game.talents.unlockBanner': 'Talanger upplåsta!',
-  'game.talents.unlockHint': 'Du har tjänat din första talangpoäng, tryck på N för att öppna Talanger.',
+  'game.talents.unlockHint':
+    'Du har tjänat din första talangpoäng, tryck på N för att öppna Talanger.',
   'game.xp.lv': 'Nivå',
   'game.xp.maxLevel': 'MAXNIVÅ',
   'game.xp.rested': 'Utvilad',
   'game.xp.suffix': 'XP',
   'game.xp.toNext': 'till nästa',
   'game.xp.totalXp': 'total XP',
-  'guide.abilityHook.arcane_intellect': 'Höjer Intellekt för att fördjupa en allierads manapool, kasta den före anstormningen.',
+  'guide.abilityHook.arcane_intellect':
+    'Höjer Intellekt för att fördjupa en allierads manapool, kasta den före anstormningen.',
   'guide.abilityHook.arcane_shot': 'Ett omedelbart skott på avstånd för snabb extra skada.',
-  'guide.abilityHook.aspect_of_the_hawk': 'En skepnad du håller uppe för att skärpa din avståndsattackstyrka.',
+  'guide.abilityHook.aspect_of_the_hawk':
+    'En skepnad du håller uppe för att skärpa din avståndsattackstyrka.',
   'guide.abilityHook.backstab': 'Smyg bakom ett mål med en dolk för en hårt slående poänggivare.',
   'guide.abilityHook.battle_shout': 'Ett samlande rop som höjer attackstyrkan för gruppen.',
-  'guide.abilityHook.blessing_of_might': 'Höjer ett vänligt måls attackstyrka, bra att kasta före en anstormning.',
-  'guide.abilityHook.charge': 'Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.',
-  'guide.abilityHook.cheap_shot': 'Öppna från smyg med en bedövning och ett försprång på komboanslag.',
-  'guide.abilityHook.commanding_shout': 'Stärker uthålligheten så alla har mer stryktålighet i en strid.',
-  'guide.abilityHook.concussive_shot': 'Förvirrar målet och saktar ner det så att det inte kan nå dig.',
-  'guide.abilityHook.conjure_food': 'Frammanar mat som återställer hälsa när du sätter dig ner och äter.',
-  'guide.abilityHook.conjure_water': 'Frammanar drycker som återställer mana, så du kan fylla på mellan anstormningarna.',
-  'guide.abilityHook.corruption': 'Förmultnar ett mål med skugga som tickar medan du gör andra saker.',
-  'guide.abilityHook.demon_skin': 'En varaktig självförstärkning som härdar din hud och ger rustning.',
-  'guide.abilityHook.devotion_aura': 'En varaktig självförstärkning som höjer rustningen så slag landar mjukare.',
-  'guide.abilityHook.divine_protection': 'Ett snabbt skyddande värn för att suga upp skada när det blir tufft.',
+  'guide.abilityHook.blessing_of_might':
+    'Höjer ett vänligt måls attackstyrka, bra att kasta före en anstormning.',
+  'guide.abilityHook.charge':
+    'Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.',
+  'guide.abilityHook.cheap_shot':
+    'Öppna från smyg med en bedövning och ett försprång på komboanslag.',
+  'guide.abilityHook.commanding_shout':
+    'Stärker uthålligheten så alla har mer stryktålighet i en strid.',
+  'guide.abilityHook.concussive_shot':
+    'Förvirrar målet och saktar ner det så att det inte kan nå dig.',
+  'guide.abilityHook.conjure_food':
+    'Frammanar mat som återställer hälsa när du sätter dig ner och äter.',
+  'guide.abilityHook.conjure_water':
+    'Frammanar drycker som återställer mana, så du kan fylla på mellan anstormningarna.',
+  'guide.abilityHook.corruption':
+    'Förmultnar ett mål med skugga som tickar medan du gör andra saker.',
+  'guide.abilityHook.cw_battle_shout': 'Ett samlande rop som höjer attackstyrkan för gruppen.',
+  'guide.abilityHook.cw_charge':
+    'Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.',
+  'guide.abilityHook.cw_commanding_shout':
+    'Stärker uthålligheten så alla har mer stryktålighet i en strid.',
+  'guide.abilityHook.cw_heroic_strike':
+    'Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.',
+  'guide.abilityHook.cw_rend': 'Öppnar en blödning som sliter ner målet över tid.',
+  'guide.abilityHook.cw_thunder_clap': 'Slår allt runt omkring dig och saktar ner deras attacker.',
+  'guide.abilityHook.demon_skin':
+    'En varaktig självförstärkning som härdar din hud och ger rustning.',
+  'guide.abilityHook.devotion_aura':
+    'En varaktig självförstärkning som höjer rustningen så slag landar mjukare.',
+  'guide.abilityHook.divine_protection':
+    'Ett snabbt skyddande värn för att suga upp skada när det blir tufft.',
   'guide.abilityHook.earth_shock': 'En omedelbar chock för snabb naturskada när du behöver det nu.',
-  'guide.abilityHook.eviscerate': 'Förbrukar dina komboanslag för att avsluta ett mål med en explosion.',
-  'guide.abilityHook.fireball': 'Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.',
-  'guide.abilityHook.flame_shock': 'En omedelbar brand som slår direkt och fortsätter att svida över tid.',
-  'guide.abilityHook.frost_armor': 'En varaktig självförstärkning som härdar din rustning före en strid.',
-  'guide.abilityHook.frostbolt': 'Slår från avstånd och saktar ner målet så att det inte kan komma nära dig.',
+  'guide.abilityHook.eviscerate':
+    'Förbrukar dina komboanslag för att avsluta ett mål med en explosion.',
+  'guide.abilityHook.fireball':
+    'Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.',
+  'guide.abilityHook.flame_shock':
+    'En omedelbar brand som slår direkt och fortsätter att svida över tid.',
+  'guide.abilityHook.frost_armor':
+    'En varaktig självförstärkning som härdar din rustning före en strid.',
+  'guide.abilityHook.frostbolt':
+    'Slår från avstånd och saktar ner målet så att det inte kan komma nära dig.',
   'guide.abilityHook.garrote': 'Öppna från smyg med en tråd som får målet att blöda över tid.',
-  'guide.abilityHook.gouge': 'Sätter målet ur spel en kort stund så du kan flytta dig eller skala av.',
-  'guide.abilityHook.healing_touch': 'En stor enmålsläkning med lång kasttid, för att toppa upp någon.',
-  'guide.abilityHook.healing_wave': 'Din huvudsakliga läkning, en direkt botning för dig själv eller en allierad.',
-  'guide.abilityHook.heroic_strike': 'Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.',
-  'guide.abilityHook.holy_light': 'En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.',
-  'guide.abilityHook.immolate': 'Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.',
-  'guide.abilityHook.judgement': 'Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.',
-  'guide.abilityHook.lesser_heal': 'En stadig kastning för att toppa upp en allierad när det finns tid att stå still.',
+  'guide.abilityHook.gouge':
+    'Sätter målet ur spel en kort stund så du kan flytta dig eller skala av.',
+  'guide.abilityHook.hamstring':
+    'Skär upp målets ben för att sakta ner det så att det inte kan jaga ikapp dig.',
+  'guide.abilityHook.healing_touch':
+    'En stor enmålsläkning med lång kasttid, för att toppa upp någon.',
+  'guide.abilityHook.healing_wave':
+    'Din huvudsakliga läkning, en direkt botning för dig själv eller en allierad.',
+  'guide.abilityHook.heroic_strike':
+    'Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.',
+  'guide.abilityHook.holy_light':
+    'En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.',
+  'guide.abilityHook.immolate':
+    'Sätter ett mål i brand för ett inledande slag och en brand som dröjer kvar.',
+  'guide.abilityHook.judgement':
+    'Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.',
+  'guide.abilityHook.lesser_heal':
+    'En stadig kastning för att toppa upp en allierad när det finns tid att stå still.',
   'guide.abilityHook.life_tap': 'Byter en del av din egen hälsa tillbaka till mana när du sinar.',
-  'guide.abilityHook.lightning_bolt': 'En avståndskastning av naturskada, ditt förstaval på långt håll.',
-  'guide.abilityHook.lightning_shield': 'Laddar dig så att angripare tar naturskada när de slår dig.',
-  'guide.abilityHook.mark_of_the_wild': 'En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.',
-  'guide.abilityHook.mongoose_bite': 'Ett motslag som öppnar sig precis efter att fienden undvikit.',
+  'guide.abilityHook.lightning_bolt':
+    'En avståndskastning av naturskada, ditt förstaval på långt håll.',
+  'guide.abilityHook.lightning_shield':
+    'Laddar dig så att angripare tar naturskada när de slår dig.',
+  'guide.abilityHook.mark_of_the_wild':
+    'En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.',
+  'guide.abilityHook.mongoose_bite':
+    'Ett motslag som öppnar sig precis efter att fienden undvikit.',
   'guide.abilityHook.moonfire': 'Slår omedelbart och lämnar målet brinnande, bra medan du rör dig.',
-  'guide.abilityHook.power_word_fortitude': 'Höjer en allierads hälsopool, så kasta den före anstormningen och håll den uppe.',
-  'guide.abilityHook.power_word_shield': 'Sveper in en allierad i en sköld som suger upp slag innan de landar.',
-  'guide.abilityHook.raptor_strike': 'Ett hårt närstridssving för när något sluter avståndet till dig.',
-  'guide.abilityHook.rejuvenation': 'Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.',
+  'guide.abilityHook.power_word_fortitude':
+    'Höjer en allierads hälsopool, så kasta den före anstormningen och håll den uppe.',
+  'guide.abilityHook.power_word_shield':
+    'Sveper in en allierad i en sköld som suger upp slag innan de landar.',
+  'guide.abilityHook.raptor_strike':
+    'Ett hårt närstridssving för när något sluter avståndet till dig.',
+  'guide.abilityHook.rejuvenation':
+    'Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.',
   'guide.abilityHook.rend': 'Öppnar en blödning som sliter ner målet över tid.',
-  'guide.abilityHook.renew': 'En läkning som tickar över tid, bra att kasta och fortsätta röra dig.',
-  'guide.abilityHook.rockbiter_weapon': 'Besjälar ditt vapen så att varje sving landar hårdare i närstrid.',
-  'guide.abilityHook.seal_of_righteousness': 'Besjälar dina sving med helig skada, förbruka den sedan med Verdict.',
+  'guide.abilityHook.renew':
+    'En läkning som tickar över tid, bra att kasta och fortsätta röra dig.',
+  'guide.abilityHook.revenge':
+    'En svepande motattack som träffar allt framför dig, och som blir billigare direkt efter att du avvärjt ett slag.',
+  'guide.abilityHook.rockbiter_weapon':
+    'Besjälar ditt vapen så att varje sving landar hårdare i närstrid.',
+  'guide.abilityHook.seal_of_righteousness':
+    'Besjälar dina sving med helig skada, förbruka den sedan med Verdict.',
   'guide.abilityHook.serpent_sting': 'Landar ett gift som blöder naturskada över tid.',
   'guide.abilityHook.shadow_bolt': 'En skuggpil du kastar mot ett mål, din förstavalskanon.',
-  'guide.abilityHook.shadow_word_pain': 'Fäster en skuggröta på en fiende, sedan går du vidare medan den tickar.',
-  'guide.abilityHook.sinister_strike': 'Ditt pålitliga slag som bygger komboanslag att förbruka senare.',
+  'guide.abilityHook.shadow_word_pain':
+    'Fäster en skuggröta på en fiende, sedan går du vidare medan den tickar.',
+  'guide.abilityHook.sinister_strike':
+    'Ditt pålitliga slag som bygger komboanslag att förbruka senare.',
   'guide.abilityHook.smite': 'En helig pil för att nöta ner ett mål från avstånd.',
-  'guide.abilityHook.summon_imp': 'Kallar fram en Emberkin som slungar eldpilar mot fiender från avstånd.',
-  'guide.abilityHook.thorns': 'Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.',
+  'guide.abilityHook.summon_imp':
+    'Kallar fram en Emberkin som slungar eldpilar mot fiender från avstånd.',
+  'guide.abilityHook.thorns':
+    'Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.',
   'guide.abilityHook.thunder_clap': 'Slår allt runt omkring dig och saktar ner deras attacker.',
   'guide.abilityHook.wrath': 'En naturpil kastad mot ett mål från avstånd, din förstavalskanon.',
   'guide.arenaPage.augmentsNote':
@@ -3260,12 +3818,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.powerupsBody':
     'Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.',
   'guide.arenaPage.powerupsTitle': 'Kraftuppladdningar i ringen',
-  'guide.arenaPage.waveGoldBody': 'Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.',
+  'guide.arenaPage.waveGoldBody':
+    'Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.',
   'guide.arenaPage.waveGoldTitle': 'Guld',
   'guide.arenaPage.wavePrismaticBody':
     'Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.',
   'guide.arenaPage.wavePrismaticTitle': 'Prismatisk',
-  'guide.arenaPage.waveSilverBody': 'Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.',
+  'guide.arenaPage.waveSilverBody':
+    'Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.',
   'guide.arenaPage.waveSilverTitle': 'Silver',
   'guide.arenaPage.wavesBody':
     'Varje runda i en Fiesta ger dig ett färskt val, och valen blir djärvare allteftersom matchen fortskrider. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.',
@@ -3304,14 +3864,22 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': 'Stil',
   'guide.classHook.druid':
     'En hamnskiftare som tankar som björn, sliter fiender i stycken som katt, eller läker mitt i tumultet.',
-  'guide.classHook.hunter': 'En prickskytt på avstånd med en lojal best vid sin sida och ett knep för varje fiende.',
-  'guide.classHook.mage': 'En besvärjare av eld, frost och arkan som kontrollerar slagfältet på avstånd.',
-  'guide.classHook.paladin': 'En helig krigare som kan skydda allierade, läka deras sår eller låta hammaren falla.',
-  'guide.classHook.priest': 'En hängiven läkare vars ljus håller gruppen på fötter, eller vars skugga gör fienden till intet.',
-  'guide.classHook.rogue': 'En mästare på smyg och gifter som slår från skuggorna och aldrig slåss rättvist.',
-  'guide.classHook.shaman': 'En andekallare som böjer storm, eld och vatten, och botar allierade mellan blixtarna.',
-  'guide.classHook.warlock': 'En mörk frammanare som befaller demoner och förbannelser, och byter liv mot förödande makt.',
-  'guide.classHook.warrior': 'En obeveklig frontlinjekämpe som förvandlar varje mottaget slag till bränsle för nästa.',
+  'guide.classHook.hunter':
+    'En prickskytt på avstånd med en lojal best vid sin sida och ett knep för varje fiende.',
+  'guide.classHook.mage':
+    'En besvärjare av eld, frost och arkan som kontrollerar slagfältet på avstånd.',
+  'guide.classHook.paladin':
+    'En helig krigare som kan skydda allierade, läka deras sår eller låta hammaren falla.',
+  'guide.classHook.priest':
+    'En hängiven läkare vars ljus håller gruppen på fötter, eller vars skugga gör fienden till intet.',
+  'guide.classHook.rogue':
+    'En mästare på smyg och gifter som slår från skuggorna och aldrig slåss rättvist.',
+  'guide.classHook.shaman':
+    'En andekallare som böjer storm, eld och vatten, och botar allierade mellan blixtarna.',
+  'guide.classHook.warlock':
+    'En mörk frammanare som befaller demoner och förbannelser, och byter liv mot förödande makt.',
+  'guide.classHook.warrior':
+    'En obeveklig frontlinjekämpe som förvandlar varje mottaget slag till bränsle för nästa.',
   'guide.classList.heading': 'De nio klasserna',
   'guide.classList.sub':
     'Tanka, läka eller stå för skadan. Välj fantasin som kallar på dig, gör den sedan till din egen med talanger.',
@@ -3324,7 +3892,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Varje förmåga denna klass kan lära sig, i den ordning den blir tillgänglig. Talanger avgör vilka som bär ditt bygge.',
   'guide.classPage.masteryLabel': 'Mästerskap',
   'guide.classPage.petsHeading': 'Demoner',
-  'guide.classPage.petsNote': 'Häxmästare frammanar demoner att slåss vid sin sida, var och en lämpad för en annan uppgift.',
+  'guide.classPage.petsNote':
+    'Häxmästare frammanar demoner att slåss vid sin sida, var och en lämpad för en annan uppgift.',
   'guide.classPage.resourceLabel': 'Resurs',
   'guide.classPage.roleLabel': 'Spelar som',
   'guide.classPage.specsHeading': 'Specialiseringar',
@@ -3363,7 +3932,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': 'Målval och strid',
   'guide.controls.groupInterface': 'Gränssnitt',
   'guide.controls.groupMovement': 'Förflyttning',
-  'guide.controls.intro': 'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar.',
+  'guide.controls.intro':
+    'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar.',
   'guide.controls.keyHeader': 'Tangent',
   'guide.controls.leaderboard': 'Topplista',
   'guide.controls.mobileBody':
@@ -3422,13 +3992,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelAround': 'Omkring nivå {n}',
   'guide.dungeonsPage.levelBand': 'Nivå {min} till {max}',
   'guide.dungeonsPage.levelExact': 'Nivå {n}',
-  'guide.dungeonsPage.party': 'Fängelsehålor är byggda för en grupp på fem. Slutspelsraiden är för tio.',
+  'guide.dungeonsPage.party':
+    'Fängelsehålor är byggda för en grupp på fem. Slutspelsraiden är för tio.',
   'guide.dungeonsPage.partySize': '{n} spelare',
   'guide.dungeonsPage.raidBody':
     'Bortom en förseglad kunglig dörr väntar en prövning för tio spelare: en strid i flera faser och en odödlig kraft som hela raiden måste stänga ner tillsammans. Förtjäna din väg in, ta sedan med dig nio vänner.',
   'guide.dungeonsPage.raidName': 'Slutspelsraiden',
   'guide.dungeonsPage.raidSize': 'Tio spelare, nivå {n}',
-  'guide.dungeonsPage.sanctumBody': 'Törntoppens mörka hjärta, där kultens långa arbete når sin fasansfulla höjdpunkt.',
+  'guide.dungeonsPage.sanctumBody':
+    'Törntoppens mörka hjärta, där kultens långa arbete når sin fasansfulla höjdpunkt.',
   'guide.dungeonsPage.sanctumName': 'Gravlindormens helgedom',
   'guide.dungeonsPage.soloLead':
     'Varje fängelsehåla inleds med en uppdragsupptakt som kan klaras ensam, så du vet alltid varför du går in.',
@@ -3472,41 +4044,52 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     'Vilda djur i skog och mark, från vargar och vildsvin till det som jagar dem. Jägare kan tämja många av dem.',
   'guide.family.beast.name': 'Bestar',
-  'guide.family.dragonkin.desc': 'Fjälliga, ormlika ting från de gamla djupen. Sällsynta, stolta och långt starkare än de ser ut.',
+  'guide.family.dragonkin.desc':
+    'Fjälliga, ormlika ting från de gamla djupen. Sällsynta, stolta och långt starkare än de ser ut.',
   'guide.family.dragonkin.name': 'Drakätt',
-  'guide.family.elemental.desc': 'Levande storm och sten, bundna till de vilda platser där elementen flödar starkt.',
+  'guide.family.elemental.desc':
+    'Levande storm och sten, bundna till de vilda platser där elementen flödar starkt.',
   'guide.family.elemental.name': 'Elementarer',
-  'guide.family.humanoid.desc': 'Banditer, kultister och andra som tagit upp fel yrke. De slåss med taktik, inte bara tänder.',
+  'guide.family.humanoid.desc':
+    'Banditer, kultister och andra som tagit upp fel yrke. De slåss med taktik, inte bara tänder.',
   'guide.family.humanoid.name': 'Humanoider',
-  'guide.family.burrower.desc': 'Lerinkrustade grävare som plågar gruvor och hålor och hetsigt vaktar sin malm.',
+  'guide.family.burrower.desc':
+    'Lerinkrustade grävare som plågar gruvor och hålor och hetsigt vaktar sin malm.',
   'guide.family.burrower.name': 'Grävare',
-  'guide.family.mudfin.desc': 'Amfibiska träskbor som svärmar i grunden i högljudda, revirhävdande flockar.',
+  'guide.family.mudfin.desc':
+    'Amfibiska träskbor som svärmar i grunden i högljudda, revirhävdande flockar.',
   'guide.family.mudfin.name': 'Mudfiner',
-  'guide.family.ogre.desc': 'Enorma, trögtänkta och farliga. De slår läger i de höga passen och slår till som ett jordskred.',
+  'guide.family.ogre.desc':
+    'Enorma, trögtänkta och farliga. De slår läger i de höga passen och slår till som ett jordskred.',
   'guide.family.ogre.name': 'Ogrer',
   'guide.family.spider.desc':
     'Nätspinnare och giftiga lurande varelser som bygger bo på mörka, snåriga platser. Jägare kan tämja dem, precis som bestar.',
   'guide.family.spider.name': 'Spindlar',
   'guide.family.troll.desc': 'Väldiga odjur som har sina nästen i kärrets träsk.',
   'guide.family.troll.name': 'Troll',
-  'guide.family.undead.desc': 'De rastlösa döda, uppväckta av mörkare händer. De tröttnar inte och de flyr inte.',
+  'guide.family.undead.desc':
+    'De rastlösa döda, uppväckta av mörkare händer. De tröttnar inte och de flyr inte.',
   'guide.family.undead.name': 'Odöda',
-  'guide.faqPage.a1': 'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
+  'guide.faqPage.a1':
+    'Ja. Hela spelet är gratis att spela ända till nivåtaket, och källkoden är öppen på GitHub.',
   'guide.faqPage.a10':
     'Taket är nivå {cap}. Därifrån kör du fängelsehålorna för fem spelare och raiden för tio, jagar bättre utrustning och prövar dig själv i arenan.',
   'guide.faqPage.a11':
     'Bjud in vem du än möter till en grupp, fråga i chatten, eller slå er ihop vid en fängelsehåla. Det mesta av världen går att klara ensam, så att gruppera sig är ett val, inte ett krav.',
   'guide.faqPage.a2':
     'Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token låser bara upp kosmetiska detaljer och påverkar aldrig styrka eller progression.',
-  'guide.faqPage.a3': 'Ja. Spelet körs i en mobilwebbläsare med pekkontroller, och det finns även en datorklient.',
+  'guide.faqPage.a3':
+    'Ja. Spelet körs i en mobilwebbläsare med pekkontroller, och det finns även en datorklient.',
   'guide.faqPage.a4':
     'Ja. Det finns ett direktstartat enspelarläge offline, och onlinevärlden går helt att klara ensam förutom fängelsehålor och raiden.',
   'guide.faqPage.a5':
     'Nio, som täcker de klassiska rollerna tank, läkare och skadegörare, var och en med ett resurssystem (raseri, mana eller energi) och sina egna signaturförmågor.',
-  'guide.faqPage.a6': 'Nivå {cap}, nådd genom tre sammanlänkade zoner av uppdrag, fängelsehålor och utforskning.',
+  'guide.faqPage.a6':
+    'Nivå {cap}, nådd genom tre sammanlänkade zoner av uppdrag, fängelsehålor och utforskning.',
   'guide.faqPage.a7':
     'Onlinekaraktärer sparas på servern automatiskt. Offlinekaraktärer lever i din webbläsare för snabba sessioner och testning.',
-  'guide.faqPage.a8': 'Ja. Projektet är öppen källkod, så du kan köra din egen server. Se GitHub-arkivet.',
+  'guide.faqPage.a8':
+    'Ja. Projektet är öppen källkod, så du kan köra din egen server. Se GitHub-arkivet.',
   'guide.faqPage.a9':
     'Ja. Duellera vem som helst på skoj, eller kliv in i Askkolosseum för att slåss mot andra spelare. PvP är frivilligt, så du tvingas aldrig in i det.',
   'guide.faqPage.intro': 'Frågorna som nya spelare ställer oftast.',
@@ -3590,16 +4173,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.upgradeBody':
     'Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.',
   'guide.gear.upgradeTitle': 'Håll din utrustning aktuell',
-  'guide.glossary.aggroDef': 'En fiendes uppmärksamhet. Spelaren som genererar mest hot håller aggro och blir attackerad.',
+  'guide.glossary.aggroDef':
+    'En fiendes uppmärksamhet. Spelaren som genererar mest hot håller aggro och blir attackerad.',
   'guide.glossary.aggroTerm': 'Aggro',
   'guide.glossary.augmentDef':
     'En tillfällig förstärkning du väljer ut under en två-mot-två-match i Fiesta-arenan som formar om din uppsättning, men bara för den matchen.',
   'guide.glossary.augmentTerm': 'Förstärkning',
-  'guide.glossary.buffDef': 'En hjälpsam effekt på dig eller en allierad, som en välsignelse som höjer en egenskap ett tag.',
+  'guide.glossary.buffDef':
+    'En hjälpsam effekt på dig eller en allierad, som en välsignelse som höjer en egenskap ett tag.',
   'guide.glossary.buffTerm': 'Buff',
-  'guide.glossary.ccDef': 'Förmågor som bedövar, rotfäster eller på annat sätt tar en fiende ur striden för ett ögonblick.',
+  'guide.glossary.ccDef':
+    'Förmågor som bedövar, rotfäster eller på annat sätt tar en fiende ur striden för ett ögonblick.',
   'guide.glossary.ccTerm': 'Masskontroll',
-  'guide.glossary.debuffDef': 'En skadlig effekt på ett mål, som en inbromsning, en blödning eller försvagad rustning.',
+  'guide.glossary.debuffDef':
+    'En skadlig effekt på ett mål, som en inbromsning, en blödning eller försvagad rustning.',
   'guide.glossary.debuffTerm': 'Debuff',
   'guide.glossary.delveDef':
     'En kort, omspelbar instansierad nedstigning för en eller två spelare, körd från en vaktares tavla med en följeslagare vid din sida.',
@@ -3618,34 +4205,44 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.gcdTerm': 'Global nedkylning',
   'guide.glossary.healerDef': 'Gruppmedlemmen som håller alla vid liv med läkande besvärjelser.',
   'guide.glossary.healerTerm': 'Helare',
-  'guide.glossary.instanceDef': 'En privat kopia av ett fängelsehål eller en raid skapad enbart för din grupp.',
+  'guide.glossary.instanceDef':
+    'En privat kopia av ett fängelsehål eller en raid skapad enbart för din grupp.',
   'guide.glossary.instanceTerm': 'Instans',
-  'guide.glossary.intro': 'En snabb referens för termerna som används genom hela den här guiden och i chatten.',
-  'guide.glossary.mobDef': 'Vilken datorstyrd varelse som helst i världen, vänlig eller fientlig. Kort för mobil.',
+  'guide.glossary.intro':
+    'En snabb referens för termerna som används genom hela den här guiden och i chatten.',
+  'guide.glossary.mobDef':
+    'Vilken datorstyrd varelse som helst i världen, vänlig eller fientlig. Kort för mobil.',
   'guide.glossary.mobTerm': 'Mob',
-  'guide.glossary.procDef': 'En slumpbaserad effekt som utlöser något annat, som en bonus som ibland slår till när du anfaller.',
+  'guide.glossary.procDef':
+    'En slumpbaserad effekt som utlöser något annat, som en bonus som ibland slår till när du anfaller.',
   'guide.glossary.procTerm': 'Proc',
-  'guide.glossary.pullDef': 'Att dra in en fiende eller grupp i en strid, vanligtvis avsiktligt och en omgång i taget.',
+  'guide.glossary.pullDef':
+    'Att dra in en fiende eller grupp i en strid, vanligtvis avsiktligt och en omgång i taget.',
   'guide.glossary.pullTerm': 'Pull',
   'guide.glossary.raidDef':
     'En större grupp, upp till tio spelare här, bildad för den tuffaste slutspelsstriden; en grupp omvandlas till en så snart den är full.',
   'guide.glossary.raidTerm': 'Raid',
-  'guide.glossary.rareDef': 'En ovanlig namngiven fiende som vandrar genom en zon och fäller bättre byte.',
+  'guide.glossary.rareDef':
+    'En ovanlig namngiven fiende som vandrar genom en zon och fäller bättre byte.',
   'guide.glossary.rareTerm': 'Sällsynt',
   'guide.glossary.specDef':
     'En specialisering: vägen du lutar din klass mot, som läkning eller skada, allt eftersom du spenderar talanger.',
   'guide.glossary.specTerm': 'Spec',
-  'guide.glossary.tankDef': 'Gruppmedlemmen som håller fiendens aggro och absorberar skadan så att andra kan slåss tryggt.',
+  'guide.glossary.tankDef':
+    'Gruppmedlemmen som håller fiendens aggro och absorberar skadan så att andra kan slåss tryggt.',
   'guide.glossary.tankTerm': 'Tank',
-  'guide.glossary.threatDef': 'Hur mycket en fiende vill anfalla dig. Tankens uppgift är att hålla mer hot än alla andra.',
+  'guide.glossary.threatDef':
+    'Hur mycket en fiende vill anfalla dig. Tankens uppgift är att hålla mer hot än alla andra.',
   'guide.glossary.threatTerm': 'Hot',
   'guide.groups.compendium': 'Kompendium',
   'guide.groups.reference': 'Referens',
   'guide.groups.start': 'Kom igång',
   'guide.home.classes.cta': 'Utforska klasserna',
   'guide.home.classes.heading': 'Välj din klass',
-  'guide.home.classes.sub': 'Nio klassiska arketyper, var och en med sin egen känsla och grupproll.',
-  'guide.home.community.body': 'Hoppa in nu, eller kom och säg hej. Världen är bättre med sällskap.',
+  'guide.home.classes.sub':
+    'Nio klassiska arketyper, var och en med sin egen känsla och grupproll.',
+  'guide.home.community.body':
+    'Hoppa in nu, eller kom och säg hej. Världen är bättre med sällskap.',
   'guide.home.community.discord': 'Gå med i Discord',
   'guide.home.community.github': 'Stjärnmärk på GitHub',
   'guide.home.community.heading': 'Gå med i världen',
@@ -3653,11 +4250,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.home.ctaLearn': 'Så spelar du',
   'guide.home.ctaPlay': 'Spela nu',
   'guide.home.eyebrow': 'Klassiskt MMO i webbläsaren',
-  'guide.home.faq.a1': 'Ja. Hela spelet är gratis upp till nivåtaket, och det är öppen källkod på GitHub.',
+  'guide.home.faq.a1':
+    'Ja. Hela spelet är gratis upp till nivåtaket, och det är öppen källkod på GitHub.',
   'guide.home.faq.a2':
     'Nej. Spelet är fullt spelbart utan en. Den valfria community-token låser bara upp kosmetisk flärd och påverkar aldrig styrkan.',
-  'guide.home.faq.a3': 'Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.',
-  'guide.home.faq.a4': 'Taket är nivå {cap}, nått genom tre zoner av uppdrag, fängelsehål och utforskning.',
+  'guide.home.faq.a3':
+    'Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.',
+  'guide.home.faq.a4':
+    'Taket är nivå {cap}, nått genom tre zoner av uppdrag, fängelsehål och utforskning.',
   'guide.home.faq.heading': 'Bra att veta',
   'guide.home.faq.q1': 'Är det gratis att spela?',
   'guide.home.faq.q2': 'Behöver jag en kryptoplånbok?',
@@ -3666,13 +4266,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.arenaBody': 'Kliv in i Askkolosseum och bevisa ditt värde mot andra spelare.',
   'guide.home.group.arenaTitle': 'Arenan',
   'guide.home.group.cta': 'Fängelsehål och raider',
-  'guide.home.group.dungeonsBody': 'Instanserade dyk för en grupp på fem, som skalar med zonerna omkring dem.',
+  'guide.home.group.dungeonsBody':
+    'Instanserade dyk för en grupp på fem, som skalar med zonerna omkring dem.',
   'guide.home.group.dungeonsTitle': 'Fängelsehål',
   'guide.home.group.heading': 'Slå er samman för de svåra delarna',
   'guide.home.group.raidBody': 'En slutstrid för tio spelare för dem som når världens topp.',
   'guide.home.group.raidTitle': 'Raiden',
-  'guide.home.group.sub': 'Världen går att klara solo, men det bästa bytet väntar bakom en bra grupp.',
-  'guide.home.subtitle': 'Lös uppdrag, slå er samman och utforska en handbyggd värld, gratis i din webbläsare.',
+  'guide.home.group.sub':
+    'Världen går att klara solo, men det bästa bytet väntar bakom en bra grupp.',
+  'guide.home.subtitle':
+    'Lös uppdrag, slå er samman och utforska en handbyggd värld, gratis i din webbläsare.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Ett klassiskt MMO, gjort för att tas upp',
   'guide.home.what.pillarClassesBody':
@@ -3691,7 +4294,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.marshName': 'Dykärrsträsket',
   'guide.home.world.peaksBlurb': 'Vindpiskade åsar som klättrar mot världens kallaste faror.',
   'guide.home.world.peaksName': 'Törntoppshöjderna',
-  'guide.home.world.sub': 'Ett sammanhängande land, tre zoner, från stilla dalar till frusna toppar.',
+  'guide.home.world.sub':
+    'Ett sammanhängande land, tre zoner, från stilla dalar till frusna toppar.',
   'guide.home.world.valeBlurb': 'Gröna kullar och gamla skogar där varje äventyr börjar.',
   'guide.home.world.valeName': 'Östbäcksdalen',
   'guide.howToPlay.basicsHeading': 'Grunderna',
@@ -3719,7 +4323,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.step1Body':
     'Välj en klass och ett utseende, ge din hjälte ett namn och gå in i världen. Du kan skapa fler karaktärer senare.',
   'guide.howToPlay.step1Title': 'Skapa en karaktär',
-  'guide.howToPlay.step2Body': 'Marskalk Redbrook väntar i startbyn. Prata med honom och anta Vargar vid dörren.',
+  'guide.howToPlay.step2Body':
+    'Marskalk Redbrook väntar i startbyn. Prata med honom och anta Vargar vid dörren.',
   'guide.howToPlay.step2Title': 'Hitta ditt första uppdrag',
   'guide.howToPlay.step3Body':
     'Rör dig med W, A, S, D. Håll ner höger musknapp och dra för att se dig omkring. Det är ungefär allt.',
@@ -3730,7 +4335,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.step5Body':
     'Slutför målet, återvänd till uppdragsgivaren (leta efter markören på din karta) och hämta din belöning.',
   'guide.howToPlay.step5Title': 'Lämna in det',
-  'guide.howToPlay.step6Body': 'Du nådde precis nivå 2. Följ uppdragsspåret ut ur staden så öppnar sig världen därifrån.',
+  'guide.howToPlay.step6Body':
+    'Du nådde precis nivå 2. Följ uppdragsspåret ut ur staden så öppnar sig världen därifrån.',
   'guide.howToPlay.step6Title': 'Fortsätt framåt',
   'guide.howToPlay.targetingBody':
     'Tab växlar mellan fiender, F interagerar och plundrar, och ditt handlingsfält håller de förmågor du har lärt dig. Dra besvärjelser till det från din besvärjelsebok.',
@@ -3794,13 +4400,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.petHook.wraithborn': 'En elitbesvärjare som regnar tunga skuggor på avstånd.',
   'guide.petHook.warfiend': 'En tålig närstridskämpe, allroundern när du väl kan frammana den.',
   'guide.petHook.spellhound': 'En skuggstrejfare som jagar fiendens besvärjare.',
-  'guide.petHook.emberkin': 'En eldpilskastande demon på avstånd som naggar fiender från säkert håll.',
-  'guide.petHook.pyre_colossus': 'En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka.',
+  'guide.petHook.emberkin':
+    'En eldpilskastande demon på avstånd som naggar fiender från säkert håll.',
+  'guide.petHook.pyre_colossus':
+    'En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka.',
   'guide.petHook.duskborn': 'En snabb närstridsdemon som slår hårt men viker sig under press.',
-  'guide.petHook.gloomshade': 'En robust demon som hånar och absorberar slag så att du kan besvärja i lugn och ro.',
+  'guide.petHook.gloomshade':
+    'En robust demon som hånar och absorberar slag så att du kan besvärja i lugn och ro.',
   'guide.placeholder.note': 'Den här delen av guiden är på väg.',
   'guide.progression.bandLabel': 'Nivå {min} till {max}',
-  'guide.progression.capBody': 'Varje nivå gör dig tåligare och ger nya förmågor, hela vägen upp till maxnivån {cap}.',
+  'guide.progression.capBody':
+    'Varje nivå gör dig tåligare och ger nya förmågor, hela vägen upp till maxnivån {cap}.',
   'guide.progression.capJourneyBody':
     'Nivå {cap} är taket, slutet på nivåökningen men inte på utvecklingen. Därifrån springer du fängelsehålor och raiden, jagar bättre utrustning och prövar dig själv i arenan.',
   'guide.progression.capTitle': 'Att nå nivå {cap}',
@@ -3823,7 +4433,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Folk med en markör över huvudet har arbete åt dig. Prata med dem för att anta ett uppdrag. Ditt allra första är Vargar vid dörren, från Marskalk Redbrook i Östbäck.',
   'guide.questsPage.acceptTitle': 'Hitta och anta',
   'guide.questsPage.heading': 'Uppdrag',
-  'guide.questsPage.intro': 'Uppdrag är världens hjärta och det snabbaste sättet att stiga i nivå. Här är hur de fungerar.',
+  'guide.questsPage.intro':
+    'Uppdrag är världens hjärta och det snabbaste sättet att stiga i nivå. Här är hur de fungerar.',
   'guide.questsPage.objectivesBody':
     'Dräp vissa fiender, samla föremål eller interagera med något i världen. Skärmens spårare räknar din framgång allteftersom. Om du ändrar dig kan du släppa ett uppdrag från din uppdragslogg och ta upp det igen från dess givare senare.',
   'guide.questsPage.objectivesTitle': 'Mål',
@@ -3903,7 +4514,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanGeneralBody':
     'En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.',
   'guide.social.chanGuild': 'Gille och officer.',
-  'guide.social.chanGuildBody': 'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är bara för officerare.',
+  'guide.social.chanGuildBody':
+    'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är bara för officerare.',
   'guide.social.chanLfg': 'Söker grupp.',
   'guide.social.chanLfgBody':
     'En frivillig rikestäckande kanal för att hitta folk till en fängelsehåla. Öppna dess flik för att gå med.',
@@ -3913,12 +4525,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.social.chanSayBody':
     'Din standardröst. Den når spelare nära dig och är den att använda medan ni löser uppdrag sida vid sida.',
   'guide.social.chanWhisper': 'Viska.',
-  'guide.social.chanWhisperBody': 'Ett privat meddelande till en spelare vid namn, var de än är. Använd det för ett tyst ord.',
+  'guide.social.chanWhisperBody':
+    'Ett privat meddelande till en spelare vid namn, var de än är. Använd det för ett tyst ord.',
   'guide.social.chanWorld': 'Värld.',
   'guide.social.chanWorldBody':
     'En rikestäckande kanal du frivilligt går med i. Öppna dess flik för att gå med, så ser och når du alla som är online.',
   'guide.social.chanYell': 'Ropa.',
-  'guide.social.chanYellBody': 'En högre version av Säg som bär en bit längre, nog för att nå tvärs över ett läger.',
+  'guide.social.chanYellBody':
+    'En högre version av Säg som bär en bit längre, nog för att nå tvärs över ett läger.',
   'guide.social.chatBody':
     'Chatten är uppdelad i kanaler, var och en visad på sin egen flik. Skriv ett meddelande för att skicka det på den aktiva kanalen, eller använd ett snedstreckskommando för att rikta en rad någon annanstans. Detta är kanalerna du kan prata på:',
   'guide.social.chatHeading': 'Chattkanaler',
@@ -3933,12 +4547,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.social.guildChatBody':
     'Att tillhöra ett gille ger dig en privat gilleschattkanal och visar dina gilleskamrater på en gemensam roster, så det finns alltid bekanta ansikten online.',
   'guide.social.guildHeading': 'Gillen',
-  'guide.social.ignoreBody': 'Om någon stör dig, lägg till dem i din ignoreringslista så slutar du se deras chatt.',
+  'guide.social.ignoreBody':
+    'Om någon stör dig, lägg till dem i din ignoreringslista så slutar du se deras chatt.',
   'guide.social.intro':
     'Det mesta av världen kan klaras på egen hand, men spelet är byggt för att spelas med andra. Här är hur du pratar, slår dig ihop och hittar din skara.',
   'guide.social.lootBody':
     'När ni grupperar er bestämmer gruppledaren hur byte delas. Reglerna täcker mynt och föremål var för sig:',
-  'guide.social.lootCoinBody': 'Pengar från ett drap kan gå till den som plundrar det, eller delas jämnt över gruppen.',
+  'guide.social.lootCoinBody':
+    'Pengar från ett drap kan gå till den som plundrar det, eller delas jämnt över gruppen.',
   'guide.social.lootCoinTitle': 'Mynt.',
   'guide.social.lootCommonBody':
     'Vanliga fynd kan gå till plundraren, medan bättre fynd läggs upp för en rullning så att alla får en rättvis chans.',
@@ -4031,8 +4647,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.whatHeading': 'Vad talanger gör',
   'guide.toc.heading': 'På den här sidan',
   'guide.viewer.canvasLabel': 'Roterbar 3D-modell av {name}',
-  'guide.viewer.dragHint': 'Dra för att vrida modellen. Använd vänster- och högerpiltangenterna när den är i fokus.',
-  'guide.viewer.error': '3D-modellen kunde inte laddas. Konsten ovan visar fortfarande denna {name}.',
+  'guide.viewer.dragHint':
+    'Dra för att vrida modellen. Använd vänster- och högerpiltangenterna när den är i fokus.',
+  'guide.viewer.error':
+    '3D-modellen kunde inte laddas. Konsten ovan visar fortfarande denna {name}.',
   'guide.viewer.loading': 'Laddar modell...',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': 'Visa {name} i 3D',
@@ -4044,7 +4662,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.i2Body':
     'När du faller släpper du din ande och återupplivas vid närmaste kyrkogård, och tar dig sedan tillbaka. Ingen erfarenhet går förlorad, så det är tryggt att ta risker och lära sig.',
   'guide.wishPage.i2Title': 'Att dö kostar dig knappt något',
-  'guide.wishPage.i3Body': 'De låses upp vid nivå 10 och återställs när du vill, så dina tidiga val är aldrig permanenta.',
+  'guide.wishPage.i3Body':
+    'De låses upp vid nivå 10 och återställs när du vill, så dina tidiga val är aldrig permanenta.',
   'guide.wishPage.i3Title': 'Talanger är ingen fälla',
   'guide.wishPage.i4Body':
     'Uppdrag är det snabbaste sättet att levla och de leder dig tvärs över världen. När du är osäker på vart du ska, leta upp nästa markör.',
@@ -4076,15 +4695,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshBlurb':
     'Ett dränkt land av dimma och ruiner. Mudfiner svärmar i grundvattnet och något äldre rör sig under ytan, bevakat från bro-staden Fenbridge.',
   'guide.worldPage.marshGreeter': 'Väktare Fenwick, Fenbridge',
-  'guide.worldPage.marshGreeting': 'Stanna vid porten. Bortom de vassen sköter myren dödandet åt oss.',
+  'guide.worldPage.marshGreeting':
+    'Stanna vid porten. Bortom de vassen sköter myren dödandet åt oss.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge vaktar den enda torra vägen. Prowler Reeds och Deepfen Shallows kryllar av träskbestar och Mudfiner; Widow Thicket är tjockt spunnet med väv; Drowned Chapel och Troll Mounds rymmer äldre faror; Gravecaller Encampment är kulten nedgrävd, och Den sjunkna bastionen är myrens instansierade hjärta.',
   'guide.worldPage.peaksBlurb':
     'Vindpiskade åsar och gamla gruvverk som klättrar mot rikets kallaste, högsta faror, hållna av utposten Highwatch.',
   'guide.worldPage.peaksGreeter': 'Kapten Thessaly, Highwatch',
-  'guide.worldPage.peaksGreeting': 'Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.',
+  'guide.worldPage.peaksGreeting':
+    'Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.',
   'guide.worldPage.peaksPlaceNotes':
-    'Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar\'s War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer och Glimmermere lyser nedanför den; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.',
+    "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer och Glimmermere lyser nedanför den; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
   'guide.worldPage.places': 'Anmärkningsvärda platser',
   'guide.worldPage.residents': 'Vem du kommer att möta',
   'guide.worldPage.valeBlurb':
@@ -4159,11 +4780,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.dodged': 'Din {ability} undviks av {target}.',
   'hud.combat.floatingDodge': 'Undvek',
   'hud.combat.floatingMiss': 'Bom',
+  'hud.combat.floatingParry': 'Parerade',
   'hud.combat.healOther': 'Din {ability} läker {target} för {amount}.',
   'hud.combat.healOtherCrit': 'Din {ability} läker {target} kritiskt för {amount}.',
   'hud.combat.healSelf': 'Din {ability} läker dig för {amount}.',
   'hud.combat.healSelfCrit': 'Din {ability} läker dig kritiskt för {amount}.',
   'hud.combat.miss': 'Din {ability} missar {target}.',
+  'hud.combat.parried': 'Din {ability} pareras av {target}.',
   'hud.core.boss': 'BOSS',
   'hud.core.chatChannels.add': 'Lägg till chattkanal',
   'hud.core.chatChannels.addTitle': 'Lägg till kanal',
@@ -4239,7 +4862,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.cat': 'Varg',
   'hud.errors.challengeExpired': 'Utmaningen har gått ut.',
   'hud.errors.chatCooldown': 'Chatten har nedkylning i {seconds}s.',
-  'hud.errors.chatLocked': 'Chatten är låst i {seconds}s eftersom du skickar meddelanden för snabbt.',
+  'hud.errors.chatLocked':
+    'Chatten är låst i {seconds}s eftersom du skickar meddelanden för snabbt.',
   'hud.errors.chatSlowDown': 'Du skickar meddelanden för snabbt. Sakta ner.',
   'hud.errors.chatTooFast': 'Du skickar meddelanden för snabbt.',
   'hud.errors.dagger': 'Du måste bära en dolk.',
@@ -4248,6 +4872,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.inCombat': 'Du kan inte göra det medan du är i strid.',
   'hud.errors.invalidAttackTarget': 'Ogiltigt anfallsmål.',
   'hud.errors.invitationExpired': 'Inbjudan har gått ut.',
+  'hud.errors.needShield': 'Du måste ha en sköld utrustad.',
   'hud.errors.noPet': 'Du har inget djur.',
   'hud.errors.noRecentWhisper': 'Ingen har viskat till dig nyligen.',
   'hud.errors.noSeal': 'Du har inget aktivt sigill.',
@@ -4257,6 +4882,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'Inte tillräckligt med mana!',
   'hud.errors.notEnoughRage': 'Inte tillräckligt med raseri!',
   'hud.errors.notEnoughResource': 'Inte tillräckligt med {resource}!',
+  'hud.errors.nothingToConsume': 'Inget att förtära.',
   'hud.errors.notInParty': 'Du är inte i en grupp.',
   'hud.errors.outOfRange': 'Utom räckhåll.',
   'hud.errors.partyFull': 'Din grupp är full.',
@@ -4274,13 +4900,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetTooFar': 'Målet är för långt bort.',
   'hud.errors.tooClose': 'För nära!',
   'hud.errors.tradeExpired': 'Handelsförfrågan har gått ut.',
-  'hud.errors.tradeFailed': 'Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.',
+  'hud.errors.tradeFailed':
+    'Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.',
   'hud.errors.tradeInProgress': 'En handel pågår redan.',
   'hud.errors.tradeTooFar': 'Målet är för långt bort för att handla.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Okänt kommando: {command}. Prova /s /y /w /p /g.',
-  'hud.errors.whisperAmbiguous': 'Flera spelare matchar \'{name}\'. Använd exakt versalisering.',
-  'hud.errors.whisperMissing': 'Det finns ingen spelare vid namn \'{name}\' uppkopplad.',
+  'hud.errors.whisperAmbiguous': "Flera spelare matchar '{name}'. Använd exakt versalisering.",
+  'hud.errors.whisperMissing': "Det finns ingen spelare vid namn '{name}' uppkopplad.",
   'hud.errors.whisperSelf': 'Du muttrar för dig själv. Ingen hör det.',
   'hud.keybinds.actions.actionBarSlot': 'Handlingsfält {slot}',
   'hud.keybinds.actions.arena': 'Arena (Askgrå kolosseum)',
@@ -4393,11 +5020,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsPresetMedium': 'Medel',
   'hud.options.graphicsPresetUltra': 'Ultra',
   'hud.options.graphicsQuality': 'Grafikkvalitet',
-  'hud.options.graphicsReloadNote': 'Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.',
+  'hud.options.graphicsReloadNote':
+    'Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.',
   'hud.options.highContrastText': 'Högkontrasttext',
   'hud.options.hudOpacity': 'HUD-opacitet',
   'hud.options.interface': 'Gränssnitt',
-  'hud.options.interfaceNote': 'Dessa alternativ ändrar bara din egen vy och sparas på den här enheten.',
+  'hud.options.interfaceNote':
+    'Dessa alternativ ändrar bara din egen vy och sparas på den här enheten.',
   'hud.options.invertLook': 'Invertera blick (peka)',
   'hud.options.invertLookY': 'Invertera blick (Y)',
   'hud.options.joystickDeadzone': 'Styrspakens dödzon',
@@ -4448,9 +5077,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensive': 'Defensiv',
   'hud.pet.defensiveDesc': 'Angriper fiender som skadar dig eller ditt djur.',
   'hud.pet.healDemon': 'Läk demon',
-  'hud.pet.healDemonDesc': 'Förbruka mana för att kanalisera läkning in i din demon under 5 sekunder.',
+  'hud.pet.healDemonDesc':
+    'Förbruka mana för att kanalisera läkning in i din demon under 5 sekunder.',
   'hud.pet.healPet': 'Läk djur',
-  'hud.pet.healPetDesc': 'Klicka och klicka sedan på mat i dina väskor för att mata och läka ditt djur under 5 sekunder.',
+  'hud.pet.healPetDesc':
+    'Klicka och klicka sedan på mat i dina väskor för att mata och läka ditt djur under 5 sekunder.',
   'hud.pet.noPetFood': 'Du har ingen mat att mata ditt djur med.',
   'hud.pet.passive': 'Passiv',
   'hud.pet.passiveDesc': 'Angriper bara när du befaller det.',
@@ -4458,7 +5089,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petAttackTitle': 'Djurets anfall',
   'hud.pet.petEatsFoodOnly': 'Ditt djur kan bara äta mat.',
   'hud.pet.petNamePlaceholder': 'Djurets namn',
-  'hud.pet.petTauntDesc': 'Befall ditt djur att gå till anfall och morra när det är inom räckhåll. 10 sekunders nedkylning.',
+  'hud.pet.petTauntDesc':
+    'Befall ditt djur att gå till anfall och morra när det är inom räckhåll. 10 sekunders nedkylning.',
   'hud.pet.petTauntTitle': 'Djurets hån',
   'hud.pet.rename': 'Byt namn på djur',
   'hud.pet.renameConfirm': 'Byt namn',
@@ -4523,7 +5155,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.social.leavePrompt': 'Är du säker på att du vill lämna ditt gille?',
   'hud.social.levelClass': 'Nivå {level} {className}',
   'hud.social.makeGuildMasterTitle': 'Gör {name} till gillesmästare',
-  'hud.social.noGuild': 'Du är inte med i något gille. Grunda ett nedan, eller bli inbjuden av ett befintligt gille.',
+  'hud.social.noGuild':
+    'Du är inte med i något gille. Grunda ett nedan, eller bli inbjuden av ett befintligt gille.',
   'hud.social.noPlayerNamed': 'Ingen spelare vid namn {name} på {realm}.',
   'hud.social.nowIgnoring': 'Ignorerar nu {name}.',
   'hud.social.offlineEmpty': 'Vänner, gillen och ignoreringslistor är tillgängliga i onlinespel.',
@@ -4549,20 +5182,24 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.social.stopIgnoringTitle': 'Sluta ignorera {name}',
   'hud.social.title': 'Socialt',
   'hud.social.transferConfirm': 'Befordra',
-  'hud.social.transferPrompt': 'Göra {name} till gillesmästare? Du kommer att kliva ner till officer.',
+  'hud.social.transferPrompt':
+    'Göra {name} till gillesmästare? Du kommer att kliva ner till officer.',
   'hud.social.whisperTitle': 'Viska till {name}',
   'hud.system.arenaCountdown': 'Matchen börjar om {seconds}...',
   'hud.system.arenaDefeatBanner': 'Besegrad av {name}. Rankning {rating} ({delta})',
-  'hud.system.arenaDefeatLog': '{name} överträffade dig i Ashen Coliseum. Rankning {rating} ({delta}).',
+  'hud.system.arenaDefeatLog':
+    '{name} överträffade dig i Ashen Coliseum. Rankning {rating} ({delta}).',
   'hud.system.arenaDrawBanner': 'Arenaoavgjort mot {name} ({delta} rankning)',
-  'hud.system.arenaDrawLog': 'Arenamatchen mot {name} slutade oavgjort. Rankning {rating} ({delta}).',
+  'hud.system.arenaDrawLog':
+    'Arenamatchen mot {name} slutade oavgjort. Rankning {rating} ({delta}).',
   'hud.system.arenaFoundBanner': 'Motståndare hittad: {name}',
   'hud.system.arenaFoundLog': 'Coliseum ställer dig mot {name}, nivå {level} {className}.',
   'hud.system.arenaQueued': 'I kö till Ashen Coliseum (plats {position}).',
   'hud.system.arenaStart': 'Slåss!',
   'hud.system.arenaUnqueued': 'Du lämnar kön till Ashen Coliseum.',
   'hud.system.arenaVictoryBanner': 'Seger mot {name}! Rankning {rating} ({delta})',
-  'hud.system.arenaVictoryLog': 'Du besegrade {name} i Ashen Coliseum. Rankning {rating} ({delta}).',
+  'hud.system.arenaVictoryLog':
+    'Du besegrade {name} i Ashen Coliseum. Rankning {rating} ({delta}).',
   'hud.system.duelCountdown': 'Duellen börjar om {seconds}...',
   'hud.system.duelEndBanner': '{winner} har besegrat {loser} i en duell!',
   'hud.system.duelEndLog': '{winner} har besegrat {loser} i en duell.',
@@ -4576,7 +5213,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.trade.copper': 'koppar',
   'hud.trade.emptyMine': 'Klicka på föremål i dina väskor för att lägga till dem',
   'hud.trade.emptyTheirs': 'Inget erbjudet ännu',
-  'hud.trade.hint': 'Klicka på ett erbjudet föremål för att ta bort det. Båda sidor måste trycka på Godkänn handel.',
+  'hud.trade.hint':
+    'Klicka på ett erbjudet föremål för att ta bort det. Båda sidor måste trycka på Godkänn handel.',
   'hud.trade.money': 'Pengar',
   'hud.trade.theirOffer': '{name}s erbjudande',
   'hud.trade.title': 'Handla med {name}',
@@ -4586,15 +5224,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.doneBody':
     'Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på {questKey} när som helst för att se dina uppdrag. Lycka till på jakten.',
   'hud.tutorial.doneTitle': 'Redo för äventyr',
-  'hud.tutorial.moveBody': 'Använd {moveKeys} för att röra dig och musen för att se dig omkring. Ta några steg för att börja.',
+  'hud.tutorial.moveBody':
+    'Använd {moveKeys} för att röra dig och musen för att se dig omkring. Ta några steg för att börja.',
   'hud.tutorial.moveTitle': 'Hitta fotfästet',
   'hud.tutorial.returnBody':
     'Ditt uppdrag är slutfört. Återvänd till Marshal Redbrook och tryck på {interactKey} för att lämna in det.',
   'hud.tutorial.returnTitle': 'Hämta din belöning',
-  'hud.tutorial.seekBody': 'Marshal Redbrook väntar i staden och har arbete åt en ny klinga. Följ markören för att nå honom.',
+  'hud.tutorial.seekBody':
+    'Marshal Redbrook väntar i staden och har arbete åt en ny klinga. Följ markören för att nå honom.',
   'hud.tutorial.seekTitle': 'Sök upp marskalken',
   'hud.tutorial.skip': 'Hoppa över handledning',
-  'hud.tutorial.slayBody': 'Jaga skogsvargarna på norra vägen. Sikta på en och attackera för att tunna ut flocken.',
+  'hud.tutorial.slayBody':
+    'Jaga skogsvargarna på norra vägen. Sikta på en och attackera för att tunna ut flocken.',
   'hud.tutorial.slayProgress': 'Dödade skogsvargar: {current} / {needed}',
   'hud.tutorial.slayTitle': 'Vargar vid dörren',
   'hud.tutorial.stepLabel': 'Steg {current} av {total}',
@@ -4605,7 +5246,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.changeEmailHint':
     'Vi mejlar en bekräftelselänk till den nya adressen och ett meddelande till den gamla. Din e-post ändras först när du öppnar länken.',
   'hudChrome.account.changeEmailNew': 'Ny e-post',
-  'hudChrome.account.changeEmailSent': 'Kolla din inkorg: öppna länken vi skickade för att bekräfta din nya e-post.',
+  'hudChrome.account.changeEmailSent':
+    'Kolla din inkorg: öppna länken vi skickade för att bekräfta din nya e-post.',
   'hudChrome.account.changeEmailSubmit': 'Skicka bekräftelselänk',
   'hudChrome.account.changeEmailTitle': 'Ändra e-post',
   'hudChrome.account.changePassword': 'Ändra lösenord',
@@ -4620,8 +5262,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.deactivateWarning':
     'Avaktivering låser ditt konto och loggar ut dig överallt. Kontakta en administratör för att återställa det. Bekräfta genom att ange ditt användarnamn och lösenord igen.',
   'hudChrome.account.deactivated': 'Ditt konto har avaktiverats.',
-  'hudChrome.account.deactivatedLocked': 'Detta konto har avaktiverats. Kontakta en administratör för att återställa det.',
-  'hudChrome.account.emailHint': 'Används endast för kontoåterställning. Använd Ändra e-post nedan för att uppdatera den.',
+  'hudChrome.account.deactivatedLocked':
+    'Detta konto har avaktiverats. Kontakta en administratör för att återställa det.',
+  'hudChrome.account.emailHint':
+    'Används endast för kontoåterställning. Använd Ändra e-post nedan för att uppdatera den.',
   'hudChrome.account.emailLabel': 'E-post (valfritt)',
   'hudChrome.account.emailSaved': 'E-post sparad.',
   'hudChrome.account.errCharactersOnline': 'Logga ut alla dina rollfigurer innan du avaktiverar.',
@@ -4633,9 +5277,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordIncorrect': 'Ditt lösenord är felaktigt.',
   'hudChrome.account.errPasswordLong': 'Det nya lösenordet får vara högst 128 tecken.',
   'hudChrome.account.errPasswordShort': 'Det nya lösenordet måste vara minst 6 tecken.',
-  'hudChrome.account.errPasswordUnchanged': 'Det nya lösenordet måste skilja sig från det nuvarande.',
+  'hudChrome.account.errPasswordUnchanged':
+    'Det nya lösenordet måste skilja sig från det nuvarande.',
   'hudChrome.account.errTwoFactorCode': 'Den koden är ogiltig, försök igen.',
-  'hudChrome.account.errTwoFactorState': 'Tvåfaktorsinställningen är inte i förväntat tillstånd. Ladda om och försök igen.',
+  'hudChrome.account.errTwoFactorState':
+    'Tvåfaktorsinställningen är inte i förväntat tillstånd. Ladda om och försök igen.',
   'hudChrome.account.errUsernameMatch': 'Det användarnamnet stämmer inte med ditt konto.',
   'hudChrome.account.exportBtn': 'Ladda ner mina data',
   'hudChrome.account.exportDone': 'Dina data laddades ner. Vi har mejlat dig en bekräftelse.',
@@ -4663,7 +5309,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorBeginHint': 'Ange ditt lösenord för att påbörja inställningen.',
   'hudChrome.account.twoFactorCodeLabel': '6-siffrig kod',
   'hudChrome.account.twoFactorDisableBtn': 'Stäng av tvåfaktor',
-  'hudChrome.account.twoFactorDisableHint': 'Ange ditt lösenord för att stänga av tvåfaktor. Dina återställningskoder kommer att kastas.',
+  'hudChrome.account.twoFactorDisableHint':
+    'Ange ditt lösenord för att stänga av tvåfaktor. Dina återställningskoder kommer att kastas.',
   'hudChrome.account.twoFactorDisabledMsg': 'Tvåfaktorsautentisering är av.',
   'hudChrome.account.twoFactorDone': 'Klart',
   'hudChrome.account.twoFactorDownloadCodes': 'Ladda ner koder',
@@ -4676,11 +5323,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Lägg till denna nyckel i din autentiseringsapp (Google Authenticator, Authy, 1Password och liknande), ange sedan den 6-siffriga koden den visar.',
   'hudChrome.account.twoFactorSecretLabel': 'Inställningsnyckel',
   'hudChrome.account.twoFactorSetupBtn': 'Ställ in tvåfaktor',
-  'hudChrome.account.twoFactorStatusOff': 'Lägg till en autentiseringsapp för starkare kontosäkerhet.',
+  'hudChrome.account.twoFactorStatusOff':
+    'Lägg till en autentiseringsapp för starkare kontosäkerhet.',
   'hudChrome.account.twoFactorStatusOn': 'Tvåfaktorsautentisering är PÅ för ditt konto.',
   'hudChrome.account.twoFactorTitle': 'Tvåfaktorsautentisering',
   'hudChrome.account.twoFactorVerifyBtn': 'Verifiera och aktivera',
-  'hudChrome.account.walletSummary': 'Verifiera en Solana-plånbok för att visa innehavarsymbol på ditt spelarkort.',
+  'hudChrome.account.walletSummary':
+    'Verifiera en Solana-plånbok för att visa innehavarsymbol på ditt spelarkort.',
   'hudChrome.bags.filterAll': 'Alla',
   'hudChrome.bags.filterArmor': 'Rustning',
   'hudChrome.bags.filterConsumable': 'Förbrukningsvaror',
@@ -4698,18 +5347,23 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.character': 'Rollfigur',
   'hudChrome.bugReport.describeFirst': 'Beskriv felet innan du skickar.',
   'hudChrome.bugReport.description': 'Vad gick fel?',
-  'hudChrome.bugReport.descriptionPlaceholder': 'Beskriv felet: vad du gjorde, vad du förväntade dig och vad som hände.',
+  'hudChrome.bugReport.descriptionPlaceholder':
+    'Beskriv felet: vad du gjorde, vad du förväntade dig och vad som hände.',
   'hudChrome.bugReport.failed': 'Kunde inte skicka felrapporten. Försök igen.',
   'hudChrome.bugReport.includeScreenshot': 'Inkludera skärmbild',
   'hudChrome.bugReport.menuButton': 'Rapportera ett fel',
   'hudChrome.bugReport.position': 'Position',
-  'hudChrome.bugReport.rateLimited': 'Du har skickat flera rapporter nyligen. Vänta en stund innan du skickar en till.',
+  'hudChrome.bugReport.rateLimited':
+    'Du har skickat flera rapporter nyligen. Vänta en stund innan du skickar en till.',
   'hudChrome.bugReport.realm': 'Värld',
-  'hudChrome.bugReport.screenshotAlt': 'Skärmbild av den aktuella vyn bifogad till denna felrapport',
+  'hudChrome.bugReport.screenshotAlt':
+    'Skärmbild av den aktuella vyn bifogad till denna felrapport',
   'hudChrome.bugReport.submit': 'Skicka rapport',
   'hudChrome.bugReport.submitted': 'Felrapport skickad. Tack!',
-  'hudChrome.bugReport.submittedNoShot': 'Felrapporten skickades, men skärmbilden var för stor för att inkluderas.',
-  'hudChrome.bugReport.tooLarge': 'Den rapporten är för stor för att skickas. Försök igen utan skärmbilden.',
+  'hudChrome.bugReport.submittedNoShot':
+    'Felrapporten skickades, men skärmbilden var för stor för att inkluderas.',
+  'hudChrome.bugReport.tooLarge':
+    'Den rapporten är för stor för att skickas. Försök igen utan skärmbilden.',
   'hudChrome.bugReport.unknown': 'Okänt',
   'hudChrome.castBar.playerAria': 'Din besvärjelsemätare',
   'hudChrome.castBar.targetAria': 'Enhetens besvärjelsemätare',
@@ -4738,7 +5392,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.cameraSpeed': 'Kamerahastighet',
   'hudChrome.controller.deadzone': 'Spakens dödzon',
   'hudChrome.controller.enable': 'Aktivera handkontroll',
-  'hudChrome.controller.help': 'Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.',
+  'hudChrome.controller.help':
+    'Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.',
   'hudChrome.controller.invertY': 'Invertera kamera (Y)',
   'hudChrome.controller.menuAction': 'Spelmeny',
   'hudChrome.controller.resetButtons': 'Återställ knapplayout',
@@ -4773,7 +5428,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} s',
-  'hudChrome.mobile.autorun': 'Autospring',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik av',
   'hudChrome.mobile.jump': 'Hoppa',
@@ -4809,13 +5463,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Visa plånbok på karaktärsskärmen',
   'hudChrome.options.showWalletOnPlayerCard': 'Visa plånbok på spelarkortet',
   'hudChrome.options.uiScale': 'Gränssnittsskala',
+  'hudChrome.paperdoll.offhand': 'Bakre hand',
   'hudChrome.paperdoll.unequipAria': 'Ta av {item}',
-  'hudChrome.paperdoll.unequipHint': 'Klicka på ×, högerklicka, eller dra till väskor för att ta av',
+  'hudChrome.paperdoll.unequipHint':
+    'Klicka på ×, högerklicka, eller dra till väskor för att ta av',
   'hudChrome.perf.badges.backgrounded': 'I bakgrunden',
   'hudChrome.perf.badges.offline': 'Offline',
   'hudChrome.perf.bgColor': 'Bakgrundsfärg',
   'hudChrome.perf.colorTheme': 'Färgtema',
-  'hudChrome.perf.description': 'Välj vilka statistikvärden som ska visas, var överlägget ska sitta och hur det ser ut.',
+  'hudChrome.perf.description':
+    'Välj vilka statistikvärden som ska visas, var överlägget ska sitta och hur det ser ut.',
   'hudChrome.perf.dragHint': 'Dra överlägget för att flytta det, eller använd reglagen nedan.',
   'hudChrome.perf.enable': 'Visa prestandaöverlägg',
   'hudChrome.perf.fontScale': 'Textstorlek',
@@ -4894,7 +5551,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questShare.ineligible': 'Du uppfyller inte kraven för det här uppdraget.',
   'hudChrome.questShare.linkTitle': 'Skift-klicka för att länka det här uppdraget i chatten.',
   'hudChrome.questShare.noQuestSelected': 'Välj ett uppdrag i din loggbok att dela.',
-  'hudChrome.questShare.notInSharerParty': 'Du måste vara i {name}s grupp för att anta det uppdraget.',
+  'hudChrome.questShare.notInSharerParty':
+    'Du måste vara i {name}s grupp för att anta det uppdraget.',
   'hudChrome.questShare.notShareable': 'Det här uppdraget kan inte delas.',
   'hudChrome.questShare.viewOnlyHint': 'Gå med i delarens grupp för att anta det här uppdraget.',
   'hudChrome.questTracker.collapseHint': 'Fäll ihop uppdragsspåraren',
@@ -4903,7 +5561,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidConvert.leaderOnly': 'Endast raidledaren får omvandla till en grupp.',
   'hudChrome.raidConvert.notRaid': 'Din grupp är inte en raid.',
   'hudChrome.raidConvert.toPartyDone': 'Din raid har omvandlats tillbaka till en grupp.',
-  'hudChrome.raidConvert.tooLarge': 'En raid med fler än fem medlemmar kan inte omvandlas tillbaka till en grupp.',
+  'hudChrome.raidConvert.tooLarge':
+    'En raid med fler än fem medlemmar kan inte omvandlas tillbaka till en grupp.',
   'hudChrome.raidLockout.allReady': 'Alla raider redo',
   'hudChrome.raidLockout.daysHours': '{d}d {h}h',
   'hudChrome.raidLockout.hoursMinutes': '{h}h {m}m',
@@ -4916,22 +5575,30 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.mainHud': 'Hoppa till huvud-HUD',
   'hudChrome.spellbook.addToBarAria': 'Lägg till {name} i handlingsfältet',
   'hudChrome.spellbook.removeFromBarAria': 'Ta bort {name} från handlingsfältet',
-  'hudChrome.statInfo.desc.agi': 'Skärper dina reflexer och din sikte, vilket förbättrar flera av dina stridsattribut.',
+  'hudChrome.statInfo.desc.agi':
+    'Skärper dina reflexer och din sikte, vilket förbättrar flera av dina stridsattribut.',
   'hudChrome.statInfo.desc.armor':
     'Mildrar inkommande fysiska slag. Minskningen är större mot anfallare på lägre nivå och har ett tak på 75 %.',
-  'hudChrome.statInfo.desc.attackPower': 'Driver dina vapenattacker. Var 14:e attackstyrka ger 1 skada per sekund.',
-  'hudChrome.statInfo.desc.critChance': 'Din chans att en attack träffar kritiskt och orsakar dubbel skada.',
-  'hudChrome.statInfo.desc.dodge': 'Din chans att helt undvika en inkommande närstridsattack utan att ta skada.',
+  'hudChrome.statInfo.desc.attackPower':
+    'Driver dina vapenattacker. Var 14:e attackstyrka ger 1 skada per sekund.',
+  'hudChrome.statInfo.desc.critChance':
+    'Din chans att en attack träffar kritiskt och orsakar dubbel skada.',
+  'hudChrome.statInfo.desc.dodge':
+    'Din chans att helt undvika en inkommande närstridsattack utan att ta skada.',
   'hudChrome.statInfo.desc.dps':
     'Din uppskattade vapenskada per sekund, som kombinerar ditt vapens skada och hastighet med din attackstyrka.',
-  'hudChrome.statInfo.desc.int': 'Utvidgar en besvärjares manapool och förbättrar chansen att landa en kritisk besvärjelseträff.',
-  'hudChrome.statInfo.desc.spi': 'Snabbar på hur fort en besvärjares mana återkommer under vila, utanför strid.',
-  'hudChrome.statInfo.desc.sta': 'Härdar din kropp, höjer din maximala hälsa och hur snabbt du återhämtar hälsa under vila.',
+  'hudChrome.statInfo.desc.int':
+    'Utvidgar en besvärjares manapool och förbättrar chansen att landa en kritisk besvärjelseträff.',
+  'hudChrome.statInfo.desc.spi':
+    'Snabbar på hur fort en besvärjares mana återkommer under vila, utanför strid.',
+  'hudChrome.statInfo.desc.sta':
+    'Härdar din kropp, höjer din maximala hälsa och hur snabbt du återhämtar hälsa under vila.',
   'hudChrome.statInfo.desc.str': 'Ökar din attackstyrka, så att dina vapenslag landar hårdare.',
   'hudChrome.statInfo.effects.armor': '+{value} Rustning',
   'hudChrome.statInfo.effects.attackPower': '+{value} Attackstyrka',
   'hudChrome.statInfo.effects.critPct': '+{value} % Kritisk träff',
-  'hudChrome.statInfo.effects.damageReduction': 'Skademinskning mot en anfallare på nivå {level}: {value} %',
+  'hudChrome.statInfo.effects.damageReduction':
+    'Skademinskning mot en anfallare på nivå {level}: {value} %',
   'hudChrome.statInfo.effects.dodgePct': '+{value} % Undvik',
   'hudChrome.statInfo.effects.dpsFromAp': 'Lägger till {value} skada per sekund till dina attacker',
   'hudChrome.statInfo.effects.healthRegen': 'Cirka {value} hälsa var 5:e sek under vila',
@@ -4941,8 +5608,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.effects.rangedAttackPower': '+{value} Distansattackstyrka',
   'hudChrome.statInfo.effects.spellCritPct': '+{value} % Kritisk besvärjelseträff',
   'hudChrome.statInfo.fromYour': 'Från dina {value} {stat}:',
-  'hudChrome.statInfo.notes.baseChance': 'Inkluderar en grundchans på 5 % som delas av alla äventyrare.',
-  'hudChrome.statInfo.notes.dpsApprox': 'En uppskattning, den utesluter kritiska träffar och förmågeskada.',
+  'hudChrome.statInfo.notes.baseChance':
+    'Inkluderar en grundchans på 5 % som delas av alla äventyrare.',
+  'hudChrome.statInfo.notes.dpsApprox':
+    'En uppskattning, den utesluter kritiska träffar och förmågeskada.',
   'hudChrome.statInfo.notes.minorForClass': 'Till föga nytta för din klass.',
   'hudChrome.swing.ready': 'Sving',
   'hudChrome.swing.seconds': '{seconds}s',
@@ -4963,7 +5632,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'Midnatt',
   'hudChrome.theme.presets.parchment': 'Pergament',
   'hudChrome.theme.reset': 'Återställ',
-  'hudChrome.tips.joinChannels': 'Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen.',
+  'hudChrome.tips.joinChannels':
+    'Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen.',
   'hudChrome.tutorial.doneBodyTouch':
     'Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten.',
   'hudChrome.tutorial.moveBodyTouch':
@@ -5022,7 +5692,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.expiredListing': 'Din marknadsannons av {item} gick ut och väntar hos Handlaren.',
   'itemUi.logs.listedItem': 'Annonserade {item} på Världsmarknaden för {money}.',
   'itemUi.logs.reclaimedItem': 'Återtog {item} från marknaden.',
-  'itemUi.logs.sellerSold': '{buyer} köpte din {item} för {money}. Hämta {proceeds} från Handlaren.',
+  'itemUi.logs.sellerSold':
+    '{buyer} köpte din {item} för {money}. Hämta {proceeds} från Handlaren.',
   'itemUi.loot.close': 'Stäng byte',
   'itemUi.loot.takeAll': 'Ta allt',
   'itemUi.lootRoll.everyonePassed': 'Alla avstod från {item}.',
@@ -5034,17 +5705,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': 'Avstå från {item}',
   'itemUi.lootRoll.title': 'Slå tärning om byte',
   'itemUi.market.browse': 'Bläddra',
-  'itemUi.market.browseNote': 'Varor annonserade av äventyrare i hela riket. Välj Köp för att köpa en hög direkt.',
+  'itemUi.market.browseNote':
+    'Varor annonserade av äventyrare i hela riket. Välj Köp för att köpa en hög direkt.',
   'itemUi.market.buy': 'Köp',
   'itemUi.market.buyAria': 'Köp {item} för {price}',
   'itemUi.market.close': 'Stäng marknad',
   'itemUi.market.collect': 'Hämta',
   'itemUi.market.collectAll': 'Hämta allt',
-  'itemUi.market.collectEmpty': 'Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.',
+  'itemUi.market.collectEmpty':
+    'Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.',
   'itemUi.market.collectNote': 'Intäkter och returnerade varor som Handlaren håller åt dig.',
   'itemUi.market.collectWithCount': 'Hämta ({count})',
   'itemUi.market.each': '{money} styck',
-  'itemUi.market.emptyBrowse': 'Marknaden är tyst. Bli den första att annonsera något under fliken Sälj.',
+  'itemUi.market.emptyBrowse':
+    'Marknaden är tyst. Bli den första att annonsera något under fliken Sälj.',
   'itemUi.market.emptyFiltered': 'Inga annonser matchar de filtren.',
   'itemUi.market.emptySearch': 'Inga varor matchar din sökning. Prova ett annat namn.',
   'itemUi.market.filterArmorAll': 'All rustning',
@@ -5088,11 +5762,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.sell': 'Sälj',
   'itemUi.market.sellNote':
     'Lägg upp varor från dina väskor. Köpmannen tar {cut}% i provision när ett föremål säljs. Du använder {used}/{max} listningsplatser.',
-  'itemUi.market.sellPickEmpty': 'Klicka på ett föremål i dina väskor för att välja vad du vill sälja.',
+  'itemUi.market.sellPickEmpty':
+    'Klicka på ett föremål i dina väskor för att välja vad du vill sälja.',
   'itemUi.market.stackCount': 'x{count}',
   'itemUi.market.subtitle': 'Köpmannens handelsplats',
   'itemUi.market.title': 'Världsmarknaden',
-  'itemUi.market.truncated': 'Visar {shown} av {total} träffar. Förfina din sökning för att se resten.',
+  'itemUi.market.truncated':
+    'Visar {shown} av {total} träffar. Förfina din sökning för att se resten.',
   'itemUi.market.weaponAxe': 'Yxor',
   'itemUi.market.weaponDagger': 'Dolkar',
   'itemUi.market.weaponMace': 'Spikklubbor',
@@ -5118,6 +5794,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.legs': 'Ben',
   'itemUi.slots.mainhand': 'Främre hand',
   'itemUi.slots.shoulder': 'Axlar',
+  'itemUi.slots.twoHand': 'Tvåhänt',
   'itemUi.slots.waist': 'Midja',
   'itemUi.stats.agi': 'Smidighet',
   'itemUi.stats.armor': 'Rustning',
@@ -5152,18 +5829,23 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': 'Uppdragsföremål',
   'itemUi.tooltip.sellPrice': 'Försäljningspris: {money}',
   'itemUi.tooltip.stat': '+{value} {stat}',
-  'itemUi.tooltip.useDrink': 'Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.',
+  'itemUi.tooltip.useDrink':
+    'Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.',
   'itemUi.tooltip.useFishing': 'Använd: Fiska i närliggande vatten.',
-  'itemUi.tooltip.useFood': 'Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.',
-  'itemUi.tooltip.useHealingPotion': 'Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.',
-  'itemUi.tooltip.useManaPotion': 'Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.',
+  'itemUi.tooltip.useFood':
+    'Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.',
+  'itemUi.tooltip.useHealingPotion':
+    'Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.',
+  'itemUi.tooltip.useManaPotion':
+    'Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.',
   'itemUi.vendor.buyAria': 'Köp {item} för {price}',
   'itemUi.vendor.buybackAria': 'Köp tillbaka {item} för {price}',
   'itemUi.vendor.buybackEmpty': 'Inga föremål',
   'itemUi.vendor.buybackTitle': 'Återköp',
   'itemUi.vendor.close': 'Stäng köpman',
   'itemUi.vendor.goodsTitle': '{name}: Varor',
-  'itemUi.vendor.hint': 'Klicka på ett föremål i dina väskor för att sälja det medan detta fönster är öppet.',
+  'itemUi.vendor.hint':
+    'Klicka på ett föremål i dina väskor för att sälja det medan detta fönster är öppet.',
   'itemUi.vendor.sellJunk': 'Sälj skräp',
   'itemUi.vendor.sellJunkAria': 'Sälj allt skräp för {price}',
   'itemUi.vendor.sellJunkHint': 'Säljer varje grått föremål i dina väskor utom uppdragsföremål.',
@@ -5175,7 +5857,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': 'Ansluter till världen...',
   'loading.connectionLost': 'Anslutningen till servern bröts.',
   'loading.connectionRejected': 'Servern stängde anslutningen.',
-  'loading.enterTimeout': 'Kunde inte gå in i världen. Anslutningen tog för lång tid. Körs spelservern?',
+  'loading.enterTimeout':
+    'Kunde inte gå in i världen. Anslutningen tog för lång tid. Körs spelservern?',
   'loading.enteringWorld': 'Går in i världen...',
   'loading.rendererFailed': 'Kunde inte starta renderaren: försök läsa om sidan. {error}',
   'loading.world': 'Läser in världen...',
@@ -5221,19 +5904,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'lockpickUi.withdraw': 'Dra dig tillbaka (Esc)',
   'lockpickUi.withdrawAria': 'Dra dig tillbaka',
   'meta.builtOn': 'Byggd {date}',
-  'mobilePreflight.androidInstallDetail': 'För helskärm på Android, installera den här sidan eller lägg först till den på din Hemskärm.',
-  'mobilePreflight.androidInstallStep': 'I Chrome, tryck på menyn och sedan Installera app eller Lägg till på Hemskärmen.',
+  'mobilePreflight.androidInstallDetail':
+    'För helskärm på Android, installera den här sidan eller lägg först till den på din Hemskärm.',
+  'mobilePreflight.androidInstallStep':
+    'I Chrome, tryck på menyn och sedan Installera app eller Lägg till på Hemskärmen.',
   'mobilePreflight.androidOpenStep': 'Öppna World of ClaudeCraft från den nya ikonen.',
-  'mobilePreflight.androidStandaloneDetail': 'Du är i helskärmsläge för appen. Håll enheten i liggande läge.',
+  'mobilePreflight.androidStandaloneDetail':
+    'Du är i helskärmsläge för appen. Håll enheten i liggande läge.',
   'mobilePreflight.baseLandscape': 'Rotera din enhet till liggande läge innan du går in i världen.',
   'mobilePreflight.basePerformance':
     'Mobilprestandan kan vara försämrad. Stäng extra flikar och sänk Renderingskvaliteten om spelet känns långsamt.',
   'mobilePreflight.continue': 'Fortsätt till spelet',
-  'mobilePreflight.iosInstallDetail': 'För äkta helskärm på iPhone eller iPad, installera först den här sidan på din Hemskärm.',
+  'mobilePreflight.iosInstallDetail':
+    'För äkta helskärm på iPhone eller iPad, installera först den här sidan på din Hemskärm.',
   'mobilePreflight.iosOpenStep': 'Öppna World of ClaudeCraft från den nya Hemskärmsikonen.',
   'mobilePreflight.iosShareStep': 'I Safari, tryck på Dela och sedan Lägg till på Hemskärmen.',
-  'mobilePreflight.iosStandaloneDetail': 'Du är i helskärmsläge från hemskärmen. Håll enheten i liggande läge.',
-  'mobilePreflight.otherInstallDetail': 'Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse.',
+  'mobilePreflight.iosStandaloneDetail':
+    'Du är i helskärmsläge från hemskärmen. Håll enheten i liggande läge.',
+  'mobilePreflight.otherInstallDetail':
+    'Installera eller lägg till den här sidan på din Hemskärm för bästa mobila helskärmsupplevelse.',
   'mobilePreflight.otherStandaloneDetail': 'Håll din enhet i liggande helskärm.',
   'mobilePreflight.rotateSub': 'Spela i liggande helskärm för bästa mobila upplevelse.',
   'mobilePreflight.rotateTitle': 'Rotera till liggande läge',
@@ -5301,7 +5990,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'playerCard.realmSubtitle': 'Världen {realm}',
   'playerCard.recruited': '{count} värvade',
   'playerCard.referralLinkAria': 'Din värvningslänk',
-  'playerCard.referralLinkLabel': 'Din värvningslänk. Alla som ansluter via den tillgodoräknas dig:',
+  'playerCard.referralLinkLabel':
+    'Din värvningslänk. Alla som ansluter via den tillgodoräknas dig:',
   'playerCard.renderFailed': 'Kunde inte rendera ditt kort. Prova en annan pose.',
   'playerCard.renderFailedStatus': 'Kortrenderingen misslyckades.',
   'playerCard.shareButton': 'Dela spelarkort',
@@ -5311,7 +6001,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'playerCard.statusDownloaded': 'Kortet nedladdat.',
   'playerCard.statusGenericError': 'Något gick fel.',
   'playerCard.statusOpenedXWithImage': 'Öppnade X. Klistra in kortbilden i inlägget.',
-  'playerCard.statusOpenedXWithLink': 'Öppnade X med din länk. Kortbilden visas efter att du publicerat från en offentlig domän.',
+  'playerCard.statusOpenedXWithLink':
+    'Öppnade X med din länk. Kortbilden visas efter att du publicerat från en offentlig domän.',
   'playerCard.statusPublished': 'Kortet publicerat. Dela din värvningslänk nedan.',
   'playerCard.statusPublishing': 'Publicerar kort...',
   'playerCard.statusReferralCopied': 'Värvningslänken kopierad. Dela den var som helst.',
@@ -5390,10 +6081,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'realm.onlineNow': '{count} online nu',
   'realm.popTipFull':
     'Full befolkning: 80 eller fler spelare online just nu. Mycket livligt; du kan få vänta i en inloggningskö.',
-  'realm.popTipHigh': 'Hög befolkning: 40 till 79 spelare online just nu. Livligt, med många spelare runtomkring.',
-  'realm.popTipLow': 'Låg befolkning: färre än 15 spelare online just nu. Gott om plats; perfekt för en nystart.',
-  'realm.popTipMedium': 'Medelhög befolkning: 15 till 39 spelare online just nu. En frisk och aktiv värld.',
-  'realm.popTipOffline': 'Offline: den här världen går inte att nå just nu och kan inte anslutas till.',
+  'realm.popTipHigh':
+    'Hög befolkning: 40 till 79 spelare online just nu. Livligt, med många spelare runtomkring.',
+  'realm.popTipLow':
+    'Låg befolkning: färre än 15 spelare online just nu. Gott om plats; perfekt för en nystart.',
+  'realm.popTipMedium':
+    'Medelhög befolkning: 15 till 39 spelare online just nu. En frisk och aktiv värld.',
+  'realm.popTipOffline':
+    'Offline: den här världen går inte att nå just nu och kan inte anslutas till.',
   'realm.recommended': 'Rekommenderas',
   'realm.selectedRealm': 'Värld: {name}',
   'realm.statsOffline': 'Offline',
@@ -5429,7 +6124,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.cannotEnterNow': 'Du kan inte gå in i en fördjupning just nu.',
   'sim.delve.cannotInteract': 'Du kan inte interagera med det.',
   'sim.delve.chestEmpty': 'Kistan är tom.',
-  'sim.delve.companionMarksRequired': 'Du behöver {marks} Fördjupningsmärken för att uppgradera {name}.',
+  'sim.delve.companionMarksRequired':
+    'Du behöver {marks} Fördjupningsmärken för att uppgradera {name}.',
   'sim.delve.companionMaxRank': 'Den här följeslagaren är redan fullt uppgraderad.',
   'sim.delve.companionRankUp': '{name} når rang {rank}.',
   'sim.delve.complete': '{name} slutförd.',
@@ -5444,7 +6140,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveDungeonFirst': 'Lämna fängelsehålan först.',
   'sim.delve.levelRequired': 'Du måste vara nivå {level} för att gå in i {name}.',
   'sim.delve.levelRequiredTier': 'Du måste vara nivå {level} för att gå in i {name} på {tier}.',
-  'sim.delve.mechanismOpen': 'En mekanism klickar upp i närheten. En passage öppnas mot norr. Hitta utgångsportalen längre fram.',
+  'sim.delve.mechanismOpen':
+    'En mekanism klickar upp i närheten. En passage öppnas mot norr. Hitta utgångsportalen längre fram.',
   'sim.delve.moduleEnter': '{name}: {objective}',
   'sim.delve.moveCloserChest': 'Gå närmare kistan.',
   'sim.delve.moveCloserPassage': 'Gå närmare passagen.',
@@ -5459,12 +6156,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.runFailed': '{name}-körningen misslyckades.',
   'sim.delve.shopItemLocked': 'Du har inte låst upp det föremålet ännu.',
   'sim.delve.shopMarksRequired': 'Du behöver {marks} Fördjupningsmärken för att köpa {name}.',
-  'sim.delve.shopSealPremiumOnly': 'Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.',
+  'sim.delve.shopSealPremiumOnly':
+    'Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.',
   'sim.delve.strikeWall': 'Slå på väggen för att bryta igenom.',
   'sim.delve.surfaceStairs': 'En trappa till ytan öppnas. Tryck F vid trappan för att lämna.',
   'sim.delve.tombstoneHint': 'En gravstenspassage öppnas mot norr när rummet är rensat.',
   'sim.delve.tombstoneInto': 'Du passerar genom gravstenen in i {name}.',
-  'sim.delve.tombstoneOpen': 'En förseglad gravstenspassage gnisslar upp mot norr. Gå in i den för att fortsätta.',
+  'sim.delve.tombstoneOpen':
+    'En förseglad gravstenspassage gnisslar upp mot norr. Gå in i den för att fortsätta.',
   'sim.delve.tooFar': 'Du är för långt bort.',
   'sim.delve.unknownCompanion': 'Okänd följeslagare.',
   'sim.delve.unknownTier': 'Okänd fördjupningsnivå.',
@@ -5473,8 +6172,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.alreadyInProgress': 'Någon arbetar redan med låset.',
   'sim.lockpick.cannotPickThat': 'Du kan inte dyrka upp det.',
   'sim.lockpick.chooseAnte': 'Välj 1, 2 eller 3 dyrkar.',
-  'sim.lockpick.lastPickSnaps': 'Den sista dyrken går av. Låset kärvar. Kistan är förlorad om du inte rensar fördjupningen igen.',
-  'sim.lockpick.lockJammed': 'Låset har kärvat bortom upplåsning. Rensa fördjupningen igen för ett nytt försök.',
+  'sim.lockpick.lastPickSnaps':
+    'Den sista dyrken går av. Låset kärvar. Kistan är förlorad om du inte rensar fördjupningen igen.',
+  'sim.lockpick.lockJammed':
+    'Låset har kärvat bortom upplåsning. Rensa fördjupningen igen för ett nytt försök.',
   'sim.lockpick.lockYields': 'Låset ger vika! {tier} byte.',
   'sim.lockpick.noAttempt': 'Inget låsförsök pågår.',
   'sim.lockpick.notYours': 'Det är inte ditt lås.',
@@ -5505,7 +6206,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'skinEvent.previewHint': 'Dra för att rotera',
   'skinEvent.previewOnly': 'Endast förhandsvisning, fullständig upplåsning kommer snart',
   'skinEvent.rolled': 'Du slog {rank}',
-  'skinEvent.subtitle': 'Du låste upp en {rank}-belöning, välj valfri skin på den nivån eller lägre.',
+  'skinEvent.subtitle':
+    'Du låste upp en {rank}-belöning, välj valfri skin på den nivån eller lägre.',
   'skinEvent.title': 'Kosmetisk förvaring',
   'skinEvent.unavailable': 'Kommer snart',
   'skinEvent.unequip': 'Ta av',
@@ -5533,20 +6235,28 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.connectedTitle': 'Ansluten. Logga in för att länka plånboken till ditt konto.',
   'wallet.connectedWithBalance': 'Ansluten: {balance} - {address}',
   'wallet.flowConnect': 'Välj en plånbok. Verifieringen fortsätter automatiskt.',
-  'wallet.flowSign': 'Signera verifieringsmeddelandet i din plånboksapp. Ingen transaktion eller SOL krävs.',
+  'wallet.flowSign':
+    'Signera verifieringsmeddelandet i din plånboksapp. Ingen transaktion eller SOL krävs.',
   'wallet.flowVerify': 'Verifierar plånboksägande...',
   'wallet.helpDisconnected':
     'Verifiera en Solana-plånbok för att aktivera innehavarmärke och spelarkortsmärken. Ingen transaktion eller SOL krävs.',
-  'wallet.helpLinked': 'Innehavarförmåner är aktiva. Plånboksappen är ansluten i den här webbläsaren.',
-  'wallet.helpLinkedDisconnected': 'Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.',
-  'wallet.helpLinkedDisconnectedWithBalance': 'Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.',
-  'wallet.helpLinkedWithBalance': 'Innehavarförmåner är aktiva. Plånboksappen är ansluten i den här webbläsaren.',
+  'wallet.helpLinked':
+    'Innehavarförmåner är aktiva. Plånboksappen är ansluten i den här webbläsaren.',
+  'wallet.helpLinkedDisconnected':
+    'Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.',
+  'wallet.helpLinkedDisconnectedWithBalance':
+    'Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.',
+  'wallet.helpLinkedWithBalance':
+    'Innehavarförmåner är aktiva. Plånboksappen är ansluten i den här webbläsaren.',
   'wallet.helpLoginToLink': 'Ansluten {address}. Logga in för att länka den till ditt konto.',
-  'wallet.helpLoginToLinkWithBalance': 'Ansluten {address} med {balance}. Logga in för att länka den till ditt konto.',
-  'wallet.helpReadyToLink': 'Plånbok vald: {address}. Signera en gång för att verifiera innehavarmärke och spelarkort.',
+  'wallet.helpLoginToLinkWithBalance':
+    'Ansluten {address} med {balance}. Logga in för att länka den till ditt konto.',
+  'wallet.helpReadyToLink':
+    'Plånbok vald: {address}. Signera en gång för att verifiera innehavarmärke och spelarkort.',
   'wallet.helpReadyToLinkWithBalance':
     'Plånbok vald: {address} med {balance}. Signera en gång för att verifiera innehavarmärke och spelarkort.',
-  'wallet.hiddenNotice': 'Plånboksraden är dold. Aktivera den igen i spelet via Alternativ > Gränssnitt.',
+  'wallet.hiddenNotice':
+    'Plånboksraden är dold. Aktivera den igen i spelet via Alternativ > Gränssnitt.',
   'wallet.hide': 'Dölj',
   'wallet.hideAria': 'Dölj plånboksraden på den här skärmen',
   'wallet.hideTitle': 'Dölj plånboksraden på den här skärmen',
@@ -5591,9 +6301,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.label': '$WOC-plånbok',
   'wallet.linkFailed': 'Plånboksverifieringen misslyckades.',
   'wallet.linkTitle': 'Klicka för att signera och länka den här plånboken till ditt konto.',
-  'wallet.linkedDisconnectedAria': 'Plånboken är fortfarande verifierad för ditt konto. Återanslut för att hantera plånboksappen.',
-  'wallet.linkedDisconnectedTitle': 'Plånboken är fortfarande verifierad för ditt konto. Återanslut för att hantera plånboksappen.',
-  'wallet.linkedTitle': 'Plånboken är verifierad för ditt konto. Klicka för att hantera plånboksappen.',
+  'wallet.linkedDisconnectedAria':
+    'Plånboken är fortfarande verifierad för ditt konto. Återanslut för att hantera plånboksappen.',
+  'wallet.linkedDisconnectedTitle':
+    'Plånboken är fortfarande verifierad för ditt konto. Återanslut för att hantera plånboksappen.',
+  'wallet.linkedTitle':
+    'Plånboken är verifierad för ditt konto. Klicka för att hantera plånboksappen.',
   'wallet.signOut': 'Koppla från',
   'wallet.signOutAria': 'Koppla från plånboksappen i den här webbläsaren',
   'wallet.signOutTitle': 'Koppla från plånboksappen i den här webbläsaren',
@@ -5621,11 +6334,32 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Tryck på F för att klättra',
   'worldContent.dungeonExitName': 'Utgång från {name}',
   'worldContent.dungeonInstanceBusy': 'Alla instanser av {name} är upptagna. Försök igen snart.',
-  'worldContent.dungeonPartyWarning': '{name} är avsedd för en fullständig grupp på {count}. Var försiktig.',
+  'worldContent.dungeonPartyWarning':
+    '{name} är avsedd för en fullständig grupp på {count}. Var försiktig.',
   'hudChrome.auraEffect.dot': 'Gör {value} {school}-skada var {interval}:e s',
   'hudChrome.auraEffect.hot': 'Återställer {value} hälsa var {interval}:e s',
   'hudChrome.auraEffect.absorb': 'Absorberar {value} skada',
   'hudChrome.auraEffect.healAbsorb': 'Absorberar {value} inkommande läkning',
+  'hudChrome.auraEffect.avatar': 'Koloss: vållad skada ökad med {pct}%',
+  'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
+  'hudChrome.auraEffect.battleTrance':
+    'Ditt nästa Plundrarhugg eller Stympande hugg kostar inget raseri',
+  'hudChrome.auraEffect.berserkerStance':
+    'Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare',
+  'hudChrome.auraEffect.bloodbath': 'Ökar kritisk träffchans och vållad skada med {pct}%',
+  'hudChrome.auraEffect.crit': 'Ökar kritisk träffchans med {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Minskar skadan du tar med {pct}% ({lowPct}% under {hpPct}% hälsa)',
+  'hudChrome.auraEffect.dmgDone': 'Ökar vållad skada med {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Minskar vållad skada med {pct}%',
+  'hudChrome.auraEffect.maxHpPct': 'Ökar maximal hälsa med {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Ökar raserigenereringen med {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Ökar kritisk träffchans med {pct}% och raserigenereringen med {ragePct}%',
+  'hudChrome.auraEffect.revengeFree': 'Din nästa Hämnd kostar inget raseri',
+  'hudChrome.auraEffect.sanguine':
+    'Ökar attackhastigheten med {hastePct}% och vållad skada med {dmgPct}%',
+  'hudChrome.auraEffect.victoryRush': 'Segerrus är redo',
   'hudChrome.auraEffect.thorns': 'Verursacht bei Angreifern {value} {school}schaden',
   'hudChrome.auraEffect.slow': 'Verringert Bewegungstempo um {pct}%',
   'hudChrome.auraEffect.speed': 'Erhöht Bewegungstempo um {pct}%',
@@ -5705,29 +6439,38 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.crownforged.name': 'Bonewrought-regalier',
   'entities.itemSets.crownforged.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.crownforged.bonus3': 'Ökar styrka med 15, uthållighet med 15 samt attack- och magihastighet med 15%.',
+  'entities.itemSets.crownforged.bonus3':
+    'Ökar styrka med 15, uthållighet med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.deathlord.name': 'Barrowlords stridsutrustning',
   'entities.itemSets.deathlord.bonus2': 'Ökar attackkraft med 40.',
   'entities.itemSets.deathlord.bonus3': 'Ökar styrka med 15 och uthållighet med 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Gråkäftssmygarens utrustning',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-skrud',
-  'entities.itemSets.necromancers.bonus2': 'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+  'entities.itemSets.necromancers.bonus2':
+    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
   'entities.itemSets.necromancers.bonus3': 'Ökar intellekt med 10 och uthållighet med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-päls',
   'entities.itemSets.nighttalon.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.nighttalon.bonus3': 'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
+  'entities.itemSets.nighttalon.bonus3':
+    'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-regalier',
-  'entities.itemSets.soulflame.bonus2': 'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
-  'entities.itemSets.soulflame.bonus3': 'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
+  'entities.itemSets.soulflame.bonus2':
+    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+  'entities.itemSets.soulflame.bonus3':
+    'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-skrud',
-  'entities.itemSets.stormcallers.bonus2': 'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
-  'entities.itemSets.stormcallers.bonus3': 'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+  'entities.itemSets.stormcallers.bonus3':
+    'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens skrud',
   'entities.itemSets.vale_arcanist.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang-skrud',
   'entities.itemSets.wyrmshadow.bonus2': 'Ökar attackkraft med 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Ökar smidighet med 15 och kritisk chans med 2%.',
+  'hudChrome.itemHeroicTag': '[HEROISK]',
+  'hudChrome.itemSoulbound': 'Själsbunden',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Motstod',
@@ -5762,14 +6505,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tiers.mythic': 'Mytisk',
   'hudChrome.discord.loginCta': 'Fortsätt med Discord',
   'hudChrome.discord.choice.title': 'Fortsätt med Discord',
-  'hudChrome.discord.choice.intro': 'Skapa ett nytt konto, eller länka ditt Discord till ett du redan har.',
+  'hudChrome.discord.choice.intro':
+    'Skapa ett nytt konto, eller länka ditt Discord till ett du redan har.',
   'hudChrome.discord.choice.greeting': 'Välkommen, {name}!',
   'hudChrome.discord.choice.createCta': 'Skapa ett nytt konto',
   'hudChrome.discord.choice.haveAccount': 'Har du redan ett konto?',
   'hudChrome.discord.choice.linkCta': 'Länka ett befintligt konto',
   'hudChrome.discord.choice.linkSubmit': 'Länka konto',
   'hudChrome.discord.choice.error': 'Det gick inte att fortsätta. Försök igen.',
-  'hudChrome.discord.choice.expired': 'Den Discord-inloggningen gick ut. Logga in med Discord igen.',
+  'hudChrome.discord.choice.expired':
+    'Den Discord-inloggningen gick ut. Logga in med Discord igen.',
   'hudChrome.discord.keep.title': 'Ange ett lösenord',
   'hudChrome.discord.keep.body':
     'Ditt konto loggar in med Discord. Ange ett lösenord så att du fortfarande kan logga in med ditt användarnamn efter avlänkning.',
@@ -5809,7 +6554,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': 'Låst',
   'hudChrome.discord.tierCurrent': 'Nuvarande',
   'hudChrome.discord.earnTitle': 'Så tjänar du poäng',
-  'hudChrome.discord.earnBody': 'Tjäna poäng på speltid i spelet och på att vara aktiv i Discord. Poäng höjer din statusnivå.',
+  'hudChrome.discord.earnBody':
+    'Tjäna poäng på speltid i spelet och på att vara aktiv i Discord. Poäng höjer din statusnivå.',
   'hudChrome.discord.memberSince': 'Medlem sedan',
   'hudChrome.discord.memberSinceDays': '{days}d i Discord',
   'hudChrome.discord.roleTag.levyst': 'Levy St',
@@ -5859,7 +6605,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
-  'errors.api.desktopCodeInvalid': 'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
+  'errors.api.desktopCodeInvalid':
+    'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
   'desktop.crash.body': 'Spelvyn slutade fungera. Ladda om den?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft stötte på ett oväntat fel och måste stängas.',
   'desktop.crash.quit': 'Avsluta',
@@ -5867,7 +6614,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.update.downloading': 'Laddar ner uppdatering {version}...',
   'desktop.update.later': 'Senare',
-  'desktop.update.ready': 'Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.',
+  'desktop.update.ready':
+    'Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.',
   'desktop.update.restart': 'Starta om nu',
   'hudChrome.dailyRewards.close': 'Stäng dagliga belöningar',
   'hudChrome.dailyRewards.endsIn': 'Slutar om {time}',
@@ -5882,7 +6630,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.prize': 'Prispott',
   'hudChrome.dailyRewards.reason.eligible': 'Belöningar upplåsta.',
   'hudChrome.dailyRewards.reason.no_wallet': 'Anslut en plånbok med minst 20 USD i WOC.',
-  'hudChrome.dailyRewards.reason.price_unavailable': 'WOC-priset är otillgängligt, belöningar är tillfälligt låsta.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC-priset är otillgängligt, belöningar är tillfälligt låsta.',
   'hudChrome.dailyRewards.reason.under_minimum': 'Plånboken är under WOC-miniminivån på 20 USD.',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours} h {minutes} min',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1 min',
@@ -5903,12 +6652,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.title': 'Dagliga belöningar',
   'hudChrome.dailyRewards.unknown': 'Okänd',
   'hudChrome.dailyRewards.usd': '{amount} USD',
-  'hudChrome.dailyRewards.walletConnectBody': 'Verifiera en Solana-plånbok med WOC för att låsa upp dagliga belöningar.',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Verifiera en Solana-plånbok med WOC för att låsa upp dagliga belöningar.',
   'hudChrome.dailyRewards.walletConnectButton': 'Verifiera plånbok',
   'hudChrome.dailyRewards.walletConnectTitle': 'Verifiera plånbok',
-  'hudChrome.dailyRewards.walletHoldBody': 'Håll minst {amount} USD i WOC för att låsa upp dagliga belöningar.',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Håll minst {amount} USD i WOC för att låsa upp dagliga belöningar.',
   'hudChrome.dailyRewards.walletHoldTitle': 'Håll WOC',
-  'hudChrome.dailyRewards.walletPriceBody': 'WOC-prissättningen är otillgänglig just nu. Kom tillbaka snart.',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'WOC-prissättningen är otillgänglig just nu. Kom tillbaka snart.',
   'hudChrome.dailyRewards.walletValue': 'Plånbokens värde (WOC)',
   'hudChrome.nativeUpdate.body':
     'En ny version av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.',
@@ -5947,7 +6699,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Silke',
   'hudChrome.corpseHarvest.components.tusk': 'Bete',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsäck',
-  'hudChrome.corpseHarvest.concentrateHint': 'Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.harvestButton': 'Skörda',
   'hudChrome.corpseHarvest.title': 'Skörda',
   'hudChrome.mobile.hotbarPage': 'Förmågor',
@@ -5955,12 +6708,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountSessionLimit': 'För många karaktärer på detta konto är redan i världen.',
   'errors.api.crossSiteOrigin': 'Begäran blockerades av säkerhetsskäl.',
   'errors.api.unsupportedMediaType': 'Formatet på begäran stöds inte.',
-  'apiError.account.characters_online': 'Logga ut alla dina karaktärer innan du inaktiverar kontot.',
-  'apiError.account.deactivated': 'Detta konto har inaktiverats. Kontakta en administratör för att återställa det.',
+  'apiError.account.characters_online':
+    'Logga ut alla dina karaktärer innan du inaktiverar kontot.',
+  'apiError.account.deactivated':
+    'Detta konto har inaktiverats. Kontakta en administratör för att återställa det.',
   'apiError.account.not_found': 'Kontot hittades inte.',
   'apiError.account.password_too_long': 'Det nya lösenordet får vara högst 128 tecken.',
   'apiError.account.password_too_short': 'Lösenordet måste vara minst 6 tecken.',
-  'apiError.account.username_invalid': 'Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.',
+  'apiError.account.username_invalid':
+    'Användarnamnet måste vara 3-24 tecken och använda bokstäver, siffror eller understreck.',
   'apiError.account.username_mismatch': 'Det användarnamnet matchar inte ditt konto.',
   'apiError.account.username_not_allowed': 'Det användarnamnet är inte tillåtet.',
   'apiError.account.username_taken': 'Det användarnamnet är redan upptaget.',
@@ -5972,7 +6728,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.auth.token_invalid': 'Din session har gått ut. Logga in igen.',
   'apiError.auth.token_missing': 'Du måste vara inloggad för att göra det.',
   'apiError.auth.too_many_attempts': 'För många försök. Vänta en minut och försök igen.',
-  'apiError.auth.too_many_failed_attempts': 'För många misslyckade försök. Vänta några minuter och försök igen.',
+  'apiError.auth.too_many_failed_attempts':
+    'För många misslyckade försök. Vänta några minuter och försök igen.',
   'apiError.auth.verification_failed': 'Verifieringen misslyckades. Försök igen.',
   'apiError.auth.web_login_only': 'Inloggningar är endast tillåtna från spelklienten.',
   'apiError.body.too_large': 'Begäran är för stor. Försök igen med mindre data.',
@@ -5986,15 +6743,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.character.name_taken': 'Det namnet är upptaget.',
   'apiError.character.not_found': 'Karaktären hittades inte.',
   'apiError.character.online': 'Karaktären är för närvarande online.',
-  'apiError.character.rename_not_permitted': 'Det är inte tillåtet att byta namn på denna karaktär.',
-  'apiError.character.rename_required': 'Denna karaktär måste byta namn innan den går in i världen.',
+  'apiError.character.rename_not_permitted':
+    'Det är inte tillåtet att byta namn på denna karaktär.',
+  'apiError.character.rename_required':
+    'Denna karaktär måste byta namn innan den går in i världen.',
   'apiError.character.taken_over': 'Din karaktär togs över av en annan session.',
   'apiError.db.conflict': 'Ändringen stod i konflikt med en annan uppdatering. Försök igen.',
   'apiError.discord.already_linked': 'Det Discord-kontot är redan kopplat till ett annat konto.',
   'apiError.discord.expired': 'Den Discord-inloggningen har gått ut. Logga in med Discord igen.',
   'apiError.discord.link_required': 'Koppla ditt Discord-konto först.',
   'apiError.discord.not_configured': 'Discord-integrationen är inte tillgänglig just nu.',
-  'apiError.discord.password_required': 'Ange ett lösenord innan du kopplar bort ditt Discord-konto.',
+  'apiError.discord.password_required':
+    'Ange ett lösenord innan du kopplar bort ditt Discord-konto.',
   'apiError.discord.swag_claimed': 'Du har redan hämtat den här belöningen.',
   'apiError.discord.swag_points': 'Inte tillräckligt med poäng.',
   'apiError.discord.swag_tier': 'Nå en högre rang för att hämta den här.',
@@ -6023,7 +6783,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.advancedHeading': 'Den avancerade förinställningen: blanda din egen',
   'guide.settingsPage.advancedMixes':
     'Två favoritblandningar: behåll Shadow Quality på High och ställ in Effects & Lighting på Low för en skarp, glödfri look som blir ljus, eller gör tvärtom för att behålla blomningen och mjuka upp skuggorna.',
-  'guide.settingsPage.balancedTagline': 'Det bästa stället för de flesta maskiner och vårt standardråd.',
+  'guide.settingsPage.balancedTagline':
+    'Det bästa stället för de flesta maskiner och vårt standardråd.',
   'guide.settingsPage.balancedTitle': 'Balanserad',
   'guide.settingsPage.balancedWhy':
     'Medium ger riktiga skuggor och fullmaterial; High lägger till omgivande ocklusion och blomning. Under Ultra absorberar ett inbyggt skyddsnät plötsliga dippar i hektiska slagsmål, så Balanced förblir smidig utan att vara barnvakt.',
@@ -6068,7 +6829,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Blomning, omgivande ocklusion och hur många facklor och besvärjelser som kastar verkligt ljus. Den enskilt största besparingen bland de avancerade plockarna.',
   'guide.settingsPage.rowFieldOfView':
     'Hur mycket av världen får plats på skärmen, från zoomade 55 till svepande 100 grader. Ett komfortval; bredare vyer drar något mer.',
-  'guide.settingsPage.rowFoliageDensity': 'Hur långt och hur tjockt gräset växer runt din karaktär.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Hur långt och hur tjockt gräset växer runt din karaktär.',
   'guide.settingsPage.rowFrostedPanels':
     'En suddig frostat glas bakom fönster. Vackert, och precis den typ av effekt en svagare webbläsare känner; lämna det för den klassiska skarpa looken.',
   'guide.settingsPage.rowGraphicsQuality':
@@ -6079,9 +6841,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Tar bort gränssnittsanimationer så att fönster visas direkt. Ett tillgänglighetsalternativ först, med en liten prestationsbonus.',
   'guide.settingsPage.rowRenderQuality':
     'Ritar 3D-världen med en lägre intern upplösning och skalar upp den; gränssnittet förblir skarpt. Det starkaste direktreglaget på svagare maskiner och högupplösta skärmar.',
-  'guide.settingsPage.rowShadowQuality': 'Skugga sprödhet. Low behåller skuggor men mjukar upp deras kanter.',
-  'guide.settingsPage.rowTerrainDetail': 'Rika, blandade markstrukturer kontra en enklare, snabbare terränglook.',
-  'guide.settingsPage.rowWeather': 'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
+  'guide.settingsPage.rowShadowQuality':
+    'Skugga sprödhet. Low behåller skuggor men mjukar upp deras kanter.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rika, blandade markstrukturer kontra en enklare, snabbare terränglook.',
+  'guide.settingsPage.rowWeather':
+    'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
   'guide.settingsPage.tableFoot':
     'Letar du efter ett skjutavståndsreglage eller en FPS-keps? Det finns inget att jaga efter: visningsavstånd är en del av varje kvalitetsnivå, och bildrutetempo följer din skärm.',
   'guide.settingsPage.tableHeading': 'Varje alternativ, förklarat',
@@ -6126,13 +6891,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'För att avsätta ett hantverk åt ett annat måste en hantverkare först göra gott för vägen som inte gicks, {playerName}.',
   'entities.quests.q_prof_make_amends.completion': 'Gjorda ändringar; en ny väg är öppen för dig.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Skogsvarg dödad',
-  'entities.npcs.bursar_aldous_crane.greeting': 'Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan.',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan.',
   'entities.npcs.bursar_aldous_crane.name': 'Kamrer Aldous Crane',
   'entities.npcs.bursar_aldous_crane.title': 'Förgyllda kassakistan',
-  'entities.npcs.bursar_fernando.greeting': 'Välkommen till Förgyllda kassakistan. Dina ägodelar vilar tryggt bakom våra lås.',
+  'entities.npcs.bursar_fernando.greeting':
+    'Välkommen till Förgyllda kassakistan. Dina ägodelar vilar tryggt bakom våra lås.',
   'entities.npcs.bursar_fernando.name': 'Kamrer Fernando',
   'entities.npcs.bursar_fernando.title': 'Förgyllda kassakistan',
-  'entities.npcs.bursar_petra_vell.greeting': 'Förgyllda kassakistan för rena huvudböcker och ännu renare valv. Vad ska vi förvara åt dig?',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Förgyllda kassakistan för rena huvudböcker och ännu renare valv. Vad ska vi förvara åt dig?',
   'entities.npcs.bursar_petra_vell.name': 'Kamrer Petra Vell',
   'entities.npcs.bursar_petra_vell.title': 'Förgyllda kassakistan',
   'guide.economy.bankBody':
@@ -6146,7 +6914,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusAdvertEmail': 'Verifiera din e-post för att tjäna 2 fack.',
   'hudChrome.bank.bonusAdvertWallet': 'Länka en plånbok för att tjäna 2 fack.',
   'hudChrome.bank.bonusEarned': '+{count}',
-  'hudChrome.bank.bonusReferralExplainer': 'Bjud in en vän: när vännen når nivå 10 tjänar ni 2 fack var, upp till 5 vänner.',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Bjud in en vän: när vännen når nivå 10 tjänar ni 2 fack var, upp till 5 vänner.',
   'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
   'hudChrome.bank.bonusSectionAria': 'Bonusbankfack och hur du tjänar fler',
   'hudChrome.bank.bonusSourceDiscord': 'Discord länkat',
@@ -6184,7 +6953,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Ta ut',
   'hudChrome.bank.withdrawQuantityInput': 'Antal att ta ut',
   'hudChrome.bank.withdrawQuantityTitle': 'Ta ut {item}',
-  'entities.abilities.faerie_fire.description': 'Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp.',
+  'entities.abilities.faerie_fire.description':
+    'Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp.',
   'hud.core.mobileSettings': 'Inställningar',
   'abilityUi.tooltip.selfOnly': 'Endast dig själv',
   'itemUi.lootRoll.rolled': '{answered}/{total} har rullat',
@@ -6192,6 +6962,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
   'entities.mobs.training_dummy.name': 'Träningsdocka',
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, den odödlige hierofanten',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, den odödliga kniven',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, den odödlige krigsvakten',
   'guide.arenaPage.yumiBody':
     'Skydda Yumi är ett lagbaserat målläge som spelas i en labyrint: varje sida vaktar sin egen kattföljeslagare samtidigt som den jagar den andra. Med jämna mellanrum blinkar båda katterna till nya hörn av labyrinten, så striden pendlar mellan att försvara, jaga och kappas om att hitta dem igen. Köa som tre mot tre eller fem mot fem; att falla i strid sätter dig bara på bänken en kort stund.',
   'guide.arenaPage.yumiHeading': 'Skydda Yumi',
@@ -6203,7 +6976,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Ökar rustningen med {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Ökar Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Ökar Uthållighet med {pct}%',
-  'hudChrome.crafting.notAtHub': 'Du måste vara vid hantverksplatsen, på rätt nivå, för att tillverka det.',
+  'hudChrome.crafting.notAtHub':
+    'Du måste vara vid hantverksplatsen, på rätt nivå, för att tillverka det.',
   'hudChrome.crafting.recipeNotLearned': 'Du har inte lärt dig det receptet än.',
   'hudChrome.crafting.throttled': 'Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.',
   'hudChrome.mobile.chatPlaceholder': 'Säg något...',
@@ -6232,4 +7006,54 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Du lämnar kön till Skydda Yumi.',
   'yumi.queue.teamLeave': 'Ditt lag lämnar kön till Skydda Yumi.',
   'yumi.respawn.title': 'NEDSLAGEN!',
+  'entities.abilities.chain_heal.name': 'Kedjeläkning',
+  'entities.abilities.razor_howl.name': 'Rakbladsvrål',
+  'entities.abilities.razor_howl.description':
+    'Ett stridsrop som saktar ned fiender inom 15 m med 50% i 8 sek. (Krigartalang)',
+  'entities.abilities.stormthrow.name': 'Stormkast',
+  'entities.abilities.stormthrow.description':
+    'Kasta ditt vapen för att bedöva ett mål i 3 sek. (Krigartalang)',
+  'entities.abilities.reckless_vow.name': 'Hänsynslöst löfte',
+  'entities.abilities.reckless_vow.description':
+    'Ökar all generering av raseri med 50% och chansen till kritiska träffar med 20% i 12 sek. (Krigartalang)',
+  'entities.abilities.red_banner.name': 'Rött baner',
+  'entities.abilities.red_banner.description':
+    'Du och allierade i närheten får 10% attackhastighet och 10% skada i 20 sek. (Krigartalang)',
+  'entities.items.chunk_of_ore.name': 'Malmbit',
+  'entities.quests.q_prof_intro.title': 'Ett yrke för varje hand',
+  'entities.quests.q_prof_intro.text':
+    'Alla i Eastbrook har ett yrke vid sidan av svärdet, {playerName}. Malmådror ligger spridda runt staden, så ta en hacka och hämta 5 bitar åt mig. Bryt dem själv; jag märker skillnaden.',
+  'entities.quests.q_prof_intro.completion':
+    'Ser du? Malm i väskan och valkar på händerna. Fortsätt bryta malm, hugga timmer och plocka örter längs vägarna. När du återvänder till staden, kom ihåg tavlan för Stadsfokus vid marknaden och arbetsbänken intill. I allt detta väntar ett hederligt yrke, om du vill ha det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Malmbit',
+  'game.talents.readout.rowsSummary': 'Talanger: {head}, {picked}/{unlocked} valrader valda.',
+  'hudChrome.fct.absorbed': '{amount} absorberat',
+  'hudChrome.fct.cheap': 'Billigare!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Skicka en {item} mindre',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Skicka en {item} mer',
+  'game.talents.choicesTab': 'Val',
+  'game.talents.rowUnlockToast': 'Ett nytt talangval har låsts upp!',
+  'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
+  'hudChrome.auth.forgotPrompt': 'Glömt lösenordet?',
+  'hudChrome.auth.forgotTitle': 'Återställ ditt lösenord',
+  'hudChrome.auth.forgotHint':
+    'Ange ditt användarnamn så skickar vi en återställningslänk till den registrerade e-postadressen.',
+  'hudChrome.auth.forgotUsername': 'Användarnamn',
+  'hudChrome.auth.forgotSubmit': 'Skicka återställningslänk',
+  'hudChrome.auth.forgotSent':
+    'Om ett konto med det användarnamnet har en registrerad e-postadress har vi skickat en återställningslänk. Kolla din inkorg.',
+  'hudChrome.auth.forgotBack': 'Tillbaka till inloggning',
+  'hudChrome.auth.resetTitle': 'Välj ett nytt lösenord',
+  'hudChrome.auth.resetNewPassword': 'Nytt lösenord',
+  'hudChrome.auth.resetConfirm': 'Bekräfta nytt lösenord',
+  'hudChrome.auth.resetSubmit': 'Uppdatera lösenord',
+  'hudChrome.auth.resetDone': 'Ditt lösenord har uppdaterats. Du kan nu logga in.',
+  'hudChrome.auth.resetMismatch': 'Lösenorden stämmer inte överens.',
+  'hudChrome.auth.resetErrInvalid':
+    'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
+  'hudChrome.auth.appleLoginCta': 'Fortsätt med Apple',
+  'hudChrome.auth.appleChoiceIntro':
+    'Skapa ett nytt konto, eller koppla Apple till ett du redan har.',
+  'hudChrome.auth.appleChoiceExpired': 'Apple-inloggningen har gått ut. Logga in med Apple igen.',
+  'hudChrome.auth.appleError': 'Det gick inte att logga in med Apple. Försök igen.',
 };

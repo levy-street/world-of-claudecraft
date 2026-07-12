@@ -30,6 +30,7 @@ import {
   type PowerupDef,
   tierForWave,
 } from '../content/augments';
+import { computeModifiersWithRows } from '../content/talent_rows';
 import {
   cloneAllocation,
   computeTalentModifiers,
@@ -192,7 +193,7 @@ export function fiestaApplyAugments(meta: PlayerMeta, e: Entity): void {
   meta.fiestaSpecial = sp;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.fiestaMods);
   const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-  recalcPlayerStats(e, meta.cls, meta.equipment, meta.fiestaMods);
+  recalcPlayerStats(e, meta.cls, meta.equipment, meta.fiestaMods, meta.equipmentInstance);
   e.hp = e.dead ? 0 : Math.max(1, Math.round(e.maxHp * frac));
 }
 
@@ -210,7 +211,7 @@ export function clearFiestaAugments(meta: PlayerMeta, e: Entity): void {
   meta.fiestaMods = null;
   meta.fiestaSpecial = {};
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
-  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
 }
 
 // Standardize a fighter to a balanced level-20 build for the bout. The
@@ -221,10 +222,13 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   meta.fiestaRestore = { level: e.level, xp: meta.xp, talents: cloneAllocation(meta.talents) };
   e.level = FIESTA_STANDARD_LEVEL;
   meta.talents = defaultBuild(meta.cls, FIESTA_STANDARD_LEVEL);
+  // Deliberately the PLAIN bake (no player choice-row PICKS): a standardized bout
+  // excludes them so every fighter enters equal. The picks themselves are untouched
+  // and return with fiestaRestoreChar below.
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
-  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
 }
 
 // Undo fiestaStandardize: restore the player's real level/xp/talents.
@@ -234,11 +238,13 @@ export function fiestaRestoreChar(meta: PlayerMeta, e: Entity): void {
   e.level = snap.level;
   meta.xp = snap.xp;
   meta.talents = snap.talents;
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
+  // The REAL build returns here, so the bake must include the choice-row picks
+  // (they were excluded by the standardized bout above, not cleared).
+  meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, e.level);
   meta.fiestaRestore = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
   meta.wireRev++; // real talents restored, refresh the wire promptly
-  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
 }
 
 // Player command: lock in one of the augments currently on offer.
@@ -308,6 +314,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.sitting = false;
   e.chargeTargetId = null;
   e.chargePath = [];
+  e.leap = null;
   e.followTargetId = null;
   e.targetId = null;
   const meta = ctx.players.get(e.id);

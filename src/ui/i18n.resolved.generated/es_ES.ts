@@ -146,7 +146,7 @@ export const es_ES: EnTranslations = {
         "noTree": "Tu clase aún no tiene árbol de talentos.",
         "locked": "Aún no has desbloqueado los talentos; comienzan en el nivel {level}.",
         "noSpec": "sin especialización",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talentos: {head}, elegidas {picked}/{unlocked} filas de opciones.",
         "summary": "Talentos: {head} — {spent}/{total} puntos gastados ({breakdown}).",
         "breakdownClass": "Clase {classPts}",
         "breakdownSpec": "Clase {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const es_ES: EnTranslations = {
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Absorbido {amount}",
+      "cheap": "¡Coste reducido!"
     },
     "emotes": {
       "wave": "Saludar",
@@ -298,6 +298,7 @@ export const es_ES: EnTranslations = {
       "playerLabel": "Tu personaje",
       "targetLabel": "Tu objetivo",
       "targetAnnounce": "Objetivo: {name}",
+      "targetOfTargetLabel": "Objetivo del objetivo",
       "partyLabel": "Tu grupo",
       "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
@@ -314,7 +315,6 @@ export const es_ES: EnTranslations = {
       "chat": "Saltar al chat"
     },
     "mobile": {
-      "autorun": "Carrera automática",
       "jump": "Saltar",
       "leaderboard": "Clasificación",
       "dailyRewards": "Recompensas",
@@ -574,13 +574,32 @@ export const es_ES: EnTranslations = {
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "walkByAutoloot": "Saqueo automático al pasar",
       "groundReticle": "Retícula de objetivo terrestre",
+      "mouseoverCast": "Lanzar al pasar el ratón sobre los marcos de grupo",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
+      "showTargetOfTarget": "Mostrar objetivo del objetivo",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
       "mobileLeftHanded": "Diseño para zurdos"
+    },
+    "talentRows": {
+      "tab": "Elecciones",
+      "defaultLoadout": "Configuración por defecto",
+      "comingSoon": "Próximamente"
+    },
+    "specPanel": {
+      "primaryAttr": "Atributo principal",
+      "complexity": "Complejidad",
+      "complexityLow": "Baja",
+      "complexityMedium": "Media",
+      "complexityHigh": "Alta",
+      "exampleAbilities": "Habilidades de ejemplo",
+      "viewTalents": "Ver talentos",
+      "selectSpec": "Elegir especialización",
+      "specUnlockBanner": "¡Especialización desbloqueada!",
+      "specUnlockHint": "Pulsa N para elegir tu especialización."
     },
     "controller": {
       "title": "Mando",
@@ -678,7 +697,9 @@ export const es_ES: EnTranslations = {
       "names": {
         "spellPower": "Poder con hechizos",
         "critRating": "Índice de golpe crítico",
-        "hasteRating": "Índice de celeridad"
+        "hasteRating": "Índice de celeridad",
+        "haste": "Celeridad",
+        "parry": "Rechazo"
       },
       "desc": {
         "str": "Aumenta tu poder de ataque, así que tus golpes con el arma impactan con más fuerza.",
@@ -693,7 +714,9 @@ export const es_ES: EnTranslations = {
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
-        "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad."
+        "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
+        "haste": "Acelera los golpes de tu arma y el lanzamiento de tus hechizos. No reduce el tiempo de reutilización global.",
+        "parry": "Tu probabilidad de rechazar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede rechazar."
       },
       "effects": {
         "attackPower": "+{value} de poder de ataque",
@@ -730,6 +753,8 @@ export const es_ES: EnTranslations = {
     "tips": {
       "joinChannels": "Consejo: escribe /join world o /join lfg para chatear con jugadores de todas partes del mundo."
     },
+    "itemHeroicTag": "[HEROICO]",
+    "itemSoulbound": "Ligado al alma",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -809,6 +834,7 @@ export const es_ES: EnTranslations = {
       "failed": "No se pudo enviar el informe de error. Inténtalo de nuevo."
     },
     "paperdoll": {
+      "offhand": "Mano secundaria",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Haz clic en ×, clic derecho o arrastra a las bolsas para desequipar"
     },
@@ -1059,9 +1085,24 @@ export const es_ES: EnTranslations = {
       "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
       "formTravel": "Forma Fleet: velocidad de desplazamiento aumentada un {pct}%",
       "defensiveStance": "Guarded Stance: menos daño recibido, más amenaza",
+      "battleStance": "Actitud de Combate: un 10% más de generación de ira",
+      "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "righteousFury": "Burning Oath: amenaza por daño Sagrado enormemente aumentada",
       "scale": "Talla aumentado un {pct}%",
       "jump": "Salto aumentada un {pct}%",
+      "dmgDone": "Incrementa el daño infligido un {pct}%",
+      "dmgDoneReduce": "Disminuye el daño infligido un {pct}%",
+      "crit": "Incrementa la probabilidad de golpe crítico un {pct}%",
+      "rageGen": "Incrementa la generación de ira un {pct}%",
+      "reckless": "Incrementa la probabilidad de golpe crítico un {pct}% y la generación de ira un {ragePct}%",
+      "avatar": "Coloso: daño infligido incrementado un {pct}%",
+      "bloodbath": "Incrementa la probabilidad de golpe crítico y el daño infligido un {pct}%",
+      "dieBySword": "Disminuye el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
+      "sanguine": "Incrementa la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
+      "battleTrance": "Tu siguiente Golpe del Saqueador o Golpe Mutilador no cuesta ira",
+      "revengeFree": "Tu siguiente Venganza no cuesta ira",
+      "victoryRush": "Ímpetu de Victoria está listo",
+      "maxHpPct": "Incrementa la salud máxima un {pct}%",
       "school": {
         "physical": "Daño físico",
         "fire": "Ígneo",
@@ -1074,6 +1115,26 @@ export const es_ES: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
+    },
+    "auth": {
+      "appleLoginCta": "Continuar con Apple",
+      "appleError": "No se pudo iniciar sesión con Apple. Inténtalo de nuevo.",
+      "appleChoiceIntro": "Crea una cuenta nueva o vincula Apple a una que ya tengas.",
+      "appleChoiceExpired": "Ese inicio de sesión con Apple ha caducado. Vuelve a iniciar sesión con Apple.",
+      "forgotPrompt": "¿Olvidaste tu contraseña?",
+      "forgotTitle": "Restablece tu contraseña",
+      "forgotHint": "Introduce tu nombre de usuario y enviaremos un enlace de restablecimiento al correo registrado.",
+      "forgotUsername": "Nombre de usuario",
+      "forgotSubmit": "Enviar enlace de restablecimiento",
+      "forgotSent": "Si una cuenta con ese nombre de usuario tiene un correo registrado, hemos enviado un enlace de restablecimiento. Revisa tu bandeja de entrada.",
+      "forgotBack": "Volver a iniciar sesión",
+      "resetTitle": "Elige una nueva contraseña",
+      "resetNewPassword": "Nueva contraseña",
+      "resetConfirm": "Confirma la nueva contraseña",
+      "resetSubmit": "Actualizar contraseña",
+      "resetDone": "Tu contraseña se ha actualizado. Ya puedes iniciar sesión.",
+      "resetMismatch": "Las contraseñas no coinciden.",
+      "resetErrInvalid": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo."
     },
     "loot": {
       "chestTitle": "Cofre"
@@ -1304,6 +1365,8 @@ export const es_ES: EnTranslations = {
       "parcelsLabel": "Paquetes",
       "parcelsHint": "Haz clic en un objeto de tus bolsas para adjuntarlo.",
       "removeParcelAria": "Quitar {item} de la carta",
+      "parcelQtyDecreaseAria": "Enviar un {item} menos",
+      "parcelQtyIncreaseAria": "Enviar un {item} más",
       "sendButton": "Enviar carta",
       "postageNote": "Franqueo: {amount}. El cuervo vuela durante unos {seconds}s.",
       "arrivedBanner": "El cuervo ha aterrizado: correo de {name}.",
@@ -1964,11 +2027,19 @@ export const es_ES: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
+      "revenge": "Un contraataque de barrido que golpea todo lo que tienes delante y sale más barato justo después de desviar un golpe.",
       "battle_shout": "Un grito de aliento que aumenta el poder de ataque del grupo.",
       "commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
       "charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
       "rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo.",
       "thunder_clap": "Golpea a los enemigos a tu alrededor y ralentiza sus ataques.",
+      "cw_heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
+      "cw_battle_shout": "Un grito de aliento que aumenta el poder de ataque del grupo.",
+      "cw_commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
+      "cw_charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
+      "cw_rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo.",
+      "cw_thunder_clap": "Golpea a los enemigos a tu alrededor y ralentiza sus ataques.",
+      "hamstring": "Raja las piernas del objetivo para ralentizarlo y que no pueda darte alcance.",
       "seal_of_righteousness": "Imbuye tus golpes con daño Sagrado, que luego gastas con Verdict.",
       "holy_light": "Una sanación constante y considerable para reponer a un aliado o a ti mismo.",
       "devotion_aura": "Una mejora propia y duradera que aumenta la armadura para que los golpes hagan menos daño.",
@@ -3275,6 +3346,7 @@ export const es_ES: EnTranslations = {
   },
   "classes": {
     "warrior": "Guerrero",
+    "warriorClassic": "Guerrero",
     "paladin": "Paladín",
     "hunter": "Cazador",
     "rogue": "Pícaro",
@@ -4042,6 +4114,7 @@ export const es_ES: EnTranslations = {
     },
     "roles": {
       "warrior": "Tanque / DPS cuerpo a cuerpo",
+      "warriorClassic": "Tanque / DPS cuerpo a cuerpo",
       "paladin": "Sanador / Tanque / DPS cuerpo a cuerpo",
       "hunter": "DPS a distancia",
       "rogue": "DPS cuerpo a cuerpo",
@@ -4066,6 +4139,7 @@ export const es_ES: EnTranslations = {
     },
     "lore": {
       "warrior": "Los guerreros son combatientes curtidos que generan ira al infligir o recibir daño. Absorben grandes golpes o aplastan enemigos con armas pesadas.",
+      "warriorClassic": "El guerrero exactamente como se jugaba antes de la renovación del combate: el conjunto de habilidades y el ritmo de ira originales, conservado junto al guerrero nuevo para que pruebes ambos y nos digas cuál te parece mejor.",
       "paladin": "Los paladines son cruzados sagrados que apoyan con bendiciones, curan con Luz Reparadora y protegen a los débiles con armadura pesada.",
       "hunter": "Los cazadores son especialistas a distancia que combaten junto a una bestia domada, acribillan a los enemigos con disparos certeros y veloces, los ralentizan con picaduras y fuego conmocionante, y cambian de aspecto según lo exija el momento.",
       "rogue": "Los pícaros son asesinos sigilosos que gastan energía y puntos de combo en puñaladas y golpes finales desde las sombras.",
@@ -4366,6 +4440,7 @@ export const es_ES: EnTranslations = {
     "combat": {
       "floatingMiss": "Fallo",
       "floatingDodge": "Esquiva",
+      "floatingParry": "Rechazo",
       "floatingResist": "Resistido",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
@@ -4375,6 +4450,7 @@ export const es_ES: EnTranslations = {
       "damageTakenCrit": "{source} te golpea críticamente por {amount}.",
       "miss": "Tu {ability} falla contra {target}.",
       "dodged": "{target} esquiva tu {ability}.",
+      "parried": "{target} rechaza tu {ability}.",
       "resisted": "{target} resiste tu {ability}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
@@ -4417,6 +4493,7 @@ export const es_ES: EnTranslations = {
       "notEnoughMana": "¡No tienes suficiente maná!",
       "notEnoughResource": "¡No tienes suficiente {resource}!",
       "notEnoughHealth": "No tienes suficiente salud.",
+      "nothingToConsume": "Nada que consumir.",
       "targetMustDodge": "Tu objetivo debe esquivar primero.",
       "requiresCombo": "Esa habilidad requiere puntos de combo.",
       "requiresForm": "Debes estar en forma de {form}.",
@@ -4433,6 +4510,7 @@ export const es_ES: EnTranslations = {
       "facing": "Debes mirar a tu objetivo.",
       "targetHealthBelow": "Esa habilidad requiere que el objetivo tenga menos de {percent}% de salud.",
       "dagger": "Debes llevar una daga.",
+      "needShield": "Debes tener un escudo equipado.",
       "behindTarget": "Debes estar detrás de tu objetivo.",
       "polymorph": "Esta criatura no puede ser polimorfada.",
       "noSeal": "No tienes un Sello activo.",
@@ -4808,6 +4886,7 @@ export const es_ES: EnTranslations = {
     },
     "slots": {
       "mainhand": "Mano principal",
+      "twoHand": "Dos manos",
       "helmet": "Cabeza",
       "neck": "Cuello",
       "shoulder": "Hombros",
@@ -5081,9 +5160,101 @@ export const es_ES: EnTranslations = {
         "name": "Terremoto",
         "description": "Sacude el área objetivo durante 6 s, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza cada 1.5 s."
       },
+      "chain_heal": {
+        "name": "Sanación en cadena",
+        "description": "Sana al objetivo por {damage} y luego salta hasta a 2 aliados cercanos; cada salto sana la mitad de la cantidad anterior."
+      },
       "heroic_strike": {
         "name": "Golpe del Saqueador",
         "description": "Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe."
+      },
+      "cw_heroic_strike": {
+        "name": "Golpe del Saqueador",
+        "description": "Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe."
+      },
+      "cw_battle_shout": {
+        "name": "Bramido de Hierro",
+        "description": "Aumenta tu poder de ataque en {buff} durante 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Grito Alentador",
+        "description": "Aumenta tu Aguante en {buff} durante 2 min."
+      },
+      "cw_charge": {
+        "name": "Arremetida",
+        "description": "Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Tajo Profundo",
+        "description": "Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s."
+      },
+      "cw_thunder_clap": {
+        "name": "Golpe Sísmico",
+        "description": "Golpea a los enemigos cercanos por {damage} de daño y ralentiza sus ataques un 10% durante 10 s."
+      },
+      "cw_hamstring": {
+        "name": "Corte Paralizante",
+        "description": "Mutila al enemigo por {damage} de daño y reduce su velocidad de movimiento un 50% durante 15 s."
+      },
+      "cw_bloodrage": {
+        "name": "Tributo de Sangre",
+        "description": "Genera 10 de ira a costa de salud."
+      },
+      "cw_overpower": {
+        "name": "Mano Roja",
+        "description": "Ataque instantáneo que inflige daño de arma más {damage}. Solo se puede usar después de que el objetivo esquive. No puede esquivarse."
+      },
+      "cw_execute": {
+        "name": "Tumba Temprana",
+        "description": "Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud."
+      },
+      "cw_slam": {
+        "name": "Mandoble Brutal",
+        "description": "Golpea al oponente e inflige daño de arma más {damage}."
+      },
+      "cw_cleave": {
+        "name": "Arco Segador",
+        "description": "Un golpe amplio que alcanza a todos los enemigos frente a ti por {damage} de daño."
+      },
+      "cw_defensive_stance": {
+        "name": "Actitud en Guardia",
+        "description": "Actitud de combate defensiva: generas un 30% más de amenaza, pero infliges y recibes un 10% menos de daño. Lánzala de nuevo para salir de la actitud."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Aullido Pavoroso",
+        "description": "Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s."
+      },
+      "cw_sunder_armor": {
+        "name": "Cizalla de Armadura",
+        "description": "Cizalla la armadura del objetivo y la reduce un {damage}% por aplicación. Se acumula hasta 5 veces. Genera una gran cantidad de amenaza."
+      },
+      "cw_taunt": {
+        "name": "Provocar",
+        "description": "Provoca al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s."
+      },
+      "cw_bloodthirst": {
+        "name": "Sangría",
+        "description": "Atacas al instante en un frenesí sangriento por un 60% de daño de arma más {damage}. (habilidad distintiva de Furia)"
+      },
+      "cw_mortal_strike": {
+        "name": "Golpe Mutilador",
+        "description": "Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)"
+      },
+      "cw_shield_slam": {
+        "name": "Quiebra de Escudo",
+        "description": "Golpeas al objetivo con tu escudo por un 50% de daño de arma más {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)"
+      },
+      "cw_whirlwind": {
+        "name": "Remolino de Cuchillas",
+        "description": "Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}. (talento de Furia)"
+      },
+      "cw_berserker_rage": {
+        "name": "Furia Hirviente",
+        "description": "Entras en un frenesí hirviente y generas 20 de furia. (talento de guerrero)"
+      },
+      "revenge": {
+        "name": "Venganza",
+        "description": "Ataca en un arco amplio e inflige daño físico a todos los enemigos frente a ti. Con más de 5 objetivos el daño se reduce. Cuando esquivas o rechazas un golpe, tu siguiente Venganza puede no costar ira."
       },
       "battle_shout": {
         "name": "Bramido de Hierro",
@@ -5127,7 +5298,7 @@ export const es_ES: EnTranslations = {
       },
       "slam": {
         "name": "Mandoble Brutal",
-        "description": "Golpea al oponente e inflige daño de arma más {damage}."
+        "description": "Golpea al oponente e inflige un 50% de daño de arma más {damage}, generando {rage} de ira."
       },
       "cleave": {
         "name": "Arco Segador",
@@ -5136,6 +5307,14 @@ export const es_ES: EnTranslations = {
       "defensive_stance": {
         "name": "Actitud en Guardia",
         "description": "Actitud de combate defensiva: generas un 30% más de amenaza, pero infliges y recibes un 10% menos de daño. Lánzala de nuevo para salir de la actitud."
+      },
+      "battle_stance": {
+        "name": "Actitud de Combate",
+        "description": "Una actitud de combate agresiva: generas un 10% más de ira. La actitud por defecto de Armas y Protección."
+      },
+      "berserker_stance": {
+        "name": "Actitud Rabiosa",
+        "description": "Una actitud de combate temeraria: tus golpes críticos aciertan un 3% más a menudo y golpean un 3% más fuerte. El guerrero Furia siempre lucha en esta actitud."
       },
       "sunder_armor": {
         "name": "Cizalla de Armadura",
@@ -5625,9 +5804,77 @@ export const es_ES: EnTranslations = {
         "name": "Golpe Mutilador",
         "description": "Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)"
       },
+      "sweeping_strikes": {
+        "name": "Arco Creciente",
+        "description": "Durante 12 s tus ataques a un solo objetivo también golpean a 1 enemigo cercano con el daño completo. (Armas)"
+      },
+      "deep_wounds": {
+        "name": "Heridas Abiertas",
+        "description": "Pasiva: tu Golpe Mutilador deja al objetivo sangrando con daño físico durante 6 s. (Armas)"
+      },
+      "enrage_passive": {
+        "name": "Desenfreno",
+        "description": "Pasiva: mientras estás Enfurecido infliges un 7% más de daño, atacas un 25% más rápido y te mueves un 10% más rápido durante 4 s. Sangría tiene un 30% de probabilidad de Enfurecerte; Cosecha Roja lo hace siempre. (Furia)"
+      },
       "bloodthirst": {
         "name": "Sangría",
         "description": "Atacas al instante en un frenesí sangriento por un 60% de daño de arma más {damage}. (habilidad distintiva de Furia)"
+      },
+      "raging_gale": {
+        "name": "Golpe Gemelo",
+        "description": "Golpea al instante dos veces con tu arma; cada golpe inflige un 40% de daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)"
+      },
+      "red_harvest": {
+        "name": "Cosecha Roja",
+        "description": "Gástalo todo: golpea tres veces en un frenesí por un 65% de daño de arma más {damage} cada golpe, y siempre te Enfurece. (Furia)"
+      },
+      "furious_mending": {
+        "name": "Remiendo Furioso",
+        "description": "Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te sana un 20% de tu salud máxima. (Furia)"
+      },
+      "emboldening_roar": {
+        "name": "Rugido Envalentonador",
+        "description": "Sueltas un rugido envalentonador: tú y los jugadores aliados en un radio de 40 m quedáis Envalentonados, y tus siguientes 3 habilidades son golpes críticos garantizados. (Furia)"
+      },
+      "raised_guard": {
+        "name": "Guardia Alzada",
+        "description": "Parapétate tras tu escudo: recibes un 50% menos de daño físico durante 6 s. Almacena hasta 2 cargas. (Protección)"
+      },
+      "iron_resolve": {
+        "name": "Determinación de Hierro",
+        "description": "Aprieta los dientes e ignora el dolor: consume toda tu ira (20 como mínimo) para absorber 4 de daño por punto de ira gastado, hasta un máximo de 10 s. (Protección)"
+      },
+      "faultline": {
+        "name": "Falla Sísmica",
+        "description": "Envía una onda de choque por el suelo: los enemigos frente a ti en un radio de 8 m reciben {damage} de daño y quedan aturdidos durante 3 s. (Protección)"
+      },
+      "defiant_bellow": {
+        "name": "Bramido Desafiante",
+        "description": "Un bramido desafiante: todos los enemigos en un radio de 10 m quedan provocados y obligados a atacarte durante 3 s. (Protección)"
+      },
+      "breachmaker": {
+        "name": "Abrebrechas",
+        "description": "Machaca al objetivo con daño de arma más {damage} y quiebra su guardia: tus propios ataques contra él infligen un 20% más de daño durante 8 s. (Armas)"
+      },
+      "measured_fury": {
+        "name": "Furia Mesurada",
+        "description": "Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)"
+      },
+      "seasoned_soldier": {
+        "name": "Soldado Veterano",
+        "description": "Tus ataques automáticos críticos generan un 10% más de ira. (Armas)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Golpe Gemelo Diabólico",
+        "description": "Mientras estás Enfurecido, tu Golpe Gemelo inflige un 15% más de daño. (Furia)"
+      },
+      "cleaving_blows": {
+        "name": "Golpes Hendedores",
+        "description": "Cosecha Roja siempre devuelve una carga de Golpe Gemelo. (Furia)"
+      },
+      "sudden_death": {
+        "name": "Muerte Súbita",
+        "description": "Tus ataques automáticos tienen una probabilidad de permitirte lanzar Tumba Temprana contra un objetivo con cualquier salud, sin coste de ira. (Armas)"
       },
       "shield_slam": {
         "name": "Quiebra de Escudo",
@@ -5641,29 +5888,29 @@ export const es_ES: EnTranslations = {
         "name": "Furia Hirviente",
         "description": "Entras en un frenesí hirviente y generas 20 de furia. (talento de guerrero)"
       },
+      "holy_shock": {
+        "name": "Choque Sagrado",
+        "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"
+      },
       "crusader_strike": {
         "name": "Golpe de cruzado",
         "description": "Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)"
-      },
-      "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfosis",
         "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
       },
       "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
-      },
-      "holy_shock": {
-        "name": "Choque Sagrado",
-        "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"
+        "name": "Rebote del Alba",
+        "description": "Lanza un escudo forjado al alba que inflige {damage} de daño Sagrado, silencia al objetivo principal durante 2 s y rebota hasta en {jumps} enemigos adicionales en un radio de {radius} m, infligiendo {falloff} de daño por rebote. (talento de Paladín)"
       },
       "holy_shield": {
         "name": "Escudo Sagrado",
         "description": "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)"
+      },
+      "repentance": {
+        "name": "Arrepentimiento",
+        "description": "Sume al enemigo en un estado de meditación hasta 6 s. Cualquier daño rompe el efecto. (habilidad distintiva de Retribución)"
       },
       "bestial_wrath": {
         "name": "Cólera de las bestias",
@@ -5717,9 +5964,21 @@ export const es_ES: EnTranslations = {
         "name": "Maestría elemental",
         "description": "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)"
       },
+      "shamanistic_rage": {
+        "name": "Ira Chamánica",
+        "description": "Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)"
+      },
+      "natures_swiftness": {
+        "name": "Presteza Natural",
+        "description": "Invoca a la naturaleza para que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Restauración)"
+      },
       "siphon_life": {
         "name": "Succionar vida",
         "description": "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)"
+      },
+      "fel_domination": {
+        "name": "Dominación Vil",
+        "description": "Domina las energías viles y hace que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)"
       },
       "conflagrate": {
         "name": "Conflagrar",
@@ -5736,6 +5995,34 @@ export const es_ES: EnTranslations = {
       "swiftmend": {
         "name": "Alivio presto",
         "description": "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)"
+      },
+      "storm_bolt": {
+        "name": "Proyectil de Tormenta",
+        "description": "Lanza tu arma contra el objetivo, inflige {damage} de daño y lo aturde durante 3 s."
+      },
+      "piercing_howl": {
+        "name": "Aullido Penetrante",
+        "description": "Un grito penetrante que ralentiza un 50% a todos los enemigos en un radio de 15 m durante 8 s."
+      },
+      "die_by_sword": {
+        "name": "Morir por la Espada",
+        "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
+      },
+      "recklessness": {
+        "name": "Temeridad",
+        "description": "Enfurecimiento: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s."
+      },
+      "sanguine_aura": {
+        "name": "Aura Sanguínea",
+        "description": "Imbuye tu arma con la sangre de tus enemigos: tú y tus aliados cuerpo a cuerpo ganáis un 10% de velocidad de ataque y un 10% de daño durante 20 s."
+      },
+      "victory_rush": {
+        "name": "Ímpetu de Victoria",
+        "description": "Golpea con daño de arma más {damage} y te sana un 20% de tu salud máxima. Solo usable en los 20 s posteriores a matar a un enemigo."
+      },
+      "intimidating_shout": {
+        "name": "Grito Intimidante",
+        "description": "Un grito aterrador que hace huir de miedo hasta a 5 enemigos en un radio de 8 m durante 8 s. El daño puede romper el efecto."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -5786,24 +6073,24 @@ export const es_ES: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a cercanos enemigos cada segundo por {damage}. (talento de guerrero)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Aullido cortante",
+        "description": "Un grito que ralentiza un 50% a los enemigos en un radio de 15 m durante 8 s. (Talento de guerrero)"
       },
       "lingering_dread": {
         "name": "Lingering Dread",
         "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Lanzamiento tormentoso",
+        "description": "Lanza tu arma para aturdir a un objetivo durante 3 s. (Talento de guerrero)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Voto temerario",
+        "description": "Aumenta un 50% toda la generación de ira y un 20% la probabilidad de golpe crítico durante 12 s. (Talento de guerrero)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Estandarte rojo",
+        "description": "Tú y los aliados cercanos obtenéis un 10% de velocidad de ataque y un 10% de daño durante 20 s. (Talento de guerrero)"
       },
       "blink": {
         "name": "Paso Fugaz",
@@ -5958,8 +6245,8 @@ export const es_ES: EnTranslations = {
         "description": "Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de guerrero)"
       },
       "rallying_cry": {
-        "name": "Arenga",
-        "description": "Lanza un grito de reunión y aumenta poder de ataque de cercanos aliados durante 10 s. (talento de guerrero)"
+        "name": "Rugido de Valor",
+        "description": "Profieres un rugido de valor que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s. Protección: además reciben un 5% menos de daño mientras dura."
       },
       "rebuke": {
         "name": "Reprensión",
@@ -6003,7 +6290,7 @@ export const es_ES: EnTranslations = {
       },
       "startle_shot": {
         "name": "Startle Shot",
-        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
@@ -6162,6 +6449,9 @@ export const es_ES: EnTranslations = {
       "greyjaw_fang": {
         "name": "Colmillo del viejo Greyjaw"
       },
+      "chunk_of_ore": {
+        "name": "Trozo de mena"
+      },
       "weathered_ledger_page": {
         "name": "Página de libro mayor ajada"
       },
@@ -6191,6 +6481,15 @@ export const es_ES: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Retal de lino"
+      },
+      "arcane_dust": {
+        "name": "Polvo Arcano"
+      },
+      "arcane_essence": {
+        "name": "Esencia Arcana"
+      },
+      "arcane_shard": {
+        "name": "Fragmento Arcano"
       },
       "fen_muster_order": {
         "name": "Orden de alistamiento de Fenbridge"
@@ -7104,6 +7403,18 @@ export const es_ES: EnTranslations = {
       "heroic_mark": {
         "name": "Marca Heroica"
       },
+      "eastbrook_buckler": {
+        "name": "Broquel de Eastbrook"
+      },
+      "highwatch_wallshield": {
+        "name": "Escudo Mural de Highwatch"
+      },
+      "eastbrook_greatsword": {
+        "name": "Espadón de Eastbrook"
+      },
+      "highwatch_greatsword": {
+        "name": "Espadón de Highwatch"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Loriga forjada en cripta de Morthen"
       },
@@ -7142,15 +7453,6 @@ export const es_ES: EnTranslations = {
       },
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Malla de piernas del Guardián Imperecedero"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Desgarralmas"
-      },
-      "scourgehide_carapace": {
-        "name": "Caparazón de piel de Azote"
       },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
@@ -7191,9 +7493,6 @@ export const es_ES: EnTranslations = {
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
       },
-      "soulforged_warplate": {
-        "name": "Coraza de guerra forjada en almas"
-      },
       "stormcallers_focus": {
         "name": "Foco del Invocador de Tormentas"
       },
@@ -7230,32 +7529,74 @@ export const es_ES: EnTranslations = {
       "deathless_heartwood": {
         "name": "Duramen de la Corona Inmortal"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Duramen de la Corona Inmortal"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, último juramento de Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, último juramento de Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Yelmo aterrador Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Yelmo aterrador Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Hombreras de guerra Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Hombreras de guerra Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Corona Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Corona Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Guardahombros Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Guardahombros Direfang"
       },
       "soulflame_cowl": {
         "name": "Caperuza Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Caperuza Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Manto Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Manto Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Corona de Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Corona de Galecall"
+      },
       "stormcallers_spaulders": {
         "name": "Bufas de Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Bufas de Galecall"
+      },
+      "bonewrought_greatsword": {
+        "name": "Espadón Bonewrought"
+      },
+      "direfang_greatblade": {
+        "name": "Gran hoja Direfang"
+      },
+      "bonewrought_bulwark": {
+        "name": "Baluarte Bonewrought"
+      },
+      "wraithfire_orb": {
+        "name": "Orbe Wraithfire"
       },
       "unknown_alien_weaponry": {
         "name": "Armamento alienígena desconocido"
@@ -7504,6 +7845,15 @@ export const es_ES: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Guardia real alzado"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardián Imperecedero"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imperecedero"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Cuchillo Imperecedero"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
@@ -7833,6 +8183,16 @@ export const es_ES: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Un oficio para cada mano",
+        "text": "Todos en Eastbrook tienen un oficio además de la espada, {playerName}. Hay vetas de mineral en los alrededores del pueblo, así que empuña un pico y tráeme 5 trozos. Extráelos tú mismo; sabré distinguirlos.",
+        "completion": "¿Ves? Mena en la bolsa y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos y, cuando vuelvas al pueblo, no olvides el tablón de Enfoque del pueblo junto al mercado ni el banco de trabajo cercano. Cada una de esas labores ofrece un oficio honrado, si lo quieres.",
+        "objectives": {
+          "0": {
+            "label": "Trozo de mena"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Lobos a la puerta",
         "text": "Los lobos del bosque se atreven ya con el camino norte, {playerName}. Abate 8 antes de que otra carreta desaparezca entre los pinos.",

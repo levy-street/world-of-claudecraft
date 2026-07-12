@@ -55,6 +55,12 @@ const PCT_FIELDS = new Set([
   'cooldownPct',
   'castPct',
   'buffPct',
+  // Recompense (warrior prot mastery): armor granted as a fraction of Strength
+  // (entity.ts folds s.str * armorFromStrPct), shown as "70% of your Strength".
+  'armorFromStrPct',
+  // Master Armorer (warrior arms mastery): fraction of extra damage while wielding
+  // a two-handed weapon, applied at runtime in combat/damage.ts, shown as "10%".
+  'masteryTwoHandDmgPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -287,9 +293,11 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
   const specs = specEntries();
 
   it('covers every class, every spec, and every choice row option', () => {
-    expect(new Set(effects.map((e) => e.cls)).size).toBe(9);
-    expect(specs).toHaveLength(27);
-    expect(effects.length).toBe(27 + 9 * 6 * 3);
+    // 10 classes: the 9 originals plus warrior_classic (the pre-overhaul PTR
+    // clone), each with 3 specs and 6 choice rows of 3 options.
+    expect(new Set(effects.map((e) => e.cls)).size).toBe(10);
+    expect(specs).toHaveLength(30);
+    expect(effects.length).toBe(30 + 10 * 6 * 3);
   });
 
   it('every spec tooltip names its signature ability', () => {
@@ -382,7 +390,7 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
       '20 Rage · Instant · 20 yd range · 30 sec cooldown',
     );
     expect(grantAbilityMetadata('bladestorm')).toBe(
-      '25 Rage · Channeled (4 sec) · 60 sec cooldown',
+      '25 Rage · Channeled (4 sec) · 90 sec cooldown',
     );
     expect(grantAbilityMetadata('counter_shot')).toBe(
       '35 Mana · Instant · 8-35 yd range · 20 sec cooldown',
@@ -503,5 +511,22 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(renderCatalogDescription('tranquility')).toBe(
       'Channels for 4 sec, healing you and allies within 30 yd for 42 to 52 each second. (Druid talent)',
     );
+  });
+
+  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    const entry = effects.find(
+      (candidate) =>
+        candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
+    );
+    if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
+
+    const rendered = entry.render();
+    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
+    expect(rendered).toContain(
+      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
+    );
+    setLanguage('en');
   });
 });

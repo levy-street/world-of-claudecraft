@@ -68,6 +68,11 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 // full (mirrors the player out-of-combat window, so combat exits cleanly while the
 // damage meter keeps the finished segment's DPS).
 const DUMMY_RESET_SECONDS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -107,6 +112,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
+      // FULL inert cleanup, mirroring the vision_ props below: if anything
+      // ever flips the dummy hostile-active (a taunt before the applyTaunt
+      // guard existed, a fear, a future mechanic), the state self-heals here.
+      // A lingering aggroTargetId is what pinned attackers in combat forever
+      // (engagedPids reads it every tick): the 2026-07-11 PBE combat-lock bug.
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
     } else {
       mob.inCombat = true;
     }
@@ -175,7 +190,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (
+    (mob.templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS.has(mob.templateId)) &&
+    mob.despawnTimer !== undefined
+  ) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -192,7 +210,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
-        mob.nythraxis.deathlessStunRemaining > 0);
+        mob.nythraxis.deathlessStunRemaining > 0 ||
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -200,7 +219,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         (mob.nythraxis &&
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
-            mob.nythraxis.deathlessStunRemaining > 0))
+            mob.nythraxis.deathlessStunRemaining > 0 ||
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
     } else {
@@ -418,12 +438,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.stompTimer = stomp.every;
       const school = stomp.school ?? 'physical';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${stomp.name}!`,
-        color: '#ff9933',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${stomp.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
       for (const meta of ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > stomp.radius) continue;
@@ -462,12 +483,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castTargetId = null;
         const school = (bigCast.school ?? 'nature') as Aura['school'];
         ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-        ctx.emit({
-          type: 'log',
-          text: `${mob.name} unleashes ${bigCast.name}!`,
-          color: '#ff9933',
-          entityId: mob.id,
-        });
+        if (!MOBS[mob.templateId]?.quietMechanics)
+          ctx.emit({
+            type: 'log',
+            text: `${mob.name} unleashes ${bigCast.name}!`,
+            color: '#ff9933',
+            entityId: mob.id,
+          });
         for (const meta of ctx.players.values()) {
           const pe = ctx.entities.get(meta.entityId);
           if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
@@ -501,12 +523,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.stoneskinTimer = stoneskin.every;
       const school = (stoneskin.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${stoneskin.name}!`,
-        color: '#c9c2b5',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${stoneskin.name}!`,
+          color: '#c9c2b5',
+          entityId: mob.id,
+        });
       ctx.applyAura(mob, {
         id: `stoneskin_${mob.templateId}`,
         name: stoneskin.name,
@@ -528,12 +551,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.terrifyTimer = terrify.every;
       const school = terrify.school ?? 'shadow';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${terrify.name}!`,
-        color: '#ff9933',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${terrify.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
       for (const meta of ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
@@ -635,6 +659,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.loudYellIndex = 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
+  mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;
+  mob.channelRamp = 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;

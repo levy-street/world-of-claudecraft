@@ -123,6 +123,7 @@ const CHARACTER_LIMIT = 10;
 /** The nine playable classes accepted by create (mirrors the legacy inline list). */
 const VALID_CLASSES: readonly string[] = [
   'warrior',
+  'warrior_classic',
   'paladin',
   'hunter',
   'rogue',
@@ -255,6 +256,9 @@ function buildCharacterList(
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
+      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }

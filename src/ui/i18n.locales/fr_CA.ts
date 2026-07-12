@@ -13,9 +13,6 @@ import type { TranslationKey } from '../i18n.catalog';
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'download.macCta': 'Telecharger la version macOS',
   'download.windowsPending': 'Version Windows a venir.',
-  // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
-  // Quebec-specific form, so per the divergence-only policy fr_CA carries no
-  // hudChrome.statInfo.* overrides.
   'seo.title': 'World of ClaudeCraft: MMO Web de style classique',
   'seo.description':
     'Lancez-vous dans une aventure épique dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un monde partagé et persistant, faites monter vos classes en niveau et terrassez vos ennemis.',
@@ -56,6 +53,8 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     'Les démonistes invoquent des démons, jettent des malédictions et des dégâts prolongés, puis drainent la vie de leurs ennemis pour tenir bon.',
   'classDetails.lore.druid':
     'Les druides canalisent la nature, guérissent, entravent les ennemis et prennent des formes animales pour défendre ou attaquer.',
+  'classDetails.lore.warriorClassic':
+    "Le guerrier exactement tel qu'il se jouait avant la refonte du combat : la panoplie de techniques et le rythme de rage d'origine, conservés aux côtés du nouveau guerrier pour que vous puissiez essayer les deux et nous dire lequel vous plaît le plus.",
   'classDetails.aria':
     'Détails de classe pour {className}: rôle {role}. Caractéristiques de départ: Force {str}, Agilité {agi}, Endurance {sta}, Intelligence {int}, Esprit {spi}.',
   'mobilePreflight.rotateTitle': 'Passez en mode paysage',
@@ -132,8 +131,92 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'delveUi.summary.title': 'Excavation terminée',
   'delveUi.tracker.marks': "Marques d'excavation : {count}",
   'delveUi.tracker.title': 'Excavation',
+  'entities.abilities.battle_stance.description':
+    'Une posture de combat agressive : vous générez 10% de rage de plus. La posture par défaut des spécialisations Armes et Protection.',
+  'entities.abilities.berserker_stance.description':
+    'Une posture de combat téméraire : vos coups critiques tombent 3% plus souvent et frappent 3% plus fort. Le guerrier Fureur combat toujours dans cette posture.',
+  'entities.abilities.berserker_stance.name': 'Posture de berserker',
+  'entities.abilities.breachmaker.description':
+    "Martèle la cible pour les dégâts de l'arme plus {damage} et fissure sa garde : vos propres attaques contre elle infligent 20% de dégâts de plus pendant 8 s. (Armes)",
+  'entities.abilities.breachmaker.name': 'Breachmaker',
+  'entities.abilities.chain_heal.description':
+    'Soigne la cible de {damage} points, puis rebondit vers un maximum de 2 alliés proches, chaque rebond soignant la moitié du montant précédent.',
+  'entities.abilities.cleaving_blows.description':
+    'Récolte rouge rembourse toujours une charge de Twinstrike. (Fureur)',
+  'entities.abilities.deep_wounds.description':
+    'Passif : votre Frappe mutilante fait saigner la cible, lui infligeant des dégâts physiques pendant 6 s. (Armes)',
+  'entities.abilities.defiant_bellow.description':
+    'Un beuglement de défi : tous les ennemis à moins de 10 mètres sont provoqués et contraints de vous attaquer pendant 3 s. (Protection)',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Tant que vous êtes enragé, votre Twinstrike inflige 15% de dégâts de plus. (Fureur)',
+  'entities.abilities.diabolical_twinstrike.name': 'Twinstrike diabolique',
+  'entities.abilities.die_by_sword.description':
+    "Recours défensif : pendant 8 s, vous subissez 30% de dégâts de moins et esquivez beaucoup plus d'attaques.",
+  'entities.abilities.emboldening_roar.description':
+    'Pousse un rugissement galvanisant : vous et les joueurs alliés à moins de 40 mètres êtes galvanisés, et vos 3 prochaines techniques sont des coups critiques garantis. (Fureur)',
+  'entities.abilities.enrage_passive.description':
+    'Passif : tant que vous êtes enragé, vous infligez 7% de dégâts de plus, attaquez 25% plus vite et vous déplacez 10% plus vite pendant 4 s. Saignée a 30% de chances de vous enrager. Récolte rouge vous enrage toujours. (Fureur)',
+  'entities.abilities.faultline.description':
+    'Envoie une onde de choc dans le sol : les ennemis devant vous à moins de 8 mètres subissent {damage} points de dégâts et sont sonnés pendant 3 s. (Protection)',
+  'entities.abilities.faultline.name': 'Faultline',
+  'entities.abilities.fel_domination.description':
+    'Domine les énergies funestes, rendant votre prochain sort instantané. (Signature Démonologie)',
+  'entities.abilities.fel_domination.name': 'Domination funeste',
+  'entities.abilities.furious_mending.description':
+    "Pendant 10 s, vous subissez 20% de dégâts de moins et, tant que l'effet dure, votre Saignée vous rend 20% de vos points de vie maximum. (Fureur)",
+  'entities.abilities.intimidating_shout.description':
+    "Un cri terrifiant qui fait fuir de peur jusqu'à 5 ennemis à moins de 8 mètres pendant 8 s. Les dégâts peuvent briser l'effet.",
+  'entities.abilities.intimidating_shout.name': "Cri d'intimidation",
+  'entities.abilities.iron_resolve.description':
+    'Serrez les dents et ignorez la douleur : consomme toute votre rage (20 au minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
+  'entities.abilities.measured_fury.description':
+    'Votre fureur mesurée aiguise votre économie : vos techniques coûtent 10% de rage de moins. (Armes)',
+  'entities.abilities.natures_swiftness.description':
+    'Fait appel à la nature pour rendre votre prochain sort instantané. (Signature Restauration)',
+  'entities.abilities.piercing_howl.description':
+    'Un hurlement perçant qui ralentit de 50% tous les ennemis à moins de 15 mètres pendant 8 s.',
+  'entities.abilities.raging_gale.description':
+    "Frappe instantanément deux fois avec votre arme, chaque coup infligeant 40% des dégâts de l'arme plus {damage}, et génère {rage} points de rage. Conserve jusqu'à 2 charges. (Fureur)",
+  'entities.abilities.raging_gale.name': 'Twinstrike',
+  'entities.abilities.raised_guard.description':
+    "Abritez-vous derrière votre bouclier : vous subissez 50% de dégâts physiques de moins pendant 6 s. Conserve jusqu'à 2 charges. (Protection)",
+  'entities.abilities.recklessness.description':
+    'Enragez-vous : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s.',
+  'entities.abilities.red_harvest.description':
+    "Dépensez tout : trois frappes frénétiques infligeant chacune 65% des dégâts de l'arme plus {damage}, qui vous enragent toujours. (Fureur)",
+  'entities.abilities.red_harvest.name': 'Récolte rouge',
+  'entities.abilities.repentance.description':
+    "Plonge l'ennemi dans un état de méditation pendant un maximum de 6 s. Le moindre dégât brise l'effet. (Signature Rétribution)",
+  'entities.abilities.revenge.description':
+    'Attaque en arc large, infligeant des dégâts physiques à tous les ennemis devant vous. Au-delà de 5 cibles, les dégâts sont réduits. Quand vous esquivez ou parez, votre prochaine Vengeance peut ne coûter aucune rage.',
+  'entities.abilities.seasoned_soldier.description':
+    'Vos attaques automatiques critiques génèrent 10% de rage de plus. (Armes)',
+  'entities.abilities.shamanistic_rage.description':
+    'Libère une rage chamanique, rendant 160 points de mana. (Signature Amélioration)',
+  'entities.abilities.storm_bolt.description':
+    'Lance votre arme sur la cible pour {damage} points de dégâts et la sonne pendant 3 s.',
+  'entities.abilities.storm_bolt.name': 'Projectile de tempête',
+  'entities.abilities.sudden_death.description':
+    'Vos attaques automatiques ont une chance de vous permettre de lancer Tombe précoce sur une cible peu importe ses points de vie, sans coût de rage. (Armes)',
+  'entities.abilities.victory_rush.description':
+    "Frappe pour les dégâts de l'arme plus {damage} et vous rend 20% de vos points de vie maximum. Utilisable seulement dans les 20 s qui suivent la mort d'un ennemi.",
+  'entities.abilities.victory_rush.name': 'Élan de victoire',
+  'entities.items.eastbrook_buckler.name': "Targe d'Eastbrook",
   'entities.mobs.reliquary_gravecall_acolyte.name': "Acolyte de l'appel des tombes",
   'entities.npcs.brother_halven.greeting': "Le reliquaire en bas s'est encore déplacé.",
+  'guide.abilityHook.cw_charge':
+    'Fonce sur un ennemi éloigné pour ouvrir le combat avec un bref étourdissement.',
+  'guide.abilityHook.cw_commanding_shout':
+    "Renforce l'endurance pour que tout le monde tienne plus longtemps en combat.",
+  'guide.abilityHook.cw_heroic_strike':
+    'Prépare un coup plus lourd qui dépense de la rage lors de votre prochaine attaque.',
+  'guide.abilityHook.cw_rend': 'Ouvre une plaie qui use la cible au fil du temps.',
+  'guide.abilityHook.cw_thunder_clap':
+    'Frappe tout ce qui vous entoure et ralentit les attaques ennemies.',
+  'guide.abilityHook.hamstring':
+    "Taillade les jambes de la cible pour la ralentir afin qu'elle ne puisse pas vous rattraper.",
+  'guide.abilityHook.revenge':
+    'Une contre-attaque balayante qui frappe tout ce qui se trouve devant vous, et qui coûte moins cher juste après que vous avez détourné un coup.',
   'sim.delve.alreadyInDelve': 'Vous êtes déjà dans une excavation.',
   'sim.delve.bossChest':
     "Le boss tombe. Un coffre de reliquaire scellé s'élève sur l'estrade : crochetez sa serrure pour réclamer votre butin.",
@@ -236,4 +319,31 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
+  'hudChrome.auraEffect.avatar': 'Colosse : dégâts infligés accrus de {pct}%',
+  'hudChrome.auraEffect.battleStance': 'Posture de combat : génération de rage accrue de 10%',
+  'hudChrome.auraEffect.berserkerStance':
+    'Posture de berserker : coups critiques 3% plus fréquents et 3% plus puissants',
+  'hudChrome.auraEffect.bloodbath':
+    'Accroît les chances de coup critique et les dégâts infligés de {pct}%',
+  'hudChrome.auraEffect.crit': 'Accroît les chances de coup critique de {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Diminue les dégâts subis de {pct}% ({lowPct}% sous {hpPct}% de points de vie)',
+  'hudChrome.auraEffect.dmgDone': 'Accroît les dégâts infligés de {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Diminue les dégâts infligés de {pct}%',
+  'hudChrome.auraEffect.maxHpPct': 'Accroît les points de vie maximum de {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Accroît la génération de rage de {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Accroît les chances de coup critique de {pct}% et la génération de rage de {ragePct}%',
+  'hudChrome.auraEffect.sanguine':
+    "Accroît la vitesse d'attaque de {hastePct}% et les dégâts infligés de {dmgPct}%",
+  'hudChrome.auraEffect.victoryRush': 'Élan de victoire est prêt',
+  'hudChrome.auth.appleChoiceIntro':
+    'Créez un nouveau compte ou liez Apple à un compte que vous avez déjà.',
+  'hudChrome.options.mouseoverCast': 'Lancement au survol sur les cadres de groupe',
+  'hudChrome.specPanel.selectSpec': 'Choisir la spécialisation',
+  'hudChrome.specPanel.specUnlockBanner': 'Spécialisation débloquée!',
+  'hudChrome.statInfo.desc.haste':
+    "Accélère vos coups d'arme et vos incantations de sorts. Ne réduit pas le délai de récupération global.",
+  'hudChrome.statInfo.desc.parry':
+    'Vos chances de parer entièrement une attaque de mêlée de front, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
 };

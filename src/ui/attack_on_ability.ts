@@ -41,7 +41,6 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   dot: 'damage',
   aoeDamage: 'damage',
   aoeHeal: 'other',
-  chainHeal: 'other',
   groundAoE: 'damage',
   aoeRoot: 'damage',
   consumeAura: 'other',
@@ -50,33 +49,52 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
+  chainHeal: 'other',
   feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
   lifeTap: 'other',
   buffTarget: 'other',
+  // Breachmaker's source-scoped vulnerability debuff is a non-breaking amp; the
+  // ability's paired weaponStrike is what classifies it as an attack.
+  debuffTargetSource: 'other',
   slow: 'other',
   root: 'other',
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
+  // Choice-row talents: an AoE slow is a non-breaking snare; the party buff is
+  // pure utility. (aoeFear/breakControl/repositionToAim are classified above.)
+  aoeSlow: 'other',
+  partyMeleeBuff: 'other',
   aoeAllyAttackPower: 'other',
+  aoeAllyMaxHp: 'other',
   aoeAllyHaste: 'other',
   aoeAllyDamage: 'other',
+  // Fury support cooldowns: the group guaranteed-crit buff and the self
+  // HoT are both pure utility, never an attack.
   aoeAllySureCrit: 'other',
-  aoeSlow: 'other',
+  selfHotPctMax: 'other',
   selfBuff: 'other',
   petBuff: 'other',
   applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
+  // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's
+  // weaponStrikes classify it).
+  enrageChance: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
   selfHealPctMax: 'other',
   charge: 'other',
   sunder: 'other',
   faerieFire: 'other',
+  // Prot kit: the Iron Resolve absorb shield is pure utility; the Defiant
+  // Bellow aoe taunt already forces the mobs onto the caster, no swing needed
+  // to engage (mirrors the single-target 'taunt' classification).
+  absorbSpentResource: 'other',
+  aoeTaunt: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',

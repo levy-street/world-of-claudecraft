@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "06b9e332",
+      "state": "a2887c7e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,8 +47,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -59,6 +61,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -69,6 +79,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -76,16 +99,17 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
+          "hp": 100,
           "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -102,10 +126,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -121,7 +145,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 415,
-      "state": "4c29fdea",
+      "state": "b9c1c084",
       "events": "5a5f26b1",
       "rng": {
         "draws": 4,
@@ -132,7 +156,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 415,
-      "state": "d2269133",
+      "state": "0ace3758",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -143,7 +167,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 415,
-      "state": "64a28571",
+      "state": "ebd0f4d2",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -154,7 +178,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 415,
-      "state": "cef6b208",
+      "state": "ff52d172",
       "events": "9cfda0e2",
       "rng": {
         "draws": 4,
@@ -165,7 +189,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 415,
-      "state": "d39ba77f",
+      "state": "440ca35a",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -176,7 +200,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 415,
-      "state": "c173c6b2",
+      "state": "67503e62",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -187,7 +211,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 415,
-      "state": "bb8d2585",
+      "state": "54c69713",
       "events": "92136cf6",
       "rng": {
         "draws": 6,
@@ -198,7 +222,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 415,
-      "state": "f097d381",
+      "state": "aa685b70",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -209,7 +233,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 415,
-      "state": "f097d381",
+      "state": "aa685b70",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -242,8 +266,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -255,6 +281,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -265,6 +299,19 @@
         {
           "aiState": "idle",
           "attackPower": 70,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101,
           "comboUntil": -1,
           "critChance": 0.063,
@@ -281,6 +328,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0675,
           "petMode": "defensive",
           "pos": {
             "x": 4800,
@@ -296,10 +344,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 26,
-            "armor": 194,
+            "armor": 228,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 35
           },
           "targetId": 411,
@@ -399,7 +447,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 415,
-      "state": "314d90f6",
+      "state": "3b52b158",
       "events": "a979a0fd",
       "rng": {
         "draws": 8,
@@ -432,8 +480,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -445,6 +495,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -455,6 +513,19 @@
         {
           "aiState": "idle",
           "attackPower": 70,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.95,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101.05,
           "comboUntil": -1,
           "critChance": 0.063,
@@ -472,6 +543,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "overpowerUntil": -1,
+          "parryChance": 0.0675,
           "petMode": "defensive",
           "pos": {
             "x": 4811.246093,
@@ -488,10 +560,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 26,
-            "armor": 194,
+            "armor": 228,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 35
           },
           "targetId": 411,
@@ -603,7 +675,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 415,
-      "state": "652f8142",
+      "state": "a54db9b0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -614,7 +686,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 415,
-      "state": "87128bd0",
+      "state": "55b59ee8",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -647,8 +719,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -660,6 +734,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -670,6 +752,19 @@
         {
           "aiState": "idle",
           "attackPower": 70,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.55,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101.45,
           "comboUntil": -1,
           "critChance": 0.063,
@@ -686,6 +781,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "overpowerUntil": -1,
+          "parryChance": 0.0675,
           "petMode": "defensive",
           "pos": {
             "x": 4820.246093,
@@ -702,10 +798,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 26,
-            "armor": 194,
+            "armor": 228,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 35
           },
           "templateId": "warrior",
@@ -762,7 +858,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 415,
-      "state": "29fcc8a7",
+      "state": "0f0a15ac",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -773,7 +869,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 415,
-      "state": "2fef8eb4",
+      "state": "ac1e236d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -806,8 +902,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -819,6 +917,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -829,6 +935,19 @@
         {
           "aiState": "idle",
           "attackPower": 70,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.45,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101.55,
           "comboUntil": -1,
           "critChance": 0.063,
@@ -845,6 +964,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "overpowerUntil": -1,
+          "parryChance": 0.0675,
           "petMode": "defensive",
           "pos": {
             "x": 4891.046093,
@@ -861,10 +981,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 26,
-            "armor": 194,
+            "armor": 228,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 35
           },
           "templateId": "warrior",
@@ -922,7 +1042,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 415,
-      "state": "2fef8eb4",
+      "state": "ac1e236d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -955,8 +1075,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -968,6 +1090,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -978,6 +1108,19 @@
         {
           "aiState": "idle",
           "attackPower": 70,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.45,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 101.55,
           "comboUntil": -1,
           "critChance": 0.063,
@@ -994,6 +1137,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "overpowerUntil": -1,
+          "parryChance": 0.0675,
           "petMode": "defensive",
           "pos": {
             "x": 4891.046093,
@@ -1010,10 +1154,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 26,
-            "armor": 194,
+            "armor": 228,
             "int": 10,
             "spi": 11,
-            "sta": 34,
+            "sta": 35,
             "str": 35
           },
           "templateId": "warrior",

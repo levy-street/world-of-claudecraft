@@ -146,15 +146,18 @@ describe('allocation contract', () => {
     expect('choices' in repaired).toBe(false);
   });
 
-  it('drops a spec below the first talent level while keeping unlocked row picks', () => {
+  it('drops a spec committed below SPEC_UNLOCK_LEVEL and any not-yet-unlocked row picks', () => {
+    // Under the warrior overhaul a spec is legal from SPEC_UNLOCK_LEVEL (5), which
+    // coincides with the first choice-row level, so below it both the spec and the
+    // not-yet-unlocked row picks are stripped.
     const repaired = repairAllocation(
       'warrior',
       alloc({ spec: 'arms', rows: { 5: rowOption('warrior', 0), 8: rowOption('warrior', 1) } }),
-      8,
+      4,
     );
     expect(repaired).toEqual({
       spec: null,
-      rows: { 5: rowOption('warrior', 0), 8: rowOption('warrior', 1) },
+      rows: {},
     });
   });
 });
@@ -166,8 +169,10 @@ describe('precomputed modifiers', () => {
     expect(half.spec).toBe('arms');
     expect(half.role).toBe('dps');
     expect(half.grants.some((g) => g.ability === 'mortal_strike')).toBe(true);
-    expect(half.global.meleeDmgPct).toBeCloseTo(0.075);
-    expect(full.global.meleeDmgPct).toBeCloseTo(0.15);
+    // Arms mastery (Master Armorer) is a two-handed damage bonus of 0.1 at max level,
+    // scaled by min(1, level/20): 0.05 at level 10, 0.1 at level 20.
+    expect(half.global.masteryTwoHandDmgPct).toBeCloseTo(0.05);
+    expect(full.global.masteryTwoHandDmgPct).toBeCloseTo(0.1);
   });
 
   it('accumulates only spec and choice-row effects, ignoring legacy rank fields', () => {

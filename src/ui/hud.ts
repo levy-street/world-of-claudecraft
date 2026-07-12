@@ -35,7 +35,12 @@ import {
   type SkinTier,
   skinRankOrder,
 } from '../sim/content/skins';
-import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import {
+  FIRST_TALENT_LEVEL,
+  SPEC_UNLOCK_LEVEL,
+  type TalentAllocation,
+  talentsFor,
+} from '../sim/content/talents';
 import { SPORT_ABILITIES } from '../sim/content/vale_cup';
 import type { ZoneDef } from '../sim/data';
 import {
@@ -63,7 +68,12 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import {
+  armorTypeForItem,
+  canEquipItem,
+  weaponArchetypeForItem,
+  weaponHand,
+} from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -342,6 +352,7 @@ import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
+import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -356,6 +367,7 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetOfTargetId } from './target_of_target';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -573,6 +585,7 @@ const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   noRecipient: 'hudChrome.mailbox.result.noRecipient',
   tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
   noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  noMailSoulbound: 'hudChrome.itemSoulbound',
   notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
   cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
   recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',
@@ -616,6 +629,7 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
 type ItemQuality = NonNullable<ItemDef['quality']>;
 const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
+  offhand: 'itemUi.slots.mainhand',
   helmet: 'itemUi.slots.helmet',
   neck: 'itemUi.slots.neck',
   shoulder: 'itemUi.slots.shoulder',
@@ -646,6 +660,8 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   food: 'itemUi.kind.food',
   drink: 'itemUi.kind.drink',
   tool: 'itemUi.kind.tool',
+  shield: 'itemUi.kind.armor',
+  held_offhand: 'itemUi.kind.armor',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
@@ -777,7 +793,9 @@ function castKeyForAbility(ability: string): string | null {
  *  (other players), flesh (creatures). */
 function materialImpactKey(tgt: Entity): string {
   if (tgt.kind === 'player')
-    return tgt.templateId === 'warrior' || tgt.templateId === 'paladin'
+    return tgt.templateId === 'warrior' ||
+      tgt.templateId === 'warrior_classic' ||
+      tgt.templateId === 'paladin'
       ? 'impact_metal'
       : 'impact_leather';
   if (tgt.kind === 'mob')
@@ -1012,6 +1030,21 @@ export class Hud {
   private targetResEl = $('#tf-res');
   private targetResTextEl = $('#tf-res-text');
   private targetDebuffsEl = $('#tf-debuffs');
+  // Target of Target (showTargetOfTarget option): element refs for the #totarget-frame
+  // mini-frame, resolved ONCE like the target refs above (never per-frame queried). The
+  // frame is a THIRD instance of the unit_frame family (totFramePainter below).
+  private totFrameEl = $('#totarget-frame');
+  private totNameEl = $('#totf-name');
+  private totLevelEl = $('#totf-level');
+  private totHpEl = $('#totf-hp');
+  private totHpTextEl = $('#totf-hp-text');
+  private totPortraitEl = $('#totf-portrait') as unknown as HTMLCanvasElement;
+  // The subject the tot painter's portrait gate redraws this frame (mirrors
+  // targetPortraitSubject); set just before the paint() call that fires the gate.
+  private totPortraitSubject: Entity | null = null;
+  // Cached showTargetOfTarget preference (set from main.ts applySetting via
+  // setShowTargetOfTarget); when off, the frame is painted hidden every frame.
+  private showTargetOfTarget = false;
   // The target whose portrait the family painter's repaint gate redraws this frame.
   // The gate fires synchronously inside the targetFramePainter.paint() call below,
   // so this holds the subject for that one call (the old inline block read `target`
@@ -1167,7 +1200,9 @@ export class Hud {
   });
   private openGossipNpcId: number | null = null;
   private openQuestDetailId: string | null = null;
-  private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> [[q:id]]/[[i:id]] token
+  // Ordered so two base/heroic items with the same display name retain their
+  // distinct tokens when the readable draft is converted for sending.
+  private pendingChatLinks: readonly { display: string; token: string }[] = [];
   private questDialogTrap: FocusTrapHandle | null = null;
   private questDialogOpenedAtMs = 0;
   // The NPC whose voice line is currently sounding, so update() can fade it by
@@ -1287,6 +1322,10 @@ export class Hud {
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
+  // Target-of-target frame throttle + identity tracking, the non-self cadence twins
+  // of the target frame's fields above (see the showTargetOfTarget paint block).
+  private lastTotFramePaintAt = 0;
+  private lastTotFrameId: number | null = null;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
   // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
@@ -1318,6 +1357,7 @@ export class Hud {
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
   // pet bar (the sideways consumables row and the Vale Cup indicator drop a band).
   private lastPetPresent = false;
+  private lastStanceBarSig = '';
   // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
   private mailIndicatorEl: HTMLElement | null = null;
   private lastMailUnread = -1;
@@ -1358,6 +1398,7 @@ export class Hud {
     onPortraitsReady(() => {
       this.drawPlayerFramePortrait();
       this.targetFramePainter.invalidatePortrait();
+      this.totFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -1595,6 +1636,7 @@ export class Hud {
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.syncAnyWindowOpenState();
     });
     const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     mapCanvas.addEventListener(
@@ -1947,10 +1989,20 @@ export class Hud {
   }
 
   private syncAnyWindowOpenState(): void {
-    const anyOpen = [...document.querySelectorAll<HTMLElement>('.window.panel')]
+    const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];
+    const anyOpen = windows
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const mapWindow = document.getElementById('map-window');
+    const questLogWindow = document.getElementById('quest-log-window');
+    document.body.classList.toggle(
+      'mobile-map-quest-open',
+      !!mapWindow &&
+        !!questLogWindow &&
+        this.isWindowVisible(mapWindow) &&
+        this.isWindowVisible(questLogWindow),
+    );
   }
 
   private placeNewWindow(el: HTMLElement): void {
@@ -2878,7 +2930,7 @@ export class Hud {
   // token it stands for, so applyPendingChatLinks can swap it back in on send.
   private insertChatLink(display: string, token: string): void {
     const input = $('#chat-input') as unknown as HTMLInputElement;
-    this.pendingChatLinks.set(display, token);
+    this.pendingChatLinks = [...this.pendingChatLinks, { display, token }];
     input.placeholder = this.activeChatPlaceholder();
     input.style.display = 'block';
     input.value =
@@ -2891,15 +2943,16 @@ export class Hud {
   // Drop any shift-click-inserted links that were never sent (chat closed/cleared),
   // so a stale [Name] entry can't silently rewrite a later message.
   clearPendingChatLinks(): void {
-    this.pendingChatLinks.clear();
+    this.pendingChatLinks = [];
   }
 
   // Replace any inserted readable [Name] with its [[q:id]]/[[i:id]] token, then forget them.
   private applyPendingChatLinks(typed: string): string {
-    if (this.pendingChatLinks.size === 0) return typed;
+    if (this.pendingChatLinks.length === 0) return typed;
+    const pending = this.pendingChatLinks;
+    this.pendingChatLinks = [];
     let out = typed;
-    for (const [display, token] of this.pendingChatLinks) out = out.split(display).join(token);
-    this.pendingChatLinks.clear();
+    for (const { display, token } of pending) out = out.replace(display, token);
     return out;
   }
 
@@ -3236,8 +3289,8 @@ export class Hud {
     document.getElementById('ui') as HTMLElement,
     (x, y, z) => this.renderer.worldToScreen(x, y, z),
     getUiScale,
-    // Tier the pool cap / TTL / drop-non-crit from the STATIC preset (data-fx-level),
-    // never the governor. spawn() reads this per event.
+    // Tier the pool cap / TTL from the STATIC preset (data-fx-level), never the
+    // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
   // The player frame is the FIRST instance of the unit_frame family. It owns
@@ -3313,6 +3366,25 @@ export class Hud {
       repaintPortrait: () => this.drawTargetPortrait(),
     },
   );
+  // The target-of-target frame is the THIRD instance of the unit_frame family (after
+  // the player and target). It carries name + level + hp (no absorb, no resource
+  // group: the mini-frame has no shield overlay or power rail), toggles flex/none via
+  // shownDisplay, and owns its own portrait repaint gate. It is painted only when the
+  // showTargetOfTarget option is on and the target-of-target entity is known.
+  private readonly totFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.totFrameEl,
+      name: this.totNameEl,
+      level: this.totLevelEl,
+      hpFill: this.totHpEl,
+      hpText: this.totHpTextEl,
+    },
+    {
+      shownDisplay: 'flex',
+      repaintPortrait: () => this.drawTargetOfTargetPortrait(),
+    },
+  );
   // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
   // the QoL would engage but the ability has a cast time, consumed by the
   // castStop event (engage on success, drop on interrupt), so starting a Smite
@@ -3347,6 +3419,10 @@ export class Hud {
   // a pure USER toggle (party HP is actionable info), never influenced by
   // data-fx-level, reduce-motion, or the FPS governor.
   private partyCollapsed = loadPartyCollapsed();
+  // The party member the cursor is over (Clique-style mouseover casts): set by
+  // the party rows' mouseenter/mouseleave, read by castSlot to redirect friendly
+  // abilities to the hovered member. null whenever no frame is hovered.
+  private hoveredPartyPid: number | null = null;
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -3359,6 +3435,11 @@ export class Hud {
       classCss,
       onTarget: (pid) => this.sim.targetEntity(pid),
       onContextMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
+      // Clique-style mouseover casts: castSlot redirects friendly abilities to
+      // the hovered member while the cursor is over a party frame.
+      onHover: (pid) => {
+        this.hoveredPartyPid = pid;
+      },
       onLeave: () => this.sim.partyLeave(),
       leaveLabel: () => t('hud.social.leaveParty'),
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
@@ -3486,16 +3567,22 @@ export class Hud {
     },
     playerClass: () => this.sim.cfg.playerClass,
     playerLevel: () => this.sim.player.level,
+    totalPoints: () => this.sim.talentPoints().total,
     currentAllocation: () => this.sim.talents,
     activeLoadout: () => this.sim.activeLoadout,
     loadouts: () => this.sim.loadouts,
+    abilityTooltip: (id) => {
+      const res = this.previewResolvedAbility(id);
+      return res ? this.abilityTooltip(res) : null;
+    },
+    rowPicks: () => this.sim.rowPicks,
+    pickRow: (rowIndex, optionId) => this.sim.pickRowTalent(rowIndex, optionId),
+    commitSpec: (specId) => this.sim.setSpec(specId),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
     applyLoadoutBar: (bar) => this.applyLoadoutBar(bar),
-    buildDropdown: (options, current, onChange, placeholder, a11y) =>
-      this.buildDropdown(options, current, onChange, placeholder, a11y),
     inputDialog: (opts) => this.inputDialog(opts),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
@@ -3866,6 +3953,7 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     focusFirstInteractive: (root, preferredSelector) =>
       this.focusManager.focusFirst(root, preferredSelector),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
@@ -3899,6 +3987,28 @@ export class Hud {
         crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
       );
     }
+  }
+
+  // Redraw the target-of-target portrait canvas, the twin of drawTargetPortrait for
+  // the #totarget-frame. Called by the tot painter's repaint gate only on identity
+  // change (or after invalidatePortrait), reading the subject set just before paint().
+  private drawTargetOfTargetPortrait(): void {
+    const tot = this.totPortraitSubject;
+    if (!tot) return;
+    if (tot.kind === 'player') {
+      this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass, tot.skin ?? 0);
+    } else {
+      this.portraits.drawCrest(
+        this.totPortraitEl,
+        crestIdForEntity(tot.kind, MOBS[tot.templateId]?.family),
+      );
+    }
+  }
+
+  // Toggle the target-of-target mini-frame (showTargetOfTarget option), driven from
+  // main.ts applySetting. When off, the per-frame update paints the frame hidden.
+  setShowTargetOfTarget(on: boolean): void {
+    this.showTargetOfTarget = on;
   }
 
   private itemIcon(item: ItemDef): string {
@@ -4229,23 +4339,36 @@ export class Hud {
   private itemTooltip(item: ItemDef, compare = true): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
-    html += `<div class="tt-sub">${esc(
+    // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
+    // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
+    // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
+    let qualityKindHtml = esc(
       t('itemUi.tooltip.qualityKind', {
         quality: itemQualityLabel(item.quality),
         kind: itemKindLabel(item.kind),
       }),
-    )}</div>`;
+    );
+    if (item.heroicOf || item.heroic) {
+      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+    }
+    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     if (item.slot) {
       // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
       // right-aligned on the same line so it is clear which classes the gear suits.
+      // A two-handed weapon reads "Two-Hand" (the classic label), not its
+      // mainhand slot: the hand, not the paperdoll cell, is what the player needs.
+      const slotName =
+        item.kind === 'weapon' && weaponHand(item) === 'twohand'
+          ? t('itemUi.slots.twoHand')
+          : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
         const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
-        html += `<div class="tt-sub tt-row"><span>${esc(itemSlotName(item.slot))}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
       } else {
-        html += `<div class="tt-sub">${esc(itemSlotName(item.slot))}</div>`;
+        html += `<div class="tt-sub">${esc(slotName)}</div>`;
       }
     }
     // Optional item-level readout (off by default; src/sim/item_level.ts derives it
@@ -4262,6 +4385,11 @@ export class Hud {
           t('hudChrome.options.itemScoreLine', { score: itemNumber(itemScore(item), 1) }),
         )}</div>`;
       }
+    }
+    // Bound-to-owner marker (marks and other soulbound tokens): shown like the
+    // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
+    if (item.soulbound) {
+      html += `<div class="tt-sub" style="color:#ffd100">${esc(t('hudChrome.itemSoulbound'))}</div>`;
     }
     if (item.weapon) {
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
@@ -4482,6 +4610,8 @@ export class Hud {
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
+      haste: p.spellHaste,
+      parryChance: p.parryChance,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,
@@ -4565,6 +4695,34 @@ export class Hud {
     }
   }
 
+  // Resolve an ability id to a ResolvedAbility for tooltip PREVIEW (the spec
+  // screen's example abilities, which are cross-spec and often not yet learned).
+  // Prefers the live resolved entry when the player already knows it (rank +
+  // talent mods reflected), else rebuilds a base resolve picking the highest rank
+  // at the player's level, mirroring abilitiesKnownAt's rank walk.
+  private previewResolvedAbility(id: string): ResolvedAbility | null {
+    const known = this.sim.known.find((k) => k.def.id === id);
+    if (known) return known;
+    const def = ABILITIES[id];
+    if (!def) return null;
+    let rank = 1;
+    let cost = def.cost;
+    let castTime = def.castTime;
+    let effects = def.effects;
+    let threatFlat = def.threat?.flat ?? 0;
+    const threatMult = def.threat?.mult ?? 1;
+    for (const r of def.ranks ?? []) {
+      if (r.level <= this.sim.player.level) {
+        rank = r.rank;
+        cost = r.cost;
+        effects = r.effects;
+        if (r.castTime !== undefined) castTime = r.castTime;
+        if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
+      }
+    }
+    return { def, rank, cost, castTime, cooldown: def.cooldown, effects, threatFlat, threatMult };
+  }
+
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
     const p = this.sim.player;
@@ -4606,6 +4764,13 @@ export class Hud {
         // Pass the ability id so the effect line can resolve its damage school
         // (the {school} placeholder in the thorns/dot/absorb summaries).
         html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value, id: a.id });
+      } else if (eff.type === 'partyMeleeBuff') {
+        // Sanguine Aura: surface the same composite line the buff icon shows.
+        html += this.auraEffectTooltipHtml({
+          kind: 'sanguine',
+          value: eff.attackSpeedMult,
+          value2: eff.dmgPct,
+        });
       }
     }
     const requirements = abilityRequirementLines(a);
@@ -4902,6 +5067,12 @@ export class Hud {
     // Only auto-place abilities that belong on the active form's bar, so newly
     // learned form abilities land on their form bar and not the caster bar.
     const consider = (id: string) => {
+      // A passive (Measured Fury) is known but never castable, so it never
+      // auto-places on the action bar (a manual drag would be a dead slot too).
+      if (ABILITIES[id]?.passive) return;
+      // Warrior stances live on the dedicated #stancebar, never the action bar,
+      // so learning one on level-up must not consume an action slot.
+      if (ABILITIES[id]?.exclusiveGroup === WARRIOR_STANCE_GROUP) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSlotSync === null) {
@@ -5170,7 +5341,9 @@ export class Hud {
       // so the client-side slot remap never desyncs slot semantics
       const resolved = this.abilityForSlot(barSlot);
       if (resolved) {
-        if (resolved.def.targetMode === 'position') {
+        // A self-centered channel (Bladestorm) casts at the caster's own feet:
+        // no ground-aim reticle, straight to the normal cast path.
+        if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
           if (this.isSportAbilityId(action.id)) {
             // Sport moves autocast toward facing (no reticle, no point-and-click).
             this.castSportTap(action.id, resolved.def.range);
@@ -5180,7 +5353,22 @@ export class Hud {
             this.sim.castAbilityAt(action.id, this.groundTargetAim());
           }
         } else {
-          this.sim.castAbility(action.id);
+          // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
+          // while hovering a party frame lands on the hovered member instead of
+          // the current target; the sim validates and falls back if it went stale.
+          // Gated on the Interface option (mouseoverCast, on by default).
+          const def = resolved.def;
+          if (
+            this.hoveredPartyPid !== null &&
+            (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
+            def.requiresTarget &&
+            def.targetType === 'friendly' &&
+            this.sim.entities.has(this.hoveredPartyPid)
+          ) {
+            this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
+          } else {
+            this.sim.castAbility(action.id);
+          }
           // Optional QoL: also engage auto-attack when the ability is an offensive
           // attack, so white swings start without a separate Attack press. Gated on
           // the player setting; abilityStartsAutoAttack skips heals/buffs and any
@@ -6043,6 +6231,66 @@ export class Hud {
     return null;
   }
 
+  // The warrior stance bar: a small row of stance toggles stacked above the
+  // action bars, shown only for warriors and only for the stances valid for the
+  // current spec (Battle + Guarded for Arms/Prot, Berserker for Fury, Battle only
+  // for no spec). Rebuilds only when the known-stance set or the active stance
+  // changes (sig elision, like the pet bar).
+  private renderStanceBar(): void {
+    const bar = $('#stancebar') as HTMLElement;
+    const isWarrior =
+      this.sim.cfg.playerClass === 'warrior' || this.sim.cfg.playerClass === 'warrior_classic';
+    const knownStances = isWarrior
+      ? this.sim.known.filter((k) => k.def.exclusiveGroup === WARRIOR_STANCE_GROUP)
+      : [];
+    const knownIds = knownStances.map((k) => k.def.id);
+    const knownSet = new Set(knownIds);
+    const activeAura = this.sim.player.auras.find((a) => knownSet.has(a.id));
+    const model = stanceBarView(isWarrior, knownIds, activeAura ? activeAura.id : null);
+    if (!model.visible) {
+      bar.style.display = 'none';
+      if (this.lastStanceBarSig !== '') {
+        bar.innerHTML = '';
+        this.lastStanceBarSig = '';
+      }
+      return;
+    }
+    bar.style.display = 'flex';
+    if (model.sig === this.lastStanceBarSig) return;
+    this.lastStanceBarSig = model.sig;
+    bar.innerHTML = '';
+    const group = document.createElement('div');
+    group.className = 'stancebar-group';
+    bar.appendChild(group);
+    for (const slot of model.slots) {
+      const known = knownStances.find((k) => k.def.id === slot.id);
+      if (!known) continue;
+      const name = abilityDisplayName(known.def);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'stance-btn';
+      if (slot.active) btn.classList.add('active');
+      btn.setAttribute('aria-pressed', slot.active ? 'true' : 'false');
+      btn.title = name;
+      btn.setAttribute('aria-label', name);
+      const icon = document.createElement('span');
+      icon.className = 'icon-label';
+      icon.style.backgroundImage = `url(${iconDataUrl('ability', slot.iconKey)})`;
+      btn.appendChild(icon);
+      btn.addEventListener('click', () => {
+        if (this.peekGuard.consume()) {
+          this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        audio.click();
+        this.sim.castAbility(slot.id);
+      });
+      this.attachTooltip(btn, () => this.abilityTooltip(known));
+      group.appendChild(btn);
+    }
+  }
+
   private renderPetBar(): void {
     const bar = $('#petbar') as HTMLElement;
     const pet = this.ownPet();
@@ -6508,7 +6756,8 @@ export class Hud {
       unitFrameView({
         present: true,
         hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
+        hpText: `${p.hp}/${p.maxHp}`,
+        showAbsorbText: true,
         resourceKind: p.resourceType,
         resFrac: p.resource / Math.max(1, p.maxResource),
         resText: `${Math.round(p.resource)} / ${p.maxResource}`,
@@ -6605,7 +6854,8 @@ export class Hud {
           unitFrameView({
             present: true,
             hpFrac: target.hp / Math.max(1, target.maxHp),
-            hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
+            hpText: target.dead ? t('hud.core.dead') : `${target.hp}/${target.maxHp}`,
+            showAbsorbText: !target.dead,
             // The target's power bar (classic target frame): players and caster
             // mobs show their mana/rage/energy; a resource-less target (a plain
             // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
@@ -6674,6 +6924,50 @@ export class Hud {
         cast: castBarState(target),
         castRemaining: target.castRemaining,
       });
+      // Target of Target (showTargetOfTarget): resolve who the target is targeting (a
+      // mob/pet's aggro target, a player's selected target) and paint the mini-frame.
+      // The id already rides the wire (aggro for mobs, tgt for players), but the ENTITY
+      // is only known when it is inside the player's ~120yd interest bubble, so an
+      // unknown (out of range) or world-object target-of-target hides the frame
+      // gracefully. Gated on the setting: off keeps the frame hidden every frame. A
+      // non-self frame, throttled like the target frame; a tot SWAP bypasses the throttle.
+      const totId = targetOfTargetId(target);
+      const tot = this.showTargetOfTarget && totId !== null ? sim.entities.get(totId) : undefined;
+      if (tot && tot.kind !== 'object') {
+        this.totPortraitSubject = tot;
+        const totChanged = tot.id !== this.lastTotFrameId;
+        if (
+          nonSelfRepaintDue(
+            totChanged,
+            this.lastTotFramePaintAt,
+            now,
+            targetFrameNonSelfIntervalMs(fxTier),
+          )
+        ) {
+          this.lastTotFramePaintAt = now;
+          this.lastTotFrameId = tot.id;
+          this.totFramePainter.paint(
+            unitFrameView({
+              present: true,
+              hpFrac: tot.hp / Math.max(1, tot.maxHp),
+              hpText: tot.dead ? t('hud.core.dead') : `${tot.hp}/${tot.maxHp}`,
+              showAbsorbText: false,
+              resourceKind: 'none',
+              resFrac: 0,
+              resText: '',
+              levelText: null,
+              name: entityDisplayName(tot),
+              portraitKey: String(tot.id),
+              absorb: null,
+              dead: false,
+              outOfRange: false,
+            }),
+          );
+        }
+      } else {
+        this.lastTotFrameId = null;
+        this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      }
     } else {
       // No target (or a world object): hide the frame. The painter also resets its
       // portrait gate here, so re-acquiring a target repaints (the old -999 reset). Reset
@@ -6692,6 +6986,11 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      // Hide the target-of-target frame too. Its parent (#target-frame) is already
+      // display:none, but paint hidden anyway to reset the painter's portrait gate +
+      // cadence id so re-acquiring a target repaints the mini-frame immediately.
+      this.lastTotFrameId = null;
+      this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
@@ -6717,6 +7016,7 @@ export class Hud {
     // routes through the elided writer facet; the aria-label keeps its per-frame t()
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
     this.renderPetBar();
+    this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     this.actionBarPainter.paint(
@@ -8083,6 +8383,7 @@ export class Hud {
     if (el.style.display === 'block') {
       el.style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.syncAnyWindowOpenState();
       return;
     }
     this.closeOtherWindows('#map-window');
@@ -8090,6 +8391,7 @@ export class Hud {
     this.mapCenter = null;
     el.style.display = 'block';
     this.updateMapWindow();
+    this.syncAnyWindowOpenState();
   }
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
@@ -8463,11 +8765,16 @@ export class Hud {
                 now,
               );
           }
-          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+          if (
+            ev.kind === 'miss' ||
+            ev.kind === 'dodge' ||
+            ev.kind === 'resist' ||
+            ev.kind === 'parry'
+          ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
-            // not miss).
+            // not miss). Parry reuses the dodge colour with its own word.
             const shape = fctSpawnShape({
               type: 'damage',
               damageKind: ev.kind,
@@ -8485,7 +8792,9 @@ export class Hud {
                       ? t('hud.combat.floatingMiss')
                       : ev.kind === 'dodge'
                         ? t('hud.combat.floatingDodge')
-                        : t('hud.combat.floatingResist'),
+                        : ev.kind === 'parry'
+                          ? t('hud.combat.floatingParry')
+                          : t('hud.combat.floatingResist'),
                   target: tgt,
                 },
                 now,
@@ -8501,7 +8810,9 @@ export class Hud {
                   ? 'hud.combat.miss'
                   : ev.kind === 'dodge'
                     ? 'hud.combat.dodged'
-                    : 'hud.combat.resisted';
+                    : ev.kind === 'parry'
+                      ? 'hud.combat.parried'
+                      : 'hud.combat.resisted';
               this.combatLog(
                 t(logKey, {
                   ability: combatAbilityName(ev.ability),
@@ -8624,7 +8935,13 @@ export class Hud {
               characterId ? { eventID: `lvl5_${characterId}` } : undefined,
             );
           }
-          // First talent point (and spec) unlock — nudge the player to the panel.
+          // Specialization unlocks at SPEC_UNLOCK_LEVEL, before talent POINTS at
+          // FIRST_TALENT_LEVEL, nudge the player to choose a spec.
+          if (ev.level === SPEC_UNLOCK_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
+            this.showBanner(t('hudChrome.specPanel.specUnlockBanner'));
+            this.log(t('hudChrome.specPanel.specUnlockHint'), '#ffd100');
+          }
+          // First talent POINT unlock, nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));
             this.log(t('game.talents.unlockHint'), '#ffd100');
@@ -9752,6 +10069,7 @@ export class Hud {
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
       'Not enough mana!': 'hud.errors.notEnoughMana',
       'Not enough health.': 'hud.errors.notEnoughHealth',
+      'Nothing to consume.': 'hud.errors.nothingToConsume',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
       'That ability requires combo points.': 'hud.errors.requiresCombo',
       "You can't do that while shapeshifted.": 'hud.errors.shapeshifted',
@@ -9762,6 +10080,7 @@ export class Hud {
       'Too close!': 'hud.errors.tooClose',
       'You must be facing your target.': 'hud.errors.facing',
       'You must wield a dagger.': 'hud.errors.dagger',
+      'You must have a shield equipped.': 'hud.errors.needShield',
       'You must be behind your target.': 'hud.errors.behindTarget',
       'This creature cannot be polymorphed.': 'hud.errors.polymorph',
       'You have no active Seal.': 'hud.errors.noSeal',
@@ -11717,17 +12036,17 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    // Show the player's currently equipped mainhand on the character sheet, so the
-    // 3D model reflects gear changes (the char window repaints the preview after an
-    // equip via charWindow.renderIfOpen -> renderPreview).
+    // Show the player's currently equipped held items on the character sheet, so
+    // the 3D model reflects gear changes.
     const weapon = this.sim.equipment.mainhand ?? null;
+    const offhand = this.sim.equipment.offhand ?? null;
     if (previewKey) {
       // mech is class-agnostic; mirror the wearer class's hand layout (rogue
       // dual-wields) so the paperdoll matches the in-world render
       const override = previewKey === 'player_mech' ? mechHeldWeaponOverride(cls) : null;
-      this.charPreview.setVisualKey(previewKey, weapon, override);
+      this.charPreview.setVisualKey(previewKey, weapon, override, offhand);
     } else {
-      this.charPreview.setClass(cls, weapon);
+      this.charPreview.setClass(cls, weapon, offhand);
     }
     this.charPreview.setSkin(skin);
   }
@@ -12636,7 +12955,7 @@ export class Hud {
     // everywhere at once, not be re-decided per export).
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
 
-    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    const slots: EquipSlot[] = ['mainhand', 'offhand', 'chest', 'legs', 'feet'];
     const gear = slots.map((slot) => {
       const id = sim.equipment[slot];
       const item = id ? ITEMS[id] : null;
@@ -14320,6 +14639,7 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
 }
 
 function itemSlotName(slot: ItemSlot): string {
+  if (slot === 'offhand') return t('hudChrome.paperdoll.offhand' as TranslationKey);
   return t(ITEM_SLOT_LABEL_KEYS[slot]);
 }
 

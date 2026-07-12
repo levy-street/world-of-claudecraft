@@ -73,7 +73,7 @@ export function abilityDamageBonus(
       // heal coefficient in effect_dispatch.
       return def.channel
         ? channelTickBonus(scaling.spellPower, def)
-        : directHealBonus(scaling.spellPower, res.castTime);
+        : directHealBonus(scaling.spellPower, res.castTime, true);
     case 'chainHeal':
       return directHealBonus(scaling.spellPower, res.castTime);
     case 'consumeAura':
@@ -139,6 +139,9 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
+      // Heroic Leap: the landing blast is nested in repositionToAim.landingAoe
+      // (fired on touchdown), so $d reads that when present.
+      (eff.type === 'repositionToAim' && eff.landingAoe != null) ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
@@ -172,7 +175,10 @@ export function abilityOverTimeEffect(
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    if (eff.type === 'aoeAttackPower') return eff.amount;
+    // aoeAttackPower reads its flat `amount`, or a `pct` reduction as a whole
+    // percent (Direhowl's 0.2 -> 20 for the "{buff}%" tooltip).
+    if (eff.type === 'aoeAttackPower')
+      return eff.amount ?? (eff.pct != null ? eff.pct * 100 : null);
     if (eff.type === 'aoeAllyAttackPower') return eff.amount ?? (eff.apPct ?? 0) * 100;
   }
   return null;

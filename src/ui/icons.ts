@@ -2192,7 +2192,7 @@ function r(
   return { bg, pal, prims: prims.map((p) => (typeof p === 'string' ? { p } : p)), fx };
 }
 
-const ABILITY_RECIPES: Record<string, IconRecipe> = {
+const BASE_ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
   // grouped here so the family reads together, order within the map is cosmetic).
   flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
@@ -2243,6 +2243,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   voidfeast: r('shadow', 'venom', ['flame'], ['glow']),
   spellsteal: r('arcane', 'arcanePink', ['sunburst'], ['glow']),
   startle_shot: r('nature', 'venom', ['sunburst'], ['glow']),
+  // Revenge: a wide frontal sweep (sword crossed with a broad slash arc), steel,
+  // distinct from cleave's axe+arcs and heroic_strike's bare sword+glow.
+  revenge: r('steel', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['arcs']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
@@ -2388,14 +2391,96 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   execute: r('blood', 'blood', ['axe'], ['glow']),
   slam: r('fury', 'steel', ['mace'], ['motion']),
   cleave: r('fury', 'steel', ['axe'], ['arcs']),
+  // Warrior stances: Battle = an offensive sword on gold; Berserker = a reckless
+  // blood-red skull; Guarded (defensive) keeps its braced shield + arcs.
+  battle_stance: r('fury', 'gold', ['sword'], ['arcs']),
+  berserker_stance: r('blood', 'blood', ['skull'], ['glow']),
   defensive_stance: r('steel', 'steel', ['shield'], ['arcs']),
   sunder_armor: r('steel', 'steel', ['chestplate', { p: 'mace', ...BR }]),
   taunt: r('fury', 'blood', ['fist'], ['arcs']),
   mortal_strike: r('blood', 'blood', ['sword', { p: 'claw_slash', ...BR }]),
   bloodthirst: r('blood', 'blood', ['heart', { p: 'dagger', ...BR }], ['drips']),
   shield_slam: r('steel', 'steel', ['shield', { p: 'mace', ...BR }]),
-  whirlwind: r('fury', 'steel', ['sword'], ['arcs']),
-  berserker_rage: r('fury', 'blood', ['fist'], ['glow']),
+  // Bladed Gyre (whirlwind): a spin, so a sweeping slash-arc rings the blade,
+  // distinct from heroic_strike's bare sword + glow.
+  whirlwind: r('fury', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['motion']),
+  // Berserker Rage: a fist wreathed in flame (enrage), distinct from taunt's
+  // bare fist + arcs on the same fury/blood palette.
+  berserker_rage: r('fury', 'blood', ['fist', { p: 'flame', ...TR }], ['glow']),
+  // Enrage (Fury passive): a raging flame engulfing a fist, glow + motion to read
+  // as an active fury state; distinct from Berserker Rage's small TR flame.
+  enrage_passive: r('fury', 'blood', ['flame', { p: 'fist', ...BIG }], ['glow', 'motion']),
+  // fury-only kit: Twinstrike = two crossed blades mid-swing; Red Harvest = a
+  // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
+  raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
+  red_harvest: r('blood', 'blood', ['axe', { p: 'droplet', ...BR }], ['drips']),
+  // fury support cooldowns: Emboldening Roar = a golden shout bursting into
+  // guaranteed crits (distinct from rallying_cry's roar+heart and
+  // intimidating_shout's roar+skull); Furious Mending = a heart shedding a
+  // blood droplet on a gold palette (distinct from life_tap's purple pair and
+  // sanguine_aura's droplet-first layout)
+  emboldening_roar: r('fury', 'gold', ['roar', { p: 'sunburst', ...TR }], ['glow']),
+  furious_mending: r('blood', 'gold', ['heart', { p: 'droplet', ...BR }], ['glow']),
+  // prot kit: Raised Guard = a braced shield doubled by a small second shield
+  // (distinct from defensive_stance's bare shield + arcs and shield_slam's
+  // shield + mace); Iron Resolve = a shield guarding a heart on steel/gold
+  // (distinct from aura_buff_dr's blood bg and die_by_sword's shield + sword);
+  // Faultline = an earthen shock cracking the ground (distinct from
+  // heroic_leap's boot and earth_shock's lightning); Defiant Bellow = a shout
+  // raising a shield (distinct from rallying_cry's roar + heart and
+  // piercing_howl's roar + boot)
+  raised_guard: r('steel', 'steel', ['shield', { p: 'shield', ...TR }], ['glow']),
+  iron_resolve: r('steel', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
+  faultline: r('earth', 'earthBrown', [{ p: 'sunburst', ...BIG }, 'fist'], ['crack']),
+  defiant_bellow: r('steel', 'steel', ['roar', { p: 'shield', ...TR }], ['arcs']),
+  // arms kit: Breachmaker = a sword biting a cracked guard on earthen steel
+  // (distinct from whirlwind's sword+arcs and faultline's sunburst+fist);
+  // Measured Fury = a calm steel helm shielding a steady heart (a passive; a
+  // composed steel look distinct from iron_resolve's shield+heart)
+  breachmaker: r('fury', 'gold', ['sword', { p: 'sunburst', ...BIG }], ['crack', 'glow']),
+  measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
+  // Arms restructure 2026-07-08: Sweeping Strikes = a wide arcing slash (hitting
+  // an extra target); Deep Wounds = a bleeding gash on blood.
+  sweeping_strikes: r('fury', 'steel', ['claw_slash', { p: 'sword', ...BR }], ['arcs', 'motion']),
+  deep_wounds: r('blood', 'blood', ['claw_slash', { p: 'droplet', ...BR }], ['drips']),
+  // Warrior passives 2026-07-09. Each hints its mechanic with a distinct combo:
+  // Seasoned Soldier = a veteran's helm and mailed fist on steel/gold (a rage
+  // economy passive; distinct from measured_fury's steel/steel helm+heart);
+  // Sudden Death = a skull crowning a bared blade (a free Execute proc; distinct
+  // from intimidating_shout's roar+skull and recklessness's axe+sunburst);
+  // Diabolical Twinstrike = crossed twin daggers on shadow/blood (an Enrage
+  // damage passive; distinct from any single-blade warrior recipe); Cleaving
+  // Blows = twin axes in motion (a Twinstrike refund; distinct from cleave and
+  // recklessness's single axe).
+  seasoned_soldier: r('steel', 'gold', ['helm', { p: 'fist', ...BR }], ['glow']),
+  sudden_death: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['glow']),
+  diabolical_twinstrike: r('shadow', 'blood', ['dagger', { p: 'dagger', ...TR }], ['glow']),
+  cleaving_blows: r('blood', 'steel', ['axe', { p: 'axe', ...BR }], ['arcs', 'motion']),
+  // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
+  pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
+  heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
+  rallying_cry: r('fury', 'gold', ['roar', { p: 'heart', ...BR }], ['arcs']), // shout granting health
+  storm_bolt: r('storm', 'steel', ['mace', { p: 'lightning', ...TR }], ['motion']), // thrown hammer
+  intimidating_shout: r('shadow', 'blood', ['roar', { p: 'skull', ...TR }], ['arcs']), // fear shout
+  // Bladestorm: a whole STORM of blades, so a storm-blue background sets it apart
+  // from raging_gale's fury-red crossed swords on the action bar.
+  bladestorm: r(
+    'storm',
+    'steel',
+    ['sword', { p: 'sword', rot: Math.PI * 0.5 }],
+    ['arcs', 'motion'],
+  ),
+  victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']), // strike that heals
+  piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']), // howl slowing feet
+  die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']), // defensive parry
+  recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']), // berserk crits
+  avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']), // stone colossus
+  sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
+  // PTR (v0.24.0) additions kept alongside the overhaul kit above.
+  razor_howl: r('fury', 'steel', ['roar', { p: 'claw_slash', ...BR }], ['arcs']),
+  stormthrow: r('storm', 'sky', ['axe', { p: 'lightning', ...TR }], ['motion']),
+  reckless_vow: r('blood', 'gold', ['heart', { p: 'fist', ...TR }], ['glow', 'arcs']),
+  red_banner: r('blood', 'blood', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['arcs']),
   // mage
   conjure_food: r('arcane', 'arcanePink', ['bread'], ['sparkle']),
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
@@ -2429,10 +2514,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ghost_wolf: r('nature', 'leafGreen', ['paw'], ['glow']),
   stormstrike: r('storm', 'sky', ['sword', { p: 'lightning', ...BR }]),
   aspect_of_the_wild: r('nature', 'leafGreen', ['paw', { p: 'sunburst', ...BR }], ['glow']),
-  avatar: r('earth', 'gold', ['chestplate', { p: 'fist', ...TR }], ['glow']),
   avenging_wrath: r('holy', 'gold', ['wing', { p: 'sunburst', ...BR }], ['glow']),
   berserk: r('fury', 'blood', ['paw', { p: 'fist', ...BR }], ['glow']),
-  bladestorm: r('fury', 'steel', ['sword', { p: 'axe', ...BR }], ['arcs']),
   blink: r('arcane', 'arcanePink', ['boot', { p: 'lightning', ...TR }], ['motion']),
   bloodlust: r('fury', 'blood', ['fist', { p: 'lightning', ...BR }], ['glow']),
   chain_lightning: r(
@@ -2463,7 +2546,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ghostly_strike: r('shadow', 'silverWhite', ['dagger', { p: 'eye', ...TR }], ['glow']),
   hammer_of_wrath: r('holy', 'holyGold', ['mace', { p: 'lightning', ...BR }], ['glow']),
   healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
-  heroic_leap: r('fury', 'gold', ['boot', { p: 'axe', ...TR }], ['motion']),
   holy_wrath: r('holy', 'holyGold', ['sunburst', { p: 'cross', ...BR }], ['arcs']),
   howl_of_terror: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
   ice_block: r('frost', 'ice', ['gem', { p: 'shield', ...BR }], ['glow']),
@@ -2479,13 +2561,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   preparation: r('shadow', 'steel', ['scroll', { p: 'dagger', ...BR }], ['sparkle']),
   presence_of_mind: r('arcane', 'silverWhite', ['eye', { p: 'sunburst', ...BR }], ['sparkle']),
   psychic_scream: r('shadow', 'shadowPurple', ['roar', { p: 'eye', ...BR }], ['glow']),
-  pummel: r('steel', 'blood', ['fist', { p: 'sigil_rune', ...BR }]),
-  razor_howl: r('fury', 'steel', ['roar', { p: 'sword', ...BR }], ['arcs']),
   lingering_dread: r('shadow', 'blood', ['roar', { p: 'shield', ...BR }], ['arcs', 'glow']),
-  stormthrow: r('storm', 'sky', ['axe', { p: 'lightning', ...BR }], ['motion']),
-  reckless_vow: r('fury', 'blood', ['heart', { p: 'lightning', ...BR }], ['glow']),
-  red_banner: r('blood', 'gold', ['scroll', { p: 'fist', ...BR }], ['arcs']),
-  rallying_cry: r('fury', 'gold', ['sunburst', { p: 'fist', ...BR }], ['arcs']),
   rebuke: r('holy', 'holyGold', ['fist', { p: 'sigil_rune', ...BR }], ['arcs']),
   shadowstep: r('shadow', 'shadowPurple', ['boot', { p: 'dagger', ...BR }], ['motion']),
   shield_wall: r('steel', 'steel', ['shield', { p: 'chestplate', ...BR }], ['glow']),
@@ -2519,8 +2595,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
+  // spec signature spells (Talents 2.0 PR3b): one per spec, grant-only
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
+  repentance: r('holy', 'silverWhite', ['hand'], ['glow']),
   bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
   trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
   wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
@@ -2534,11 +2612,63 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
   shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
   elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
+  shamanistic_rage: r('storm', 'blood', ['fist'], ['glow']),
+  natures_swiftness: r('nature', 'leafGreen', ['leaf'], ['sparkle']),
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
+  fel_domination: r('shadow', 'ember', ['imp_head'], ['glow']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
+};
+
+// Classic Warrior (the pre-overhaul PTR side-by-side class): every cw_ ability is a
+// verbatim clone of a base warrior ability (classes_warrior_classic.ts), so each icon
+// reuses the base recipe with the lead primitive drawn slightly smaller. The art stays
+// recognizably the same at a glance, but the recipe is distinct, satisfying the
+// no-two-abilities-share-an-icon guard (tests/ability_icons.test.ts).
+const CLASSIC_WARRIOR_BASE_IDS = [
+  'heroic_strike',
+  'battle_shout',
+  'commanding_shout',
+  'charge',
+  'rend',
+  'thunder_clap',
+  'hamstring',
+  'bloodrage',
+  'overpower',
+  'execute',
+  'slam',
+  'cleave',
+  'defensive_stance',
+  'demoralizing_shout',
+  'sunder_armor',
+  'taunt',
+  'bloodthirst',
+  'mortal_strike',
+  'shield_slam',
+  'whirlwind',
+  'berserker_rage',
+] as const;
+const CLASSIC_WARRIOR_ICON_SCALE = 0.9;
+
+function classicWarriorRecipes(): Record<string, IconRecipe> {
+  const out: Record<string, IconRecipe> = {};
+  for (const baseId of CLASSIC_WARRIOR_BASE_IDS) {
+    const base = BASE_ABILITY_RECIPES[baseId];
+    out[`cw_${baseId}`] = {
+      ...base,
+      prims: base.prims.map((placement, i) =>
+        i === 0 ? { ...placement, s: (placement.s ?? 1) * CLASSIC_WARRIOR_ICON_SCALE } : placement,
+      ),
+    };
+  }
+  return out;
+}
+
+const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  ...BASE_ABILITY_RECIPES,
+  ...classicWarriorRecipes(),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -2745,6 +2875,10 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   yumis_keepsake_locket: r('storm', 'sky', ['gem'], ['sparkle', 'glow']),
   zense_meridian: r('arcane', 'arcanePink', ['moon', 'gem'], ['glow']),
   medallion_of_endless_profit: r('treasure', 'gold', ['coin', 'sunburst'], ['sparkle']),
+  // Nythraxis raid offhand epics (the two 2H weapons ship rendered thumbnails
+  // via ITEM_WEAPON_VARIANTS like every other weapon).
+  bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
+  wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -2775,6 +2909,21 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  // Bladed Echo (whirlwind's armed area-echo buff, aura id 'bladed_echo')
+  aura_aoe_echo: r('fury', 'steel', ['sword'], ['motion']),
+  // Emboldened (Emboldening Roar's armed guaranteed-crit buff, aura id
+  // 'emboldening_roar_crit')
+  aura_sure_crit: r('fury', 'gold', ['sunburst'], ['glow']),
+  // Parameterized damage-reduction buffs (Furious Mending's 20% cut, aura id
+  // 'furious_mending_dr')
+  aura_buff_dr: r('blood', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // Physical-only damage-reduction buffs (Raised Guard's 50% cut, aura id
+  // 'raised_guard_dr'), mirroring aura_buff_dr on the steel palette
+  aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // Breachmaker's source-scoped vulnerability debuff (aura id 'breachmaker_vuln',
+  // kind 'vuln_source'), shown on the target's debuff frame: a cracked guard
+  // struck by a blade on a blood palette
+  aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
@@ -2783,6 +2932,9 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
 const CREST_RECIPES: Record<string, IconRecipe> = {
   // player classes (motif + class-flavoured background)
   class_warrior: r('fury', 'steel', ['sword'], ['glow']),
+  // Classic Warrior (PTR side-by-side class): the warrior crest with the sword
+  // drawn slightly smaller, matching the cw_ ability-icon treatment.
+  class_warrior_classic: r('fury', 'steel', [{ p: 'sword', s: 0.9 }], ['glow']),
   class_paladin: r('holy', 'holyGold', ['mace'], ['glow']),
   class_hunter: r('nature', 'leafGreen', ['arrow'], ['glow']),
   class_rogue: r(
@@ -3253,17 +3405,53 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'hamstring',
   'bloodrage',
   'overpower',
+  'raging_gale',
   'execute',
   'slam',
+  'red_harvest',
   'cleave',
+  'battle_stance',
   'defensive_stance',
   'demoralizing_shout',
+  'intimidating_shout',
   'sunder_armor',
   'mortal_strike',
   'bloodthirst',
   'shield_slam',
+  'furious_mending',
+  'emboldening_roar',
+  'raised_guard',
+  'iron_resolve',
+  'faultline',
+  'defiant_bellow',
+  'revenge',
+  'rallying_cry',
+  'berserker_stance',
+  'die_by_sword',
+  'storm_bolt',
+  'victory_rush',
+  'piercing_howl',
+  'bladestorm',
+  'colossal_might',
+  'second_wind',
+  'pursuit',
+  'lingering_dread',
+  'anger_management',
+  'battle_rhythm',
+  'recklessness',
+  'avatar',
+  'bloodbath',
+  'sanguine_aura',
+  'pummel',
+  'sweeping_strikes',
+  'breachmaker',
+  'heroic_leap',
+  'attack',
   'whirlwind',
   'berserker_rage',
+  'double_charge',
+  'crushing_charge',
+  'combat_mastery',
   // mage (CraftPix premium pyromancer/cryomancer/lightning-mage packs — fire/frost/arcane;
   // aeromancer unused, mage has no wind). conjure_food and polymorph have no fit (no
   // bread/food or sheep art) and stay procedural.
@@ -3347,7 +3535,21 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
-  const cls = ABILITIES[id]?.class;
+  const cls =
+    ABILITIES[id]?.class ??
+    (id === 'bloodbath' ||
+    id === 'colossal_might' ||
+    id === 'second_wind' ||
+    id === 'pursuit' ||
+    id === 'lingering_dread' ||
+    id === 'anger_management' ||
+    id === 'battle_rhythm' ||
+    id === 'double_charge' ||
+    id === 'crushing_charge' ||
+    id === 'combat_mastery' ||
+    id === 'attack'
+      ? 'warrior'
+      : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 

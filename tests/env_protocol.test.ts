@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ACTIONS, NUM_ACTIONS, encodeObs, obsSize } from '../src/sim/obs';
+import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from '../headless/protocol';
 import { CLASSES } from '../src/sim/data';
+import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES } from '../src/sim/types';
-import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from '../headless/protocol';
 
 describe('headless environment protocol validation', () => {
   it('accepts only integer action ids from the declared action space', () => {
@@ -17,11 +17,13 @@ describe('headless environment protocol validation', () => {
   });
 
   it('accepts every declared player class and rejects anything else', () => {
-    // all 9 classes are valid env inputs, not just warrior/mage
+    // all 10 classes (the 9 originals plus the classic-warrior PTR clone) are
+    // valid env inputs, not just warrior/mage
     for (const cls of ALL_CLASSES) {
       expect(validatePlayerClass(cls)).toBe(cls);
     }
-    expect(ALL_CLASSES.length).toBe(9);
+    expect(ALL_CLASSES.length).toBe(10);
+    expect(validatePlayerClass('warrior_classic')).toBe('warrior_classic');
     expect(validatePlayerClass('warlock')).toBe('warlock');
     expect(validatePlayerClass('necromancer')).toBeNull();
     expect(validatePlayerClass('')).toBeNull();

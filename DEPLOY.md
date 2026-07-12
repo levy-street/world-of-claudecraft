@@ -47,6 +47,20 @@ First boot takes a few minutes (Docker image build). Watch it with:
 ssh ubuntu@<elastic-ip> sudo tail -f /var/log/eastbrook-setup.log
 ```
 
+## PTR throwaway environment
+
+`deploy/ptr-user-data.sh` is only for a dedicated, disposable PTR host and database. It clones
+the canonical `levy-street/world-of-claudecraft` repository at `release/v0.24.0-ptr` into
+`/opt/eastbrook-ptr`. Do not run it on a production host, attach a production volume, restore a
+production backup into it, or promote its database to production.
+
+The PTR bootstrap writes `ALLOW_DEV_COMMANDS=1` to its host-only `.env` so testers can use the
+PTR vendor and level-jump commands. `docker-compose.yml` passes that variable through with an
+empty default, so generic and production deployments remain disabled unless their host
+explicitly opts in. A PTR source update uses a fast-forward-only pull, verifies that the deployed
+commit is the exact fetched canonical commit, and refuses a source worktree with nonignored
+changes. The deployment aborts if any of those checks fail.
+
 ## 3. Point DNS at it
 
 Create an **A record** for your domain (e.g. `play.example.com`) pointing
@@ -82,6 +96,35 @@ sudo docker compose up -d --build
 
 Players online during the restart are disconnected for a few seconds and
 can log straight back in; the server saves all characters on shutdown.
+
+## Outbound email (AWS SES)
+
+The server sends account-lifecycle mail (signup, password reset, email change,
+security notices; see `server/email/`). Without configuration it uses the
+console transport: emails are logged, never sent. To deliver for real via SES:
+
+1. In SES (same region as the instance is simplest), create a **domain
+   identity** for the sending domain and publish the DKIM CNAMEs, MAIL FROM,
+   and DMARC records it gives you.
+2. Request **production access** for the SES account (until granted, the
+   sandbox only delivers to individually verified addresses).
+3. Attach an IAM role to the instance allowing `ses:SendEmail` on that
+   identity (preferred over access keys; the SDK default chain picks it up
+   through the instance metadata service).
+4. In `/opt/eastbrook/.env` set:
+
+```bash
+EMAIL_PROVIDER=ses
+EMAIL_SES_REGION=us-east-1
+EMAIL_FROM="World of ClaudeCraft <noreply@worldofclaudecraft.com>"
+EMAIL_BASE_URL=https://worldofclaudecraft.com
+```
+
+Then `docker compose up -d game`. The startup log line
+`email transport selected` confirms which transport is live; every send
+attempt is audited in the `email_log` table. A provider with a plain HTTP
+API works too: set `EMAIL_API_URL`, `EMAIL_API_KEY`, and `EMAIL_FROM`
+instead (see `.env.example`).
 
 ## Backups
 

@@ -1,3 +1,6 @@
+// FIRST import on purpose: loads .env before realm.ts (or any other module
+// with an import-time process.env read) evaluates. See server/env.ts.
+import './env';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
@@ -25,6 +28,8 @@ import {
   handleAccountExport,
   handleAccountLogout,
   handleAccountMarketing,
+  handleAccountPasswordForgot,
+  handleAccountPasswordReset,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
   handleAccountWhoami,
@@ -35,6 +40,13 @@ import { configureAdminRuntime, handleAdminApi } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
+import {
+  configureAppleAuthRuntime,
+  handleAppleLogin,
+  handleAppleLoginLink,
+  handleAppleLoginNew,
+} from './apple_auth';
+import { pruneApplePendingLogins } from './apple_auth_db';
 import {
   hashPassword,
   newToken,
@@ -113,6 +125,7 @@ import {
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
+  handleNativeDiscordExchange,
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
@@ -514,6 +527,7 @@ function characterListPayload(chars: CharacterRow[]): {
     playtimeSeconds: number;
     skinCatalog: 'class' | 'mech';
     mainhandItemId: string | null;
+    offhandItemId: string | null;
   }[];
 } {
   return {
@@ -529,9 +543,10 @@ function characterListPayload(chars: CharacterRow[]): {
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
       // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      // Combat Mech cosmetic body and the equipped held items, matching the world).
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }
@@ -769,7 +784,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (
       activeConfig().requireWebLogin &&
       req.method === 'POST' &&
-      (url === '/api/register' || url === '/api/login') &&
+      (url === '/api/register' ||
+        url === '/api/login' ||
+        url === '/api/account/password/forgot' ||
+        url === '/api/account/password/reset') &&
       !isWebClientRequest(req)
     ) {
       return json(res, 403, {
@@ -1474,6 +1492,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountChangePassword(req, res, accountId, callerToken);
     }
+    // Password reset is for users who are locked out, so both routes are
+    // unauthenticated (rate-limited + web-login guarded above, and each handler is
+    // written to never reveal whether an account exists).
+    if (req.method === 'POST' && url === '/api/account/password/forgot') {
+      return handleAccountPasswordForgot(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/account/password/reset') {
+      return handleAccountPasswordReset(req, res);
+    }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
       if (!callerToken || (await accountForToken(callerToken)) === null)
@@ -1593,16 +1620,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    if (req.method === 'POST' && url === '/api/auth/apple') {
+      return handleAppleLogin(req, res, await readBody(req));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/new') {
+      return handleAppleLoginNew(req, res, await readBody(req), (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/link') {
+      return handleAppleLoginLink(req, res, await readBody(req));
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
     // web-login guard, which is login/register-only). Mutations go through
     // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
     if (req.method === 'POST' && url === '/api/auth/discord/start') {
-      const mode =
-        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
-          ? 'link'
-          : 'login';
+      const discordStartUrl = new URL(req.url ?? '/', 'http://localhost');
+      const mode = discordStartUrl.searchParams.get('mode') === 'link' ? 'link' : 'login';
+      const native = discordStartUrl.searchParams.get('native') === '1';
+      const nativeChallenge = discordStartUrl.searchParams.get('challenge') ?? undefined;
       let accountId: number | null = null;
       if (mode === 'link') {
         accountId = await bearerActiveAccount(req, res);
@@ -1610,10 +1646,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       if (!discordRateLimited(req, accountId ?? 0).allowed)
         return json(res, 429, { error: 'rate limited' });
-      return handleDiscordStart(req, res, { mode, accountId });
+      const body = native ? await readBody(req) : {};
+      return handleDiscordStart(req, res, {
+        mode,
+        accountId,
+        native,
+        nativeChallenge,
+        nativeAttestation: body.nativeAttestation,
+      });
     }
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
-      return handleDiscordCallback(req, res);
+      return handleDiscordCallback(req, res, (ip) => liveGame().isIpBlocked(ip));
     }
     // First-time-login chooser endpoints. Unauthenticated like /callback: the
     // authorization is the single-use pending-login token (minted only after a
@@ -1624,6 +1667,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
       return handleDiscordLoginLink(req, res, (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/native/exchange') {
+      return handleNativeDiscordExchange(req, res);
     }
     if (req.method === 'GET' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);
@@ -1874,6 +1920,9 @@ configureAuthRuntime({
   // legacy handleApi arm above.
   passesTurnstile: (req, body) => passesTurnstile(req, body, activeConfig().turnstileSecret),
   requestMetadata,
+});
+configureAppleAuthRuntime({
+  isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
 });
 
 // Inject the main.ts runtime the ported character handlers (server/characters.ts) need
@@ -2239,6 +2288,7 @@ export async function startServer(): Promise<http.Server> {
     console.log(
       `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
     );
+  await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
   await game.loadChatFilter();
@@ -2262,6 +2312,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneDiscordPendingLogins(pool).catch((err) =>
       console.error('discord pending login prune failed:', err),
+    );
+    void pruneApplePendingLogins(pool).catch((err) =>
+      console.error('apple pending login prune failed:', err),
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),

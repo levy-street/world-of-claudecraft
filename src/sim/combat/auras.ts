@@ -31,7 +31,14 @@
 import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import {
+  type Aura,
+  type AuraKind,
+  CAST_COMPLETE_EPS,
+  DT,
+  type Entity,
+  SECOND_WIND_THRESHOLD,
+} from '../types';
 import { isStunned } from './cc';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { tickThornsCooldown } from './thorns_charge';
@@ -95,6 +102,17 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }
+  // Second Wind (warrior choice row): IN-combat recovery while badly hurt, a
+  // separate arm from the out-of-combat regen above (which gates on !inCombat).
+  // 3%/sec folded into this 2-second cadence; 0 for everyone without the talent.
+  const swPct = ctx.playerMods(meta).global.secondWindPctPerSec;
+  if (swPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
+    const heal = Math.min(Math.round(p.maxHp * swPct * 2), p.maxHp - p.hp);
+    if (heal > 0) {
+      p.hp += heal;
+      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+    }
+  }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
     const c = p[slot];
@@ -119,8 +137,17 @@ export function updateTimers(p: Entity): void {
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
     const nv = v - DT;
-    if (nv <= 0) p.cooldowns.delete(k);
-    else p.cooldowns.set(k, nv);
+    if (nv <= 0) {
+      p.cooldowns.delete(k);
+      // Charge-limited abilities (Double Charge): an expired timer is one
+      // RECHARGE completing; refund the use and re-arm while more are spent.
+      const cs = p.charges?.get(k);
+      if (cs) {
+        cs.spent -= 1;
+        if (cs.spent > 0) p.cooldowns.set(k, cs.cdMax);
+        else p.charges?.delete(k);
+      }
+    } else p.cooldowns.set(k, nv);
   }
   if (p.abilityCharges) {
     for (const [abilityId, state] of Object.entries(p.abilityCharges)) {
@@ -260,15 +287,25 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         const src = ctx.entities.get(a.sourceId);
         if (src && !src.dead && src.kind === 'player') onHotExpired(ctx, src, a.id, e);
       }
-      // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
-      // mark stats dirty on expiry or the AP cut would persist after the fade.
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+      // debuff_ap and bloodbath are the non-buff* kinds recalcPlayerStats folds,
+      // so they must mark stats dirty on expiry or their stat contribution
+      // (the AP cut, Bloodbath's crit) would persist after the fade.
+      if (
+        a.kind.startsWith('buff') ||
+        a.kind.startsWith('form') ||
+        a.kind === 'debuff_ap' ||
+        a.kind === 'bloodbath' ||
+        // Fury Enrage folds +25% haste into meleeHaste/spellHaste, so its fade
+        // must re-run recalc or the haste would persist after the buff ends.
+        a.kind === 'enrage'
+      )
         statsDirty = true;
     }
   }
   if (statsDirty && e.kind === 'player') {
     const meta = ctx.players.get(e.id);
-    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+    if (meta)
+      recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
   e.stealthed = e.auras.some((a) => a.kind === 'stealth');
 }

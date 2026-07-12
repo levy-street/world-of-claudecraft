@@ -85,9 +85,9 @@ export const tr_TR: EnTranslations = {
       "title": "Yetenekler",
       "classTab": "Sınıf",
       "specTab": "Uzmanlık",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Seçimler",
+      "rowUnlockToast": "Yeni bir yetenek seçimi açıldı!",
+      "rowUnlocks": "{level}. seviyede açılır",
       "available": "Mevcut",
       "spent": "Harcanan",
       "pointSource": "{first}. seviyeden {cap}. seviyeye kadar her seviyede 1 yetenek puanı kazanırsın. Daha fazla puan için seviye atla.",
@@ -146,7 +146,7 @@ export const tr_TR: EnTranslations = {
         "noTree": "Sınıfının henüz bir yetenek ağacı yok.",
         "locked": "Henüz yetenekleri açmadın — {level}. seviyede başlarlar.",
         "noSpec": "uzmanlık yok",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Yetenekler: {head}, {picked}/{unlocked} seçim satırı seçildi.",
         "summary": "Yetenekler: {head} — {spent}/{total} puan harcandı ({breakdown}).",
         "breakdownClass": "Sınıf {classPts}",
         "breakdownSpec": "Sınıf {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const tr_TR: EnTranslations = {
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} soğuruldu",
+      "cheap": "Daha ucuz!"
     },
     "emotes": {
       "wave": "El Salla",
@@ -298,6 +298,7 @@ export const tr_TR: EnTranslations = {
       "playerLabel": "Kahramanın",
       "targetLabel": "Hedefin",
       "targetAnnounce": "{name} hedefini işaretle",
+      "targetOfTargetLabel": "Hedefin Hedefi",
       "partyLabel": "Takımın",
       "partyChip": "Grup",
       "partyGroup": "Grup {n}",
@@ -314,7 +315,6 @@ export const tr_TR: EnTranslations = {
       "chat": "Sohbete Atla"
     },
     "mobile": {
-      "autorun": "Otomatik Koşu",
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
       "dailyRewards": "Ödüller",
@@ -574,13 +574,32 @@ export const tr_TR: EnTranslations = {
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",
       "groundReticle": "Yer hedefleme halkası",
+      "mouseoverCast": "Grup Çerçevelerinde İmleçle Büyü Yapma",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
+      "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
       "mobileLeftHanded": "Solak düzen"
+    },
+    "talentRows": {
+      "tab": "Seçimler",
+      "defaultLoadout": "Varsayılan Dizilim",
+      "comingSoon": "Çok yakında"
+    },
+    "specPanel": {
+      "primaryAttr": "Birincil nitelik",
+      "complexity": "Karmaşıklık",
+      "complexityLow": "Düşük",
+      "complexityMedium": "Orta",
+      "complexityHigh": "Yüksek",
+      "exampleAbilities": "Örnek yetenekler",
+      "viewTalents": "Yetenekleri görüntüle",
+      "selectSpec": "Uzmanlık seç",
+      "specUnlockBanner": "Uzmanlık Açıldı!",
+      "specUnlockHint": "Uzmanlığını seçmek için N'ye bas."
     },
     "controller": {
       "title": "Oyun Kolu",
@@ -678,7 +697,9 @@ export const tr_TR: EnTranslations = {
       "names": {
         "spellPower": "Büyü Gücü",
         "critRating": "Kritik Puanı",
-        "hasteRating": "Hız Puanı"
+        "hasteRating": "Hız Puanı",
+        "haste": "Hız",
+        "parry": "Karşılama"
       },
       "desc": {
         "str": "Saldırı gücünü artırır, böylece silah darbelerin daha sert iner.",
@@ -693,7 +714,9 @@ export const tr_TR: EnTranslations = {
         "critChance": "Bir saldırının kritik vurma ve çift hasar verme şansın.",
         "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
         "critRating": "Teçhizatından ve set bonuslarından gelen kritik puanı, kritik vuruş şansını artırır. Yaklaşık 10 puan %1 kritik sağlar.",
-        "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar."
+        "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",
+        "haste": "Silah savruluşlarını ve büyü okumalarını hızlandırır. Genel bekleme süresini azaltmaz.",
+        "parry": "Önden gelen bir yakın dövüş saldırısını hiç hasar almadan tümüyle karşılama şansın. Arkadan gelen bir darbe karşılanamaz."
       },
       "effects": {
         "attackPower": "+{value} Saldırı Gücü",
@@ -730,6 +753,8 @@ export const tr_TR: EnTranslations = {
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
+    "itemHeroicTag": "[KAHRAMANCA]",
+    "itemSoulbound": "Ruha bağlı",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -809,6 +834,7 @@ export const tr_TR: EnTranslations = {
       "failed": "Hata bildirimi gönderilemedi. Lütfen tekrar deneyin."
     },
     "paperdoll": {
+      "offhand": "Yan El",
       "unequipAria": "{item} eşyasını çıkar",
       "unequipHint": "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin"
     },
@@ -1059,9 +1085,24 @@ export const tr_TR: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Formu: hareket hızı %{pct} artar",
       "defensiveStance": "Korumali Durus: alınan hasar azalır, daha fazla tehdit",
+      "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
+      "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
       "righteousFury": "Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
+      "dmgDone": "Verilen hasarı %{pct} artırır",
+      "dmgDoneReduce": "Verilen hasarı %{pct} azaltır",
+      "crit": "Kritik vuruş şansını %{pct} artırır",
+      "rageGen": "Öfke üretimini %{pct} artırır",
+      "reckless": "Kritik vuruş şansını %{pct}, Öfke üretimini %{ragePct} artırır",
+      "avatar": "Devcüsse: verilen hasar %{pct} artar",
+      "bloodbath": "Kritik vuruş şansını ve verilen hasarı %{pct} artırır",
+      "dieBySword": "Alınan hasarı %{pct} azaltır (can %{hpPct} seviyesinin altındayken %{lowPct})",
+      "sanguine": "Saldırı hızını %{hastePct}, verilen hasarı %{dmgPct} artırır",
+      "battleTrance": "Bir sonraki Yağmacı Darbesi veya Sakatlayan Darbe hiç Öfkeye mal olmaz",
+      "revengeFree": "Bir sonraki İntikam hiç Öfkeye mal olmaz",
+      "victoryRush": "Zafer Atılımı hazır",
+      "maxHpPct": "Azami canı %{pct} artırır",
       "school": {
         "physical": "Fiziksel",
         "fire": "Ateş",
@@ -1074,6 +1115,26 @@ export const tr_TR: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
+    },
+    "auth": {
+      "appleLoginCta": "Apple ile devam et",
+      "appleError": "Apple ile giriş yapılamadı. Lütfen tekrar dene.",
+      "appleChoiceIntro": "Yeni bir hesap oluştur veya Apple'ı zaten sahip olduğun bir hesaba bağla.",
+      "appleChoiceExpired": "Bu Apple girişinin süresi doldu. Lütfen Apple ile yeniden giriş yap.",
+      "forgotPrompt": "Şifreni mi unuttun?",
+      "forgotTitle": "Şifreni sıfırla",
+      "forgotHint": "Kullanıcı adını gir, kayıtlı e-posta adresine bir sıfırlama bağlantısı gönderelim.",
+      "forgotUsername": "Kullanıcı adı",
+      "forgotSubmit": "Sıfırlama bağlantısı gönder",
+      "forgotSent": "Bu kullanıcı adına sahip hesabın kayıtlı bir e-posta adresi varsa bir sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+      "forgotBack": "Girişe geri dön",
+      "resetTitle": "Yeni bir şifre seç",
+      "resetNewPassword": "Yeni şifre",
+      "resetConfirm": "Yeni şifreyi onayla",
+      "resetSubmit": "Şifreyi güncelle",
+      "resetDone": "Şifren güncellendi. Artık giriş yapabilirsin.",
+      "resetMismatch": "Şifreler eşleşmiyor.",
+      "resetErrInvalid": "Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste."
     },
     "loot": {
       "chestTitle": "Sandık"
@@ -1304,6 +1365,8 @@ export const tr_TR: EnTranslations = {
       "parcelsLabel": "Paketler",
       "parcelsHint": "Eklemek için çantandaki bir eşyaya tıkla.",
       "removeParcelAria": "{item} paketini mektuptan çıkar",
+      "parcelQtyDecreaseAria": "Bir eksik {item} gönder",
+      "parcelQtyIncreaseAria": "Bir fazla {item} gönder",
       "sendButton": "Mektubu Gönder",
       "postageNote": "Posta ücreti: {amount}. Kuzgun yaklaşık {seconds} saniye uçar.",
       "arrivedBanner": "Kuzgun kondu: {name} sana posta gönderdi.",
@@ -1964,11 +2027,19 @@ export const tr_TR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
+      "revenge": "Önündeki her şeye vuran süpürücü bir karşı saldırı; bir darbeyi savuşturmanın hemen ardından daha ucuza gelir.",
       "battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
       "commanding_shout": "Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.",
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
       "rend": "Hedefi zamanla yıpratan bir kanama açar.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
+      "cw_heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
+      "cw_battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
+      "cw_commanding_shout": "Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.",
+      "cw_charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
+      "cw_rend": "Hedefi zamanla yıpratan bir kanama açar.",
+      "cw_thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
+      "hamstring": "Hedefin bacaklarını keserek onu yavaşlatır, böylece seni kovalayıp yakalayamaz.",
       "seal_of_righteousness": "Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.",
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",
@@ -3275,6 +3346,7 @@ export const tr_TR: EnTranslations = {
   },
   "classes": {
     "warrior": "Savaşçı",
+    "warriorClassic": "Savaşçı",
     "paladin": "Paladin",
     "hunter": "Avcı",
     "rogue": "Hırsız",
@@ -4042,6 +4114,7 @@ export const tr_TR: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Yakın DPS",
+      "warriorClassic": "Tank / Yakın DPS",
       "paladin": "Şifacı / Tank / Yakın DPS",
       "hunter": "Menzilli DPS",
       "rogue": "Yakın DPS",
@@ -4066,6 +4139,7 @@ export const tr_TR: EnTranslations = {
     },
     "lore": {
       "warrior": "Savaşçılar, hasar verdikçe ya da aldıkça Öfke biriktiren çelik gibi yakın dövüş savaşçılarıdır. Ağır darbeleri soğurur ya da düşmanları güçlü silahlarla ezerler.",
+      "warriorClassic": "Savaşçının dövüş yenilemesinden önceki haliyle birebir aynısı: özgün yetenek seti ve öfke temposu, yeni savaşçının yanında korundu; böylece ikisini de deneyip hangisinin daha iyi hissettirdiğini bize söyleyebilirsin.",
       "paladin": "Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Onaran Işık'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.",
       "hunter": "Avcılar, evcilleştirdikleri bir canavarın yanında savaşan menzilli uzmanlardır; düşmanları nişanlı ve seri atış yağmuruna tutar, sokmalar ve sersemletici atışlarla yavaşlatır ve ana uygun suretlere bürünürler.",
       "rogue": "Hırsızlar, gölgelerden sırttan bıçaklamalar ve bitirici hamleler için Enerji ile Kombo Puanı harcayan gizli suikastçılardır.",
@@ -4366,6 +4440,7 @@ export const tr_TR: EnTranslations = {
     "combat": {
       "floatingMiss": "Iskaladı",
       "floatingDodge": "Savuşturma",
+      "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
       "cannotMove": "Hareket edemezsin!",
       "attack": "saldırı",
@@ -4375,6 +4450,7 @@ export const tr_TR: EnTranslations = {
       "damageTakenCrit": "{source} sana kritik {amount} hasar vurdu.",
       "miss": "{ability} yeteneğin {target} hedefini ıskaladı.",
       "dodged": "{ability} yeteneğin {target} tarafından savuşturuldu.",
+      "parried": "{ability} yeteneğin {target} tarafından karşılandı.",
       "resisted": "{target}, {ability} yeteneğine direndi.",
       "healSelf": "{ability} yeteneğin seni {amount} iyileştirdi.",
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
@@ -4417,6 +4493,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughMana": "Yeterli mana yok!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
+      "nothingToConsume": "Tüketilecek bir şey yok.",
       "targetMustDodge": "Önce hedefinin sıyrılması gerekir.",
       "requiresCombo": "O yetenek kombo puanı gerektirir.",
       "requiresForm": "{form} Formunda olmalısın.",
@@ -4433,6 +4510,7 @@ export const tr_TR: EnTranslations = {
       "facing": "Hedefine dönük olmalısın.",
       "targetHealthBelow": "O yetenek, hedefin canının %{percent} altında olmasını gerektirir.",
       "dagger": "Bir hançer kuşanmalısın.",
+      "needShield": "Bir kalkan kuşanmalısın.",
       "behindTarget": "Hedefinin arkasında olmalısın.",
       "polymorph": "Bu yaratık dönüştürülemez.",
       "noSeal": "Etkin bir Mührün yok.",
@@ -4808,6 +4886,7 @@ export const tr_TR: EnTranslations = {
     },
     "slots": {
       "mainhand": "Ana El",
+      "twoHand": "Çift El",
       "helmet": "Miğfer",
       "neck": "Boyun",
       "shoulder": "Omuzluk",
@@ -5081,9 +5160,101 @@ export const tr_TR: EnTranslations = {
         "name": "Deprem",
         "description": "Hedef alanı 6 saniye boyunca sarsar ve düşmanları her 1.5 saniyede bir {damage} Doğa hasarıyla hırpalar."
       },
+      "chain_heal": {
+        "name": "Zincirleme İyileştirme",
+        "description": "Hedefi {damage} iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar; her sıçrama bir öncekinin yarısı kadar iyileştirir."
+      },
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
         "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."
+      },
+      "cw_heroic_strike": {
+        "name": "Yağmacı Darbesi",
+        "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."
+      },
+      "cw_battle_shout": {
+        "name": "Demir Nara",
+        "description": "Saldırı gücünü 2 dakika boyunca {buff} artırır."
+      },
+      "cw_commanding_shout": {
+        "name": "Güçlendiren Nara",
+        "description": "Dayanıklılığını 2 dakika boyunca {buff} artırır."
+      },
+      "cw_charge": {
+        "name": "Atılım",
+        "description": "Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil."
+      },
+      "cw_rend": {
+        "name": "Derin Yarık",
+        "description": "Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar."
+      },
+      "cw_thunder_clap": {
+        "name": "Sarsan Darbe",
+        "description": "Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır."
+      },
+      "cw_hamstring": {
+        "name": "Topallatan Kesik",
+        "description": "Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır."
+      },
+      "cw_bloodrage": {
+        "name": "Kan Bedeli",
+        "description": "Can pahasına 10 öfke üretir."
+      },
+      "cw_overpower": {
+        "name": "Kızıl El",
+        "description": "Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz."
+      },
+      "cw_execute": {
+        "name": "Erken Mezar",
+        "description": "Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20'nin altındaki düşmanlarda kullanılabilir."
+      },
+      "cw_slam": {
+        "name": "Kaba Savuruş",
+        "description": "Rakibe silah hasarı artı {damage} için çarpar."
+      },
+      "cw_cleave": {
+        "name": "Biçen Yay",
+        "description": "Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe."
+      },
+      "cw_defensive_stance": {
+        "name": "Korumali Durus",
+        "description": "Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Vahim Uluma",
+        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır."
+      },
+      "cw_sunder_armor": {
+        "name": "Zırh Kesme",
+        "description": "Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir."
+      },
+      "cw_taunt": {
+        "name": "Tahrik",
+        "description": "Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır."
+      },
+      "cw_bloodthirst": {
+        "name": "Kan Akıtma",
+        "description": "Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)"
+      },
+      "cw_mortal_strike": {
+        "name": "Sakatlayan Darbe",
+        "description": "Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)"
+      },
+      "cw_shield_slam": {
+        "name": "Kalkan Kırma",
+        "description": "Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)"
+      },
+      "cw_whirlwind": {
+        "name": "Bıçaklı Girdap",
+        "description": "Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)"
+      },
+      "cw_berserker_rage": {
+        "name": "Kaynayan Gazap",
+        "description": "Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)"
+      },
+      "revenge": {
+        "name": "İntikam",
+        "description": "Geniş bir yayla saldırır, önündeki tüm düşmanlara Fiziksel hasar verirsin. 5 hedefin üzerinde hasar azalır. Bir saldırıyı savuşturduğunda ya da karşıladığında bir sonraki İntikam hiç öfkeye mal olmayabilir."
       },
       "battle_shout": {
         "name": "Demir Nara",
@@ -5127,7 +5298,7 @@ export const tr_TR: EnTranslations = {
       },
       "slam": {
         "name": "Kaba Savuruş",
-        "description": "Rakibe silah hasarı artı {damage} için çarpar."
+        "description": "Rakibe %50 silah hasarı artı {damage} verir ve {rage} öfke üretir."
       },
       "cleave": {
         "name": "Biçen Yay",
@@ -5136,6 +5307,14 @@ export const tr_TR: EnTranslations = {
       "defensive_stance": {
         "name": "Korumali Durus",
         "description": "Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan."
+      },
+      "battle_stance": {
+        "name": "Savaş Duruşu",
+        "description": "Saldırgan bir dövüş duruşu: %10 daha fazla öfke üretirsin. Silahşor ve Koruma için varsayılan duruş."
+      },
+      "berserker_stance": {
+        "name": "Berserker Duruşu",
+        "description": "Pervasız bir dövüş duruşu: kritik vuruşların %3 daha sık gerçekleşir ve %3 daha sert vurur. Hiddet savaşçısı her zaman bu duruşta dövüşür."
       },
       "sunder_armor": {
         "name": "Zırh Kesme",
@@ -5625,9 +5804,77 @@ export const tr_TR: EnTranslations = {
         "name": "Sakatlayan Darbe",
         "description": "Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)"
       },
+      "sweeping_strikes": {
+        "name": "Genişleyen Yay",
+        "description": "12 sn boyunca tek hedefli saldırıların yakındaki 1 düşmana da tam hasarla vurur. (Silahşor)"
+      },
+      "deep_wounds": {
+        "name": "Kanayan Yaralar",
+        "description": "Pasif: Sakatlayan Darbe hedefi 6 sn boyunca Fiziksel hasar verecek şekilde kanatır. (Silahşor)"
+      },
+      "enrage_passive": {
+        "name": "Kargaşa",
+        "description": "Pasif: gazaba gelmişken 4 sn boyunca %7 daha fazla hasar verir, %25 daha hızlı saldırır ve %10 daha hızlı hareket edersin. Kan Akıtma %30 olasılıkla seni gazaba getirir; Kızıl Hasat ise her zaman getirir. (Hiddet)"
+      },
       "bloodthirst": {
         "name": "Kan Akıtma",
         "description": "Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)"
+      },
+      "raging_gale": {
+        "name": "Çifte Darbe",
+        "description": "Silahınla anında iki kez vurursun; her vuruş %40 silah hasarı artı {damage} verir ve {rage} öfke üretirsin. En fazla 2 kullanım birikir. (Hiddet)"
+      },
+      "red_harvest": {
+        "name": "Kızıl Hasat",
+        "description": "Her şeyini harca: çılgınca üç kez vurursun; her vuruş %65 silah hasarı artı {damage} verir ve seni her zaman gazaba getirir. (Hiddet)"
+      },
+      "furious_mending": {
+        "name": "Öfkeli Onarım",
+        "description": "10 sn boyunca %20 azaltılmış hasar alırsın ve bu süre boyunca Kan Akıtma seni azami canının %20'si kadar iyileştirir. (Hiddet)"
+      },
+      "emboldening_roar": {
+        "name": "Yüreklendiren Kükreme",
+        "description": "Yüreklendiren bir kükreme koparırsın: sen ve 40 yarda içindeki dost oyuncular Yüreklenirsiniz ve sonraki 3 yeteneğiniz garantili kritik vuruş olur. (Hiddet)"
+      },
+      "raised_guard": {
+        "name": "Yükseltilmiş Gard",
+        "description": "Kalkanının ardında siper alırsın: 6 sn boyunca %50 azaltılmış Fiziksel hasar alırsın. En fazla 2 kullanım birikir. (Koruma)"
+      },
+      "iron_resolve": {
+        "name": "Demir Azim",
+        "description": "Dişini sık ve acıyı yok say: tüm öfkeni tüketir (en az 20) ve harcanan öfke başına 4 hasar soğurur, en fazla 10 sn sürer. (Koruma)"
+      },
+      "faultline": {
+        "name": "Fay Hattı",
+        "description": "Yerden bir şok dalgası gönderirsin: önündeki 8 yarda içindeki düşmanlar {damage} hasar alır ve 3 sn sersemler. (Koruma)"
+      },
+      "defiant_bellow": {
+        "name": "Meydan Okuyan Nara",
+        "description": "Meydan okuyan bir nara: 10 yarda içindeki her düşman kışkırtılır ve 3 sn boyunca sana saldırmaya zorlanır. (Koruma)"
+      },
+      "breachmaker": {
+        "name": "Gedik Açan",
+        "description": "Hedefe silah hasarı artı {damage} vurur ve gardını kırarsın: ona karşı kendi saldırıların 8 sn boyunca %20 daha fazla hasar verir. (Silahşor)"
+      },
+      "measured_fury": {
+        "name": "Ölçülü Gazap",
+        "description": "Ölçülü gazabın tutumunu keskinleştirir: yeteneklerin %10 daha az öfkeye mal olur. (Silahşor)"
+      },
+      "seasoned_soldier": {
+        "name": "Tecrübeli Asker",
+        "description": "Kritik otomatik saldırıların %10 daha fazla öfke üretir. (Silahşor)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Şeytani Çifte Darbe",
+        "description": "Gazaba gelmişken Çifte Darbe %15 daha fazla hasar verir. (Hiddet)"
+      },
+      "cleaving_blows": {
+        "name": "Biçen Darbeler",
+        "description": "Kızıl Hasat her zaman bir Çifte Darbe kullanımını geri kazandırır. (Hiddet)"
+      },
+      "sudden_death": {
+        "name": "Ani Ölüm",
+        "description": "Otomatik saldırıların, canı ne olursa olsun bir hedefe hiç öfke harcamadan Erken Mezar kullanmana izin verme şansı taşır. (Silahşor)"
       },
       "shield_slam": {
         "name": "Kalkan Kırma",
@@ -5641,29 +5888,29 @@ export const tr_TR: EnTranslations = {
         "name": "Kaynayan Gazap",
         "description": "Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)"
       },
+      "holy_shock": {
+        "name": "Kutsal Şok",
+        "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
+      },
       "crusader_strike": {
         "name": "Haçlı Darbesi",
         "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
-      },
-      "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfoz",
         "description": "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)"
       },
       "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
-      },
-      "holy_shock": {
-        "name": "Kutsal Şok",
-        "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
+        "name": "Şafak Sekmesi",
+        "description": "Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından {radius} metre içindeki en fazla {jumps} ek düşmana sekerek her sekmede {falloff} hasar verir. (Paladin yeteneği)"
       },
       "holy_shield": {
         "name": "Kutsal Kalkan",
         "description": "Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)"
+      },
+      "repentance": {
+        "name": "Tövbe",
+        "description": "Düşmanı en fazla 6 sn boyunca derin bir tefekküre sokar. Herhangi bir hasar etkiyi bozar. (Karşılık imzası)"
       },
       "bestial_wrath": {
         "name": "Vahşi Gazap",
@@ -5717,9 +5964,21 @@ export const tr_TR: EnTranslations = {
         "name": "Element Ustalığı",
         "description": "Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)"
       },
+      "shamanistic_rage": {
+        "name": "Şaman Gazabı",
+        "description": "Şamanca bir gazabı serbest bırakır ve 160 mana yeniler. (Güçlendirme imzası)"
+      },
+      "natures_swiftness": {
+        "name": "Doğanın Çevikliği",
+        "description": "Doğayı yardıma çağırır, sonraki büyünü anında yapar. (Restorasyon imzası)"
+      },
       "siphon_life": {
         "name": "Can Sömürüsü",
         "description": "Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)"
+      },
+      "fel_domination": {
+        "name": "Şeytani Hakimiyet",
+        "description": "Şeytani enerjilere hükmeder, sonraki büyünü anında yapar. (Demonoloji imzası)"
       },
       "conflagrate": {
         "name": "Tutuşturma",
@@ -5736,6 +5995,34 @@ export const tr_TR: EnTranslations = {
       "swiftmend": {
         "name": "Hızlı İyileştirme",
         "description": "Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)"
+      },
+      "storm_bolt": {
+        "name": "Fırtına Oku",
+        "description": "Silahını hedefe fırlatır, {damage} hasar verir ve onu 3 sn sersemletirsin."
+      },
+      "piercing_howl": {
+        "name": "Delici Uluma",
+        "description": "15 yarda içindeki tüm düşmanları 8 sn boyunca %50 yavaşlatan delici bir nara."
+      },
+      "die_by_sword": {
+        "name": "Kılıçla Ölüm",
+        "description": "Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun."
+      },
+      "recklessness": {
+        "name": "Pervasızlık",
+        "description": "Gazaba gelirsin: öfke üretimin %50, kritik vuruş şansın %20 artar, 12 sn sürer."
+      },
+      "sanguine_aura": {
+        "name": "Kan Aurası",
+        "description": "Silahını düşmanlarının kanıyla donatırsın: sen ve yakın dövüşçü müttefiklerin 20 sn boyunca %10 saldırı hızı ve %10 hasar kazanırsınız."
+      },
+      "victory_rush": {
+        "name": "Zafer Atılımı",
+        "description": "Silah hasarı artı {damage} vurur ve azami canının %20'sini iyileştirirsin. Yalnızca bir düşman öldürdükten sonraki 20 sn içinde kullanılabilir."
+      },
+      "intimidating_shout": {
+        "name": "Gözdağı Narası",
+        "description": "8 yarda içindeki en fazla 5 düşmanı 8 sn boyunca korku içinde kaçırtan dehşet verici bir nara. Hasar etkiyi bozabilir."
       },
       "summon_imp": {
         "name": "Emberkin Çağırma",
@@ -5786,24 +6073,24 @@ export const tr_TR: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a yakındaki düşmanları cada segundo por {damage}. (savaşçı yeteneği)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Keskin Uluma",
+        "description": "15 m içindeki düşmanları 8 sn. boyunca %50 yavaşlatan bir haykırış. (Savaşçı yeteneği)"
       },
       "lingering_dread": {
         "name": "Lingering Dread",
         "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Fırtına Atışı",
+        "description": "Bir hedefi 3 sn. sersemletmek için silahını fırlat. (Savaşçı yeteneği)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Pervasız Yemin",
+        "description": "Tüm öfke üretimini %50 ve kritik vuruş şansını %20 artırır, 12 sn. sürer. (Savaşçı yeteneği)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Kızıl Sancak",
+        "description": "Sen ve yakındaki müttefikler 20 sn. boyunca %10 saldırı hızı ve %10 hasar kazanırsınız. (Savaşçı yeteneği)"
       },
       "blink": {
         "name": "Titreşim Adımı",
@@ -6003,7 +6290,7 @@ export const tr_TR: EnTranslations = {
       },
       "startle_shot": {
         "name": "Startle Shot",
-        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -6162,6 +6449,9 @@ export const tr_TR: EnTranslations = {
       "greyjaw_fang": {
         "name": "Yaşlı Greyjaw'un Dişi"
       },
+      "chunk_of_ore": {
+        "name": "Cevher Parçası"
+      },
       "weathered_ledger_page": {
         "name": "Yıpranmış Defter Sayfası"
       },
@@ -6191,6 +6481,15 @@ export const tr_TR: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Keten Parçası"
+      },
+      "arcane_dust": {
+        "name": "Ezoterik Toz"
+      },
+      "arcane_essence": {
+        "name": "Ezoterik Öz"
+      },
+      "arcane_shard": {
+        "name": "Ezoterik Kırıntı"
       },
       "fen_muster_order": {
         "name": "Fenbridge Seferberlik Emri"
@@ -7104,6 +7403,18 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
+      "eastbrook_buckler": {
+        "name": "Doğudere Kalkanı"
+      },
+      "highwatch_wallshield": {
+        "name": "Yükseknöbet Sur Kalkanı"
+      },
+      "eastbrook_greatsword": {
+        "name": "Doğudere Büyük Kılıcı"
+      },
+      "highwatch_greatsword": {
+        "name": "Yükseknöbet Büyük Kılıcı"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthen'in Mezardövümü Zırh Gömleği"
       },
@@ -7142,15 +7453,6 @@ export const tr_TR: EnTranslations = {
       },
       "scepter_of_the_deathless_court": {
         "name": "Ölümsüz Saray Asası"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Ölümsüz Savaşmuhafızı Bacak Zırhı"
-      },
-      "soulrend_diadem": {
-        "name": "Ruhyırtan Tacı"
-      },
-      "scourgehide_carapace": {
-        "name": "Afetpostu Kabuğu"
       },
       "cryptplate_helm": {
         "name": "Mezarzırh Miğferi"
@@ -7191,9 +7493,6 @@ export const tr_TR: EnTranslations = {
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"
       },
-      "soulforged_warplate": {
-        "name": "Ruhdövümü Savaş Zırhı"
-      },
       "stormcallers_focus": {
         "name": "Fırtınaçağıranın Odağı"
       },
@@ -7230,32 +7529,74 @@ export const tr_TR: EnTranslations = {
       "deathless_heartwood": {
         "name": "Ölümsüz Taç'ın Öz Odunu"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Ölümsüz Taç'ın Öz Odunu"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Dikenzirve'nin Son Yemini"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Dikenzirve'nin Son Yemini"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought Dehşet Miğferi"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dehşet Miğferi"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought Savaş Omuzlukları"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought Savaş Omuzlukları"
       },
       "nighttalon_crown": {
         "name": "Direfang Tacı"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Tacı"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang Omuzlukları"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang Omuzlukları"
       },
       "soulflame_cowl": {
         "name": "Wraithfire Başlığı"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Başlığı"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire Pelerini"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire Pelerini"
       },
       "stormcallers_crown": {
         "name": "Galecall Tacı"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Tacı"
+      },
       "stormcallers_spaulders": {
         "name": "Galecall Omuzlukları"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Omuzlukları"
+      },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought Büyük Kılıcı"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang Palası"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought Siperi"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire Küresi"
       },
       "unknown_alien_weaponry": {
         "name": "Bilinmeyen Uzaylı Silahı"
@@ -7504,6 +7845,15 @@ export const tr_TR: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Dirilen Kraliyet Muhafızı"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Ölümsüz Savaşmuhafızı"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Ölümsüz Başrahip"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Ölümsüz Bıçak"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
@@ -7833,6 +8183,16 @@ export const tr_TR: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Her Ele Bir Zanaat",
+        "text": "Eastbrook’taki herkes kılıç dışında bir zanaatla uğraşır, {playerName}. Kasabanın çevresinde cevher damarları var; bir kazma salla ve bana 5 parça getir. Kendin çıkar; aradaki farkı anlarım.",
+        "completion": "Gördün mü? Çantanda cevher, ellerinde nasır. Yollarda ilerlerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosunu ve yakındaki çalışma tezgâhını unutma. İstersen bunların hepsinde dürüst bir zanaat seni bekliyor.",
+        "objectives": {
+          "0": {
+            "label": "Cevher Parçası"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Kapıdaki Kurtlar",
         "text": "Orman kurtları cüretkârlaşıyor, kuzey yolundaki yolculara saldırıyorlar. Sayılarını azalt, {playerName}. 8 Orman Kurdu öldür ki Doğudere rahat bir nefes alsın.",

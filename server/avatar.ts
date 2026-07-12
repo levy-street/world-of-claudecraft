@@ -27,6 +27,7 @@ export const MAX_SKIN = 7;
 // Card-design class colors (shared palette in WORLD-OF-CLAUDECRAFT.md §6).
 const CLASS_COLOR: Record<PlayerClass, [number, number, number]> = {
   warrior: [0xc7, 0x9c, 0x6e],
+  warrior_classic: [0xc7, 0x9c, 0x6e],
   paladin: [0xf5, 0x8c, 0xba],
   hunter: [0xab, 0xd4, 0x73],
   rogue: [0xff, 0xf5, 0x69],

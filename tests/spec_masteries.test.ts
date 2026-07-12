@@ -250,9 +250,11 @@ describe('spec masteries', () => {
       | { abilities: string[]; dmgPct?: number; costPct?: number };
     const AXES: Record<string, Record<string, Axis>> = {
       warrior: {
-        arms: { global: 'meleeDmgPct', value: 0.15 },
-        fury: { stat: 'crit', value: 0.1 },
-        prot: { global: 'threatPct', value: 0.5 },
+        // Warrior overhaul masteries: Arms scales two-handed damage (Master Armorer),
+        // Fury crit (Bloodletter), Protection threat (Recompense).
+        arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
+        fury: { stat: 'crit', value: 0.05 },
+        prot: { global: 'threatPct', value: 0.3 },
       },
       paladin: {
         holy: { global: 'critDmgPct', value: 0.5 },

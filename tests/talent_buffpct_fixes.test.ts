@@ -1,72 +1,86 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import type { AbilityModEffect, TalentModifiers } from '../src/sim/content/talents';
 import {
   accumulateTalentEffect,
   computeTalentModifiers,
   emptyModifiers,
 } from '../src/sim/content/talents';
-import type { PlayerClass } from '../src/sim/types';
+import type { AbilityEffect, PlayerClass } from '../src/sim/types';
 
-function rowMods(cls: PlayerClass, rows: Record<number, string>) {
+function modsFor(...effects: AbilityModEffect[]): TalentModifiers {
+  const mods = emptyModifiers();
+  accumulateTalentEffect(mods, { ability: effects }, 1);
+  return mods;
+}
+
+function rowMods(cls: PlayerClass, rows: Record<number, string>): TalentModifiers {
   return computeTalentModifiers(cls, { spec: null, rows }, 20);
 }
 
-function resolvedAbility(cls: PlayerClass, abilityId: string, rows: Record<number, string>) {
-  const ability = abilitiesKnownAt(cls, 20, rowMods(cls, rows)).find((a) => a.def.id === abilityId);
+function resolvedEffect<T extends AbilityEffect['type']>(
+  cls: PlayerClass,
+  abilityId: string,
+  type: T,
+  mods: TalentModifiers,
+): Extract<AbilityEffect, { type: T }> {
+  const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === abilityId);
+  if (!ability) throw new Error(`missing resolved ability ${cls}:${abilityId}`);
+  const effect = ability.effects.find((candidate) => candidate.type === type);
+  if (!effect) throw new Error(`missing resolved effect ${cls}:${abilityId}:${type}`);
+  return effect as Extract<AbilityEffect, { type: T }>;
+}
+
+function resolvedAbility(cls: PlayerClass, abilityId: string, mods: TalentModifiers) {
+  const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === abilityId);
   if (!ability) throw new Error(`missing resolved ability ${cls}:${abilityId}`);
   return ability;
 }
 
 describe('talent buffPct resolver fixes', () => {
-  // These three talents were redesigned into behavior-changing procs (they no
-  // longer carry these buffPct/cooldownPct mods), so the resolver fixes are pinned
-  // on synthetic effects, matching the judgement case below. They guard the same
-  // engine paths: buffPct scaling a finisherHaste multiplier and a fractional
-  // buff_dodge, and cooldownPct scaling a defensive cooldown.
-  it('buffPct scales a finisherHaste multiplier (Slice and Dice)', () => {
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { ability: [{ ability: 'slice_and_dice', buffPct: 0.25 }] }, 1);
-    const ability = abilitiesKnownAt('rogue', 20, mods).find((a) => a.def.id === 'slice_and_dice');
-    const effect = ability?.effects.find((e) => e.type === 'finisherHaste');
-    if (!effect || effect.type !== 'finisherHaste') throw new Error('missing finisherHaste effect');
+  // The choice-row quality pass replaced several original passive ability mods
+  // with proc mechanics. These resolver tests use synthetic mods so they pin the
+  // engine behavior without changing the authored row choices back.
+  it('buffPct scales a finisher haste bonus above its neutral multiplier', () => {
+    const effect = resolvedEffect(
+      'rogue',
+      'slice_and_dice',
+      'finisherHaste',
+      modsFor({ ability: 'slice_and_dice', buffPct: 0.25 }),
+    );
+
     expect(effect.mult).toBeCloseTo(1.375, 6);
     expect(effect.basedur).toBe(9);
     expect(effect.perCombo).toBe(3);
   });
 
-  it('cooldownPct and buffPct scale a defensive cooldown (Evasion)', () => {
-    const mods = emptyModifiers();
-    accumulateTalentEffect(
-      mods,
-      { ability: [{ ability: 'evasion', cooldownPct: -0.2, buffPct: 0.3 }] },
-      1,
+  it('buffPct and cooldownPct compose on the same defensive ability', () => {
+    const ability = resolvedAbility(
+      'rogue',
+      'evasion',
+      modsFor({ ability: 'evasion', buffPct: 0.3, cooldownPct: -0.2 }),
     );
-    const ability = abilitiesKnownAt('rogue', 20, mods).find((a) => a.def.id === 'evasion');
-    if (!ability) throw new Error('missing evasion');
-    const effect = ability.effects.find((e) => e.type === 'selfBuff');
+    const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
+
     expect(ability.cooldown).toBeCloseTo(240, 6);
     expect(effect).toMatchObject({ kind: 'buff_dodge', value: 0.65 });
   });
 
-  it('buffPct scales a fractional buff_dodge value (Aspect of the Monkey)', () => {
-    const mods = emptyModifiers();
-    accumulateTalentEffect(
-      mods,
-      { ability: [{ ability: 'aspect_of_the_monkey', buffPct: 0.4 }] },
-      1,
+  it('buffPct scales a fractional dodge value without rounding it away', () => {
+    const effect = resolvedEffect(
+      'hunter',
+      'aspect_of_the_monkey',
+      'selfBuff',
+      modsFor({ ability: 'aspect_of_the_monkey', buffPct: 0.4 }),
     );
-    const ability = abilitiesKnownAt('hunter', 20, mods).find(
-      (a) => a.def.id === 'aspect_of_the_monkey',
-    );
-    const effect = ability?.effects.find((e) => e.type === 'selfBuff');
-    if (!effect || effect.type !== 'selfBuff') throw new Error('missing selfBuff');
+
     expect(effect.kind).toBe('buff_dodge');
     expect(effect.value).toBeCloseTo(0.112, 6);
   });
 
   it('Redline Draw replaces the old scalar with an every-third-shot cooldown refund', () => {
     const mods = rowMods('hunter', { 20: 'hun_r20_rapid_killing' });
-    const ability = resolvedAbility('hunter', 'rapid_fire', { 20: 'hun_r20_rapid_killing' });
+    const ability = resolvedAbility('hunter', 'rapid_fire', mods);
     const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
     const proc = mods.procs.find((candidate) => candidate.id === 'hun_redline_draw');
 

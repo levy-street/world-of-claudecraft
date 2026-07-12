@@ -19,7 +19,14 @@
 import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import {
+  canDualWield,
+  canDualWieldTwoHand,
+  canEquipItem,
+  canEquipItemInSlot,
+  resolveEquipSlot,
+  weaponHand,
+} from './equipment_rules';
 import { formatMoney } from './format_money';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -33,11 +40,94 @@ import {
   type EquipSlot,
   FISHING_CAST_ID,
   INTERACT_RANGE,
+  type ItemInstancePayload,
   POTION_COOLDOWN,
 } from './types';
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+function shouldAutoRouteToOffhand(meta: PlayerMeta, spec: string | null | undefined): boolean {
+  // Delegate to the ONE dual-wield rule: a hand-written copy of it here
+  // silently missed the classic warrior joining canDualWield (2026-07-11 PBE
+  // bug: the second one-hander kept replacing the mainhand, so 1H+1H was
+  // unreachable by right-click).
+  return canDualWield(meta.cls, spec);
+}
+
+function desiredEquipSlot(
+  meta: PlayerMeta,
+  itemId: string,
+  spec: string | null | undefined,
+): EquipSlot | null {
+  const def = ITEMS[itemId];
+  if (!def?.slot) return null;
+  // Non-weapons resolve their concrete slot directly; rings (slot 'ring') land in
+  // whichever ring slot is empty via resolveEquipSlot (ring1 first).
+  if (def.kind === 'armor' || def.kind === 'shield' || def.kind === 'held_offhand')
+    return resolveEquipSlot(def, meta.equipment);
+  if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
+  const hand = weaponHand(def);
+  if (hand === 'mainhand') return 'mainhand';
+  if (hand === 'twohand') {
+    // A two-hander goes to the mainhand (the strong hand) unless the wielder
+    // dual-wields two-handers (Titan's Grip: Fury). Even then it fills the
+    // mainhand FIRST and only routes to the offhand once the mainhand already
+    // holds a two-hander, so a looted greatsword upgrades the mainhand instead
+    // of landing in the weak (half-damage) offhand. (review round 2, item 6)
+    if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
+    const mh = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (mh?.kind === 'weapon' && weaponHand(mh) === 'twohand' && !meta.equipment.offhand)
+      return 'offhand';
+    return 'mainhand';
+  }
+  // One-handers below.
+  if (!meta.equipment.mainhand) return 'mainhand';
+  if (!shouldAutoRouteToOffhand(meta, spec)) return 'mainhand';
+  // A 2H mainhand blocks offhand routing for ordinary dual-wielders only:
+  // under Titan's Grip a one-hander may sit beside a two-handed mainhand.
+  const tg = canDualWieldTwoHand(meta.cls, spec);
+  if (
+    canDualWield(meta.cls, spec) &&
+    canEquipItemInSlot(meta.cls, def, 'offhand', spec) &&
+    !meta.equipment.offhand
+  ) {
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (tg || mainhand?.kind !== 'weapon' || weaponHand(mainhand) !== 'twohand') return 'offhand';
+  }
+  if (
+    canDualWield(meta.cls, spec) &&
+    canEquipItemInSlot(meta.cls, def, 'offhand', spec) &&
+    meta.equipment.offhand
+  ) {
+    const offhand = ITEMS[meta.equipment.offhand];
+    if (tg || !offhand || offhand.kind !== 'weapon' || weaponHand(offhand) !== 'twohand')
+      return 'offhand';
+  }
+  return 'mainhand';
+}
+
+// Fungible-preferring removal: consumes plain (non-instanced) copies first and
+// only reaches for an instanced copy (an enchanted or otherwise signed/rolled
+// piece) once no fungible copy remains. removeItem's own ordering (sim.ts) scans
+// highest-index-first, which is exactly where applyEnchant's addItemInstance
+// pushes a freshly-enchanted copy (professions/enchanting.ts), so a plain
+// ctx.removeItem there would eat the enchanted copy first when both exist.
+// sellItem/discardItem below and trade.ts's drop arm route through this instead
+// so "sell/discard/trade one" prefers the plain copy a player almost always means.
+export function removePreferFungible(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid?: number,
+): ItemInstancePayload[] {
+  const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
+  const fungibleTake = Math.min(fungibleAvailable, count);
+  if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
+  const remaining = count - fungibleTake;
+  if (remaining <= 0) return [];
+  return ctx.removeItem(itemId, remaining, pid);
+}
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -49,10 +139,10 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
-  if (def.noDiscard) return;
+  if (def.noDiscard || def.soulbound) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
-  ctx.removeItem(itemId, discardCount, meta.entityId);
+  removePreferFungible(ctx, itemId, discardCount, meta.entityId);
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -67,7 +157,15 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (
+    !def?.slot ||
+    (def.kind !== 'weapon' &&
+      def.kind !== 'armor' &&
+      def.kind !== 'shield' &&
+      def.kind !== 'held_offhand')
+  ) {
+    return;
+  }
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (!canEquipItem(meta.cls, def)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
@@ -77,14 +175,77 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
     return;
   }
-  // Rings declare slot 'ring'; the resolver picks ring1/ring2 (empty-first).
-  const slot = resolveEquipSlot(def, meta.equipment);
-  if (!slot) return;
+  // Rings declare slot 'ring'; desiredEquipSlot resolves ring1/ring2 (empty-first)
+  // and routes weapons to mainhand/offhand for dual-wield specs.
+  const spec = ctx.playerMods(meta).spec;
+  const slot = desiredEquipSlot(meta, itemId, spec);
+  if (!slot || !canEquipItemInSlot(meta.cls, def, slot, spec)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
+    return;
+  }
   const old = meta.equipment[slot];
-  ctx.removeItem(itemId, 1, meta.entityId);
-  if (old) addItemSilent(old, 1, meta);
+  const oldInstance = meta.equipmentInstance?.[slot];
+  // A two-hander occupies both hands: mainhand 2H + a filled offhand must never
+  // coexist (shield block or a dual-wield swing would stack with the two-hand
+  // mastery). Equipping into the offhand while wielding a 2H displaces the 2H to
+  // the bags, and equipping a 2H displaces the offhand piece, the classic swap in
+  // both directions. The one exemption is Titan's Grip (canDualWieldTwoHand):
+  // weapon-beside-2H is that spec's whole point, so only shields/held offhands
+  // still displace. With no bag room for the displaced piece the equip is
+  // refused, mirroring unequipItem (nothing is ever force-dropped).
+  let displacedSlot: EquipSlot | null = null;
+  if (slot === 'offhand') {
+    const mh = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const tgPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (mh?.kind === 'weapon' && weaponHand(mh) === 'twohand' && !tgPair)
+      displacedSlot = 'mainhand';
+  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
+    const oh = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
+    const tgPair = oh?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (meta.equipment.offhand && !tgPair) displacedSlot = 'offhand';
+  }
+  const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
+  const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
+  if (displacedSlot && displacedId) {
+    // With a swap also returning `old`, the displaced piece needs its own free
+    // slot beyond the one the equipped item vacates; check before mutating.
+    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
+    delete meta.equipment[displacedSlot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
+  }
+  // removeItem scans from the highest inventory index down (sim.ts), so a
+  // freshly-enchanted copy (pushed onto the end by addItemInstance,
+  // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
+  // when both a plain and an enchanted copy of the same item exist and nothing
+  // else has been looted since. That only holds while the enchanted copy stays
+  // the highest-index match: loot another plain copy afterward and the plain
+  // one gets equipped instead. Deterministic, acceptable for v1, but a future
+  // picker UI should not assume the enchanted copy is always favored.
+  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  if (old) {
+    // Return the piece that was worn: if it carried an enchant, give it back
+    // its own instanced slot (never merge it into a plain stack, which would
+    // silently drop the enchant), same non-merge rule addItemInstance follows.
+    if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
+    else addItemSilent(old, 1, meta);
+  }
+  if (displacedId) {
+    // The benched other-hand piece keeps its enchant instance too.
+    if (displacedInstance)
+      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
+    else addItemSilent(displacedId, 1, meta);
+  }
   meta.equipment[slot] = itemId;
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  if (consumed[0]) {
+    meta.equipmentInstance ??= {};
+    meta.equipmentInstance[slot] = consumed[0];
+  } else if (meta.equipmentInstance) {
+    delete meta.equipmentInstance[slot];
+  }
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
 
@@ -102,12 +263,16 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
     bagsFullError(ctx, meta.entityId);
     return false;
   }
+  const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
+  if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
-  // today keys on an unequip, so there is nothing to award here regardless.
-  addItemSilent(itemId, 1, meta);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  // today keys on an unequip, so there is nothing to award here regardless. An
+  // enchanted piece gets its own instanced slot instead, so its enchant survives.
+  if (instance) meta.inventory.push({ itemId, count: 1, instance });
+  else addItemSilent(itemId, 1, meta);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({
     type: 'log',
@@ -116,6 +281,40 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
     pid: meta.entityId,
   });
   return true;
+}
+
+// A spec change is the one place equipment legality can shift without an equip
+// action: a Fury Titan's Grip pair (a two-hander in the offhand), or a Fury pair
+// of one-handers, becomes illegal the moment the player commits to Arms/Prot
+// (canDualWieldTwoHand / canDualWield both go false). The equip boundary already
+// refuses to CREATE such a state; this benches an offhand the new spec can no
+// longer hold. Uncapped return to bags (like the grant hub, never capacity-
+// capped) so a respec can never destroy gear even with full bags. Shields and
+// held-offhands stay: canEquipItemInSlot admits them for any class.
+export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  const offId = meta.equipment.offhand;
+  if (!offId) return;
+  const def = ITEMS[offId];
+  if (!def) return;
+  const spec = ctx.playerMods(meta).spec;
+  if (canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return;
+  const instance = meta.equipmentInstance?.offhand;
+  delete meta.equipment.offhand;
+  if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
+  // Keep an enchant instance with the benched piece (same non-merge rule as
+  // unequipItem), else return a plain copy.
+  if (instance) meta.inventory.push({ itemId: offId, count: 1, instance });
+  else addItemSilent(offId, 1, meta);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.emit({
+    type: 'log',
+    text: `Unequipped ${def.name}.`,
+    color: '#8f8',
+    pid: meta.entityId,
+  });
 }
 
 export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseResult | undefined {
@@ -209,13 +408,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
-    if (restoresHp) {
-      const heal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+    if (restoresHp && def.potionHp !== undefined) {
+      const heal = Math.min(Math.round(def.potionHp * ctx.healingTakenMult(p)), p.maxHp - p.hp);
       p.hp += heal;
       ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
     }
-    if (restoresMana) {
-      p.resource = Math.min(p.maxResource, p.resource + def.potionMana!);
+    if (restoresMana && def.potionMana !== undefined) {
+      p.resource = Math.min(p.maxResource, p.resource + def.potionMana);
     }
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'elixir') {
@@ -235,7 +434,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-  } else if (def.kind === 'weapon' || def.kind === 'armor') {
+  } else if (
+    def.kind === 'weapon' ||
+    def.kind === 'armor' ||
+    def.kind === 'shield' ||
+    def.kind === 'held_offhand'
+  ) {
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
@@ -330,7 +534,7 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'There is no merchant nearby.');
     return;
   }
-  if (def.noVendorSell) {
+  if (def.noVendorSell || def.soulbound) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -338,7 +542,7 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'You cannot sell quest items.');
     return;
   }
-  ctx.removeItem(itemId, sellCount, meta.entityId);
+  removePreferFungible(ctx, itemId, sellCount, meta.entityId);
   recordVendorBuyback(meta, itemId, sellCount);
   const payout = def.sellValue * sellCount;
   meta.copper += payout;
@@ -371,7 +575,12 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     .filter((s) => {
       const def = ITEMS[s.itemId];
       return (
-        !!def && def.quality === 'poor' && def.kind !== 'quest' && !def.noVendorSell && s.count > 0
+        !!def &&
+        def.quality === 'poor' &&
+        def.kind !== 'quest' &&
+        !def.noVendorSell &&
+        !def.soulbound &&
+        s.count > 0
       );
     })
     .map((s) => ({ itemId: s.itemId, count: s.count }));
@@ -379,7 +588,8 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   let total = 0;
   let soldCount = 0;
   for (const { itemId, count } of junk) {
-    const def = ITEMS[itemId]!;
+    const def = ITEMS[itemId];
+    if (!def) continue;
     ctx.removeItem(itemId, count, meta.entityId);
     recordVendorBuyback(meta, itemId, count);
     total += def.sellValue * count;

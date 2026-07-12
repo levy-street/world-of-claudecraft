@@ -38,6 +38,7 @@ const appearance = (over: Partial<PreviewAppearance>): PreviewAppearance => ({
   skin: 0,
   skinCatalog: 'class',
   mainhandItemId: null,
+  offhandItemId: null,
   ...over,
 });
 
@@ -72,14 +73,16 @@ describe('previewAppearanceVisual', () => {
   it('uses the class rig for a class-catalog character and holds its mainhand', () => {
     const v = previewAppearanceVisual(appearance({ cls: 'mage', mainhandItemId: 'staff_x' }));
     expect(v.visualKey).toBe('player_mage');
-    expect(v.weaponItemId).toBe('staff_x');
+    expect(v.mainhandItemId).toBe('staff_x');
+    expect(v.offhandItemId).toBeNull();
     expect(v.weaponOverride).toBeNull();
   });
 
   it('shows no weapon when the character is unarmed', () => {
     const v = previewAppearanceVisual(appearance({ cls: 'priest', mainhandItemId: null }));
     expect(v.visualKey).toBe('player_priest');
-    expect(v.weaponItemId).toBeNull();
+    expect(v.mainhandItemId).toBeNull();
+    expect(v.offhandItemId).toBeNull();
   });
 
   it('uses the Combat Mech body for an event skin (skinCatalog mech)', () => {
@@ -92,14 +95,14 @@ describe('previewAppearanceVisual', () => {
       appearance({ cls: 'rogue', skinCatalog: 'mech', mainhandItemId: 'dagger_x' }),
     );
     expect(rogue.visualKey).toBe('player_mech');
-    expect(rogue.weaponItemId).toBe('dagger_x');
+    expect(rogue.mainhandItemId).toBe('dagger_x');
     // Same override the in-world mech render applies for the dual-wield class.
     expect(rogue.weaponOverride).toEqual(mechHeldWeaponOverride('rogue'));
     expect(rogue.weaponOverride).not.toBeNull();
 
-    // A single-mainhand class keeps the mech's own default (no override).
+    // Shield/offhand classes also mirror their layout onto the mech.
     const warrior = previewAppearanceVisual(appearance({ cls: 'warrior', skinCatalog: 'mech' }));
-    expect(warrior.weaponOverride).toBeNull();
+    expect(warrior.weaponOverride).toEqual(mechHeldWeaponOverride('warrior'));
   });
 });
 
@@ -113,6 +116,7 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, skin: 3 })).not.toBe(sig);
     expect(appearanceSignature({ ...base, skinCatalog: 'mech' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, offhandItemId: 'c' })).not.toBe(sig);
   });
 });
 
@@ -124,11 +128,12 @@ describe('CharacterPreview.setAppearance', () => {
       skin: 2,
       skinCatalog: 'mech',
       mainhandItemId: 'dagger_x',
+      offhandItemId: 'keen_dirk',
     });
 
     preview.setAppearance(mech);
     expect(setVisualKey).toHaveBeenCalledOnce();
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_rogue', 'dagger_x');
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_rogue', 'dagger_x', null, 'keen_dirk');
 
     await finishMechLoad();
 
@@ -138,6 +143,7 @@ describe('CharacterPreview.setAppearance', () => {
       'player_mech',
       'dagger_x',
       mechHeldWeaponOverride('rogue'),
+      'keen_dirk',
     );
   });
 
@@ -149,11 +155,11 @@ describe('CharacterPreview.setAppearance', () => {
     );
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null, null);
 
     await finishMechLoad();
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null, null);
   });
 });

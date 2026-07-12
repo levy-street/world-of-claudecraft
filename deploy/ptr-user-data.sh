@@ -1,15 +1,15 @@
 #!/bin/bash
 # World of Claudecraft PTR realm -- first-boot setup (cloud-init user data).
 #
-# Same standalone stack as deploy/user-data.sh, PINNED to the Talents 2.0 PTR
-# branch (ryan-foo fork, ptr/talents-2-0) so testers can play the talent flip
-# before it lands on the levy-street release. Fill DOMAIN (or leave empty to
-# test by IP), paste into the host's user-data / run as root on any Ubuntu
-# 24.04 arm64 box with Docker. Full walkthrough: DEPLOY.md.
+# Same standalone stack as deploy/user-data.sh, pinned to the canonical PTR
+# release branch. Fill DOMAIN (or leave empty to test by IP), paste into the
+# host's user-data / run as root on any Ubuntu 24.04 arm64 box with Docker.
+# Full walkthrough: DEPLOY.md.
 #
-# PTR realm note: this is a throwaway test realm. It ships with
+# PTR realm note: this is a throwaway test realm on a dedicated disposable
+# host and database. It ships with
 # ALLOW_DEV_COMMANDS=1 so testers can /dev level and jump characters to the
-# row unlocks. NEVER point this script at production data.
+# row unlocks. NEVER run it on a production host or attach production data.
 
 # ---------------------------------------------------------------------------
 # REQUIRED CONFIG
@@ -20,10 +20,10 @@ DOMAIN=""
 ADMIN_DOMAIN=""
 
 # ---------------------------------------------------------------------------
-REPO="https://github.com/ryan-foo/world-of-claudecraft.git"
-BRANCH="ptr/talents-2-0"
-APP_DIR="/opt/eastbrook"
-BACKUP_DIR="/var/backups/eastbrook"
+REPO="https://github.com/levy-street/world-of-claudecraft.git"
+BRANCH="release/v0.24.0-ptr"
+APP_DIR="/opt/eastbrook-ptr"
+BACKUP_DIR="/var/backups/eastbrook-ptr"
 
 set -euo pipefail
 exec > >(tee -a /var/log/eastbrook-setup.log) 2>&1
@@ -45,8 +45,20 @@ if [ ! -d "$APP_DIR" ]; then
   git clone --branch "$BRANCH" --single-branch "$REPO" "$APP_DIR"
 fi
 cd "$APP_DIR"
+if [ "$(git remote get-url origin)" != "$REPO" ]; then
+  echo "Refusing PTR update: origin is not the canonical repository." >&2
+  exit 1
+fi
 git checkout "$BRANCH"
-git pull --ff-only origin "$BRANCH" || true
+git pull --ff-only origin "$BRANCH"
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]; then
+  echo "Refusing PTR update: local branch is not the exact fetched remote commit." >&2
+  exit 1
+fi
+if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+  echo "Refusing PTR update: source worktree has nonignored changes." >&2
+  exit 1
+fi
 
 # compose reads .env automatically; never commit this file
 if [ ! -f .env ]; then

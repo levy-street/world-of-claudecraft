@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { classLore, className } from '../src/guide/class_view';
 import {
   GUIDE_CLASSES,
   GUIDE_DELVES,
@@ -169,8 +170,9 @@ describe('guide.html shell', () => {
 });
 
 describe('Guide generated class content', () => {
-  it('covers all nine classes with grounded data', () => {
-    expect(GUIDE_CLASSES).toHaveLength(9);
+  it('covers all ten classes with grounded data', () => {
+    // 10 = the 9 originals plus warrior_classic (the pre-overhaul PTR clone).
+    expect(GUIDE_CLASSES).toHaveLength(10);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
       expect(['rage', 'mana', 'energy']).toContain(c.resource);
@@ -182,10 +184,11 @@ describe('Guide generated class content', () => {
         expect(['tank', 'healer', 'dps']).toContain(s.role);
         expect(s.signature.length).toBeGreaterThan(0);
       }
-      // every class nav name resolves
-      expect(t(`classes.${c.id}` as never).length).toBeGreaterThan(0);
+      // every class nav name resolves (via the guide's helper, which owns the
+      // class-id -> catalog-key mapping: warrior_classic -> classes.warriorClassic)
+      expect(className(c.id).length).toBeGreaterThan(0);
       // the class page uses the canonical character-creation description, not a guide-only blurb
-      expect(t(`classDetails.lore.${c.id}` as never).length).toBeGreaterThan(0);
+      expect(classLore(c.id).length).toBeGreaterThan(0);
       // every signature ability has a spoiler-safe one-liner
       for (const a of c.signatureAbilities) {
         expect(t(`guide.abilityHook.${a.id}` as never).length).toBeGreaterThan(0);

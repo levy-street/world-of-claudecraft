@@ -9,6 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
   WARRIOR_CHOICE_ROWS,
+  WARRIOR_CLASSIC_CHOICE_ROWS,
 } from './choice_rows_classic';
 import { accumulateTalentEffect, type TalentEffect, type TalentModifiers } from './talents';
 
@@ -38,6 +39,7 @@ export type ChoiceRowAllocation = Partial<Record<ChoiceRowLevel, string>>;
 
 export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> & Record<string, ClassChoiceRows> = {
   warrior: WARRIOR_CHOICE_ROWS,
+  warrior_classic: WARRIOR_CLASSIC_CHOICE_ROWS,
   paladin: PALADIN_CHOICE_ROWS,
   hunter: HUNTER_CHOICE_ROWS,
   rogue: ROGUE_CHOICE_ROWS,

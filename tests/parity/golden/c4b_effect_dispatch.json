@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 412,
-      "state": "72e4db50",
+      "state": "94947aa3",
       "events": "cb3e7eb4",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 412,
-      "state": "83d1724e",
+      "state": "9159651a",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 412,
-      "state": "ca20645c",
+      "state": "05ed16f2",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "d30c4d20",
+      "state": "363ee757",
       "events": "83db7fc1",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 412,
-      "state": "55169185",
+      "state": "00002219",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 412,
-      "state": "a6cabfb3",
+      "state": "b0d4f468",
       "events": "1d430444",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 412,
-      "state": "79ee779d",
+      "state": "c16511b7",
       "events": "b3b75a1c",
       "rng": {
         "draws": 4,
@@ -131,8 +131,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -144,6 +146,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -173,6 +183,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -188,6 +199,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -215,8 +234,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -228,6 +249,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -257,6 +286,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -272,6 +302,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -301,6 +339,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -316,6 +355,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -345,6 +392,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -360,6 +408,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -370,6 +426,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.4,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -387,6 +456,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -403,10 +473,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 410,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 61,
             "str": 61
           },
           "templateId": "warrior",
@@ -474,6 +544,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 100.6,
           "hp": 50000,
@@ -484,8 +555,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -537,6 +615,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -586,6 +665,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -749,7 +829,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 412,
-      "state": "09c0e3a1",
+      "state": "ead2c64a",
       "events": "fbe8fc0f",
       "rng": {
         "draws": 4,
@@ -760,7 +840,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "3b28842b",
+      "state": "e05a4235",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -771,7 +851,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 412,
-      "state": "f1e3673d",
+      "state": "51f486f8",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -782,7 +862,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 412,
-      "state": "2f2d3e78",
+      "state": "237909a8",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -793,7 +873,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 412,
-      "state": "bfe38e3e",
+      "state": "b8dbe7de",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -804,7 +884,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "71afea17",
+      "state": "bcf499d8",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -815,7 +895,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 412,
-      "state": "8fa07ff6",
+      "state": "5ef635a0",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -826,7 +906,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 412,
-      "state": "d2730c73",
+      "state": "e631c5da",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -837,7 +917,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 412,
-      "state": "d2c00ab8",
+      "state": "476b34bb",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -848,7 +928,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 412,
-      "state": "0b861939",
+      "state": "d5be5491",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -859,7 +939,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 412,
-      "state": "b3867257",
+      "state": "47abb940",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -870,7 +950,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 412,
-      "state": "69f91e3e",
+      "state": "9b55514a",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -881,7 +961,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 412,
-      "state": "3df9a3fa",
+      "state": "fe07a22e",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -892,7 +972,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 412,
-      "state": "166bb6a7",
+      "state": "28969aa2",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -903,7 +983,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 412,
-      "state": "2b326e38",
+      "state": "45a5a978",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -914,7 +994,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 412,
-      "state": "ea900318",
+      "state": "91f95a2d",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -925,7 +1005,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 412,
-      "state": "91aa4ab1",
+      "state": "8662e0fa",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -936,7 +1016,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 412,
-      "state": "3806d214",
+      "state": "3ad137e8",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -947,7 +1027,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "d138cf41",
+      "state": "b59ceab0",
       "events": "741638a5",
       "rng": {
         "draws": 407,
@@ -958,7 +1038,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 412,
-      "state": "65186f3e",
+      "state": "c1335f30",
       "events": "741638a5",
       "rng": {
         "draws": 434,
@@ -969,7 +1049,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 413,
-      "state": "416a1469",
+      "state": "084784ec",
       "events": "e66f2234",
       "rng": {
         "draws": 444,
@@ -999,8 +1079,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1012,6 +1094,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1041,6 +1131,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1056,6 +1147,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1083,8 +1182,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1096,6 +1197,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1125,6 +1234,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1140,6 +1250,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1169,6 +1287,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1184,6 +1303,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1213,6 +1340,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1228,6 +1356,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1238,6 +1374,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -1255,6 +1404,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -1271,10 +1421,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 410,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 61,
             "str": 61
           },
           "templateId": "warrior",
@@ -1342,6 +1492,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -1352,8 +1503,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -1405,6 +1563,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -1454,6 +1613,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -1617,8 +1777,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 414,
-      "state": "39eca52a",
-      "events": "6b5ea059",
+      "state": "e5add19a",
+      "events": "b0fa9ba3",
       "rng": {
         "draws": 445,
         "digest": "357c3bc7"
@@ -1647,8 +1807,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1660,8 +1822,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -1689,6 +1860,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1704,6 +1876,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1731,8 +1911,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1744,6 +1926,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1773,6 +1963,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1788,6 +1979,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1817,6 +2016,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1832,6 +2032,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1861,6 +2069,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1876,6 +2085,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1886,6 +2103,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -1893,17 +2123,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -1921,10 +2152,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -1993,6 +2224,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -2003,8 +2235,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -2056,6 +2295,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2105,6 +2345,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -2319,7 +2560,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -2334,7 +2575,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 416,
-      "state": "e93fdd7e",
+      "state": "7cbdbc28",
       "events": "6fa09ad1",
       "rng": {
         "draws": 447,
@@ -2364,8 +2605,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2377,8 +2620,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -2408,6 +2660,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2423,6 +2676,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2450,8 +2711,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2463,6 +2726,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2492,6 +2763,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2507,6 +2779,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2536,6 +2816,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2551,6 +2832,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2580,6 +2869,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2595,6 +2885,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2605,6 +2903,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -2612,17 +2923,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -2640,10 +2952,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -2712,6 +3024,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -2722,8 +3035,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -2775,6 +3095,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2824,6 +3145,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -3038,7 +3360,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -3161,7 +3483,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 417,
-      "state": "80a12aa4",
+      "state": "a6c025be",
       "events": "bc0883b0",
       "rng": {
         "draws": 452,
@@ -3191,8 +3513,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3204,8 +3528,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -3235,6 +3568,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3250,6 +3584,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3279,8 +3621,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3292,6 +3636,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3321,6 +3673,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3336,6 +3689,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3365,6 +3726,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3380,6 +3742,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3409,6 +3779,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3424,6 +3795,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3434,6 +3813,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -3441,17 +3833,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -3469,10 +3862,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -3546,6 +3939,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -3558,8 +3952,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -3612,6 +4013,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -3661,6 +4063,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -3875,7 +4278,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -4063,7 +4466,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 418,
-      "state": "3245c25a",
+      "state": "ea0c1d40",
       "events": "09c32895",
       "rng": {
         "draws": 453,
@@ -4093,8 +4496,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4106,8 +4511,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -4137,6 +4551,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4152,6 +4567,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -4181,8 +4604,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4194,6 +4619,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -4225,6 +4658,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4240,6 +4674,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -4269,6 +4711,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4284,6 +4727,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -4313,6 +4764,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4328,6 +4780,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -4338,6 +4798,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -4345,17 +4818,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -4373,10 +4847,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -4450,6 +4924,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -4462,8 +4937,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -4540,6 +5022,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -4590,6 +5073,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -4804,7 +5288,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -5043,7 +5527,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "a264a4fc",
+      "state": "43119576",
       "events": "0dacb00e",
       "rng": {
         "draws": 453,
@@ -5073,8 +5557,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5086,8 +5572,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -5117,6 +5612,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5132,6 +5628,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -5161,8 +5665,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5174,6 +5680,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -5205,6 +5719,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5220,6 +5735,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -5249,6 +5772,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5264,6 +5788,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -5293,6 +5825,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5308,6 +5841,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -5318,6 +5859,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -5325,17 +5879,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -5353,10 +5908,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -5430,6 +5985,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -5442,8 +5998,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -5520,6 +6083,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -5581,6 +6145,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -5797,7 +6362,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -6077,7 +6642,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "a264a4fc",
+      "state": "43119576",
       "events": "741638a5",
       "rng": {
         "draws": 453,
@@ -6107,8 +6672,10 @@
           "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6120,8 +6687,17 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -6151,6 +6727,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6166,6 +6743,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -6195,8 +6780,10 @@
           "entityId": 407,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6208,6 +6795,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -6239,6 +6834,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6254,6 +6850,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -6283,6 +6887,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6298,6 +6903,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -6327,6 +6940,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6342,6 +6956,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -6352,6 +6974,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -6359,17 +6994,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1062,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1062,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -6387,10 +7023,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 413,
@@ -6464,6 +7100,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -6476,8 +7113,15 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -6554,6 +7198,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -6615,6 +7260,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -6831,7 +7477,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {

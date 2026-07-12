@@ -3,15 +3,16 @@
 // Pure HTML-string builders; all interpolation goes through esc(). Localized spec and
 // mastery prose come from talent_i18n (the same source the in-game talents panel uses).
 
-import { t, type TranslationKey } from '../ui/i18n';
-import { esc } from '../ui/esc';
-import { iconDataUrl } from '../ui/icons';
-import { tTalent } from '../ui/talent_i18n';
 import { TALENTS } from '../sim/content/talents';
 import type { PlayerClass } from '../sim/types';
+import { classDisplayName, tEntity } from '../ui/entity_i18n';
+import { esc } from '../ui/esc';
+import { type TranslationKey, t } from '../ui/i18n';
+import { iconDataUrl } from '../ui/icons';
+import { tTalent } from '../ui/talent_i18n';
 import { CLASS_META } from './class_meta';
+import type { GuideClassSpec, GuideRole } from './content.generated';
 import { badge, tag, tagRow } from './pages/ui';
-import type { GuideRole, GuideClassSpec } from './content.generated';
 
 export function roleKey(role: GuideRole): TranslationKey {
   if (role === 'tank') return 'guide.role.tank';
@@ -19,9 +20,15 @@ export function roleKey(role: GuideRole): TranslationKey {
   return 'guide.role.damage';
 }
 
-export const className = (id: string): string => t(`classes.${id}` as TranslationKey);
-export const classLore = (id: string): string => t(`classDetails.lore.${id}` as TranslationKey);
-export const classCrest = (id: string, size: number): string => iconDataUrl('crest', `class_${id}`, size);
+// Class name + lore resolve through entity_i18n (the same source the HUD uses),
+// which owns the class-id -> catalog-key mapping. A raw `classes.${id}` template
+// key breaks for warrior_classic, whose catalog key is the camelCase
+// classes.warriorClassic.
+export const className = (id: string): string => classDisplayName(id as PlayerClass);
+export const classLore = (id: string): string =>
+  tEntity({ kind: 'class', id: id as PlayerClass, field: 'description' });
+export const classCrest = (id: string, size: number): string =>
+  iconDataUrl('crest', `class_${id}`, size);
 export const abilityHook = (id: string): string => t(`guide.abilityHook.${id}` as TranslationKey);
 
 export function roleBadges(roles: GuideRole[]): string {
@@ -32,9 +39,24 @@ export function roleBadges(roles: GuideRole[]): string {
 export function classTags(id: string): string {
   const m = CLASS_META[id];
   if (!m) return '';
-  const styleKey: TranslationKey = m.style === 'melee' ? 'guide.tag.melee' : m.style === 'ranged' ? 'guide.tag.ranged' : 'guide.tag.both';
-  const playKey: TranslationKey = m.play === 'solo' ? 'guide.tag.solo' : m.play === 'group' ? 'guide.tag.group' : 'guide.tag.flexible';
-  const cxKey: TranslationKey = m.complexity === 'low' ? 'guide.tag.simple' : m.complexity === 'med' ? 'guide.tag.moderate' : 'guide.tag.complex';
+  const styleKey: TranslationKey =
+    m.style === 'melee'
+      ? 'guide.tag.melee'
+      : m.style === 'ranged'
+        ? 'guide.tag.ranged'
+        : 'guide.tag.both';
+  const playKey: TranslationKey =
+    m.play === 'solo'
+      ? 'guide.tag.solo'
+      : m.play === 'group'
+        ? 'guide.tag.group'
+        : 'guide.tag.flexible';
+  const cxKey: TranslationKey =
+    m.complexity === 'low'
+      ? 'guide.tag.simple'
+      : m.complexity === 'med'
+        ? 'guide.tag.moderate'
+        : 'guide.tag.complex';
   const chips = [
     tag(t(styleKey), 'guide-tag-style'),
     tag(t(playKey), 'guide-tag-play'),

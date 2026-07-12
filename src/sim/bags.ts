@@ -22,7 +22,6 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import { ITEMS } from './data';
-import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { InvSlot, ItemDef } from './types';
 
@@ -34,7 +33,7 @@ export const BAG_SOCKETS = 4;
 const DEFAULT_STACK = 20;
 
 /** Kinds that never stack: each copy occupies its own slot, classic style. */
-const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'bag', 'tool']);
+const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'shield', 'held_offhand', 'bag', 'tool']);
 
 /** Max copies of an item per inventory slot. Explicit `stackSize` wins;
  *  gear/bags/tools default to 1, everything else to 20. */
@@ -208,7 +207,7 @@ export function equipBag(ctx: SimContext, itemId: string, socket?: number, pid?:
   }
   let target = socket;
   if (target === undefined) {
-    const empty = meta.bags.findIndex((b) => b === null);
+    const empty = meta.bags.indexOf(null);
     target = empty >= 0 ? empty : -1;
   }
   if (target === -1) {

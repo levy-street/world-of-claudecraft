@@ -8,14 +8,14 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 932,
-  "drawDigest": "34d01e34",
+  "draws": 922,
+  "drawDigest": "2223edd7",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "c77ee89a",
+      "state": "d8530e66",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -62,6 +63,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -89,6 +98,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.061,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -125,7 +135,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "fc36ca46",
+      "state": "c1529733",
       "events": "e8ac312d",
       "rng": {
         "draws": 4,
@@ -136,7 +146,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "70a90ad9",
+      "state": "9bcdf782",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -147,7 +157,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "96fcffcd",
+      "state": "6564fcea",
       "events": "a09f41fc",
       "rng": {
         "draws": 80,
@@ -158,7 +168,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "af1198a8",
+      "state": "95c79721",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -169,7 +179,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "b1245d3a",
+      "state": "2c625bc1",
       "events": "a17b2c3e",
       "rng": {
         "draws": 270,
@@ -180,7 +190,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "e3303abd",
+      "state": "c81d6be8",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -191,7 +201,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 407,
-      "state": "4df5a891",
+      "state": "e7f3b65c",
       "events": "b6995f4a",
       "rng": {
         "draws": 501,
@@ -202,7 +212,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 407,
-      "state": "d9267fc7",
+      "state": "19180aac",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -213,33 +223,33 @@
       "tick": 180,
       "time": 9,
       "nextId": 407,
-      "state": "aa970099",
-      "events": "df861ecc",
+      "state": "e93eb64e",
+      "events": "805dc0ac",
       "rng": {
-        "draws": 765,
-        "digest": "84d7375c"
+        "draws": 762,
+        "digest": "29ec1562"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 407,
-      "state": "8b930262",
+      "state": "56ec6ead",
       "events": "741638a5",
       "rng": {
-        "draws": 931,
-        "digest": "5764acf5"
+        "draws": 922,
+        "digest": "2223edd7"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 407,
-      "state": "dfc56b3a",
+      "state": "df3d0a7b",
       "events": "741638a5",
       "rng": {
-        "draws": 932,
-        "digest": "34d01e34"
+        "draws": 922,
+        "digest": "2223edd7"
       },
       "label": "final",
       "players": [
@@ -260,7 +270,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 164,
-            "damageTaken": 22
+            "damageTaken": 14
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -271,6 +281,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -286,6 +297,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -296,14 +315,14 @@
         {
           "aiState": "idle",
           "attackPower": 120,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.068,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49978,
+          "hp": 49986,
           "id": 405,
           "inCombat": true,
           "kind": "player",
@@ -314,6 +333,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -348,7 +368,7 @@
         {
           "aggroTargetId": 405,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

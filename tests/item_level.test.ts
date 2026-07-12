@@ -221,20 +221,41 @@ describe('item level: raid tier', () => {
   });
 });
 
-describe('item level: heroic boss drops read item level 31 and are budget-exact', () => {
-  it('every heroic drop is an epic at item level 31 with its exact stat budget', () => {
+describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/37)', () => {
+  it('every heroic drop is at its tier item level with its exact stat budget', () => {
+    // The five-man final bosses register at source level 25 (item level 31); the
+    // 10-player raid boss (Heroic Nythraxis) is one tier above, at source level 27
+    // (epic item level 33, legendary item level 37). See buildSourceIndex +
+    // NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
+    const raidIds = new Set(
+      (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>
+        e.itemId ? [e.itemId] : [],
+      ),
+    );
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
       .flatMap((e) => (e.itemId ? [e.itemId] : []));
-    expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
+    expect(ids.length).toBeGreaterThanOrEqual(12); // the authored heroic set
+    // Eight heroic set pieces (helm + shoulder per set), three heroic-only weapons,
+    // and two heroic legendaries. The bespoke legs/chest armor was cut so each set is
+    // a clean 4-piece and every armor drop is a real heroic set piece.
+    expect(raidIds.size).toBe(13);
     for (const id of ids) {
       const item = ITEMS[id];
+      const raid = raidIds.has(id);
       expect(item, `${id} is a real item`).toBeTruthy();
-      expect(item.quality, id).toBe('epic');
-      expect(itemSourceLevel(id), `${id} source`).toBe(25);
-      expect(itemLevel(item), `${id} ilvl`).toBe(31);
+      expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
+      if (item.quality === 'legendary') {
+        expect(raid, `${id} legendary only appears in the raid table`).toBe(true);
+        expect(itemLevel(item), `${id} ilvl`).toBe(37);
+      } else {
+        expect(item.quality, id).toBe('epic');
+        expect(itemLevel(item), `${id} ilvl`).toBe(raid ? 33 : 31);
+      }
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }
+    expect(primaryStatSum(ITEMS.deathless_heartwood_heroic)).toBe(49);
+    expect(primaryStatSum(ITEMS.kingsbane_last_oath_heroic)).toBe(49);
   });
 });
 
@@ -254,12 +275,16 @@ describe('item level: every level-20 item is balanced to budget', () => {
     expect(offBudget, offBudget.join('\n')).toEqual([]);
   });
 
-  it('level-20 items of the same item level + slot share one budget', () => {
+  it('level-20 items of the same item level + slot + hand share one budget', () => {
     const groups = new Map<string, Set<number>>();
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
       if (!item.slot || itemSourceLevel(id) !== 20) continue;
-      const key = `${itemLevel(item)}:${item.quality}:${item.slot}`;
+      // Two-handers carry TWOHAND_STAT_MULT x the one-hand budget, so the
+      // hand is part of the budget identity (a 26:epic:mainhand 2H and 1H
+      // legitimately differ; expectedStatBudget is hand-aware the same way).
+      const hand = item.kind === 'weapon' && item.hand === 'twohand' ? 'twohand' : 'onehand';
+      const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}`;
       let sums = groups.get(key);
       if (!sums) {
         sums = new Set();

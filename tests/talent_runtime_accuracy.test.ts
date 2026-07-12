@@ -154,7 +154,7 @@ describe('talent runtime accuracy', () => {
   it("Giant's Momentum counts rage paid by a queued Reaver Strike", () => {
     const sim = new Sim({ seed: 47, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: 'arms', rows: { 20: 'war_r20_giants_momentum' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 20: 'war_r20_giants_momentum' } })).toBe(true);
     const target = addMob(sim, 9260, sim.player.pos.x, sim.player.pos.z + 3);
     sim.targetEntity(target.id);
     sim.player.resource = sim.player.maxResource;

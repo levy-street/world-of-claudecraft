@@ -31,6 +31,7 @@ export function createCharacterVisual(
     e.color,
     formKey ? 0 : (e.skin ?? 0),
     formKey ? null : e.mainhandItemId,
+    formKey ? null : e.offhandItemId,
     weaponOverride,
   );
 }

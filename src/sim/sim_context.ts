@@ -324,6 +324,7 @@ export interface SimContextCallbacks {
     duration: number,
   ): number | null;
   hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
+  friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
   breakStealth(entity: Entity): void;
 
   // Shared entry point (stays on Sim, exposed here): taunt forces a mob's target.
@@ -368,6 +369,16 @@ export interface SimContextCallbacks {
   // Fungible-only count (excludes per-instance slots, #1165); market.ts uses this
   // instead of countItem so an instanced copy is never listed as a plain stack member.
   countFungibleItem(itemId: string, pid?: number): number;
+  // Enchanting-eligible count/removal (#1712 review): counts/removes a plain
+  // fungible stack OR an instanced copy with no rolled.stats (crafted rare+
+  // gear), excluding only an already-enchanted (rolled.stats) copy. Used by
+  // professions/enchanting.ts instead of countFungibleItem/removeFungibleItem
+  // so crafted single-copy rares remain disenchantable/enchantable.
+  countEnchantableItem(itemId: string, pid?: number): number;
+  // Returns the consumed slots' `instance` payloads (removeItem's contract),
+  // so applyEnchant can merge a crafted copy's signer/rolled.quality into the
+  // freshly-enchanted instance instead of dropping them.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
@@ -443,6 +454,7 @@ export interface SimContextCallbacks {
   // on Sim (or a shared module); the eventual owners flip points-at, never rename.
   // --- shared movement/combat entry points (STAY on Sim, exposed here) ---
   moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles?: boolean): boolean;
+  attackerInFront(defender: Entity, attacker: Entity): boolean;
   mobSwing(mob: Entity, target: Entity): void;
   updateRangedPetAttack(
     pet: Entity,
@@ -570,6 +582,9 @@ export interface SimContextCallbacks {
   // `runEffects` itself is the C4b boundary: it flips points-at to effect_dispatch
   // (the moved switch), reached only via the cast lifecycle's applyAbility/applyChannelTick.
   awardCombo(p: Entity, target: Entity, points: number): void;
+  // meleeSwing's optional onDealt reports the resolved damage of a connected
+  // swing (Bladed Echo, combat/area_echo.ts); runEffects' optional opts carries
+  // the per-cast area-echo flag applyAbility resolved. Both are additive.
   meleeSwing(
     attacker: Entity,
     target: Entity,
@@ -580,13 +595,23 @@ export interface SimContextCallbacks {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
+      onDealt?: (amount: number) => void;
+      // Emboldened (combat/sure_crit.ts): override the connected swing's crit
+      // OUTCOME; the crit rng inside meleeSwing is still drawn as before.
+      forceCrit?: boolean;
       damageMult?: number;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
-  runEffects(p: Entity, meta: PlayerMeta, target: Entity | null, res: ResolvedAbility): void;
+  runEffects(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity | null,
+    res: ResolvedAbility,
+    opts?: { areaEcho?: boolean },
+  ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
   // reach back for these. All STAY on Sim. `syncPetAspect` is pet-management (the P1b
@@ -907,6 +932,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     applyKnockback: host.applyKnockback,
     diminishedCrowdControlDuration: host.diminishedCrowdControlDuration,
     hostilesInRadius: host.hostilesInRadius,
+    friendliesInRadius: host.friendliesInRadius,
     breakStealth: host.breakStealth,
     applyTaunt: host.applyTaunt,
     summonPet: host.summonPet,
@@ -917,6 +943,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     spendResource: host.spendResource,
     removeItem: host.removeItem,
     removeFungibleItem: host.removeFungibleItem,
+    countEnchantableItem: host.countEnchantableItem,
+    removeEnchantableItem: host.removeEnchantableItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     partyInvite: host.partyInvite,
@@ -958,6 +986,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     syncPetLevel: host.syncPetLevel,
     // M2 mob locomotion seam.
     moveToward: host.moveToward,
+    attackerInFront: host.attackerInFront,
     mobSwing: host.mobSwing,
     updateRangedPetAttack: host.updateRangedPetAttack,
     fleeMoveSpeed: host.fleeMoveSpeed,

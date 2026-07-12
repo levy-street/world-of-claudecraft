@@ -48,7 +48,7 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
     case 'weapon':
       return item.kind === 'weapon';
     case 'armor':
-      return item.kind === 'armor';
+      return item.kind === 'armor' || item.kind === 'shield' || item.kind === 'held_offhand';
     case 'consumable':
       return (
         item.kind === 'food' ||
@@ -88,19 +88,19 @@ export function applyBagFilter(
   state: BagFilterState,
 ): InvSlot[] {
   const query = state.search.trim().toLowerCase();
-  const filtered = slots.filter((slot) => {
+  const filtered = slots.flatMap((slot) => {
     const item = lookup(slot.itemId);
-    if (!item) return false;
-    if (!matchesCategory(item, state.category)) return false;
-    if (query && !item.name.toLowerCase().includes(query)) return false;
-    return true;
+    if (!item) return [];
+    if (!matchesCategory(item, state.category)) return [];
+    if (query && !item.name.toLowerCase().includes(query)) return [];
+    return [{ slot, item }] as const;
   });
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    filtered.sort((a, b) => qualityRank(a.item) - qualityRank(b.item));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => lookup(a.itemId)!.name.localeCompare(lookup(b.itemId)!.name));
+    filtered.sort((a, b) => a.item.name.localeCompare(b.item.name));
   }
-  return filtered;
+  return filtered.map(({ slot }) => slot);
 }
 
 export function serializeBagFilter(state: BagFilterState): string {

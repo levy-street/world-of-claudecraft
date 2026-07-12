@@ -14,6 +14,73 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': '약탈자의 일격',
+  'entities.abilities.cw_heroic_strike.description':
+    '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
+  'entities.abilities.cw_battle_shout.name': '강철의 외침',
+  'entities.abilities.cw_battle_shout.description': '2분 동안 전투력이 {buff}만큼 증가합니다.',
+  'entities.abilities.cw_commanding_shout.name': '북돋는 외침',
+  'entities.abilities.cw_commanding_shout.description': '2분 동안 체력이 {buff}만큼 증가합니다.',
+  'entities.abilities.cw_charge.name': '쇄도',
+  'entities.abilities.cw_charge.description':
+    '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
+  'entities.abilities.cw_rend.name': '깊은 상처',
+  'entities.abilities.cw_rend.description':
+    '대상을 상처 입혀 {duration}초에 걸쳐 {damage}의 출혈 피해를 입힙니다.',
+  'entities.abilities.cw_thunder_clap.name': '진동의 일격',
+  'entities.abilities.cw_thunder_clap.description':
+    '주위 적에게 {damage}의 피해를 입히고 10초 동안 공격 속도를 10%만큼 늦춥니다.',
+  'entities.abilities.cw_hamstring.name': '절뚝이는 베기',
+  'entities.abilities.cw_hamstring.description':
+    '적에게 {damage}의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
+  'entities.abilities.cw_bloodrage.name': '피의 대가',
+  'entities.abilities.cw_bloodrage.description': '생명력을 희생하여 분노 10을 생성합니다.',
+  'entities.abilities.cw_overpower.name': '붉은 손',
+  'entities.abilities.cw_overpower.description':
+    '무기 피해에 {damage}를 더한 피해를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
+  'entities.abilities.cw_execute.name': '이른 무덤',
+  'entities.abilities.cw_execute.description':
+    '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
+  'entities.abilities.cw_slam.name': '우악스러운 휘두르기',
+  'entities.abilities.cw_slam.description': '상대에게 무기 피해에 {damage}를 더한 피해를 입힙니다.',
+  'entities.abilities.cw_cleave.name': '수확의 호',
+  'entities.abilities.cw_cleave.description': '전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다.',
+  'entities.abilities.cw_defensive_stance.name': '방어 태세',
+  'entities.abilities.cw_defensive_stance.description':
+    '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다.',
+  'entities.abilities.cw_demoralizing_shout.name': '흉포한 울부짖음',
+  'entities.abilities.cw_demoralizing_shout.description':
+    '무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 {buff}만큼 감소시킵니다.',
+  'entities.abilities.cw_sunder_armor.name': '방어구 절단',
+  'entities.abilities.cw_sunder_armor.description':
+    '대상의 방어구를 가르고 적용마다 {damage}%만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다.',
+  'entities.abilities.cw_taunt.name': '부추김',
+  'entities.abilities.cw_taunt.description':
+    '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
+  'entities.abilities.cw_bloodthirst.name': '사혈',
+  'entities.abilities.cw_bloodthirst.description':
+    '피의 광란으로 즉시 공격하여 무기 피해의 60%에 {damage}를 더한 피해를 줍니다. (분노 특화 대표 기술)',
+  'entities.abilities.cw_mortal_strike.name': '불구의 일격',
+  'entities.abilities.cw_mortal_strike.description':
+    '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
+  'entities.abilities.cw_shield_slam.name': '방패 강타',
+  'entities.abilities.cw_shield_slam.description':
+    '방패로 대상을 강타해 무기 피해의 50%에 {damage}를 더한 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',
+  'entities.abilities.cw_whirlwind.name': '칼날 회오리',
+  'entities.abilities.cw_whirlwind.description':
+    '치명적인 호를 그리며 돌아 주변 모든 적에게 {damage}의 피해를 줍니다. (분노 특성)',
+  'entities.abilities.cw_berserker_rage.name': '들끓는 격노',
+  'entities.abilities.cw_berserker_rage.description':
+    '들끓는 격노에 들어가 분노 20을 생성합니다. (전사 특성)',
+  'classDetails.lore.warriorClassic':
+    '전투 개편 이전의 전사를 그대로 남겨 두었습니다. 원래의 기술 구성과 분노 흐름을 새 전사와 나란히 플레이해 보고 어느 쪽이 더 좋은지 알려 주세요.',
+  'classDetails.roles.warriorClassic': '탱커 / 근접 DPS',
+  'classes.warriorClassic': '전사',
+  'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
+  'hudChrome.auth.appleError': 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
+  'hudChrome.auth.appleChoiceExpired':
+    'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
   'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
   'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
@@ -32,6 +99,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '받는 사람',
   'itemUi.kind.bag': '가방',
   'itemUi.tooltip.bagSlots': '{slots}칸 가방',
+  'hudChrome.auth.forgotPrompt': '비밀번호를 잊으셨나요?',
+  'hudChrome.auth.forgotTitle': '비밀번호 재설정',
+  'hudChrome.auth.forgotHint': '사용자 이름을 입력하면 등록된 이메일로 재설정 링크를 보내드립니다.',
+  'hudChrome.auth.forgotUsername': '사용자 이름',
+  'hudChrome.auth.forgotSubmit': '재설정 링크 보내기',
+  'hudChrome.auth.forgotSent':
+    '해당 사용자 이름의 계정에 등록된 이메일이 있으면 재설정 링크를 보냈습니다. 받은 편지함을 확인하세요.',
+  'hudChrome.auth.forgotBack': '로그인으로 돌아가기',
+  'hudChrome.auth.resetTitle': '새 비밀번호 설정',
+  'hudChrome.auth.resetNewPassword': '새 비밀번호',
+  'hudChrome.auth.resetConfirm': '새 비밀번호 확인',
+  'hudChrome.auth.resetSubmit': '비밀번호 업데이트',
+  'hudChrome.auth.resetDone': '비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.',
+  'hudChrome.auth.resetMismatch': '비밀번호가 일치하지 않습니다.',
+  'hudChrome.auth.resetErrInvalid':
+    '이 재설정 링크가 유효하지 않거나 만료되었습니다. 새 링크를 요청하세요.',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': '마지막 접속: {when}',
   'hudChrome.social.lastSeenNever': '없음',
   'hudChrome.dailyRewards.title': '일일 보상',
@@ -118,6 +202,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
   'hudChrome.unitFrame.targetAnnounce': '대상: {name}',
   'hudChrome.unitFrame.targetLabel': '내 대상',
+  'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
   'seo.officialLabel': 'World of ClaudeCraft 공식 웹사이트',
   'seo.officialBody':
     'worldofclaudecraft.com은 Claudemoon 월드의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요.',
@@ -1576,6 +1661,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': '은화',
   'itemUi.money.copper': '동화',
   'itemUi.slots.mainhand': '주장비',
+  'itemUi.slots.twoHand': '양손',
   'itemUi.slots.chest': '가슴',
   'itemUi.slots.legs': '다리',
   'itemUi.slots.feet': '발',
@@ -1799,7 +1885,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
   'entities.abilities.slam.name': '우악스러운 휘두르기',
-  'entities.abilities.slam.description': '상대에게 무기 피해에 {damage}를 더한 피해를 입힙니다.',
+  'entities.abilities.slam.description':
+    '상대에게 무기 피해의 50%에 {damage}를 더한 피해를 입히고 분노를 {rage} 생성합니다.',
   'entities.abilities.cleave.name': '수확의 호',
   'entities.abilities.cleave.description': '전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다.',
   'entities.abilities.defensive_stance.name': '방어 태세',
@@ -2033,9 +2120,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
-  'entities.abilities.chain_heal.name': '연쇄 치유',
-  'entities.abilities.chain_heal.description':
-    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -2216,69 +2300,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
   'entities.abilities.revive_pet.name': '소환수 소생',
   'entities.abilities.revive_pet.description': '죽은 소환수를 되살려 당신의 곁으로 되돌립니다.',
-  'entities.abilities.aura_surge.name': '여명 방패 도탄',
+  'entities.abilities.aura_surge.name': '여명의 도탄',
   'entities.abilities.aura_surge.description':
-    '여명벼림 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, {radius}미터 안의 적 최대 {jumps}명에게 튕깁니다. 튕길 때마다 이전 피해의 {falloff}를 입힙니다. (성기사 특성)',
-  'entities.abilities.holy_shock.name': '신성 충격',
-  'entities.abilities.holy_shock.description':
-    '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
-  'entities.abilities.holy_shield.name': '신성한 방패',
-  'entities.abilities.holy_shield.description':
-    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
-  'entities.abilities.bestial_wrath.name': '야수의 격노',
-  'entities.abilities.bestial_wrath.description':
-    '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
-  'entities.abilities.trueshot_aura.name': '정조준 오라',
-  'entities.abilities.trueshot_aura.description':
-    '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
-  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
-  'entities.abilities.wyvern_sting.description':
-    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
-  'entities.abilities.arcane_power.name': '신비의 마법 강화',
-  'entities.abilities.arcane_power.description':
-    '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
-  'entities.abilities.combustion.name': '발화',
-  'entities.abilities.combustion.description':
-    '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
+    '여명으로 벼린 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, {radius}미터 안의 추가 적 최대 {jumps}명에게 튕기며 도탄마다 {falloff}의 피해를 입힙니다. (성기사 특성)',
+  'entities.abilities.lingering_dread.name': '남은 공포',
+  'entities.abilities.lingering_dread.description':
+    '전투의 함성을 내질러 10미터 안의 적을 4초 동안 공포에 빠뜨립니다. 각 대상은 최대 생명력의 20%에 해당하는 피해를 받기 전까지 공포가 깨지지 않습니다. (전사 특성)',
+  'entities.abilities.cleansing_verdict.name': '정화의 심판',
+  'entities.abilities.cleansing_verdict.description':
+    '아군 대상의 해로운 마법 효과 하나를 정화하고 생명력을 {damage}만큼 회복합니다.',
+  'entities.abilities.voidfeast.name': '공허의 포식',
+  'entities.abilities.voidfeast.description':
+    '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다.',
+  'entities.abilities.spellsteal.name': '마법 훔치기',
+  'entities.abilities.spellsteal.description':
+    '적의 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
+  'entities.abilities.startle_shot.name': '기습 사격',
+  'entities.abilities.startle_shot.description':
+    '거친 사격으로 대상을 {duration}초 동안 혼란시킵니다. 피해를 받으면 효과가 깨집니다.',
   'entities.abilities.icy_veins.name': '얼음 핏줄',
   'entities.abilities.icy_veins.description':
     '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
-  'entities.abilities.cold_blood.name': '냉혈',
-  'entities.abilities.cold_blood.description':
-    '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
-  'entities.abilities.blade_flurry.name': '폭풍의 칼날',
-  'entities.abilities.blade_flurry.description':
-    '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
-  'entities.abilities.hemorrhage.name': '과다출혈',
-  'entities.abilities.hemorrhage.description':
-    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
-  'entities.abilities.power_infusion.name': '마력 주입',
-  'entities.abilities.power_infusion.description':
-    '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
   'entities.abilities.holy_nova.name': '신성한 폭발',
-  'entities.abilities.holy_nova.description':
-    '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
-  'entities.abilities.shadowform.name': '어둠의 형상',
-  'entities.abilities.shadowform.description':
-    '어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)',
-  'entities.abilities.elemental_mastery.name': '정기의 깨달음',
-  'entities.abilities.elemental_mastery.description':
-    '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
-  'entities.abilities.siphon_life.name': '생명력 착취',
-  'entities.abilities.siphon_life.description':
-    '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
-  'entities.abilities.conflagrate.name': '점화',
-  'entities.abilities.conflagrate.description':
-    '적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)',
-  'entities.abilities.moonkin_form.name': '달빛야수 변신',
-  'entities.abilities.moonkin_form.description':
-    '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
-  'entities.abilities.feral_charge.name': '야성의 돌진',
-  'entities.abilities.feral_charge.description':
-    '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
-  'entities.abilities.swiftmend.name': '신속한 치유',
-  'entities.abilities.swiftmend.description':
-    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
@@ -2288,22 +2331,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': '야생송곳니 형상',
   'entities.abilities.aspect_of_the_wild.description':
     '야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)',
-  'entities.abilities.avatar.name': '거상화',
-  'entities.abilities.avatar.description':
-    '제어 효과를 해제하고 거상이 되어 20초 동안 주는 피해가 20% 증가합니다. (전사 특성)',
   'entities.abilities.avenging_wrath.name': '응징의 날개',
   'entities.abilities.avenging_wrath.description':
     '복수의 힘을 내려 전투력과 주문력을 높입니다. 20초 동안 지속됩니다. (성기사 특성)',
   'entities.abilities.berserk.name': '붉은 안개',
   'entities.abilities.berserk.description':
     '전투력을 높입니다. 15초 동안 지속됩니다. (드루이드 특성)',
-  'entities.abilities.bladestorm.name': '강철 회오리',
-  'entities.abilities.bladestorm.description':
-    '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)',
   'entities.abilities.razor_howl.name': '칼날 포효',
-  'entities.abilities.lingering_dread.name': '잔존하는 공포',
-  'entities.abilities.lingering_dread.description':
-    '전투의 함성으로 10미터 안의 적을 4초 동안 공포에 빠뜨립니다. 각 공포는 대상 최대 생명력의 20%만큼 피해를 받아야 풀립니다. (전사 특성)',
   'entities.abilities.razor_howl.description':
     '15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)',
   'entities.abilities.stormthrow.name': '폭풍 투척',
@@ -2331,8 +2365,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cloak_of_shadows.description':
     '그림자로 몸을 감싸 피해를 흡수합니다. 5초 동안 지속됩니다. (도적 특성)',
   'entities.abilities.cone_of_cold.name': '서리휩쓸기',
-  'entities.abilities.cone_of_cold.description':
-    '주위 적을 냉기로 강타하여 {damage}의 냉기 피해를 입힙니다. (마법사 특성)',
   'entities.abilities.counter_shot.name': '침묵 사격',
   'entities.abilities.counter_shot.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (사냥꾼 특성)',
@@ -2377,9 +2409,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.name': '샘물',
   'entities.abilities.healing_stream.description':
     '12초에 걸쳐 아군 대상을 치유합니다. (주술사 특성)',
-  'entities.abilities.heroic_leap.name': '전쟁도약',
-  'entities.abilities.heroic_leap.description':
-    '대상 지역으로 도약하여 주위 적에게 {damage}의 물리 피해를 입힙니다. (전사 특성)',
   'entities.abilities.holy_wrath.name': '성자의 분노',
   'entities.abilities.holy_wrath.description':
     '신성한 힘을 발산하여 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
@@ -2425,12 +2454,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': '정신의 절규',
   'entities.abilities.psychic_scream.description':
     '주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (사제 특성)',
-  'entities.abilities.pummel.name': '턱 부수기',
-  'entities.abilities.pummel.description':
-    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (전사 특성)',
-  'entities.abilities.rallying_cry.name': '집결',
-  'entities.abilities.rallying_cry.description':
-    '결집의 함성을 질러 주위 아군의 전투력을 높입니다. 10초 동안 지속됩니다. (전사 특성)',
   'entities.abilities.rebuke.name': '꾸짖음',
   'entities.abilities.rebuke.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (성기사 특성)',
@@ -2499,6 +2522,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water2.name': '창조된 우물물',
   'entities.items.conjured_water3.name': '창조된 맑은 물',
   'entities.items.eastbrook_arming_sword.name': '이스트브룩 무장검',
+  'entities.items.eastbrook_buckler.name': '이스트브룩 버클러',
+  'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.bronzework_mace.name': '청동세공 철퇴',
   'entities.items.vale_carving_knife.name': '계곡 조각칼',
   'entities.items.hickory_shortstaff.name': '히코리 짧은지팡이',
@@ -2520,6 +2545,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': '흑거미줄 비단샘',
   'entities.items.supply_crate.name': '도난당한 보급 상자',
   'entities.items.greyjaw_fang.name': '늙은 그레이죠의 송곳니',
+  'entities.items.chunk_of_ore.name': '광석 조각',
   'entities.items.weathered_ledger_page.name': '풍화된 장부 페이지',
   'entities.items.morthen_grimoire.name': '모르덴의 마법서',
   'entities.items.wolf_fang.name': '갈라진 늑대 송곳니',
@@ -2534,6 +2560,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '기름진 수지 덩어리',
   'entities.items.spider_leg.name': '꿈틀대는 거미 다리',
   'entities.items.bone_fragments.name': '뼈 조각',
+  'entities.items.arcane_dust.name': '비전 가루',
+  'entities.items.arcane_essence.name': '비전 정수',
+  'entities.items.arcane_shard.name': '비전 파편',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',
@@ -2631,6 +2660,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.roast_mountain_goat.name': '구운 산양',
   'entities.items.glacier_melt.name': '빙하 녹은물',
   'entities.items.highwatch_warblade.name': '하이워치 전투검',
+  'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
+  'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.craghorn_staff.name': '바위뿔 지팡이',
   'entities.items.icevein_dirk.name': '얼음맥 더크',
   'entities.items.highwatch_breastplate.name': '하이워치 흉갑',
@@ -2896,6 +2927,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '조수지기',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네.',
+  'entities.quests.q_prof_intro.title': '검 말고도 할 수 있는 일',
+  'entities.quests.q_prof_intro.text':
+    '이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.',
+  'entities.quests.q_prof_intro.completion':
+    '봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.',
+  'entities.quests.q_prof_intro.objectives.0.label': '광석 조각',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
     '숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.',
@@ -3454,9 +3491,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.shroud_of_the_gravewyrm.name': '무덤용의 장막',
   'entities.items.sanctum_prowlers_grips.name': '성소 잠행자의 장갑',
   'entities.items.scepter_of_the_deathless_court.name': '불사 궁정의 홀',
-  'entities.items.deathless_warguard_legmail.name': '불사 전쟁수호 다리갑옷',
-  'entities.items.soulrend_diadem.name': '영혼분열 왕관',
-  'entities.items.scourgehide_carapace.name': '재앙가죽 갑각',
   'entities.items.cryptplate_helm.name': '묘지판금 투구',
   'entities.items.shadowpulse_slippers.name': '어둠파동 슬리퍼',
   'entities.items.bonechill_cord.name': '뼈서리 허리끈',
@@ -3470,7 +3504,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravescale_girdle.name': '무덤비늘 허리띠',
   'entities.items.wyrmchoir_handwraps.name': '용노래 손싸개',
   'entities.items.deathless_greatblade.name': '불사 대검',
-  'entities.items.soulforged_warplate.name': '혼주조 전투갑옷',
   'entities.items.stormcallers_focus.name': '폭풍소환사의 매개체',
   'entities.items.zense_meridian.name': '젠세의 자오선',
   'entities.items.seal_of_the_nine_oaths.name': '아홉 맹세의 인장',
@@ -3819,7 +3852,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}초',
   'hudChrome.mobile.actionPageToggle': '행동 페이지 전환',
   'hudChrome.mobile.actionRing': '전투 행동',
-  'hudChrome.mobile.autorun': '자동 달리기',
   'hudChrome.mobile.haptics': '진동',
   'hudChrome.mobile.hapticsOff': '진동 꺼짐',
   'hudChrome.mobile.hotbarPage': '스킬',
@@ -3916,17 +3948,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnBody':
     '임무를 마쳤습니다. 레드브룩 원수에게 돌아가 {interactKey} 키를 눌러 완료하세요.',
   'entities.mobs.nythraxis_skeleton_warrior.name': '되살아난 왕실 근위병',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': '죽지 않는 전쟁수호병 알드렌',
+  'entities.mobs.nythraxis_heroic_priest_add.name': '죽지 않는 대사제 말릭',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': '죽지 않는 칼날 보스',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': '나이트락시스, 손피크의 재앙',
   'itemUi.quality.legendary': '전설',
   'entities.items.deathless_heartwood.name': '죽지 않는 왕관의 심재',
+  'entities.items.deathless_heartwood_heroic.name': '죽지 않는 왕관의 심재',
   'entities.items.kingsbane_last_oath.name': '왕좌살해자, 손피크의 마지막 맹세',
+  'entities.items.kingsbane_last_oath_heroic.name': '왕좌살해자, 손피크의 마지막 맹세',
   'entities.items.crownforged_dreadhelm.name': '뼈벼림 공포투구',
+  'entities.items.crownforged_dreadhelm_heroic.name': '뼈벼림 공포투구',
   'entities.items.crownforged_warspaulders.name': '뼈벼림 전쟁 어깨갑옷',
+  'entities.items.crownforged_warspaulders_heroic.name': '뼈벼림 전쟁 어깨갑옷',
   'entities.items.nighttalon_crown.name': '흉포송곳니 왕관',
+  'entities.items.nighttalon_crown_heroic.name': '흉포송곳니 왕관',
   'entities.items.nighttalon_shoulderguards.name': '흉포송곳니 어깨수호대',
+  'entities.items.nighttalon_shoulderguards_heroic.name': '흉포송곳니 어깨수호대',
   'entities.items.soulflame_cowl.name': '망령불꽃 두건',
+  'entities.items.soulflame_cowl_heroic.name': '망령불꽃 두건',
   'entities.items.soulflame_mantle.name': '망령불꽃 어깨덮개',
+  'entities.items.soulflame_mantle_heroic.name': '망령불꽃 어깨덮개',
   'entities.items.stormcallers_crown.name': '강풍부름 관',
+  'entities.items.stormcallers_crown_heroic.name': '강풍부름 관',
   'entities.items.crownforged_gauntlets.name': '왕관벼림 건틀릿',
   'entities.items.nighttalon_grips.name': '밤발톱 손아귀',
   'entities.items.soulflame_gloves.name': '영혼불꽃 장갑',
@@ -3939,6 +3983,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'hudChrome.worldBoss.spawn': '{name}이(가) 쏜피크 고지에 솟아올랐습니다!',
   'entities.items.stormcallers_spaulders.name': '강풍부름 어깨갑옷',
+  'entities.items.stormcallers_spaulders_heroic.name': '강풍부름 어깨갑옷',
+  'entities.items.bonewrought_greatsword.name': '뼈벼림 대검',
+  'entities.items.direfang_greatblade.name': '흉포송곳니 대도',
+  'entities.items.bonewrought_bulwark.name': '뼈벼림 방벽',
+  'entities.items.wraithfire_orb.name': '망령불꽃 보주',
   'hud.chat.context.convertToRaid': '공격대로 전환',
   'hud.chat.context.convertToParty': '파티로 전환',
   'hudChrome.raidConvert.leaderOnly': '공격대장만 파티로 전환할 수 있습니다.',
@@ -4605,6 +4654,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp': '원거리에서 적에게 화염 화살을 날리는 불씨족을 불러냅니다.',
   'guide.abilityHook.thorns': '아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다.',
   'guide.abilityHook.thunder_clap': '주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.',
+  'guide.abilityHook.cw_heroic_strike':
+    '다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.',
+  'guide.abilityHook.cw_battle_shout': '파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.',
+  'guide.abilityHook.cw_commanding_shout':
+    '체력을 높여 모두가 전투에서 더 오래 버틸 수 있게 합니다.',
+  'guide.abilityHook.cw_charge': '멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.',
+  'guide.abilityHook.cw_rend': '시간이 지나며 대상을 약화시키는 출혈을 입힙니다.',
+  'guide.abilityHook.cw_thunder_clap': '주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.',
   'guide.abilityHook.wrath': '원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.',
   'guide.arenaPage.augmentsNote':
     '증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.',
@@ -5491,6 +5548,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus4':
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
+  'hudChrome.itemHeroicTag': '[영웅]',
+  'hudChrome.itemSoulbound': '귀속',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -6295,6 +6354,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '소포',
   'hudChrome.mailbox.parcelsHint': '가방의 아이템을 클릭하면 첨부됩니다.',
   'hudChrome.mailbox.removeParcelAria': '편지에서 {item} 제거',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '{item} 하나 적게 보내기',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '{item} 하나 더 보내기',
   'hudChrome.mailbox.sendButton': '편지 보내기',
   'hudChrome.mailbox.postageNote': '우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.',
   'hudChrome.mailbox.arrivedBanner': '까마귀가 도착했습니다: {name}의 우편.',
@@ -6684,15 +6745,220 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
   'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
   'entities.mobs.yumi_cat.name': '유미',
-  // Choice-row dispel spells.
-  'entities.abilities.cleansing_verdict.name': '정화의 심판',
-  'entities.abilities.cleansing_verdict.description':
-    '아군의 해로운 마법 효과 하나를 정화하고 {damage}의 신성 치유를 부여합니다.',
-  'entities.abilities.voidfeast.name': '공허의 만찬',
-  'entities.abilities.voidfeast.description':
-    '마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 집어삼키고 최대 생명력의 6%를 회복합니다.',
-  'entities.abilities.spellsteal.name': '주문 도둑',
-  'entities.abilities.spellsteal.description': '적에게서 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
-  'entities.abilities.startle_shot.name': '교란 사격',
-  'entities.abilities.startle_shot.description': '거친 사격으로 대상을 혼란시킵니다. 피해를 입으면 효과가 풀립니다.',
+  'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
+  'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
+  'hudChrome.talentRows.tab': '선택',
+  'hudChrome.talentRows.defaultLoadout': '기본 구성',
+  'hudChrome.talentRows.comingSoon': '준비 중',
+  'hudChrome.specPanel.primaryAttr': '주요 능력치',
+  'hudChrome.specPanel.complexity': '복잡도',
+  'hudChrome.specPanel.complexityLow': '낮음',
+  'hudChrome.specPanel.complexityMedium': '중간',
+  'hudChrome.specPanel.complexityHigh': '높음',
+  'hudChrome.specPanel.exampleAbilities': '대표 능력',
+  'hudChrome.specPanel.viewTalents': '특성 보기',
+  'hudChrome.specPanel.selectSpec': '전문화 선택',
+  'hudChrome.specPanel.specUnlockBanner': '전문화 해제!',
+  'hudChrome.specPanel.specUnlockHint': 'N을 눌러 전문화를 선택하세요.',
+  'hudChrome.statInfo.names.haste': '가속',
+  'hudChrome.statInfo.names.parry': '무기 막기',
+  'hudChrome.statInfo.desc.haste':
+    '무기 공격과 주문 시전 속도를 높입니다. 공용 재사용 대기시간은 줄이지 않습니다.',
+  'hudChrome.statInfo.desc.parry':
+    '전방 근접 공격을 완전히 무기로 막아 피해를 입지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다.',
+  'hudChrome.paperdoll.offhand': '보조장비',
+  'hudChrome.auraEffect.battleStance': '전투 태세: 분노 생성 10% 증가',
+  'hudChrome.auraEffect.berserkerStance': '광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가',
+  'hudChrome.auraEffect.dmgDone': '입히는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.crit': '치명타 확률이 {pct}% 증가합니다',
+  'hudChrome.auraEffect.rageGen': '분노 생성이 {pct}% 증가합니다',
+  'hudChrome.auraEffect.reckless': '치명타 확률이 {pct}%, 분노 생성이 {ragePct}% 증가합니다',
+  'hudChrome.auraEffect.avatar': '거상: 입히는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.bloodbath': '치명타 확률과 입히는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.dieBySword':
+    '받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)',
+  'hudChrome.auraEffect.sanguine': '공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다',
+  'hudChrome.auraEffect.battleTrance':
+    '다음 약탈자의 일격 또는 불구의 일격이 분노를 소모하지 않습니다',
+  'hudChrome.auraEffect.revengeFree': '다음 복수가 분노를 소모하지 않습니다',
+  'hudChrome.auraEffect.victoryRush': '연전연승을 사용할 수 있습니다',
+  'hudChrome.auraEffect.maxHpPct': '최대 생명력이 {pct}% 증가합니다',
+  'guide.abilityHook.revenge':
+    '전방의 모든 적을 휩쓰는 반격으로, 공격을 받아넘긴 직후에는 더 저렴하게 사용할 수 있습니다.',
+  'guide.abilityHook.hamstring':
+    '대상의 다리를 베어 이동 속도를 늦춰 당신을 쫓아오지 못하게 합니다.',
+  'hud.combat.floatingParry': '무기 막기',
+  'hud.combat.parried': '{target}이 당신의 {ability}을 무기로 막았습니다.',
+  'hud.errors.nothingToConsume': '소모할 대상이 없습니다.',
+  'hud.errors.needShield': '방패를 착용해야 합니다.',
+  'entities.abilities.chain_heal.name': '사슬 치유',
+  'entities.abilities.chain_heal.description':
+    '대상의 생명력을 {damage}만큼 회복시킨 뒤 주위 아군 최대 2명에게 튕겨가며, 튕길 때마다 이전 치유량의 절반을 회복시킵니다.',
+  'entities.abilities.revenge.name': '복수',
+  'entities.abilities.revenge.description':
+    '넓은 호를 그리며 공격하여 전방의 모든 적에게 물리 피해를 입힙니다. 대상이 5명을 넘으면 피해가 감소합니다. 회피하거나 무기로 막으면 다음 복수가 분노를 소모하지 않을 수 있습니다.',
+  'entities.abilities.battle_stance.name': '전투 태세',
+  'entities.abilities.battle_stance.description':
+    '공격적인 전투 태세입니다. 분노를 10% 더 생성합니다. 무기와 방어 전문화의 기본 태세입니다.',
+  'entities.abilities.berserker_stance.name': '광전사 태세',
+  'entities.abilities.berserker_stance.description':
+    '무모한 전투 태세입니다. 치명타 확률이 3% 증가하고 치명타 피해가 3% 증가합니다. 분노 전사는 항상 이 태세로 싸웁니다.',
+  'entities.abilities.sweeping_strikes.name': '넓어지는 호',
+  'entities.abilities.sweeping_strikes.description':
+    '12초 동안 단일 대상 공격이 주위 적 1명에게도 100% 피해로 적중합니다. (무기 특성)',
+  'entities.abilities.deep_wounds.name': '벌어진 상처',
+  'entities.abilities.deep_wounds.description':
+    '지속 효과: 불구의 일격이 대상에게 6초에 걸쳐 물리 피해를 입히는 출혈을 남깁니다. (무기 특성)',
+  'entities.abilities.enrage_passive.name': '아수라장',
+  'entities.abilities.enrage_passive.description':
+    '지속 효과: 격노 상태일 때 4초 동안 입히는 피해가 7% 증가하고 공격 속도가 25%, 이동 속도가 10% 빨라집니다. 사혈은 30% 확률로 격노시키며, 붉은 수확은 항상 격노시킵니다. (분노 특성)',
+  'entities.abilities.raging_gale.name': '쌍격',
+  'entities.abilities.raging_gale.description':
+    '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 40%에 {damage}를 더한 피해를 입히고 분노 {rage}를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
+  'entities.abilities.red_harvest.name': '붉은 수확',
+  'entities.abilities.red_harvest.description':
+    '모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해의 65%에 {damage}를 더한 피해를 입히고 반드시 격노합니다. (분노 특성)',
+  'entities.abilities.furious_mending.name': '분노의 회복',
+  'entities.abilities.furious_mending.description':
+    '10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%만큼 자신을 치유합니다. (분노 특성)',
+  'entities.abilities.emboldening_roar.name': '대담한 포효',
+  'entities.abilities.emboldening_roar.description':
+    '대담한 포효를 내질러 자신과 40yd 이내의 아군 플레이어에게 대담함을 부여하며, 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노 특성)',
+  'entities.abilities.raised_guard.name': '방패 세우기',
+  'entities.abilities.raised_guard.description':
+    '방패 뒤로 몸을 웅크려 6초 동안 받는 물리 피해가 50% 감소합니다. 최대 2회까지 충전됩니다. (방어 특성)',
+  'entities.abilities.iron_resolve.name': '강철 의지',
+  'entities.abilities.iron_resolve.description':
+    '이를 악물고 고통을 견뎌내며 모든 분노(최소 20)를 소모하여 소모한 분노 1당 피해 4를 흡수하고, 최대 10초 동안 지속됩니다. (방어 특성)',
+  'entities.abilities.faultline.name': '단층선',
+  'entities.abilities.faultline.description':
+    '땅에 충격파를 보내 전방 8yd 이내의 적에게 {damage}의 피해를 입히고 3초 동안 기절시킵니다. (방어 특성)',
+  'entities.abilities.defiant_bellow.name': '반항의 고함',
+  'entities.abilities.defiant_bellow.description':
+    '반항의 고함을 내질러 10yd 이내의 모든 적을 도발하여 3초 동안 자신을 공격하게 만듭니다. (방어 특성)',
+  'entities.abilities.breachmaker.name': '돌파자',
+  'entities.abilities.breachmaker.description':
+    '대상을 강타하여 무기 피해에 {damage}를 더한 피해를 입히고 방어를 무너뜨려, 8초 동안 대상에게 가하는 자신의 공격이 20% 더 큰 피해를 입힙니다. (무기 특성)',
+  'entities.abilities.measured_fury.name': '절제된 분노',
+  'entities.abilities.measured_fury.description':
+    '절제된 분노가 자원 운용을 다듬어 기술의 분노 소모가 10% 감소합니다. (무기 특성)',
+  'entities.abilities.seasoned_soldier.name': '노련한 전사',
+  'entities.abilities.seasoned_soldier.description':
+    '자동 공격이 치명타로 적중하면 분노를 10% 더 생성합니다. (무기 특성)',
+  'entities.abilities.diabolical_twinstrike.name': '사악한 쌍격',
+  'entities.abilities.diabolical_twinstrike.description':
+    '격노 상태일 때 쌍격이 15% 더 큰 피해를 입힙니다. (분노 특성)',
+  'entities.abilities.cleaving_blows.name': '가르는 일격',
+  'entities.abilities.cleaving_blows.description':
+    '붉은 수확이 항상 쌍격의 충전을 하나 되돌려줍니다. (분노 특성)',
+  'entities.abilities.sudden_death.name': '급살',
+  'entities.abilities.sudden_death.description':
+    '자동 공격 시 일정 확률로 생명력에 관계없이 대상에게 이른 무덤을 분노 소모 없이 시전할 수 있습니다. (무기 특성)',
+  'entities.abilities.holy_shock.name': '신성 충격',
+  'entities.abilities.holy_shock.description':
+    '아군 대상에게 신성한 기운으로 충격을 주어 생명력을 {damage}만큼 회복시킵니다. (신성 대표 기술)',
+  'entities.abilities.holy_shield.name': '신성한 벽',
+  'entities.abilities.holy_shield.description':
+    '신성한 힘으로 10초 동안 자신을 보호하여 방어도를 90 증가시키고 근접 공격자에게 12의 신성 피해를 입힙니다. (보호 대표 기술)',
+  'entities.abilities.repentance.name': '회개',
+  'entities.abilities.repentance.description':
+    '적을 최대 6초 동안 명상 상태에 빠뜨립니다. 어떤 피해든 효과를 해제합니다. (징벌 대표 기술)',
+  'entities.abilities.bestial_wrath.name': '울부짖는 격노',
+  'entities.abilities.bestial_wrath.description':
+    '야수의 격노에 빠져들어 15초 동안 전투력이 55 증가합니다. (야수 대표 기술)',
+  'entities.abilities.trueshot_aura.name': '확실한 화살의 오라',
+  'entities.abilities.trueshot_aura.description':
+    '주위 아군을 고무시켜 5분 동안 전투력을 35 증가시킵니다. (사격 대표 기술)',
+  'entities.abilities.wyvern_sting.name': '비룡의 쐐기',
+  'entities.abilities.wyvern_sting.description':
+    '원거리에서 적을 찔러 최대 4초 동안 무력화합니다. 어떤 피해든 효과를 해제합니다. (생존 대표 기술)',
+  'entities.abilities.arcane_power.name': '에테르 쇄도',
+  'entities.abilities.arcane_power.description':
+    '에테르의 쇄도로 몸을 가득 채워 12초 동안 주문력이 28 증가합니다. (비전 대표 기술)',
+  'entities.abilities.combustion.name': '섬광 화염',
+  'entities.abilities.combustion.description':
+    '화염 마법을 집중하여 다음 공격이 반드시 치명타가 됩니다. (화염 대표 기술)',
+  'entities.abilities.cone_of_cold.description':
+    '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 입힙니다. (냉기 대표 기술)',
+  'entities.abilities.cold_blood.name': '살수의 평정',
+  'entities.abilities.cold_blood.description':
+    '살의를 집중하여 다음 공격이 반드시 치명타가 됩니다. (암살 대표 기술)',
+  'entities.abilities.blade_flurry.name': '거울 칼날',
+  'entities.abilities.blade_flurry.description':
+    '칼날의 폭풍을 몰아쳐 12초 동안 공격 속도가 20% 증가합니다. (전투 대표 기술)',
+  'entities.abilities.hemorrhage.name': '붉은 리본',
+  'entities.abilities.hemorrhage.description':
+    '적에게 무기 피해에 {damage}를 더한 피해를 입히고 12초에 걸쳐 출혈 피해를 입힙니다. 연계 점수 1점을 얻습니다. (잠행 대표 기술)',
+  'entities.abilities.power_infusion.name': '도유',
+  'entities.abilities.power_infusion.description':
+    '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28 증가시킵니다. (수양 대표 기술)',
+  'entities.abilities.holy_nova.description':
+    '치유의 빛을 폭발시켜 주위 아군의 생명력을 {damage}만큼 회복시키고 주위 적에게 피해를 입힙니다. (신성 대표 기술)',
+  'entities.abilities.shadowform.name': '어스름 장막',
+  'entities.abilities.shadowform.description':
+    '어스름 장막을 두르고 원래 모습으로 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 원래 형태로 돌아옵니다. (암흑 대표 기술)',
+  'entities.abilities.elemental_mastery.name': '원시의 숙련',
+  'entities.abilities.elemental_mastery.description':
+    '원시의 숙련을 끌어내어 다음 주문을 즉시 시전합니다. (정기 대표 기술)',
+  'entities.abilities.shamanistic_rage.name': '주술사의 격노',
+  'entities.abilities.shamanistic_rage.description':
+    '주술사의 격노를 발산하여 마나 160을 회복합니다. (고양 대표 기술)',
+  'entities.abilities.natures_swiftness.name': '자연의 신속함',
+  'entities.abilities.natures_swiftness.description':
+    '자연의 힘을 빌려 다음 주문을 즉시 시전합니다. (복원 대표 기술)',
+  'entities.abilities.siphon_life.name': '혈맥 착취',
+  'entities.abilities.siphon_life.description':
+    '적에게서 생명력을 흡수하여 30초에 걸쳐 {damage}의 암흑 피해를 입히고 입힌 피해만큼 자신을 치유합니다. (고통 대표 기술)',
+  'entities.abilities.fel_domination.name': '지옥 지배',
+  'entities.abilities.fel_domination.description':
+    '지옥의 기운을 지배하여 다음 주문을 즉시 시전합니다. (악마 대표 기술)',
+  'entities.abilities.conflagrate.name': '점화',
+  'entities.abilities.conflagrate.description':
+    '적에게 걸린 불타는 계약을 소모하여 불태워 {damage}의 화염 피해를 입힙니다. (파괴 대표 기술)',
+  'entities.abilities.moonkin_form.name': '달날개 형상',
+  'entities.abilities.moonkin_form.description':
+    '달날개 형상을 취하고 원래 모습으로 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 원래 형태로 돌아옵니다. (조화 대표 기술)',
+  'entities.abilities.feral_charge.name': '야성의 돌진',
+  'entities.abilities.feral_charge.description':
+    '적에게 돌진하여 1초 동안 속박합니다. 사거리 8-25yd. (야성 대표 기술)',
+  'entities.abilities.swiftmend.name': '신속한 치유',
+  'entities.abilities.swiftmend.description':
+    '아군 대상에게 걸린 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 대표 기술)',
+  'entities.abilities.storm_bolt.name': '폭풍 망치',
+  'entities.abilities.storm_bolt.description':
+    '대상에게 무기를 던져 {damage}의 피해를 입히고 3초 동안 기절시킵니다.',
+  'entities.abilities.piercing_howl.name': '꿰뚫는 절규',
+  'entities.abilities.piercing_howl.description':
+    '날카로운 외침으로 15yd 이내의 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다.',
+  'entities.abilities.die_by_sword.name': '검의 승부',
+  'entities.abilities.die_by_sword.description':
+    '방어 재사용 기술입니다. 8초 동안 받는 피해가 30% 감소하고 훨씬 많은 공격을 회피합니다.',
+  'entities.abilities.recklessness.name': '무모함',
+  'entities.abilities.recklessness.description':
+    '격노: 12초 동안 분노 생성이 50%, 치명타 확률이 20% 증가합니다.',
+  'entities.abilities.avatar.name': '화신',
+  'entities.abilities.avatar.description':
+    '20초 동안 거상으로 변신하여 자신에게 걸린 모든 군중 제어 효과를 해제하고 입히는 피해가 20% 증가합니다.',
+  'entities.abilities.sanguine_aura.name': '선혈의 오라',
+  'entities.abilities.sanguine_aura.description':
+    '적의 피로 무기를 물들여 20초 동안 자신과 근접 아군의 공격 속도와 피해가 10% 증가합니다.',
+  'entities.abilities.victory_rush.name': '연전연승',
+  'entities.abilities.victory_rush.description':
+    '무기 피해에 {damage}를 더한 피해로 공격하고 최대 생명력의 20%를 회복합니다. 적을 처치한 후 20초 이내에만 사용할 수 있습니다.',
+  'entities.abilities.bladestorm.name': '칼날폭풍',
+  'entities.abilities.bladestorm.description':
+    '소용돌이치는 강철의 폭풍이 되어 4초 동안 매초 8yd 이내의 모든 적에게 {damage}의 피해를 입힙니다.',
+  'entities.abilities.intimidating_shout.name': '위협의 외침',
+  'entities.abilities.intimidating_shout.description':
+    '무시무시한 외침으로 8yd 이내의 적 최대 5명을 8초 동안 공포에 질려 달아나게 합니다. 피해를 입으면 효과가 해제될 수 있습니다.',
+  'entities.abilities.pummel.name': '마구 치기',
+  'entities.abilities.pummel.description':
+    '주문 시전을 방해하여 4초 동안 해당 계열의 주문을 시전하지 못하게 합니다. 시전을 저지하면 분노 10을 생성합니다.',
+  'entities.abilities.heroic_leap.name': '영웅의 도약',
+  'entities.abilities.heroic_leap.description':
+    '지정한 지역으로 도약하여 주위 적에게 {damage}의 피해를 입힙니다.',
+  'entities.abilities.rallying_cry.name': '재집결의 함성',
+  'entities.abilities.rallying_cry.description':
+    '재집결의 함성을 내질러 자신과 40yd 이내의 파티원에게 10초 동안 최대 생명력을 20% 추가로 부여합니다.',
 };

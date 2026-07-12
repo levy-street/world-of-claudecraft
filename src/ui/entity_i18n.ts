@@ -20,6 +20,7 @@ import {
   type InterpolationValues,
   type SupportedLanguage,
   supportedLanguages,
+  t,
   tOptional,
 } from './i18n';
 
@@ -128,6 +129,7 @@ export interface EntityTranslationFallback extends EntityTranslationManifestEntr
 
 const CLASS_NAME_KEYS: Record<PlayerClass, string> = {
   warrior: 'classes.warrior',
+  warrior_classic: 'classes.warriorClassic',
   paladin: 'classes.paladin',
   hunter: 'classes.hunter',
   rogue: 'classes.rogue',
@@ -140,6 +142,7 @@ const CLASS_NAME_KEYS: Record<PlayerClass, string> = {
 
 const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
   warrior: 'classDetails.lore.warrior',
+  warrior_classic: 'classDetails.lore.warriorClassic',
   paladin: 'classDetails.lore.paladin',
   hunter: 'classDetails.lore.hunter',
   rogue: 'classDetails.lore.rogue',
@@ -351,7 +354,8 @@ function interpolateSource(source: string, values?: InterpolationValues): string
 }
 
 function classDescriptionSource(id: PlayerClass): string {
-  return en.classDetails.lore[id];
+  // The catalog uses camelCase keys; the one multi-word class id maps by hand.
+  return en.classDetails.lore[id === 'warrior_classic' ? 'warriorClassic' : id];
 }
 
 function canonicalEntityText(request: EntityTranslationRequest): string {
@@ -535,6 +539,14 @@ export function tEntity(request: EntityTranslationRequest): string {
 }
 
 export function itemDisplayName(item: ItemDef): string {
+  // Heroic upgraded variants share the base item's name (classic behavior: a heroic
+  // drop reads the same as its normal counterpart). The heroic distinction shows as
+  // an "[HEROIC]" tag on the tooltip's quality/kind line, not in the name, so a
+  // variant never needs its own translated name key.
+  if (item.heroicOf) {
+    const base = ITEMS[item.heroicOf];
+    return base ? itemDisplayName(base) : item.heroicOf;
+  }
   return tEntity({ kind: 'item', id: item.id, field: 'name' });
 }
 
@@ -605,6 +617,9 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
     );
   }
   for (const item of Object.values(ITEMS).sort(compareById)) {
+    // Heroic upgraded variants carry no name key: they share the base item's name
+    // (see itemDisplayName), so they never enter the manifest.
+    if (item.heroicOf) continue;
     entries.push(
       entry(
         'item',

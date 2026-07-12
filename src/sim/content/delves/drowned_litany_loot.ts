@@ -8,6 +8,7 @@ import type { PlayerClass } from '../../types';
 
 const LOOT_ARCHETYPE: Record<PlayerClass, 'WAR' | 'ROG' | 'MAG'> = {
   warrior: 'WAR',
+  warrior_classic: 'WAR',
   paladin: 'WAR',
   shaman: 'WAR',
   rogue: 'ROG',

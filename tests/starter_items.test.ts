@@ -25,7 +25,8 @@ describe('starter rations', () => {
 
   it('rage and energy classes are exactly the waterless ones', () => {
     const waterless = ALL_CLASSES.filter((c) => CLASSES[c].resourceType !== 'mana').sort();
-    expect(waterless).toEqual(['rogue', 'warrior']);
+    // warrior_classic keeps the pre-overhaul rage model, so it is waterless too.
+    expect(waterless).toEqual(['rogue', 'warrior', 'warrior_classic']);
   });
 
   it('a saved character keeps its bags as-is (no re-grant on load)', () => {

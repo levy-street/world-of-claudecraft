@@ -32,31 +32,34 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { computeModifiersWithRows, rowTreeFor } from '../content/talent_rows';
 import {
   cloneAllocation,
-  computeTalentModifiers,
-  FIRST_TALENT_LEVEL,
   MAX_LOADOUTS,
   repairAllocation,
   rowsPicked,
   rowsUnlockedAtLevel,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
+  SPEC_UNLOCK_LEVEL,
   type TalentAllocation,
   talentsFor,
   validateAllocation,
 } from '../content/talents';
 import { recalcPlayerStats } from '../entity';
+import { revalidateOffhandForSpec } from '../items';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
-// The ONLY place a talent tree is walked. Re-resolves the flat modifier struct and
-// refreshes the stat pass + known-ability resolver that consume it.
+// The ONLY place a talent tree is walked. Re-resolves the flat modifier struct
+// (point tree + choice-row picks, one bake) and refreshes the stat pass +
+// known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   const e = ctx.entities.get(meta.entityId);
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e?.level ?? 20);
-  if (e) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, e?.level ?? 20);
+  if (e)
+    recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   // Announce newly granted abilities (spec signature, active nodes): emits `learnAbility`
   // (the HUD places it on the bar + spellbook) and a "You have learned" log. This is a
   // LIVE-action path only (apply/spec-pick/respec/loadout-switch); character LOAD resolves
@@ -108,8 +111,8 @@ export function applyTalentAllocation(
     return false;
   }
   const sanitized = sanitizeTalentAllocation(alloc);
-  if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
-    ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
+  if (sanitized.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
+    ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
     return false;
   }
   const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
@@ -119,6 +122,11 @@ export function applyTalentAllocation(
   }
   r.meta.talents = sanitized;
   recomputeTalents(ctx, r.meta);
+  // A committed spec can make a held offhand illegal (a Titan's Grip two-hander,
+  // or a Fury dual-wield one-hander, under a spec that allows neither): bench it
+  // so the spec boundary never persists a state the equip path refuses. No-op
+  // when the offhand stays legal (a plain point-tree edit, or a shield).
+  revalidateOffhandForSpec(ctx, pid);
   ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
   return true;
 }
@@ -149,6 +157,38 @@ export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: numb
   const cand = cloneAllocation(r.meta.talents);
   cand.spec = specId;
   return applyTalentAllocation(ctx, cand, pid);
+}
+
+// Pick (or clear, optionId null) a choice-row talent (the Pandaria-style row
+// system, content/talent_rows.ts). Server-authoritative: the row must be
+// unlocked by level, the option must belong to that row, and the same
+// out-of-combat lock as the point tree applies. Re-picking a row replaces its
+// previous choice (free respec by design). Structural invalids return false
+// silently (nothing player-triggerable reaches here until the picker UI phase,
+// which will carry its own messaging).
+export function pickChoiceRowTalent(
+  ctx: SimContext,
+  rowIndex: number,
+  optionId: string | null,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const lock = talentLockReason(ctx, r.e);
+  if (lock) {
+    ctx.error(r.e.id, lock);
+    return false;
+  }
+  const tree = rowTreeFor(r.meta.cls);
+  if (!tree) return false;
+  const row = tree[rowIndex];
+  if (!row || r.e.level < row.level) return false;
+  if (optionId !== null && !row.options.some((o) => o.id === optionId)) return false;
+  if (r.meta.rowPicks[rowIndex] === optionId) return true;
+  r.meta.rowPicks[rowIndex] = optionId;
+  recomputeTalents(ctx, r.meta);
+  ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
+  return true;
 }
 
 // Free respec (out of combat): wipe choice rows. Spec is retained.
@@ -187,8 +227,8 @@ export function saveTalentLoadout(
       return -1;
     }
     const sanitized = sanitizeTalentAllocation(alloc);
-    if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
-      ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
+    if (sanitized.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
+      ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
       return -1;
     }
     const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
@@ -236,7 +276,7 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
     ctx.error(r.e.id, 'No such loadout.');
     return false;
   }
-  if (lo.alloc.spec && r.e.level < FIRST_TALENT_LEVEL) {
+  if (lo.alloc.spec && r.e.level < SPEC_UNLOCK_LEVEL) {
     ctx.error(r.e.id, 'That loadout needs a higher level.');
     return false;
   }

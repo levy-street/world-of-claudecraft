@@ -5,45 +5,14 @@
 // debuff and which expose the right-click affordance). Keeping the classification
 // in one leaf means "rendered as a helpful buff" and "right-click cancelable" are
 // provably the same set and can never drift apart.
-import type { Aura, AuraKind } from '../types';
-
-// Every aura kind that works AGAINST its bearer. This is the broad, player-facing
-// debuff set (the inverse of "helpful buff"), deliberately wider than the narrow
-// `isHarmfulAura` in sim.ts used only for the /targetbuffs cosmetic tag: it MUST
-// include the hard-CC and silence family so a player can never right-click a
-// silence, hex, or disarm off themselves (that would be a free CC break).
-const DEBUFF_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
-  'dot',
-  'slow',
-  'root',
-  'stun',
-  'incapacitate',
-  'polymorph',
-  'attackspeed',
-  'debuff_ap',
-  'sunder',
-  'corrode',
-  'faerie_fire',
-  'mortal_wound',
-  'silence',
-  'disarm',
-  'blind',
-  'expose',
-  'spellvuln',
-  'lockout',
-  'vulnerability',
-  'hex',
-  'tongues',
-  'cost_tax',
-  'heal_absorb',
-  'critvuln',
-]);
+import { isDebuffAura as classifyDebuffAura } from '../aura_classify';
+import type { Aura } from '../types';
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
 // the stat). Mirrors the HUD's buff-vs-debuff styling test.
 export function isDebuffAura(a: Aura): boolean {
-  return DEBUFF_KINDS.has(a.kind) || (a.kind.startsWith('buff_') && a.value < 0);
+  return classifyDebuffAura(a.kind, a.value);
 }
 
 // A player may voluntarily cancel any helpful aura they carry; debuffs never. The

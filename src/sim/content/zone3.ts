@@ -847,6 +847,11 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // the straight line through fences, buildings, and the waterline, so he can
     // always go directly at his target and never wedges on a collider.
     phasesThroughObstacles: true,
+    // His only periodic voice is the battle cry below (every ~45s, zone-wide). The
+    // per-mechanic log barks ("unleashes Seismic Stomp/Tectonic Heave/Mountainhide!"
+    // and "becomes enraged!") are silenced so an overworld pull does not spam the
+    // combat log; the mechanics still fire with their spellfx and damage.
+    quietMechanics: true,
     ccImmune: true,
     // A raid boss cannot be perma-snared by a wall of Frostbolts / Hamstrings: slows do
     // not stick to him (ccImmune already blocks stun/root/etc; slow is separate).
@@ -926,12 +931,13 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       summon: 'Rise, stormlings! Tear them loose from my slopes!',
       enrage: 'The peak breaks, and the sky falls with it!',
     },
-    // Loud: a mountain-sized voice. Every yell (engage/summon/enrage + these battle
-    // cries) carries 350yd, far past the 100yd default, and he bellows one of these
-    // lines once a minute in combat: the whole of Thornpeak still knows he is awake,
-    // but the barks never drown out the raid's chat.
+    // Loud: a mountain-sized voice, and (with quietMechanics) his ONLY periodic
+    // voice. Every yell (engage/summon/enrage + these battle cries) carries 350yd,
+    // far past the 100yd default; he bellows one of these lines about every 45s in
+    // combat, so the whole of Thornpeak knows he is awake without the log ever
+    // filling with per-mechanic barks.
     battleYells: {
-      every: 60,
+      every: 45,
       range: 350,
       lines: [
         'THUNDER ANSWERS! The peak has teeth again!',
@@ -1097,7 +1103,13 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.8,
     color: 0x717d7e,
     questIds: [],
-    vendorItems: ['highwatch_warblade', 'craghorn_staff', 'icevein_dirk'],
+    vendorItems: [
+      'highwatch_warblade',
+      'highwatch_greatsword',
+      'highwatch_wallshield',
+      'craghorn_staff',
+      'icevein_dirk',
+    ],
     greeting: 'Forge is hot and the grindstone is turning. If it cuts, I sell it.',
   },
   heroic_quartermaster: {
@@ -2178,6 +2190,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 800,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
+  // Caster cloth carries the same six-class list as the caster weapon group:
+  // the mail casters (elemental/restoration shaman, holy paladin) wear cloth
+  // down-rank, classic-style, because no int mail exists for most body slots.
   revenant_silk_robe: {
     id: 'revenant_silk_robe',
     name: 'Revenant Silk Robe',
@@ -2187,7 +2202,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 60, int: 5, spi: 3 },
     sellValue: 800,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   nightwalk_jerkin: {
     id: 'nightwalk_jerkin',
@@ -2459,7 +2474,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 75, int: 9, spi: 4 },
     sellValue: 3000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmscale_jerkin: {
     id: 'wyrmscale_jerkin',
@@ -2503,7 +2518,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 68, int: 5, spi: 3 },
     sellValue: 3200,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   deathlord_warplate: {
     id: 'deathlord_warplate',
@@ -2527,7 +2542,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 92, int: 11, spi: 7 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_harness: {
     id: 'wyrmshadow_harness',
@@ -2575,7 +2590,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 80, int: 8, spi: 4 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   necromancers_legwraps: {
     id: 'necromancers_legwraps',
@@ -2587,7 +2602,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 86, int: 13, spi: 7 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_treads: {
     id: 'wyrmshadow_treads',
@@ -2619,11 +2634,16 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Wyrmfang Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     weapon: { min: 30, max: 48, speed: 2.6 },
-    stats: { str: 11, sta: 7 },
+    // Two-handers carry both hands' stat budgets (TWOHAND_STAT_MULT): the
+    // PR #1762 hand declaration re-statted 18 -> 36 points at ilvl 26.
+    stats: { str: 22, sta: 14 },
     sellValue: 8000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    // Rogue dropped with the no-rogue-two-handers rule (2026-07-11): the
+    // requiredClass list must honestly name who can equip.
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
   staff_of_the_gravewyrm: {
     id: 'staff_of_the_gravewyrm',
@@ -2673,7 +2693,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 70, int: 9, spi: 5 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_talongrips: {
     id: 'wyrmshadow_talongrips',
@@ -2723,7 +2743,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 60, int: 8, sta: 5 },
     sellValue: 3600,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     set: 'soulflame', // 3rd Wraithfire piece, unlocks the set's 3-piece bonus
   },
   stormcallers_handguards: {
@@ -2773,7 +2793,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 50, int: 8, spi: 5 },
     sellValue: 3600,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     set: 'soulflame',
   },
   stormcallers_waistguard: {
@@ -2919,7 +2939,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 105, int: 11, sta: 6 },
     sellValue: 12000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   soulflame_mantle: {
     id: 'soulflame_mantle',
@@ -2931,7 +2951,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 92, int: 9, sta: 6 },
     sellValue: 12000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   stormcallers_crown: {
     id: 'stormcallers_crown',
@@ -2956,6 +2976,81 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 190, int: 8, sta: 7 },
     sellValue: 12000,
     requiredClass: ['shaman'],
+  },
+  // --- Nythraxis raid (normal): the missing offhand-slot + two-hander epics.
+  // All four register at item level 29 (source 20 + epic 6 + raid 3), the same
+  // tier as the set pieces above. ---
+  bonewrought_greatsword: {
+    id: 'bonewrought_greatsword',
+    name: 'Bonewrought Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    // Two-handers trade the offhand for a slow, heavy swing at the top of the
+    // 10-to-15% DPS premium band over the one-hand line (the Eastbrook/Highwatch
+    // greatsword rule): weaponDpsBudget(29) = 15.4, x1.15 -> 17.65 dps here.
+    weapon: { min: 45, max: 75, speed: 3.4 },
+    // A 2H carries BOTH hands' stat budgets: 2x primaryStatBudget(29, epic,
+    // mainhand) = 2 x 20 = 40 points (TWOHAND_STAT_MULT in item_budget.ts).
+    stats: { str: 22, sta: 18 },
+    sellValue: 12000,
+    // The warrior weapon group MINUS rogue: rogues never equip two-handers
+    // (equipment_rules, 2026-07-11), and requiredClass must honestly list who
+    // can equip (the equipment_proficiency guard). The list no longer matches
+    // WARRIOR_WEAPON_CLASSES, so it resolves by literal membership; the
+    // classic warrior still equips via the gearCls alias.
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
+  },
+  direfang_greatblade: {
+    id: 'direfang_greatblade',
+    name: 'Direfang Greatblade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    // Same 2H rules as the Bonewrought Greatsword: weaponDpsBudget(29) x 1.15
+    // -> 17.67 dps at a faster 3.0 swing, and the doubled 40-point stat budget.
+    weapon: { min: 40, max: 66, speed: 3.0 },
+    stats: { agi: 22, sta: 18 },
+    sellValue: 12000,
+    // A bespoke hunter lock (not a proficiency group): the agi identity is the
+    // hunter's, and handing it to the rogue group would trade away dual wield.
+    requiredClass: ['hunter'],
+  },
+  bonewrought_bulwark: {
+    id: 'bonewrought_bulwark',
+    name: 'Bonewrought Bulwark',
+    kind: 'shield',
+    slot: 'offhand',
+    quality: 'epic',
+    // Shield armor is ~2x a same-tier epic chest (the common-tier rule:
+    // Wallshield 112 vs chain vest 60): the ilvl-29 epic mail chest
+    // extrapolates to ~340 (deathlord_warplate 270 at 26, scaled by the 29-tier
+    // helm ratio 310/245), so 680 here. blockValue extrapolates the common
+    // ladder (buckler 6, Wallshield 14) to the epic tier: 30. Stats are the
+    // exact offhand budget, primaryStatBudget(29, epic, offhand) = 15,
+    // sta-heavy for the tank identity.
+    blockValue: 30,
+    stats: { armor: 680, sta: 10, str: 5 },
+    sellValue: 12000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  wraithfire_orb: {
+    id: 'wraithfire_orb',
+    name: 'Wraithfire Orb',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    // Held-in-offhand caster stat stick: no weapon damage, stats on the exact
+    // offhand budget, primaryStatBudget(29, epic, offhand) = 15 (the budget
+    // model's 0.75x mainhand line), int/spi identity with minor sta.
+    stats: { int: 7, spi: 5, sta: 3 },
+    sellValue: 12000,
+    // The caster weapon-proficiency group list (CASTER_WEAPON_CLASSES); kind
+    // held_offhand equips by the literal requiredClass, so the old-kit classic
+    // warrior stays excluded.
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {
@@ -3004,6 +3099,30 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 24, speed: 2.3 },
     sellValue: 600,
     buyValue: 6000,
+  },
+  highwatch_greatsword: {
+    id: 'highwatch_greatsword',
+    name: 'Highwatch Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    // Same 10-to-15%-over-one-hand DPS line as the Eastbrook Greatsword, at this tier.
+    weapon: { min: 26, max: 40, speed: 3.4 },
+    sellValue: 680,
+    buyValue: 6800,
+  },
+  highwatch_wallshield: {
+    id: 'highwatch_wallshield',
+    name: 'Highwatch Wallshield',
+    kind: 'shield',
+    slot: 'offhand',
+    blockValue: 14,
+    quality: 'common',
+    stats: { armor: 112, sta: 2 },
+    sellValue: 560,
+    buyValue: 5600,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   craghorn_staff: {
     id: 'craghorn_staff',

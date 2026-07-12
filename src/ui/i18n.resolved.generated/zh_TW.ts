@@ -298,6 +298,7 @@ export const zh_TW: EnTranslations = {
       "playerLabel": "你的角色",
       "targetLabel": "你的目標",
       "targetAnnounce": "目標：{name}",
+      "targetOfTargetLabel": "目標的目標",
       "partyLabel": "你的隊伍",
       "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
@@ -314,7 +315,6 @@ export const zh_TW: EnTranslations = {
       "chat": "跳至聊天"
     },
     "mobile": {
-      "autorun": "自動奔跑",
       "jump": "跳躍",
       "leaderboard": "排行榜",
       "dailyRewards": "獎勵",
@@ -574,13 +574,32 @@ export const zh_TW: EnTranslations = {
       "startAttackOnAbility": "使用技能時自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
+      "mouseoverCast": "對隊伍框架滑鼠指向施法",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
+      "showTargetOfTarget": "顯示目標的目標",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
       "mobileLeftHanded": "左手配置"
+    },
+    "talentRows": {
+      "tab": "抉擇",
+      "defaultLoadout": "預設配置",
+      "comingSoon": "敬請期待"
+    },
+    "specPanel": {
+      "primaryAttr": "主要屬性",
+      "complexity": "複雜度",
+      "complexityLow": "低",
+      "complexityMedium": "中等",
+      "complexityHigh": "高",
+      "exampleAbilities": "範例技能",
+      "viewTalents": "檢視天賦",
+      "selectSpec": "選擇專精",
+      "specUnlockBanner": "專精已解鎖！",
+      "specUnlockHint": "按 N 選擇你的專精。"
     },
     "controller": {
       "title": "手把",
@@ -678,7 +697,9 @@ export const zh_TW: EnTranslations = {
       "names": {
         "spellPower": "法術強度",
         "critRating": "暴擊等級",
-        "hasteRating": "急速等級"
+        "hasteRating": "急速等級",
+        "haste": "急速",
+        "parry": "招架"
       },
       "desc": {
         "str": "提升你的攻擊強度，使你的武器攻擊更具威力。",
@@ -693,7 +714,9 @@ export const zh_TW: EnTranslations = {
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
-        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。"
+        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
+        "haste": "加快你的武器揮擊與法術施放。它不會縮短全域冷卻時間。",
+        "parry": "你招架正面近戰攻擊、完全不受傷害的機率。來自背後的攻擊無法招架。"
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",
@@ -730,6 +753,8 @@ export const zh_TW: EnTranslations = {
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
+    "itemHeroicTag": "[英雄]",
+    "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -809,6 +834,7 @@ export const zh_TW: EnTranslations = {
       "failed": "無法傳送錯誤回報。請重試。"
     },
     "paperdoll": {
+      "offhand": "副手",
       "unequipAria": "卸下 {item}",
       "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下"
     },
@@ -1059,9 +1085,24 @@ export const zh_TW: EnTranslations = {
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
+      "battleStance": "戰鬥姿態：怒氣產生提高 10%",
+      "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
+      "dmgDone": "造成的傷害提高 {pct}%",
+      "dmgDoneReduce": "造成的傷害降低 {pct}%",
+      "crit": "暴擊機率提高 {pct}%",
+      "rageGen": "怒氣產生提高 {pct}%",
+      "reckless": "暴擊機率提高 {pct}%，怒氣產生提高 {ragePct}%",
+      "avatar": "巨像：造成的傷害提高 {pct}%",
+      "bloodbath": "暴擊機率與造成的傷害提高 {pct}%",
+      "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
+      "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
+      "battleTrance": "你的下一次劫掠打擊或致殘打擊不消耗怒氣",
+      "revengeFree": "你的下一次復仇不消耗怒氣",
+      "victoryRush": "乘勝追擊已就緒",
+      "maxHpPct": "最大生命值提高 {pct}%",
       "school": {
         "physical": "物理",
         "fire": "火焰",
@@ -1074,6 +1115,26 @@ export const zh_TW: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name}在荊峰高地崛起！"
+    },
+    "auth": {
+      "appleLoginCta": "透過 Apple 繼續",
+      "appleError": "無法透過 Apple 登入。請再試一次。",
+      "appleChoiceIntro": "建立新帳戶，或將 Apple 連結到現有帳戶。",
+      "appleChoiceExpired": "Apple 登入已過期。請再次使用 Apple 登入。",
+      "forgotPrompt": "忘記密碼？",
+      "forgotTitle": "重設密碼",
+      "forgotHint": "輸入您的使用者名稱，我們會將重設連結寄送到登記的電子郵件。",
+      "forgotUsername": "使用者名稱",
+      "forgotSubmit": "傳送重設連結",
+      "forgotSent": "如果該使用者名稱對應的帳戶已登記電子郵件，我們已寄出重設連結。請查看您的收件匣。",
+      "forgotBack": "返回登入",
+      "resetTitle": "設定新密碼",
+      "resetNewPassword": "新密碼",
+      "resetConfirm": "確認新密碼",
+      "resetSubmit": "更新密碼",
+      "resetDone": "您的密碼已更新。現在可以登入了。",
+      "resetMismatch": "兩次輸入的密碼不一致。",
+      "resetErrInvalid": "此重設連結無效或已過期。請重新申請一個。"
     },
     "loot": {
       "chestTitle": "寶箱"
@@ -1304,6 +1365,8 @@ export const zh_TW: EnTranslations = {
       "parcelsLabel": "包裹",
       "parcelsHint": "點擊背包中的物品即可附上。",
       "removeParcelAria": "從信件中移除 {item}",
+      "parcelQtyDecreaseAria": "少寄一個{item}",
+      "parcelQtyIncreaseAria": "多寄一個{item}",
       "sendButton": "寄出信件",
       "postageNote": "郵資：{amount}。渡鴉飛行約 {seconds} 秒。",
       "arrivedBanner": "渡鴉已降落：來自 {name} 的郵件。",
@@ -1964,11 +2027,19 @@ export const zh_TW: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
+      "revenge": "一記橫掃你正面所有敵人的反擊，在你格開一記攻擊之後施放會更省怒氣。",
       "battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
       "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
       "rend": "施加流血，隨時間慢慢磨耗目標。",
       "thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
+      "cw_heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
+      "cw_battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
+      "cw_commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
+      "cw_charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
+      "cw_rend": "施加流血，隨時間慢慢磨耗目標。",
+      "cw_thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
+      "hamstring": "砍向目標的雙腿使其減速，讓它無法追上你。",
       "seal_of_righteousness": "為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。",
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",
@@ -3275,6 +3346,7 @@ export const zh_TW: EnTranslations = {
   },
   "classes": {
     "warrior": "戰士",
+    "warriorClassic": "戰士",
     "paladin": "聖騎士",
     "hunter": "獵人",
     "rogue": "盜賊",
@@ -4042,6 +4114,7 @@ export const zh_TW: EnTranslations = {
     },
     "roles": {
       "warrior": "坦克 / 近戰 DPS",
+      "warriorClassic": "坦克 / 近戰 DPS",
       "paladin": "治療 / 坦克 / 近戰 DPS",
       "hunter": "遠程 DPS",
       "rogue": "近戰 DPS",
@@ -4066,6 +4139,7 @@ export const zh_TW: EnTranslations = {
     },
     "lore": {
       "warrior": "戰士是久經戰場的近戰鬥士，會在造成或承受傷害時累積怒氣。他們能承受重擊，也能用強力武器粉碎敵人。",
+      "warriorClassic": "戰鬥重做之前的戰士玩法原樣保留：原版技能組與怒氣節奏，與新戰士並存，試試兩個版本，告訴我們哪個手感更好。",
       "paladin": "聖騎士是神聖的十字軍，以祝福支援盟友，用療癒聖光治療傷口，並身披重甲保護弱者。",
       "hunter": "獵人是遠程專家，與馴服的野獸並肩作戰，以瞄準與快速射擊不斷襲擊敵人，用叮咬與震盪射擊使其減速，並隨機應變地切換守護。",
       "rogue": "盜賊是隱密刺客，消耗能量與連擊點，從陰影中施展背刺與終結技。",
@@ -4366,6 +4440,7 @@ export const zh_TW: EnTranslations = {
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "閃避",
+      "floatingParry": "招架",
       "floatingResist": "抵抗",
       "cannotMove": "無法移動！",
       "attack": "攻擊",
@@ -4375,6 +4450,7 @@ export const zh_TW: EnTranslations = {
       "damageTakenCrit": "{source}對你造成致命一擊，造成 {amount} 點傷害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}閃避了你的{ability}。",
+      "parried": "你的{ability}被{target}招架了。",
       "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}為你恢復 {amount} 點生命。",
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
@@ -4417,6 +4493,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughMana": "法力不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
+      "nothingToConsume": "沒有可供消耗的效果。",
       "targetMustDodge": "你的目標必須先閃避。",
       "requiresCombo": "該技能需要連擊點。",
       "requiresForm": "你必須處於{form}形態。",
@@ -4433,6 +4510,7 @@ export const zh_TW: EnTranslations = {
       "facing": "你必須面向目標。",
       "targetHealthBelow": "該技能要求目標生命值低於 {percent}%。",
       "dagger": "你必須裝備匕首。",
+      "needShield": "你必須裝備盾牌。",
       "behindTarget": "你必須位於目標背後。",
       "polymorph": "該生物不能被變形。",
       "noSeal": "你沒有啟用的聖印。",
@@ -4808,6 +4886,7 @@ export const zh_TW: EnTranslations = {
     },
     "slots": {
       "mainhand": "主手",
+      "twoHand": "雙手",
       "helmet": "頭部",
       "neck": "頸部",
       "shoulder": "肩部",
@@ -5081,9 +5160,101 @@ export const zh_TW: EnTranslations = {
         "name": "地震",
         "description": "撼動目標區域，持續 6 秒，每 1.5 秒重擊敵人造成 {damage} 點自然傷害。"
       },
+      "chain_heal": {
+        "name": "治療鏈",
+        "description": "治療目標 {damage} 點生命，接著跳躍至最多 2 名附近的盟友，每次跳躍的治療量為前一次的一半。"
+      },
       "heroic_strike": {
         "name": "劫掠打擊",
         "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"
+      },
+      "cw_heroic_strike": {
+        "name": "劫掠打擊",
+        "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"
+      },
+      "cw_battle_shout": {
+        "name": "鐵嗓怒吼",
+        "description": "使你的攻擊強度提高 {buff}，持續 2 分鐘。"
+      },
+      "cw_commanding_shout": {
+        "name": "激勵吶喊",
+        "description": "使你的耐力提高 {buff}，持續 2 分鐘。"
+      },
+      "cw_charge": {
+        "name": "猛衝",
+        "description": "向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。"
+      },
+      "cw_rend": {
+        "name": "深切裂傷",
+        "description": "撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。"
+      },
+      "cw_thunder_clap": {
+        "name": "撼地一擊",
+        "description": "轟擊附近敵人，造成 {damage} 點傷害，並使其攻擊速度降低 10%，持續 10 秒。"
+      },
+      "cw_hamstring": {
+        "name": "跛行斬",
+        "description": "重創敵人，造成 {damage} 點傷害，並使其移動速度降低 50%，持續 15 秒。"
+      },
+      "cw_bloodrage": {
+        "name": "血之代價",
+        "description": "以生命值為代價產生 10 點怒氣。"
+      },
+      "cw_overpower": {
+        "name": "血手",
+        "description": "立即攻擊，造成武器傷害加 {damage}。只能在目標閃躲後使用。無法被閃躲。"
+      },
+      "cw_execute": {
+        "name": "提早入土",
+        "description": "嘗試終結受傷的敵人，造成 {damage} 點傷害。只能對生命值低於 20% 的敵人使用。"
+      },
+      "cw_slam": {
+        "name": "蠻力揮擊",
+        "description": "猛擊對手，造成武器傷害加 {damage}。"
+      },
+      "cw_cleave": {
+        "name": "收割弧斬",
+        "description": "橫掃一擊，對你前方所有敵人造成 {damage} 點傷害。"
+      },
+      "cw_defensive_stance": {
+        "name": "戒備姿態",
+        "description": "防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。"
+      },
+      "cw_demoralizing_shout": {
+        "name": "厲嚎",
+        "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 {buff}，持續 30 秒。"
+      },
+      "cw_sunder_armor": {
+        "name": "削甲",
+        "description": "撕裂目標的護甲，每次使其降低 {damage}%。最多疊加 5 次。產生大量威脅值。"
+      },
+      "cw_taunt": {
+        "name": "挑釁",
+        "description": "嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。"
+      },
+      "cw_bloodthirst": {
+        "name": "放血",
+        "description": "在鮮血狂怒中立即攻擊，造成 60% 武器傷害加 {damage}。（狂怒專精標誌技能）"
+      },
+      "cw_mortal_strike": {
+        "name": "致殘打擊",
+        "description": "凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）"
+      },
+      "cw_shield_slam": {
+        "name": "碎盾擊",
+        "description": "用盾牌猛擊目標，造成 50% 武器傷害加 {damage} 並產生巨量威脅。（防護專精標誌技能）"
+      },
+      "cw_whirlwind": {
+        "name": "利刃迴旋",
+        "description": "以致命弧線旋轉，打擊附近所有敵人，造成 {damage} 點傷害。（狂怒天賦）"
+      },
+      "cw_berserker_rage": {
+        "name": "沸血狂怒",
+        "description": "進入沸血狂怒，產生 20 點怒氣。（戰士天賦）"
+      },
+      "revenge": {
+        "name": "復仇",
+        "description": "以大幅弧線攻擊，對你正面的所有敵人造成物理傷害。超過 5 個目標時傷害會降低。當你閃躲或招架時，你的下一次復仇可能不消耗怒氣。"
       },
       "battle_shout": {
         "name": "鐵嗓怒吼",
@@ -5127,7 +5298,7 @@ export const zh_TW: EnTranslations = {
       },
       "slam": {
         "name": "蠻力揮擊",
-        "description": "猛擊對手，造成武器傷害加 {damage}。"
+        "description": "猛擊對手，造成 50% 武器傷害加 {damage}，並產生 {rage} 點怒氣。"
       },
       "cleave": {
         "name": "收割弧斬",
@@ -5136,6 +5307,14 @@ export const zh_TW: EnTranslations = {
       "defensive_stance": {
         "name": "戒備姿態",
         "description": "防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。"
+      },
+      "battle_stance": {
+        "name": "戰鬥姿態",
+        "description": "一種進攻性的戰鬥姿態：你產生的怒氣提高 10%。這是武器與防護的預設姿態。"
+      },
+      "berserker_stance": {
+        "name": "狂暴姿態",
+        "description": "一種魯莽的戰鬥姿態：你的暴擊機率提高 3%，暴擊傷害提高 3%。狂怒戰士總是以這個姿態作戰。"
       },
       "sunder_armor": {
         "name": "削甲",
@@ -5625,9 +5804,77 @@ export const zh_TW: EnTranslations = {
         "name": "致殘打擊",
         "description": "凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）"
       },
+      "sweeping_strikes": {
+        "name": "擴弧斬",
+        "description": "持續 12 秒，你的單體攻擊還會以全額傷害額外打擊 1 名附近的敵人。（武器）"
+      },
+      "deep_wounds": {
+        "name": "撕裂創傷",
+        "description": "被動：你的致殘打擊使目標在 6 秒內流血並受到物理傷害。（武器）"
+      },
+      "enrage_passive": {
+        "name": "狂亂",
+        "description": "被動：處於激怒狀態時，你造成的傷害提高 7%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）"
+      },
       "bloodthirst": {
         "name": "放血",
         "description": "在鮮血狂怒中立即攻擊，造成 60% 武器傷害加 {damage}。（狂怒專精標誌技能）"
+      },
+      "raging_gale": {
+        "name": "雙擊",
+        "description": "立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）"
+      },
+      "red_harvest": {
+        "name": "血色收割",
+        "description": "傾盡所有：在狂亂中攻擊三次，每擊造成65%武器傷害外加 {damage}，並必定使你激怒。（狂怒）"
+      },
+      "furious_mending": {
+        "name": "狂怒療傷",
+        "description": "持續 10 秒，你受到的傷害降低 20%，且在效果持續期間，你的深切裂傷會治療你 20% 的最大生命值。（狂怒）"
+      },
+      "emboldening_roar": {
+        "name": "壯膽怒吼",
+        "description": "發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）"
+      },
+      "raised_guard": {
+        "name": "舉盾防禦",
+        "description": "舉盾防禦：你受到的物理傷害降低 50%，持續 6 秒。最多儲存 2 次充能。（防護）"
+      },
+      "iron_resolve": {
+        "name": "鋼鐵意志",
+        "description": "咬緊牙關無視痛楚：消耗你所有的怒氣（最低 20 點），每消耗 1 點怒氣便吸收 4 點傷害，最多持續 10 秒。（防護）"
+      },
+      "faultline": {
+        "name": "斷層",
+        "description": "沿地面送出一道衝擊波：你正面 8 碼內的敵人受到 {damage} 點傷害並昏迷 3 秒。（防護）"
+      },
+      "defiant_bellow": {
+        "name": "挑釁怒吼",
+        "description": "一聲挑釁的怒吼：10 碼內的每個敵人都被嘲諷，被迫攻擊你 3 秒。（防護）"
+      },
+      "breachmaker": {
+        "name": "破防者",
+        "description": "重擊目標，造成武器傷害外加 {damage}，並破開它的防禦：你對它的攻擊在 8 秒內造成的傷害提高 20%。（武器）"
+      },
+      "measured_fury": {
+        "name": "節制之怒",
+        "description": "你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）"
+      },
+      "seasoned_soldier": {
+        "name": "沙場老兵",
+        "description": "你的自動攻擊暴擊時多產生 10% 的怒氣。（武器）"
+      },
+      "diabolical_twinstrike": {
+        "name": "邪惡雙擊",
+        "description": "處於激怒狀態時，你的雙擊造成的傷害提高 15%。（狂怒）"
+      },
+      "cleaving_blows": {
+        "name": "順劈連擊",
+        "description": "血色收割必定返還一次雙擊的充能。（狂怒）"
+      },
+      "sudden_death": {
+        "name": "猝死",
+        "description": "你的自動攻擊有機率讓你能對任何生命值的目標施放提早入土，且不消耗怒氣。（武器）"
       },
       "shield_slam": {
         "name": "碎盾擊",
@@ -5641,101 +5888,141 @@ export const zh_TW: EnTranslations = {
         "name": "沸血狂怒",
         "description": "進入沸血狂怒，產生 20 點怒氣。（戰士天賦）"
       },
+      "holy_shock": {
+        "name": "神聖懲擊",
+        "description": "以神聖能量衝擊友方目標，治療其 {damage} 點生命。（神聖專精標誌技能）"
+      },
       "crusader_strike": {
         "name": "十字軍聖擊",
         "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
-      },
-      "chain_heal": {
-        "name": "治療鏈",
-        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）"
       },
       "metamorphosis": {
         "name": "惡魔變形",
         "description": "化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）"
       },
       "aura_surge": {
-        "name": "黎明聖盾彈射",
-        "description": "擲出黎明鑄造的聖盾，造成 {damage} 點神聖傷害，並使主要目標沉默 2 秒，隨後彈向 {radius} 碼內最多 {jumps} 個額外敵人。每次彈射造成上一次傷害的 {falloff}。（聖騎士天賦）"
-      },
-      "holy_shock": {
-        "name": "神聖震擊",
-        "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"
+        "name": "曙光彈射",
+        "description": "擲出曙光鑄造的聖盾，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至{radius}碼內最多{jumps}個額外敵人，每次彈射造成{falloff}點傷害。（聖騎士天賦）"
       },
       "holy_shield": {
-        "name": "神聖之盾",
-        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
+        "name": "神聖之牆",
+        "description": "以神聖能量為你護盾，持續 10 秒，使護甲提高 90，並對近戰攻擊者造成 12 點神聖傷害。（防護專精標誌技能）"
+      },
+      "repentance": {
+        "name": "懺悔",
+        "description": "使敵人陷入冥想狀態，最多持續 6 秒。任何傷害都會打破效果。（懲戒專精標誌技能）"
       },
       "bestial_wrath": {
-        "name": "狂野怒火",
-        "description": "使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）"
+        "name": "咆哮之怒",
+        "description": "使你陷入野性狂怒，攻擊強度提高 55，持續 15 秒。（野獸控制專精標誌技能）"
       },
       "trueshot_aura": {
-        "name": "強擊光環",
-        "description": "鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）"
+        "name": "穩翔光環",
+        "description": "激勵附近的盟友，使攻擊強度提高 35，持續 5 分鐘。（射擊專精標誌技能）"
       },
       "wyvern_sting": {
-        "name": "翼龍釘刺",
-        "description": "從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）"
+        "name": "翼龍毒刺",
+        "description": "從遠處螫刺敵人，使其無法行動，最多持續 4 秒。任何傷害都會打破效果。（生存專精標誌技能）"
       },
       "arcane_power": {
-        "name": "祕法強化",
-        "description": "法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）"
+        "name": "以太湧動",
+        "description": "讓以太之力湧遍全身，使法術強度提高 28，持續 12 秒。（秘法專精標誌技能）"
       },
       "combustion": {
-        "name": "燃燒",
-        "description": "法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）"
+        "name": "閃火",
+        "description": "凝聚你的火焰魔法，使你的下一次攻擊必定是暴擊。（火焰專精標誌技能）"
       },
       "icy_veins": {
         "name": "冰冷血脈",
         "description": "法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）"
       },
       "cold_blood": {
-        "name": "冷血",
-        "description": "集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）"
+        "name": "殺手之靜",
+        "description": "凝聚你的殺意，使你的下一次攻擊必定是暴擊。（刺殺專精標誌技能）"
       },
       "blade_flurry": {
-        "name": "劍刃亂舞",
-        "description": "釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）"
+        "name": "鏡影之刃",
+        "description": "施展一陣連環刀刃，使攻擊速度提高 20%，持續 12 秒。（戰鬥專精標誌技能）"
       },
       "hemorrhage": {
-        "name": "出血",
-        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）"
+        "name": "赤紅緞帶",
+        "description": "打擊敵人，造成武器傷害外加 {damage}，並使其在 12 秒內流血。給予 1 個連擊點。（敏銳專精標誌技能）"
       },
       "power_infusion": {
-        "name": "能量灌注",
-        "description": "向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）"
+        "name": "受膏",
+        "description": "為友方目標灌注力量，使法術強度提高 28，持續 15 秒。（戒律專精標誌技能）"
       },
       "holy_nova": {
         "name": "神聖新星",
-        "description": "引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）"
+        "description": "引發一陣療癒之光的爆發，治療附近的盟友 {damage} 點生命並傷害附近的敵人。（神聖專精標誌技能）"
       },
       "shadowform": {
-        "name": "暗影形態",
-        "description": "進入暗影形態，強化暗影魔法直到你切換回來。再次施放可返回普通形態。（暗影專精招牌）"
+        "name": "幽暮之紗",
+        "description": "化為幽暮之紗，強化暗影魔法直到你變回原形。再次施放可返回正常形態。（暗影專精標誌技能）"
       },
       "elemental_mastery": {
-        "name": "元素精通",
-        "description": "呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）"
+        "name": "原始掌控",
+        "description": "引動原始掌控，使你的下一個法術瞬發。（元素專精標誌技能）"
+      },
+      "shamanistic_rage": {
+        "name": "薩滿之怒",
+        "description": "釋放薩滿之怒，回復 160 點法力。（增強專精標誌技能）"
+      },
+      "natures_swiftness": {
+        "name": "自然迅捷",
+        "description": "召喚自然之力，使你的下一個法術瞬發。（恢復專精標誌技能）"
       },
       "siphon_life": {
-        "name": "生命虹吸",
-        "description": "虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）"
+        "name": "噬脈",
+        "description": "從敵人身上虹吸生命，在 30 秒內造成 {damage} 點暗影傷害，並以造成的傷害量治療你。（痛苦專精標誌技能）"
+      },
+      "fel_domination": {
+        "name": "惡魔支配",
+        "description": "支配邪能，使你的下一個法術瞬發。（惡魔學識專精標誌技能）"
       },
       "conflagrate": {
-        "name": "燃盡",
-        "description": "吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）"
+        "name": "燃燒殆盡",
+        "description": "消耗你在敵人身上的獻祭，將其點燃並造成 {damage} 點火焰傷害。（毀滅專精標誌技能）"
       },
       "moonkin_form": {
-        "name": "梟獸形態",
-        "description": "進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）"
+        "name": "月翼形態",
+        "description": "化為月翼形態，強化施法直到你變回原形。再次施放可返回正常形態。（平衡專精標誌技能）"
       },
       "feral_charge": {
         "name": "野性衝鋒",
-        "description": "衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）"
+        "description": "向敵人衝鋒並將其定身 1 秒。8-25 碼距離。（野性專精標誌技能）"
       },
       "swiftmend": {
-        "name": "迅癒",
-        "description": "吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）"
+        "name": "迅捷治療",
+        "description": "消耗友方目標身上的一個持續治療效果，治療其 {damage} 點生命。（恢復專精標誌技能）"
+      },
+      "storm_bolt": {
+        "name": "風暴之錘",
+        "description": "將你的武器擲向目標，造成 {damage} 點傷害，並使其昏迷 3 秒。"
+      },
+      "piercing_howl": {
+        "name": "穿刺怒吼",
+        "description": "一聲穿刺的吼叫，使 15 碼內的所有敵人減速 50%，持續 8 秒。"
+      },
+      "die_by_sword": {
+        "name": "劍在人在",
+        "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "recklessness": {
+        "name": "魯莽",
+        "description": "激怒：你的怒氣產生提高 50%，暴擊機率提高 20%，持續 12 秒。"
+      },
+      "sanguine_aura": {
+        "name": "血色光環",
+        "description": "以敵人的鮮血浸染你的武器：你與你的近戰盟友獲得 10% 攻擊速度與 10% 傷害，持續 20 秒。"
+      },
+      "victory_rush": {
+        "name": "乘勝追擊",
+        "description": "攻擊造成武器傷害外加 {damage}，並治療你 20% 的最大生命值。只能在擊殺敵人後的 20 秒內使用。"
+      },
+      "intimidating_shout": {
+        "name": "破膽怒吼",
+        "description": "一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。"
       },
       "summon_imp": {
         "name": "召喚燼裔",
@@ -5770,8 +6057,8 @@ export const zh_TW: EnTranslations = {
         "description": "以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）"
       },
       "avatar": {
-        "name": "巨像化身",
-        "description": "解除控制效果並化為巨像，使造成的傷害提高 20%，持續 20 秒。（戰士天賦）"
+        "name": "戰爭化身",
+        "description": "化身為巨像，持續 20 秒，解除你身上所有的控制效果，並使你造成的傷害提高 20%。"
       },
       "avenging_wrath": {
         "name": "復仇之翼",
@@ -5782,16 +6069,16 @@ export const zh_TW: EnTranslations = {
         "description": "提高攻擊強度，持續 15 秒。（德魯伊天賦）"
       },
       "bladestorm": {
-        "name": "鋼鐵旋風",
-        "description": "化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）"
+        "name": "劍刃風暴",
+        "description": "化為一陣旋轉的鋼鐵風暴，每秒對 8 碼內的所有敵人造成 {damage} 點傷害，持續 4 秒。"
       },
       "razor_howl": {
         "name": "銳刃怒吼",
         "description": "使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）"
       },
       "lingering_dread": {
-        "name": "縈繞恐懼",
-        "description": "發出戰吼，使 10 碼內的敵人恐懼 4 秒。每個恐懼效果承受相當於目標最大生命值 20% 的傷害後才會打破。（戰士天賦）"
+        "name": "餘懼",
+        "description": "發出戰吼，使10碼內的敵人恐懼4秒。每個目標受到相當於其最大生命值20%的傷害前，恐懼不會中斷。（戰士天賦）"
       },
       "stormthrow": {
         "name": "風暴投擲",
@@ -5827,7 +6114,7 @@ export const zh_TW: EnTranslations = {
       },
       "cone_of_cold": {
         "name": "寒霜橫掃",
-        "description": "以寒霜衝擊附近的敵人，造成 {damage} 點冰霜傷害。（法師天賦）"
+        "description": "以冰霜轟擊附近的敵人，造成 {damage} 點冰霜傷害。（冰霜專精標誌技能）"
       },
       "counter_shot": {
         "name": "緘默射擊",
@@ -5890,8 +6177,8 @@ export const zh_TW: EnTranslations = {
         "description": "在 12 秒內治療一名友方目標。（薩滿天賦）"
       },
       "heroic_leap": {
-        "name": "戰躍",
-        "description": "躍向目標區域，對附近敵人造成 {damage} 點物理傷害。（戰士天賦）"
+        "name": "英勇飛躍",
+        "description": "躍向目標區域，對附近的敵人造成 {damage} 點傷害。"
       },
       "holy_wrath": {
         "name": "聖徒之怒",
@@ -5954,12 +6241,12 @@ export const zh_TW: EnTranslations = {
         "description": "恐嚇附近的敵人，最多持續 4 秒。受到傷害可能打破該效果。（牧師天賦）"
       },
       "pummel": {
-        "name": "裂顎擊",
-        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（戰士天賦）"
+        "name": "拳擊",
+        "description": "打斷施法，使該法術學派的任何法術在 4 秒內無法施放。成功打斷一次施法時產生 10 點怒氣。"
       },
       "rallying_cry": {
-        "name": "集結",
-        "description": "發出激勵的吶喊，提高附近盟友的攻擊強度，持續 10 秒。（戰士天賦）"
+        "name": "團結號令",
+        "description": "發出一聲團結的號令，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。"
       },
       "rebuke": {
         "name": "斥責",
@@ -5991,19 +6278,19 @@ export const zh_TW: EnTranslations = {
       },
       "cleansing_verdict": {
         "name": "淨化裁決",
-        "description": "淨化友方目標身上的一個有害魔法效果，並治療其{damage}點神聖傷害。"
+        "description": "淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。"
       },
       "voidfeast": {
         "name": "虛空盛宴",
-        "description": "吞噬一個魔法效果（敵人的增益或友方的減益），並治療自身相當於最大生命值6%的生命。"
+        "description": "吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。"
       },
       "spellsteal": {
-        "name": "竊法",
-        "description": "從敵人身上竊取一個有益的魔法效果，轉移到自己身上。"
+        "name": "奪法",
+        "description": "從敵人身上竊取一個有益魔法效果並轉移到自己身上。"
       },
       "startle_shot": {
         "name": "驚擾射擊",
-        "description": "一記狂野的射擊，使目標迷亂。任何傷害都會解除該效果。"
+        "description": "狂野射擊使目標迷惑{duration}秒。受到任何傷害都會打破此效果。"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",
@@ -6162,6 +6449,9 @@ export const zh_TW: EnTranslations = {
       "greyjaw_fang": {
         "name": "老灰顎的尖牙"
       },
+      "chunk_of_ore": {
+        "name": "礦石塊"
+      },
       "weathered_ledger_page": {
         "name": "風化帳頁"
       },
@@ -6191,6 +6481,15 @@ export const zh_TW: EnTranslations = {
       },
       "linen_scrap": {
         "name": "亞麻碎布"
+      },
+      "arcane_dust": {
+        "name": "奧術之塵"
+      },
+      "arcane_essence": {
+        "name": "奧術精華"
+      },
+      "arcane_shard": {
+        "name": "奧術碎片"
       },
       "fen_muster_order": {
         "name": "芬橋集結令"
@@ -7104,6 +7403,18 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "eastbrook_buckler": {
+        "name": "東溪小圓盾"
+      },
+      "highwatch_wallshield": {
+        "name": "高望壁盾"
+      },
+      "eastbrook_greatsword": {
+        "name": "東溪巨劍"
+      },
+      "highwatch_greatsword": {
+        "name": "高望巨劍"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "莫爾森的墓鑄鎖甲"
       },
@@ -7142,15 +7453,6 @@ export const zh_TW: EnTranslations = {
       },
       "scepter_of_the_deathless_court": {
         "name": "不死王庭權杖"
-      },
-      "deathless_warguard_legmail": {
-        "name": "不死戰衛腿甲"
-      },
-      "soulrend_diadem": {
-        "name": "裂魂冠冕"
-      },
-      "scourgehide_carapace": {
-        "name": "災禍之皮甲殼"
       },
       "cryptplate_helm": {
         "name": "墓板頭盔"
@@ -7191,9 +7493,6 @@ export const zh_TW: EnTranslations = {
       "deathless_greatblade": {
         "name": "不死巨刃"
       },
-      "soulforged_warplate": {
-        "name": "鑄魂戰甲"
-      },
       "stormcallers_focus": {
         "name": "喚雷之核"
       },
@@ -7230,32 +7529,74 @@ export const zh_TW: EnTranslations = {
       "deathless_heartwood": {
         "name": "不朽王冠之心木"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不朽王冠之心木"
+      },
       "kingsbane_last_oath": {
+        "name": "弒座者，荊峰的最後誓言"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "弒座者，荊峰的最後誓言"
       },
       "crownforged_dreadhelm": {
         "name": "骨鑄恐懼頭盔"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "骨鑄恐懼頭盔"
+      },
       "crownforged_warspaulders": {
+        "name": "骨鑄戰肩甲"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "骨鑄戰肩甲"
       },
       "nighttalon_crown": {
         "name": "厲牙之冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "厲牙之冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "厲牙護肩"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "厲牙護肩"
       },
       "soulflame_cowl": {
         "name": "怨焰兜帽"
       },
+      "soulflame_cowl_heroic": {
+        "name": "怨焰兜帽"
+      },
       "soulflame_mantle": {
+        "name": "怨焰披肩"
+      },
+      "soulflame_mantle_heroic": {
         "name": "怨焰披肩"
       },
       "stormcallers_crown": {
         "name": "喚風之冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "喚風之冠"
+      },
       "stormcallers_spaulders": {
         "name": "喚風肩甲"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "喚風肩甲"
+      },
+      "bonewrought_greatsword": {
+        "name": "骨鑄巨劍"
+      },
+      "direfang_greatblade": {
+        "name": "厲牙巨刃"
+      },
+      "bonewrought_bulwark": {
+        "name": "骨鑄壁壘"
+      },
+      "wraithfire_orb": {
+        "name": "怨焰寶珠"
       },
       "unknown_alien_weaponry": {
         "name": "未知異星武器"
@@ -7504,6 +7845,15 @@ export const zh_TW: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "復甦王室衛兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奧德倫，亡魂戰衛"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "馬爾里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"
@@ -7833,6 +8183,16 @@ export const zh_TW: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "人人都有一技之長",
+        "text": "伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。",
+        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。",
+        "objectives": {
+          "0": {
+            "label": "礦石塊"
+          }
+        }
+      },
       "q_wolves": {
         "title": "門前群狼",
         "text": "森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。",

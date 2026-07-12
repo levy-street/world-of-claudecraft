@@ -31,6 +31,7 @@ import {
   WARLOCK_TALENTS,
 } from './talents_classic';
 import { WARRIOR_TALENTS } from './talents_warrior';
+import { WARRIOR_CLASSIC_TALENTS } from './talents_warrior_classic';
 
 export type Role = 'tank' | 'healer' | 'dps';
 
@@ -50,6 +51,9 @@ export interface StatModEffect {
   apPct?: number;
   staPct?: number;
   armorPct?: number;
+  // Bonus armor equal to this fraction of the wearer's Strength (Protection's
+  // Vanguard: 0.70 = +70% of Strength as armor), folded in recalcPlayerStats.
+  armorFromStrPct?: number;
   maxHpPct?: number;
   // Primary-attribute multipliers (0.10 = +10%). Applied to the fully-summed attribute
   // (base + per-level + gear + auras + flat talent bonuses) in recalcPlayerStats, so a
@@ -79,7 +83,7 @@ export interface AbilityModEffect {
   dmgPctVsDottedAbility?: string;
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
   damagePushbackImmune?: boolean; // damage cannot delay a cast or shorten a channel
-  bonusCharges?: number; // extra stored uses for cooldown abilities (1 = two total charges)
+  bonusCharges?: number; // +N stored uses (Double Charge); base is 1 (1 = two total charges)
   addEffects?: AbilityEffect[];
 }
 
@@ -104,17 +108,47 @@ export interface GlobalModEffect {
   // it shortens every cast and the cast-time tooltips reflect it live.
   spellHastePct?: number;
   critVsRooted?: number; // additive spell crit chance against rooted targets
+  // Rage-generation multipliers (warrior choice rows, e.g. Anger Management).
+  // `autoRagePct` scales the rage minted by auto-attack damage dealt;
+  // `abilityRagePct` scales ability-granted rage (gainResource, Charge's burst).
+  // Rage from TAKING damage is deliberately unscaled by either.
+  autoRagePct?: number;
+  abilityRagePct?: number;
+  // Warrior choice-row passives, read by their runtime hooks (all 0 = off):
+  // Pursuit's on-kill speed burst (+fraction, handleDeath), Second Wind's
+  // in-combat regen below 35% health (fraction of max HP per second,
+  // updateRegen), Battle Rhythm's every-3rd-cast empower (a 0/1 flag,
+  // runEffects), Bloodbath's per-stack on-kill crit+damage fraction
+  // (handleDeath), and Colossal Might's cooldown seconds shaved per rage spent
+  // (spendAbilityCost).
+  onKillSpeedPct?: number;
+  secondWindPctPerSec?: number;
+  battleRhythm?: number;
+  bloodbathPct?: number;
+  cdrPerRage?: number;
+  // Combat Mastery (choice-row talent): 1 when picked. Each warrior stance
+  // gains an extra effect, read at three sites off the STANCE_MASTERY_*
+  // constants (types.ts): Battle ability-crit damage (combat/damage.ts),
+  // Berserker auto-attack speed (combat/auto_attack.ts), Guarded heavy-blow
+  // reduction (combat/damage.ts).
+  stanceMastery?: number;
+  // Lingering Dread: fraction of the target's max health a fear the player
+  // applies can soak before breaking (0 = classic break on any damage).
+  fearBreakPct?: number;
+  // Master Armorer (Arms mastery): fraction of extra physical damage dealt WHILE
+  // wielding a two-handed weapon. Declares the magnitude so the tooltip is
+  // effect-backed, but is applied only by the 2H-gated hook in combat/damage.ts
+  // (never folded into the generic meleeDmgPct path), so it never double-counts
+  // and never leaks to one-handed builds.
+  masteryTwoHandDmgPct?: number;
   // Cheat death (Deathless Ardor style): a killing blow leaves the player at
   // 1 hp instead, once per this many seconds (0 disables). Consumed in
   // combat/damage.ts behind the procState internal cooldown.
   cheatDeathIcd?: number;
-  fearBreakPct?: number;
-  onKillSpeedPct?: number;
+  // PTR spec-mastery duration/cap riders for the on-kill speed + bloodbath procs.
   onKillSpeedDuration?: number;
-  bloodbathPct?: number;
   bloodbathDuration?: number;
   bloodbathMaxPct?: number;
-  cdrPerRage?: number;
 }
 
 export interface TalentEffect {
@@ -187,7 +221,7 @@ export interface ResolvedAbilityMod {
   buffPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune?: boolean;
-  bonusCharges?: number;
+  bonusCharges: number;
   addEffects: AbilityEffect[];
 }
 
@@ -208,6 +242,7 @@ export interface TalentModifiers {
 
 export const TALENTS: Partial<Record<PlayerClass, ClassTalents>> = {
   warrior: WARRIOR_TALENTS,
+  warrior_classic: WARRIOR_CLASSIC_TALENTS,
   paladin: PALADIN_TALENTS,
   hunter: HUNTER_TALENTS,
   rogue: ROGUE_TALENTS,
@@ -230,6 +265,16 @@ export function hasTalents(cls: PlayerClass): boolean {
 // ---------------------------------------------------------------------------
 
 export const FIRST_TALENT_LEVEL = 10;
+
+// Spec identity (the signature ability + mastery + spec-gated kit) unlocks EARLIER
+// than talent POINTS: a specialization may be committed from SPEC_UNLOCK_LEVEL, but
+// points still accrue from FIRST_TALENT_LEVEL (talentPointsAtLevel is unchanged), so
+// the talent tree and point economy are untouched. A spec below this level is illegal.
+export const SPEC_UNLOCK_LEVEL = 5;
+
+export function talentPointsAtLevel(level: number): number {
+  return Math.max(0, Math.min(level, MAX_LEVEL) - (FIRST_TALENT_LEVEL - 1));
+}
 
 export function rowsUnlockedAtLevel(cls: PlayerClass, level: number): number {
   const capped = Math.max(1, Math.min(level, MAX_LEVEL));
@@ -321,9 +366,12 @@ export function repairAllocation(
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
   const requestedSpec = alloc.spec ?? null;
+  // Spec unlock is DECOUPLED from talent points: a spec is legal from SPEC_UNLOCK_LEVEL
+  // (below it a spec would still grant the signature ability + mastery passive), matching
+  // the apply-time gate.
   const spec =
     requestedSpec !== null &&
-    playerLevel >= FIRST_TALENT_LEVEL &&
+    playerLevel >= SPEC_UNLOCK_LEVEL &&
     ct.specs.some((s) => s.id === requestedSpec)
       ? requestedSpec
       : null;
@@ -349,6 +397,7 @@ function zeroStats(): Required<StatModEffect> {
     apPct: 0,
     staPct: 0,
     armorPct: 0,
+    armorFromStrPct: 0,
     maxHpPct: 0,
     strPct: 0,
     agiPct: 0,
@@ -371,14 +420,20 @@ function zeroGlobal(): Required<GlobalModEffect> {
     critDmgPct: 0,
     spellHastePct: 0,
     critVsRooted: 0,
-    cheatDeathIcd: 0,
-    fearBreakPct: 0,
+    autoRagePct: 0,
+    abilityRagePct: 0,
     onKillSpeedPct: 0,
-    onKillSpeedDuration: 0,
+    secondWindPctPerSec: 0,
+    battleRhythm: 0,
     bloodbathPct: 0,
+    cdrPerRage: 0,
+    stanceMastery: 0,
+    fearBreakPct: 0,
+    masteryTwoHandDmgPct: 0,
+    cheatDeathIcd: 0,
+    onKillSpeedDuration: 0,
     bloodbathDuration: 0,
     bloodbathMaxPct: 0,
-    cdrPerRage: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -419,7 +474,12 @@ export function accumulateTalentEffect(
   accumulate(mods, eff, mult);
 }
 
-function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
+// Exported for the row engine (talent_rows.ts folds each picked row option in).
+export function accumulate(
+  mods: TalentModifiers,
+  eff: TalentEffect | undefined,
+  mult: number,
+): void {
   if (!eff) return;
   if (eff.stats) {
     const s = mods.stats,
@@ -436,6 +496,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     s.apPct += (e.apPct ?? 0) * mult;
     s.staPct += (e.staPct ?? 0) * mult;
     s.armorPct += (e.armorPct ?? 0) * mult;
+    s.armorFromStrPct += (e.armorFromStrPct ?? 0) * mult;
     s.maxHpPct += (e.maxHpPct ?? 0) * mult;
     s.strPct += (e.strPct ?? 0) * mult;
     s.agiPct += (e.agiPct ?? 0) * mult;
@@ -458,13 +519,19 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
-    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
+    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
+    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
     g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
     g.onKillSpeedDuration += (e.onKillSpeedDuration ?? 0) * mult;
+    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
+    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
     g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
     g.bloodbathDuration += (e.bloodbathDuration ?? 0) * mult;
     g.bloodbathMaxPct += (e.bloodbathMaxPct ?? 0) * mult;
     g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
+    g.stanceMastery += (e.stanceMastery ?? 0) * mult;
+    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
+    g.masteryTwoHandDmgPct += (e.masteryTwoHandDmgPct ?? 0) * mult;
     // An ICD is a duration, not a rate: take the longest granted, ignore mult.
     g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
   }
@@ -482,7 +549,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
-    cur.bonusCharges = (cur.bonusCharges ?? 0) + (am.bonusCharges ?? 0) * mult;
+    cur.bonusCharges += (am.bonusCharges ?? 0) * mult;
     if (am.castWhileMoving) cur.castWhileMoving = true;
     if (am.damagePushbackImmune) cur.damagePushbackImmune = true;
     // Added effects are rank-1 semantics, not multiplied by talent rank.

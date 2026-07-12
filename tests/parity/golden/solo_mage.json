@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "a8b80181",
+      "state": "0f9f459a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -62,6 +63,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -125,7 +134,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "35149d6c",
+      "state": "d9c01815",
       "events": "6f4af3da",
       "rng": {
         "draws": 3,
@@ -136,7 +145,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "388882ce",
+      "state": "8c9f0f13",
       "events": "32aafa0f",
       "rng": {
         "draws": 3,
@@ -147,7 +156,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "697f700e",
+      "state": "84bc5fd3",
       "events": "c880e87c",
       "rng": {
         "draws": 73,
@@ -158,7 +167,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "0afa71a2",
+      "state": "0e7b564f",
       "events": "c880e87c",
       "rng": {
         "draws": 162,
@@ -169,7 +178,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "01c2991a",
+      "state": "1d5e9727",
       "events": "894957f3",
       "rng": {
         "draws": 254,
@@ -180,7 +189,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "e6303b8d",
+      "state": "983e80f4",
       "events": "c880e87c",
       "rng": {
         "draws": 367,
@@ -191,7 +200,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 407,
-      "state": "b13c24fd",
+      "state": "96e28964",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -224,6 +233,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -239,6 +249,14 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },

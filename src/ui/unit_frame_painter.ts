@@ -35,6 +35,7 @@ import type { UnitFrameView } from './unit_frame';
 const RES_TYPE_CLASSES = ['rage', 'energy', 'mana'] as const;
 // The shield-overlay class (the shield reaches the bar's right edge).
 const OVERSHIELD_CLASS = 'overshield';
+const ABSORB_START_PROP = '--absorb-start';
 // Frame-state classes target/party need; the player always passes them off.
 const DEAD_CLASS = 'dead';
 const OUT_OF_RANGE_CLASS = 'oor';
@@ -129,13 +130,14 @@ export class UnitFramePainter {
     }
   }
 
-  // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the
-  // overshield class. Folds the former raw updateAbsorb('#pf-absorb', p) onto the
-  // elided writers; skipped for a frame with no shield bar.
+  // The shield overlay: a positioned segment, not a left-filled overlay. When a
+  // shield would extend beyond the bar, the segment is right-aligned so full-HP
+  // shields remain visible instead of being clipped past the edge.
   private paintAbsorb(view: UnitFrameView): void {
     const absorb = this.el.absorb;
     if (!absorb) return;
-    this.writers.setTransform(absorb, this.barScaleX(view.absorbFrac));
+    this.writers.setStyleProp(absorb, ABSORB_START_PROP, `${view.absorbStartFrac * 100}%`);
+    this.writers.setTransform(absorb, this.barScaleX(view.absorbSizeFrac));
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
   }
 

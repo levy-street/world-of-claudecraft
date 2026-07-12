@@ -39,6 +39,14 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // entity.ts, not the form effect's value.
   defensive_stance: [30],
   bear_form: [30, 90],
+  // "you generate 10% more rage": Battle Stance's STANCE_RAGE_GEN constant
+  // (0.1) folded in types.ts rageGenAuraMult, not the stance effect's value
+  // (the selfBuff aura only carries the stance kind, value 0).
+  battle_stance: [10],
+  // "Protection: they also take 5% less damage": the prot-only buff_dr rider
+  // (value 0.05) hardcoded in effect_dispatch's aoeAllyMaxHp case, not a field
+  // on rallying_cry's aoeAllyMaxHp effect.
+  rallying_cry: [5],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   growl: [3],
@@ -56,6 +64,12 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // dedicated branch in casting_lifecycle.ts. The HUD replaces 240 with the
   // resolved HoT total after Improved Patch Up is applied.
   revive_pet: [240, 35],
+  // Classic Warrior clones (classes_warrior_classic.ts): same dispatch-code
+  // constants as their base ids above (charge rage/stun, the defensive-stance
+  // threat multiplier, the taunt compel window).
+  cw_charge: [9, 1],
+  cw_defensive_stance: [30],
+  cw_taunt: [3],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

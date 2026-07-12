@@ -19,12 +19,17 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_edge: 'sword_e',
   zealotsbane_blade: 'sword_e',
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
+  kingsbane_last_oath_heroic: 'sword_f',
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
+  eastbrook_greatsword: 'adv_sword_2handed',
+  highwatch_greatsword: 'adv_sword_2handed',
   verlans_oathblade: 'adv_sword_2handed',
   moonscale_saber: 'adv_sword_2handed',
   wyrmfang_greatblade: 'adv_sword_2handed_color', // EPIC: gold greatblade
+  bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
+  direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -66,6 +71,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   ogre_bonecharm_staff: 'adv_staff',
   staff_of_the_gravewyrm: 'adv_druid_staff',
   deathless_heartwood: 'adv_druid_staff', // LEGENDARY druid relic (antler staff)
+  deathless_heartwood_heroic: 'adv_druid_staff',
   drovers_staff: 'adv_druid_staff',
 
   // ---- wands (1H caster: scepters / rods) -------------------------------------

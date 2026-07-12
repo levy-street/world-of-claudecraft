@@ -134,6 +134,10 @@ export class PartyMachine {
       color: '#aaf',
       pid: r.meta.entityId,
     });
+    // A dev test dummy ("/dev bot") has no client to click Accept: take the
+    // invite immediately, mirroring its whisper auto-reply, so party features
+    // (frames, mouseover heals) can be exercised offline.
+    if (target.isDevBot) this.partyAccept(targetPid);
   }
 
   partyAccept(pid?: number): void {

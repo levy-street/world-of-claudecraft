@@ -8,10 +8,11 @@
 // by the tests/item_level.test.ts heroic sweep. requiredClass locks follow the
 // established archetype groups so every class has a near-complete set to chase.
 //
-// Each final boss drops TWO heroic epics: one from its `_heroic` group and one
-// from its `_heroic2` group (each group's chances sum to 1, so exactly one item
-// drops per group). The set is built so every armor archetype covers all eight
-// droppable slots (helmet/shoulder/chest/waist/legs/gloves/feet + mainhand;
+// Each five-man final boss drops TWO heroic epics: one from its `_heroic` group
+// and one from its `_heroic2` group. Heroic Nythraxis instead drops five raid
+// items, one per raid roll group. Every group's chances sum to 1, so exactly one
+// item drops per group. The set is built so every armor archetype covers all
+// eight droppable slots (helmet/shoulder/chest/waist/legs/gloves/feet + mainhand;
 // neck + rings come from the Heroic Quartermaster), and the mail casters
 // (elemental/resto shaman, holy paladin) and str plate get real coverage rather
 // than a single token piece.
@@ -22,6 +23,17 @@ import type { ItemDef, LootEntry } from '../types';
 // dungeons are level-20 content and heroic is the tier above (+5), so the
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
+
+// The 10-player raid (Heroic Nythraxis) sits one tier above the heroic
+// five-mans: its set reads a higher source level so the epics land at item
+// level 33 (27 + the epic bump of 6), a clear step above heroic dungeon gear
+// (variants 28, dungeon final-boss sets 31). buildSourceIndex in item_level.ts
+// registers the Nythraxis boss table at this level, the five-mans at
+// HEROIC_LOOT_SOURCE_LEVEL.
+export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
+
+// The boss whose heroic table reads the raid source level (see above).
+export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
@@ -110,8 +122,9 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'epic',
+    heroic: true,
     requiredLevel: 20,
-    weapon: { min: 24, max: 40, speed: 1.8 },
+    weapon: { min: 22, max: 36, speed: 1.8 },
     stats: { agi: 13, sta: 9 },
     sellValue: 15000,
     requiredClass: AGILE,
@@ -184,7 +197,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 30, max: 50, speed: 3.0 },
+    weapon: { min: 36, max: 60, speed: 3.0 },
     stats: { int: 13, spi: 9 },
     sellValue: 15000,
     requiredClass: CASTER,
@@ -257,7 +270,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 26, max: 44, speed: 2.6 },
+    weapon: { min: 31, max: 52, speed: 2.6 },
     stats: { str: 13, sta: 9 },
     sellValue: 15000,
     requiredClass: HEAVY,
@@ -323,77 +336,149 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredClass: HEAL_MAIL,
   },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
+  // Primary stats are the exact normalizePrimaryStats(normalStats, budget)
+  // outputs for ilvl 33: helmet budget 20, shoulder budget 17. Armor is the
+  // normal ilvl-29 value scaled by 33 / 29 and rounded.
+  crownforged_dreadhelm_heroic: {
+    id: 'crownforged_dreadhelm_heroic',
+    set: 'crownforged',
+    name: 'Bonewrought Dreadhelm',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'helmet',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 353, str: 9, sta: 11 },
+    sellValue: 12000,
+    requiredClass: ['warrior', 'paladin'],
+  },
+  crownforged_warspaulders_heroic: {
+    id: 'crownforged_warspaulders_heroic',
+    set: 'crownforged',
+    name: 'Bonewrought Warspaulders',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'shoulder',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 296, str: 8, sta: 9 },
+    sellValue: 12000,
+    requiredClass: ['warrior', 'paladin'],
+  },
+  nighttalon_crown_heroic: {
+    id: 'nighttalon_crown_heroic',
+    set: 'nighttalon',
+    name: 'Direfang Crown',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'helmet',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 216, agi: 12, sta: 8 },
+    sellValue: 12000,
+    requiredClass: AGILE_WILD,
+  },
+  nighttalon_shoulderguards_heroic: {
+    id: 'nighttalon_shoulderguards_heroic',
+    set: 'nighttalon',
+    name: 'Direfang Shoulderguards',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 188, agi: 10, sta: 7 },
+    sellValue: 12000,
+    requiredClass: AGILE_WILD,
+  },
+  soulflame_cowl_heroic: {
+    id: 'soulflame_cowl_heroic',
+    set: 'soulflame',
+    name: 'Wraithfire Cowl',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 119, int: 13, sta: 7 },
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  soulflame_mantle_heroic: {
+    id: 'soulflame_mantle_heroic',
+    set: 'soulflame',
+    name: 'Wraithfire Mantle',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 105, int: 10, sta: 7 },
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  stormcallers_crown_heroic: {
+    id: 'stormcallers_crown_heroic',
+    set: 'stormcallers',
+    name: 'Galecall Crown',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'helmet',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 256, int: 12, sta: 8 },
+    sellValue: 12000,
+    requiredClass: ['shaman'],
+  },
+  stormcallers_spaulders_heroic: {
+    id: 'stormcallers_spaulders_heroic',
+    set: 'stormcallers',
+    name: 'Galecall Spaulders',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'shoulder',
+    quality: 'epic',
+    heroic: true,
+    requiredLevel: 20,
+    stats: { armor: 216, int: 9, sta: 8 },
+    sellValue: 12000,
+    requiredClass: ['shaman'],
+  },
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
     name: 'Scepter of the Deathless Court',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'epic',
+    heroic: true,
     requiredLevel: 20,
-    weapon: { min: 22, max: 38, speed: 2.4 },
-    stats: { int: 12, spi: 10 },
+    weapon: { min: 29, max: 51, speed: 2.4 },
+    stats: { int: 13, spi: 10 },
     sellValue: 16000,
     requiredClass: CASTER,
-  },
-  deathless_warguard_legmail: {
-    id: 'deathless_warguard_legmail',
-    name: 'Deathless Warguard Legmail',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'legs',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 315, str: 11, sta: 9 },
-    sellValue: 13000,
-    requiredClass: HEAVY,
-  },
-  soulrend_diadem: {
-    id: 'soulrend_diadem',
-    name: 'Soulrend Diadem',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'helmet',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 76, int: 10, spi: 8 },
-    sellValue: 12000,
-    requiredClass: CASTER,
-  },
-  scourgehide_carapace: {
-    id: 'scourgehide_carapace',
-    name: 'Scourgehide Carapace',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'chest',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 172, agi: 12, sta: 10 },
-    sellValue: 14000,
-    requiredClass: AGILE_WILD,
   },
   deathless_greatblade: {
     id: 'deathless_greatblade',
     name: 'Deathless Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
+    heroic: true,
     requiredLevel: 20,
-    weapon: { min: 40, max: 62, speed: 3.4 },
-    stats: { str: 13, sta: 9 },
+    weapon: { min: 45, max: 68, speed: 3.4 },
+    // Two-handers carry both hands' stat budgets (TWOHAND_STAT_MULT): the
+    // PR #1762 hand declaration re-statted 23 -> 46 points at ilvl 33.
+    stats: { str: 28, sta: 18 },
     sellValue: 16000,
     requiredClass: HEAVY,
-  },
-  soulforged_warplate: {
-    id: 'soulforged_warplate',
-    name: 'Soulforged Warplate',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'chest',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 335, int: 12, spi: 10 },
-    sellValue: 14000,
-    requiredClass: HEAL_MAIL,
   },
   stormcallers_focus: {
     id: 'stormcallers_focus',
@@ -401,17 +486,81 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'epic',
+    heroic: true,
     requiredLevel: 20,
-    weapon: { min: 20, max: 36, speed: 2.5 },
-    stats: { int: 13, spi: 9 },
+    weapon: { min: 30, max: 53, speed: 2.5 },
+    stats: { int: 14, spi: 9 },
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
   },
+  deathless_heartwood_heroic: {
+    id: 'deathless_heartwood_heroic',
+    name: 'Heartwood of the Deathless Crown',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'legendary',
+    heroic: true,
+    requiredLevel: 20,
+    weapon: { min: 42, max: 68, speed: 3.2 },
+    stats: { spi: 19, sta: 14, int: 16 },
+    sellValue: 25000,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+    weaponProcs: [
+      {
+        id: 'deathbloom',
+        name: 'Deathbloom',
+        trigger: 'spellDamage',
+        chance: 0.15,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Deathbloom',
+            school: 'nature',
+            perTick: 12,
+            interval: 2,
+            duration: 8,
+          },
+        ],
+      },
+      {
+        id: 'lifebloom',
+        name: 'Lifebloom',
+        trigger: 'heal',
+        chance: 0.15,
+        effects: [{ kind: 'hot', name: 'Lifebloom', perTick: 10, interval: 2, duration: 8 }],
+      },
+    ],
+  },
+  kingsbane_last_oath_heroic: {
+    id: 'kingsbane_last_oath_heroic',
+    name: 'Thronebane, Last Oath of Thornpeak',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'legendary',
+    heroic: true,
+    requiredLevel: 20,
+    weapon: { min: 46, max: 74, speed: 2.8 },
+    stats: { str: 17, agi: 17, sta: 15 },
+    sellValue: 25000,
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    weaponProcs: [
+      {
+        id: 'thronebane_arc',
+        name: 'Chain Arc',
+        trigger: 'weaponHit',
+        chance: 0.1,
+        effects: [
+          { kind: 'chainArc', school: 'nature', damage: 42, jumps: 3, falloff: 0.6, radius: 8 },
+          { kind: 'attackSlow', name: 'Thunderclap', mult: 1.2, duration: 6 },
+        ],
+      },
+    ],
+  },
 };
 
-// Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a
-// group sum to 1.0, so exactly one item drops per group => two heroic epics per
-// heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.
+// Heroic-only drop tables per final boss. Five-man bosses have two rollGroups;
+// Heroic Nythraxis has five. Chances inside every group sum to 1.0, so exactly
+// one item drops per group. loot_roll.ts rolls these only for a heroic claim.
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
     { itemId: 'morthens_cryptforged_hauberk', chance: 0.34, rollGroup: 'morthen_heroic' },
@@ -445,13 +594,45 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
     { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
   ],
+  // The raid drops FIVE heroic epics per kill (five rollGroups, each summing to
+  // 1.0 so exactly one item drops per group), against the five-mans' two. On a
+  // heroic Nythraxis claim loot_roll.ts also suppresses the boss's normal
+  // (item-level-26) table, so every epic drop is a [HEROIC] ilvl-33 piece.
+  // Low-chance heroic legendary variants replace epics inside the weapon group,
+  // keeping the total at five drops.
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'scepter_of_the_deathless_court', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_warguard_legmail', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'soulrend_diadem', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'scourgehide_carapace', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
+    // Each armor group drops one of the set's two raid-tier heroic pieces (helm /
+    // shoulder); the third slots come from the normal set sources. Weapons and
+    // legendaries are the heroic-only extras (last group).
+    // Strength mail.
+    { itemId: 'crownforged_dreadhelm_heroic', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
+    {
+      itemId: 'crownforged_warspaulders_heroic',
+      chance: 0.5,
+      rollGroup: 'nythraxis_heroic_1',
+    },
+    // Agility leather.
+    { itemId: 'nighttalon_crown_heroic', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    {
+      itemId: 'nighttalon_shoulderguards_heroic',
+      chance: 0.5,
+      rollGroup: 'nythraxis_heroic_2',
+    },
+    // Caster cloth.
+    { itemId: 'soulflame_cowl_heroic', chance: 0.5, rollGroup: 'nythraxis_heroic_3' },
+    { itemId: 'soulflame_mantle_heroic', chance: 0.5, rollGroup: 'nythraxis_heroic_3' },
+    // Healing mail.
+    { itemId: 'stormcallers_crown_heroic', chance: 0.5, rollGroup: 'nythraxis_heroic_4' },
+    {
+      itemId: 'stormcallers_spaulders_heroic',
+      chance: 0.5,
+      rollGroup: 'nythraxis_heroic_4',
+    },
+    // Weapons.
+    { itemId: 'kingsbane_last_oath_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'deathless_heartwood_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'deathless_greatblade', chance: 0.314, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'scepter_of_the_deathless_court', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'stormcallers_focus', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
   ],
 };

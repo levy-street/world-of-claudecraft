@@ -148,7 +148,6 @@ describe('axe: talents window', () => {
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
-        buildDropdown: () => document.createElement('div'),
         captureFocus: () => null,
       }),
     );

@@ -77,6 +77,8 @@ describe('unitFrameView: the present / hidden gate', () => {
       name: '',
       portraitKey: '',
       absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
@@ -90,6 +92,8 @@ describe('unitFrameView: absorb resolution via the shared absorbBarView core', (
       playerDescriptor({ absorb: { hp: 300, maxHp: 600, auras: [shield(60)] } }),
     );
     expect(v.absorbFrac).toBeCloseTo((300 + 60) / 600); // 0.6
+    expect(v.absorbStartFrac).toBeCloseTo(0.5);
+    expect(v.absorbSizeFrac).toBeCloseTo(0.1);
     expect(v.absorbOvershield).toBe(false);
   });
 
@@ -98,13 +102,24 @@ describe('unitFrameView: absorb resolution via the shared absorbBarView core', (
       playerDescriptor({ absorb: { hp: 590, maxHp: 600, auras: [shield(50)] } }),
     );
     expect(v.absorbFrac).toBe(1);
+    expect(v.absorbStartFrac).toBeCloseTo(1 - 50 / 600);
+    expect(v.absorbSizeFrac).toBeCloseTo(50 / 600);
     expect(v.absorbOvershield).toBe(true);
   });
 
   it('treats a null absorb input as no shield (the dead-target case)', () => {
     const v = unitFrameView(playerDescriptor({ absorb: null }));
     expect(v.absorbFrac).toBe(0);
+    expect(v.absorbStartFrac).toBe(0);
+    expect(v.absorbSizeFrac).toBe(0);
     expect(v.absorbOvershield).toBe(false);
+  });
+
+  it('appends shield text only when requested by the frame instance', () => {
+    const hidden = unitFrameView(playerDescriptor());
+    const shown = unitFrameView(playerDescriptor({ showAbsorbText: true }));
+    expect(hidden.hpText).toBe('300 / 600');
+    expect(shown.hpText).toBe('300 / 600 (60)');
   });
 });
 
@@ -174,6 +189,27 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.outOfRange).toBe(true);
     expect(v.levelText).toBeNull();
     expect(v.resClass).toBe('mana');
+  });
+
+  it('drives a PARTY-shaped descriptor from a compact shield total without hp text', () => {
+    const v = unitFrameView({
+      present: true,
+      hpFrac: 0.8,
+      hpText: '',
+      resourceKind: 'mana',
+      resFrac: 0.7,
+      resText: '',
+      levelText: null,
+      name: 'Goradil',
+      portraitKey: 'player:warrior:2',
+      absorb: { hp: 80, maxHp: 100, total: 20 },
+      dead: false,
+      outOfRange: false,
+    });
+    expect(v.hpText).toBe('');
+    expect(v.absorbStartFrac).toBeCloseTo(0.8);
+    expect(v.absorbSizeFrac).toBeCloseTo(0.2);
+    expect(v.absorbOvershield).toBe(true);
   });
 });
 

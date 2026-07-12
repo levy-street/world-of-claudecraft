@@ -25,18 +25,22 @@ import {
   accountById,
   accountByUnsubscribeToken,
   accountForToken,
+  accountMailTarget,
   accountTwoFactorEnabled,
   backfillAccountEmailIfEmpty,
   characterCountForAccount,
   claimTotpWindow,
   consumeEmailChangeRequest,
+  consumePasswordResetRequest,
   consumeRecoveryCode,
   createCompanionToken,
   createEmailChangeRequest,
+  createPasswordResetRequest,
   disableTotp,
   enableTotp,
   ensureUnsubscribeToken,
   exportAccountData,
+  findAccount,
   getTotpState,
   listCharacters,
   listCompanionTokens,
@@ -56,10 +60,12 @@ import {
   emailDataExport,
   emailEmailChangeRequested,
   emailPasswordChanged,
+  emailPasswordReset,
   emailTwoFactorDisabled,
   emailTwoFactorEnabled,
   hashEmailToken,
   makeEmailToken,
+  passwordResetUrl,
 } from './email';
 import { ctxAccountId } from './http/context';
 import type { Ctx, Middleware, RouteDef } from './http/types';
@@ -78,6 +84,9 @@ const TOTP_ISSUER = 'World of ClaudeCraft';
 
 // How long an email-change verification link stays valid.
 const EMAIL_CHANGE_TTL_HOURS = 24;
+// How long a password-reset link stays valid. Shorter than the email-change TTL:
+// a reset is higher-value and the user acts on it immediately.
+const PASSWORD_RESET_TTL_HOURS = 1;
 
 // Hooks main.ts injects so the deactivate path can consult and tear down live
 // game sessions without account.ts importing the GameServer (which pulls in the
@@ -154,6 +163,63 @@ export async function handleAccountChangePassword(
   await revokeTokensExcept(accountId, callerToken);
   // Best-effort security notice; never blocks the password change on mail state.
   emailPasswordChanged(acct);
+  return json(res, 200, { ok: true });
+}
+
+// Unauthenticated: begin a self-service password reset. Identify by username, look
+// up the account's on-file email, and mail a reset link if there is one. ALWAYS
+// returns 200 with an identical body on every path (unknown user, known-but-no
+// email, success), so the status/body never reveal whether an account exists (anti
+// enumeration, mirroring handleEmailUnsubscribe). The email send is fire-and-forget
+// so its latency does not leak either; only the count of DB round-trips differs by
+// path, the same best-effort timing posture the rest of the account routes accept.
+// An account with no email on file simply cannot self-reset (still 200): those
+// users recover via Discord or an admin.
+export async function handleAccountPasswordForgot(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
+  const body = await readBody(req);
+  const username = typeof body.username === 'string' ? body.username.trim() : '';
+  if (username) {
+    const acct = await findAccount(username);
+    if (acct) {
+      const target = await accountMailTarget(acct.id);
+      if (target?.email) {
+        const { token, tokenHash } = makeEmailToken();
+        await createPasswordResetRequest(acct.id, tokenHash, PASSWORD_RESET_TTL_HOURS);
+        emailPasswordReset(target, passwordResetUrl(token));
+      }
+    }
+  }
+  return json(res, 200, { ok: true });
+}
+
+// Unauthenticated: complete a reset with the emailed token + a new password. The
+// token is validated, the new password applied, and every session revoked, all in
+// one atomic DB call. Invalid and expired tokens return the same 400 so neither a
+// bad guess nor an old link reveals anything.
+export async function handleAccountPasswordReset(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
+  const body = await readBody(req);
+  const raw = typeof body.token === 'string' ? body.token.trim() : '';
+  const next = body.next;
+  if (!raw) return json(res, 400, { error: 'invalid or expired link' });
+  if (typeof next !== 'string' || next.length < MIN_PASSWORD_LENGTH) {
+    return json(res, 400, { error: `password must be at least ${MIN_PASSWORD_LENGTH} chars` });
+  }
+  if (next.length > MAX_PASSWORD_LENGTH) {
+    return json(res, 400, { error: `password must be at most ${MAX_PASSWORD_LENGTH} chars` });
+  }
+  const applied = await consumePasswordResetRequest(hashEmailToken(raw), await hashPassword(next));
+  if (!applied) return json(res, 400, { error: 'invalid or expired link' });
+  // Best-effort "your password changed" notice; never blocks the reset on mail state.
+  const target = await accountMailTarget(applied.accountId);
+  if (target) emailPasswordChanged(target);
   return json(res, 200, { ok: true });
 }
 

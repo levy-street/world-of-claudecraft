@@ -277,6 +277,7 @@
           </div>
           <div id="petbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="stancebar"></div>
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
         </div>
@@ -887,7 +888,7 @@
           <div class="desktop-download-actions">
             <a
               class="btn btn-primary desktop-download-link"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.23.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.24.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
           </div>
@@ -928,7 +929,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.23.0</div>
+      <div id="game-version">v0.24.0</div>
       </div>
       <div class="footer-lang-row">
         <div class="language-selector">
@@ -967,15 +968,13 @@
   <div id="mobile-controls" data-i18n-aria="hud.core.mobileControls" aria-label="Mobile controls">
     <div id="mobile-move-zone" aria-hidden="true"></div>
     <div id="mobile-move-joystick" class="mobile-joystick" data-i18n-aria="hud.core.mobileMove" aria-label="Move">
+      <div id="mobile-autorun-target" class="mobile-autorun-target" aria-hidden="true" data-icon="autorun"></div>
       <div id="mobile-move-stick" class="mobile-stick"></div>
       <div class="mobile-joy-label" data-i18n="hud.core.mobileMove">Move</div>
     </div>
     <div id="mobile-camera-joystick" class="mobile-joystick" data-i18n-aria="hud.core.mobileCamera" aria-label="Camera">
       <div id="mobile-camera-stick" class="mobile-stick"></div>
       <div class="mobile-joy-label" data-i18n="hud.core.mobileCamera">Camera</div>
-    </div>
-    <div id="mobile-utility-cluster">
-      <button class="mobile-btn" type="button" id="mobile-autorun" data-i18n-title="hud.keybinds.actions.autorun" data-i18n-aria="hud.keybinds.actions.autorun" title="Toggle autorun" aria-label="Toggle autorun" data-icon="autorun"><span class="mobile-label" data-i18n="hudChrome.mobile.autorun">Auto</span></button>
     </div>
     <div id="mobile-combat-controls">
       <button class="mobile-btn" type="button" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
@@ -1047,7 +1046,7 @@
     <div>
       <div class="rotate-icon" aria-hidden="true">↻</div>
       <div class="rotate-title" data-i18n="mobilePreflight.rotateTitle">Rotate to Landscape</div>
-      <div class="rotate-sub" data-i18n="mobilePreflight.rotateSub">Play in landscape fullscreen for the best mobile experience.</div>
+      <div class="rotate-sub" data-i18n="mobilePreflight.rotateSub">Portrait mode is not supported. Rotate your device to landscape to continue.</div>
     </div>
   </div>
 

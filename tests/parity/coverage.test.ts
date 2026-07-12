@@ -152,9 +152,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(logs.some((t) => t.startsWith('You abandon'))).toBe(true);
     // Demon Heal channel ticked: applyDemonHealTick emits a heal2 with ability 'Demon Heal'.
     expect(ev.some((e) => e.type === 'heal2' && e.ability === 'Demon Heal')).toBe(true);
-    // Demon swap exercised BOTH branches: a new demon answered, then the same demon faded.
-    expect(logs.some((t) => t.includes('answers your summons'))).toBe(true);
-    expect(logs.some((t) => t.includes('fades back into the void'))).toBe(true);
+    // Demon swap AND same-demon re-summon both produce a fresh demon answering the call
+    // (re-summoning while the current demon is alive dismisses it and summons anew, it
+    // never toggles off into no pet).
+    expect(logs.filter((t) => t.includes('answers your summons')).length).toBeGreaterThanOrEqual(4);
     // despawnPet scrubbed the hunter's targetId (set to the demon, nulled on its hard despawn).
     expect((rec.sim as any).player.targetId).toBeNull();
     // abandon's despawnPersistentPet scrub pulled the biter off the (now-gone) pet.
@@ -877,5 +878,30 @@ describe('coverage: each scenario fires its subsystem', () => {
     const tankMeta = [...sim.players.values()].find((m: any) => m.name === 'NyxTank') as any;
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
+  });
+
+  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+    const rec = run('warrior_row_capstones');
+    const sim = rec.sim as any;
+    const pid = sim.playerId;
+    const ev = rec.allEvents as Ev[];
+    // Double Charge: BOTH stored uses were spent while one recharge timer ran;
+    // the classic single-cooldown gate would have blocked cast #2.
+    expect(rec.notes.chargeSpent).toBe(2);
+    expect(rec.notes.chargeRecharging).toBe(true);
+    // Intimidating Shout feared a wolf; Lingering Dread armed its threshold.
+    const feared = entities(rec).find((e) =>
+      e.auras?.some((a: any) => a.id === 'fear_incap'),
+    ) as any;
+    expect(feared).toBeTruthy();
+    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
+    expect(fear.breaksOnDamage).toBe(true);
+    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // Victory Rush: the on-kill strike healed the player.
+    expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
+      true,
+    );
+    // Steel Cyclone (bladestorm): the self-centered channel pulsed damage.
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Steel Cyclone')).toBe(true);
   });
 });

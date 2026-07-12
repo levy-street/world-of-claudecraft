@@ -30,6 +30,7 @@ function member(pid: number, partial: Partial<PartyMemberInfo> = {}): PartyMembe
     level: 1,
     hp: 1,
     mhp: 1,
+    absorb: 0,
     res: 0,
     mres: 0,
     rtype: null,

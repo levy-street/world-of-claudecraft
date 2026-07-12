@@ -29,7 +29,10 @@ import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
-const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
+// chunk_of_ore (q_prof_intro): granted by an ore-node harvest while the quest
+// is active (NODE_QUEST_GRANT, src/sim/professions/gathering.ts), not by mob
+// loot or a ground object.
+const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather', 'chunk_of_ore']);
 
 describe('content referential integrity', () => {
   it('every quest reference resolves (NPCs, mobs, items, chains)', () => {

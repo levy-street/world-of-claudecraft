@@ -184,6 +184,7 @@ export const shellStrings = {
       },
       roles: {
         warrior: 'Tank / Melee DPS',
+        warriorClassic: 'Tank / Melee DPS',
         paladin: 'Healer / Tank / Melee DPS',
         hunter: 'Ranged DPS',
         rogue: 'Melee DPS',
@@ -209,6 +210,8 @@ export const shellStrings = {
       lore: {
         warrior:
           'Warriors are battle-hardened melee fighters who build Rage as they deal or take damage. They absorb heavy hits or crush foes with powerful weapons.',
+        warriorClassic:
+          'The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.',
         paladin:
           'Paladins are holy crusaders who support allies with blessings, heal wounds with Mending Light, and protect the weak in heavy armor.',
         hunter:
@@ -232,7 +235,7 @@ export const shellStrings = {
       title: 'Play in Landscape Fullscreen',
       continue: 'Continue to Game',
       rotateTitle: 'Rotate to Landscape',
-      rotateSub: 'Play in landscape fullscreen for the best mobile experience.',
+      rotateSub: 'Portrait mode is not supported. Rotate your device to landscape to continue.',
       baseLandscape: 'Rotate your device to landscape before entering the world.',
       basePerformance:
         'Mobile performance may be degraded. Close extra tabs and lower Render Quality if the game feels slow.',
@@ -1211,6 +1214,7 @@ export const shellStrings = {
       },
       roles: {
         warrior: 'Tank / Melee DPS',
+        warriorClassic: 'Tank / Melee DPS',
         paladin: 'Healer / Tank / Melee DPS',
         hunter: 'Ranged DPS',
         rogue: 'Melee DPS',
@@ -1236,6 +1240,8 @@ export const shellStrings = {
       lore: {
         warrior:
           'Warriors are battle-hardened melee fighters who build Rage as they deal or take damage. They absorb heavy hits or crush foes with powerful weapons.',
+        warriorClassic:
+          'The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.',
         paladin:
           'Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armour.',
         hunter:
@@ -1259,7 +1265,7 @@ export const shellStrings = {
       title: 'Play in Landscape Fullscreen',
       continue: 'Continue to Game',
       rotateTitle: 'Rotate to Landscape',
-      rotateSub: 'Play in landscape fullscreen for the best mobile experience.',
+      rotateSub: 'Portrait mode is not supported. Rotate your device to landscape to continue.',
       baseLandscape: 'Rotate your device to landscape before entering the world.',
       basePerformance:
         'Mobile performance may be degraded. Close extra tabs and lower Render Quality if the game feels slow.',

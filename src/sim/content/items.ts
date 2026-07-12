@@ -674,6 +674,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     // (content/heroic_vendor.ts) does not eat a bag slot per mark.
     stackSize: 20,
     sellValue: 0,
+    // Bound to the earner: marks can only be spent at the Heroic Quartermaster,
+    // never traded, mailed, listed, or destroyed. See the soulbound flag in types.ts.
+    soulbound: true,
   },
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
@@ -898,6 +901,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
     buyValue: 1400,
   },
+  eastbrook_greatsword: {
+    id: 'eastbrook_greatsword',
+    name: 'Eastbrook Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    // Two-handers trade the offhand (no shield, no dual wield) for a slow, heavy
+    // swing at a 10 to 15% DPS premium over the one-hand whites of the same stock.
+    weapon: { min: 9, max: 15, speed: 3.4 },
+    sellValue: 160,
+    buyValue: 1600,
+  },
   vale_carving_knife: {
     id: 'vale_carving_knife',
     name: 'Vale Carving Knife',
@@ -918,6 +934,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1 },
     sellValue: 150,
     buyValue: 1500,
+  },
+  eastbrook_buckler: {
+    id: 'eastbrook_buckler',
+    name: 'Eastbrook Buckler',
+    kind: 'shield',
+    slot: 'offhand',
+    blockValue: 6,
+    quality: 'common',
+    stats: { armor: 34, sta: 1 },
+    sellValue: 130,
+    buyValue: 1300,
+    requiredClass: WAR,
   },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',
@@ -1205,6 +1233,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     questId: 'q_greyjaw',
   },
+  chunk_of_ore: {
+    id: 'chunk_of_ore',
+    name: 'Chunk of Ore',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_prof_intro',
+  },
   weathered_ledger_page: {
     id: 'weathered_ledger_page',
     name: 'Weathered Ledger Page',
@@ -1322,6 +1357,34 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'poor',
     sellValue: 3,
+  },
+
+  // --- Enchanting materials ------------------------------------------------
+  // Disenchant yield (src/sim/professions/enchanting.ts), tiered by the
+  // disenchanted item's rarity: common/uncommon -> dust, rare -> essence,
+  // epic/legendary -> shard. Consumed as reagents by the ENCHANTS table
+  // (content/enchants.ts). Reuses the 'junk' kind, same as bone_fragments/
+  // linen_scrap/spider_leg above (this repo has no dedicated material kind).
+  arcane_dust: {
+    id: 'arcane_dust',
+    name: 'Arcane Dust',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 6,
+  },
+  arcane_essence: {
+    id: 'arcane_essence',
+    name: 'Arcane Essence',
+    kind: 'junk',
+    quality: 'uncommon',
+    sellValue: 18,
+  },
+  arcane_shard: {
+    id: 'arcane_shard',
+    name: 'Arcane Shard',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 55,
   },
 
   // --- Quartermaster's Consignment ---------------------------------------

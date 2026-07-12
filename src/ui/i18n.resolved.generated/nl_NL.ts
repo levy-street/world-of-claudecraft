@@ -85,9 +85,9 @@ export const nl_NL: EnTranslations = {
       "title": "Talenten",
       "classTab": "Klasse",
       "specTab": "Specialisatie",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Keuzes",
+      "rowUnlockToast": "Een nieuwe talentkeuze is ontgrendeld!",
+      "rowUnlocks": "Wordt ontgrendeld op niveau {level}",
       "available": "Beschikbaar",
       "spent": "Besteed",
       "pointSource": "Verdien 1 talentpunt per level van level {first} tot {cap}. Level omhoog om meer punten te krijgen.",
@@ -146,7 +146,7 @@ export const nl_NL: EnTranslations = {
         "noTree": "Je klasse heeft nog geen talentenboom.",
         "locked": "Je hebt nog geen talenten ontgrendeld — die beginnen op niveau {level}.",
         "noSpec": "geen specialisatie",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenten: {head}, {picked}/{unlocked} keuzerijen gekozen.",
         "summary": "Talenten: {head} — {spent}/{total} punten besteed ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const nl_NL: EnTranslations = {
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} geabsorbeerd",
+      "cheap": "Goedkoper!"
     },
     "emotes": {
       "wave": "Zwaaien",
@@ -298,6 +298,7 @@ export const nl_NL: EnTranslations = {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
       "targetAnnounce": "Markeer {name}",
+      "targetOfTargetLabel": "Doelwit van het doelwit",
       "partyLabel": "Je Bende",
       "partyChip": "Groep",
       "partyGroup": "Groep {n}",
@@ -314,7 +315,6 @@ export const nl_NL: EnTranslations = {
       "chat": "Ga naar chat"
     },
     "mobile": {
-      "autorun": "Autoloop",
       "jump": "Springen",
       "leaderboard": "Ranglijst",
       "dailyRewards": "Beloningen",
@@ -574,13 +574,32 @@ export const nl_NL: EnTranslations = {
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
+      "mouseoverCast": "Mouseover-bezwering op groepsframes",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
+      "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
       "mobileLeftHanded": "Linkshandige indeling"
+    },
+    "talentRows": {
+      "tab": "Keuzes",
+      "defaultLoadout": "Standaardopstelling",
+      "comingSoon": "Binnenkort beschikbaar"
+    },
+    "specPanel": {
+      "primaryAttr": "Primair attribuut",
+      "complexity": "Complexiteit",
+      "complexityLow": "Laag",
+      "complexityMedium": "Gemiddeld",
+      "complexityHigh": "Hoog",
+      "exampleAbilities": "Voorbeeldvaardigheden",
+      "viewTalents": "Talenten bekijken",
+      "selectSpec": "Kies specialisatie",
+      "specUnlockBanner": "Specialisatie ontgrendeld!",
+      "specUnlockHint": "Druk op N om je specialisatie te kiezen."
     },
     "controller": {
       "title": "Controller",
@@ -678,7 +697,9 @@ export const nl_NL: EnTranslations = {
       "names": {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
-        "hasteRating": "Snelheidswaardering"
+        "hasteRating": "Snelheidswaardering",
+        "haste": "Snelheid",
+        "parry": "Parering"
       },
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
@@ -693,7 +714,9 @@ export const nl_NL: EnTranslations = {
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
-        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid."
+        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "haste": "Versnelt je wapenslagen en spreukbezwering. Het verkort de globale afkoeltijd niet.",
+        "parry": "Je kans om een frontale melee-aanval volledig te pareren, zodat je geen schade oploopt. Een klap van achteren kan niet worden gepareerd."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
@@ -730,6 +753,8 @@ export const nl_NL: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
+    "itemHeroicTag": "[HEROÏSCH]",
+    "itemSoulbound": "Zielsgebonden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -809,6 +834,7 @@ export const nl_NL: EnTranslations = {
       "failed": "Kon het bugrapport niet versturen. Probeer het opnieuw."
     },
     "paperdoll": {
+      "offhand": "Nevenhand",
       "unequipAria": "{item} afdoen",
       "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen"
     },
@@ -1059,9 +1085,24 @@ export const nl_NL: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
+      "battleStance": "Strijdhouding: 10% meer woedeopbouw",
+      "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "righteousFury": "Brandende Eed: sterk verhoogde dreiging door Heilige schade",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
+      "dmgDone": "Verhoogt toegebrachte schade met {pct}%",
+      "dmgDoneReduce": "Vermindert toegebrachte schade met {pct}%",
+      "crit": "Verhoogt kans op kritieke treffers met {pct}%",
+      "rageGen": "Verhoogt woedeopbouw met {pct}%",
+      "reckless": "Verhoogt kans op kritieke treffers met {pct}% en woedeopbouw met {ragePct}%",
+      "avatar": "Kolossus: toegebrachte schade verhoogd met {pct}%",
+      "bloodbath": "Verhoogt kans op kritieke treffers en toegebrachte schade met {pct}%",
+      "dieBySword": "Vermindert opgelopen schade met {pct}% ({lowPct}% onder {hpPct}% gezondheid)",
+      "sanguine": "Verhoogt aanvalssnelheid met {hastePct}% en toegebrachte schade met {dmgPct}%",
+      "battleTrance": "Je volgende Plunderaarsslag of Verminkende Slag kost geen woede",
+      "revengeFree": "Je volgende Wraak kost geen woede",
+      "victoryRush": "Overwinningsroes is gereed",
+      "maxHpPct": "Verhoogt maximale gezondheid met {pct}%",
       "school": {
         "physical": "Fysiek",
         "fire": "Vuur",
@@ -1074,6 +1115,26 @@ export const nl_NL: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+    },
+    "auth": {
+      "appleLoginCta": "Ga door met Apple",
+      "appleError": "Inloggen met Apple is niet gelukt. Probeer het opnieuw.",
+      "appleChoiceIntro": "Maak een nieuw account aan, of koppel Apple aan een account dat je al hebt.",
+      "appleChoiceExpired": "Die Apple-aanmelding is verlopen. Log opnieuw in met Apple.",
+      "forgotPrompt": "Wachtwoord vergeten?",
+      "forgotTitle": "Wachtwoord opnieuw instellen",
+      "forgotHint": "Voer je gebruikersnaam in en we sturen een herstellink naar het geregistreerde e-mailadres.",
+      "forgotUsername": "Gebruikersnaam",
+      "forgotSubmit": "Herstellink versturen",
+      "forgotSent": "Als een account met die gebruikersnaam een e-mailadres heeft, hebben we een herstellink gestuurd. Controleer je inbox.",
+      "forgotBack": "Terug naar inloggen",
+      "resetTitle": "Kies een nieuw wachtwoord",
+      "resetNewPassword": "Nieuw wachtwoord",
+      "resetConfirm": "Bevestig nieuw wachtwoord",
+      "resetSubmit": "Wachtwoord bijwerken",
+      "resetDone": "Je wachtwoord is bijgewerkt. Je kunt nu inloggen.",
+      "resetMismatch": "De wachtwoorden komen niet overeen.",
+      "resetErrInvalid": "Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan."
     },
     "loot": {
       "chestTitle": "Kist"
@@ -1304,6 +1365,8 @@ export const nl_NL: EnTranslations = {
       "parcelsLabel": "Pakketten",
       "parcelsHint": "Klik op een voorwerp in je tassen om het bij te voegen.",
       "removeParcelAria": "Verwijder {item} uit de brief",
+      "parcelQtyDecreaseAria": "Eén {item} minder verzenden",
+      "parcelQtyIncreaseAria": "Eén {item} meer verzenden",
       "sendButton": "Brief versturen",
       "postageNote": "Porto: {amount}. De raaf vliegt ongeveer {seconds}s.",
       "arrivedBanner": "De raaf is geland: post van {name}.",
@@ -1964,11 +2027,19 @@ export const nl_NL: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
+      "revenge": "Een vegende tegenaanval die alles voor je raakt, en goedkoper wordt vlak nadat je een klap hebt afgeweerd.",
       "battle_shout": "Een strijdkreet die de aanvalskracht van de groep verhoogt.",
       "commanding_shout": "Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.",
       "charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
       "rend": "Opent een bloeding die het doelwit na verloop van tijd uitput.",
       "thunder_clap": "Raakt alles om je heen en vertraagt hun aanvallen.",
+      "cw_heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
+      "cw_battle_shout": "Een strijdkreet die de aanvalskracht van de groep verhoogt.",
+      "cw_commanding_shout": "Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.",
+      "cw_charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
+      "cw_rend": "Opent een bloeding die het doelwit na verloop van tijd uitput.",
+      "cw_thunder_clap": "Raakt alles om je heen en vertraagt hun aanvallen.",
+      "hamstring": "Snijdt in de benen van het doelwit om het te vertragen, zodat het je niet kan inhalen.",
       "seal_of_righteousness": "Doordringt je uithalen met Heilige schade, besteed het daarna met Verdict.",
       "holy_light": "Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.",
       "devotion_aura": "Een blijvende zelfbuff die pantser verhoogt zodat klappen zachter aankomen.",
@@ -3275,6 +3346,7 @@ export const nl_NL: EnTranslations = {
   },
   "classes": {
     "warrior": "Krijger",
+    "warriorClassic": "Krijger",
     "paladin": "Paladijn",
     "hunter": "Jager",
     "rogue": "Schurk",
@@ -4042,6 +4114,7 @@ export const nl_NL: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Melee-DPS",
+      "warriorClassic": "Tank / Melee-DPS",
       "paladin": "Genezer / Tank / Melee-DPS",
       "hunter": "Ranged-DPS",
       "rogue": "Melee-DPS",
@@ -4066,6 +4139,7 @@ export const nl_NL: EnTranslations = {
     },
     "lore": {
       "warrior": "Krijgers zijn in de strijd geharde man-tot-man-vechters die Woede opbouwen terwijl ze schade uitdelen of incasseren. Ze absorberen zware klappen of verpletteren vijanden met krachtige wapens.",
+      "warriorClassic": "De krijger precies zoals hij speelde voor de gevechtsherziening: de oorspronkelijke vaardighedenset en het originele woedetempo, behouden naast de nieuwe krijger zodat je beide kunt uitproberen en ons kunt vertellen welke beter aanvoelt.",
       "paladin": "Paladijnen zijn heilige kruisvaarders die bondgenoten steunen met zegeningen, wonden helen met Helend Licht en de zwakken beschermen in zwaar pantser.",
       "hunter": "Jagers zijn afstandsspecialisten die aan de zijde van een getemd beest vechten, vijanden bestoken met gerichte en snelle schoten, hen vertragen met steken en verdovend vuur, en van aspect wisselen om zich aan het moment aan te passen.",
       "rogue": "Schurken zijn sluipende sluipmoordenaars die Energie en Combopunten besteden aan rugsteken en finishers vanuit de schaduwen.",
@@ -4366,6 +4440,7 @@ export const nl_NL: EnTranslations = {
     "combat": {
       "floatingMiss": "Mis",
       "floatingDodge": "Ontwijking",
+      "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
       "cannotMove": "Kan niet bewegen!",
       "attack": "aanval",
@@ -4375,6 +4450,7 @@ export const nl_NL: EnTranslations = {
       "damageTakenCrit": "{source} raakt je kritiek voor {amount}.",
       "miss": "Je {ability} mist {target}.",
       "dodged": "Je {ability} wordt ontweken door {target}.",
+      "parried": "Je {ability} wordt gepareerd door {target}.",
       "resisted": "{target} weerstaat je {ability}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
@@ -4417,6 +4493,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughMana": "Niet genoeg mana!",
       "notEnoughResource": "Niet genoeg {resource}!",
       "notEnoughHealth": "Niet genoeg gezondheid.",
+      "nothingToConsume": "Niets om te verbruiken.",
       "targetMustDodge": "Je doelwit moet eerst ontwijken.",
       "requiresCombo": "Die vaardigheid vereist combopunten.",
       "requiresForm": "Je moet in {form}-gedaante zijn.",
@@ -4433,6 +4510,7 @@ export const nl_NL: EnTranslations = {
       "facing": "Je moet naar je doelwit gekeerd staan.",
       "targetHealthBelow": "Die vaardigheid vereist dat het doelwit onder {percent}% gezondheid is.",
       "dagger": "Je moet een dolk hanteren.",
+      "needShield": "Je moet een schild uitgerust hebben.",
       "behindTarget": "Je moet achter je doelwit staan.",
       "polymorph": "Dit wezen kan niet van gedaante worden veranderd.",
       "noSeal": "Je hebt geen actief Zegel.",
@@ -4808,6 +4886,7 @@ export const nl_NL: EnTranslations = {
     },
     "slots": {
       "mainhand": "Hoofdhand",
+      "twoHand": "Tweehandig",
       "helmet": "Helm",
       "neck": "Hals",
       "shoulder": "Schouder",
@@ -5081,9 +5160,101 @@ export const nl_NL: EnTranslations = {
         "name": "Aardbeving",
         "description": "Laat het doelgebied 6 sec beven en treft vijanden elke 1.5 sec voor {damage} Natuurschade."
       },
+      "chain_heal": {
+        "name": "Kettinggenezing",
+        "description": "Geneest het doelwit voor {damage} en springt daarna over naar maximaal 2 nabije bondgenoten, waarbij elke sprong de helft van de vorige geneest."
+      },
       "heroic_strike": {
         "name": "Plunderaarsslag",
         "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."
+      },
+      "cw_heroic_strike": {
+        "name": "Plunderaarsslag",
+        "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."
+      },
+      "cw_battle_shout": {
+        "name": "IJzeren Gebrul",
+        "description": "Verhoogt je aanvalskracht met {buff} gedurende 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Versterkende Kreet",
+        "description": "Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min."
+      },
+      "cw_charge": {
+        "name": "Bestorming",
+        "description": "Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Diepe Snee",
+        "description": "Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec."
+      },
+      "cw_thunder_clap": {
+        "name": "Schuddende Klap",
+        "description": "Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec."
+      },
+      "cw_hamstring": {
+        "name": "Kreupelsnede",
+        "description": "Verminkt de vijand voor {damage} schade en vertraagt zijn beweging met 50% gedurende 15 sec."
+      },
+      "cw_bloodrage": {
+        "name": "Bloedtol",
+        "description": "Genereert 10 woede ten koste van levenskracht."
+      },
+      "cw_overpower": {
+        "name": "Roodhand",
+        "description": "Ogenblikkelijke aanval voor wapenschade plus {damage}. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken."
+      },
+      "cw_execute": {
+        "name": "Vroeg Graf",
+        "description": "Poging om een gewonde vijand af te maken voor {damage} schade. Alleen bruikbaar op vijanden met minder dan 20% levenskracht."
+      },
+      "cw_slam": {
+        "name": "Botte Zwaai",
+        "description": "Dreunt op de tegenstander in voor wapenschade plus {damage}."
+      },
+      "cw_cleave": {
+        "name": "Maaiboog",
+        "description": "Een vegende slag die alle vijanden voor je raakt voor {damage} schade."
+      },
+      "cw_defensive_stance": {
+        "name": "Bewaakte Houding",
+        "description": "Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Grimmig Gehuil",
+        "description": "Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec."
+      },
+      "cw_sunder_armor": {
+        "name": "Pantserscheur",
+        "description": "Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging."
+      },
+      "cw_taunt": {
+        "name": "Provoceren",
+        "description": "Provoceert het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt 3 sec lang gedwongen jou aan te vallen."
+      },
+      "cw_bloodthirst": {
+        "name": "Aderlating",
+        "description": "Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)"
+      },
+      "cw_mortal_strike": {
+        "name": "Verminkende Slag",
+        "description": "Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)"
+      },
+      "cw_shield_slam": {
+        "name": "Schildbreuk",
+        "description": "Sla het doelwit met je schild voor 50% wapenschade plus {damage} en enorme dreiging. (Protectie-kenmerk)"
+      },
+      "cw_whirlwind": {
+        "name": "Snijdende Wenteling",
+        "description": "Draai in een dodelijke boog en tref alle nabije vijanden voor {damage}. (Razernij-talent)"
+      },
+      "cw_berserker_rage": {
+        "name": "Kolkende Woede",
+        "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
+      },
+      "revenge": {
+        "name": "Wraak",
+        "description": "Val aan in een brede boog en breng Fysieke schade toe aan alle vijanden voor je. Boven de 5 doelwitten wordt de schade verminderd. Wanneer je ontwijkt of pareert, kan je volgende Wraak geen woede kosten."
       },
       "battle_shout": {
         "name": "IJzeren Gebrul",
@@ -5127,7 +5298,7 @@ export const nl_NL: EnTranslations = {
       },
       "slam": {
         "name": "Botte Zwaai",
-        "description": "Dreunt op de tegenstander in voor wapenschade plus {damage}."
+        "description": "Dreunt op de tegenstander in voor 50% wapenschade plus {damage} en genereert {rage} woede."
       },
       "cleave": {
         "name": "Maaiboog",
@@ -5136,6 +5307,14 @@ export const nl_NL: EnTranslations = {
       "defensive_stance": {
         "name": "Bewaakte Houding",
         "description": "Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten."
+      },
+      "battle_stance": {
+        "name": "Strijdhouding",
+        "description": "Een agressieve gevechtshouding: je genereert 10% meer woede. De standaardhouding voor Wapens en Protectie."
+      },
+      "berserker_stance": {
+        "name": "Berserkerhouding",
+        "description": "Een roekeloze gevechtshouding: je kritieke treffers landen 3% vaker en raken 3% harder. De Razernij-krijger vecht altijd in deze houding."
       },
       "sunder_armor": {
         "name": "Pantserscheur",
@@ -5625,9 +5804,77 @@ export const nl_NL: EnTranslations = {
         "name": "Verminkende Slag",
         "description": "Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)"
       },
+      "sweeping_strikes": {
+        "name": "Verbredende Boog",
+        "description": "Gedurende 12 sec raken je aanvallen op een enkel doelwit ook 1 nabije vijand voor volledige schade. (Wapens)"
+      },
+      "deep_wounds": {
+        "name": "Gapende Wonden",
+        "description": "Passief: je Verminkende Slag laat het doelwit bloeden voor Fysieke schade gedurende 6 sec. (Wapens)"
+      },
+      "enrage_passive": {
+        "name": "Amok",
+        "description": "Passief: terwijl je Razend bent, breng je 7% meer schade toe, val je 25% sneller aan en beweeg je 10% sneller gedurende 4 sec. Aderlating heeft 30% kans om je Razend te maken; Rode Oogst doet dat altijd. (Razernij)"
+      },
       "bloodthirst": {
         "name": "Aderlating",
         "description": "Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)"
+      },
+      "raging_gale": {
+        "name": "Dubbelslag",
+        "description": "Sla onmiddellijk tweemaal toe met je wapen, waarbij elke treffer 40% wapenschade plus {damage} toebrengt, en genereer {rage} woede. Slaat maximaal 2 ladingen op. (Razernij)"
+      },
+      "red_harvest": {
+        "name": "Rode Oogst",
+        "description": "Zet alles in: sla driemaal woest toe voor telkens 65% wapenschade plus {damage}, en word altijd Razend. (Razernij)"
+      },
+      "furious_mending": {
+        "name": "Woedend Herstel",
+        "description": "Gedurende 10 sec loop je 20% minder schade op, en zolang het duurt geneest je Aderlating je voor 20% van je maximale gezondheid. (Razernij)"
+      },
+      "emboldening_roar": {
+        "name": "Bezielend Gebrul",
+        "description": "Laat een bezielend gebrul los: jij en bevriende spelers binnen 40 m worden Bezield, en je volgende 3 vaardigheden zijn gegarandeerd kritieke treffers. (Razernij)"
+      },
+      "raised_guard": {
+        "name": "Geheven Schild",
+        "description": "Zet je schrap achter je schild: je loopt gedurende 6 sec 50% minder Fysieke schade op. Slaat maximaal 2 ladingen op. (Protectie)"
+      },
+      "iron_resolve": {
+        "name": "IJzeren Vastberadenheid",
+        "description": "Zet je tanden op elkaar en negeer de pijn: verbruikt al je woede (minimaal 20) om 4 schade per bestede woede te absorberen, tot 10 sec lang. (Protectie)"
+      },
+      "faultline": {
+        "name": "Breuklijn",
+        "description": "Stuur een schokgolf door de grond: vijanden voor je binnen 8 m lopen {damage} schade op en worden gedurende 3 sec verdoofd. (Protectie)"
+      },
+      "defiant_bellow": {
+        "name": "Tartend Gebrul",
+        "description": "Een tartend gebrul: elke vijand binnen 10 m wordt geprovoceerd en gedwongen jou gedurende 3 sec aan te vallen. (Protectie)"
+      },
+      "breachmaker": {
+        "name": "Bresmaker",
+        "description": "Beuk het doelwit voor wapenschade plus {damage} en breek zijn dekking open: je eigen aanvallen op dat doelwit brengen gedurende 8 sec 20% meer schade toe. (Wapens)"
+      },
+      "measured_fury": {
+        "name": "Beheerste Woede",
+        "description": "Je beheerste woede scherpt je zuinigheid aan: je vaardigheden kosten 10% minder woede. (Wapens)"
+      },
+      "seasoned_soldier": {
+        "name": "Doorgewinterde Soldaat",
+        "description": "Je kritieke auto-aanvallen genereren 10% meer woede. (Wapens)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Diabolische Dubbelslag",
+        "description": "Terwijl je Razend bent, brengt je Dubbelslag 15% meer schade toe. (Razernij)"
+      },
+      "cleaving_blows": {
+        "name": "Klievende Slagen",
+        "description": "Rode Oogst geeft altijd een lading Dubbelslag terug. (Razernij)"
+      },
+      "sudden_death": {
+        "name": "Plotse Dood",
+        "description": "Je auto-aanvallen hebben een kans om je Vroeg Graf te laten inzetten op een doelwit ongeacht zijn gezondheid, zonder woedekosten. (Wapens)"
       },
       "shield_slam": {
         "name": "Schildbreuk",
@@ -5641,29 +5888,29 @@ export const nl_NL: EnTranslations = {
         "name": "Kolkende Woede",
         "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
+      "holy_shock": {
+        "name": "Heilige schok",
+        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+      },
       "crusader_strike": {
         "name": "Kruisvaardersslag",
         "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
-      },
-      "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
         "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
       },
       "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
-      },
-      "holy_shock": {
-        "name": "Heilige schok",
-        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+        "name": "Dageraadskets",
+        "description": "Slingert een bij dageraad gesmeed schild voor {damage} Heilige schade, legt het hoofddoel 2 sec. het zwijgen op en stuitert daarna naar maximaal {jumps} extra vijanden binnen {radius} meter voor {falloff} schade per stuiter. (Paladijntalent)"
       },
       "holy_shield": {
         "name": "Heilig schild",
         "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+      },
+      "repentance": {
+        "name": "Berouw",
+        "description": "Brengt de vijand tot 6 sec in een staat van meditatie. Elke schade verbreekt het effect. (Vergelding signatuur)"
       },
       "bestial_wrath": {
         "name": "Beestachtige woede",
@@ -5717,9 +5964,21 @@ export const nl_NL: EnTranslations = {
         "name": "Elementaire meesterschap",
         "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
       },
+      "shamanistic_rage": {
+        "name": "Sjamanistische Woede",
+        "description": "Ontketent sjamanistische woede en herstelt 160 mana. (Versterking signatuur)"
+      },
+      "natures_swiftness": {
+        "name": "Snelheid van de Natuur",
+        "description": "Roept de natuur aan om je volgende spreuk onmiddellijk te maken. (Herstel signatuur)"
+      },
       "siphon_life": {
         "name": "Levenshevel",
         "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "fel_domination": {
+        "name": "Duivelse Dominantie",
+        "description": "Domineert duivelse energieën, waardoor je volgende spreuk onmiddellijk is. (Demonologie signatuur)"
       },
       "conflagrate": {
         "name": "Ontvlamming",
@@ -5736,6 +5995,34 @@ export const nl_NL: EnTranslations = {
       "swiftmend": {
         "name": "Snelle genezing",
         "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
+      "storm_bolt": {
+        "name": "Stormbout",
+        "description": "Slinger je wapen naar het doelwit voor {damage} en verdoof het gedurende 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Doordringend Gehuil",
+        "description": "Een doordringende schreeuw die alle vijanden binnen 15 m gedurende 8 sec met 50% vertraagt."
+      },
+      "die_by_sword": {
+        "name": "Door het Zwaard",
+        "description": "Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen."
+      },
+      "recklessness": {
+        "name": "Roekeloosheid",
+        "description": "Maakt je Razend: gedurende 12 sec neemt je woedeopbouw met 50% toe en je kans op kritieke treffers met 20%."
+      },
+      "sanguine_aura": {
+        "name": "Bloedrode Aura",
+        "description": "Doordring je wapen met het bloed van je vijanden: jij en je melee-bondgenoten krijgen gedurende 20 sec 10% aanvalssnelheid en 10% schade."
+      },
+      "victory_rush": {
+        "name": "Overwinningsroes",
+        "description": "Sla toe voor wapenschade plus {damage} en genees 20% van je maximale gezondheid. Alleen bruikbaar binnen 20 sec na het doden van een vijand."
+      },
+      "intimidating_shout": {
+        "name": "Intimiderende Schreeuw",
+        "description": "Een angstaanjagende schreeuw die tot 5 vijanden binnen 8 m gedurende 8 sec in angst laat vluchten. Schade kan het effect verbreken."
       },
       "summon_imp": {
         "name": "Emberkin Oproepen",
@@ -5786,24 +6073,24 @@ export const nl_NL: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a nabije vijanden cada segundo por {damage}. (krijgerstalent)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Messcherpe huil",
+        "description": "Een kreet die vijanden binnen 15 m gedurende 8 sec. met 50% vertraagt. (Krijgertalent)"
       },
       "lingering_dread": {
         "name": "Lingering Dread",
         "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Stormworp",
+        "description": "Slinger je wapen om een doelwit 3 sec. te verdoven. (Krijgertalent)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Roekeloze gelofte",
+        "description": "Verhoogt alle woedeopwekking met 50% en de kans op een kritieke treffer met 20% gedurende 12 sec. (Krijgertalent)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rode banier",
+        "description": "Jij en nabije bondgenoten krijgen 10% aanvalssnelheid en 10% schade gedurende 20 sec. (Krijgertalent)"
       },
       "blink": {
         "name": "Flikkerstap",
@@ -6003,7 +6290,7 @@ export const nl_NL: EnTranslations = {
       },
       "startle_shot": {
         "name": "Startle Shot",
-        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -6162,6 +6449,9 @@ export const nl_NL: EnTranslations = {
       "greyjaw_fang": {
         "name": "Tand van Oude Grijskaak"
       },
+      "chunk_of_ore": {
+        "name": "Brok erts"
+      },
       "weathered_ledger_page": {
         "name": "Verweerd Grootboekblad"
       },
@@ -6191,6 +6481,15 @@ export const nl_NL: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Linnen Lap"
+      },
+      "arcane_dust": {
+        "name": "Arcaan stof"
+      },
+      "arcane_essence": {
+        "name": "Arcane essentie"
+      },
+      "arcane_shard": {
+        "name": "Arcane scherf"
       },
       "fen_muster_order": {
         "name": "Veenbrug-Mobilisatiebevel"
@@ -7104,6 +7403,18 @@ export const nl_NL: EnTranslations = {
       "heroic_mark": {
         "name": "Heroïsch Merk"
       },
+      "eastbrook_buckler": {
+        "name": "Oostbeek-Beukelaar"
+      },
+      "highwatch_wallshield": {
+        "name": "Hoogwacht-Muurschild"
+      },
+      "eastbrook_greatsword": {
+        "name": "Oostbeek-Grootzwaard"
+      },
+      "highwatch_greatsword": {
+        "name": "Hoogwacht-Grootzwaard"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens Kryptgesmede Maliënkolder"
       },
@@ -7142,15 +7453,6 @@ export const nl_NL: EnTranslations = {
       },
       "scepter_of_the_deathless_court": {
         "name": "Scepter van het Doodloze Hof"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Doodloze Krijgswacht-Beenmalie"
-      },
-      "soulrend_diadem": {
-        "name": "Zielscheur-Diadeem"
-      },
-      "scourgehide_carapace": {
-        "name": "Geselhuid-Pantser"
       },
       "cryptplate_helm": {
         "name": "Kryptplaat-Helm"
@@ -7191,9 +7493,6 @@ export const nl_NL: EnTranslations = {
       "deathless_greatblade": {
         "name": "Doodloos Grootzwaard"
       },
-      "soulforged_warplate": {
-        "name": "Zielgesmede Krijgsplaat"
-      },
       "stormcallers_focus": {
         "name": "Stormroepers Focus"
       },
@@ -7230,32 +7529,74 @@ export const nl_NL: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kernhout van de Dodeloze Kroon"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kernhout van de Dodeloze Kroon"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Laatste Eed van Doorntop"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Laatste Eed van Doorntop"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought-Schrikhelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought-Schrikhelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought-Strijdschouderstukken"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought-Strijdschouderstukken"
       },
       "nighttalon_crown": {
         "name": "Direfang-Kroon"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang-Kroon"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang-Schouderstukken"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang-Schouderstukken"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Kap"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire-Kap"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire-Mantel"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire-Mantel"
       },
       "stormcallers_crown": {
         "name": "Galecall-Kroon"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall-Kroon"
+      },
       "stormcallers_spaulders": {
         "name": "Galecall-Schouderstukken"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall-Schouderstukken"
+      },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought-Grootzwaard"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang-Grootkling"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought-Bolwerk"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire-Orb"
       },
       "unknown_alien_weaponry": {
         "name": "Onbekende Buitenaardse Wapens"
@@ -7504,6 +7845,15 @@ export const nl_NL: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Verrezen Koninklijke Garde"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Doodloze Krijgswacht"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Doodloze Hiërofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Doodloos Mes"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
@@ -7833,6 +8183,16 @@ export const nl_NL: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Een vak voor elke hand",
+        "text": "Iedereen in Eastbrook beoefent naast het zwaard een vak, {playerName}. Er liggen overal rond de stad ertsaders, dus pak een houweel en breng me 5 brokken. Delf ze zelf; ik merk het verschil.",
+        "completion": "Zie je wel? Erts in je tas en eelt op je handen. Blijf onderweg mijnen, houthakken en kruiden plukken. Denk bij terugkomst in de stad aan het bord voor Stadsfocus bij de markt en de werkbank ernaast. In al dat werk wacht een eerlijk vak, als je het wilt.",
+        "objectives": {
+          "0": {
+            "label": "Brok erts"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wolven voor de Deur",
         "text": "De boswolven worden brutaal en happen naar reizigers op de noordweg. Dun hun aantal uit, {playerName}. Dood 8 Boswolven en Oostbeek zal vrijer ademen.",

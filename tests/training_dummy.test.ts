@@ -71,6 +71,50 @@ describe('Highwatch training dummy', () => {
     expect(d.inCombat).toBe(false);
   });
 
+  it('a taunt lands as threat but the dummy never turns, and combat still ends', () => {
+    // 2026-07-11 PBE bug: taunting the dummy (or Defiant Bellow's area taunt
+    // in range of it) force-aggroed it through applyTaunt, which has no dummy
+    // guard, and the permanently-aggroed dummy re-flagged the player into
+    // combat every tick forever: rage frozen at cap, food blocked.
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const pid = meleePlayerAt(sim, d.pos.x + 1, d.pos.z);
+    const player = sim.entities.get(pid)!;
+    player.targetId = d.id;
+    sim.castAbility('taunt', pid);
+    for (let i = 0; i < 20; i++) sim.tick();
+    // The taunt registers on the meters (threat) but the dummy stays inert.
+    expect(d.aiState).toBe('idle');
+    expect(d.aggroTargetId).toBe(null);
+    // After the reset window the player is out of combat and the slate wipes.
+    for (let i = 0; i < 20 * 7; i++) sim.tick();
+    expect(player.inCombat).toBe(false);
+    expect(d.inCombat).toBe(false);
+    expect(d.threat.size).toBe(0);
+  });
+
+  it('any forced hostile state on the dummy self-heals at the reset window', () => {
+    // Whatever path flips the dummy hostile-active (a taunt variant, a fear,
+    // a future mechanic), the reset performs the FULL inert cleanup so a
+    // stationary prop can never pin its attacker in combat indefinitely.
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const pid = meleePlayerAt(sim, d.pos.x + 1, d.pos.z);
+    const player = sim.entities.get(pid)!;
+    d.aiState = 'attack';
+    d.aggroTargetId = pid;
+    d.forcedTargetId = pid;
+    d.forcedTargetTimer = 6;
+    d.threat.set(pid, 100);
+    d.combatTimer = 0;
+    for (let i = 0; i < 20 * 7; i++) sim.tick();
+    expect(d.aiState).toBe('idle');
+    expect(d.aggroTargetId).toBe(null);
+    expect(d.forcedTargetId).toBe(null);
+    expect(d.threat.size).toBe(0);
+    expect(player.inCombat).toBe(false);
+  });
+
   it('respawns on its own short timer when felled', () => {
     const sim = makeWorld();
     const d = dummyOf(sim);

@@ -85,9 +85,9 @@ export const id_ID: EnTranslations = {
       "title": "Talenta",
       "classTab": "Kelas",
       "specTab": "Spesialisasi",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Pilihan",
+      "rowUnlockToast": "Pilihan talenta baru terbuka!",
+      "rowUnlocks": "Terbuka pada level {level}",
       "available": "Tersedia",
       "spent": "Terpakai",
       "pointSource": "Dapatkan 1 poin talenta tiap level dari level {first} hingga {cap}. Naik level untuk mendapat lebih banyak poin.",
@@ -146,7 +146,7 @@ export const id_ID: EnTranslations = {
         "noTree": "Kelasmu belum memiliki pohon talenta.",
         "locked": "Kamu belum membuka talenta — talenta mulai tersedia di level {level}.",
         "noSpec": "tanpa spesialisasi",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenta: {head}, {picked}/{unlocked} baris pilihan dipilih.",
         "summary": "Talenta: {head} — {spent}/{total} poin terpakai ({breakdown}).",
         "breakdownClass": "Kelas {classPts}",
         "breakdownSpec": "Kelas {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const id_ID: EnTranslations = {
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} diserap",
+      "cheap": "Lebih murah!"
     },
     "emotes": {
       "wave": "Melambai",
@@ -298,6 +298,7 @@ export const id_ID: EnTranslations = {
       "playerLabel": "Pahlawan Anda",
       "targetLabel": "Sasaran Anda",
       "targetAnnounce": "Tandai {name}",
+      "targetOfTargetLabel": "Sasaran dari Sasaran",
       "partyLabel": "Kelompok Anda",
       "partyChip": "Kelompok",
       "partyGroup": "Grup {n}",
@@ -314,7 +315,6 @@ export const id_ID: EnTranslations = {
       "chat": "Lewati ke Obrolan"
     },
     "mobile": {
-      "autorun": "Lari Otomatis",
       "jump": "Lompat",
       "leaderboard": "Peringkat",
       "dailyRewards": "Hadiah",
@@ -574,13 +574,32 @@ export const id_ID: EnTranslations = {
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",
       "groundReticle": "Retikel bidik darat",
+      "mouseoverCast": "Rapal Saat Menyorot Bingkai Kelompok",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal"
+    },
+    "talentRows": {
+      "tab": "Pilihan",
+      "defaultLoadout": "Susunan Bawaan",
+      "comingSoon": "Segera hadir"
+    },
+    "specPanel": {
+      "primaryAttr": "Atribut utama",
+      "complexity": "Kompleksitas",
+      "complexityLow": "Rendah",
+      "complexityMedium": "Sedang",
+      "complexityHigh": "Tinggi",
+      "exampleAbilities": "Contoh kemampuan",
+      "viewTalents": "Lihat talenta",
+      "selectSpec": "Pilih spesialisasi",
+      "specUnlockBanner": "Spesialisasi Terbuka!",
+      "specUnlockHint": "Tekan N untuk memilih spesialisasimu."
     },
     "controller": {
       "title": "Kontroler",
@@ -678,7 +697,9 @@ export const id_ID: EnTranslations = {
       "names": {
         "spellPower": "Kekuatan Mantra",
         "critRating": "Rating Kritis",
-        "hasteRating": "Rating Kecepatan"
+        "hasteRating": "Rating Kecepatan",
+        "haste": "Kecepatan",
+        "parry": "Tangkis"
       },
       "desc": {
         "str": "Meningkatkan daya serang Anda, sehingga serangan senjata Anda menghantam lebih keras.",
@@ -693,7 +714,9 @@ export const id_ID: EnTranslations = {
         "critChance": "Peluang serangan Anda menghantam secara kritis, memberikan kerusakan ganda.",
         "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan.",
         "critRating": "Rating kritis dari perlengkapan dan bonus set Anda, menaikkan peluang serangan kritis Anda. Sekitar 10 rating memberi 1% kritis.",
-        "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan."
+        "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.",
+        "haste": "Mempercepat ayunan senjata dan rapalan mantra Anda. Tidak mengurangi cooldown global.",
+        "parry": "Peluang Anda untuk sepenuhnya menangkis serangan jarak dekat dari depan, tanpa menerima kerusakan. Pukulan dari belakang tidak dapat ditangkis."
       },
       "effects": {
         "attackPower": "+{value} Daya Serang",
@@ -730,6 +753,8 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
+    "itemHeroicTag": "[HEROIK]",
+    "itemSoulbound": "Terikat jiwa",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -809,6 +834,7 @@ export const id_ID: EnTranslations = {
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
     },
     "paperdoll": {
+      "offhand": "Tangan Pendamping",
       "unequipAria": "Lepas {item}",
       "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas"
     },
@@ -1059,9 +1085,24 @@ export const id_ID: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
+      "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
+      "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
+      "dmgDone": "Meningkatkan kerusakan yang diberikan sebesar {pct}%",
+      "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
+      "crit": "Meningkatkan peluang serangan kritis sebesar {pct}%",
+      "rageGen": "Meningkatkan penghasilan Amarah sebesar {pct}%",
+      "reckless": "Meningkatkan peluang serangan kritis sebesar {pct}% dan penghasilan Amarah sebesar {ragePct}%",
+      "avatar": "Kolosus: kerusakan yang diberikan meningkat {pct}%",
+      "bloodbath": "Meningkatkan peluang serangan kritis dan kerusakan yang diberikan sebesar {pct}%",
+      "dieBySword": "Mengurangi kerusakan yang diterima sebesar {pct}% ({lowPct}% saat di bawah {hpPct}% nyawa)",
+      "sanguine": "Meningkatkan kecepatan serangan sebesar {hastePct}% dan kerusakan yang diberikan sebesar {dmgPct}%",
+      "battleTrance": "Serangan Perampas atau Serangan Pelukai berikutnya tidak membutuhkan Amarah",
+      "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
+      "victoryRush": "Terjangan Kemenangan siap digunakan",
+      "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
       "school": {
         "physical": "Fisik",
         "fire": "Api",
@@ -1074,6 +1115,26 @@ export const id_ID: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+    },
+    "auth": {
+      "appleLoginCta": "Lanjutkan dengan Apple",
+      "appleError": "Tidak dapat masuk dengan Apple. Silakan coba lagi.",
+      "appleChoiceIntro": "Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.",
+      "appleChoiceExpired": "Sesi masuk dengan Apple itu sudah kedaluwarsa. Silakan masuk dengan Apple lagi.",
+      "forgotPrompt": "Lupa kata sandi?",
+      "forgotTitle": "Atur ulang kata sandimu",
+      "forgotHint": "Masukkan nama penggunamu dan kami akan mengirim tautan pengaturan ulang ke alamat email yang terdaftar.",
+      "forgotUsername": "Nama pengguna",
+      "forgotSubmit": "Kirim tautan pengaturan ulang",
+      "forgotSent": "Jika akun dengan nama pengguna itu memiliki email terdaftar, kami telah mengirim tautan pengaturan ulang. Periksa kotak masukmu.",
+      "forgotBack": "Kembali ke masuk",
+      "resetTitle": "Pilih kata sandi baru",
+      "resetNewPassword": "Kata sandi baru",
+      "resetConfirm": "Konfirmasi kata sandi baru",
+      "resetSubmit": "Perbarui kata sandi",
+      "resetDone": "Kata sandimu telah diperbarui. Sekarang kamu bisa masuk.",
+      "resetMismatch": "Kata sandi tidak cocok.",
+      "resetErrInvalid": "Tautan pengaturan ulang ini tidak valid atau sudah kedaluwarsa. Minta yang baru."
     },
     "loot": {
       "chestTitle": "Peti"
@@ -1304,6 +1365,8 @@ export const id_ID: EnTranslations = {
       "parcelsLabel": "Bingkisan",
       "parcelsHint": "Klik barang di tasmu untuk melampirkannya.",
       "removeParcelAria": "Keluarkan {item} dari surat",
+      "parcelQtyDecreaseAria": "Kirim satu {item} lebih sedikit",
+      "parcelQtyIncreaseAria": "Kirim satu {item} lebih banyak",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",
@@ -1964,11 +2027,19 @@ export const id_ID: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
+      "revenge": "Serangan balasan menyapu yang menghantam segala sesuatu di hadapanmu, dan menjadi lebih murah tepat setelah kamu menangkis sebuah pukulan.",
       "battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
       "commanding_shout": "Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.",
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
       "rend": "Membuka pendarahan yang menggerus sasaran seiring waktu.",
       "thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
+      "cw_heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
+      "cw_battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
+      "cw_commanding_shout": "Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.",
+      "cw_charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
+      "cw_rend": "Membuka pendarahan yang menggerus sasaran seiring waktu.",
+      "cw_thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
+      "hamstring": "Menyabet kaki sasaran untuk melambatkannya sehingga ia tak bisa mengejarmu.",
       "seal_of_righteousness": "Mengisi ayunanmu dengan kerusakan Suci, lalu habiskan dengan Vonis.",
       "holy_light": "Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.",
       "devotion_aura": "Penguat-diri tahan lama yang menaikkan zirah sehingga pukulan terasa lebih ringan.",
@@ -3275,6 +3346,7 @@ export const id_ID: EnTranslations = {
   },
   "classes": {
     "warrior": "Prajurit",
+    "warriorClassic": "Prajurit",
     "paladin": "Paladin",
     "hunter": "Pemburu",
     "rogue": "Penyamun",
@@ -4042,6 +4114,7 @@ export const id_ID: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / DPS Jarak Dekat",
+      "warriorClassic": "Tank / DPS Jarak Dekat",
       "paladin": "Penyembuh / Tank / DPS Jarak Dekat",
       "hunter": "DPS Jarak Jauh",
       "rogue": "DPS Jarak Dekat",
@@ -4066,6 +4139,7 @@ export const id_ID: EnTranslations = {
     },
     "lore": {
       "warrior": "Prajurit adalah petarung jarak dekat yang tangguh, yang membangun Amarah saat memberi atau menerima kerusakan. Mereka menyerap pukulan keras atau meremukkan lawan dengan senjata ampuh.",
+      "warriorClassic": "Prajurit persis seperti sebelum perombakan sistem tempur: paket kemampuan asli dan ritme amarah aslinya, dipertahankan berdampingan dengan Prajurit baru agar kamu bisa mencoba keduanya dan memberi tahu kami mana yang terasa lebih baik.",
       "paladin": "Paladin adalah ksatria suci yang mendukung sekutu dengan berkah, menyembuhkan luka dengan Cahaya Pemulih, dan melindungi yang lemah dengan zirah berat.",
       "hunter": "Pemburu adalah spesialis jarak jauh yang bertarung berdampingan dengan binatang buas jinak, menghujani musuh dengan tembakan terarah dan beruntun, memperlambat mereka dengan sengat dan tembakan pengguncang, serta berganti Aspek sesuai keadaan pertempuran.",
       "rogue": "Penyamun adalah pembunuh siluman yang menghabiskan Energi dan Poin Kombo untuk tikaman belakang dan jurus penutup dari balik bayangan.",
@@ -4366,6 +4440,7 @@ export const id_ID: EnTranslations = {
     "combat": {
       "floatingMiss": "Meleset",
       "floatingDodge": "Elak",
+      "floatingParry": "Tangkis",
       "floatingResist": "Ditahan",
       "cannotMove": "Tidak bisa bergerak!",
       "attack": "serang",
@@ -4375,6 +4450,7 @@ export const id_ID: EnTranslations = {
       "damageTakenCrit": "{source} mengenaimu secara kritis sebesar {amount}.",
       "miss": "{ability}-mu meleset dari {target}.",
       "dodged": "{ability}-mu dielakkan oleh {target}.",
+      "parried": "{ability}-mu ditangkis oleh {target}.",
       "resisted": "{target} menahan {ability} milikmu.",
       "healSelf": "{ability}-mu menyembuhkanmu sebesar {amount}.",
       "healSelfCrit": "{ability}-mu menyembuhkanmu secara kritis sebesar {amount}.",
@@ -4417,6 +4493,7 @@ export const id_ID: EnTranslations = {
       "notEnoughMana": "Mana tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
       "notEnoughHealth": "Nyawa tidak cukup.",
+      "nothingToConsume": "Tidak ada yang bisa dikonsumsi.",
       "targetMustDodge": "Sasaranmu harus mengelak terlebih dahulu.",
       "requiresCombo": "Kemampuan itu membutuhkan poin kombo.",
       "requiresForm": "Kamu harus berada dalam Wujud {form}.",
@@ -4433,6 +4510,7 @@ export const id_ID: EnTranslations = {
       "facing": "Kamu harus menghadap sasaranmu.",
       "targetHealthBelow": "Kemampuan itu membutuhkan nyawa sasaran di bawah {percent}%.",
       "dagger": "Kamu harus menggunakan belati.",
+      "needShield": "Kamu harus mengenakan perisai.",
       "behindTarget": "Kamu harus berada di belakang sasaranmu.",
       "polymorph": "Makhluk ini tidak bisa diubah wujud.",
       "noSeal": "Kamu tidak memiliki Segel yang aktif.",
@@ -4808,6 +4886,7 @@ export const id_ID: EnTranslations = {
     },
     "slots": {
       "mainhand": "Tangan Utama",
+      "twoHand": "Dua Tangan",
       "helmet": "Helm",
       "neck": "Leher",
       "shoulder": "Bahu",
@@ -5081,9 +5160,101 @@ export const id_ID: EnTranslations = {
         "name": "Gempa Bumi",
         "description": "Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik."
       },
+      "chain_heal": {
+        "name": "Penyembuhan Berantai",
+        "description": "Menyembuhkan target sebesar {damage}, lalu melompat ke hingga 2 sekutu terdekat, setiap lompatan menyembuhkan setengah dari jumlah sebelumnya."
+      },
       "heroic_strike": {
         "name": "Serangan Perampas",
         "description": "Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya."
+      },
+      "cw_heroic_strike": {
+        "name": "Serangan Perampas",
+        "description": "Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya."
+      },
+      "cw_battle_shout": {
+        "name": "Raungan Besi",
+        "description": "Meningkatkan daya serangmu sebesar {buff} selama 2 menit."
+      },
+      "cw_commanding_shout": {
+        "name": "Seruan Penguat",
+        "description": "Meningkatkan Staminamu sebesar {buff} selama 2 menit."
+      },
+      "cw_charge": {
+        "name": "Serbuan",
+        "description": "Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard."
+      },
+      "cw_rend": {
+        "name": "Sayatan Dalam",
+        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik."
+      },
+      "cw_thunder_clap": {
+        "name": "Pukulan Gempa",
+        "description": "Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik."
+      },
+      "cw_hamstring": {
+        "name": "Sayatan Pincang",
+        "description": "Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik."
+      },
+      "cw_bloodrage": {
+        "name": "Tumbal Darah",
+        "description": "Menghasilkan 10 amarah dengan mengorbankan nyawa."
+      },
+      "cw_overpower": {
+        "name": "Redhand",
+        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
+      },
+      "cw_execute": {
+        "name": "Ajal Dini",
+        "description": "Berupaya menghabisi musuh yang terluka, menimbulkan {damage} kerusakan. Hanya dapat digunakan pada musuh di bawah 20% kesehatan."
+      },
+      "cw_slam": {
+        "name": "Ayunan Brutal",
+        "description": "Menghantam lawan sebesar kerusakan senjata ditambah {damage}."
+      },
+      "cw_cleave": {
+        "name": "Busur Penuai",
+        "description": "Sabetan menyapu yang menghantam semua musuh di hadapanmu untuk {damage} kerusakan."
+      },
+      "cw_defensive_stance": {
+        "name": "Kuda-kuda Waspada",
+        "description": "Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Direhowl",
+        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik."
+      },
+      "cw_sunder_armor": {
+        "name": "Robek Zirah",
+        "description": "Merobek zirah target, menguranginya sebesar {damage}% per penerapan. Menumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah besar."
+      },
+      "cw_taunt": {
+        "name": "Hasutan",
+        "description": "Memprovokasi target: ancamanmu naik menyamai musuhnya yang paling dibenci dan ia terpaksa menyerangmu selama 3 detik."
+      },
+      "cw_bloodthirst": {
+        "name": "Pertumpahan Darah",
+        "description": "Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)"
+      },
+      "cw_mortal_strike": {
+        "name": "Serangan Pelukai",
+        "description": "Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)"
+      },
+      "cw_shield_slam": {
+        "name": "Shieldcrack",
+        "description": "Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)"
+      },
+      "cw_whirlwind": {
+        "name": "Pusaran Berpisau",
+        "description": "Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)"
+      },
+      "cw_berserker_rage": {
+        "name": "Amukan Mendidih",
+        "description": "Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)"
+      },
+      "revenge": {
+        "name": "Balas Dendam",
+        "description": "Menyerang dalam busur lebar, memberikan kerusakan Fisik kepada semua musuh di hadapanmu. Di atas 5 target kerusakannya berkurang. Saat kamu mengelak atau menangkis, Balas Dendam berikutnya mungkin tidak membutuhkan amarah."
       },
       "battle_shout": {
         "name": "Raungan Besi",
@@ -5127,7 +5298,7 @@ export const id_ID: EnTranslations = {
       },
       "slam": {
         "name": "Ayunan Brutal",
-        "description": "Menghantam lawan sebesar kerusakan senjata ditambah {damage}."
+        "description": "Menghantam lawan sebesar 50% kerusakan senjata ditambah {damage}, menghasilkan {rage} amarah."
       },
       "cleave": {
         "name": "Busur Penuai",
@@ -5136,6 +5307,14 @@ export const id_ID: EnTranslations = {
       "defensive_stance": {
         "name": "Kuda-kuda Waspada",
         "description": "Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini."
+      },
+      "battle_stance": {
+        "name": "Kuda-kuda Tempur",
+        "description": "Kuda-kuda tempur agresif: kamu menghasilkan 10% lebih banyak amarah. Kuda-kuda bawaan untuk Arms dan Protection."
+      },
+      "berserker_stance": {
+        "name": "Kuda-kuda Berserker",
+        "description": "Kuda-kuda tempur nekat: serangan kritismu mendarat 3% lebih sering dan menghantam 3% lebih keras. Prajurit Fury selalu bertarung dalam kuda-kuda ini."
       },
       "sunder_armor": {
         "name": "Robek Zirah",
@@ -5625,9 +5804,77 @@ export const id_ID: EnTranslations = {
         "name": "Serangan Pelukai",
         "description": "Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)"
       },
+      "sweeping_strikes": {
+        "name": "Busur Melebar",
+        "description": "Selama 12 detik serangan target-tunggalmu juga menghantam 1 musuh terdekat dengan kerusakan penuh. (Arms)"
+      },
+      "deep_wounds": {
+        "name": "Luka Menganga",
+        "description": "Pasif: Serangan Pelukai-mu membuat target berdarah, menerima kerusakan Fisik selama 6 detik. (Arms)"
+      },
+      "enrage_passive": {
+        "name": "Huru-hara",
+        "description": "Pasif: saat Mengamuk kamu memberikan 7% lebih banyak kerusakan, menyerang 25% lebih cepat, dan bergerak 10% lebih cepat selama 4 detik. Pertumpahan Darah punya peluang 30% membuatmu Mengamuk; Panen Merah selalu melakukannya. (Fury)"
+      },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
         "description": "Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)"
+      },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Seketika menyerang dengan senjatamu dua kali, setiap pukulan memberikan 40% kerusakan senjata ditambah {damage}, dan menghasilkan {rage} amarah. Menyimpan hingga 2 muatan. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Panen Merah",
+        "description": "Menghabiskan segalanya: menyerang tiga kali dalam amukan untuk 65% kerusakan senjata ditambah {damage} setiap serangan, selalu membuatmu Mengamuk. (Fury)"
+      },
+      "furious_mending": {
+        "name": "Pemulihan Murka",
+        "description": "Selama 10 detik kamu menerima kerusakan 20% lebih sedikit, dan selama itu berlangsung Pertumpahan Darah-mu menyembuhkanmu sebesar 20% dari nyawa maksimummu. (Fury)"
+      },
+      "emboldening_roar": {
+        "name": "Auman Penyemangat",
+        "description": "Melepaskan auman penyemangat: kamu dan pemain kawan dalam 40 yard menjadi Bernyali, dan 3 kemampuanmu berikutnya dipastikan menjadi serangan kritis. (Fury)"
+      },
+      "raised_guard": {
+        "name": "Perisai Terangkat",
+        "description": "Bersiaga di balik perisaimu: kamu menerima kerusakan Fisik 50% lebih sedikit selama 6 detik. Menyimpan hingga 2 muatan. (Protection)"
+      },
+      "iron_resolve": {
+        "name": "Tekad Besi",
+        "description": "Mengertakkan gigi dan mengabaikan rasa sakit: menghabiskan seluruh amarahmu (minimum 20) untuk menyerap 4 kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Protection)"
+      },
+      "faultline": {
+        "name": "Faultline",
+        "description": "Mengirim gelombang kejut melalui tanah: musuh di hadapanmu dalam 8 yard menerima {damage} kerusakan dan terpana selama 3 detik. (Protection)"
+      },
+      "defiant_bellow": {
+        "name": "Raungan Menantang",
+        "description": "Raungan penuh tantangan: semua musuh dalam 10 yard terhasut, terpaksa menyerangmu selama 3 detik. (Protection)"
+      },
+      "breachmaker": {
+        "name": "Breachmaker",
+        "description": "Menggempur target sebesar kerusakan senjata ditambah {damage} dan meretakkan pertahanannya: seranganmu sendiri terhadapnya memberikan 20% lebih banyak kerusakan selama 8 detik. (Arms)"
+      },
+      "measured_fury": {
+        "name": "Amarah Terukur",
+        "description": "Amarah terukurmu mempertajam penghematanmu: kemampuanmu membutuhkan 10% lebih sedikit amarah. (Arms)"
+      },
+      "seasoned_soldier": {
+        "name": "Serdadu Kawakan",
+        "description": "Serangan otomatis kritismu menghasilkan 10% lebih banyak amarah. (Arms)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Twinstrike Diabolis",
+        "description": "Saat Mengamuk, Twinstrike-mu memberikan 15% lebih banyak kerusakan. (Fury)"
+      },
+      "cleaving_blows": {
+        "name": "Pukulan Membelah",
+        "description": "Panen Merah selalu mengembalikan satu muatan Twinstrike. (Fury)"
+      },
+      "sudden_death": {
+        "name": "Kematian Mendadak",
+        "description": "Serangan otomatismu punya peluang membuatmu bisa merapal Ajal Dini pada target dengan kesehatan berapa pun, tanpa membutuhkan amarah. (Arms)"
       },
       "shield_slam": {
         "name": "Shieldcrack",
@@ -5641,29 +5888,29 @@ export const id_ID: EnTranslations = {
         "name": "Amukan Mendidih",
         "description": "Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)"
       },
+      "holy_shock": {
+        "name": "Kejutan Suci",
+        "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
+      },
       "crusader_strike": {
         "name": "Serangan Tentara Salib",
         "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
-      },
-      "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfosis",
         "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"
       },
       "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged aegis for {damage} Holy damage, silencing the primary target for 2 sec, then bouncing to up to {jumps} additional enemies within {radius} yards for {falloff} damage per bounce. (Paladin talent)"
-      },
-      "holy_shock": {
-        "name": "Kejutan Suci",
-        "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
+        "name": "Pantulan Fajar",
+        "description": "Melempar perisai tempa fajar yang menghasilkan {damage} kerusakan Suci, membungkam target utama selama 2 detik, lalu memantul ke hingga {jumps} musuh lain dalam jarak {radius} yard dengan {falloff} kerusakan tiap pantulan. (talenta Paladin)"
       },
       "holy_shield": {
         "name": "Perisai Suci",
         "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
+      },
+      "repentance": {
+        "name": "Pertobatan",
+        "description": "Menempatkan musuh dalam keadaan meditasi hingga 6 detik. Kerusakan apa pun mematahkan efeknya. (Ciri khas Retribution)"
       },
       "bestial_wrath": {
         "name": "Murka Buas",
@@ -5717,9 +5964,21 @@ export const id_ID: EnTranslations = {
         "name": "Penguasaan Elemen",
         "description": "Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)"
       },
+      "shamanistic_rage": {
+        "name": "Amukan Dukun",
+        "description": "Melepaskan amukan sang dukun, memulihkan 160 mana. (Ciri khas Enhancement)"
+      },
+      "natures_swiftness": {
+        "name": "Kecepatan Alam",
+        "description": "Memanggil kekuatan alam untuk membuat mantramu berikutnya menjadi seketika. (Ciri khas Restoration)"
+      },
       "siphon_life": {
         "name": "Sifon Nyawa",
         "description": "Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)"
+      },
+      "fel_domination": {
+        "name": "Dominasi Fel",
+        "description": "Menundukkan energi fel, membuat mantramu berikutnya menjadi seketika. (Ciri khas Demonology)"
       },
       "conflagrate": {
         "name": "Kobaran Api",
@@ -5736,6 +5995,34 @@ export const id_ID: EnTranslations = {
       "swiftmend": {
         "name": "Pemulihan Cepat",
         "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
+      },
+      "storm_bolt": {
+        "name": "Baut Badai",
+        "description": "Melemparkan senjatamu ke target sebesar {damage}, membuatnya terpana selama 3 detik."
+      },
+      "piercing_howl": {
+        "name": "Lolongan Menusuk",
+        "description": "Teriakan menusuk yang memperlambat semua musuh dalam 15 yard sebesar 50% selama 8 detik."
+      },
+      "die_by_sword": {
+        "name": "Mati oleh Pedang",
+        "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
+      },
+      "recklessness": {
+        "name": "Kenekatan",
+        "description": "Mengamuk: penghasilan amarahmu meningkat sebesar 50% dan peluang serangan kritismu sebesar 20% selama 12 detik."
+      },
+      "sanguine_aura": {
+        "name": "Aura Darah",
+        "description": "Mengisi senjatamu dengan darah musuh-musuhmu: kamu dan sekutu jarak dekatmu mendapatkan 10% kecepatan serangan dan 10% kerusakan selama 20 detik."
+      },
+      "victory_rush": {
+        "name": "Terjangan Kemenangan",
+        "description": "Menyerang sebesar kerusakan senjata ditambah {damage} dan memulihkan 20% dari nyawa maksimummu. Hanya dapat digunakan dalam 20 detik setelah membunuh musuh."
+      },
+      "intimidating_shout": {
+        "name": "Teriakan Menggentarkan",
+        "description": "Teriakan menggentarkan yang membuat hingga 5 musuh dalam 8 yard lari ketakutan selama 8 detik. Kerusakan dapat mematahkan efeknya."
       },
       "summon_imp": {
         "name": "Panggil Emberkin",
@@ -5786,24 +6073,24 @@ export const id_ID: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a di dekat musuh cada segundo por {damage}. (talenta warrior)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Raungan Tajam",
+        "description": "Teriakan yang memperlambat musuh dalam jarak 15 m sebesar 50% selama 8 dtk. (Talenta petarung)"
       },
       "lingering_dread": {
         "name": "Lingering Dread",
         "description": "Unleash a battle cry that fears enemies within 10 yards for 4 sec. The fear endures up to 20% of each target's maximum health in damage. (Warrior talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Lemparan Badai",
+        "description": "Lemparkan senjatamu untuk membuat target pingsan selama 3 dtk. (Talenta petarung)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Sumpah Nekat",
+        "description": "Meningkatkan semua perolehan amarah sebesar 50% dan peluang serangan kritis sebesar 20% selama 12 dtk. (Talenta petarung)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and allies within 30 yd gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Panji Merah",
+        "description": "Kamu dan sekutu di dekatmu memperoleh 10% kecepatan serangan dan 10% kerusakan selama 20 dtk. (Talenta petarung)"
       },
       "blink": {
         "name": "Langkah Kilat",
@@ -6003,7 +6290,7 @@ export const id_ID: EnTranslations = {
       },
       "startle_shot": {
         "name": "Startle Shot",
-        "description": "A wild shot that disorients the target. Any damage breaks the effect."
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -6162,6 +6449,9 @@ export const id_ID: EnTranslations = {
       "greyjaw_fang": {
         "name": "Taring Greyjaw Tua"
       },
+      "chunk_of_ore": {
+        "name": "Bongkahan Bijih"
+      },
       "weathered_ledger_page": {
         "name": "Halaman Buku Besar Lapuk"
       },
@@ -6191,6 +6481,15 @@ export const id_ID: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Potongan Linen"
+      },
+      "arcane_dust": {
+        "name": "Debu Arkana"
+      },
+      "arcane_essence": {
+        "name": "Esensi Arkana"
+      },
+      "arcane_shard": {
+        "name": "Pecahan Arkana"
       },
       "fen_muster_order": {
         "name": "Perintah Mobilisasi Fenbridge"
@@ -7104,6 +7403,18 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
+      "eastbrook_buckler": {
+        "name": "Perisai Kecil Eastbrook"
+      },
+      "highwatch_wallshield": {
+        "name": "Perisai Tembok Highwatch"
+      },
+      "eastbrook_greatsword": {
+        "name": "Pedang Agung Eastbrook"
+      },
+      "highwatch_greatsword": {
+        "name": "Pedang Agung Highwatch"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Baju Zirah Tempaan Kripta Morthen"
       },
@@ -7142,15 +7453,6 @@ export const id_ID: EnTranslations = {
       },
       "scepter_of_the_deathless_court": {
         "name": "Tongkat Kebesaran Istana Nirmaut"
-      },
-      "deathless_warguard_legmail": {
-        "name": "Zirah Kaki Garda Perang Nirmaut"
-      },
-      "soulrend_diadem": {
-        "name": "Diadem Pengoyak Jiwa"
-      },
-      "scourgehide_carapace": {
-        "name": "Karapas Kulit Sampar"
       },
       "cryptplate_helm": {
         "name": "Helm Lempeng Kripta"
@@ -7191,9 +7493,6 @@ export const id_ID: EnTranslations = {
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"
       },
-      "soulforged_warplate": {
-        "name": "Zirah Perang Tempaan Jiwa"
-      },
       "stormcallers_focus": {
         "name": "Fokus Pemanggil Badai"
       },
@@ -7230,32 +7529,74 @@ export const id_ID: EnTranslations = {
       "deathless_heartwood": {
         "name": "Inti Kayu Mahkota Baka"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Inti Kayu Mahkota Baka"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Sumpah Terakhir Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Sumpah Terakhir Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Helm Seram Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Helm Seram Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Bahu Perang Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bahu Perang Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Mahkota Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Mahkota Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Pelindung Bahu Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Pelindung Bahu Direfang"
       },
       "soulflame_cowl": {
         "name": "Tudung Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Tudung Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Mantel Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Mantel Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Mahkota Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Mahkota Galecall"
+      },
       "stormcallers_spaulders": {
         "name": "Pelindung Bahu Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Pelindung Bahu Galecall"
+      },
+      "bonewrought_greatsword": {
+        "name": "Pedang Besar Bonewrought"
+      },
+      "direfang_greatblade": {
+        "name": "Bilah Besar Direfang"
+      },
+      "bonewrought_bulwark": {
+        "name": "Perisai Benteng Bonewrought"
+      },
+      "wraithfire_orb": {
+        "name": "Orb Wraithfire"
       },
       "unknown_alien_weaponry": {
         "name": "Persenjataan Alien Tak Dikenal"
@@ -7504,6 +7845,15 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Pengawal Kerajaan Bangkit"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garda Perang Nirmaut"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofan Nirmaut"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Belati Nirmaut"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
@@ -7833,6 +8183,16 @@ export const id_ID: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Keahlian untuk Setiap Tangan",
+        "text": "Setiap orang di Eastbrook memiliki keahlian selain bermain pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ambil beliung dan bawakan 5 bongkahan untukku. Tambang sendiri; aku akan tahu bedanya.",
+        "completion": "Lihat? Bijih di dalam tas dan kapalan di tanganmu. Teruslah menambang, menebang kayu, dan memetik herba sepanjang perjalanan. Saat kembali ke kota, ingat papan Fokus Kota di dekat pasar dan meja kerja di sebelahnya. Ada keahlian yang jujur dalam semua pekerjaan itu, jika kamu menginginkannya.",
+        "objectives": {
+          "0": {
+            "label": "Bongkahan Bijih"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Serigala di Ambang Pintu",
         "text": "Serigala hutan kian berani, menerkam para pengelana di jalan utara. Kurangi jumlah mereka, {playerName}. Bunuh 8 Serigala Hutan dan Eastbrook akan bernapas lebih lega.",

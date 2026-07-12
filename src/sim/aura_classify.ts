@@ -8,7 +8,7 @@ import type { AuraKind } from './types';
 // A kind that is harmful by nature regardless of its value. Mirrors classic-era
 // "Debuff" framing: damage-over-time, crowd control, stat/armor reductions, and
 // the various combat penalties (silence/disarm/blind/lockout/expose/...).
-const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'dot',
   'slow',
   'root',
@@ -16,6 +16,7 @@ const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'incapacitate',
   'polymorph',
   'attackspeed',
+  'bleed_vuln',
   'debuff_ap',
   'sunder',
   'corrode',
@@ -38,5 +39,5 @@ const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
 // an Intellect-draining curse) is a debuff even though it reuses a buff_* kind.
 export function isDebuffAura(kind: AuraKind, value: number): boolean {
-  return HARMFUL_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
+  return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }

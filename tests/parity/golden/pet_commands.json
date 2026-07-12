@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "cd2e74a2",
+      "state": "34ac3903",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,6 +56,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -70,6 +71,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -97,6 +106,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.057,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -134,7 +144,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "c0431ec9",
+      "state": "f5465d05",
       "events": "e042fd30",
       "rng": {
         "draws": 0,
@@ -167,6 +177,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -182,6 +193,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -209,6 +228,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -287,7 +307,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "d0eba1a8",
+      "state": "35f8b0c6",
       "events": "97340448",
       "rng": {
         "draws": 0,
@@ -320,6 +340,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -335,6 +356,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -362,6 +391,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -454,7 +484,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "c431ea3e",
+      "state": "a09be934",
       "events": "d70fb9f2",
       "rng": {
         "draws": 0,
@@ -465,7 +495,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "86443690",
+      "state": "6c2dbf2a",
       "events": "1a2734ed",
       "rng": {
         "draws": 0,
@@ -476,7 +506,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "a166cd4f",
+      "state": "a78e46ef",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -509,6 +539,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -524,6 +555,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -551,6 +590,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -705,7 +745,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "de636535",
+      "state": "3147a2bd",
       "events": "5aadc799",
       "rng": {
         "draws": 0,
@@ -738,6 +778,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -753,6 +794,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -780,6 +829,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -873,7 +923,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "bb3072df",
+      "state": "9c951a3b",
       "events": "1b51753b",
       "rng": {
         "draws": 0,
@@ -906,6 +956,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -921,6 +972,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -948,6 +1007,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1082,7 +1142,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "37c100eb",
+      "state": "448db10b",
       "events": "39bbf203",
       "rng": {
         "draws": 0,
@@ -1115,6 +1175,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1130,6 +1191,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1157,6 +1226,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1291,7 +1361,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "de636535",
+      "state": "3147a2bd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1324,6 +1394,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1339,6 +1410,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1366,6 +1445,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1459,7 +1539,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "de636535",
+      "state": "3147a2bd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1492,6 +1572,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1507,6 +1588,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1534,6 +1623,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1627,7 +1717,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 414,
-      "state": "44f87d08",
+      "state": "8e53b8fb",
       "events": "d74bfbad",
       "rng": {
         "draws": 0,
@@ -1660,6 +1750,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1675,6 +1766,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1704,6 +1803,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1719,6 +1819,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -1746,6 +1854,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1936,7 +2045,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 414,
-      "state": "c7228eb3",
+      "state": "deed0e48",
       "events": "a919d341",
       "rng": {
         "draws": 82,
@@ -1947,7 +2056,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "90d75ee3",
+      "state": "ebffcd22",
       "events": "1005cba8",
       "rng": {
         "draws": 158,
@@ -1958,7 +2067,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "90d75ee3",
+      "state": "ebffcd22",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -1993,6 +2102,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2008,6 +2118,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2037,6 +2155,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2052,6 +2171,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2080,6 +2207,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2277,14 +2405,14 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 415,
-      "state": "9d6d4b65",
-      "events": "e3337e5d",
+      "nextId": 416,
+      "state": "233bf716",
+      "events": "d9be4bae",
       "rng": {
         "draws": 158,
         "digest": "878ecdcb"
       },
-      "label": "demon-faded",
+      "label": "demon-resummoned",
       "players": [
         {
           "activeLoadout": -1,
@@ -2313,6 +2441,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2328,6 +2457,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2357,6 +2494,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2372,6 +2510,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2400,6 +2546,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2550,15 +2697,56 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -0.525705,
+          "fiveSecondRule": 99,
+          "hp": 378,
+          "id": 415,
+          "kind": "mob",
+          "level": 12,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 378,
+          "moveSpeed": 5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "ownerId": 412,
+          "petMode": "defensive",
+          "pos": {
+            "x": 34,
+            "y": -0.525705,
+            "z": -1
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 34,
+            "y": -0.525705,
+            "z": -1
+          },
+          "stats": {
+            "armor": 495
+          },
+          "templateId": "gloomshade",
+          "weapon": {
+            "max": 15,
+            "min": 10,
+            "speed": 2
+          }
         }
       ]
     },
     {
       "tick": 80,
       "time": 4,
-      "nextId": 417,
-      "state": "64bc7bd2",
-      "events": "4966d07c",
+      "nextId": 418,
+      "state": "503ad6e5",
+      "events": "2cf8a2d5",
       "rng": {
         "draws": 158,
         "digest": "878ecdcb"
@@ -2592,6 +2780,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2607,6 +2796,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2636,6 +2833,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2651,6 +2849,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2679,6 +2885,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2842,7 +3049,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 416,
+          "id": 417,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -2866,7 +3073,7 @@
           "stats": {
             "armor": 70
           },
-          "targetId": 415,
+          "targetId": 416,
           "templateId": "forest_wolf",
           "threat": [
             [
@@ -2885,8 +3092,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 417,
-      "state": "64bc7bd2",
+      "nextId": 418,
+      "state": "503ad6e5",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -2921,6 +3128,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2936,6 +3144,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -2965,6 +3181,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2980,6 +3197,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -3008,6 +3233,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -3171,7 +3397,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 416,
+          "id": 417,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -3195,7 +3421,7 @@
           "stats": {
             "armor": 70
           },
-          "targetId": 415,
+          "targetId": 416,
           "templateId": "forest_wolf",
           "threat": [
             [

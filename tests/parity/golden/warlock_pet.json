@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "98db0b25",
+      "state": "a4976716",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,6 +49,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -63,6 +64,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -126,7 +135,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 406,
-      "state": "3103cebf",
+      "state": "d1531ee0",
       "events": "52e2641a",
       "rng": {
         "draws": 0,
@@ -137,7 +146,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 406,
-      "state": "4d4884ed",
+      "state": "fe6eefea",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -148,7 +157,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 406,
-      "state": "0e8551ec",
+      "state": "80cf9a7b",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -159,7 +168,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 406,
-      "state": "0cd58ea7",
+      "state": "19350228",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -170,7 +179,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "301f134b",
+      "state": "b8ca48a4",
       "events": "beca190f",
       "rng": {
         "draws": 271,
@@ -181,7 +190,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 408,
-      "state": "b5cb6baa",
+      "state": "f6869c55",
       "events": "444f665f",
       "rng": {
         "draws": 366,
@@ -192,7 +201,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 408,
-      "state": "cd2d1095",
+      "state": "cc9d7832",
       "events": "c6409e52",
       "rng": {
         "draws": 495,
@@ -203,7 +212,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 408,
-      "state": "72f104f1",
+      "state": "4876bbf6",
       "events": "4c6e5ad5",
       "rng": {
         "draws": 636,
@@ -214,7 +223,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 408,
-      "state": "f6f2cd17",
+      "state": "e827c518",
       "events": "4e4cd0df",
       "rng": {
         "draws": 774,
@@ -225,7 +234,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 408,
-      "state": "45684324",
+      "state": "8f463fb3",
       "events": "8d48f7c0",
       "rng": {
         "draws": 943,
@@ -236,7 +245,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 408,
-      "state": "ca06652d",
+      "state": "520df2aa",
       "events": "21908e56",
       "rng": {
         "draws": 1021,
@@ -247,7 +256,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 408,
-      "state": "09d5ff2d",
+      "state": "e4d21caa",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -282,6 +291,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -297,6 +307,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -474,7 +492,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 408,
-      "state": "aae1437b",
+      "state": "6bef7e94",
       "events": "9f8a4417",
       "rng": {
         "draws": 1050,
@@ -509,6 +527,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -524,6 +543,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },

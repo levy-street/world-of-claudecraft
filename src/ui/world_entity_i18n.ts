@@ -75,6 +75,9 @@ const MOB_IDS = [
   'vision_deathstalker_voss',
   'bound_guardian',
   'nythraxis_skeleton_warrior',
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
   'nythraxis_scourge_of_thornpeak',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
@@ -135,6 +138,7 @@ const NPC_IDS = [
 ] as const;
 
 const QUEST_IDS = [
+  'q_prof_intro',
   'q_wolves',
   'q_greyjaw',
   'q_boars',

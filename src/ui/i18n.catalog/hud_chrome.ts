@@ -179,6 +179,12 @@ export const hudChromeStrings = {
     // is a five-letter run), so this reuses the frame's own term for the target ("Mark", from
     // targetLabel above), which a screen-reader user already hears as the target frame's name.
     targetAnnounce: 'Mark {name}',
+    // targetOfTargetLabel names the optional #totarget-frame region (the classic
+    // "target of target": who your current target is targeting). Kept NON-WORDY (no
+    // run of four+ lowercase after stripping tokens) so an English-filled non-Latin
+    // locale does not trip the M16 untranslated-leak guard, reusing the frame's own
+    // term for the target ("Mark", from targetLabel): your mark's mark.
+    targetOfTargetLabel: "Mark's Mark",
     // partyLabel names the #party-frames region (a group of tappable / focusable
     // party member buttons, each named by its visible member name). Kept short and
     // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
@@ -235,7 +241,6 @@ export const hudChromeStrings = {
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {
-    autorun: 'Auto',
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Rewards',
@@ -639,6 +644,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
+    // Interface panel toggle: Clique-style mouseover casting of friendly abilities
+    // on the hovered party frame (on by default).
+    mouseoverCast: 'Mouseover Cast on Party Frames',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
@@ -646,6 +654,10 @@ export const hudChromeStrings = {
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
+    // Interface panel toggle for the classic "target of target" mini-frame (off by
+    // default): a small unit frame under the target frame showing who your target
+    // is targeting.
+    showTargetOfTarget: 'Show Target of Target',
     showDailyRewardsChest: 'Show Daily Rewards Chest',
     // Touch-only Graphics panel toggles (mobile combat HUD rework, phase 2).
     // Camera joystick: hidden and off by default, swipe-look on open gameplay
@@ -655,6 +667,33 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+  },
+  // Choice-row talents (the Pandaria-style rows tab in the talents window).
+  // The row OPTION names/descriptions are sim content (English source, localized
+  // with the talent-copy batch); only the chrome lives here. defaultLoadout is
+  // the loadout dropdown button's label while no saved build is active.
+  talentRows: {
+    tab: 'Choices',
+    defaultLoadout: 'Default Loadout',
+    // Badge on a row option whose mechanic is not implemented yet (empty
+    // effect): the pill renders disabled so nobody picks a no-op talent.
+    // Wordy (M16): filled in the five non-Latin locales in this change.
+    comingSoon: 'Coming soon',
+  },
+  // Specialization screen: the detail rows shown under the selected spec's card
+  // (role/description come from the spec itself; these label the extra facts).
+  // Wordy leaves (M16): filled in the five non-Latin locales in this change.
+  specPanel: {
+    primaryAttr: 'Primary attribute',
+    complexity: 'Complexity',
+    complexityLow: 'Low',
+    complexityMedium: 'Medium',
+    complexityHigh: 'High',
+    exampleAbilities: 'Example abilities',
+    viewTalents: 'View talents',
+    selectSpec: 'Select specialization',
+    specUnlockBanner: 'Specialization Unlocked!',
+    specUnlockHint: 'Press N to choose your specialization.',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -780,6 +819,8 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      haste: 'Haste',
+      parry: 'Parry',
     },
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
@@ -799,6 +840,10 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      haste:
+        'Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.',
+      parry:
+        'Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -847,6 +892,13 @@ export const hudChromeStrings = {
   // Item-set (tier set) tooltip block. The set name and per-tier bonus text come
   // from content/item_sets.ts via entity_i18n; these two are the surrounding
   // chrome, with `name`/`bonus` spliced in already-localized.
+  // Tooltip tag appended to the quality/kind line of a Heroic upgraded drop variant
+  // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
+  // base item's name; this tag is the only heroic marker, shown in gold.
+  itemHeroicTag: '[HEROIC]',
+  // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
+  // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
+  itemSoulbound: 'Soulbound',
   itemSet: {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
@@ -942,6 +994,7 @@ export const hudChromeStrings = {
   },
   // Character window (paperdoll) controls.
   paperdoll: {
+    offhand: 'Offhand',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
   },
@@ -1256,9 +1309,29 @@ export const hudChromeStrings = {
     formCat: 'Cat Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
+    battleStance: 'Battle Stance: 10% more rage generation',
+    berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
+    // Warrior choice-row auras (aura_effect.ts arms of the same names). All
+    // wordy (M16): filled in the five non-Latin locales in this change.
+    dmgDone: 'Increases damage dealt by {pct}%',
+    dmgDoneReduce: 'Reduces damage dealt by {pct}%',
+    crit: 'Increases critical strike chance by {pct}%',
+    rageGen: 'Increases Rage generation by {pct}%',
+    reckless: 'Increases critical strike chance by {pct}% and Rage generation by {ragePct}%',
+    avatar: 'Colossus: damage dealt increased by {pct}%',
+    bloodbath: 'Increases critical strike chance and damage dealt by {pct}%',
+    dieBySword: 'Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)',
+    sanguine: 'Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%',
+    // The two ability names are the locale's own (Reaver Strike / Maiming
+    // Strike here; each fill uses its locale's translated names). Brute Swing
+    // left the scope 2026-07-10 (it is now itself free, see empower_next.ts).
+    battleTrance: 'Your next Reaver Strike or Maiming Strike costs no Rage',
+    revengeFree: 'Your next Revenge costs no Rage',
+    victoryRush: 'Victory Rush is ready',
+    maxHpPct: 'Increases maximum health by {pct}%',
     // Localized damage-school names spliced into {school} above.
     school: {
       physical: 'Physical',
@@ -1275,6 +1348,32 @@ export const hudChromeStrings = {
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
     spawn: '{name} rises over Thornpeak Heights!',
+  },
+  // Password-reset ("forgot password") flow: the login-panel entry link, the
+  // request-a-link panel, and the set-a-new-password panel (index.html +
+  // main.ts). English-only lives here; the reset-link error is re-localized in
+  // main.ts userFacingApiError. The generic "sent" copy never reveals whether an
+  // account exists.
+  auth: {
+    appleLoginCta: 'Continue with Apple',
+    appleError: 'Could not sign in with Apple. Please try again.',
+    appleChoiceIntro: 'Create a new account, or link Apple to one you already have.',
+    appleChoiceExpired: 'That Apple sign-in expired. Please sign in with Apple again.',
+    forgotPrompt: 'Forgot password?',
+    forgotTitle: 'Reset your password',
+    forgotHint: 'Enter your username and we will email a reset link to the address on file.',
+    forgotUsername: 'Username',
+    forgotSubmit: 'Send reset link',
+    forgotSent:
+      'If an account with that username has an email on file, we have sent a reset link. Check your inbox.',
+    forgotBack: 'Back to log in',
+    resetTitle: 'Choose a new password',
+    resetNewPassword: 'New password',
+    resetConfirm: 'Confirm new password',
+    resetSubmit: 'Update password',
+    resetDone: 'Your password has been updated. You can now log in.',
+    resetMismatch: 'The passwords do not match.',
+    resetErrInvalid: 'This reset link is invalid or has expired. Request a new one.',
   },
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
@@ -1543,6 +1642,8 @@ export const hudChromeStrings = {
     parcelsLabel: 'Parcels',
     parcelsHint: 'Click an item in your bags to attach it.',
     removeParcelAria: 'Remove {item} from the letter',
+    parcelQtyDecreaseAria: 'Send one fewer {item}',
+    parcelQtyIncreaseAria: 'Send one more {item}',
     sendButton: 'Send letter',
     postageNote: 'Postage: {amount}. The raven flies for about {seconds}s.',
     arrivedBanner: 'The raven has landed: mail from {name}.',

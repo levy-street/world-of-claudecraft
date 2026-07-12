@@ -192,3 +192,79 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
     expect(buildSpellbookView(i)).toEqual(buildSpellbookView(i));
   });
 });
+
+describe('spec-gated kit filtering', () => {
+  const warriorKit = CLASSES.warrior.abilities;
+  const rowIds = (spec: string | null): string[] =>
+    buildSpellbookView(
+      input({ classId: 'warrior' as PlayerClass, abilities: warriorKit, spec }),
+    ).rows.map((r) => r.abilityId);
+
+  it('hides abilities a committed spec can never learn', () => {
+    const arms = rowIds('arms');
+    // Protection-only kit is dropped for Arms (no dangling "Trainable at level X").
+    expect(arms).not.toContain('thunder_clap');
+    expect(arms).not.toContain('sunder_armor');
+    // Reaver Strike is excludeSpecs ['prot','arms'], so Arms does not see it.
+    expect(arms).not.toContain('heroic_strike');
+    // Arms' own spec-exclusive kit stays.
+    expect(arms).toContain('sweeping_strikes');
+    expect(arms).toContain('die_by_sword');
+    // Redhand is now a baseline all-spec rage spender (owner 2026-07-09), so it is
+    // in every spec's book, not gated to Arms.
+    expect(arms).toContain('overpower');
+  });
+
+  it('hides Arms and Protection kit from a Fury warrior', () => {
+    const fury = rowIds('fury');
+    // Arms-only kit is hidden.
+    expect(fury).not.toContain('sweeping_strikes');
+    expect(fury).not.toContain('die_by_sword');
+    expect(fury).not.toContain('deep_wounds');
+    // Protection-only kit is hidden.
+    expect(fury).not.toContain('thunder_clap');
+    expect(fury).not.toContain('sunder_armor');
+    // Reaver Strike is now excluded for Fury too (owner 2026-07-08).
+    expect(fury).not.toContain('heroic_strike');
+    // Fury keeps its own kit (Twinstrike) plus ungated staples (execute).
+    expect(fury).toContain('raging_gale');
+    expect(fury).toContain('execute');
+    // Redhand hands off at Red Harvest (owner 2026-07-10): with no level given
+    // (or at/after 10) the book hides it for Fury.
+    expect(fury).not.toContain('overpower');
+  });
+
+  it('shows Redhand to a Fury warrior below the level-10 hand-off, hides it after', () => {
+    const at = (level: number): string[] =>
+      buildSpellbookView(
+        input({ classId: 'warrior' as PlayerClass, abilities: warriorKit, spec: 'fury', level }),
+      ).rows.map((r) => r.abilityId);
+    expect(at(9)).toContain('overpower'); // still Fury's only real rage spender
+    expect(at(10)).not.toContain('overpower'); // Red Harvest took the role
+  });
+
+  it('each spec sees only its own gated kit (no cross-spec leakage)', () => {
+    const arms = new Set(rowIds('arms'));
+    const fury = new Set(rowIds('fury'));
+    const prot = new Set(rowIds('prot'));
+    // A spec-exclusive lands in exactly the intended spec's book.
+    expect(
+      arms.has('sweeping_strikes') &&
+        !fury.has('sweeping_strikes') &&
+        !prot.has('sweeping_strikes'),
+    ).toBe(true);
+    expect(fury.has('raging_gale') && !arms.has('raging_gale') && !prot.has('raging_gale')).toBe(
+      true,
+    );
+    expect(prot.has('sunder_armor') && !arms.has('sunder_armor') && !fury.has('sunder_armor')).toBe(
+      true,
+    );
+  });
+
+  it('keeps the whole kit when no spec is committed', () => {
+    const open = rowIds(null);
+    expect(open).toContain('thunder_clap');
+    expect(open).toContain('heroic_strike');
+    expect(open).toContain('sunder_armor');
+  });
+});

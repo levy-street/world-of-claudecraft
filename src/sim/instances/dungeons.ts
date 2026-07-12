@@ -84,10 +84,19 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   }
 }
 
-export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): void {
+export function enterDungeon(
+  ctx: SimContext,
+  dungeonId: string,
+  pid?: number,
+  // [dev] /dev raid: skip the raid-group requirement and the Nythraxis attunement
+  // so a lone tester can zone into the raid. Dev-gated (never in production). The
+  // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
+  devBypass = false,
+): void {
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return;
+  const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
   // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
@@ -99,11 +108,11 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return;
   }
-  if (!party?.raid && raidRequired) {
+  if (!party?.raid && raidRequired && !bypass) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta)) {
+  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta) && !bypass) {
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return;
   }
@@ -354,7 +363,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   // KILL, independent of the marks daily gate below, and scoped to the
   // :heroic key so the normal difficulty is never consumed.
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  let awarded = false;
+  const earners: number[] = [];
   for (const meta of recipients) {
     meta.raidLockouts.set(heroicLockoutId(inst.dungeonId), lockedUntil);
     // `utcDay` comes from the host, never the wall clock (determinism). Both
@@ -366,12 +375,19 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
     }
     if (meta.heroicDaily.marked.has(inst.dungeonId)) continue;
     meta.heroicDaily.marked.add(inst.dungeonId);
-    for (let i = 0; i < tuning.marksPerParticipant; i++) {
-      loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [meta.entityId] });
-    }
-    awarded = true;
+    earners.push(meta.entityId);
   }
-  if (!awarded) return;
+  if (earners.length === 0) return;
+  // One shared-personal slot for the whole party: whoever loots the corpse hands
+  // every earner their marks at once, so no one has to reach the body and click
+  // their own copy. `count` is the per-participant payout (1 for a five-man, 3
+  // for the raid); the loot handler grants that many to each id in `personalFor`.
+  loot.items.push({
+    itemId: HEROIC_MARK_ITEM_ID,
+    count: tuning.marksPerParticipant,
+    personalFor: earners,
+    sharedPersonal: true,
+  });
   mob.loot = loot;
   mob.lootable = true;
 }

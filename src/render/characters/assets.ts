@@ -16,7 +16,7 @@ import { addRimGlow, GFX } from '../gfx';
 import {
   type AttachDef,
   characterPreloadUrls,
-  itemWeaponModelUrl,
+  itemHeldModelUrl,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -36,7 +36,7 @@ type HandGrip = {
 // KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
 // lone child node. handslot.r/l children in the character glbs carry the
 // authored grip — copy those (or this fallback table) after flattening.
-const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
+export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   axe_1handed: '1H_Axe',
   axe_2handed: '2H_Axe',
   crossbow_1handed: '1H_Crossbow',
@@ -93,6 +93,12 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   wand_a: 'VAR_WAND',
   wand_b: 'VAR_WAND',
   adv_wand: 'VAR_WAND',
+  // Shields use KayKit's authored accessory node names (the v1 characters
+  // shipped these as built-in meshes on handslot.l), so the grips below carry
+  // the pack's real seat per variant instead of one shared guess.
+  shield_round: 'Round_Shield',
+  shield_square: 'Rectangle_Shield',
+  shield_badge: 'Badge_Shield',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -112,7 +118,7 @@ const VARIANT_GRIPS: Record<string, VariantGrip> = {
   VAR_WAND: { lift: 0.04, maxHeight: 1.2 },
 };
 
-const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
+export const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
   '1H_Axe': {
     r: { position: [0.231697, 0.382471, 0], quaternion: [0, 1, 0, 0], scale: 0.622211 },
     l: { position: [-0.231697, 0.382471, 0], quaternion: [0, 0, 0, 1], scale: 0.622211 },
@@ -146,6 +152,22 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
   },
   '1H_Wand': {
     r: { position: [0, 0.2174, 0], quaternion: [0, 1, 0, 0], scale: 0.4831 },
+  },
+  // Shield seats extracted from the v1 knight.glb authored handslot.l children
+  // (same provenance as the weapon rows above): flat against the forearm with a
+  // small outward z offset, at the pack's native scale. The r rows mirror l by
+  // the table's convention; nothing attaches a right-hand shield today.
+  Round_Shield: {
+    r: { position: [0, 0.017, 0.1771], quaternion: [0, 1, 0, 0], scale: 0.4413 },
+    l: { position: [0, 0.017, 0.1771], quaternion: [0, 0, 0, 1], scale: 0.4413 },
+  },
+  Rectangle_Shield: {
+    r: { position: [0, 0.017, 0.1617], quaternion: [0, 1, 0, 0], scale: 0.5964 },
+    l: { position: [0, 0.017, 0.1617], quaternion: [0, 0, 0, 1], scale: 0.5964 },
+  },
+  Badge_Shield: {
+    r: { position: [0, -0.0123, 0.1341], quaternion: [0, 1, 0, 0], scale: 0.5108 },
+    l: { position: [0, -0.0123, 0.1341], quaternion: [0, 0, 0, 1], scale: 0.5108 },
   },
 };
 
@@ -218,8 +240,8 @@ function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
   return holder;
 }
 
-// Marks the holder group of the equipped-weapon attachment (the `weaponSlot`
-// entry), so setHeldWeapon can find and replace exactly that prop without
+// Marks the holder group of the equipped held-item attachment (the `weaponSlot`
+// entry), so setHeldItems can find and replace exactly that prop without
 // touching fixed offhands (rogue's second dagger, the warlock spellbook).
 const SWAP_WEAPON_TAG = 'swapWeaponHolder';
 
@@ -246,12 +268,19 @@ function attachProp(
   bone: THREE.Object3D,
   att: AttachDef,
   markSwap = false,
+  heldSlot?: number,
 ): void {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
   });
-  if (markSwap) payload.userData[SWAP_WEAPON_TAG] = true;
+  if (markSwap) {
+    payload.userData[SWAP_WEAPON_TAG] = true;
+    // Which held slot this holder carries (0 = mainhand, 1 = offhand), so a
+    // weapon-only overlay (the Sanguine weapon aura) can target the mainhand
+    // instead of guessing by traverse order (which found the shield first).
+    if (heldSlot !== undefined) payload.userData.heldSlot = heldSlot;
+  }
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip);
@@ -271,8 +300,9 @@ function attachProp(
 // substituted when one is mapped (else the class default). The grip resolves from
 // the item model's own family (KAYKIT_WEAPON_ACCESSORY), so any base position/
 // rotationY/gripRef override is dropped for the substituted model.
-function swapAttachDef(base: AttachDef, weaponItemId: string | null | undefined): AttachDef {
-  const url = itemWeaponModelUrl(weaponItemId);
+function swapAttachDef(base: AttachDef, heldItemId: string | null | undefined): AttachDef | null {
+  if (!heldItemId) return null;
+  const url = itemHeldModelUrl(heldItemId);
   return url ? { url, bone: base.bone } : base;
 }
 
@@ -295,14 +325,19 @@ function assetUrl(url: string): string {
 // tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
 // synchronously, so the preload set must be a superset of any tier's placement set or
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
+// Browser-only (the vale_cup_stadium.ts preload pattern): under Node/Vitest the
+// root-relative fetches cannot resolve and each one dies as an unhandled
+// rejection on the loader's retry timer, so the boot sweep never starts there.
 const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
 
-for (const url of preloadUrls) {
-  registerPreload(
-    loadGltf(url).then((g) => {
-      gltfByUrl.set(url, g);
-    }),
-  );
+if (typeof window !== 'undefined') {
+  for (const url of preloadUrls) {
+    registerPreload(
+      loadGltf(url).then((g) => {
+        gltfByUrl.set(url, g);
+      }),
+    );
+  }
 }
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
@@ -321,13 +356,16 @@ function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise
 }
 
 // Boot sweep skips lazyPreload keys (e.g. the cosmetic mech) - those load on
-// demand via preloadMechAssets().
+// demand via preloadMechAssets(). Browser-only, like the GLB sweep above
+// (three's TextureLoader needs `document` and dies under Node/Vitest).
 const bootSkinUrls = new Set<string>();
 for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+if (typeof window !== 'undefined') {
+  for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+}
 
 /** Resolved skin texture for a visual key + skin index, or null for the model's
  *  embedded default (index 0, unknown key, or an atlas that is not loaded yet). */
@@ -485,7 +523,10 @@ function mergeSkinnedParts(root: THREE.Object3D): void {
 
 /** Fresh SkeletonUtils clone of a manifest entry with its kit applied.
  *  Pure model space — normalization (scale/yaw/feet offset) happens upstream. */
-export function assembleModel(def: VisualDef, weaponItemId?: string | null): THREE.Object3D {
+export function assembleModel(
+  def: VisualDef,
+  heldItemIds: ReadonlyArray<string | null> = [],
+): THREE.Object3D {
   const root = cloneSkinned(optimizedScene(def.url));
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below
@@ -507,15 +548,19 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
   const attachments = visibleAttachmentsForGraphics(def);
   for (let i = 0; i < attachments.length; i++) {
     const isSwap = def.weaponSlots?.includes(i) ?? false;
-    // Swappable slots take the equipped item's model (when given); every other
-    // attachment is fixed (the warlock's spellbook offhand). The rogue lists both
-    // hand slots so a dagger shows in both.
-    const att = isSwap ? swapAttachDef(attachments[i], weaponItemId) : attachments[i];
+    // Swappable slots take the equipped held item model (when given); every other
+    // attachment is fixed (the warlock's spellbook offhand).
+    const swapIndex = def.weaponSlots?.indexOf(i) ?? -1;
+    const att =
+      isSwap && swapIndex >= 0
+        ? swapAttachDef(attachments[i], heldItemIds[swapIndex])
+        : attachments[i];
+    if (!att) continue;
     // GLTFLoader sanitizes node names (PropertyBinding strips [].:/ chars),
     // so the authored "handslot.r" arrives as "handslotr" — try both
     const bone = resolveBone(root, att.bone);
     if (!bone) continue; // manifest/bone mismatch — ship without the prop
-    attachProp(root, bone, att, isSwap);
+    attachProp(root, bone, att, isSwap, swapIndex >= 0 ? swapIndex : undefined);
   }
   // Re-orient mis-baked built-in weapon nodes (e.g. the golem axe) in place.
   for (const fix of def.weaponFix ?? []) {
@@ -535,10 +580,10 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
  *  both hands update). The caller must re-apply materials and re-snapshot the
  *  original-material map afterwards (see CharacterVisual.setWeapon), since the new
  *  weapon meshes start on the source GLB's raw materials. */
-export function setHeldWeapon(
+export function setHeldItems(
   root: THREE.Object3D,
   def: VisualDef,
-  weaponItemId: string | null,
+  heldItemIds: ReadonlyArray<string | null>,
 ): void {
   if (!def.weaponSlots?.length) return;
   const stale: THREE.Object3D[] = [];
@@ -546,13 +591,15 @@ export function setHeldWeapon(
     if (o.userData[SWAP_WEAPON_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
-  for (const i of def.weaponSlots) {
+  for (let slot = 0; slot < def.weaponSlots.length; slot++) {
+    const i = def.weaponSlots[slot];
     const base = def.attach?.[i];
     if (!base) continue;
-    const att = swapAttachDef(base, weaponItemId);
+    const att = swapAttachDef(base, heldItemIds[slot] ?? null);
+    if (!att) continue;
     const bone = resolveBone(root, att.bone);
     if (!bone) continue;
-    attachProp(root, bone, att, true);
+    attachProp(root, bone, att, true, slot);
   }
 }
 
@@ -662,6 +709,8 @@ export function applyMaterials(
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    // the head halo keeps its own additive glow material (visual.ts/halo.ts)
+    if (mesh.name === 'class_halo') return;
     const role: MaterialRole = mesh.userData.weaponMesh ? 'weapon' : 'body';
     const materialTint = role === 'weapon' ? null : tint;
     // skin/emissive override only touches the character's own atlas meshes, not weapons

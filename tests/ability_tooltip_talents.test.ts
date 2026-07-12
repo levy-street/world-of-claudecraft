@@ -30,6 +30,7 @@ function modsFor(
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    bonusCharges: 0,
     addEffects: [],
     ...mod,
   };

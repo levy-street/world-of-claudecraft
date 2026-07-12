@@ -288,6 +288,7 @@ export const V07_SLASH = [
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',
+  'Total time played: Aki.',
   'Unknown command: Aki. Type /help for a list.',
   'Vendor buyback (5): Aki. Repurchase at any merchant.',
   'You are Aki.',
@@ -335,4 +336,9 @@ export const V07_SLASH = [
   "[dev] Unknown item 'Aki'.",
   '[dev] Spawned the Test Quartermaster (free epic gear) next to you.',
   '[dev] Could not spawn the test vendor.',
+  '[dev] God mode ON.',
+  '[dev] God mode OFF.',
+  '[dev] Attuned: marked 5 quests complete (in-progress quests untouched).',
+  '[dev] Raid lockouts cleared.',
+  '[dev] Entering Nythraxis raid (Aki).',
 ];

@@ -873,6 +873,117 @@ export interface AccountDetail {
   }[];
 }
 
+export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
+
+export interface ModerationActionHistoryEntry {
+  source: 'account' | 'ip';
+  id: number;
+  accountId: number | null;
+  username: string | null;
+  ip: string | null;
+  action: string;
+  reason: string;
+  createdAt: string;
+  expiresAt: string | null;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface ModerationActionHistoryPage {
+  rows: ModerationActionHistoryEntry[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function listModerationActions(
+  tab: ModerationHistoryTab,
+  adminAccountId: number,
+  page: number,
+  limit: number,
+): Promise<ModerationActionHistoryPage> {
+  const offset = (page - 1) * limit;
+  const params: unknown[] = [];
+  let accountWhereSql = '';
+  let ipWhereSql = '';
+  if (tab === 'mine') {
+    params.push(adminAccountId);
+    accountWhereSql = 'WHERE action_log.admin_account_id = $1';
+    ipWhereSql = 'WHERE ip_action.admin_account_id = $1';
+  } else if (tab === 'notes') {
+    params.push(adminAccountId);
+    accountWhereSql = "WHERE action_log.admin_account_id = $1 AND action_log.action = 'note'";
+    ipWhereSql = 'WHERE false';
+  }
+  const pageParams = [...params, limit, offset];
+  const limitParam = params.length + 1;
+  const offsetParam = params.length + 2;
+  const auditSql = `SELECT *
+       FROM (
+         SELECT 'account' AS source,
+                action_log.id,
+                action_log.account_id,
+                target.username,
+                NULL::text AS ip,
+                action_log.action,
+                action_log.reason,
+                action_log.created_at,
+                action_log.expires_at,
+                action_log.admin_account_id,
+                admin.username AS admin_username
+         FROM account_moderation_actions action_log
+         JOIN accounts target ON target.id = action_log.account_id
+         LEFT JOIN accounts admin ON admin.id = action_log.admin_account_id
+         ${accountWhereSql}
+         UNION ALL
+         SELECT 'ip' AS source,
+                ip_action.id,
+                NULL::int AS account_id,
+                NULL::text AS username,
+                ip_action.ip,
+                ip_action.action,
+                ip_action.reason,
+                ip_action.created_at,
+                NULL::timestamptz AS expires_at,
+                ip_action.admin_account_id,
+                admin.username AS admin_username
+         FROM blocked_ip_actions ip_action
+         LEFT JOIN accounts admin ON admin.id = ip_action.admin_account_id
+         ${ipWhereSql}
+       ) audit_log`;
+  const [rows, total] = await Promise.all([
+    pool.query(
+      `${auditSql}
+       ORDER BY created_at DESC, id DESC, source
+       LIMIT $${limitParam} OFFSET $${offsetParam}`,
+      pageParams,
+    ),
+    pool.query(
+      `SELECT count(*)::int AS total
+       FROM (${auditSql}) count_log`,
+      params,
+    ),
+  ]);
+  return {
+    rows: rows.rows.map((entry) => ({
+      source: entry.source,
+      id: Number(entry.id),
+      accountId: entry.account_id === null ? null : Number(entry.account_id),
+      username: entry.username ?? null,
+      ip: entry.ip ?? null,
+      action: entry.action,
+      reason: entry.reason,
+      createdAt: entry.created_at,
+      expiresAt: entry.expires_at ?? null,
+      adminAccountId: entry.admin_account_id === null ? null : Number(entry.admin_account_id),
+      adminUsername: entry.admin_username ?? null,
+    })),
+    total: Number(total.rows[0]?.total ?? 0),
+    page,
+    limit,
+  };
+}
+
 export async function accountDetail(accountId: number): Promise<AccountDetail | null> {
   const [account, characters, sessions, moderationHistory] = await Promise.all([
     pool.query(

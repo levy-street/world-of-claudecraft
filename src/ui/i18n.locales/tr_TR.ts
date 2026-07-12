@@ -2,30 +2,100 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.sport_boot.description': 'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
+  'entities.abilities.cw_heroic_strike.name': 'Yağmacı Darbesi',
+  'entities.abilities.cw_heroic_strike.description':
+    'Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir.',
+  'entities.abilities.cw_battle_shout.name': 'Demir Nara',
+  'entities.abilities.cw_battle_shout.description':
+    'Saldırı gücünü 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.cw_commanding_shout.name': 'Güçlendiren Nara',
+  'entities.abilities.cw_commanding_shout.description':
+    'Dayanıklılığını 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.cw_charge.name': 'Atılım',
+  'entities.abilities.cw_charge.description':
+    'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil.',
+  'entities.abilities.cw_rend.name': 'Derin Yarık',
+  'entities.abilities.cw_rend.description':
+    'Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar.',
+  'entities.abilities.cw_thunder_clap.name': 'Sarsan Darbe',
+  'entities.abilities.cw_thunder_clap.description':
+    'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
+  'entities.abilities.cw_hamstring.name': 'Topallatan Kesik',
+  'entities.abilities.cw_hamstring.description':
+    'Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır.',
+  'entities.abilities.cw_bloodrage.name': 'Kan Bedeli',
+  'entities.abilities.cw_bloodrage.description': 'Can pahasına 10 öfke üretir.',
+  'entities.abilities.cw_overpower.name': 'Kızıl El',
+  'entities.abilities.cw_overpower.description':
+    'Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz.',
+  'entities.abilities.cw_execute.name': 'Erken Mezar',
+  'entities.abilities.cw_execute.description':
+    "Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20'nin altındaki düşmanlarda kullanılabilir.",
+  'entities.abilities.cw_slam.name': 'Kaba Savuruş',
+  'entities.abilities.cw_slam.description': 'Rakibe silah hasarı artı {damage} için çarpar.',
+  'entities.abilities.cw_cleave.name': 'Biçen Yay',
+  'entities.abilities.cw_cleave.description':
+    'Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe.',
+  'entities.abilities.cw_defensive_stance.name': 'Korumali Durus',
+  'entities.abilities.cw_defensive_stance.description':
+    'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Vahim Uluma',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır.',
+  'entities.abilities.cw_sunder_armor.name': 'Zırh Kesme',
+  'entities.abilities.cw_sunder_armor.description':
+    'Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir.',
+  'entities.abilities.cw_taunt.name': 'Tahrik',
+  'entities.abilities.cw_taunt.description':
+    'Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır.',
+  'entities.abilities.cw_bloodthirst.name': 'Kan Akıtma',
+  'entities.abilities.cw_bloodthirst.description':
+    'Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)',
+  'entities.abilities.cw_mortal_strike.name': 'Sakatlayan Darbe',
+  'entities.abilities.cw_mortal_strike.description':
+    'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
+  'entities.abilities.cw_shield_slam.name': 'Kalkan Kırma',
+  'entities.abilities.cw_shield_slam.description':
+    'Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)',
+  'entities.abilities.cw_whirlwind.name': 'Bıçaklı Girdap',
+  'entities.abilities.cw_whirlwind.description':
+    'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
+  'entities.abilities.cw_berserker_rage.name': 'Kaynayan Gazap',
+  'entities.abilities.cw_berserker_rage.description':
+    'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
+  'classDetails.roles.warriorClassic': 'Tank / Yakın DPS',
+  'classes.warriorClassic': 'Savaşçı',
+  'entities.abilities.sport_boot.description':
+    'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',
-  'entities.abilities.sport_dive.description': 'Kendini nişan noktasına doğru fırlat. Önünden geçen top sana yapışır.',
+  'entities.abilities.sport_dive.description':
+    'Kendini nişan noktasına doğru fırlat. Önünden geçen top sana yapışır.',
   'entities.abilities.sport_dive.name': 'Dalış',
-  'entities.abilities.sport_feint.description': 'Nişan noktasına doğru hızlı bir yana kaçış hamlesi.',
+  'entities.abilities.sport_feint.description':
+    'Nişan noktasına doğru hızlı bir yana kaçış hamlesi.',
   'entities.abilities.sport_feint.name': 'Çalım',
   'entities.abilities.sport_hoof.description': 'Topu yerden ve sert bir şekilde ileri gönder.',
   'entities.abilities.sport_hoof.name': 'Sert Vuruş',
   'entities.abilities.sport_kick.description': 'Topu yerden nişan noktasına doğru gönder.',
   'entities.abilities.sport_kick.name': 'Vuruş',
-  'entities.abilities.sport_pass.description': 'Hedeflediğin takım arkadaşına, koşusunun önüne sağlam bir pas at.',
+  'entities.abilities.sport_pass.description':
+    'Hedeflediğin takım arkadaşına, koşusunun önüne sağlam bir pas at.',
   'entities.abilities.sport_pass.name': 'Pas',
   'entities.abilities.sport_punt.description': 'Kaleci degajı: yüksek ve uzak.',
   'entities.abilities.sport_punt.name': 'Uzun Degaj',
-  'entities.abilities.sport_second_wind.description': 'Bacaklarını topla: 4 sn boyunca %50 daha hızlı hareket et.',
+  'entities.abilities.sport_second_wind.description':
+    'Bacaklarını topla: 4 sn boyunca %50 daha hızlı hareket et.',
   'entities.abilities.sport_second_wind.name': 'Taze Bacaklar',
-  'entities.abilities.sport_shoot.description': 'Basılı tutarak güç topla, bırakınca kaleye şut çek. Fazla güç topu üstten aşırır.',
+  'entities.abilities.sport_shoot.description':
+    'Basılı tutarak güç topla, bırakınca kaleye şut çek. Fazla güç topu üstten aşırır.',
   'entities.abilities.sport_shoot.name': 'Şut',
-  'entities.abilities.sport_shoulder.description': 'Hasat ateşkesine yakışır dürüst bir omuz. Rakibi toptan yuvarlayarak uzaklaştırır.',
+  'entities.abilities.sport_shoulder.description':
+    'Hasat ateşkesine yakışır dürüst bir omuz. Rakibi toptan yuvarlayarak uzaklaştırır.',
   'entities.abilities.sport_shoulder.name': 'Omuzlama',
   'entities.npcs.groundskeeper_bram.greeting':
-    'Domuz Tarlası\'nda ateşkes geçerli, {className}: yalnızca vuruş ve omuz. Bakır Kova için oynamaya var mısın?',
+    "Domuz Tarlası'nda ateşkes geçerli, {className}: yalnızca vuruş ve omuz. Bakır Kova için oynamaya var mısın?",
   'entities.npcs.groundskeeper_bram.name': 'Saha Bekçisi Bram',
-  'entities.npcs.groundskeeper_bram.title': 'Domuz Tarlası\'nın Bekçisi',
+  'entities.npcs.groundskeeper_bram.title': "Domuz Tarlası'nın Bekçisi",
   'entities.zones.eastbrook_vale.pois.10.label': 'Domuz Tarlası',
   'guide.nav.professions': 'Meslekler',
   'guide.nav.valeCup': 'Vadi Kupası',
@@ -77,22 +147,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.howQueue':
     'Vadi Kupası penceresinden her yerden sıraya gir ya da Domuz Tarlası kapısındaki Saha Bekçisi Bram ile konuş. Teke tekten beşe beşe kadar bir kategori, bir sancak ulusu ve bir spor rolü seç; tek başına sıraya gir ya da grubunu getir.',
   'guide.valeCupPage.howTruce':
-    'Domuz Tarlası\'nda kimse kanamaz: müdahaleler yalnızca yere yuvarlar, hiçbir şey acıtmaz ve evcil hayvanlar maçı dışarıdan izler.',
+    "Domuz Tarlası'nda kimse kanamaz: müdahaleler yalnızca yere yuvarlar, hiçbir şey acıtmaz ve evcil hayvanlar maçı dışarıdan izler.",
   'guide.valeCupPage.intro':
-    'Domuz Tarlası\'nda Domuztopu: bir sancak seç, bir rol seç ve saman doldurulmuş domuz derisini kalecinin yanından geçirip Bakır Kova\'yı kap. Kan yok, ganimet yok; yalnızca tribünlerin uğultusu.',
+    "Domuz Tarlası'nda Domuztopu: bir sancak seç, bir rol seç ve saman doldurulmuş domuz derisini kalecinin yanından geçirip Bakır Kova'yı kap. Kan yok, ganimet yok; yalnızca tribünlerin uğultusu.",
   'guide.valeCupPage.loreHeading': 'Domuztopu ve hasat ateşkesi',
   'guide.valeCupPage.loreOldSow':
-    'Ölüler uyanmadan çok önce, Doğudere\'nin ırgatları hasattan sonra anız tarlalarında domuztopu oynardı: iki kalabalık, samanla doldurulmuş bir domuz derisi ve çayırın iki ucuna çekilmiş iki araba kapısı. İlk top, Koca Domuz, bronzlanmış halde meyhane ocağının üstünde asılıdır.',
+    "Ölüler uyanmadan çok önce, Doğudere'nin ırgatları hasattan sonra anız tarlalarında domuztopu oynardı: iki kalabalık, samanla doldurulmuş bir domuz derisi ve çayırın iki ucuna çekilmiş iki araba kapısı. İlk top, Koca Domuz, bronzlanmış halde meyhane ocağının üstünde asılıdır.",
   'guide.valeCupPage.loreTruce':
     'Kül Koliseumu savaş oyunlarına resmiyet kazandırmaya başlayınca, Mareşal Redbrook buna daha yumuşak bir şeyle karşılık verdi: eski çayırda kalıcı bir hasat ateşkesi. Araba kapıları kale direği oldu; çayır duvarlara, tribünlere ve bir isme kavuştu: Domuz Tarlası. Ödülse hep aynıydı: kazananların içinden içtiği o ezik süt kovası, Bakır Kova.',
-  'guide.valeCupPage.nationChoir': 'Çanın altında uçuk mavi ve gümüş: ürkütücü, isabetli ve çok sessiz.',
-  'guide.valeCupPage.nationColiseum': 'Çapraz kılıçlarla kırmızı ve siyah: hâlâ bir savaş oyunuymuş gibi oynarlar.',
-  'guide.valeCupPage.nationCopperdig': 'Kazma armalı bakır ve kahverengi: koşmayı hiç bırakmayan kazıcılar.',
-  'guide.valeCupPage.nationMirefen': 'Balıkçılın altında petrol mavisi ve gri: sabırlı, uzun bacaklı, hiç acele etmez.',
+  'guide.valeCupPage.nationChoir':
+    'Çanın altında uçuk mavi ve gümüş: ürkütücü, isabetli ve çok sessiz.',
+  'guide.valeCupPage.nationColiseum':
+    'Çapraz kılıçlarla kırmızı ve siyah: hâlâ bir savaş oyunuymuş gibi oynarlar.',
+  'guide.valeCupPage.nationCopperdig':
+    'Kazma armalı bakır ve kahverengi: koşmayı hiç bırakmayan kazıcılar.',
+  'guide.valeCupPage.nationMirefen':
+    'Balıkçılın altında petrol mavisi ve gri: sabırlı, uzun bacaklı, hiç acele etmez.',
   'guide.valeCupPage.nationMoon': 'Hilalin altında mor ve gümüş: gece oyuncuları, ayakları hafif.',
-  'guide.valeCupPage.nationOgre': 'Yumruğun ardında turuncu ve koyu kahve: önce omuz atarlar ve bununla gurur duyarlar.',
-  'guide.valeCupPage.nationThornpeak': 'Dağ zirvesinin altında buz mavisi ve beyaz: ayağı sağlam ve inatçı.',
-  'guide.valeCupPage.nationVale': 'Yeşil ve altın, başak demeti sancağıyla: ev sahibi taraf, iliklerine kadar ırgat.',
+  'guide.valeCupPage.nationOgre':
+    'Yumruğun ardında turuncu ve koyu kahve: önce omuz atarlar ve bununla gurur duyarlar.',
+  'guide.valeCupPage.nationThornpeak':
+    'Dağ zirvesinin altında buz mavisi ve beyaz: ayağı sağlam ve inatçı.',
+  'guide.valeCupPage.nationVale':
+    'Yeşil ve altın, başak demeti sancağıyla: ev sahibi taraf, iliklerine kadar ırgat.',
   'guide.valeCupPage.nationsBody':
     'Her takım bir sancak altında oynar. Ulusu kaptan seçer ve iki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.',
   'guide.valeCupPage.nationsHeading': 'Sekiz sancak ulusu',
@@ -102,7 +179,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.rolesBody':
     'Rolün, sahaya çıkarken taşıyacağın donanımı belirler. Herkes vuruş yapar; gerisi mizaç meselesidir.',
   'guide.valeCupPage.rolesHeading': 'Spor rolleri',
-  'guide.valeCupPage.spectateBody': 'Stadyumda aynı anda tek maç oynanır ve isteyen herkes gelip tribünlerden izleyebilir.',
+  'guide.valeCupPage.spectateBody':
+    'Stadyumda aynı anda tek maç oynanır ve isteyen herkes gelip tribünlerden izleyebilir.',
   'hudChrome.keybinds.valecup': 'Vadi Kupası',
   'hudChrome.mobile.dailyRewards': 'Ödüller',
   'hudChrome.perf.labels.predLead': 'Tahmin Avansı',
@@ -114,17 +192,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Odağını ayarlamak için kasabada olmalısın.',
   'hudChrome.townFocus.saveButton': 'Odağı Kaydet',
   'hudChrome.townFocus.title': 'Kasaba Odağı',
-  'hudChrome.vcup.awayNote': 'İki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.',
+  'hudChrome.vcup.awayNote':
+    'İki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.',
   'hudChrome.vcup.bannerCountdown': 'Başlama vuruşuna {seconds}...',
-  'hudChrome.vcup.bannerDraw': 'Domuz Tarlası\'nda beraberlik.',
+  'hudChrome.vcup.bannerDraw': "Domuz Tarlası'nda beraberlik.",
   'hudChrome.vcup.bannerEnd': 'Maç sonu: {nationA} {scoreA}, {nationB} {scoreB}',
   'hudChrome.vcup.bannerFound': 'Vadi Kupası çağırıyor: {nationA} ile {nationB} karşı karşıya!',
   'hudChrome.vcup.bannerGoal': 'GOL! {nation} attı!',
   'hudChrome.vcup.bannerGolden': 'ALTIN GOL: sıradaki gol kazandırır!',
   'hudChrome.vcup.bannerKickoff': 'BAŞLAMA VURUŞU!',
-  'hudChrome.vcup.bannerLoss': 'Domuz Tarlası\'nda yenilgi.',
+  'hudChrome.vcup.bannerLoss': "Domuz Tarlası'nda yenilgi.",
   'hudChrome.vcup.bannerSave': '{name} KURTARDI!',
-  'hudChrome.vcup.bannerWin': 'Domuz Tarlası\'nda zafer!',
+  'hudChrome.vcup.bannerWin': "Domuz Tarlası'nda zafer!",
   'hudChrome.vcup.bet.aria': 'Vadi Kupası maç bahisleri',
   'hudChrome.vcup.bet.back': '{team} tarafını tut',
   'hudChrome.vcup.bet.closed': 'Bahisler kapandı',
@@ -160,9 +239,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.readyDone': 'Hazır',
   'hudChrome.vcup.briefing.rosterHeading': 'Kadro listesi',
   'hudChrome.vcup.briefing.rule1': 'Gol atmak için topu vurarak ya da pasla rakip kaleye gönder.',
-  'hudChrome.vcup.briefing.rule2': '5 gole ilk ulaşan kazanır; süre dolduğunda ise en çok golü atan.',
-  'hudChrome.vcup.briefing.rule3': 'Normal süre sonunda eşitlik altın gole gider: sıradaki gol kazandırır.',
-  'hudChrome.vcup.briefing.rule4': 'Müdahaleler seni yalnızca yere yuvarlar. Hasat ateşkesi altında kimseye zarar gelmez.',
+  'hudChrome.vcup.briefing.rule2':
+    '5 gole ilk ulaşan kazanır; süre dolduğunda ise en çok golü atan.',
+  'hudChrome.vcup.briefing.rule3':
+    'Normal süre sonunda eşitlik altın gole gider: sıradaki gol kazandırır.',
+  'hudChrome.vcup.briefing.rule4':
+    'Müdahaleler seni yalnızca yere yuvarlar. Hasat ateşkesi altında kimseye zarar gelmez.',
   'hudChrome.vcup.briefing.rule5': 'İsteyen herkes gelip tribünlerden seni destekleyebilir.',
   'hudChrome.vcup.briefing.rulesHeading': 'Nasıl oynanır',
   'hudChrome.vcup.briefing.subtitle': 'Maç öncesi brifing',
@@ -172,7 +254,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.you': 'Sen',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.close': 'Vadi Kupası penceresini kapat',
-  'hudChrome.vcup.deserterNote': 'Saha Bekçisi unutmaz. {seconds} sn sonra yeniden sıraya girebilirsin.',
+  'hudChrome.vcup.deserterNote':
+    'Saha Bekçisi unutmaz. {seconds} sn sonra yeniden sıraya girebilirsin.',
   'hudChrome.vcup.enterAsGuild': '{guild} sancağı altında katıl',
   'hudChrome.vcup.gossipOpen': 'Fikstür defteri',
   'hudChrome.vcup.gossipOpenAria': 'Vadi Kupası penceresini aç',
@@ -186,16 +269,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.indicatorQueued': 'Vadi Kupası sırası: {bracket}, sıra {position} / {count}',
   'hudChrome.vcup.leaveQueue': 'Sıradan Ayrıl',
   'hudChrome.vcup.liveAria': 'Vadi Kupası: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.liveHeading': 'Şimdi Domuz Tarlası\'nda',
-  'hudChrome.vcup.logDraw': 'Domuz Tarlası\'ndaki karşılaşma beraberlikle bitti.',
+  'hudChrome.vcup.liveHeading': "Şimdi Domuz Tarlası'nda",
+  'hudChrome.vcup.logDraw': "Domuz Tarlası'ndaki karşılaşma beraberlikle bitti.",
   'hudChrome.vcup.logFound': 'Vadi Kupası maçın hazır: {nationA} ile {nationB} karşı karşıya.',
-  'hudChrome.vcup.logGoal': '{name}, {nation} adına gol attı! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logLoss': 'Domuz Tarlası\'ndaki karşılaşmayı kaybettin.',
+  'hudChrome.vcup.logGoal':
+    '{name}, {nation} adına gol attı! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': "Domuz Tarlası'ndaki karşılaşmayı kaybettin.",
   'hudChrome.vcup.logQueued': '{bracket} için Vadi Kupası sırasına girdin (sıra {position}).',
   'hudChrome.vcup.logRoster': 'Senin taraf: {allies}. Karşı taraf: {enemies}.',
   'hudChrome.vcup.logSave': '{name} kurtarışı yaptı!',
   'hudChrome.vcup.logUnqueued': 'Vadi Kupası sırasından ayrıldın.',
-  'hudChrome.vcup.logWin': 'Domuz Tarlası\'ndaki karşılaşmayı kazandın.',
+  'hudChrome.vcup.logWin': "Domuz Tarlası'ndaki karşılaşmayı kazandın.",
   'hudChrome.vcup.mobileLabel': 'Kupa',
   'hudChrome.vcup.nation.choir': 'Soluk Koro',
   'hudChrome.vcup.nation.coliseum': 'Kül Koliseumu',
@@ -216,22 +300,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.practiceNote': 'Kendi antrenman sahanda hemen özel bir bot maçı başlatır.',
   'hudChrome.vcup.practicingNow': 'Şu an antrenmanda ({count}):',
   'hudChrome.vcup.queue': 'Sıraya Gir',
-  'hudChrome.vcup.queueNote': 'Her yerden sıraya girebilirsin; düdük seni Domuz Tarlası\'na çağırır.',
+  'hudChrome.vcup.queueNote':
+    "Her yerden sıraya girebilirsin; düdük seni Domuz Tarlası'na çağırır.",
   'hudChrome.vcup.queuedStatus': '{bracket} için sırada: sıra {position} / {count}.',
-  'hudChrome.vcup.recordLine': 'Sicilin: {wins} galibiyet, {losses} mağlubiyet, {draws} beraberlik.',
+  'hudChrome.vcup.recordLine':
+    'Sicilin: {wins} galibiyet, {losses} mağlubiyet, {draws} beraberlik.',
   'hudChrome.vcup.role.allrounder.desc': 'Her şeyden biraz: vuruş, aşırtma ve dürüst bir omuz.',
   'hudChrome.vcup.role.allrounder.name': 'Çok Yönlü',
   'hudChrome.vcup.role.keeper.desc': 'Kale sahasını tutuş, dalış ve degajla korur.',
   'hudChrome.vcup.role.keeper.name': 'Kaleci',
   'hudChrome.vcup.role.striker.desc': 'Uzun vuruş ve hızlı çalım için yaşar.',
   'hudChrome.vcup.role.striker.name': 'Golcü',
-  'hudChrome.vcup.role.sweeper.desc': 'Koşucuları toptan omuzlayıp uzaklaştırır ve topu sertçe temizler.',
+  'hudChrome.vcup.role.sweeper.desc':
+    'Koşucuları toptan omuzlayıp uzaklaştırır ve topu sertçe temizler.',
   'hudChrome.vcup.role.sweeper.name': 'Libero',
   'hudChrome.vcup.rolesHeading': 'Spor rolü',
   'hudChrome.vcup.shootPower': 'GÜÇ',
   'hudChrome.vcup.title': 'Vadi Kupası',
   'hudChrome.vcup.waitingCount': '{count} bekliyor',
-  'hudChrome.vcup.walkUp': 'Tribünlerden izlemek için Domuz Tarlası\'na gel.',
+  'hudChrome.vcup.walkUp': "Tribünlerden izlemek için Domuz Tarlası'na gel.",
   'hudChrome.archetypeTitle.label': 'Unvan',
   'hudChrome.archetypeTitle.none': 'Yok',
   'hudChrome.archetypeTitle.armorcrafting': 'Zırhçı',
@@ -245,24 +332,26 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.tailoring': 'Terzi',
   'hudChrome.archetypeTitle.leatherworking': 'Derici',
   'entities.itemSets.crownforged.bonus4':
-    'Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn\'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.',
+    "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
   'entities.itemSets.deathlord.bonus4':
     'Silah kritik vuruşlarının %50 ihtimalle Mezargücü kazandırır, 10 sn boyunca saldırı gücünü 60 artırır.',
-  'entities.itemSets.necromancers.bonus4': 'Büyülerinin %10 ihtimalle Berrak Büyü kazandırır, bir sonraki büyünü bedava yapar.',
+  'entities.itemSets.necromancers.bonus4':
+    'Büyülerinin %10 ihtimalle Berrak Büyü kazandırır, bir sonraki büyünü bedava yapar.',
   'entities.itemSets.nighttalon.bonus4':
-    'Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn\'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.',
-  'entities.itemSets.soulflame.bonus4': 'Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.',
-  'entities.itemSets.stormcallers.bonus4': 'Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.',
+    "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.",
+  'entities.itemSets.soulflame.bonus4':
+    'Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.',
   'entities.itemSets.wyrmshadow.bonus4':
     'Silah kritik vuruşlarının %50 ihtimalle Dişhücumu kazandırır, 8 sn boyunca saldırı hızını %25 artırır.',
   'entities.items.architects_cornerstone.name': 'Mimarın Köşe Taşı',
   'entities.items.bonechill_cord.name': 'Kemikürperti Kuşağı',
   'entities.items.bonechill_striders.name': 'Kemikürperti Adımları',
   'entities.items.choir_blessed_spaulders.name': 'Koro Kutsamalı Omuzlukları',
-  'entities.items.choirmothers_casque.name': 'Koroana\'nın Miğferi',
+  'entities.items.choirmothers_casque.name': "Koroana'nın Miğferi",
   'entities.items.cryptplate_helm.name': 'Mezarzırh Miğferi',
   'entities.items.deathless_greatblade.name': 'Ölümsüz Pala',
-  'entities.items.deathless_warguard_legmail.name': 'Ölümsüz Savaşmuhafızı Bacak Zırhı',
   'entities.items.gravescale_girdle.name': 'Mezarpulu Kemeri',
   'entities.items.gravewyrm_claws.name': 'Mezarejderi Pençeleri',
   'entities.items.gravewyrm_cleaver.name': 'Mezarejderi Satırı',
@@ -272,48 +361,49 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.medallion_of_endless_profit.name': 'Bitmez Kâr Madalyonu',
   'entities.items.mistcallers_fang.name': 'Sisçağıranın Dişi',
   'entities.items.mistforged_pauldrons.name': 'Sisdövümü Omuzlukları',
-  'entities.items.morthens_cryptforged_hauberk.name': 'Morthen\'in Mezardövümü Zırh Gömleği',
-  'entities.items.nielas_coldlight_band.name': 'Niela\'nın Soğukışık Halkası',
+  'entities.items.morthens_cryptforged_hauberk.name': "Morthen'in Mezardövümü Zırh Gömleği",
+  'entities.items.nielas_coldlight_band.name': "Niela'nın Soğukışık Halkası",
   'entities.items.oath_of_the_round_table.name': 'Yuvarlak Masa Yemini',
   'entities.items.sanctum_prowlers_grips.name': 'Mabet Avcısının Eldivenleri',
   'entities.items.sash_of_the_sunken_court.name': 'Boğulmuş Saray Kuşağı',
   'entities.items.scepter_of_the_deathless_court.name': 'Ölümsüz Saray Asası',
-  'entities.items.scourgehide_carapace.name': 'Afetpostu Kabuğu',
   'entities.items.seal_of_the_nine_oaths.name': 'Dokuz Yeminin Mührü',
   'entities.items.shadowpulse_handwraps.name': 'Gölgenabzı El Sargıları',
   'entities.items.shadowpulse_slippers.name': 'Gölgenabzı Terlikleri',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mezarejderi Kefeni',
-  'entities.items.soulforged_warplate.name': 'Ruhdövümü Savaş Zırhı',
-  'entities.items.soulrend_diadem.name': 'Ruhyırtan Tacı',
   'entities.items.stormcallers_focus.name': 'Fırtınaçağıranın Odağı',
   'entities.items.sunken_court_mantle.name': 'Boğulmuş Saray Pelerini',
-  'entities.items.sutils_gambit.name': 'Sutil\'in Kumarı',
+  'entities.items.sutils_gambit.name': "Sutil'in Kumarı",
   'entities.items.swiftfang_talisman.name': 'Tezdiş Tılsımı',
   'entities.items.tidebound_spaulders.name': 'Gelgitbağı Omuzlukları',
   'entities.items.tideguard_faceguard.name': 'Gelgitmuhafızı Yüzlüğü',
   'entities.items.tideworn_warboots.name': 'Gelgityıpranmış Savaş Çizmeleri',
   'entities.items.tidewoven_trousers.name': 'Gelgitörgüsü Pantolonu',
   'entities.items.wyrmchoir_handwraps.name': 'Ejderkorosu El Sargıları',
-  'entities.items.yumis_keepsake_locket.name': 'Yumi\'nin Yadigâr Madalyonu',
+  'entities.items.yumis_keepsake_locket.name': "Yumi'nin Yadigâr Madalyonu",
   'entities.items.zense_meridian.name': 'Zense Meridyeni',
-  'entities.items.zyzzs_deathless_signet.name': 'Zyzz\'in Ölümsüz Mühür Yüzüğü',
+  'entities.items.zyzzs_deathless_signet.name': "Zyzz'in Ölümsüz Mühür Yüzüğü",
   'entities.npcs.heroic_quartermaster.greeting':
-    'Kahramanca derinliklerin kanıtı, Highwatch\'taki en iyi yüzükleri ve kolyeleri satın alır. Nişanlarını göster bana.',
+    "Kahramanca derinliklerin kanıtı, Highwatch'taki en iyi yüzükleri ve kolyeleri satın alır. Nişanlarını göster bana.",
   'entities.npcs.heroic_quartermaster.name': 'Levazımcı Vex',
   'entities.npcs.heroic_quartermaster.title': 'Kahramanca Levazımcı',
   'heroicShop.balance': 'Kahramanca Nişanlar: {count}',
   'heroicShop.buyAria': '{item} ürününü {marks} Kahramanca Nişan karşılığında satın al',
   'hudChrome.bags.cannotDestroy': 'Bu eşya yok edilemez.',
   'hudChrome.bags.rightClickDestroy': 'Yok etmek için sağ tıkla',
-  'hudChrome.crafting.comboRequirementUnmet': 'O tarif için gereken iki zanaata da gereken kademede sahip değilsin.',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'O tarif için gereken iki zanaata da gereken kademede sahip değilsin.',
   'hudChrome.discord.roleTag.coredevs': 'Çekirdek Geliştirici',
   'hudChrome.dungeonDifficulty.setHeroic': 'Zindan Zorluğunu Ayarla: Kahramanca',
   'hudChrome.dungeonDifficulty.setNormal': 'Zindan Zorluğunu Ayarla: Normal',
-  'hudChrome.itemProc.attackSlow': 've hedefin saldırı hızını {duration} sn boyunca %{pct} yavaşlatır',
+  'hudChrome.itemProc.attackSlow':
+    've hedefin saldırı hızını {duration} sn boyunca %{pct} yavaşlatır',
   'hudChrome.itemProc.chainArc':
     'hedefi, {jumps} yakındaki düşmana sıçrayıp azalan hasar veren bir {school} {name} ({damage}) ile vurur',
-  'hudChrome.itemProc.dot': '{name} yaratır, {duration} sn boyunca {total} veren bir {school} zamana yayılı hasar etkisi',
-  'hudChrome.itemProc.hot': '{name} açtırır, {duration} sn boyunca {total} geri kazandıran zamana yayılı bir iyileştirme',
+  'hudChrome.itemProc.dot':
+    '{name} yaratır, {duration} sn boyunca {total} veren bir {school} zamana yayılı hasar etkisi',
+  'hudChrome.itemProc.hot':
+    '{name} açtırır, {duration} sn boyunca {total} geri kazandıran zamana yayılı bir iyileştirme',
   'hudChrome.itemProc.onHeal': 'İyileştirmelerinde şans (%{chance}): {effect}',
   'hudChrome.itemProc.onMeleeHit': 'Vuruşta şans (%{chance}): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Hasar veren büyülerinde şans (%{chance}): {effect}',
@@ -324,8 +414,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Teçhizatından ve set bonuslarından gelen kritik puanı, kritik vuruş şansını artırır. Yaklaşık 10 puan %1 kritik sağlar.',
   'hudChrome.statInfo.desc.hasteRating':
     'Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.',
+  'hudChrome.statInfo.desc.haste':
+    'Silah savruluşlarını ve büyü okumalarını hızlandırır. Genel bekleme süresini azaltmaz.',
+  'hudChrome.statInfo.desc.parry':
+    'Önden gelen bir yakın dövüş saldırısını hiç hasar almadan tümüyle karşılama şansın. Arkadan gelen bir darbe karşılanamaz.',
   'hudChrome.statInfo.names.critRating': 'Kritik Puanı',
+  'hudChrome.statInfo.names.haste': 'Hız',
   'hudChrome.statInfo.names.hasteRating': 'Hız Puanı',
+  'hudChrome.statInfo.names.parry': 'Karşılama',
   'itemUi.slots.neck': 'Boyun',
   'itemUi.slots.ring': 'Parmak',
   'auth.email': 'E-posta',
@@ -342,10 +438,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sunaklar sırayla yanacak. Her sunağı sırasıyla etkinleştirerek diziyi tekrarla. Yanlış bir dokunuş denemeyi boşa çıkarır ve diziyi yeniden oynatır; kusursuz bir deneme en zengin ganimeti kazandırır; denemelerin tükenirse emanetlik en cimri haliyle açılır. Ayinin seni nasıl sınayacağını seç.',
   'delveRiteUi.closeAria': 'Kapat',
   'delveRiteUi.easy': 'Kolay',
-  'delveRiteUi.guideRepeat': 'Sunaklar karardığında, her sunağa aynı sırayla yürü ve F\'ye (Etkileşim) bas.',
+  'delveRiteUi.guideRepeat':
+    "Sunaklar karardığında, her sunağa aynı sırayla yürü ve F'ye (Etkileşim) bas.",
   'delveRiteUi.guideStakes':
     'Yanlış bir sunak üstüne kara su sıçratır ve bir denemeye mal olur. Emanetliği açmak için diziyi tamamla.',
-  'delveRiteUi.guideWatch': 'Seçimini yaptıktan sonra dört sunak teker teker yanar. Sırayı ezberle.',
+  'delveRiteUi.guideWatch':
+    'Seçimini yaptıktan sonra dört sunak teker teker yanar. Sırayı ezberle.',
   'delveRiteUi.hard': 'Zor',
   'delveRiteUi.medium': 'Orta',
   'delveRiteUi.reward.easy': 'Mütevazı ganimet',
@@ -362,14 +460,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.edda': 'Edda Reedhand',
   'delveUi.board.partyTooLarge': 'Yalnızca tek veya iki kişi (en fazla {max} oyuncu)',
   'delveUi.companion.edda.ally_revive': 'Kalk hadi. Bataklık bugün seni alamaz.',
-  'delveUi.companion.edda.boss_pull': 'O ilahi senin adını tanıyor, {playerName}. Sakın karşılık söyleme.',
+  'delveUi.companion.edda.boss_pull':
+    'O ilahi senin adını tanıyor, {playerName}. Sakın karşılık söyleme.',
   'delveUi.companion.edda.combat_start': 'Kara suya dikkat et, {playerName}. Bataklık dinliyor.',
   'delveUi.companion.edda.completion': 'Bataklık sırlarını bir gece daha yutabilir.',
   'delveUi.companion.edda.low_hp': 'Sakin ol. Fenerim daha sönmedi.',
   'delveUi.companion.edda.rank.1': 'Fener Taşıyıcısı',
   'delveUi.companion.edda.rank.2': 'Saz Gözcüsü',
   'delveUi.companion.edda.rank.3': 'Fenbridge Çömezi',
-  'delveUi.companion.edda.run_start': 'Kalas hattından ayrılma, {playerName}. Balçık, mağrur adım atanı alır.',
+  'delveUi.companion.edda.run_start':
+    'Kalas hattından ayrılma, {playerName}. Balçık, mağrur adım atanı alır.',
   'delveUi.companion.edda.trap_spotted': 'Dur. Buradaki sazlarda bir terslik var.',
   'delveUi.companion.tessa.ally_revive': 'Kalk hadi. Bu gecenin defterinde senin adın yazmıyor.',
   'delveUi.companion.tessa.run_start': 'Mumum da defterim de yanımda, {playerName}. Yolu göster.',
@@ -377,13 +477,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kara su geçit yolunun taşlarını yalıyor. Edda\'nın alevi yeşil yeşil titriyor. "Aşağıda yine şarkı söylüyorlar, {playerName}. Koroya yanıt verme."',
   'delveUi.intro.litanyNormal':
     'Sazlarla boğulmuş merdivenler Fenbridge\'in altına iniyor. Edda Reedhand fenerini kaldırıyor. "Bataklık boğdukları her ismi hatırlar, {playerName}. Işıkta kal."',
-  'delveUi.module.litany_apse': 'Boğulmuş apsis, Rahibe Nhalia\'nın sunak adasına açılır.',
-  'delveUi.module.litany_baptistry': 'Çatlamış aziz taşlarının ve yumurta keselerinin altında bir obruk vaftizhanesi ağzını açar.',
-  'delveUi.module.litany_causeway': 'Y biçiminde bir geçit yolu, bele kadar gelen bataklık suyunun üzerinde çatallanır.',
-  'delveUi.module.litany_choir_loft': 'Yelpaze gibi açılan koro mahfilleri, hiç tam susmayan iple asılı çanlarla yankılanır.',
-  'delveUi.module.litany_ledger': 'Su basmış kanallardan defter adaları yükselir; mürekkep bataklığa sızar.',
-  'delveUi.module.litany_ring': 'Bir emanetlik halkası, mühürlü kara su kurnasının çevresinde döner.',
-  'delveUi.module.litany_sluice': 'Yosun kaplı savak kapakları, eski koro mahzenine kara su damlatır.',
+  'delveUi.module.litany_apse': "Boğulmuş apsis, Rahibe Nhalia'nın sunak adasına açılır.",
+  'delveUi.module.litany_baptistry':
+    'Çatlamış aziz taşlarının ve yumurta keselerinin altında bir obruk vaftizhanesi ağzını açar.',
+  'delveUi.module.litany_causeway':
+    'Y biçiminde bir geçit yolu, bele kadar gelen bataklık suyunun üzerinde çatallanır.',
+  'delveUi.module.litany_choir_loft':
+    'Yelpaze gibi açılan koro mahfilleri, hiç tam susmayan iple asılı çanlarla yankılanır.',
+  'delveUi.module.litany_ledger':
+    'Su basmış kanallardan defter adaları yükselir; mürekkep bataklığa sızar.',
+  'delveUi.module.litany_ring':
+    'Bir emanetlik halkası, mühürlü kara su kurnasının çevresinde döner.',
+  'delveUi.module.litany_sluice':
+    'Yosun kaplı savak kapakları, eski koro mahzenine kara su damlatır.',
   'delveUi.moduleName.litany_apse': 'Boğulmuş Apsis',
   'delveUi.moduleName.litany_baptistry': 'Obruk Vaftizhanesi',
   'delveUi.moduleName.litany_causeway': 'Y Çatalı Geçidi',
@@ -397,9 +503,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.object.corpse_candle': 'Ceset Mumu',
   'delveUi.object.grave_tablet': 'Mezar Kitabesi',
   'delveUi.object.sluice_valve': 'Savak Vanası',
-  'delveUi.tracker.riteChoose': 'Boğulmuş Emanetlik\'e yaklaş ve ayini başlatmak için F\'ye bas',
-  'delveUi.tracker.riteInput': 'Her sunakta, yandıkları sırayla F\'ye bas ({current}/{total})',
-  'delveUi.tracker.riteOpen': 'Emanetlik açık: ganimetini almak için üzerinde F\'ye bas',
+  'delveUi.tracker.riteChoose': "Boğulmuş Emanetlik'e yaklaş ve ayini başlatmak için F'ye bas",
+  'delveUi.tracker.riteInput': "Her sunakta, yandıkları sırayla F'ye bas ({current}/{total})",
+  'delveUi.tracker.riteOpen': "Emanetlik açık: ganimetini almak için üzerinde F'ye bas",
   'delveUi.tracker.ritePlayback': 'Sunakları izle: yanma sırasını ezberle',
   'editor.a11y.dialog': 'Editör iletişim kutusu',
   'editor.a11y.stage': 'Harita görünümü',
@@ -417,16 +523,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.assets.category.weapons': 'Silahlar',
   'editor.assets.categoryTab': '{category} ({count})',
   'editor.assets.deleteAsset': 'Yüklenen varlığı sil',
-  'editor.assets.deleteAssetConfirm': '"{name}" adlı yüklenen varlık silinsin mi? Onu kullanan haritalar modeli kaybeder.',
+  'editor.assets.deleteAssetConfirm':
+    '"{name}" adlı yüklenen varlık silinsin mi? Onu kullanan haritalar modeli kaybeder.',
   'editor.assets.empty': 'Eşleşen varlık yok.',
   'editor.assets.label': 'Varlık tarayıcısı',
   'editor.assets.pick': '{name} yerleştir',
   'editor.assets.search': 'Varlıklarda ara',
   'editor.assets.searchPlaceholder': 'Varlık ara...',
   'editor.assets.title': 'Varlık Tarayıcısı',
-  'editor.assets.uploadedEmpty': 'Henüz yüklenen varlık yok. Bir GLB modeli (en fazla 8 MiB) eklemek için Varlık Yükle\'yi kullan.',
+  'editor.assets.uploadedEmpty':
+    "Henüz yüklenen varlık yok. Bir GLB modeli (en fazla 8 MiB) eklemek için Varlık Yükle'yi kullan.",
   'editor.assets.uploadedLoadFailed': 'Yüklediğin varlıklar yüklenemedi.',
-  'editor.assets.uploadedSignIn': 'Kendi GLB modellerini yükleyip yerleştirmek için oyundan giriş yap.',
+  'editor.assets.uploadedSignIn':
+    'Kendi GLB modellerini yükleyip yerleştirmek için oyundan giriş yap.',
   'editor.assets.uploadedTab': 'Yüklenenler',
   'editor.biome.beach': 'Kumsal',
   'editor.biome.cave': 'Mağara',
@@ -447,12 +556,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.blockerTool.title': 'Engel Duvarı',
   'editor.brush.editCount': 'Arazi düzenlemeleri: {count} / {max}',
   'editor.brush.size': 'Fırça boyutu',
-  'editor.brush.sizeHint': 'Tuşlar: [ ve ] fırçayı boyutlandırır; Shift+[ ve Shift+] gücü değiştirir.',
+  'editor.brush.sizeHint':
+    'Tuşlar: [ ve ] fırçayı boyutlandırır; Shift+[ ve Shift+] gücü değiştirir.',
   'editor.brush.strength': 'Güç',
   'editor.brush.title': 'Fırça',
   'editor.camp.count': 'Sayı',
   'editor.camp.delete': 'Kampı sil',
-  'editor.camp.hint': 'Kamp eklemek için boş zemine tıkla ya da düzenlemek için mevcut bir kampa tıkla.',
+  'editor.camp.hint':
+    'Kamp eklemek için boş zemine tıkla ya da düzenlemek için mevcut bir kampa tıkla.',
   'editor.camp.mob': 'Yaratık',
   'editor.camp.none': 'Seçili kamp yok.',
   'editor.camp.playtestNote': 'Yaratıklar yalnızca oyun testinde belirir, editör görünümünde asla.',
@@ -469,41 +580,51 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.confirm.discardTitle': 'Değişiklikler atılsın mı?',
   'editor.confirm.ok': 'Tamam',
   'editor.docTitle': 'Harita Editörü - World of ClaudeCraft',
-  'editor.eraseTool.blockerHint': 'Bir engel duvarının yakınına tıklamak, bunun yerine o duvarı kaldırır.',
+  'editor.eraseTool.blockerHint':
+    'Bir engel duvarının yakınına tıklamak, bunun yerine o duvarı kaldırır.',
   'editor.eraseTool.hint':
     'Kaldırmak için yerleştirilmiş bir varlığa tıkla ya da imlecin altındaki en yeni damgayı kaldırmak için şekillendirilmiş zemine tıkla.',
   'editor.eraseTool.title': 'Sil',
   'editor.flatten.hardEdge': 'Sert kenar',
-  'editor.flatten.hint': 'Düzleştir, zemini sürükleme başladığı andaki imlecin altındaki yüksekliğe eşitler.',
+  'editor.flatten.hint':
+    'Düzleştir, zemini sürükleme başladığı andaki imlecin altındaki yüksekliğe eşitler.',
   'editor.frame.all': 'Tümü',
   'editor.frame.title': 'Çerçevele',
   'editor.help.beginTutorial': 'Öğreticiyi başlat',
   'editor.help.close': 'Kapat',
   'editor.help.flow.draft':
     'Kaydedilmemiş değişikliklerin varken her 30 saniyede bir taslak otomatik kaydedilir; Aç onu geri getirir.',
-  'editor.help.flow.playtest': 'Oyun Testi, kaydedilmemiş düzenlemelerin dahil, gerçek oyunu bu haritada başlatır.',
+  'editor.help.flow.playtest':
+    'Oyun Testi, kaydedilmemiş düzenlemelerin dahil, gerçek oyunu bu haritada başlatır.',
   'editor.help.flow.save': 'Kaydet, haritayı bu tarayıcıda ve giriş yaptığında sunucuda saklar.',
   'editor.help.flowTitle': 'Kaydetme ve oyun testi',
   'editor.help.key.brush': '[ ve ] fırçayı boyutlandırır; Shift+[ ve Shift+] gücünü değiştirir.',
   'editor.help.key.delete': 'Delete, seçili varlığı veya kampı kaldırır.',
   'editor.help.key.duplicate': 'Ctrl+D seçili varlığı çoğaltır.',
   'editor.help.key.escape': 'Esc önce seçimi temizler, sonra Seç aracına döner.',
-  'editor.help.key.nudge': 'Ok tuşları seçili varlığı 0,5 yarda kaydırır; 2 yarda için Shift\'i basılı tut.',
+  'editor.help.key.nudge':
+    "Ok tuşları seçili varlığı 0,5 yarda kaydırır; 2 yarda için Shift'i basılı tut.",
   'editor.help.key.save': 'Ctrl+S haritayı kaydeder.',
-  'editor.help.key.tools': 'Her aracın, araç çubuğundaki düğmesinde gösterilen tek harfli bir kısayolu vardır.',
+  'editor.help.key.tools':
+    'Her aracın, araç çubuğundaki düğmesinde gösterilen tek harfli bir kısayolu vardır.',
   'editor.help.key.undo': 'Ctrl+Z son değişikliği geri alır; Ctrl+Y veya Ctrl+Shift+Z yineler.',
   'editor.help.key.wheel': 'Shift+kaydırma seçili varlığı döndürür; Alt+kaydırma ölçekler.',
-  'editor.help.mouse.fly3d': '3D görünümde sürüklemeyi basılı tutarken WASD kamerayı uçurur ve Q/E yüksekliği değiştirir.',
-  'editor.help.mouse.move': 'Seç etkinken, yerleştirilmiş bir varlığı zeminde taşımak için sürükle.',
+  'editor.help.mouse.fly3d':
+    '3D görünümde sürüklemeyi basılı tutarken WASD kamerayı uçurur ve Q/E yüksekliği değiştirir.',
+  'editor.help.mouse.move':
+    'Seç etkinken, yerleştirilmiş bir varlığı zeminde taşımak için sürükle.',
   'editor.help.mouse.orbit3d':
     '3D görünüm: yörüngede dönmek için sürükle, yakınlaştırmak için tekerleği çevir; orta tuşla ya da Shift ile sürüklemek görünümü kaydırır.',
-  'editor.help.mouse.pan2d': '2D görünüm: görünümü kaydırmak için sürükle, yakınlaştırmak için tekerleği çevir.',
+  'editor.help.mouse.pan2d':
+    '2D görünüm: görünümü kaydırmak için sürükle, yakınlaştırmak için tekerleği çevir.',
   'editor.help.mouseTitle': 'Fare ve gezinme',
   'editor.help.shortcutsTitle': 'Klavye kısayolları',
   'editor.help.title': 'Editör Yardımı',
-  'editor.help.tool.blocker': 'Oyun testinde hareketi engelleyen görünmez duvarlar sürükleyerek çiz.',
+  'editor.help.tool.blocker':
+    'Oyun testinde hareketi engelleyen görünmez duvarlar sürükleyerek çiz.',
   'editor.help.tool.camp': 'Oyun testinde beliren yaratık kamplarını ekle ve düzenle.',
-  'editor.help.tool.erase': 'İmlecin altındaki yerleştirilmiş varlıkları veya şekillendirme damgalarını kaldır.',
+  'editor.help.tool.erase':
+    'İmlecin altındaki yerleştirilmiş varlıkları veya şekillendirme damgalarını kaldır.',
   'editor.help.tool.flatten': 'Zemini, sürüklemenin başladığı yüksekliğe eşitle.',
   'editor.help.tool.lower': 'Fırçanın altındaki araziyi alçalt.',
   'editor.help.tool.paint': 'Bölge varsayılanının üzerine biyom zemin örtüsü boya.',
@@ -525,7 +646,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.layers.graveyard': 'Mezarlıklar',
   'editor.layers.hub': 'Merkezler',
   'editor.layers.lake': 'Göller',
-  'editor.layers.npc': 'NPC\'ler',
+  'editor.layers.npc': "NPC'ler",
   'editor.layers.object': 'Nesneler',
   'editor.layers.poi': 'Önemli noktalar',
   'editor.layers.title': 'Katmanlar',
@@ -538,10 +659,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.colUpdated': 'Güncellenme',
   'editor.openDrawer.delete': 'Sil',
   'editor.openDrawer.deleteLocalConfirm': '"{name}" adlı yerel harita silinsin mi?',
-  'editor.openDrawer.deleteServerConfirm': '"{name}" adlı sunucu haritası silinsin mi? Bu geri alınamaz.',
+  'editor.openDrawer.deleteServerConfirm':
+    '"{name}" adlı sunucu haritası silinsin mi? Bu geri alınamaz.',
   'editor.openDrawer.draft': 'Otomatik kaydedilen taslak',
-  'editor.openDrawer.emptyLocal': 'Bu tarayıcıda henüz kaydedilmiş harita yok. Bir tane kaydet, burada görünsün.',
-  'editor.openDrawer.emptyMine': 'Sunucuda henüz harita yok. Bir tane oluşturmak için giriş yapmışken kaydet.',
+  'editor.openDrawer.emptyLocal':
+    'Bu tarayıcıda henüz kaydedilmiş harita yok. Bir tane kaydet, burada görünsün.',
+  'editor.openDrawer.emptyMine':
+    'Sunucuda henüz harita yok. Bir tane oluşturmak için giriş yapmışken kaydet.',
   'editor.openDrawer.emptyPublic': 'Henüz herkese açık harita yok.',
   'editor.openDrawer.fork': 'Çatalla',
   'editor.openDrawer.loadFailed': 'Haritalar sunucudan yüklenemedi.',
@@ -551,7 +675,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.page': 'Sayfa {page}',
   'editor.openDrawer.prev': 'Önceki sayfa',
   'editor.openDrawer.publish': 'Yayımla',
-  'editor.openDrawer.signInHint': 'Sunucu haritalarına göz atmak, onları kaydetmek ve çatallamak için oyundan giriş yap.',
+  'editor.openDrawer.signInHint':
+    'Sunucu haritalarına göz atmak, onları kaydetmek ve çatallamak için oyundan giriş yap.',
   'editor.openDrawer.statusPrivate': 'Özel',
   'editor.openDrawer.statusPublic': 'Herkese Açık',
   'editor.openDrawer.tabLocal': 'Bu Tarayıcı',
@@ -561,8 +686,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.unpublish': 'Yayımdan Kaldır',
   'editor.place.chosen': 'Yerleştiriliyor: {name}',
   'editor.place.collide': 'Hareketi engeller',
-  'editor.place.collideHint': 'Engelleyen bir varlık, oyuncuların içinden yürüyemeyeceği bir çarpışma alanı kazanır.',
-  'editor.place.none': 'Aşağıdaki tarayıcıdan bir varlık seç, sonra yerleştirmek için zemine tıkla.',
+  'editor.place.collideHint':
+    'Engelleyen bir varlık, oyuncuların içinden yürüyemeyeceği bir çarpışma alanı kazanır.',
+  'editor.place.none':
+    'Aşağıdaki tarayıcıdan bir varlık seç, sonra yerleştirmek için zemine tıkla.',
   'editor.place.randomRotation': 'Rastgele döndürme',
   'editor.place.scale': 'Ölçek',
   'editor.place.title': 'Varlık Yerleştir',
@@ -580,7 +707,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.region.copy': 'Bölgeyi kopyala',
   'editor.region.hint':
     'Yerleştirmeleri ve arazi düzenlemelerini seçmek için bir kutu sürükle. Kopyala, sonra yapıştırmak için tıkla.',
-  'editor.region.hint3d': 'Bölge kutuları 2D görünümde çizilir; kopyalama ve yapıştırma her iki görünümde de çalışır.',
+  'editor.region.hint3d':
+    'Bölge kutuları 2D görünümde çizilir; kopyalama ve yapıştırma her iki görünümde de çalışır.',
   'editor.region.needBox': 'Önce bir bölge kutusu çiz.',
   'editor.region.needClipboard': 'Önce bir bölge kopyala.',
   'editor.region.pasteBeside': 'Yanına yapıştır',
@@ -594,33 +722,42 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.selection.footprints': 'Çarpışma alanlarını göster',
   'editor.selection.moveHint':
     'Taşıma: varlığı 3D görünümde zemin boyunca sürükle ya da ok tuşlarıyla kaydır (0,5 yarda, Shift ile 2 yarda).',
-  'editor.selection.none': 'Hiçbir şey seçili değil. Seç aracını kullan ve yerleştirilmiş bir varlığa tıkla.',
+  'editor.selection.none':
+    'Hiçbir şey seçili değil. Seç aracını kullan ve yerleştirilmiş bir varlığa tıkla.',
   'editor.selection.radius': 'Çarpışma yarıçapı',
   'editor.selection.radiusAuto': 'Otomatik',
-  'editor.selection.radiusAutoTitle': 'Çarpışma yarıçapını varlık ölçeğini izleyecek şekilde sıfırla',
-  'editor.selection.radiusHint': 'Otomatik, çarpışma yarıçapını varlık ölçeğinden türetir; geçersiz kılmak için kaydırıcıyı sürükle.',
+  'editor.selection.radiusAutoTitle':
+    'Çarpışma yarıçapını varlık ölçeğini izleyecek şekilde sıfırla',
+  'editor.selection.radiusHint':
+    'Otomatik, çarpışma yarıçapını varlık ölçeğinden türetir; geçersiz kılmak için kaydırıcıyı sürükle.',
   'editor.selection.rotation': 'Döndürme',
   'editor.selection.scale': 'Ölçek',
   'editor.selection.title': 'Seçim',
-  'editor.selection.wheelHint': 'Shift+kaydırma varlığı döndürür, Alt+kaydırma ölçekler, Ctrl+D çoğaltır.',
+  'editor.selection.wheelHint':
+    'Shift+kaydırma varlığı döndürür, Alt+kaydırma ölçekler, Ctrl+D çoğaltır.',
   'editor.selection.x': 'X',
   'editor.selection.z': 'Z',
   'editor.serverError.asset_blocked': 'O varlık moderasyon tarafından engellendi.',
-  'editor.serverError.asset_limit_reached': 'Yüklenen varlık sınırına ulaştın. Daha fazla yüklemek için birini sil.',
+  'editor.serverError.asset_limit_reached':
+    'Yüklenen varlık sınırına ulaştın. Daha fazla yüklemek için birini sil.',
   'editor.serverError.asset_not_found': 'O varlık artık sunucuda yok.',
-  'editor.serverError.asset_storage_limit_reached': 'Varlık depolama alanın doldu. Önce bir varlık sil.',
+  'editor.serverError.asset_storage_limit_reached':
+    'Varlık depolama alanın doldu. Önce bir varlık sil.',
   'editor.serverError.asset_too_large': 'O model, yükleme boyutu sınırının üzerinde.',
   'editor.serverError.invalid_glb': 'O dosya geçerli bir GLB modeli değil.',
   'editor.serverError.invalid_map_doc': 'Sunucu harita belgesini reddetti.',
-  'editor.serverError.invalid_map_name': 'O harita adına izin verilmiyor. Harf, rakam, boşluk, kesme işareti veya tire kullan.',
+  'editor.serverError.invalid_map_name':
+    'O harita adına izin verilmiyor. Harf, rakam, boşluk, kesme işareti veya tire kullan.',
   'editor.serverError.invalid_version': 'Kaydetme isteği bozuktu. Sayfayı yenile ve tekrar dene.',
-  'editor.serverError.map_limit_reached': 'Sunucu harita sınırına ulaştın. Daha fazla kaydetmek için bir harita sil.',
+  'editor.serverError.map_limit_reached':
+    'Sunucu harita sınırına ulaştın. Daha fazla kaydetmek için bir harita sil.',
   'editor.serverError.map_name_not_allowed': 'O harita adına izin verilmiyor.',
   'editor.serverError.map_not_found': 'O harita artık sunucuda yok.',
   'editor.serverError.map_too_large': 'Harita belgesi sunucuya kaydedilemeyecek kadar büyük.',
   'editor.serverError.network': 'Sunucuya ulaşılamadı. Bağlantını kontrol et ve tekrar dene.',
   'editor.serverError.rate_limited': 'Biraz yavaşla ve tekrar dene.',
-  'editor.serverError.slug_unavailable': 'Sunucu o ad için bir bağlantı oluşturamadı. Farklı bir ad dene.',
+  'editor.serverError.slug_unavailable':
+    'Sunucu o ad için bir bağlantı oluşturamadı. Farklı bir ad dene.',
   'editor.serverError.timeout': 'Sunucu yanıt vermekte çok gecikti. Tekrar dene.',
   'editor.serverError.unauthorized': 'Oturumunun süresi doldu. Oyundan yeniden giriş yap.',
   'editor.serverError.unknown': 'Sunucuyla iletişimde bir şeyler ters gitti.',
@@ -634,7 +771,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.status.autosaveFailed':
     'Otomatik kayıt başarısız oldu (tarayıcı depolaması dolu veya engelli). Yedek tutmak için haritayı dışa aktar.',
   'editor.status.autosaveOff': 'Otomatik kayıt kapatıldı: {reason} Elle kaydet, sonra yeniden aç.',
-  'editor.status.blockerCapReached': 'Engel duvarı sınırına ulaşıldı ({max}). Yeni duvar eklenmedi.',
+  'editor.status.blockerCapReached':
+    'Engel duvarı sınırına ulaşıldı ({max}). Yeni duvar eklenmedi.',
   'editor.status.deleted': 'Harita silindi.',
   'editor.status.draftRestored': 'Otomatik kaydedilen taslak geri yüklendi.',
   'editor.status.draftSaved': 'Taslak otomatik kaydedildi.',
@@ -645,15 +783,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.status.loading3d': 'Dünya yükleniyor...',
   'editor.status.newMap': 'Yerleşik dünyadan yeni bir harita başlatıldı.',
   'editor.status.opened': '"{name}" açıldı.',
-  'editor.status.placementCapReached': 'Yerleştirme sınırına ulaşıldı ({max}). Fazladan varlıklar eklenmedi.',
+  'editor.status.placementCapReached':
+    'Yerleştirme sınırına ulaşıldı ({max}). Fazladan varlıklar eklenmedi.',
   'editor.status.playtestFailed': 'Oyun testi başlatılamadı (depolama engelli).',
   'editor.status.playtestLaunch': 'Oyun testi başlatılıyor...',
   'editor.status.published': 'Harita yayımlandı. Artık herkes onu bulabilir ve çatallayabilir.',
   'editor.status.saveFailedLocal': 'Yerel kayıt başarısız oldu (depolama engelli).',
   'editor.status.savedLocal': '"{name}" bu tarayıcıya kaydedildi.',
-  'editor.status.savedLocalOnly': '"{name}" bu tarayıcıya kaydedildi. Çevrimiçi kaydetmek için giriş yap.',
+  'editor.status.savedLocalOnly':
+    '"{name}" bu tarayıcıya kaydedildi. Çevrimiçi kaydetmek için giriş yap.',
   'editor.status.savedServer': '"{name}" sunucuya kaydedildi (v{version}).',
-  'editor.status.terrainCapReached': 'Arazi düzenleme sınırına ulaşıldı ({max}). Fazladan şekillendirme damgaları eklenmedi.',
+  'editor.status.terrainCapReached':
+    'Arazi düzenleme sınırına ulaşıldı ({max}). Fazladan şekillendirme damgaları eklenmedi.',
   'editor.status.unpublished': 'Harita yayımdan kaldırıldı.',
   'editor.tool.blocker': 'Engel Duvarı',
   'editor.tool.camp': 'Kamp',
@@ -710,11 +851,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.topbar.signInTitle': 'Oyun giriş ekranını yeni sekmede aç',
   'editor.topbar.undo': 'Geri Al',
   'editor.topbar.undoCount': 'Geri al: {count}',
-  'editor.topbar.undoCountTitle': '{count} geri alınabilir adım (geri almak için Ctrl+Z, yinelemek için Ctrl+Y)',
+  'editor.topbar.undoCountTitle':
+    '{count} geri alınabilir adım (geri almak için Ctrl+Z, yinelemek için Ctrl+Y)',
   'editor.topbar.undoTitle': 'Son değişikliği geri al (Ctrl+Z)',
   'editor.topbar.uploadAsset': 'Varlık Yükle',
   'editor.topbar.uploadAssetDisabledTitle': 'Varlık yüklemek için oyundan giriş yap',
-  'editor.topbar.uploadAssetTitle': 'Haritalarına yerleştirmek için bir GLB modeli yükle (en fazla 8 MiB)',
+  'editor.topbar.uploadAssetTitle':
+    'Haritalarına yerleştirmek için bir GLB modeli yükle (en fazla 8 MiB)',
   'editor.topbar.view2d': '2D',
   'editor.topbar.view2dTitle': 'Sembolik kuş bakışı haritada düzenle',
   'editor.topbar.view3d': '3D',
@@ -726,7 +869,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.tutorial.next': 'İleri',
   'editor.tutorial.skip': 'Turu atla',
   'editor.tutorial.steps.help.body':
-    'Döngünün tamamı bu. Tam araç listesi ve tüm kısayollar için ya da bu turu yeniden başlatmak için istediğin zaman Yardım\'ı aç.',
+    "Döngünün tamamı bu. Tam araç listesi ve tüm kısayollar için ya da bu turu yeniden başlatmak için istediğin zaman Yardım'ı aç.",
   'editor.tutorial.steps.help.title': 'Yardım burada',
   'editor.tutorial.steps.inspector.body':
     'Etkin aracın seçenekleri burada görünür: fırça boyutu, biyom paleti, varlık ölçeği, kamp ayarları ve seçtiğin her şeyin özellikleri.',
@@ -754,12 +897,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.upload.uploaded': 'Varlık yüklendi: {name}',
   'editor.upload.uploadedExisting': 'O model zaten sunucudaydı; yeniden kullanılıyor.',
   'editor.upload.uploading': 'Varlık yükleniyor...',
-  'editor.water.hint': 'Harita genelindeki su yüzeyi yüksekliğini {min} ile {max} yarda arasında ayarlar.',
+  'editor.water.hint':
+    'Harita genelindeki su yüzeyi yüksekliğini {min} ile {max} yarda arasında ayarlar.',
   'editor.water.level': 'Su seviyesi',
   'editor.water.reset': 'Yerleşik seviyeye sıfırla',
   'editor.water.title': 'Su Seviyesi',
   'entities.delves.drowned_litany.enterText': 'Bataklığın kıyısındaki boğulmuş mabede inersin.',
-  'entities.delves.drowned_litany.leaveText': 'Bataklığın kıyısında Birader Halven\'in yanına tırmanıp geri dönersin.',
+  'entities.delves.drowned_litany.leaveText':
+    "Bataklığın kıyısında Birader Halven'in yanına tırmanıp geri dönersin.",
   'entities.delves.drowned_litany.name': 'Boğulmuş Litanya',
   'entities.items.blackwater_vanguard_chest.name': 'Karasu Öncüsü Göğüslüğü',
   'entities.items.bulwark_rusted_pauldrons.name': 'Siper Pası Omuzlukları',
@@ -774,12 +919,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_plate_chest.name': 'Batak Muhafızı Zırhı',
   'entities.items.litany_shoulder.name': 'Karasu Akıntısı Pelerini',
   'entities.items.mirejaw_fang_knife.name': 'Mirejaw Diş Bıçağı',
-  'entities.items.nhalias_bell_maul.name': 'Nhalia\'nın Çan Balyozu',
-  'entities.items.nhalias_litany_rod.name': 'Nhalia\'nın Litanya Çubuğu',
+  'entities.items.nhalias_bell_maul.name': "Nhalia'nın Çan Balyozu",
+  'entities.items.nhalias_litany_rod.name': "Nhalia'nın Litanya Çubuğu",
   'entities.items.reedstalker_jerkin.name': 'Sazsinsisi Cepkeni',
   'entities.items.siltguard_helm.name': 'Balçıkmuhafız Miğferi',
   'entities.items.siltstep_leggings.name': 'Balçıkadım Tozlukları',
-  'entities.items.sister_nhalia_choir_plate.name': 'Rahibe Nhalia\'nın Koroda Dövülmüş Zırhı',
+  'entities.items.sister_nhalia_choir_plate.name': "Rahibe Nhalia'nın Koroda Dövülmüş Zırhı",
   'entities.items.sunken_reliquary_hood.name': 'Batık Emanetlik Başlığı',
   'entities.items.widow_silk_hood.name': 'Dul İpeği Başlığı',
   'entities.mobs.choir_thrall.name': 'Bataklık Kölesi',
@@ -796,10 +941,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Uyanan Zirve',
   'entities.mobs.tolling_bell.name': 'Çalan Çan',
   'entities.mobs.vale_cup_ball.name': 'Yaban Domuzu Topu',
-  'entities.npcs.brother_halven_marsh.greeting': 'İz kuzeye çıktı. Bir emanetlik daha, bir ayin daha. Kademeni seç, sen dönene dek ipi ben tutarım.',
+  'entities.npcs.brother_halven_marsh.greeting':
+    'İz kuzeye çıktı. Bir emanetlik daha, bir ayin daha. Kademeni seç, sen dönene dek ipi ben tutarım.',
   'entities.npcs.brother_halven_marsh.name': 'Birader Halven',
   'entities.npcs.brother_halven_marsh.title': 'Emanetlik Bekçisi',
-  'entities.npcs.spirit_healer.greeting': 'Dinlen şimdi, ruh. Seni bedenine geri döndürebilirim, ama geri geçiş seni güçsüz bırakır.',
+  'entities.npcs.spirit_healer.greeting':
+    'Dinlen şimdi, ruh. Seni bedenine geri döndürebilirim, ama geri geçiş seni güçsüz bırakır.',
   'entities.npcs.spirit_healer.name': 'Solgun Bekçi',
   'entities.npcs.spirit_healer.title': 'Ölülerin Muhafızı',
   'entities.quests.q_old_cragmaw.completion':
@@ -834,19 +981,26 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.close': 'Takvimi kapat',
   'hudChrome.calendar.dayAria': '{date}: {count} etkinlik',
   'hudChrome.calendar.deleteAria': '{title} etkinliğini kaldır',
-  'hudChrome.calendar.events.arenaClash.note': 'Düellocular Kül Kolezyumu\'na akın ediyor. Sıraya gir ve merdiveni tırman.',
+  'hudChrome.calendar.events.arenaClash.note':
+    "Düellocular Kül Kolezyumu'na akın ediyor. Sıraya gir ve merdiveni tırman.",
   'hudChrome.calendar.events.arenaClash.title': 'Arena Çatışması',
-  'hudChrome.calendar.events.delveDay.note': 'Birader Halven haritalarını işaretliyor: Çökmüş Emanetlik\'e meydan okumak için güzel bir gün.',
+  'hudChrome.calendar.events.delveDay.note':
+    "Birader Halven haritalarını işaretliyor: Çökmüş Emanetlik'e meydan okumak için güzel bir gün.",
   'hudChrome.calendar.events.delveDay.title': 'Mağara Günü',
-  'hudChrome.calendar.events.fiestaNight.note': 'İkiye iki Fiesta ringi bu gece en gürültülü kalabalığını topluyor.',
+  'hudChrome.calendar.events.fiestaNight.note':
+    'İkiye iki Fiesta ringi bu gece en gürültülü kalabalığını topluyor.',
   'hudChrome.calendar.events.fiestaNight.title': 'Fiesta Gecesi',
-  'hudChrome.calendar.events.fishingDerby.note': 'Oltacılar göl kıyılarını doldurdu. Bir olta kap ve balıkçı hikayeleri paylaş.',
+  'hudChrome.calendar.events.fishingDerby.note':
+    'Oltacılar göl kıyılarını doldurdu. Bir olta kap ve balıkçı hikayeleri paylaş.',
   'hudChrome.calendar.events.fishingDerby.title': 'Balık Tutma Yarışması',
-  'hudChrome.calendar.events.marketDay.note': 'Tüccar taze mal bekliyor. Dünya Pazarı\'na göz atmak için güzel bir gün.',
+  'hudChrome.calendar.events.marketDay.note':
+    "Tüccar taze mal bekliyor. Dünya Pazarı'na göz atmak için güzel bir gün.",
   'hudChrome.calendar.events.marketDay.title': 'Pazar Günü',
-  'hudChrome.calendar.events.moongateCommunion.note': 'Hacılar, ay ortası ayının altında tapınağın ay geçidinde toplanıyor.',
+  'hudChrome.calendar.events.moongateCommunion.note':
+    'Hacılar, ay ortası ayının altında tapınağın ay geçidinde toplanıyor.',
   'hudChrome.calendar.events.moongateCommunion.title': 'Ay Geçidi Ayini',
-  'hudChrome.calendar.events.raidCall.note': 'Muhafızlar boruyu çalıyor: mahzenler ve akın için bir grup topla.',
+  'hudChrome.calendar.events.raidCall.note':
+    'Muhafızlar boruyu çalıyor: mahzenler ve akın için bir grup topla.',
   'hudChrome.calendar.events.raidCall.title': 'Akın Çağrısı',
   'hudChrome.calendar.guildOnlyNote': 'Birlikte etkinlik planlamak için bir loncaya katıl.',
   'hudChrome.calendar.hourAllDay': 'Tüm gün',
@@ -861,7 +1015,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.created': 'Etkinlik lonca takviminde.',
   'hudChrome.calendar.result.eventGone': 'O etkinlik artık takvimde değil.',
   'hudChrome.calendar.result.notInGuild': 'Bir loncada değilsin.',
-  'hudChrome.calendar.result.notOfficer': 'Lonca etkinliklerini yalnızca subaylar ve Lonca Üstadı yönetebilir.',
+  'hudChrome.calendar.result.notOfficer':
+    'Lonca etkinliklerini yalnızca subaylar ve Lonca Üstadı yönetebilir.',
   'hudChrome.calendar.result.removed': 'Etkinlik takvimden kaldırıldı.',
   'hudChrome.calendar.title': 'Etkinlik Takvimi',
   'hudChrome.calendar.titlePlaceholder': 'Etkinlik başlığı',
@@ -875,13 +1030,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'İpek',
   'hudChrome.corpseHarvest.components.tusk': 'Azı Dişi',
   'hudChrome.corpseHarvest.components.venomSac': 'Zehir Kesesi',
-  'hudChrome.corpseHarvest.concentrateHint': 'Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.',
   'hudChrome.corpseHarvest.harvestButton': 'Topla',
   'hudChrome.corpseHarvest.title': 'Toplama',
   'hudChrome.dailyRewards.disclaimer':
     'WOC fiyatı hızla değişebilir. Olağan fiyat dalgalanmalarının seni dışarıda bırakmaması için 20 USD asgarisinden fazlasını tutmanı öneririz. Bu bir yatırım tavsiyesi değildir.',
   'hudChrome.dailyRewards.hideChestConfirmBody':
-    'Bu, sandık kısayolunu HUD\'undan kaldırır. Ödüller, uygunluk ve bu panel kullanılabilir kalır; kısayolu Seçenekler\'den geri getirebilirsin.',
+    "Bu, sandık kısayolunu HUD'undan kaldırır. Ödüller, uygunluk ve bu panel kullanılabilir kalır; kısayolu Seçenekler'den geri getirebilirsin.",
   'hudChrome.dailyRewards.hideChestConfirmCancel': 'İptal',
   'hudChrome.dailyRewards.hideChestConfirmOk': 'Sandığı Gizle',
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Günlük Ödül Sandığı gizlensin mi?',
@@ -891,7 +1047,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.totalPlayers': 'Bugün {count} oyuncu',
   'hudChrome.death.resurrectAtCorpse': 'Cesedinin Başında Diril',
   'hudChrome.death.resurrectAtHealer': 'Solgun Bekçi (Bekçinin Bedeli)',
-  'hudChrome.death.spiritHealerAlive': 'Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.',
+  'hudChrome.death.spiritHealerAlive':
+    'Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.',
   'hudChrome.discord.roleTag.admin': 'Yönetici',
   'hudChrome.frameReset.label': 'Çerçeve Konumlarını Sıfırla',
   'hudChrome.mailbox.arrivedBanner': 'Kuzgun kondu: {name} sana posta gönderdi.',
@@ -907,7 +1064,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.deleteAria': '{subject} mektubunu sil',
   'hudChrome.mailbox.empty': 'Posta kutun boş.',
   'hudChrome.mailbox.indicatorAria': 'Okunmamış posta: {count}',
-  'hudChrome.mailbox.indicatorTip': '{count} okunmamış mektubun var. Okumak için bir posta kutusuna uğra.',
+  'hudChrome.mailbox.indicatorTip':
+    '{count} okunmamış mektubun var. Okumak için bir posta kutusuna uğra.',
   'hudChrome.mailbox.noSubject': '(konu yok)',
   'hudChrome.mailbox.openAria': '{name} tarafından gönderilen {subject} mektubunu oku',
   'hudChrome.mailbox.parcelsHint': 'Eklemek için çantandaki bir eşyaya tıkla.',
@@ -922,9 +1080,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.noRecipient': 'Burada bu isimde posta kutusu olan kimse yok.',
   'hudChrome.mailbox.result.notEnoughItems': 'Gönderecek o kadar tane yok.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Alıcının posta kutusu dolu.',
-  'hudChrome.mailbox.result.sent': 'Bir kuzgun, mektubunla {name} adlı alıcıya doğru havalanır (posta ücreti: {postage}).',
+  'hudChrome.mailbox.result.sent':
+    'Bir kuzgun, mektubunla {name} adlı alıcıya doğru havalanır (posta ücreti: {postage}).',
   'hudChrome.mailbox.result.takeParcelsFirst': 'Mektubu atmadan önce paketleri çıkar.',
-  'hudChrome.mailbox.result.tooFar': 'Postanla ilgilenmek için bir posta kutusunun başında olmalısın.',
+  'hudChrome.mailbox.result.tooFar':
+    'Postanla ilgilenmek için bir posta kutusunun başında olmalısın.',
   'hudChrome.mailbox.result.tooManyParcels': 'Bir mektup en fazla {count} paket taşır.',
   'hudChrome.mailbox.sendButton': 'Mektubu Gönder',
   'hudChrome.mailbox.subjectLabel': 'Konu',
@@ -943,9 +1103,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': 'Düşman',
   'hudChrome.mobTooltip.levelFamily': 'Seviye {level} {family}',
   'hudChrome.options.aurasOnPlayerFrame': 'Oyuncu Çerçevesinde Güçlendirmeler',
+  'hudChrome.options.mouseoverCast': 'Grup Çerçevelerinde İmleçle Büyü Yapma',
   'hudChrome.options.playerFrameScale': 'Oyuncu Çerçevesi Ölçeği',
   'hudChrome.options.showDailyRewardsChest': 'Günlük Ödül Sandığını Göster',
   'hudChrome.options.showOwnNameplate': 'Kendi İsim Etiketimi Göster',
+  'hudChrome.options.showTargetOfTarget': 'Hedefin Hedefini Göster',
   'hudChrome.options.targetFrameScale': 'Hedef Çerçevesi Ölçeği',
   'hudChrome.options.walkByAutoloot': 'Yanından Geçerken Otomatik Yağma',
   'hudChrome.party.inviteUsage': 'Kimi davet edeyim? Kullanım: /invite <name>.',
@@ -958,21 +1120,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'g',
   'hudChrome.unitFrame.durationUnitHours': 'sa',
   'hudChrome.unitFrame.durationUnitMinutes': 'dk',
-  'hudChrome.worldBoss.spawn': '{name}, Dikenzirve Tepeleri\'nin üzerinde yükseliyor!',
+  'hudChrome.worldBoss.spawn': "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!",
   'itemUi.kind.bag': 'Çanta',
   'itemUi.tooltip.bagSlots': '{slots} Yuvalı Çanta',
   'questUi.tracker.hideFromMap': '{name} görevini haritadan gizle',
   'questUi.tracker.showOnMap': '{name} görevini haritada göster',
-  'sim.delve.baptistryEggs': 'Vaftizhane sessizliğe gömülür. Örümcek yumurta keseleri kenarlara ıslak ıslak tutunuyor.',
+  'sim.delve.baptistryEggs':
+    'Vaftizhane sessizliğe gömülür. Örümcek yumurta keseleri kenarlara ıslak ıslak tutunuyor.',
   'sim.delve.baptistrySpidersSealed': 'Örümcek keselerini yok etmeyi denemelisin.',
   'sim.delve.baptistryWave': 'Vaftizhanenin kara suyunda bir şey kıpırdanır.',
   'sim.delve.bellRopeShock': 'Çan ipi aniden gerilir. Boğulmuş Kantorlar şokla sendeler.',
-  'sim.delve.drownedLitanyReliquaryRise': 'Rahibe Nhalia susar. Boğulmuş Emanetlik kara sudan yükselir. Ayini başlatmak için ona yaklaş.',
-  'sim.delve.eggSacBurst': 'Yumurta kesesi patlar. Örümcek yavruları vaftizhanenin kenarına dağılır.',
+  'sim.delve.drownedLitanyReliquaryRise':
+    'Rahibe Nhalia susar. Boğulmuş Emanetlik kara sudan yükselir. Ayini başlatmak için ona yaklaş.',
+  'sim.delve.eggSacBurst':
+    'Yumurta kesesi patlar. Örümcek yavruları vaftizhanenin kenarına dağılır.',
   'sim.delve.moveCloserReliquary': 'Emanetliğe yaklaş.',
   'sim.delve.nhaliaBlackwaterMark': '{name}, {player} üzerine Kara Su işareti bırakır!',
   'sim.delve.nhaliaCantorShield': 'Kantorlar, notayı tutun!',
-  'sim.delve.partyTooLarge': '{name}, tek ya da iki kişilik delveler içindir. {max} veya daha kalabalık gruplar giremez.',
+  'sim.delve.partyTooLarge':
+    '{name}, tek ya da iki kişilik delveler içindir. {max} veya daha kalabalık gruplar giremez.',
   'sim.delve.puzzleSealed': 'Mührü, odanın bir yerine baskı uygulayarak açman gerekiyor.',
   'sim.delve.riteCorrect': 'Dokunuşuna yumuşak bir çınlama yanıt verir.',
   'sim.delve.riteReliquaryEmpty': 'Emanetlik boş.',
@@ -982,12 +1148,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.riteSequenceReady': 'Sunaklar kararır. Diziyi tekrarla.',
   'sim.delve.riteWrong': 'Sert bir çan çatlaması. Ayaklarına kara su sıçrar.',
   'sim.delve.ropesSealed': 'Çan iplerini çekmeyi denemelisin.',
-  'wallet.extensionHelp': 'Burada bir cüzdan görmek için Solflare Wallet gibi bir tarayıcı cüzdan uzantısını etkin tutun.',
-  'worldContent.delveReliquaryInteract': 'Boğulmuş Emanetlik: Ayini başlatmak için F\'ye bas',
-  'worldContent.delveRiteShrineBellInteract': 'Çan Sunağı: Çalmak için F\'ye bas',
-  'worldContent.delveRiteShrineCandleInteract': 'Mum Sunağı: Dokunmak için F\'ye bas',
-  'worldContent.delveRiteShrineReedInteract': 'Saz Sunağı: Dokunmak için F\'ye bas',
-  'worldContent.delveRiteShrineSkullInteract': 'Kafatası Sunağı: Dokunmak için F\'ye bas',
+  'wallet.extensionHelp':
+    'Burada bir cüzdan görmek için Solflare Wallet gibi bir tarayıcı cüzdan uzantısını etkin tutun.',
+  'worldContent.delveReliquaryInteract': "Boğulmuş Emanetlik: Ayini başlatmak için F'ye bas",
+  'worldContent.delveRiteShrineBellInteract': "Çan Sunağı: Çalmak için F'ye bas",
+  'worldContent.delveRiteShrineCandleInteract': "Mum Sunağı: Dokunmak için F'ye bas",
+  'worldContent.delveRiteShrineReedInteract': "Saz Sunağı: Dokunmak için F'ye bas",
+  'worldContent.delveRiteShrineSkullInteract': "Kafatası Sunağı: Dokunmak için F'ye bas",
   'worldContent.mailboxName': 'Posta Kutusu',
   'entities.npcs.auctioneer_voss.greeting':
     'World Market burada da açık, {className}. Diyardaki her maceracıdan alışveriş yap ya da kendi mallarını sergile.',
@@ -996,15 +1163,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.badgeTitle': 'Geliştirici: {tier}',
   'hudChrome.devBadge.contributor': 'Açık kaynak katkıcısı',
   'hudChrome.devBadge.flavors.architect': 'Diyarın bir mimarı: 30 pull request birleştirildi.',
-  'hudChrome.devBadge.flavors.artificer': 'Beş pull request geldi ve dünya senin koduna göre şekilleniyor.',
+  'hudChrome.devBadge.flavors.artificer':
+    'Beş pull request geldi ve dünya senin koduna göre şekilleniyor.',
   'hudChrome.devBadge.flavors.runesmith': 'On beş pull request çalışan oyuna işlendi.',
-  'hudChrome.devBadge.flavors.tinkerer': 'İlk pull request\'in diyara indi.',
-  'hudChrome.devBadge.flavors.worldwright': 'Dünyaların bir ustası: 70 pull request oyunu şekillendiriyor.',
+  'hudChrome.devBadge.flavors.tinkerer': "İlk pull request'in diyara indi.",
+  'hudChrome.devBadge.flavors.worldwright':
+    'Dünyaların bir ustası: 70 pull request oyunu şekillendiriyor.',
   'hudChrome.devBadge.link.benefits':
-    'Açık kaynak deposuna birleştirilen pull request\'lerin için bir geliştirici rozeti kazanmak üzere GitHub hesabını bağla.',
-  'hudChrome.devBadge.link.cta': 'GitHub\'ı Bağla',
+    "Açık kaynak deposuna birleştirilen pull request'lerin için bir geliştirici rozeti kazanmak üzere GitHub hesabını bağla.",
+  'hudChrome.devBadge.link.cta': "GitHub'ı Bağla",
   'hudChrome.devBadge.link.error': 'GitHub bağlanamadı. Lütfen tekrar dene.',
-  'hudChrome.devBadge.link.relink': 'GitHub\'ı Yeniden Bağla',
+  'hudChrome.devBadge.link.relink': "GitHub'ı Yeniden Bağla",
   'hudChrome.devBadge.linkedAs': '{login} olarak bağlandı',
   'hudChrome.devBadge.prsLanded': '{count} pull request birleştirildi',
   'hudChrome.devBadge.tiers.architect': 'Mimar',
@@ -1020,7 +1189,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.devEmpty': 'Henüz sıralı katkıcı yok.',
   'hudChrome.leaderboard.devName': 'Katkıcı',
   'hudChrome.leaderboard.devTierCol': 'Rozet',
-  'hudChrome.leaderboard.mergedPrs': 'Birleştirilen PR\'ler',
+  'hudChrome.leaderboard.mergedPrs': "Birleştirilen PR'ler",
   'hudChrome.leaderboard.tabDevs': 'Geliştiriciler',
   'hudChrome.lootSettings.close': 'Ganimet ayarlarını kapat',
   'hudChrome.lootSettings.groupLoot': 'Grup Ganimeti',
@@ -1034,16 +1203,21 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.looterChanged': 'Ganimet Yöneticisi artık {name}.',
   'hudChrome.masterLoot.rollingFor': '{item} için zar atılıyor.',
   'hudChrome.masterLoot.summaryGroup': 'Ganimet Ayarları: Grup Ganimeti.',
-  'hudChrome.masterLoot.summaryMaster': 'Ganimet Ayarları: Yönetilen Ganimet, Ganimet Yöneticisi {name}, eşik {threshold}.',
+  'hudChrome.masterLoot.summaryMaster':
+    'Ganimet Ayarları: Yönetilen Ganimet, Ganimet Yöneticisi {name}, eşik {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Ganimet eşiği {threshold} olarak ayarlandı.',
   'hudChrome.options.showDevBadges': 'Geliştirici Rozetlerini Göster',
   'hudChrome.options.groundReticle': 'Yer hedefleme halkası',
   'hudChrome.options.startAttackOnAbility': 'Yetenek Kullanımında Otomatik Saldırı',
   'hudChrome.party.promoteLeader': 'Lider Yap',
-  'hudChrome.plurals.playersMatching.few': 'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
-  'hudChrome.plurals.playersMatching.many': 'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
-  'hudChrome.plurals.playersMatching.one': 'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
-  'hudChrome.plurals.playersMatching.other': 'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
+  'hudChrome.plurals.playersMatching.few':
+    'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
+  'hudChrome.plurals.playersMatching.many':
+    'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
+  'hudChrome.plurals.playersMatching.one':
+    'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
+  'hudChrome.plurals.playersMatching.other':
+    'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
   'hudChrome.statInfo.desc.spellPower':
     'Büyülerinin hasarını ve iyileştirmelerinin gücünü artırır. Her Zeka puanı, teçhizat veya güçlendirmelerden gelenlere ek olarak biraz Büyü Gücü sağlar.',
   'hudChrome.statInfo.names.spellPower': 'Büyü Gücü',
@@ -1056,14 +1230,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.sources.talents': 'Yetenekler ve etkiler: {value}',
   'a11y.characterActions': 'Karakter eylemleri',
   'a11y.discordCommunity': 'World of ClaudeCraft Discord topluluğuna katıl',
-  'a11y.donateProject': 'World of ClaudeCraft\'a destek olmak için bağış yap',
+  'a11y.donateProject': "World of ClaudeCraft'a destek olmak için bağış yap",
   'a11y.githubProject': 'World of ClaudeCraft GitHub projesini aç',
   'a11y.goHome': 'Ana sayfaya git',
   'a11y.languageSelection': 'Dil seçimi',
   'a11y.mainNavigation': 'Ana gezinme',
   'a11y.toggleMenu': 'Menüyü aç/kapat',
   'abilityUi.actionBar.attackName': 'Saldırı',
-  'abilityUi.actionBar.attackTooltip': 'Hedefine otomatik saldırıyı aç/kapat. Bir düşmana sağ tıklamak da saldırır.',
+  'abilityUi.actionBar.attackTooltip':
+    'Hedefine otomatik saldırıyı aç/kapat. Bir düşmana sağ tıklamak da saldırır.',
   'abilityUi.actionBar.clearHint': 'Temizlemek için Shift+sağ tık veya Shift+Delete',
   'abilityUi.actionBar.emptySlot': 'Boş yuva',
   'abilityUi.actionBar.emptySlotAria': 'Eylem yuvası {slot}: boş',
@@ -1109,7 +1284,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresLevel': '{level}. seviye gerektirir',
   'abilityUi.tooltip.requiresOutOfCombat': 'Savaş dışında olmayı gerektirir',
   'abilityUi.tooltip.requiresStealth': 'Gizlenme gerektirir',
-  'abilityUi.tooltip.requiresTargetHealthBelow': 'Hedefin canının %{percent} altında olmasını gerektirir',
+  'abilityUi.tooltip.requiresTargetHealthBelow':
+    'Hedefin canının %{percent} altında olmasını gerektirir',
   'abilityUi.tooltip.unavailable': 'Kullanılamaz',
   'auth.appearance': 'Görünüm',
   'auth.back': 'Geri',
@@ -1138,7 +1314,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'auth.realm': 'Dünya',
   'auth.realmList': 'Dünya Listesi',
   'auth.showPassword': 'Parolayı göster',
-  'auth.twoFactorHint': 'Kimlik doğrulama uygulamandaki kodu ya da kurtarma kodlarından birini gir.',
+  'auth.twoFactorHint':
+    'Kimlik doğrulama uygulamandaki kodu ya da kurtarma kodlarından birini gir.',
   'auth.twoFactorLabel': 'Kimlik doğrulama kodu',
   'auth.twoFactorPlaceholder': '6 haneli ya da kurtarma kodu',
   'auth.username': 'Kullanıcı adı',
@@ -1166,7 +1343,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'character.tabCharacters': 'Karakterler',
   'character.tabCreate': 'Oluştur',
   'character.takeOver': 'Devral',
-  'character.takeOverConfirm': 'Bu işlem bu karakteri başka bir oturumdan koparıp buraya getirecek. Devam edilsin mi?',
+  'character.takeOverConfirm':
+    'Bu işlem bu karakteri başka bir oturumdan koparıp buraya getirecek. Devam edilsin mi?',
   'character.viewProfile': 'Profili Görüntüle',
   'classDetails.aria':
     '{className} sınıf ayrıntıları: rol {role}. Başlangıç nitelikleri: Kuvvet {str}, Çeviklik {agi}, Dayanıklılık {sta}, Zeka {int}, Ruh {spi}.',
@@ -1188,9 +1366,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.mage':
     'Büyücüler Ateş, Buz ve gizem gücünü bükerek düşmanları yok eder, su çağırır ve tehditleri olduğu yerde dondurur.',
   'classDetails.lore.paladin':
-    'Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Onaran Işık\'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.',
+    "Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Onaran Işık'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.",
   'classDetails.lore.priest':
-    'Rahipler müttefikleri iyileştirmek ve korumak için Onaran Işık\'a başvurur; Gölge büyüsü ise düşmanlarının canını emmelerine olanak tanır.',
+    "Rahipler müttefikleri iyileştirmek ve korumak için Onaran Işık'a başvurur; Gölge büyüsü ise düşmanlarının canını emmelerine olanak tanır.",
   'classDetails.lore.rogue':
     'Hırsızlar, gölgelerden sırttan bıçaklamalar ve bitirici hamleler için Enerji ile Kombo Puanı harcayan gizli suikastçılardır.',
   'classDetails.lore.shaman':
@@ -1199,6 +1377,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Karabüyücüler şeytanlar çağırır, lanetler ve süregelen hasar büyüleri uygular ve dayanmak için düşmanlardan can emer.',
   'classDetails.lore.warrior':
     'Savaşçılar, hasar verdikçe ya da aldıkça Öfke biriktiren çelik gibi yakın dövüş savaşçılarıdır. Ağır darbeleri soğurur ya da düşmanları güçlü silahlarla ezerler.',
+  'classDetails.lore.warriorClassic':
+    'Savaşçının dövüş yenilemesinden önceki haliyle birebir aynısı: özgün yetenek seti ve öfke temposu, yeni savaşçının yanında korundu; böylece ikisini de deneyip hangisinin daha iyi hissettirdiğini bize söyleyebilirsin.',
   'classDetails.resources.energy': 'Enerji',
   'classDetails.resources.mana': 'Mana',
   'classDetails.resources.rage': 'Öfke',
@@ -1281,14 +1461,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.affix.old_mechanisms': 'Eski Mekanizmalar',
   'delveUi.affix.restless_graves': 'Huzursuz Mezarlar',
   'delveUi.affix.unstable_roof': 'Çökmeye Yakın Tavan',
-  'delveUi.blessing.chapel_candle': 'Şapel Mumu: daha güvenli bir koşu, tamamlamada bir eksik İşaret.',
-  'delveUi.board.companion.boon': 'Dövüşler arasında grubu iyileştirir. 3. seviye, koşu başına bir kez düşmüş bir müttefiki diriltir.',
+  'delveUi.blessing.chapel_candle':
+    'Şapel Mumu: daha güvenli bir koşu, tamamlamada bir eksik İşaret.',
+  'delveUi.board.companion.boon':
+    'Dövüşler arasında grubu iyileştirir. 3. seviye, koşu başına bir kez düşmüş bir müttefiki diriltir.',
   'delveUi.board.companion.maxRank': 'Tamamen geliştirildi',
   'delveUi.board.companion.pick': 'Bir yoldaş seç',
   'delveUi.board.companion.rank': 'Rütbe {rank}',
   'delveUi.board.companion.tessa': 'Çömez Tessa',
-  'delveUi.board.companion.upgrade': 'Rütbe {rank}\'e yükselt ({marks} Nişan)',
-  'delveUi.board.companion.upgradeAria': '{name} adlı yoldaşı {marks} Mağara Nişanı karşılığında rütbe {rank}\'e yükselt',
+  'delveUi.board.companion.upgrade': "Rütbe {rank}'e yükselt ({marks} Nişan)",
+  'delveUi.board.companion.upgradeAria':
+    "{name} adlı yoldaşı {marks} Mağara Nişanı karşılığında rütbe {rank}'e yükselt",
   'delveUi.board.enter': 'Mağaraya Gir',
   'delveUi.board.enterAria': '{delve} mağarasına {tier} zorlukta gir',
   'delveUi.board.marks': 'Mağara Nişanları: {count}',
@@ -1302,25 +1485,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.title': 'Mağara Panosu',
   'delveUi.boss.varric.bell.emote': 'Diyakoz Varric gömülü çanı iki eliyle kavrar!',
   'delveUi.boss.varric.bell.impact': 'Çanın çınlaması mahzenin zeminini çatlatır!',
-  'delveUi.boss.varric.bell.lesson': 'Çan Çınlaması: her on iki saniyede bir yere vuruş. Düşmeden önce uzaklaş.',
+  'delveUi.boss.varric.bell.lesson':
+    'Çan Çınlaması: her on iki saniyede bir yere vuruş. Düşmeden önce uzaklaş.',
   'delveUi.boss.varric.bell.log': 'Diyakoz Varric defin çanını çalmaya başlar.',
-  'delveUi.boss.varric.bell.warning': 'Diyakoz Varric\'ten uzaklaş!',
+  'delveUi.boss.varric.bell.warning': "Diyakoz Varric'ten uzaklaş!",
   'delveUi.boss.varric.defeat': 'Hayır... İsimler bendeydi... Hepsi bendeydi...',
   'delveUi.boss.varric.intro': 'Hiçbir ruh kaybolmaz. Yalnızca yanlış yerleştirilir.',
   'delveUi.boss.varric.mid30': 'Defin çanı söylediği her isme yanıt verir.',
   'delveUi.boss.varric.mid60': 'Diyakoz Varric defterden isimleri titrek bir zaferle okur.',
-  'delveUi.boss.varric.pull': 'Kutsal toprağa kirli niyetlerle ayak basıyorsun. Diz çök ve sayıma katıl.',
+  'delveUi.boss.varric.pull':
+    'Kutsal toprağa kirli niyetlerle ayak basıyorsun. Diz çök ve sayıma katıl.',
   'delveUi.boss.varric.raise.emote': 'Diyakoz Varric kırık mezarlardan isimler çağırır!',
-  'delveUi.boss.varric.raise.interrupt_fail': 'Ölüler Diyakoz Varric\'in çağrısına yanıt verir!',
+  'delveUi.boss.varric.raise.interrupt_fail': "Ölüler Diyakoz Varric'in çağrısına yanıt verir!",
   'delveUi.boss.varric.raise.interrupt_ok': 'Mezar ayini sekteye uğrar.',
-  'delveUi.boss.varric.raise.lesson': 'Çatlamış mezarı beş saniye içinde kes, yoksa ölüler onun çağrısına kalkar.',
-  'delveUi.boss.varric.raise.log': 'Diyakoz Varric Ölü Diriltme\'ye başlar.',
+  'delveUi.boss.varric.raise.lesson':
+    'Çatlamış mezarı beş saniye içinde kes, yoksa ölüler onun çağrısına kalkar.',
+  'delveUi.boss.varric.raise.log': "Diyakoz Varric Ölü Diriltme'ye başlar.",
   'delveUi.boss.varric.raise.object': 'Çatlamış mezar çalınmış bir nefesle titrer.',
   'delveUi.boss.varric.raise.warning': 'Mezar ayinini durdur!',
   'delveUi.chest.flavor': 'Ölüler ayırabildiklerini teslim etti.',
   'delveUi.companion.barkLine': '{name}: {line}',
   'delveUi.companion.tessa.boss_pull': 'O çan ağırlığını tanıyor, {playerName}. Sakın diz çökme.',
-  'delveUi.companion.tessa.combat_start': 'Ayağını sağlam bas, {playerName}. Ölüler burada huzursuz.',
+  'delveUi.companion.tessa.combat_start':
+    'Ayağını sağlam bas, {playerName}. Ölüler burada huzursuz.',
   'delveUi.companion.tessa.completion': 'Defter bir gece daha dinlenebilir. Aferin sana.',
   'delveUi.companion.tessa.low_hp': 'Nefes al. Senin için hâlâ dualarım var.',
   'delveUi.companion.tessa.rank.1': 'Şapel Acemisi',
@@ -1337,17 +1524,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.lore.bell_below':
     'Tessa\'nın kenar notu: "Kutsal mahzenin altında ikinci bir çan var. Ölüler için değil, yanlış yerleştirilmiş olanlar için çalıyor."',
   'delveUi.lore.eastbrook_ledger':
-    'Doğudere\'nin defin defterinden su lekeli bir sayfa. İsimler üzeri çizilip insana ait olmayan bir el yazısıyla yeniden yazılmış.',
+    "Doğudere'nin defin defterinden su lekeli bir sayfa. İsimler üzeri çizilip insana ait olmayan bir el yazısıyla yeniden yazılmış.",
   'delveUi.lore.first_collapse':
     'Şapel kayıtları ilk çökmeyi not eder: aziz taşları çatlamış, raflar eğilmiş ve yer altından bir çan notası duyulmuştur.',
   'delveUi.lore.gravecaller_mark':
-    'Tabut tahtasına kazınmış bir simge, Morthen\'in mührü değil, Oyuk Mezar\'dan daha eski bir mezarçağırıcı işareti.',
+    "Tabut tahtasına kazınmış bir simge, Morthen'in mührü değil, Oyuk Mezar'dan daha eski bir mezarçağırıcı işareti.",
   'delveUi.lore.tessa_note':
     'Tessa\'nın el yazısıyla katlanmış bir kağıt parçası: "Biz aşağıdayken defterler değişirse, seslere değil, muma güven."',
-  'delveUi.module.reliquary_bell_niche': 'Düzinelerce el çanı sessizlik içinde asılı duruyor, her biri cenaze bezine bağlanmış.',
+  'delveUi.module.reliquary_bell_niche':
+    'Düzinelerce el çanı sessizlik içinde asılı duruyor, her biri cenaze bezine bağlanmış.',
   'delveUi.module.reliquary_finale': 'Gömülü çan botlarının altında bir kez çınlar.',
-  'delveUi.module.reliquary_saintless_hall': 'Yüzleri özenli bir nefretle yontulup silinmiş heykeller.',
-  'delveUi.module.reliquary_sunken_ossuary': 'Su, defin raflarından sızarak gümüş-siyah dereler hâlinde eski külleri taşıyor.',
+  'delveUi.module.reliquary_saintless_hall':
+    'Yüzleri özenli bir nefretle yontulup silinmiş heykeller.',
+  'delveUi.module.reliquary_sunken_ossuary':
+    'Su, defin raflarından sızarak gümüş-siyah dereler hâlinde eski külleri taşıyor.',
   'delveUi.moduleName.reliquary_bell_niche': 'Çan Hücresi',
   'delveUi.moduleName.reliquary_finale': 'Çan Gömülü Oda',
   'delveUi.moduleName.reliquary_saintless_hall': 'Azizsiz Salon',
@@ -1357,7 +1547,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.objective.clear_room': 'Odayı temizle',
   'delveUi.objective.kill_boss': '{boss} adlı düşmanı öldür',
   'delveUi.objective.recover_artifact': 'Defin defterini geri al',
-  'delveUi.run.failed': 'Mağara seferi başarısız oldu. Birader Halven\'e geri döndürüldün.',
+  'delveUi.run.failed': "Mağara seferi başarısız oldu. Birader Halven'e geri döndürüldün.",
   'delveUi.shop.buy': 'Satın Al',
   'delveUi.shop.buyAria': '{item} ürününü {marks} Mağara Nişanı karşılığında satın al',
   'delveUi.shop.empty': 'Stokta bir şey yok.',
@@ -1375,35 +1565,43 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Bölüm {current} / {total}',
   'delveUi.tracker.objective': 'Hedef',
   'delveUi.tracker.title': 'Mağara',
-  'download.desc': 'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
+  'download.desc':
+    'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
   'download.title': 'Masaüstü Başlatıcısını İndir',
   'download.macCta': 'macOS için indir',
   'download.windowsPending': 'Windows derlemesi beklemede.',
-  'entities.abilities.adrenaline_rush.description': 'Kanın kaynar, anında 60 enerji geri kazandırır.',
+  'entities.abilities.adrenaline_rush.description':
+    'Kanın kaynar, anında 60 enerji geri kazandırır.',
   'entities.abilities.adrenaline_rush.name': 'Hızlanan Kan',
   'entities.abilities.aimed_shot.description': '{damage} hasar veren, dikkatle çekilmiş bir atış.',
   'entities.abilities.aimed_shot.name': 'Uzun Çekiş',
   'entities.abilities.ambush.description':
     'Hedefe %250 silah hasarı artı {damage} ile pusu kur. Gizlenmiş ve hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır.',
   'entities.abilities.ambush.name': 'Pusucunun Darbesi',
-  'entities.abilities.arcane_explosion.description': 'Bir Gizemli enerji patlaması yakındaki tüm düşmanlara {damage} Gizemli hasar verir.',
+  'entities.abilities.arcane_explosion.description':
+    'Bir Gizemli enerji patlaması yakındaki tüm düşmanlara {damage} Gizemli hasar verir.',
   'entities.abilities.arcane_explosion.name': 'Aether Patlaması',
   'entities.abilities.arcane_intellect.description': 'Zekayı 30 dakika boyunca {buff} artırır.',
   'entities.abilities.arcane_intellect.name': 'Aether Sezgisi',
-  'entities.abilities.arcane_missiles.description': 'Düşmana Aether Okları fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir.',
+  'entities.abilities.arcane_missiles.description':
+    'Düşmana Aether Okları fırlatır, 3 saniye boyunca her saniye {damage} Gizemli hasar verir.',
   'entities.abilities.arcane_missiles.name': 'Aether Okları',
   'entities.abilities.arcane_shot.description': '{damage} Gizemli hasar veren anlık bir atış.',
   'entities.abilities.arcane_shot.name': 'Uğursuz Atış',
-  'entities.abilities.aspect_of_the_cheetah.description': 'Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın.',
+  'entities.abilities.aspect_of_the_cheetah.description':
+    'Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Küheylan Sureti',
-  'entities.abilities.aspect_of_the_hawk.description': 'Delice suretine bürünerek saldırı gücünü 30 dakika boyunca {buff} artırırsın.',
+  'entities.abilities.aspect_of_the_hawk.description':
+    'Delice suretine bürünerek saldırı gücünü 30 dakika boyunca {buff} artırırsın.',
   'entities.abilities.aspect_of_the_hawk.name': 'Delice Sureti',
-  'entities.abilities.aspect_of_the_monkey.description': 'Sansar suretine bürünerek kaçınma şansını 30 dakika boyunca %8 artırırsın.',
+  'entities.abilities.aspect_of_the_monkey.description':
+    'Sansar suretine bürünerek kaçınma şansını 30 dakika boyunca %8 artırırsın.',
   'entities.abilities.aspect_of_the_monkey.name': 'Sansar Sureti',
   'entities.abilities.backstab.description':
     'Hedefe %150 silah hasarı artı {damage} ile sırttan bıçakla. Hedefin arkasında olmalısın. Bir hançer gerektirir. 1 kombo puanı kazandırır.',
   'entities.abilities.backstab.name': 'Korkakça Saplama',
-  'entities.abilities.barkskin.description': 'Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca 150 artırır.',
+  'entities.abilities.barkskin.description':
+    'Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca 150 artırır.',
   'entities.abilities.barkskin.name': 'Meşe Derisi',
   'entities.abilities.bash.description': 'Hedefi 2 saniye sersemletir. Yalnızca Bruin Formu.',
   'entities.abilities.bash.name': 'Sarsma',
@@ -1415,71 +1613,89 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Bir ayıya dönüş: zırh +%90, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.bear_form.name': 'Bruin Formu',
-  'entities.abilities.berserker_rage.description': 'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
+  'entities.abilities.berserker_rage.description':
+    'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
   'entities.abilities.berserker_rage.name': 'Kaynayan Gazap',
-  'entities.abilities.blessing_of_might.description': 'Dost bir hedefe bir Kutsama yerleştirir, saldırı gücünü 5 dakika boyunca {buff} artırır.',
+  'entities.abilities.blessing_of_might.description':
+    'Dost bir hedefe bir Kutsama yerleştirir, saldırı gücünü 5 dakika boyunca {buff} artırır.',
   'entities.abilities.blessing_of_might.name': 'Demir Yemini',
   'entities.abilities.blind.description':
     'Hedefi kör eder, 8 saniye boyunca şaşkın şaşkın dolaşmasına neden olur. Herhangi bir hasar etkiyi bozar.',
   'entities.abilities.blind.name': 'Toprak Fırlatma',
   'entities.abilities.bloodrage.description': 'Can pahasına 10 öfke üretir.',
   'entities.abilities.bloodrage.name': 'Kan Bedeli',
-  'entities.abilities.bloodthirst.description': 'Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)',
+  'entities.abilities.bloodthirst.description':
+    'Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)',
   'entities.abilities.bloodthirst.name': 'Kan Akıtma',
   'entities.abilities.cat_form.description':
     'Bir kurda dönüş: saldırı gücü seviyenle yükselir, saldırıların enerji ve kombo puanı kullanır ve %29 daha az tehdit üretirsin. Büyücü formuna dönmek için tekrar kullan.',
   'entities.abilities.cat_form.name': 'Kurt Formu',
-  'entities.abilities.charge.description': 'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil.',
+  'entities.abilities.charge.description':
+    'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil.',
   'entities.abilities.charge.name': 'Atılım',
   'entities.abilities.cheap_shot.description':
     'Hedefe {damage} hasar vererek onu 4 saniye sersemletir. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.',
   'entities.abilities.cheap_shot.name': 'Mide Yumruğu',
-  'entities.abilities.claw.description': 'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
+  'entities.abilities.claw.description':
+    'Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
   'entities.abilities.claw.name': 'Pençe',
-  'entities.abilities.cleave.description': 'Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe.',
+  'entities.abilities.cleave.description':
+    'Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe.',
   'entities.abilities.cleave.name': 'Biçen Yay',
-  'entities.abilities.commanding_shout.description': 'Dayanıklılığını 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.commanding_shout.description':
+    'Dayanıklılığını 2 dakika boyunca {buff} artırır.',
   'entities.abilities.commanding_shout.name': 'Güçlendiren Nara',
-  'entities.abilities.concussive_shot.description': 'Hedefi {damage} hasarla sersemletir, hareketini 4 saniye boyunca %50 yavaşlatır.',
+  'entities.abilities.concussive_shot.description':
+    'Hedefi {damage} hasarla sersemletir, hareketini 4 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.concussive_shot.name': 'Sarsıcı Atış',
   'entities.abilities.conjure_food.description':
     'Yendiğinde can geri kazandıran 2 porsiyon ekmek çağırır. Daha yüksek rütbeler daha doyurucu yiyecekler çağırır.',
   'entities.abilities.conjure_food.name': 'Ekmek Bağlama',
-  'entities.abilities.conjure_water.description': 'İçildiğinde mana geri kazandıran 2 şişe su çağırır. Daha yüksek rütbeler daha saf su çağırır.',
+  'entities.abilities.conjure_water.description':
+    'İçildiğinde mana geri kazandıran 2 şişe su çağırır. Daha yüksek rütbeler daha saf su çağırır.',
   'entities.abilities.conjure_water.name': 'Su Bağlama',
   'entities.abilities.consecration.description':
     'Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar.',
   'entities.abilities.consecration.name': 'Kutsal Toprak',
-  'entities.abilities.corruption.description': 'Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir.',
+  'entities.abilities.corruption.description':
+    'Hedefi yozlaştırır, 18 saniye boyunca {damage} Gölge hasarı verir.',
   'entities.abilities.corruption.name': 'Kara Çürüme',
   'entities.abilities.crippling_poison.description':
     'Hedefe kurşun gibi ağır bir zehirle vurur, {damage} Doğa hasarı verir ve hareket hızını 12 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.crippling_poison.name': 'Kurşuni Zehir',
-  'entities.abilities.curse_of_agony.description': 'Hedefi ızdırapla lanetler: 24 saniye boyunca {damage} Gölge hasarı.',
+  'entities.abilities.curse_of_agony.description':
+    'Hedefi ızdırapla lanetler: 24 saniye boyunca {damage} Gölge hasarı.',
   'entities.abilities.curse_of_agony.name': 'Izdırap Büyüsü',
-  'entities.abilities.dash.description': 'İleri atılarak hareket hızını 15 saniye boyunca %50 artırır. Yalnızca Kurt Formu.',
+  'entities.abilities.dash.description':
+    'İleri atılarak hareket hızını 15 saniye boyunca %50 artırır. Yalnızca Kurt Formu.',
   'entities.abilities.dash.name': 'Atılma',
-  'entities.abilities.deadly_poison.description': 'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 14 ek Doğa hasarı verir.',
+  'entities.abilities.deadly_poison.description':
+    'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 14 ek Doğa hasarı verir.',
   'entities.abilities.deadly_poison.name': 'İrinli Zehir',
   'entities.abilities.defensive_stance.description':
     'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
   'entities.abilities.defensive_stance.name': 'Korumali Durus',
-  'entities.abilities.demon_skin.description': 'Şeytani deri zırhını 30 dakika boyunca {buff} artırır.',
+  'entities.abilities.demon_skin.description':
+    'Şeytani deri zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.demon_skin.name': 'İblis Derisi',
   'entities.abilities.demoralizing_roar.description':
     'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Bruin Formu.',
   'entities.abilities.demoralizing_roar.name': 'Sindiren Kükreme',
-  'entities.abilities.demoralizing_shout.description': 'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır.',
+  'entities.abilities.demoralizing_shout.description':
+    'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır.',
   'entities.abilities.demoralizing_shout.name': 'Vahim Uluma',
   'entities.abilities.devotion_aura.description': 'Zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.devotion_aura.name': 'Sarsılmaz Aura',
   'entities.abilities.dismiss_pet.description': 'Evcilini tekrar vahşi doğaya salar.',
   'entities.abilities.dismiss_pet.name': 'Yoldaşı Serbest Bırakma',
-  'entities.abilities.divine_protection.description': 'Koruyucu bir siper 10 saniye boyunca {damage} hasarı emer.',
+  'entities.abilities.divine_protection.description':
+    'Koruyucu bir siper 10 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.divine_protection.name': 'İnanç Siperi',
-  'entities.abilities.drain_life.description': 'Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır.',
+  'entities.abilities.drain_life.description':
+    'Hedefin canını emer; 5 saniye boyunca her saniye sana {damage} can aktarır.',
   'entities.abilities.drain_life.name': 'Tüketme',
-  'entities.abilities.earth_shock.description': 'Hedefi sersemletici bir kuvvetle anında şoklar ve {damage} Doğa hasarı verir.',
+  'entities.abilities.earth_shock.description':
+    'Hedefi sersemletici bir kuvvetle anında şoklar ve {damage} Doğa hasarı verir.',
   'entities.abilities.earth_shock.name': 'Toprak Sarsıntısı',
   'entities.abilities.enrage.description': 'Anında 20 öfke üretir. Yalnızca Bruin Formu.',
   'entities.abilities.enrage.name': 'Körükleme',
@@ -1490,24 +1706,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.eviscerate.description': '{damage} veren bitirici hamle.',
   'entities.abilities.eviscerate.name': 'Toprak Uykusu',
   'entities.abilities.execute.description':
-    'Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20\'nin altındaki düşmanlarda kullanılabilir.',
+    "Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20'nin altındaki düşmanlarda kullanılabilir.",
   'entities.abilities.execute.name': 'Erken Mezar',
-  'entities.abilities.exorcism.description': 'Günahkârı Kutsal gazapla kovar ve {damage} Kutsal hasar verir.',
+  'entities.abilities.exorcism.description':
+    'Günahkârı Kutsal gazapla kovar ve {damage} Kutsal hasar verir.',
   'entities.abilities.exorcism.name': 'Kovma Ayini',
-  'entities.abilities.expose_armor.description': 'Hedefi açığa düşüren, zırhını 30 saniye boyunca {damage} azaltan bitirici hamle.',
+  'entities.abilities.expose_armor.description':
+    'Hedefi açığa düşüren, zırhını 30 saniye boyunca {damage} azaltan bitirici hamle.',
   'entities.abilities.expose_armor.name': 'Zırh Gediği',
   'entities.abilities.faerie_fire.name': 'Cadı Işığı',
   'entities.abilities.fear.description':
     'Düşmanın yüreğine korku salar ve onu 8 saniyeye kadar sinmiş bırakır. Herhangi bir hasar etkiyi bozar.',
   'entities.abilities.fear.name': 'Dehşet',
-  'entities.abilities.ferocious_bite.description': '{damage} veren bitirici hamle. Yalnızca Kurt Formu.',
+  'entities.abilities.ferocious_bite.description':
+    '{damage} veren bitirici hamle. Yalnızca Kurt Formu.',
   'entities.abilities.ferocious_bite.name': 'Kanlı Isırık',
   'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',
   'entities.abilities.fire_blast.name': 'Köz Yağmuru',
-  'entities.abilities.fireball.description': 'Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+  'entities.abilities.fireball.description':
+    'Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
   'entities.abilities.fireball.name': 'Köz Oku',
   'entities.abilities.rain_of_fire.name': 'Ateş Yağmuru',
-  'entities.abilities.rain_of_fire.description': 'Hedef alana 4 saniye boyunca ateş yağdırır ve düşmanları her saniye {damage} Ateş hasarıyla yakar.',
+  'entities.abilities.rain_of_fire.description':
+    'Hedef alana 4 saniye boyunca ateş yağdırır ve düşmanları her saniye {damage} Ateş hasarıyla yakar.',
   'entities.abilities.volley.name': 'Ok Yağmuru',
   'entities.abilities.volley.description':
     'Hedef alana 3 saniye boyunca ok yağdırır ve içindeki düşmanlara her 0.5 saniyede bir {damage} hasar verir.',
@@ -1520,29 +1741,38 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.name': 'Alev Vuruşu',
   'entities.abilities.flamestrike.description':
     'Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir.',
-  'entities.abilities.flame_shock.description': 'Hedefi ateşle dağlar: {damage} hasar artı 12 saniye boyunca {overTime}.',
+  'entities.abilities.flame_shock.description':
+    'Hedefi ateşle dağlar: {damage} hasar artı 12 saniye boyunca {overTime}.',
   'entities.abilities.flame_shock.name': 'Köz Sarsıntısı',
-  'entities.abilities.flametongue_weapon.description': 'Silahını element ateşiyle güçlendirir: her vuruş 5 dakika boyunca {damage} ek Ateş hasarı verir.',
+  'entities.abilities.flametongue_weapon.description':
+    'Silahını element ateşiyle güçlendirir: her vuruş 5 dakika boyunca {damage} ek Ateş hasarı verir.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand Silahı',
-  'entities.abilities.flash_heal.description': 'Dost bir hedefi {damage} iyileştiren hızlı bir dua.',
+  'entities.abilities.flash_heal.description':
+    'Dost bir hedefi {damage} iyileştiren hızlı bir dua.',
   'entities.abilities.flash_heal.name': 'Acil Dua',
-  'entities.abilities.flash_of_light.description': 'Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması.',
+  'entities.abilities.flash_of_light.description':
+    'Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması.',
   'entities.abilities.flash_of_light.name': 'Işık Şifası',
-  'entities.abilities.frost_armor.description': 'Seni buzla sarar ve zırhını 30 dakika boyunca {buff} artırır.',
+  'entities.abilities.frost_armor.description':
+    'Seni buzla sarar ve zırhını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.frost_armor.name': 'Kırağı Pelerini',
-  'entities.abilities.frost_nova.description': 'Yakındaki tüm düşmanları 8 saniyeye kadar yerinde dondurur ve {damage} Ayaz hasarı verir.',
+  'entities.abilities.frost_nova.description':
+    'Yakındaki tüm düşmanları 8 saniyeye kadar yerinde dondurur ve {damage} Ayaz hasarı verir.',
   'entities.abilities.frost_nova.name': 'Buz Bağı',
   'entities.abilities.frost_shock.description':
     'Hedefi ayazla anında şoklar, {damage} Ayaz hasarı verir ve hareketini 8 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.frost_shock.name': 'Ayaz Sarsıntısı',
-  'entities.abilities.frostbolt.description': 'Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi %40 yavaşlatır.',
+  'entities.abilities.frostbolt.description':
+    'Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi %40 yavaşlatır.',
   'entities.abilities.frostbolt.name': 'Ayaz Mızrağı',
-  'entities.abilities.frostbrand_weapon.description': 'Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca {damage} ek hasar verir.',
+  'entities.abilities.frostbrand_weapon.description':
+    'Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca {damage} ek hasar verir.',
   'entities.abilities.frostbrand_weapon.name': 'Rimebound Silahı',
   'entities.abilities.garrote.description':
     'Düşmanı boğarak anında {damage} hasar verir ve 18 saniye boyunca {overTime} kanama yaratır. Gizlenmiş olmalısın. 1 kombo puanı kazandırır.',
   'entities.abilities.garrote.name': 'Boğaz Teli',
-  'entities.abilities.ghost_wolf.description': 'Seni bir Shadewolf\'a dönüştürür ve hareket hızını 10 dakika boyunca %40 artırır.',
+  'entities.abilities.ghost_wolf.description':
+    "Seni bir Shadewolf'a dönüştürür ve hareket hızını 10 dakika boyunca %40 artırır.",
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
     'Hedefe {damage} hasar vererek onu 4 saniye boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. 1 kombo puanı kazandırır.',
@@ -1550,59 +1780,77 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.growl.description':
     'Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu.',
   'entities.abilities.growl.name': 'Gözdağı',
-  'entities.abilities.hammer_of_justice.description': 'Hedefi {duration} saniye boyunca sersemletir.',
+  'entities.abilities.hammer_of_justice.description':
+    'Hedefi {duration} saniye boyunca sersemletir.',
   'entities.abilities.hammer_of_justice.name': 'Parçalayan Tokmak',
-  'entities.abilities.hamstring.description': 'Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır.',
+  'entities.abilities.hamstring.description':
+    'Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır.',
   'entities.abilities.hamstring.name': 'Topallatan Kesik',
-  'entities.abilities.heal.description': 'Dost bir hedefi {damage} iyileştiren yavaş ama güçlü bir dua.',
+  'entities.abilities.heal.description':
+    'Dost bir hedefi {damage} iyileştiren yavaş ama güçlü bir dua.',
   'entities.abilities.heal.name': 'Vakur Dua',
   'entities.abilities.healing_touch.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_touch.name': 'Yaban Şifası',
   'entities.abilities.healing_wave.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_wave.name': 'Onaran Sular',
-  'entities.abilities.heroic_strike.description': 'Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir.',
+  'entities.abilities.heroic_strike.description':
+    'Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir.',
   'entities.abilities.heroic_strike.name': 'Yağmacı Darbesi',
-  'entities.abilities.hibernate.description': 'Hedefi 8 saniyeye kadar derin bir uykuya zorlar. Herhangi bir hasar onu uyandırır.',
+  'entities.abilities.hibernate.description':
+    'Hedefi 8 saniyeye kadar derin bir uykuya zorlar. Herhangi bir hasar onu uyandırır.',
   'entities.abilities.hibernate.name': 'Derin Uyku',
   'entities.abilities.holy_light.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.holy_light.name': 'Onaran Işık',
-  'entities.abilities.ice_barrier.description': 'Seni buzla kalkanlar ve 60 saniye boyunca {damage} hasarı emer.',
+  'entities.abilities.ice_barrier.description':
+    'Seni buzla kalkanlar ve 60 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.ice_barrier.name': 'Buz Örtüsü',
-  'entities.abilities.immolate.description': 'Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar.',
+  'entities.abilities.immolate.description':
+    'Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar.',
   'entities.abilities.immolate.name': 'Yanan Ahit',
-  'entities.abilities.insect_swarm.description': 'Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.',
+  'entities.abilities.insect_swarm.description':
+    'Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.',
   'entities.abilities.insect_swarm.name': 'Sokan Sürü',
-  'entities.abilities.instant_poison.description': 'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 8 ek Doğa hasarı verir.',
+  'entities.abilities.instant_poison.description':
+    'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 8 ek Doğa hasarı verir.',
   'entities.abilities.instant_poison.name': 'Engerek Isırığı',
-  'entities.abilities.judgement.description': 'Aktif Mührünü düşmanın üzerine salar ve onu tüketerek depoladığı Kutsal hasarı verir.',
+  'entities.abilities.judgement.description':
+    'Aktif Mührünü düşmanın üzerine salar ve onu tüketerek depoladığı Kutsal hasarı verir.',
   'entities.abilities.judgement.name': 'Hukum',
-  'entities.abilities.kidney_shot.description': 'Hedefi sersemleten bitirici hamle. Her kombo puanı başına 1 saniye daha uzun sürer.',
+  'entities.abilities.kidney_shot.description':
+    'Hedefi sersemleten bitirici hamle. Her kombo puanı başına 1 saniye daha uzun sürer.',
   'entities.abilities.kidney_shot.name': 'Aşağılık Darbe',
-  'entities.abilities.lay_on_hands.description': 'Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi.',
+  'entities.abilities.lay_on_hands.description':
+    'Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi.',
   'entities.abilities.lay_on_hands.name': 'Son Ayin',
   'entities.abilities.lesser_heal.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.lesser_heal.name': 'Fısıldanan Dua',
   'entities.abilities.life_tap.description': '{damage} canı {damage} manaya dönüştürür.',
   'entities.abilities.life_tap.name': 'Ağır Pazarlık',
-  'entities.abilities.lightning_bolt.description': 'Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir.',
+  'entities.abilities.lightning_bolt.description':
+    'Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir.',
   'entities.abilities.lightning_bolt.name': 'Ark Oku',
   'entities.abilities.lightning_shield.description':
     'Seni çatırdayan yıldırımla sarar: yakın dövüş saldırganları {buff} Doğa hasarı alır, en fazla 3 yük ve en fazla 5 saniyede bir kez.',
   'entities.abilities.lightning_shield.name': 'Gök Gürültüsü Siperi',
-  'entities.abilities.mark_of_the_wild.description': 'Dost bir hedefe Wildward\'ı yerleştirir ve zırhını 30 dakika boyunca {buff} artırır.',
+  'entities.abilities.mark_of_the_wild.description':
+    "Dost bir hedefe Wildward'ı yerleştirir ve zırhını 30 dakika boyunca {buff} artırır.",
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.maul.description':
     'Yakın dövüş hasarını {damage} artıran ve yüksek miktarda tehdit yaratan hırpalayıcı bir saldırı. Bir sonraki vuruşunda etkinleşir. Yalnızca Bruin Formu.',
   'entities.abilities.maul.name': 'Kemik Kıran',
   'entities.abilities.mind_blast.description': 'Hedefin zihnini {damage} Gölge hasarıyla patlatır.',
   'entities.abilities.mind_blast.name': 'Zihin Kırılması',
-  'entities.abilities.mind_flay.description': 'Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir.',
+  'entities.abilities.mind_flay.description':
+    'Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir.',
   'entities.abilities.mind_flay.name': 'Keder Yakarışı',
-  'entities.abilities.mongoose_bite.description': 'Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz.',
+  'entities.abilities.mongoose_bite.description':
+    'Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz.',
   'entities.abilities.mongoose_bite.name': 'Karşı Diş',
-  'entities.abilities.moonfire.description': 'Düşmanı ay ateşiyle {damage} Gizemli hasar ve zamana yayılı hasar ile yakar.',
+  'entities.abilities.moonfire.description':
+    'Düşmanı ay ateşiyle {damage} Gizemli hasar ve zamana yayılı hasar ile yakar.',
   'entities.abilities.moonfire.name': 'Ay Fırtınası',
-  'entities.abilities.mortal_strike.description': 'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
+  'entities.abilities.mortal_strike.description':
+    'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
   'entities.abilities.mortal_strike.name': 'Sakatlayan Darbe',
   'entities.abilities.overpower.description':
     'Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz.',
@@ -1613,26 +1861,33 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pounce.description':
     'Hedefi 2 saniye boyunca sersemleten gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
   'entities.abilities.pounce.name': 'Sinsi Darbe',
-  'entities.abilities.power_word_fortitude.description': 'Hedefin Dayanıklılığını 30 dakika boyunca {buff} artırır.',
+  'entities.abilities.power_word_fortitude.description':
+    'Hedefin Dayanıklılığını 30 dakika boyunca {buff} artırır.',
   'entities.abilities.power_word_fortitude.name': 'Azim Yakarışı',
-  'entities.abilities.power_word_shield.description': 'Hedefi kalkanlar ve 30 saniye boyunca {damage} hasarı emer.',
+  'entities.abilities.power_word_shield.description':
+    'Hedefi kalkanlar ve 30 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.power_word_shield.name': 'Koruma Mezmuru',
-  'entities.abilities.prowl.description': 'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
+  'entities.abilities.prowl.description':
+    'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Sokulma',
-  'entities.abilities.pyroblast.description': 'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+  'entities.abilities.pyroblast.description':
+    'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
   'entities.abilities.pyroblast.name': 'Alev Mızrağı',
   'entities.abilities.rake.description':
     'Düşmanı silah hasarı artı {damage} ile tırmalayan ve 9 saniye boyunca kanama hasarı yaratan gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
   'entities.abilities.rake.name': 'Deri Yüzme',
   'entities.abilities.rapid_fire.description': 'Saldırı hızını 15 saniye boyunca %40 artırır.',
   'entities.abilities.rapid_fire.name': 'Hummalı Çekiş',
-  'entities.abilities.raptor_strike.description': 'Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir.',
+  'entities.abilities.raptor_strike.description':
+    'Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir.',
   'entities.abilities.raptor_strike.name': 'Deşen Darbe',
-  'entities.abilities.regrowth.description': 'Dost bir hedefi {damage} ve 21 saniye boyunca ek bir miktar iyileştirir.',
+  'entities.abilities.regrowth.description':
+    'Dost bir hedefi {damage} ve 21 saniye boyunca ek bir miktar iyileştirir.',
   'entities.abilities.regrowth.name': 'İkinci Çiçeklenme',
   'entities.abilities.rejuvenation.description': 'Hedefi 12 saniye boyunca {damage} iyileştirir.',
   'entities.abilities.rejuvenation.name': 'Yaban Çiçeği',
-  'entities.abilities.rend.description': 'Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar.',
+  'entities.abilities.rend.description':
+    'Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar.',
   'entities.abilities.rend.name': 'Derin Yarık',
   'entities.abilities.renew.description': 'Hedefi 15 saniye boyunca {damage} iyileştirir.',
   'entities.abilities.renew.name': 'Kalıcı Lütuf',
@@ -1641,55 +1896,69 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.retribution_aura.name': 'Karşılık Aurası',
   'entities.abilities.revive_pet.description': 'Ölü evcilini diriltir ve yanına geri getirir.',
   'entities.abilities.revive_pet.name': 'Evcili Diriltme',
-  'entities.abilities.righteous_fury.description': 'Kutsal hasarının ürettiği tehdidi 30 dakika boyunca %60 artırır. Tank paladinin temel taşı.',
+  'entities.abilities.righteous_fury.description':
+    'Kutsal hasarının ürettiği tehdidi 30 dakika boyunca %60 artırır. Tank paladinin temel taşı.',
   'entities.abilities.righteous_fury.name': 'Yanan Yemin',
   'entities.abilities.rip.description':
     '12 saniye boyunca {damage} Kanama hasarı veren bitirici hamle. Kombo puanlarını tüketir. Yalnızca Kurt Formu.',
   'entities.abilities.rip.name': 'Parçalama',
-  'entities.abilities.rockbiter_weapon.description': 'Silahına taşın gazabını işler: her vuruş 5 dakika boyunca {damage} ek hasar verir.',
+  'entities.abilities.rockbiter_weapon.description':
+    'Silahına taşın gazabını işler: her vuruş 5 dakika boyunca {damage} ek hasar verir.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound Silahı',
-  'entities.abilities.rupture.description': 'Hedefi yaralayan bitirici hamle; 16 saniye boyunca {damage} kanama hasarı vermesine yol açar.',
+  'entities.abilities.rupture.description':
+    'Hedefi yaralayan bitirici hamle; 16 saniye boyunca {damage} kanama hasarı vermesine yol açar.',
   'entities.abilities.rupture.name': 'Kan Kaybı',
   'entities.abilities.sap.description':
     'Hedefi 8 saniye boyunca etkisiz hale getirir. Gizlenmiş ve dövüş dışı olman gerekir. Herhangi bir hasar etkiyi bozar.',
   'entities.abilities.sap.name': 'Bayıltma',
-  'entities.abilities.scorch.description': 'Düşmanı {damage} Ateş hasarıyla kavurur. Hızlı büyülenir.',
+  'entities.abilities.scorch.description':
+    'Düşmanı {damage} Ateş hasarıyla kavurur. Hızlı büyülenir.',
   'entities.abilities.scorch.name': 'Haşlama',
   'entities.abilities.seal_of_righteousness.description':
     'Seni 30 saniye boyunca Kutsal güçle doldurur; her yakın dövüş vuruşunun {damage} ek Kutsal hasar vermesini sağlar. Verdict ile açığa çıkar.',
   'entities.abilities.seal_of_righteousness.name': 'Yemin Damgası',
-  'entities.abilities.searing_pain.description': 'Düşmanı ıstırap veren ateşle {damage} Ateş hasarı için dağlar. Hızlı büyülenir.',
+  'entities.abilities.searing_pain.description':
+    'Düşmanı ıstırap veren ateşle {damage} Ateş hasarı için dağlar. Hızlı büyülenir.',
   'entities.abilities.searing_pain.name': 'Dağlama',
-  'entities.abilities.serpent_sting.description': 'Hedefi sokar ve 15 saniye boyunca {damage} Doğa hasarı verir.',
+  'entities.abilities.serpent_sting.description':
+    'Hedefi sokar ve 15 saniye boyunca {damage} Doğa hasarı verir.',
   'entities.abilities.serpent_sting.name': 'Zehir Dikeni',
-  'entities.abilities.shadow_bolt.description': 'Düşmana {damage} Gölge hasarı için gölgeli bir ok gönderir.',
+  'entities.abilities.shadow_bolt.description':
+    'Düşmana {damage} Gölge hasarı için gölgeli bir ok gönderir.',
   'entities.abilities.shadow_bolt.name': 'Kasvet Oku',
-  'entities.abilities.shadow_word_pain.description': 'Bir karanlık sözü 18 saniye boyunca {damage} Gölge hasarı verir.',
+  'entities.abilities.shadow_word_pain.description':
+    'Bir karanlık sözü 18 saniye boyunca {damage} Gölge hasarı verir.',
   'entities.abilities.shadow_word_pain.name': 'Çürüme Ağıdı',
-  'entities.abilities.shadowburn.description': 'Hedefi anında dağlayan gölge ile vurarak {damage} Gölge hasarı verir.',
+  'entities.abilities.shadowburn.description':
+    'Hedefi anında dağlayan gölge ile vurarak {damage} Gölge hasarı verir.',
   'entities.abilities.shadowburn.name': 'Alaca Ateşi',
   'entities.abilities.shield_slam.description':
     'Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)',
   'entities.abilities.shield_slam.name': 'Kalkan Kırma',
-  'entities.abilities.sinister_strike.description': 'Silah hasarı artı {damage} için anlık bir vuruş. 1 kombo puanı kazandırır.',
+  'entities.abilities.sinister_strike.description':
+    'Silah hasarı artı {damage} için anlık bir vuruş. 1 kombo puanı kazandırır.',
   'entities.abilities.sinister_strike.name': 'Kötücül Kesik',
-  'entities.abilities.slam.description': 'Rakibe silah hasarı artı {damage} için çarpar.',
+  'entities.abilities.slam.description':
+    'Rakibe %50 silah hasarı artı {damage} verir ve {rage} öfke üretir.',
   'entities.abilities.slam.name': 'Kaba Savuruş',
-  'entities.abilities.slice_and_dice.description': 'Yakın dövüş saldırı hızını %30 artıran bitirici hamle. Kombo puanı başına daha uzun sürer.',
+  'entities.abilities.slice_and_dice.description':
+    'Yakın dövüş saldırı hızını %30 artıran bitirici hamle. Kombo puanı başına daha uzun sürer.',
   'entities.abilities.slice_and_dice.name': 'Gaddar Tempo',
   'entities.abilities.smite.description': 'Düşmanı {damage} Kutsal hasarla cezalandırır.',
   'entities.abilities.smite.name': 'Cezalandırma',
   'entities.abilities.sprint.description': 'Hareket hızını 15 saniye boyunca %70 artırır.',
   'entities.abilities.sprint.name': 'Çevik Topuklar',
-  'entities.abilities.starfire.description': 'Yıldız ateşinden bir ok indirir ve {damage} Gizemli hasar verir.',
+  'entities.abilities.starfire.description':
+    'Yıldız ateşinden bir ok indirir ve {damage} Gizemli hasar verir.',
   'entities.abilities.starfire.name': 'Gök Düşüşü',
   'entities.abilities.stealth.description':
-    'Seni gölgelerde gizler: düşmanlar seni güçlükle fark eder, ancak %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Duskveil\'i bozar. Çıkmak için tekrar kullan.',
+    "Seni gölgelerde gizler: düşmanlar seni güçlükle fark eder, ancak %50 daha yavaş hareket edersin. Saldırmak ya da hasar almak Duskveil'i bozar. Çıkmak için tekrar kullan.",
   'entities.abilities.stealth.name': 'Duskveil',
-  'entities.abilities.stormstrike.description': 'Fırtınayı silahından geçirir ve silah hasarı artı {damage} için anında vurur.',
+  'entities.abilities.stormstrike.description':
+    'Fırtınayı silahından geçirir ve silah hasarı artı {damage} için anında vurur.',
   'entities.abilities.stormstrike.name': 'Atalar Darbesi',
   'entities.abilities.summon_doomguard.description':
-    'Bir Wraithborn\'u iradene bağlar: uzaktan ağır Gölge hasarı yağdıran seçkin bir iblis. Uzun bir bekleme süresi yıkıcı gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
+    "Bir Wraithborn'u iradene bağlar: uzaktan ağır Gölge hasarı yağdıran seçkin bir iblis. Uzun bir bekleme süresi yıkıcı gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.",
   'entities.abilities.summon_doomguard.name': 'Wraithborn Çağırma',
   'entities.abilities.summon_felguard.description':
     'Karabüyücünün komutası altında bir Warfiend çağırır. Warfiend, savaşa dalan ve kendi başının çaresine bakan dayanıklı bir yakın dövüş iblisidir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
@@ -1701,7 +1970,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Karabüyücünün komutası altında bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Okları fırlatır. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
   'entities.abilities.summon_imp.name': 'Emberkin Çağırma',
   'entities.abilities.summon_infernal.description':
-    'Bir Pyre Colossus\'u iradene bağlar: ezici yakın dövüşe ve herhangi bir iblisin en derin canına ve zırhına sahip hantal bir devasa güç. Uzun bir bekleme süresi ham gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
+    "Bir Pyre Colossus'u iradene bağlar: ezici yakın dövüşe ve herhangi bir iblisin en derin canına ve zırhına sahip hantal bir devasa güç. Uzun bir bekleme süresi ham gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.",
   'entities.abilities.summon_infernal.name': 'Pyre Colossus Çağırma',
   'entities.abilities.summon_succubus.description':
     'Karabüyücünün komutası altında bir Duskborn çağırır. Duskborn, yakın dövüşte hızla vuran ve sert darbeler indiren kırılgan bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
@@ -1710,7 +1979,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Karabüyücünün komutası altında bir Gloomshade çağırır. Gloomshade, düşmanlarını kışkırtan ve cezayı üstüne çeken sağlam bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
   'entities.abilities.summon_voidwalker.name': 'Gloomshade Çağırma',
   'entities.abilities.sunder_armor.name': 'Zırh Kesme',
-  'entities.abilities.swipe.description': 'Yakındaki düşmanları {damage} hasar için savurur. Ekstra tehdit üretir. Yalnızca Bruin Formu.',
+  'entities.abilities.swipe.description':
+    'Yakındaki düşmanları {damage} hasar için savurur. Ekstra tehdit üretir. Yalnızca Bruin Formu.',
   'entities.abilities.swipe.name': 'Süpüren Pençeler',
   'entities.abilities.tame_beast.description':
     'Bir canavarı yoldaşın olması için evcilleştirmeye başlar. Senin seviyende ya da daha düşük olmalı ve seçkin olmamalı. Evcilin seni takip eder, düşmanlarına saldırır ve kendi tehdidini tutar. Bir seferde yalnızca bir evcilin olabilir.',
@@ -1718,53 +1988,69 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır.',
   'entities.abilities.taunt.name': 'Tahrik',
-  'entities.abilities.thorns.description': 'Hedeften dikenler filizlenir: yakın dövüş saldırganları {buff} Doğa hasarı alır.',
+  'entities.abilities.thorns.description':
+    'Hedeften dikenler filizlenir: yakın dövüş saldırganları {buff} Doğa hasarı alır.',
   'entities.abilities.thorns.name': 'Diken Muhafızı',
   'entities.abilities.thunder_clap.description':
     'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
   'entities.abilities.thunder_clap.name': 'Sarsan Darbe',
-  'entities.abilities.tigers_fury.description': 'Saldırı gücünü 6 saniye boyunca 40 artırır. Yalnızca Kurt Formu.',
+  'entities.abilities.tigers_fury.description':
+    'Saldırı gücünü 6 saniye boyunca 40 artırır. Yalnızca Kurt Formu.',
   'entities.abilities.tigers_fury.name': 'Kurt Kanı',
   'entities.abilities.travel_form.description':
-    'Anında hızlı bir Fleet Formu\'na bürünerek hareket hızını %40 artırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir.',
+    "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir.",
   'entities.abilities.travel_form.name': 'Fleet Formu',
   'entities.abilities.vanish.description':
-    'Gözden kaybolursun, dövüşte bile Duskveil\'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer.',
+    "Gözden kaybolursun, dövüşte bile Duskveil'e geçersin. Gizliyken %50 daha yavaş hareket edersin. 10 saniyeye kadar sürer.",
   'entities.abilities.vanish.name': 'Duman Adımı',
-  'entities.abilities.whirlwind.description': 'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
+  'entities.abilities.whirlwind.description':
+    'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
   'entities.abilities.whirlwind.name': 'Bıçaklı Girdap',
-  'entities.abilities.wing_clip.description': 'Düşmanı {damage} hasarla yaralar, 10 saniye boyunca %40 yavaşlatır.',
+  'entities.abilities.wing_clip.description':
+    'Düşmanı {damage} hasarla yaralar, 10 saniye boyunca %40 yavaşlatır.',
   'entities.abilities.wing_clip.name': 'Prangalayan Kesik',
-  'entities.abilities.wrath.description': '{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır.',
+  'entities.abilities.wrath.description':
+    '{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır.',
   'entities.abilities.wrath.name': 'Yaban Oku',
+  'entities.abilities.aura_surge.name': 'Şafak Sekmesi',
+  'entities.abilities.aura_surge.description':
+    'Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından {radius} metre içindeki en fazla {jumps} ek düşmana sekerek her sekmede {falloff} hasar verir. (Paladin yeteneği)',
   'entities.abilities.holy_shock.name': 'Kutsal Şok',
-  'entities.abilities.holy_shock.description': 'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
+  'entities.abilities.holy_shock.description':
+    'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
   'entities.abilities.holy_shield.name': 'Kutsal Kalkan',
   'entities.abilities.holy_shield.description':
     'Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)',
   'entities.abilities.bestial_wrath.name': 'Vahşi Gazap',
-  'entities.abilities.bestial_wrath.description': 'Seni vahşi bir öfkeye sokar, saldırı gücünü 15 sn boyunca 55 artırır. (Canavar Ustalığı imzası)',
+  'entities.abilities.bestial_wrath.description':
+    'Seni vahşi bir öfkeye sokar, saldırı gücünü 15 sn boyunca 55 artırır. (Canavar Ustalığı imzası)',
   'entities.abilities.trueshot_aura.name': 'Keskin Nişan Aurası',
-  'entities.abilities.trueshot_aura.description': 'Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)',
+  'entities.abilities.trueshot_aura.description':
+    'Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)',
   'entities.abilities.wyvern_sting.name': 'Viverna Sokması',
   'entities.abilities.wyvern_sting.description':
     'Düşmanı uzaktan sokar ve en fazla 4 sn boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. (Hayatta Kalma imzası)',
   'entities.abilities.arcane_power.name': 'Gizemli Güç',
-  'entities.abilities.arcane_power.description': 'Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)',
+  'entities.abilities.arcane_power.description':
+    'Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)',
   'entities.abilities.combustion.name': 'Yakma',
-  'entities.abilities.combustion.description': 'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
+  'entities.abilities.combustion.description':
+    'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
   'entities.abilities.icy_veins.name': 'Buzlu Damarlar',
   'entities.abilities.icy_veins.description':
     'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)',
   'entities.abilities.cold_blood.name': 'Soğukkanlılık',
-  'entities.abilities.cold_blood.description': 'Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)',
+  'entities.abilities.cold_blood.description':
+    'Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)',
   'entities.abilities.blade_flurry.name': 'Bıçak Yağmuru',
-  'entities.abilities.blade_flurry.description': 'Bir bıçak yağmuru salar, saldırı hızını 12 sn boyunca 20% artırır. (Çarpışma imzası)',
+  'entities.abilities.blade_flurry.description':
+    'Bir bıçak yağmuru salar, saldırı hızını 12 sn boyunca 20% artırır. (Çarpışma imzası)',
   'entities.abilities.hemorrhage.name': 'Kanama',
   'entities.abilities.hemorrhage.description':
     'Düşmana silah hasarı artı {damage} vurur ve 12 sn boyunca kanama hasarı verir. 1 kombo puanı kazandırır. (İncelik imzası)',
   'entities.abilities.power_infusion.name': 'Güç Aşılaması',
-  'entities.abilities.power_infusion.description': 'Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)',
+  'entities.abilities.power_infusion.description':
+    'Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)',
   'entities.abilities.holy_nova.name': 'Kutsal Nova',
   'entities.abilities.holy_nova.description':
     'Kutsal ışık patlaması yaratır, yakındaki müttefikleri {damage} kadar iyileştirir ve yakındaki düşmanlara hasar verir. (Kutsal imza)',
@@ -1772,43 +2058,53 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowform.description':
     'Gölge formuna girer, geri dönene kadar gölge büyüsünü güçlendirirsin. Normal forma dönmek için tekrar kullan. (Gölge imzası)',
   'entities.abilities.elemental_mastery.name': 'Element Ustalığı',
-  'entities.abilities.elemental_mastery.description': 'Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)',
+  'entities.abilities.elemental_mastery.description':
+    'Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)',
   'entities.abilities.siphon_life.name': 'Can Sömürüsü',
   'entities.abilities.siphon_life.description':
     'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
   'entities.abilities.conflagrate.name': 'Tutuşturma',
-  'entities.abilities.conflagrate.description': 'Düşmandaki Yakma etkini tüketerek onu {damage} Ateş hasarıyla tutuşturur. (Yıkım imzası)',
+  'entities.abilities.conflagrate.description':
+    'Düşmandaki Yakma etkini tüketerek onu {damage} Ateş hasarıyla tutuşturur. (Yıkım imzası)',
   'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
   'entities.abilities.moonkin_form.description':
     'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)',
   'entities.abilities.feral_charge.name': 'Yabani Hücum',
-  'entities.abilities.feral_charge.description': 'Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)',
+  'entities.abilities.feral_charge.description':
+    'Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)',
   'entities.abilities.swiftmend.name': 'Hızlı İyileştirme',
   'entities.abilities.swiftmend.description':
     'Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)',
   'entities.abilities.crusader_strike.name': 'Haçlı Darbesi',
-  'entities.abilities.crusader_strike.description': 'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
+  'entities.abilities.crusader_strike.description':
+    'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
   'entities.abilities.metamorphosis.name': 'Metamorfoz',
-  'entities.abilities.metamorphosis.description': 'İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)',
+  'entities.abilities.metamorphosis.description':
+    'İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)',
   'entities.delves.collapsed_reliquary.enterText': 'Çökmüş emanetliğe inersin.',
-  'entities.delves.collapsed_reliquary.leaveText': 'Emanetlik harabesinde Birader Halven\'in yanına tırmanıp geri dönersin.',
+  'entities.delves.collapsed_reliquary.leaveText':
+    "Emanetlik harabesinde Birader Halven'in yanına tırmanıp geri dönersin.",
   'entities.delves.collapsed_reliquary.name': 'Çökmüş Emanetlik',
-  'entities.dungeons.drowned_temple.enterText': 'Ay geçidinden geçersin — hava soğuk suya ve solgun ışığa dönüşür, şarkı başının üstünde kapanır.',
-  'entities.dungeons.drowned_temple.leaveText': 'Ay geçidinden dağ gecesine doğru su yüzüne çıkarsın.',
+  'entities.dungeons.drowned_temple.enterText':
+    'Ay geçidinden geçersin — hava soğuk suya ve solgun ışığa dönüşür, şarkı başının üstünde kapanır.',
+  'entities.dungeons.drowned_temple.leaveText':
+    'Ay geçidinden dağ gecesine doğru su yüzüne çıkarsın.',
   'entities.dungeons.drowned_temple.name': 'Boğulmuş Tapınak',
-  'entities.dungeons.gravewyrm_sanctum.enterText': 'Hava soğuyor. Aşağıda devasa bir şey nefes alıyor...',
+  'entities.dungeons.gravewyrm_sanctum.enterText':
+    'Hava soğuyor. Aşağıda devasa bir şey nefes alıyor...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': 'Sendeleyerek dağ rüzgarına geri çıkarsın.',
   'entities.dungeons.gravewyrm_sanctum.name': 'Mezarejderi Mabedi',
-  'entities.dungeons.hollow_crypt.enterText': 'Oyuk Mezar\'a inersin...',
+  'entities.dungeons.hollow_crypt.enterText': "Oyuk Mezar'a inersin...",
   'entities.dungeons.hollow_crypt.leaveText': 'Gün ışığına geri tırmanırsın.',
   'entities.dungeons.hollow_crypt.name': 'Oyuk Mezar',
   'entities.dungeons.nythraxis_boss_arena.enterText': 'Mühürlü kraliyet kapısından geçersin.',
-  'entities.dungeons.nythraxis_boss_arena.leaveText': 'Dikenzirve\'nin soğuk havasına geri dönersin.',
+  'entities.dungeons.nythraxis_boss_arena.leaveText':
+    "Dikenzirve'nin soğuk havasına geri dönersin.",
   'entities.dungeons.nythraxis_boss_arena.name': 'Nythraxis Akın Arenası',
-  'entities.dungeons.nythraxis_crypt.enterText': 'Terk Edilmiş Mahzen\'in eşiğini aşarsın.',
-  'entities.dungeons.nythraxis_crypt.leaveText': 'Dikenzirve\'nin soğuk havasına geri dönersin.',
+  'entities.dungeons.nythraxis_crypt.enterText': "Terk Edilmiş Mahzen'in eşiğini aşarsın.",
+  'entities.dungeons.nythraxis_crypt.leaveText': "Dikenzirve'nin soğuk havasına geri dönersin.",
   'entities.dungeons.nythraxis_crypt.name': 'Terk Edilmiş Mahzen',
-  'entities.dungeons.sunken_bastion.enterText': 'Batık Kale\'ye doğru suya dalarsın...',
+  'entities.dungeons.sunken_bastion.enterText': "Batık Kale'ye doğru suya dalarsın...",
   'entities.dungeons.sunken_bastion.leaveText': 'Boğan karanlıktan dışarı tırmanırsın.',
   'entities.dungeons.sunken_bastion.name': 'Batık Kale',
   'entities.items.acolytes_circlet.name': 'Çömezin Tacı',
@@ -1829,6 +2125,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.bogiron_mace.name': 'Batakdemiri Topuzu',
   'entities.items.bogiron_nugget.name': 'Batakdemiri Külçesi',
   'entities.items.bone_fragments.name': 'Kemik Parçaları',
+  'entities.items.arcane_dust.name': 'Ezoterik Toz',
+  'entities.items.arcane_essence.name': 'Ezoterik Öz',
+  'entities.items.arcane_shard.name': 'Ezoterik Kırıntı',
   'entities.items.boneguard_breastplate.name': 'Kemikmuhafız Göğüslüğü',
   'entities.items.boneplate_vest.name': 'Kemikplaka Yeleği',
   'entities.items.boundstone_girdle.name': 'Bağlıtaş Kemeri',
@@ -1840,7 +2139,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.bristlehide_spaulders.name': 'Dikenpost Omuzlukları',
   'entities.items.bronzework_mace.name': 'Tunçişi Topuz',
   'entities.items.broodmother_silk_robe.name': 'Yumurtlayan Ananın İpek Cübbesi',
-  'entities.items.brutoks_maul.name': 'Brutok\'un Balyozu',
+  'entities.items.brutoks_maul.name': "Brutok'un Balyozu",
   'entities.items.captains_crest.name': 'Mezar Kilittaşı Üst Parça',
   'entities.items.caravan_quilted_vest.name': 'Kervan Kapitone Yeleği',
   'entities.items.caravan_warden_dirk.name': 'Kervan Muhafızı Hançeri',
@@ -1856,13 +2155,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cracked_wyrm_scale.name': 'Çatlak Ejder Pulu',
   'entities.items.crag_warden_cudgel.name': 'Kayalık Bekçisi Topuzu',
   'entities.items.craghorn_staff.name': 'Kayaboynuz Asası',
-  'entities.items.cragmaw_huntcord.name': 'Cragmaw\'un Av Kuşağı',
+  'entities.items.cragmaw_huntcord.name': "Cragmaw'un Av Kuşağı",
   'entities.items.cragmaw_prowlboots.name': 'Cragmaw Sinsi Çizmeleri',
   'entities.items.cragwalker_boots.name': 'Kayayürüyen Çizmeleri',
   'entities.items.crimson_amber_armor_plate.name': 'Koyu Kırmızı Kehribar',
   'entities.items.crossroads_saber.name': 'Kavşak Palası',
   'entities.items.crownforged_dreadhelm.name': 'Bonewrought Dehşet Miğferi',
+  'entities.items.crownforged_dreadhelm_heroic.name': 'Bonewrought Dehşet Miğferi',
   'entities.items.crownforged_warspaulders.name': 'Bonewrought Savaş Omuzlukları',
+  'entities.items.crownforged_warspaulders_heroic.name': 'Bonewrought Savaş Omuzlukları',
   'entities.items.crypt_keystone.name': 'Mahzen Kilit Taşı',
   'entities.items.crypt_ritual_circle.name': 'Ayin Çemberi',
   'entities.items.cryptbone_greaves.name': 'Mezarkemiği Dizlikleri',
@@ -1872,16 +2173,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cult_cipher.name': 'Mezarçağıran Şifresi',
   'entities.items.cultist_flayer.name': 'Tarikatçı Derisoyanı',
   'entities.items.cyan_magenta_armor_plate.name': 'Camgöbeği Macenta',
-  'entities.items.deacon_reliquary_helm.name': 'Diyakoz\'un Kutsal Emanet Miğferi',
-  'entities.items.deacons_cleaver.name': 'Diyakoz\'un Satırı',
-  'entities.items.deathless_heartwood.name': 'Ölümsüz Taç\'ın Öz Odunu',
+  'entities.items.deacon_reliquary_helm.name': "Diyakoz'un Kutsal Emanet Miğferi",
+  'entities.items.deacons_cleaver.name': "Diyakoz'un Satırı",
+  'entities.items.deathless_heartwood.name': "Ölümsüz Taç'ın Öz Odunu",
+  'entities.items.deathless_heartwood_heroic.name': "Ölümsüz Taç'ın Öz Odunu",
   'entities.items.deathlord_legguards.name': 'Barrowlord Bacaklığı',
   'entities.items.deathlord_sabatons.name': 'Barrowlord Demir Çizmeleri',
   'entities.items.deathlord_warplate.name': 'Barrowlord Savaş Zırhı',
-  'entities.items.deathlords_dread_visage.name': 'Barrowlord\'un Dehşet Suratlığı',
+  'entities.items.deathlords_dread_visage.name': "Barrowlord'un Dehşet Suratlığı",
   'entities.items.deepfen_pearl.name': 'Derinbataklık İncisi',
-  'entities.items.drogmar_warboots.name': 'Drogmar\'ın Savaş Çizmeleri',
-  'entities.items.drogmars_skullcleaver.name': 'Drogmar\'ın Kafatası Yaranı',
+  'entities.items.drogmar_warboots.name': "Drogmar'ın Savaş Çizmeleri",
+  'entities.items.drogmars_skullcleaver.name': "Drogmar'ın Kafatası Yaranı",
   'entities.items.drovers_staff.name': 'Davar Sürücüsü Asası',
   'entities.items.drowned_offering.name': 'Boğulmuş Adak',
   'entities.items.drowned_prayer_leggings.name': 'Boğulmuş Dua Tozluğu',
@@ -1895,7 +2197,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.drownstep_slippers.name': 'Boğukadım Terlikleri',
   'entities.items.drownstep_treads.name': 'Boğukadım Postalları',
   'entities.items.eastbrook_arming_sword.name': 'Doğudere Cenk Kılıcı',
+  'entities.items.eastbrook_buckler.name': 'Doğudere Kalkanı',
   'entities.items.eastbrook_chain_vest.name': 'Doğudere Zincir Zırh Yeleği',
+  'entities.items.eastbrook_greatsword.name': 'Doğudere Büyük Kılıcı',
   'entities.items.eastbrook_wool_trousers.name': 'Doğudere Yün Pantolonu',
   'entities.items.eelscale_leggings.name': 'Yılanbalığı Pulu Tozluğu',
   'entities.items.eelscale_treads.name': 'Yılanbalığı Pulu Postalları',
@@ -1907,7 +2211,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.emberwood_staff.name': 'Köz Odunu Asası',
   'entities.items.embroidered_mantle.name': 'İşlemeli Pelerin',
   'entities.items.event_skin_token.name': 'Gizemli Kozmetik Sandığı',
-  'entities.items.fang_of_korzul.name': 'Korzul\'un Dişi',
+  'entities.items.fang_of_korzul.name': "Korzul'un Dişi",
   'entities.items.fen_muster_order.name': 'Fenbridge Seferberlik Emri',
   'entities.items.fen_reaver_glaive.name': 'Bataklık Yağmacısı Glaivi',
   'entities.items.fenbridge_rye.name': 'Fenbridge Çavdar Somunu',
@@ -1922,14 +2226,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': 'Pırıltıyüzgeç Koi',
   'entities.items.glowing_wax.name': 'Parlayan Balmumu',
   'entities.items.gnarled_staff.name': 'Bataklık Meşesi Asası',
-  'entities.items.gorraks_cleaver.name': 'Gorrak\'ın Satırı',
-  'entities.items.gorraks_cruel_chopper.name': 'Gorrak\'ın Zalim Baltası',
-  'entities.items.grave_captain_voss.name': 'Kraliyet Suikastçısı Voss\'un Mezarı',
-  'entities.items.grave_high_priest_malric.name': 'Baş Rahip Malric\'in Mezarı',
-  'entities.items.grave_sir_aldren.name': 'Kaptan Aldren\'in Mezarı',
-  'entities.items.gravecaller_blade.name': 'Mezarçağıran\'ın Geniş Kılıcı',
-  'entities.items.gravecaller_sigil.name': 'Mezarçağıran\'ın Mührü',
-  'entities.items.gravecaller_staff.name': 'Oyuk\'un Asası',
+  'entities.items.gorraks_cleaver.name': "Gorrak'ın Satırı",
+  'entities.items.gorraks_cruel_chopper.name': "Gorrak'ın Zalim Baltası",
+  'entities.items.grave_captain_voss.name': "Kraliyet Suikastçısı Voss'un Mezarı",
+  'entities.items.grave_high_priest_malric.name': "Baş Rahip Malric'in Mezarı",
+  'entities.items.grave_sir_aldren.name': "Kaptan Aldren'in Mezarı",
+  'entities.items.gravecaller_blade.name': "Mezarçağıran'ın Geniş Kılıcı",
+  'entities.items.gravecaller_sigil.name': "Mezarçağıran'ın Mührü",
+  'entities.items.gravecaller_staff.name': "Oyuk'un Asası",
   'entities.items.gravepath_treads.name': 'Mezar Yolu Postalları',
   'entities.items.gravewalker_softboots.name': 'Mezaryürüyen Yumuşak Çizmeleri',
   'entities.items.gravewardens_shiv.name': 'Mezar Bekçisi Şişi',
@@ -1940,15 +2244,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewyrm_scale_hauberk.name': 'Mezarejderi Pul Zırhı',
   'entities.items.gravewyrm_sigil.name': 'Mezarejderi Mührü',
   'entities.items.gravewyrm_stalkers_treads.name': 'Mezarejderi Sinsisi Postalları',
-  'entities.items.greyjaw_fang.name': 'Yaşlı Greyjaw\'un Dişi',
+  'entities.items.greyjaw_fang.name': "Yaşlı Greyjaw'un Dişi",
   'entities.items.greyjaw_hide_boots.name': 'Greyjaw Postu Çizmeleri',
-  'entities.items.greyjaw_pelt_cloak.name': 'Greyjaw\'un Post Tozluğu',
-  'entities.items.grubjaw_tusk.name': 'Grubjaw\'un Dişi',
+  'entities.items.greyjaw_pelt_cloak.name': "Greyjaw'un Post Tozluğu",
+  'entities.items.grubjaw_tusk.name': "Grubjaw'un Dişi",
   'entities.items.gutripper_shiv.name': 'Bağırsakdeşen Şiş',
   'entities.items.healing_potion.name': 'İyileştirme İksiri',
   'entities.items.hickory_shortstaff.name': 'Ceviz Kısa Asası',
   'entities.items.highwatch_breastplate.name': 'Yükseknöbet Göğüslüğü',
+  'entities.items.highwatch_greatsword.name': 'Yükseknöbet Büyük Kılıcı',
   'entities.items.highwatch_summons.name': 'Yükseknöbet Çağrısı',
+  'entities.items.highwatch_wallshield.name': 'Yükseknöbet Sur Kalkanı',
   'entities.items.highwatch_warblade.name': 'Yükseknöbet Savaş Kılıcı',
   'entities.items.hobnail_boots.name': 'Çivili Çizmeler',
   'entities.items.hollow_vigil_staff.name': 'Oyuk Nöbet Asası',
@@ -1961,18 +2267,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ironvein_lantern_staff.name': 'Demirdamar Fener Asası',
   'entities.items.ironvein_pickblade.name': 'Demirdamar Kazma Kılıcı',
   'entities.items.ivory_copper_armor_plate.name': 'Fildişi Bakır',
-  'entities.items.kazzix_heartshard.name': 'Kazzix\'in Kalp Parçası',
+  'entities.items.kazzix_heartshard.name': "Kazzix'in Kalp Parçası",
   'entities.items.keen_dirk.name': 'Keskin Hançer',
-  'entities.items.kings_signet.name': 'Kral\'ın Mühür Yüzüğü',
-  'entities.items.kingsbane_last_oath.name': 'Thronebane, Dikenzirve\'nin Son Yemini',
+  'entities.items.kings_signet.name': "Kral'ın Mühür Yüzüğü",
+  'entities.items.kingsbane_last_oath.name': "Thronebane, Dikenzirve'nin Son Yemini",
+  'entities.items.kingsbane_last_oath_heroic.name': "Thronebane, Dikenzirve'nin Son Yemini",
   'entities.items.knight_commanders_greaves.name': 'Şövalye-Komutan Dizlikleri',
-  'entities.items.korgaths_chainwraps.name': 'Korgath\'ın Zincir Sargıları',
+  'entities.items.korgaths_chainwraps.name': "Korgath'ın Zincir Sargıları",
   'entities.items.lesser_healing_potion.name': 'Küçük İyileştirme İksiri',
   'entities.items.lesser_mana_potion.name': 'Küçük Mana İksiri',
   'entities.items.linen_scrap.name': 'Keten Parçası',
   'entities.items.lost_caravan_goods.name': 'Kayıp Kervan Malları',
   'entities.items.magenta_cyan_armor_plate.name': 'Macenta Camgöbeği',
-  'entities.items.maldrecs_soulbinder.name': 'Maldrec\'in Ruh Bağlayıcısı',
+  'entities.items.maldrecs_soulbinder.name': "Maldrec'in Ruh Bağlayıcısı",
   'entities.items.mana_potion.name': 'Mana İksiri',
   'entities.items.marrowlord_boneboots.name': 'İlik Lordu Kemik Çizmeleri',
   'entities.items.marrowtread_boots.name': 'İlikadım Çizmeleri',
@@ -1990,13 +2297,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_oracle_staff.name': 'Bataklıkçene Kâhin Asası',
   'entities.items.mirejaw_scale_vest.name': 'Bataklıkçene Pul Yeleği',
   'entities.items.mistbinder_kris.name': 'Sis Bağlayan Hançeri',
-  'entities.items.mistcallers_edge.name': 'Fogbinder\'ın Keskini',
+  'entities.items.mistcallers_edge.name': "Fogbinder'ın Keskini",
   'entities.items.mistveil_cord.name': 'Sis Tülü Kuşağı',
   'entities.items.mistveil_grips.name': 'Sis Tülü Eldivenleri',
-  'entities.items.moggers_copper_cudgel.name': 'Mogger\'ın Bakır Topuzu',
-  'entities.items.moggers_shiv.name': 'Mogger\'ın Şişi',
-  'entities.items.moggers_stomper_boots.name': 'Mogger\'ın Ezici Çizmeleri',
-  'entities.items.monarch_crown_helm.name': 'Hükümdar\'ın Tacı',
+  'entities.items.moggers_copper_cudgel.name': "Mogger'ın Bakır Topuzu",
+  'entities.items.moggers_shiv.name': "Mogger'ın Şişi",
+  'entities.items.moggers_stomper_boots.name': "Mogger'ın Ezici Çizmeleri",
+  'entities.items.monarch_crown_helm.name': "Hükümdar'ın Tacı",
   'entities.items.copper_mining_pick.name': 'Bakır Maden Kazması',
   'entities.items.iron_mining_pick.name': 'Demir Maden Kazması',
   'entities.items.mithril_mining_pick.name': 'Mithril Maden Kazması',
@@ -2024,31 +2331,33 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.moonshroud_breastplate.name': 'Moonwrack Göğüslüğü',
   'entities.items.moonshroud_robe.name': 'Moonwrack Cübbesi',
   'entities.items.moonshroud_tunic.name': 'Moonwrack Tuniği',
-  'entities.items.morthen_grimoire.name': 'Morthen\'in Büyü Kitabı',
+  'entities.items.morthen_grimoire.name': "Morthen'in Büyü Kitabı",
   'entities.items.mossy_handwraps.name': 'Yosunkaplı El Sargıları',
   'entities.items.mudfin_scale.name': 'Yapışkan Mudfin Pulu',
   'entities.items.necromancers_legwraps.name': 'Mournweave Bacak Sargıları',
   'entities.items.necromancers_soulspire_mantle.name': 'Mournweave Ruhkule Pelerini',
   'entities.items.necromancers_soulsteps.name': 'Mournweave Ruhadımları',
   'entities.items.necromancers_starshroud.name': 'Mournweave Yıldızörtüsü',
-  'entities.items.nhalias_dirgeblade.name': 'Nhalia\'nın Ağıt Kılıcı',
-  'entities.items.nhalias_funeral_wraps.name': 'Nhalia\'nın Cenaze Sargıları',
+  'entities.items.nhalias_dirgeblade.name': "Nhalia'nın Ağıt Kılıcı",
+  'entities.items.nhalias_funeral_wraps.name': "Nhalia'nın Cenaze Sargıları",
   'entities.items.nighttalon_crown.name': 'Direfang Tacı',
+  'entities.items.nighttalon_crown_heroic.name': 'Direfang Tacı',
   'entities.items.nighttalon_shoulderguards.name': 'Direfang Omuzlukları',
+  'entities.items.nighttalon_shoulderguards_heroic.name': 'Direfang Omuzlukları',
   'entities.items.nightwalk_jerkin.name': 'Geceyürüyüş Ceketi',
   'entities.items.oathbound_greaves.name': 'Yeminbağlı Dizlikleri',
   'entities.items.ogre_bonecharm_staff.name': 'Devin Kemiktılsım Asası',
   'entities.items.ogre_toe_ring.name': 'Dev Ayakparmağı Yüzüğü',
   'entities.items.ogre_war_totem.name': 'Dev Savaş Totemi',
   'entities.items.oiled_boots.name': 'Yağlı Deri Çizmeler',
-  'entities.items.old_cragmaws_pelt.name': 'Yaşlı Cragmaw\'un Postu',
+  'entities.items.old_cragmaws_pelt.name': "Yaşlı Cragmaw'un Postu",
   'entities.items.onyx_gold_armor_plate.name': 'Oniks Altın',
   'entities.items.orange_steel_armor_plate.name': 'Turuncu Çelik',
   'entities.items.outrider_brigandine.name': 'Öncü Süvari Zırhı',
   'entities.items.outrider_legguards.name': 'Öncü Süvari Bacaklıkları',
   'entities.items.outrider_sabatons.name': 'Öncü Süvari Demir Çizmeleri',
   'entities.items.pale_pearl.name': 'Soluk İnci',
-  'entities.items.palecoil_heartscale.name': 'Sethrael\'in Kalp Pulu',
+  'entities.items.palecoil_heartscale.name': "Sethrael'in Kalp Pulu",
   'entities.items.palecoil_rod.name': 'Solukhalka Çubuğu',
   'entities.items.peakwool_robe.name': 'Zirveyünü Cübbesi',
   'entities.items.pilgrims_leggings.name': 'Hacının Tozlukları',
@@ -2090,7 +2399,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sableweb_cord.name': 'Karaağ Kuşağı',
   'entities.items.sableweb_slippers.name': 'Karaağ Patikleri',
   'entities.items.sanctum_key_shard.name': 'Mabet Anahtarı Parçası',
-  'entities.items.selthes_seastriders.name': 'Selthe\'nin Denizyürüyenleri',
+  'entities.items.selthes_seastriders.name': "Selthe'nin Denizyürüyenleri",
   'entities.items.sextons_slippers.name': 'Zangocun Patikleri',
   'entities.items.shadow_jerkin.name': 'Gölgedikiş Ceketi',
   'entities.items.shadowmeld_tunic.name': 'Gece Örtüsü Tuniği',
@@ -2099,13 +2408,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.simple_fishing_pole.name': 'Basit Olta',
   'entities.items.skullsmasher_warbelt.name': 'Kafataspatlatanın Savaş Kemeri',
   'entities.items.skullsplitter_dirk.name': 'Kafatasyaran Hançeri',
-  'entities.items.sloomtooth_tidefang.name': 'Sloomtooth\'un Gelgitdişi',
+  'entities.items.sloomtooth_tidefang.name': "Sloomtooth'un Gelgitdişi",
   'entities.items.smoked_eel.name': 'Tütsülenmiş Mirefen Yılanbalığı',
   'entities.items.soft_down.name': 'Yumuşak Tüy Yumağı',
   'entities.items.soggy_boot.name': 'Islak Çizme',
   'entities.items.soggy_moccasin.name': 'Islak Mokasen',
   'entities.items.soulflame_cowl.name': 'Wraithfire Başlığı',
+  'entities.items.soulflame_cowl_heroic.name': 'Wraithfire Başlığı',
   'entities.items.soulflame_mantle.name': 'Wraithfire Pelerini',
+  'entities.items.soulflame_mantle_heroic.name': 'Wraithfire Pelerini',
   'entities.items.spider_leg.name': 'Seğiren Örümcek Bacağı',
   'entities.items.spring_water.name': 'Soğuk Kuyu Suyu',
   'entities.items.staff_of_drowned_prayers.name': 'Boğulmuş Dualar Asası',
@@ -2116,6 +2427,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.steel_orange_armor_plate.name': 'Çelik Turuncu',
   'entities.items.storm_core.name': 'Fırtına Çekirdeği',
   'entities.items.stormcallers_crown.name': 'Galecall Tacı',
+  'entities.items.stormcallers_crown_heroic.name': 'Galecall Tacı',
   'entities.items.crownforged_gauntlets.name': 'Taçdövme Eldivenleri',
   'entities.items.nighttalon_grips.name': 'Gecepençe Kavrayıcıları',
   'entities.items.soulflame_gloves.name': 'Ruhalevi Eldivenleri',
@@ -2125,6 +2437,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Ruhalevi Kordonu',
   'entities.items.stormcallers_waistguard.name': 'Fırtınaçağıranın Bel Koruyucusu',
   'entities.items.stormcallers_spaulders.name': 'Galecall Omuzlukları',
+  'entities.items.stormcallers_spaulders_heroic.name': 'Galecall Omuzlukları',
+  'entities.items.bonewrought_greatsword.name': 'Bonewrought Büyük Kılıcı',
+  'entities.items.direfang_greatblade.name': 'Direfang Palası',
+  'entities.items.bonewrought_bulwark.name': 'Bonewrought Siperi',
+  'entities.items.wraithfire_orb.name': 'Wraithfire Küresi',
   'entities.items.stormshard_leggings.name': 'Fırtınaparçası Tozlukları',
   'entities.items.sturdy_belt.name': 'Sağlam Yolcu Kemeri',
   'entities.items.supply_crate.name': 'Çalınmış Erzak Sandığı',
@@ -2147,15 +2464,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.trollhide_leggings.name': 'Trolderisi Tozlukları',
   'entities.items.tunnelkings_spade.name': 'Tünelkralının Beli',
   'entities.items.unknown_alien_weaponry.name': 'Bilinmeyen Uzaylı Silahı',
-  'entities.items.vaels_mist_staff.name': 'Vael\'in Sis Asası',
+  'entities.items.vaels_mist_staff.name': "Vael'in Sis Asası",
   'entities.items.vale_carving_knife.name': 'Vadi Oyma Bıçağı',
   'entities.items.valeborn_spellblade.name': 'Vadidoğumlu Büyü Kılıcı',
   'entities.items.valespun_robe.name': 'Vadidokuma Cübbesi',
   'entities.items.vanguard_azure_armor_plate.name': 'Öncü Birlik Gök Mavisi',
   'entities.items.vanguard_chrome_armor_plate.name': 'Öncü Birlik Krom',
-  'entities.items.varric_shadow_cowl.name': 'Varric\'in Gölge Başlığı',
-  'entities.items.verlans_oathblade.name': 'Verlan\'ın Yemin Kılıcı',
-  'entities.items.voss_sanctified_mace.name': 'Voss\'un Kutsanmış Topuzu',
+  'entities.items.varric_shadow_cowl.name': "Varric'in Gölge Başlığı",
+  'entities.items.verlans_oathblade.name': "Verlan'ın Yemin Kılıcı",
+  'entities.items.voss_sanctified_mace.name': "Voss'un Kutsanmış Topuzu",
   'entities.items.wanderers_chestguard.name': 'Gezginin Göğüslüğü',
   'entities.items.waterlogged_idol.name': 'Suya Doymuş Put',
   'entities.items.wayfarers_hood.name': 'Yolcunun Başlığı',
@@ -2169,21 +2486,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.travelers_knapsack.name': 'Gezginin Sırt Çantası',
   'entities.items.wolfhide_satchel.name': 'Kurt Derisi Çanta',
   'entities.items.gravewoven_bag.name': 'Mezar Dokuması Çanta',
-  'entities.items.mistcallers_duffel.name': 'Fogbinder\'ın Denizci Çantası',
+  'entities.items.mistcallers_duffel.name': "Fogbinder'ın Denizci Çantası",
   'entities.abilities.aspect_of_the_wild.name': 'Yaban Dişi Sureti',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira a yakındaki müttefikleri con fuerza salvaje, aumentando saldırı gücünü durante 5 dk. (avcı yeteneği)',
   'entities.abilities.avatar.name': 'Devcüsse',
-  'entities.abilities.avatar.description': 'Te transforma en un coloso y aumenta saldırı gücünü durante 20 sn. (savaşçı yeteneği)',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta saldırı gücünü durante 20 sn. (savaşçı yeteneği)',
   'entities.abilities.avenging_wrath.name': 'İntikam Kanadı',
-  'entities.abilities.avenging_wrath.description': 'Invoca poder vengador y aumenta saldırı gücünü y büyü gücünü durante 20 sn. (paladin yeteneği)',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta saldırı gücünü y büyü gücünü durante 20 sn. (paladin yeteneği)',
   'entities.abilities.berserk.name': 'Kızıl Sis',
-  'entities.abilities.berserk.description': 'Aumenta saldırı gücünü durante 15 sn. (druid yeteneği)',
+  'entities.abilities.berserk.description':
+    'Aumenta saldırı gücünü durante 15 sn. (druid yeteneği)',
   'entities.abilities.bladestorm.name': 'Çelik Siklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a yakındaki düşmanları cada segundo por {damage}. (savaşçı yeteneği)',
   'entities.abilities.blink.name': 'Titreşim Adımı',
-  'entities.abilities.blink.description': 'Te teletransporta 15 m hacia delante y rompe raíces. (büyücü yeteneği)',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (büyücü yeteneği)',
   'entities.abilities.bloodlust.name': 'Savaş Davulları',
   'entities.abilities.bloodlust.description':
     'Lleva a yakındaki müttefikleri al frenesí y aumenta su velocidad de ataque durante 15 sn. (şaman yeteneği)',
@@ -2191,17 +2512,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Lanza relámpagos al área objetivo e inflige {damage} de daño a yakındaki düşmanları. (şaman yeteneği)',
   'entities.abilities.chaos_bolt.name': 'Yıkım Oku',
-  'entities.abilities.chaos_bolt.description': 'Lanza una descarga de fuego caótico que inflige {damage} de daño de Ateş. (kara büyücü yeteneği)',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Ateş. (kara büyücü yeteneği)',
   'entities.abilities.cloak_of_shadows.name': 'Gölge Pelerini',
-  'entities.abilities.cloak_of_shadows.description': 'Te envuelve en sombras y absorbe daño durante 5 sn. (haydut yeteneği)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 sn. (haydut yeteneği)',
   'entities.abilities.cone_of_cold.name': 'Don Süpürüşü',
-  'entities.abilities.cone_of_cold.description': 'Golpea a yakındaki düşmanları con escarcha e inflige {damage} de daño de Buz. (büyücü yeteneği)',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a yakındaki düşmanları con escarcha e inflige {damage} de daño de Buz. (büyücü yeteneği)',
   'entities.abilities.counter_shot.name': 'Susturan Atış',
-  'entities.abilities.counter_shot.description': 'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (avcı yeteneği)',
+  'entities.abilities.counter_shot.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (avcı yeteneği)',
   'entities.abilities.counterspell.name': 'Büyükıran',
-  'entities.abilities.counterspell.description': 'Büyü kullanımını keser ve o okuldan büyüleri 6 sn engeller. (büyücü yeteneği)',
+  'entities.abilities.counterspell.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 6 sn engeller. (büyücü yeteneği)',
   'entities.abilities.curse_of_exhaustion.name': 'Kurşun Lanet',
-  'entities.abilities.curse_of_exhaustion.description': 'Maldice a hedefi y reduce su velocidad de movimiento un 30% durante 12 sn. (kara büyücü yeteneği)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a hedefi y reduce su velocidad de movimiento un 30% durante 12 sn. (kara büyücü yeteneği)',
   'entities.abilities.death_coil.name': 'Mezar Sarmalı',
   'entities.abilities.death_coil.description':
     'Golpea a hedefi por {damage} de daño de Gölge y luego lo aterroriza durante 3 sn. Esta versión no sana al lanzador. (kara büyücü yeteneği)',
@@ -2209,20 +2536,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a hedefi, inflige {damage} de daño de Buz y lo aturde durante 4 sn. (büyücü yeteneği)',
   'entities.abilities.desperate_prayer.name': 'Son Dua',
-  'entities.abilities.desperate_prayer.description': 'Te sana al instante por {damage}. (rahip yeteneği)',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (rahip yeteneği)',
   'entities.abilities.deterrence.name': 'Diken Muhafızı',
-  'entities.abilities.deterrence.description': 'Aumenta tu kaçınma şansını un 50% durante 10 sn. (avcı yeteneği)',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu kaçınma şansını un 50% durante 10 sn. (avcı yeteneği)',
   'entities.abilities.divine_shield.name': 'Işık Siperi',
   'entities.abilities.divine_shield.description':
     'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sn. (paladin yeteneği)',
   'entities.abilities.earthbind.name': 'Kavrayan Toprak',
-  'entities.abilities.earthbind.description': 'Ata a la tierra a yakındaki düşmanları y los inmoviliza durante 2 sn. (şaman yeteneği)',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a yakındaki düşmanları y los inmoviliza durante 2 sn. (şaman yeteneği)',
   'entities.abilities.evocation.name': 'Eter Kuyusu',
   'entities.abilities.evocation.description': 'Restaura manayı rápidamente. (büyücü yeteneği)',
   'entities.abilities.frenzied_regeneration.name': 'Yaban Onarımı',
-  'entities.abilities.frenzied_regeneration.description': 'Regenera salud durante 10 sn. Solo en Forma de oso. (druid yeteneği)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 sn. Solo en Forma de oso. (druid yeteneği)',
   'entities.abilities.frost_trap.name': 'Kırağı Tuzağı',
-  'entities.abilities.frost_trap.description': 'Congela a los düşmanları en el área objetivo durante 3 sn. (avcı yeteneği)',
+  'entities.abilities.frost_trap.description':
+    'Congela a los düşmanları en el área objetivo durante 3 sn. (avcı yeteneği)',
   'entities.abilities.ghostly_strike.name': 'Hayalet Vuruş',
   'entities.abilities.ghostly_strike.description':
     'Golpea a hedefi por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (haydut yeteneği)',
@@ -2230,28 +2562,35 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Kutsal. Solo se usa por debajo del 20% de salud. (paladin yeteneği)',
   'entities.abilities.healing_stream.name': 'Kaynak Kuyusu',
-  'entities.abilities.healing_stream.description': 'Restaura a dost hedefi durante 12 sn. (şaman yeteneği)',
+  'entities.abilities.healing_stream.description':
+    'Restaura a dost hedefi durante 12 sn. (şaman yeteneği)',
   'entities.abilities.heroic_leap.name': 'Savaş Sıçrayışı',
   'entities.abilities.heroic_leap.description':
     'Saltas al área objetivo e infliges {damage} de daño Fiziksel a yakındaki düşmanları. (savaşçı yeteneği)',
   'entities.abilities.holy_wrath.name': 'Aziz Hiddeti',
-  'entities.abilities.holy_wrath.description': 'Desata poder sagrado e inflige {damage} de daño a yakındaki düşmanları. (paladin yeteneği)',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a yakındaki düşmanları. (paladin yeteneği)',
   'entities.abilities.howl_of_terror.name': 'Dehşet Uluması',
   'entities.abilities.howl_of_terror.description':
     'Aterroriza a yakındaki düşmanları hasta 3 sn. El daño puede romper el efecto. (kara büyücü yeteneği)',
   'entities.abilities.ice_block.name': 'Soğuk Tabut',
-  'entities.abilities.ice_block.description': 'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)',
   'entities.abilities.inner_focus.name': 'Dingin Zihin',
-  'entities.abilities.inner_focus.description': 'Hace que tu siguiente hechizo no tenga coste. Dura 60 sn. (rahip yeteneği)',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 sn. (rahip yeteneği)',
   'entities.abilities.innervate.name': 'Yaşam Özsuyu',
   'entities.abilities.innervate.description':
     'Canlı özsu 10 sn boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 20 doldurur: mana, öfke veya enerji; form değiştirmek bunu bozmaz. (Druid yeteneği)',
   'entities.abilities.kick.name': 'Tekme',
-  'entities.abilities.kick.description': 'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (haydut yeteneği)',
+  'entities.abilities.kick.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (haydut yeteneği)',
   'entities.abilities.last_stand.name': 'On Birinci Saat',
-  'entities.abilities.last_stand.description': 'Aumenta temporalmente Dayanıklılığı durante 15 sn, aumentando la salud máxima. (savaşçı yeteneği)',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Dayanıklılığı durante 15 sn, aumentando la salud máxima. (savaşçı yeteneği)',
   'entities.abilities.mend_pet.name': 'Yama Yap',
-  'entities.abilities.mend_pet.description': 'Sana a dost hedefi por {damage} durante 15 sn. (avcı yeteneği)',
+  'entities.abilities.mend_pet.description':
+    'Sana a dost hedefi por {damage} durante 15 sn. (avcı yeteneği)',
   'entities.abilities.meteor.name': 'Göktaşı',
   'entities.abilities.meteor.description':
     'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ateş y quema el suelo. (büyücü yeteneği)',
@@ -2259,34 +2598,46 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     'Canaliza energía de Gölge en el área objetivo e inflige {damage} cada segundo a yakındaki düşmanları. (rahip yeteneği)',
   'entities.abilities.multi_shot.name': 'Bölük Atış',
-  'entities.abilities.multi_shot.description': 'Dispara varios proyectiles e inflige {damage} a yakındaki düşmanları. (avcı yeteneği)',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a yakındaki düşmanları. (avcı yeteneği)',
   'entities.abilities.prayer_of_healing.name': 'Koro Şifası',
-  'entities.abilities.prayer_of_healing.description': 'Sana a yakındaki müttefikleri por {damage}. (rahip yeteneği)',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a yakındaki müttefikleri por {damage}. (rahip yeteneği)',
   'entities.abilities.preparation.name': 'Acil Plan',
-  'entities.abilities.preparation.description': 'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (haydut yeteneği)',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (haydut yeteneği)',
   'entities.abilities.presence_of_mind.name': 'Atılgan Zihin',
-  'entities.abilities.presence_of_mind.description': 'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)',
   'entities.abilities.psychic_scream.name': 'Psişik Çığlık',
-  'entities.abilities.psychic_scream.description': 'Aterroriza a yakındaki düşmanları hasta 4 sn. El daño puede romper el efecto. (rahip yeteneği)',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a yakındaki düşmanları hasta 4 sn. El daño puede romper el efecto. (rahip yeteneği)',
   'entities.abilities.pummel.name': 'Hırpala',
-  'entities.abilities.pummel.description': 'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (savaşçı yeteneği)',
+  'entities.abilities.pummel.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (savaşçı yeteneği)',
   'entities.abilities.rallying_cry.name': 'Toplanma Çağrısı',
   'entities.abilities.rallying_cry.description':
     'Lanza un grito de reunión y aumenta saldırı gücünü de yakındaki müttefikleri durante 10 sn. (savaşçı yeteneği)',
   'entities.abilities.rebuke.name': 'Azar',
-  'entities.abilities.rebuke.description': 'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (paladin yeteneği)',
+  'entities.abilities.rebuke.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (paladin yeteneği)',
   'entities.abilities.shadowstep.name': 'Gölge Kayışı',
-  'entities.abilities.shadowstep.description': 'Das un paso entre las sombras hacia tu hedefi. (haydut yeteneği)',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu hedefi. (haydut yeteneği)',
   'entities.abilities.shield_wall.name': 'Tabya',
-  'entities.abilities.shield_wall.description': 'Alzas un muro de escudo y aumentas mucho la zırhı durante 10 sn. (savaşçı yeteneği)',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la zırhı durante 10 sn. (savaşçı yeteneği)',
   'entities.abilities.silence.name': 'Sessizlik',
   'entities.abilities.silence.description': 'Silencia a hedefi durante 4 sn. (rahip yeteneği)',
   'entities.abilities.skull_bash.name': 'Kafa Darbesi',
-  'entities.abilities.skull_bash.description': 'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (druid yeteneği)',
+  'entities.abilities.skull_bash.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (druid yeteneği)',
   'entities.abilities.spell_lock.name': 'Susturma Emri',
-  'entities.abilities.spell_lock.description': 'Büyü kullanımını keser ve o okuldan büyüleri 5 sn engeller. (kara büyücü yeteneği)',
+  'entities.abilities.spell_lock.description':
+    'Büyü kullanımını keser ve o okuldan büyüleri 5 sn engeller. (kara büyücü yeteneği)',
   'entities.abilities.tranquility.name': 'Koru Şarkısı',
-  'entities.abilities.tranquility.description': 'Canaliza energía restauradora y sana a yakındaki müttefikleri cada segundo. (druid yeteneği)',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a yakındaki müttefikleri cada segundo. (druid yeteneği)',
   'entities.items.worn_sword.name': 'Çentikli Kısa Kılıç',
   'entities.items.woven_robe.name': 'Vadidokuma Cübbesi',
   'entities.items.wyrmcult_grand_robe.name': 'Ejdertarikatı Görkemli Cübbesi',
@@ -2298,7 +2649,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_legguards.name': 'Nightfang Bacaklıkları',
   'entities.items.wyrmshadow_talongrips.name': 'Nightfang Pençe Kavramaları',
   'entities.items.wyrmshadow_treads.name': 'Nightfang Postalları',
-  'entities.items.ysols_pearl_greaves.name': 'Ysolei\'nin İnci Dizlikleri',
+  'entities.items.ysols_pearl_greaves.name': "Ysolei'nin İnci Dizlikleri",
   'entities.items.zealotsbane_blade.name': 'Bağnazbelası Kılıcı',
   'entities.mobs.acolyte_tessa.name': 'Çömez Tessa',
   'entities.mobs.bastion_revenant.name': 'Kale Hortlağı',
@@ -2385,9 +2736,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vael_the_mistcaller.name': 'Fogbinder Vael',
   'entities.mobs.vale_bandit.name': 'Vadi Haydudu',
   'entities.mobs.varkas_boneguard.name': 'Varkas Kemik Muhafızı',
-  'entities.mobs.vision_aldren_warrior.name': 'Kaptan Aldren\'in Hayali',
-  'entities.mobs.vision_deathstalker_voss.name': 'Kraliyet Suikastçısı Voss\'un Hayali',
-  'entities.mobs.vision_malric_mage.name': 'Baş Rahip Malric\'in Hayali',
+  'entities.mobs.vision_aldren_warrior.name': "Kaptan Aldren'in Hayali",
+  'entities.mobs.vision_deathstalker_voss.name': "Kraliyet Suikastçısı Voss'un Hayali",
+  'entities.mobs.vision_malric_mage.name': "Baş Rahip Malric'in Hayali",
   'entities.mobs.gloomshade.name': 'Gloomshade',
   'entities.mobs.voskar_emberwing.name': 'Korkanat Voskar',
   'entities.mobs.warlock_imp.name': 'Ateş İblisi',
@@ -2398,70 +2749,79 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.wraithbinder_maldrec.name': 'Hayaletbağlayan Maldrec',
   'entities.mobs.wyrmcult_necromancer.name': 'Ejder Tarikatı Nekromcusu',
   'entities.mobs.wyrmcult_zealot.name': 'Ejder Tarikatı Bağnazı',
-  'entities.mobs.ysolei.name': 'Ysolei, Boğulmuş Ay\'ın Avatarı',
+  'entities.mobs.ysolei.name': "Ysolei, Boğulmuş Ay'ın Avatarı",
   'entities.npcs.apothecary_lin.greeting': 'Doğu ormanlarında adımına dikkat et, dostum.',
   'entities.npcs.apothecary_lin.name': 'Eczacı Lin',
   'entities.npcs.apothecary_lin.title': 'Şifalı Otçu',
   'entities.npcs.armorer_hode.greeting': 'Ocak kızgın, bileği taşı dönüyor. Kesiyorsa, satarım.',
   'entities.npcs.armorer_hode.name': 'Zırhçı Hode',
   'entities.npcs.armorer_hode.title': 'Usta Zırhçı',
-  'entities.npcs.brother_aldric.greeting': 'Işık seni korusun. Son zamanlarda ölüler bile burada huzur bulamıyor.',
+  'entities.npcs.brother_aldric.greeting':
+    'Işık seni korusun. Son zamanlarda ölüler bile burada huzur bulamıyor.',
   'entities.npcs.brother_aldric.name': 'Birader Aldric',
   'entities.npcs.brother_aldric.title': 'Vadi Rahibi',
-  'entities.npcs.brother_aldric_fen.greeting': 'Işık seni suyun üstünde tutsun, {playerName}. Bu bataklıktaki ölüler uyumaz, sığ sularda yürürler.',
+  'entities.npcs.brother_aldric_fen.greeting':
+    'Işık seni suyun üstünde tutsun, {playerName}. Bu bataklıktaki ölüler uyumaz, sığ sularda yürürler.',
   'entities.npcs.brother_aldric_fen.name': 'Birader Aldric',
   'entities.npcs.brother_aldric_fen.title': 'Vadi Rahibi',
   'entities.npcs.brother_aldric_highwatch.greeting':
-    'Vadi\'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum.',
+    "Vadi'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum.",
   'entities.npcs.brother_aldric_highwatch.name': 'Birader Aldric',
   'entities.npcs.brother_aldric_highwatch.title': 'Vadi Rahibi',
   'entities.npcs.brother_aldric_raid.greeting':
-    'Vadi\'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum.',
+    "Vadi'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum.",
   'entities.npcs.brother_aldric_raid.name': 'Birader Aldric',
   'entities.npcs.brother_aldric_raid.title': 'Vadi Rahibi',
   'entities.npcs.brother_halven.greeting': 'Aşağıdaki kutsal emanetlik yine yer değiştirdi.',
   'entities.npcs.brother_halven.name': 'Birader Halven',
   'entities.npcs.brother_halven.title': 'Emanetlik Bekçisi',
-  'entities.npcs.captain_thessaly.greeting': 'İki yüz yıldır bu sur dayandı, {className}. Benim nöbetimde yıkılmayacak, ama inliyor.',
+  'entities.npcs.captain_thessaly.greeting':
+    'İki yüz yıldır bu sur dayandı, {className}. Benim nöbetimde yıkılmayacak, ama inliyor.',
   'entities.npcs.captain_thessaly.name': 'Kaptan Thessaly',
   'entities.npcs.captain_thessaly.title': 'Highwatch Kaptanı',
-  'entities.npcs.fisherman_brandt.greeting': 'Blrb-glub- pardon, şu balık adamlarını çok uzun süredir dinliyorum.',
+  'entities.npcs.fisherman_brandt.greeting':
+    'Blrb-glub- pardon, şu balık adamlarını çok uzun süredir dinliyorum.',
   'entities.npcs.fisherman_brandt.name': 'Balıkçı Brandt',
   'entities.npcs.fisherman_brandt.title': 'Eski Denizci',
   'entities.npcs.foreman_odell.greeting': 'Bütün kazı şu toprağa bulanmış haşaratla kaynıyor!',
   'entities.npcs.foreman_odell.name': 'Ustabaşı Odell',
   'entities.npcs.foreman_odell.title': 'Maden Ustabaşısı',
-  'entities.npcs.herbalist_yara.greeting': 'Yolun batısındaki çalılığa dikkat et. Bu mevsim ağlar yelken bezi kadar kalın.',
+  'entities.npcs.herbalist_yara.greeting':
+    'Yolun batısındaki çalılığa dikkat et. Bu mevsim ağlar yelken bezi kadar kalın.',
   'entities.npcs.herbalist_yara.name': 'Şifalı Otçu Yara',
   'entities.npcs.herbalist_yara.title': 'Şifalı Otçu',
   'entities.npcs.loremaster_caddis.greeting':
     'Gevşek kayalara dikkat et, {className}. Dağ son zamanlarda... huzursuz. Nedenini öğrenmeye niyetliyim.',
   'entities.npcs.loremaster_caddis.name': 'İrfan Ustası Caddis',
   'entities.npcs.loremaster_caddis.title': 'İrfan Ustası',
-  'entities.npcs.marshal_redbrook.greeting': 'Kılıcını yakın tut, {className}. Vadi eskisi gibi değil.',
+  'entities.npcs.marshal_redbrook.greeting':
+    'Kılıcını yakın tut, {className}. Vadi eskisi gibi değil.',
   'entities.npcs.marshal_redbrook.name': 'Mareşal Redbrook',
   'entities.npcs.marshal_redbrook.title': 'Kasaba Mareşali',
-  'entities.npcs.provisioner_hale.greeting': 'Kuru çizme, kuru ekmek, kuru barut, Fenbridge\'de iyi bir günde üçünden ikisini bulursun.',
+  'entities.npcs.provisioner_hale.greeting':
+    "Kuru çizme, kuru ekmek, kuru barut, Fenbridge'de iyi bir günde üçünden ikisini bulursun.",
   'entities.npcs.provisioner_hale.name': 'Levazımcı Hale',
   'entities.npcs.provisioner_hale.title': 'Levazımcı',
   'entities.npcs.quartermaster_bree.greeting':
     'Yün, peksimet ve çelik nallı çizmeler, Highwatch üçüyle de ayakta durur, bense her şeyden yoksunum.',
   'entities.npcs.quartermaster_bree.name': 'Donatım Subayı Bree',
   'entities.npcs.quartermaster_bree.title': 'Highwatch Donatım Subayı',
-  'entities.npcs.scout_maren.greeting': 'Sessiz adımlar ve kısa bir bıçak burada nefes almanı sağlar. Çabuk konuş, sazlıklara dönmem gerek.',
+  'entities.npcs.scout_maren.greeting':
+    'Sessiz adımlar ve kısa bir bıçak burada nefes almanı sağlar. Çabuk konuş, sazlıklara dönmem gerek.',
   'entities.npcs.scout_maren.name': 'İzci Maren',
   'entities.npcs.scout_maren.title': 'Mareşalin İzcisi',
   'entities.npcs.scout_maren_highwatch.greeting':
     'Yanında bataklık boyunca tarikatçıların izini sürdüm ve iz buraya çıktı. Zirveler daha beter, {className}. Tetikte ol.',
   'entities.npcs.scout_maren_highwatch.name': 'İzci Maren',
   'entities.npcs.scout_maren_highwatch.title': 'Mareşalin İzcisi',
-  'entities.npcs.smith_haldren.greeting': 'Kıvılcımlara dikkat et, {className}. İyi çelik, bir yara izi ile bir mezar arasındaki farktır.',
+  'entities.npcs.smith_haldren.greeting':
+    'Kıvılcımlara dikkat et, {className}. İyi çelik, bir yara izi ile bir mezar arasındaki farktır.',
   'entities.npcs.smith_haldren.name': 'Demirci Haldren',
   'entities.npcs.smith_haldren.title': 'Zırhçı ve Silah Ustası',
   'entities.npcs.the_merchant.greeting':
-    'Dünya Pazarı\'na hoş geldin, {className}. Diyardaki her maceracıdan alışveriş yap, ya da kendi mallarını sergile ve bırak altın seni bulsun.',
+    "Dünya Pazarı'na hoş geldin, {className}. Diyardaki her maceracıdan alışveriş yap, ya da kendi mallarını sergile ve bırak altın seni bulsun.",
   'entities.npcs.the_merchant.name': 'Tüccar',
-  'entities.npcs.the_merchant.title': 'Dünya Pazarı\'nın Bekçisi',
+  'entities.npcs.the_merchant.title': "Dünya Pazarı'nın Bekçisi",
   'entities.npcs.tidewatcher_ondrel.greeting':
     'Göl ay ışığını içer, {className}, ve karşılığında boğulanları geri verir. O kapıyı otuz gece boyunca gözledim — ve bu gece açık.',
   'entities.npcs.tidewatcher_ondrel.name': 'Ondrel Vane',
@@ -2469,7 +2829,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.trader_wilkes.greeting': 'Taze ekmek, temiz su, dürüst fiyatlar. Sana ne vereyim?',
   'entities.npcs.trader_wilkes.name': 'Tüccar Wilkes',
   'entities.npcs.trader_wilkes.title': 'Erzakçı',
-  'entities.npcs.warden_fenwick.greeting': 'Kapıda dur, {className}. Şu sazlıkların ötesinde, öldürme işini bataklık bizim için yapar.',
+  'entities.npcs.warden_fenwick.greeting':
+    'Kapıda dur, {className}. Şu sazlıkların ötesinde, öldürme işini bataklık bizim için yapar.',
   'entities.npcs.warden_fenwick.name': 'Muhafız Fenwick',
   'entities.npcs.warden_fenwick.title': 'Fenbridge Muhafızı',
   'entities.quests.q_aldrics_fallen_star.completion':
@@ -2477,23 +2838,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_aldrics_fallen_star.objectives.0.label': 'Bilinmeyen Yabancı Silahlar',
   'entities.quests.q_aldrics_fallen_star.text':
     'Batı gökyüzünden bir kayanın düştüğünü gördüm, {playerName}. Bataklık duvarına çarptı ve bir demir ocağı gibi patladı, dul çalılığının çok ötesinde. Batıya git, patlamadan geriye ne kaldıysa bul ve bana bu dünyaya ait olmayan ne varsa getir.',
-  'entities.quests.q_aldrics_fallen_star.title': 'Aldric\'in Düşen Yıldızı',
+  'entities.quests.q_aldrics_fallen_star.title': "Aldric'in Düşen Yıldızı",
   'entities.quests.q_bandits.completion': 'Karanlıkta on bıçak eksildi. Bunu al, hak ettin.',
   'entities.quests.q_bandits.objectives.0.label': 'Vadi Haydudu öldürüldü',
   'entities.quests.q_bandits.text':
     'Bir grup kesik boğaz güneybatı tepelerinde kamp kurmuş. Bu hafta üç vagon soydular. Onları sür çıkar, 10 Vadi Haydudu öldür.',
   'entities.quests.q_bandits.title': 'Vadinin Haydutları',
-  'entities.quests.q_bastion_door.completion': 'Tılsım çürük bir ip gibi ayrılıyor. Kapı açık duruyor... ve altındaki karanlık dinliyor.',
+  'entities.quests.q_bastion_door.completion':
+    'Tılsım çürük bir ip gibi ayrılıyor. Kapı açık duruyor... ve altındaki karanlık dinliyor.',
   'entities.quests.q_bastion_door.objectives.0.label': 'Kale Tılsım Taşı',
   'entities.quests.q_bastion_door.text':
-    'Batık Kale, bir asır önce bataklıkta boğulmuş bir şövalye yurdu, Voss\'un mektuplarının işaret ettiği yer ve şu Fogbinder\'ın boğulma ilahilerini söylediği yer. Tarikat kapısını mezar taşlarıyla tılsımlamış. Bana tılsım taşlarından birini getir, {playerName}, ben de mührü çözeyim.',
+    "Batık Kale, bir asır önce bataklıkta boğulmuş bir şövalye yurdu, Voss'un mektuplarının işaret ettiği yer ve şu Fogbinder'ın boğulma ilahilerini söylediği yer. Tarikat kapısını mezar taşlarıyla tılsımlamış. Bana tılsım taşlarından birini getir, {playerName}, ben de mührü çözeyim.",
   'entities.quests.q_bastion_door.title': 'Batık Kale',
   'entities.quests.q_boars.completion': 'Ah, güzel kıllı postlar! Bunlar iyi para eder.',
   'entities.quests.q_boars.objectives.0.label': 'Kıllı Yaban Domuzu Postu',
   'entities.quests.q_boars.text':
     'Yaban domuzu postundan en iyi seyahat çantaları yapılır ve kasabanın batısındaki çayırlar bu hayvanlarla kaynıyor. Bana 5 Kıllı Yaban Domuzu Postu getir, emeğinin karşılığını vereyim.',
   'entities.quests.q_boars.title': 'Kıllı Yabandomuzu Postları',
-  'entities.quests.q_bones.completion': 'Artık huzur bulsunlar ve Işık, onları her ne uyandırdıysa onu bağışlasın.',
+  'entities.quests.q_bones.completion':
+    'Artık huzur bulsunlar ve Işık, onları her ne uyandırdıysa onu bağışlasın.',
   'entities.quests.q_bones.objectives.0.label': 'Huzursuz Kemikler huzura kavuşturuldu',
   'entities.quests.q_bones.text':
     'Kuzeybatı tepesindeki eski harabe bir zamanlar bir şapeldi ve avlusu bir huzur yeriydi. Bir şey ölüleri uykularından uyandırdı. Onlara huzur ver, {playerName}, 8 Huzursuz Kemiği toprağa geri ver.',
@@ -2502,27 +2865,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Mavi ve temiz yanıyorlar, dağ eski yeminini hatırlıyor. Bunlarla kapıyı yalnızca bizim için çözebilirim.',
   'entities.quests.q_breaking_the_seal.objectives.0.label': 'Kutsanmış Korlar',
   'entities.quests.q_breaking_the_seal.text':
-    'Mabet\'in mührü dağ ateşiyle işlenmişti ve onu sonuna kadar yırtmadan geçmemizi yalnızca dağ ateşi sağlar. Stormcrag elementalleri çekirdeklerinde o ilk dövüşün korlarını taşır. Bana beş Kutsanmış Kor getir, {playerName}, çünkü tarikat o kapıyı önce açarsa, dikkatli olmayacaklar ve Ejder nazikçe uyanmayacak.',
+    "Mabet'in mührü dağ ateşiyle işlenmişti ve onu sonuna kadar yırtmadan geçmemizi yalnızca dağ ateşi sağlar. Stormcrag elementalleri çekirdeklerinde o ilk dövüşün korlarını taşır. Bana beş Kutsanmış Kor getir, {playerName}, çünkü tarikat o kapıyı önce açarsa, dikkatli olmayacaklar ve Ejder nazikçe uyanmayacak.",
   'entities.quests.q_breaking_the_seal.title': 'Mührü Kırmak',
   'entities.quests.q_broodmother.completion':
     'Öldü mü? Gerçekten öldü mü? O zaman çalılık yine sadece ağaçlardan ibaret. Işık kılıcını kutsasın, {playerName}.',
   'entities.quests.q_broodmother.objectives.0.label': 'Mirefen Dulu öldürüldü',
   'entities.quests.q_broodmother.objectives.1.label': 'Yumurta Anası öldürüldü',
   'entities.quests.q_broodmother.text':
-    'Ağları gördün, şimdi kendine bir adamın bileği kadar kalın halatları neyin ördüğünü sor. Muhafızlar ona Yumurta Anası diyor ve yumurta kümesi Dul Çalılığı\'nın üzerinde ikinci bir örtü gibi asılı duruyor. 8 dul daha yak ve o küme açılmadan önce yaşlı anayı yere ser.',
+    "Ağları gördün, şimdi kendine bir adamın bileği kadar kalın halatları neyin ördüğünü sor. Muhafızlar ona Yumurta Anası diyor ve yumurta kümesi Dul Çalılığı'nın üzerinde ikinci bir örtü gibi asılı duruyor. 8 dul daha yak ve o küme açılmadan önce yaşlı anayı yere ser.",
   'entities.quests.q_broodmother.title': 'Yumurta Anası',
-  'entities.quests.q_crushers.completion': 'On ezici devrildi. Savaş kampı omurgasız bir beden, kafayı koparma zamanı.',
+  'entities.quests.q_crushers.completion':
+    'On ezici devrildi. Savaş kampı omurgasız bir beden, kafayı koparma zamanı.',
   'entities.quests.q_crushers.objectives.0.label': 'Dikenzirve Ezicisi öldürüldü',
   'entities.quests.q_crushers.text':
-    'Drogmar\'ın savaş kampı doğu kayalıklarına çökmüş ve ezicileri onun omurgası, her biri benim üç askerime bedel. Yanına yoldaşlar al; bu tek bir kılıcın işi değil. On eziciyi kır, savaş ağasının ordusu da onlarla birlikte dağılsın.',
+    "Drogmar'ın savaş kampı doğu kayalıklarına çökmüş ve ezicileri onun omurgası, her biri benim üç askerime bedel. Yanına yoldaşlar al; bu tek bir kılıcın işi değil. On eziciyi kır, savaş ağasının ordusu da onlarla birlikte dağılsın.",
   'entities.quests.q_crushers.title': 'Savaş Kampını Dağıt',
-  'entities.quests.q_cult_camp.completion': 'On iki cüppe çamura yüzükoyun düştü. Artık bataklığın da onları izlediğini biliyorlar.',
+  'entities.quests.q_cult_camp.completion':
+    'On iki cüppe çamura yüzükoyun düştü. Artık bataklığın da onları izlediğini biliyorlar.',
   'entities.quests.q_cult_camp.objectives.0.label': 'Mezarçağıran Tarikatçısı öldürüldü',
   'entities.quests.q_cult_camp.text':
-    'İşte orada, üçüncü gölün kuzeyinde, sisin hiç dağılmadığı yerde. Gri cüppeler, gri sancaklar: Mezarçağıranlar, bataklık çoktan onlarınmış gibi açıkta kamp kurmuşlar. Saklanmayı bıraktılar, {playerName}, bu da çoktan kazandıklarını sandıkları anlamına geliyor. Yanıldıklarını kanıtla. Tarikatçılarından 12\'sini biç.',
+    "İşte orada, üçüncü gölün kuzeyinde, sisin hiç dağılmadığı yerde. Gri cüppeler, gri sancaklar: Mezarçağıranlar, bataklık çoktan onlarınmış gibi açıkta kamp kurmuşlar. Saklanmayı bıraktılar, {playerName}, bu da çoktan kazandıklarını sandıkları anlamına geliyor. Yanıldıklarını kanıtla. Tarikatçılarından 12'sini biç.",
   'entities.quests.q_cult_camp.title': 'Sazlıktaki Cüppeler',
   'entities.quests.q_cult_orders.completion':
-    'Bu yazı... Benzerini en son Morthen\'in büyü kitabında, Doğudere\'de görmüştüm. Uğruna savaştığımız her mezarı aynı el yönlendirmiş, {playerName}.',
+    "Bu yazı... Benzerini en son Morthen'in büyü kitabında, Doğudere'de görmüştüm. Uğruna savaştığımız her mezarı aynı el yönlendirmiş, {playerName}.",
   'entities.quests.q_cult_orders.objectives.0.label': 'Ejdertarikatı Bağnazı öldürüldü',
   'entities.quests.q_cult_orders.objectives.1.label': 'Ejdertarikatı Emirleri',
   'entities.quests.q_cult_orders.text':
@@ -2532,7 +2897,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Voss öldü ve kampın üzerindeki sis çoktan inceliyor. Bataklıktaki seslerini kırdın, şimdi geriye yalnızca Kale kaldı.',
   'entities.quests.q_deacon.objectives.0.label': 'Diyakoz Voss öldürüldü',
   'entities.quests.q_deacon.text':
-    'Demek o kampın kalbinde Mezarçağıranların bir diyakozu duruyor, boğulmuş muhafızlarımı göllerden çıkıp ona hizmet etmeleri için ilahilerle çağırıyor. İlahisi bugün son buluyor. Kuzeye, kamp yoluna düş, {playerName}, ve Diyakoz Voss\'u toprağa göm, onu kimsenin geri çağıramayacağı kadar derine.',
+    "Demek o kampın kalbinde Mezarçağıranların bir diyakozu duruyor, boğulmuş muhafızlarımı göllerden çıkıp ona hizmet etmeleri için ilahilerle çağırıyor. İlahisi bugün son buluyor. Kuzeye, kamp yoluna düş, {playerName}, ve Diyakoz Voss'u toprağa göm, onu kimsenin geri çağıramayacağı kadar derine.",
   'entities.quests.q_deacon.title': 'Bataklığın Diyakozu',
   'entities.quests.q_deepfen.completion':
     'Bu, onları bir süreliğine çamura geri iter. Ama bir şey onları kazmaya itti ve neyin olduğunu öğrenmeye niyetliyim.',
@@ -2540,7 +2905,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_deepfen.text':
     'Deepfen Mudfinleri yirmi yıl boyunca sığlıklarında kaldı. Şimdi doğu kıyısını bir leşin üstündeki sinekler gibi sarıyorlar ve muhafızlarım göl yatağından bir şeyler çıkardıklarını söylüyor. Onları her ne kışkırttıysa, durdurulmasını istiyorum. Isırganlardan 12 tanesini telef et.',
   'entities.quests.q_deepfen.title': 'Deepfen Kıpırdanıyor',
-  'entities.quests.q_deepfen_purge.completion': 'Acımasız ve titiz. Bu bataklık bir gün kurursa, seni bekleyen bir muhafızlık işi var.',
+  'entities.quests.q_deepfen_purge.completion':
+    'Acımasız ve titiz. Bu bataklık bir gün kurursa, seni bekleyen bir muhafızlık işi var.',
   'entities.quests.q_deepfen_purge.objectives.0.label': 'Deepfen Isırganı öldürüldü',
   'entities.quests.q_deepfen_purge.text':
     'Aldric o putların tarikat işi olduğunu söylüyor, bu da Mudfinlerin bataklığın eski şeytanını kucak kucak yukarı taşıdığı anlamına geliyor. Bunun benim geçidime vurmasına izin vermem. Sığlıklara geri dön ve o tarama işini tamamen bitir: 14 ısırgan daha.',
@@ -2549,15 +2915,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Drogmar, kendi kampında ölü. Klanlar yüksek geçitlere dağılacak, duvarıma bir kışlık zaman kazandırdın, {playerName}.',
   'entities.quests.q_drogmar.objectives.0.label': 'Savaş Ağası Drogmar öldürüldü',
   'entities.quests.q_drogmar.text':
-    'Savaş Ağası Drogmar, Ejdertarikatı\'nın altınını aldı ve klanları dağın uyanışına yemin ettirdi. O, duvarıma savurmayı düşündükleri çekiç, ve yere vurduğunda, {playerName}, yanında durma. Yoldaşlarını savaş kampına götür ve onu yok et, Highwatch için.',
+    "Savaş Ağası Drogmar, Ejdertarikatı'nın altınını aldı ve klanları dağın uyanışına yemin ettirdi. O, duvarıma savurmayı düşündükleri çekiç, ve yere vurduğunda, {playerName}, yanında durma. Yoldaşlarını savaş kampına götür ve onu yok et, Highwatch için.",
   'entities.quests.q_drogmar.title': 'Savaş Ağası Drogmar',
-  'entities.quests.q_drowned.completion': 'Yere serdiğin her biri, özgür kalan çalınmış bir ruh. Ama onları boğan kişi hâlâ su döküyor.',
+  'entities.quests.q_drowned.completion':
+    'Yere serdiğin her biri, özgür kalan çalınmış bir ruh. Ama onları boğan kişi hâlâ su döküyor.',
   'entities.quests.q_drowned.objectives.0.label': 'Boğulmuş Ölü huzura kavuşturuldu',
   'entities.quests.q_drowned.text':
-    'Geçitte boğulan yolcular göllerden yürüyerek çıkıyor, {playerName}, hâlâ içinde öldükleri yosunlara sarılı. Bu, huzursuz bir hortlama değil. Boğulma iz bırakmaz; itaatkâr cesetler yapar. Birisi bu bataklığı bir bağış kutusu gibi dolduruyor. Boğulmuş Ölülerden 12\'sini huzura kavuştur.',
+    "Geçitte boğulan yolcular göllerden yürüyerek çıkıyor, {playerName}, hâlâ içinde öldükleri yosunlara sarılı. Bu, huzursuz bir hortlama değil. Boğulma iz bırakmaz; itaatkâr cesetler yapar. Birisi bu bataklığı bir bağış kutusu gibi dolduruyor. Boğulmuş Ölülerden 12'sini huzura kavuştur.",
   'entities.quests.q_drowned.title': 'Boğulmuş Ölüler',
   'entities.quests.q_drowned_censers.completion':
-    'Korktuğum gibi. Bu buhurdanlar tütsü değil, mezar külü yaktı. Birisi o şapeli boğulmaya adamış, ve ayin \'Voss\' diye imzalanmış.',
+    "Korktuğum gibi. Bu buhurdanlar tütsü değil, mezar külü yaktı. Birisi o şapeli boğulmaya adamış, ve ayin 'Voss' diye imzalanmış.",
   'entities.quests.q_drowned_censers.objectives.0.label': 'Paslı Buhurdan',
   'entities.quests.q_drowned_censers.text':
     'Dul gölünün kuzeyinde, bataklık yükseldiğinde cemaatiyle birlikte boğulan bir şapel duruyor. Oradaki ölüler paslı buhurdanlar taşıyor, cenaze buhurdanları, bir Mezarçağıran ayininde sallanan türden. Şapel avlusundan 4 tane topla, ben de o suyun üstünde hangi ayinin söylendiğini okuyayım.',
@@ -2571,26 +2938,28 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_choir.title': 'Boğulmuş Koro',
   'entities.quests.q_drowned_moon.completion':
     'Sunak karanlık, su durgun ve dağ gölünün üstündeki ay yalnızca ay. Bu gece bir tanrıçayı boğdun, {playerName} — ve dağ, ne kadar yaklaştığını asla bilmeyecek. Bırak kıyı kayalarının muhafızları sonunda huzurla dinlensin.',
-  'entities.quests.q_drowned_moon.objectives.0.label': 'Boğulmuş Ay\'ın Sureti Ysolei öldürüldü',
+  'entities.quests.q_drowned_moon.objectives.0.label': "Boğulmuş Ay'ın Sureti Ysolei öldürüldü",
   'entities.quests.q_drowned_moon.text':
     'Kalıpların sonuncusunu da okudum, {playerName}, ve tarikatın uykuda tutmak için kendini neden boğduğunu artık anlıyorum. Ysolei — etten kemiğe bürünmüş Boğulmuş Ay — tapınağın kalbindeki sunağın üstünde kıvrılmış yatıyor ve gölün aldığı her canın çalınmış sıcaklığı onun uyanışına akıyor. Ay dolunay olduğunda yükselecek ve su da onunla yükselecek — dağ gölü, duvar, altındaki bütün dağ. Bulabildiğin en güçlüleri topla ve onu tekrar uykuya yatır. Bu sefer temelli.',
   'entities.quests.q_drowned_moon.title': 'Boğulmuş Ay',
-  'entities.quests.q_elementals.completion': 'Parçalar çalınan çanlar gibi uğulduyor. Dağ kızgın değil, {playerName}... rahatsız ediliyor.',
+  'entities.quests.q_elementals.completion':
+    'Parçalar çalınan çanlar gibi uğulduyor. Dağ kızgın değil, {playerName}... rahatsız ediliyor.',
   'entities.quests.q_elementals.objectives.0.label': 'Stormcrag Elementali öldürüldü',
   'entities.quests.q_elementals.text':
     'Stormcrag bin yıldır sessiz durdu ve şimdi taşları bile kalkıp yürüyor. Elementaller öylece uyanmaz, {playerName}, bu dağın altında bir şey uykusunda dönüyor. On ikisini yere ser de geriye kalanı inceleyebileyim.',
   'entities.quests.q_elementals.title': 'Dağ Uyanıyor',
-  'entities.quests.q_fen_supplies.completion': 'Su almış, ama sağlam. Zavallı sürücüler... bataklık yakaladığını tutar, {playerName}. Bunu unutma.',
+  'entities.quests.q_fen_supplies.completion':
+    'Su almış, ama sağlam. Zavallı sürücüler... bataklık yakaladığını tutar, {playerName}. Bunu unutma.',
   'entities.quests.q_fen_supplies.objectives.0.label': 'Kayıp Kervan Malları',
   'entities.quests.q_fen_supplies.text':
-    'Doğudere\'den çıkan bir kervan üç gün önce sise daldı ve kapı çanını hiç çalmadı. Enkaz geçidin tüm boyunca saçılmış, sandıklar, fıçılar, hepsi yavaşça batıyor. Bataklık işini bitirmeden önce 5 yük mal kurtar.',
+    "Doğudere'den çıkan bir kervan üç gün önce sise daldı ve kapı çanını hiç çalmadı. Enkaz geçidin tüm boyunca saçılmış, sandıklar, fıçılar, hepsi yavaşça batıyor. Bataklık işini bitirmeden önce 5 yük mal kurtar.",
   'entities.quests.q_fen_supplies.title': 'Kayıp Kervan',
   'entities.quests.q_fenbridge_muster.completion':
-    'Aldric\'in mührü, öyle mi? O zaman işimi görürsün. Bataklık devriyelerimi olduğu gibi yutuyor ve yüzebilen her kılıca ihtiyacım var.',
+    "Aldric'in mührü, öyle mi? O zaman işimi görürsün. Bataklık devriyelerimi olduğu gibi yutuyor ve yüzebilen her kılıca ihtiyacım var.",
   'entities.quests.q_fenbridge_muster.objectives.0.label': 'Fenbridge Toplanma Emri',
   'entities.quests.q_fenbridge_muster.text':
-    'Morthen\'in yazıları kuzey bataklığında bir efendiden söz ediyordu, bir \'Fogbinder.\' Şimdi Muhafız Fenwick, Fenbridge\'de toplanma borusunu çaldı ve ben tesadüflere inanmam, {playerName}. Geçitten kuzeye git, kapı direğinden toplanma emrini al ve Muhafız\'a sun.',
-  'entities.quests.q_fenbridge_muster.title': 'Fenbridge\'de Toplanma',
+    "Morthen'in yazıları kuzey bataklığında bir efendiden söz ediyordu, bir 'Fogbinder.' Şimdi Muhafız Fenwick, Fenbridge'de toplanma borusunu çaldı ve ben tesadüflere inanmam, {playerName}. Geçitten kuzeye git, kapı direğinden toplanma emrini al ve Muhafız'a sun.",
+  'entities.quests.q_fenbridge_muster.title': "Fenbridge'de Toplanma",
   'entities.quests.q_glimmermere_light.completion':
     'Bir uyandırma duası... Boğulmuş Ay dedikleri bir şeye. Ve altında, daha sağlam bir elle: "O yalnızca uyuyor." Su uzun zamandır dinliyor, {playerName}.',
   'entities.quests.q_glimmermere_light.objectives.0.label': 'Tılsım Kalıbı alındı',
@@ -2604,92 +2973,96 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Caddis bana o tünelcilerden birinden alınmış bir parça balmumu gösterdi, parıldıyor, {playerName}, ve bir kalp atışı kadar sıcak. O, incelemek için daha fazlasını istiyor, ben de bunu istek listemden çıkarmak istiyorum. Parıldayan balmumundan altı parça geri getir.',
   'entities.quests.q_glowing_wax.title': 'Tuhaf Balmumu',
   'entities.quests.q_gravecallers_trail.completion':
-    'Morthen, kuzey bataklığındaki bir \'Fogbinder\'a yazmış. Tarikat ölü değil, {playerName}, yalnızca sabırlı davranmış.',
-  'entities.quests.q_gravecallers_trail.objectives.0.label': 'Morthen\'in Büyü Kitabı',
+    "Morthen, kuzey bataklığındaki bir 'Fogbinder'a yazmış. Tarikat ölü değil, {playerName}, yalnızca sabırlı davranmış.",
+  'entities.quests.q_gravecallers_trail.objectives.0.label': "Morthen'in Büyü Kitabı",
   'entities.quests.q_gravecallers_trail.text':
     'Morthen öldü, yine de bir soru içimi kemiriyor: bir asır boyunca saklanan bir tarikat, kendini tek bir köy şapelinde harcamaz. Bir büyü kitabı tutuyordu, ayinleri, yazışmaları. Ondan bir şey kaldıysa, mahzenin üstündeki yıkık şapelin kutsal odasında yatıyordur. Harabeyi ara ve yazılarından geriye ne kaldıysa bana getir, {playerName}.',
   'entities.quests.q_gravecallers_trail.title': 'Mezarçağıranın İzi',
   'entities.quests.q_gravewyrm.completion':
-    'Bitti. Üç diyarın ölüleri huzur bulabilir, dağ hortlaksız uyuyor, ve buradan Doğudere\'ye kadar her çanın bu gece çaldığı isim senin ismin, {playerName}.',
+    "Bitti. Üç diyarın ölüleri huzur bulabilir, dağ hortlaksız uyuyor, ve buradan Doğudere'ye kadar her çanın bu gece çaldığı isim senin ismin, {playerName}.",
   'entities.quests.q_gravewyrm.objectives.0.label': 'Mezarejder Korzul öldürüldü',
   'entities.quests.q_gravewyrm.text':
-    'Durdurulacak bir ayin kalmadı, {playerName}, yalnızca Ejder\'in kendisi, oyuğunda yarı uyanmış, Vadi\'nin ve bataklığın ölüleriyle tıka basa doymuş. Yükselirse, duvar, bataklık, Doğudere, savunduğumuz her şey tek bir gecede yıkılır. Yoldaşlarını Ejder\'in Oyuğu\'na götür ve çok uzun zaman önce bir şapel avlusunda başladığımız işi bitir. Işık seni buraya kadar taşıdı; geri kalan yolda sen onu taşı.',
+    "Durdurulacak bir ayin kalmadı, {playerName}, yalnızca Ejder'in kendisi, oyuğunda yarı uyanmış, Vadi'nin ve bataklığın ölüleriyle tıka basa doymuş. Yükselirse, duvar, bataklık, Doğudere, savunduğumuz her şey tek bir gecede yıkılır. Yoldaşlarını Ejder'in Oyuğu'na götür ve çok uzun zaman önce bir şapel avlusunda başladığımız işi bitir. Işık seni buraya kadar taşıdı; geri kalan yolda sen onu taşı.",
   'entities.quests.q_gravewyrm.title': 'Mezarejder Korzul',
-  'entities.quests.q_greyjaw.completion': 'Demek yaşlı şeytan sonunda ölmüş. Ahır çocuğu daha rahat uyuyacak, ben de öyle.',
-  'entities.quests.q_greyjaw.objectives.0.label': 'Yaşlı Greyjaw\'ın Dişi',
+  'entities.quests.q_greyjaw.completion':
+    'Demek yaşlı şeytan sonunda ölmüş. Ahır çocuğu daha rahat uyuyacak, ben de öyle.',
+  'entities.quests.q_greyjaw.objectives.0.label': "Yaşlı Greyjaw'ın Dişi",
   'entities.quests.q_greyjaw.text':
     'Hiçbir tuzağın tutamadığı bir kurt var: Yaşlı Greyjaw. Üç tazıyı ve bir ahır çocuğunun kolunu aldı. Kurt yollarının kuzeyindeki derin ormanlarda dolaşıyor. Bana dişini getir.',
   'entities.quests.q_greyjaw.title': 'Yaşlı Kurt',
-  'entities.quests.q_grubjaw.completion': 'O diş ön kolum kadar uzun! Katırların intikamı alındı ve Fenbridge sana bir içki borçlu.',
-  'entities.quests.q_grubjaw.objectives.0.label': 'Grubjaw\'ın Dişi',
+  'entities.quests.q_grubjaw.completion':
+    'O diş ön kolum kadar uzun! Katırların intikamı alındı ve Fenbridge sana bir içki borçlu.',
+  'entities.quests.q_grubjaw.objectives.0.label': "Grubjaw'ın Dişi",
   'entities.quests.q_grubjaw.text':
     'Diğerlerinin yanında kazmaya yanaşmadığı bir trol var: Obur Grubjaw. Son iki yük katırımı, koşum takımıyla birlikte yedi ve sigortacım yıllar önce boğuldu. Uzak doğu höyüklerinde dolaşıyor, {playerName}. Bana dişini getir, seni doğru dürüst donatayım.',
   'entities.quests.q_grubjaw.title': 'Obur',
   'entities.quests.q_highwatch_summons.completion':
-    'Aldric\'in sözü uzaklara ulaşıyor. Vadi\'nin rahibi dağa bizzat tırmanıyorsa, durum korktuğum kadar kötü demektir. Highwatch\'a hoş geldin, {playerName}.',
+    "Aldric'in sözü uzaklara ulaşıyor. Vadi'nin rahibi dağa bizzat tırmanıyorsa, durum korktuğum kadar kötü demektir. Highwatch'a hoş geldin, {playerName}.",
   'entities.quests.q_highwatch_summons.objectives.0.label': 'Highwatch Çağrısı',
   'entities.quests.q_highwatch_summons.text':
-    'Vael\'in son sözleri aklımdan çıkmıyor, {playerName}: Ejder zirvelerin altında kıpırdanıyor. Yüzbaşı Thessaly, kuzeye giden dağ yolunun başındaki Highwatch\'ta duvara komuta ediyor. Kapısında bir çağrı asılı duruyor, onu al ve ona Birader Aldric\'in senin arkandan dağa tırmandığını söyle.',
+    "Vael'in son sözleri aklımdan çıkmıyor, {playerName}: Ejder zirvelerin altında kıpırdanıyor. Yüzbaşı Thessaly, kuzeye giden dağ yolunun başındaki Highwatch'ta duvara komuta ediyor. Kapısında bir çağrı asılı duruyor, onu al ve ona Birader Aldric'in senin arkandan dağa tırmandığını söyle.",
   'entities.quests.q_highwatch_summons.title': 'Zirvelerdeki Nöbet',
   'entities.quests.q_hollow.completion':
-    'Fısıltı durdu. Bütün Vadi\'nin yapamadığını sen yaptın, {playerName}, ölüler uyuyor ve Doğudere sana sahip olduğu her şeyi borçlu.',
+    "Fısıltı durdu. Bütün Vadi'nin yapamadığını sen yaptın, {playerName}, ölüler uyuyor ve Doğudere sana sahip olduğu her şeyi borçlu.",
   'entities.quests.q_hollow.objectives.0.label': 'Mezarçağıran Morthen öldürüldü',
   'entities.quests.q_hollow.text':
-    'Mezarçağıran Morthen, dirilttiği seçkin ölülerle çevrili olarak Oyuk Mezar\'ın dibinde bekliyor. Tek bir kahramanın çok ötesinde, dört yoldaş al, daha az değil. Onu yok et, Vadi\'nin ölüleri sonunda uyuyacak.',
+    "Mezarçağıran Morthen, dirilttiği seçkin ölülerle çevrili olarak Oyuk Mezar'ın dibinde bekliyor. Tek bir kahramanın çok ötesinde, dört yoldaş al, daha az değil. Onu yok et, Vadi'nin ölüleri sonunda uyuyacak.",
   'entities.quests.q_hollow.title': 'Oyuğun İçine',
   'entities.quests.q_idols.completion':
-    'Mezarçağıran işi, Morthen\'den de yaşlı, benden de yaşlı. Tarikat Doğudere\'de başlamadı, {playerName}. Burada başladı ve göl sırlarını saklıyor.',
+    "Mezarçağıran işi, Morthen'den de yaşlı, benden de yaşlı. Tarikat Doğudere'de başlamadı, {playerName}. Burada başladı ve göl sırlarını saklıyor.",
   'entities.quests.q_idols.objectives.0.label': 'Su Almış Put',
   'entities.quests.q_idols.text':
-    'Fenwick\'in muhafızları, balık adamların göl dibinden putlar çıkardığını ve onları kutsal emanetler gibi sımsıkı tuttuğunu söylüyor. O putlar korktuğum şeyse, onları kendi gözlerimle görmeliyim. Deepfen ısırganlarından 5 tane al, onları kolay kolay vermezler.',
+    "Fenwick'in muhafızları, balık adamların göl dibinden putlar çıkardığını ve onları kutsal emanetler gibi sımsıkı tuttuğunu söylüyor. O putlar korktuğum şeyse, onları kendi gözlerimle görmeliyim. Deepfen ısırganlarından 5 tane al, onları kolay kolay vermezler.",
   'entities.quests.q_idols.title': 'Derinliğin Putları',
   'entities.quests.q_kazzix.completion':
     'Kalp parçası! Hâlâ çıtırdıyor, muhteşem. Şu pantolonu al; ölçüsünü bir tahmin ve bir duayla biçtim.',
-  'entities.quests.q_kazzix.objectives.0.label': 'Kazzix\'in Kalp Parçası',
+  'entities.quests.q_kazzix.objectives.0.label': "Kazzix'in Kalp Parçası",
   'entities.quests.q_kazzix.text':
-    'Elementaller arasında biri diğerlerinden daha parlak yanıyor: Parça Efendisi Kazzix, omuz kazanmış bir fırtına. Kalp parçası, aldığım her ölçümü sabitler, eğer onu o şeyden söküp alabilirsen. Stormcrag\'in batısındaki uzak kayalıklarda, ikinci kampın ötesinde dolaşıyor.',
+    "Elementaller arasında biri diğerlerinden daha parlak yanıyor: Parça Efendisi Kazzix, omuz kazanmış bir fırtına. Kalp parçası, aldığım her ölçümü sabitler, eğer onu o şeyden söküp alabilirsen. Stormcrag'in batısındaki uzak kayalıklarda, ikinci kampın ötesinde dolaşıyor.",
   'entities.quests.q_kazzix.title': 'Parça Efendisi',
-  'entities.quests.q_kobold_tunnels.completion': 'Dümdüz aşağıya, her bir kuyusu, oyucular kendi başlarına böyle kazmaz. Kitaplarıma danışmalıyım.',
+  'entities.quests.q_kobold_tunnels.completion':
+    'Dümdüz aşağıya, her bir kuyusu, oyucular kendi başlarına böyle kazmaz. Kitaplarıma danışmalıyım.',
   'entities.quests.q_kobold_tunnels.objectives.0.label': 'Deeprock Tünelcisi öldürüldü',
   'entities.quests.q_kobold_tunnels.text':
-    'Deeprock İnleri\'ndeki tünelciler, hiçbir çukur faresinin kazması gerekenden daha derine kazıyor, dümdüz aşağıya, sanki bir şey onları çağırıyormuş gibi. Tünelleri duvarımızın altından geçiyor, {playerName}. Meseleyi çökert: on iki Deeprock Tünelcisi öldür.',
+    "Deeprock İnleri'ndeki tünelciler, hiçbir çukur faresinin kazması gerekenden daha derine kazıyor, dümdüz aşağıya, sanki bir şey onları çağırıyormuş gibi. Tünelleri duvarımızın altından geçiyor, {playerName}. Meseleyi çökert: on iki Deeprock Tünelcisi öldür.",
   'entities.quests.q_kobold_tunnels.title': 'Deeprock Belası',
   'entities.quests.q_korgath.completion':
     'Korgath, sonunda kırıldı. Zincirleri bile bundan daha nazik bir son hak ediyordu. Bu sargılar senin, onları beklediği eşiğin ötesine taşı.',
   'entities.quests.q_korgath.objectives.0.label': 'Zincirli Korgath öldürüldü',
   'entities.quests.q_korgath.text':
-    'Mabet\'in ağzında son bir taramamda zincirler buldum, {playerName}, bir gemi direği kadar kalın zincirler ve içlerinde gerilen ogr biçimli bir şey. Tarikat, eşikte bir şampiyon zincirlemiş: Korgath, ikimizin de yaşadığından daha uzun süre öfkeyle beslenmiş. Dört yoldaş al ve onu yere ser, ve zincirler çözüldüğünde seni köşeye sıkıştırmasına izin verme.',
+    "Mabet'in ağzında son bir taramamda zincirler buldum, {playerName}, bir gemi direği kadar kalın zincirler ve içlerinde gerilen ogr biçimli bir şey. Tarikat, eşikte bir şampiyon zincirlemiş: Korgath, ikimizin de yaşadığından daha uzun süre öfkeyle beslenmiş. Dört yoldaş al ve onu yere ser, ve zincirler çözüldüğünde seni köşeye sıkıştırmasına izin verme.",
   'entities.quests.q_korgath.title': 'Zincirli Muhafız',
-  'entities.quests.q_mine.completion': 'Ha! İşe geri dönün, çocuklar! Teşekkürlerimi al, altınımı da.',
+  'entities.quests.q_mine.completion':
+    'Ha! İşe geri dönün, çocuklar! Teşekkürlerimi al, altınımı da.',
   'entities.quests.q_mine.objectives.0.label': 'Deeprock Kazıcısı öldürüldü',
   'entities.quests.q_mine.text':
     'Güzel bir bakır damarı bulduk, sonra o oyucu haşaratı tepenin yamacından kaynayarak çıktı. Ekibim temizlenene kadar kazıya ayak basmaz. 10 Deeprock Kazıcısı yere ser.',
   'entities.quests.q_mine.title': 'Madendeki Fareler',
   'entities.quests.q_mistcaller.completion':
-    'Vael öldü ve sis yıllardır ilk kez dağılıyor. Ama Maren onun son sözlerini duydu ve bunlar kanımı donduruyor: \'Ejder, zirvelerin altında kıpırdanıyor.\' Tarikat, tahmin ettiğimizden çok daha eski bir şeye hizmet ediyor, {playerName}. Fırsatın varken dinlen; sıra dağlarda.',
+    "Vael öldü ve sis yıllardır ilk kez dağılıyor. Ama Maren onun son sözlerini duydu ve bunlar kanımı donduruyor: 'Ejder, zirvelerin altında kıpırdanıyor.' Tarikat, tahmin ettiğimizden çok daha eski bir şeye hizmet ediyor, {playerName}. Fırsatın varken dinlen; sıra dağlarda.",
   'entities.quests.q_mistcaller.objectives.0.label': 'Fogbinder Vael öldürüldü',
   'entities.quests.q_mistcaller.text':
-    'Kalenin dibinde Fogbinder Vael bekliyor; Morthen\'in efendisi, Voss\'un efendisi, kendine bir ordu kurmak için yüzlerce yolcuyu boğan ses. Tek bir kahramanın çok ötesinde: yanına dört yoldaş al, daha az değil. Onun işini bitir, {playerName}, böylece bataklığın ölüleri sonunda huzura erebilir.',
+    "Kalenin dibinde Fogbinder Vael bekliyor; Morthen'in efendisi, Voss'un efendisi, kendine bir ordu kurmak için yüzlerce yolcuyu boğan ses. Tek bir kahramanın çok ötesinde: yanına dört yoldaş al, daha az değil. Onun işini bitir, {playerName}, böylece bataklığın ölüleri sonunda huzura erebilir.",
   'entities.quests.q_mistcaller.title': 'Fogbinder',
   'entities.quests.q_mogger.completion':
-    'Mogger sonunda öldü. Doğudere\'nin tarlaları artık daha güvenli ve Vadi\'den anlatılmaya değer bir hikâye daha bırakarak ayrılıyorsun.',
+    "Mogger sonunda öldü. Doğudere'nin tarlaları artık daha güvenli ve Vadi'den anlatılmaya değer bir hikâye daha bırakarak ayrılıyorsun.",
   'entities.quests.q_mogger.objectives.0.label': 'Mogger öldürüldü',
   'entities.quests.q_mogger.text':
-    'Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi\'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp doğudaki çayıra git ve o canavarı temelli yere ser.',
+    "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp doğudaki çayıra git ve o canavarı temelli yere ser.",
   'entities.quests.q_mogger.title': 'Mogger Düşmeli',
   'entities.quests.q_murlocs.completion': 'Ha! Bu, kendi çamur çukurlarına bakmayı öğretir onlara.',
   'entities.quests.q_murlocs.objectives.0.label': 'Çamuryüzgeç Sinsisi öldürüldü',
   'entities.quests.q_murlocs.text':
-    'Yirmi yıldır Ayna Gölü\'nde balık tutarım ve o gurultulu balık-adamlar sığlıklardan sürünüp çıkana dek hiç ağ kaybetmedim. Mudfinleri geri püskürt; 8 tanesini öldür. Ve kendine dikkat et: bir Mudfin\'in olduğu yerde beş tane vardır.',
+    "Yirmi yıldır Ayna Gölü'nde balık tutarım ve o gurultulu balık-adamlar sığlıklardan sürünüp çıkana dek hiç ağ kaybetmedim. Mudfinleri geri püskürt; 8 tanesini öldür. Ve kendine dikkat et: bir Mudfin'in olduğu yerde beş tane vardır.",
   'entities.quests.q_murlocs.title': 'Göldeki Bela',
   'entities.quests.q_names_of_the_dead.completion':
-    'Bu zavallı ruhlar... ve şuraya bak. Zangoç Marrow; şapelin canlı bekçisi; mezarı ilk bozulan o oldu. Morthen, Doğudere\'nin ölülerini gömen adamla başlamış.',
+    "Bu zavallı ruhlar... ve şuraya bak. Zangoç Marrow; şapelin canlı bekçisi; mezarı ilk bozulan o oldu. Morthen, Doğudere'nin ölülerini gömen adamla başlamış.",
   'entities.quests.q_names_of_the_dead.objectives.0.label': 'Yıpranmış Defter Sayfası',
   'entities.quests.q_names_of_the_dead.text':
     'Mezarçağıranlar ölülerimizi dirilttiyse, hangi mezarları soyduklarını bilmeliyim. Şapelin zangocu bir defin defteri tutardı ve rüzgâr sayfalarını şapel avlusuna savurdu. Benim için 3 tanesini topla, {playerName}; ölüler, adlarıyla anılmayı hak ediyor.',
   'entities.quests.q_names_of_the_dead.title': 'Ölülerin Adları',
   'entities.quests.q_necromancers.completion':
-    'Işık bizi affetsin. Bunlar Vadi\'nin ve bataklığın ölülerini barındırıyor; Mezarçağıranların dirilttiği her ceset, hasat edilmiş. Hiç ordu kurmuyorlarmış, {playerName}. Bir haraç topluyorlarmış.',
+    "Işık bizi affetsin. Bunlar Vadi'nin ve bataklığın ölülerini barındırıyor; Mezarçağıranların dirilttiği her ceset, hasat edilmiş. Hiç ordu kurmuyorlarmış, {playerName}. Bir haraç topluyorlarmış.",
   'entities.quests.q_necromancers.objectives.0.label': 'Ejder Tarikatı Nekromatiği öldürüldü',
   'entities.quests.q_necromancers.objectives.1.label': 'Ayinsel Filakter',
   'entities.quests.q_necromancers.text':
@@ -2702,18 +3075,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'O buhurdanlıklardaki ayin, boğulmuşları bataklığın değdiği her yerde dirilmeye bağlıyor; bataklık ise her şeye değiyor. Ölüler, dirilerden fazla olana dek bu sazlıklarda huzur olmayacak. Ayini henüz bozamayız, ama onu askerlerinden boşaltabiliriz. 14 Boğulmuş Ölüyü daha huzura kavuştur.',
   'entities.quests.q_no_rest.title': 'Sazlıkta Huzur Yok',
   'entities.quests.q_nythraxis_bound_guardian.completion':
-    'Üç emanet aynı hikâyeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını yıktı ve Voss ardından geleni durdurmaya çalıştı. Mühür zayıflıyor ve bu mühür yüzüğü, Nythraxis\'in mezarının anahtarı. Artık Nythraxis\'in Mahzeni\'ne girmeye uyumlandın. Terk edilmiş mahzene dön, kraliyet kapısını aç ve eski kralın öfkesi Dikenzirve\'nin ötesine taşmadan Nythraxis ile yüzleş.',
-  'entities.quests.q_nythraxis_bound_guardian.objectives.0.label': 'Mahzen Kilittaşı ayin çemberinde kullanıldı',
+    "Üç emanet aynı hikâyeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını yıktı ve Voss ardından geleni durdurmaya çalıştı. Mühür zayıflıyor ve bu mühür yüzüğü, Nythraxis'in mezarının anahtarı. Artık Nythraxis'in Mahzeni'ne girmeye uyumlandın. Terk edilmiş mahzene dön, kraliyet kapısını aç ve eski kralın öfkesi Dikenzirve'nin ötesine taşmadan Nythraxis ile yüzleş.",
+  'entities.quests.q_nythraxis_bound_guardian.objectives.0.label':
+    'Mahzen Kilittaşı ayin çemberinde kullanıldı',
   'entities.quests.q_nythraxis_bound_guardian.objectives.1.label': 'Bağlı Muhafız yenildi',
   'entities.quests.q_nythraxis_bound_guardian.objectives.2.label': 'Kralın Mühür Yüzüğü',
   'entities.quests.q_nythraxis_bound_guardian.text':
-    'Voss, hayatta kalanların Kralın Mühür Yüzüğü\'nü kadim bir muhafızın ardına mühürlediğini yazmış; böylece kimse Nythraxis\'in mezarına ne kazara ne de hırsla ulaşabilsin. Mahzen Kilittaşı\'nı, terk edilmiş mahzenin doğusunda ve batıdaki mezarın güneydoğusundaki düzlükte bulunan ayin çemberine götür. Onu orada kullan, muhafızı parçala ve mühür yüzüğünü geri getir.',
+    "Voss, hayatta kalanların Kralın Mühür Yüzüğü'nü kadim bir muhafızın ardına mühürlediğini yazmış; böylece kimse Nythraxis'in mezarına ne kazara ne de hırsla ulaşabilsin. Mahzen Kilittaşı'nı, terk edilmiş mahzenin doğusunda ve batıdaki mezarın güneydoğusundaki düzlükte bulunan ayin çemberine götür. Onu orada kullan, muhafızı parçala ve mühür yüzüğünü geri getir.",
   'entities.quests.q_nythraxis_bound_guardian.title': 'Bağlı Muhafız',
   'entities.quests.q_nythraxis_graves.completion':
     'Aldren sadık kaldı, Malric ölümü kabul etmeyi reddetti ve Voss tehlikeyi herkesten önce gördü. Üçü de aynı unutulmuş krala hizmet etmişti.',
-  'entities.quests.q_nythraxis_graves.objectives.0.label': 'Yüzbaşı Aldren\'in Mezarındaki İmge',
-  'entities.quests.q_nythraxis_graves.objectives.1.label': 'Başrahip Malric\'in Mezarındaki İmge',
-  'entities.quests.q_nythraxis_graves.objectives.2.label': 'Kraliyet Suikastçısı Voss\'un Mezarındaki İmge',
+  'entities.quests.q_nythraxis_graves.objectives.0.label': "Yüzbaşı Aldren'in Mezarındaki İmge",
+  'entities.quests.q_nythraxis_graves.objectives.1.label': "Başrahip Malric'in Mezarındaki İmge",
+  'entities.quests.q_nythraxis_graves.objectives.2.label':
+    "Kraliyet Suikastçısı Voss'un Mezarındaki İmge",
   'entities.quests.q_nythraxis_graves.text':
     'Bu işaretleri daha önce gördüm; kuzeydeki savaş meydanının çevresindeki üç eski mezarda. Yüzbaşı Aldren doğudaki yükseltide yatıyor, Başrahip Malric ortadaki kırık yolun yakınında ve Kraliyet Suikastçısı Voss batıdaki uçurumun kenarında. Her mezara dokun ve dinle, {playerName}. Ölüler, dirilerin unuttuğunu hatırlıyor olabilir.',
   'entities.quests.q_nythraxis_graves.title': 'Unutulmuşların Mezarları',
@@ -2721,26 +3096,27 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Aynı işaret her parçada beliriyor... bir taç. Bunu daha önce gördüm, hiçbir Doğudere kaydının hatırlamadığı eski mezarlara kazınmış hâlde.',
   'entities.quests.q_nythraxis_restless_dead.objectives.0.label': 'Rünlü Kemik Parçası',
   'entities.quests.q_nythraxis_restless_dead.text':
-    'Dikenzirve Tepeleri\'nde bir şeyler değişti, {playerName}. Ölüler artık amaçsızca dolaşmıyor. Toplanıp Highwatch\'ın ötesindeki kuzey kemik tarlalarından, eski savaş meydanının uçurum yoluyla buluştuğu yerden geçerek yürüyorlar. Oraya git, Kemikzırhlı Hortlaklar arasındaki huzursuzluğu araştır ve onları neyin harekete geçirdiğine dair her türlü kanıtı geri getir.',
+    "Dikenzirve Tepeleri'nde bir şeyler değişti, {playerName}. Ölüler artık amaçsızca dolaşmıyor. Toplanıp Highwatch'ın ötesindeki kuzey kemik tarlalarından, eski savaş meydanının uçurum yoluyla buluştuğu yerden geçerek yürüyorlar. Oraya git, Kemikzırhlı Hortlaklar arasındaki huzursuzluğu araştır ve onları neyin harekete geçirdiğine dair her türlü kanıtı geri getir.",
   'entities.quests.q_nythraxis_restless_dead.title': 'Kemik Tarlalarında Huzursuzluk',
   'entities.quests.q_nythraxis_scourges_end.completion':
-    'Demek taç sonunda sustu. Dikenzirve hâlâ ölülerini taşıyacak, ama altındaki hiçbir kral onları bir daha savaşa çağırmayacak. Aldren, Malric ve Voss\'un yalnızca durdurabildiğini sen sona erdirdin.',
+    "Demek taç sonunda sustu. Dikenzirve hâlâ ölülerini taşıyacak, ama altındaki hiçbir kral onları bir daha savaşa çağırmayacak. Aldren, Malric ve Voss'un yalnızca durdurabildiğini sen sona erdirdin.",
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': 'Nythraxis öldürüldü',
   'entities.quests.q_nythraxis_scourges_end.text':
-    'Mühür yüzüğü yolu açtı, {playerName}, ama açık bir mezar zafer değildir. Nythraxis bir zamanlar bir kraldı ve Dikenzirve\'nin altındaki yıkıntı hâlâ onun iradesine bağlı. Mahzene güvendiğin müttefiklerle gir. Ölümsüz tacı, buyruğu yukarıdaki savaş meydanına ulaşmadan parçala.',
+    "Mühür yüzüğü yolu açtı, {playerName}, ama açık bir mezar zafer değildir. Nythraxis bir zamanlar bir kraldı ve Dikenzirve'nin altındaki yıkıntı hâlâ onun iradesine bağlı. Mahzene güvendiğin müttefiklerle gir. Ölümsüz tacı, buyruğu yukarıdaki savaş meydanına ulaşmadan parçala.",
   'entities.quests.q_nythraxis_scourges_end.title': 'Belanın Sonu',
   'entities.quests.q_nythraxis_sealed_crypt.completion':
-    'Kilittaşının yarımları birbirine oturuyor ve Voss\'un günlüğü neyi mühürlediklerini adlandırıyor: Kral Nythraxis\'in mühür yüzüğü. Günlük doğruysa, o mühür yüzüğü mezarının anahtarı.',
+    "Kilittaşının yarımları birbirine oturuyor ve Voss'un günlüğü neyi mühürlediklerini adlandırıyor: Kral Nythraxis'in mühür yüzüğü. Günlük doğruysa, o mühür yüzüğü mezarının anahtarı.",
   'entities.quests.q_nythraxis_sealed_crypt.objectives.0.label': 'Mahzen Kilittaşı Üst Yarısı',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Mahzen Kilittaşı Alt Yarısı',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Kadim Günlük',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'İmgeler batıdaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric\'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.',
+    "İmgeler batıdaki uçurumda bulunan terk edilmiş mahzeni işaret ediyor. Mahzenin bir kralı barındırdığına dair eski bir efsane var. Belki de Malric'in ayini onu ölümsüz bir şeye dönüştürdükten sonra Dikenzirve onu aşağıya mühürledi. Mahzene gir ve içeride ne kaldığını gör.",
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Terk Edilmiş Mahzen',
-  'entities.quests.q_ogre_bounty.completion': 'Ödül tam olarak ödendi. Dağ etekleri artık daha sessiz; şimdi sıra satın alanlarla uğraşmakta.',
+  'entities.quests.q_ogre_bounty.completion':
+    'Ödül tam olarak ödendi. Dağ etekleri artık daha sessiz; şimdi sıra satın alanlarla uğraşmakta.',
   'entities.quests.q_ogre_bounty.objectives.0.label': 'Dikenzirve Devi öldürüldü',
   'entities.quests.q_ogre_bounty.text':
-    'Maren\'in totemleri bilmem gereken her şeyi anlatıyor: klanlar satın alınmış ve duvarım onların ilk işi. Toplanmalarını beklemeyeceğim. On dört Dikenzirve Devi daha, {playerName}; her biri için ödül ödeyeceğim.',
+    "Maren'in totemleri bilmem gereken her şeyi anlatıyor: klanlar satın alınmış ve duvarım onların ilk işi. Toplanmalarını beklemeyeceğim. On dört Dikenzirve Devi daha, {playerName}; her biri için ödül ödeyeceğim.",
   'entities.quests.q_ogre_bounty.title': 'Yüzbaşının Ödülü',
   'entities.quests.q_ogre_edges.completion':
     'On iki tane indi ve hâlâ geri çekilmiyorlar. Onları kim satın aldıysa, altından daha ağır bir şeyle ödemiş.',
@@ -2758,20 +3134,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Demek nöbeti sonunda sona erdi. Adının kapıya kazınmasını bizzat sağlayacağım. Teşekkürler, {playerName}.',
   'entities.quests.q_olen.objectives.0.label': 'Şövalye-Komutan Olen huzura kavuşturuldu',
   'entities.quests.q_olen.text':
-    'Şövalye-Komutan Olen, Kale battığında onu savunuyordu; görevini terk etmektense yerinde boğuldu. Her muhafız onun adını gururla öğrenir. Şimdi Fogbinder onu, savunurken öldüğü kapıyı korusun diye bir kukla olarak diriltti. Bu utanç sona erecek, {playerName}. Yanına dört yoldaş alıp aşağı in ve Olen\'e hak ettiği huzuru bağışla.',
+    "Şövalye-Komutan Olen, Kale battığında onu savunuyordu; görevini terk etmektense yerinde boğuldu. Her muhafız onun adını gururla öğrenir. Şimdi Fogbinder onu, savunurken öldüğü kapıyı korusun diye bir kukla olarak diriltti. Bu utanç sona erecek, {playerName}. Yanına dört yoldaş alıp aşağı in ve Olen'e hak ettiği huzuru bağışla.",
   'entities.quests.q_olen.title': 'Şövalye-Komutanın Utancı',
   'entities.quests.q_palecoil.completion':
     'Dünyanın dibi kadar soğuk, ama hâlâ seğiriyor. Sahanlık temizlendi, {playerName} — kapıya çıkan merdiven açık duruyor. Neredeyse açık olmamasını dilerdim.',
-  'entities.quests.q_palecoil.objectives.0.label': 'Sethrael\'in Kalp Pulu',
+  'entities.quests.q_palecoil.objectives.0.label': "Sethrael'in Kalp Pulu",
   'entities.quests.q_palecoil.text':
     'Göletteki bir şekil boğulmuş bir adam değil. Kemik renginde bir yılan, merdivenin başladığı derin sahanlıkta süzülüyor — Sethrael, sürtme izleri onu öyle adlandırıyor, Solukkıvrım, ayın kendi gözcü canavarı. O suyu koruduğu sürece kimse kapıya sağ ulaşamaz. Sahanlığa in ve onu öldür, {playerName}. İşin bittiğini bilmem için kalp pulunu al.',
   'entities.quests.q_palecoil.title': 'Solukkıvrım Sethrael',
-  'entities.quests.q_prowler_pelts.completion': 'Güzel, kalın postlar bunlar. Şu geçit yolu artık ikimizden de uzun ömürlü olacak.',
+  'entities.quests.q_prowler_pelts.completion':
+    'Güzel, kalın postlar bunlar. Şu geçit yolu artık ikimizden de uzun ömürlü olacak.',
   'entities.quests.q_prowler_pelts.objectives.0.label': 'Bataklık Avcısı Postu',
   'entities.quests.q_prowler_pelts.text':
-    'O geçit yolunun her tahtası, yağlanmış avcı derisiyle sarılı kazıkların üzerinde duruyor; çürümenin kemiremediği tek şey bu. Stoğum tükendi ve güneydeki açıklıklar şimdiden batıyor. Hepimiz Doğudere\'ye kadar suda yürümek zorunda kalmadan bana 8 bozulmamış post getir, {playerName}.',
+    "O geçit yolunun her tahtası, yağlanmış avcı derisiyle sarılı kazıkların üzerinde duruyor; çürümenin kemiremediği tek şey bu. Stoğum tükendi ve güneydeki açıklıklar şimdiden batıyor. Hepimiz Doğudere'ye kadar suda yürümek zorunda kalmadan bana 8 bozulmamış post getir, {playerName}.",
   'entities.quests.q_prowler_pelts.title': 'Geçit Yolu İçin Postlar',
-  'entities.quests.q_prowlers.completion': 'On iki tane ve üzerinde tek bir ısırık bile yok mu? Geçit yolu bu gece daha rahat nefes alıyor.',
+  'entities.quests.q_prowlers.completion':
+    'On iki tane ve üzerinde tek bir ısırık bile yok mu? Geçit yolu bu gece daha rahat nefes alıyor.',
   'entities.quests.q_prowlers.objectives.0.label': 'Bataklık Avcısı öldürüldü',
   'entities.quests.q_prowlers.text':
     'Bataklık avcıları, bir erzak katırının nasıl bir ses çıkardığını öğrendi ve artık doğrudan geçit yolunu avlıyorlar. Geçen hafta bir ulağı, bu kapıdan elli adım bile uzakta olmayan sazlığa sürüklediler. Onları seyrelt, {playerName}; on iki ölü avcı, kalanlara korkuyu öğretir.',
@@ -2788,31 +3166,33 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_revenants.text':
     'Mabet yolunun doğusunda eski bir savaş meydanı uzanıyor; bu dağı almaya çalışan son ordunun öncü birliği, iki yüz yıldır gömülü. Tarikat onları diriltti, paslı zırhların içindeki kemikler. On iki hortlağı yeniden toprağa ver, {playerName}.',
   'entities.quests.q_revenants.title': 'Hortlak Tarlaları',
-  'entities.quests.q_ringleader.completion': 'Gorrak öldü mü? O zaman Vadi onun gölgesinden kurtuldu. Doğudere\'ye büyük bir hizmette bulundun.',
+  'entities.quests.q_ringleader.completion':
+    "Gorrak öldü mü? O zaman Vadi onun gölgesinden kurtuldu. Doğudere'ye büyük bir hizmette bulundun.",
   'entities.quests.q_ringleader.objectives.0.label': 'Acımasız Gorrak öldürüldü',
   'entities.quests.q_ringleader.text':
     'Haydutlar tek bir adama hesap veriyor: Acımasız Gorrak. Başı kesersen gövde dağılır. Kampının tam ortasında sinmiş bekliyor. Onun işini bitir, {playerName}.',
   'entities.quests.q_ringleader.title': 'Elebaşı',
   'entities.quests.q_rite.completion':
-    'Tamamlandı. Aşağıya giden yol açık duruyor... ve onu açtığım için Işık beni affetsin. İnmeden önce en güçlü yoldaşlarını topla, {playerName}. Kimse Oyuk\'la yalnız yüzleşmemeli.',
+    "Tamamlandı. Aşağıya giden yol açık duruyor... ve onu açtığım için Işık beni affetsin. İnmeden önce en güçlü yoldaşlarını topla, {playerName}. Kimse Oyuk'la yalnız yüzleşmemeli.",
   'entities.quests.q_rite.objectives.0.label': 'Kutsanmış Donyağı',
   'entities.quests.q_rite.objectives.1.label': 'Hayaletimsi Öz',
   'entities.quests.q_rite.text':
-    'Gravecaller\'ı durduracaksak şapelin altındaki mahzenin mührü açılmalı; ama yaşayanların geçmesine yalnızca bir bağlama ayini izin verir. 4 parça Kutsanmış Donyağı\'na ihtiyacım var; madenin oyucuları donyağını sandık sandık biriktiriyor; bir de huzursuz ölülerden 6 Hayaletimsi Öz.',
+    "Gravecaller'ı durduracaksak şapelin altındaki mahzenin mührü açılmalı; ama yaşayanların geçmesine yalnızca bir bağlama ayini izin verir. 4 parça Kutsanmış Donyağı'na ihtiyacım var; madenin oyucuları donyağını sandık sandık biriktiriyor; bir de huzursuz ölülerden 6 Hayaletimsi Öz.",
   'entities.quests.q_rite.title': 'Bağlama Ayini',
   'entities.quests.q_sanctum_gate.completion':
     'Parçalar tam yerine oturuyor... ve kapı anahtarını tanıyor. Aşağıya giden yol açık, {playerName}. Bulabildiğin en güçlü yoldaşları topla; bundan sonrasıyla kimse yalnız yüzleşmemeli.',
   'entities.quests.q_sanctum_gate.objectives.0.label': 'Mabet Anahtarı Parçası',
   'entities.quests.q_sanctum_gate.text':
-    'Bu son eşik, {playerName}. Mezarejderi Mabedi\'nin kapısı bir kilittaşıyla kilitlenmişti ve tarikat, onun kendilerine karşı kullanılmasındansa parçalara ayırdı. Parçalar, kemikzırhlı ölülerin gözleri altında kapı meydanına saçılmış durumda. Bana üç tane getir, ben de Işık\'ın murat ettiği gibi, sessizce yolu açayım.',
+    "Bu son eşik, {playerName}. Mezarejderi Mabedi'nin kapısı bir kilittaşıyla kilitlenmişti ve tarikat, onun kendilerine karşı kullanılmasındansa parçalara ayırdı. Parçalar, kemikzırhlı ölülerin gözleri altında kapı meydanına saçılmış durumda. Bana üç tane getir, ben de Işık'ın murat ettiği gibi, sessizce yolu açayım.",
   'entities.quests.q_sanctum_gate.title': 'Mabet Kapısı',
-  'entities.quests.q_sexton.completion': 'Demek Marrow sonunda özgür. Onun için çan çalma; sağken yeterince duydu.',
+  'entities.quests.q_sexton.completion':
+    'Demek Marrow sonunda özgür. Onun için çan çalma; sağken yeterince duydu.',
   'entities.quests.q_sexton.objectives.0.label': 'Zangoç Marrow huzura kavuşturuldu',
   'entities.quests.q_sexton.text':
-    'Defter onu adlandırdı ve mahzen onu barındırıyor: Zangoç Marrow, şapelin bekçisi, Morthen\'in dirilttiği ilk adam; sağken şapeli koruduğu kadar sadakatle, ölümünde de efendisinin kapısını koruyor. Yanına dört yoldaş al, Oyuk Mezar\'a gir ve yaşlı zangoca elinden alınan huzuru bağışla, {playerName}.',
+    "Defter onu adlandırdı ve mahzen onu barındırıyor: Zangoç Marrow, şapelin bekçisi, Morthen'in dirilttiği ilk adam; sağken şapeli koruduğu kadar sadakatle, ölümünde de efendisinin kapısını koruyor. Yanına dört yoldaş al, Oyuk Mezar'a gir ve yaşlı zangoca elinden alınan huzuru bağışla, {playerName}.",
   'entities.quests.q_sexton.title': 'Zangocun Çanı',
   'entities.quests.q_shard_cores.completion':
-    'Her çekirdek aynı yöne yöneliyor, mıknatıs taşına yönelen demir talaşları gibi. Güneyi gösteriyorlar, {playerName}. Mabet\'e.',
+    "Her çekirdek aynı yöne yöneliyor, mıknatıs taşına yönelen demir talaşları gibi. Güneyi gösteriyorlar, {playerName}. Mabet'e.",
   'entities.quests.q_shard_cores.objectives.0.label': 'Fırtına Çekirdeği',
   'entities.quests.q_shard_cores.text':
     'Her elementalin kalbinde bir fırtına çekirdeği bulunur; taşa hapsedilmiş bir yıldırım düğümü. Altısı yan yana dizildiğinde, bana bu kargaşanın merkezinin nerede olduğunu söyleyecek. Sanırım zaten biliyorum, {playerName} ve içtenlikle yanılıyor olmayı umuyorum.',
@@ -2821,7 +3201,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Avlu giderek sessizleşiyor; ama çağrı durmadı. Artık aşağıdan yükseliyor, {playerName}. Mahzenin ta kendisinden.',
   'entities.quests.q_silence_the_call.objectives.0.label': 'Huzursuz Kemikler susturuldu',
   'entities.quests.q_silence_the_call.text':
-    'O defterdeki her isim, Morthen\'in topraktan çıkarmak istediği bir ruh ve şapel avlusu çağırdıklarıyla şimdiden kaynıyor. Mezarçağıran\'ın fısıltısı bir koroya dönüşmeden, 12 Huzursuz Kemik\'i mezarlarına geri yolla, {playerName}.',
+    "O defterdeki her isim, Morthen'in topraktan çıkarmak istediği bir ruh ve şapel avlusu çağırdıklarıyla şimdiden kaynıyor. Mezarçağıran'ın fısıltısı bir koroya dönüşmeden, 12 Huzursuz Kemik'i mezarlarına geri yolla, {playerName}.",
   'entities.quests.q_silence_the_call.title': 'Çağrıyı Sustur',
   'entities.quests.q_silence_the_choir.completion':
     'Dua kesiliyor... ve otuz gecedir ilk kez gölet sessiz. Ama sessizlik, bitmiş olmakla aynı şey değil. Selthe yalnızca korodu. Altındaki bir şey hâlâ dinliyor.',
@@ -2835,24 +3215,27 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_spiders.text':
     'Doğudaki ormandaki pusucular, lapalarım için ihtiyaç duyduğum bir ipek örüyor; üstelik aşırı çoğaldılar. 6 Sableweb Pusucusunu telef et ve karınlarından 4 ipek bezi kes.',
   'entities.quests.q_spiders.title': 'Sableweb Tehdidi',
-  'entities.quests.q_stalker_pelts.completion': 'Kolum kadar kalın bunlar. Nöbetçiler bu yıl donmayacak; zahmetin için şu çizmeleri al.',
+  'entities.quests.q_stalker_pelts.completion':
+    'Kolum kadar kalın bunlar. Nöbetçiler bu yıl donmayacak; zahmetin için şu çizmeleri al.',
   'entities.quests.q_stalker_pelts.objectives.0.label': 'Sırt Pusucusu Postu',
   'entities.quests.q_stalker_pelts.text':
     'Bu dağda kış kapıyı çalmaz, {playerName}; tekmeyle kırar. Sekiz sırt pusucusu postu, duvarı ilk karlardan geçirecek kadar pelerini astarlar. O canavarlar, güneye giden yolun iki yanındaki sırtlarda dolanıyor.',
-  'entities.quests.q_stalker_pelts.title': 'Highwatch\'a Kış Geliyor',
-  'entities.quests.q_stalkers.completion': 'Sırtta on iki gölge eksildi. Devriyeler bu gece daha rahat nefes alacak.',
+  'entities.quests.q_stalker_pelts.title': "Highwatch'a Kış Geliyor",
+  'entities.quests.q_stalkers.completion':
+    'Sırtta on iki gölge eksildi. Devriyeler bu gece daha rahat nefes alacak.',
   'entities.quests.q_stalkers.objectives.0.label': 'Sırt Pusucusu öldürüldü',
   'entities.quests.q_stalkers.text':
     'Sırt kedileri yüksek karlardan aç inmiş ve devriyelerim bunun bedelini kanla ödüyor. Yere serdiğin her pusucu, duvarda tutabildiğim bir asker demek. Onları seyrelt, {playerName}; başlangıç için on iki tane.',
   'entities.quests.q_stalkers.title': 'Sırttaki Pusucular',
   'entities.quests.q_summoners.completion':
-    'Her şifre \'Diyakoz Voss\' tarafından karşı imzalanmış; ve Kale\'deki bir \'Fogbinder\'a yönlendirilmiş. Morthen\'in efendisi, {playerName}. Onu bulduk.',
+    "Her şifre 'Diyakoz Voss' tarafından karşı imzalanmış; ve Kale'deki bir 'Fogbinder'a yönlendirilmiş. Morthen'in efendisi, {playerName}. Onu bulduk.",
   'entities.quests.q_summoners.objectives.0.label': 'Mezarçağıran Davetçisi öldürüldü',
   'entities.quests.q_summoners.objectives.1.label': 'Mezarçağıran Şifresi',
   'entities.quests.q_summoners.text':
-    'Maren\'in raporları tarikat üyeleri arasında davetçilerden söz ediyor; boğulmuşları, düdükle çağrılan tazılar gibi sudan çağıran sesler. Şifreleri komuta zincirini açık eder. 8 davetçiyi sustur ve şifrelerinden 4 tanesini bana getir.',
+    "Maren'in raporları tarikat üyeleri arasında davetçilerden söz ediyor; boğulmuşları, düdükle çağrılan tazılar gibi sudan çağıran sesler. Şifreleri komuta zincirini açık eder. 8 davetçiyi sustur ve şifrelerinden 4 tanesini bana getir.",
   'entities.quests.q_summoners.title': 'Davetin Durdurulması',
-  'entities.quests.q_supplies.completion': 'Sandıklarım! Üzerlerinde neredeyse tek çizik bile yok. Sen bir harikasın.',
+  'entities.quests.q_supplies.completion':
+    'Sandıklarım! Üzerlerinde neredeyse tek çizik bile yok. Sen bir harikasın.',
   'entities.quests.q_supplies.objectives.0.label': 'Çalınmış Erzak Sandığı',
   'entities.quests.q_supplies.text':
     'O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneydoğudaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?',
@@ -2864,16 +3247,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kapı açıldığından beri, alacakaranlıkta göletten bir şeyler tırmanıp çıkıyor; şişmiş, solgun, ellerin olması gereken yerde yüzgeçli. Glimmermere Sığlıkgezerleri, eski sürtme izleri onları öyle adlandırıyor. Yaşayan ne varsa kendileriyle birlikte aşağı sürüklüyorlar. Nöbetimi hiçe indirmeden önce on tanesini telef et.',
   'entities.quests.q_tarn_waders.title': 'Gölün Geri Verdikleri',
   'entities.quests.q_the_codfather.completion':
-    'Rutubetli azizler aşkına... Codfather\'ın ta kendisi. Şu bıyıklara bak. Fenbridge bu avın hikâyesini bir yıl boyunca dilinden düşürmez, {playerName}.',
+    "Rutubetli azizler aşkına... Codfather'ın ta kendisi. Şu bıyıklara bak. Fenbridge bu avın hikâyesini bir yıl boyunca dilinden düşürmez, {playerName}.",
   'entities.quests.q_the_codfather.objectives.0.label': 'Codfather',
   'entities.quests.q_the_codfather.text':
-    'Codfather sıradan bir balık değil, {playerName}, soğukkanlı bir katil. Eskiler, kahvaltıda Bataklık Avcıları yediğine yemin eder ve Mirefen Dulları bile katıksız bir dehşetle Deepfen Sığlıkları\'nın yakınında ağ örmez. O sulara o hükmediyor. Bir olta kap, o yaşlı şeytanı sularından çek çıkar, ben de aileye katıldığını kabul edeyim.',
+    "Codfather sıradan bir balık değil, {playerName}, soğukkanlı bir katil. Eskiler, kahvaltıda Bataklık Avcıları yediğine yemin eder ve Mirefen Dulları bile katıksız bir dehşetle Deepfen Sığlıkları'nın yakınında ağ örmez. O sulara o hükmediyor. Bir olta kap, o yaşlı şeytanı sularından çek çıkar, ben de aileye katıldığını kabul edeyim.",
   'entities.quests.q_the_codfather.title': 'Codfather',
   'entities.quests.q_troll_fetishes.completion':
     'Tarikat kampındaki sancaklarla aynı yapımcı. Troller kiralık küreklerden başka bir şey değil. İyi iş, {playerName}.',
   'entities.quests.q_troll_fetishes.objectives.0.label': 'Mirefen Trol Fetişi',
   'entities.quests.q_troll_fetishes.text':
-    'İki gece önce trol tümseklerini didik didik aradım. Diktikleri o fetişler trol işi değil; düğümler yanlış, kemikler insan kemiği ve her biri açık höyükleri bir tabela gibi işaret ediyor. Bana 8 tanesini getir, ben de bu kazının bedelini gerçekte kimin ödediğini Fenwick\'e kanıtlayayım.',
+    "İki gece önce trol tümseklerini didik didik aradım. Diktikleri o fetişler trol işi değil; düğümler yanlış, kemikler insan kemiği ve her biri açık höyükleri bir tabela gibi işaret ediyor. Bana 8 tanesini getir, ben de bu kazının bedelini gerçekte kimin ödediğini Fenwick'e kanıtlayayım.",
   'entities.quests.q_troll_fetishes.title': 'Fetiş ve Kemik',
   'entities.quests.q_trolls.completion':
     'Troller sebepsiz yere kazı yapmaz. Birisi onlara nerede kazacaklarını söyledi, ve kapımı ortaya koyarım ki bu kişi gri bir cüppe giyiyor.',
@@ -2885,17 +3268,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Velkhar öldü ve ayin başsız kaldı. Ama orada aşağıda hissettin, değil mi? Ruhlar çoktan tüketilmiş, Ejder artık uykuda değil.',
   'entities.quests.q_velkhar.objectives.0.label': 'Öldürülen Yüce Nekromant Velkhar',
   'entities.quests.q_velkhar.text':
-    'İzlediğimiz her ipliği, Morthen\'i, Vael\'i, ruh hokkalarını, tek bir el eğirdi: Yüce Nekromant Velkhar, Mezar Çağıranlar\'ın ilki, uyanış ayininin koruyucusu. Aşağıdaki ayin mahzeninde durmuş, iki diyar değerinde çalınmış ruhu Ejder\'e döküyor. Onu bitir, {playerName}, ve haraç onunla birlikte son bulsun.',
+    "İzlediğimiz her ipliği, Morthen'i, Vael'i, ruh hokkalarını, tek bir el eğirdi: Yüce Nekromant Velkhar, Mezar Çağıranlar'ın ilki, uyanış ayininin koruyucusu. Aşağıdaki ayin mahzeninde durmuş, iki diyar değerinde çalınmış ruhu Ejder'e döküyor. Onu bitir, {playerName}, ve haraç onunla birlikte son bulsun.",
   'entities.quests.q_velkhar.title': 'Yüce Nekromant',
   'entities.quests.q_voice_below.completion':
     'Diz çökmeler durdu. Sesi susturmadık, {playerName}, yalnızca korosunu inceltik. Bu kadarı yeterli olmalı.',
   'entities.quests.q_voice_below.objectives.0.label': 'Öldürülen Ejder Tarikatı Yobazı',
   'entities.quests.q_voice_below.objectives.1.label': 'Öldürülen Ejder Tarikatı Nekromantı',
   'entities.quests.q_voice_below.text':
-    'Dün gece bütün tarikat kampı bir anda diz çöktü, {playerName}, her yobaz, her nekromant, hepsi Mabet\'e dönük. Korzul artık onlara uykularında konuşuyor; Vael bataklıkta aynı sesi duydu, ondan önce de Morthen. Cemaati biçin, on yobaz, altı nekromant, o sesin kapıyı kendi elleriyle açacak kadar ele sahip olmasından önce.',
+    "Dün gece bütün tarikat kampı bir anda diz çöktü, {playerName}, her yobaz, her nekromant, hepsi Mabet'e dönük. Korzul artık onlara uykularında konuşuyor; Vael bataklıkta aynı sesi duydu, ondan önce de Morthen. Cemaati biçin, on yobaz, altı nekromant, o sesin kapıyı kendi elleriyle açacak kadar ele sahip olmasından önce.",
   'entities.quests.q_voice_below.title': 'Aşağıdaki Ses',
   'entities.quests.q_whispers.completion':
-    'Bu mühür... Mezar Çağıranlar\'ın izini taşıyor, soyu tükendi diye dua ettiğim bir tarikatın. Bu korktuğumdan da beter, {playerName}.',
+    "Bu mühür... Mezar Çağıranlar'ın izini taşıyor, soyu tükendi diye dua ettiğim bir tarikatın. Bu korktuğumdan da beter, {playerName}.",
   'entities.quests.q_whispers.objectives.0.label': 'Mezar Çağıran Mührü',
   'entities.quests.q_whispers.text':
     'Ölüleri huzura kavuşturdun, ama dinlenmeye devam etmeyecekler, bir şey onları geri çağırıyor. Çağrıyı yapanın izini bulmak için şapel harabesini ara. Bir mühür ya da damga bulursan, ona dokunmadan bana getir.',
@@ -2916,13 +3299,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Evet... bir uyanış-duası, nesiller boyu yazılmış. Yakınlar, {playerName}. Korkmaya cüret ettiğimden de yakın.',
   'entities.quests.q_wyrm_sigils.objectives.0.label': 'Mezarejderi Mührü',
   'entities.quests.q_wyrm_sigils.text':
-    'İşin tamamını öğrenmenin vakti geldi, {playerName}. Mezar Çağıranlar, Mezarejderi Korzul\'a hizmet eder, bu dağın altına mühürlenmiş kadim bir ejderhaya, ve Doğudere\'den beri çaldıkları her ruh, onun uyanışına dökülen bir haraçtır. Mabet Yolu\'nda tarikat, mührü inceltmek için mühürler dizdi. Bana üç tane getir; işledikleri ayini okumak isterim.',
+    "İşin tamamını öğrenmenin vakti geldi, {playerName}. Mezar Çağıranlar, Mezarejderi Korzul'a hizmet eder, bu dağın altına mühürlenmiş kadim bir ejderhaya, ve Doğudere'den beri çaldıkları her ruh, onun uyanışına dökülen bir haraçtır. Mabet Yolu'nda tarikat, mührü inceltmek için mühürler dizdi. Bana üç tane getir; işledikleri ayini okumak isterim.",
   'entities.quests.q_wyrm_sigils.title': 'Ejderin Mühürleri',
   'entities.quests.q_zealots.completion':
     'Rüzgâr daha sessiz. Ama beni rahatsız eden ilahi söylemeleri değil, {playerName}, asıl mesele bir şeyin onlara karşılık söylüyor olabileceği.',
   'entities.quests.q_zealots.objectives.0.label': 'Öldürülen Ejder Tarikatı Yobazı',
   'entities.quests.q_zealots.text':
-    'Rüzgâr güney zirvelerinden geldiğinde, {playerName}, ilahi taşır. Ejder Tarikatı artık saklanmıyor, Mabet\'in aşağısına çadırlar kurdular ve altında uyuyana şarkı söylüyorlar. On iki yobazı sustur. Susturulan her ses, dağa bir gecelik uyku daha kazandırır.',
+    "Rüzgâr güney zirvelerinden geldiğinde, {playerName}, ilahi taşır. Ejder Tarikatı artık saklanmıyor, Mabet'in aşağısına çadırlar kurdular ve altında uyuyana şarkı söylüyorlar. On iki yobazı sustur. Susturulan her ses, dağa bir gecelik uyku daha kazandırır.",
   'entities.quests.q_zealots.title': 'Rüzgârdaki İlahiler',
   'entities.zones.eastbrook_vale.name': 'Doğudere Vadisi',
   'entities.zones.eastbrook_vale.pois.0.label': 'Doğudere',
@@ -2935,7 +3318,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': 'Yıkık Şapel',
   'entities.zones.eastbrook_vale.pois.8.label': 'Kutsal Emanet Tepesi',
   'entities.zones.eastbrook_vale.pois.9.label': 'Parlakorman Açıklığı',
-  'entities.zones.eastbrook_vale.welcome': 'Kasabada Mareşal Redbrook\'u bul, senin için işi var.',
+  'entities.zones.eastbrook_vale.welcome': "Kasabada Mareşal Redbrook'u bul, senin için işi var.",
   'entities.zones.mirefen_marsh.name': 'Mirefen Bataklığı',
   'entities.zones.mirefen_marsh.pois.0.label': 'Bataklık Köprüsü',
   'entities.zones.mirefen_marsh.pois.1.label': 'Avcı Sazlıkları',
@@ -2945,19 +3328,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trol Höyükleri',
   'entities.zones.mirefen_marsh.pois.6.label': 'Mezar Çağıran Kampı',
   'entities.zones.mirefen_marsh.pois.7.label': 'Batık Kale',
-  'entities.zones.mirefen_marsh.welcome': 'Bataklık Köprüsü kapısında Muhafız Fenwick\'e rapor ver.',
+  'entities.zones.mirefen_marsh.welcome': "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
   'entities.zones.thornpeak_heights.name': 'Dikenzirve Tepeleri',
   'entities.zones.thornpeak_heights.pois.0.label': 'Yüksek Gözcü',
   'entities.zones.thornpeak_heights.pois.1.label': 'Pusucu Sırtı',
   'entities.zones.thornpeak_heights.pois.2.label': 'Derinkaya Oyukları',
   'entities.zones.thornpeak_heights.pois.3.label': 'Dev Etekleri',
-  'entities.zones.thornpeak_heights.pois.4.label': 'Drogmar\'ın Savaş Kampı',
+  'entities.zones.thornpeak_heights.pois.4.label': "Drogmar'ın Savaş Kampı",
   'entities.zones.thornpeak_heights.pois.5.label': 'Fırtınakaya',
   'entities.zones.thornpeak_heights.pois.6.label': 'Işıltıgöl',
   'entities.zones.thornpeak_heights.pois.7.label': 'Ejder Tarikatı Çadırları',
   'entities.zones.thornpeak_heights.pois.8.label': 'Hortlak Tarlaları',
   'entities.zones.thornpeak_heights.pois.9.label': 'Mezarejderi Mabedi',
-  'entities.zones.thornpeak_heights.welcome': 'Yüzbaşı Thessaly, Yüksek Gözcü\'deki duvarı tutuyor, zar zor.',
+  'entities.zones.thornpeak_heights.welcome':
+    "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
   'errors.api.accountBanned': 'Bu hesap yasaklandı.',
   'errors.api.accountSuspended': 'Bu hesap {date} tarihine kadar askıya alındı.',
   'errors.api.alreadyInWorld': 'Karakter zaten dünyada.',
@@ -2977,7 +3361,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'errors.api.takenOver': 'Karakteriniz başka bir oturum tarafından devralındı.',
   'errors.api.tooManyAttempts': 'Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.',
   'errors.api.usernameNotAllowed': 'Bu kullanıcı adına izin verilmiyor.',
-  'errors.api.usernameShape': 'Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.',
+  'errors.api.usernameShape':
+    'Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.',
   'errors.api.usernameTaken': 'Bu kullanıcı adı zaten alınmış.',
   'errors.api.verificationFailed': 'Doğrulama başarısız oldu. Lütfen tekrar deneyin.',
   'errors.api.webLoginOnly': 'Girişlere yalnızca oyun istemcisinden izin verilir.',
@@ -2989,7 +3374,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'errors.pickClass': 'Bir sınıf seçin.',
   'errors.returnToLogin': 'Girişe Dön',
   'errors.selectClass': 'Lütfen bir sınıf seçin.',
-  'fiesta.augment.aug_apex_predator.desc': '+%40 fiziksel hasar, +%15 kritik, verdiğin hasarın %12\'si kadar can yeniler.',
+  'fiesta.augment.aug_apex_predator.desc':
+    "+%40 fiziksel hasar, +%15 kritik, verdiğin hasarın %12'si kadar can yeniler.",
   'fiesta.augment.aug_apex_predator.name': 'Zirve Avcısı',
   'fiesta.augment.aug_arcane_surge.desc': '+%25 büyü hasarı ve +%10 kritik. Tutuştur onları.',
   'fiesta.augment.aug_arcane_surge.name': 'Gizemli Cereyan',
@@ -3001,7 +3387,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_avatar.name': 'Savaş Avatarı',
   'fiesta.augment.aug_bloodhunter.desc': 'Her türden +%18 hasar ve +%12 hareket hızı.',
   'fiesta.augment.aug_bloodhunter.name': 'Kan Avcısı',
-  'fiesta.augment.aug_bounty_hunter.desc': 'Öldürmelerin +1 bonus takım puanı değerinde. Mesafeyi hızla kapat.',
+  'fiesta.augment.aug_bounty_hunter.desc':
+    'Öldürmelerin +1 bonus takım puanı değerinde. Mesafeyi hızla kapat.',
   'fiesta.augment.aug_bounty_hunter.name': 'Ödül Avcısı',
   'fiesta.augment.aug_brutality.desc': 'Fiziksel vuruşların %15 daha sert isabet eder.',
   'fiesta.augment.aug_brutality.name': 'Vahşilik',
@@ -3023,11 +3410,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_spellfire.name': 'Kara Ateş',
   'fiesta.augment.aug_toughness.desc': '%12 azami can kazan.',
   'fiesta.augment.aug_toughness.name': 'Dayanıklılık',
-  'fiesta.augment.aug_unkillable.desc': '+%40 azami can, +600 zırh, verdiğin hasarın %10\'u kadar can yeniler.',
+  'fiesta.augment.aug_unkillable.desc':
+    "+%40 azami can, +600 zırh, verdiğin hasarın %10'u kadar can yeniler.",
   'fiesta.augment.aug_unkillable.name': 'Öldürülemez',
-  'fiesta.augment.aug_vampirism.desc': 'Verdiğin tüm hasarın %15\'i kadar can yenile. Kaosun içinde ayakta kal.',
+  'fiesta.augment.aug_vampirism.desc':
+    "Verdiğin tüm hasarın %15'i kadar can yenile. Kaosun içinde ayakta kal.",
   'fiesta.augment.aug_vampirism.name': 'Vampirlik',
-  'fiesta.augment.aug_warlords_might.desc': '+%25 fiziksel hasar ve +%10 kritik. Tehdidin ta kendisi ol.',
+  'fiesta.augment.aug_warlords_might.desc':
+    '+%25 fiziksel hasar ve +%10 kritik. Tehdidin ta kendisi ol.',
   'fiesta.augment.aug_warlords_might.name': 'Savaş Lordunun Gücü',
   'fiesta.augment.choose': 'Bir Güçlendirme Seç',
   'fiesta.banner.augmentGained': 'Güçlendirme kazanıldı: {name}!',
@@ -3042,7 +3432,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA BERABERE! Sonuç çok yakın!',
   'fiesta.end.loss': 'FIESTA KAYBEDİLDİ! Tekrar dene!',
   'fiesta.end.win': 'FIESTA KAZANILDI! 🎉 Ne parti ama!',
-  'fiesta.enterQueue': 'Fiesta\'ya Katıl!',
+  'fiesta.enterQueue': "Fiesta'ya Katıl!",
   'fiesta.error.leaderOnly': 'Takımını {label} için kuyruğa yalnızca grup lideri sokabilir.',
   'fiesta.error.noAugment': 'Şu anda seçebileceğin bir güçlendirme yok.',
   'fiesta.error.notOnOffer': 'O güçlendirme sunulmuyor.',
@@ -3052,7 +3442,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.log.go': 'FIESTA — BAŞLA!',
   'fiesta.log.over': 'FIESTA BİTTİ! Ne parti ama. Dünyaya dönülüyor…',
   'fiesta.log.powerup': '{player}, {name} kaptı!',
-  'fiesta.log.welcome': '2v2 FIESTA\'ya hoş geldin! Avlar yap, güçlendirmeler kap, ringden sağ çık!',
+  'fiesta.log.welcome': "2v2 FIESTA'ya hoş geldin! Avlar yap, güçlendirmeler kap, ringden sağ çık!",
   'fiesta.pending.label': 'Güçlendirme hazır — bir sonraki ölümünde seç!',
   'fiesta.powerup.pow_berserker.name': 'Cinnet Savaşçısı',
   'fiesta.powerup.pow_colossus.name': 'Dev Heykel',
@@ -3066,7 +3456,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.queue.teamLeave': 'Takımın 2v2 Fiesta kuyruğundan ayrılıyor.',
   'fiesta.respawn.sub': 'Tekrar savaşa dönüş…',
   'fiesta.respawn.title': 'DÜŞTÜN!',
-  'fiesta.score.aria': 'Fiesta skoru: senin takımın {mine}, düşman takım {theirs}, {limit} puana ilk ulaşan kazanır.',
+  'fiesta.score.aria':
+    'Fiesta skoru: senin takımın {mine}, düşman takım {theirs}, {limit} puana ilk ulaşan kazanır.',
   'fiesta.score.title': 'FIESTA',
   'fiesta.score.toWin': 'İlk {n} puana',
   'fiesta.tier.gold': 'Altın',
@@ -3082,7 +3473,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'fiesta.word.spree': '{n}× SERİ!',
   'fiesta.word.wave': 'GÜÇLENDİRMELER!',
   'footer.copyright': '2026 World of ClaudeCraft',
-  'footer.discordLabel': 'Discord\'a Katıl',
+  'footer.discordLabel': "Discord'a Katıl",
   'footer.githubLabel': 'Açık Kaynak Proje',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Teknik Doküman',
@@ -3113,7 +3504,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'game.milestone.veteran': 'Kıdemli',
   'game.prestige.action': 'Prestij',
   'game.prestige.body':
-    'Prestij, Prestij Rütbeni 1 artırır ve seviye XP çubuğunu sıfırlar. Seviyeni, ekipmanını, yeteneklerini, becerilerini veya ömür boyu XP\'ni ve lider tablosu konumunu DEĞİŞTİRMEZ — yalnızca kozmetik bir gösteriştir.',
+    "Prestij, Prestij Rütbeni 1 artırır ve seviye XP çubuğunu sıfırlar. Seviyeni, ekipmanını, yeteneklerini, becerilerini veya ömür boyu XP'ni ve lider tablosu konumunu DEĞİŞTİRMEZ — yalnızca kozmetik bir gösteriştir.",
   'game.prestige.cancel': 'İptal',
   'game.prestige.confirm': 'Prestij',
   'game.prestige.needCap': 'Prestij yapmak için seviye üst sınırında olmalısın.',
@@ -3127,7 +3518,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'game.progression.totalXp': 'Toplam XP',
   'game.progression.virtualLevel': 'Sanal Seviye',
   'game.progression.virtualLevelUp': 'Sanal Seviye',
-  'game.settings.showOverflowXp': 'Taşan XP\'yi Göster',
+  'game.settings.showOverflowXp': "Taşan XP'yi Göster",
   'game.settings.weather': 'Hava Durumu Efektleri',
   'game.talents.apply': 'Değişiklikleri uygula',
   'game.talents.available': 'Mevcut',
@@ -3181,7 +3572,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'game.talents.readout.locked': 'Henüz yetenekleri açmadın — {level}. seviyede başlarlar.',
   'game.talents.readout.noSpec': 'uzmanlık yok',
   'game.talents.readout.noTree': 'Sınıfının henüz bir yetenek ağacı yok.',
-  'game.talents.readout.summary': 'Yetenekler: {head} — {spent}/{total} puan harcandı ({breakdown}).',
+  'game.talents.readout.summary':
+    'Yetenekler: {head} — {spent}/{total} puan harcandı ({breakdown}).',
   'game.talents.readout.unspent': ' {count} harcanmadı.',
   'game.talents.requires': 'Gerektirir',
   'game.talents.reset': 'Sıfırla',
@@ -3198,65 +3590,111 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Harcanan',
   'game.talents.title': 'Yetenekler',
   'game.talents.unlockBanner': 'Yetenekler Açıldı!',
-  'game.talents.unlockHint': 'İlk yetenek puanını kazandın — Yetenekleri açmak için N\'ye bas.',
+  'game.talents.unlockHint': "İlk yetenek puanını kazandın — Yetenekleri açmak için N'ye bas.",
   'game.xp.lv': 'Sv',
   'game.xp.maxLevel': 'AZAMİ SEVİYE',
   'game.xp.rested': 'Dinlenmiş',
   'game.xp.suffix': 'TP',
   'game.xp.toNext': 'sonrakine',
   'game.xp.totalXp': 'toplam TP',
-  'guide.abilityHook.arcane_intellect': 'Zekayı yükselterek bir dostun mana havuzunu derinleştirir, akına girmeden önce kullan.',
+  'guide.abilityHook.arcane_intellect':
+    'Zekayı yükselterek bir dostun mana havuzunu derinleştirir, akına girmeden önce kullan.',
   'guide.abilityHook.arcane_shot': 'Hızlı ek hasar için menzilden ani bir atış.',
-  'guide.abilityHook.aspect_of_the_hawk': 'Menzilli saldırı gücünü keskinleştirmek için sürekli açık tuttuğun bir suret.',
-  'guide.abilityHook.backstab': 'Bir hançerle hedefin arkasına süzül ve sert vuran bir birikim becerisi kullan.',
+  'guide.abilityHook.aspect_of_the_hawk':
+    'Menzilli saldırı gücünü keskinleştirmek için sürekli açık tuttuğun bir suret.',
+  'guide.abilityHook.backstab':
+    'Bir hançerle hedefin arkasına süzül ve sert vuran bir birikim becerisi kullan.',
   'guide.abilityHook.battle_shout': 'Grubun saldırı gücünü yükselten coşturucu bir nara.',
-  'guide.abilityHook.blessing_of_might': 'Dost bir hedefin saldırı gücünü yükseltir, akından önce kullanmak iyidir.',
-  'guide.abilityHook.charge': 'Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.',
-  'guide.abilityHook.cheap_shot': 'Gizlilikten bir sersemletmeyle ve kombo puanlarında öne geçerek başla.',
-  'guide.abilityHook.commanding_shout': 'Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.',
+  'guide.abilityHook.blessing_of_might':
+    'Dost bir hedefin saldırı gücünü yükseltir, akından önce kullanmak iyidir.',
+  'guide.abilityHook.charge':
+    'Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.',
+  'guide.abilityHook.cheap_shot':
+    'Gizlilikten bir sersemletmeyle ve kombo puanlarında öne geçerek başla.',
+  'guide.abilityHook.commanding_shout':
+    'Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.',
   'guide.abilityHook.concussive_shot': 'Hedefi sersemletir ve yavaşlatır, böylece sana ulaşamaz.',
   'guide.abilityHook.conjure_food': 'Oturup yediğinde can yenileyen yiyecek çağırır.',
-  'guide.abilityHook.conjure_water': 'Mana yenileyen içecekler çağırır, böylece akınlar arasında dolum yapabilirsin.',
-  'guide.abilityHook.corruption': 'Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.',
+  'guide.abilityHook.conjure_water':
+    'Mana yenileyen içecekler çağırır, böylece akınlar arasında dolum yapabilirsin.',
+  'guide.abilityHook.corruption':
+    'Bir hedefi gölgeyle çürütür ve sen başka işler yaparken hasar verir.',
+  'guide.abilityHook.cw_battle_shout': 'Grubun saldırı gücünü yükselten coşturucu bir nara.',
+  'guide.abilityHook.cw_charge':
+    'Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.',
+  'guide.abilityHook.cw_commanding_shout':
+    'Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.',
+  'guide.abilityHook.cw_heroic_strike':
+    'Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.',
+  'guide.abilityHook.cw_rend': 'Hedefi zamanla yıpratan bir kanama açar.',
+  'guide.abilityHook.cw_thunder_clap': 'Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.',
   'guide.abilityHook.demon_skin': 'Derini sertleştirip zırh ekleyen kalıcı bir öz güçlendirmesi.',
-  'guide.abilityHook.devotion_aura': 'Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.',
-  'guide.abilityHook.divine_protection': 'İşler kızıştığında hasarı emmek için hızlı bir koruyucu siper.',
+  'guide.abilityHook.devotion_aura':
+    'Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.',
+  'guide.abilityHook.divine_protection':
+    'İşler kızıştığında hasarı emmek için hızlı bir koruyucu siper.',
   'guide.abilityHook.earth_shock': 'Şimdi gerektiğinde hızlı Doğa hasarı için ani bir şok.',
   'guide.abilityHook.eviscerate': 'Bir hedefi patlamayla bitirmek için kombo puanlarını harcar.',
-  'guide.abilityHook.fireball': 'Ana ateş bombası; bir darbe indirir ve hedefi yanar halde bırakır.',
+  'guide.abilityHook.fireball':
+    'Ana ateş bombası; bir darbe indirir ve hedefi yanar halde bırakır.',
   'guide.abilityHook.flame_shock': 'Önden vuran ve zamanla yakmayı sürdüren ani bir yanış.',
-  'guide.abilityHook.frost_armor': 'Dövüşten önce zırhını sertleştiren kalıcı bir öz güçlendirmesi.',
+  'guide.abilityHook.frost_armor':
+    'Dövüşten önce zırhını sertleştiren kalıcı bir öz güçlendirmesi.',
   'guide.abilityHook.frostbolt': 'Menzilden vurur ve hedefi yavaşlatır, böylece sana yaklaşamaz.',
   'guide.abilityHook.garrote': 'Gizlilikten, hedefi zamanla kanatan bir telle başla.',
-  'guide.abilityHook.gouge': 'Hedefi kısa süre etkisiz bırakır, böylece yer değiştirebilir ya da sıyrılabilirsin.',
-  'guide.abilityHook.healing_touch': 'Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.',
-  'guide.abilityHook.healing_wave': 'Ana iyileştirmen; kendin ya da bir dostun için doğrudan bir tedavi.',
-  'guide.abilityHook.heroic_strike': 'Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.',
-  'guide.abilityHook.holy_light': 'Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.',
-  'guide.abilityHook.immolate': 'Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.',
+  'guide.abilityHook.gouge':
+    'Hedefi kısa süre etkisiz bırakır, böylece yer değiştirebilir ya da sıyrılabilirsin.',
+  'guide.abilityHook.hamstring':
+    'Hedefin bacaklarını keserek onu yavaşlatır, böylece seni kovalayıp yakalayamaz.',
+  'guide.abilityHook.healing_touch':
+    'Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.',
+  'guide.abilityHook.healing_wave':
+    'Ana iyileştirmen; kendin ya da bir dostun için doğrudan bir tedavi.',
+  'guide.abilityHook.heroic_strike':
+    'Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.',
+  'guide.abilityHook.holy_light':
+    'Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.',
+  'guide.abilityHook.immolate':
+    'Bir hedefi tutuşturur; açılış darbesi ve sonra süren bir yanış verir.',
   'guide.abilityHook.judgement': 'Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.',
-  'guide.abilityHook.lesser_heal': 'Sabit durmaya vakit olduğunda bir dostu doldurmak için istikrarlı bir okuma.',
+  'guide.abilityHook.lesser_heal':
+    'Sabit durmaya vakit olduğunda bir dostu doldurmak için istikrarlı bir okuma.',
   'guide.abilityHook.life_tap': 'Tükendiğinde kendi canının bir kısmını manaya çevirir.',
   'guide.abilityHook.lightning_bolt': 'Menzilli bir Doğa hasarı okuması; uzaktan başvuru becerin.',
-  'guide.abilityHook.lightning_shield': 'Seni yükler, böylece sana vuran saldırganlar Doğa hasarı alır.',
-  'guide.abilityHook.mark_of_the_wild': 'Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.',
+  'guide.abilityHook.lightning_shield':
+    'Seni yükler, böylece sana vuran saldırganlar Doğa hasarı alır.',
+  'guide.abilityHook.mark_of_the_wild':
+    'Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.',
   'guide.abilityHook.mongoose_bite': 'Düşman savuşturduktan hemen sonra açılan bir karşı darbe.',
-  'guide.abilityHook.moonfire': 'Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.',
-  'guide.abilityHook.power_word_fortitude': 'Bir dostun can havuzunu yükseltir, akından önce kullan ve açık tut.',
-  'guide.abilityHook.power_word_shield': 'Bir dostu, darbeler isabet etmeden onları emen bir kalkanla sarar.',
-  'guide.abilityHook.raptor_strike': 'Bir şey aradaki mesafeyi kapattığında kullanılacak sert bir yakın dövüş savruşu.',
-  'guide.abilityHook.rejuvenation': 'Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.',
+  'guide.abilityHook.moonfire':
+    'Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.',
+  'guide.abilityHook.power_word_fortitude':
+    'Bir dostun can havuzunu yükseltir, akından önce kullan ve açık tut.',
+  'guide.abilityHook.power_word_shield':
+    'Bir dostu, darbeler isabet etmeden onları emen bir kalkanla sarar.',
+  'guide.abilityHook.raptor_strike':
+    'Bir şey aradaki mesafeyi kapattığında kullanılacak sert bir yakın dövüş savruşu.',
+  'guide.abilityHook.rejuvenation':
+    'Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.',
   'guide.abilityHook.rend': 'Hedefi zamanla yıpratan bir kanama açar.',
-  'guide.abilityHook.renew': 'Zamanla hasar veren bir iyileştirme; okuyup hareket etmeye devam etmek iyidir.',
-  'guide.abilityHook.rockbiter_weapon': 'Silahını güçlendirir, böylece yakın dövüşte her savruş daha sert iner.',
-  'guide.abilityHook.seal_of_righteousness': 'Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.',
+  'guide.abilityHook.renew':
+    'Zamanla hasar veren bir iyileştirme; okuyup hareket etmeye devam etmek iyidir.',
+  'guide.abilityHook.revenge':
+    'Önündeki her şeye vuran süpürücü bir karşı saldırı; bir darbeyi savuşturmanın hemen ardından daha ucuza gelir.',
+  'guide.abilityHook.rockbiter_weapon':
+    'Silahını güçlendirir, böylece yakın dövüşte her savruş daha sert iner.',
+  'guide.abilityHook.seal_of_righteousness':
+    'Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.',
   'guide.abilityHook.serpent_sting': 'Zamanla doğa hasarı kanatan bir zehir bulaştırır.',
   'guide.abilityHook.shadow_bolt': 'Bir hedefe okuduğun bir gölge oku; başvuru bombasın.',
-  'guide.abilityHook.shadow_word_pain': 'Bir düşmana bir gölge çürümesi yapıştırır, sonra o hasar verirken sen yoluna devam edersin.',
-  'guide.abilityHook.sinister_strike': 'Sonradan harcamak için kombo puanı biriktiren güvenilir darben.',
+  'guide.abilityHook.shadow_word_pain':
+    'Bir düşmana bir gölge çürümesi yapıştırır, sonra o hasar verirken sen yoluna devam edersin.',
+  'guide.abilityHook.sinister_strike':
+    'Sonradan harcamak için kombo puanı biriktiren güvenilir darben.',
   'guide.abilityHook.smite': 'Bir hedefi menzilden eritmek için kutsal bir ok.',
   'guide.abilityHook.summon_imp': 'Düşmanlara menzilden ateş okları fırlatan bir Emberkin çağırır.',
-  'guide.abilityHook.thorns': 'Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir.',
+  'guide.abilityHook.thorns':
+    'Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir.',
   'guide.abilityHook.thunder_clap': 'Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.',
   'guide.abilityHook.wrath': 'Bir hedefe menzilden fırlatılan bir doğa oku; başvuru bomban.',
   'guide.arenaPage.augmentsNote':
@@ -3279,15 +3717,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.powerupsBody':
     'Parlayan küreler de dövüşün ortasında arenaya düşer, kim önce ulaşırsa onun olur. Bilerek abartılıdırlar ve yalnızca kısa bir süre dayanırlar: bir göz kırpımlık göz kamaştırıcı hız için Hız İblisi, hantal bir deve dönüşmek için Devasa, zıplayan, düşük yerçekimli bir sıçrama için Ay Botları, ve ani bir öfke dalgası için Cinnet.',
   'guide.arenaPage.powerupsTitle': 'Ringdeki takviyeler',
-  'guide.arenaPage.waveGoldBody': 'Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.',
+  'guide.arenaPage.waveGoldBody':
+    'Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.',
   'guide.arenaPage.waveGoldTitle': 'Altın',
   'guide.arenaPage.wavePrismaticBody':
     'Son dalga: kurguyu belirleyen, ekran eriten, en güzel anlamda saçma hissettirmesi amaçlanan sıçramalar.',
   'guide.arenaPage.wavePrismaticTitle': 'Prizmatik',
-  'guide.arenaPage.waveSilverBody': 'Açılış dalgası: sınıfının temellerini keskinleştiren temiz, tek istatistikli takviyeler.',
+  'guide.arenaPage.waveSilverBody':
+    'Açılış dalgası: sınıfının temellerini keskinleştiren temiz, tek istatistikli takviyeler.',
   'guide.arenaPage.waveSilverTitle': 'Gümüş',
   'guide.arenaPage.wavesBody':
-    'Bir Fiesta\'nın her raundu sana taze bir seçim sunar, ve maç ilerledikçe seçimler cüretkarlaşır. Bir dalgadan diğerine kurgunu inşa edersin, her seferinde birkaç seçenekten birini seçer ve dövüşün geri kalanı için onu elinde tutarsın.',
+    "Bir Fiesta'nın her raundu sana taze bir seçim sunar, ve maç ilerledikçe seçimler cüretkarlaşır. Bir dalgadan diğerine kurgunu inşa edersin, her seferinde birkaç seçenekten birini seçer ve dövüşün geri kalanı için onu elinde tutarsın.",
   'guide.arenaPage.wavesTitle': 'Güçlendirmeler dalgalar halinde gelir',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Vadiden zirvelere kadar mezarları kirleten ölüm tarikatının cüppeli hizmetkarları. Toplandıkları yerde, ölüler huzur bulmaz.',
@@ -3316,21 +3756,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.heading': 'Sınıfını bul',
   'guide.chooser.intro':
     'Nasıl oynamayı sevdiğine göre filtrele. Her sınıf oynanabilir, bu yüzden bu yalnızca alanı daraltır, onları sıralamaz.',
-  'guide.chooser.none': 'Hiçbir sınıf her filtreye uymuyor. Daha fazlasını görmek için birini temizle.',
+  'guide.chooser.none':
+    'Hiçbir sınıf her filtreye uymuyor. Daha fazlasını görmek için birini temizle.',
   'guide.chooser.resource': 'Kaynak',
   'guide.chooser.results': '{total} içinden {count} gösteriliyor',
   'guide.chooser.role': 'Rol',
   'guide.chooser.style': 'Tarz',
   'guide.classHook.druid':
     'Ayı olarak tank yapan, kedi olarak düşmanları parçalayan ya da göbeğinde iyileştiren bir şekil değiştiren.',
-  'guide.classHook.hunter': 'Yanında sadık bir canavar ve her düşman için bir hilesi olan menzilli bir nişancı.',
-  'guide.classHook.mage': 'Savaş alanını uzaktan kontrol eden ateş, buz ve gizem dokuyan bir büyücü.',
-  'guide.classHook.paladin': 'Dostlarını kalkanlayabilen, yaralarını sarabilen ya da çekici indirebilen kutsal bir savaşçı.',
-  'guide.classHook.priest': 'Işığıyla grubu ayakta tutan ya da gölgesiyle düşmanı yok eden adanmış bir iyileştirici.',
+  'guide.classHook.hunter':
+    'Yanında sadık bir canavar ve her düşman için bir hilesi olan menzilli bir nişancı.',
+  'guide.classHook.mage':
+    'Savaş alanını uzaktan kontrol eden ateş, buz ve gizem dokuyan bir büyücü.',
+  'guide.classHook.paladin':
+    'Dostlarını kalkanlayabilen, yaralarını sarabilen ya da çekici indirebilen kutsal bir savaşçı.',
+  'guide.classHook.priest':
+    'Işığıyla grubu ayakta tutan ya da gölgesiyle düşmanı yok eden adanmış bir iyileştirici.',
   'guide.classHook.rogue': 'Gölgelerden vuran ve asla adil dövüşmeyen, gizlilik ve zehir ustası.',
-  'guide.classHook.shaman': 'Fırtınayı, ateşi ve suyu büken, yıldırımlar arasında dostları iyileştiren bir ruh çağırıcı.',
-  'guide.classHook.warlock': 'İblislere ve lanetlere hükmeden, yıkıcı güç için can takas eden karanlık bir çağırıcı.',
-  'guide.classHook.warrior': 'Aldığı her darbeyi bir sonrakine yakıt çeviren, yılmaz bir ön saf dövüşçüsü.',
+  'guide.classHook.shaman':
+    'Fırtınayı, ateşi ve suyu büken, yıldırımlar arasında dostları iyileştiren bir ruh çağırıcı.',
+  'guide.classHook.warlock':
+    'İblislere ve lanetlere hükmeden, yıkıcı güç için can takas eden karanlık bir çağırıcı.',
+  'guide.classHook.warrior':
+    'Aldığı her darbeyi bir sonrakine yakıt çeviren, yılmaz bir ön saf dövüşçüsü.',
   'guide.classList.heading': 'Dokuz sınıf',
   'guide.classList.sub':
     'Tank yap, iyileştir ya da hasarı ver. Sana seslenen fantaziyi seç, sonra yeteneklerle onu kendine özgü kıl.',
@@ -3343,7 +3791,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bu sınıfın öğrenebileceği her yetenek, açıldığı sırayla. Hangilerinin kurgunu taşıyacağına yetenekler karar verir.',
   'guide.classPage.masteryLabel': 'Ustalık',
   'guide.classPage.petsHeading': 'İblisler',
-  'guide.classPage.petsNote': 'Karabüyücüler yanlarında dövüşmek için iblisler çağırır, her biri farklı bir işe uygundur.',
+  'guide.classPage.petsNote':
+    'Karabüyücüler yanlarında dövüşmek için iblisler çağırır, her biri farklı bir işe uygundur.',
   'guide.classPage.resourceLabel': 'Kaynak',
   'guide.classPage.roleLabel': 'Oynanışı',
   'guide.classPage.specsHeading': 'Uzmanlıklar',
@@ -3369,7 +3818,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.combat.resourcesBody':
     'Savaşçılar dövüşün göbeğinde Öfke biriktirir, hırsızlar istikrarlı geri dönen Enerji harcar ve büyücüler bir Mana havuzunu yönetir. Kaynağını öğrenmek, sınıfını iyi oynamanın yarısıdır.',
   'guide.combat.resourcesTitle': 'Her sınıfın kendi ritmi vardır',
-  'guide.controls.abilities': 'Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)',
+  'guide.controls.abilities':
+    'Eylem çubuğu yeteneklerini kullan (rakam sırası; ikinci bir çubuk sayı tuş takımında yer alır)',
   'guide.controls.actionHeader': 'Aksiyon',
   'guide.controls.arena': 'Arena',
   'guide.controls.controllerBody':
@@ -3381,7 +3831,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': 'Hedefleme ve savaş',
   'guide.controls.groupInterface': 'Arayüz',
   'guide.controls.groupMovement': 'Hareket',
-  'guide.controls.intro': 'Masaüstü için varsayılan tuşlar. Her atama oyunun seçenekler menüsünden değiştirilebilir.',
+  'guide.controls.intro':
+    'Masaüstü için varsayılan tuşlar. Her atama oyunun seçenekler menüsünden değiştirilebilir.',
   'guide.controls.keyHeader': 'Tuş',
   'guide.controls.leaderboard': 'Lider Tablosu',
   'guide.controls.mobileBody':
@@ -3398,7 +3849,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.delvesPage.companionFmt': '{name}, {role}',
   'guide.delvesPage.companionHeading': 'Yoldaşınız',
   'guide.delvesPage.companionLabel': 'Yoldaş',
-  'guide.delvesPage.fromLevel': 'Seviye {n}\'den itibaren',
+  'guide.delvesPage.fromLevel': "Seviye {n}'den itibaren",
   'guide.delvesPage.heading': 'Mağara Seferleri',
   'guide.delvesPage.howBody':
     'Panoyu açmak için bekçiyle konuşun, bir zorluk seçin ve aşağı inin. Her sefer birkaç kısa odayı art arda dizer ve muhafızında sona erer; ödülünüzü almak ve yüzeye dönmek için onu temizleyin. Varsa bir arkadaş getirin, yoksa yoldaşınıza güvenin.',
@@ -3422,7 +3873,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir mağara seferi, yalnızca sizin ve en fazla bir müttefikiniz için oluşturulmuş küçük, kopya alanlı bir zindandır; rahatsız edilemeyeceğiniz özel bir kopya. Onu, dünyada bir mağara seferi bekçisinin tuttuğu bir panodan başlatır, içeri dalar, bir avuç odanın içinden savaşarak iner ve tek bir muhafızda bitirirsiniz. Seferler hızlıdır ve tekrarlanmak için tasarlanmıştır, bu yüzden açık dünya kuruduğunda bir mağara seferi güvenilir bir ilerleme parçasıdır.',
   'guide.delvesPage.whatHeading': 'Mağara seferi nedir',
   'guide.delvesPage.whereBody':
-    'İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi\'nin başlangıç vadisindeki Emanetlik Tepesi\'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir.',
+    "İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi'nin başlangıç vadisindeki Emanetlik Tepesi'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir.",
   'guide.delvesPage.whereHeading': 'Nerede bulunur',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
@@ -3440,20 +3891,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelAround': 'Seviye {n} civarı',
   'guide.dungeonsPage.levelBand': 'Seviye {min} - {max}',
   'guide.dungeonsPage.levelExact': 'Seviye {n}',
-  'guide.dungeonsPage.party': 'Zindanlar beş kişilik bir grup için tasarlanmıştır. Son oyun akını ise on kişiliktir.',
+  'guide.dungeonsPage.party':
+    'Zindanlar beş kişilik bir grup için tasarlanmıştır. Son oyun akını ise on kişiliktir.',
   'guide.dungeonsPage.partySize': '{n} oyuncu',
   'guide.dungeonsPage.raidBody':
     'Mühürlü bir kraliyet kapısının ardında on oyunculu bir sınav bekler: çok aşamalı bir savaş ve tüm akının birlikte durdurması gereken, ölümsüz bir güç. İçeri girme hakkını kazanın, sonra dokuz arkadaşınızı getirin.',
   'guide.dungeonsPage.raidName': 'Son oyun akını',
   'guide.dungeonsPage.raidSize': 'On oyuncu, seviye {n}',
-  'guide.dungeonsPage.sanctumBody': 'Tarikatın uzun emeğinin korkunç doruğuna ulaştığı, Dikenzirve\'nin karanlık kalbi.',
+  'guide.dungeonsPage.sanctumBody':
+    "Tarikatın uzun emeğinin korkunç doruğuna ulaştığı, Dikenzirve'nin karanlık kalbi.",
   'guide.dungeonsPage.sanctumName': 'Mezarejderi Mabedi',
   'guide.dungeonsPage.soloLead':
     'Her zindan tek başına tamamlanabilen bir giriş göreviyle açılır, böylece içeri neden girdiğinizi her zaman bilirsiniz.',
   'guide.dungeonsPage.templeBody':
     'Zirvelerin yükseklerinde, ışıldayan bir göletin altına gömülmüş, soğuk ışıktan bir geçitle ulaşılan ay ışığıyla aydınlanmış bir tapınak. Boğulmuş bir tarikat çürümüş cüppeleriyle hâlâ orada aşağıda şarkı söylüyor ve kıyıya kazınmış uyarılar, aşağıdaki bir şeyin yalnızca uyuduğunu söylüyor. Meraklılar ve iyi hazırlananlar için, ana hikâyeden ayrı duran, kendi içinde bir gizem.',
   'guide.dungeonsPage.templeLoreBody':
-    'Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl\'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro\'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.',
+    "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
   'guide.dungeonsPage.templeLoreTitle': 'Boğulmuş Tapınak, biraz daha derinde',
   'guide.dungeonsPage.templeName': 'Boğulmuş Tapınak',
   'guide.economy.buyingBody':
@@ -3468,11 +3921,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İşinize yaramayan ganimetler yine de herhangi bir satıcıya satılır, bu yüzden çantalarınızın dolmasına izin vermek yerine kasabadan her geçtiğinizde onları boşaltın. Gerçekten değersiz öteberi yer açmak için doğrudan atılabilir de.',
   'guide.economy.junkTitle': 'Hurdaları temizleme',
   'guide.economy.marketBody':
-    'Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı\'nı işletir. Açmak için Tüccar\'la konuşun. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.',
+    "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Tüccar'la konuşun. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
   'guide.economy.marketBrowse':
     'Göz atma: satışta neyin olduğunu bulmak için ilanları kaydırın ya da isme göre arayın. Her ilan malları, satıcıyı ve tüm yığın için istenen fiyatı gösterir.',
   'guide.economy.marketCollect':
-    'Toplama: mallarınız satıldığında, geliriniz Tüccar\'da sizi bekler. Satılmadan geri gelen her şeyle birlikte altını toplamak için geri dönün. Tüccar tamamlanan her satıştan küçük bir pay alır.',
+    "Toplama: mallarınız satıldığında, geliriniz Tüccar'da sizi bekler. Satılmadan geri gelen her şeyle birlikte altını toplamak için geri dönün. Tüccar tamamlanan her satıştan küçük bir pay alır.",
   'guide.economy.marketPost':
     'İlan verme: çantalarınızdan bir yığın seçin, fiyatınızı belirleyin ve listeleyin. Mallar biri satın alana dek Tüccar tarafından tutulur. Satılmayan ilanlar bir süre sonra size geri döner ve fikrinizi değiştirirseniz birini erkenden geri alabilirsiniz.',
   'guide.economy.marketPricing':
@@ -3490,26 +3943,34 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     'Kurtlardan ve yaban domuzlarından onları avlayan şeylere kadar, ormanın ve kırın vahşi hayvanları. Avcılar bunların çoğunu evcilleştirebilir.',
   'guide.family.beast.name': 'Canavarlar',
-  'guide.family.dragonkin.desc': 'Eski derinliklerin pullu, yılansı yaratıkları. Nadir, mağrur ve göründüklerinden çok daha güçlü.',
+  'guide.family.dragonkin.desc':
+    'Eski derinliklerin pullu, yılansı yaratıkları. Nadir, mağrur ve göründüklerinden çok daha güçlü.',
   'guide.family.dragonkin.name': 'Ejder Soyu',
-  'guide.family.elemental.desc': 'Elementlerin güçlü estiği vahşi yerlere bağlı, canlı fırtına ve taş.',
+  'guide.family.elemental.desc':
+    'Elementlerin güçlü estiği vahşi yerlere bağlı, canlı fırtına ve taş.',
   'guide.family.elemental.name': 'Elementaller',
-  'guide.family.humanoid.desc': 'Haydutlar, tarikatçılar ve yanlış işe bulaşmış diğerleri. Sadece dişle değil, taktikle savaşırlar.',
+  'guide.family.humanoid.desc':
+    'Haydutlar, tarikatçılar ve yanlış işe bulaşmış diğerleri. Sadece dişle değil, taktikle savaşırlar.',
   'guide.family.humanoid.name': 'İnsansılar',
-  'guide.family.burrower.desc': 'Madenleri ve oyukları istila eden, cevherlerini hırsla koruyan toprağa bulanmış kazıcılar.',
+  'guide.family.burrower.desc':
+    'Madenleri ve oyukları istila eden, cevherlerini hırsla koruyan toprağa bulanmış kazıcılar.',
   'guide.family.burrower.name': 'Oyucular',
-  'guide.family.mudfin.desc': 'Sığ suları gürültülü, bölgeci sürüler hâlinde saran amfibik bataklık sakinleri.',
+  'guide.family.mudfin.desc':
+    'Sığ suları gürültülü, bölgeci sürüler hâlinde saran amfibik bataklık sakinleri.',
   'guide.family.mudfin.name': 'Mudfinler',
-  'guide.family.ogre.desc': 'Devasa, kıt akıllı ve tehlikeli. Yüksek geçitlere konaklar ve bir heyelan gibi vururlar.',
+  'guide.family.ogre.desc':
+    'Devasa, kıt akıllı ve tehlikeli. Yüksek geçitlere konaklar ve bir heyelan gibi vururlar.',
   'guide.family.ogre.name': 'Devler',
   'guide.family.spider.desc':
     'Karanlık, çapraşık yerlerde yuvalanan ağ örücüler ve zehirli pusucular. Avcılar onları, tıpkı yabani hayvanlar gibi evcilleştirebilir.',
   'guide.family.spider.name': 'Örümcekler',
   'guide.family.troll.desc': 'Bataklığın sazlıklarında inini kuran iri kıyım vahşiler.',
   'guide.family.troll.name': 'Troller',
-  'guide.family.undead.desc': 'Daha karanlık ellerce diriltilmiş huzursuz ölüler. Yorulmaz ve kaçmazlar.',
+  'guide.family.undead.desc':
+    'Daha karanlık ellerce diriltilmiş huzursuz ölüler. Yorulmaz ve kaçmazlar.',
   'guide.family.undead.name': 'Hortlaklar',
-  'guide.faqPage.a1': 'Evet. Oyunun tamamı seviye sınırına kadar ücretsiz oynanabilir ve kaynak kodu GitHub\'da açıktır.',
+  'guide.faqPage.a1':
+    "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz oynanabilir ve kaynak kodu GitHub'da açıktır.",
   'guide.faqPage.a10':
     'Sınır seviye {cap}. Oradan itibaren beş oyunculu zindanları ve on oyunculu akını koşar, daha iyi teçhizatın peşinden gider ve kendinizi arenada sınarsınız.',
   'guide.faqPage.a11':
@@ -3522,12 +3983,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Evet. Anında bir tek oyunculu çevrimdışı mod vardır ve çevrimiçi dünya, zindanlar ile akın dışında tamamen tek başına oynanabilir.',
   'guide.faqPage.a5':
     'Dokuz; klasik tank, şifacı ve hasar rollerini kapsar, her biri bir kaynak sistemine (öfke, mana ya da enerji) ve kendi imza yeteneklerine sahiptir.',
-  'guide.faqPage.a6': 'Görevler, zindanlar ve keşiflerle dolu, birbirine bağlı üç bölgede ulaşılan seviye {cap}.',
+  'guide.faqPage.a6':
+    'Görevler, zindanlar ve keşiflerle dolu, birbirine bağlı üç bölgede ulaşılan seviye {cap}.',
   'guide.faqPage.a7':
     'Çevrimiçi karakterler sunucuda otomatik olarak kaydedilir. Çevrimdışı karakterler hızlı oturumlar ve testler için tarayıcınızda yaşar.',
-  'guide.faqPage.a8': 'Evet. Proje açık kaynaklıdır, böylece kendi sunucunuzu çalıştırabilirsiniz. GitHub deposuna bakın.',
+  'guide.faqPage.a8':
+    'Evet. Proje açık kaynaklıdır, böylece kendi sunucunuzu çalıştırabilirsiniz. GitHub deposuna bakın.',
   'guide.faqPage.a9':
-    'Evet. Eğlence için herkese düello açın ya da diğer oyuncularla savaşmak için Küllü Kolezyum\'a adım atın. PvP isteğe bağlıdır, dolayısıyla asla zorlanmazsınız.',
+    "Evet. Eğlence için herkese düello açın ya da diğer oyuncularla savaşmak için Küllü Kolezyum'a adım atın. PvP isteğe bağlıdır, dolayısıyla asla zorlanmazsınız.",
   'guide.faqPage.intro': 'Yeni oyuncuların en sık sorduğu sorular.',
   'guide.faqPage.q1': 'Gerçekten ücretsiz mi?',
   'guide.faqPage.q10': 'Azami seviyede yapılacak ne var?',
@@ -3542,9 +4005,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q9': 'PvP var mı?',
   'guide.footer.blurb':
     'Açık kaynaklı, klasik tarzda bir mikro MMO. Görev yapın, gruplaşın ve elle yapılmış bir dünyayı, tam da tarayıcınızda keşfedin.',
-  'guide.footer.communityWiki': 'Topluluk Wiki\'si',
-  'guide.footer.discord': 'Discord\'a Katıl',
-  'guide.footer.github': 'GitHub\'daki Kaynak',
+  'guide.footer.communityWiki': "Topluluk Wiki'si",
+  'guide.footer.discord': "Discord'a Katıl",
+  'guide.footer.github': "GitHub'daki Kaynak",
   'guide.footer.playNow': 'Şimdi Oyna',
   'guide.footer.rights': 'World of ClaudeCraft',
   'guide.gear.consumablesElixirs':
@@ -3609,7 +4072,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.upgradeBody':
     'Eski bir parçayı taze bir yükseltmeyle değiştirmek, geride bıraktığınız teçhizatla kusursuz oynamaktan size daha çok şey kazandırır. Daha iyi bir şey düştüğünde ya da bir görev onu sunduğunda, alın. İyi eşyalarınızı sonraya saklamayın.',
   'guide.gear.upgradeTitle': 'Teçhizatınızı güncel tutun',
-  'guide.glossary.aggroDef': 'Bir düşmanın dikkati. En çok tehdit üreten oyuncu aggro\'yu tutar ve saldırıya uğrar.',
+  'guide.glossary.aggroDef':
+    "Bir düşmanın dikkati. En çok tehdit üreten oyuncu aggro'yu tutar ve saldırıya uğrar.",
   'guide.glossary.aggroTerm': 'Aggro',
   'guide.glossary.augmentDef':
     'İkiye iki bir Fiesta arena maçı sırasında seçtiğiniz, kurgunuzu yalnızca o maç için yeniden şekillendiren geçici bir güçlendirme.',
@@ -3617,9 +4081,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.buffDef':
     'Üzerinizdeki ya da bir müttefikinizdeki yardımcı bir etki; bir süreliğine bir niteliği yükselten bir kutsama gibi.',
   'guide.glossary.buffTerm': 'Takviye',
-  'guide.glossary.ccDef': 'Bir düşmanı bir an için sersemleten, köklendiren ya da başka türlü savaş dışı bırakan yetenekler.',
+  'guide.glossary.ccDef':
+    'Bir düşmanı bir an için sersemleten, köklendiren ya da başka türlü savaş dışı bırakan yetenekler.',
   'guide.glossary.ccTerm': 'Kalabalık kontrolü',
-  'guide.glossary.debuffDef': 'Bir hedef üzerindeki zararlı bir etki; bir yavaşlatma, bir kanama ya da zayıflatılmış zırh gibi.',
+  'guide.glossary.debuffDef':
+    'Bir hedef üzerindeki zararlı bir etki; bir yavaşlatma, bir kanama ya da zayıflatılmış zırh gibi.',
   'guide.glossary.debuffTerm': 'Zayıflatma',
   'guide.glossary.delveDef':
     'Bir ya da iki oyuncu için, yanınızda bir yoldaşla bir bekçinin panosundan yürütülen, kısa, tekrar oynanabilen, kopya alanlı bir iniş.',
@@ -3638,22 +4104,28 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.gcdTerm': 'Genel bekleme süresi',
   'guide.glossary.healerDef': 'Herkesi iyileştirme büyüleriyle hayatta tutan grup üyesi.',
   'guide.glossary.healerTerm': 'İyileştirici',
-  'guide.glossary.instanceDef': 'Bir zindanın ya da akının yalnızca senin grubun için oluşturulmuş özel bir kopyası.',
+  'guide.glossary.instanceDef':
+    'Bir zindanın ya da akının yalnızca senin grubun için oluşturulmuş özel bir kopyası.',
   'guide.glossary.instanceTerm': 'Kopya alan',
-  'guide.glossary.intro': 'Bu rehber boyunca ve sohbette kullanılan terimler için hızlı bir başvuru.',
-  'guide.glossary.mobDef': 'Dünyadaki, dost ya da düşman, bilgisayar denetimli her yaratık. "Mobile" sözcüğünün kısaltması.',
+  'guide.glossary.intro':
+    'Bu rehber boyunca ve sohbette kullanılan terimler için hızlı bir başvuru.',
+  'guide.glossary.mobDef':
+    'Dünyadaki, dost ya da düşman, bilgisayar denetimli her yaratık. "Mobile" sözcüğünün kısaltması.',
   'guide.glossary.mobTerm': 'Yaratık (Mob)',
   'guide.glossary.procDef':
     'Şansa bağlı olarak başka bir şeyi tetikleyen etki; örneğin saldırırken zaman zaman devreye giren bir bonus.',
   'guide.glossary.procTerm': 'Proc',
-  'guide.glossary.pullDef': 'Bir düşmanı ya da grubu savaşa çekmek; genellikle bilerek ve birer birer.',
+  'guide.glossary.pullDef':
+    'Bir düşmanı ya da grubu savaşa çekmek; genellikle bilerek ve birer birer.',
   'guide.glossary.pullTerm': 'Çekme (Pull)',
   'guide.glossary.raidDef':
     'En çetin son oyun karşılaşması için kurulan, burada en fazla on oyuncudan oluşan daha büyük bir grup; bir grup dolduğunda birine dönüşür.',
   'guide.glossary.raidTerm': 'Akın',
-  'guide.glossary.rareDef': 'Bir bölgede dolaşan ve daha iyi ganimet düşüren, az rastlanır adlı düşman.',
+  'guide.glossary.rareDef':
+    'Bir bölgede dolaşan ve daha iyi ganimet düşüren, az rastlanır adlı düşman.',
   'guide.glossary.rareTerm': 'Nadir (Rare)',
-  'guide.glossary.specDef': 'Uzmanlık: yetenek puanı harcadıkça sınıfını iyileştirme ya da hasar gibi bir yöne eğdiğin yol.',
+  'guide.glossary.specDef':
+    'Uzmanlık: yetenek puanı harcadıkça sınıfını iyileştirme ya da hasar gibi bir yöne eğdiğin yol.',
   'guide.glossary.specTerm': 'Uzmanlık (Spec)',
   'guide.glossary.tankDef':
     'Düşman ilgisini üzerinde tutan ve hasarı soğuran, böylece diğerlerinin güvenle savaşmasını sağlayan grup üyesi.',
@@ -3667,34 +4139,43 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.home.classes.cta': 'Sınıfları keşfet',
   'guide.home.classes.heading': 'Sınıfını seç',
   'guide.home.classes.sub': 'Dokuz klasik arketip, her biri kendine özgü bir his ve grup rolüyle.',
-  'guide.home.community.body': 'Hemen katıl ya da bir merhaba demeye gel. Dünya, arkadaşlarla daha güzel.',
-  'guide.home.community.discord': 'Discord\'a katıl',
-  'guide.home.community.github': 'GitHub\'da yıldız ver',
+  'guide.home.community.body':
+    'Hemen katıl ya da bir merhaba demeye gel. Dünya, arkadaşlarla daha güzel.',
+  'guide.home.community.discord': "Discord'a katıl",
+  'guide.home.community.github': "GitHub'da yıldız ver",
   'guide.home.community.heading': 'Dünyaya katıl',
   'guide.home.community.play': 'Şimdi Oyna',
   'guide.home.ctaLearn': 'Nasıl Oynanır',
   'guide.home.ctaPlay': 'Şimdi Oyna',
-  'guide.home.eyebrow': 'Klasik tarz tarayıcı MMO\'su',
-  'guide.home.faq.a1': 'Evet. Oyunun tamamı seviye sınırına kadar ücretsiz ve GitHub\'da açık kaynak.',
+  'guide.home.eyebrow': "Klasik tarz tarayıcı MMO'su",
+  'guide.home.faq.a1':
+    "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz ve GitHub'da açık kaynak.",
   'guide.home.faq.a2':
     'Hayır. Oyun, cüzdan olmadan da tümüyle oynanabilir. İsteğe bağlı topluluk jetonu yalnızca görsel süsler açar ve gücü asla etkilemez.',
-  'guide.home.faq.a3': 'Evet. Tarayıcında anında başlayan bir tek oyunculu mod, ayrıca paylaşılan çevrim içi dünya var.',
-  'guide.home.faq.a4': 'Sınır, üç bölge boyunca görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir.',
+  'guide.home.faq.a3':
+    'Evet. Tarayıcında anında başlayan bir tek oyunculu mod, ayrıca paylaşılan çevrim içi dünya var.',
+  'guide.home.faq.a4':
+    'Sınır, üç bölge boyunca görevler, zindanlar ve keşifle ulaşılan {cap}. seviyedir.',
   'guide.home.faq.heading': 'Bilmekte fayda var',
   'guide.home.faq.q1': 'Ücretsiz mi oynanıyor?',
   'guide.home.faq.q2': 'Kripto cüzdanına ihtiyacım var mı?',
   'guide.home.faq.q3': 'Çevrim dışı oynayabilir miyim?',
   'guide.home.faq.q4': 'Azami seviyeye ulaşmak ne kadar sürer?',
-  'guide.home.group.arenaBody': 'Kül Koliseumu\'na adım at ve kendini başka oyunculara karşı kanıtla.',
+  'guide.home.group.arenaBody':
+    "Kül Koliseumu'na adım at ve kendini başka oyunculara karşı kanıtla.",
   'guide.home.group.arenaTitle': 'Arena',
   'guide.home.group.cta': 'Zindanlar ve Akınlar',
-  'guide.home.group.dungeonsBody': 'Beş kişilik bir grup için, çevresindeki bölgelere göre ölçeklenen kopya alan dalışları.',
+  'guide.home.group.dungeonsBody':
+    'Beş kişilik bir grup için, çevresindeki bölgelere göre ölçeklenen kopya alan dalışları.',
   'guide.home.group.dungeonsTitle': 'Zindanlar',
   'guide.home.group.heading': 'Zorlu kısımlar için grup kur',
-  'guide.home.group.raidBody': 'Dünyanın zirvesine ulaşanlar için on oyunculu bir doruk meydan okuması.',
+  'guide.home.group.raidBody':
+    'Dünyanın zirvesine ulaşanlar için on oyunculu bir doruk meydan okuması.',
   'guide.home.group.raidTitle': 'Akın',
-  'guide.home.group.sub': 'Dünya tek başına aşılabilir, ama en iyi ganimet iyi bir grubun ardında bekler.',
-  'guide.home.subtitle': 'Görev yap, grup kur ve elle kurulmuş bir dünyayı keşfet; tarayıcında ücretsiz.',
+  'guide.home.group.sub':
+    'Dünya tek başına aşılabilir, ama en iyi ganimet iyi bir grubun ardında bekler.',
+  'guide.home.subtitle':
+    'Görev yap, grup kur ve elle kurulmuş bir dünyayı keşfet; tarayıcında ücretsiz.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Klasik bir MMO, hemen başlanacak biçimde',
   'guide.home.what.pillarClassesBody':
@@ -3709,9 +4190,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.cta': 'Dünyayı gör',
   'guide.home.world.heading': 'Dünyayı keşfet',
   'guide.home.world.levels': 'Seviye {min} - {max}',
-  'guide.home.world.marshBlurb': 'Batık bataklıklar ve dalgaların aşındırdığı harabeler; Mudfinlerin ve daha beterlerinin yurdu.',
+  'guide.home.world.marshBlurb':
+    'Batık bataklıklar ve dalgaların aşındırdığı harabeler; Mudfinlerin ve daha beterlerinin yurdu.',
   'guide.home.world.marshName': 'Mirefen Bataklığı',
-  'guide.home.world.peaksBlurb': 'Rüzgârın kavurduğu, diyarın en soğuk tehlikelerine doğru yükselen sırtlar.',
+  'guide.home.world.peaksBlurb':
+    'Rüzgârın kavurduğu, diyarın en soğuk tehlikelerine doğru yükselen sırtlar.',
   'guide.home.world.peaksName': 'Dikenzirve Tepeleri',
   'guide.home.world.sub': 'Tek bir kesintisiz toprak, üç bölge; sakin vadilerden donmuş zirvelere.',
   'guide.home.world.valeBlurb': 'Her maceranın başladığı yeşil tepeler ve eski ormanlar.',
@@ -3725,7 +4208,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.groupingBody':
     'Görev hakkını paylaşmak ve zindanlara girişmek için başkalarını gruba davet et. Dünyanın çoğu tek başına aşılabilir, yani gruplaşmak bir zorunluluk değil, bir tercihtir.',
   'guide.howToPlay.groupingTitle': 'Birlikte oynamak',
-  'guide.howToPlay.intro': 'Bu tür oyunlara yeni misin? Dakikalar içinde görev yapıyor olacaksın. İşte adım adım kısa anlatım.',
+  'guide.howToPlay.intro':
+    'Bu tür oyunlara yeni misin? Dakikalar içinde görev yapıyor olacaksın. İşte adım adım kısa anlatım.',
   'guide.howToPlay.onlineBody':
     'Herkesle birlikte paylaşılan çevrim içi dünyada oyna ya da ipuçlarını öğrenmek için tarayıcında anında bir çevrim dışı dünya başlat.',
   'guide.howToPlay.onlineTitle': 'Çevrim içi ya da çevrim dışı',
@@ -3747,9 +4231,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'W, A, S, D ile hareket et. Etrafına bakmak için sağ fare tuşunu basılı tut ve sürükle. Aşağı yukarı hepsi bu kadar.',
   'guide.howToPlay.step3Title': 'Hareket et ve etrafına bak',
   'guide.howToPlay.step4Body':
-    'En yakın düşmanı hedeflemek için Tab\'a bas, sonra saldırmak için çubuktaki yeteneklerine (1\'den 0\'a kadar tuşlar) bas.',
+    "En yakın düşmanı hedeflemek için Tab'a bas, sonra saldırmak için çubuktaki yeteneklerine (1'den 0'a kadar tuşlar) bas.",
   'guide.howToPlay.step4Title': 'Bir şeyle dövüş',
-  'guide.howToPlay.step5Body': 'Amacı tamamla, görev verene dön (haritandaki işareti ara) ve ödülünü topla.',
+  'guide.howToPlay.step5Body':
+    'Amacı tamamla, görev verene dön (haritandaki işareti ara) ve ödülünü topla.',
   'guide.howToPlay.step5Title': 'Görevi teslim et',
   'guide.howToPlay.step6Body':
     'Az önce 2. seviyeye ulaştın. Kasabadan çıkan görev izini takip et ve dünya oradan itibaren açılsın.',
@@ -3761,13 +4246,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.language.select': 'Bir dil seç',
   'guide.loading': 'Yükleniyor...',
   'guide.lore.aldricBody':
-    'Önce Doğudere\'de kirletilmiş bir mezar başında tarikatı adlandıran, sonra onun izini bizzat bataklık boyunca ve Yüksetnöbet\'teki surlara dek süren mütevazı bir köy rahibi. Tüm seferin sağlam yüreğidir.',
-  'guide.lore.aldricRole': 'Vadi\'nin Rahibi',
-  'guide.lore.figuresBody': 'Bir avuç insan tüm yolu seninle birlikte yürür. Vadiden zirvelere bu adlara dikkat et.',
+    "Önce Doğudere'de kirletilmiş bir mezar başında tarikatı adlandıran, sonra onun izini bizzat bataklık boyunca ve Yüksetnöbet'teki surlara dek süren mütevazı bir köy rahibi. Tüm seferin sağlam yüreğidir.",
+  'guide.lore.aldricRole': "Vadi'nin Rahibi",
+  'guide.lore.figuresBody':
+    'Bir avuç insan tüm yolu seninle birlikte yürür. Vadiden zirvelere bu adlara dikkat et.',
   'guide.lore.figuresTitle': 'Tanışacağın yüzler',
   'guide.lore.marenBody':
-    'Mirefen\'in sazlıklarında karşılaştığın, az konuşan bir iz sürücü; tamamı sessiz adımlar ve kısa bir bıçak. O da izi kuzeye doğru takip eder ve seni zirvelere gönderen sözleri yakalayan onun kulağıdır.',
-  'guide.lore.marenRole': 'Mareşal\'in İzcisi',
+    "Mirefen'in sazlıklarında karşılaştığın, az konuşan bir iz sürücü; tamamı sessiz adımlar ve kısa bir bıçak. O da izi kuzeye doğru takip eder ve seni zirvelere gönderen sözleri yakalayan onun kulağıdır.",
+  'guide.lore.marenRole': "Mareşal'in İzcisi",
   'guide.models.count': '{count} model',
   'guide.models.groupClasses': 'Sınıflar',
   'guide.models.groupCreatures': 'Yaratıklar',
@@ -3816,13 +4302,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.petHook.warfiend':
     'Dayanıklı bir yakın dövüş kabadayısı; onu çağırabildiğin andan itibaren her işe yarayan bir yoldaş.',
   'guide.petHook.spellhound': 'Düşman büyücülerin peşine düşen bir gölge akıncısı.',
-  'guide.petHook.emberkin': 'Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.',
-  'guide.petHook.pyre_colossus': 'Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır.',
-  'guide.petHook.duskborn': 'Sert vuran ama baskı altında çabuk dağılan hızlı bir yakın dövüş iblisi.',
-  'guide.petHook.gloomshade': 'Kışkırtıp darbeleri üzerine çeken sağlam bir iblis, böylece rahatça büyü yapabilirsin.',
+  'guide.petHook.emberkin':
+    'Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.',
+  'guide.petHook.pyre_colossus':
+    'Ezici yakın dövüşüyle iri yarı bir devasa güç, çiğ kuvvet için çağrılır.',
+  'guide.petHook.duskborn':
+    'Sert vuran ama baskı altında çabuk dağılan hızlı bir yakın dövüş iblisi.',
+  'guide.petHook.gloomshade':
+    'Kışkırtıp darbeleri üzerine çeken sağlam bir iblis, böylece rahatça büyü yapabilirsin.',
   'guide.placeholder.note': 'Rehberin bu bölümü yolda, yakında geliyor.',
   'guide.progression.bandLabel': 'Seviye {min} ile {max} arası',
-  'guide.progression.capBody': 'Her seviye seni daha güçlü kılar ve yeni yetenekler getirir, ta ki seviye {cap} olan tavana kadar.',
+  'guide.progression.capBody':
+    'Her seviye seni daha güçlü kılar ve yeni yetenekler getirir, ta ki seviye {cap} olan tavana kadar.',
   'guide.progression.capJourneyBody':
     'Seviye {cap} tavandır, seviye atlamanın sonu ama gelişmenin değil. Oradan itibaren zindanları ve akını koşar, daha iyi teçhizatın peşine düşer ve kendini arenada sınarsın.',
   'guide.progression.capTitle': 'Seviye {cap} seviyesine ulaşmak',
@@ -3842,10 +4333,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Tecrübeyi görevleri tamamlayarak ve düşmanları yenerek kazanırsın. Görevler açık ara en çoğunu verir, bu yüzden görev izini takip etmek tırmanmanın en hızlı yoludur. Yol boyunca bir şeyler öldürmek geri kalanı tamamlar.',
   'guide.progression.xpTitle': 'Tecrübeyi nasıl kazanırsın',
   'guide.questsPage.acceptBody':
-    'Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. İlk görevin, Doğudere\'deki Mareşal Redbrook\'tan alacağın Kapıdaki Kurtlar\'dır.',
+    "Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. İlk görevin, Doğudere'deki Mareşal Redbrook'tan alacağın Kapıdaki Kurtlar'dır.",
   'guide.questsPage.acceptTitle': 'Bulmak ve kabul etmek',
   'guide.questsPage.heading': 'Görevler',
-  'guide.questsPage.intro': 'Görevler dünyanın kalbidir ve seviye atlamanın en hızlı yoludur. İşte nasıl işledikleri.',
+  'guide.questsPage.intro':
+    'Görevler dünyanın kalbidir ve seviye atlamanın en hızlı yoludur. İşte nasıl işledikleri.',
   'guide.questsPage.objectivesBody':
     'Belirli düşmanları öldür, eşyalar topla ya da dünyadaki bir şeyle etkileşime gir. Ekrandaki takipçi sen ilerledikçe ilerlemeni sayar. Fikrini değiştirirsen, bir görevi görev günlüğünden bırakabilir ve daha sonra onu veren kişiden tekrar alabilirsin.',
   'guide.questsPage.objectivesTitle': 'Hedefler',
@@ -3855,14 +4347,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaBody':
     'Ana hikaye tek bir uzun kovalamacadır. Bir ölüm tarikatı diyarın mezarları üzerinde çalışıyor ve kapattığın her bölüm seni yolda bir bölge daha yukarı işaret eder. Komployla bir anda baştan başa savaşmazsın; bir ipliği çekersin, o da seni onu tutan bir sonraki ele götürür.',
   'guide.questsPage.sagaMarshBody':
-    'Mirefen\'de boğulmalar tesadüf değil. Biri bataklığı bir öşür kutusu gibi dolduruyor, suyun aldığı her yolcudan itaatkâr ölüler diriltiyor. Emirleri zincirde yukarı, boğulmuş kaledeki bir Fogbinder\'a kadar takip et; onun son sözleri zirvelerin altında kıpırdanan, daha da kadim bir şeyin adını verir.',
+    "Mirefen'de boğulmalar tesadüf değil. Biri bataklığı bir öşür kutusu gibi dolduruyor, suyun aldığı her yolcudan itaatkâr ölüler diriltiyor. Emirleri zincirde yukarı, boğulmuş kaledeki bir Fogbinder'a kadar takip et; onun son sözleri zirvelerin altında kıpırdanan, daha da kadim bir şeyin adını verir.",
   'guide.questsPage.sagaMarshTitle': 'Bataklık: ruhlardan bir öşür',
   'guide.questsPage.sagaPeaksBody':
-    'Thornpeak\'te bütün düzen açığa çıkar. Vale\'den beri çalınan her ruh, dağın kalbindeki kültün kasvetli işine dökülen bir öşürdü. Bir şapel avlusunda başlayan iz burada, tüm bunların ardındaki eli karşılamak için beş oyunculu bir inişte son bulur. En dipte kimin beklediğini öğrenmeyi sana bırakacağız.',
+    "Thornpeak'te bütün düzen açığa çıkar. Vale'den beri çalınan her ruh, dağın kalbindeki kültün kasvetli işine dökülen bir öşürdü. Bir şapel avlusunda başlayan iz burada, tüm bunların ardındaki eli karşılamak için beş oyunculu bir inişte son bulur. En dipte kimin beklediğini öğrenmeyi sana bırakacağız.",
   'guide.questsPage.sagaPeaksTitle': 'Zirveler: öşür ne içindi',
   'guide.questsPage.sagaTitle': 'İzi kuzeye doğru takip et',
   'guide.questsPage.sagaValeBody':
-    'Doğudere\'de ölüler huzur bulmuyor ve bunun ardındaki damga, çoktan yok olduğu sanılan bir mezhebe ait. İzi şapel mahzeninde çalışan bir Mezar Çağırıcı\'ya kadar sür, onun kendi evrakları seni kuzeydeki bataklığa yönlendirir.',
+    "Doğudere'de ölüler huzur bulmuyor ve bunun ardındaki damga, çoktan yok olduğu sanılan bir mezhebe ait. İzi şapel mahzeninde çalışan bir Mezar Çağırıcı'ya kadar sür, onun kendi evrakları seni kuzeydeki bataklığa yönlendirir.",
   'guide.questsPage.sagaValeTitle': 'Vadi: bir mühürdeki isim',
   'guide.questsPage.sideCryptBody':
     'Zirvelerin yükseğinde daha sessiz bir gizem uzanır: hiçbir kaydın hatırlamadığı bir taçla işaretlenmiş eski mezarlar. Ölüleri oku, korudukları şeyi topla ve kapalı kalması gereken bir mezarın mührünü aç. Bu, diyarın on oyunculu son oyun akınına giden yolu açan bir dedektif izidir.',
@@ -3872,12 +4364,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sideTempleTitle': 'Boğulmuş tapınak',
   'guide.questsPage.sideTitle': 'Ana yoldan ayrılan iplikler',
   'guide.questsPage.sideWardenBody':
-    'Hikayenin yanı sıra, Vale\'nin ve bataklığın muhafızları ve bekçileri sürekli bir ödül merdiveni dağıtır. Senden önceki her ödül avcısının yerini kazandığı gibi, düşman düşman üstüne tırmanarak ilerle. Bu dürüst bir seviye atlama ve her bölgenin en azılı baş belalarının bir turudur.',
+    "Hikayenin yanı sıra, Vale'nin ve bataklığın muhafızları ve bekçileri sürekli bir ödül merdiveni dağıtır. Senden önceki her ödül avcısının yerini kazandığı gibi, düşman düşman üstüne tırmanarak ilerle. Bu dürüst bir seviye atlama ve her bölgenin en azılı baş belalarının bir turudur.",
   'guide.questsPage.sideWardenTitle': 'İsmini kazanmak',
   'guide.questsPage.soloNote':
     'Ana hikaye, her bölümün finaline kadar tamamen tek başına yapılabilir; o final ise beş oyunculu bir zindandır.',
   'guide.questsPage.storyBody':
-    'Doğudere\'deki ilk küçük işlerinden itibaren, ölülerde bir terslik var. Bir tarikat iş başında ve iz her bölgeden geçerek kuzeye götürür. Ardında kimin durduğunu öğrenmek için onu takip et.',
+    "Doğudere'deki ilk küçük işlerinden itibaren, ölülerde bir terslik var. Bir tarikat iş başında ve iz her bölgeden geçerek kuzeye götürür. Ardında kimin durduğunu öğrenmek için onu takip et.",
   'guide.questsPage.storyTitle': 'Hepsinin içinden geçen bir iplik',
   'guide.questsPage.turninBody':
     'Tamamlanmış bir görevi teslim işaretçisine götür, harita sana nereyi göstereceğini söyler; tecrübe, para ve çoğu zaman sınıfına uygun seçilmiş bir teçhizat parçası için. Bu genellikle görevi sana veren kişidir, ama bazı görevler seni başka birine yönlendirir.',
@@ -3923,24 +4415,27 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.skipToContent': 'Ana içeriğe geç',
   'guide.social.chanGeneral': 'Genel.',
   'guide.social.chanGeneralBody':
-    'Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group\'un aksine, asla katılmayı seçmek zorunda değilsin.',
+    "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
   'guide.social.chanGuild': 'Lonca ve Subay.',
-  'guide.social.chanGuildBody': 'Loncan için kanallar. Lonca sohbeti her üyeye ulaşır; subay kanalı yalnızca subaylar içindir.',
+  'guide.social.chanGuildBody':
+    'Loncan için kanallar. Lonca sohbeti her üyeye ulaşır; subay kanalı yalnızca subaylar içindir.',
   'guide.social.chanLfg': 'Grup Arıyor.',
   'guide.social.chanLfgBody':
     'Bir zindan koşmak için insan bulmaya yarayan, isteğe bağlı, diyar çapında bir kanal. Katılmak için sekmesini aç.',
   'guide.social.chanParty': 'Grup.',
   'guide.social.chanPartyBody': 'Ne kadar dağılmış olursanız olun, grubundaki herkesle konuş.',
   'guide.social.chanSay': 'Söyle.',
-  'guide.social.chanSayBody': 'Varsayılan sesin. Sana yakın oyunculara ulaşır ve yan yana görev yaparken kullanılacak olandır.',
+  'guide.social.chanSayBody':
+    'Varsayılan sesin. Sana yakın oyunculara ulaşır ve yan yana görev yaparken kullanılacak olandır.',
   'guide.social.chanWhisper': 'Fısılda.',
-  'guide.social.chanWhisperBody': 'Nerede olursa olsun, isimle tek bir oyuncuya özel bir mesaj. Sessiz bir çift söz için kullan.',
+  'guide.social.chanWhisperBody':
+    'Nerede olursa olsun, isimle tek bir oyuncuya özel bir mesaj. Sessiz bir çift söz için kullan.',
   'guide.social.chanWorld': 'Dünya.',
   'guide.social.chanWorldBody':
     'İsteğe bağlı katıldığın, diyar çapında bir kanal. Katılmak için sekmesini aç, çevrimiçi olan herkesi görür ve herkese ulaşırsın.',
   'guide.social.chanYell': 'Bağır.',
   'guide.social.chanYellBody':
-    'Söyle\'nin biraz daha uzağa taşıyan daha gür bir hali, bir kampın bir ucundan diğerine ulaşmaya yeter.',
+    "Söyle'nin biraz daha uzağa taşıyan daha gür bir hali, bir kampın bir ucundan diğerine ulaşmaya yeter.",
   'guide.social.chatBody':
     'Sohbet kanallara bölünmüştür, her biri kendi sekmesinde gösterilir. Etkin kanalda göndermek için bir mesaj yaz ya da tek bir satırı başka yere yönlendirmek için bir eğik çizgi komutu kullan. Konuşabileceğin kanallar şunlardır:',
   'guide.social.chatHeading': 'Sohbet kanalları',
@@ -3955,12 +4450,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.social.guildChatBody':
     'Bir loncaya ait olmak sana özel bir lonca sohbet kanalı verir ve lonca arkadaşlarını ortak bir listede gösterir, böylece çevrimiçi her zaman tanıdık yüzler olur.',
   'guide.social.guildHeading': 'Loncalar',
-  'guide.social.ignoreBody': 'Biri seni rahatsız ediyorsa, onu görmezden gelme listene ekle, sohbetini artık görmezsin.',
+  'guide.social.ignoreBody':
+    'Biri seni rahatsız ediyorsa, onu görmezden gelme listene ekle, sohbetini artık görmezsin.',
   'guide.social.intro':
     'Dünyanın çoğu tek başına yapılabilir, ama oyun başka insanlarla oynanmak üzere kurulmuştur. İşte nasıl konuşulur, takım kurulur ve kendi çevreni bulursun.',
   'guide.social.lootBody':
     'Gruplaştığında, grup lideri ganimetin nasıl paylaşılacağını belirler. Kurallar parayı ve eşyaları ayrı ayrı kapsar:',
-  'guide.social.lootCoinBody': 'Bir öldürmeden gelen para, onu toplayan kişiye gidebilir ya da grup arasında eşit bölünebilir.',
+  'guide.social.lootCoinBody':
+    'Bir öldürmeden gelen para, onu toplayan kişiye gidebilir ya da grup arasında eşit bölünebilir.',
   'guide.social.lootCoinTitle': 'Para.',
   'guide.social.lootCommonBody':
     'Sıradan ganimetler toplayana gidebilir, daha iyi ganimetler ise herkesin adil bir şansı olsun diye zar atışına konur.',
@@ -4053,8 +4550,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.whatHeading': 'Yetenekler ne işe yarar',
   'guide.toc.heading': 'Bu sayfada',
   'guide.viewer.canvasLabel': '{name} ögesinin döndürülebilir 3B modeli',
-  'guide.viewer.dragHint': 'Modeli döndürmek için sürükleyin. Odaklandığında sol ve sağ ok tuşlarını kullanın.',
-  'guide.viewer.error': '3B model yüklenemedi. Yukarıdaki görsel yine de bu {name} ögesini gösteriyor.',
+  'guide.viewer.dragHint':
+    'Modeli döndürmek için sürükleyin. Odaklandığında sol ve sağ ok tuşlarını kullanın.',
+  'guide.viewer.error':
+    '3B model yüklenemedi. Yukarıdaki görsel yine de bu {name} ögesini gösteriyor.',
   'guide.viewer.loading': 'Model yükleniyor...',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name} ögesini 3B görüntüle',
@@ -4087,7 +4586,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.wishPage.intro':
     'Yeni oyuncuları pek çok ikircikten kurtaracak birkaç dürüst gerçek. Hiçbiri okunması zorunlu değil, ama hepsi işe yarar.',
   'guide.worldPage.gladeBody':
-    'Vale\'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Brightwood Glade adlı güneşli bir koru, dalların altındaki sessiz patikaları ve benek benek ışığıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer.',
+    "Vale'deki her hikaye ölülerle ilgili değildir. Kuzeyde, Brightwood Glade adlı güneşli bir koru, dalların altındaki sessiz patikaları ve benek benek ışığıyla kendi daha yumuşak ritmini korur. Takip ettiğiniz izin yumuşak bir karşı sesidir ve yol başıboş dolaşmanıza imkan verdiğinde görmeye değer.",
   'guide.worldPage.gladeTitle': 'Sakin bir köşe: Parlakorman Açıklığı',
   'guide.worldPage.heading': 'Dünya',
   'guide.worldPage.hub': 'Ana üs',
@@ -4097,15 +4596,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.mapSub':
     'Güneyden kuzeye üç bölge, her biri seviye olarak bir basamak daha yüksek. Görev izini takip edin, diyar sizi vadiden zirvelere taşır.',
   'guide.worldPage.marshBlurb':
-    'Sis ve harabelerle dolu, suya gömülmüş bir ülke. Mudfinler sığlıkları sarar ve suyun altında daha eski bir şey kıpırdanır, köprü-kasabası Fenbridge\'den izlenir.',
+    "Sis ve harabelerle dolu, suya gömülmüş bir ülke. Mudfinler sığlıkları sarar ve suyun altında daha eski bir şey kıpırdanır, köprü-kasabası Fenbridge'den izlenir.",
   'guide.worldPage.marshGreeter': 'Muhafız Fenwick, Fenbridge',
-  'guide.worldPage.marshGreeting': 'Kapıda durun. Şu sazların ötesinde, öldürme işini bizim yerimize bataklık görür.',
+  'guide.worldPage.marshGreeting':
+    'Kapıda durun. Şu sazların ötesinde, öldürme işini bizim yerimize bataklık görür.',
   'guide.worldPage.marshPlaceNotes':
     'Fenbridge tek kuru yolu korur. Sinsi Sazliklar ve Deepfen Sigliklari bataklik canavarlari ve Mudfinlerle kaynar; Dul Cadirligi simsiki aglarla oruludur; Bogulmus Sapel ve Trol Hoyukleri daha eski tehlikeleri barindirir; Gravecaller Kampi tarikatin siper kazdigi yerdir ve Batik Kale bataklarin orneklenmis kalbidir.',
   'guide.worldPage.peaksBlurb':
     'Rüzgarın aşındırdığı sırtlar ve eski maden ocakları, diyarın en soğuk, en yüksek tehlikelerine doğru tırmanır; ileri karakol Highwatch tarafından tutulur.',
   'guide.worldPage.peaksGreeter': 'Yüzbaşı Thessaly, Highwatch',
-  'guide.worldPage.peaksGreeting': 'İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.',
+  'guide.worldPage.peaksGreeting':
+    'İki yüz yıldır bu sur dayandı. Benim nöbetimde yıkılmayacak, ama inliyor.',
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch suru tutar. Sinsi Sirt ve Deeprock Oyuklari sirt kedileri ve oyucularindir; Dev Etekleri ve Drogmar Savas Kampi kiralik zorbalarindir; Firtinakaya elementallerle citirdar ve altinda Piriltigol isildar; Solucankut Cadirlari ve Hortlak Tarlalari tarikatin yuksek mevzisini kusatir, zirvesinde Mezarejderi Mabedi yer alir.',
   'guide.worldPage.places': 'Görülmeye değer yerler',
@@ -4115,7 +4616,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Mareşal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Kılıcını yakın tut. Vadi eski Vadi değil.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook ilk ana üssünüzdür. Wolf Run ve Boar Meadow yumuşak av sahalarıdır; Mirror Lake balık tutulacak sakin sulardır; Sableweb ve Copper Dig örümcekleri ve cevhere aç kazıcıları saklar; bir Bandit Camp ve Fallen Chapel daha çetin işler barındırır; Reliquary Hill, diyarın ilk delvesi olan Collapsed Reliquary\'ye iner; ve Brightwood Glade kuzeydeki sakin, güneşli bir korudur.',
+    "Eastbrook ilk ana üssünüzdür. Wolf Run ve Boar Meadow yumuşak av sahalarıdır; Mirror Lake balık tutulacak sakin sulardır; Sableweb ve Copper Dig örümcekleri ve cevhere aç kazıcıları saklar; bir Bandit Camp ve Fallen Chapel daha çetin işler barındırır; Reliquary Hill, diyarın ilk delvesi olan Collapsed Reliquary'ye iner; ve Brightwood Glade kuzeydeki sakin, güneşli bir korudur.",
   'highscores.desc': 'Dünyanın en büyük şampiyonlarını takip et ve ilerlemeni kıyasla.',
   'highscores.title': 'Yüksek Skorlar Liderlik Tablosu',
   'hud.arena.close': 'Arenayı kapat',
@@ -4182,11 +4683,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.dodged': '{ability} yeteneğin {target} tarafından savuşturuldu.',
   'hud.combat.floatingDodge': 'Savuşturma',
   'hud.combat.floatingMiss': 'Iskaladı',
+  'hud.combat.floatingParry': 'Karşılama',
   'hud.combat.healOther': '{ability} yeteneğin {target} hedefini {amount} iyileştirdi.',
   'hud.combat.healOtherCrit': '{ability} yeteneğin {target} hedefini kritik {amount} iyileştirdi.',
   'hud.combat.healSelf': '{ability} yeteneğin seni {amount} iyileştirdi.',
   'hud.combat.healSelfCrit': '{ability} yeteneğin seni kritik {amount} iyileştirdi.',
   'hud.combat.miss': '{ability} yeteneğin {target} hedefini ıskaladı.',
+  'hud.combat.parried': '{ability} yeteneğin {target} tarafından karşılandı.',
   'hud.core.boss': 'PATRON',
   'hud.core.chatChannels.add': 'Sohbet kanalı ekle',
   'hud.core.chatChannels.addTitle': 'Kanal ekle',
@@ -4252,7 +4755,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Sıraya girmeden önce takasını bitir.',
   'hud.errors.assistNoTarget': '{name} bir hedefe sahip değil.',
   'hud.errors.assistSelf': 'Kendine yardım edemezsin.',
-  'hud.errors.assistWhom': 'Kime yardım edeceksin? Bir oyuncuyu hedefle ya da /assist <name> kullan.',
+  'hud.errors.assistWhom':
+    'Kime yardım edeceksin? Bir oyuncuyu hedefle ya da /assist <name> kullan.',
   'hud.errors.assisting': '{name} oyuncusuna yardım ediliyor.',
   'hud.errors.bear': 'Bruin',
   'hud.errors.behindTarget': 'Hedefinin arkasında olmalısın.',
@@ -4271,6 +4775,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.inCombat': 'Bunu savaşta yapamazsın.',
   'hud.errors.invalidAttackTarget': 'Geçersiz saldırı hedefi.',
   'hud.errors.invitationExpired': 'Davetin süresi doldu.',
+  'hud.errors.needShield': 'Bir kalkan kuşanmalısın.',
   'hud.errors.noPet': 'Hiç evcil hayvanın yok.',
   'hud.errors.noRecentWhisper': 'Sana yakın zamanda kimse fısıldamadı.',
   'hud.errors.noSeal': 'Etkin bir Mührün yok.',
@@ -4280,6 +4785,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'Yeterli mana yok!',
   'hud.errors.notEnoughRage': 'Yeterli öfke yok!',
   'hud.errors.notEnoughResource': 'Yeterli {resource} yok!',
+  'hud.errors.nothingToConsume': 'Tüketilecek bir şey yok.',
   'hud.errors.notInParty': 'Bir grupta değilsin.',
   'hud.errors.outOfRange': 'Menzil dışında.',
   'hud.errors.partyFull': 'Grubun dolu.',
@@ -4292,7 +4798,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': 'Susturuldun!',
   'hud.errors.stealthed': 'Gizlenmiş olmalısın.',
   'hud.errors.stunned': 'Sersemledin!',
-  'hud.errors.targetHealthBelow': 'O yetenek, hedefin canının %{percent} altında olmasını gerektirir.',
+  'hud.errors.targetHealthBelow':
+    'O yetenek, hedefin canının %{percent} altında olmasını gerektirir.',
   'hud.errors.targetMustDodge': 'Önce hedefinin sıyrılması gerekir.',
   'hud.errors.targetTooFar': 'Hedef çok uzakta.',
   'hud.errors.tooClose': 'Çok yakın!',
@@ -4302,8 +4809,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.tradeTooFar': 'Hedef takas için çok uzakta.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Bilinmeyen komut: {command}. /s /y /w /p /g deneyin.',
-  'hud.errors.whisperAmbiguous': 'Birkaç oyuncu \'{name}\' ile eşleşiyor. Büyük-küçük harfleri tam yaz.',
-  'hud.errors.whisperMissing': 'Çevrimiçi olan \'{name}\' adlı bir oyuncu yok.',
+  'hud.errors.whisperAmbiguous':
+    "Birkaç oyuncu '{name}' ile eşleşiyor. Büyük-küçük harfleri tam yaz.",
+  'hud.errors.whisperMissing': "Çevrimiçi olan '{name}' adlı bir oyuncu yok.",
   'hud.errors.whisperSelf': 'Kendi kendine mırıldanıyorsun. Kimse duymuyor.',
   'hud.keybinds.actions.actionBarSlot': 'Eylem Çubuğu {slot}',
   'hud.keybinds.actions.arena': 'Arena (Kül Koliseumu)',
@@ -4334,7 +4842,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.categories.targeting': 'Hedefleme',
   'hud.logs.arenaJoin': 'Kül Koliseumu sırasına katıldın. Layık bir rakip için bekle...',
   'hud.logs.arenaLeave': 'Kül Koliseumu sırasından ayrıldın.',
-  'hud.logs.arenaSands': 'Kül Koliseumu\'nun kumlarına adım atıyorsun.',
+  'hud.logs.arenaSands': "Kül Koliseumu'nun kumlarına adım atıyorsun.",
   'hud.logs.duelBegun': 'Düello başladı!',
   'hud.logs.duelChallengeSent': '{name} oyuncusunu düelloya davet ettin.',
   'hud.logs.duelDecline': '{name} meydan okumanı reddetti.',
@@ -4408,7 +4916,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.options.gameMenu': 'Oyun Menüsü',
   'hud.options.graphics': 'Grafikler',
   'hud.options.graphicsNote':
-    'Daha sakin bir fare bakışı için Kamera Hızını düşürün. %100\'ün altındaki Görüntü Kalitesi, zayıf makinelerde FPS\'i artırır.',
+    "Daha sakin bir fare bakışı için Kamera Hızını düşürün. %100'ün altındaki Görüntü Kalitesi, zayıf makinelerde FPS'i artırır.",
   'hud.options.graphicsPresetAdvanced': 'Gelişmiş',
   'hud.options.graphicsPresetAuto': 'Otomatik',
   'hud.options.graphicsPresetHigh': 'Yüksek',
@@ -4416,11 +4924,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsPresetMedium': 'Orta',
   'hud.options.graphicsPresetUltra': 'Ultra',
   'hud.options.graphicsQuality': 'Grafik Kalitesi',
-  'hud.options.graphicsReloadNote': 'Grafik Kalitesi ve Arazi Ayrıntısı, yeniden yükledikten sonra uygulanır.',
+  'hud.options.graphicsReloadNote':
+    'Grafik Kalitesi ve Arazi Ayrıntısı, yeniden yükledikten sonra uygulanır.',
   'hud.options.highContrastText': 'Yüksek Kontrastlı Metin',
   'hud.options.hudOpacity': 'Arayüz Saydamlığı',
   'hud.options.interface': 'Arayüz',
-  'hud.options.interfaceNote': 'Bu seçenekler yalnızca kendi görünümünüzü değiştirir ve bu cihazda kaydedilir.',
+  'hud.options.interfaceNote':
+    'Bu seçenekler yalnızca kendi görünümünüzü değiştirir ve bu cihazda kaydedilir.',
   'hud.options.invertLook': 'Bakışı Ters Çevir (Dokunmatik)',
   'hud.options.invertLookY': 'Bakışı Ters Çevir (Y)',
   'hud.options.joystickDeadzone': 'Yönelteç Ölü Bölgesi',
@@ -4462,7 +4972,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.options.unbound': 'Atanmamış',
   'hud.options.voiceVolume': 'Ses Düzeyi',
   'hud.pet.abandon': 'Evcili Terk Et',
-  'hud.pet.abandonBody': '{name} kalıcı olarak terk edilsin mi? Başka bir evcil hayvan evcilleştirmeniz gerekecek.',
+  'hud.pet.abandonBody':
+    '{name} kalıcı olarak terk edilsin mi? Başka bir evcil hayvan evcilleştirmeniz gerekecek.',
   'hud.pet.abandonConfirm': 'Terk Et',
   'hud.pet.aggressive': 'Saldırgan',
   'hud.pet.aggressiveDesc': 'Yakındaki düşman varlıklara saldırır.',
@@ -4473,7 +4984,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healDemon': 'Şeytanı İyileştir',
   'hud.pet.healDemonDesc': '5 saniye boyunca şeytanına iyileştirme kanalize etmek için mana harca.',
   'hud.pet.healPet': 'Evcili İyileştir',
-  'hud.pet.healPetDesc': 'Tıkla, ardından evcilini 5 saniye boyunca beslemek ve iyileştirmek için çantandaki yiyeceğe tıkla.',
+  'hud.pet.healPetDesc':
+    'Tıkla, ardından evcilini 5 saniye boyunca beslemek ve iyileştirmek için çantandaki yiyeceğe tıkla.',
   'hud.pet.noPetFood': 'Evcilini besleyecek yiyeceğin yok.',
   'hud.pet.passive': 'Pasif',
   'hud.pet.passiveDesc': 'Yalnızca sen emrettiğinde saldırır.',
@@ -4481,7 +4993,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petAttackTitle': 'Evcil Saldırısı',
   'hud.pet.petEatsFoodOnly': 'Evcilin yalnızca yiyecek yiyebilir.',
   'hud.pet.petNamePlaceholder': 'Evcil adı',
-  'hud.pet.petTauntDesc': 'Evciline saldırıya geçmesini ve menzile girince Hırlamasını emret. 10 saniyelik bekleme süresi.',
+  'hud.pet.petTauntDesc':
+    'Evciline saldırıya geçmesini ve menzile girince Hırlamasını emret. 10 saniyelik bekleme süresi.',
   'hud.pet.petTauntTitle': 'Evcil Kışkırtması',
   'hud.pet.rename': 'Evcili Yeniden Adlandır',
   'hud.pet.renameConfirm': 'Yeniden Adlandır',
@@ -4546,10 +5059,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.social.leavePrompt': 'Loncandan ayrılmak istediğine emin misin?',
   'hud.social.levelClass': 'Svy {level} {className}',
   'hud.social.makeGuildMasterTitle': '{name} oyuncusunu Lonca Üstadı yap',
-  'hud.social.noGuild': 'Bir loncada değilsin. Aşağıdan bir lonca kur veya mevcut bir loncaya davet edil.',
+  'hud.social.noGuild':
+    'Bir loncada değilsin. Aşağıdan bir lonca kur veya mevcut bir loncaya davet edil.',
   'hud.social.noPlayerNamed': '{realm} sunucusunda {name} adında bir oyuncu yok.',
   'hud.social.nowIgnoring': '{name} artık görmezden geliniyor.',
-  'hud.social.offlineEmpty': 'Arkadaşlar, loncalar ve görmezden gelinenler listeleri çevrimiçi oyunda kullanılabilir.',
+  'hud.social.offlineEmpty':
+    'Arkadaşlar, loncalar ve görmezden gelinenler listeleri çevrimiçi oyunda kullanılabilir.',
   'hud.social.promoteTitle': '{name} oyuncusunu subaylığa terfi ettir',
   'hud.social.raidEmpty': 'Akın gruplarını buradan yönetmek için bir takımı akına dönüştür.',
   'hud.social.raidGroupEmpty': 'Bu grupta oyuncu yok.',
@@ -4576,16 +5091,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.social.whisperTitle': '{name} oyuncusuna fısılda',
   'hud.system.arenaCountdown': 'Müsabaka {seconds} içinde başlıyor...',
   'hud.system.arenaDefeatBanner': '{name} tarafından yenildin. Derece {rating} ({delta})',
-  'hud.system.arenaDefeatLog': '{name}, Kül Koliseum\'da seni alt etti. Derece {rating} ({delta}).',
+  'hud.system.arenaDefeatLog': "{name}, Kül Koliseum'da seni alt etti. Derece {rating} ({delta}).",
   'hud.system.arenaDrawBanner': '{name} ile arena berabere ({delta} derece)',
-  'hud.system.arenaDrawLog': '{name} ile arena müsabakası berabere bitti. Derece {rating} ({delta}).',
+  'hud.system.arenaDrawLog':
+    '{name} ile arena müsabakası berabere bitti. Derece {rating} ({delta}).',
   'hud.system.arenaFoundBanner': 'Rakip bulundu: {name}',
   'hud.system.arenaFoundLog': 'Koliseum seni {level}. seviye {className} {name} ile eşleştirdi.',
   'hud.system.arenaQueued': 'Kül Koliseum için sıraya girdin (sıra {position}).',
   'hud.system.arenaStart': 'Savaş!',
   'hud.system.arenaUnqueued': 'Kül Koliseum sırasından ayrıldın.',
   'hud.system.arenaVictoryBanner': '{name} karşısında zafer! Derece {rating} ({delta})',
-  'hud.system.arenaVictoryLog': 'Kül Koliseum\'da {name} oyuncusunu yendin. Derece {rating} ({delta}).',
+  'hud.system.arenaVictoryLog':
+    "Kül Koliseum'da {name} oyuncusunu yendin. Derece {rating} ({delta}).",
   'hud.system.duelCountdown': 'Düello {seconds} içinde başlıyor...',
   'hud.system.duelEndBanner': '{winner}, bir düelloda {loser} oyuncusunu yendi!',
   'hud.system.duelEndLog': '{winner}, bir düelloda {loser} oyuncusunu yendi.',
@@ -4599,7 +5116,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.trade.copper': 'bakır',
   'hud.trade.emptyMine': 'Eklemek için çantalarındaki eşyalara tıkla',
   'hud.trade.emptyTheirs': 'Henüz bir şey teklif edilmedi',
-  'hud.trade.hint': 'Teklif edilen bir eşyayı kaldırmak için tıkla. İki taraf da Takası Kabul Et\'e basmalı.',
+  'hud.trade.hint':
+    "Teklif edilen bir eşyayı kaldırmak için tıkla. İki taraf da Takası Kabul Et'e basmalı.",
   'hud.trade.money': 'Para',
   'hud.trade.theirOffer': '{name} oyuncusunun teklifi',
   'hud.trade.title': '{name} ile takas',
@@ -4612,24 +5130,27 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.moveBody':
     'Hareket etmek için {moveKeys} tuşlarını, etrafa bakmak için fareyi kullan. Başlamak için birkaç adım at.',
   'hud.tutorial.moveTitle': 'Ayağını Sağlam Bas',
-  'hud.tutorial.returnBody': 'Görevin tamamlandı. Mareşal Redbrook\'a dön ve teslim etmek için {interactKey} tuşuna bas.',
+  'hud.tutorial.returnBody':
+    "Görevin tamamlandı. Mareşal Redbrook'a dön ve teslim etmek için {interactKey} tuşuna bas.",
   'hud.tutorial.returnTitle': 'Ödülünü Al',
   'hud.tutorial.seekBody':
     'Mareşal Redbrook kasabada bekliyor ve yeni bir kılıç için işi var. Ona ulaşmak için işareti takip et.',
-  'hud.tutorial.seekTitle': 'Mareşal\'i Ara',
+  'hud.tutorial.seekTitle': "Mareşal'i Ara",
   'hud.tutorial.skip': 'Eğitimi Atla',
-  'hud.tutorial.slayBody': 'Kuzey yolundaki Orman Kurtlarını avla. Birini hedef al ve sürüyü seyreltmek için saldır.',
+  'hud.tutorial.slayBody':
+    'Kuzey yolundaki Orman Kurtlarını avla. Birini hedef al ve sürüyü seyreltmek için saldır.',
   'hud.tutorial.slayProgress': 'Öldürülen Orman Kurtları: {current} / {needed}',
   'hud.tutorial.slayTitle': 'Kapıdaki Kurtlar',
   'hud.tutorial.stepLabel': 'Adım {current} / {total}',
   'hud.tutorial.talkBody':
-    'Mareşal Redbrook\'un yanında dur ve konuşmak için {interactKey} tuşuna bas, ardından görevini kabul et.',
+    "Mareşal Redbrook'un yanında dur ve konuşmak için {interactKey} tuşuna bas, ardından görevini kabul et.",
   'hud.tutorial.talkTitle': 'Görevi Üstlen',
   'hud.tutorial.title': 'Yeni Maceracı',
   'hudChrome.account.changeEmailHint':
     'Yeni adrese bir onay bağlantısı, eskisine de bir bildirim gönderiyoruz. E-postanız ancak bağlantıyı açtığınızda değişir.',
   'hudChrome.account.changeEmailNew': 'Yeni e-posta',
-  'hudChrome.account.changeEmailSent': 'Gelen kutunuzu kontrol edin: yeni e-postanızı onaylamak için gönderdiğimiz bağlantıyı açın.',
+  'hudChrome.account.changeEmailSent':
+    'Gelen kutunuzu kontrol edin: yeni e-postanızı onaylamak için gönderdiğimiz bağlantıyı açın.',
   'hudChrome.account.changeEmailSubmit': 'Onay Bağlantısı Gönder',
   'hudChrome.account.changeEmailTitle': 'E-postayı Değiştir',
   'hudChrome.account.changePassword': 'Parolayı Değiştir',
@@ -4644,12 +5165,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.deactivateWarning':
     'Devre dışı bırakma hesabınızı kilitler ve sizi her yerden çıkış yaptırır. Geri yüklemek için bir yöneticiyle iletişime geçin. Kullanıcı adınızı ve parolanızı yeniden girerek onaylayın.',
   'hudChrome.account.deactivated': 'Hesabınız devre dışı bırakıldı.',
-  'hudChrome.account.deactivatedLocked': 'Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.',
+  'hudChrome.account.deactivatedLocked':
+    'Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.',
   'hudChrome.account.emailHint':
     'Yalnızca hesap kurtarma için kullanılır. Güncellemek için aşağıdaki E-postayı Değiştir seçeneğini kullanın.',
   'hudChrome.account.emailLabel': 'E-posta (isteğe bağlı)',
   'hudChrome.account.emailSaved': 'E-posta kaydedildi.',
-  'hudChrome.account.errCharactersOnline': 'Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.',
+  'hudChrome.account.errCharactersOnline':
+    'Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.',
   'hudChrome.account.errCurrentPassword': 'Mevcut parolanız hatalı.',
   'hudChrome.account.errCurrentRequired': 'Mevcut parolanızı girin.',
   'hudChrome.account.errEmailInvalid': 'Geçerli bir e-posta adresi girin.',
@@ -4660,7 +5183,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.errPasswordShort': 'Yeni parola en az 6 karakter olmalıdır.',
   'hudChrome.account.errPasswordUnchanged': 'Yeni parola mevcut olandan farklı olmalıdır.',
   'hudChrome.account.errTwoFactorCode': 'Bu kod geçerli değil, tekrar deneyin.',
-  'hudChrome.account.errTwoFactorState': 'İki adımlı kurulum beklenen durumda değil. Yeniden yükleyip tekrar deneyin.',
+  'hudChrome.account.errTwoFactorState':
+    'İki adımlı kurulum beklenen durumda değil. Yeniden yükleyip tekrar deneyin.',
   'hudChrome.account.errUsernameMatch': 'Bu kullanıcı adı hesabınızla eşleşmiyor.',
   'hudChrome.account.exportBtn': 'Verilerimi İndir',
   'hudChrome.account.exportDone': 'Verileriniz indirildi. Size bir onay e-postası gönderdik.',
@@ -4688,7 +5212,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorBeginHint': 'Kuruluma başlamak için parolanızı girin.',
   'hudChrome.account.twoFactorCodeLabel': '6 haneli kod',
   'hudChrome.account.twoFactorDisableBtn': 'İki Adımlı Doğrulamayı Kapat',
-  'hudChrome.account.twoFactorDisableHint': 'İki adımlı doğrulamayı kapatmak için parolanızı girin. Kurtarma kodlarınız geçersiz kılınacak.',
+  'hudChrome.account.twoFactorDisableHint':
+    'İki adımlı doğrulamayı kapatmak için parolanızı girin. Kurtarma kodlarınız geçersiz kılınacak.',
   'hudChrome.account.twoFactorDisabledMsg': 'İki adımlı kimlik doğrulama kapalı.',
   'hudChrome.account.twoFactorDone': 'Bitti',
   'hudChrome.account.twoFactorDownloadCodes': 'Kodları İndir',
@@ -4701,11 +5226,13 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bu anahtarı kimlik doğrulama uygulamanıza (Google Authenticator, Authy, 1Password ve benzeri) ekleyin, ardından gösterdiği 6 haneli kodu girin.',
   'hudChrome.account.twoFactorSecretLabel': 'Kurulum anahtarı',
   'hudChrome.account.twoFactorSetupBtn': 'İki Adımlı Doğrulamayı Kur',
-  'hudChrome.account.twoFactorStatusOff': 'Daha güçlü hesap güvenliği için bir kimlik doğrulama uygulaması ekleyin.',
+  'hudChrome.account.twoFactorStatusOff':
+    'Daha güçlü hesap güvenliği için bir kimlik doğrulama uygulaması ekleyin.',
   'hudChrome.account.twoFactorStatusOn': 'Hesabınız için iki adımlı kimlik doğrulama AÇIK.',
   'hudChrome.account.twoFactorTitle': 'İki Adımlı Kimlik Doğrulama',
   'hudChrome.account.twoFactorVerifyBtn': 'Doğrula ve Etkinleştir',
-  'hudChrome.account.walletSummary': 'Oyuncu kartınızda sahip rozetini göstermek için bir Solana cüzdanını doğrulayın.',
+  'hudChrome.account.walletSummary':
+    'Oyuncu kartınızda sahip rozetini göstermek için bir Solana cüzdanını doğrulayın.',
   'hudChrome.bags.filterAll': 'Tümü',
   'hudChrome.bags.filterArmor': 'Zırh',
   'hudChrome.bags.filterConsumable': 'Sarf Malzemeleri',
@@ -4723,18 +5250,23 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.character': 'Karakter',
   'hudChrome.bugReport.describeFirst': 'Lütfen göndermeden önce hatayı açıklayın.',
   'hudChrome.bugReport.description': 'Ne ters gitti?',
-  'hudChrome.bugReport.descriptionPlaceholder': 'Hatayı anlatın: ne yaptınız, ne beklediniz ve ne oldu.',
+  'hudChrome.bugReport.descriptionPlaceholder':
+    'Hatayı anlatın: ne yaptınız, ne beklediniz ve ne oldu.',
   'hudChrome.bugReport.failed': 'Hata bildirimi gönderilemedi. Lütfen tekrar deneyin.',
   'hudChrome.bugReport.includeScreenshot': 'Ekran Görüntüsü Ekle',
   'hudChrome.bugReport.menuButton': 'Hata Bildir',
   'hudChrome.bugReport.position': 'Konum',
-  'hudChrome.bugReport.rateLimited': 'Son zamanlarda birkaç bildirim gönderdiniz. Yenisini göndermeden önce lütfen biraz bekleyin.',
+  'hudChrome.bugReport.rateLimited':
+    'Son zamanlarda birkaç bildirim gönderdiniz. Yenisini göndermeden önce lütfen biraz bekleyin.',
   'hudChrome.bugReport.realm': 'Dünya',
-  'hudChrome.bugReport.screenshotAlt': 'Bu hata bildirimine eklenen mevcut görünümün ekran görüntüsü',
+  'hudChrome.bugReport.screenshotAlt':
+    'Bu hata bildirimine eklenen mevcut görünümün ekran görüntüsü',
   'hudChrome.bugReport.submit': 'Bildirimi Gönder',
   'hudChrome.bugReport.submitted': 'Hata bildirimi gönderildi. Teşekkürler!',
-  'hudChrome.bugReport.submittedNoShot': 'Hata bildirimi gönderildi, ancak ekran görüntüsü eklenemeyecek kadar büyüktü.',
-  'hudChrome.bugReport.tooLarge': 'Bu bildirim gönderilemeyecek kadar büyük. Ekran görüntüsü olmadan tekrar deneyin.',
+  'hudChrome.bugReport.submittedNoShot':
+    'Hata bildirimi gönderildi, ancak ekran görüntüsü eklenemeyecek kadar büyüktü.',
+  'hudChrome.bugReport.tooLarge':
+    'Bu bildirim gönderilemeyecek kadar büyük. Ekran görüntüsü olmadan tekrar deneyin.',
   'hudChrome.bugReport.unknown': 'Bilinmeyen',
   'hudChrome.castBar.playerAria': 'Senin Büyü Çubuğun',
   'hudChrome.castBar.targetAria': 'Birim Büyü Çubuğu',
@@ -4799,7 +5331,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/sn',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}sn',
-  'hudChrome.mobile.autorun': 'Otomatik Koşu',
   'hudChrome.mobile.haptics': 'Dokunsal Geri Bildirim',
   'hudChrome.mobile.hapticsOff': 'Dokunsal Kapalı',
   'hudChrome.mobile.hotbarPage': 'Yetenekler',
@@ -4829,7 +5360,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceModeAuto': 'Otomatik',
   'hudChrome.options.interfaceModeDesktop': 'Masaüstü',
   'hudChrome.options.interfaceModeNote':
-    'Otomatik, cihazınıza göre masaüstü veya dokunmatik denetimleri seçer. Klavye ve fareyi zorlamak için Masaüstü\'nü seçin (klavyeli bir tablette kullanışlıdır) ya da ekran üzeri denetimler için Dokunmatik\'i seçin.',
+    "Otomatik, cihazınıza göre masaüstü veya dokunmatik denetimleri seçer. Klavye ve fareyi zorlamak için Masaüstü'nü seçin (klavyeli bir tablette kullanışlıdır) ya da ekran üzeri denetimler için Dokunmatik'i seçin.",
   'hudChrome.options.interfaceModeTouch': 'Dokunmatik',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.',
@@ -4837,14 +5368,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Cüzdanı Karakter Ekranında Göster',
   'hudChrome.options.showWalletOnPlayerCard': 'Cüzdanı Oyuncu Kartında Göster',
   'hudChrome.options.uiScale': 'Arayüz Ölçeği',
+  'hudChrome.paperdoll.offhand': 'Yan El',
   'hudChrome.paperdoll.unequipAria': '{item} eşyasını çıkar',
-  'hudChrome.paperdoll.unequipHint': 'Çıkarmak için ×\'e tıklayın, sağ tıklayın ya da çantalara sürükleyin',
+  'hudChrome.paperdoll.unequipHint':
+    "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin",
   'hudChrome.perf.badges.backgrounded': 'Arka Planda',
   'hudChrome.perf.badges.offline': 'Çevrimdışı',
   'hudChrome.perf.bgColor': 'Arka Plan Rengi',
   'hudChrome.perf.colorTheme': 'Renk Teması',
-  'hudChrome.perf.description': 'Hangi istatistiklerin gösterileceğini, kaplamanın nerede duracağını ve nasıl görüneceğini seçin.',
-  'hudChrome.perf.dragHint': 'Taşımak için kaplamayı sürükleyin ya da aşağıdaki kaydırıcıları kullanın.',
+  'hudChrome.perf.description':
+    'Hangi istatistiklerin gösterileceğini, kaplamanın nerede duracağını ve nasıl görüneceğini seçin.',
+  'hudChrome.perf.dragHint':
+    'Taşımak için kaplamayı sürükleyin ya da aşağıdaki kaydırıcıları kullanın.',
   'hudChrome.perf.enable': 'Performans Kaplamasını Göster',
   'hudChrome.perf.fontScale': 'Metin Boyutu',
   'hudChrome.perf.graph': 'Kare Süresi Grafiği',
@@ -4920,9 +5455,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questShare.alreadyOn': 'Bu görevi zaten üstlendin.',
   'hudChrome.questShare.dialogTitle': 'Paylaşılan Görev',
   'hudChrome.questShare.ineligible': 'Bu görevin gereksinimlerini karşılamıyorsun.',
-  'hudChrome.questShare.linkTitle': 'Bu görevi sohbette bağlamak için Shift\'e basılı tutarak tıkla.',
+  'hudChrome.questShare.linkTitle':
+    "Bu görevi sohbette bağlamak için Shift'e basılı tutarak tıkla.",
   'hudChrome.questShare.noQuestSelected': 'Paylaşmak için günlüğünden bir görev seç.',
-  'hudChrome.questShare.notInSharerParty': 'Bu görevi kabul etmek için {name} adlı oyuncunun grubunda olmalısın.',
+  'hudChrome.questShare.notInSharerParty':
+    'Bu görevi kabul etmek için {name} adlı oyuncunun grubunda olmalısın.',
   'hudChrome.questShare.notShareable': 'Bu görev paylaşılamaz.',
   'hudChrome.questShare.viewOnlyHint': 'Bu görevi kabul etmek için paylaşanın grubuna katıl.',
   'hudChrome.questTracker.collapseHint': 'Görev takipçisini daralt',
@@ -4931,7 +5468,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidConvert.leaderOnly': 'Yalnızca akın lideri gruba dönüştürebilir.',
   'hudChrome.raidConvert.notRaid': 'Grubun bir akın değil.',
   'hudChrome.raidConvert.toPartyDone': 'Akının yeniden gruba dönüştü.',
-  'hudChrome.raidConvert.tooLarge': 'Beşten fazla üyesi olan bir akın yeniden gruba dönüştürülemez.',
+  'hudChrome.raidConvert.tooLarge':
+    'Beşten fazla üyesi olan bir akın yeniden gruba dönüştürülemez.',
   'hudChrome.raidLockout.allReady': 'Tüm akınlar hazır',
   'hudChrome.raidLockout.daysHours': '{d}g {h}s',
   'hudChrome.raidLockout.hoursMinutes': '{h}s {m}d',
@@ -4944,21 +5482,29 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.mainHud': 'Ana Arayüze Atla',
   'hudChrome.spellbook.addToBarAria': '{name} yeteneğini eylem çubuğuna ekle',
   'hudChrome.spellbook.removeFromBarAria': '{name} yeteneğini eylem çubuğundan kaldır',
-  'hudChrome.statInfo.desc.agi': 'Reflekslerini ve nişan alma yeteneğini keskinleştirir, birçok savaş istatistiğini geliştirir.',
+  'hudChrome.statInfo.desc.agi':
+    'Reflekslerini ve nişan alma yeteneğini keskinleştirir, birçok savaş istatistiğini geliştirir.',
   'hudChrome.statInfo.desc.armor':
     'Gelen fiziksel darbeleri yumuşatır. Azalma, daha düşük seviyeli saldırganlara karşı daha büyüktür ve en fazla %75 ile sınırlıdır.',
-  'hudChrome.statInfo.desc.attackPower': 'Silah saldırılarına güç katar. Her 14 saldırı gücü, saniye başına 1 hasar ekler.',
+  'hudChrome.statInfo.desc.attackPower':
+    'Silah saldırılarına güç katar. Her 14 saldırı gücü, saniye başına 1 hasar ekler.',
   'hudChrome.statInfo.desc.critChance': 'Bir saldırının kritik vurma ve çift hasar verme şansın.',
-  'hudChrome.statInfo.desc.dodge': 'Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.',
-  'hudChrome.statInfo.desc.dps': 'Silahının hasarını ve hızını saldırı gücünle birleştiren, saniye başına tahmini silah hasarın.',
-  'hudChrome.statInfo.desc.int': 'Bir büyücünün mana havuzunu genişletir ve büyü kritik vuruş şansını artırır.',
-  'hudChrome.statInfo.desc.spi': 'Bir büyücünün savaş dışında dinlenirken manasının ne kadar hızlı dolduğunu artırır.',
-  'hudChrome.statInfo.desc.sta': 'Bedenini güçlendirir, azami canını ve dinlenirken can yenileme hızını yükseltir.',
+  'hudChrome.statInfo.desc.dodge':
+    'Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.',
+  'hudChrome.statInfo.desc.dps':
+    'Silahının hasarını ve hızını saldırı gücünle birleştiren, saniye başına tahmini silah hasarın.',
+  'hudChrome.statInfo.desc.int':
+    'Bir büyücünün mana havuzunu genişletir ve büyü kritik vuruş şansını artırır.',
+  'hudChrome.statInfo.desc.spi':
+    'Bir büyücünün savaş dışında dinlenirken manasının ne kadar hızlı dolduğunu artırır.',
+  'hudChrome.statInfo.desc.sta':
+    'Bedenini güçlendirir, azami canını ve dinlenirken can yenileme hızını yükseltir.',
   'hudChrome.statInfo.desc.str': 'Saldırı gücünü artırır, böylece silah darbelerin daha sert iner.',
   'hudChrome.statInfo.effects.armor': '+{value} Zırh',
   'hudChrome.statInfo.effects.attackPower': '+{value} Saldırı Gücü',
   'hudChrome.statInfo.effects.critPct': '+%{value} Kritik Vuruş',
-  'hudChrome.statInfo.effects.damageReduction': '{level}. seviye bir saldırgana karşı hasar azaltma: %{value}',
+  'hudChrome.statInfo.effects.damageReduction':
+    '{level}. seviye bir saldırgana karşı hasar azaltma: %{value}',
   'hudChrome.statInfo.effects.dodgePct': '+%{value} Sıyrılma',
   'hudChrome.statInfo.effects.dpsFromAp': 'Saldırılarına saniye başına {value} hasar ekler',
   'hudChrome.statInfo.effects.healthRegen': 'Dinlenirken her 5 saniyede yaklaşık {value} can',
@@ -4968,8 +5514,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.effects.rangedAttackPower': '+{value} Menzilli Saldırı Gücü',
   'hudChrome.statInfo.effects.spellCritPct': '+%{value} Büyü Kritik Vuruşu',
   'hudChrome.statInfo.fromYour': '{value} {stat} değerinden:',
-  'hudChrome.statInfo.notes.baseChance': 'Tüm maceracıların paylaştığı %5\'lik temel şansı içerir.',
-  'hudChrome.statInfo.notes.dpsApprox': 'Bir tahmindir; kritik vuruşları ve yetenek hasarını hariç tutar.',
+  'hudChrome.statInfo.notes.baseChance': "Tüm maceracıların paylaştığı %5'lik temel şansı içerir.",
+  'hudChrome.statInfo.notes.dpsApprox':
+    'Bir tahmindir; kritik vuruşları ve yetenek hasarını hariç tutar.',
   'hudChrome.statInfo.notes.minorForClass': 'Sınıfın için pek faydası yok.',
   'hudChrome.swing.ready': 'Vuruş',
   'hudChrome.swing.seconds': '{seconds}sn',
@@ -4990,13 +5537,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'Gece Yarısı',
   'hudChrome.theme.presets.parchment': 'Parşömen',
   'hudChrome.theme.reset': 'Sıfırla',
-  'hudChrome.tips.joinChannels': 'İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz.',
+  'hudChrome.tips.joinChannels':
+    'İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz.',
   'hudChrome.tutorial.doneBodyTouch':
-    'Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla\'ya, ardından Görevler\'e dokun. İyi avlar.',
+    "Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla'ya, ardından Görevler'e dokun. İyi avlar.",
   'hudChrome.tutorial.moveBodyTouch':
     'Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.',
-  'hudChrome.tutorial.returnBodyTouch': 'Görevin tamamlandı. Mareşal Redbrook\'a dön ve teslim etmek için Kullan düğmesine dokun.',
-  'hudChrome.tutorial.talkBodyTouch': 'Mareşal Redbrook\'a yaklaş ve konuşmak için Kullan düğmesine dokun, ardından görevini kabul et.',
+  'hudChrome.tutorial.returnBodyTouch':
+    "Görevin tamamlandı. Mareşal Redbrook'a dön ve teslim etmek için Kullan düğmesine dokun.",
+  'hudChrome.tutorial.talkBodyTouch':
+    "Mareşal Redbrook'a yaklaş ve konuşmak için Kullan düğmesine dokun, ardından görevini kabul et.",
   'hudChrome.unitFrame.durationUnitSeconds': 'sn',
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Takımın',
@@ -5018,7 +5568,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.title': 'Çantalar',
   'itemUi.equipment.empty': 'Boş',
   'itemUi.equipment.levelClass': '{level}. seviye {className}',
-  'itemUi.errors.bringGoods': 'Mallarını Tüccar\'a getirmelisin.',
+  'itemUi.errors.bringGoods': "Mallarını Tüccar'a getirmelisin.",
   'itemUi.errors.cannotAfford': 'Buna paran yetmez.',
   'itemUi.errors.listingUnavailable': 'O ilan artık mevcut değil.',
   'itemUi.errors.minPrice': 'En az 1 bakır fiyat belirle.',
@@ -5029,8 +5579,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.notYourListing': 'O senin ilanın değil.',
   'itemUi.errors.nothingToCollect': 'Toplayacak bir şeyin yok.',
   'itemUi.errors.ownListing': 'O kendi ilanın. Geri almak için iptal et.',
-  'itemUi.errors.priceTooHigh': 'O fiyat Tüccar\'ın aracılık edeceğinin ötesinde.',
-  'itemUi.errors.tooFar': 'Tüccar\'dan çok uzaktasın.',
+  'itemUi.errors.priceTooHigh': "O fiyat Tüccar'ın aracılık edeceğinin ötesinde.",
+  'itemUi.errors.tooFar': "Tüccar'dan çok uzaktasın.",
   'itemUi.errors.tooManyListings': 'Pazarda aynı anda en fazla {count} mal tutabilirsin.',
   'itemUi.kind.armor': 'Zırh',
   'itemUi.kind.drink': 'İçecek',
@@ -5043,11 +5593,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.weapon': 'Silah',
   'itemUi.logs.boughtBackItem': '{item} eşyasını {money} karşılığında geri aldın.',
   'itemUi.logs.boughtItem': '{item} eşyasını {money} karşılığında satın aldın.',
-  'itemUi.logs.collectedMoney': 'Tüccar\'dan {money} topladın.',
-  'itemUi.logs.expiredListing': '{item} pazar ilanının süresi doldu ve Tüccar\'da seni bekliyor.',
-  'itemUi.logs.listedItem': '{item} eşyasını Dünya Pazarı\'nda {money} karşılığında ilana koydun.',
+  'itemUi.logs.collectedMoney': "Tüccar'dan {money} topladın.",
+  'itemUi.logs.expiredListing': "{item} pazar ilanının süresi doldu ve Tüccar'da seni bekliyor.",
+  'itemUi.logs.listedItem': "{item} eşyasını Dünya Pazarı'nda {money} karşılığında ilana koydun.",
   'itemUi.logs.reclaimedItem': '{item} eşyasını pazardan geri aldın.',
-  'itemUi.logs.sellerSold': '{buyer}, {item} eşyanı {money} karşılığında satın aldı. {proceeds} tutarını Tüccar\'dan topla.',
+  'itemUi.logs.sellerSold':
+    "{buyer}, {item} eşyanı {money} karşılığında satın aldı. {proceeds} tutarını Tüccar'dan topla.",
   'itemUi.loot.close': 'Ganimeti kapat',
   'itemUi.loot.takeAll': 'Hepsini Al',
   'itemUi.lootRoll.everyonePassed': 'Herkes {item} için pas geçti.',
@@ -5060,14 +5611,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.title': 'Ganimet için zar at',
   'itemUi.market.browse': 'Göz At',
   'itemUi.market.browseNote':
-    'Diyar genelindeki maceracılar tarafından ilana konan mallar. Bir yığını doğrudan satın almak için Satın Al\'ı seç.',
+    "Diyar genelindeki maceracılar tarafından ilana konan mallar. Bir yığını doğrudan satın almak için Satın Al'ı seç.",
   'itemUi.market.buy': 'Satın Al',
   'itemUi.market.buyAria': '{item} eşyasını {price} karşılığında satın al',
   'itemUi.market.close': 'Pazarı kapat',
   'itemUi.market.collect': 'Topla',
   'itemUi.market.collectAll': 'Hepsini Topla',
-  'itemUi.market.collectEmpty': 'Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.',
-  'itemUi.market.collectNote': 'Tüccar\'ın senin için tuttuğu kazançlar ve geri dönen mallar.',
+  'itemUi.market.collectEmpty':
+    'Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.',
+  'itemUi.market.collectNote': "Tüccar'ın senin için tuttuğu kazançlar ve geri dönen mallar.",
   'itemUi.market.collectWithCount': 'Topla ({count})',
   'itemUi.market.each': 'tanesi {money}',
   'itemUi.market.emptyBrowse': 'Pazar sessiz. Sat sekmesinde bir şeyi ilana koyan ilk kişi ol.',
@@ -5088,10 +5640,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterWeaponAll': 'Tüm silahlar',
   'itemUi.market.filterWeaponType': 'Silah türü',
   'itemUi.market.filters': 'Pazar filtreleri',
-  'itemUi.market.listButton': 'Dünya Pazarı\'na koy',
+  'itemUi.market.listButton': "Dünya Pazarı'na koy",
   'itemUi.market.merchantStock': 'Tüccar stoğu',
   'itemUi.market.minPriceError': 'En az 1 bakır bir fiyat belirleyin.',
-  'itemUi.market.noMerchant': 'Alışveriş için Tüccar\'a yaklaşın.',
+  'itemUi.market.noMerchant': "Alışveriş için Tüccar'a yaklaşın.",
   'itemUi.market.pageNext': 'İleri',
   'itemUi.market.pageNextAria': 'Sonraki pazar sayfası',
   'itemUi.market.pagePrev': 'Geri',
@@ -5109,16 +5661,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.reclaim': 'Geri al',
   'itemUi.market.reclaimAria': '{item} eşyasını geri al',
   'itemUi.market.saleProceeds': 'Satış geliri',
-  'itemUi.market.searchAria': 'Dünya Pazarı\'nda eşya adına göre ara',
+  'itemUi.market.searchAria': "Dünya Pazarı'nda eşya adına göre ara",
   'itemUi.market.searchPlaceholder': 'Pazarda ara...',
   'itemUi.market.sell': 'Sat',
   'itemUi.market.sellNote':
     'Çantalarınızdaki malları satışa koyun. Bir eşya satıldığında Tüccar %{cut} pay alır. {max} ilan yuvasından {used} tanesini kullanıyorsunuz.',
-  'itemUi.market.sellPickEmpty': 'Satılacak eşyayı seçmek için çantalarınızdaki bir eşyaya tıklayın.',
+  'itemUi.market.sellPickEmpty':
+    'Satılacak eşyayı seçmek için çantalarınızdaki bir eşyaya tıklayın.',
   'itemUi.market.stackCount': 'x{count}',
-  'itemUi.market.subtitle': 'Tüccar\'ın takas yeri',
+  'itemUi.market.subtitle': "Tüccar'ın takas yeri",
   'itemUi.market.title': 'Dünya Pazarı',
-  'itemUi.market.truncated': '{total} eşleşmeden {shown} tanesi gösteriliyor. Geri kalanını görmek için aramanızı daraltın.',
+  'itemUi.market.truncated':
+    '{total} eşleşmeden {shown} tanesi gösteriliyor. Geri kalanını görmek için aramanızı daraltın.',
   'itemUi.market.weaponAxe': 'Baltalar',
   'itemUi.market.weaponDagger': 'Hançerler',
   'itemUi.market.weaponMace': 'Topuzlar',
@@ -5144,6 +5698,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.legs': 'Bacaklar',
   'itemUi.slots.mainhand': 'Ana El',
   'itemUi.slots.shoulder': 'Omuzluk',
+  'itemUi.slots.twoHand': 'Çift El',
   'itemUi.slots.waist': 'Bel',
   'itemUi.stats.agi': 'Çeviklik',
   'itemUi.stats.armor': 'Zırh',
@@ -5178,11 +5733,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': 'Görev Eşyası',
   'itemUi.tooltip.sellPrice': 'Satış fiyatı: {money}',
   'itemUi.tooltip.stat': '+{value} {stat}',
-  'itemUi.tooltip.useDrink': 'Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.',
+  'itemUi.tooltip.useDrink':
+    'Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.',
   'itemUi.tooltip.useFishing': 'Kullanım: Yakındaki sularda balık tut.',
-  'itemUi.tooltip.useFood': 'Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.',
-  'itemUi.tooltip.useHealingPotion': 'Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.',
-  'itemUi.tooltip.useManaPotion': 'Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.',
+  'itemUi.tooltip.useFood':
+    'Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.',
+  'itemUi.tooltip.useHealingPotion':
+    'Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.',
+  'itemUi.tooltip.useManaPotion':
+    'Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.',
   'itemUi.vendor.buyAria': '{item} eşyasını {price} karşılığında satın al',
   'itemUi.vendor.buybackAria': '{item} eşyasını {price} karşılığında geri al',
   'itemUi.vendor.buybackEmpty': 'Eşya yok',
@@ -5201,7 +5760,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': 'Dünyaya bağlanılıyor...',
   'loading.connectionLost': 'Sunucuyla bağlantı koptu.',
   'loading.connectionRejected': 'Sunucu bağlantıyı kapattı.',
-  'loading.enterTimeout': 'Dünyaya girilemedi. Bağlantı zaman aşımına uğradı. Oyun sunucusu çalışıyor mu?',
+  'loading.enterTimeout':
+    'Dünyaya girilemedi. Bağlantı zaman aşımına uğradı. Oyun sunucusu çalışıyor mu?',
   'loading.enteringWorld': 'Dünyaya giriliyor...',
   'loading.rendererFailed': 'Görüntüleyici başlatılamadı: yeniden yüklemeyi deneyin. {error}',
   'loading.world': 'Dünya yükleniyor...',
@@ -5217,7 +5777,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'lockpickUi.cofferBlurb':
     'Bu mühür yalnızca bir ustanın eline boyun eğer: onu yalnızca Zorlu, Birinci Sınıf yol açabilir. İmza ödülü için üç kilidi de çöz.',
   'lockpickUi.cofferTitle': 'Bereketli Hazine Sandığı',
-  'lockpickUi.depthKeys': 'Kısayol tuşları, mandal numarasını değil, maşa derinliğini ayarlar (Q/W/E/A/Z).',
+  'lockpickUi.depthKeys':
+    'Kısayol tuşları, mandal numarasını değil, maşa derinliğini ayarlar (Q/W/E/A/Z).',
   'lockpickUi.feedback.advanced': 'Pim biraz veriyor...',
   'lockpickUi.feedback.bind': 'Maşa takılıyor: yanlış derinlik!',
   'lockpickUi.feedback.fail': 'Kilit sıkıştı. Bir daha kıpırdamaz.',
@@ -5247,19 +5808,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'lockpickUi.withdraw': 'Geri Çekil (Esc)',
   'lockpickUi.withdrawAria': 'Geri Çekil',
   'meta.builtOn': '{date} tarihinde derlendi',
-  'mobilePreflight.androidInstallDetail': 'Android\'de tam ekran için önce bu sayfayı yükleyin veya Ana ekranınıza ekleyin.',
-  'mobilePreflight.androidInstallStep': 'Chrome\'da menüye dokunun, ardından Uygulamayı yükle veya Ana ekrana ekle seçeneğini seçin.',
-  'mobilePreflight.androidOpenStep': 'World of ClaudeCraft\'ı yeni simgeden açın.',
-  'mobilePreflight.androidStandaloneDetail': 'Tam ekran uygulama modundasınız. Cihazı yatay konumda tutun.',
+  'mobilePreflight.androidInstallDetail':
+    "Android'de tam ekran için önce bu sayfayı yükleyin veya Ana ekranınıza ekleyin.",
+  'mobilePreflight.androidInstallStep':
+    "Chrome'da menüye dokunun, ardından Uygulamayı yükle veya Ana ekrana ekle seçeneğini seçin.",
+  'mobilePreflight.androidOpenStep': "World of ClaudeCraft'ı yeni simgeden açın.",
+  'mobilePreflight.androidStandaloneDetail':
+    'Tam ekran uygulama modundasınız. Cihazı yatay konumda tutun.',
   'mobilePreflight.baseLandscape': 'Dünyaya girmeden önce cihazınızı yatay konuma çevirin.',
   'mobilePreflight.basePerformance':
-    'Mobil performans düşük olabilir. Oyun yavaş geliyorsa fazladan sekmeleri kapatın ve Görüntüleme Kalitesi\'ni düşürün.',
+    "Mobil performans düşük olabilir. Oyun yavaş geliyorsa fazladan sekmeleri kapatın ve Görüntüleme Kalitesi'ni düşürün.",
   'mobilePreflight.continue': 'Oyuna Devam Et',
-  'mobilePreflight.iosInstallDetail': 'iPhone veya iPad\'de gerçek tam ekran için önce bu sayfayı Ana Ekranınıza yükleyin.',
-  'mobilePreflight.iosOpenStep': 'World of ClaudeCraft\'ı yeni Ana Ekran simgesinden açın.',
-  'mobilePreflight.iosShareStep': 'Safari\'de Paylaş\'a, ardından Ana Ekrana Ekle\'ye dokunun.',
-  'mobilePreflight.iosStandaloneDetail': 'Ana ekran tam ekran modundasınız. Cihazı yatay konumda tutun.',
-  'mobilePreflight.otherInstallDetail': 'En iyi tam ekran mobil deneyim için bu sayfayı yükleyin veya Ana ekranınıza ekleyin.',
+  'mobilePreflight.iosInstallDetail':
+    "iPhone veya iPad'de gerçek tam ekran için önce bu sayfayı Ana Ekranınıza yükleyin.",
+  'mobilePreflight.iosOpenStep': "World of ClaudeCraft'ı yeni Ana Ekran simgesinden açın.",
+  'mobilePreflight.iosShareStep': "Safari'de Paylaş'a, ardından Ana Ekrana Ekle'ye dokunun.",
+  'mobilePreflight.iosStandaloneDetail':
+    'Ana ekran tam ekran modundasınız. Cihazı yatay konumda tutun.',
+  'mobilePreflight.otherInstallDetail':
+    'En iyi tam ekran mobil deneyim için bu sayfayı yükleyin veya Ana ekranınıza ekleyin.',
   'mobilePreflight.otherStandaloneDetail': 'Cihazınızı yatay tam ekran konumunda tutun.',
   'mobilePreflight.rotateSub': 'En iyi mobil deneyim için yatay tam ekranda oynayın.',
   'mobilePreflight.rotateTitle': 'Yatay Konuma Çevir',
@@ -5267,13 +5834,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'mode.caCopyAria': 'Sözleşme adresini kopyala',
   'mode.caLabel': '$WOC Sözleşme Adresi',
   'mode.caNote':
-    'WOC topluluk jetonumuzdur. Oynamak için gerekli değildir. WOC\'un faydasını ve döngüsünü tartışmak için Discord\'a katılın.',
+    "WOC topluluk jetonumuzdur. Oynamak için gerekli değildir. WOC'un faydasını ve döngüsünü tartışmak için Discord'a katılın.",
   'mode.offlineAria': 'Çevrimdışı Oyna: anında yerel tek oyunculu oturum başlat',
   'mode.offlineDesc':
     'Tarayıcınızda anında tek oyunculu dünya. Hiçbir şey kaydedilmez: hızlı bir kapışma veya test için ideal.',
   'mode.offlineTitle': 'Çevrimdışı Oyna',
   'mode.onlineAria': 'Çevrimiçi Oyna: kalıcı paylaşımlı dünyaya giriş yap',
-  'mode.onlineDesc': 'Dünyaya giriş yap. Karakterlerin sunucuda yaşar ve dünyayı çevrimiçi olan herkesle paylaşırsın.',
+  'mode.onlineDesc':
+    'Dünyaya giriş yap. Karakterlerin sunucuda yaşar ve dünyayı çevrimiçi olan herkesle paylaşırsın.',
   'mode.onlineTitle': 'Çevrimiçi Oyna',
   'mode.play': 'Oyna',
   'mode.playAria': 'World of ClaudeCraft oyna',
@@ -5303,11 +5871,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'news.loading': 'En son güncellemeler yükleniyor…',
   'news.prerelease': 'Ön sürüm',
   'news.title': 'Haberler ve Güncellemeler',
-  'news.viewOnGithub': 'GitHub\'da Görüntüle',
+  'news.viewOnGithub': "GitHub'da Görüntüle",
   'playerCard.actionCopyReferral': 'Davet Bağlantısını Kopyala',
   'playerCard.actionDownload': 'İndir',
   'playerCard.actionShareNative': 'Paylaş...',
-  'playerCard.actionShareX': 'X\'te Paylaş',
+  'playerCard.actionShareX': "X'te Paylaş",
   'playerCard.arenaStat': 'Arena',
   'playerCard.brandWordmark': 'WORLD OF CLAUDECRAFT',
   'playerCard.close': 'Oyuncu kartını kapat',
@@ -5330,12 +5898,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'playerCard.renderFailed': 'Kartın oluşturulamadı. Farklı bir poz dene.',
   'playerCard.renderFailedStatus': 'Kart oluşturma başarısız oldu.',
   'playerCard.shareButton': 'Oyuncu Kartını Paylaş',
-  'playerCard.shareText': 'World of ClaudeCraft\'ta efsanemi yaratıyorum: Seviye {level} {className}{tierBit}. Dünyama katıl:',
+  'playerCard.shareText':
+    "World of ClaudeCraft'ta efsanemi yaratıyorum: Seviye {level} {className}{tierBit}. Dünyama katıl:",
   'playerCard.shareTierBit': ', {tier}-derece $WOC sahibi',
   'playerCard.statusDownloaded': 'Kart indirildi.',
   'playerCard.statusGenericError': 'Bir şeyler ters gitti.',
   'playerCard.statusOpenedXWithImage': 'X açıldı. Kart görselini gönderiye yapıştır.',
-  'playerCard.statusOpenedXWithLink': 'X bağlantınla açıldı. Kart görseli, herkese açık bir alandan gönderdikten sonra görünür.',
+  'playerCard.statusOpenedXWithLink':
+    'X bağlantınla açıldı. Kart görseli, herkese açık bir alandan gönderdikten sonra görünür.',
   'playerCard.statusPublished': 'Kart yayımlandı. Davet bağlantını aşağıdan paylaş.',
   'playerCard.statusPublishing': 'Kart yayımlanıyor...',
   'playerCard.statusReferralCopied': 'Davet bağlantısı kopyalandı. İstediğin yerde paylaş.',
@@ -5369,8 +5939,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.readyQuestAria': 'Teslim edilmeye hazır görev: {name}',
   'questUi.dialog.turnIn': 'Teslim Et',
   'questUi.dialog.unavailable': 'Mevcut Değil',
-  'questUi.dialog.worldMarket': 'Bana Dünya Pazarı\'nı göster.',
-  'questUi.dialog.worldMarketAria': 'Dünya Pazarı\'nı aç',
+  'questUi.dialog.worldMarket': "Bana Dünya Pazarı'nı göster.",
+  'questUi.dialog.worldMarketAria': "Dünya Pazarı'nı aç",
   'questUi.errors.giverMissing': 'O görev veren yakında değil.',
   'questUi.errors.incomplete': 'O görev tamamlanmadı.',
   'questUi.errors.notInLog': 'O görev kaydında yok.',
@@ -5414,9 +5984,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'realm.onlineNow': 'şu anda {count} çevrimiçi',
   'realm.popTipFull':
     'Dolu nüfus: şu anda 80 veya daha fazla oyuncu çevrimiçi. Çok yoğun; giriş kuyruğunda bekleyebilirsin.',
-  'realm.popTipHigh': 'Yüksek nüfus: şu anda 40 ila 79 oyuncu çevrimiçi. Yoğun, çevrede çok sayıda oyuncu var.',
-  'realm.popTipLow': 'Düşük nüfus: şu anda 15\'ten az oyuncu çevrimiçi. Bolca yer var; taze bir başlangıç için harika.',
-  'realm.popTipMedium': 'Orta nüfus: şu anda 15 ila 39 oyuncu çevrimiçi. Sağlıklı, etkin bir dünya.',
+  'realm.popTipHigh':
+    'Yüksek nüfus: şu anda 40 ila 79 oyuncu çevrimiçi. Yoğun, çevrede çok sayıda oyuncu var.',
+  'realm.popTipLow':
+    "Düşük nüfus: şu anda 15'ten az oyuncu çevrimiçi. Bolca yer var; taze bir başlangıç için harika.",
+  'realm.popTipMedium':
+    'Orta nüfus: şu anda 15 ila 39 oyuncu çevrimiçi. Sağlıklı, etkin bir dünya.',
   'realm.popTipOffline': 'Çevrimdışı: bu dünyaya şu anda ulaşılamıyor ve katılınamıyor.',
   'realm.recommended': 'Önerilen',
   'realm.selectedRealm': 'Dünya: {name}',
@@ -5428,16 +6001,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Oyun',
   'seo.description':
-    'Doğrudan tarayıcında oynanabilen klasik tarzı bir mikro MMO olan World of ClaudeCraft\'ta destansı bir maceraya atıl. Kalıcı bir ortak dünyaya katıl, sınıfları geliştir ve düşmanları alt et!',
+    "Doğrudan tarayıcında oynanabilen klasik tarzı bir mikro MMO olan World of ClaudeCraft'ta destansı bir maceraya atıl. Kalıcı bir ortak dünyaya katıl, sınıfları geliştir ve düşmanları alt et!",
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com, Claudemoon dünyasının resmi ücretsiz tarayıcı MMO\'sudur. Kalıcı bir karakterle çevrimiçi oyna, çevrimdışı tek başına keşfet, wiki\'yi oku ve bu siteden doğrulanmış topluluk bağlantılarını takip et.',
+    "worldofclaudecraft.com, Claudemoon dünyasının resmi ücretsiz tarayıcı MMO'sudur. Kalıcı bir karakterle çevrimiçi oyna, çevrimdışı tek başına keşfet, wiki'yi oku ve bu siteden doğrulanmış topluluk bağlantılarını takip et.",
   'seo.officialLabel': 'Resmi World of ClaudeCraft web sitesi',
   'seo.operatingSystem': 'Web tarayıcısı',
   'seo.playMode': 'Çok Oyunculu',
-  'seo.title': 'World of ClaudeCraft: Klasik Tarzı Web MMO\'su',
+  'seo.title': "World of ClaudeCraft: Klasik Tarzı Web MMO'su",
   'serverUnavailable.body':
-    'Oyun hizmetini yeniden başlatıyoruz ve Claudemoon\'un kısa süre içinde geri döneceğini umuyoruz. Bu sayfa otomatik olarak denetlemeye devam edecek.',
+    "Oyun hizmetini yeniden başlatıyoruz ve Claudemoon'un kısa süre içinde geri döneceğini umuyoruz. Bu sayfa otomatik olarak denetlemeye devam edecek.",
   'serverUnavailable.eyebrow': 'Dünya bakımı',
   'serverUnavailable.heading': 'Dünya geçici olarak kullanılamıyor.',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
@@ -5453,7 +6026,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.cannotEnterNow': 'Şu anda bir delveye giremezsin.',
   'sim.delve.cannotInteract': 'Onunla etkileşime giremezsin.',
   'sim.delve.chestEmpty': 'Sandık boş.',
-  'sim.delve.companionMarksRequired': '{name} öğesini yükseltmek için {marks} Delve Nişanına ihtiyacın var.',
+  'sim.delve.companionMarksRequired':
+    '{name} öğesini yükseltmek için {marks} Delve Nişanına ihtiyacın var.',
   'sim.delve.companionMaxRank': 'Bu yoldaş zaten tamamen yükseltilmiş.',
   'sim.delve.companionRankUp': '{name} {rank}. dereceye ulaşır.',
   'sim.delve.complete': '{name} tamamlandı.',
@@ -5467,8 +6041,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveArenaFirst': 'Önce arenadan ayrıl.',
   'sim.delve.leaveDungeonFirst': 'Önce zindandan ayrıl.',
   'sim.delve.levelRequired': '{name} bölümüne girmek için {level}. seviyede olmalısın.',
-  'sim.delve.levelRequiredTier': '{tier} kademesinde {name} bölümüne girmek için {level}. seviyede olmalısın.',
-  'sim.delve.mechanismOpen': 'Yakınlarda bir mekanizma açılır. Kuzeye doğru bir geçit açılır. İlerideki çıkış portalını bul.',
+  'sim.delve.levelRequiredTier':
+    '{tier} kademesinde {name} bölümüne girmek için {level}. seviyede olmalısın.',
+  'sim.delve.mechanismOpen':
+    'Yakınlarda bir mekanizma açılır. Kuzeye doğru bir geçit açılır. İlerideki çıkış portalını bul.',
   'sim.delve.moduleEnter': '{name}: {objective}',
   'sim.delve.moveCloserChest': 'Sandığa yaklaş.',
   'sim.delve.moveCloserPassage': 'Geçide yaklaş.',
@@ -5479,16 +6055,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.objectiveClearRoom': 'Odayı temizle.',
   'sim.delve.objectiveDefeatBoss': 'Patronu alt et.',
   'sim.delve.passageSealed': 'Geçit mühürlü.',
-  'sim.delve.raiseDead': '{name} Ölü Diriltme\'ye başlar.',
+  'sim.delve.raiseDead': "{name} Ölü Diriltme'ye başlar.",
   'sim.delve.runFailed': '{name} seferi başarısız oldu.',
   'sim.delve.shopItemLocked': 'O eşyanın kilidini henüz açmadın.',
   'sim.delve.shopMarksRequired': '{name} satın almak için {marks} Delve Nişanına ihtiyacın var.',
-  'sim.delve.shopSealPremiumOnly': 'Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.',
+  'sim.delve.shopSealPremiumOnly':
+    'Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.',
   'sim.delve.strikeWall': 'Geçmek için duvara vur.',
-  'sim.delve.surfaceStairs': 'Yüzeye çıkan bir merdiven açılır. Ayrılmak için merdivenlerde F\'ye bas.',
+  'sim.delve.surfaceStairs':
+    "Yüzeye çıkan bir merdiven açılır. Ayrılmak için merdivenlerde F'ye bas.",
   'sim.delve.tombstoneHint': 'Oda temizlendiğinde kuzeye doğru bir mezar taşı geçidi açılır.',
   'sim.delve.tombstoneInto': 'Mezar taşından geçerek {name} içine girersin.',
-  'sim.delve.tombstoneOpen': 'Mühürlü bir mezar taşı geçidi kuzeye doğru gıcırdayarak açılır. Devam etmek için içine yürü.',
+  'sim.delve.tombstoneOpen':
+    'Mühürlü bir mezar taşı geçidi kuzeye doğru gıcırdayarak açılır. Devam etmek için içine yürü.',
   'sim.delve.tooFar': 'Çok uzaktasın.',
   'sim.delve.unknownCompanion': 'Bilinmeyen yoldaş.',
   'sim.delve.unknownTier': 'Bilinmeyen delve kademesi.',
@@ -5497,8 +6076,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.alreadyInProgress': 'Birisi kilidi zaten kurcalıyor.',
   'sim.lockpick.cannotPickThat': 'Onun kilidini açamazsın.',
   'sim.lockpick.chooseAnte': '1, 2 veya 3 maymuncuk seç.',
-  'sim.lockpick.lastPickSnaps': 'Son maymuncuk kırılır. Kilit sıkışır. Delveyi tekrar temizlemezsen sandık kaybolur.',
-  'sim.lockpick.lockJammed': 'Kilit, açılamayacak kadar sıkıştı. Başka bir deneme için delveyi tekrar temizle.',
+  'sim.lockpick.lastPickSnaps':
+    'Son maymuncuk kırılır. Kilit sıkışır. Delveyi tekrar temizlemezsen sandık kaybolur.',
+  'sim.lockpick.lockJammed':
+    'Kilit, açılamayacak kadar sıkıştı. Başka bir deneme için delveyi tekrar temizle.',
   'sim.lockpick.lockYields': 'Kilit açılır! {tier} ganimet.',
   'sim.lockpick.noAttempt': 'Devam eden bir kilit açma denemesi yok.',
   'sim.lockpick.notYours': 'Bu senin kilidin değil.',
@@ -5542,7 +6123,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.appConnected': 'Uygulama Bağlandı',
   'wallet.balanceAmount': '{amount} $WOC',
   'wallet.balanceAria': 'Doğrulanmış Solana cüzdanı bakiyesi: {balance}',
-  'wallet.balancePreviewAria': 'Bağlı cüzdan bakiyesi önizlemesi: {balance}. Sahip rozetini doğrulamak için cüzdanı bağlayın.',
+  'wallet.balancePreviewAria':
+    'Bağlı cüzdan bakiyesi önizlemesi: {balance}. Sahip rozetini doğrulamak için cüzdanı bağlayın.',
   'wallet.balancePreviewTitle': 'Bağlı cüzdan $WOC bakiyesi önizlemesi',
   'wallet.balanceTitle': 'Doğrulanmış Solana cüzdanı $WOC bakiyesi',
   'wallet.connect': 'Cüzdanı Doğrula',
@@ -5562,15 +6144,21 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.helpDisconnected':
     'Sahip rozetini ve oyuncu kartı nişanlarını etkinleştirmek için bir Solana cüzdanı doğrulayın. İşlem veya SOL gerekmez.',
   'wallet.helpLinked': 'Sahip ayrıcalıkları etkin. Cüzdan uygulaması bu tarayıcıda bağlı.',
-  'wallet.helpLinkedDisconnected': 'Sahip ayrıcalıkları etkin. İmzalamanız veya harcamanız gerektiğinde uygulamayı bağlayın.',
-  'wallet.helpLinkedDisconnectedWithBalance': 'Sahip ayrıcalıkları etkin. İmzalamanız veya harcamanız gerektiğinde uygulamayı bağlayın.',
-  'wallet.helpLinkedWithBalance': 'Sahip ayrıcalıkları etkin. Cüzdan uygulaması bu tarayıcıda bağlı.',
+  'wallet.helpLinkedDisconnected':
+    'Sahip ayrıcalıkları etkin. İmzalamanız veya harcamanız gerektiğinde uygulamayı bağlayın.',
+  'wallet.helpLinkedDisconnectedWithBalance':
+    'Sahip ayrıcalıkları etkin. İmzalamanız veya harcamanız gerektiğinde uygulamayı bağlayın.',
+  'wallet.helpLinkedWithBalance':
+    'Sahip ayrıcalıkları etkin. Cüzdan uygulaması bu tarayıcıda bağlı.',
   'wallet.helpLoginToLink': '{address} bağlandı. Hesabınıza bağlamak için giriş yapın.',
-  'wallet.helpLoginToLinkWithBalance': '{address} adresi {balance} ile bağlandı. Hesabınıza bağlamak için giriş yapın.',
-  'wallet.helpReadyToLink': 'Cüzdan seçildi: {address}. Sahip rozetini ve oyuncu kartlarını doğrulamak için bir kez imzalayın.',
+  'wallet.helpLoginToLinkWithBalance':
+    '{address} adresi {balance} ile bağlandı. Hesabınıza bağlamak için giriş yapın.',
+  'wallet.helpReadyToLink':
+    'Cüzdan seçildi: {address}. Sahip rozetini ve oyuncu kartlarını doğrulamak için bir kez imzalayın.',
   'wallet.helpReadyToLinkWithBalance':
     'Cüzdan seçildi: {address}, bakiye {balance}. Sahip rozetini ve oyuncu kartlarını doğrulamak için bir kez imzalayın.',
-  'wallet.hiddenNotice': 'Cüzdan satırı gizlendi. Oyun içinde Seçenekler > Arayüz menüsünden yeniden etkinleştirin.',
+  'wallet.hiddenNotice':
+    'Cüzdan satırı gizlendi. Oyun içinde Seçenekler > Arayüz menüsünden yeniden etkinleştirin.',
   'wallet.hide': 'Gizle',
   'wallet.hideAria': 'Bu ekranda cüzdan satırını gizle',
   'wallet.hideTitle': 'Bu ekranda cüzdan satırını gizle',
@@ -5584,40 +6172,44 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.holderTiers.ember.name': 'Köz',
   'wallet.holderTiers.gilded.flavor': 'Yaldızlanmış ve sırıtan.',
   'wallet.holderTiers.gilded.name': 'Yaldızlı',
-  'wallet.holderTiers.krakencrown.flavor': 'Derinliklerin tacı: arzın %4\'ü.',
+  'wallet.holderTiers.krakencrown.flavor': "Derinliklerin tacı: arzın %4'ü.",
   'wallet.holderTiers.krakencrown.name': 'Kraken Tacı',
-  'wallet.holderTiers.leviathan.flavor': 'Piyasalar hareketini hisseder: arzın %1\'i.',
+  'wallet.holderTiers.leviathan.flavor': "Piyasalar hareketini hisseder: arzın %1'i.",
   'wallet.holderTiers.leviathan.name': 'Leviathan',
-  'wallet.holderTiers.realmshaper.flavor': 'Diyarı yeniden şekillendirirsin: arzın %8\'i.',
+  'wallet.holderTiers.realmshaper.flavor': "Diyarı yeniden şekillendirirsin: arzın %8'i.",
   'wallet.holderTiers.realmshaper.name': 'Diyar Şekillendiren',
   'wallet.holderTiers.silverbound.flavor': 'Gümüşe bağlı, kese büyüyor.',
   'wallet.holderTiers.silverbound.name': 'Gümüş Bağlı',
   'wallet.holderTiers.sovereign.flavor': 'Diyar diz çöker: arzın tamamı.',
   'wallet.holderTiers.sovereign.name': 'Hükümdar',
-  'wallet.holderTiers.starhoard.flavor': 'Yıldız ışığını büken bir hazine: arzın %6\'sı.',
+  'wallet.holderTiers.starhoard.flavor': "Yıldız ışığını büken bir hazine: arzın %6'sı.",
   'wallet.holderTiers.starhoard.name': 'Yıldız Hazinesi',
-  'wallet.holderTiers.stormcaller.flavor': 'Adının anılmasıyla fırtınalar toplanır: arzın %3\'ü.',
+  'wallet.holderTiers.stormcaller.flavor': "Adının anılmasıyla fırtınalar toplanır: arzın %3'ü.",
   'wallet.holderTiers.stormcaller.name': 'Fırtına Çağıran',
-  'wallet.holderTiers.tidelord.flavor': 'Gelgit çağrına yanıt verir: arzın %2\'si.',
+  'wallet.holderTiers.tidelord.flavor': "Gelgit çağrına yanıt verir: arzın %2'si.",
   'wallet.holderTiers.tidelord.name': 'Gelgit Efendisi',
-  'wallet.holderTiers.titanforged.flavor': 'Titanlar arasında dövülmüş: arzın %5\'i.',
+  'wallet.holderTiers.titanforged.flavor': "Titanlar arasında dövülmüş: arzın %5'i.",
   'wallet.holderTiers.titanforged.name': 'Titan Dövmesi',
-  'wallet.holderTiers.vaultwarden.flavor': 'Artık gerçek bir kasayı koruyorsun: tüm $WOC\'nin %0,01\'i.',
+  'wallet.holderTiers.vaultwarden.flavor':
+    "Artık gerçek bir kasayı koruyorsun: tüm $WOC'nin %0,01'i.",
   'wallet.holderTiers.vaultwarden.name': 'Kasa Muhafızı',
-  'wallet.holderTiers.voidwarden.flavor': 'Boşluğun kıyısındaki bekçi: arzın %7\'si.',
+  'wallet.holderTiers.voidwarden.flavor': "Boşluğun kıyısındaki bekçi: arzın %7'si.",
   'wallet.holderTiers.voidwarden.name': 'Boşluk Muhafızı',
-  'wallet.holderTiers.whale.flavor': 'Yüzdüğünde derinlik ikiye ayrılır: arzın %0,1\'i.',
+  'wallet.holderTiers.whale.flavor': "Yüzdüğünde derinlik ikiye ayrılır: arzın %0,1'i.",
   'wallet.holderTiers.whale.name': 'Balina',
-  'wallet.holderTiers.worldbearer.flavor': 'Dünyanın bir parçasını taşırsın: arzın %10\'u.',
+  'wallet.holderTiers.worldbearer.flavor': "Dünyanın bir parçasını taşırsın: arzın %10'u.",
   'wallet.holderTiers.worldbearer.name': 'Dünya Taşıyıcı',
-  'wallet.holderTiers.worldforger.flavor': 'Kendine ait bir dünya döversin: arzın %9\'u.',
+  'wallet.holderTiers.worldforger.flavor': "Kendine ait bir dünya döversin: arzın %9'u.",
   'wallet.holderTiers.worldforger.name': 'Dünya Döven',
   'wallet.label': '$WOC Cüzdanı',
   'wallet.linkFailed': 'Cüzdan doğrulaması başarısız oldu.',
   'wallet.linkTitle': 'Bu cüzdanı imzalayıp hesabınıza bağlamak için tıklayın.',
-  'wallet.linkedDisconnectedAria': 'Cüzdan hesabınız için doğrulanmış kalır. Cüzdan uygulamasını yönetmek için yeniden bağlanın.',
-  'wallet.linkedDisconnectedTitle': 'Cüzdan hesabınız için doğrulanmış kalır. Cüzdan uygulamasını yönetmek için yeniden bağlanın.',
-  'wallet.linkedTitle': 'Cüzdan hesabınız için doğrulandı. Cüzdan uygulamasını yönetmek için tıklayın.',
+  'wallet.linkedDisconnectedAria':
+    'Cüzdan hesabınız için doğrulanmış kalır. Cüzdan uygulamasını yönetmek için yeniden bağlanın.',
+  'wallet.linkedDisconnectedTitle':
+    'Cüzdan hesabınız için doğrulanmış kalır. Cüzdan uygulamasını yönetmek için yeniden bağlanın.',
+  'wallet.linkedTitle':
+    'Cüzdan hesabınız için doğrulandı. Cüzdan uygulamasını yönetmek için tıklayın.',
   'wallet.signOut': 'Bağlantıyı Kes',
   'wallet.signOutAria': 'Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes',
   'wallet.signOutTitle': 'Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes',
@@ -5636,16 +6228,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.verifyTitle': 'Bir cüzdan seçin ve sahipliği doğrulamak için bir kez imzalayın.',
   'wallet.verifying': 'Doğrulanıyor...',
   'wallet.verifyingTitle': 'Cüzdan doğrulaması sürüyor.',
-  'wiki.cta': 'Wiki\'ye Göz At',
+  'wiki.cta': "Wiki'ye Göz At",
   'wiki.desc': 'Diyarın sırlarını, sınıf rehberlerini ve stratejilerini keşfedin.',
   'wiki.title': 'Oyun Wiki ve Rehberi',
   'worldContent.corpseName': '{name} (ceset)',
-  'worldContent.delveLockedChestInteract': 'Kilidi açmak için F\'ye bas',
-  'worldContent.delveRewardChestInteract': 'Ganimeti almak için F\'ye bas',
-  'worldContent.delveSurfaceExitInteract': 'Tırmanmak için F\'ye bas',
+  'worldContent.delveLockedChestInteract': "Kilidi açmak için F'ye bas",
+  'worldContent.delveRewardChestInteract': "Ganimeti almak için F'ye bas",
+  'worldContent.delveSurfaceExitInteract': "Tırmanmak için F'ye bas",
   'worldContent.dungeonExitName': '{name} Çıkışı',
-  'worldContent.dungeonInstanceBusy': '{name} zindanının tüm kopyaları dolu. Birazdan tekrar deneyin.',
-  'worldContent.dungeonPartyWarning': '{name}, {count} kişilik tam bir grup içindir. Dikkatli ilerleyin.',
+  'worldContent.dungeonInstanceBusy':
+    '{name} zindanının tüm kopyaları dolu. Birazdan tekrar deneyin.',
+  'worldContent.dungeonPartyWarning':
+    '{name}, {count} kişilik tam bir grup içindir. Dikkatli ilerleyin.',
   'hudChrome.auraEffect.dot': 'Her {interval} sn {value} {school} hasarı verir',
   'hudChrome.auraEffect.hot': 'Her {interval} sn {value} sağlık yeniler',
   'hudChrome.auraEffect.absorb': '{value} hasar emer',
@@ -5697,7 +6291,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Fleet Formu: hareket hızı %{pct} artar',
   'hudChrome.auraEffect.defensiveStance': 'Korumali Durus: alınan hasar azalır, daha fazla tehdit',
-  'hudChrome.auraEffect.righteousFury': 'Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar',
+  'hudChrome.auraEffect.righteousFury':
+    'Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Altura de salto aumentada un {pct}%',
   'hudChrome.auraEffect.school.physical': 'Fiziksel',
@@ -5720,7 +6315,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assignAria': '{item} esyasini {name} oyuncusuna ata',
   'hudChrome.masterLoot.rollButton': 'Zar at',
   'hudChrome.masterLoot.selectAll': 'Tümünü sec',
-  'hudChrome.masterLoot.methodMaster': 'Ganimet yontemi ganimet ustasi olarak ayarlandi. Ganimet ustasi: {name}.',
+  'hudChrome.masterLoot.methodMaster':
+    'Ganimet yontemi ganimet ustasi olarak ayarlandi. Ganimet ustasi: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Ganimet yontemi grup ganimeti olarak ayarlandi.',
   'hudChrome.masterLoot.assigned': '{looter}, {item} esyasini {target} oyuncusuna atadi.',
   'hudChrome.masterLoot.unassigned': '{item} atanmadi ve herkes icin serbest.',
@@ -5729,7 +6325,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.crownforged.name': 'Bonewrought Kıyafetleri',
   'entities.itemSets.crownforged.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.crownforged.bonus3': 'Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.',
+  'entities.itemSets.crownforged.bonus3':
+    'Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.deathlord.name': 'Barrowlord Savaş Takımı',
   'entities.itemSets.deathlord.bonus2': 'Saldırı gücünü 40 artırır.',
   'entities.itemSets.deathlord.bonus3': 'Gücü 15 ve dayanıklılığı 15 artırır.',
@@ -5740,18 +6337,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.bonus3': 'Zekayı 10 ve dayanıklılığı 10 artırır.',
   'entities.itemSets.nighttalon.name': 'Direfang Postu',
   'entities.itemSets.nighttalon.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.nighttalon.bonus3': 'Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.',
+  'entities.itemSets.nighttalon.bonus3':
+    'Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.soulflame.name': 'Wraithfire Kıyafetleri',
   'entities.itemSets.soulflame.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
   'entities.itemSets.soulflame.bonus3': 'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.stormcallers.name': 'Galecall Cübbeleri',
   'entities.itemSets.stormcallers.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
-  'entities.itemSets.stormcallers.bonus3': 'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
+  'entities.itemSets.stormcallers.bonus3':
+    'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.vale_arcanist.name': 'Vadi Arkanisti giysileri',
   'entities.itemSets.vale_arcanist.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang Cübbeleri',
   'entities.itemSets.wyrmshadow.bonus2': 'Saldırı gücünü 40 artırır.',
   'entities.itemSets.wyrmshadow.bonus3': 'Çevikliği 15 ve kritik şansını %2 artırır.',
+  'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
+  'hudChrome.itemSoulbound': 'Ruha bağlı',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Direnildi',
@@ -5786,14 +6387,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tiers.mythic': 'Mitik',
   'hudChrome.discord.loginCta': 'Discord ile devam et',
   'hudChrome.discord.choice.title': 'Discord ile devam et',
-  'hudChrome.discord.choice.intro': 'Yeni bir hesap oluştur ya da Discord\'unu mevcut bir hesabına bağla.',
+  'hudChrome.discord.choice.intro':
+    "Yeni bir hesap oluştur ya da Discord'unu mevcut bir hesabına bağla.",
   'hudChrome.discord.choice.greeting': 'Hoş geldin, {name}!',
   'hudChrome.discord.choice.createCta': 'Yeni hesap oluştur',
   'hudChrome.discord.choice.haveAccount': 'Zaten bir hesabın var mı?',
   'hudChrome.discord.choice.linkCta': 'Mevcut bir hesabı bağla',
   'hudChrome.discord.choice.linkSubmit': 'Hesabı bağla',
   'hudChrome.discord.choice.error': 'Devam edilemedi. Lütfen tekrar dene.',
-  'hudChrome.discord.choice.expired': 'Bu Discord girişinin süresi doldu. Lütfen Discord ile tekrar giriş yap.',
+  'hudChrome.discord.choice.expired':
+    'Bu Discord girişinin süresi doldu. Lütfen Discord ile tekrar giriş yap.',
   'hudChrome.discord.keep.title': 'Parola belirle',
   'hudChrome.discord.keep.body':
     'Hesabın Discord ile giriş yapıyor. Bağlantıyı kaldırdıktan sonra kullanıcı adınla giriş yapmaya devam edebilmen için bir parola belirle.',
@@ -5809,8 +6412,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.cta.statsLoading': 'Topluluğa katıl ve ödüller kazan',
   'hudChrome.discord.cta.button': 'Tek tıkla bağla',
   'hudChrome.discord.cta.dismiss': 'Kapat',
-  'hudChrome.discord.link.cta': 'Discord\'u bağla',
-  'hudChrome.discord.link.relink': 'Discord\'u yeniden bağla',
+  'hudChrome.discord.link.cta': "Discord'u bağla",
+  'hudChrome.discord.link.relink': "Discord'u yeniden bağla",
   'hudChrome.discord.link.connecting': 'Discord açılıyor...',
   'hudChrome.discord.link.benefits':
     'Oyun ve topluluk etkinliğinden puan kazanmak ve statü kademelerini tırmanmak için Discord hesabını bağla.',
@@ -5821,8 +6424,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.viewCharacter': '{name} görüntüle',
   'hudChrome.discord.viewProfile': 'Bu karakterin herkese açık profilini aç',
   'hudChrome.discord.unlink': 'Bağlantıyı kaldır',
-  'hudChrome.discord.visit': 'Discord\'u ziyaret et',
-  'hudChrome.discord.unlinkConfirm': 'Discord hesabının bu oyun hesabıyla bağlantısı kaldırılsın mı?',
+  'hudChrome.discord.visit': "Discord'u ziyaret et",
+  'hudChrome.discord.unlinkConfirm':
+    'Discord hesabının bu oyun hesabıyla bağlantısı kaldırılsın mı?',
   'hudChrome.discord.statusLabel': 'Statü',
   'hudChrome.discord.rank': 'Rütbe',
   'hudChrome.discord.points': 'Puan',
@@ -5834,16 +6438,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierCurrent': 'Mevcut',
   'hudChrome.discord.earnTitle': 'Nasıl puan kazanılır',
   'hudChrome.discord.earnBody':
-    'Oyunda geçirdiğin süreden ve Discord\'da aktif kalmaktan puan kazan. Puanlar statü kademeni yükseltir.',
+    "Oyunda geçirdiğin süreden ve Discord'da aktif kalmaktan puan kazan. Puanlar statü kademeni yükseltir.",
   'hudChrome.discord.memberSince': 'Üyelik tarihi',
-  'hudChrome.discord.memberSinceDays': 'Discord\'da {days}g',
+  'hudChrome.discord.memberSinceDays': "Discord'da {days}g",
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': 'Geliştirici',
   'hudChrome.discord.roleTag.mods': 'Moderatör',
   'hudChrome.discord.roleTag.artists': 'Sanatçı',
   'hudChrome.discord.guildMember': 'Onaylı üye',
   'hudChrome.discord.notMember': 'Henüz sunucuda değil',
-  'hudChrome.discord.joinCta': 'Discord\'a katıl',
+  'hudChrome.discord.joinCta': "Discord'a katıl",
   'hudChrome.discord.online': '{count} çevrimiçi',
   'hudChrome.discord.community': 'Topluluk',
   'hudChrome.discord.rewards': 'Ödüller',
@@ -5884,15 +6488,18 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
-  'errors.api.desktopCodeInvalid': 'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
+  'errors.api.desktopCodeInvalid':
+    'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
   'desktop.crash.body': 'Oyun görünümü çalışmayı durdurdu. Yeniden yüklensin mi?',
-  'desktop.crash.fatalBody': 'World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor.',
+  'desktop.crash.fatalBody':
+    'World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor.',
   'desktop.crash.quit': 'Çık',
   'desktop.crash.reload': 'Yeniden Yükle',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.update.downloading': '{version} güncellemesi indiriliyor...',
   'desktop.update.later': 'Daha Sonra',
-  'desktop.update.ready': '{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.',
+  'desktop.update.ready':
+    '{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.',
   'desktop.update.restart': 'Şimdi Yeniden Başlat',
   'hudChrome.dailyRewards.close': 'Günlük ödülleri kapat',
   'hudChrome.dailyRewards.endsIn': 'Bitmesine {time}',
@@ -5907,8 +6514,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.prize': 'Ödül Havuzu',
   'hudChrome.dailyRewards.reason.eligible': 'Ödüllerin kilidi açıldı.',
   'hudChrome.dailyRewards.reason.no_wallet': 'En az 20 USD değerinde WOC bulunan bir cüzdan bağla.',
-  'hudChrome.dailyRewards.reason.price_unavailable': 'WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.',
-  'hudChrome.dailyRewards.reason.under_minimum': 'Cüzdan, 20 USD değerindeki WOC alt sınırının altında.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'Cüzdan, 20 USD değerindeki WOC alt sınırının altında.',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}sa {minutes}dk',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1dk',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}dk',
@@ -5928,17 +6537,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.title': 'Günlük Ödüller',
   'hudChrome.dailyRewards.unknown': 'Bilinmiyor',
   'hudChrome.dailyRewards.usd': '{amount} USD',
-  'hudChrome.dailyRewards.walletConnectBody': 'Günlük ödüllerin kilidini açmak için WOC bulunan bir Solana cüzdanını doğrula.',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Günlük ödüllerin kilidini açmak için WOC bulunan bir Solana cüzdanını doğrula.',
   'hudChrome.dailyRewards.walletConnectButton': 'Cüzdanı Doğrula',
   'hudChrome.dailyRewards.walletConnectTitle': 'Cüzdanı Doğrula',
-  'hudChrome.dailyRewards.walletHoldBody': 'Günlük ödüllerin kilidini açmak için en az {amount} USD değerinde WOC bulundur.',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Günlük ödüllerin kilidini açmak için en az {amount} USD değerinde WOC bulundur.',
   'hudChrome.dailyRewards.walletHoldTitle': 'WOC Bulundur',
-  'hudChrome.dailyRewards.walletPriceBody': 'WOC fiyatı şu anda alınamıyor. Kısa süre sonra tekrar bak.',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'WOC fiyatı şu anda alınamıyor. Kısa süre sonra tekrar bak.',
   'hudChrome.dailyRewards.walletValue': 'Cüzdan Değeri (WOC)',
   'hudChrome.nativeUpdate.body':
-    'World of ClaudeCraft\'ın yeni bir sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.',
+    "World of ClaudeCraft'ın yeni bir sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
   'hudChrome.nativeUpdate.bodyWithVersion':
-    'World of ClaudeCraft\'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.',
+    "World of ClaudeCraft'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
   'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
@@ -5965,12 +6577,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountSessionLimit': 'Bu hesaba ait çok fazla karakter zaten dünyada.',
   'errors.api.crossSiteOrigin': 'Güvenlik nedeniyle istek engellendi.',
   'errors.api.unsupportedMediaType': 'Desteklenmeyen istek biçimi.',
-  'apiError.account.characters_online': 'Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.',
-  'apiError.account.deactivated': 'Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.',
+  'apiError.account.characters_online':
+    'Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.',
+  'apiError.account.deactivated':
+    'Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.',
   'apiError.account.not_found': 'Hesap bulunamadı.',
   'apiError.account.password_too_long': 'Yeni parola en fazla 128 karakter olmalıdır.',
   'apiError.account.password_too_short': 'Parola en az 6 karakter olmalıdır.',
-  'apiError.account.username_invalid': 'Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.',
+  'apiError.account.username_invalid':
+    'Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.',
   'apiError.account.username_mismatch': 'Bu kullanıcı adı hesabınızla eşleşmiyor.',
   'apiError.account.username_not_allowed': 'Bu kullanıcı adına izin verilmiyor.',
   'apiError.account.username_taken': 'Bu kullanıcı adı zaten alınmış.',
@@ -5982,7 +6597,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.auth.token_invalid': 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.',
   'apiError.auth.token_missing': 'Bunu yapmak için giriş yapmış olmanız gerekir.',
   'apiError.auth.too_many_attempts': 'Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.',
-  'apiError.auth.too_many_failed_attempts': 'Çok fazla başarısız deneme. Birkaç dakika bekleyip tekrar deneyin.',
+  'apiError.auth.too_many_failed_attempts':
+    'Çok fazla başarısız deneme. Birkaç dakika bekleyip tekrar deneyin.',
   'apiError.auth.verification_failed': 'Doğrulama başarısız oldu. Lütfen tekrar deneyin.',
   'apiError.auth.web_login_only': 'Girişlere yalnızca oyun istemcisinden izin verilir.',
   'apiError.body.too_large': 'Bu istek çok büyük. Daha az veriyle tekrar deneyin.',
@@ -5996,15 +6612,19 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.character.name_taken': 'Bu ad alınmış.',
   'apiError.character.not_found': 'Karakter bulunamadı.',
   'apiError.character.online': 'Karakter şu anda çevrimiçi.',
-  'apiError.character.rename_not_permitted': 'Bu karakterin yeniden adlandırılmasına izin verilmiyor.',
-  'apiError.character.rename_required': 'Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.',
+  'apiError.character.rename_not_permitted':
+    'Bu karakterin yeniden adlandırılmasına izin verilmiyor.',
+  'apiError.character.rename_required':
+    'Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.',
   'apiError.character.taken_over': 'Karakteriniz başka bir oturum tarafından devralındı.',
   'apiError.db.conflict': 'Bu değişiklik başka bir güncellemeyle çakıştı. Lütfen tekrar deneyin.',
   'apiError.discord.already_linked': 'Bu Discord hesabı zaten başka bir hesaba bağlı.',
-  'apiError.discord.expired': 'Bu Discord girişinin süresi doldu. Lütfen tekrar Discord ile giriş yapın.',
+  'apiError.discord.expired':
+    'Bu Discord girişinin süresi doldu. Lütfen tekrar Discord ile giriş yapın.',
   'apiError.discord.link_required': 'Önce Discord hesabınızı bağlayın.',
   'apiError.discord.not_configured': 'Discord entegrasyonu şu anda kullanılamıyor.',
-  'apiError.discord.password_required': 'Discord hesabınızın bağlantısını kaldırmadan önce bir parola belirleyin.',
+  'apiError.discord.password_required':
+    'Discord hesabınızın bağlantısını kaldırmadan önce bir parola belirleyin.',
   'apiError.discord.swag_claimed': 'Bu ödülü zaten aldınız.',
   'apiError.discord.swag_points': 'Yeterli puan yok.',
   'apiError.discord.swag_tier': 'Bunu almak için daha yüksek bir rütbeye ulaşın.',
@@ -6014,7 +6634,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.internal.error': 'Bizim tarafımızda bir şeyler ters gitti. Lütfen tekrar deneyin.',
   'apiError.json.malformed': 'Bu istek okunamadı. Lütfen tekrar deneyin.',
   'apiError.moderation.banned': 'Bu hesap yasaklandı.',
-  'apiError.moderation.force_rename': 'Bir moderatör, karakterlerinizden birinin yeniden adlandırılmasını gerektiriyor.',
+  'apiError.moderation.force_rename':
+    'Bir moderatör, karakterlerinizden birinin yeniden adlandırılmasını gerektiriyor.',
   'apiError.moderation.suspended': 'Bu hesap askıya alındı.',
   'apiError.moderation.suspended_until': 'Bu hesap {date} tarihine kadar askıya alındı.',
   'apiError.origin.cross_site': 'Güvenlik nedeniyle istek engellendi.',
@@ -6025,37 +6646,39 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Önce iki adımlı doğrulama kurulumunu başlatın.',
   'apiError.validation.failed': 'Bazı alanlar geçersiz. Formu kontrol edip tekrar deneyin.',
   'download.linuxCta': 'Linux için indirin',
-  'download.linuxHint': 'AppImage: yürütülebilir hale getirin ve ardından çalıştırın. Kurulum gerekmez.',
+  'download.linuxHint':
+    'AppImage: yürütülebilir hale getirin ve ardından çalıştırın. Kurulum gerekmez.',
   'loading.reconnecting': 'Bağlantı kesildi. Yeniden bağlanılıyor...',
   'guide.nav.settings': 'Ayarlar ve Performans',
   'guide.settingsPage.advancedBody':
     'Gelişmiş, High seviyesinden başlar ve dört ekstra seçicinin kilidini açar, böylece karelerinizi gerçekten fark ettiğiniz yerde geçirebilirsiniz: Arazi Detayı, Yeşillik Yoğunluğu, Efektler ve Aydınlatma ve Gölge Kalitesi. Grafik Kalitesi gibi, yeniden yükleme sonrasında uygulanırlar.',
   'guide.settingsPage.advancedHeading': 'Gelişmiş ön ayar: kendinizinkini karıştırın',
   'guide.settingsPage.advancedMixes':
-    'En sevdiğiniz iki karışım: Gölge Kalitesini High\'de tutun ve ışık veren net, parlamayan bir görünüm için Efektler ve Aydınlatma\'yı Low olarak ayarlayın veya çiçeklenmeyi korumak ve gölgeleri yumuşatmak için tam tersini yapın.',
+    "En sevdiğiniz iki karışım: Gölge Kalitesini High'de tutun ve ışık veren net, parlamayan bir görünüm için Efektler ve Aydınlatma'yı Low olarak ayarlayın veya çiçeklenmeyi korumak ve gölgeleri yumuşatmak için tam tersini yapın.",
   'guide.settingsPage.balancedTagline': 'Çoğu makine için en uygun nokta ve varsayılan tavsiyemiz.',
   'guide.settingsPage.balancedTitle': 'Dengeli',
   'guide.settingsPage.balancedWhy':
-    'Medium gerçek gölgeler ve dolu materyaller getiriyor; High ortam tıkanıklığını ve çiçeklenmeyi ekler. Ultra\'ün altında yerleşik bir güvenlik ağı, yoğun kavgalarda ani düşüşleri emer, böylece Dengeli, bebek bakıcılığı gerektirmeden sorunsuz kalır.',
+    "Medium gerçek gölgeler ve dolu materyaller getiriyor; High ortam tıkanıklığını ve çiçeklenmeyi ekler. Ultra'ün altında yerleşik bir güvenlik ağı, yoğun kavgalarda ani düşüşleri emer, böylece Dengeli, bebek bakıcılığı gerektirmeden sorunsuz kalır.",
   'guide.settingsPage.colDoes': 'Ne işe yarar',
   'guide.settingsPage.colImpact': 'FPS etkisi',
   'guide.settingsPage.colSetting': 'Ayar',
   'guide.settingsPage.factDetectBody':
-    'İlk başlatışınızda oyun cihazınızı okur ve mütevazı bir telefondaki Low\'dan güçlü bir masaüstündeki Ultra\'e kadar mantıklı bir katman seçer. Kendi yaptığınız herhangi bir seçim her zaman kazanır.',
+    "İlk başlatışınızda oyun cihazınızı okur ve mütevazı bir telefondaki Low'dan güçlü bir masaüstündeki Ultra'e kadar mantıklı bir katman seçer. Kendi yaptığınız herhangi bir seçim her zaman kazanır.",
   'guide.settingsPage.factDetectTitle': 'Oyun önce kendini ayarlar',
   'guide.settingsPage.factGovernorBody':
-    'Ultra\'ün altındaki her kademede oyun, büyük bir kavganın arttığı an için çimleri, efektleri ve ışıklandırmayı sessizce inceltiyor ve ardından bunları yeniden canlandırıyor. Ultra\'ü seçmek her ayrıntıyı saklamayı tercih ettiğinizi gösterir.',
+    "Ultra'ün altındaki her kademede oyun, büyük bir kavganın arttığı an için çimleri, efektleri ve ışıklandırmayı sessizce inceltiyor ve ardından bunları yeniden canlandırıyor. Ultra'ü seçmek her ayrıntıyı saklamayı tercih ettiğinizi gösterir.",
   'guide.settingsPage.factGovernorTitle': 'Yerleşik bir güvenlik ağı',
   'guide.settingsPage.factReloadBody':
     'Grafik Kalitesi ve Gelişmiş seçiciler, yeniden yükleme sonrasında devreye girer ve gerektiğinde panelde Şimdi Yeniden Yükle düğmesi sunulur. Diğer tüm seçenekler, değiştirdiğiniz anda geçerli olur.',
   'guide.settingsPage.factReloadTitle': 'İki çeşit seçenek',
   'guide.settingsPage.fairnessBody':
-    'Burada güzelliği güçle takas eden hiçbir seçenek yok. Lower ayarları yalnızca kozmetik cilayı değiştirir, asla savaştığınız bilgileri değiştirmez: debuff\'larınız, kullanım çubuklarınız, grup sağlığınız ve hasar numaralarınız Low ile Ultra arasında aynıdır. Mütevazı bir makinede oynamak asla bir dezavantaj değildir.',
+    "Burada güzelliği güçle takas eden hiçbir seçenek yok. Lower ayarları yalnızca kozmetik cilayı değiştirir, asla savaştığınız bilgileri değiştirmez: debuff'larınız, kullanım çubuklarınız, grup sağlığınız ve hasar numaralarınız Low ile Ultra arasında aynıdır. Mütevazı bir makinede oynamak asla bir dezavantaj değildir.",
   'guide.settingsPage.fairnessTitle': 'Tasarım gereği fuar',
-  'guide.settingsPage.fpsTagline': 'Daha eski dizüstü bilgisayarlar, entegre grafikler ve pille çalışma için.',
+  'guide.settingsPage.fpsTagline':
+    'Daha eski dizüstü bilgisayarlar, entegre grafikler ve pille çalışma için.',
   'guide.settingsPage.fpsTitle': 'En iyi FPS',
   'guide.settingsPage.fpsWhy':
-    'Grafik Kalitesi ana anahtardır ve İşleme Kalitesi en güçlü kaydırıcıdır: %70\'te dünya piksellerin kabaca yarısını çekerken arayüz mükemmel derecede keskin kalır.',
+    "Grafik Kalitesi ana anahtardır ve İşleme Kalitesi en güçlü kaydırıcıdır: %70'te dünya piksellerin kabaca yarısını çekerken arayüz mükemmel derecede keskin kalır.",
   'guide.settingsPage.heading': 'Ayarlar ve Performans',
   'guide.settingsPage.howHeading': 'Seçeneklerin nasıl davrandığı',
   'guide.settingsPage.impactHeavy': 'Ağır',
@@ -6068,7 +6691,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.loadoutsIntro':
     'Makinenize benzeyen ekipmanla başlayın, ardından size doğru gelene kadar her seferinde bir seçeneği ayarlayın.',
   'guide.settingsPage.mobileBody':
-    'Mobil sizin için daha fazlasını yönetir: Oyun katmanı seçer, pili ve ısıyı korumak için çözünürlüğü bir dokunuş daha düşük tutar ve en yüksek katmanları yalnızca masaüstünde tutar. Yukarıdaki yüklemeler hala geçerlidir; telefonlar High\'de doruğa ulaşır.',
+    "Mobil sizin için daha fazlasını yönetir: Oyun katmanı seçer, pili ve ısıyı korumak için çözünürlüğü bir dokunuş daha düşük tutar ve en yüksek katmanları yalnızca masaüstünde tutar. Yukarıdaki yüklemeler hala geçerlidir; telefonlar High'de doruğa ulaşır.",
   'guide.settingsPage.mobileTitle': 'Telefonlarda ve tabletlerde',
   'guide.settingsPage.recommended': 'Tavsiye edilen',
   'guide.settingsPage.rowBrightness': 'Sahne pozlaması, daha koyu veya daha parlak. Saf tercih.',
@@ -6078,7 +6701,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bloom, ortamın kapanması ve kaç tane meşale ve büyünün gerçek ışık saçtığı. Gelişmiş toplayıcılar arasında en büyük tasarruf.',
   'guide.settingsPage.rowFieldOfView':
     'Yakınlaştırılmış 55 dereceden geniş 100 dereceye kadar dünyanın ne kadarı ekrana sığıyor? Konforlu bir seçim; daha geniş görüşler biraz daha fazla çeker.',
-  'guide.settingsPage.rowFoliageDensity': 'Karakterinizin etrafındaki çimlerin ne kadar uzağa ve ne kadar kalın büyüdüğü.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Karakterinizin etrafındaki çimlerin ne kadar uzağa ve ne kadar kalın büyüdüğü.',
   'guide.settingsPage.rowFrostedPanels':
     'Pencerelerin arkasında buzlu cam bulanıklığı. Güzel ve tam olarak daha zayıf bir tarayıcının hissettiği türden bir etki; Klasik net görünüm için onu bırakın.',
   'guide.settingsPage.rowGraphicsQuality':
@@ -6089,9 +6713,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Pencerelerin anında görünmesi için arayüz animasyonlarını kaldırır. Öncelikle küçük bir performans bonusuyla erişilebilirlik seçeneği.',
   'guide.settingsPage.rowRenderQuality':
     '3 boyutlu dünyayı daha düşük bir dahili çözünürlükte çizer ve ölçeklendirir; arayüz keskin kalır. Daha zayıf makinelerde ve yüksek çözünürlüklü ekranlarda en güçlü anlık kaydırıcı.',
-  'guide.settingsPage.rowShadowQuality': 'Gölge netliği. Low gölgeleri korur ancak kenarlarını yumuşatır.',
-  'guide.settingsPage.rowTerrainDetail': 'Daha basit, daha hızlı bir arazi görünümüne karşı zengin, harmanlanmış zemin dokuları.',
-  'guide.settingsPage.rowWeather': 'Ortam yağmur ve kar. Yalnızca atmosfer ve onu kapatmak fırtınalar sırasında biraz tasarruf sağlar.',
+  'guide.settingsPage.rowShadowQuality':
+    'Gölge netliği. Low gölgeleri korur ancak kenarlarını yumuşatır.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Daha basit, daha hızlı bir arazi görünümüne karşı zengin, harmanlanmış zemin dokuları.',
+  'guide.settingsPage.rowWeather':
+    'Ortam yağmur ve kar. Yalnızca atmosfer ve onu kapatmak fırtınalar sırasında biraz tasarruf sağlar.',
   'guide.settingsPage.tableFoot':
     'Bir çekme mesafesi kaydırıcısı veya FPS başlığı mı arıyorsunuz? Aranacak hiçbir şey yok: Görüş mesafesi her kalite katmanının bir parçasıdır ve çerçeve ilerleme hızı ekranınızı takip eder.',
   'guide.settingsPage.tableHeading': 'Her seçenek açıklandı',
@@ -6104,9 +6731,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsTagline': 'Güçlü masaüstü makineler için ekran görüntüsü modu.',
   'guide.settingsPage.visualsTitle': 'En İyi Görseller',
   'guide.settingsPage.visualsWhy':
-    'Ultra, ekranınızın sunduğu en zengin ışıklandırmayla en yüksek çözünürlükte oluşturulur. Ayrıca güvenlik ağını da kapatır ve yalnızca masaüstünde kullanılabilir: telefonlar ve uygulama High\'de zirveye çıkar.',
+    "Ultra, ekranınızın sunduğu en zengin ışıklandırmayla en yüksek çözünürlükte oluşturulur. Ayrıca güvenlik ağını da kapatır ve yalnızca masaüstünde kullanılabilir: telefonlar ve uygulama High'de zirveye çıkar.",
   'guide.settingsPage.wherePath':
-    'Bu sayfadaki her şey oyunda mevcuttur: Esc tuşuna basın ve Grafikler, Arayüz ve Performans Arayüzü\'ne bakın.',
+    "Bu sayfadaki her şey oyunda mevcuttur: Esc tuşuna basın ve Grafikler, Arayüz ve Performans Arayüzü'ne bakın.",
   'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
   'hudChrome.crafting.close': 'İşçiliği kapat',
   'hudChrome.crafting.craft': 'Zanaat',
@@ -6124,30 +6751,34 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.spellbookPageLabel': 'Sayfa {page}',
   'hudChrome.mobile.targetCycle': 'Hedefi değiştir',
   'hudChrome.mobile.targetCycleShort': 'Hedef',
-  'hudChrome.options.mobileCameraJoystick': 'Kamera joystick\'i',
+  'hudChrome.options.mobileCameraJoystick': "Kamera joystick'i",
   'hudChrome.options.mobileLeftHanded': 'Solak düzen',
   'entities.quests.q_archetype_acceptance.title': 'Kendinize Ait Bir Zanaat',
   'entities.quests.q_archetype_acceptance.text':
-    'Eastbrook\'un her zanaatkarı eninde sonunda kendilerine ait bir zanaatta karar kılıyor. Tek bir hareketle kendinizi kanıtlayın, {playerName}, ve yolunuzu ilan edin.',
+    "Eastbrook'un her zanaatkarı eninde sonunda kendilerine ait bir zanaatta karar kılıyor. Tek bir hareketle kendinizi kanıtlayın, {playerName}, ve yolunuzu ilan edin.",
   'entities.quests.q_archetype_acceptance.completion': 'Yolunuz seçilmiştir; iyi yürü.',
   'entities.quests.q_archetype_acceptance.objectives.0.label': 'Orman kurdu öldürüldü',
   'entities.quests.q_prof_make_amends.title': 'Değişiklikler Yapmak',
   'entities.quests.q_prof_make_amends.text':
     'Bir zanaatı diğerine ayırmak için, bir zanaatkarın öncelikle yürümediği yolu telafi etmesi gerekir, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion': 'Değişiklikler yapıldı; önünüze yeni bir yol açılıyor.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Değişiklikler yapıldı; önünüze yeni bir yol açılıyor.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Orman kurdu öldürüldü',
-  'entities.npcs.bursar_aldous_crane.greeting': 'Her sandık, her çekmece, her biblo Yaldızlı Kasa\'da güvendedir.',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    "Her sandık, her çekmece, her biblo Yaldızlı Kasa'da güvendedir.",
   'entities.npcs.bursar_aldous_crane.name': 'Veznedar Aldous Crane',
   'entities.npcs.bursar_aldous_crane.title': 'Yaldızlı Kasa',
-  'entities.npcs.bursar_fernando.greeting': 'Yaldızlı Kasa\'ya hoş geldin. Malların kilitlerimizin ardında güvenle durur.',
+  'entities.npcs.bursar_fernando.greeting':
+    "Yaldızlı Kasa'ya hoş geldin. Malların kilitlerimizin ardında güvenle durur.",
   'entities.npcs.bursar_fernando.name': 'Veznedar Fernando',
   'entities.npcs.bursar_fernando.title': 'Yaldızlı Kasa',
-  'entities.npcs.bursar_petra_vell.greeting': 'Yaldızlı Kasa\'nın defterleri temiz, kasaları daha da temizdir. Senin için ne saklayalım?',
+  'entities.npcs.bursar_petra_vell.greeting':
+    "Yaldızlı Kasa'nın defterleri temiz, kasaları daha da temizdir. Senin için ne saklayalım?",
   'entities.npcs.bursar_petra_vell.name': 'Veznedar Petra Vell',
   'entities.npcs.bursar_petra_vell.title': 'Yaldızlı Kasa',
   'guide.economy.bankTitle': 'Banka',
   'guide.economy.bankBody':
-    'Her merkez kasabada diyarın bankacılık müessesesi olan Yaldızlı Kasa\'nın bir şubesi bulunur. Oradaki veznedarla konuşarak kasanı aç: çantalarının ötesinde, karakterinin ömür boyu elinde tuttuğu özel bir depo. Oraya bıraktığın her şey, bir sonraki sefer hangi şubeye uğrarsan uğra, güvenle bekler.',
+    "Her merkez kasabada diyarın bankacılık müessesesi olan Yaldızlı Kasa'nın bir şubesi bulunur. Oradaki veznedarla konuşarak kasanı aç: çantalarının ötesinde, karakterinin ömür boyu elinde tuttuğu özel bir depo. Oraya bıraktığın her şey, bir sonraki sefer hangi şubeye uğrarsan uğra, güvenle bekler.",
   'guide.economy.bankHow':
     'Kasan açıkken, çantandaki bir eşyaya tıklayarak onu yatır; kasadaki eşyaya tıklayarak geri al. Kasa yalnızca eşya tutar, asla para tutmaz; görev eşyaları da sende kalır. Yol ortasında çantaların dolduğunda, tek bir düğme bütün zanaat malzemelerini bir seferde içeri süpürür.',
   'guide.economy.bankSlots':
@@ -6195,7 +6826,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Bir arkadaşını davet et: arkadaşın 10. seviyeye ulaştığında ikiniz de 2 yuva kazanırsınız (en fazla 5 arkadaş).',
   'hudChrome.bank.bonusSectionAria': 'Bonus banka yuvaları ve daha fazlasını kazanmanın yolları',
-  'entities.abilities.faerie_fire.description': 'Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez.',
+  'entities.abilities.faerie_fire.description':
+    'Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez.',
   'hud.core.mobileSettings': 'Ayarlar',
   'abilityUi.tooltip.selfOnly': 'Yalnızca kendine',
   'itemUi.lootRoll.rolled': '{answered}/{total} zar attı',
@@ -6203,9 +6835,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir.',
   'entities.mobs.training_dummy.name': 'Antrenman Kuklası',
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Ölümsüz Başrahip',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Ölümsüz Bıçak',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Ölümsüz Savaşmuhafızı',
   'guide.arenaPage.yumiBody':
-    'Yumi\'yi Koru, bir labirentte oynanan bir takım hedef modudur: her taraf kendi kedi yoldaşını korurken diğerininkini avlar. Ara sıra her iki kedi de labirentin yeni köşelerine ışınlanır, bu yüzden dövüş savunma, avlanma ve onları yeniden bulmak için yarışma arasında gidip gelir. Üçe üç ya da beşe beş olarak kuyruğa gir; dövüşte düşmek seni yalnızca kısa bir süre kenara çeker.',
-  'guide.arenaPage.yumiHeading': 'Yumi\'yi Koru',
+    "Yumi'yi Koru, bir labirentte oynanan bir takım hedef modudur: her taraf kendi kedi yoldaşını korurken diğerininkini avlar. Ara sıra her iki kedi de labirentin yeni köşelerine ışınlanır, bu yüzden dövüş savunma, avlanma ve onları yeniden bulmak için yarışma arasında gidip gelir. Üçe üç ya da beşe beş olarak kuyruğa gir; dövüşte düşmek seni yalnızca kısa bir süre kenara çeker.",
+  'guide.arenaPage.yumiHeading': "Yumi'yi Koru",
   'hudChrome.archetypeTitle.hobbyLabel': 'Hobi',
   'hudChrome.auraEffect.armorPct': 'Zırhı %{pct} azaltır',
   'hudChrome.auraEffect.armorPctStacks': 'Zırhı %{pct} azaltır ({stacks} istif)',
@@ -6214,33 +6849,213 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Zırhı %{pct} artırır',
   'hudChrome.auraEffect.increasePct.int': 'Zekayı %{pct} artırır',
   'hudChrome.auraEffect.increasePct.sta': 'Dayanıklılığı %{pct} artırır',
-  'hudChrome.crafting.notAtHub': 'Bunu üretmek için zanaat merkezinde ve gereken kademede olmalısın.',
+  'hudChrome.auraEffect.avatar': 'Devcüsse: verilen hasar %{pct} artar',
+  'hudChrome.auraEffect.battleStance': 'Savaş Duruşu: %10 daha fazla öfke üretimi',
+  'hudChrome.auraEffect.battleTrance':
+    'Bir sonraki Yağmacı Darbesi veya Sakatlayan Darbe hiç Öfkeye mal olmaz',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur',
+  'hudChrome.auraEffect.bloodbath': 'Kritik vuruş şansını ve verilen hasarı %{pct} artırır',
+  'hudChrome.auraEffect.crit': 'Kritik vuruş şansını %{pct} artırır',
+  'hudChrome.auraEffect.dieBySword':
+    'Alınan hasarı %{pct} azaltır (can %{hpPct} seviyesinin altındayken %{lowPct})',
+  'hudChrome.auraEffect.dmgDone': 'Verilen hasarı %{pct} artırır',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Verilen hasarı %{pct} azaltır',
+  'hudChrome.auraEffect.maxHpPct': 'Azami canı %{pct} artırır',
+  'hudChrome.auraEffect.rageGen': 'Öfke üretimini %{pct} artırır',
+  'hudChrome.auraEffect.reckless': 'Kritik vuruş şansını %{pct}, Öfke üretimini %{ragePct} artırır',
+  'hudChrome.auraEffect.revengeFree': 'Bir sonraki İntikam hiç Öfkeye mal olmaz',
+  'hudChrome.auraEffect.sanguine': 'Saldırı hızını %{hastePct}, verilen hasarı %{dmgPct} artırır',
+  'hudChrome.auraEffect.victoryRush': 'Zafer Atılımı hazır',
+  'hudChrome.crafting.notAtHub':
+    'Bunu üretmek için zanaat merkezinde ve gereken kademede olmalısın.',
   'hudChrome.crafting.recipeNotLearned': 'Bu tarifi henüz öğrenmedin.',
   'hudChrome.crafting.throttled': 'Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.',
   'hudChrome.mobile.chatPlaceholder': 'Bir şey söyle...',
   'hudChrome.mobile.hideKeyboard': 'Klavyeyi gizle',
   'hudChrome.unitFrame.partyChip': 'Grup',
-  'yumi.banner.sudden': 'ANİ ÖLÜM! Yumi\'ler yerlerini koruyor!',
-  'yumi.banner.teleport': 'Yumi\'ler ışınlanıyor!',
-  'yumi.bracket3': 'Yumi\'yi Koru 3v3',
-  'yumi.bracket5': 'Yumi\'yi Koru 5v5',
-  'yumi.end.loss': 'YENİLGİ! Yumi\'n düştü.',
+  'yumi.banner.sudden': "ANİ ÖLÜM! Yumi'ler yerlerini koruyor!",
+  'yumi.banner.teleport': "Yumi'ler ışınlanıyor!",
+  'yumi.bracket3': "Yumi'yi Koru 3v3",
+  'yumi.bracket5': "Yumi'yi Koru 5v5",
+  'yumi.end.loss': "YENİLGİ! Yumi'n düştü.",
   'yumi.end.win': 'ZAFER! Yumi güvende!',
-  'yumi.enterQueue': 'Yumi\'yi Koru\'ya Katıl!',
-  'yumi.error.partyTooBig3': 'Yumi\'yi Koru 3v3 en fazla üç kişilik bir gruba izin verir.',
-  'yumi.error.partyTooBig5': 'Yumi\'yi Koru 5v5 en fazla beş kişilik bir gruba izin verir.',
-  'yumi.hud.aria': 'Senin Yumi\'n {max} candan {mine} canda, düşman Yumi\'si {theirs} canda.',
-  'yumi.hud.collapse': 'Yumi\'yi Koru çubuklarını daralt',
-  'yumi.hud.enemyYumi': 'Düşman Yumi\'si',
-  'yumi.hud.expand': 'Yumi\'yi Koru çubuklarını genişlet',
+  'yumi.enterQueue': "Yumi'yi Koru'ya Katıl!",
+  'yumi.error.partyTooBig3': "Yumi'yi Koru 3v3 en fazla üç kişilik bir gruba izin verir.",
+  'yumi.error.partyTooBig5': "Yumi'yi Koru 5v5 en fazla beş kişilik bir gruba izin verir.",
+  'yumi.hud.aria': "Senin Yumi'n {max} candan {mine} canda, düşman Yumi'si {theirs} canda.",
+  'yumi.hud.collapse': "Yumi'yi Koru çubuklarını daralt",
+  'yumi.hud.enemyYumi': "Düşman Yumi'si",
+  'yumi.hud.expand': "Yumi'yi Koru çubuklarını genişlet",
   'yumi.hud.getReady': 'Hazır ol…',
   'yumi.hud.suddenDeath': 'ANİ ÖLÜM',
-  'yumi.hud.teleportIn': 'Yumi\'ler {s} içinde hareket eder',
-  'yumi.hud.title': 'YUMİ\'Yİ KORU',
-  'yumi.hud.yourYumi': 'Senin Yumi\'n',
-  'yumi.log.start': 'Yumi\'yi Koru! Kendi yoldaşını savun ve onlarınkini avla.',
-  'yumi.queue.join': 'Yumi\'yi Koru kuyruğuna katılıyorsun. Yoldaşını koru…',
-  'yumi.queue.leave': 'Yumi\'yi Koru kuyruğundan ayrılıyorsun.',
-  'yumi.queue.teamLeave': 'Takımın Yumi\'yi Koru kuyruğundan ayrılıyor.',
+  'yumi.hud.teleportIn': "Yumi'ler {s} içinde hareket eder",
+  'yumi.hud.title': "YUMİ'Yİ KORU",
+  'yumi.hud.yourYumi': "Senin Yumi'n",
+  'yumi.log.start': "Yumi'yi Koru! Kendi yoldaşını savun ve onlarınkini avla.",
+  'yumi.queue.join': "Yumi'yi Koru kuyruğuna katılıyorsun. Yoldaşını koru…",
+  'yumi.queue.leave': "Yumi'yi Koru kuyruğundan ayrılıyorsun.",
+  'yumi.queue.teamLeave': "Takımın Yumi'yi Koru kuyruğundan ayrılıyor.",
   'yumi.respawn.title': 'DÜŞTÜN!',
+  'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
+  'entities.abilities.chain_heal.description':
+    'Hedefi {damage} iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar; her sıçrama bir öncekinin yarısı kadar iyileştirir.',
+  'entities.abilities.razor_howl.name': 'Keskin Uluma',
+  'entities.abilities.razor_howl.description':
+    '15 m içindeki düşmanları 8 sn. boyunca %50 yavaşlatan bir haykırış. (Savaşçı yeteneği)',
+  'entities.abilities.stormthrow.name': 'Fırtına Atışı',
+  'entities.abilities.stormthrow.description':
+    'Bir hedefi 3 sn. sersemletmek için silahını fırlat. (Savaşçı yeteneği)',
+  'entities.abilities.reckless_vow.name': 'Pervasız Yemin',
+  'entities.abilities.reckless_vow.description':
+    'Tüm öfke üretimini %50 ve kritik vuruş şansını %20 artırır, 12 sn. sürer. (Savaşçı yeteneği)',
+  'entities.abilities.red_banner.name': 'Kızıl Sancak',
+  'entities.abilities.red_banner.description':
+    'Sen ve yakındaki müttefikler 20 sn. boyunca %10 saldırı hızı ve %10 hasar kazanırsınız. (Savaşçı yeteneği)',
+  'entities.abilities.battle_stance.name': 'Savaş Duruşu',
+  'entities.abilities.battle_stance.description':
+    'Saldırgan bir dövüş duruşu: %10 daha fazla öfke üretirsin. Silahşor ve Koruma için varsayılan duruş.',
+  'entities.abilities.berserker_stance.name': 'Berserker Duruşu',
+  'entities.abilities.berserker_stance.description':
+    'Pervasız bir dövüş duruşu: kritik vuruşların %3 daha sık gerçekleşir ve %3 daha sert vurur. Hiddet savaşçısı her zaman bu duruşta dövüşür.',
+  'entities.abilities.breachmaker.name': 'Gedik Açan',
+  'entities.abilities.breachmaker.description':
+    'Hedefe silah hasarı artı {damage} vurur ve gardını kırarsın: ona karşı kendi saldırıların 8 sn boyunca %20 daha fazla hasar verir. (Silahşor)',
+  'entities.abilities.cleaving_blows.name': 'Biçen Darbeler',
+  'entities.abilities.cleaving_blows.description':
+    'Kızıl Hasat her zaman bir Çifte Darbe kullanımını geri kazandırır. (Hiddet)',
+  'entities.abilities.deep_wounds.name': 'Kanayan Yaralar',
+  'entities.abilities.deep_wounds.description':
+    'Pasif: Sakatlayan Darbe hedefi 6 sn boyunca Fiziksel hasar verecek şekilde kanatır. (Silahşor)',
+  'entities.abilities.defiant_bellow.name': 'Meydan Okuyan Nara',
+  'entities.abilities.defiant_bellow.description':
+    'Meydan okuyan bir nara: 10 yarda içindeki her düşman kışkırtılır ve 3 sn boyunca sana saldırmaya zorlanır. (Koruma)',
+  'entities.abilities.diabolical_twinstrike.name': 'Şeytani Çifte Darbe',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Gazaba gelmişken Çifte Darbe %15 daha fazla hasar verir. (Hiddet)',
+  'entities.abilities.die_by_sword.name': 'Kılıçla Ölüm',
+  'entities.abilities.die_by_sword.description':
+    'Savunma yeteneği: 8 sn boyunca %30 daha az hasar alır ve saldırıları çok daha sık savuşturursun.',
+  'entities.abilities.emboldening_roar.name': 'Yüreklendiren Kükreme',
+  'entities.abilities.emboldening_roar.description':
+    'Yüreklendiren bir kükreme koparırsın: sen ve 40 yarda içindeki dost oyuncular Yüreklenirsiniz ve sonraki 3 yeteneğiniz garantili kritik vuruş olur. (Hiddet)',
+  'entities.abilities.enrage_passive.name': 'Kargaşa',
+  'entities.abilities.enrage_passive.description':
+    'Pasif: gazaba gelmişken 4 sn boyunca %7 daha fazla hasar verir, %25 daha hızlı saldırır ve %10 daha hızlı hareket edersin. Kan Akıtma %30 olasılıkla seni gazaba getirir; Kızıl Hasat ise her zaman getirir. (Hiddet)',
+  'entities.abilities.faultline.name': 'Fay Hattı',
+  'entities.abilities.faultline.description':
+    'Yerden bir şok dalgası gönderirsin: önündeki 8 yarda içindeki düşmanlar {damage} hasar alır ve 3 sn sersemler. (Koruma)',
+  'entities.abilities.fel_domination.name': 'Şeytani Hakimiyet',
+  'entities.abilities.fel_domination.description':
+    'Şeytani enerjilere hükmeder, sonraki büyünü anında yapar. (Demonoloji imzası)',
+  'entities.abilities.furious_mending.name': 'Öfkeli Onarım',
+  'entities.abilities.furious_mending.description':
+    "10 sn boyunca %20 azaltılmış hasar alırsın ve bu süre boyunca Kan Akıtma seni azami canının %20'si kadar iyileştirir. (Hiddet)",
+  'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
+  'entities.abilities.intimidating_shout.description':
+    '8 yarda içindeki en fazla 5 düşmanı 8 sn boyunca korku içinde kaçırtan dehşet verici bir nara. Hasar etkiyi bozabilir.',
+  'entities.abilities.iron_resolve.name': 'Demir Azim',
+  'entities.abilities.iron_resolve.description':
+    'Dişini sık ve acıyı yok say: tüm öfkeni tüketir (en az 20) ve harcanan öfke başına 4 hasar soğurur, en fazla 10 sn sürer. (Koruma)',
+  'entities.abilities.measured_fury.name': 'Ölçülü Gazap',
+  'entities.abilities.measured_fury.description':
+    'Ölçülü gazabın tutumunu keskinleştirir: yeteneklerin %10 daha az öfkeye mal olur. (Silahşor)',
+  'entities.abilities.natures_swiftness.name': 'Doğanın Çevikliği',
+  'entities.abilities.natures_swiftness.description':
+    'Doğayı yardıma çağırır, sonraki büyünü anında yapar. (Restorasyon imzası)',
+  'entities.abilities.piercing_howl.name': 'Delici Uluma',
+  'entities.abilities.piercing_howl.description':
+    '15 yarda içindeki tüm düşmanları 8 sn boyunca %50 yavaşlatan delici bir nara.',
+  'entities.abilities.raging_gale.name': 'Çifte Darbe',
+  'entities.abilities.raging_gale.description':
+    'Silahınla anında iki kez vurursun; her vuruş %40 silah hasarı artı {damage} verir ve {rage} öfke üretirsin. En fazla 2 kullanım birikir. (Hiddet)',
+  'entities.abilities.raised_guard.name': 'Yükseltilmiş Gard',
+  'entities.abilities.raised_guard.description':
+    'Kalkanının ardında siper alırsın: 6 sn boyunca %50 azaltılmış Fiziksel hasar alırsın. En fazla 2 kullanım birikir. (Koruma)',
+  'entities.abilities.recklessness.name': 'Pervasızlık',
+  'entities.abilities.recklessness.description':
+    'Gazaba gelirsin: öfke üretimin %50, kritik vuruş şansın %20 artar, 12 sn sürer.',
+  'entities.abilities.red_harvest.name': 'Kızıl Hasat',
+  'entities.abilities.red_harvest.description':
+    'Her şeyini harca: çılgınca üç kez vurursun; her vuruş %65 silah hasarı artı {damage} verir ve seni her zaman gazaba getirir. (Hiddet)',
+  'entities.abilities.repentance.name': 'Tövbe',
+  'entities.abilities.repentance.description':
+    'Düşmanı en fazla 6 sn boyunca derin bir tefekküre sokar. Herhangi bir hasar etkiyi bozar. (Karşılık imzası)',
+  'entities.abilities.revenge.name': 'İntikam',
+  'entities.abilities.revenge.description':
+    'Geniş bir yayla saldırır, önündeki tüm düşmanlara Fiziksel hasar verirsin. 5 hedefin üzerinde hasar azalır. Bir saldırıyı savuşturduğunda ya da karşıladığında bir sonraki İntikam hiç öfkeye mal olmayabilir.',
+  'entities.abilities.sanguine_aura.name': 'Kan Aurası',
+  'entities.abilities.sanguine_aura.description':
+    'Silahını düşmanlarının kanıyla donatırsın: sen ve yakın dövüşçü müttefiklerin 20 sn boyunca %10 saldırı hızı ve %10 hasar kazanırsınız.',
+  'entities.abilities.seasoned_soldier.name': 'Tecrübeli Asker',
+  'entities.abilities.seasoned_soldier.description':
+    'Kritik otomatik saldırıların %10 daha fazla öfke üretir. (Silahşor)',
+  'entities.abilities.shamanistic_rage.name': 'Şaman Gazabı',
+  'entities.abilities.shamanistic_rage.description':
+    'Şamanca bir gazabı serbest bırakır ve 160 mana yeniler. (Güçlendirme imzası)',
+  'entities.abilities.storm_bolt.name': 'Fırtına Oku',
+  'entities.abilities.storm_bolt.description':
+    'Silahını hedefe fırlatır, {damage} hasar verir ve onu 3 sn sersemletirsin.',
+  'entities.abilities.sudden_death.name': 'Ani Ölüm',
+  'entities.abilities.sudden_death.description':
+    'Otomatik saldırıların, canı ne olursa olsun bir hedefe hiç öfke harcamadan Erken Mezar kullanmana izin verme şansı taşır. (Silahşor)',
+  'entities.abilities.sweeping_strikes.name': 'Genişleyen Yay',
+  'entities.abilities.sweeping_strikes.description':
+    '12 sn boyunca tek hedefli saldırıların yakındaki 1 düşmana da tam hasarla vurur. (Silahşor)',
+  'entities.abilities.victory_rush.name': 'Zafer Atılımı',
+  'entities.abilities.victory_rush.description':
+    "Silah hasarı artı {damage} vurur ve azami canının %20'sini iyileştirirsin. Yalnızca bir düşman öldürdükten sonraki 20 sn içinde kullanılabilir.",
+  'entities.items.chunk_of_ore.name': 'Cevher Parçası',
+  'entities.quests.q_prof_intro.title': 'Her Ele Bir Zanaat',
+  'entities.quests.q_prof_intro.text':
+    'Eastbrook’taki herkes kılıç dışında bir zanaatla uğraşır, {playerName}. Kasabanın çevresinde cevher damarları var; bir kazma salla ve bana 5 parça getir. Kendin çıkar; aradaki farkı anlarım.',
+  'entities.quests.q_prof_intro.completion':
+    'Gördün mü? Çantanda cevher, ellerinde nasır. Yollarda ilerlerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosunu ve yakındaki çalışma tezgâhını unutma. İstersen bunların hepsinde dürüst bir zanaat seni bekliyor.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Cevher Parçası',
+  'game.talents.readout.rowsSummary':
+    'Yetenekler: {head}, {picked}/{unlocked} seçim satırı seçildi.',
+  'hudChrome.fct.absorbed': '{amount} soğuruldu',
+  'hudChrome.fct.cheap': 'Daha ucuz!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir eksik {item} gönder',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir fazla {item} gönder',
+  'game.talents.choicesTab': 'Seçimler',
+  'game.talents.rowUnlockToast': 'Yeni bir yetenek seçimi açıldı!',
+  'game.talents.rowUnlocks': '{level}. seviyede açılır',
+  'hudChrome.auth.forgotPrompt': 'Şifreni mi unuttun?',
+  'hudChrome.auth.forgotTitle': 'Şifreni sıfırla',
+  'hudChrome.auth.forgotHint':
+    'Kullanıcı adını gir, kayıtlı e-posta adresine bir sıfırlama bağlantısı gönderelim.',
+  'hudChrome.auth.forgotUsername': 'Kullanıcı adı',
+  'hudChrome.auth.forgotSubmit': 'Sıfırlama bağlantısı gönder',
+  'hudChrome.auth.forgotSent':
+    'Bu kullanıcı adına sahip hesabın kayıtlı bir e-posta adresi varsa bir sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.',
+  'hudChrome.auth.forgotBack': 'Girişe geri dön',
+  'hudChrome.auth.resetTitle': 'Yeni bir şifre seç',
+  'hudChrome.auth.resetNewPassword': 'Yeni şifre',
+  'hudChrome.auth.resetConfirm': 'Yeni şifreyi onayla',
+  'hudChrome.auth.resetSubmit': 'Şifreyi güncelle',
+  'hudChrome.auth.resetDone': 'Şifren güncellendi. Artık giriş yapabilirsin.',
+  'hudChrome.auth.resetMismatch': 'Şifreler eşleşmiyor.',
+  'hudChrome.auth.resetErrInvalid':
+    'Bu sıfırlama bağlantısı geçersiz veya süresi dolmuş. Yeni bir tane iste.',
+  'hudChrome.auth.appleChoiceExpired':
+    'Bu Apple girişinin süresi doldu. Lütfen Apple ile yeniden giriş yap.',
+  'hudChrome.auth.appleChoiceIntro':
+    "Yeni bir hesap oluştur veya Apple'ı zaten sahip olduğun bir hesaba bağla.",
+  'hudChrome.auth.appleError': 'Apple ile giriş yapılamadı. Lütfen tekrar dene.',
+  'hudChrome.auth.appleLoginCta': 'Apple ile devam et',
+  'hudChrome.specPanel.complexity': 'Karmaşıklık',
+  'hudChrome.specPanel.complexityHigh': 'Yüksek',
+  'hudChrome.specPanel.complexityLow': 'Düşük',
+  'hudChrome.specPanel.complexityMedium': 'Orta',
+  'hudChrome.specPanel.exampleAbilities': 'Örnek yetenekler',
+  'hudChrome.specPanel.primaryAttr': 'Birincil nitelik',
+  'hudChrome.specPanel.selectSpec': 'Uzmanlık seç',
+  'hudChrome.specPanel.specUnlockBanner': 'Uzmanlık Açıldı!',
+  'hudChrome.specPanel.specUnlockHint': "Uzmanlığını seçmek için N'ye bas.",
+  'hudChrome.specPanel.viewTalents': 'Yetenekleri görüntüle',
+  'hudChrome.talentRows.comingSoon': 'Çok yakında',
+  'hudChrome.talentRows.defaultLoadout': 'Varsayılan Dizilim',
+  'hudChrome.talentRows.tab': 'Seçimler',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin Hedefi',
 };

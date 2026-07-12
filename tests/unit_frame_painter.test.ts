@@ -112,7 +112,8 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'setText', args: [LEVEL, '60'] },
       { m: 'setTransform', args: [HP_FILL, 'scaleX(0.5)'] },
       { m: 'setText', args: [HP_TEXT, '300 / 600'] },
-      { m: 'setTransform', args: [ABSORB, 'scaleX(0.5)'] },
+      { m: 'setStyleProp', args: [ABSORB, '--absorb-start', '50%'] },
+      { m: 'setTransform', args: [ABSORB, 'scaleX(0)'] },
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
@@ -159,7 +160,11 @@ describe('UnitFramePainter: the player instance routes every write through the e
         },
       }),
     );
-    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, 'scaleX(1)'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [ABSORB, '--absorb-start', `${(1 - 50 / 600) * 100}%`],
+    });
+    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, `scaleX(${50 / 600})`] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', true] });
   });
 });

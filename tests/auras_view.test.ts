@@ -64,14 +64,14 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
     expect(isAuraDebuff(aura({ id: 'x', kind: 'buff_int', value: -20 }))).toBe(true);
   });
 
-  // This list MUST mirror the sim's HARMFUL_AURA_KINDS (src/sim/aura_classify.ts): the
-  // two classifiers are separate lists, so a kind added to one must be added to both or
-  // the HUD renders it with the wrong buff/debuff styling.
-  it('matches the exact set of harmful kinds (mirrors the sim classifier)', () => {
+  // The view re-exports the shared sim classification set. Pin its exact contents
+  // so an accidental removal changes every consumer loudly.
+  it('matches the exact shared set of harmful kinds', () => {
     expect([...DEBUFF_AURA_KINDS].sort()).toEqual(
       [
         'attackspeed',
         'blind',
+        'bleed_vuln',
         'corrode',
         'cost_tax',
         'critvuln',
@@ -112,6 +112,19 @@ describe('createAurasView: derivation per mode', () => {
     const debuffs = createAurasView('debuffs', deps()).tick(entity(auras));
     expect(debuffs.count).toBe(2);
     expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['rend', 'sunder']);
+  });
+
+  it('renders bleed vulnerability as a non-cancelable debuff, never a helpful buff', () => {
+    const bleedVulnerability = aura({
+      id: 'hemorrhage_bleed_vuln',
+      kind: 'bleed_vuln',
+      value: 0.4,
+    });
+
+    const all = createAurasView('all', deps()).tick(entity([bleedVulnerability]));
+    expect(all.slots[0]).toMatchObject({ isDebuff: true, cancelable: false });
+    expect(createAurasView('buffs', deps()).tick(entity([bleedVulnerability])).count).toBe(0);
+    expect(createAurasView('debuffs', deps()).tick(entity([bleedVulnerability])).count).toBe(1);
   });
 
   it('emits one slot PER aura even when two share an id (no core-side dedup)', () => {
@@ -195,6 +208,14 @@ describe('createAurasView: derivation per mode', () => {
     ).toBe('');
     expect(
       v.tick(entity([aura({ id: 'bear_form', kind: 'form_bear', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'moonkin_form', kind: 'form_moonkin', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'shadowform', kind: 'form_shadow', remaining: 3600 })])).slots[0]
         .durationText,
     ).toBe('');
     expect(

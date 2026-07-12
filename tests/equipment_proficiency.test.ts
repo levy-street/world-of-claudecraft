@@ -14,7 +14,11 @@ function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   sim.setPlayerLevel(20, pid);
   sim.addItem(itemId, 1, pid);
   sim.equipItem(itemId, pid);
-  return sim.meta(pid)!;
+  const meta = sim.meta(pid);
+  if (!meta) {
+    throw new Error(`Missing player meta for ${pid}`);
+  }
+  return meta;
 }
 
 describe('armor proficiencies', () => {
@@ -38,7 +42,13 @@ describe('armor proficiencies', () => {
 
   it('allows warrior-style weapons for warriors, rogues, hunters, shamans, and paladins', () => {
     expect(equip('warrior', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
-    expect(equip('rogue', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
+    // Rogues dual-wield (owner 2026-07-09): a one-hand weapon auto-routes to the off
+    // hand when the main hand already holds the starter dagger, so the proficiency
+    // check verifies it lands in EITHER hand, not specifically the main hand.
+    const rogueEq = equip('rogue', 'kingsbane_last_oath').equipment;
+    expect(
+      rogueEq.mainhand === 'kingsbane_last_oath' || rogueEq.offhand === 'kingsbane_last_oath',
+    ).toBe(true);
     expect(equip('hunter', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('shaman', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('paladin', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
@@ -68,6 +78,13 @@ describe('armor proficiencies', () => {
       'staff_of_the_gravewyrm',
     );
   });
+
+  it('allows shields for warrior-style classes and keeps cloth casters out', () => {
+    expect(equip('warrior', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('paladin', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('shaman', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('mage', 'eastbrook_buckler').equipment.offhand).toBeUndefined();
+  });
 });
 
 describe('weapon requiredClass is representative of who can equip', () => {
@@ -78,7 +95,13 @@ describe('weapon requiredClass is representative of who can equip', () => {
   it('lists exactly the classes canEquipItem allows, for every weapon with a class list', () => {
     for (const item of Object.values(ITEMS)) {
       if (item.kind !== 'weapon' || !item.requiredClass) continue;
-      const equippable = ALL_CLASSES.filter((c) => canEquipItem(c, item)).sort();
+      // warrior_classic is exempt: it equips via the deliberate gearCls alias to
+      // 'warrior' (equipment_rules.ts), because the class is a warrior variant and
+      // every authored requiredClass list predates it. Tooltips listing the warrior
+      // group are correct for it, so the alias never appears in requiredClass.
+      const equippable = ALL_CLASSES.filter(
+        (c) => c !== 'warrior_classic' && canEquipItem(c, item),
+      ).sort();
       const listed = [...item.requiredClass].sort();
       expect(listed, `${item.id}: requiredClass must match its equippable classes`).toEqual(
         equippable,

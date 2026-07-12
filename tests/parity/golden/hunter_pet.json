@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "cd2e74a2",
+      "state": "34ac3903",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -62,6 +63,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -89,6 +98,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.057,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -126,7 +136,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "c9bb0773",
+      "state": "ec251b19",
       "events": "aad1beb5",
       "rng": {
         "draws": 9,
@@ -137,7 +147,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "99618df6",
+      "state": "bf067678",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -148,7 +158,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "8ff1007b",
+      "state": "22a7059d",
       "events": "35c1ec5c",
       "rng": {
         "draws": 100,
@@ -159,7 +169,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "1c03e07e",
+      "state": "e9fe9b44",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -170,7 +180,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "c89e06c2",
+      "state": "064b1ec8",
       "events": "5a0db5c0",
       "rng": {
         "draws": 298,
@@ -181,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "6ad0552f",
+      "state": "26d55241",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -192,7 +202,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "6ad0552f",
+      "state": "26d55241",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -227,6 +237,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -242,6 +253,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "rows": {}
           },
@@ -271,6 +290,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,

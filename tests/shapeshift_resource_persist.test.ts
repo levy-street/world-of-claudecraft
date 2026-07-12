@@ -30,7 +30,7 @@ function shiftToBear(sim: Sim, pid: number): void {
     sourceId: pid,
     school: 'physical',
   });
-  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods);
+  recalcPlayerStats(e, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
 }
 
 describe('shapeshifted druid resource persistence', () => {

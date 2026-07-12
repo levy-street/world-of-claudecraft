@@ -90,6 +90,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Los brujos invocan demonios, lanzan maldiciones y magia de daño continuo, y sorben la vida de sus enemigos para aguantar.',
   'classDetails.lore.druid':
     'Los druidas canalizan la naturaleza, curan heridas, enredan enemigos y cambian a formas animales para defender o dañar.',
+  'classDetails.lore.warriorClassic':
+    'El guerrero exactamente como se jugaba antes de la renovación del combate: el conjunto de habilidades y el ritmo de ira originales, conservado junto al guerrero nuevo para que pruebes ambos y nos digas cuál te parece mejor.',
   'mobilePreflight.baseLandscape': 'Gira el dispositivo a horizontal antes de entrar en el mundo.',
   'mobilePreflight.basePerformance':
     'El rendimiento móvil puede degradarse. Cierra pestañas extra y baja la calidad de renderizado si el juego va lento.',
@@ -289,7 +291,92 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrada',
   'hudChrome.auraEffect.school.nature': 'Natural',
+  // v0.24.0 release i18n fill: warrior rework aura tooltip summaries.
+  'hudChrome.auraEffect.avatar': 'Coloso: daño infligido incrementado un {pct}%',
+  'hudChrome.auraEffect.battleStance': 'Actitud de Combate: un 10% más de generación de ira',
+  'hudChrome.auraEffect.bloodbath':
+    'Incrementa la probabilidad de golpe crítico y el daño infligido un {pct}%',
+  'hudChrome.auraEffect.crit': 'Incrementa la probabilidad de golpe crítico un {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Disminuye el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)',
+  'hudChrome.auraEffect.dmgDone': 'Incrementa el daño infligido un {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Disminuye el daño infligido un {pct}%',
+  'hudChrome.auraEffect.maxHpPct': 'Incrementa la salud máxima un {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Incrementa la generación de ira un {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Incrementa la probabilidad de golpe crítico un {pct}% y la generación de ira un {ragePct}%',
+  'hudChrome.auraEffect.sanguine':
+    'Incrementa la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%',
   // Corpse-harvest window + mobile hotbar page toggle.
   'hudChrome.corpseHarvest.title': 'Recolección',
   'hudChrome.corpseHarvest.components.gills': 'Branquias',
+  // v0.24.0 release i18n fill: parry combat text, shield errors, two-hand slot.
+  'hud.combat.floatingParry': 'Rechazo',
+  'hud.combat.parried': '{target} rechaza tu {ability}.',
+  'hud.errors.needShield': 'Debes tener un escudo equipado.',
+  // v0.24.0 release i18n fill: warrior rework abilities and signatures.
+  'entities.abilities.battle_stance.name': 'Actitud de Combate',
+  'entities.abilities.battle_stance.description':
+    'Una actitud de combate agresiva: generas un 10% más de ira. La actitud por defecto de Armas y Protección.',
+  'entities.abilities.berserker_stance.description':
+    'Una actitud de combate temeraria: tus golpes críticos aciertan un 3% más a menudo y golpean un 3% más fuerte. El guerrero Furia siempre lucha en esta actitud.',
+  'entities.abilities.deep_wounds.description':
+    'Pasiva: tu Golpe Mutilador deja al objetivo sangrando con daño físico durante 6 s. (Armas)',
+  'entities.abilities.enrage_passive.name': 'Desenfreno',
+  'entities.abilities.enrage_passive.description':
+    'Pasiva: mientras estás Enfurecido infliges un 7% más de daño, atacas un 25% más rápido y te mueves un 10% más rápido durante 4 s. Sangría tiene un 30% de probabilidad de Enfurecerte; Cosecha Roja lo hace siempre. (Furia)',
+  'entities.abilities.faultline.name': 'Falla Sísmica',
+  'entities.abilities.fel_domination.description':
+    'Domina las energías viles y hace que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)',
+  'entities.abilities.intimidating_shout.description':
+    'Un grito aterrador que hace huir de miedo hasta a 5 enemigos en un radio de 8 m durante 8 s. El daño puede romper el efecto.',
+  'entities.abilities.iron_resolve.name': 'Determinación de Hierro',
+  'entities.abilities.iron_resolve.description':
+    'Aprieta los dientes e ignora el dolor: consume toda tu ira (20 como mínimo) para absorber 4 de daño por punto de ira gastado, hasta un máximo de 10 s. (Protección)',
+  'entities.abilities.natures_swiftness.name': 'Presteza Natural',
+  'entities.abilities.raging_gale.description':
+    'Golpea al instante dos veces con tu arma; cada golpe inflige un 40% de daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',
+  'entities.abilities.raised_guard.description':
+    'Parapétate tras tu escudo: recibes un 50% menos de daño físico durante 6 s. Almacena hasta 2 cargas. (Protección)',
+  'entities.abilities.recklessness.description':
+    'Enfurecimiento: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s.',
+  'entities.abilities.red_harvest.description':
+    'Gástalo todo: golpea tres veces en un frenesí por un 65% de daño de arma más {damage} cada golpe, y siempre te Enfurece. (Furia)',
+  'entities.abilities.revenge.description':
+    'Ataca en un arco amplio e inflige daño físico a todos los enemigos frente a ti. Con más de 5 objetivos el daño se reduce. Cuando esquivas o rechazas un golpe, tu siguiente Venganza puede no costar ira.',
+  'entities.abilities.sanguine_aura.description':
+    'Imbuye tu arma con la sangre de tus enemigos: tú y tus aliados cuerpo a cuerpo ganáis un 10% de velocidad de ataque y un 10% de daño durante 20 s.',
+  'entities.abilities.shamanistic_rage.description':
+    'Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)',
+  'entities.abilities.storm_bolt.description':
+    'Lanza tu arma contra el objetivo, inflige {damage} de daño y lo aturde durante 3 s.',
+  'entities.abilities.sudden_death.description':
+    'Tus ataques automáticos tienen una probabilidad de permitirte lanzar Tumba Temprana contra un objetivo con cualquier salud, sin coste de ira. (Armas)',
+  'entities.abilities.sweeping_strikes.description':
+    'Durante 12 s tus ataques a un solo objetivo también golpean a 1 enemigo cercano con el daño completo. (Armas)',
+  'entities.abilities.victory_rush.description':
+    'Golpea con daño de arma más {damage} y te sana un 20% de tu salud máxima. Solo usable en los 20 s posteriores a matar a un enemigo.',
+  // v0.24.0 release i18n fill: new item names.
+  'entities.items.eastbrook_buckler.name': 'Broquel de Eastbrook',
+  // v0.24.0 release i18n fill: guide ability hooks (cw_ rows reuse the es base
+  // translations of the identical English non-cw hooks).
+  'guide.abilityHook.hamstring':
+    'Raja las piernas del objetivo para ralentizarlo y que no pueda darte alcance.',
+  'guide.abilityHook.revenge':
+    'Un contraataque de barrido que golpea todo lo que tienes delante y sale más barato justo después de desviar un golpe.',
+  // v0.24.0 release i18n fill: Apple sign-in choice dialog (login screen).
+  'hudChrome.auth.appleChoiceExpired':
+    'Ese inicio de sesión con Apple ha caducado. Vuelve a iniciar sesión con Apple.',
+  // v0.24.0 release i18n fill: options, paperdoll, spec panel, stats, talent rows.
+  'hudChrome.options.mouseoverCast': 'Lanzar al pasar el ratón sobre los marcos de grupo',
+  'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
+  'hudChrome.specPanel.selectSpec': 'Elegir especialización',
+  'hudChrome.statInfo.desc.haste':
+    'Acelera los golpes de tu arma y el lanzamiento de tus hechizos. No reduce el tiempo de reutilización global.',
+  'hudChrome.statInfo.desc.parry':
+    'Tu probabilidad de rechazar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede rechazar.',
+  'hudChrome.statInfo.names.parry': 'Rechazo',
+  'hudChrome.talentRows.comingSoon': 'Próximamente',
+  'hudChrome.talentRows.defaultLoadout': 'Configuración por defecto',
+  'hudChrome.talentRows.tab': 'Elecciones',
 };

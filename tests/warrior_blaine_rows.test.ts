@@ -33,7 +33,9 @@ function addMob(sim: Sim, hp = 1000, dist = 3): Entity {
 describe('Blaine1705 warrior row mechanics', () => {
   it('Twin Onrush resolves to two stored Onrush uses', () => {
     const { sim } = rig({ 5: 'war_r5_twin_onrush' });
-    expect(sim.resolvedAbility('charge')?.bonusCharges).toBe(1);
+    // Twin Onrush arms one bonus stored use; the resolved ability exposes it as a
+    // total charge count of 2 (base 1 + talent).
+    expect(sim.resolvedAbility('charge')?.charges).toBe(2);
   });
 
   it('Grave Omen arms a free full-health Early Grave after three melee abilities', () => {

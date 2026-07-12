@@ -4,19 +4,21 @@ import { mechHeldWeaponOverride } from './manifest';
 
 /** A character's real, in-world appearance for the char-select / char-sheet
  *  turntable: body class, appearance skin, whether it is the class rig or the
- *  class-agnostic Combat Mech cosmetic, and the equipped mainhand (null when
- *  unarmed, so the preview shows no weapon rather than a class default). */
+ *  class-agnostic Combat Mech cosmetic, and the equipped held items (null when
+ *  empty, so the preview shows no weapon/shield rather than a class default). */
 export interface PreviewAppearance {
   cls: PlayerClass;
   skin: number;
   skinCatalog: 'class' | 'mech';
   mainhandItemId: string | null;
+  offhandItemId: string | null;
 }
 
 /** The model key + held-weapon layout the appearance resolves to. */
 export interface PreviewVisual {
   visualKey: string;
-  weaponItemId: string | null;
+  mainhandItemId: string | null;
+  offhandItemId: string | null;
   weaponOverride: WeaponLayoutOverride | null;
 }
 
@@ -28,7 +30,8 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   const mech = a.skinCatalog === 'mech';
   return {
     visualKey: mech ? 'player_mech' : `player_${a.cls}`,
-    weaponItemId: a.mainhandItemId ?? null,
+    mainhandItemId: a.mainhandItemId ?? null,
+    offhandItemId: a.offhandItemId ?? null,
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
   };
 }
@@ -36,5 +39,5 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
 /** Stable identity of an appearance, so an async mech re-apply can bail out if a
  *  newer selection superseded it. */
 export function appearanceSignature(a: PreviewAppearance): string {
-  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}`;
+  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}`;
 }

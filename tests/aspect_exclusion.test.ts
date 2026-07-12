@@ -82,7 +82,9 @@ describe('classic self-buff mutual exclusion groups', () => {
     expect(ABILITIES.devotion_aura.exclusiveGroup).toBe('paladin_aura');
     expect(ABILITIES.retribution_aura.exclusiveGroup).toBe('paladin_aura');
     expect(ABILITIES.battle_shout.exclusiveGroup).toBe('warrior_shout');
-    expect(ABILITIES.commanding_shout.exclusiveGroup).toBe('warrior_shout');
+    // Bolstering Cry (commanding_shout) was RETIRED from the kit 2026-07-08; its
+    // dormant def carries no exclusive group.
+    expect(ABILITIES.commanding_shout.exclusiveGroup).toBeUndefined();
   });
 
   it('keeps only one paladin aura active', () => {
@@ -100,20 +102,7 @@ describe('classic self-buff mutual exclusion groups', () => {
     ]);
   });
 
-  it('keeps only one self-applied warrior shout active', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
-    sim.setPlayerLevel(14); // battle(1) + commanding(14) known
-    const baseAp = sim.player.attackPower;
-
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'battle_shout');
-    expect(sim.player.attackPower).toBeGreaterThan(baseAp);
-
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'commanding_shout');
-    expect(sim.player.auras.filter((a) => a.id.endsWith('_shout')).map((a) => a.id)).toEqual([
-      'commanding_shout',
-    ]);
-    expect(sim.player.attackPower).toBe(baseAp);
-  });
+  // The "two warrior shouts coexist" test was removed 2026-07-08: Bolstering Cry
+  // (commanding_shout) was retired from the warrior kit, leaving Iron Bellow as the
+  // only warrior shout with an exclusive group, so there is nothing left to pair.
 });

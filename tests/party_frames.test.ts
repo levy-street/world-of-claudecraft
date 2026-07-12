@@ -9,6 +9,7 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
   level: 20,
   hp: 100,
   mhp: 100,
+  absorb: 0,
   res: 100,
   mres: 100,
   rtype: 'mana',
@@ -96,7 +97,7 @@ describe('party frame signature (the per-frame short-circuit)', () => {
     expect(sig).toContain('L1:R0:G1');
   });
 
-  it('changes when any rendered field changes (hp, dead, level, leader, raid, out-of-range)', () => {
+  it('changes when any rendered field changes (hp, shield, dead, level, leader, raid, out-of-range)', () => {
     const pos = { x: 0, z: 0 };
     const base = partyFrameSignature(info(), 1, pos);
     const members = info().members;
@@ -105,6 +106,13 @@ describe('party frame signature (the per-frame short-circuit)', () => {
     expect(
       partyFrameSignature(
         info({ members: [members[0], { ...members[1], hp: 50 }, members[2]] }),
+        1,
+        pos,
+      ),
+    ).not.toBe(base);
+    expect(
+      partyFrameSignature(
+        info({ members: [members[0], { ...members[1], absorb: 25 }, members[2]] }),
         1,
         pos,
       ),

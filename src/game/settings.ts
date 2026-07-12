@@ -176,6 +176,11 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // on by default: Clique-style mouseover casting. Pressing an action-bar key
+  // for a friendly (heal/buff) ability while the cursor is over a party frame
+  // casts it on the hovered member without touching the current target (read
+  // live by Hud.castSlot). Off restores the classic target-else-self routing.
+  mouseoverCast: { def: true },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players
@@ -246,6 +251,12 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: the classic "target of target" mini-frame. When on, and you have
+  // a target, a small unit frame under the target frame shows who YOUR target is
+  // targeting (a mob's aggro target, a player's selected target). Purely a display
+  // preference read by the HUD's target-frame update; the id it reads already rides
+  // the wire, and the frame hides itself when the target-of-target is unknown.
+  showTargetOfTarget: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
