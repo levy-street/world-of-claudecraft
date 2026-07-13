@@ -185,6 +185,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the compact player-metrics schema without a boot backfill', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_account_facts');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_activity_daily');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_business_daily');
+    const ddl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS player_account_facts'),
+    );
+    expect(ddl).toBeDefined();
+    expect(ddl).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
+  });
+
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {
     await ensureSchema();
     const firstBoot = h.calls.slice();

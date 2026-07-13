@@ -26,6 +26,13 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { OAUTH_SCHEMA } from './oauth_db';
+import {
+  closeOrphanPlayerSessions,
+  closePlayerSession,
+  openPlayerSession,
+  PLAYER_METRICS_SCHEMA,
+  recordCharacterCreation,
+} from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -814,6 +821,10 @@ export async function ensureSchema(): Promise<void> {
     await client.query('BEGIN');
     await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
     await client.query(SCHEMA);
+    // Compact player analytics facts depend on accounts, characters, and
+    // play_sessions from the core schema. The tables start empty and collect
+    // lifecycle facts prospectively, so boot never runs a production backfill.
+    await client.query(PLAYER_METRICS_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
@@ -2308,11 +2319,22 @@ export async function createCharacter(
   cls: PlayerClass,
   state: CharacterState | null = null,
 ): Promise<CharacterRow> {
-  const res = await pool.query(
-    'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
-    [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
-  );
-  return res.rows[0];
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(
+      'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
+      [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
+    );
+    await recordCharacterCreation(client, accountId, REALM);
+    await client.query('COMMIT');
+    return res.rows[0];
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function createCharacterCapped(
@@ -2344,6 +2366,7 @@ export async function createCharacterCapped(
       'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
       [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
     );
+    await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
     return res.rows[0];
   } catch (err) {
@@ -3103,26 +3126,21 @@ export async function openPlaySession(
   characterId: number,
   characterName: string,
   meta: RequestMetadata = {},
+  initialLevel = 1,
 ): Promise<number> {
-  const res = await pool.query(
-    `INSERT INTO play_sessions (account_id, character_id, character_name, ip_address, user_agent)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [
-      accountId,
-      characterId,
-      characterName,
-      cleanMetadataText(meta.ip, 128),
-      cleanMetadataText(meta.userAgent, 512),
-    ],
-  );
-  return res.rows[0].id;
+  return openPlayerSession(pool, {
+    accountId,
+    characterId,
+    characterName,
+    realm: REALM,
+    initialLevel,
+    ipAddress: cleanMetadataText(meta.ip, 128),
+    userAgent: cleanMetadataText(meta.userAgent, 512),
+  });
 }
 
-export async function closePlaySession(sessionId: number): Promise<void> {
-  await pool.query('UPDATE play_sessions SET ended_at = now() WHERE id = $1 AND ended_at IS NULL', [
-    sessionId,
-  ]);
+export async function closePlaySession(sessionId: number, maxLevel = 1): Promise<void> {
+  await closePlayerSession(pool, sessionId, REALM, maxLevel);
 }
 
 // Sessions left open by a crash have an unknown duration; close them at their
@@ -3130,16 +3148,7 @@ export async function closePlaySession(sessionId: number): Promise<void> {
 // current realm: in the process-per-realm model peers share one database, and
 // an unscoped UPDATE would force-close sessions still live on other realms.
 export async function closeOrphanSessions(): Promise<number> {
-  const res = await pool.query(
-    `UPDATE play_sessions ps
-        SET ended_at = ps.started_at
-       FROM characters c
-      WHERE ps.character_id = c.id
-        AND c.realm = $1
-        AND ps.ended_at IS NULL`,
-    [REALM],
-  );
-  return res.rowCount ?? 0;
+  return closeOrphanPlayerSessions(pool, REALM);
 }
 
 // ---------------------------------------------------------------------------
