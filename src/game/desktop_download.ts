@@ -10,7 +10,7 @@ export type DesktopPlatform = 'mac' | 'win' | 'linux' | 'other';
 // artifacts uploaded to updates.worldofclaudecraft.com/desktop/ at release
 // (see docs/desktop-release.md). The static hrefs in index.html carry the same
 // version as a no-JS fallback.
-export const DESKTOP_VERSION = '0.24.0';
+export const DESKTOP_VERSION = '0.24.1';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';
 
 // electron-builder website-channel artifact names (docs/desktop-release.md):

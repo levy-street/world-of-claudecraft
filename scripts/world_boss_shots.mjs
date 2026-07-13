@@ -128,18 +128,18 @@ async function hoverBagItem(label) {
   await sleep(800);
 
   const handle = await page.evaluateHandle((label) => {
-    const rows = [...document.querySelectorAll('#bags .item-cell')];
-    return rows.find((r) => (r.getAttribute('aria-label') || '').includes(label)) ?? null;
+    const rows = [...document.querySelectorAll('#bags .bag-item')];
+    return rows.find((r) => (r.textContent || '').includes(label)) ?? null;
   }, label);
   const el = handle.asElement();
   if (!el) {
     // Debug: log what IS in the bag to help diagnose failures
     const bagInfo = await page.evaluate(() => {
-      const rows = [...document.querySelectorAll('#bags .item-cell')];
+      const rows = [...document.querySelectorAll('#bags .bag-item')];
       const inv = window.__game.sim.inventory;
       return {
         rowCount: rows.length,
-        rowTexts: rows.map((r) => (r.getAttribute('aria-label') || '').trim().substring(0, 60)),
+        rowTexts: rows.map((r) => r.textContent?.trim().substring(0, 60)),
         inventory: inv.map((s) => s.itemId),
       };
     });

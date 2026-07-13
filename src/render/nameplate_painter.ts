@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -33,7 +34,7 @@ import {
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, t } from '../ui/i18n';
+import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
@@ -149,24 +150,6 @@ export class NameplatePainter {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
-      // Distance scale rides inside the one transform write (transform is the
-      // sanctioned per-frame mover channel: no width/font-size layout writes).
-      // The write itself is deferred to the single post-declutter pass below, so
-      // the scale is remembered on the view for that pass to rebuild it.
-      v.nameplateScale = plan.scale;
-      // Distance fade: this per-frame writer is the ONLY style.opacity writer.
-      // The static pass stores the plate's base opacity (stealth etc.) on the
-      // view; outside the fade band the base string is reused verbatim, so the
-      // common case allocates nothing and elides the write.
-      const opacity =
-        plan.fade >= 1
-          ? v.nameplateBaseOpacity
-          : (Number(v.nameplateBaseOpacity) * plan.fade).toFixed(2);
-      if (opacity !== v.nameplateOpacity) {
-        v.nameplate.style.opacity = opacity;
-        v.nameplateOpacity = opacity;
-      }
-
       if (!fullPass && !plan.urgent) continue;
       const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
@@ -251,6 +234,8 @@ export class NameplatePainter {
         this.setNameplateDevTier(v, suppressSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator.
         this.setNameplateDiscord(v, suppressSelf ? undefined : e.discordAvatar, e.discordName);
+        // Book of Deeds title subtitle (the `title` wire field, a deed id).
+        this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
@@ -341,7 +326,7 @@ export class NameplatePainter {
       const anchor = this.anchorScratch[i];
       const v = this.views.get(anchor.id);
       if (v?.nameplateDisplay !== '') continue;
-      const transform = nameplateScreenTransform(anchor.sx, anchor.sy, v.nameplateScale);
+      const transform = nameplateScreenTransform(anchor.sx, anchor.sy);
       if (transform !== v.nameplateTransform) {
         v.nameplate.style.transform = transform;
         v.nameplateTransform = transform;
@@ -378,11 +363,7 @@ export class NameplatePainter {
     v.hpBar.classList.toggle('boss', frame === 'boss');
     v.markerEl.textContent = marker;
     v.markerEl.className = markerClass;
-    // Base opacity only: the per-frame distance-fade writer in update() owns
-    // the actual style.opacity write (single-writer, so fade and stealth never
-    // fight over the property). `opacity` stays in the sig above, so a base
-    // change (e.g. stealth) still lands here and the writer picks it up.
-    v.nameplateBaseOpacity = opacity;
+    v.nameplate.style.opacity = opacity;
     // guild tag rides in the sig (players only); empty for every other kind
     if (guild) {
       v.guildEl.textContent = `<${guild}>`;
@@ -431,6 +412,24 @@ export class NameplatePainter {
     } else {
       v.devTierEl.removeAttribute('src');
       v.devTierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the Book of Deeds title subtitle under a player's name (the
+  // entity `title` wire field, a deed id; empty means untitled). Cheap-diffed
+  // per (language, title id) so the id-to-text resolution and the DOM write
+  // only run when either changes: no per-frame string work.
+  private setNameplateTitle(v: EntityView, titleId: string | null | undefined): void {
+    const sig = titleId ? `${getLanguage()}|${titleId}` : '';
+    if (sig === v.titleSig) return;
+    v.titleSig = sig;
+    // A stale/unknown deed id (content drift) resolves to '' and hides the line.
+    const text = titleId ? deedTitleText(titleId) : '';
+    if (text !== '') {
+      v.titleEl.textContent = text;
+      v.titleEl.style.display = '';
+    } else {
+      v.titleEl.style.display = 'none';
     }
   }
 

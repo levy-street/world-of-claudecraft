@@ -11,14 +11,6 @@
 // injected callbacks. It holds no Sim reference and reaches into Hud only through
 // its deps.
 //
-// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
-// with a close control, a scrollable body holding the two-pane list+detail, and a
-// sticky footer with the abandon action (sharing stays the per-row shift-click
-// affordance). Like the vendor / options windows the frame mounts on an INNER
-// container (ensureFrame), so the shared #quest-log-window root stays a pristine
-// .window.panel (drag/resize/position live on the root; the frame draws its own
-// chrome). Cold-stamped at first open, reused on later renders.
-//
 // This is the quest LOG window, not the always-on quest TRACKER (quest_tracker.ts,
 // a separate pure core). It is NOT a canvas window (colors live in the extracted
 // stylesheet; the per-quality reward color comes from the shared QUALITY_COLOR
@@ -26,28 +18,18 @@
 
 import { ITEMS, NPCS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { buildQuestLogView, type QuestDetailModel } from './questlog_view';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
+import { svgIcon } from './ui_icons';
 
 // The reward-name color comes from the shared QUALITY_COLOR map; this token covers
 // an unknown quality, so the painter carries no literal hex.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
-
-// A closable, footer-bearing frame with no tab rail: the quest list + detail are
-// the two panes of one scrollable body. Every key is reused from the existing
-// quest catalog.
-const QUESTLOG_FRAME: WindowFrameDescriptor = {
-  id: 'quest-log-window',
-  titleKey: 'questUi.log.title',
-  closeLabelKey: 'questUi.log.close',
-  footer: true,
-};
 
 /**
  * Hud-supplied glue. The quest log renders from IWorld + these callbacks plus the
@@ -85,7 +67,7 @@ export class QuestLogWindow {
   constructor(private readonly deps: QuestLogWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'flex';
+    return this.deps.root().style.display === 'block';
   }
 
   /** The currently selected quest id (read by Hud's quest-share command). */
@@ -101,7 +83,7 @@ export class QuestLogWindow {
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.render();
-    this.deps.root().style.display = 'flex';
+    this.deps.root().style.display = 'block';
     this.deps.onVisibilityChange?.();
   }
 
@@ -113,32 +95,11 @@ export class QuestLogWindow {
       this.openerFocus = this.deps.captureFocus();
       this.deps.closeOthers();
       this.render();
-      this.deps.root().style.display = 'flex';
+      this.deps.root().style.display = 'block';
       this.deps.onVisibilityChange?.();
       return;
     }
     this.render();
-  }
-
-  // Stamp the shared window frame cold at first open, then reuse it. The frame
-  // mounts on an inner container so the #quest-log-window root stays a pristine
-  // .window.panel; an intact mounted frame (its body present) is the reuse marker.
-  private ensureFrame(): WindowFrameParts {
-    const el = this.deps.root();
-    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-    const body = mounted?.querySelector<HTMLElement>('.window-body');
-    if (mounted && body) {
-      return {
-        root: mounted,
-        body,
-        footer: mounted.querySelector<HTMLElement>('.window-footer'),
-        tabButtons: [],
-      };
-    }
-    const mount = document.createElement('div');
-    const parts = renderWindowFrame(mount, QUESTLOG_FRAME, { onClose: () => this.close() });
-    el.replaceChildren(mount);
-    return parts;
   }
 
   close(restoreFocus = true): void {
@@ -163,21 +124,13 @@ export class QuestLogWindow {
     });
     this.selected = view.selectedQuestId;
 
-    const { root: frame, body, footer } = this.ensureFrame();
-    // The frame builder resolves the title key WITHOUT interpolation; the quest
-    // log title carries a muted active/completed summary, so paint it here (the
-    // same key + values) onto the frame's title element.
-    const titleEl = frame.querySelector<HTMLElement>('.window-title');
-    if (titleEl) {
-      titleEl.innerHTML = `${esc(t('questUi.log.title'))} <span class="quest-muted">${esc(
-        t('questUi.log.summary', {
-          active: this.questNumber(view.summary.active),
-          completed: this.questNumber(view.summary.completed),
-        }),
-      )}</span>`;
-    }
-
-    body.innerHTML = '';
+    markDialogRoot(el, { labelledBy: 'quest-log-title' });
+    el.innerHTML = `<div class="panel-title"><span id="quest-log-title">${esc(t('questUi.log.title'))} <span class="quest-muted">${esc(
+      t('questUi.log.summary', {
+        active: this.questNumber(view.summary.active),
+        completed: this.questNumber(view.summary.completed),
+      }),
+    )}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.log.close'))}">${svgIcon('close')}</button></div>`;
     const cols = document.createElement('div');
     cols.className = 'ql-cols';
     const list = document.createElement('div');
@@ -185,7 +138,7 @@ export class QuestLogWindow {
     const detail = document.createElement('div');
     detail.className = 'ql-detail';
     cols.append(list, detail);
-    body.appendChild(cols);
+    el.appendChild(cols);
 
     if (view.empty) {
       list.innerHTML = `<div class="ql-empty">${esc(t('questUi.log.emptyTitle'))}</div>`;
@@ -217,41 +170,11 @@ export class QuestLogWindow {
 
     if (view.detail) this.renderDetail(detail, view.detail, world.player.name);
 
-    this.renderFooter(footer, view.detail !== null);
+    this.deps
+      .root()
+      .querySelector('[data-close]')
+      ?.addEventListener('click', () => this.close());
     this.deps.focusFirstInteractive(el);
-  }
-
-  // The sticky footer carries the abandon action (spec 6 for the quest log): a
-  // painter-only wrapper over the existing confirm flow, rendered only when a quest
-  // is selected so an empty log shows no dangling action. Sharing stays the
-  // shift-click affordance on each quest row (insertQuestChatLink), unchanged.
-  private renderFooter(footer: HTMLElement | null, hasSelection: boolean): void {
-    if (!footer) return;
-    footer.innerHTML = '';
-    if (!hasSelection) return;
-    const abandon = document.createElement('button');
-    abandon.type = 'button';
-    abandon.className = 'btn is-danger';
-    abandon.dataset.questAbandon = '1';
-    abandon.textContent = t('questUi.log.abandon');
-    abandon.addEventListener('click', () => this.confirmAbandon());
-    footer.append(abandon);
-  }
-
-  private confirmAbandon(): void {
-    const questId = this.selected;
-    if (!questId) return;
-    this.deps.confirmDialog(
-      t('questUi.log.abandonConfirmTitle'),
-      t('questUi.log.abandonConfirmBody', { name: this.questTitle(questId) }),
-      t('questUi.log.abandonConfirm'),
-      t('questUi.log.abandonCancel'),
-      () => {
-        this.deps.world().abandonQuest(questId);
-        this.selected = null;
-        this.render();
-      },
-    );
   }
 
   private renderDetail(detail: HTMLElement, d: QuestDetailModel, playerName: string): void {
@@ -280,8 +203,29 @@ export class QuestLogWindow {
       const itemId = d.rewardItemId;
       this.deps.attachTooltip(rewardRow, () => this.deps.itemTooltip(ITEMS[itemId]));
     }
-    // The abandon action moved to the sticky window-frame footer (renderFooter);
-    // the detail pane is now purely the quest's read-only description.
+    const actions = document.createElement('div');
+    actions.className = 'ql-detail-actions';
+    const abandon = document.createElement('button');
+    abandon.className = 'btn';
+    abandon.type = 'button';
+    abandon.textContent = t('questUi.log.abandon');
+    abandon.addEventListener('click', () => {
+      const questId = this.selected;
+      if (!questId) return;
+      this.deps.confirmDialog(
+        t('questUi.log.abandonConfirmTitle'),
+        t('questUi.log.abandonConfirmBody', { name: this.questTitle(questId) }),
+        t('questUi.log.abandonConfirm'),
+        t('questUi.log.abandonCancel'),
+        () => {
+          this.deps.world().abandonQuest(questId);
+          this.selected = null;
+          this.render();
+        },
+      );
+    });
+    actions.appendChild(abandon);
+    detail.appendChild(actions);
   }
 
   // ---- localized helpers (the trivial Hud free-function wrappers, reimplemented

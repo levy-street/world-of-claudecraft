@@ -1,7 +1,7 @@
 // i18n source catalog - in-game HUD chrome strings that were previously hard-coded
 // at their call sites (emote wheel/editor, swing timer, rest indicator, mobile
 // controls, minimap/compass/clock widgets, DPS/HPS meters formatting). English
-// values only; the 13 locale translations live in src/ui/i18n.locales/<lang>.ts
+// values only; the locale translations live in src/ui/i18n.locales/<lang>.ts
 // (the runtime-authoritative overlays), filled by the maintainer at release.
 //
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
@@ -245,18 +245,11 @@ export const hudChromeStrings = {
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Rewards',
+    deeds: 'Deeds',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
-    // The collapse handle for the top-left menu-button cluster (Chat/Social/
-    // Quests/Settings/More). Default collapsed so the round icons do not crowd
-    // the play field; the arrow chip stays visible so a player can reopen it.
-    // The accessible name reflects the action the tap performs, mirrored by
-    // aria-expanded. Both values are wordy prose (M16), so the five non-Latin
-    // locales are filled in the same change.
-    showMenuButtons: 'Show menu buttons',
-    hideMenuButtons: 'Hide menu buttons',
     // The v0.22.0 base's touch-hotbar paging button ("Skills", #mobile-hotbar-page):
     // superseded by the paged action ring below, whose page toggle owns ability
     // paging on touch. The keys stay (already filled in all 20 locales) per the
@@ -324,6 +317,24 @@ export const hudChromeStrings = {
       'Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.',
     doneBodyTouch:
       'You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting.',
+    // Appended to the slay-step body (hud.tutorial.slayBody) so first-time players
+    // learn HOW to fight, not just what to fight: playtesters reported the wolf
+    // step never explains targeting. Keyboard/mouse points at the actual bound
+    // target key (Tab by default, see src/game/keybinds.ts) and a click; the
+    // touch variant taps instead, matching the other *Touch keys in this block.
+    // English-only add, WORDY by M16, so the five non-Latin overlays carry real
+    // fills below.
+    slayTargetHint:
+      'New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.',
+    slayTargetHintTouch:
+      'New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.',
+    // Shown as a short bulleted list under the closing "done" card so a brand-new
+    // player has somewhere to go right after the last tutorial step, instead of
+    // being dropped into the open world with no pointer (see tutorial.ts).
+    nextTipsTitle: 'Where to next',
+    nextTipQuestLog: 'Open your Quest Log ({key}) to find your next task nearby.',
+    nextTipMap: 'Check the World Map ({key}) to see where quests are waiting.',
+    nextTipSocial: 'Open Social ({key}) to find a group for tougher fights.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {
@@ -676,114 +687,6 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
-    // Esc menu redesign ("The Warden's Codex"): the category-rail information
-    // architecture, owned as data by options_ia.ts. Rail-group headers plus the
-    // per-category NAME (only where no existing category key is reused) and the
-    // one-line muted SUBHEAD. All wordy prose, so the five non-Latin fills
-    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) landed with the keys (M16). Rendered by
-    // options_window.ts: the rail groups/tabs and the per-category detail heads.
-    ia: {
-      railDisplay: 'Display',
-      railInput: 'Input',
-      railSystem: 'System',
-      catOverviewName: 'Overview',
-      catOverviewSub: 'Pinned essentials, quick actions, and what changed.',
-      catGraphicsSub: 'Quality, view, and world visuals.',
-      catInterfaceSub: 'HUD scale, panels, chat, and unit frames.',
-      catAccessibilityName: 'Accessibility',
-      catAccessibilitySub: 'Motion, contrast, and content comfort.',
-      catControlsName: 'Controls',
-      catControlsSub: 'Camera, movement, combat, and feedback.',
-      catKeybindsSub: 'Bind keys for every action.',
-      catControllerSub: 'Gamepad feel and button layout.',
-      catTouchName: 'Touch',
-      catTouchSub: 'On-screen sticks, look, and buttons.',
-      catAudioSub: 'Volume and sound toggles.',
-      catSystemName: 'System',
-      catSystemSub: 'Performance, support, and about.',
-    },
-    // Esc menu redesign P2 (desktop chrome): the shell search strip, footer
-    // "Done", the reset-all confirm, the Overview status block, and the
-    // section heads (one per structural section id, spec section 4). All wordy
-    // prose, so the five non-Latin fills (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in
-    // this same change (M16).
-    done: 'Done',
-    resetAllTitle: 'Reset all settings?',
-    resetAllBody: 'This restores every setting to its default. This cannot be undone.',
-    searchPlaceholder: 'Search settings',
-    searchScopeAll: 'All settings',
-    searchScopeThis: 'This section',
-    searchEmpty: 'No settings match your search.',
-    searchGoTo: 'Go to {category}',
-    modeOnline: 'Online',
-    modeOffline: 'Offline',
-    changed: '{count} changed',
-    changedSummary: '{count} changed from defaults',
-    // Esc menu redesign P3 (navigation): the controller button-legend strip shown
-    // in the footer while a pad is connected (spec section 5), each verb's menu
-    // meaning, plus the assertive announce for the X = clear-keybind verb. The
-    // physical button GLYPHS (A / LB / D-pad) stay hardware names in gamepad_map;
-    // only these MEANINGS are localized. All wordy prose except back/page, so the
-    // five non-Latin fills (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in this same change (M16).
-    legend: {
-      category: 'Category',
-      navigate: 'Navigate',
-      select: 'Select',
-      back: 'Back',
-      reset: 'Reset',
-      clear: 'Clear',
-      page: 'Page',
-    },
-    keybindCleared: 'Cleared {action}',
-    // Esc menu redesign P4 (rebind UX + conflicts): the assertive rebind-capture
-    // announce, the eviction announce/note (exact wording), the transient badge on
-    // a displaced row, the persistent unbound-action banner line, and the
-    // controller-duplicate chip. keybindRebinding / keybindEvicted / keybindTaken /
-    // controller.duplicate are wordy, so their five non-Latin fills
-    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) land in this same change (M16); keybindUnbound
-    // is short prose (no 4+ lowercase run) and English-fills at PR tier.
-    keybindRebinding: 'Rebinding {action}. Press a key, or Escape to cancel.',
-    keybindEvicted: 'Bound {key} to {action}; removed from {evicted}',
-    keybindTaken: 'Key removed',
-    keybindUnbound: '{action} has no key',
-    // Keybinds pane helper line (under the capture instructions): modifier combos
-    // are bindable. Wordy prose, so its five non-Latin fills (zh_CN/zh_TW/ja_JP/
-    // ko_KR/ru_RU) land in this same change (M16).
-    keybindModifierHint:
-      'Tip: you can bind modifier combinations. Hold Shift, Ctrl, or Alt while pressing a key to capture the combo (for example Shift+1).',
-    // The aggregate rail warning dot (spec section 7) and the Overview alert row
-    // (spec section 3) for a keybind conflict / fully-unbound action. Both wordy, so
-    // their five non-Latin fills land in this same change (M16).
-    conflictDot: 'Binding conflict',
-    overviewConflictAlert: 'Some key bindings conflict or are unbound.',
-    sec: {
-      quality: 'Quality',
-      view: 'View',
-      general: 'General',
-      scaleText: 'Scale and Text',
-      panels: 'Panels',
-      unitFrames: 'Unit Frames',
-      actionBars: 'Action Bars',
-      chat: 'Chat',
-      combatTooltips: 'Combat and Tooltips',
-      hudExtras: 'HUD Extras',
-      motionContrast: 'Motion and Contrast',
-      content: 'Content',
-      camera: 'Camera',
-      movement: 'Movement',
-      combat: 'Combat',
-      feedback: 'Feedback',
-      inputMode: 'Input Mode',
-      feel: 'Feel',
-      sticks: 'Sticks',
-      look: 'Look',
-      buttons: 'Buttons',
-      volume: 'Volume',
-      toggles: 'Toggles',
-      performance: 'Performance',
-      support: 'Support',
-      about: 'About',
-    },
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -800,10 +703,6 @@ export const hudChromeStrings = {
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
-    // Chip on a button row that shares its action with other buttons (spec section
-    // 6: a pad MAY map two buttons to one action, so this names the duplicate rather
-    // than preventing it). Wordy: its five non-Latin fills land in this same change.
-    duplicate: 'Also bound to {buttons}',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
@@ -968,19 +867,9 @@ export const hudChromeStrings = {
       talents: 'Talents and effects: {value}',
     },
   },
-  // Talents window chrome for the tiered-choices layout (the rest of the panel's
-  // labels predate it and live in game.talents.*). defaultBuildName pre-fills the
-  // Save-Build-As dialog, e.g. "Build 3".
+  // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
-    // The CHOICES tab label, doubling as the status-strip "Choices: N / M" lead.
-    choicesTab: 'Choices',
-    // The Current-build action that clears every staged point.
-    resetChoices: 'Reset choices',
-    // Tier-row unlock level: the accessible label ("Level 12") and the small
-    // caption over the rail's big level number.
-    tierLevel: 'Level {n}',
-    tierLevelLabel: 'Level',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.
@@ -1226,6 +1115,12 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
+    // Playtester-clarity fix: new players did not know Harvest is a separate,
+    // no-cost gathering action (not a profession skill check) that extracts raw
+    // crafting materials (hide, fang, silk, and the rest of the component list
+    // below) from the corpse, on top of any coin or items taken with Take All.
+    harvestButtonTooltip:
+      'Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
@@ -1456,6 +1351,9 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
+    // Playtester-clarity fix: pairs with corpseHarvest.harvestButtonTooltip so
+    // the two loot-window buttons read as clearly distinct actions.
+    takeAllTooltip: 'Take All: collect every coin and item in this loot window.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare
@@ -1691,6 +1589,20 @@ export const hudChromeStrings = {
     linkedAs: 'Linked as {login}',
     unlink: 'Unlink GitHub',
   },
+  // Steam account link (the deeds achievement mirror), the stacked card beside
+  // the GitHub one on character select. Renders only when the server's
+  // /api/status advert says the Steam surface is lit; linking itself is
+  // desktop-app only (the shell mints the session ticket), web shows status +
+  // Unlink. Linking is never a sign-in method.
+  steam: {
+    title: 'Steam',
+    link: 'Link Steam',
+    unlink: 'Unlink Steam',
+    linked: 'Linked to Steam account {id}',
+    benefits:
+      'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
+    noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+  },
   // The Ravenpost mailbox window + envelope indicator. Authored letter
   // sender/subject/body localize via entities.letters.* (world_entity_i18n),
   // not here; these are the window chrome and the structured mailResult lines.
@@ -1921,5 +1833,86 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+  },
+  // The Book of Deeds window: the deed catalog browser (summary strip,
+  // category rail, entry cards, title picker), the watchlist HUD tracker, and
+  // the unlock moment (banner, log lines, retro catch-up summary). Deed
+  // names, descriptions, and title strings are sim content localized through
+  // deed_i18n.ts, never through these keys.
+  deeds: {
+    title: 'Book of Deeds',
+    close: 'Close the Book of Deeds',
+    searchPlaceholder: 'Search deeds',
+    searchAria: 'Search deeds by name',
+    renownLabel: 'Renown',
+    countLabel: '{earned}/{total} deeds',
+    completionAria: 'Deeds earned: {earned} of {total}',
+    recentLabel: 'Recent:',
+    nearestLabel: 'Nearly there:',
+    filterGroupAria: 'Filter deeds',
+    filterAll: 'All',
+    filterEarned: 'Earned',
+    filterUnearned: 'Unearned',
+    filterNearly: 'Nearly done',
+    categoriesAria: 'Deed categories',
+    catProgression: 'Progression',
+    catCombat: 'Combat',
+    catDungeon: 'Dungeons',
+    catDelve: 'Delves',
+    catChronicle: 'Chronicles',
+    catCollection: 'Collection',
+    catPvp: 'PvP and Sport',
+    catSocial: 'Social',
+    catExploration: 'Exploration',
+    catFeat: 'Feats',
+    categoryCountAria: '{category}: {earned} of {visible} deeds earned',
+    emptyCategory: 'No deeds match here.',
+    progressText: '{current}/{target}',
+    progressAria: 'Progress: {current} of {target}',
+    renownChip: '{renown} Renown',
+    earnedDate: 'Earned {date}',
+    featRibbon: 'Feat',
+    hiddenBadge: 'Hidden',
+    titleChip: 'Title reward',
+    watch: 'Watch',
+    unwatch: 'Unwatch',
+    watchFull: 'Watchlist full ({cap} max)',
+    watchAria: 'Watch {name} on the HUD tracker',
+    unwatchAria: 'Stop watching {name}',
+    titlesSection: 'Titles',
+    titlesAria: 'Choose your displayed title',
+    titlesNone: 'No Title',
+    titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
+    unlockedBanner: 'Deed accomplished: {name}',
+    unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
+    retroSummary: 'Your chronicle catches up: {count} deeds recorded.',
+    broadcastLine: '{name} has accomplished a deed: {deed}',
+    rarityLine: 'Earned by {percent} of adventurers',
+    trackerLabel: 'Deeds',
+    collapseHint: 'Collapse deed tracker',
+    expandHint: 'Expand deed tracker',
+    // Compact touch tier: the tracker header is a count chip that opens the Book
+    // of Deeds dialog rather than toggling the inline watch list.
+    openBookHint: 'Open the Book of Deeds',
+    charTitleLabel: 'Title',
+    charTitleNone: 'No title chosen',
+    charOpenBook: 'Book of Deeds',
+    // The Renown tab of the high-score window: tab label, the deeds-board
+    // column headers (rank/name reuse the shared game.leaderboard.* headers,
+    // the Renown column reuses renownLabel above), the viewer's standing
+    // line, and the empty-board state.
+    lbTab: 'Renown',
+    lbDeedsCol: 'Deeds',
+    lbTitleCol: 'Title',
+    lbSelf: 'Your standing: rank {rank}, top {percent} percent',
+    lbEmpty: 'No ranked chroniclers yet.',
+    // The options-window account row (accounts.deed_broadcasts): whether a
+    // marquee unlock is shared with guildmates and followers.
+    broadcastsLabel: 'Share deed unlocks with guild and friends',
+    // The name-plus-title display pattern every titled surface composes
+    // through (chat sender, target frame): the bracket decoration and its
+    // placement around the name live HERE so a locale owns both. Non-wordy
+    // after placeholder strip, so no forced non-Latin fills.
+    titledName: '{name} [{title}]',
   },
 };

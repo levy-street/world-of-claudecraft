@@ -8,6 +8,7 @@ import {
   setGameVersionText,
   setPackageLockVersion,
   setPackageVersion,
+  setReadmeVersionBadge,
 } from '../scripts/release_version.mjs';
 
 const PACKAGE_JSON = JSON.stringify(
@@ -62,6 +63,8 @@ const PLAY_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world
 
 const DESKTOP_TS = `export const DESKTOP_VERSION = '0.20.0';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';`;
+
+const README_MD = `[![Version](https://img.shields.io/badge/version-0.20.0-blue)](package.json)`;
 
 describe('inferExpectedReleaseVersion', () => {
   it('prefers an explicit semver argument', () => {
@@ -146,6 +149,18 @@ describe('release version transforms', () => {
     expect(out).not.toContain('0.20.0');
   });
 
+  it('updates README version badges', () => {
+    const out = setReadmeVersionBadge(README_MD, '0.21.0', 'README.md');
+    expect(out).toContain('version-0.21.0-blue');
+    expect(out).not.toContain('version-0.20.0-blue');
+  });
+
+  it('fails loudly when a README has no version badge', () => {
+    expect(() => setReadmeVersionBadge('# World of ClaudeCraft', '0.21.0', 'README.md')).toThrow(
+      /version badge/,
+    );
+  });
+
   it('fails loudly when the module has no DESKTOP_VERSION constant', () => {
     expect(() => setDesktopModuleVersion('const x = 1;', '0.21.0', 'desktop_download.ts')).toThrow(
       /DESKTOP_VERSION/,
@@ -171,6 +186,9 @@ describe('planReleaseVersion', () => {
         'index.html': INDEX_HTML,
         'play.html': PLAY_HTML,
       },
+      readmeFiles: {
+        'README.md': README_MD,
+      },
     });
 
     expect(JSON.parse(plan.packageJson).version).toBe('0.21.0');
@@ -183,6 +201,7 @@ describe('planReleaseVersion', () => {
     );
     expect(plan.htmlFiles['play.html']).toContain('<div id="game-version">v0.21.0</div>');
     expect(plan.desktopModule).toContain("export const DESKTOP_VERSION = '0.21.0';");
+    expect(plan.readmeFiles['README.md']).toContain('version-0.21.0-blue');
   });
 });
 
@@ -199,6 +218,9 @@ describe('collectReleaseVersionFailures', () => {
         'index.html': INDEX_HTML,
         'play.html': '<div class="coming-soon-badge">Coming Soon...</div>',
       },
+      readmeFiles: {
+        'README.md': README_MD,
+      },
     });
 
     expect(failures).toEqual(
@@ -212,6 +234,7 @@ describe('collectReleaseVersionFailures', () => {
         'src/game/desktop_download.ts DESKTOP_VERSION is 0.20.0, expected 0.21.0',
         'play.html is missing the macOS desktop download URL for 0.21.0',
         'play.html still contains Coming Soon in the download panel',
+        'README.md version badge includes 0.20.0, expected all 0.21.0',
       ]),
     );
   });
@@ -226,6 +249,9 @@ describe('collectReleaseVersionFailures', () => {
       desktopModule: DESKTOP_TS,
       htmlFiles: {
         'play.html': PLAY_HTML,
+      },
+      readmeFiles: {
+        'README.md': README_MD,
       },
     });
 

@@ -69,14 +69,10 @@ export const SETTING_RANGES = {
   // touch-only: scales both on-screen joysticks from their anchored corner so
   // players can size the thumb pads to their hands (0.7x–1.3x). 1.0 = stock.
   joystickScale: { min: 0.7, max: 1.3, def: 1 },
-  // touch only: scale the on-screen action button cluster (spell/ability ring +
-  // touch buttons) so players with larger or smaller thumbs can size the controls
-  // to taste. Widened from the old 0.8-1.3 band to 25-200% on live feedback: the
-  // 0.25 floor keeps the buttons on screen (a 0 scale collapsed the whole cluster
-  // to nothing, soft-locking the player), 100% is stock, 200% is the large end.
-  // def stays 1.0x so no stored value migrates (the load clamp only widens the
-  // interval). Surfaced in the Esc menu only on phone-touch devices.
-  actionButtonScale: { min: 0.25, max: 2, def: 1 },
+  // touch only: scale the on-screen action button cluster so players with
+  // larger or smaller thumbs can size the controls to taste (default 1.0x).
+  // Surfaced in the Esc menu only on phone-touch devices.
+  actionButtonScale: { min: 0.8, max: 1.3, def: 1 },
   // touch-only: how far the move thumbstick must travel before it registers
   // movement. Higher values resist accidental drift on a jittery thumb; lower
   // values make the stick more responsive. Default matches the old fixed 0.22.
@@ -241,6 +237,10 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Book of Deeds watchlist
+  // tracker is collapsed to just its header. Toggled by clicking the tracker
+  // header (the quest-tracker convention); kept here so the choice persists.
+  deedTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.

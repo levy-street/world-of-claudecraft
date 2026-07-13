@@ -92,6 +92,17 @@ let currentLanguage: SupportedLanguage = 'en';
 const DEV_PSEUDO_LOCALE = 'en_XA';
 let pseudoActive = false;
 
+/** Whether the dev-only en_XA pseudo-locale is active (accent-push + brackets on
+ *  English, {placeholders} preserved). The `!import.meta.env.PROD` guard mirrors
+ *  tableFor, so a release build statically resolves this to `false` and any
+ *  consumer's pseudo branch tree-shakes away. Player text that resolves its
+ *  English OUTSIDE the catalog table (deed names/descs/titles come from the sim
+ *  content table, so tableFor never pseudo-folds them) consults this to fold at
+ *  render time (src/ui/deed_i18n.ts). */
+export function isPseudoActive(): boolean {
+  return !import.meta.env.PROD && pseudoActive;
+}
+
 export function isSupportedLanguage(value: string): value is SupportedLanguage {
   return SUPPORTED_SET.has(value);
 }

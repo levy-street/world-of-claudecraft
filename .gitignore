@@ -10,6 +10,7 @@ release-steam/
 # generated main-process runtime bundles (scripts/electron-vendor.mjs)
 electron/vendor/
 media-cache/
+sfx-runtime/
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)
 src/ui/i18n.resolved.generated/*.tmp

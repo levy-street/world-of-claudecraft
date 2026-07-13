@@ -141,7 +141,7 @@ describe('releaseAllCharacterLeases', () => {
 });
 
 describe('shutdown wiring (source pin)', () => {
-  it('main.ts drains the bank ledger, then sweeps leases, then closes the pool', () => {
+  it('main.ts drains the bank ledger and deed records, then sweeps leases, then closes the pool', () => {
     // The shutdown closure in server/main.ts is not unit-drivable, so pin its
     // ordering by source. The load-bearing order is: endAllPlaySessions() (close
     // the play-session rows), then bankLedgerIdle() (flush every queued audit row
@@ -150,16 +150,22 @@ describe('shutdown wiring (source pin)', () => {
     // sweep matters: once the leases drop, a replacement process can load the same
     // character and write new bank_ledger rows, and any rows still queued here would
     // flush AFTER them with higher insertion ids, inverting the id order the offline
-    // audit replays by (false negative_net / purchased_regression alarms). Match the
-    // awaited CALL forms so a prose mention in a comment never shifts an index.
+    // audit replays by (false negative_net / purchased_regression alarms). The
+    // deed-records FIFO drains in the same window: a queued character_deeds insert
+    // rejected by pool.end() would go missing until that character's next login
+    // (the join reconcile is the only heal). Match the awaited CALL forms so a
+    // prose mention in a comment never shifts an index.
     const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8');
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
     const ledgerDrain = src.indexOf('await bankLedgerIdle()');
+    const deedsDrain = src.indexOf('await deedRecordsIdle()');
     const poolEnd = src.indexOf('await pool.end()');
     expect(endSessions).toBeGreaterThan(-1);
     expect(ledgerDrain).toBeGreaterThan(endSessions);
+    expect(deedsDrain).toBeGreaterThan(endSessions);
     expect(sweep).toBeGreaterThan(ledgerDrain);
+    expect(sweep).toBeGreaterThan(deedsDrain);
     expect(poolEnd).toBeGreaterThan(sweep);
   });
 });

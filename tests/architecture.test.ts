@@ -143,10 +143,6 @@ const UI_PURE_CORES = [
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
-  'src/ui/options_ia.ts',
-  'src/ui/options_focus_model.ts',
-  'src/ui/options_mobile_shell_view.ts',
-  'src/ui/keybind_conflicts.ts',
   'src/ui/vendor_view.ts',
   'src/ui/heroic_vendor_view.ts',
   'src/ui/loot_roll_status_view.ts',
@@ -169,7 +165,9 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
   'src/ui/dev_leaderboard_view.ts',
+  'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
+  'src/ui/deeds_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/questlog_view.ts',
   'src/ui/swing_timer.ts',
@@ -191,11 +189,8 @@ const UI_PURE_CORES = [
   'src/ui/desktop_update_view.ts',
   'src/ui/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
-  'src/ui/window_frame_view.ts',
-  'src/ui/chat_mobile_panel.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
-  'src/game/menu_gamepad_nav.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
@@ -224,9 +219,6 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/unit_portrait.ts',
-  'src/ui/options_ia.ts',
-  'src/ui/options_focus_model.ts',
-  'src/ui/keybind_conflicts.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
@@ -247,10 +239,8 @@ const BARE_NAMED = [
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/mobile_hud_layout.ts',
-  'src/ui/chat_mobile_panel.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
-  'src/game/menu_gamepad_nav.ts',
   'src/render/cast_bar.ts',
 ].map((rel) => join(repoRoot, rel));
 

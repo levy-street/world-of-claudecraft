@@ -13,6 +13,7 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { TalentModifiers } from './content/talents';
+import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
@@ -39,6 +40,7 @@ import type {
   AbilityDef,
   Aura,
   CrowdControlDrCategory,
+  DeedStatKey,
   DelveRun,
   DungeonDifficulty,
   Entity,
@@ -181,6 +183,29 @@ export interface SimContextPrimitives {
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
   // module, the damage no-damage floor, and targeting's candidate arm.
   readonly vcup: VcState;
+  // Book of Deeds: players whose deed-relevant state changed this tick,
+  // evaluated and cleared at the tick tail (deeds.ts updateDeeds). Sim-owned
+  // Set mutated in place, so a read-only live view.
+  readonly deedDirtyPids: Set<number>;
+  // Keyed dirty marks beside deedDirtyPids: pid -> the trigger-input keys
+  // that changed this tick (the deeds.ts narrow mark sites), so the tail
+  // evaluator re-checks only the deeds reading those inputs. A dirty pid with
+  // NO entry takes a full pass. Sim-owned Map mutated in place.
+  readonly deedDirtyKeys: Map<number, Set<string>>;
+  // The world-boss scheduler's live entity ids, one slot per WORLD_BOSSES
+  // entry (null while that boss is not up). Sim owns and reassigns slot
+  // VALUES in place; the deeds proximity sweep resolves the witness target
+  // through this instead of scanning the whole entity map every second.
+  readonly worldBossEntityIds: readonly (number | null)[];
+  // Book of Deeds session runtime (per-attempt encounter windows, per-match
+  // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
+  // place; nothing in it persists.
+  readonly deedRuntime: DeedRuntime;
+  // Live practice-bot roster for offline 2v2 Fiesta (fiesta_bots.ts). The Book
+  // of Deeds reads it to gate Fiesta deeds to real matchmade bouts (a bot in a
+  // seat means practice; the online server never seats fiesta bots). Sim-owned,
+  // mutated in place, read-only view like bankerIds.
+  readonly fiestaBotPids: number[];
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -661,6 +686,22 @@ export interface SimContextCallbacks {
 
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
+  // Book of Deeds (deeds.ts owns every body; append-only additions). The
+  // increment/mark sites across the gameplay modules reach the persisted
+  // deed surface only through these. bumpDeedStat raises a lifetime counter
+  // and marks the player dirty; markItemDiscovered/markVisited add to the
+  // bounded ledger sets (dirty only when newly added; rolledQuality carries
+  // an instanced copy's rolled quality for the quality-first marks);
+  // markDeedsDirty flags a player whose persisted trigger inputs changed
+  // (quest turn-in, delve clear, arena result, craft/gather grants,
+  // lifetime-XP accrual, and similar); grantDeed is the idempotent unlock
+  // every path shares (the evaluator and the bespoke manual-deed sites).
+  bumpDeedStat(meta: PlayerMeta, stat: DeedStatKey, delta: number): void;
+  markItemDiscovered(meta: PlayerMeta, itemId: string, rolledQuality?: string): void;
+  markVisited(meta: PlayerMeta, markId: string): void;
+  markDeedsDirty(pid: number): void;
+  grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
+
   // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
   // combat/effect_dispatch.ts). All three silently no-op unless the caster is
   // seated in the live Sowfield match's play phase. vcupBallKick launches the
@@ -855,6 +896,21 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get vcup() {
       return host.vcup;
+    },
+    get deedDirtyPids() {
+      return host.deedDirtyPids;
+    },
+    get deedDirtyKeys() {
+      return host.deedDirtyKeys;
+    },
+    get worldBossEntityIds() {
+      return host.worldBossEntityIds;
+    },
+    get deedRuntime() {
+      return host.deedRuntime;
+    },
+    get fiestaBotPids() {
+      return host.fiestaBotPids;
     },
     emit: host.emit,
     error: host.error,
@@ -1054,6 +1110,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
     applySetProcs: host.applySetProcs,
+    // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
+    bumpDeedStat: host.bumpDeedStat,
+    markItemDiscovered: host.markItemDiscovered,
+    markVisited: host.markVisited,
+    markDeedsDirty: host.markDeedsDirty,
+    grantDeed: host.grantDeed,
     // The Vale Cup sport-move arms (points at social/vale_cup.ts).
     vcupBallKick: host.vcupBallKick,
     vcupBallPass: host.vcupBallPass,

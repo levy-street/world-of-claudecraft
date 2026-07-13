@@ -11,28 +11,82 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "es_ES": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_FR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "fr_CA": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "de_DE": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +94,120 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "nl_NL": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "pl_PL": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "id_ID": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "tr_TR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "sv_SE": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "vi_VN": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ],
   "da_DK": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
+    "hudChrome.loot.takeAllTooltip",
+    "hudChrome.tutorial.nextTipMap",
+    "hudChrome.tutorial.nextTipQuestLog",
+    "hudChrome.tutorial.nextTipSocial",
+    "hudChrome.tutorial.nextTipsTitle",
+    "hudChrome.tutorial.slayTargetHint",
+    "hudChrome.tutorial.slayTargetHintTouch"
   ]
 };

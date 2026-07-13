@@ -15,39 +15,20 @@
 // extracted stylesheet, no literal hex/px in TS). refreshHotbarControls
 // is the one not-cold touch: hud.update() calls it while the window is open so the
 // +/- toggles track action-bar changes without a full rebuild.
-//
-// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
-// with a close control, a scrollable body holding the spell list, and a sticky
-// footer that hosts the per-form reset-bar action. Like the vendor / options
-// windows the frame mounts on an INNER container (ensureFrame), so the shared
-// #spellbook root stays a pristine .window.panel (drag/resize/position live on the
-// root). Drag-to-actionbar is unchanged: the row grammar, the dragstart/dragend
-// payload, and the +/- toggle wiring are byte-identical to the pre-frame code.
 
 import { audio } from '../game/audio';
 import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import { buildSpellbookView, type SpellbookRow } from './spellbook_view';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
-
-// A closable, footer-bearing frame with no tab rail: the class kit renders as one
-// scrollable list (the pre-redesign window had no tabs; the ability schools are
-// not modelled in the view core, so a school-tab split would need a core change,
-// out of this painters-only scope). Every key is reused from the ability catalog.
-const SPELLBOOK_FRAME: WindowFrameDescriptor = {
-  id: 'spellbook',
-  titleKey: 'abilityUi.spellbook.title',
-  closeLabelKey: 'abilityUi.spellbook.close',
-  footer: true,
-};
+import { svgIcon } from './ui_icons';
 
 /**
  * Hud-supplied glue. The spellbook renders from IWorld + these callbacks; it never
@@ -106,7 +87,7 @@ export class SpellbookWindow {
   }
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'flex';
+    return this.deps.root().style.display === 'block';
   }
 
   toggle(): void {
@@ -119,13 +100,13 @@ export class SpellbookWindow {
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.render();
-    this.deps.root().style.display = 'flex';
-    (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+    this.deps.root().style.display = 'block';
+    (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 
   close(): void {
     const el = this.deps.root();
-    if (el.style.display !== 'flex') {
+    if (el.style.display !== 'block') {
       this.openerFocus = null;
       return;
     }
@@ -133,27 +114,6 @@ export class SpellbookWindow {
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
-  }
-
-  // Stamp the shared window frame cold at first open, then reuse it. The frame
-  // mounts on an inner container so the #spellbook root stays a pristine
-  // .window.panel; an intact mounted frame (its body present) is the reuse marker.
-  private ensureFrame(): WindowFrameParts {
-    const el = this.deps.root();
-    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-    const body = mounted?.querySelector<HTMLElement>('.window-body');
-    if (mounted && body) {
-      return {
-        root: mounted,
-        body,
-        footer: mounted.querySelector<HTMLElement>('.window-footer'),
-        tabButtons: [],
-      };
-    }
-    const mount = document.createElement('div');
-    const parts = renderWindowFrame(mount, SPELLBOOK_FRAME, { onClose: () => this.close() });
-    el.replaceChildren(mount);
-    return parts;
   }
 
   // Per-frame entry while the window is open. Rebuilds the whole list only when a
@@ -176,10 +136,7 @@ export class SpellbookWindow {
   // ability id; or the close/reset control), then restore after the render.
   private rerenderPreservingView(): void {
     const root = this.deps.root();
-    // The .window-body is the scroll container now (the frame bounds it as a flex
-    // column); capture its scrollTop, not the root's.
-    const scroller = root.querySelector<HTMLElement>('.window-body');
-    const scrollTop = scroller?.scrollTop ?? 0;
+    const scrollTop = root.scrollTop;
     const active = document.activeElement as HTMLElement | null;
     let refocus: string | null = null;
     if (active && root.contains(active)) {
@@ -189,15 +146,15 @@ export class SpellbookWindow {
       else if (id && active.classList.contains('spell-row'))
         refocus = `.spell-row[data-ability-id="${id}"]`;
       else if (active.hasAttribute('data-reset-bar')) refocus = '[data-reset-bar]';
-      else if (active.hasAttribute('data-window-close')) refocus = '[data-window-close]';
+      else if (active.hasAttribute('data-close')) refocus = '[data-close]';
     }
     this.render();
-    const scrollerAfter = root.querySelector<HTMLElement>('.window-body');
-    if (scrollerAfter) scrollerAfter.scrollTop = scrollTop;
+    root.scrollTop = scrollTop;
     if (refocus) (root.querySelector(refocus) as HTMLElement | null)?.focus();
   }
 
   render(): void {
+    const el = this.deps.root();
     const world = this.deps.world();
     this.lastKnownSig = SpellbookWindow.knownSig(world.known);
     const classId = world.cfg.playerClass;
@@ -212,20 +169,17 @@ export class SpellbookWindow {
       hasFormBars: this.deps.hasFormBars(),
     });
     const className = classDisplayName(view.classId);
-    const { root: frame, body, footer } = this.ensureFrame();
-    // The frame builder resolves the title key WITHOUT interpolation; the spellbook
-    // title carries the class subtitle, so paint it here onto the frame's title.
-    const titleEl = frame.querySelector<HTMLElement>('.window-title');
-    if (titleEl) {
-      titleEl.innerHTML = `${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(
-        t('abilityUi.spellbook.classSubtitle', { className }),
-      )}</span>`;
-    }
-    body.innerHTML = '';
+    markDialogRoot(el, { label: t('abilityUi.spellbook.title') });
+    // "Reset bar" only applies to classes with per-form bars (druid); other classes
+    // have a single bar, so the button is omitted for them.
+    const resetBtnHtml = view.hasFormBars
+      ? `<button type="button" class="x-btn spellbook-reset" data-reset-bar aria-label="${esc(t('abilityUi.spellbook.resetBarAria'))}">${esc(t('abilityUi.spellbook.resetBar'))}</button>`
+      : '';
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(t('abilityUi.spellbook.classSubtitle', { className }))}</span></span><div class="panel-title-actions">${resetBtnHtml}<button type="button" class="x-btn" data-close aria-label="${esc(t('abilityUi.spellbook.close'))}">${svgIcon('close')}</button></div></div>`;
     const list = document.createElement('div');
     list.className = 'spell-list';
     list.setAttribute('role', 'list');
-    body.appendChild(list);
+    el.appendChild(list);
     for (const row of view.rows) this.appendRow(list, row);
     if (view.empty) {
       const empty = document.createElement('div');
@@ -233,27 +187,15 @@ export class SpellbookWindow {
       empty.textContent = t('abilityUi.spellbook.empty');
       list.appendChild(empty);
     }
-    // "Reset bar" only applies to classes with per-form bars (druid); other classes
-    // have a single bar, so the footer stays empty for them (collapsed by CSS).
-    if (footer) {
-      footer.innerHTML = '';
-      if (view.hasFormBars) {
-        const resetBtn = document.createElement('button');
-        resetBtn.type = 'button';
-        resetBtn.className = 'btn spellbook-reset';
-        resetBtn.dataset.resetBar = '1';
-        resetBtn.setAttribute('aria-label', t('abilityUi.spellbook.resetBarAria'));
-        resetBtn.textContent = t('abilityUi.spellbook.resetBar');
-        resetBtn.addEventListener('pointerdown', (ev) => ev.stopPropagation());
-        resetBtn.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          this.deps.resetFormBar();
-          audio.click();
-        });
-        footer.appendChild(resetBtn);
-      }
-    }
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    const resetBtn = el.querySelector('[data-reset-bar]');
+    resetBtn?.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+    resetBtn?.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.deps.resetFormBar();
+      audio.click();
+    });
   }
 
   // In-place refresh of the per-row hotbar toggles, called from hud.update() while

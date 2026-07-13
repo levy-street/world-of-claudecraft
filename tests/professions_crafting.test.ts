@@ -81,6 +81,50 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
   });
 });
 
+describe('profession XP on craft (profession_xp.ts)', () => {
+  it('a successful craft grants character XP', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!;
+    grantItem(sim, 'spider_leg', 1, pid);
+    const before = meta.xp;
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(meta.xp).toBeGreaterThan(before);
+  });
+
+  it('a trivial craft for a high-level player grants zero XP (gray band)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.setPlayerLevel(20);
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!; // level 1
+    grantItem(sim, 'spider_leg', 1, pid);
+    const before = meta.xp;
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(meta.xp).toBe(before);
+  });
+
+  it('a denied craft (insufficient materials) grants no XP', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!;
+    const before = meta.xp;
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(false);
+    expect(meta.xp).toBe(before);
+  });
+});
+
 describe('resolveCraft (#1127)', () => {
   it('consumes exactly the required materials and produces the correct output', () => {
     const sim = makeSim();
@@ -332,6 +376,7 @@ describe('tiered mastery gating (#1128)', () => {
     skillReq: 25,
     trivialAt: 50,
     itemLevelBudget: 10,
+    level: 10,
   };
 
   function setSkill(sim: Sim, pid: number, craftId: string, value: number) {

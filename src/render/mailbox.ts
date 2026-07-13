@@ -1,15 +1,32 @@
-// The Ravenpost pillar: the procedural mailbox prop the renderer builds for
-// `kind:'object'` entities with templateId 'mailbox'. A carved stone plinth,
-// a timber post carrying the brass letterbox, a small peaked roof, and the
-// service's brass raven perched on top. The votive glow under the letterbox is
-// the per-viewer "unread mail" beacon: the renderer toggles it from
-// IWorld.mailUnread each frame (exposed via group.userData.mailGlow).
+// The Ravenpost pillar: the mailbox prop the renderer builds for
+// `kind:'object'` entities with templateId 'mailbox'. A small Tripo-generated
+// GLB (see public/models/props/CLAUDE.md), with the carved-plinth/timber-post
+// procedural build kept as a fallback for the brief window before the GLB
+// preload resolves. The votive glow under the letterbox is the per-viewer
+// "unread mail" beacon: the renderer toggles it from IWorld.mailUnread each
+// frame (exposed via group.userData.mailGlow).
 //
 // Deterministic (entityId drives the only variation, never Math.random);
 // materials go through surfaceMat() for dedup, matching delve_props.ts.
 
 import * as THREE from 'three';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+
+const MAILBOX_ASSET_URL = '/models/props/mailbox_pillar.glb';
+let loadedMailboxGltf: THREE.Group | null = null;
+
+if (typeof window !== 'undefined') {
+  registerPreload(
+    loadGltf(MAILBOX_ASSET_URL).then((gltf) => {
+      loadedMailboxGltf = gltf.scene;
+    }),
+  );
+}
+
+/** Test-only window into the preload asset (mirrors props.ts). */
+export const mailboxPreloadInternalsForTest = { mailboxAssetUrl: MAILBOX_ASSET_URL };
 
 function stoneMat(color: number): THREE.Material {
   return surfaceMat({
@@ -38,7 +55,47 @@ function brassMat(color: number): THREE.Material {
   });
 }
 
+function attachMailGlow(group: THREE.Group): THREE.Mesh {
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(0.09, 8, 6),
+    surfaceMat({
+      color: 0xffd27a,
+      roughness: 0.3,
+      metalness: 0,
+      emissive: 0xffb84d,
+      emissiveIntensity: 1.6,
+      flatShading: !GFX.standardMaterials,
+    }),
+  );
+  glow.position.set(0, 1.56, 0.2);
+  glow.visible = false;
+  group.add(glow);
+  group.userData.mailGlow = glow;
+  return glow;
+}
+
+const MAILBOX_TARGET_H = 2.9;
+
+// Normalize the GLB to MAILBOX_TARGET_H (same Box3 trick as delve_props.ts'
+// buildStandaloneGlb) so the nameplate offset and the unread-mail glow anchor
+// hold regardless of the exported scale, instead of assuming the export is
+// already 2.9 units tall.
 export function buildMailboxPillar(entityId: number): { group: THREE.Group; height: number } {
+  if (loadedMailboxGltf) {
+    const group = new THREE.Group();
+    const inst = loadedMailboxGltf.clone(true);
+    inst.traverse((child) => {
+      if (child instanceof THREE.Mesh) child.castShadow = true;
+    });
+    const size = new THREE.Vector3();
+    new THREE.Box3().setFromObject(inst).getSize(size);
+    if (size.y > 1e-3) inst.scale.setScalar(MAILBOX_TARGET_H / size.y);
+    const seated = new THREE.Box3().setFromObject(inst);
+    inst.position.y -= seated.min.y;
+    group.add(inst);
+    attachMailGlow(group);
+    return { group, height: MAILBOX_TARGET_H };
+  }
   const group = new THREE.Group();
   const stone = stoneMat(0x6f6a61);
   const stoneDark = stoneMat(0x57534b);
@@ -104,21 +161,7 @@ export function buildMailboxPillar(entityId: number): { group: THREE.Group; heig
 
   // The unread-mail votive: a warm ember tucked under the letterbox. Hidden by
   // default; the renderer flips visibility from the viewer's mailUnread.
-  const glow = new THREE.Mesh(
-    new THREE.SphereGeometry(0.09, 8, 6),
-    surfaceMat({
-      color: 0xffd27a,
-      roughness: 0.3,
-      metalness: 0,
-      emissive: 0xffb84d,
-      emissiveIntensity: 1.6,
-      flatShading: !GFX.standardMaterials,
-    }),
-  );
-  glow.position.set(0, 1.56, 0.2);
-  glow.visible = false;
-  group.add(glow);
-  group.userData.mailGlow = glow;
+  attachMailGlow(group);
 
   return { group, height: 2.9 };
 }

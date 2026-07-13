@@ -9,6 +9,7 @@ import { bestiary } from './bestiary';
 import { classes } from './classes';
 import { combat } from './combat';
 import { controls } from './controls';
+import { deeds } from './deeds';
 import { delves } from './delves';
 import { dungeons } from './dungeons';
 import { economy } from './economy';
@@ -49,6 +50,7 @@ const PAGES: Record<string, GuidePage> = {
   delves,
   arena,
   'vale-cup': valeCup,
+  deeds,
   combat,
   stats,
   progression,

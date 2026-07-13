@@ -102,10 +102,27 @@ const ORPHAN_DEVIATION = KNOWN_DEVIATIONS.find(
 );
 const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 
+// Routes born AFTER the migration as registry-only RouteDefs (the new-route
+// rule in server/http/CLAUDE.md: a NEW endpoint never gets an inline ladder
+// arm). They are router-owned with NO legacy rollback arm by design, so the
+// stays-delegate-served requirement does not apply; the loop below asserts the
+// router-owned-only shape instead (the same assertion pair as the orphan).
+const REGISTRY_ONLY_PATHS = new Set<string>([
+  '/api/deeds/rarity',
+  '/api/deeds/broadcasts',
+  '/api/steam/link',
+  '/api/steam/status',
+]);
+
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
-// documented unreachable orphan.
+// documented unreachable orphan and the registry-only routes (they are
+// inventory rows, but they were never ladder arms, so the ladder-coverage and
+// rollback-retention invariants do not describe them).
 const legacyLadder = SURFACE_INVENTORY.filter(
-  (r) => r.dispatcher === DISPATCH.mainApi && !EXCLUDED_PATHS.has(r.path),
+  (r) =>
+    r.dispatcher === DISPATCH.mainApi &&
+    !EXCLUDED_PATHS.has(r.path) &&
+    !REGISTRY_ONLY_PATHS.has(r.path),
 );
 
 // Read main.ts as a FILE (never import: main constructs a pg pool at load) and
@@ -277,6 +294,18 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/daily-rewards' },
     { method: 'POST', path: '/api/daily-rewards/spin' },
     { method: 'GET', path: '/api/daily-rewards/history' },
+    // The deeds family (server/deeds.ts): registry-only routes born AFTER the
+    // migration, per the new-route rule (a NEW endpoint is a RouteDef module,
+    // never an inline ladder arm), so they have no legacy twin to retain; the
+    // REGISTRY_ONLY_PATHS branch below asserts the router-owned-only shape.
+    { method: 'GET', path: '/api/deeds/rarity' },
+    { method: 'GET', path: '/api/deeds/broadcasts' },
+    { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The Steam link trio (server/steam/routes.ts): registry-only like the
+    // deeds pair, env-gated dark until STEAM_ENABLED=1.
+    { method: 'POST', path: '/api/steam/link' },
+    { method: 'DELETE', path: '/api/steam/link' },
+    { method: 'GET', path: '/api/steam/status' },
     // v0.20.0: the paginated daily leaderboard read (the ops-side sibling is
     // asserted with the internal family below).
     { method: 'GET', path: '/api/daily-rewards/leaderboard' },
@@ -332,7 +361,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
       // NOT legacy-served) and skip the must-be-a-ladder-route requirement. Its
       // dedicated 'excludes the documented unreachable swag-claim orphan' test pins
       // the SURFACE_INVENTORY unreachable flag + the deviation.
-      if (EXCLUDED_PATHS.has(route.path)) {
+      if (EXCLUDED_PATHS.has(route.path) || REGISTRY_ONLY_PATHS.has(route.path)) {
         expect(isRouterOwned(apiRegistry, route)).toBe(true);
         expect(legacyServes(route, legacyServed)).toBe(false);
         continue;

@@ -7,6 +7,7 @@
 // mob-template hooks are NOT used.
 
 import { DELVES, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import {
@@ -433,6 +434,8 @@ function tickBells(
       if (dx * dx + dz * dz > BELL_HIT_RADIUS * BELL_HIT_RADIUS) continue;
       const dmg = Math.max(1, Math.round(p.maxHp * BELL_DMG_PCT));
       ctx.dealDamage(boss, p, dmg, false, 'nature', 'Tolling Bell', 'hit', true);
+      // A landed bell contact taints the footwork task.
+      deedsMod.onBellContactForDeeds(ctx, boss);
       if (p.dead) continue;
       // Knockback: push radially outward from altar center.
       // Build a fake "source" position at the altar center so applyKnockback

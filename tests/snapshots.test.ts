@@ -393,7 +393,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 36 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 40 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -1711,6 +1711,226 @@ describe('guild nameplate wire', () => {
   });
 });
 
+// The Book of Deeds active title rides the identity wire (key `title`, a deed
+// id, never display text) so other players' titles reach nameplates/inspect.
+// Emitted only when non-null (mobs and untitled players pay zero bytes); the
+// sim validator (src/sim/deeds.ts setActiveTitle) is the only writer.
+describe('active title wire (Book of Deeds)', () => {
+  it('carries the title deed id through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    const meta = sim.players.get(pid)!;
+    expect(wireEntity(e).title).toBeUndefined();
+
+    // earn a title-reward deed, then select it through the sim setter
+    meta.deedsEarned.set('prog_veteran', '2026-07-08');
+    sim.setActiveTitle('prog_veteran', pid);
+    expect(wireEntity(e).title).toBe('prog_veteran');
+
+    // clearing the title drops the key, so the line disappears for viewers
+    sim.setActiveTitle(null, pid);
+    expect(wireEntity(e).title).toBeUndefined();
+  });
+
+  it('restores entity.title on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, title: 'prog_veteran' }] });
+    expect(client.entities.get(7)?.title).toBe('prog_veteran');
+
+    // a later full record without `title` means "untitled" -> reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.title).toBeNull();
+  });
+
+  it('server dispatch shape-checks the payload and routes through the sim validator', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Titled');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set('prog_veteran', '2026-07-08');
+
+    // a non-string, non-null payload never reaches the sim (silent no-op)
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: 42 }));
+    expect(meta.activeTitle).toBeNull();
+    expect(e.title).toBeNull();
+
+    // a raw frame naming an UNEARNED deed is refused by the sim validator
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_champion' }),
+    );
+    expect(meta.activeTitle).toBeNull();
+    expect(e.title).toBeNull();
+
+    // the earned title-reward deed is accepted and echoes on the snapshot
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' }),
+    );
+    expect(meta.activeTitle).toBe('prog_veteran');
+    expect(e.title).toBe('prog_veteran');
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.atitle).toBe('prog_veteran');
+  });
+
+  it('the ClientWorld send frame round-trips through the server dispatch (key lockstep)', () => {
+    // Drive the REAL ClientWorld send path (cmd -> rawCmd -> ws.send) and feed
+    // the produced frame verbatim into server.handleMessage, so a key rename
+    // on EITHER side (deedId vs anything else) reddens here instead of
+    // silently no-oping in production.
+    const outbox: string[] = [];
+    const client = bareClient(1);
+    (client as any).connected = true;
+    (client as any).ws = { readyState: 1, send: (p: string) => outbox.push(p) };
+    client.setActiveTitle('prog_veteran');
+    client.setActiveTitle(null);
+    expect(outbox.map((p) => JSON.parse(p))).toEqual([
+      { t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' },
+      { t: 'cmd', cmd: 'deed_set_title', deedId: null },
+    ]);
+
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Lockstep');
+    const meta = server.sim.players.get(session.pid)!;
+    const e = server.sim.entities.get(session.pid)!;
+    meta.deedsEarned.set('prog_veteran', '2026-07-08');
+    server.handleMessage(session, outbox[0]); // the client-built select frame
+    expect(meta.activeTitle).toBe('prog_veteran');
+    expect(e.title).toBe('prog_veteran');
+    server.handleMessage(session, outbox[1]); // the client-built clear frame
+    expect(meta.activeTitle).toBeNull();
+    expect(e.title).toBeNull();
+  });
+
+  it('a null payload through the server dispatch clears the title and echoes null', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cleared');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+    const e = sim.entities.get(session.pid)!;
+    meta.deedsEarned.set('prog_veteran', '2026-07-08');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' }),
+    );
+    expect(meta.activeTitle).toBe('prog_veteran');
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: null }),
+    );
+    expect(meta.activeTitle).toBeNull();
+    expect(e.title).toBeNull();
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.atitle).toBeNull();
+  });
+
+  it('a mid-session unlock re-emits deeds and dstats on the next snapshot', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Unlocks');
+    const sim = server.sim;
+    const meta = sim.players.get(session.pid)!;
+
+    broadcast(server); // first snapshot: full self state
+    sim.tick(); // a quiet tick: nothing deed-related changed
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self).not.toHaveProperty('deeds');
+    expect(quiet.self).not.toHaveProperty('dstats');
+
+    // a real evaluator grant mid-session (duelsWon 0 -> 1 crosses the
+    // pvp_duel_first_win threshold) must reach the client on the NEXT
+    // snapshot, not the ~2s staggered backstop
+    sim.ctx.bumpDeedStat(meta, 'duelsWon', 1);
+    sim.tick();
+    expect(meta.deedsEarned.has('pvp_duel_first_win')).toBe(true);
+    fc.sent.length = 0;
+    broadcast(server);
+    const after = lastSnap(fc.sent);
+    expect(after.self.deeds).toHaveProperty('pvp_duel_first_win');
+    expect(after.self.dstats.counters.duelsWon).toBe(1);
+    expect(after.self.renown).toBe(5); // exactly pvp_duel_first_win's renown, from a base of 0
+  });
+
+  it('a second client sees the first client entity title after the re-wire', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const a = joinServer(server, fcA, 1, 'Wearer');
+    const fcB = fakeWs();
+    const b = joinServer(server, fcB, 2, 'Viewer');
+    const sim = server.sim;
+    sim.players.get(a.pid)!.deedsEarned.set('prog_veteran', '2026-07-08');
+
+    // before the title: B's view of A carries no `title` key
+    broadcast(server);
+    const viewerB = bareClient(b.pid);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.title ?? null).toBeNull();
+
+    // A selects the title; the identity change re-wires A as a full record on
+    // the next tick (the per-entity wire cache re-serializes at most once per
+    // sim tick, so the tick between command and broadcast mirrors production)
+    server.handleMessage(
+      a,
+      JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: 'prog_veteran' }),
+    );
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.title).toBe('prog_veteran');
+
+    // A clears; the identity JSON loses the key, so A re-wires as a full
+    // record WITHOUT `title` and B's mirror must return to null (the ?? null
+    // default in the apply, not a stale carry-over)
+    server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'deed_set_title', deedId: null }));
+    sim.tick();
+    fcB.sent.length = 0;
+    broadcast(server);
+    (viewerB as any).applySnapshot(lastSnap(fcB.sent));
+    expect(viewerB.entities.get(a.pid)?.title).toBeNull();
+  });
+
+  it('a fresh player wires an empty earned map and null title that decode faithfully', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Fresh');
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // empty-value fidelity on the wire (the 40-key presence test above only
+    // proves the keys ride the first snapshot)
+    expect(snap.self.deeds).toEqual({});
+    expect(snap.self.atitle).toBeNull();
+    expect(snap.self.renown).toBe(0);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.deedsEarned.size).toBe(0);
+    expect(client.activeTitle).toBeNull();
+    expect(client.renown).toBe(0);
+  });
+});
+
 // Equipped mainhand item id rides the identity wire (terse key `mh`) so the
 // renderer can show each player's held weapon model. Recomputed in
 // recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
@@ -1976,11 +2196,12 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 36 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 40 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 37th unregistered delta key reddens this gate.
+// 41st unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
+  'atitle',
   'bags',
   'bank',
   'buyback',
@@ -1990,9 +2211,11 @@ const ALL_DELTA_KEYS = [
   'dclears',
   'dcomp',
   'dcompanion',
+  'deeds',
   'delveDaily',
   'dmarks',
   'drun',
+  'dstats',
   'duel',
   'equip',
   'gprof',
@@ -2009,6 +2232,7 @@ const ALL_DELTA_KEYS = [
   'prof',
   'qdone',
   'qlog',
+  'renown',
   'sport',
   'stats',
   'tal',
@@ -2027,6 +2251,7 @@ const ALL_DELTA_KEYS = [
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
+  atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
   buyback: 'vendorBuyback',
@@ -2035,8 +2260,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
+  deeds: 'deedsEarned',
   dmarks: 'delveMarks',
   drun: 'delveRun',
+  dstats: 'deedStats',
   duel: 'duelInfo',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
@@ -2145,6 +2372,18 @@ function dirtyEveryDeltaField(): {
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
+  // would be a vacuous pin), a non-zero stat block covering the counter, both
+  // sets, and a clear record, a renown total, and an active title
+  // (prog_veteran carries a title reward, so the sim setter would accept it).
+  meta.deedsEarned.set('prog_first_steps', '2026-07-01');
+  meta.deedsEarned.set('prog_veteran', '2026-07-08');
+  meta.deedStats.counters.kills = 7;
+  meta.deedStats.itemsDiscovered.add('wolf_fang');
+  meta.deedStats.visited.add('npc:chronicler_saul');
+  meta.deedStats.dungeonClears.hollow_crypt = 2;
+  meta.renown = 15;
+  meta.activeTitle = 'prog_veteran';
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -2275,6 +2514,19 @@ describe('full self-state snapshot delta fixture', () => {
     }); // prof -> professionsState
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
+    // deeds -> deedsEarned: the Map rebuilds from the plain wire object with
+    // both utcDay stamps intact (a Map does not survive JSON.stringify)
+    expect([...client.deedsEarned.entries()]).toEqual([
+      ['prog_first_steps', '2026-07-01'],
+      ['prog_veteran', '2026-07-08'],
+    ]);
+    // dstats -> deedStats: counters survive and BOTH Sets rebuild from arrays
+    expect(client.deedStats.counters.kills).toBe(7);
+    expect(client.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
+    expect(client.deedStats.visited.has('npc:chronicler_saul')).toBe(true);
+    expect(client.deedStats.dungeonClears).toEqual({ hollow_crypt: 2 });
+    expect(client.renown).toBe(15); // renown (same name both sides, no rename)
+    expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
     // tal -> talents / talentSpec / loadouts / activeLoadout
     expect(client.talents).toEqual({ spec: 'arms', ranks: {}, choices: {} });
     expect(client.talentSpec).toBe('arms');
@@ -2323,9 +2575,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(36);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
+  it('ALL_DELTA_KEYS contains exactly 40 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(40);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(40);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2337,12 +2589,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(36);
+    expect(scraped.size).toBe(40);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
   it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {
-    // the 11 non-obvious renames the brief calls out as where drift hides
+    // the non-obvious renames the brief calls out as where drift hides
     const required: Record<string, string> = {
       res: 'resource',
       mres: 'maxResource',
@@ -2355,10 +2607,16 @@ describe('delta-key contract pins (anti-drift)', () => {
       dmarks: 'delveMarks',
       dcomp: 'companionUpgrades',
       dclears: 'delveClears',
+      atitle: 'activeTitle',
+      deeds: 'deedsEarned',
+      dstats: 'deedStats',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
     }
+    // renown keeps the same name on both sides, so it must NEVER grow a rename
+    // entry (one would imply a wire key the decoder does not read)
+    expect('renown' in TERSE_TO_IWORLD).toBe(false);
     // sorted-membership pin: adding or renaming an entry must be a deliberate,
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());

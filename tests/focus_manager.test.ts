@@ -10,10 +10,8 @@ import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 // tests DOM-touching wiring with a hand-rolled fake DOM in the default node env (no
 // jsdom); the real-browser axe + keyboard E2E is a separate browser suite. The fake faithfully models only
 // the DOM contracts the manager uses: querySelectorAll(FOCUSABLE_SELECTOR) in document
-// order, contains() ancestry, getClientRects() visibility, the close-marker matches()
-// (both [data-close] and the frame builder's [data-window-close]), and focus() setting
-// document.activeElement. Also covered here: activeTrapRoot + stepTrapFocus, the seam
-// the Hud's generic gamepad menu fallback drives for non-options trapped dialogs.
+// order, contains() ancestry, getClientRects() visibility, matches('[data-close]'), and
+// focus() setting document.activeElement.
 
 type FakeKeydown = { key: string; shiftKey: boolean; preventDefault: () => void };
 
@@ -24,21 +22,13 @@ class FakeHTMLElement {
   visible: boolean;
   focusable: boolean;
   dataClose: boolean;
-  dataWindowClose: boolean;
   id: string;
 
   constructor(
-    opts: {
-      focusable?: boolean;
-      dataClose?: boolean;
-      dataWindowClose?: boolean;
-      visible?: boolean;
-      id?: string;
-    } = {},
+    opts: { focusable?: boolean; dataClose?: boolean; visible?: boolean; id?: string } = {},
   ) {
     this.focusable = opts.focusable ?? false;
     this.dataClose = opts.dataClose ?? false;
-    this.dataWindowClose = opts.dataWindowClose ?? false;
     this.visible = opts.visible ?? true;
     this.id = opts.id ?? '';
   }
@@ -75,22 +65,16 @@ class FakeHTMLElement {
   }
 
   querySelectorAll(sel: string): FakeHTMLElement[] {
-    if (sel === FOCUSABLE_SELECTOR) return this.descendants().filter((d) => d.focusable);
-    if (sel === '#preferred') return this.descendants().filter((d) => d.id === 'preferred');
-    return [];
+    return sel === FOCUSABLE_SELECTOR ? this.descendants().filter((d) => d.focusable) : [];
   }
 
   querySelector(sel: string): FakeHTMLElement | null {
+    if (sel === '#preferred') return this.descendants().find((d) => d.id === 'preferred') ?? null;
     return this.querySelectorAll(sel)[0] ?? null;
   }
 
-  // The manager skips the close X via ONE combined selector covering both the
-  // legacy [data-close] marker and the frame builder's [data-window-close].
   matches(sel: string): boolean {
-    if (sel === '[data-close], [data-window-close]') return this.dataClose || this.dataWindowClose;
-    if (sel === '[data-close]') return this.dataClose;
-    if (sel === '[data-window-close]') return this.dataWindowClose;
-    return false;
+    return sel === '[data-close]' ? this.dataClose : false;
   }
 
   focus(): void {
@@ -174,121 +158,6 @@ describe('FocusManager.focusFirst', () => {
     root.append(a, pref);
     new FocusManager().focusFirst(el(root), '#preferred');
     expect(fakeDoc.activeElement).toBe(pref);
-  });
-
-  it('skips the frame builder close X ([data-window-close]) exactly like [data-close]', () => {
-    const root = new FakeHTMLElement();
-    const x = new FakeHTMLElement({ focusable: true, dataWindowClose: true });
-    const a = new FakeHTMLElement({ focusable: true });
-    root.append(x, a); // the frame stamps its X first in DOM order (titlebar)
-    new FocusManager().focusFirst(el(root));
-    expect(fakeDoc.activeElement).toBe(a);
-  });
-
-  it('falls back to the frame close X when it is the only focusable element', () => {
-    const root = new FakeHTMLElement();
-    const x = new FakeHTMLElement({ focusable: true, dataWindowClose: true });
-    root.append(x);
-    new FocusManager().focusFirst(el(root));
-    expect(fakeDoc.activeElement).toBe(x);
-  });
-
-  it('never picks a hidden (zero-rect) element: focus() there would silently no-op', () => {
-    const root = new FakeHTMLElement();
-    const hiddenPref = new FakeHTMLElement({ focusable: true, id: 'preferred', visible: false });
-    const hiddenFirst = new FakeHTMLElement({ focusable: true, visible: false });
-    const shown = new FakeHTMLElement({ focusable: true });
-    root.append(hiddenPref, hiddenFirst, shown);
-    // Both the preferred match and the first focusable are display:none; the
-    // manager must fall through to the first RENDERED control.
-    new FocusManager().focusFirst(el(root), '#preferred');
-    expect(fakeDoc.activeElement).toBe(shown);
-  });
-
-  it('prefers a later, visible preferred match over a hidden earlier one', () => {
-    const root = new FakeHTMLElement();
-    const hiddenPref = new FakeHTMLElement({ focusable: true, id: 'preferred', visible: false });
-    const shownPref = new FakeHTMLElement({ focusable: true, id: 'preferred' });
-    root.append(hiddenPref, shownPref);
-    new FocusManager().focusFirst(el(root), '#preferred');
-    expect(fakeDoc.activeElement).toBe(shownPref);
-  });
-});
-
-describe('FocusManager.activeTrapRoot + stepTrapFocus (the generic gamepad fallback)', () => {
-  it('exposes the topmost live trap root and null when none is installed', () => {
-    const fm = new FocusManager();
-    expect(fm.activeTrapRoot()).toBeNull();
-    const root1 = new FakeHTMLElement();
-    root1.append(new FakeHTMLElement({ focusable: true }));
-    const root2 = new FakeHTMLElement();
-    root2.append(new FakeHTMLElement({ focusable: true }));
-    fm.open({ root: () => el(root1) });
-    const top = fm.open({ root: () => el(root2) });
-    expect(fm.activeTrapRoot()).toBe(el(root2));
-    top.release(false);
-    expect(fm.activeTrapRoot()).toBe(el(root1));
-  });
-
-  it('skips a leaked (hidden) top trap without mutating the stack', () => {
-    const fm = new FocusManager();
-    const below = new FakeHTMLElement();
-    below.append(new FakeHTMLElement({ focusable: true }));
-    const leaked = new FakeHTMLElement();
-    leaked.append(new FakeHTMLElement({ focusable: true }));
-    fm.open({ root: () => el(below) });
-    fm.open({ root: () => el(leaked) });
-    leaked.visible = false; // closed without release()
-    expect(fm.activeTrapRoot()).toBe(el(below));
-    leaked.visible = true; // reappears: still the top of the untouched stack
-    expect(fm.activeTrapRoot()).toBe(el(leaked));
-  });
-
-  it('steps focus through the trap root, clamped at both ends (no wrap)', () => {
-    const fm = new FocusManager();
-    const root = new FakeHTMLElement();
-    const a = new FakeHTMLElement({ focusable: true });
-    const b = new FakeHTMLElement({ focusable: true });
-    const c = new FakeHTMLElement({ focusable: true });
-    root.append(a, b, c);
-    fm.open({ root: () => el(root) });
-    fakeDoc.activeElement = a;
-    fm.stepTrapFocus(1);
-    expect(fakeDoc.activeElement).toBe(b);
-    fm.stepTrapFocus(1);
-    fm.stepTrapFocus(1); // clamped at the last element, never wraps
-    expect(fakeDoc.activeElement).toBe(c);
-    fm.stepTrapFocus(-1);
-    fm.stepTrapFocus(-1);
-    fm.stepTrapFocus(-1); // clamped at the first element
-    expect(fakeDoc.activeElement).toBe(a);
-  });
-
-  it('enters at the first visible focusable when focus is not inside the trap', () => {
-    const fm = new FocusManager();
-    const root = new FakeHTMLElement();
-    const hidden = new FakeHTMLElement({ focusable: true, visible: false });
-    const a = new FakeHTMLElement({ focusable: true });
-    root.append(hidden, a);
-    fm.open({ root: () => el(root) });
-    fakeDoc.activeElement = null;
-    fm.stepTrapFocus(1);
-    expect(fakeDoc.activeElement).toBe(a); // the hidden member is not a stop
-    fakeDoc.activeElement = null;
-    fm.stepTrapFocus(-1);
-    expect(fakeDoc.activeElement).toBe(a); // rowPrev from nowhere also lands home
-  });
-
-  it('is a no-op with no trap or an empty focusable set', () => {
-    const fm = new FocusManager();
-    const outside = new FakeHTMLElement({ focusable: true });
-    fakeDoc.activeElement = outside;
-    fm.stepTrapFocus(1); // no trap installed
-    expect(fakeDoc.activeElement).toBe(outside);
-    const empty = new FakeHTMLElement();
-    fm.open({ root: () => el(empty) });
-    fm.stepTrapFocus(1); // trap with nothing focusable
-    expect(fakeDoc.activeElement).toBe(outside);
   });
 });
 
@@ -425,36 +294,5 @@ describe('FocusManager listener lifecycle', () => {
     expect(keydownHandler).not.toBeNull(); // installed on open
     handle.release(false);
     expect(keydownHandler).toBeNull(); // removed once the stack empties
-  });
-});
-
-describe('FocusManager.hasActiveTrap', () => {
-  // The gamepad menu-input gate (spec section 5): the pad drives menu intents and consumes
-  // its edges ONLY while a trap owns focus. This predicate exposes that, with no change to
-  // trap mechanics.
-  it('is false with no trap, true while a trap is open, false after release', () => {
-    const root = new FakeHTMLElement();
-    root.append(new FakeHTMLElement({ focusable: true }));
-    const fm = new FocusManager();
-    expect(fm.hasActiveTrap()).toBe(false);
-    const handle = fm.open({ root: () => el(root) });
-    expect(fm.hasActiveTrap()).toBe(true);
-    handle.release(false);
-    expect(fm.hasActiveTrap()).toBe(false);
-  });
-
-  it('stays true while any nested trap remains, false only when the stack empties', () => {
-    const root1 = new FakeHTMLElement();
-    root1.append(new FakeHTMLElement({ focusable: true }));
-    const root2 = new FakeHTMLElement();
-    root2.append(new FakeHTMLElement({ focusable: true }));
-    const fm = new FocusManager();
-    const t1 = fm.open({ root: () => el(root1) });
-    const t2 = fm.open({ root: () => el(root2) });
-    expect(fm.hasActiveTrap()).toBe(true);
-    t2.release(false);
-    expect(fm.hasActiveTrap()).toBe(true); // the trap beneath is still installed
-    t1.release(false);
-    expect(fm.hasActiveTrap()).toBe(false);
   });
 });

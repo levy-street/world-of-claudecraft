@@ -968,6 +968,23 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
+  // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
+  // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
+  // the warlock spellbook grip) with the per-NPC entity tint carrying each
+  // identity. When the bespoke chronicler .glb files arrive, split this into
+  // one def per chronicler with its own url.
+  npc_chronicler: {
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: ['Mage_Hat'],
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
   // Reedbound Acolyte (The Drowned Litany trash mob): Stone Cantor model from
   // the Raid 02 asset batch. The earlier Meshy mesh (reedbound_acolyte.glb) was
   // realistically proportioned and clashed with the chunky KayKit-style rigs;
@@ -1110,6 +1127,9 @@ const NPC_KEYS: Record<string, string> = {
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
   brother_halven_marsh: 'npc_reliquary_keeper',
+  chronicler_saul: 'npc_chronicler',
+  chronicler_osric_fenn: 'npc_chronicler',
+  chronicler_edda_hartwell: 'npc_chronicler',
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',

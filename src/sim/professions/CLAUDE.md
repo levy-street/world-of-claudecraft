@@ -1,39 +1,80 @@
-<!-- src/sim/professions/: professions subsystem contracts (types + IWorld
-     read-surface). Don't repeat root / src/sim CLAUDE.md, reference them. -->
+<!-- Area-scoped: src/sim/professions/ only. Root + src/sim CLAUDE.md already
+     loaded (determinism, SimContext seam, module-first); this file covers the
+     professions subsystem's own contracts. -->
 
-# src/sim/professions/: professions contracts
+# src/sim/professions/: profession mechanics
 
-Shared skill/craft/recipe/node record shapes for the professions system
-(mining, herbalism, alchemy, cooking, ...), settled ahead of content and
-mechanics so later issues (#1119, #1120, #1125, #1126, #1140) build against
-one contract instead of duplicating it. Content-as-code friendly per
-`src/sim/content/` conventions: `ProfessionRecord`/`ProfessionNodeRecord`/
-`ProfessionRecipeRecord` are declarative tables a future `src/sim/content/`
-module will populate; this directory only defines the shapes, it holds no
-game data itself.
+The mechanics home for gathering, crafting, enchanting, salvage, and the
+archetype identity system. Every module here is host-agnostic sim logic behind
+the `SimContext` seam (`src/sim/sim_context.ts`): functions taking `(ctx, ...)`
+or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
+`tests/architecture.test.ts`). The data tables live in `src/sim/content/`
+(`professions.ts`, `recipes.ts`, `gather_nodes.ts`, `enchants.ts`), never here.
 
-## Files
-- `types.ts`: `ProfessionRecord`, `ProfessionNodeRecord`, `ProfessionRecipeRecord`,
-  `ProfessionReagent`, `ProfessionCraftRecord`, `PlayerProfessionSkill`. Zero
-  DOM/browser/Three.js imports, no randomness (guarded by
-  `tests/architecture.test.ts`).
-- `index.ts`: barrel re-exporting the above. Import from here
-  (`from '../sim/professions'`), never reach into `types.ts` directly.
+## Module map (mechanic owners; `ls src/sim/professions/` for the live set)
+- `gathering.ts`: gathering proficiency + node harvest (`harvestNode`/
+  `resolveHarvest`, `NODE_HARVEST_TABLE`, the `rollMaterialRarity` rarity
+  ladder). Node respawn is per VIEWER: two players can see the same node
+  differently.
+- `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
+  `tierForSkill`/`tierCapability`, perk-eligibility reads).
+- `crafting.ts`: `craftItem`/`resolveCraft` (all-or-nothing reagent consume,
+  quality roll clamped to the archetype ceiling, skill gain, recipe acquisition).
+- `archetype.ts`: the active-archetype state machine (`ArchetypeState`,
+  `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated switching).
+- `enchanting.ts` / `salvage.ts`: disenchant + apply an enchant onto a SPECIFIC
+  instanced copy (`ItemInstancePayload`); break items back into materials
+  (off-wheel, ungated).
+- `tools.ts` / `crafting_hub.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
+  gates and bonuses (gather-tool tier, level-20 hub, town focus allocation,
+  field crafting station).
+- `profession_xp.ts` / `battlefield_xp.ts`: character-XP curves for gather/craft
+  actions; the crafted-item attribution XP trickle.
+- `types.ts`: the shared record shapes. `index.ts` is a types-only barrel; the
+  logic modules are imported per-module by path (see the imports in `sim.ts`).
 
-## IWorld facet
-The read-surface facet (`IWorldProfessions`) lives at `src/world_api/professions.ts`,
-alongside the other 21 facets under `src/world_api/` (see the FACET MAP in
-`src/world_api.ts`). Stubbed empty by #1164; #1119 landed the gathering read, so
-`professionsState` now returns the Mining/Logging/Herbalism skills on `Sim` and
-is mirrored onto `ClientWorld` from the `prof` wire delta. Crafting/secondary
-professions still contribute nothing until #1120/#1125/#1126/#1140. Extend
-`IWorldProfessions` first, then implement in BOTH worlds, per the root CLAUDE.md
-"IWorld is the only seam" rule.
+## Where a new profession mechanic lands
+1. Its own small module here taking `SimContext`; never import `Sim`, never a
+   new method cluster on `sim.ts`.
+2. Backing state as `PlayerMeta` fields initialized in `addPlayer` (`sim.ts`),
+   persisted as OPTIONAL `CharacterState` fields with defaults so pre-feature
+   saves load cleanly (the pattern every existing field follows:
+   `gatheringProficiency`, `craftSkills`, `knownRecipes`, `archetype`).
+3. Data tables in `src/sim/content/`, never in the module.
+4. Reads/actions: extend `IWorldProfessions` (`src/world_api/professions.ts`)
+   FIRST, then implement in BOTH `Sim` and `ClientWorld` (root "IWorld is the
+   only seam" rule).
+5. A test in `tests/professions_<thing>.test.ts` (exemplars:
+   `tests/professions_crafting.test.ts`, `tests/gather_node_harvest.test.ts`).
+   Bug fix rule: a failing test that reproduces the bug first, then the
+   smallest change that turns it green.
 
-## Settled contract names (landed by #1119, reused by #1120/#1125/#1126/#1140)
-- Wire/snapshot key: `prof` for `self.prof` on the WS snapshot, mapped to
-  `professionsState` in `TERSE_TO_IWORLD` and listed in `ALL_DELTA_KEYS` (see
-  `tests/snapshots.test.ts`). Diff-sent, so it ships only when the view changes.
-- Persistence JSONB key: `professions` on the character save row (parallel to
-  the existing `delveDaily`/`companionUpgrades` keys persisted in
-  `server/db.ts`).
+## Balance invariants (settled; do not re-litigate)
+- All ten craft skills are independent, purely ADDITIVE counters (`wheel.ts`):
+  no conserved pool, never drain one craft to raise another. Gathering
+  proficiencies are additive the same way (`gathering.ts`).
+- Archetype identity is a ring-adjacent PAIR of majors (`activeArchetype` +
+  `pairedMajor`, uncapped) plus a hobby (the opposite craft on `CRAFT_RING`,
+  capped at rare); every other craft caps at common once an archetype is set,
+  and everything caps at rare before one is set (`archetype.ts`
+  `archetypeCeilingFor`).
+- The ceiling freezes EMPOWERMENT, never the raw-capability climb: output
+  quality is clamped to the ceiling and a recipe tiered ABOVE the ceiling
+  grants zero skill, but at or below the ceiling the ordinary progress curve
+  runs off raw capability unchanged (`crafting.ts` `resolveCraft`; pinned by
+  `tests/archetype_ceiling.test.ts` and `tests/professions_skill.test.ts`).
+
+## Wire + persistence names (settled)
+- Snapshot deltas: `prof` (the `professionsState` view) and `gprof`
+  (`gatheringProficiency`), diff-sent; the terse-key maps and `ALL_DELTA_KEYS`
+  are pinned in `tests/snapshots.test.ts`.
+- Persistence (JSONB on the character save row, `server/db.ts`):
+  `gatheringProficiency` is the current key (preferred on read, always
+  written); `professions` is the legacy pre-rename key, still dual-written on
+  every save for downgrade back-compat and read only as a fallback when
+  `gatheringProficiency` is absent. Craft-side state persists as separate optional `CharacterState`
+  fields (`craftSkills`, `knownRecipes`, `archetype`, `equipmentInstance` for
+  enchanted copies); see the comments on `CharacterState` in `sim.ts`.
+- The facet's member list is pinned by `tests/world_api_parity.test.ts`
+  (`FACET_PROFESSIONS`) and exercised by `tests/professions_contracts.test.ts`;
+  keep counts out of prose.

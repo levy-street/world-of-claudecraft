@@ -43,25 +43,6 @@ function translation(locale: string, key: TranslationKey): string {
 }
 
 describe('reviewed localization semantics', () => {
-  const lookLabels: Record<string, string> = {
-    id_ID: 'Arah Pandang',
-    it_IT: 'Visuale',
-    ja_JP: '視点',
-    ko_KR: '시점',
-    pt_BR: 'Câmera',
-    ru_RU: 'Обзор',
-    tr_TR: 'Bakış',
-    vi_VN: 'Hướng Nhìn',
-    zh_CN: '视角',
-    zh_TW: '視角',
-  };
-
-  for (const [locale, expected] of Object.entries(lookLabels)) {
-    it(`${locale} labels camera look controls accurately`, () => {
-      expect(translation(locale, 'hudChrome.options.sec.look')).toBe(expected);
-    });
-  }
-
   const marketTerms: Record<string, string> = {
     id_ID: 'dunia',
     tr_TR: 'dünya',
