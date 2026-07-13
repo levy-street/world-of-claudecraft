@@ -2269,6 +2269,14 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
+  // Baseline class interrupts (physical spell-kicks).
+  pummel: r('fury', 'steel', ['fist'], ['motion']),
+  kick: r('leather', 'steel', ['boot'], ['motion']),
+  counterspell: r('arcane', 'steel', ['fist', { p: 'sunburst', ...TR }]),
+  counter_shot: r('nature', 'gold', ['sword', { p: 'sunburst', ...TR }]),
+  rebuke: r('holy', 'gold', ['fist'], ['glow']),
+  skull_bash: r('earth', 'earthBrown', ['paw'], ['motion']),
+  spell_lock: r('shadow', 'steel', ['fist'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
@@ -2341,6 +2349,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   divine_protection: r('holy', 'silverWhite', ['shield'], ['glow']),
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
+  holy_taunt: r('holy', 'holyGold', ['roar'], ['arcs']),
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
@@ -2373,6 +2382,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   lightning_bolt: r('storm', 'sky', ['lightning'], ['glow']),
   rockbiter_weapon: r('earth', 'earthBrown', ['fist'], ['crack']),
   healing_wave: r('frost', 'sky', ['droplet'], ['arcs', 'sparkle']),
+  chain_heal: r('nature', 'sky', ['droplet'], ['arcs', 'glow']),
   earth_shock: r('earth', 'earthBrown', [{ p: 'lightning', pal: 'earthBrown' }], ['crack']),
   lightning_shield: r('storm', 'sky', ['shield', { p: 'lightning', s: 0.6 }], ['glow']),
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),
@@ -2426,6 +2436,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
   scorch: r('fire', 'ember', ['flame'], ['motion']),
   ice_barrier: r('frost', 'ice', ['shield'], ['glow']),
+  crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
   ambush: r('shadow', 'steel', ['dagger'], ['motion']),
@@ -2463,6 +2474,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
+  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -2477,11 +2489,33 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
+  holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
+  holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
+  bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
+  trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
+  wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
+  arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
+  combustion: r('fire', 'ember', ['flame'], ['sparkle']),
+  icy_veins: r('frost', 'ice', ['snowflake'], ['glow']),
+  cold_blood: r('frost', 'steel', ['dagger'], ['glow']),
+  blade_flurry: r('fury', 'steel', ['sword', { p: 'sword', ...BR }], ['motion']),
+  hemorrhage: r('blood', 'blood', ['dagger', { p: 'droplet', ...BR }], ['drips']),
+  power_infusion: r('holy', 'arcanePink', ['sunburst'], ['sparkle']),
+  holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
+  shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
+  elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
+  siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
+  conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
+  moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
+  swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). Palettes step up with
-  // the quality tier so the bag reads richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
+  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
+  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
+  // richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -3603,8 +3637,11 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags
+  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  'gravewoven_bag',
   'linen_pouch',
+  'mistcallers_duffel',
+  'travelers_knapsack',
   'wolfhide_satchel',
   // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)
   'copper_mining_pick',
@@ -3634,9 +3671,16 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'unknown_alien_weaponry',
 ]);
 
-/** Static URL of an item's image icon, or null if it uses a recipe. */
+// UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
+// records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
+// looted, equipped, or unequipped, so it has no item def. Kept apart from ITEM_IMAGE_IDS so
+// the item guard (tests/item_icons.test.ts) keeps asserting that every wired ITEM id is a
+// real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
+export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
+
+/** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
-  return ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
+  return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
 
 // Book of Deeds crest ids are shaped `deed_<deedId>` (deeds_view.ts deedCrestId). Those whose

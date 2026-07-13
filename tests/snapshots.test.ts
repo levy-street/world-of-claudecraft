@@ -46,6 +46,8 @@ const DELTA_KEYS = [
   'party',
   'trade',
   'duel',
+  'honor',
+  'lhonor',
   'corpse',
 ];
 
@@ -107,6 +109,8 @@ function bareClient(pid: number): ClientWorld {
   c.equipment = {};
   c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
   c.copper = 0;
+  c.honor = 0;
+  c.lifetimeHonor = 0;
   c.xp = 0;
   c.known = [];
   c.questLog = new Map();
@@ -164,6 +168,34 @@ describe('self stat wire round-trip', () => {
     // Without the wire fields these read the blankEntity default 0 (the bug this guards).
     expect(client.player.critRating).toBe(20);
     expect(client.player.hasteRating).toBe(150);
+  });
+
+  it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Veteran',
+        lv: 20,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        stats: { str: 40, agi: 25, sta: 38, int: 10, spi: 12, armor: 300 },
+      },
+    });
+    expect(client.player.stats).toMatchObject({
+      str: 40,
+      pvpOffense: 0,
+      pvpDefense: 0,
+    });
   });
 });
 
@@ -365,6 +397,65 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+// Operator-set account flair (the [AI] mark + an official streamer's links). The
+// wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
+// server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only
+// the decode (a hand-built wire record) would let the server rename or drop the key
+// with every test still green, which is exactly the hole this closes.
+describe('account flair over the wire', () => {
+  const LINKS = { twitch: 'https://twitch.tv/someone', youtube: 'https://youtu.be/abc' };
+
+  it('mirrors the AI mark and the streamer links onto another player client', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+    // What the server stamps on the entity once an operator sets the flair
+    // (GameServer.applyAccountFlairLive; the wireStreamerLinks gate runs there).
+    e.aiAccount = true;
+    e.streamerLinks = { ...LINKS };
+
+    const wire = wireEntity(e);
+    expect(wire.ai).toBe(1); // the wire key is `ai`, encoded as 1 (sparse)
+    expect(wire.slk).toEqual(LINKS); // the wire key is `slk`
+
+    // A DIFFERENT player's client seeing this streamer in the world.
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.aiAccount).toBe(true);
+    expect(mirrored.streamerLinks).toEqual(LINKS);
+  });
+
+  it('leaves an ordinary player unmarked, with neither key on the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+
+    const wire = wireEntity(e);
+    // Absent, not `ai: 0` / `slk: {}`: an ordinary player's identity record must be
+    // byte-unchanged by this feature, or every entity on screen pays for it.
+    expect(wire).not.toHaveProperty('ai');
+    expect(wire).not.toHaveProperty('slk');
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.aiAccount).toBe(false);
+    expect(mirrored.streamerLinks).toBeUndefined();
+  });
+
+  it('drops a hostile link at the client boundary even if one reached the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+    // The server gates this twice (admin write + wireStreamerLinks), so this record
+    // cannot occur in production. The point is that the CLIENT re-sanitizes anyway:
+    // a link that survives to a client must never reach window.open.
+    const wire = { ...wireEntity(e), slk: { twitch: 'javascript:alert(1)' } };
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(e.id)!.streamerLinks).toBeUndefined();
+  });
+});
+
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
@@ -399,7 +490,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 40 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 42 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -1265,7 +1356,7 @@ describe('/who command', () => {
     expect(text).not.toContain('Gimel');
   });
 
-  it('waits for the requester ignore list before showing online players', () => {
+  it('waits for the requester block list before showing online players', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const self = joinServer(server, fc, 1, 'Aleph');
@@ -1276,11 +1367,11 @@ describe('/who command', () => {
     server.handleMessage(self, JSON.stringify({ t: 'cmd', cmd: 'chat', text: '/who' }));
 
     expect(eventTexts(fc.sent)).toContain(
-      'Your ignore list is still loading. Try /who again in a moment.',
+      'Your block list is still loading. Try /who again in a moment.',
     );
   });
 
-  it('omits players whose own ignore list is still loading', () => {
+  it('omits players whose own block list is still loading', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const self = joinServer(server, fc, 1, 'Aleph');
@@ -2357,7 +2448,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 40 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 42 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
 // 41st unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
@@ -2380,7 +2471,9 @@ const ALL_DELTA_KEYS = [
   'duel',
   'equip',
   'gprof',
+  'honor',
   'inv',
+  'lhonor',
   'lockouts',
   'lroll',
   'lrollg',
@@ -2429,6 +2522,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   gprof: 'gatheringProficiency',
   inv: 'inventory',
+  lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
   lrollg: 'lootRollGroup',
@@ -2525,6 +2619,8 @@ function dirtyEveryDeltaField(): {
   meta.raidLockouts.set('nythraxis_boss_arena', FAR_FUTURE_MS);
   meta.unlockedMilestones.add('milestone_test');
   meta.lifetimeXp = 555;
+  meta.honor = 321;
+  meta.lifetimeHonor = 654;
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
@@ -2561,7 +2657,7 @@ function dirtyEveryDeltaField(): {
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
-  p.stats = { ...p.stats, str: 12345 };
+  p.stats = { ...p.stats, str: 12345, pvpOffense: 0.17, pvpDefense: 0.13 };
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
   p.maxResource = 150;
@@ -2614,7 +2710,11 @@ describe('full self-state snapshot delta fixture', () => {
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
-    expect(client.player.stats).toMatchObject({ str: 12345 }); // stats (inline s.X ?? e.X)
+    expect(client.player.stats).toMatchObject({
+      str: 12345,
+      pvpOffense: 0.17,
+      pvpDefense: 0.13,
+    }); // stats (legacy-safe object replacement)
     expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
     expect(client.player.resource).toBe(42); // res -> resource
     expect(client.player.maxResource).toBe(150); // mres -> maxResource
@@ -2622,6 +2722,8 @@ describe('full self-state snapshot delta fixture', () => {
 
     // --- always-present scalar renames ---
     expect(client.lifetimeXp).toBe(555); // lxp -> lifetimeXp
+    expect(client.honor).toBe(321); // honor
+    expect(client.lifetimeHonor).toBe(654); // lhonor -> lifetimeHonor
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
@@ -2735,14 +2837,16 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.delveRun).toBe(delveRunRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
+    expect(client.honor).toBe(321);
+    expect(client.lifetimeHonor).toBe(654);
     expect(client.companionState?.companionId).toBe('companion_tessa');
   });
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 40 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(40);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(40);
+  it('ALL_DELTA_KEYS contains exactly 42 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(42);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(42);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2754,7 +2858,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(40);
+    expect(scraped.size).toBe(42);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2765,6 +2869,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       mres: 'maxResource',
       rtype: 'resourceType',
       lxp: 'lifetimeXp',
+      lhonor: 'lifetimeHonor',
       rxp: 'restedXp',
       prk: 'prestigeRank',
       drun: 'delveRun',

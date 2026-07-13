@@ -76,7 +76,7 @@ export function hobbyCraftText(craftId: string | null): string {
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
-// The ten character-sheet stat cells, primaries down the left column and derived
+// The character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
 // from the unit-tested stat_tooltip_view model, so the order is the only stat
 // concern this painter owns.
@@ -94,6 +94,7 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'warfare',
 ];
 
 /**

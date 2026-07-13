@@ -926,8 +926,8 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 412,
-      "state": "c624241e",
-      "events": "0be01f7f",
+      "state": "6da06524",
+      "events": "f4020904",
       "rng": {
         "draws": 284,
         "digest": "22941d42"
@@ -983,12 +983,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
@@ -1046,6 +1055,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
@@ -1056,6 +1073,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
@@ -1404,7 +1422,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "f5f97c86",
+      "state": "0756e56c",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -1415,7 +1433,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 412,
-      "state": "5f2477e0",
+      "state": "3eb4e9a6",
       "events": "741638a5",
       "rng": {
         "draws": 548,
@@ -1426,7 +1444,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 412,
-      "state": "5f3586ea",
+      "state": "2a3244d0",
       "events": "741638a5",
       "rng": {
         "draws": 704,
@@ -1437,7 +1455,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 412,
-      "state": "481a08d4",
+      "state": "476fd94a",
       "events": "741638a5",
       "rng": {
         "draws": 898,
@@ -1448,7 +1466,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 412,
-      "state": "34e5442a",
+      "state": "067f0a94",
       "events": "2bbf670f",
       "rng": {
         "draws": 1011,
@@ -1459,7 +1477,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 412,
-      "state": "f89ac84a",
+      "state": "4a3b40b4",
       "events": "741638a5",
       "rng": {
         "draws": 1087,
@@ -1519,12 +1537,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
@@ -1585,6 +1612,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
@@ -1595,6 +1630,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
@@ -1954,7 +1990,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 412,
-      "state": "f89ac84a",
+      "state": "4a3b40b4",
       "events": "741638a5",
       "rng": {
         "draws": 1087,
@@ -2014,12 +2050,21 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,
@@ -2080,6 +2125,14 @@
           "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 50,
+          "honorArenaDaily": {
+            "fiestaCompletionsByOpponent": {},
+            "totalWins": 1,
+            "winsByOpponent": {
+              "2v2:[\"name:dalet\",\"name:gimel\"]": 1
+            }
+          },
           "inventory": [
             {
               "count": 5,
@@ -2090,6 +2143,7 @@
               "itemId": "spring_water"
             }
           ],
+          "lifetimeHonor": 50,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "renown": 15,

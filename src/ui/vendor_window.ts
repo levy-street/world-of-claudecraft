@@ -12,7 +12,7 @@ import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
-import type { VendorView } from './vendor_view';
+import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
 
 /**
  * Hud-supplied glue. The icon/money/tooltip painters are the shared
@@ -33,6 +33,28 @@ export interface VendorWindowDeps extends PainterHostPresentation {
   };
 }
 
+function honorText(amount: number): string {
+  return t('hudChrome.warfare.honorAmount', {
+    amount: formatNumber(amount, { maximumFractionDigits: 0 }),
+  });
+}
+
+function goodsPriceText(price: VendorPrice): string {
+  const money = price.copper > 0 ? formatLocalizedMoney(price.copper) : '';
+  const honor = price.honor > 0 ? honorText(price.honor) : '';
+  if (money && honor) return t('hudChrome.warfare.dualPrice', { money, honor });
+  return money || honor;
+}
+
+function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
+  const parts: string[] = [];
+  if (row.price.copper > 0) parts.push(deps.moneyHtml(row.price.copper));
+  if (row.price.honor > 0) {
+    parts.push(`<span class="warfare-price">${esc(honorText(row.price.honor))}</span>`);
+  }
+  return parts.join('<span aria-hidden="true"> + </span>');
+}
+
 /** Paint the vendor panel from a prepared view. */
 export function renderVendorWindow(
   el: HTMLElement,
@@ -46,11 +68,22 @@ export function renderVendorWindow(
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
-  for (const { itemId, item, price: priceCopper, quantity } of view.goods) {
+  if (view.hasHonorGoods) {
+    const balance = document.createElement('div');
+    balance.className = 'warfare-balance';
+    balance.textContent = t('hudChrome.warfare.balance', {
+      amount: formatNumber(view.honorBalance, { maximumFractionDigits: 0 }),
+    });
+    el.appendChild(balance);
+  }
+
+  for (const goods of view.goods) {
+    const { itemId, item, quantity } = goods;
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'vendor-item';
-    const price = formatLocalizedMoney(priceCopper);
+    row.disabled = !goods.affordable;
+    const price = goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =
       quantity > 1
@@ -60,7 +93,7 @@ export function renderVendorWindow(
       'aria-label',
       t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     deps.attachTooltip(
       row,

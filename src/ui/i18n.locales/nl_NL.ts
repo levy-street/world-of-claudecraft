@@ -292,7 +292,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Koormoeders Helm',
   'entities.items.cryptplate_helm.name': 'Kryptplaat-Helm',
   'entities.items.deathless_greatblade.name': 'Doodloos Grootzwaard',
-  'entities.items.deathless_warguard_legmail.name': 'Doodloze Krijgswacht-Beenmalie',
   'entities.items.gravescale_girdle.name': 'Grafschub-Gordel',
   'entities.items.gravewyrm_claws.name': 'Grafwurm-Klauwen',
   'entities.items.gravewyrm_cleaver.name': 'Grafwurm-Kliever',
@@ -308,13 +307,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Heiligdomsluiper-Grepen',
   'entities.items.sash_of_the_sunken_court.name': 'Sjerp van het Verzonken Hof',
   'entities.items.scepter_of_the_deathless_court.name': 'Scepter van het Doodloze Hof',
-  'entities.items.scourgehide_carapace.name': 'Geselhuid-Pantser',
   'entities.items.seal_of_the_nine_oaths.name': 'Zegel van de Negen Eden',
   'entities.items.shadowpulse_handwraps.name': 'Schaduwpuls-Handwindsels',
   'entities.items.shadowpulse_slippers.name': 'Schaduwpuls-Sloffen',
   'entities.items.shroud_of_the_gravewyrm.name': 'Doodskleed van de Grafwurm',
-  'entities.items.soulforged_warplate.name': 'Zielgesmede Krijgsplaat',
-  'entities.items.soulrend_diadem.name': 'Zielscheur-Diadeem',
   'entities.items.stormcallers_focus.name': 'Stormroepers Focus',
   'entities.items.sunken_court_mantle.name': 'Mantel van het Verzonken Hof',
   'entities.items.sutils_gambit.name': 'Sutils Gambiet',
@@ -1147,6 +1143,25 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Ontwikkelaarsinsignes tonen',
   'hudChrome.options.groundReticle': 'Grondrichtkruis',
   'hudChrome.options.startAttackOnAbility': 'Auto-aanval bij gebruik van vaardigheid',
+  'hudChrome.playerMenu.info': 'Spelerinfo',
+  'hudChrome.playerMenu.block': 'Blokkeren',
+  'hudChrome.playerMenu.unblock': 'Deblokkeren',
+  'hudChrome.playerMenu.openFor': 'Spelersmenu voor {name} openen',
+  'hudChrome.playerMenu.profileUnavailable': 'Geen profiel gevonden voor {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Door AI bestuurd account',
+  'hudChrome.playerMenu.watchTwitch': 'Bekijken op Twitch',
+  'hudChrome.playerMenu.watchX': 'Bekijken op X',
+  'hudChrome.playerMenu.watchKick': 'Bekijken op Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Bekijken op YouTube',
+  'hudChrome.social.ignoredTab': 'Genegeerd',
+  'hudChrome.social.ignoredEmpty': 'Je negeert niemand.',
+  'hudChrome.social.blockedEmpty': 'Je hebt niemand geblokkeerd.',
+  'hudChrome.social.blockSearchPlaceholder': 'Spelersnaam',
+  'hudChrome.social.blockAction': 'Blokkeren',
+  'hudChrome.social.nowBlocking': '{name} geblokkeerd.',
+  'hudChrome.social.blockedTab': 'Geblokkeerd',
+  'hudChrome.social.stopBlockingTitle': '{name} deblokkeren',
   'hudChrome.party.promoteLeader': 'Bevorderen tot leider',
   'hudChrome.plurals.playersMatching.few':
     'Wie: {count} spelers die overeenkomen met "{query}" op {realm}.',
@@ -1962,6 +1977,72 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     'Slingert een bout van natuurenergie voor {damage} Natuurschade.',
   'entities.abilities.wrath.name': 'Wildbout',
+  'entities.abilities.holy_shock.name': 'Heilige schok',
+  'entities.abilities.holy_shock.description':
+    'Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)',
+  'entities.abilities.holy_shield.name': 'Heilig schild',
+  'entities.abilities.holy_shield.description':
+    'Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)',
+  'entities.abilities.bestial_wrath.name': 'Beestachtige woede',
+  'entities.abilities.bestial_wrath.description':
+    'Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)',
+  'entities.abilities.trueshot_aura.name': 'Zuiver schot-aura',
+  'entities.abilities.trueshot_aura.description':
+    'Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)',
+  'entities.abilities.wyvern_sting.name': 'Wyvernsteek',
+  'entities.abilities.wyvern_sting.description':
+    'Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)',
+  'entities.abilities.arcane_power.name': 'Arcanekracht',
+  'entities.abilities.arcane_power.description':
+    'Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)',
+  'entities.abilities.combustion.name': 'Verbranding',
+  'entities.abilities.combustion.description':
+    'Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)',
+  'entities.abilities.icy_veins.name': 'IJzige Aders',
+  'entities.abilities.icy_veins.description':
+    'Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)',
+  'entities.abilities.cold_blood.name': 'Koud bloed',
+  'entities.abilities.cold_blood.description':
+    'Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)',
+  'entities.abilities.blade_flurry.name': 'Klingenvlaag',
+  'entities.abilities.blade_flurry.description':
+    'Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)',
+  'entities.abilities.hemorrhage.name': 'Bloeding',
+  'entities.abilities.hemorrhage.description':
+    'Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)',
+  'entities.abilities.power_infusion.name': 'Krachtinfusie',
+  'entities.abilities.power_infusion.description':
+    'Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)',
+  'entities.abilities.holy_nova.name': 'Heilige nova',
+  'entities.abilities.holy_nova.description':
+    'Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)',
+  'entities.abilities.shadowform.name': 'Schaduwvorm',
+  'entities.abilities.shadowform.description':
+    'Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)',
+  'entities.abilities.elemental_mastery.name': 'Elementaire meesterschap',
+  'entities.abilities.elemental_mastery.description':
+    'Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)',
+  'entities.abilities.siphon_life.name': 'Levenshevel',
+  'entities.abilities.siphon_life.description':
+    'Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)',
+  'entities.abilities.conflagrate.name': 'Ontvlamming',
+  'entities.abilities.conflagrate.description':
+    'Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)',
+  'entities.abilities.moonkin_form.name': 'Maanuilvorm',
+  'entities.abilities.moonkin_form.description':
+    'Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)',
+  'entities.abilities.feral_charge.name': 'Wilde stormloop',
+  'entities.abilities.feral_charge.description':
+    'Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)',
+  'entities.abilities.swiftmend.name': 'Snelle genezing',
+  'entities.abilities.swiftmend.description':
+    'Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)',
+  'entities.abilities.crusader_strike.name': 'Kruisvaardersslag',
+  'entities.abilities.crusader_strike.description':
+    'Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)',
+  'entities.abilities.metamorphosis.name': 'Metamorfose',
+  'entities.abilities.metamorphosis.description':
+    'Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)',
   'entities.delves.collapsed_reliquary.enterText': 'Je daalt af in het ingestorte reliekschrijn.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Je klimt terug omhoog naar Broeder Halven bij de reliekschrijnruïne.',
@@ -2419,6 +2500,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen de Grafroeper',
   'entities.mobs.mudfin_murloc.name': 'Modvin-Sluiper',
   'entities.mobs.nhalia_mourner.name': 'Nhalia-Rouwklager',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Doodloze Hiërofant',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Doodloos Mes',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Doodloze Krijgswacht',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Gesel van Doorntop',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Verrezen Koninklijke Garde',
   'entities.mobs.ogre_crusher.name': 'Doorntop-Verbrijzelaar',

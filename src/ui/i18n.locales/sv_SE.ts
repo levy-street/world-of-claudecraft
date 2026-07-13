@@ -283,7 +283,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Körmoderns hjälm',
   'entities.items.cryptplate_helm.name': 'Kryptplåtshjälm',
   'entities.items.deathless_greatblade.name': 'Odödlig storklinga',
-  'entities.items.deathless_warguard_legmail.name': 'Odödlig krigsvakts benbrynja',
   'entities.items.gravescale_girdle.name': 'Gravfjällsgördel',
   'entities.items.gravewyrm_claws.name': 'Gravlindormsklor',
   'entities.items.gravewyrm_cleaver.name': 'Gravlindormsklyva',
@@ -299,13 +298,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Helgedomssmygarens handskar',
   'entities.items.sash_of_the_sunken_court.name': 'Sjunkna hovets skärp',
   'entities.items.scepter_of_the_deathless_court.name': 'Odödliga hovets spira',
-  'entities.items.scourgehide_carapace.name': 'Gisselhudspansar',
   'entities.items.seal_of_the_nine_oaths.name': 'De nio edernas sigill',
   'entities.items.shadowpulse_handwraps.name': 'Skuggpulshandlindor',
   'entities.items.shadowpulse_slippers.name': 'Skuggpulstofflor',
   'entities.items.shroud_of_the_gravewyrm.name': 'Gravlindormens svepning',
-  'entities.items.soulforged_warplate.name': 'Själssmidd krigsplåt',
-  'entities.items.soulrend_diadem.name': 'Själsrivardiadem',
   'entities.items.stormcallers_focus.name': 'Stormkallarens fokus',
   'entities.items.sunken_court_mantle.name': 'Sjunkna hovets mantel',
   'entities.items.sutils_gambit.name': 'Sutils gambit',
@@ -1126,6 +1122,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Visa utvecklarmärken',
   'hudChrome.options.groundReticle': 'Markriktmedel',
   'hudChrome.options.startAttackOnAbility': 'Automatisk attack vid förmågeanvändning',
+  'hudChrome.playerMenu.info': 'Spelarinfo',
+  'hudChrome.playerMenu.block': 'Blockera',
+  'hudChrome.playerMenu.unblock': 'Avblockera',
+  'hudChrome.playerMenu.openFor': 'Öppna spelarmenyn för {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Ingen profil hittades för {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'AI-styrt konto',
+  'hudChrome.playerMenu.watchTwitch': 'Titta på Twitch',
+  'hudChrome.playerMenu.watchX': 'Visa på X',
+  'hudChrome.playerMenu.watchKick': 'Titta på Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Titta på YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorerade',
+  'hudChrome.social.ignoredEmpty': 'Du ignorerar ingen.',
+  'hudChrome.social.blockedEmpty': 'Du har inte blockerat någon.',
+  'hudChrome.social.blockSearchPlaceholder': 'Spelarnamn',
+  'hudChrome.social.blockAction': 'Blockera',
+  'hudChrome.social.nowBlocking': '{name} blockerad.',
+  'hudChrome.social.blockedTab': 'Blockerade',
+  'hudChrome.social.stopBlockingTitle': 'Avblockera {name}',
   'hudChrome.party.promoteLeader': 'Befordra till ledare',
   'hudChrome.plurals.playersMatching.few': 'Vilka: {count} spelare matchar "{query}" på {realm}.',
   'hudChrome.plurals.playersMatching.many': 'Vilka: {count} spelare matchar "{query}" på {realm}.',
@@ -1920,6 +1935,72 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.name': 'Fjättrande hugg',
   'entities.abilities.wrath.description': 'Slungar en pil av naturenergi för {damage} naturskada.',
   'entities.abilities.wrath.name': 'Vildbult',
+  'entities.abilities.holy_shock.name': 'Helig chock',
+  'entities.abilities.holy_shock.description':
+    'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
+  'entities.abilities.holy_shield.name': 'Helig sköld',
+  'entities.abilities.holy_shield.description':
+    'Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)',
+  'entities.abilities.bestial_wrath.name': 'Bestialisk vrede',
+  'entities.abilities.bestial_wrath.description':
+    'Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)',
+  'entities.abilities.trueshot_aura.name': 'Träffsäkerhetsaura',
+  'entities.abilities.trueshot_aura.description':
+    'Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)',
+  'entities.abilities.wyvern_sting.name': 'Wyvernsting',
+  'entities.abilities.wyvern_sting.description':
+    'Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)',
+  'entities.abilities.arcane_power.name': 'Arkan kraft',
+  'entities.abilities.arcane_power.description':
+    'Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)',
+  'entities.abilities.combustion.name': 'Förbränning',
+  'entities.abilities.combustion.description':
+    'Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)',
+  'entities.abilities.icy_veins.name': 'Isiga Ådror',
+  'entities.abilities.icy_veins.description':
+    'Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)',
+  'entities.abilities.cold_blood.name': 'Kallt blod',
+  'entities.abilities.cold_blood.description':
+    'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
+  'entities.abilities.blade_flurry.name': 'Klingflod',
+  'entities.abilities.blade_flurry.description':
+    'Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)',
+  'entities.abilities.hemorrhage.name': 'Blödning',
+  'entities.abilities.hemorrhage.description':
+    'Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)',
+  'entities.abilities.power_infusion.name': 'Kraftinfusion',
+  'entities.abilities.power_infusion.description':
+    'Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)',
+  'entities.abilities.holy_nova.name': 'Helig nova',
+  'entities.abilities.holy_nova.description':
+    'Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)',
+  'entities.abilities.shadowform.name': 'Skuggform',
+  'entities.abilities.shadowform.description':
+    'Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)',
+  'entities.abilities.elemental_mastery.name': 'Elementär mästerskap',
+  'entities.abilities.elemental_mastery.description':
+    'Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)',
+  'entities.abilities.siphon_life.name': 'Livssifon',
+  'entities.abilities.siphon_life.description':
+    'Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)',
+  'entities.abilities.conflagrate.name': 'Storbrand',
+  'entities.abilities.conflagrate.description':
+    'Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)',
+  'entities.abilities.moonkin_form.name': 'Månugglaform',
+  'entities.abilities.moonkin_form.description':
+    'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
+  'entities.abilities.feral_charge.name': 'Vild rusning',
+  'entities.abilities.feral_charge.description':
+    'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
+  'entities.abilities.swiftmend.name': 'Snabb läkning',
+  'entities.abilities.swiftmend.description':
+    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)',
+  'entities.abilities.crusader_strike.name': 'Korsfararslag',
+  'entities.abilities.crusader_strike.description':
+    'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
+  'entities.abilities.metamorphosis.name': 'Metamorfos',
+  'entities.abilities.metamorphosis.description':
+    'Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)',
   'entities.delves.collapsed_reliquary.enterText': 'Du stiger ner i det rasade relikvariet.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Du klättrar tillbaka till broder Halven vid relikvarieruinen.',
@@ -2375,6 +2456,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen Gravkallaren',
   'entities.mobs.mudfin_murloc.name': 'Dyfenesmygare',
   'entities.mobs.nhalia_mourner.name': 'Sörjaren Nhalia',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, den odödlige hierofanten',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, den odödliga kniven',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, den odödlige krigsvakten',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Törntoppens gissel',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Uppstånden kunglig vakt',
   'entities.mobs.ogre_crusher.name': 'Törntoppskrossare',

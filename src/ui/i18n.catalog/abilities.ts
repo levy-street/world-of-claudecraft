@@ -870,6 +870,11 @@ const classAbilityNamesEn = {
         'A massive surge of healing: restores {damage} health. 10 min cooldown.',
       ],
       [
+        'holy_taunt',
+        'Sacred Goad',
+        'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+      ],
+      [
         'flash_of_light',
         'Lightmend',
         'A quick, efficient burst of Light that heals a friendly target for {damage}.',
@@ -1183,6 +1188,121 @@ const classAbilityNamesEn = {
         'Enter a seething fury, generating 20 rage. (Warrior talent)',
       ],
       [
+        'crusader_strike',
+        'Crusader Strike',
+        'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
+      ],
+      [
+        'chain_heal',
+        'Chain Heal',
+        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+      ],
+      [
+        'metamorphosis',
+        'Dread Aspect',
+        'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
+      ],
+      [
+        'holy_shock',
+        'Holy Shock',
+        'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
+      ],
+      [
+        'holy_shield',
+        'Hallowed Wall',
+        'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+      ],
+      [
+        'bestial_wrath',
+        'Howling Rage',
+        'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
+      ],
+      [
+        'trueshot_aura',
+        'Sureflight Aura',
+        'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
+      ],
+      [
+        'wyvern_sting',
+        'Wyvern Sting',
+        'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+      ],
+      [
+        'arcane_power',
+        'Aether Surge',
+        'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
+      ],
+      [
+        'combustion',
+        'Flashfire',
+        'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+      ],
+      [
+        'icy_veins',
+        'Icy Veins',
+        'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
+      ],
+      [
+        'cold_blood',
+        "Killer's Calm",
+        'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
+      ],
+      [
+        'blade_flurry',
+        'Mirrored Blades',
+        'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
+      ],
+      [
+        'hemorrhage',
+        'Red Ribbon',
+        'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+      ],
+      [
+        'power_infusion',
+        'Anointing',
+        'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
+      ],
+      [
+        'holy_nova',
+        'Holy Nova',
+        'Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+      ],
+      [
+        'shadowform',
+        'Gloamveil Form',
+        'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+      ],
+      [
+        'elemental_mastery',
+        'Primal Mastery',
+        'Calls on the storm, making your next spell instant. (Elemental signature)',
+      ],
+      [
+        'siphon_life',
+        'Veinleech',
+        'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+      ],
+      [
+        'conflagrate',
+        'Conflagrate',
+        'Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)',
+      ],
+      [
+        'moonkin_form',
+        'Moonwing Form',
+        'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
+      ],
+      [
+        'feral_charge',
+        'Primal Surge',
+        'Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
+      ],
+      [
+        'swiftmend',
+        'Swiftmend',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)',
+      ],
+      [
         'summon_imp',
         'Summon Emberkin',
         'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
@@ -1216,6 +1336,42 @@ const classAbilityNamesEn = {
         'summon_doomguard',
         'Summon Wraithborn',
         'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      ],
+      // Baseline class interrupts.
+      [
+        'pummel',
+        'Jawcrack',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'kick',
+        'Boot',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'counterspell',
+        'Spellbreak',
+        "Counters the target's spellcast and prevents casting from that school for 6 sec.",
+      ],
+      [
+        'counter_shot',
+        'Hushing Shot',
+        "A snap shot that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'rebuke',
+        'Reproach',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'skull_bash',
+        'Headbutt',
+        "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'spell_lock',
+        'Gag Order',
+        'Silences the target mid-cast and prevents casting from that school for 5 sec.',
       ],
     ]),
   },
@@ -1481,6 +1637,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Imposición de manos',
           'Una enorme oleada de sanación: restaura 250 de salud. Tiempo de reutilización de 10 min.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -1840,6 +2001,106 @@ export const classAbilityNames = {
           'Entras en una ira rabiosa y generas 20 de ira. (talento de guerrero)',
         ],
         [
+          'holy_shock',
+          'Choque Sagrado',
+          'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',
+        ],
+        [
+          'holy_shield',
+          'Escudo Sagrado',
+          'Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)',
+        ],
+        [
+          'bestial_wrath',
+          'Cólera de las bestias',
+          'Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)',
+        ],
+        [
+          'trueshot_aura',
+          'Aura de disparo certero',
+          'Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)',
+        ],
+        [
+          'wyvern_sting',
+          'Picadura de dracoleón',
+          'Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)',
+        ],
+        [
+          'arcane_power',
+          'Poder Arcano',
+          'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
+        ],
+        [
+          'combustion',
+          'Combustión',
+          'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+        ],
+        [
+          'icy_veins',
+          'Venas heladas',
+          'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
+        ],
+        [
+          'cold_blood',
+          'Sangre fría',
+          'Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)',
+        ],
+        [
+          'blade_flurry',
+          'Aluvión de acero',
+          'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)',
+        ],
+        [
+          'hemorrhage',
+          'Hemorragia',
+          'Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)',
+        ],
+        [
+          'power_infusion',
+          'Infusión de poder',
+          'Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)',
+        ],
+        [
+          'holy_nova',
+          'Nova Sagrada',
+          'Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)',
+        ],
+        [
+          'shadowform',
+          'Forma de las Sombras',
+          'Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)',
+        ],
+        [
+          'elemental_mastery',
+          'Maestría elemental',
+          'Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)',
+        ],
+        [
+          'siphon_life',
+          'Succionar vida',
+          'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
+        ],
+        [
+          'conflagrate',
+          'Conflagrar',
+          'Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)',
+        ],
+        [
+          'moonkin_form',
+          'Forma de lechúcico lunar',
+          'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
+        ],
+        [
+          'feral_charge',
+          'Carga feral',
+          'Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)',
+        ],
+        [
+          'swiftmend',
+          'Alivio presto',
+          'Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)',
+        ],
+        [
           'summon_imp',
           'Invocar diablillo',
           'Invoca a un Diablillo bajo el mando del brujo. El Diablillo lanza Descargas de Fuego a tus enemigos desde la distancia. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
@@ -2174,6 +2435,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Imposition des mains',
           'Une vague de soins massive: rend 250 points de vie. Temps de recharge de 10 min.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -2529,6 +2795,106 @@ export const classAbilityNames = {
           'Entre dans une rage berserker et génère 20 rage. (talent de guerrier)',
         ],
         [
+          'holy_shock',
+          'Horion sacré',
+          'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
+        ],
+        [
+          'holy_shield',
+          'Bouclier sacré',
+          'Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)',
+        ],
+        [
+          'bestial_wrath',
+          'Courroux bestial',
+          'Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)',
+        ],
+        [
+          'trueshot_aura',
+          'Aura de précision',
+          'Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)',
+        ],
+        [
+          'wyvern_sting',
+          'Piqûre de wyverne',
+          'Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)',
+        ],
+        [
+          'arcane_power',
+          'Pouvoir des Arcanes',
+          'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
+        ],
+        [
+          'combustion',
+          'Flashfire',
+          'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
+        ],
+        [
+          'icy_veins',
+          'Veines glaciales',
+          'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
+        ],
+        [
+          'cold_blood',
+          'Sang froid',
+          'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
+        ],
+        [
+          'blade_flurry',
+          'Déluge de lames',
+          'Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)',
+        ],
+        [
+          'hemorrhage',
+          'Hémorragie',
+          'Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)',
+        ],
+        [
+          'power_infusion',
+          'Infusion de puissance',
+          'Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)',
+        ],
+        [
+          'holy_nova',
+          'Nova sacrée',
+          'Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)',
+        ],
+        [
+          'shadowform',
+          "Forme d'Ombre",
+          'Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)',
+        ],
+        [
+          'elemental_mastery',
+          'Maîtrise élémentaire',
+          'Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)',
+        ],
+        [
+          'siphon_life',
+          'Siphon de vie',
+          'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
+        ],
+        [
+          'conflagrate',
+          'Conflagration',
+          'Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)',
+        ],
+        [
+          'moonkin_form',
+          'Forme de sélénien',
+          'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
+        ],
+        [
+          'feral_charge',
+          'Charge farouche',
+          'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
+        ],
+        [
+          'swiftmend',
+          'Prompte guérison',
+          'Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)',
+        ],
+        [
           'summon_imp',
           'Invoquer un diablotin',
           "Invoque un Diablotin sous le commandement du démoniste. Le Diablotin lance des Éclairs de feu sur vos ennemis à distance. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois.",
@@ -2794,6 +3160,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Imposizione delle Mani',
           'Una grande ondata di guarigione: ripristina 250 salute. Tempo di recupero di 10 min.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -3141,6 +3512,106 @@ export const classAbilityNames = {
           'Entri in una furia berserker e generi 20 rabbia. (talento del guerriero)',
         ],
         [
+          'holy_shock',
+          'Shock Sacro',
+          'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
+        ],
+        [
+          'holy_shield',
+          'Scudo Sacro',
+          'Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)',
+        ],
+        [
+          'bestial_wrath',
+          'Ira Bestiale',
+          'Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)',
+        ],
+        [
+          'trueshot_aura',
+          'Aura di Precisione',
+          'Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)',
+        ],
+        [
+          'wyvern_sting',
+          'Morso della Viverna',
+          'Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)',
+        ],
+        [
+          'arcane_power',
+          'Potere Arcano',
+          'Aumenta i danni magici del 20% e la celerità magica del 10% per 10 s. (firma Arcano)',
+        ],
+        [
+          'combustion',
+          'Combustione',
+          'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
+        ],
+        [
+          'icy_veins',
+          'Vene Gelide',
+          'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
+        ],
+        [
+          'cold_blood',
+          'Sangue Freddo',
+          'Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)',
+        ],
+        [
+          'blade_flurry',
+          'Vortice di Lame',
+          'Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)',
+        ],
+        [
+          'hemorrhage',
+          'Emorragia',
+          'Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)',
+        ],
+        [
+          'power_infusion',
+          'Infusione di Potere',
+          'Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)',
+        ],
+        [
+          'holy_nova',
+          'Nova Sacra',
+          'Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)',
+        ],
+        [
+          'shadowform',
+          "Forma d'Ombra",
+          'Assume Forma d’Ombra, potenziando la magia d’ombra finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Ombra)',
+        ],
+        [
+          'elemental_mastery',
+          'Maestria Elementale',
+          'Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)',
+        ],
+        [
+          'siphon_life',
+          'Risucchio Vitale',
+          'Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)',
+        ],
+        [
+          'conflagrate',
+          'Conflagrazione',
+          'Consuma il tuo Immolazione sul nemico per incendiarlo, infliggendo {damage} danni da Fuoco. (firma Distruzione)',
+        ],
+        [
+          'moonkin_form',
+          'Forma di Lunagufo',
+          'Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)',
+        ],
+        [
+          'feral_charge',
+          'Carica Ferina',
+          'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
+        ],
+        [
+          'swiftmend',
+          'Rapidità di Guarigione',
+          'Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)',
+        ],
+        [
           'summon_imp',
           'Evoca folletto',
           'Evoca un Folletto al comando dello stregone. Il Folletto scaglia Dardi di fuoco contro i tuoi nemici a distanza. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.',
@@ -3412,6 +3883,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Handauflegung',
           'Ein gewaltiger Heilungsstoß: Stellt 250 Gesundheit wieder her. 10 Min. Abklingzeit.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -3759,6 +4235,106 @@ export const classAbilityNames = {
           'Ihr verfallt in Berserkerwut und erzeugt 20 Wut. (Krieger-Talent)',
         ],
         [
+          'holy_shock',
+          'Heiliger Schock',
+          'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
+        ],
+        [
+          'holy_shield',
+          'Heiliger Schild',
+          'Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)',
+        ],
+        [
+          'bestial_wrath',
+          'Zorn des Wildtiers',
+          'Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)',
+        ],
+        [
+          'trueshot_aura',
+          'Aura des Volltreffers',
+          'Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)',
+        ],
+        [
+          'wyvern_sting',
+          'Stich des Flügeldrachen',
+          'Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)',
+        ],
+        [
+          'arcane_power',
+          'Arkane Macht',
+          'Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)',
+        ],
+        [
+          'combustion',
+          'Verbrennung',
+          'Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)',
+        ],
+        [
+          'icy_veins',
+          'Eisige Adern',
+          'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
+        ],
+        [
+          'cold_blood',
+          'Kaltblütigkeit',
+          'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
+        ],
+        [
+          'blade_flurry',
+          'Klingenwirbel',
+          'Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)',
+        ],
+        [
+          'hemorrhage',
+          'Blutsturz',
+          'Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)',
+        ],
+        [
+          'power_infusion',
+          'Machtinfusion',
+          'Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)',
+        ],
+        [
+          'holy_nova',
+          'Heilige Nova',
+          'Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)',
+        ],
+        [
+          'shadowform',
+          'Schattenform',
+          'Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)',
+        ],
+        [
+          'elemental_mastery',
+          'Elementarbeherrschung',
+          'Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)',
+        ],
+        [
+          'siphon_life',
+          'Lebensentzug',
+          'Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)',
+        ],
+        [
+          'conflagrate',
+          'Feuersbrunst',
+          'Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)',
+        ],
+        [
+          'moonkin_form',
+          'Mondkingestalt',
+          'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
+        ],
+        [
+          'feral_charge',
+          'Wilde Attacke',
+          'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
+        ],
+        [
+          'swiftmend',
+          'Rasche Heilung',
+          'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)',
+        ],
+        [
           'summon_imp',
           'Wichtel beschwören',
           'Beschwört einen Wichtel unter dem Befehl des Hexenmeisters. Der Wichtel schleudert aus der Ferne Feuerblitze auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
@@ -3927,6 +4503,11 @@ export const classAbilityNames = {
         ['divine_protection', '圣佑术', '神圣护盾吸收 50 点伤害，持续 10 秒。'],
         ['hammer_of_justice', '制裁之锤', '使目标昏迷 3 秒。'],
         ['lay_on_hands', '圣疗术', '巨大的治疗涌流：恢复 250 点生命值。10 分钟冷却时间。'],
+        [
+          'holy_taunt',
+          '神圣嘲讽',
+          '嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。',
+        ],
         ['flash_of_light', '圣光闪现', '快速而高效的圣光，为一个友方目标恢复 {damage} 点生命值。'],
         ['exorcism', '驱邪术', '以神圣怒火驱逐邪恶，造成 {damage} 点神圣伤害。'],
         ['consecration', '奉献', '奉献你脚下的土地，灼烧附近敌人，造成 {damage} 点神圣伤害。'],
@@ -4080,6 +4661,90 @@ export const classAbilityNames = {
           '以致命弧线旋转，打击附近所有敌人，造成 {damage} 点伤害。（狂怒天赋）',
         ],
         ['berserker_rage', '狂暴之怒', '进入狂暴之怒，产生 20 点怒气。（战士天赋）'],
+        [
+          'holy_shock',
+          '神圣震击',
+          '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
+        ],
+        [
+          'holy_shield',
+          '神圣之盾',
+          '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
+        ],
+        [
+          'bestial_wrath',
+          '狂野怒火',
+          '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
+        ],
+        [
+          'trueshot_aura',
+          '强击光环',
+          '鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）',
+        ],
+        [
+          'wyvern_sting',
+          '翼龙钉刺',
+          '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
+        ],
+        [
+          'arcane_power',
+          '奥术强化',
+          '法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）',
+        ],
+        ['combustion', '燃烧', '法术暴击几率提高50%，持续15秒。（火焰专精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脉',
+          '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
+        ],
+        ['cold_blood', '冷血', '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）'],
+        ['blade_flurry', '剑刃乱舞', '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）'],
+        [
+          'hemorrhage',
+          '出血',
+          '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
+        ],
+        [
+          'power_infusion',
+          '能量灌注',
+          '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
+        ],
+        [
+          'holy_nova',
+          '神圣新星',
+          '引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）',
+        ],
+        [
+          'shadowform',
+          '暗影形态',
+          '进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）',
+        ],
+        [
+          'elemental_mastery',
+          '元素掌握',
+          '呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）',
+        ],
+        [
+          'siphon_life',
+          '生命虹吸',
+          '虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）',
+        ],
+        [
+          'conflagrate',
+          '燃尽',
+          '吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）',
+        ],
+        [
+          'moonkin_form',
+          '枭兽形态',
+          '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
+        ],
+        ['feral_charge', '野性冲锋', '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）'],
+        [
+          'swiftmend',
+          '迅捷治愈',
+          '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
+        ],
         [
           'summon_imp',
           '召唤小鬼',
@@ -4249,6 +4914,11 @@ export const classAbilityNames = {
         ['divine_protection', '聖佑術', '神聖護盾吸收 50 點傷害，持續 10 秒。'],
         ['hammer_of_justice', '制裁之錘', '使目標昏迷 3 秒。'],
         ['lay_on_hands', '聖療術', '巨大的治療湧流：恢復 250 點生命值。10 分鐘冷卻時間。'],
+        [
+          'holy_taunt',
+          '神聖嘲諷',
+          '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
+        ],
         ['flash_of_light', '聖光閃現', '快速而高效的聖光，為一個友方目標恢復 {damage} 點生命值。'],
         ['exorcism', '驅邪術', '以神聖怒火驅逐邪惡，造成 {damage} 點神聖傷害。'],
         ['consecration', '奉獻', '奉獻你腳下的土地，灼燒附近敵人，造成 {damage} 點神聖傷害。'],
@@ -4402,6 +5072,90 @@ export const classAbilityNames = {
           '以致命弧線旋轉，打擊附近所有敵人，造成 {damage} 點傷害。（狂怒天賦）',
         ],
         ['berserker_rage', '狂暴之怒', '進入狂暴之怒，產生 20 點怒氣。（戰士天賦）'],
+        [
+          'holy_shock',
+          '神聖震擊',
+          '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
+        ],
+        [
+          'holy_shield',
+          '神聖之盾',
+          '以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）',
+        ],
+        [
+          'bestial_wrath',
+          '狂野怒火',
+          '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',
+        ],
+        [
+          'trueshot_aura',
+          '強擊光環',
+          '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
+        ],
+        [
+          'wyvern_sting',
+          '翼龍釘刺',
+          '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
+        ],
+        [
+          'arcane_power',
+          '祕法強化',
+          '法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）',
+        ],
+        ['combustion', '燃燒', '法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脈',
+          '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
+        ],
+        ['cold_blood', '冷血', '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）'],
+        ['blade_flurry', '劍刃亂舞', '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）'],
+        [
+          'hemorrhage',
+          '出血',
+          '攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）',
+        ],
+        [
+          'power_infusion',
+          '能量灌注',
+          '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
+        ],
+        [
+          'holy_nova',
+          '神聖新星',
+          '引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）',
+        ],
+        [
+          'shadowform',
+          '暗影形態',
+          '進入暗影形態，強化暗影魔法直到你切換回來。再次施放可返回普通形態。（暗影專精招牌）',
+        ],
+        [
+          'elemental_mastery',
+          '元素精通',
+          '呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）',
+        ],
+        [
+          'siphon_life',
+          '生命虹吸',
+          '虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）',
+        ],
+        [
+          'conflagrate',
+          '燃盡',
+          '吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）',
+        ],
+        [
+          'moonkin_form',
+          '梟獸形態',
+          '進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）',
+        ],
+        ['feral_charge', '野性衝鋒', '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）'],
+        [
+          'swiftmend',
+          '迅癒',
+          '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
+        ],
         [
           'summon_imp',
           '召喚小鬼',
@@ -4638,6 +5392,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           '신의 축복',
           '막대한 치유의 힘으로 생명력 250을 회복시킵니다. 재사용 대기시간 10분.',
+        ],
+        [
+          'holy_taunt',
+          '신성한 도발',
+          '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
         ],
         [
           'flash_of_light',
@@ -4917,6 +5676,102 @@ export const classAbilityNames = {
           '광전사의 격노에 들어가 분노 20을 생성합니다. (전사 특성)',
         ],
         [
+          'holy_shock',
+          '신성 충격',
+          '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
+        ],
+        [
+          'holy_shield',
+          '신성한 방패',
+          '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+        ],
+        [
+          'bestial_wrath',
+          '야수의 격노',
+          '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
+        ],
+        [
+          'trueshot_aura',
+          '정조준 오라',
+          '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
+        ],
+        [
+          'wyvern_sting',
+          '비룡 쐐기',
+          '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+        ],
+        [
+          'arcane_power',
+          '신비의 마법 강화',
+          '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
+        ],
+        ['combustion', '발화', '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)'],
+        [
+          'icy_veins',
+          '얼음 핏줄',
+          '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
+        ],
+        [
+          'cold_blood',
+          '냉혈',
+          '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
+        ],
+        [
+          'blade_flurry',
+          '폭풍의 칼날',
+          '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
+        ],
+        [
+          'hemorrhage',
+          '과다출혈',
+          '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+        ],
+        [
+          'power_infusion',
+          '마력 주입',
+          '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
+        ],
+        [
+          'holy_nova',
+          '신성한 폭발',
+          '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
+        ],
+        [
+          'shadowform',
+          '어둠의 형상',
+          '어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)',
+        ],
+        [
+          'elemental_mastery',
+          '정기의 깨달음',
+          '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
+        ],
+        [
+          'siphon_life',
+          '생명력 착취',
+          '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
+        ],
+        [
+          'conflagrate',
+          '점화',
+          '적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)',
+        ],
+        [
+          'moonkin_form',
+          '달빛야수 변신',
+          '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
+        ],
+        [
+          'feral_charge',
+          '야성의 돌진',
+          '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
+        ],
+        [
+          'swiftmend',
+          '신속한 치유',
+          '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
+        ],
+        [
           'summon_imp',
           '임프 소환',
           '흑마법사의 명령을 따르는 임프를 소환합니다. 임프는 멀리서 적에게 화염 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
@@ -5172,6 +6027,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'レイ・オン・ハンズ',
           '大きな癒やしの波で体力を250回復します。クールダウン10分。',
+        ],
+        [
+          'holy_taunt',
+          '聖なる挑発',
+          '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
         ],
         [
           'flash_of_light',
@@ -5467,6 +6327,106 @@ export const classAbilityNames = {
           'バーサーカーの怒りに入り、怒りを20生成します。（戦士タレント）',
         ],
         [
+          'holy_shock',
+          'ホーリーショック',
+          '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
+        ],
+        [
+          'holy_shield',
+          'ホーリーシールド',
+          '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+        ],
+        [
+          'bestial_wrath',
+          '野獣の怒り',
+          '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
+        ],
+        [
+          'trueshot_aura',
+          'トゥルーショットオーラ',
+          '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
+        ],
+        [
+          'wyvern_sting',
+          'ワイバーンスティング',
+          '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
+        ],
+        [
+          'arcane_power',
+          'アーケインパワー',
+          '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
+        ],
+        [
+          'combustion',
+          'コンバッション',
+          '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
+        ],
+        [
+          'icy_veins',
+          'アイシーヴェインズ',
+          '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
+        ],
+        [
+          'cold_blood',
+          'コールドブラッド',
+          '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
+        ],
+        [
+          'blade_flurry',
+          'ブレードフラリー',
+          '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
+        ],
+        [
+          'hemorrhage',
+          'ヘモリッジ',
+          '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
+        ],
+        [
+          'power_infusion',
+          'パワーインフュージョン',
+          '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
+        ],
+        [
+          'holy_nova',
+          'ホーリーノヴァ',
+          '聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）',
+        ],
+        [
+          'shadowform',
+          'シャドウフォーム',
+          'シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）',
+        ],
+        [
+          'elemental_mastery',
+          'エレメンタルマスタリー',
+          '元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）',
+        ],
+        [
+          'siphon_life',
+          'サイフォンライフ',
+          '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
+        ],
+        [
+          'conflagrate',
+          'コンフラグレート',
+          '敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）',
+        ],
+        [
+          'moonkin_form',
+          'ムーンキンフォーム',
+          'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
+        ],
+        [
+          'feral_charge',
+          'フェラルチャージ',
+          '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
+        ],
+        [
+          'swiftmend',
+          'スウィフトメンド',
+          '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
+        ],
+        [
           'summon_imp',
           'インプの召喚',
           'ウォーロックの命令に従うインプを召喚します。インプは遠くから敵にファイアボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -5734,6 +6694,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Imposição de Mãos',
           'Uma onda massiva de cura: restaura 250 de vida. Recarga de 10 min.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -6061,6 +7026,106 @@ export const classAbilityNames = {
           'Entra em raiva berserker e gera 20 de raiva. (talento de guerreiro)',
         ],
         [
+          'holy_shock',
+          'Choque Sagrado',
+          'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
+        ],
+        [
+          'holy_shield',
+          'Escudo Sagrado',
+          'Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)',
+        ],
+        [
+          'bestial_wrath',
+          'Ira Bestial',
+          'Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)',
+        ],
+        [
+          'trueshot_aura',
+          'Aura de Tiro Certeiro',
+          'Inspira aliados próximos, aumentando o poder de ataque em 35 por 5 min. (assinatura Precisão)',
+        ],
+        [
+          'wyvern_sting',
+          'Aguilhão de Mantícora',
+          'Fere o inimigo à distância, incapacitando-o por até 4 s. Qualquer dano quebra o efeito. (assinatura Sobrevivência)',
+        ],
+        [
+          'arcane_power',
+          'Poder Arcano',
+          'Aumenta o dano de feitiços em 20% e a aceleração de feitiços em 10% por 10 s. (assinatura Arcano)',
+        ],
+        [
+          'combustion',
+          'Combustão',
+          'Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)',
+        ],
+        [
+          'icy_veins',
+          'Veias Gélidas',
+          'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
+        ],
+        [
+          'cold_blood',
+          'Sangue Frio',
+          'Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)',
+        ],
+        [
+          'blade_flurry',
+          'Torrente de Lâminas',
+          'Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)',
+        ],
+        [
+          'hemorrhage',
+          'Hemorragia',
+          'Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)',
+        ],
+        [
+          'power_infusion',
+          'Infusão de Poder',
+          'Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)',
+        ],
+        [
+          'holy_nova',
+          'Nova Sagrada',
+          'Causa uma explosão de luz Sagrada, curando aliados próximos em {damage} e causando dano a inimigos próximos. (assinatura Sagrado)',
+        ],
+        [
+          'shadowform',
+          'Forma de Sombra',
+          'Assume Forma de Sombra, fortalecendo a magia sombria até você voltar. Lance novamente para retornar à forma normal. (assinatura Sombras)',
+        ],
+        [
+          'elemental_mastery',
+          'Maestria Elemental',
+          'Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)',
+        ],
+        [
+          'siphon_life',
+          'Sifão de Vida',
+          'Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)',
+        ],
+        [
+          'conflagrate',
+          'Conflagrar',
+          'Consome seu Imolar no inimigo para incendiá-lo com {damage} de dano de Fogo. (assinatura Destruição)',
+        ],
+        [
+          'moonkin_form',
+          'Forma de Luniscante',
+          'Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)',
+        ],
+        [
+          'feral_charge',
+          'Investida Feral',
+          'Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)',
+        ],
+        [
+          'swiftmend',
+          'Recuperação Rápida',
+          'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)',
+        ],
+        [
           'summon_imp',
           'Invocar diabrete',
           'Invoca um Diabrete sob o comando do bruxo. O Diabrete arremessa Flechas de Fogo nos seus inimigos à distância. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',
@@ -6332,6 +7397,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Возложение рук',
           'Мощный поток исцеления: восстанавливает 250 здоровья. Время восстановления 10 мин.',
+        ],
+        [
+          'holy_taunt',
+          'Священная провокация',
+          'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
         ],
         [
           'flash_of_light',
@@ -6677,6 +7747,106 @@ export const classAbilityNames = {
           'berserker_rage',
           'Ярость берсерка',
           'Впадаете в ярость берсерка и получаете 20 ярости. (талант воина)',
+        ],
+        [
+          'holy_shock',
+          'Шок небес',
+          'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
+        ],
+        [
+          'holy_shield',
+          'Священный щит',
+          'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
+        ],
+        [
+          'bestial_wrath',
+          'Звериный гнев',
+          'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',
+        ],
+        [
+          'trueshot_aura',
+          'Аура меткого выстрела',
+          'Воодушевляет ближайших союзников, повышая силу атаки на 35 на 5 мин. (знаковое умение Стрельбы)',
+        ],
+        [
+          'wyvern_sting',
+          'Укус виверны',
+          'Поражает врага издалека и выводит его из строя на срок до 4 сек. Любой урон прерывает эффект. (знаковое умение Выживания)',
+        ],
+        [
+          'arcane_power',
+          'Мощь тайной магии',
+          'Повышает урон от заклинаний на 20% и скорость заклинаний на 10% на 10 сек. (знаковое умение Тайной магии)',
+        ],
+        [
+          'combustion',
+          'Возгорание',
+          'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
+        ],
+        [
+          'icy_veins',
+          'Ледяные жилы',
+          'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
+        ],
+        [
+          'cold_blood',
+          'Хладнокровие',
+          'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
+        ],
+        [
+          'blade_flurry',
+          'Шквал клинков',
+          'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
+        ],
+        [
+          'hemorrhage',
+          'Кровоизлияние',
+          'Бьет врага, нанося урон оружием плюс {damage}, и вызывает кровотечение на 12 сек. Дает 1 прием. (знаковое умение Скрытности)',
+        ],
+        [
+          'power_infusion',
+          'Придание сил',
+          'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',
+        ],
+        [
+          'holy_nova',
+          'Кольцо света',
+          'Вызывает взрыв Света, исцеляя ближайших союзников на {damage} и раня ближайших врагов. (знаковое умение Света)',
+        ],
+        [
+          'shadowform',
+          'Облик Тьмы',
+          'Вы принимаете Облик Тьмы, усиливая темную магию до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Тьмы)',
+        ],
+        [
+          'elemental_mastery',
+          'Покорение стихий',
+          'Призывает покорение стихий, делая следующее заклинание мгновенным. (знаковое умение Стихий)',
+        ],
+        [
+          'siphon_life',
+          'Вытягивание жизни',
+          'Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)',
+        ],
+        [
+          'conflagrate',
+          'Поджигание',
+          'Поглощает ваше Жертвенное пламя на враге, поджигая его и нанося {damage} ед. урона от огня. (знаковое умение Разрушения)',
+        ],
+        [
+          'moonkin_form',
+          'Облик лунного совуха',
+          'Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)',
+        ],
+        [
+          'feral_charge',
+          'Звериная атака',
+          'Вы бросаетесь к врагу и обездвиживаете его на 1 сек. Дистанция 8-25 м. (знаковое умение Силы зверя)',
+        ],
+        [
+          'swiftmend',
+          'Быстрое восстановление',
+          'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
         ],
         [
           'summon_imp',

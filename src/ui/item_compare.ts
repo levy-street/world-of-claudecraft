@@ -1,10 +1,10 @@
 // Pure item-comparison helper (no DOM), so the stat-delta math can be unit
 // tested directly the way xp_bar.ts / player_context_menu.ts are. The HUD turns
 // these deltas into coloured tooltip lines; see Hud.itemCompareBlock.
-import type { ItemDef, Stats } from '../sim/types';
+import type { CoreStats, ItemDef } from '../sim/types';
 
 // Stable stat identifier; the HUD maps it to a localized label via t().
-export type CompareStat = 'dps' | 'armor' | 'str' | 'agi' | 'sta' | 'int' | 'spi';
+export type CompareStat = 'dps' | 'armor' | 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'warfare';
 
 export interface StatDelta {
   stat: CompareStat;
@@ -24,10 +24,17 @@ export function itemStatDeltas(item: ItemDef, equipped: ItemDef): StatDelta[] {
   const dpsDelta = weaponDps(item.weapon) - weaponDps(equipped.weapon);
   if (Math.abs(dpsDelta) >= 0.05) out.push({ stat: 'dps', delta: dpsDelta, decimals: 1 });
 
-  const stats: Array<keyof Stats & CompareStat> = ['armor', 'str', 'agi', 'sta', 'int', 'spi'];
+  const stats: Array<keyof CoreStats & CompareStat> = ['armor', 'str', 'agi', 'sta', 'int', 'spi'];
   for (const k of stats) {
     const delta = (item.stats?.[k] ?? 0) - (equipped.stats?.[k] ?? 0);
     if (Math.abs(delta) >= 0.5) out.push({ stat: k, delta, decimals: 0 });
+  }
+
+  const warfareRating = (def: ItemDef): number =>
+    Math.min(def.pvpOffenseRating ?? 0, def.pvpDefenseRating ?? 0);
+  const warfareDelta = warfareRating(item) - warfareRating(equipped);
+  if (Math.abs(warfareDelta) >= 0.5) {
+    out.push({ stat: 'warfare', delta: warfareDelta, decimals: 0 });
   }
   return out;
 }

@@ -311,7 +311,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Casco de la Madre del Coro',
   'entities.items.cryptplate_helm.name': 'Yelmo Placacripta',
   'entities.items.deathless_greatblade.name': 'Mandoble Imperecedero',
-  'entities.items.deathless_warguard_legmail.name': 'Malla de piernas del Guardián Imperecedero',
   'entities.items.gravescale_girdle.name': 'Ceñidor de Escamas Sepulcrales',
   'entities.items.gravewyrm_claws.name': 'Garras del Gravewyrm',
   'entities.items.gravewyrm_cleaver.name': 'Hendedor del Gravewyrm',
@@ -327,13 +326,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Empuñaduras del Merodeador del Santuario',
   'entities.items.sash_of_the_sunken_court.name': 'Faja de la Corte Sumergida',
   'entities.items.scepter_of_the_deathless_court.name': 'Cetro de la Corte Imperecedera',
-  'entities.items.scourgehide_carapace.name': 'Caparazón de piel de Azote',
   'entities.items.seal_of_the_nine_oaths.name': 'Sello de los Nueve Juramentos',
   'entities.items.shadowpulse_handwraps.name': 'Vendas Pulso de Sombra',
   'entities.items.shadowpulse_slippers.name': 'Escarpines Pulso de Sombra',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del Gravewyrm',
-  'entities.items.soulforged_warplate.name': 'Coraza de guerra forjada en almas',
-  'entities.items.soulrend_diadem.name': 'Diadema Desgarralmas',
   'entities.items.stormcallers_focus.name': 'Foco del Invocador de Tormentas',
   'entities.items.sunken_court_mantle.name': 'Manto de la Corte Sumergida',
   'entities.items.sutils_gambit.name': 'Gambito de Sutil',
@@ -1149,6 +1145,25 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Mostrar insignias de desarrollador',
   'hudChrome.options.groundReticle': 'Retícula de objetivo terrestre',
   'hudChrome.options.startAttackOnAbility': 'Ataque automático al usar habilidad',
+  'hudChrome.playerMenu.info': 'Info del jugador',
+  'hudChrome.playerMenu.block': 'Bloquear',
+  'hudChrome.playerMenu.unblock': 'Desbloquear',
+  'hudChrome.playerMenu.openFor': 'Abrir el menú de jugador de {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'No se encontró el perfil de {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Cuenta operada por IA',
+  'hudChrome.playerMenu.watchTwitch': 'Ver en Twitch',
+  'hudChrome.playerMenu.watchX': 'Ver en X',
+  'hudChrome.playerMenu.watchKick': 'Ver en Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Ver en YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorados',
+  'hudChrome.social.ignoredEmpty': 'No estás ignorando a nadie.',
+  'hudChrome.social.blockedEmpty': 'No has bloqueado a nadie.',
+  'hudChrome.social.blockSearchPlaceholder': 'Nombre del jugador',
+  'hudChrome.social.blockAction': 'Bloquear',
+  'hudChrome.social.nowBlocking': '{name} bloqueado.',
+  'hudChrome.social.blockedTab': 'Bloqueados',
+  'hudChrome.social.stopBlockingTitle': 'Dejar de bloquear a {name}',
   'hudChrome.party.promoteLeader': 'Promover a líder',
   'hudChrome.statInfo.desc.spellPower':
     'Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.',
@@ -3210,6 +3225,72 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Revivir mascota',
   'entities.abilities.revive_pet.description':
     'Revive a tu mascota muerta y la devuelve a tu lado.',
+  'entities.abilities.holy_shock.name': 'Choque Sagrado',
+  'entities.abilities.holy_shock.description':
+    'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',
+  'entities.abilities.holy_shield.name': 'Escudo Sagrado',
+  'entities.abilities.holy_shield.description':
+    'Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)',
+  'entities.abilities.bestial_wrath.name': 'Cólera de las bestias',
+  'entities.abilities.bestial_wrath.description':
+    'Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)',
+  'entities.abilities.trueshot_aura.name': 'Aura de disparo certero',
+  'entities.abilities.trueshot_aura.description':
+    'Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)',
+  'entities.abilities.wyvern_sting.name': 'Picadura de dracoleón',
+  'entities.abilities.wyvern_sting.description':
+    'Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)',
+  'entities.abilities.arcane_power.name': 'Poder Arcano',
+  'entities.abilities.arcane_power.description':
+    'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
+  'entities.abilities.combustion.name': 'Combustión',
+  'entities.abilities.combustion.description':
+    'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+  'entities.abilities.icy_veins.name': 'Venas heladas',
+  'entities.abilities.icy_veins.description':
+    'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
+  'entities.abilities.cold_blood.name': 'Sangre fría',
+  'entities.abilities.cold_blood.description':
+    'Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)',
+  'entities.abilities.blade_flurry.name': 'Aluvión de acero',
+  'entities.abilities.blade_flurry.description':
+    'Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)',
+  'entities.abilities.hemorrhage.name': 'Hemorragia',
+  'entities.abilities.hemorrhage.description':
+    'Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)',
+  'entities.abilities.power_infusion.name': 'Infusión de poder',
+  'entities.abilities.power_infusion.description':
+    'Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)',
+  'entities.abilities.holy_nova.name': 'Nova Sagrada',
+  'entities.abilities.holy_nova.description':
+    'Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)',
+  'entities.abilities.shadowform.name': 'Forma de las Sombras',
+  'entities.abilities.shadowform.description':
+    'Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)',
+  'entities.abilities.elemental_mastery.name': 'Maestría elemental',
+  'entities.abilities.elemental_mastery.description':
+    'Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)',
+  'entities.abilities.siphon_life.name': 'Succionar vida',
+  'entities.abilities.siphon_life.description':
+    'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
+  'entities.abilities.conflagrate.name': 'Conflagrar',
+  'entities.abilities.conflagrate.description':
+    'Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)',
+  'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
+  'entities.abilities.moonkin_form.description':
+    'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
+  'entities.abilities.feral_charge.name': 'Carga feral',
+  'entities.abilities.feral_charge.description':
+    'Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)',
+  'entities.abilities.swiftmend.name': 'Alivio presto',
+  'entities.abilities.swiftmend.description':
+    'Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)',
+  'entities.abilities.crusader_strike.name': 'Golpe de cruzado',
+  'entities.abilities.crusader_strike.description':
+    'Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)',
+  'entities.abilities.metamorphosis.name': 'Metamorfosis',
+  'entities.abilities.metamorphosis.description':
+    'Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)',
   'entities.items.worn_sword.name': 'Espada corta corroída',
   'entities.items.gnarled_staff.name': 'Bastón de Roble Pantanoso',
   'entities.items.rusty_dagger.name': 'Daga oxidada',
@@ -4541,6 +4622,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.menuAction': 'Menú del juego',
   'hudChrome.controller.help':
     'El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla.',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Hierofante Imperecedero',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Cuchillo Imperecedero',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Guardián Imperecedero',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Guardia real alzado',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Azote de Thornpeak',
   'entities.dungeons.nythraxis_boss_arena.name': 'Arena de banda de Nythraxis',

@@ -914,6 +914,20 @@ export const hudChromeStrings = {
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
   },
+  warfare: {
+    honorAmount: '{amount} Honor',
+    dualPrice: '{money} + {honor}',
+    balance: 'Honor: {amount}',
+    honorFloat: '+{amount} Honor',
+    honorGain: 'You gain {amount} Honor ({reason}).',
+    notEnoughHonor: 'Not enough Honor.',
+    reasons: {
+      arenaWin: 'Arena victory',
+      fiestaKill: 'Fiesta takedown',
+      fiestaComplete: 'Fiesta completed',
+      fiestaWin: 'Fiesta victory',
+    },
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -930,7 +944,9 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      warfare: 'Warfare',
     },
+    warfareValue: '+{increase}% dealt / -{reduction}% taken',
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
@@ -949,6 +965,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      warfare:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -1274,6 +1292,29 @@ export const hudChromeStrings = {
     // The global "/invite <name>" usage hint shown when the command is typed
     // without a name (the invite itself has no proximity gate).
     inviteUsage: 'Invite whom? Usage: /invite <name>.',
+  },
+  // The player context menu (click a name in chat, or right-click a unit frame).
+  // Ignore is the chat-only tier: it hides their public chat from you (its
+  // Ignore/Unignore labels are the existing hud.chat.context.* keys). Block is the
+  // heavy tier: it also drops invites, whispers, mail and /who visibility.
+  // Neither is the ADMIN "mute", which is a staff silence, not a player action.
+  playerMenu: {
+    info: 'Player Info',
+    block: 'Block',
+    unblock: 'Unblock',
+    // Accessible name on a clickable chat sender name.
+    openFor: 'Open player menu for {name}',
+    // Shown when a profile lookup for an out-of-range player finds nothing.
+    profileUnavailable: 'No profile found for {name}.',
+    // Operator-set account flair. The tag itself is the bracketed literal every
+    // classic client shows beside a name; the title is its hover explanation.
+    aiTag: '[AI]',
+    aiTagTitle: 'AI-operated account',
+    // Player-menu rows linking out to an official streamer's own channel.
+    watchTwitch: 'Watch on Twitch',
+    watchX: 'View on X',
+    watchKick: 'Watch on Kick',
+    watchYouTube: 'Watch on YouTube',
   },
   lootSettings: {
     title: 'Loot Settings',
@@ -1896,6 +1937,16 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+    // The two PLAYER chat-filter tiers get a tab each. Ignored is chat-only;
+    // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
+    ignoredTab: 'Ignored',
+    blockedTab: 'Blocked',
+    ignoredEmpty: 'You are not ignoring anyone.',
+    blockedEmpty: 'You have not blocked anyone.',
+    blockSearchPlaceholder: 'Player name',
+    blockAction: 'Block',
+    nowBlocking: 'Blocked {name}.',
+    stopBlockingTitle: 'Stop blocking {name}',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

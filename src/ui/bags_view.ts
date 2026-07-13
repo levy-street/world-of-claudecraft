@@ -25,7 +25,7 @@ export interface BagItemInfo {
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
   noDiscard?: boolean;
-  /** Bound to its owner: cannot be destroyed, traded, mailed, listed, or sold. */
+  /** Bound to its owner: cannot be traded, mailed, listed, or sold. */
   soulbound?: boolean;
 }
 
@@ -187,7 +187,7 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.bankDeposit
   )
     return 'none';
-  if (item.noDiscard || item.soulbound) return 'discardBlocked';
+  if (item.noDiscard) return 'discardBlocked';
   return 'discard';
 }
 

@@ -310,8 +310,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmetto della madre del coro',
   'entities.items.cryptplate_helm.name': 'Elmo della corazza della cripta',
   'entities.items.deathless_greatblade.name': 'Spadone senza morte',
-  'entities.items.deathless_warguard_legmail.name':
-    'Cosciali di maglia del guardiaguerra senza morte',
   'entities.items.gravescale_girdle.name': 'Cintura scagliatomba',
   'entities.items.gravewyrm_claws.name': 'Artigli del wyrm tombale',
   'entities.items.gravewyrm_cleaver.name': 'Mannaia del wyrm tombale',
@@ -327,13 +325,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Prese del predatore del santuario',
   'entities.items.sash_of_the_sunken_court.name': 'Fascia della corte sommersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Scettro della corte senza morte',
-  'entities.items.scourgehide_carapace.name': 'Carapace di pelle del flagello',
   'entities.items.seal_of_the_nine_oaths.name': 'Sigillo dei nove giuramenti',
   'entities.items.shadowpulse_handwraps.name': 'Bende ombrapulsante',
   'entities.items.shadowpulse_slippers.name': 'Calzari ombrapulsante',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del wyrm tombale',
-  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
-  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
   'entities.items.stormcallers_focus.name': "Focus dell'evocatempesta",
   'entities.items.sunken_court_mantle.name': 'Mantello della corte sommersa',
   'entities.items.sutils_gambit.name': 'Gambetto di Sutil',
@@ -1163,6 +1158,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Mostra distintivi sviluppatore',
   'hudChrome.options.groundReticle': 'Reticolo di puntamento a terra',
   'hudChrome.options.startAttackOnAbility': "Attacco automatico all'uso dell'abilita",
+  'hudChrome.playerMenu.info': 'Info giocatore',
+  'hudChrome.playerMenu.block': 'Blocca',
+  'hudChrome.playerMenu.unblock': 'Sblocca',
+  'hudChrome.playerMenu.openFor': 'Apri il menu giocatore di {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Nessun profilo trovato per {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Account gestito da IA',
+  'hudChrome.playerMenu.watchTwitch': 'Guarda su Twitch',
+  'hudChrome.playerMenu.watchX': 'Vedi su X',
+  'hudChrome.playerMenu.watchKick': 'Guarda su Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Guarda su YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorati',
+  'hudChrome.social.ignoredEmpty': 'Non stai ignorando nessuno.',
+  'hudChrome.social.blockedEmpty': 'Non hai bloccato nessuno.',
+  'hudChrome.social.blockSearchPlaceholder': 'Nome del giocatore',
+  'hudChrome.social.blockAction': 'Blocca',
+  'hudChrome.social.nowBlocking': '{name} bloccato.',
+  'hudChrome.social.blockedTab': 'Bloccati',
+  'hudChrome.social.stopBlockingTitle': 'Sblocca {name}',
   'hudChrome.party.promoteLeader': 'Promuovi a Capo',
   'hudChrome.statInfo.desc.spellPower':
     "Aumenta il danno dei tuoi incantesimi e la potenza delle tue cure. Ogni punto di Intelletto conferisce un po' di Potere Magico, in aggiunta a quello dell'equipaggiamento o dei potenziamenti.",
@@ -3201,6 +3215,72 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Rianima Famiglio',
   'entities.abilities.revive_pet.description':
     'Rianima il tuo famiglio morto e lo richiama al tuo fianco.',
+  'entities.abilities.holy_shock.name': 'Shock Sacro',
+  'entities.abilities.holy_shock.description':
+    'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
+  'entities.abilities.holy_shield.name': 'Scudo Sacro',
+  'entities.abilities.holy_shield.description':
+    'Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)',
+  'entities.abilities.bestial_wrath.name': 'Ira Bestiale',
+  'entities.abilities.bestial_wrath.description':
+    'Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)',
+  'entities.abilities.trueshot_aura.name': 'Aura di Precisione',
+  'entities.abilities.trueshot_aura.description':
+    'Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)',
+  'entities.abilities.wyvern_sting.name': 'Morso della Viverna',
+  'entities.abilities.wyvern_sting.description':
+    'Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)',
+  'entities.abilities.arcane_power.name': 'Potere Arcano',
+  'entities.abilities.arcane_power.description':
+    'Aumenta i danni magici del 20% e la celerità magica del 10% per 10 s. (firma Arcano)',
+  'entities.abilities.combustion.name': 'Combustione',
+  'entities.abilities.combustion.description':
+    'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
+  'entities.abilities.icy_veins.name': 'Vene Gelide',
+  'entities.abilities.icy_veins.description':
+    'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
+  'entities.abilities.cold_blood.name': 'Sangue Freddo',
+  'entities.abilities.cold_blood.description':
+    'Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)',
+  'entities.abilities.blade_flurry.name': 'Vortice di Lame',
+  'entities.abilities.blade_flurry.description':
+    'Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)',
+  'entities.abilities.hemorrhage.name': 'Emorragia',
+  'entities.abilities.hemorrhage.description':
+    'Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)',
+  'entities.abilities.power_infusion.name': 'Infusione di Potere',
+  'entities.abilities.power_infusion.description':
+    'Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)',
+  'entities.abilities.holy_nova.name': 'Nova Sacra',
+  'entities.abilities.holy_nova.description':
+    'Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)',
+  'entities.abilities.shadowform.name': "Forma d'Ombra",
+  'entities.abilities.shadowform.description':
+    'Assume Forma d’Ombra, potenziando la magia d’ombra finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Ombra)',
+  'entities.abilities.elemental_mastery.name': 'Maestria Elementale',
+  'entities.abilities.elemental_mastery.description':
+    'Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)',
+  'entities.abilities.siphon_life.name': 'Risucchio Vitale',
+  'entities.abilities.siphon_life.description':
+    'Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)',
+  'entities.abilities.conflagrate.name': 'Conflagrazione',
+  'entities.abilities.conflagrate.description':
+    'Consuma il tuo Immolazione sul nemico per incendiarlo, infliggendo {damage} danni da Fuoco. (firma Distruzione)',
+  'entities.abilities.moonkin_form.name': 'Forma di Lunagufo',
+  'entities.abilities.moonkin_form.description':
+    'Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)',
+  'entities.abilities.feral_charge.name': 'Carica Ferina',
+  'entities.abilities.feral_charge.description':
+    'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
+  'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
+  'entities.abilities.swiftmend.description':
+    'Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)',
+  'entities.abilities.crusader_strike.name': 'Assalto del Crociato',
+  'entities.abilities.crusader_strike.description':
+    'Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)',
+  'entities.abilities.metamorphosis.name': 'Metamorfosi',
+  'entities.abilities.metamorphosis.description':
+    'Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)',
   'entities.items.worn_sword.name': 'Spada corta corrosa',
   'entities.items.gnarled_staff.name': 'Bastone di Rovere Palustre',
   'entities.items.rusty_dagger.name': 'Pugnale arrugginito',
@@ -4539,6 +4619,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.menuAction': 'Menu di gioco',
   'hudChrome.controller.help':
     'Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo.',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Ierofante senza morte',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Lama senza morte',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Guardiaguerra senza morte',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Guardia reale risorta',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Flagello di Thornpeak',
   'itemUi.quality.legendary': 'Leggendario',

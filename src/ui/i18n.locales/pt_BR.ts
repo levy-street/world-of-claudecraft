@@ -310,7 +310,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmo da Mãe do Coro',
   'entities.items.cryptplate_helm.name': 'Elmo de Placas da Cripta',
   'entities.items.deathless_greatblade.name': 'Grande Lâmina Imortal',
-  'entities.items.deathless_warguard_legmail.name': 'Malha de Pernas Imortal da Guarda de Guerra',
   'entities.items.gravescale_girdle.name': 'Cinto de Escamas Tumulares',
   'entities.items.gravewyrm_claws.name': 'Garras do Verme Tumular',
   'entities.items.gravewyrm_cleaver.name': 'Cutelo do Verme Tumular',
@@ -326,13 +325,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Manoplas do Espreitador do Santuário',
   'entities.items.sash_of_the_sunken_court.name': 'Faixa da Corte Submersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Cetro da Corte Imortal',
-  'entities.items.scourgehide_carapace.name': 'Carapaça de Couro do Flagelo',
   'entities.items.seal_of_the_nine_oaths.name': 'Selo dos Nove Juramentos',
   'entities.items.shadowpulse_handwraps.name': 'Faixas de Mãos do Pulso Sombrio',
   'entities.items.shadowpulse_slippers.name': 'Sapatilhas do Pulso Sombrio',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mortalha do Verme Tumular',
-  'entities.items.soulforged_warplate.name': 'Placa de Guerra Forjada na Alma',
-  'entities.items.soulrend_diadem.name': 'Diadema Dilacera-Almas',
   'entities.items.stormcallers_focus.name': 'Foco do Invocador da Tempestade',
   'entities.items.sunken_court_mantle.name': 'Manto da Corte Submersa',
   'entities.items.sutils_gambit.name': 'O Estratagema de Sutil',
@@ -1154,6 +1150,25 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Exibir Insígnias de Desenvolvedor',
   'hudChrome.options.groundReticle': 'Retícula de mira no chão',
   'hudChrome.options.startAttackOnAbility': 'Ataque Automático ao Usar Habilidade',
+  'hudChrome.playerMenu.info': 'Info do jogador',
+  'hudChrome.playerMenu.block': 'Bloquear',
+  'hudChrome.playerMenu.unblock': 'Desbloquear',
+  'hudChrome.playerMenu.openFor': 'Abrir o menu do jogador {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Nenhum perfil encontrado para {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Conta operada por IA',
+  'hudChrome.playerMenu.watchTwitch': 'Assistir na Twitch',
+  'hudChrome.playerMenu.watchX': 'Ver no X',
+  'hudChrome.playerMenu.watchKick': 'Assistir na Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Assistir no YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorados',
+  'hudChrome.social.ignoredEmpty': 'Você não está ignorando ninguém.',
+  'hudChrome.social.blockedEmpty': 'Você não bloqueou ninguém.',
+  'hudChrome.social.blockSearchPlaceholder': 'Nome do jogador',
+  'hudChrome.social.blockAction': 'Bloquear',
+  'hudChrome.social.nowBlocking': '{name} bloqueado.',
+  'hudChrome.social.blockedTab': 'Bloqueados',
+  'hudChrome.social.stopBlockingTitle': 'Parar de bloquear {name}',
   'hudChrome.party.promoteLeader': 'Promover a Líder',
   'hudChrome.statInfo.desc.spellPower':
     'Aumenta o dano das suas magias e a força das suas curas. Cada ponto de Intelecto concede um pouco de Poder Mágico, além do que vem de equipamentos ou benefícios.',
@@ -3188,6 +3203,72 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Reviver Mascote',
   'entities.abilities.revive_pet.description':
     'Revive seu mascote morto e o traz de volta ao seu lado.',
+  'entities.abilities.holy_shock.name': 'Choque Sagrado',
+  'entities.abilities.holy_shock.description':
+    'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
+  'entities.abilities.holy_shield.name': 'Escudo Sagrado',
+  'entities.abilities.holy_shield.description':
+    'Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)',
+  'entities.abilities.bestial_wrath.name': 'Ira Bestial',
+  'entities.abilities.bestial_wrath.description':
+    'Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)',
+  'entities.abilities.trueshot_aura.name': 'Aura de Tiro Certeiro',
+  'entities.abilities.trueshot_aura.description':
+    'Inspira aliados próximos, aumentando o poder de ataque em 35 por 5 min. (assinatura Precisão)',
+  'entities.abilities.wyvern_sting.name': 'Aguilhão de Mantícora',
+  'entities.abilities.wyvern_sting.description':
+    'Fere o inimigo à distância, incapacitando-o por até 4 s. Qualquer dano quebra o efeito. (assinatura Sobrevivência)',
+  'entities.abilities.arcane_power.name': 'Poder Arcano',
+  'entities.abilities.arcane_power.description':
+    'Aumenta o dano de feitiços em 20% e a aceleração de feitiços em 10% por 10 s. (assinatura Arcano)',
+  'entities.abilities.combustion.name': 'Combustão',
+  'entities.abilities.combustion.description':
+    'Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)',
+  'entities.abilities.icy_veins.name': 'Veias Gélidas',
+  'entities.abilities.icy_veins.description':
+    'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
+  'entities.abilities.cold_blood.name': 'Sangue Frio',
+  'entities.abilities.cold_blood.description':
+    'Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)',
+  'entities.abilities.blade_flurry.name': 'Torrente de Lâminas',
+  'entities.abilities.blade_flurry.description':
+    'Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)',
+  'entities.abilities.hemorrhage.name': 'Hemorragia',
+  'entities.abilities.hemorrhage.description':
+    'Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)',
+  'entities.abilities.power_infusion.name': 'Infusão de Poder',
+  'entities.abilities.power_infusion.description':
+    'Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)',
+  'entities.abilities.holy_nova.name': 'Nova Sagrada',
+  'entities.abilities.holy_nova.description':
+    'Causa uma explosão de luz Sagrada, curando aliados próximos em {damage} e causando dano a inimigos próximos. (assinatura Sagrado)',
+  'entities.abilities.shadowform.name': 'Forma de Sombra',
+  'entities.abilities.shadowform.description':
+    'Assume Forma de Sombra, fortalecendo a magia sombria até você voltar. Lance novamente para retornar à forma normal. (assinatura Sombras)',
+  'entities.abilities.elemental_mastery.name': 'Maestria Elemental',
+  'entities.abilities.elemental_mastery.description':
+    'Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)',
+  'entities.abilities.siphon_life.name': 'Sifão de Vida',
+  'entities.abilities.siphon_life.description':
+    'Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)',
+  'entities.abilities.conflagrate.name': 'Conflagrar',
+  'entities.abilities.conflagrate.description':
+    'Consome seu Imolar no inimigo para incendiá-lo com {damage} de dano de Fogo. (assinatura Destruição)',
+  'entities.abilities.moonkin_form.name': 'Forma de Luniscante',
+  'entities.abilities.moonkin_form.description':
+    'Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)',
+  'entities.abilities.feral_charge.name': 'Investida Feral',
+  'entities.abilities.feral_charge.description':
+    'Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)',
+  'entities.abilities.swiftmend.name': 'Recuperação Rápida',
+  'entities.abilities.swiftmend.description':
+    'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)',
+  'entities.abilities.crusader_strike.name': 'Golpe do Cruzado',
+  'entities.abilities.crusader_strike.description':
+    'Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)',
+  'entities.abilities.metamorphosis.name': 'Metamorfose',
+  'entities.abilities.metamorphosis.description':
+    'Assume poder demoníaco, aumentando armadura e poder de ataque por 20 s. (talento de bruxo)',
   'entities.items.worn_sword.name': 'Espada Curta Corroída',
   'entities.items.gnarled_staff.name': 'Cajado de Carvalho do Brejo',
   'entities.items.rusty_dagger.name': 'Adaga enferrujada',
@@ -4527,6 +4608,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.menuAction': 'Menu do Jogo',
   'hudChrome.controller.help':
     'O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela.',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Hierofante Imortal',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Lâmina Imortal',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Guarda de Guerra Imortal',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Guarda real reerguido',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Flagelo de Thornpeak',
   'itemUi.quality.legendary': 'Lendário',

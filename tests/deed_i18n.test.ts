@@ -115,8 +115,10 @@ describe('titledDisplayName + titledNameDecoration (the name-plus-title pattern)
     // and the "To {name}" whisper echo must never receive the sender's title.
     const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     const fn = hudSrc.slice(hudSrc.indexOf('private chatLogFrom('));
-    expect(fn.slice(0, 1600)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
-    expect(fn.slice(0, 1600)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
+    // The window spans the sender-span setup: the name is now clickable/tappable as
+    // well as right-clickable, so the contextmenu arm sits behind those handlers.
+    expect(fn.slice(0, 2400)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
+    expect(fn.slice(0, 2400)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
     const toWhisperArm = hudSrc.slice(hudSrc.indexOf('CHAT_TEMPLATE_KEYS.toWhisper') - 200);
     expect(toWhisperArm.slice(0, 400)).not.toContain('ev.fromTitle');
   });

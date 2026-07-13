@@ -158,7 +158,7 @@ offline launch to ensure startup does not depend on an update service.
   newer Clear appearance is an Icon Composer workflow, not a PNG appiconset slot;
   create and add a matching `AppIcon.icon` asset in Xcode when adopting Apple's
   Liquid Glass icon format.
-- First store release hides Donate, GitHub Sponsors, and token contract CTAs in
+- First store release hides Donate and token contract CTAs in
   native builds.
 - Online play uses the hosted production REST and WebSocket backend.
 - Privacy and terms URLs:

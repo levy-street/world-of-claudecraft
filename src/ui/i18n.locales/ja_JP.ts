@@ -451,6 +451,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.enableAria': 'マスタールートを有効化',
   'hudChrome.masterLoot.looterLabel': '分配担当',
   'hudChrome.masterLoot.leaderOption': 'パーティリーダー',
+  'hudChrome.playerMenu.info': 'プレイヤー情報',
+  'hudChrome.playerMenu.block': 'ブロック',
+  'hudChrome.playerMenu.unblock': 'ブロック解除',
+  'hudChrome.playerMenu.openFor': '{name} のプレイヤーメニューを開く',
+  'hudChrome.playerMenu.profileUnavailable': '{name} のプロフィールが見つかりません。',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'AI操作アカウント',
+  'hudChrome.playerMenu.watchTwitch': 'Twitch で視聴',
+  'hudChrome.playerMenu.watchX': 'X で見る',
+  'hudChrome.playerMenu.watchKick': 'Kick で視聴',
+  'hudChrome.playerMenu.watchYouTube': 'YouTube で視聴',
+  'hudChrome.social.ignoredTab': '無視中',
+  'hudChrome.social.ignoredEmpty': '誰も無視していません。',
+  'hudChrome.social.blockedEmpty': '誰もブロックしていません。',
+  'hudChrome.social.blockSearchPlaceholder': 'プレイヤー名',
+  'hudChrome.social.blockAction': 'ブロック',
+  'hudChrome.social.nowBlocking': '{name} をブロックしました。',
+  'hudChrome.social.blockedTab': 'ブロック',
+  'hudChrome.social.stopBlockingTitle': '{name} のブロックを解除',
   'hudChrome.party.promoteLeader': 'パーティリーダーに指定',
   'hudChrome.party.inviteUsage': '誰を招待しますか？使用法：/invite <名前>。',
   'hudChrome.masterLoot.thresholdLabel': '品質しきい値',
@@ -529,16 +548,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceModeTouch': 'タッチ',
   'hudChrome.options.interfaceModeNote':
     '自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。',
+  'hudChrome.warfare.honorAmount': '名誉 {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.balance': '名誉: {amount}',
+  'hudChrome.warfare.honorFloat': '名誉 +{amount}',
+  'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
+  'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
+  'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
+  'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
+  'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
+  'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
+  'hudChrome.statInfo.names.warfare': 'ウォーフェア',
+  'hudChrome.statInfo.warfareValue': '与ダメージ +{increase}% / 被ダメージ -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
     '装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。',
   'hudChrome.statInfo.desc.hasteRating':
     '装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。',
   'hudChrome.statInfo.desc.spellPower':
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
+  'hudChrome.statInfo.desc.warfare':
+    'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。',
   'hudChrome.statInfo.sources.header': '内訳:',
   'hudChrome.statInfo.sources.base': '基本: {value}',
   'hudChrome.statInfo.sources.attributes': '能力値から: {value}',
@@ -2248,6 +2281,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
   'entities.abilities.lay_on_hands.description':
     '大きな癒やしの波で体力を{damage}回復します。クールダウン10分。',
+  'entities.abilities.holy_taunt.name': '聖なる挑発',
+  'entities.abilities.holy_taunt.description':
+    '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.flash_of_light.name': '光の癒し',
   'entities.abilities.flash_of_light.description':
     '素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。',
@@ -2333,6 +2369,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
+  'entities.abilities.chain_heal.name': 'チェインヒール',
+  'entities.abilities.chain_heal.description':
+    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -2511,6 +2550,72 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
   'entities.abilities.revive_pet.name': 'ペット蘇生',
   'entities.abilities.revive_pet.description': '死んだペットを蘇生させ、自分のそばに呼び戻す。',
+  'entities.abilities.holy_shock.name': 'ホーリーショック',
+  'entities.abilities.holy_shock.description':
+    '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
+  'entities.abilities.holy_shield.name': 'ホーリーシールド',
+  'entities.abilities.holy_shield.description':
+    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+  'entities.abilities.bestial_wrath.name': '野獣の怒り',
+  'entities.abilities.bestial_wrath.description':
+    '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
+  'entities.abilities.trueshot_aura.name': 'トゥルーショットオーラ',
+  'entities.abilities.trueshot_aura.description':
+    '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
+  'entities.abilities.wyvern_sting.name': 'ワイバーンスティング',
+  'entities.abilities.wyvern_sting.description':
+    '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
+  'entities.abilities.arcane_power.name': 'アーケインパワー',
+  'entities.abilities.arcane_power.description':
+    '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
+  'entities.abilities.combustion.name': 'コンバッション',
+  'entities.abilities.combustion.description':
+    '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
+  'entities.abilities.icy_veins.name': 'アイシーヴェインズ',
+  'entities.abilities.icy_veins.description':
+    '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
+  'entities.abilities.cold_blood.name': 'コールドブラッド',
+  'entities.abilities.cold_blood.description':
+    '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
+  'entities.abilities.blade_flurry.name': 'ブレードフラリー',
+  'entities.abilities.blade_flurry.description':
+    '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
+  'entities.abilities.hemorrhage.name': 'ヘモリッジ',
+  'entities.abilities.hemorrhage.description':
+    '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
+  'entities.abilities.power_infusion.name': 'パワーインフュージョン',
+  'entities.abilities.power_infusion.description':
+    '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
+  'entities.abilities.holy_nova.name': 'ホーリーノヴァ',
+  'entities.abilities.holy_nova.description':
+    '聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）',
+  'entities.abilities.shadowform.name': 'シャドウフォーム',
+  'entities.abilities.shadowform.description':
+    'シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）',
+  'entities.abilities.elemental_mastery.name': 'エレメンタルマスタリー',
+  'entities.abilities.elemental_mastery.description':
+    '元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）',
+  'entities.abilities.siphon_life.name': 'サイフォンライフ',
+  'entities.abilities.siphon_life.description':
+    '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
+  'entities.abilities.conflagrate.name': 'コンフラグレート',
+  'entities.abilities.conflagrate.description':
+    '敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）',
+  'entities.abilities.moonkin_form.name': 'ムーンキンフォーム',
+  'entities.abilities.moonkin_form.description':
+    'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
+  'entities.abilities.feral_charge.name': 'フェラルチャージ',
+  'entities.abilities.feral_charge.description':
+    '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
+  'entities.abilities.swiftmend.name': 'スウィフトメンド',
+  'entities.abilities.swiftmend.description':
+    '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
+  'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
+  'entities.abilities.crusader_strike.description':
+    '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
+  'entities.abilities.metamorphosis.name': '悪魔変身',
+  'entities.abilities.metamorphosis.description':
+    '悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）',
   'entities.items.worn_sword.name': '錆穴だらけのショートソード',
   'entities.items.gnarled_staff.name': '沼樫の杖',
   'entities.items.rusty_dagger.name': '錆びたダガー',
@@ -3521,9 +3626,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.shroud_of_the_gravewyrm.name': 'グレイヴワームの帳',
   'entities.items.sanctum_prowlers_grips.name': 'サンクタムプラウラーのグリップ',
   'entities.items.scepter_of_the_deathless_court.name': '不死の宮廷の笏',
-  'entities.items.deathless_warguard_legmail.name': '不死の戦衛レッグメイル',
-  'entities.items.soulrend_diadem.name': 'ソウルレンドの宝冠',
-  'entities.items.scourgehide_carapace.name': 'スカージハイドの甲殻',
   'entities.items.cryptplate_helm.name': 'クリプトプレートヘルム',
   'entities.items.shadowpulse_slippers.name': 'シャドウパルスのスリッパ',
   'entities.items.bonechill_cord.name': 'ボーンチルの帯',
@@ -3537,7 +3639,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravescale_girdle.name': 'グレイヴスケイルの帯',
   'entities.items.wyrmchoir_handwraps.name': 'ワームクワイアの手巻き',
   'entities.items.deathless_greatblade.name': '不死の大剣',
-  'entities.items.soulforged_warplate.name': '魂鍛の戦甲',
   'entities.items.stormcallers_focus.name': 'ストームコーラーの焦点',
   'entities.items.zense_meridian.name': 'ゼンセの子午線',
   'entities.items.seal_of_the_nine_oaths.name': '九誓の印章',
@@ -3698,6 +3799,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_log.name': 'エルダーウッドの丸太',
   'entities.items.goldleaf_herb.name': 'ゴールドリーフ草',
   'entities.items.sunpetal_herb.name': 'サンペタル草',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': '死なずの戦衛オルドレン',
+  'entities.mobs.nythraxis_heroic_priest_add.name': '死なずの司祭長マルリック',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': '死なずの刃ヴォス',
   'entities.mobs.nythraxis_skeleton_warrior.name': '蘇った王家の衛兵',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'ナイスラクシス、ソーンピークの災厄',
   'hud.core.chatChannels.add': 'チャットチャンネルを追加',
@@ -6852,6 +6956,49 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '金張りの金庫',
   'entities.npcs.bursar_aldous_crane.greeting':
     'どんな木箱も、金櫃も、装身具も、金張りの金庫にお預けいただければ安全です。',
+  'entities.items.furyforged_warhelm.name': '憤怒鋳りの戦兜',
+  'entities.items.furyforged_warspaulders.name': '憤怒鋳りの戦肩当て',
+  'entities.items.furyforged_warplate.name': '憤怒鋳りの戦鎧',
+  'entities.items.furyforged_girdle.name': '憤怒鋳りの腰帯',
+  'entities.items.furyforged_legguards.name': '憤怒鋳りの脚当て',
+  'entities.items.furyforged_gauntlets.name': '憤怒鋳りの篭手',
+  'entities.items.furyforged_sabatons.name': '憤怒鋳りの戦靴',
+  'entities.items.stormbound_crown.name': '嵐縛りの王冠',
+  'entities.items.stormbound_spaulders.name': '嵐縛りの肩当て',
+  'entities.items.stormbound_hauberk.name': '嵐縛りの鎖帷子',
+  'entities.items.stormbound_waistguard.name': '嵐縛りの腰守り',
+  'entities.items.stormbound_legmail.name': '嵐縛りの脚鎖',
+  'entities.items.stormbound_handguards.name': '嵐縛りの手甲',
+  'entities.items.stormbound_greaves.name': '嵐縛りの脛当て',
+  'entities.items.ashstalker_cowl.name': '灰追いの頭巾',
+  'entities.items.ashstalker_shoulderguards.name': '灰追いの肩守り',
+  'entities.items.ashstalker_harness.name': '灰追いの胴具',
+  'entities.items.ashstalker_waistband.name': '灰追いの腰帯',
+  'entities.items.ashstalker_legguards.name': '灰追いの脚当て',
+  'entities.items.ashstalker_grips.name': '灰追いの手甲',
+  'entities.items.ashstalker_treads.name': '灰追いの足袋',
+  'entities.items.cinderweave_cowl.name': '熾火織りの頭巾',
+  'entities.items.cinderweave_mantle.name': '熾火織りの肩衣',
+  'entities.items.cinderweave_raiment.name': '熾火織りの法衣',
+  'entities.items.cinderweave_cord.name': '熾火織りの腰紐',
+  'entities.items.cinderweave_legwraps.name': '熾火織りの脚巻き',
+  'entities.items.cinderweave_handwraps.name': '熾火織りの手巻き',
+  'entities.items.cinderweave_slippers.name': '熾火織りの上履き',
+  'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
+  'entities.items.razorwind_torque.name': '刃風の首輪',
+  'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',
+  'entities.items.iron_vow_band.name': '鉄の誓いの指輪',
+  'entities.items.unbroken_circle.name': '不壊の円環',
+  'entities.items.fleetblood_band.name': '疾血の指輪',
+  'entities.items.last_step_signet.name': '最後の一歩の印章',
+  'entities.items.ashen_focus_ring.name': '灰燼の集中指輪',
+  'entities.items.spellbreakers_seal.name': '呪文砕きの印章',
+  'entities.items.final_argument_greatblade.name': '最後の論駁の大剣',
+  'entities.items.first_blood_razor.name': '初血の剃刀',
+  'entities.items.emberglass_warstaff.name': '熾火硝子の戦杖',
+  'entities.npcs.fury.name': 'フューリー',
+  'entities.npcs.fury.title': '名誉補給官',
+  'entities.npcs.fury.greeting': '戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。',
   'guide.economy.bankBody':
     '各拠点の町には、この地の銀行商会である金張りの金庫の支店があります。そこの出納官に話しかけると自分の金庫が開きます。バッグとは別の私的な収納で、キャラクターが生涯持ち続けるものです。預けた品は、次にどの支店を訪れてもそのまま安全に待っています。',
   'guide.economy.bankHow':
@@ -6991,6 +7138,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
+  // Baseline class interrupts.
+  'entities.abilities.pummel.name': '顎砕き',
+  'entities.abilities.pummel.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.kick.name': 'ブーツ',
+  'entities.abilities.kick.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.counterspell.name': 'スペルブレイク',
+  'entities.abilities.counterspell.description':
+    '対象の呪文を打ち消し、6秒間その系統の呪文を封じる。',
+  'entities.abilities.counter_shot.name': '沈黙の一射',
+  'entities.abilities.counter_shot.description':
+    '素早い一射で対象の詠唱を中断し、4秒間その系統を封じる。',
+  'entities.abilities.rebuke.name': '叱咤',
+  'entities.abilities.rebuke.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',
+  'entities.abilities.skull_bash.name': '頭突き',
+  'entities.abilities.skull_bash.description':
+    '突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。',
+  'entities.abilities.spell_lock.name': '猿轡',
+  'entities.abilities.spell_lock.description':
+    '詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。',
   'guide.bestiary.flavor.sethrael_palecoil':
     '骨のように蒼白い蛇で、グリマーミアの深い棚を音もなく滑り、自らのものとした水域を守る無言の番人。この湖を分かち合った泳ぎ手が、水面に戻ることはまずない。',
   'guide.combat.metersBody':

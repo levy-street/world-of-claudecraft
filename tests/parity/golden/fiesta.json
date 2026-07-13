@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 412,
-      "state": "ca5fe110",
+      "state": "ac7dcab1",
       "events": "9bae7dad",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 412,
-      "state": "e31fea8a",
+      "state": "c865f733",
       "events": "b46d41a9",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 412,
-      "state": "1f13cf14",
+      "state": "46926261",
       "events": "3a440865",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 412,
-      "state": "abadcf12",
+      "state": "ce6711b3",
       "events": "8025fc6d",
       "rng": {
         "draws": 231,
@@ -74,8 +74,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "1802fe11",
-      "events": "b509200e",
+      "state": "ae892c8f",
+      "events": "b2b23e9e",
       "rng": {
         "draws": 385,
         "digest": "e8022e47"
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 412,
-      "state": "a57ac7e5",
+      "state": "a15d17df",
       "events": "741638a5",
       "rng": {
         "draws": 537,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 412,
-      "state": "c8cc5040",
+      "state": "75e79aa0",
       "events": "ba8c5aac",
       "rng": {
         "draws": 606,
@@ -151,12 +151,14 @@
           },
           "gatheringProficiency": {},
           "heroicDaily": {},
+          "honor": 20,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
             }
           ],
+          "lifetimeHonor": 20,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
@@ -387,6 +389,7 @@
           "combatTimer": 102.1,
           "comboUntil": -1,
           "critChance": 0.0995,
+          "critDmgPhysBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0795,
           "fiveSecondRule": 107.15,
@@ -443,7 +446,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 418,
-          "maxResource": 1671,
+          "maxResource": 1611,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -453,18 +456,19 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 1671,
+          "resource": 1611,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 47,
+          "spellHaste": 0.1,
+          "spellPower": 45,
           "stats": {
             "agi": 12,
             "armor": 133,
-            "int": 93,
+            "int": 89,
             "spi": 60,
             "sta": 33,
             "str": 10
@@ -528,7 +532,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 141,
+          "attackPower": 131,
           "combatTimer": 102.1,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -552,7 +556,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 194,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {

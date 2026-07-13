@@ -284,7 +284,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Kormoderens Hjelm',
   'entities.items.cryptplate_helm.name': 'Kryptplade-Hjelm',
   'entities.items.deathless_greatblade.name': 'Udødelig Storklinge',
-  'entities.items.deathless_warguard_legmail.name': 'Udødelig Krigsvagt-Benbrynje',
   'entities.items.gravescale_girdle.name': 'Gravskæl-Livgjord',
   'entities.items.gravewyrm_claws.name': 'Gravorm-Kløer',
   'entities.items.gravewyrm_cleaver.name': 'Gravorm-Kløver',
@@ -300,13 +299,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Helligdommens Luskers Greb',
   'entities.items.sash_of_the_sunken_court.name': 'Skærf fra Det Sunkne Hof',
   'entities.items.scepter_of_the_deathless_court.name': 'Scepter fra Det Udødelige Hof',
-  'entities.items.scourgehide_carapace.name': 'Svøbehud-Panser',
   'entities.items.seal_of_the_nine_oaths.name': 'Segl over De Ni Eder',
   'entities.items.shadowpulse_handwraps.name': 'Skyggepuls-Håndomvikling',
   'entities.items.shadowpulse_slippers.name': 'Skyggepuls-Futter',
   'entities.items.shroud_of_the_gravewyrm.name': 'Gravormens Ligklæde',
-  'entities.items.soulforged_warplate.name': 'Sjælesmedet Krigsplade',
-  'entities.items.soulrend_diadem.name': 'Sjæleflæng-Diadem',
   'entities.items.stormcallers_focus.name': 'Stormkalderens Fokus',
   'entities.items.sunken_court_mantle.name': 'Kappe fra Det Sunkne Hof',
   'entities.items.sutils_gambit.name': 'Sutils Gambit',
@@ -1118,6 +1114,25 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Vis udviklermærker',
   'hudChrome.options.groundReticle': 'Jordsigte-retikel',
   'hudChrome.options.startAttackOnAbility': 'Autoangreb ved brug af evne',
+  'hudChrome.playerMenu.info': 'Spilleroplysninger',
+  'hudChrome.playerMenu.block': 'Blokér',
+  'hudChrome.playerMenu.unblock': 'Fjern blokering',
+  'hudChrome.playerMenu.openFor': 'Åbn spillermenuen for {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Ingen profil fundet for {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'AI-styret konto',
+  'hudChrome.playerMenu.watchTwitch': 'Se på Twitch',
+  'hudChrome.playerMenu.watchX': 'Vis på X',
+  'hudChrome.playerMenu.watchKick': 'Se på Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Se på YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorerede',
+  'hudChrome.social.ignoredEmpty': 'Du ignorerer ingen.',
+  'hudChrome.social.blockedEmpty': 'Du har ikke blokeret nogen.',
+  'hudChrome.social.blockSearchPlaceholder': 'Spillernavn',
+  'hudChrome.social.blockAction': 'Blokér',
+  'hudChrome.social.nowBlocking': '{name} blokeret.',
+  'hudChrome.social.blockedTab': 'Blokerede',
+  'hudChrome.social.stopBlockingTitle': 'Fjern blokering af {name}',
   'hudChrome.party.promoteLeader': 'Forfrem til leder',
   'hudChrome.plurals.playersMatching.few':
     'Hvem: {count} spillere, der matcher "{query}" på {realm}.',
@@ -1913,6 +1928,72 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.name': 'Lænkende Snit',
   'entities.abilities.wrath.description': 'Slynger et lyn af naturenergi for {damage} Natur skade.',
   'entities.abilities.wrath.name': 'Vildlyn',
+  'entities.abilities.holy_shock.name': 'Hellig chok',
+  'entities.abilities.holy_shock.description':
+    'Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)',
+  'entities.abilities.holy_shield.name': 'Hellig skjold',
+  'entities.abilities.holy_shield.description':
+    'Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)',
+  'entities.abilities.bestial_wrath.name': 'Bestialsk vrede',
+  'entities.abilities.bestial_wrath.description':
+    'Sender dig i bestialsk raseri, så angrebskraft øges med 55 i 15 sek. (Bæstmestersignatur)',
+  'entities.abilities.trueshot_aura.name': 'Træfsikkerhedsaura',
+  'entities.abilities.trueshot_aura.description':
+    'Inspirerer nærliggende allierede og øger angrebskraft med 35 i 5 min. (Skytte signatur)',
+  'entities.abilities.wyvern_sting.name': 'Wyvernstik',
+  'entities.abilities.wyvern_sting.description':
+    'Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)',
+  'entities.abilities.arcane_power.name': 'Arkan kraft',
+  'entities.abilities.arcane_power.description':
+    'Øger besværgelsesskade med 20% og besværgelseshast med 10% i 10 sek. (Arcane-signatur)',
+  'entities.abilities.combustion.name': 'Forbrænding',
+  'entities.abilities.combustion.description':
+    'Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)',
+  'entities.abilities.icy_veins.name': 'Iskolde Årer',
+  'entities.abilities.icy_veins.description':
+    'Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)',
+  'entities.abilities.cold_blood.name': 'Koldt blod',
+  'entities.abilities.cold_blood.description':
+    'Fokuserer din dræbervilje, så dit næste angreb bliver et kritisk træf. (Snigmordersignatur)',
+  'entities.abilities.blade_flurry.name': 'Klingevirvel',
+  'entities.abilities.blade_flurry.description':
+    'Udløser en byge af klinger og øger angrebshastighed med 20% i 12 sek. (Kampsignatur)',
+  'entities.abilities.hemorrhage.name': 'Blødning',
+  'entities.abilities.hemorrhage.description':
+    'Ramler fjenden for våbenskade plus {damage} og påfører blødningsskade over 12 sek. Giver 1 combopoint. (Underfundighedssignatur)',
+  'entities.abilities.power_infusion.name': 'Kraftinfusion',
+  'entities.abilities.power_infusion.description':
+    'Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)',
+  'entities.abilities.holy_nova.name': 'Hellig nova',
+  'entities.abilities.holy_nova.description':
+    'Udløser en eksplosion af helligt lys, helbreder nærliggende allierede for {damage} og skader nærliggende fjender. (Hellig signatur)',
+  'entities.abilities.shadowform.name': 'Skyggeform',
+  'entities.abilities.shadowform.description':
+    'Antag skyggeform, som styrker skyggemagi, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Skyggesignatur)',
+  'entities.abilities.elemental_mastery.name': 'Elementær beherskelse',
+  'entities.abilities.elemental_mastery.description':
+    'Påkalder elementær beherskelse og gør din næste besværgelse øjeblikkelig. (Elementær signatur)',
+  'entities.abilities.siphon_life.name': 'Sug liv',
+  'entities.abilities.siphon_life.description':
+    'Suger liv fra fjenden, påfører {damage} skyggeskade over 30 sek og helbreder dig for den skade, der bliver gjort. (Lidelsessignatur)',
+  'entities.abilities.conflagrate.name': 'Antændelse',
+  'entities.abilities.conflagrate.description':
+    'Forbruger din Opbrænding på fjenden for at antænde den for {damage} ildskade. (Ødelæggelsessignatur)',
+  'entities.abilities.moonkin_form.name': 'Månekinform',
+  'entities.abilities.moonkin_form.description':
+    'Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)',
+  'entities.abilities.feral_charge.name': 'Vild ladning',
+  'entities.abilities.feral_charge.description':
+    'Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)',
+  'entities.abilities.swiftmend.name': 'Hurtig heling',
+  'entities.abilities.swiftmend.description':
+    'Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)',
+  'entities.abilities.crusader_strike.name': 'Korsfarerslag',
+  'entities.abilities.crusader_strike.description':
+    'Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)',
+  'entities.abilities.metamorphosis.name': 'Metamorfose',
+  'entities.abilities.metamorphosis.description':
+    'Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)',
   'entities.delves.collapsed_reliquary.enterText':
     'Du stiger ned i det sammenstyrtede relikvarium.',
   'entities.delves.collapsed_reliquary.leaveText':
@@ -2369,6 +2450,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen Gravkalderen',
   'entities.mobs.mudfin_murloc.name': 'Mudfinne-Sniger',
   'entities.mobs.nhalia_mourner.name': 'Nhalia Sørgende',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Den Udødelige Hierofant',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Den Udødelige Kniv',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Den Udødelige Krigsvagt',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Tornetops Svøbe',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Genopstanden Kongelig Garder',
   'entities.mobs.ogre_crusher.name': 'Tornetop-Knuser',

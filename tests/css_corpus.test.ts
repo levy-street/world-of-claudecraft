@@ -144,6 +144,9 @@ const INDEX_SECTIONS = [
   'chat',
   'party frames',
   'context menu',
+  // the operator-set AI-account tag: one shared animated-gradient class serving the
+  // chat line, the nameplate .np-ai span, and the target frame's flair line.
+  'ai account tag',
   'prompts (invite/trade/duel)',
   'trade window',
   'elite target frame',
@@ -176,12 +179,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 67 index + 65 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(67);
-    expect(PLAY_SECTIONS.length).toBe(65);
-    expect(MANIFEST.length).toBe(67);
-    expect(new Set(INDEX_SECTIONS).size).toBe(67);
-    expect(new Set(PLAY_SECTIONS).size).toBe(65);
+  it('pins a non-vacuous manifest: 68 index + 66 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(68);
+    expect(PLAY_SECTIONS.length).toBe(66);
+    expect(MANIFEST.length).toBe(68);
+    expect(new Set(INDEX_SECTIONS).size).toBe(68);
+    expect(new Set(PLAY_SECTIONS).size).toBe(66);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

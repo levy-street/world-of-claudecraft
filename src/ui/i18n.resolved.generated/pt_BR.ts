@@ -943,13 +943,29 @@ export const pt_BR: EnTranslations = {
       "highContrast": "Alto contraste",
       "highContrastAria": "Alternar o fundo de alto contraste: desativa o trailer em movimento para que o texto da tela inicial permaneça legível"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "Do seu {value} de {stat}:",
       "names": {
         "spellPower": "Poder Mágico",
         "critRating": "Índice de crítico",
-        "hasteRating": "Índice de aceleração"
+        "hasteRating": "Índice de aceleração",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Aumenta seu poder de ataque, de modo que seus golpes com armas atinjam com mais força.",
         "agi": "Aguça seus reflexos e sua mira, melhorando vários dos seus atributos de combate.",
@@ -963,7 +979,8 @@ export const pt_BR: EnTranslations = {
         "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
         "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
         "critRating": "Índice de crítico dos seus equipamentos e benefícios de conjunto, elevando sua chance de acerto crítico. Cerca de 10 de índice concede 1% de crítico.",
-        "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração."
+        "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} de Poder de ataque",
@@ -1215,6 +1232,19 @@ export const pt_BR: EnTranslations = {
     "party": {
       "promoteLeader": "Promover a Líder",
       "inviteUsage": "Convidar quem? Uso: /invite <nome>."
+    },
+    "playerMenu": {
+      "info": "Info do jogador",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "openFor": "Abrir o menu do jogador {name}",
+      "profileUnavailable": "Nenhum perfil encontrado para {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Conta operada por IA",
+      "watchTwitch": "Assistir na Twitch",
+      "watchX": "Ver no X",
+      "watchKick": "Assistir na Kick",
+      "watchYouTube": "Assistir no YouTube"
     },
     "lootSettings": {
       "title": "Configurações de Saque",
@@ -1735,7 +1765,15 @@ export const pt_BR: EnTranslations = {
     },
     "social": {
       "lastSeen": "Visto por último: {when}",
-      "lastSeenNever": "nunca"
+      "lastSeenNever": "nunca",
+      "ignoredTab": "Ignorados",
+      "blockedTab": "Bloqueados",
+      "ignoredEmpty": "Você não está ignorando ninguém.",
+      "blockedEmpty": "Você não bloqueou ninguém.",
+      "blockSearchPlaceholder": "Nome do jogador",
+      "blockAction": "Bloquear",
+      "nowBlocking": "{name} bloqueado.",
+      "stopBlockingTitle": "Parar de bloquear {name}"
     },
     "gathering": {
       "title": "Coleta",
@@ -5839,6 +5877,10 @@ export const pt_BR: EnTranslations = {
         "name": "Extrema-Unção",
         "description": "Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Cura Luminosa",
         "description": "Uma explosão de Luz rápida e eficiente que cura um alvo aliado em {damage}."
@@ -6163,6 +6205,98 @@ export const pt_BR: EnTranslations = {
         "name": "Fúria Fervente",
         "description": "Entra em uma fúria fervente, gerando 20 de raiva. (talento de guerreiro)"
       },
+      "crusader_strike": {
+        "name": "Golpe do Cruzado",
+        "description": "Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfose",
+        "description": "Assume poder demoníaco, aumentando armadura e poder de ataque por 20 s. (talento de bruxo)"
+      },
+      "holy_shock": {
+        "name": "Choque Sagrado",
+        "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"
+      },
+      "holy_shield": {
+        "name": "Escudo Sagrado",
+        "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
+      },
+      "bestial_wrath": {
+        "name": "Ira Bestial",
+        "description": "Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)"
+      },
+      "trueshot_aura": {
+        "name": "Aura de Tiro Certeiro",
+        "description": "Inspira aliados próximos, aumentando o poder de ataque em 35 por 5 min. (assinatura Precisão)"
+      },
+      "wyvern_sting": {
+        "name": "Aguilhão de Mantícora",
+        "description": "Fere o inimigo à distância, incapacitando-o por até 4 s. Qualquer dano quebra o efeito. (assinatura Sobrevivência)"
+      },
+      "arcane_power": {
+        "name": "Poder Arcano",
+        "description": "Aumenta o dano de feitiços em 20% e a aceleração de feitiços em 10% por 10 s. (assinatura Arcano)"
+      },
+      "combustion": {
+        "name": "Combustão",
+        "description": "Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)"
+      },
+      "icy_veins": {
+        "name": "Veias Gélidas",
+        "description": "Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)"
+      },
+      "cold_blood": {
+        "name": "Sangue Frio",
+        "description": "Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)"
+      },
+      "blade_flurry": {
+        "name": "Torrente de Lâminas",
+        "description": "Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)"
+      },
+      "hemorrhage": {
+        "name": "Hemorragia",
+        "description": "Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)"
+      },
+      "power_infusion": {
+        "name": "Infusão de Poder",
+        "description": "Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)"
+      },
+      "holy_nova": {
+        "name": "Nova Sagrada",
+        "description": "Causa uma explosão de luz Sagrada, curando aliados próximos em {damage} e causando dano a inimigos próximos. (assinatura Sagrado)"
+      },
+      "shadowform": {
+        "name": "Forma de Sombra",
+        "description": "Assume Forma de Sombra, fortalecendo a magia sombria até você voltar. Lance novamente para retornar à forma normal. (assinatura Sombras)"
+      },
+      "elemental_mastery": {
+        "name": "Maestria Elemental",
+        "description": "Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)"
+      },
+      "siphon_life": {
+        "name": "Sifão de Vida",
+        "description": "Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)"
+      },
+      "conflagrate": {
+        "name": "Conflagrar",
+        "description": "Consome seu Imolar no inimigo para incendiá-lo com {damage} de dano de Fogo. (assinatura Destruição)"
+      },
+      "moonkin_form": {
+        "name": "Forma de Luniscante",
+        "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
+      },
+      "feral_charge": {
+        "name": "Investida Feral",
+        "description": "Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)"
+      },
+      "swiftmend": {
+        "name": "Recuperação Rápida",
+        "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)"
+      },
       "summon_imp": {
         "name": "Invocar Emberkin",
         "description": "Invoca um Emberkin sob o comando do bruxo. O Emberkin arremessa flechas de cinzas nos seus inimigos à distância. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
@@ -6190,6 +6324,34 @@ export const pt_BR: EnTranslations = {
       "summon_doomguard": {
         "name": "Invocar Wraithborn",
         "description": "Vincula um Wraithborn à sua vontade, um demônio de elite que faz chover pesado dano Sombrio à distância. Uma longa recarga limita seu poder devastador. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
+      },
+      "pummel": {
+        "name": "Jawcrack",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "kick": {
+        "name": "Boot",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+      },
+      "counter_shot": {
+        "name": "Hushing Shot",
+        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+      },
+      "rebuke": {
+        "name": "Reproach",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "skull_bash": {
+        "name": "Headbutt",
+        "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
+      },
+      "spell_lock": {
+        "name": "Gag Order",
+        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
       },
       "bear_charge": {
         "name": "Investida de Bruin",
@@ -6834,6 +6996,126 @@ export const pt_BR: EnTranslations = {
       "sunpetal_herb": {
         "name": "Erva Pétala Solar"
       },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
+      },
       "bristleback_maul": {
         "name": "Martelo Gallowglass"
       },
@@ -7341,15 +7623,6 @@ export const pt_BR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro da Corte Imortal"
       },
-      "deathless_warguard_legmail": {
-        "name": "Malha de Pernas Imortal da Guarda de Guerra"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Dilacera-Almas"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapaça de Couro do Flagelo"
-      },
       "cryptplate_helm": {
         "name": "Elmo de Placas da Cripta"
       },
@@ -7388,9 +7661,6 @@ export const pt_BR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"
-      },
-      "soulforged_warplate": {
-        "name": "Placa de Guerra Forjada na Alma"
       },
       "stormcallers_focus": {
         "name": "Foco do Invocador da Tempestade"
@@ -7706,6 +7976,15 @@ export const pt_BR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guarda de Guerra Imortal"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imortal"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lâmina Imortal"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"
       },
@@ -7973,6 +8252,11 @@ export const pt_BR: EnTranslations = {
         "name": "Intendente Vex",
         "title": "Intendente Heroico",
         "greeting": "A prova das profundezas heroicas compra os melhores anéis e pingentes de Highwatch. Mostre-me suas marcas."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Mestre do saber Caddis",

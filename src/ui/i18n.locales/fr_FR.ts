@@ -314,7 +314,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Casque de la Mère du Choeur',
   'entities.items.cryptplate_helm.name': 'Heaume de plaques sépulcrales',
   'entities.items.deathless_greatblade.name': 'Grande lame immortelle',
-  'entities.items.deathless_warguard_legmail.name': 'Cotte de jambes de la garde immortelle',
   'entities.items.gravescale_girdle.name': "Ceinturon d'écailles sépulcrales",
   'entities.items.gravewyrm_claws.name': 'Griffes du Gravewyrm',
   'entities.items.gravewyrm_cleaver.name': 'Fendoir du Gravewyrm',
@@ -330,13 +329,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Poignes du Rôdeur du Sanctuaire',
   'entities.items.sash_of_the_sunken_court.name': 'Écharpe de la Cour engloutie',
   'entities.items.scepter_of_the_deathless_court.name': 'Sceptre de la Cour immortelle',
-  'entities.items.scourgehide_carapace.name': 'Carapace en peau de Fléau',
   'entities.items.seal_of_the_nine_oaths.name': 'Sceau des Neuf Serments',
   'entities.items.shadowpulse_handwraps.name': "Bandes de mains d'Ombre pulsante",
   'entities.items.shadowpulse_slippers.name': "Chaussons d'Ombre pulsante",
   'entities.items.shroud_of_the_gravewyrm.name': 'Suaire du Gravewyrm',
-  'entities.items.soulforged_warplate.name': 'Harnois de guerre forgé dans les âmes',
-  'entities.items.soulrend_diadem.name': 'Diadème Déchire-âme',
   'entities.items.stormcallers_focus.name': "Focalisateur de l'Invocateur de tempêtes",
   'entities.items.sunken_court_mantle.name': 'Mantelet de la Cour engloutie',
   'entities.items.sutils_gambit.name': 'Gambit de Sutil',
@@ -1177,6 +1173,25 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Afficher les badges de développeur',
   'hudChrome.options.groundReticle': 'Réticule de ciblage au sol',
   'hudChrome.options.startAttackOnAbility': "Attaque auto à l'utilisation d'une compétence",
+  'hudChrome.playerMenu.info': 'Infos joueur',
+  'hudChrome.playerMenu.block': 'Bloquer',
+  'hudChrome.playerMenu.unblock': 'Débloquer',
+  'hudChrome.playerMenu.openFor': 'Ouvrir le menu du joueur {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Aucun profil trouvé pour {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Compte géré par une IA',
+  'hudChrome.playerMenu.watchTwitch': 'Regarder sur Twitch',
+  'hudChrome.playerMenu.watchX': 'Voir sur X',
+  'hudChrome.playerMenu.watchKick': 'Regarder sur Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Regarder sur YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorés',
+  'hudChrome.social.ignoredEmpty': "Vous n'ignorez personne.",
+  'hudChrome.social.blockedEmpty': "Vous n'avez bloqué personne.",
+  'hudChrome.social.blockSearchPlaceholder': 'Nom du joueur',
+  'hudChrome.social.blockAction': 'Bloquer',
+  'hudChrome.social.nowBlocking': '{name} bloqué.',
+  'hudChrome.social.blockedTab': 'Bloqués',
+  'hudChrome.social.stopBlockingTitle': 'Débloquer {name}',
   'hudChrome.party.promoteLeader': 'Promouvoir chef',
   'hudChrome.statInfo.desc.spellPower':
     "Augmente les dégâts de vos sorts et la puissance de vos soins. Chaque point d'Intelligence confère un peu de Puissance des sorts, en plus de celle de l'équipement ou des améliorations.",
@@ -3238,6 +3253,72 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Ranimer le familier',
   'entities.abilities.revive_pet.description':
     'Ranime votre familier mort et le ramène à vos côtés.',
+  'entities.abilities.holy_shock.name': 'Horion sacré',
+  'entities.abilities.holy_shock.description':
+    'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
+  'entities.abilities.holy_shield.name': 'Bouclier sacré',
+  'entities.abilities.holy_shield.description':
+    'Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)',
+  'entities.abilities.bestial_wrath.name': 'Courroux bestial',
+  'entities.abilities.bestial_wrath.description':
+    'Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)',
+  'entities.abilities.trueshot_aura.name': 'Aura de précision',
+  'entities.abilities.trueshot_aura.description':
+    'Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)',
+  'entities.abilities.wyvern_sting.name': 'Piqûre de wyverne',
+  'entities.abilities.wyvern_sting.description':
+    'Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)',
+  'entities.abilities.arcane_power.name': 'Pouvoir des Arcanes',
+  'entities.abilities.arcane_power.description':
+    'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
+  'entities.abilities.combustion.name': 'Combustion',
+  'entities.abilities.combustion.description':
+    'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
+  'entities.abilities.icy_veins.name': 'Veines glaciales',
+  'entities.abilities.icy_veins.description':
+    'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
+  'entities.abilities.cold_blood.name': 'Sang froid',
+  'entities.abilities.cold_blood.description':
+    'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
+  'entities.abilities.blade_flurry.name': 'Déluge de lames',
+  'entities.abilities.blade_flurry.description':
+    'Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)',
+  'entities.abilities.hemorrhage.name': 'Hémorragie',
+  'entities.abilities.hemorrhage.description':
+    'Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)',
+  'entities.abilities.power_infusion.name': 'Infusion de puissance',
+  'entities.abilities.power_infusion.description':
+    'Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)',
+  'entities.abilities.holy_nova.name': 'Nova sacrée',
+  'entities.abilities.holy_nova.description':
+    'Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)',
+  'entities.abilities.shadowform.name': "Forme d'Ombre",
+  'entities.abilities.shadowform.description':
+    'Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)',
+  'entities.abilities.elemental_mastery.name': 'Maîtrise élémentaire',
+  'entities.abilities.elemental_mastery.description':
+    'Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)',
+  'entities.abilities.siphon_life.name': 'Siphon de vie',
+  'entities.abilities.siphon_life.description':
+    'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
+  'entities.abilities.conflagrate.name': 'Conflagration',
+  'entities.abilities.conflagrate.description':
+    'Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)',
+  'entities.abilities.moonkin_form.name': 'Forme de sélénien',
+  'entities.abilities.moonkin_form.description':
+    'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
+  'entities.abilities.feral_charge.name': 'Charge farouche',
+  'entities.abilities.feral_charge.description':
+    'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
+  'entities.abilities.swiftmend.name': 'Prompte guérison',
+  'entities.abilities.swiftmend.description':
+    'Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)',
+  'entities.abilities.crusader_strike.name': 'Frappe du croisé',
+  'entities.abilities.crusader_strike.description':
+    'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
+  'entities.abilities.metamorphosis.name': 'Métamorphose',
+  'entities.abilities.metamorphosis.description':
+    'Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)',
   'entities.items.worn_sword.name': 'Épée courte corrodée',
   'entities.items.gnarled_staff.name': 'Bâton de Bogoak',
   'entities.items.rusty_dagger.name': 'Dague rouillée',
@@ -4587,6 +4668,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.menuAction': 'Menu du jeu',
   'hudChrome.controller.help':
     "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Hiérophante immortel',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Lame immortelle',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Garde immortel',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Garde royal relevé',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Fléau de Thornpeak',
   'entities.dungeons.nythraxis_boss_arena.name': 'Arène de raid de Nythraxis',

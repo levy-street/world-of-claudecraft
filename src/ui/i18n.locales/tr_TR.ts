@@ -336,7 +336,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': "Koroana'nın Miğferi",
   'entities.items.cryptplate_helm.name': 'Mezarzırh Miğferi',
   'entities.items.deathless_greatblade.name': 'Ölümsüz Pala',
-  'entities.items.deathless_warguard_legmail.name': 'Ölümsüz Savaşmuhafızı Bacak Zırhı',
   'entities.items.gravescale_girdle.name': 'Mezarpulu Kemeri',
   'entities.items.gravewyrm_claws.name': 'Mezarejderi Pençeleri',
   'entities.items.gravewyrm_cleaver.name': 'Mezarejderi Satırı',
@@ -352,13 +351,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Mabet Avcısının Eldivenleri',
   'entities.items.sash_of_the_sunken_court.name': 'Boğulmuş Saray Kuşağı',
   'entities.items.scepter_of_the_deathless_court.name': 'Ölümsüz Saray Asası',
-  'entities.items.scourgehide_carapace.name': 'Afetpostu Kabuğu',
   'entities.items.seal_of_the_nine_oaths.name': 'Dokuz Yeminin Mührü',
   'entities.items.shadowpulse_handwraps.name': 'Gölgenabzı El Sargıları',
   'entities.items.shadowpulse_slippers.name': 'Gölgenabzı Terlikleri',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mezarejderi Kefeni',
-  'entities.items.soulforged_warplate.name': 'Ruhdövümü Savaş Zırhı',
-  'entities.items.soulrend_diadem.name': 'Ruhyırtan Tacı',
   'entities.items.stormcallers_focus.name': 'Fırtınaçağıranın Odağı',
   'entities.items.sunken_court_mantle.name': 'Boğulmuş Saray Pelerini',
   'entities.items.sutils_gambit.name': "Sutil'in Kumarı",
@@ -1189,6 +1185,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Geliştirici Rozetlerini Göster',
   'hudChrome.options.groundReticle': 'Yer hedefleme halkası',
   'hudChrome.options.startAttackOnAbility': 'Yetenek Kullanımında Otomatik Saldırı',
+  'hudChrome.playerMenu.info': 'Oyuncu bilgisi',
+  'hudChrome.playerMenu.block': 'Engelle',
+  'hudChrome.playerMenu.unblock': 'Engeli kaldır',
+  'hudChrome.playerMenu.openFor': '{name} için oyuncu menüsünü aç',
+  'hudChrome.playerMenu.profileUnavailable': '{name} için profil bulunamadı.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Yapay zeka ile yönetilen hesap',
+  'hudChrome.playerMenu.watchTwitch': "Twitch'te izle",
+  'hudChrome.playerMenu.watchX': "X'te görüntüle",
+  'hudChrome.playerMenu.watchKick': "Kick'te izle",
+  'hudChrome.playerMenu.watchYouTube': "YouTube'da izle",
+  'hudChrome.social.ignoredTab': 'Yok sayılanlar',
+  'hudChrome.social.ignoredEmpty': 'Kimseyi yok saymıyorsun.',
+  'hudChrome.social.blockedEmpty': 'Kimseyi engellemedin.',
+  'hudChrome.social.blockSearchPlaceholder': 'Oyuncu adı',
+  'hudChrome.social.blockAction': 'Engelle',
+  'hudChrome.social.nowBlocking': '{name} engellendi.',
+  'hudChrome.social.blockedTab': 'Engellenenler',
+  'hudChrome.social.stopBlockingTitle': '{name} engelini kaldır',
   'hudChrome.party.promoteLeader': 'Lider Yap',
   'hudChrome.plurals.playersMatching.few':
     'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',
@@ -1991,6 +2006,72 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     '{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır.',
   'entities.abilities.wrath.name': 'Yaban Oku',
+  'entities.abilities.holy_shock.name': 'Kutsal Şok',
+  'entities.abilities.holy_shock.description':
+    'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
+  'entities.abilities.holy_shield.name': 'Kutsal Kalkan',
+  'entities.abilities.holy_shield.description':
+    'Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)',
+  'entities.abilities.bestial_wrath.name': 'Vahşi Gazap',
+  'entities.abilities.bestial_wrath.description':
+    'Seni vahşi bir öfkeye sokar, saldırı gücünü 15 sn boyunca 55 artırır. (Canavar Ustalığı imzası)',
+  'entities.abilities.trueshot_aura.name': 'Keskin Nişan Aurası',
+  'entities.abilities.trueshot_aura.description':
+    'Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)',
+  'entities.abilities.wyvern_sting.name': 'Viverna Sokması',
+  'entities.abilities.wyvern_sting.description':
+    'Düşmanı uzaktan sokar ve en fazla 4 sn boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. (Hayatta Kalma imzası)',
+  'entities.abilities.arcane_power.name': 'Gizemli Güç',
+  'entities.abilities.arcane_power.description':
+    'Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)',
+  'entities.abilities.combustion.name': 'Yakma',
+  'entities.abilities.combustion.description':
+    'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
+  'entities.abilities.icy_veins.name': 'Buzlu Damarlar',
+  'entities.abilities.icy_veins.description':
+    'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)',
+  'entities.abilities.cold_blood.name': 'Soğukkanlılık',
+  'entities.abilities.cold_blood.description':
+    'Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)',
+  'entities.abilities.blade_flurry.name': 'Bıçak Yağmuru',
+  'entities.abilities.blade_flurry.description':
+    'Bir bıçak yağmuru salar, saldırı hızını 12 sn boyunca 20% artırır. (Çarpışma imzası)',
+  'entities.abilities.hemorrhage.name': 'Kanama',
+  'entities.abilities.hemorrhage.description':
+    'Düşmana silah hasarı artı {damage} vurur ve 12 sn boyunca kanama hasarı verir. 1 kombo puanı kazandırır. (İncelik imzası)',
+  'entities.abilities.power_infusion.name': 'Güç Aşılaması',
+  'entities.abilities.power_infusion.description':
+    'Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)',
+  'entities.abilities.holy_nova.name': 'Kutsal Nova',
+  'entities.abilities.holy_nova.description':
+    'Kutsal ışık patlaması yaratır, yakındaki müttefikleri {damage} kadar iyileştirir ve yakındaki düşmanlara hasar verir. (Kutsal imza)',
+  'entities.abilities.shadowform.name': 'Gölge Formu',
+  'entities.abilities.shadowform.description':
+    'Gölge formuna girer, geri dönene kadar gölge büyüsünü güçlendirirsin. Normal forma dönmek için tekrar kullan. (Gölge imzası)',
+  'entities.abilities.elemental_mastery.name': 'Element Ustalığı',
+  'entities.abilities.elemental_mastery.description':
+    'Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)',
+  'entities.abilities.siphon_life.name': 'Can Sömürüsü',
+  'entities.abilities.siphon_life.description':
+    'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
+  'entities.abilities.conflagrate.name': 'Tutuşturma',
+  'entities.abilities.conflagrate.description':
+    'Düşmandaki Yakma etkini tüketerek onu {damage} Ateş hasarıyla tutuşturur. (Yıkım imzası)',
+  'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
+  'entities.abilities.moonkin_form.description':
+    'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)',
+  'entities.abilities.feral_charge.name': 'Yabani Hücum',
+  'entities.abilities.feral_charge.description':
+    'Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)',
+  'entities.abilities.swiftmend.name': 'Hızlı İyileştirme',
+  'entities.abilities.swiftmend.description':
+    'Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)',
+  'entities.abilities.crusader_strike.name': 'Haçlı Darbesi',
+  'entities.abilities.crusader_strike.description':
+    'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
+  'entities.abilities.metamorphosis.name': 'Metamorfoz',
+  'entities.abilities.metamorphosis.description':
+    'İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)',
   'entities.delves.collapsed_reliquary.enterText': 'Çökmüş emanetliğe inersin.',
   'entities.delves.collapsed_reliquary.leaveText':
     "Emanetlik harabesinde Birader Halven'in yanına tırmanıp geri dönersin.",
@@ -2447,6 +2528,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Mezarçağıran Morthen',
   'entities.mobs.mudfin_murloc.name': 'Çamuryüzgeç Sinsisi',
   'entities.mobs.nhalia_mourner.name': 'Nhalia Yas Tutanı',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Ölümsüz Başrahip',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Ölümsüz Bıçak',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Ölümsüz Savaşmuhafızı',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Dikenzirve Belası',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Dirilen Kraliyet Muhafızı',
   'entities.mobs.ogre_crusher.name': 'Dikenzirve Ezicisi',

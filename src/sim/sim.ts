@@ -40,7 +40,7 @@ import {
   spendResource as spendResourceImpl,
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
-import { isRooted, isStunned } from './combat/cc';
+import { isLockedOut, isRooted, isSilenced, isStunned } from './combat/cc';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -56,6 +56,7 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -64,6 +65,7 @@ import { isSpellResisted } from './combat/spell_resist';
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
+import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -199,6 +201,7 @@ import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
 } from './mob/combat_profile';
+import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -278,6 +281,7 @@ import {
 } from './progression/talents';
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
+import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
@@ -405,6 +409,7 @@ import {
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
   GCD,
+  type HonorArenaDailyState,
   type InvSlot,
   type ItemInstancePayload,
   isConsuming,
@@ -671,6 +676,13 @@ export interface ArenaMatch {
   ratingA: number; // team avg at start
   ratingB: number;
   defeated: Set<number>;
+  // Result accounting is exactly once even if a disconnect arrives during the
+  // post-match return delay. Practice matches never award honor.
+  resultRecorded?: boolean;
+  practice?: boolean;
+  // Stable team identities snapshotted at match start for persisted honor DR.
+  honorTeamAKey?: string;
+  honorTeamBKey?: string;
   fiesta?: FiestaState; // present only for format === 'fiesta'
   yumi?: YumiMatchState; // present only for format 'yumi3' | 'yumi5'
 }
@@ -692,6 +704,8 @@ export interface FiestaState {
   respawn: Map<number, number>; // pid -> seconds until revive (absent = alive)
   deaths: Map<number, number>; // pid -> times downed (drives respawn growth)
   kills: Map<number, number>; // pid -> takedowns this bout (scoreboard)
+  // Per killer-victim takedown count for in-match honor diminishing returns.
+  honorKillsByPair: Map<string, number>;
   streak: Map<number, number>; // pid -> takedowns since last death (word pops)
   lastKill: Map<number, number>; // pid -> active-timer of last takedown (double-kill window)
   // Augment offers wait here until the player's NEXT death so a pick never
@@ -815,6 +829,8 @@ export interface PlayerMeta {
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
   isDevBot?: boolean;
+  // Offline Fiesta practice opponent. Session-only and never serialized.
+  isFiestaBot?: boolean;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
@@ -855,6 +871,11 @@ export interface PlayerMeta {
   // the leaderboard sort key + virtual-level source. `prestigeRank` and
   // `unlockedMilestones` are cosmetic-only. All persisted in CharacterState.
   lifetimeXp: number;
+  // Soulbound PvP currency. honor is spendable; lifetimeHonor is monotonic.
+  honor: number;
+  lifetimeHonor: number;
+  // Persisted per-day, per-opponent ranked-win accounting for honor DR.
+  honorArenaDaily?: HonorArenaDailyState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1047,6 +1068,10 @@ export interface CharacterState {
   // Post-cap progression. All optional so characters saved before the Max-Level
   // XP Overflow system load cleanly (addPlayer backfills lifetimeXp from level).
   lifetimeXp?: number;
+  // Soulbound PvP progression. Optional so pre-honor saves load at zero.
+  honor?: number;
+  lifetimeHonor?: number;
+  honorArenaDaily?: HonorArenaDailyState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -1582,6 +1607,17 @@ export class Sim {
       }
     }
 
+    // FURY uses a reserved id and spawns after the rng-driven world roster, so
+    // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
+    {
+      const furyDef = worldContent.npcs[FURY_NPC_ID];
+      if (furyDef && !this.entities.has(FURY_ENTITY_ID)) {
+        const safe = this.findSafePos(furyDef.pos.x, furyDef.pos.z, waterLevel() + 0.6);
+        const fury = createNpc(FURY_ENTITY_ID, furyDef, this.groundPos(safe.x, safe.z));
+        this.addEntity(fury);
+      }
+    }
+
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
         const origin = delveOrigin(delve.index, i);
@@ -1809,6 +1845,8 @@ export class Sim {
       equipmentInstance: {},
       xp: 0,
       lifetimeXp: 0,
+      honor: 0,
+      lifetimeHonor: 0,
       prestigeRank: 0,
       unlockedMilestones: new Set(),
       restedXp: 0,
@@ -1893,6 +1931,12 @@ export class Sim {
       // plus their current bar progress, so the leaderboard is meaningful for
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
+      meta.honor = honorMod.normalizeHonorCounter(s.honor);
+      meta.lifetimeHonor = Math.max(
+        meta.honor,
+        honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
+      );
+      meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -2021,7 +2065,7 @@ export class Sim {
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents);
+    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
@@ -2150,11 +2194,7 @@ export class Sim {
     if (duel) this.endDuel(duel, duel.a === pid ? duel.b : duel.a);
     // arena: leaving the queue is free; disconnecting mid-bout forfeits it
     this.arenaDequeue(pid);
-    const match = this.arenaMatches.get(pid);
-    if (match) {
-      const team = this.arenaTeamOf(match, pid);
-      this.endArenaMatch(match, team === 'A' ? 'B' : team === 'B' ? 'A' : null, 'forfeit');
-    }
+    this.arenaResolveDesertion(pid);
     // Vale Cup: leaving the queue is free; deserting a counted match benches
     // the fighter (the team plays short), takes the loss, and arms the
     // Groundskeeper's lockout. Idempotent: the server already resolved it
@@ -2221,6 +2261,21 @@ export class Sim {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
+      ...(meta.honor || meta.lifetimeHonor
+        ? { honor: meta.honor, lifetimeHonor: meta.lifetimeHonor }
+        : {}),
+      ...(meta.honorArenaDaily
+        ? {
+            honorArenaDaily: {
+              date: meta.honorArenaDaily.date,
+              winsByOpponent: { ...meta.honorArenaDaily.winsByOpponent },
+              fiestaCompletionsByOpponent: {
+                ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
+              },
+              totalWins: meta.honorArenaDaily.totalWins,
+            },
+          }
+        : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
@@ -3442,6 +3497,12 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
+    // Re-bake the flat talent mods at the new level before the stat + ability pass:
+    // spec mastery magnitudes scale with level (min(1, level/20)), so a dev/GM level
+    // jump must strengthen (or weaken) the mastery, exactly like the live ding path
+    // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
+    // mastery baked at the OLD level.
+    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
     recalcPlayerStats(
       r.e,
       r.meta.cls,
@@ -3842,6 +3903,17 @@ export class Sim {
     return Math.max(0, attackPower);
   }
 
+  private petDamageMult(e: Entity): number {
+    if (e.ownerId === null) return 1;
+    let mult = 1;
+    for (const a of e.auras) {
+      if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+    }
+    const ownerMeta = this.players.get(e.ownerId);
+    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    return mult;
+  }
+
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
   // these thin delegates for the applyAura/aura-expiry callers (this.applyNonPlayerStatAura)
   // and respawnMob's ctx.clearNonPlayerStatAuras.
@@ -4085,7 +4157,9 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
+      const isSpell = effect.school !== 'physical';
+      const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
+      const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
       this.dealDamage(
         source,
         target,
@@ -4185,7 +4259,7 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    return 0.05 + p.stats.int * 0.0008;
+    return 0.05 + p.stats.int * 0.0008 + spellCritBonusFromAuras(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the
@@ -4236,6 +4310,7 @@ export class Sim {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
     if (
       this.isNythraxisRaidEnemy(target) &&
+      !nythraxis.isNythraxisControllableAdd(target) && // priest + stalker are meant to be CC'd
       this.isNythraxisControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !this.isNythraxisScriptedControl(target, aura)
@@ -4434,6 +4509,14 @@ export class Sim {
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
+    // A mob flagged ignoreTaunt (special add AI) or a training dummy takes the
+    // threat (it shows on the meters) but never turns, forces, or fights: without
+    // this guard a taunt (or an area taunt like Defiant Bellow in range) force-
+    // aggroed it permanently and pinned the attacker in combat forever.
+    if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
+      this.enterCombat(p, mob);
+      return;
+    }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
       return;
@@ -4613,6 +4696,7 @@ export class Sim {
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
     attackAnimationStarted = false,
+    alreadyFinal = false,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4627,6 +4711,7 @@ export class Sim {
       threatOpts,
       direct,
       attackAnimationStarted,
+      alreadyFinal,
     );
   }
 
@@ -4916,6 +5001,7 @@ export class Sim {
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
+    dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     const dealt = Math.max(1, Math.round(dmg));
@@ -4979,7 +5065,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         const dmg = Math.round(
-          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1),
+          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
+            this.petDamageMult(pet),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }
@@ -5111,6 +5198,7 @@ export class Sim {
         !tmpl.desperateHeal &&
         !tmpl.mendAlly &&
         !tmpl.wardAllies &&
+        !tmpl.channelHeal &&
         !tmpl.rally &&
         !tmpl.warcry)
     )
@@ -5247,6 +5335,82 @@ export class Sim {
               school,
             });
           }
+        }
+      }
+    }
+    // Channeled ESCALATING heal ("Hierophant's Mending"): heal the strongest
+    // friendly mob in range (its protectee, the raid boss) for a base amount plus
+    // a ramp that grows each uninterrupted tick. Any stun/incapacitate/silence
+    // (isStunned covers stun/incap/polymorph) breaks the channel and RESETS the
+    // ramp, so a raid that fails to lock the caster down watches the boss heal for
+    // more and more. The caster is CC-able by design (ccImmune: false).
+    if (tmpl.channelHeal) {
+      const ch = tmpl.channelHeal;
+      // Stun, a true silence, OR a school lockout (a real interrupt: Kick / Pummel /
+      // Counterspell lands a lockout of the channel's school) all break the channel
+      // and reset the ramp. This is what makes the interruptible cast bar honest.
+      const interrupted =
+        this.ctx.isStunned(mob) || isSilenced(mob) || isLockedOut(mob, ch.school ?? 'shadow');
+      if (interrupted) {
+        // Clear the (scripted) channel bar so a stunned/interrupted healer is not
+        // left rendering a frozen cast; updateHealerHold re-arms it once free.
+        if (mob.castingAbility === NYTHRAXIS_SPIRIT_MENDING_CAST_ID) {
+          mob.castingAbility = null;
+          mob.castTotal = 0;
+          mob.castRemaining = 0;
+          mob.channeling = false;
+        }
+        if (mob.channelRamp > 0) {
+          mob.channelRamp = 0;
+          if (!tmpl.quietMechanics)
+            this.emit({
+              type: 'log',
+              text: `${ch.name} is interrupted!`,
+              color: '#ffcc66',
+              entityId: mob.id,
+            });
+        }
+        mob.channelTimer = ch.every;
+      } else {
+        mob.channelTimer -= DT;
+        if (mob.channelTimer <= 0) {
+          mob.channelTimer = ch.every;
+          let protectee: Entity | null = null;
+          for (const ally of this.entities.values()) {
+            if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
+            if (ally.hostile !== mob.hostile || ally.id === mob.id) continue; // same-faction, not self
+            if (dist2d(ally.pos, mob.pos) > ch.radius) continue;
+            if (!protectee || ally.maxHp > protectee.maxHp) protectee = ally; // the boss = biggest pool
+          }
+          if (protectee && protectee.hp < protectee.maxHp) {
+            const amount = Math.round(
+              Math.min(ch.maxHeal, ch.baseHeal + mob.channelRamp) * (mob.mechanicHealMult ?? 1),
+            );
+            const school = ch.school ?? 'shadow';
+            this.emit({
+              type: 'spellfx',
+              sourceId: mob.id,
+              targetId: protectee.id,
+              school,
+              fx: 'beam',
+            });
+            // Reuse the existing "{name} channels {mechanic}." log shape (localized
+            // by the broad channels rule in sim_i18n.ts); the heal amount surfaces
+            // through the heal event + beam above, so no bespoke number string ships.
+            // quietMechanics healers (the Nythraxis spirit adds) stay silent: the
+            // beam + heal event are enough, no per-tick chat line.
+            if (!tmpl.quietMechanics)
+              this.emit({
+                type: 'log',
+                text: `${mob.name} channels ${ch.name}.`,
+                color: '#66ff99',
+                entityId: mob.id,
+              });
+            this.applyHeal(mob, protectee, amount, ch.name);
+          }
+          // The ramp grows each uninterrupted tick (capped so base+ramp never
+          // exceeds maxHeal), so an ignored channel heals more and more over time.
+          mob.channelRamp = Math.min(ch.maxHeal - ch.baseHeal, mob.channelRamp + ch.rampAdd);
         }
       }
     }
@@ -6353,6 +6517,8 @@ export class Sim {
   friendRemove(_name: string): void {}
   blockAdd(_name: string): void {}
   blockRemove(_name: string): void {}
+  ignoreAdd(_name: string): void {}
+  ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
   guildAccept(): void {}
@@ -6367,6 +6533,15 @@ export class Sim {
   guildEventRemove(_eventId: number): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
+  }
+  characterProfile(_name: string): Promise<import('../world_api').CharacterProfile | null> {
+    return Promise.resolve(null);
+  }
+  // Account flair is operator-set on an ACCOUNT, and offline play has none, so the
+  // offline world never has any to report. The sim must never read this for
+  // gameplay either way: it is cosmetic, server-set, and confers no effect.
+  accountFlair(_name: string): import('./account_flair').PlayerFlair | null {
+    return null;
   }
 
   private updateDuels(): void {
@@ -6489,6 +6664,15 @@ export class Sim {
     reason: 'defeat' | 'timeout' | 'forfeit',
   ): void {
     arenaMod.endArenaMatch(this.ctx, match, winnerTeam, reason);
+  }
+
+  // Resolve a ranked/Fiesta disconnect before the server's leave save. The
+  // ArenaMatch result guard makes the removePlayer cleanup call harmless.
+  arenaResolveDesertion(pid: number): void {
+    const match = this.arenaMatches.get(pid);
+    if (!match) return;
+    const team = this.arenaTeamOf(match, pid);
+    this.endArenaMatch(match, team === 'A' ? 'B' : team === 'B' ? 'A' : null, 'forfeit');
   }
 
   private returnFromArena(match: ArenaMatch): void {
@@ -7150,6 +7334,14 @@ export class Sim {
 
   get arenaInfo(): import('../world_api').ArenaInfo | null {
     return this.primaryId === -1 ? null : this.arenaInfoFor(this.primaryId);
+  }
+
+  get honor(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.honor ?? 0);
+  }
+
+  get lifetimeHonor(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {

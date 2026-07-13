@@ -943,13 +943,29 @@ export const ko_KR: EnTranslations = {
       "highContrast": "고대비",
       "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
     },
+    "warfare": {
+      "honorAmount": "명예 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "명예: {amount}",
+      "honorFloat": "명예 +{amount}",
+      "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "notEnoughHonor": "명예가 부족합니다.",
+      "reasons": {
+        "arenaWin": "투기장 승리",
+        "fiestaKill": "피에스타 처치",
+        "fiestaComplete": "피에스타 완료",
+        "fiestaWin": "피에스타 승리"
+      }
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
-        "hasteRating": "가속 등급"
+        "hasteRating": "가속 등급",
+        "warfare": "워페어"
       },
+      "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
         "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
@@ -963,7 +979,8 @@ export const ko_KR: EnTranslations = {
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
-        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속."
+        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -1215,6 +1232,19 @@ export const ko_KR: EnTranslations = {
     "party": {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
+    },
+    "playerMenu": {
+      "info": "플레이어 정보",
+      "block": "차단",
+      "unblock": "차단 해제",
+      "openFor": "{name} 님의 플레이어 메뉴 열기",
+      "profileUnavailable": "{name} 님의 프로필을 찾을 수 없습니다.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 운영 계정",
+      "watchTwitch": "Twitch에서 시청",
+      "watchX": "X에서 보기",
+      "watchKick": "Kick에서 시청",
+      "watchYouTube": "YouTube에서 시청"
     },
     "lootSettings": {
       "title": "전리품 설정",
@@ -1735,7 +1765,15 @@ export const ko_KR: EnTranslations = {
     },
     "social": {
       "lastSeen": "마지막 접속: {when}",
-      "lastSeenNever": "없음"
+      "lastSeenNever": "없음",
+      "ignoredTab": "무시됨",
+      "blockedTab": "차단",
+      "ignoredEmpty": "아무도 무시하고 있지 않습니다.",
+      "blockedEmpty": "아무도 차단하지 않았습니다.",
+      "blockSearchPlaceholder": "플레이어 이름",
+      "blockAction": "차단",
+      "nowBlocking": "{name} 님을 차단했습니다.",
+      "stopBlockingTitle": "{name} 님 차단 해제"
     },
     "gathering": {
       "title": "채집",
@@ -5839,6 +5877,10 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 의식",
         "description": "막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분."
       },
+      "holy_taunt": {
+        "name": "신성한 부추김",
+        "description": "대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다."
+      },
       "flash_of_light": {
         "name": "빛의 치유",
         "description": "빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
@@ -6163,6 +6205,98 @@ export const ko_KR: EnTranslations = {
         "name": "들끓는 격노",
         "description": "들끓는 격노에 들어가 분노 20을 생성합니다. (전사 특성)"
       },
+      "crusader_strike": {
+        "name": "성전사의 일격",
+        "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
+      },
+      "chain_heal": {
+        "name": "연쇄 치유",
+        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
+      },
+      "metamorphosis": {
+        "name": "악마 변신",
+        "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"
+      },
+      "holy_shock": {
+        "name": "신성 충격",
+        "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"
+      },
+      "holy_shield": {
+        "name": "신성한 방패",
+        "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+      },
+      "bestial_wrath": {
+        "name": "야수의 격노",
+        "description": "야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)"
+      },
+      "trueshot_aura": {
+        "name": "정조준 오라",
+        "description": "주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)"
+      },
+      "wyvern_sting": {
+        "name": "비룡 쐐기",
+        "description": "원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)"
+      },
+      "arcane_power": {
+        "name": "신비의 마법 강화",
+        "description": "10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)"
+      },
+      "combustion": {
+        "name": "발화",
+        "description": "15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)"
+      },
+      "icy_veins": {
+        "name": "얼음 핏줄",
+        "description": "10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)"
+      },
+      "cold_blood": {
+        "name": "냉혈",
+        "description": "살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)"
+      },
+      "blade_flurry": {
+        "name": "폭풍의 칼날",
+        "description": "칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)"
+      },
+      "hemorrhage": {
+        "name": "과다출혈",
+        "description": "적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)"
+      },
+      "power_infusion": {
+        "name": "마력 주입",
+        "description": "아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)"
+      },
+      "holy_nova": {
+        "name": "신성한 폭발",
+        "description": "신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)"
+      },
+      "shadowform": {
+        "name": "어둠의 형상",
+        "description": "어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)"
+      },
+      "elemental_mastery": {
+        "name": "정기의 깨달음",
+        "description": "정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)"
+      },
+      "siphon_life": {
+        "name": "생명력 착취",
+        "description": "적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)"
+      },
+      "conflagrate": {
+        "name": "점화",
+        "description": "적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)"
+      },
+      "moonkin_form": {
+        "name": "달빛야수 변신",
+        "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
+      },
+      "feral_charge": {
+        "name": "야성의 돌진",
+        "description": "적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)"
+      },
+      "swiftmend": {
+        "name": "신속한 치유",
+        "description": "아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)"
+      },
       "summon_imp": {
         "name": "불씨족 소환",
         "description": "흑마법사의 명령을 따르는 불씨족을 소환합니다. 불씨족은 멀리서 적에게 잿불 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
@@ -6190,6 +6324,34 @@ export const ko_KR: EnTranslations = {
       "summon_doomguard": {
         "name": "망령태생 소환",
         "description": "망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+      },
+      "pummel": {
+        "name": "턱 강타",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "kick": {
+        "name": "발차기",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "counterspell": {
+        "name": "주문 분쇄",
+        "description": "대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "counter_shot": {
+        "name": "침묵의 사격",
+        "description": "빠른 사격으로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
+      },
+      "rebuke": {
+        "name": "질책",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "skull_bash": {
+        "name": "박치기",
+        "description": "돌진 박치기로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
+      },
+      "spell_lock": {
+        "name": "재갈 물리기",
+        "description": "시전 중인 대상을 침묵시키고 5초 동안 해당 계열의 주문을 봉쇄합니다."
       },
       "bear_charge": {
         "name": "큰곰 돌진",
@@ -6834,6 +6996,126 @@ export const ko_KR: EnTranslations = {
       "sunpetal_herb": {
         "name": "태양꽃잎 약초"
       },
+      "furyforged_warhelm": {
+        "name": "분노벼림 전투투구"
+      },
+      "furyforged_warspaulders": {
+        "name": "분노벼림 전투어깨갑옷"
+      },
+      "furyforged_warplate": {
+        "name": "분노벼림 전투흉갑"
+      },
+      "furyforged_girdle": {
+        "name": "분노벼림 요대"
+      },
+      "furyforged_legguards": {
+        "name": "분노벼림 다리보호대"
+      },
+      "furyforged_gauntlets": {
+        "name": "분노벼림 건틀릿"
+      },
+      "furyforged_sabatons": {
+        "name": "분노벼림 전투장화"
+      },
+      "stormbound_crown": {
+        "name": "폭풍결속 왕관"
+      },
+      "stormbound_spaulders": {
+        "name": "폭풍결속 어깨갑옷"
+      },
+      "stormbound_hauberk": {
+        "name": "폭풍결속 사슬갑옷"
+      },
+      "stormbound_waistguard": {
+        "name": "폭풍결속 허리보호대"
+      },
+      "stormbound_legmail": {
+        "name": "폭풍결속 다리사슬갑옷"
+      },
+      "stormbound_handguards": {
+        "name": "폭풍결속 손보호대"
+      },
+      "stormbound_greaves": {
+        "name": "폭풍결속 경갑"
+      },
+      "ashstalker_cowl": {
+        "name": "잿빛추적자 두건"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "잿빛추적자 어깨보호대"
+      },
+      "ashstalker_harness": {
+        "name": "잿빛추적자 멜빵갑옷"
+      },
+      "ashstalker_waistband": {
+        "name": "잿빛추적자 허리띠"
+      },
+      "ashstalker_legguards": {
+        "name": "잿빛추적자 다리보호대"
+      },
+      "ashstalker_grips": {
+        "name": "잿빛추적자 장갑"
+      },
+      "ashstalker_treads": {
+        "name": "잿빛추적자 발덮개"
+      },
+      "cinderweave_cowl": {
+        "name": "불씨매듭 두건"
+      },
+      "cinderweave_mantle": {
+        "name": "불씨매듭 어깨망토"
+      },
+      "cinderweave_raiment": {
+        "name": "불씨매듭 예복"
+      },
+      "cinderweave_cord": {
+        "name": "불씨매듭 장식끈"
+      },
+      "cinderweave_legwraps": {
+        "name": "불씨매듭 다리싸개"
+      },
+      "cinderweave_handwraps": {
+        "name": "불씨매듭 손싸개"
+      },
+      "cinderweave_slippers": {
+        "name": "불씨매듭 덧신"
+      },
+      "final_oath_medallion": {
+        "name": "최후의 맹세 메달"
+      },
+      "razorwind_torque": {
+        "name": "칼바람 목가리개"
+      },
+      "cinder_sigil_pendant": {
+        "name": "불씨 인장 목걸이"
+      },
+      "iron_vow_band": {
+        "name": "강철 맹세의 반지"
+      },
+      "unbroken_circle": {
+        "name": "깨지지 않는 고리"
+      },
+      "fleetblood_band": {
+        "name": "쾌혈의 반지"
+      },
+      "last_step_signet": {
+        "name": "마지막 걸음의 인장"
+      },
+      "ashen_focus_ring": {
+        "name": "잿빛 집중의 반지"
+      },
+      "spellbreakers_seal": {
+        "name": "주문파괴자의 인장"
+      },
+      "final_argument_greatblade": {
+        "name": "최후 논박의 대검"
+      },
+      "first_blood_razor": {
+        "name": "첫 피의 면도날"
+      },
+      "emberglass_warstaff": {
+        "name": "불씨유리 전투지팡이"
+      },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
       },
@@ -7341,15 +7623,6 @@ export const ko_KR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "불사 궁정의 홀"
       },
-      "deathless_warguard_legmail": {
-        "name": "불사 전쟁수호 다리갑옷"
-      },
-      "soulrend_diadem": {
-        "name": "영혼분열 왕관"
-      },
-      "scourgehide_carapace": {
-        "name": "재앙가죽 갑각"
-      },
       "cryptplate_helm": {
         "name": "묘지판금 투구"
       },
@@ -7388,9 +7661,6 @@ export const ko_KR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "불사 대검"
-      },
-      "soulforged_warplate": {
-        "name": "혼주조 전투갑옷"
       },
       "stormcallers_focus": {
         "name": "폭풍소환사의 매개체"
@@ -7706,6 +7976,15 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "죽지 않는 전쟁수호병 알드렌"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "죽지 않는 대사제 말릭"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "죽지 않는 칼날 보스"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -7973,6 +8252,11 @@ export const ko_KR: EnTranslations = {
         "name": "병참장교 벡스",
         "title": "영웅 병참장교",
         "greeting": "영웅 던전의 증표는 하이워치 최고의 반지와 펜던트로 바꿀 수 있소. 징표를 보여 주시오."
+      },
+      "fury": {
+        "name": "퓨리",
+        "title": "명예 병참장교",
+        "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",

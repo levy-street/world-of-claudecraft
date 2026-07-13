@@ -292,7 +292,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Hełm matki chóru',
   'entities.items.cryptplate_helm.name': 'Hełm z kryptowej płyty',
   'entities.items.deathless_greatblade.name': 'Nieśmiertelne wielkie ostrze',
-  'entities.items.deathless_warguard_legmail.name': 'Nieśmiertelne nogawice wojennej straży',
   'entities.items.gravescale_girdle.name': 'Pas z grobowej łuski',
   'entities.items.gravewyrm_claws.name': 'Szpony grobowego żmija',
   'entities.items.gravewyrm_cleaver.name': 'Tasak grobowego żmija',
@@ -308,13 +307,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Rękawice skradacza sanktuarium',
   'entities.items.sash_of_the_sunken_court.name': 'Szarfa zatopionego dworu',
   'entities.items.scepter_of_the_deathless_court.name': 'Berło nieśmiertelnego dworu',
-  'entities.items.scourgehide_carapace.name': 'Pancerz ze skóry plagi',
   'entities.items.seal_of_the_nine_oaths.name': 'Pieczęć dziewięciu przysiąg',
   'entities.items.shadowpulse_handwraps.name': 'Owijki cienistego pulsu',
   'entities.items.shadowpulse_slippers.name': 'Trzewiki cienistego pulsu',
   'entities.items.shroud_of_the_gravewyrm.name': 'Całun grobowego żmija',
-  'entities.items.soulforged_warplate.name': 'Bojowa zbroja kuta z duszy',
-  'entities.items.soulrend_diadem.name': 'Diadem rozdarcia dusz',
   'entities.items.stormcallers_focus.name': 'Ognisko przyzywacza burz',
   'entities.items.sunken_court_mantle.name': 'Peleryna zatopionego dworu',
   'entities.items.sutils_gambit.name': 'Gambit Sutila',
@@ -1129,6 +1125,25 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Pokaż odznaki deweloperów',
   'hudChrome.options.groundReticle': 'Celownik naziemny',
   'hudChrome.options.startAttackOnAbility': 'Automatyczny atak przy użyciu umiejętności',
+  'hudChrome.playerMenu.info': 'Informacje o graczu',
+  'hudChrome.playerMenu.block': 'Zablokuj',
+  'hudChrome.playerMenu.unblock': 'Odblokuj',
+  'hudChrome.playerMenu.openFor': 'Otwórz menu gracza {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Nie znaleziono profilu gracza {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Konto prowadzone przez SI',
+  'hudChrome.playerMenu.watchTwitch': 'Oglądaj na Twitchu',
+  'hudChrome.playerMenu.watchX': 'Zobacz na X',
+  'hudChrome.playerMenu.watchKick': 'Oglądaj na Kicku',
+  'hudChrome.playerMenu.watchYouTube': 'Oglądaj na YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorowani',
+  'hudChrome.social.ignoredEmpty': 'Nikogo nie ignorujesz.',
+  'hudChrome.social.blockedEmpty': 'Nikogo nie zablokowałeś.',
+  'hudChrome.social.blockSearchPlaceholder': 'Nazwa gracza',
+  'hudChrome.social.blockAction': 'Zablokuj',
+  'hudChrome.social.nowBlocking': '{name} zablokowany.',
+  'hudChrome.social.blockedTab': 'Zablokowani',
+  'hudChrome.social.stopBlockingTitle': 'Odblokuj gracza {name}',
   'hudChrome.party.promoteLeader': 'Mianuj przywódcą',
   'hudChrome.plurals.playersMatching.few':
     'Kto: {count} graczy pasujących do "{query}" na {realm}.',
@@ -1932,6 +1947,72 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     'Ciska pocisk energii natury, zadając {damage} obrażeń od Natury.',
   'entities.abilities.wrath.name': 'Dziki pocisk',
+  'entities.abilities.holy_shock.name': 'Święty wstrząs',
+  'entities.abilities.holy_shock.description':
+    'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
+  'entities.abilities.holy_shield.name': 'Święta tarcza',
+  'entities.abilities.holy_shield.description':
+    'Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)',
+  'entities.abilities.bestial_wrath.name': 'Bestialski gniew',
+  'entities.abilities.bestial_wrath.description':
+    'Wpadasz w bestialski szał, zwiększając siłę ataku o 55 na 15 sek. (specjalizacja Władca Bestii)',
+  'entities.abilities.trueshot_aura.name': 'Aura celnego strzału',
+  'entities.abilities.trueshot_aura.description':
+    'Inspiruje pobliskich sojuszników, zwiększając siłę ataku o 35 na 5 min. (specjalizacja Strzelectwo)',
+  'entities.abilities.wyvern_sting.name': 'Żądło wiwerny',
+  'entities.abilities.wyvern_sting.description':
+    'Żądli wroga z dystansu, obezwładniając go na maksymalnie 4 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Przetrwanie)',
+  'entities.abilities.arcane_power.name': 'Moc Arkanów',
+  'entities.abilities.arcane_power.description':
+    'Zwiększa obrażenia zaklęć o 20% i przyspieszenie zaklęć o 10% na 10 sek. (specjalizacja Arkana)',
+  'entities.abilities.combustion.name': 'Zapłon',
+  'entities.abilities.combustion.description':
+    'Zwiększa szansę na krytyczny efekt zaklęć o 50% na 15 sek. (specjalizacja Ogień)',
+  'entities.abilities.icy_veins.name': 'Lodowe Żyły',
+  'entities.abilities.icy_veins.description':
+    'Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)',
+  'entities.abilities.cold_blood.name': 'Zimna krew',
+  'entities.abilities.cold_blood.description':
+    'Skupia twoją morderczą intencję, aby następny atak był trafieniem krytycznym. (specjalizacja Zabójstwo)',
+  'entities.abilities.blade_flurry.name': 'Nawałnica ostrzy',
+  'entities.abilities.blade_flurry.description':
+    'Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sek. (specjalizacja Walka)',
+  'entities.abilities.hemorrhage.name': 'Krwotok',
+  'entities.abilities.hemorrhage.description':
+    'Uderza wroga za obrażenia broni plus {damage} i powoduje krwawienie przez 12 sek. Daje 1 punkt combo. (specjalizacja Subtelność)',
+  'entities.abilities.power_infusion.name': 'Infuzja mocy',
+  'entities.abilities.power_infusion.description':
+    'Napełnia przyjazny cel mocą, zwiększając moc zaklęć o 28 na 15 sek. (specjalizacja Dyscyplina)',
+  'entities.abilities.holy_nova.name': 'Święta nova',
+  'entities.abilities.holy_nova.description':
+    'Wywołuje wybuch Świętego światła, leczy pobliskich sojuszników za {damage} i rani pobliskich wrogów. (specjalizacja Świętość)',
+  'entities.abilities.shadowform.name': 'Postać cienia',
+  'entities.abilities.shadowform.description':
+    'Przyjmujesz postać cienia, wzmacniając magię cienia do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Cień)',
+  'entities.abilities.elemental_mastery.name': 'Mistrzostwo żywiołów',
+  'entities.abilities.elemental_mastery.description':
+    'Przywołuje mistrzostwo żywiołów, sprawiając, że następne zaklęcie jest natychmiastowe. (specjalizacja Żywioły)',
+  'entities.abilities.siphon_life.name': 'Wyssanie życia',
+  'entities.abilities.siphon_life.description':
+    'Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)',
+  'entities.abilities.conflagrate.name': 'Pożoga',
+  'entities.abilities.conflagrate.description':
+    'Zużywa twoje podpalenie na wrogu, aby zajął się ogniem i otrzymał {damage} obrażeń od Ognia. (specjalizacja Zniszczenie)',
+  'entities.abilities.moonkin_form.name': 'Postać księżycowej sowy',
+  'entities.abilities.moonkin_form.description':
+    'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
+  'entities.abilities.feral_charge.name': 'Dzika szarża',
+  'entities.abilities.feral_charge.description':
+    'Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)',
+  'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
+  'entities.abilities.swiftmend.description':
+    'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)',
+  'entities.abilities.crusader_strike.name': 'Cios krzyżowca',
+  'entities.abilities.crusader_strike.description':
+    'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
+  'entities.abilities.metamorphosis.name': 'Metamorfoza',
+  'entities.abilities.metamorphosis.description':
+    'Przyjmujesz demoniczną moc, zwiększając pancerz i siłę ataku na 20 s. (talent czarnoksiężnika)',
   'entities.delves.collapsed_reliquary.enterText': 'Schodzisz do zawalonego relikwiarza.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Wspinasz się z powrotem do Brata Halvena przy ruinie relikwiarza.',
@@ -2389,6 +2470,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen Grobowy Wołacz',
   'entities.mobs.mudfin_murloc.name': 'Błotnopłetwy Skradacz',
   'entities.mobs.nhalia_mourner.name': 'Żałobnica Nhalia',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Nieśmiertelny Hierofant',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Nieśmiertelny Nóż',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Nieśmiertelny Strażnik Wojenny',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Plaga Ciernistego Szczytu',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Powstały Strażnik Królewski',
   'entities.mobs.ogre_crusher.name': 'Miażdżyciel z Ciernistego Szczytu',

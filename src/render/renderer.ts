@@ -577,6 +577,7 @@ export interface EntityView {
   devTierValue: number; // last-applied devTier, to diff cheaply
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
   discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
+  aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -2936,6 +2937,7 @@ export class Renderer {
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
@@ -3516,6 +3518,13 @@ export class Renderer {
     // CDN); if it fails to load, hide it rather than leave the browser's broken-image
     // placeholder on the plate. Attached once here; the element is reused per entity.
     attachAvatarFallback(discordEl);
+    // operator-set AI-account tag, inline before the name. A SEPARATE span, never a
+    // restyled .np-name: the name's black text-shadow is what keeps it legible over
+    // bright terrain, and the tag's background-clip: text cannot coexist with it.
+    // Keeping them apart also lets an AI account who is also Discord staff keep its
+    // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
+    const aiEl = document.createElement('span');
+    aiEl.className = 'np-ai';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3550,6 +3559,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       nameEl,
       titleEl,
       guildEl,
@@ -3603,6 +3613,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -4292,6 +4303,9 @@ export class Renderer {
       let hasCatForm = false;
       let hasTravelForm = false;
       let hasStealth = false;
+      let hasShadowform = false;
+      let hasMoonkin = false;
+      let hasMetamorph = false;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4299,6 +4313,9 @@ export class Renderer {
         if (a.kind === 'form_cat') hasCatForm = true;
         if (a.kind === 'form_travel') hasTravelForm = true;
         if (a.kind === 'stealth') hasStealth = true;
+        if (a.kind === 'form_shadow') hasShadowform = true;
+        if (a.kind === 'form_moonkin') hasMoonkin = true;
+        if (a.kind === 'form_metamorph') hasMetamorph = true;
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -4550,6 +4567,12 @@ export class Renderer {
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
+      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
+      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
+      // Metamorphosis also grows the body via Entity.scale in the sim.
+      active.setShadowform(hasShadowform);
+      active.setMoonkin(hasMoonkin);
+      active.setMetamorph(hasMetamorph);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
@@ -4702,6 +4725,14 @@ export class Renderer {
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+      }
+      // Shapeshift-form particle auras riding the tints above: metamorph fire,
+      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+      // (the auras themselves drop, but a corpse must not smolder for a frame).
+      if (!e.dead) {
+        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);

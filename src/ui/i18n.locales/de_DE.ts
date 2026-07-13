@@ -310,7 +310,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Helm der Chormutter',
   'entities.items.cryptplate_helm.name': 'Gruftplatten-Helm',
   'entities.items.deathless_greatblade.name': 'Todlose Großklinge',
-  'entities.items.deathless_warguard_legmail.name': 'Todlose Beinkette der Kriegswache',
   'entities.items.gravescale_girdle.name': 'Grabschuppen-Gürtel',
   'entities.items.gravewyrm_claws.name': 'Grabwyrm-Klauen',
   'entities.items.gravewyrm_cleaver.name': 'Grabwyrm-Spalter',
@@ -326,13 +325,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Griffe des Sanktum-Pirschers',
   'entities.items.sash_of_the_sunken_court.name': 'Schärpe des Versunkenen Hofes',
   'entities.items.scepter_of_the_deathless_court.name': 'Zepter des Todlosen Hofes',
-  'entities.items.scourgehide_carapace.name': 'Geißelhaut-Panzer',
   'entities.items.seal_of_the_nine_oaths.name': 'Siegel der Neun Eide',
   'entities.items.shadowpulse_handwraps.name': 'Schattenpuls-Handwickel',
   'entities.items.shadowpulse_slippers.name': 'Schattenpuls-Schuhe',
   'entities.items.shroud_of_the_gravewyrm.name': 'Leichentuch des Grabwyrms',
-  'entities.items.soulforged_warplate.name': 'Seelengeschmiedete Kriegsplatte',
-  'entities.items.soulrend_diadem.name': 'Seelenriss-Diadem',
   'entities.items.stormcallers_focus.name': 'Fokus des Sturmrufers',
   'entities.items.sunken_court_mantle.name': 'Umhang des Versunkenen Hofes',
   'entities.items.sutils_gambit.name': 'Sutils Gambit',
@@ -1174,6 +1170,25 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Entwicklerabzeichen anzeigen',
   'hudChrome.options.groundReticle': 'Bodenziel-Fadenkreuz',
   'hudChrome.options.startAttackOnAbility': 'Auto-Angriff bei Fähigkeitseinsatz',
+  'hudChrome.playerMenu.info': 'Spielerinfo',
+  'hudChrome.playerMenu.block': 'Blockieren',
+  'hudChrome.playerMenu.unblock': 'Blockierung aufheben',
+  'hudChrome.playerMenu.openFor': 'Spielermenü für {name} öffnen',
+  'hudChrome.playerMenu.profileUnavailable': 'Kein Profil für {name} gefunden.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'KI-gesteuertes Konto',
+  'hudChrome.playerMenu.watchTwitch': 'Auf Twitch ansehen',
+  'hudChrome.playerMenu.watchX': 'Auf X ansehen',
+  'hudChrome.playerMenu.watchKick': 'Auf Kick ansehen',
+  'hudChrome.playerMenu.watchYouTube': 'Auf YouTube ansehen',
+  'hudChrome.social.ignoredTab': 'Ignoriert',
+  'hudChrome.social.ignoredEmpty': 'Du ignorierst niemanden.',
+  'hudChrome.social.blockedEmpty': 'Du hast niemanden blockiert.',
+  'hudChrome.social.blockSearchPlaceholder': 'Spielername',
+  'hudChrome.social.blockAction': 'Blockieren',
+  'hudChrome.social.nowBlocking': '{name} blockiert.',
+  'hudChrome.social.blockedTab': 'Blockiert',
+  'hudChrome.social.stopBlockingTitle': '{name} nicht mehr blockieren',
   'hudChrome.party.promoteLeader': 'Zum Anführer befördern',
   'hudChrome.statInfo.desc.spellPower':
     'Erhöht den Schaden deiner Zauber und die Stärke deiner Heilungen. Jeder Punkt Intelligenz gewährt etwas Zaubermacht, zusätzlich zu der aus Ausrüstung oder Stärkungszaubern.',
@@ -3215,6 +3230,72 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Begleiter wiederbeleben',
   'entities.abilities.revive_pet.description':
     'Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück.',
+  'entities.abilities.holy_shock.name': 'Heiliger Schock',
+  'entities.abilities.holy_shock.description':
+    'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
+  'entities.abilities.holy_shield.name': 'Heiliger Schild',
+  'entities.abilities.holy_shield.description':
+    'Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)',
+  'entities.abilities.bestial_wrath.name': 'Zorn des Wildtiers',
+  'entities.abilities.bestial_wrath.description':
+    'Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)',
+  'entities.abilities.trueshot_aura.name': 'Aura des Volltreffers',
+  'entities.abilities.trueshot_aura.description':
+    'Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)',
+  'entities.abilities.wyvern_sting.name': 'Stich des Flügeldrachen',
+  'entities.abilities.wyvern_sting.description':
+    'Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)',
+  'entities.abilities.arcane_power.name': 'Arkane Macht',
+  'entities.abilities.arcane_power.description':
+    'Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)',
+  'entities.abilities.combustion.name': 'Verbrennung',
+  'entities.abilities.combustion.description':
+    'Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)',
+  'entities.abilities.icy_veins.name': 'Eisige Adern',
+  'entities.abilities.icy_veins.description':
+    'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
+  'entities.abilities.cold_blood.name': 'Kaltblütigkeit',
+  'entities.abilities.cold_blood.description':
+    'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
+  'entities.abilities.blade_flurry.name': 'Klingenwirbel',
+  'entities.abilities.blade_flurry.description':
+    'Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)',
+  'entities.abilities.hemorrhage.name': 'Blutsturz',
+  'entities.abilities.hemorrhage.description':
+    'Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)',
+  'entities.abilities.power_infusion.name': 'Machtinfusion',
+  'entities.abilities.power_infusion.description':
+    'Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)',
+  'entities.abilities.holy_nova.name': 'Heilige Nova',
+  'entities.abilities.holy_nova.description':
+    'Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)',
+  'entities.abilities.shadowform.name': 'Schattenform',
+  'entities.abilities.shadowform.description':
+    'Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)',
+  'entities.abilities.elemental_mastery.name': 'Elementarbeherrschung',
+  'entities.abilities.elemental_mastery.description':
+    'Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)',
+  'entities.abilities.siphon_life.name': 'Lebensentzug',
+  'entities.abilities.siphon_life.description':
+    'Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)',
+  'entities.abilities.conflagrate.name': 'Feuersbrunst',
+  'entities.abilities.conflagrate.description':
+    'Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)',
+  'entities.abilities.moonkin_form.name': 'Mondkingestalt',
+  'entities.abilities.moonkin_form.description':
+    'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
+  'entities.abilities.feral_charge.name': 'Wilde Attacke',
+  'entities.abilities.feral_charge.description':
+    'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
+  'entities.abilities.swiftmend.name': 'Rasche Heilung',
+  'entities.abilities.swiftmend.description':
+    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)',
+  'entities.abilities.crusader_strike.name': 'Kreuzfahrerstoß',
+  'entities.abilities.crusader_strike.description':
+    'Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)',
+  'entities.abilities.metamorphosis.name': 'Metamorphose',
+  'entities.abilities.metamorphosis.description':
+    'Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)',
   'entities.items.worn_sword.name': 'Abgenutztes Kurzschwert',
   'entities.items.gnarled_staff.name': 'Mooreichenstab',
   'entities.items.rusty_dagger.name': 'Rostiger Dolch',
@@ -4566,6 +4647,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.menuAction': 'Spielmenü',
   'hudChrome.controller.help':
     'Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden.',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Todloser Hierophant',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Todlose Klinge',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Todlose Kriegswache',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Auferstandene Königswache',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Geißel von Thornpeak',
   'itemUi.quality.legendary': 'Legendär',
