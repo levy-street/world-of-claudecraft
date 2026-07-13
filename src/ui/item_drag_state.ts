@@ -16,6 +16,11 @@
 export interface BagItemDrag {
   itemId: string;
   count: number;
+  /** The stack's inventory index at pick-up, or null when the grid is not showing
+   *  the raw array order (a sorted/filtered view names no position, so the stack
+   *  cannot be reordered from there). It is what the manual-order move command
+   *  sends as `from`; the sim re-validates it. */
+  index: number | null;
 }
 
 export class ItemDragState {
@@ -23,7 +28,7 @@ export class ItemDragState {
 
   /** Pick up a bag stack (dragstart, or the touch hold arming). */
   begin(drag: BagItemDrag): void {
-    this.current = { itemId: drag.itemId, count: drag.count };
+    this.current = { itemId: drag.itemId, count: drag.count, index: drag.index };
   }
 
   /** The stack in flight, or null when nothing is being dragged. */

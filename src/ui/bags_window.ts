@@ -28,6 +28,7 @@ import {
   type BagCategory,
   type BagFilterState,
   type BagSort,
+  bagOrderIsManual,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
@@ -456,12 +457,22 @@ export class BagsWindow {
       grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
+    // Manual order: only the raw-array view (no sort, no filter) can name a cell's
+    // inventory index, so only there do the cells become reorder drop targets.
+    const manual = bagOrderIsManual(this.filter);
     for (const s of model.visible) {
       const item = ITEMS[s.itemId];
       if (!item) continue;
       const row = document.createElement('button');
       row.type = 'button';
       row.className = `bag-item q-${bagQualityKey(item)}`;
+      // The stack's live inventory index, resolved by REFERENCE (duplicate stacks and
+      // instanced copies share an itemId), which is exactly what the move command sends.
+      const index = manual ? bagStackIndex(world.inventory, s) : -1;
+      if (index >= 0) {
+        row.dataset.bagIndex = String(index);
+        this.bindBagCellDrop(row, index);
+      }
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -532,7 +543,11 @@ export class BagsWindow {
       // targets that must decide during dragover, where the DataTransfer is unreadable.
       row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
       row.addEventListener('dragstart', (e) => {
-        const drag: BagItemDrag = { itemId: s.itemId, count: Math.max(1, Math.floor(s.count)) };
+        const drag: BagItemDrag = {
+          itemId: s.itemId,
+          count: Math.max(1, Math.floor(s.count)),
+          index: index >= 0 ? index : null,
+        };
         this.deps.dragState.begin(drag);
         if (this.deps.isHotbarItemId(s.itemId)) {
           const action = { type: 'item' as const, id: s.itemId };
@@ -565,7 +580,11 @@ export class BagsWindow {
         payload: () =>
           this.deps.tradeOpen() || this.deps.vendorOpen()
             ? null
-            : { itemId: s.itemId, count: Math.max(1, Math.floor(s.count)) },
+            : {
+                itemId: s.itemId,
+                count: Math.max(1, Math.floor(s.count)),
+                index: index >= 0 ? index : null,
+              },
         ghostHtml: () => this.deps.itemIcon(item),
         onStart: () => {
           this.deps.hideTooltip();
@@ -583,6 +602,8 @@ export class BagsWindow {
           // and the equip refusals); the world drop belongs here, where the destroy
           // prompt lives. Releasing anywhere else is a plain cancel.
           if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
+          else if (target.kind === 'bagCell')
+            this.dropOnBagCell(index >= 0 ? index : null, target.index);
           else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
         },
         onEnd: () => {
@@ -598,8 +619,51 @@ export class BagsWindow {
       const cell = document.createElement('div');
       cell.className = 'bag-item empty';
       cell.setAttribute('aria-hidden', 'true');
+      if (manual) {
+        // Free space, not a position: the inventory array holds no holes, so a stack
+        // dropped on ANY free square goes to the end (the sim's own rule). Every free
+        // square therefore names the same index, the first one past the last stack.
+        const endIndex = world.inventory.length;
+        cell.dataset.bagIndex = String(endIndex);
+        this.bindBagCellDrop(cell, endIndex);
+      }
       grid.appendChild(cell);
     }
+  }
+
+  // A bag cell as a reorder drop target: it accepts a stack dragged out of the SAME
+  // bag (never a paperdoll piece, whose drag ends on the bags window as an unequip),
+  // and only while the grid shows the raw array order, where a cell names an index.
+  private bindBagCellDrop(cell: HTMLElement, index: number): void {
+    cell.addEventListener('dragover', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag || drag.index === null || drag.index === index) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      cell.classList.add('drop-target');
+    });
+    cell.addEventListener('dragleave', () => cell.classList.remove('drop-target'));
+    cell.addEventListener('drop', (e) => {
+      const drag = this.deps.dragState.get();
+      cell.classList.remove('drop-target');
+      if (!drag || drag.index === null) return;
+      e.preventDefault();
+      // Stop the drop bubbling to the #bags unequip drop target behind the grid.
+      e.stopPropagation();
+      const from = drag.index;
+      this.deps.dragState.end();
+      this.dropOnBagCell(from, index);
+    });
+  }
+
+  // Run the reorder. Both ends are re-validated by the sim (a stale index after a
+  // repaint, or a hand-crafted pair, is simply refused there), so this only dispatches.
+  private dropOnBagCell(from: number | null, to: number): void {
+    if (from === null || from === to) return;
+    this.deps.world().moveInventoryItem(from, to);
+    audio.click();
+    this.deps.hideTooltip();
+    this.render();
   }
 
   /** Open the destroy prompt for a stack dropped on the world. Public so the HUD's

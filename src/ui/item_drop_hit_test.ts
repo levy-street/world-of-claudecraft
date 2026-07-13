@@ -15,6 +15,7 @@ const WORLD_CANVAS_SELECTOR = '#game-canvas';
 
 export type DropTargetAt =
   | { kind: 'equip'; slot: EquipSlot }
+  | { kind: 'bagCell'; index: number }
   | { kind: 'world' }
   | { kind: 'none' };
 
@@ -35,6 +36,13 @@ export function resolveDropTargetAt(
   // a stale or hand-edited value must resolve to no target, never to a wrong slot.
   if (raw && (EQUIP_SLOTS as readonly string[]).includes(raw)) {
     return { kind: 'equip', slot: raw as EquipSlot };
+  }
+  // A bag cell (the manual-order drop): its data-bag-index IS an inventory index
+  // while the grid shows the raw array order, which is the only view that stamps it.
+  const cell = el.closest?.('[data-bag-index]') as HTMLElement | null;
+  const cellIndex = Number(cell?.dataset.bagIndex);
+  if (cell && Number.isInteger(cellIndex) && cellIndex >= 0) {
+    return { kind: 'bagCell', index: cellIndex };
   }
   if (el.closest?.(WORLD_CANVAS_SELECTOR)) return { kind: 'world' };
   return { kind: 'none' };

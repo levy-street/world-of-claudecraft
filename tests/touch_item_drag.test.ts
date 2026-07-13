@@ -44,7 +44,7 @@ function harness(opts: { touch?: boolean; payload?: boolean } = {}): Harness {
   bindTouchItemDrag(el, {
     state,
     isTouchHud: () => opts.touch !== false,
-    payload: () => (opts.payload === false ? null : { itemId: 'linen_cloth', count: 4 }),
+    payload: () => (opts.payload === false ? null : { itemId: 'linen_cloth', count: 4, index: 2 }),
     ghostHtml: () => '<img class="item-icon">',
     onStart: () => {
       h.started++;
@@ -73,7 +73,7 @@ describe('bindTouchItemDrag', () => {
     expect(h.state.get()).toBeNull(); // nothing in flight yet: this could still be a tap
     vi.advanceTimersByTime(TOUCH_DRAG_HOLD_MS);
     expect(h.started).toBe(1);
-    expect(h.state.get()).toEqual({ itemId: 'linen_cloth', count: 4 });
+    expect(h.state.get()).toEqual({ itemId: 'linen_cloth', count: 4, index: 2 });
     expect(document.body.classList.contains('touch-item-dragging')).toBe(true);
     expect(document.querySelector('.touch-drag-ghost')).not.toBeNull();
   });

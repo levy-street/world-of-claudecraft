@@ -243,6 +243,7 @@ export const COMMAND_NAMES = [
   'abandon',
   'qlinkaccept',
   'equip',
+  'inv_move',
   'unequip_item',
   'use',
   'discard',

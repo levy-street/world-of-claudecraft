@@ -5,6 +5,7 @@ import {
   BAG_CATEGORIES,
   type BagFilterState,
   bagFilterIsDefault,
+  bagOrderIsManual,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
@@ -191,5 +192,19 @@ describe('bagFilterIsDefault (shared by the bags grid and the bank window)', () 
     expect(bagFilterIsDefault(state({ category: 'weapon' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: 'x' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: '   ' }))).toBe(true);
+  });
+});
+
+describe('bagOrderIsManual (the reorder gate)', () => {
+  // Dragging a stack onto a cell only means "put it there" while the grid shows the
+  // raw inventory array. Under a sort or a filter the grid is a derived view, a cell
+  // names no index, and the reorder must be refused rather than guessing an index
+  // (which would move the WRONG stack).
+  it('is true only for the unsorted, unfiltered view', () => {
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: '' })).toBe(true);
+    expect(bagOrderIsManual({ category: 'all', sort: 'quality', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
   });
 });

@@ -121,6 +121,19 @@ describe('resolveDropTargetAt (touch release)', () => {
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
   });
 
+  it('resolves a bag cell by its data-bag-index (the manual-order drop)', () => {
+    const el = stubEl('<button class="bag-item" data-bag-index="5"></button>');
+    expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'bagCell', index: 5 });
+    // A free square stamps the end index, so a stack dropped there goes last.
+    const free = stubEl('<div class="bag-item empty" data-bag-index="3"></div>');
+    expect(resolveDropTargetAt(10, 10, () => free)).toEqual({ kind: 'bagCell', index: 3 });
+  });
+
+  it('leaves an unstamped bag cell inert (a sorted/filtered grid names no index)', () => {
+    const el = stubEl('<button class="bag-item"></button>');
+    expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });
+  });
+
   it('resolves the world canvas', () => {
     const el = stubEl('<canvas id="game-canvas"></canvas>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'world' });

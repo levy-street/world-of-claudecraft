@@ -35,6 +35,15 @@ export function bagFilterIsDefault(filter: BagFilterState): boolean {
   return filter.category === 'all' && filter.search.trim() === '';
 }
 
+// Whether the grid currently shows the inventory in its RAW array order, i.e. whether
+// a cell's position IS an inventory index. Only then can dragging a stack onto a cell
+// mean "put it there": under a quality/name sort or a category/search filter the grid
+// is a derived view, so a cell names no position and the reorder is refused rather than
+// guessing (the manual order still exists, it is just not what you are looking at).
+export function bagOrderIsManual(filter: BagFilterState): boolean {
+  return filter.sort === 'recent' && bagFilterIsDefault(filter);
+}
+
 // Look up an item definition by id. Injected so the pure core never imports the
 // live ITEMS table (and tests can supply a synthetic one).
 export type ItemLookup = (itemId: string) => ItemDef | undefined;

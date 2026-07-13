@@ -16,11 +16,12 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
+import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { moveInventorySlot } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -83,6 +84,19 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     color: '#999',
     pid: meta.entityId,
   });
+}
+
+// Reorder the bags: the player dragged the stack at `from` onto the cell at `to`
+// (a swap, or a move to the end when the cell is free space). The order IS the
+// inventory array, which is serialized with the character, so the arrangement
+// persists. Authoritative like every other inventory command: the sim re-validates
+// the indices against the live bag (moveInventorySlot refuses anything illegal), so
+// a hand-crafted wire command cannot duplicate or drop a stack.
+export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta } = r;
+  moveInventorySlot(meta.inventory, from, to, bagCapacity(meta.bags));
 }
 
 // `targetSlot` names the exact equipment key the player aimed at (the paperdoll

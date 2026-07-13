@@ -421,6 +421,7 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
+  'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
   'equip_bag',
   'unequip_bag',
@@ -3637,6 +3638,13 @@ export class GameServer {
               : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
           else sim.equipItem(msg.item, pid);
+        }
+        break;
+      case 'inv_move':
+        // Manual bag order (a drag between bag cells). Both indices are re-validated
+        // inside the sim against the live bag, so a bogus pair is simply refused.
+        if (typeof msg.from === 'number' && typeof msg.to === 'number') {
+          sim.moveInventoryItem(msg.from, msg.to, pid);
         }
         break;
       case 'unequip_item':

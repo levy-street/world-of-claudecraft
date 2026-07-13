@@ -11,6 +11,10 @@ export interface IWorldInventory {
   equipment: Partial<Record<EquipSlot, string>>;
   copper: number;
   equipItem(itemId: string): void;
+  /** Reorder the bags: move the stack at inventory index `from` onto the bag cell at
+   *  `to` (a swap when that cell holds a stack, a move to the end when it is free
+   *  space). The order is the inventory array itself, persisted with the character. */
+  moveInventoryItem(from: number, to: number): void;
   /** Equip into the exact slot the player aimed at (a paperdoll drop target),
    *  instead of letting the sim's resolver pick (a ring dropped on the second
    *  finger lands there even while the first is free). The sim re-validates the
