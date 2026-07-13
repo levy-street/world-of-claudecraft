@@ -4220,7 +4220,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.rightClickDestroy': '右クリックで破壊',
   'hudChrome.bags.dragEquipHint': 'キャラクターにドラッグして装備',
   'hudChrome.bags.dragDestroyHint': '世界へドラッグして破壊',
-  'hudChrome.bags.reorderNeedsRecent': '並び順を「最近」にすると持ち物を並べ替えられます',
+  'hudChrome.bags.reorderNeedsRecent':
+    '絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます',
   'hudChrome.bags.filterGroupAria': 'バッグをカテゴリーで絞り込む',
   'hudChrome.bags.filterAll': 'すべて',
   'hudChrome.bags.filterWeapon': '武器',

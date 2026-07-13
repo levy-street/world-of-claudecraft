@@ -35,15 +35,13 @@ export function bagFilterIsDefault(filter: BagFilterState): boolean {
   return filter.category === 'all' && filter.search.trim() === '';
 }
 
-// Whether the grid PRESERVES the inventory array order, i.e. whether dragging a stack
-// onto another cell can mean "put it there". A category chip or a search only HIDES
-// stacks (the survivors keep their relative array order), so a swap between two visible
-// stacks stays coherent there. A quality/name sort does not: it REORDERS the view, so a
-// cell names no array position and a swap would look like nothing happened (the sort
-// would immediately put both stacks back where they were). That view refuses the drop,
-// with a toast, rather than silently doing nothing.
+// Whether the grid is showing the bag's REAL cells (the fixed squares a stack can be
+// parked in), which is the only view where dragging a stack onto a square can mean "put
+// it there". A category chip, a search, or a quality/name sort all turn the grid into a
+// derived LIST: the squares there are just rows, they hold no position, so a drop is
+// refused with a toast rather than moving something the player did not aim at.
 export function bagOrderIsManual(filter: BagFilterState): boolean {
-  return filter.sort === 'recent';
+  return filter.sort === 'recent' && bagFilterIsDefault(filter);
 }
 
 // Look up an item definition by id. Injected so the pure core never imports the

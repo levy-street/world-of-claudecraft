@@ -201,15 +201,14 @@ describe('bagOrderIsManual (the reorder gate)', () => {
   // array position and the sort would put both stacks straight back: that view refuses
   // the drop (with a toast). A category chip or a search only HIDES stacks, leaving the
   // survivors in array order, so a swap between two visible stacks stays coherent there.
-  it('is true whenever the view preserves the array order (a filter still does)', () => {
+  it('is true only for the pristine view, the one that shows the bag REAL cells', () => {
     expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: '' })).toBe(true);
-    expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(true);
-    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(true);
   });
 
-  it('is false under a sort, which reorders the view rather than hiding rows', () => {
+  it('is false for any derived view: its squares are rows, not bag positions', () => {
     expect(bagOrderIsManual({ category: 'all', sort: 'quality', search: '' })).toBe(false);
     expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
-    expect(bagOrderIsManual({ category: 'weapon', sort: 'name', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
   });
 });

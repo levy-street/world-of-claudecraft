@@ -21,7 +21,7 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rules';
 import { formatMoney } from './format_money';
-import { moveInventorySlot } from './inventory_order';
+import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -86,17 +86,17 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   });
 }
 
-// Reorder the bags: the player dragged the stack at `from` onto the cell at `to`
-// (a swap, or a move to the end when the cell is free space). The order IS the
-// inventory array, which is serialized with the character, so the arrangement
-// persists. Authoritative like every other inventory command: the sim re-validates
-// the indices against the live bag (moveInventorySlot refuses anything illegal), so
-// a hand-crafted wire command cannot duplicate or drop a stack.
+// Manual bag arrangement: the player dragged the stack at inventory index `from` onto
+// bag CELL `to`. An empty cell parks the stack there (leaving a hole behind it, which is
+// the point of fixed cells); an occupied one trades cells with its stack. The arrangement
+// rides on each stack (InvSlot.slot) and is serialized with the character, so it
+// persists. Authoritative like every other inventory command: moveStackToCell
+// re-validates both ends against the live bag and refuses anything illegal.
 export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
-  moveInventorySlot(meta.inventory, from, to, bagCapacity(meta.bags));
+  moveStackToCell(meta.inventory, from, to, bagCapacity(meta.bags));
 }
 
 // `targetSlot` names the exact equipment key the player aimed at (the paperdoll

@@ -457,25 +457,46 @@ export class BagsWindow {
       grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
-    // A cell can only name an inventory index while the view PRESERVES the array order
-    // (a category chip or a search only hides stacks; a quality/name sort reorders the
-    // view, so a cell there names nothing). Every stack cell is still stamped and still
-    // a drop target under a sort: the drop is REFUSED with a toast rather than silently
-    // doing nothing, which is indistinguishable from a broken drag.
-    const manual = bagOrderIsManual(this.filter);
+    // The pristine view paints the bag's REAL cells (model.cells): every stack sits in
+    // the square the player parked it in, and the squares between them stay empty. Any
+    // other view (a filter, a search, a sort) is a derived LIST, whose squares hold no
+    // position: those are still drop targets, but the drop is REFUSED with a toast
+    // rather than silently doing nothing, which is what a broken drag looks like.
+    if (model.cells.length > 0) {
+      for (let cell = 0; cell < model.cells.length; cell++) {
+        const stack = model.cells[cell];
+        const item = stack ? ITEMS[stack.itemId] : undefined;
+        grid.appendChild(
+          stack && item ? this.buildStackCell(stack, item, cell) : this.buildEmptyCell(cell),
+        );
+      }
+      return;
+    }
     for (const s of model.visible) {
       const item = ITEMS[s.itemId];
       if (!item) continue;
+      grid.appendChild(this.buildStackCell(s, item, null));
+    }
+    for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+  }
+
+  // One occupied square. `cell` is the bag CELL it sits in (the drop-target position), or
+  // null in a derived list view where a square names no position.
+  private buildStackCell(
+    s: InvSlot,
+    item: (typeof ITEMS)[string],
+    cell: number | null,
+  ): HTMLElement {
+    const world = this.deps.world();
+    {
       const row = document.createElement('button');
       row.type = 'button';
       row.className = `bag-item q-${bagQualityKey(item)}`;
-      // The stack's live inventory index, resolved by REFERENCE (duplicate stacks and
-      // instanced copies share an itemId), which is exactly what the move command sends.
+      // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
+      // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
-      if (index >= 0) {
-        row.dataset.bagIndex = String(index);
-        this.bindBagCellDrop(row, index);
-      }
+      if (cell !== null) row.dataset.bagIndex = String(cell);
+      this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -614,60 +635,60 @@ export class BagsWindow {
         },
       });
       this.attachRowTooltip(row, item, s);
-      grid.appendChild(row);
-    }
-    // Free-slot squares (unfiltered view only): the classic empty sockets that
-    // make the remaining capacity visible at a glance. Decorative, not focusable.
-    for (let i = 0; i < model.emptyCells; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'bag-item empty';
-      cell.setAttribute('aria-hidden', 'true');
-      if (manual) {
-        // Free space, not a position: the inventory array holds no holes, so a stack
-        // dropped on ANY free square goes to the end (the sim's own rule). Every free
-        // square therefore names the same index, the first one past the last stack.
-        const endIndex = world.inventory.length;
-        cell.dataset.bagIndex = String(endIndex);
-        this.bindBagCellDrop(cell, endIndex);
-      }
-      grid.appendChild(cell);
+      return row;
     }
   }
 
-  // A bag cell as a reorder drop target: it accepts a stack dragged out of the SAME
-  // bag (never a paperdoll piece, whose drag ends on the bags window as an unequip),
-  // and only while the grid shows the raw array order, where a cell names an index.
-  private bindBagCellDrop(cell: HTMLElement, index: number): void {
-    cell.addEventListener('dragover', (e) => {
+  // One empty square: free space in the bag. In the pristine view it is a real CELL a
+  // stack can be parked in (a hole, deliberately), so it accepts a drop; in a derived
+  // list view it is decorative padding. Never focusable either way.
+  private buildEmptyCell(cell: number | null): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'bag-item empty';
+    el.setAttribute('aria-hidden', 'true');
+    if (cell !== null) {
+      el.dataset.bagIndex = String(cell);
+      this.bindBagCellDrop(el, cell);
+    }
+    return el;
+  }
+
+  // A bag square as a drop target for a stack dragged out of the SAME bag. `cell` is the
+  // square's bag position, or null in a derived list view (where the drop is refused with
+  // a toast: the square holds no position there, so honoring it would move a stack the
+  // player never aimed at).
+  private bindBagCellDrop(el: HTMLElement, cell: number | null): void {
+    el.addEventListener('dragover', (e) => {
       const drag = this.deps.dragState.get();
-      if (!drag || drag.index === null || drag.index === index) return;
+      if (!drag || drag.index === null) return;
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-      // Under a quality/name sort the drop will be refused, so do not promise it with
-      // the accepting highlight; the drop still fires and explains why.
-      if (bagOrderIsManual(this.filter)) cell.classList.add('drop-target');
+      // Only a real cell can accept, so only a real cell lights up; the list-view square
+      // still takes the drop, purely to explain why it cannot.
+      if (cell !== null) el.classList.add('drop-target');
     });
-    cell.addEventListener('dragleave', () => cell.classList.remove('drop-target'));
-    cell.addEventListener('drop', (e) => {
+    el.addEventListener('dragleave', () => el.classList.remove('drop-target'));
+    el.addEventListener('drop', (e) => {
       const drag = this.deps.dragState.get();
-      cell.classList.remove('drop-target');
+      el.classList.remove('drop-target');
       if (!drag || drag.index === null) return;
       e.preventDefault();
       // Stop the drop bubbling to the #bags unequip drop target behind the grid.
       e.stopPropagation();
       const from = drag.index;
       this.deps.dragState.end();
-      this.dropOnBagCell(from, index);
+      this.dropOnBagCell(from, cell);
     });
   }
 
   // Run the reorder. Both ends are re-validated by the sim (a stale index after a
   // repaint, or a hand-crafted pair, is simply refused there), so this only dispatches.
-  private dropOnBagCell(from: number | null, to: number): void {
-    if (from === null || from === to) return;
-    if (!bagOrderIsManual(this.filter)) {
-      // A quality/name sort reorders the VIEW: a cell names no array position there, and
-      // the sort would put both stacks straight back. Say so instead of doing nothing.
+  private dropOnBagCell(from: number | null, to: number | null): void {
+    if (from === null) return;
+    if (to === null || !bagOrderIsManual(this.filter)) {
+      // A filtered / searched / sorted grid is a derived LIST: its squares hold no bag
+      // position, so a drop there would move a stack the player never aimed at. Say so
+      // instead of doing nothing, which is indistinguishable from a broken drag.
       this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
       return;
     }

@@ -1266,7 +1266,7 @@ export const en_XA: EnTranslations = {
       "rightClickDestroy": "[Ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
       "dragEquipHint": "[Ðŕáĝ óñţó ýóúŕ çĥáŕáçţéŕ ţó éɋúíþ]",
       "dragDestroyHint": "[Ðŕáĝ óúţ íñţó ţĥé ŵóŕļð ţó ðéšţŕóý]",
-      "reorderNeedsRecent": "[Šŵíţçĥ ţĥé šóŕţ ţó Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
+      "reorderNeedsRecent": "[Çļéáŕ ţĥé ƒíļţéŕ áñð šóŕţ ƀý Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",

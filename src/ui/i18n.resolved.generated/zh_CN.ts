@@ -1266,7 +1266,7 @@ export const zh_CN: EnTranslations = {
       "rightClickDestroy": "右键单击以销毁",
       "dragEquipHint": "拖到角色身上以装备",
       "dragDestroyHint": "拖出到世界中以销毁",
-      "reorderNeedsRecent": "将排序切换为“最近”以整理背包",
+      "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
