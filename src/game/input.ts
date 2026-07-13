@@ -1,7 +1,7 @@
-// Default (Mouse Camera off): classic-MMO-style — WASD + A/D keyboard turn, Q/E strafe,
-// left-drag orbits, right-drag mouselooks, both buttons run forward.
-// Optional Mouse Camera (on): OSRS-style — WASD is camera-relative, A/D strafe,
-// mouse drag rotates the orbit (no pointer lock), no keyboard turn.
+// Default (Mouse Camera off): classic-MMO-style (WASD + A/D keyboard turn, Q/E strafe,
+// left-drag orbits, right-drag mouselooks, both buttons run forward).
+// Optional Mouse Camera (on): OSRS-style (WASD is camera-relative, A/D strafe,
+// mouse drag rotates the orbit (no pointer lock), no keyboard turn).
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -43,6 +43,9 @@ export interface InputCallbacks {
   onTab(): void;
   onTargetFriendly(): void;
   onCycleFriendly(): void;
+  // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
+  // stop (passive stance), taunt, or set the defensive/aggressive stance.
+  onPet(action: 'attack' | 'stop' | 'taunt' | 'defensive' | 'aggressive'): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -67,6 +70,7 @@ export interface InputCallbacks {
       | 'leaderboard'
       | 'calendar'
       | 'discord'
+      | 'deeds'
       | 'crafting',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -728,6 +732,22 @@ export class Input {
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
     if (edge !== null) {
+      // A matched chord that carries a modifier (Ctrl/Alt/Cmd) shadows a browser
+      // accelerator, e.g. Ctrl+number tab switching. Cancel the default so the
+      // game keeps the keypress. Some accelerators are not cancelable (Chrome and
+      // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
+      // (Firefox) and is a no-op where there is nothing to cancel.
+      if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
+      // 'chat' focuses the composer textarea as a side effect of this very
+      // keydown. Left un-prevented, the browser still delivers the follow-up
+      // keypress (and its default newline insertion) to whichever element is
+      // focused AT THAT POINT, i.e. the composer we just focused, so Enter
+      // both opens chat and types a newline into it before the placeholder is
+      // ever seen. Cancel the default so the composer opens empty, but only
+      // when the key was not itself focused on a button: a button's own Enter
+      // activation is a real default action too, and it should still fire
+      // alongside chat opening, same as before this fix.
+      if (edge === 'chat' && tag !== 'button') e.preventDefault?.();
       if (edge.startsWith('slot')) {
         // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
         // whether a slot charges (shoot) or fires immediately (tap = down+up).
@@ -781,6 +801,21 @@ export class Input {
       case 'targetFriendlyNext':
         this.cb.onCycleFriendly();
         return;
+      case 'petAttack':
+        this.cb.onPet('attack');
+        return;
+      case 'petStop':
+        this.cb.onPet('stop');
+        return;
+      case 'petTaunt':
+        this.cb.onPet('taunt');
+        return;
+      case 'petDefensive':
+        this.cb.onPet('defensive');
+        return;
+      case 'petAggressive':
+        this.cb.onPet('aggressive');
+        return;
       case 'interact':
         this.cb.onUiKey('interact');
         return;
@@ -828,6 +863,9 @@ export class Input {
         return;
       case 'discord':
         this.cb.onUiKey('discord');
+        return;
+      case 'deeds':
+        this.cb.onUiKey('deeds');
         return;
       case 'chat':
         this.cb.onUiKey('chat');
@@ -909,8 +947,8 @@ export class Input {
       // BOTH camera modes, so rotation never begins with a free cursor that can
       // reach the screen edge (movementX clamps to 0 and the camera freezes) or
       // slip onto a second monitor. One lock per drag, none for a plain click
-      // (#116); fullscreen stays a plain drag because Chrome forces its own
-      // "press and hold Esc" prompt there.
+      // (#116). Fullscreen uses the same lock path so right-drag mouselook
+      // behaves identically there.
       if (
         !this.pointerLockRequestedForDrag &&
         shouldEngagePointerLock({

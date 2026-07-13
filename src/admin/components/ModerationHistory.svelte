@@ -2,52 +2,14 @@
   import type { ModerationHistoryEntry } from '../types';
   import { fmtDate } from '../format';
   import { t } from '../i18n';
+  import { moderationActionLabel, moderationActionVariant } from '../labels';
   import Badge from './Badge.svelte';
   import Panel from './Panel.svelte';
 
-  type BadgeVariant = 'default' | 'neutral' | 'warn' | 'bad' | 'success';
-
+  // The action label/variant table is shared with ModerationHistoryPage (src/admin/labels.ts):
+  // a new server action kind must never render as an unlabelled "Other action" in one
+  // history view and correctly in the other.
   let { entries }: { entries: ModerationHistoryEntry[] } = $props();
-
-  function actionLabel(action: string): string {
-    if (action === 'suspend') return t('moderationHistory.actionSuspend');
-    if (action === 'unsuspend') return t('moderationHistory.actionUnsuspend');
-    if (action === 'ban') return t('moderationHistory.actionBan');
-    if (action === 'unban') return t('moderationHistory.actionUnban');
-    if (action === 'chat_mute') return t('moderationHistory.actionChatMute');
-    if (action === 'chat_unmute') return t('moderationHistory.actionChatUnmute');
-    if (action === 'force_rename') return t('moderationHistory.actionForceRename');
-    if (action === 'kick') return t('moderationHistory.actionKick');
-    if (action === 'kill') return t('moderationHistory.actionKill');
-    if (action === 'jail') return t('moderationHistory.actionJail');
-    if (action === 'unjail') return t('moderationHistory.actionUnjail');
-    if (action === 'note') return t('moderationHistory.actionNote');
-    if (action === 'reset_password') return t('moderationHistory.actionResetPassword');
-    return t('moderationHistory.actionUnknown');
-  }
-
-  function actionVariant(action: string): BadgeVariant {
-    if (action === 'ban') return 'bad';
-    if (
-      action === 'suspend' ||
-      action === 'chat_mute' ||
-      action === 'reset_password' ||
-      action === 'kick' ||
-      action === 'kill' ||
-      action === 'jail'
-    ) {
-      return 'warn';
-    }
-    if (
-      action === 'unban' ||
-      action === 'unsuspend' ||
-      action === 'chat_unmute' ||
-      action === 'unjail'
-    ) {
-      return 'success';
-    }
-    return 'neutral';
-  }
 </script>
 
 <div class="history-panel">
@@ -62,8 +24,8 @@
         {#each entries as entry (entry.id)}
           <li>
             <div class="history-meta">
-              <Badge variant={actionVariant(entry.action)} size="medium">
-                {actionLabel(entry.action)}
+              <Badge variant={moderationActionVariant(entry.action)} size="medium">
+                {moderationActionLabel(entry.action)}
               </Badge>
               <span>
                 {t('moderationHistory.by', {

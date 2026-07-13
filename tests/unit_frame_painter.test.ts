@@ -325,3 +325,40 @@ describe('UnitFramePainter: no raw DOM writes, no magic values', () => {
     expect(px, `px: ${px.join(', ')}`).toEqual([]);
   });
 });
+
+describe('UnitFramePainter: the title-decoration spans (Book of Deeds)', () => {
+  const TITLE_PRE = { tag: 'titlePre' } as unknown as HTMLElement;
+  const TITLE_POST = { tag: 'titlePost' } as unknown as HTMLElement;
+  const TITLED_ELEMENTS: UnitFrameElements = {
+    ...FULL_ELEMENTS,
+    titlePre: TITLE_PRE,
+    titlePost: TITLE_POST,
+  };
+
+  it('writes both decoration strings on an instance that supplies the spans', () => {
+    const calls = paint(
+      playerDescriptor({ titlePre: '', titlePost: ' [Veteran]' }),
+      TITLED_ELEMENTS,
+      { shownDisplay: 'flex' },
+    );
+    expect(calls).toContainEqual({ m: 'setText', args: [NAME, 'Aerwynn'] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_PRE, ''] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_POST, ' [Veteran]'] });
+  });
+
+  it('writes empty strings for an untitled unit (the spans collapse, height unchanged)', () => {
+    const calls = paint(playerDescriptor(), TITLED_ELEMENTS, { shownDisplay: 'flex' });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_PRE, ''] });
+    expect(calls).toContainEqual({ m: 'setText', args: [TITLE_POST, ''] });
+  });
+
+  it('an instance without the spans pays zero title writes even when the view carries one', () => {
+    const calls = paint(
+      playerDescriptor({ titlePre: '[Pre] ', titlePost: ' [Post]' }),
+      FULL_ELEMENTS,
+      { shownDisplay: 'flex' },
+    );
+    expect(calls.some((c) => c.args[0] === TITLE_PRE || c.args[0] === TITLE_POST)).toBe(false);
+    expect(calls.some((c) => c.args[1] === '[Pre] ' || c.args[1] === ' [Post]')).toBe(false);
+  });
+});

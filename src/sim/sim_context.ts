@@ -13,6 +13,7 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { TalentModifiers } from './content/talents';
+import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
@@ -39,6 +40,7 @@ import type {
   AbilityDef,
   Aura,
   CrowdControlDrCategory,
+  DeedStatKey,
   DelveRun,
   DungeonDifficulty,
   Entity,
@@ -46,6 +48,7 @@ import type {
   ItemInstancePayload,
   PlayerClass,
   QuestProgress,
+  ReadyCheck,
   SetProc,
   SimConfig,
   SimEvent,
@@ -152,6 +155,9 @@ export interface SimContextPrimitives {
   // it routes through ctx until that slice puts it on the seam. (trades/tradeInvites/
   // duelInvites are already declared above; deduped.)
   readonly partyInvites: Map<number, { fromPid: number; expires: number }>;
+  // Active party/raid ready checks (social/ready_check.ts), keyed by party id. Swept
+  // in the end-of-tick block by updateReadyChecks. Sim-internal, never wired.
+  readonly readyChecks: Map<number, ReadyCheck>;
   readonly chatTokens: Map<number, { tokens: number; at: number }>;
   readonly channelSubs: Map<number, Set<JoinableChannel>>;
   // L1 loot-distribution state. The pending need-greed rolls map is mutated in
@@ -177,6 +183,29 @@ export interface SimContextPrimitives {
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
   // module, the damage no-damage floor, and targeting's candidate arm.
   readonly vcup: VcState;
+  // Book of Deeds: players whose deed-relevant state changed this tick,
+  // evaluated and cleared at the tick tail (deeds.ts updateDeeds). Sim-owned
+  // Set mutated in place, so a read-only live view.
+  readonly deedDirtyPids: Set<number>;
+  // Keyed dirty marks beside deedDirtyPids: pid -> the trigger-input keys
+  // that changed this tick (the deeds.ts narrow mark sites), so the tail
+  // evaluator re-checks only the deeds reading those inputs. A dirty pid with
+  // NO entry takes a full pass. Sim-owned Map mutated in place.
+  readonly deedDirtyKeys: Map<number, Set<string>>;
+  // The world-boss scheduler's live entity ids, one slot per WORLD_BOSSES
+  // entry (null while that boss is not up). Sim owns and reassigns slot
+  // VALUES in place; the deeds proximity sweep resolves the witness target
+  // through this instead of scanning the whole entity map every second.
+  readonly worldBossEntityIds: readonly (number | null)[];
+  // Book of Deeds session runtime (per-attempt encounter windows, per-match
+  // Vale Cup memory, the Saul talk counter). Sim-owned holder mutated in
+  // place; nothing in it persists.
+  readonly deedRuntime: DeedRuntime;
+  // Live practice-bot roster for offline 2v2 Fiesta (fiesta_bots.ts). The Book
+  // of Deeds reads it to gate Fiesta deeds to real matchmade bouts (a bot in a
+  // seat means practice; the online server never seats fiesta bots). Sim-owned,
+  // mutated in place, read-only view like bankerIds.
+  readonly fiestaBotPids: number[];
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -198,9 +227,9 @@ export interface SimContextCallbacks {
   // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
   // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
   // slash command and instances/dungeons reach them through the seam.
-  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it after
-  // rollLoot so a heroic final-boss corpse gains one personal Heroic Mark slot per
-  // eligible participant (no rng draws).
+  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
+  // once per death to settle a heroic final boss's direct participant rewards
+  // and whole-claim realm-reset lockout together (no rng draws).
   lockoutNowMs(): number;
   // The next raid-reset instant (epoch ms) for a given lockout "now". The host owns
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
@@ -208,6 +237,7 @@ export interface SimContextCallbacks {
   raidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
+  instanceClaimIdAt(pos: Vec3): number | null;
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
@@ -228,6 +258,9 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    attackAnimationStarted?: boolean,
+    // Amount is already fully source-modified (redirect shares); skip source-output mods.
+    alreadyFinal?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -284,6 +317,7 @@ export interface SimContextCallbacks {
     school: string,
     ability: string | null,
     kind: 'hit' | 'miss' | 'dodge',
+    attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
@@ -351,6 +385,9 @@ export interface SimContextCallbacks {
   // Invite a player to the actor's party by pid (delegates to the PartyMachine);
   // used by the chat "/invite <name>" command in social/chat.ts.
   partyInvite(targetPid: number, pid?: number): void;
+  // Start a party/raid ready check as the actor (leader-gated); used by the chat
+  // "/ready" command in social/chat.ts. Delegates to social/ready_check.ts.
+  readyCheckStart(pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -429,9 +466,12 @@ export interface SimContextCallbacks {
   grantNythraxisLockout(boss: Entity): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
-  // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts)
-  // both consume refreshKnownAbilities: the talent path always passes announce=false
-  // (a silent re-resolve, no learnAbility spam); the level-up path passes announce=true.
+  // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both
+  // consume refreshKnownAbilities with announce=true, so a spec pick / talent apply that
+  // grants a new ability (e.g. a spec signature) surfaces it: emits learnAbility (the HUD
+  // places it on the bar + spellbook) and a "You have learned" log. Character LOAD uses its
+  // OWN announce=false call (addPlayer/restore) so it never spams on login; the before/after
+  // diff in refreshKnownAbilities means only genuinely new abilities are announced.
   // G1a's talent module also consumes the core `error` sink (declared above). The talent
   // PUBLIC API (applyTalents/spendTalent/setSpec/respec/saveLoadout/switchLoadout/
   // deleteLoadout/talentPoints) is NOT on this seam: Sim keeps thin wrapper methods that
@@ -574,7 +614,13 @@ export interface SimContextCallbacks {
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
-  runEffects(p: Entity, meta: PlayerMeta, target: Entity | null, res: ResolvedAbility): void;
+  runEffects(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity | null,
+    res: ResolvedAbility,
+    attackAnimationStarted?: boolean,
+  ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
   // reach back for these. All STAY on Sim. `syncPetAspect` is pet-management (the P1b
@@ -648,6 +694,22 @@ export interface SimContextCallbacks {
 
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
+  // Book of Deeds (deeds.ts owns every body; append-only additions). The
+  // increment/mark sites across the gameplay modules reach the persisted
+  // deed surface only through these. bumpDeedStat raises a lifetime counter
+  // and marks the player dirty; markItemDiscovered/markVisited add to the
+  // bounded ledger sets (dirty only when newly added; rolledQuality carries
+  // an instanced copy's rolled quality for the quality-first marks);
+  // markDeedsDirty flags a player whose persisted trigger inputs changed
+  // (quest turn-in, delve clear, arena result, craft/gather grants,
+  // lifetime-XP accrual, and similar); grantDeed is the idempotent unlock
+  // every path shares (the evaluator and the bespoke manual-deed sites).
+  bumpDeedStat(meta: PlayerMeta, stat: DeedStatKey, delta: number): void;
+  markItemDiscovered(meta: PlayerMeta, itemId: string, rolledQuality?: string): void;
+  markVisited(meta: PlayerMeta, markId: string): void;
+  markDeedsDirty(pid: number): void;
+  grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
+
   // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
   // combat/effect_dispatch.ts). All three silently no-op unless the caster is
   // seated in the live Sowfield match's play phase. vcupBallKick launches the
@@ -813,6 +875,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get partyInvites() {
       return host.partyInvites;
     },
+    get readyChecks() {
+      return host.readyChecks;
+    },
     get chatTokens() {
       return host.chatTokens;
     },
@@ -840,12 +905,28 @@ export function createSimContext(host: SimContextHost): SimContext {
     get vcup() {
       return host.vcup;
     },
+    get deedDirtyPids() {
+      return host.deedDirtyPids;
+    },
+    get deedDirtyKeys() {
+      return host.deedDirtyKeys;
+    },
+    get worldBossEntityIds() {
+      return host.worldBossEntityIds;
+    },
+    get deedRuntime() {
+      return host.deedRuntime;
+    },
+    get fiestaBotPids() {
+      return host.fiestaBotPids;
+    },
     emit: host.emit,
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
+    instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
     dungeonDifficulty: host.dungeonDifficulty,
@@ -908,6 +989,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     partyInvite: host.partyInvite,
+    readyCheckStart: host.readyCheckStart,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     onMobKilledForQuests: host.onMobKilledForQuests,
@@ -1036,6 +1118,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
     applySetProcs: host.applySetProcs,
+    // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
+    bumpDeedStat: host.bumpDeedStat,
+    markItemDiscovered: host.markItemDiscovered,
+    markVisited: host.markVisited,
+    markDeedsDirty: host.markDeedsDirty,
+    grantDeed: host.grantDeed,
     // The Vale Cup sport-move arms (points at social/vale_cup.ts).
     vcupBallKick: host.vcupBallKick,
     vcupBallPass: host.vcupBallPass,

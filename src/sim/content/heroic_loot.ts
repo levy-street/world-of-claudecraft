@@ -23,6 +23,14 @@ import type { ItemDef, LootEntry } from '../types';
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 
+// The 10-player heroic raid (Heroic Nythraxis) is one tier ABOVE the five-man
+// heroics: its drop table registers at source level 27 so its epics land at item
+// level 33 and its legendaries at 37 (27 + the quality bump). Its heroic set
+// pieces are the same collectible slots as the five-man versions, only rescaled
+// to this raid tier. See buildHeroicVariants + the item-level source index.
+export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
+
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
@@ -330,46 +338,10 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 28, max: 49, speed: 2.4 },
-    stats: { int: 12, spi: 10 },
+    weapon: { min: 29, max: 51, speed: 2.4 },
+    stats: { int: 13, spi: 10 },
     sellValue: 16000,
     requiredClass: CASTER,
-  },
-  deathless_warguard_legmail: {
-    id: 'deathless_warguard_legmail',
-    name: 'Deathless Warguard Legmail',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'legs',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 315, str: 11, sta: 9 },
-    sellValue: 13000,
-    requiredClass: HEAVY,
-  },
-  soulrend_diadem: {
-    id: 'soulrend_diadem',
-    name: 'Soulrend Diadem',
-    kind: 'armor',
-    armorType: 'cloth',
-    slot: 'helmet',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 76, int: 10, spi: 8 },
-    sellValue: 12000,
-    requiredClass: CASTER,
-  },
-  scourgehide_carapace: {
-    id: 'scourgehide_carapace',
-    name: 'Scourgehide Carapace',
-    kind: 'armor',
-    armorType: 'leather',
-    slot: 'chest',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 172, agi: 12, sta: 10 },
-    sellValue: 14000,
-    requiredClass: AGILE_WILD,
   },
   deathless_greatblade: {
     id: 'deathless_greatblade',
@@ -378,22 +350,10 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 43, max: 66, speed: 3.4 },
-    stats: { str: 13, sta: 9 },
+    weapon: { min: 45, max: 68, speed: 3.4 },
+    stats: { str: 14, sta: 9 },
     sellValue: 16000,
     requiredClass: HEAVY,
-  },
-  soulforged_warplate: {
-    id: 'soulforged_warplate',
-    name: 'Soulforged Warplate',
-    kind: 'armor',
-    armorType: 'mail',
-    slot: 'chest',
-    quality: 'epic',
-    requiredLevel: 20,
-    stats: { armor: 335, int: 12, spi: 10 },
-    sellValue: 14000,
-    requiredClass: HEAL_MAIL,
   },
   stormcallers_focus: {
     id: 'stormcallers_focus',
@@ -402,8 +362,8 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     requiredLevel: 20,
-    weapon: { min: 29, max: 51, speed: 2.5 },
-    stats: { int: 13, spi: 9 },
+    weapon: { min: 31, max: 52, speed: 2.5 },
+    stats: { int: 14, spi: 9 },
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
   },
@@ -446,12 +406,18 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
   ],
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'scepter_of_the_deathless_court', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_warguard_legmail', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'soulrend_diadem', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'scourgehide_carapace', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
+    // The heroic set pieces and legendaries come free from the heroic loot swap:
+    // the raid boss's normal set-piece and legendary drops auto-upgrade to their
+    // raid-tier (item level 33/37) heroic variants in a heroic claim
+    // (loot/loot_roll.ts + heroic_variants.ts). This table adds only the
+    // heroic-ONLY extras the normal table never carries: the three bespoke raid
+    // weapons, one of which drops per heroic kill (chances sum to 1.0).
+    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic_weapon' },
+    {
+      itemId: 'scepter_of_the_deathless_court',
+      chance: 0.33,
+      rollGroup: 'nythraxis_heroic_weapon',
+    },
+    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic_weapon' },
   ],
 };

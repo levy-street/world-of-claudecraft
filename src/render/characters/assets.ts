@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
@@ -23,7 +24,12 @@ import {
   type VisualDef,
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
+  weaponSkinModelUrl,
 } from './manifest';
+import { mergeSkinnedParts } from './rig_merge';
+import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
+import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
+import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -93,6 +99,56 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   wand_a: 'VAR_WAND',
   wand_b: 'VAR_WAND',
   adv_wand: 'VAR_WAND',
+  emberfang_sword: 'VAR_SWORD',
+  redskull_sword: 'VAR_SWORD',
+  redskull_dagger: 'VAR_DAGGER',
+  redskull_staff: 'VAR_STAFF',
+  redskull_wand: 'VAR_WAND',
+  redskull_hammer: 'VAR_AXE',
+  purple_sword: 'VAR_SWORD',
+  purple_dagger: 'VAR_DAGGER',
+  purple_axe: 'VAR_AXE',
+  purple_staff: 'VAR_STAFF',
+  purple_wand: 'VAR_WAND',
+  wrought_iron_longsword: 'VAR_SWORD',
+  notched_woodaxe: 'VAR_AXE',
+  iron_field_hammer: 'VAR_AXE',
+  peeled_birch_wand: 'VAR_WAND',
+  simple_farmhand_crossbow: 'VAR_CROSSBOW',
+  guildmark_arming_sword: 'VAR_SWORD',
+  skyrender_the_firmament_s_wound: 'VAR_AXE',
+  cosmarch_spire_of_the_endless_void: 'VAR_STAFF',
+  emberwish_mote_of_the_dying_sun: 'VAR_WAND',
+  meteorlatch_the_sky_s_last_judgment: 'VAR_CROSSBOW',
+  starfall_judgment_of_the_heavens: 'VAR_MACE',
+  ice_fang: 'VAR_SWORD',
+  glaciersplit: 'VAR_AXE',
+  rimecrusher: 'VAR_MACE',
+  frostbite: 'VAR_DAGGER',
+  hoarfrost_vigil: 'VAR_STAFF',
+  shard_of_everwinter: 'VAR_WAND',
+  solheim_last_light_of_the_dawn: 'VAR_SWORD',
+  astravyr_fang_of_the_fallen_star: 'VAR_DAGGER',
+  brasscap_hatchet: 'VAR_AXE',
+  knotted_oak_stave: 'VAR_STAFF',
+  whittler_s_knife: 'VAR_DAGGER',
+  winterbite: 'VAR_BOW',
+  cinderbrand: 'VAR_SWORD',
+  emberbite: 'VAR_AXE',
+  smoulderfall: 'VAR_HAMMER',
+  ashspark_shiv: 'VAR_DAGGER',
+  forgeheart_stave: 'VAR_STAFF',
+  emberwrought_wand: 'VAR_WAND',
+  cinderlatch: 'VAR_CROSSBOW',
+  tempered_flanged_mace: 'VAR_MACE',
+  guildmark_dirk: 'VAR_DAGGER',
+  brasscrown_walking_staff: 'VAR_STAFF',
+  lacquered_rod: 'VAR_WAND',
+  fletcher_s_guild_bow: 'VAR_BOW',
+  rude_awakening_sword: 'VAR_SWORD',
+  // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
+  // grip family follows the handling, like the attach bone below.
+  encore_the_second_falling_star: 'VAR_CROSSBOW',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -108,8 +164,13 @@ const VARIANT_GRIPS: Record<string, VariantGrip> = {
   VAR_DAGGER: { lift: 0.04, maxHeight: 1.4 },
   VAR_STAFF: { lift: 0.18, maxHeight: 2.4 },
   VAR_AXE: { lift: 0.04, maxHeight: 1.5 },
+  VAR_HAMMER: { lift: 0.04, maxHeight: 1.5 },
+  VAR_MACE: { lift: 0.04, maxHeight: 1.5 },
   VAR_POLEARM: { lift: 0.18, maxHeight: 2.5 },
   VAR_WAND: { lift: 0.04, maxHeight: 1.2 },
+  VAR_BOOK: { lift: 0.04, maxHeight: 1.2 },
+  VAR_CROSSBOW: { lift: 0.04, maxHeight: 1.6 },
+  VAR_BOW: { lift: 0.04, maxHeight: 2.0 },
 };
 
 const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
@@ -226,19 +287,36 @@ const SWAP_WEAPON_TAG = 'swapWeaponHolder';
 // Grip for a variant-pack weapon. Its origin is authored AT the grip, so we attach
 // at the origin (no recenter) and only clamp an oversized model so its blade does
 // not drag. `lift` nudges along the hand bone; the side picks the 180-degree flip.
+// A WEAPON_GRIP_OVERRIDES row (hand-tuned in the asset-pipeline inspector's grip
+// bar) layers a per-weapon pos/rot/scale fine-tune on top, composed by the SAME
+// pure variantGripTransform the inspector previews, so the editor fit IS the
+// in-game fit. With no row the transform is exactly the bare lift/flip/clamp.
 const variantBox = new THREE.Box3();
 function variantGripFor(url: string): VariantGrip | null {
   const accessory = kaykitAccessoryFor(url);
   return accessory ? (VARIANT_GRIPS[accessory] ?? null) : null;
 }
-function applyVariantGrip(payload: THREE.Object3D, bone: string, grip: VariantGrip): void {
+function modelBasename(url: string): string {
+  return url.slice(url.lastIndexOf('/') + 1).replace(/\.glb$/, '');
+}
+function applyVariantGrip(
+  payload: THREE.Object3D,
+  bone: string,
+  grip: VariantGrip,
+  url: string,
+): void {
   variantBox.setFromObject(payload);
   const height = variantBox.max.y - variantBox.min.y;
-  const scale = height > 1e-3 ? Math.min(1, grip.maxHeight / height) : 1;
-  const left = handSide(bone) === 'l';
-  payload.position.set(0, grip.lift, 0);
-  payload.quaternion.set(0, left ? 0 : 1, 0, left ? 1 : 0);
-  payload.scale.setScalar(scale);
+  const t = variantGripTransform(
+    height,
+    handSide(bone) === 'l',
+    grip.lift,
+    grip.maxHeight,
+    WEAPON_GRIP_OVERRIDES[modelBasename(url)],
+  );
+  payload.position.set(t.position[0], t.position[1], t.position[2]);
+  payload.quaternion.set(t.quaternion[0], t.quaternion[1], t.quaternion[2], t.quaternion[3]);
+  payload.scale.setScalar(t.scale);
 }
 
 function attachProp(
@@ -246,7 +324,7 @@ function attachProp(
   bone: THREE.Object3D,
   att: AttachDef,
   markSwap = false,
-): void {
+): THREE.Object3D {
   const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
@@ -254,7 +332,7 @@ function attachProp(
   if (markSwap) payload.userData[SWAP_WEAPON_TAG] = true;
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
-    applyVariantGrip(payload, att.bone, variantGrip);
+    applyVariantGrip(payload, att.bone, variantGrip, att.url);
   } else if (att.position || att.rotationY !== undefined) {
     if (att.position) payload.position.set(...att.position);
     if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;
@@ -265,15 +343,48 @@ function attachProp(
     applyHandGrip(payload, root, att.bone, att.url);
   }
   bone.add(payload);
+  return payload;
 }
 
 // The AttachDef for the swappable mainhand slot, with the equipped item's model
-// substituted when one is mapped (else the class default). The grip resolves from
-// the item model's own family (KAYKIT_WEAPON_ACCESSORY), so any base position/
+// substituted when one is mapped (else the class default). An applied Season 1
+// Armory weapon skin wins over the item model (that is the point of the skin).
+// The grip resolves from the substituted model's own family
+// (KAYKIT_WEAPON_ACCESSORY + WEAPON_GRIP_OVERRIDES), so any base position/
 // rotationY/gripRef override is dropped for the substituted model.
-function swapAttachDef(base: AttachDef, weaponItemId: string | null | undefined): AttachDef {
-  const url = itemWeaponModelUrl(weaponItemId);
+function swapAttachDef(
+  base: AttachDef,
+  weaponItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined = null,
+): AttachDef {
+  const url = weaponSkinModelUrl(weaponSkinId) ?? itemWeaponModelUrl(weaponItemId);
   return url ? { url, bone: base.bone } : base;
+}
+
+// Classes without weaponSlots keep a FIXED weapon visual (the hunter's ranged
+// crossbow). A bow/crossbow skin replaces that fixed attach instead of a
+// swappable slot, so those attaches join the swap/stale cycle too.
+const RANGED_SWAP_BASENAMES = new Set(['crossbow_1handed', 'crossbow_2handed']);
+
+function attachBasename(att: AttachDef): string {
+  return modelBasename(att.url);
+}
+
+function isRangedSwapAttach(att: AttachDef): boolean {
+  return RANGED_SWAP_BASENAMES.has(attachBasename(att));
+}
+
+// The fixed ranged attach with a bow/crossbow skin substituted, or null to keep
+// the base def (no skin, or a skin of a non-ranged type). The bone follows the
+// skin's HANDLING: drawn bows move to the left handslot (the draw animation's
+// front arm); crossbow handling (real crossbows, and bow-slot guns that aim
+// like them) keeps the base bone.
+function rangedSkinAttachDef(base: AttachDef, weaponSkinId: string | null): AttachDef | null {
+  if (!weaponSkinId) return null;
+  const def = WEAPON_SKINS[weaponSkinId];
+  if (!def || (def.weaponType !== 'bow' && def.weaponType !== 'crossbow')) return null;
+  const url = weaponSkinModelUrl(weaponSkinId);
+  return url ? { url, bone: weaponSkinAttachBone(weaponSkinHandling(def), base.bone) } : null;
 }
 
 function resolveBone(root: THREE.Object3D, name: string): THREE.Object3D | null {
@@ -403,9 +514,11 @@ function resolvedGltf(url: string): GLTF {
 }
 
 // ---------------------------------------------------------------------------
-// Per-url source optimization: KayKit characters ship six skinned body parts
+// Per-url source optimization: KayKit characters ship several skinned body parts
 // sharing one skeleton and one material — merge them into a single SkinnedMesh
-// once per asset so every instance costs ~1 body draw instead of ~6.
+// once per asset so every instance costs ~1 body draw instead of ~9 (and one
+// Skeleton / bone texture instead of ~9). See rig_merge.ts for why the parts'
+// per-primitive bind data has to be rebaked first.
 // ---------------------------------------------------------------------------
 
 const optimizedSceneCache = new Map<string, THREE.Object3D>();
@@ -417,66 +530,6 @@ function optimizedScene(url: string): THREE.Object3D {
   mergeSkinnedParts(root);
   optimizedSceneCache.set(url, root);
   return root;
-}
-
-const BIND_EPS = 1e-3;
-
-function sameBindData(a: THREE.SkinnedMesh, b: THREE.SkinnedMesh): boolean {
-  const ia = a.skeleton.boneInverses,
-    ib = b.skeleton.boneInverses;
-  if (ia.length !== ib.length) return false;
-  for (let m = 0; m < ia.length; m++) {
-    const ea = ia[m].elements,
-      eb = ib[m].elements;
-    for (let i = 0; i < 16; i++) if (Math.abs(ea[i] - eb[i]) > BIND_EPS) return false;
-  }
-  const ba = a.bindMatrix.elements,
-    bb = b.bindMatrix.elements;
-  for (let i = 0; i < 16; i++) if (Math.abs(ba[i] - bb[i]) > BIND_EPS) return false;
-  return true;
-}
-
-function mergeSkinnedParts(root: THREE.Object3D): void {
-  // bucket by bone set / material / parent / local transform, then split
-  // buckets by approximate bind-data equality (float noise must not block a
-  // merge, while genuinely different bind poses must never share vertices —
-  // the skeleton pack's parts carry per-part bind data)
-  const groups = new Map<string, THREE.SkinnedMesh[][]>();
-  root.traverse((o) => {
-    const sm = o as THREE.SkinnedMesh;
-    if (!sm.isSkinnedMesh || !sm.visible) return;
-    const mat = sm.material as THREE.Material;
-    if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
-    const bones = sm.skeleton.bones.map((b) => b.uuid).join(',');
-    const key = `${bones}|${mat.uuid}|${sm.parent?.uuid}|${sm.matrix.elements.join(',')}`;
-    let buckets = groups.get(key);
-    if (!buckets) {
-      buckets = [];
-      groups.set(key, buckets);
-    }
-    const bucket = buckets.find((b) => sameBindData(b[0], sm));
-    if (bucket) bucket.push(sm);
-    else buckets.push([sm]);
-  });
-  for (const parts of [...groups.values()].flat()) {
-    if (parts.length < 2) continue;
-    const names = new Set(parts.flatMap((p) => Object.keys(p.geometry.attributes)));
-    if (![...names].every((n) => parts.every((p) => p.geometry.getAttribute(n)))) continue;
-    const geo = mergeGeometries(
-      parts.map((p) => p.geometry),
-      false,
-    );
-    if (!geo) continue;
-    const first = parts[0];
-    const merged = new THREE.SkinnedMesh(geo, first.material);
-    merged.name = `${first.name}_bodymerged`;
-    merged.position.copy(first.position);
-    merged.quaternion.copy(first.quaternion);
-    merged.scale.copy(first.scale);
-    merged.bind(first.skeleton, first.bindMatrix);
-    first.parent!.add(merged);
-    for (const p of parts) p.removeFromParent();
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -509,13 +562,15 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
     const isSwap = def.weaponSlots?.includes(i) ?? false;
     // Swappable slots take the equipped item's model (when given); every other
     // attachment is fixed (the warlock's spellbook offhand). The rogue lists both
-    // hand slots so a dagger shows in both.
+    // hand slots so a dagger shows in both. Fixed RANGED attaches (hunter) are
+    // still marked as swaps so a later bow/crossbow weapon skin can replace them
+    // in place (setHeldWeapon's stale cycle).
     const att = isSwap ? swapAttachDef(attachments[i], weaponItemId) : attachments[i];
     // GLTFLoader sanitizes node names (PropertyBinding strips [].:/ chars),
     // so the authored "handslot.r" arrives as "handslotr" — try both
     const bone = resolveBone(root, att.bone);
     if (!bone) continue; // manifest/bone mismatch — ship without the prop
-    attachProp(root, bone, att, isSwap);
+    attachProp(root, bone, att, isSwap || isRangedSwapAttach(attachments[i]));
   }
   // Re-orient mis-baked built-in weapon nodes (e.g. the golem axe) in place.
   for (const fix of def.weaponFix ?? []) {
@@ -530,30 +585,61 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
 }
 
 /** Replace the equipped-weapon attachment(s) on an already-assembled model in place,
- *  for a runtime gear swap. No-op for visuals without `weaponSlots` (hunter keeps its
- *  crossbow; mobs/NPCs are fixed). Re-attaches every swap slot (the rogue has two, so
- *  both hands update). The caller must re-apply materials and re-snapshot the
- *  original-material map afterwards (see CharacterVisual.setWeapon), since the new
- *  weapon meshes start on the source GLB's raw materials. */
+ *  for a runtime gear swap or a weapon-skin change. Re-attaches every swap slot (the
+ *  rogue has two, so both hands update) plus, for classes with a fixed ranged visual
+ *  (hunter), the fixed ranged attach that a bow/crossbow skin replaces. Returns the
+ *  attached weapon payload roots so the caller can hang rarity VFX off them. The
+ *  caller must re-apply materials and re-snapshot the original-material map
+ *  afterwards (see CharacterVisual.setWeapon), since the new weapon meshes start on
+ *  the source GLB's raw materials. */
 export function setHeldWeapon(
   root: THREE.Object3D,
   def: VisualDef,
   weaponItemId: string | null,
-): void {
-  if (!def.weaponSlots?.length) return;
+  weaponSkinId: string | null = null,
+): THREE.Object3D[] {
+  const attachments = def.attach ?? [];
+  const targets: number[] = [];
+  for (let i = 0; i < attachments.length; i++) {
+    if (def.weaponSlots?.includes(i) || isRangedSwapAttach(attachments[i])) targets.push(i);
+  }
+  if (targets.length === 0) return [];
   const stale: THREE.Object3D[] = [];
   root.traverse((o) => {
     if (o.userData[SWAP_WEAPON_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
-  for (const i of def.weaponSlots) {
-    const base = def.attach?.[i];
-    if (!base) continue;
-    const att = swapAttachDef(base, weaponItemId);
+  const payloads: THREE.Object3D[] = [];
+  for (const i of targets) {
+    const base = attachments[i];
+    const att = def.weaponSlots?.includes(i)
+      ? swapAttachDef(base, weaponItemId, weaponSkinId)
+      : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     const bone = resolveBone(root, att.bone);
     if (!bone) continue;
-    attachProp(root, bone, att, true);
+    payloads.push(attachProp(root, bone, att, true));
   }
+  return payloads;
+}
+
+/** A standalone display clone of a weapon-skin model for the armory inspect
+ *  turntable (weapon-only mode). Origin is the grip, like every held model.
+ *  Materials are cloned per call: the VFX emissive derive mutates them in
+ *  place, and SkeletonUtils.clone shares the cached GLTF source materials. */
+export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
+  const url = weaponSkinModelUrl(skinId);
+  if (!url) return null;
+  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(url).scene));
+  payload.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.userData.weaponMesh = true;
+    mesh.material = Array.isArray(mesh.material)
+      ? mesh.material.map((m) => m.clone())
+      : mesh.material.clone();
+  });
+  markOwnedWeaponSkinMaterials(payload);
+  return payload;
 }
 
 // ---------------------------------------------------------------------------
@@ -561,6 +647,7 @@ export function setHeldWeapon(
 // ---------------------------------------------------------------------------
 
 const matCache = new Map<string, THREE.Material>();
+const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
@@ -662,17 +749,25 @@ export function applyMaterials(
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    // Weapon-skin VFX rigs own their ShaderMaterials, and a skinned weapon's
+    // payload materials are per-instance clones the VFX emissive derive mutates
+    // and restores. Tinting either (or re-deriving them from the shared cache
+    // on a body-skin change) corrupts live handles, so both stay untouched.
+    if (mesh.userData.weaponVfxMesh || mesh.userData.weaponSkinIsolated) return;
+    // Always derive a skin/material variant from the assembled model's source
+    // material. Reusing the last applied variant would retain its alternate map
+    // when skin 0 asks to restore the embedded default texture.
+    const source = sourceMaterials.get(mesh) ?? mesh.material;
+    sourceMaterials.set(mesh, source);
     const role: MaterialRole = mesh.userData.weaponMesh ? 'weapon' : 'body';
     const materialTint = role === 'weapon' ? null : tint;
     // skin/emissive override only touches the character's own atlas meshes, not weapons
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
-    if (Array.isArray(mesh.material)) {
-      mesh.material = mesh.material.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role),
-      );
+    if (Array.isArray(source)) {
+      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
     } else {
-      mesh.material = tintedMaterial(mesh.material, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
     }
   });
 }

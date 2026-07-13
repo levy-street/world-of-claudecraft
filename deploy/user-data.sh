@@ -44,7 +44,7 @@ fi
 # --- packages: docker, compose v2, git, caddy ------------------------------
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y docker.io docker-compose-v2 git curl gnupg apt-transport-https
+apt-get install -y docker.io docker-compose-v2 git curl gnupg apt-transport-https unzip
 
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
   | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
@@ -66,6 +66,10 @@ if [ ! -f .env ]; then
   echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)" > .env
   chmod 600 .env
 fi
+
+# Persistent host overlay for SFX Studio production bundles. Create it before
+# Compose so Docker does not create a root-owned bind-mount directory.
+install -d -o ubuntu -g ubuntu "$APP_DIR/sfx-runtime"
 
 # --- build + run the stack --------------------------------------------------
 docker compose up -d --build

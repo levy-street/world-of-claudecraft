@@ -999,7 +999,7 @@ describe('client HTML shell', () => {
     // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
     // this drawer button is the touch path to Discord (the account panel when
     // available, else the community invite). Donate mirrors the desktop shell's
-    // sponsors community link.
+    // Ko-fi community link.
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -1020,15 +1020,54 @@ describe('client HTML shell', () => {
     // .donate links in hud.css.
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
-    // offline fallback, and the sponsors page, pinned to the shells' URLs.
+    // offline fallback, and the Ko-fi page, pinned to the shells' URLs.
     expect(mainTs).toContain("const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';");
-    expect(mainTs).toContain("const DONATE_URL = 'https://github.com/sponsors/levy-street';");
+    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
     expect(mainTs).toContain(
       "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
     );
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
+    }
+  });
+
+  it('offers a desktop micro-menu Discord entry in BOTH entries (not keybind-only)', () => {
+    // Before this, linking Discord was reachable only via the undocumented 'U'
+    // keybind: no menu item, button, or keybind-list mention told a desktop
+    // player the feature existed. #mm-discord in the micro-menu (alongside
+    // #mm-social, #mm-valecup, ...) gives it a visible, clickable affordance
+    // that mirrors the mobile tray's #mobile-discord button.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="mm-discord"');
+      expect(entry, name).toMatch(/id="mm-discord"[^>]*data-icon="discord"/);
+      // Starts hidden; main.ts reveals it at boot on any build with Discord UI
+      // enabled, mirroring #mobile-discord's own gating.
+      expect(entry, name).toMatch(/id="mm-discord"\s+hidden/);
+      // Shows the 'U' default keybind as a discoverability hint, same as every
+      // other micro-menu button (#mm-social shows 'o', #mm-valecup shows 'y').
+      expect(entry, name).toMatch(/id="mm-discord"[^>]*>\s*<span class="keybind">u<\/span>/);
+    }
+    // main.ts wires the click through the Hud's discord hook (attachDiscordHook)
+    // to openDiscordEntry, the SAME entry point the mobile tray uses: it opens
+    // the panel when logged in and falls through to the community invite
+    // otherwise, so the desktop button is a live affordance offline too. The
+    // hook is attached unconditionally (not inside `if (online)`), else the
+    // button would render visible but no-op offline.
+    expect(mainTs).toMatch(
+      /hud\.attachDiscordHook\(\(\) => openDiscordEntry\(\)\);\s*\n\s*if \(online\) \{/,
+    );
+    expect(mainTs).toContain('function syncDiscordEntries(): void {');
+    expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
   });
 
   it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
@@ -1593,6 +1632,12 @@ describe('client HTML shell', () => {
     );
     expect(html).toContain('id="mobile-more-close"');
     expect(html).toContain('<div id="mobile-extra-grid">');
+    // Daily Rewards and the Book of Deeds ride the More grid in BOTH entries
+    // (play.html historically lags index.html; these pins keep them in step).
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="mobile-daily-rewards"');
+      expect(entry).toContain('id="mobile-deeds"');
+    }
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
     );
@@ -1675,6 +1720,33 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
     expect(hudTs).toContain("style.display !== 'none' && style.visibility !== 'hidden'");
     expect(hudTs).toContain("if (document.body.classList.contains('mobile-more-open')) {");
+  });
+
+  it('keeps the More tray out of the managed-window close path', () => {
+    // The closed tray stays display:flex (opacity/visibility carry the
+    // transition), so the managed-window visibility probe must key on the
+    // body class: otherwise closeAll() treats the closed tray as the topmost
+    // window and stamps an inline display:none that the class toggles can
+    // never clear, leaving the tray unopenable until reload.
+    const isWindowVisible = hudTs.slice(
+      hudTs.indexOf('private isWindowVisible('),
+      hudTs.indexOf('private syncWindowOpenState('),
+    );
+    expect(isWindowVisible).toContain("if (el.id === 'mobile-extra-controls')");
+    expect(isWindowVisible).toContain(
+      "return document.body.classList.contains('mobile-more-open');",
+    );
+    // Closing through the window manager must ride the same class mechanism
+    // as the tray's own X button, never the default inline display:none arm.
+    const closeManaged = hudTs.slice(
+      hudTs.indexOf('private closeManagedWindow('),
+      hudTs.indexOf('private initChatTabs('),
+    );
+    expect(closeManaged).toContain("case 'mobile-extra-controls':");
+    expect(closeManaged).toContain("document.body.classList.remove('mobile-more-open');");
+    expect(closeManaged).toContain(
+      "document.getElementById('mobile-more')?.classList.remove('active');",
+    );
   });
 
   it('replaces the dual mode cards with one Play CTA and a realm selector', () => {
@@ -2111,6 +2183,23 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('@media (prefers-reduced-motion: reduce) {');
   });
 
+  it('shrinks the compact-tier page-toggle digit so it is not clipped by the ring circle', () => {
+    // On the compact tier the toggle is clamped to the 40px touch floor
+    // (--mobile-ring-toggle-size: max(40px, ...)), whose border-box inner
+    // height is only 40 - 2 * 2px border = 36px. The base 20px digit plus the
+    // 2px-margin 15px icon below it (37px) overflowed that by a hair, and
+    // #mobile-action-ring > button's overflow:hidden (needed to clip the
+    // cooldown sweep) cropped the digit's top pixels instead of showing it in
+    // full at 1044x480 (the compact tier's exact 480px height boundary).
+    // Regression for that clip: the compact tier must shrink the digit enough
+    // to clear the 36px inner floor with the icon still under it.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #mobile-action-page-toggle .mobile-action-page-indicator {\n' +
+        '    font-size: 15px;\n' +
+        '  }',
+    );
+  });
+
   it('gates the camera joystick behind its opt-in setting (swipe-look is the primary camera)', () => {
     // The base's declutter removed the camera joystick outright; this branch
     // keeps it as an OPT-IN (settings.mobileCameraJoystick stamps
@@ -2149,19 +2238,16 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar.many-spells');
   });
 
-  it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
+  it('seeds druid form bars and initializes stealth pages blank', () => {
     expect(hudTs).toContain('if (this.isFormKitBar()) {');
     expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
     expect(hudTs).toMatch(
       /buildDefaultFormBar\(\s*this\.formKitAbilityIds\(this\.activeHotbarForm\),\s*Hud\.BAR_ABILITY_SLOTS,\s*\)/,
     );
-    expect(hudTs).toMatch(
-      /const emptyFormMap =\s*this\.activeHotbarForm !== 'normal' && parsed\.every\(\(action\) => action === null\);/,
-    );
-    expect(hudTs).toContain("localStorage.getItem(this.slotMapKey('normal'))");
-    expect(hudTs).not.toContain(
-      "this.loadedSlotMapFromStorage = stored || this.activeHotbarForm !== 'normal';",
-    );
+    expect(hudTs).toContain('if (this.isStealthHotbarForm()) {');
+    expect(hudTs).toContain('this.loadStealthSlotMap(parsed, stored, storedRaw);');
+    expect(hudTs).toMatch(/Array\.from\(\{ length: Hud\.BAR_ABILITY_SLOTS \}, \(\) => null\)/);
+    expect(hudTs).not.toContain('fallbackForm');
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
@@ -2179,6 +2265,7 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("new Set(['bear_form', 'cat_form', 'travel_form'])");
     expect(hudTs).toContain("if (this.activeHotbarForm === 'bear') return 'bear_form';");
     expect(hudTs).toContain("if (this.activeHotbarForm === 'cat') return 'cat_form';");
+    expect(hudTs).not.toContain("this.activeHotbarForm === 'cat_stealth') return 'cat_form'");
     expect(hudTs).toContain(
       'if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);',
     );
@@ -2318,5 +2405,21 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: 50%;');
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%);');
     expect(hudMobileCss).toContain('z-index: 95 !important;');
+  });
+  it('keeps desktop rolls above managed windows and the mobile bag sheet above rolls', () => {
+    const railZ = Number(componentsCss.match(/#loot-rolls \{[\s\S]*?z-index:\s*(\d+);/)?.[1]);
+    const managedFloors = [
+      ...hudTs.matchAll(/(?:private windowZ =|this\.windowZ =)\s*(\d+);/g),
+    ].map((match) => Number(match[1]));
+    expect(Number.isFinite(railZ)).toBe(true);
+    expect(managedFloors).toHaveLength(2); // initial value + normalization reset
+    for (const floor of managedFloors) {
+      // Desktop Bags shares the roll rail's bottom-right footprint, so the first
+      // managed window must remain below it.
+      expect(floor + 1, `first managed z-index overlaps loot rail ${railZ}`).toBeLessThan(railZ);
+    }
+    // On mobile Bags is a full-screen modal sheet. !important intentionally
+    // beats the inline managed-window value without changing desktop stacking.
+    expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
   });
 });

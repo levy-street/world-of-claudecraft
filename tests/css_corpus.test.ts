@@ -144,6 +144,9 @@ const INDEX_SECTIONS = [
   'chat',
   'party frames',
   'context menu',
+  // the operator-set AI-account tag: one shared animated-gradient class serving the
+  // chat line, the nameplate .np-ai span, and the target frame's flair line.
+  'ai account tag',
   'prompts (invite/trade/duel)',
   'trade window',
   'elite target frame',
@@ -161,6 +164,10 @@ const INDEX_SECTIONS = [
   'skip links',
   'forced-colors',
   'print reset',
+  // Book of Deeds: the window/tracker bodies (components.css) and the
+  // standalone touch layout (hud.mobile.css); both modules load in both entries.
+  'deeds',
+  'mobile deeds (standalone window + tracker)',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -172,12 +179,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 65 index + 63 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(65);
-    expect(PLAY_SECTIONS.length).toBe(63);
-    expect(MANIFEST.length).toBe(65);
-    expect(new Set(INDEX_SECTIONS).size).toBe(65);
-    expect(new Set(PLAY_SECTIONS).size).toBe(63);
+  it('pins a non-vacuous manifest: 68 index + 66 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(68);
+    expect(PLAY_SECTIONS.length).toBe(66);
+    expect(MANIFEST.length).toBe(68);
+    expect(new Set(INDEX_SECTIONS).size).toBe(68);
+    expect(new Set(PLAY_SECTIONS).size).toBe(66);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {
@@ -232,5 +239,55 @@ describe('css_corpus guard has teeth (fixture-proven, touches no product files)'
     const present = new Set(sectionNames(dropped));
     expect(present.has('windows')).toBe(false);
     expect(MANIFEST.filter((name) => !present.has(name))).toContain('windows');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Per-file brace balance. A merge-resolution hand-union once dropped a closing
+// brace mid-file (components.css, the v0.24.0 merge): the sheet stays lintable
+// text and every text-scan guard above still matches, but the browser treats
+// each rule from the unbalanced point to EOF as invalid declarations inside the
+// unterminated block and silently discards thousands of lines. Balance is
+// checked per FILE, not on the union: a +1 in one file and a -1 in another must
+// not cancel out.
+// ---------------------------------------------------------------------------
+
+/** Curly-brace balance with comments and quoted strings stripped first, so a
+ *  literal brace inside content: "}" or a commented-out rule never miscounts. */
+function braceBalance(css: string): number {
+  const stripped = css
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, '');
+  let balance = 0;
+  for (const ch of stripped) {
+    if (ch === '{') balance++;
+    else if (ch === '}') balance--;
+  }
+  return balance;
+}
+
+describe('css_corpus per-file brace balance', () => {
+  it('balances every src/styles module exactly', () => {
+    expect(existsSync(stylesDir)).toBe(true);
+    const files = readdirSync(stylesDir)
+      .sort()
+      .filter((name) => name.endsWith('.css'));
+    expect(files.length).toBeGreaterThan(0);
+    for (const name of files) {
+      const css = readFileSync(join(stylesDir, name), 'utf8');
+      expect(braceBalance(css), `src/styles/${name} must have balanced braces`).toBe(0);
+    }
+  });
+
+  it('balances both entries inline style blocks', () => {
+    for (const entry of ['index.html', 'play.html']) {
+      expect(braceBalance(inlineStyleCss(entry)), `${entry} inline styles`).toBe(0);
+    }
+  });
+
+  it('teeth: an unterminated block is flagged and string/comment braces are ignored', () => {
+    expect(braceBalance('.a { color: red;')).toBe(1);
+    expect(braceBalance('.a { color: red; } }')).toBe(-1);
+    expect(braceBalance('.a { content: "}"; } /* } */ .b { color: blue; }')).toBe(0);
   });
 });

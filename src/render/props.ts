@@ -833,7 +833,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       scale: [3.1 / stand.size.x, 2.6 / stand.size.y, 2.5 / stand.size.z],
       rot: (keyRand(key, 1) - 0.5) * 0.1,
     });
-    if (!lowProps && (i === 1 || i === 4)) {
+    if (!lowProps && s.smithy) {
       // Smith Haldren (z1) / Armorer Hode (z3): forge-front dressing
       addParts(g, 'anvil', { x: 1.35, z: 1.15, rot: 0.9, scale: 1.35 });
       addParts(g, 'weaponStand', { x: -1.45, z: 0.6, rot: 0.5 + Math.PI, scale: 1.25 });

@@ -45,7 +45,7 @@
 //   I18N_OUT_DIR=... node scripts/i18n_scan.mjs   emit both into a custom directory
 
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { COPIED_ALLOW_IDS, V07_SLASH } from './i18n_blocked_seed.mjs';
@@ -64,6 +64,18 @@ const OUT_DIR = process.env.I18N_OUT_DIR
   : path.join(root, 'src/ui');
 const OUT_PATH = path.join(OUT_DIR, 'i18n.status.json');
 const SUMMARY_PATH = path.join(OUT_DIR, 'i18n.status.summary.json');
+
+// Write-then-rename so no concurrent reader ever observes a half-written
+// artifact: the test suite regenerates these files into the real tree while
+// parallel workers run `git status` porcelain assertions, and a direct
+// multi-megabyte writeFileSync leaves a mid-write window where a tracked,
+// otherwise byte-identical file reads as modified. Same-directory rename is
+// atomic on POSIX.
+function atomicWriteFileSync(filePath, contents) {
+  const tmpPath = `${filePath}.tmp`;
+  writeFileSync(tmpPath, contents);
+  renameSync(tmpPath, filePath);
+}
 
 // The authoritative ordered locale set (mirrors scripts/i18n_build.mjs). `en` is
 // the nested base; the rest are flat dotted-key overlays. The registry tracks the
@@ -123,6 +135,8 @@ function cognateReason(scope, locale, key) {
     return "'Status' is the accepted term in this locale and is identical to English (matches detail.status).";
   if (key === 'chatFilter.escalationTitle')
     return "'Escalation' is a borrowed term already used across this locale's admin strings.";
+  if (key === 'accounts.badgeStreamer' || key === 'detail.streamerLabel')
+    return "'Streamer' is the borrowed term this locale actually uses for the role; the native calque is not what an operator would say.";
   return 'Accepted cognate or borrowed term that is legitimately identical to English.';
 }
 
@@ -378,7 +392,7 @@ async function main() {
 
   const text = JSON.stringify(registry, null, 2) + '\n';
   mkdirSync(OUT_DIR, { recursive: true });
-  writeFileSync(OUT_PATH, text);
+  atomicWriteFileSync(OUT_PATH, text);
 
   // A small COMMITTED audit summary alongside the (gitignored) full registry: the
   // headline counts, a per-locale state rollup, and a hash over the whole key
@@ -411,7 +425,7 @@ async function main() {
     perLocale,
   };
   const summaryText = JSON.stringify(summary, null, 2) + '\n';
-  writeFileSync(SUMMARY_PATH, summaryText);
+  atomicWriteFileSync(SUMMARY_PATH, summaryText);
 
   console.log(
     `generated ${path.relative(root, OUT_PATH)} ` +

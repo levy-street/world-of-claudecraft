@@ -1,6 +1,6 @@
 // Mobile target-size pass: under a real landscape phone viewport (the
-// in-game view is landscape-only on web mobile), every primary gameplay control
-// must render at least 48x48px, not merely the >=24px absolute desktop floor.
+// in-game view is landscape-only on web mobile), every TOUCH control must render >=40x40px,
+// the PREFERRED mobile floor, not merely the >=24px absolute desktop floor.
 // This measures REAL rendered geometry (getBoundingClientRect under the real style barrel +
 // the body.mobile-touch.game-active state), never a CSS-text assertion, mirroring the V16
 // mobile_button_size / mobile_joystick_size harnesses but with an actual numeric floor the
@@ -10,9 +10,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { cleanup } from './_harness';
 
-const TOUCH_FLOOR = 48;
-const LEGACY_TOUCH_FLOOR = 40;
-// getBoundingClientRect can land a hair under an exact declaration on sub-pixel
+const TOUCH_FLOOR = 40;
+// getBoundingClientRect can land a hair under an exact 40px declaration on sub-pixel
 // rounding; allow half a pixel so the gate tests the real floor, not rounding noise.
 const EPSILON = 0.5;
 
@@ -21,13 +20,11 @@ beforeEach(async () => {
   // landscape media query drives the in-game landscape rules in hud.mobile.css.
   await page.viewport(844, 390);
   document.body.className = 'mobile-touch game-active';
-  document.body.style.setProperty('--btn-scale', '0.8');
 });
 
 afterEach(() => {
   cleanup();
   document.body.className = '';
-  document.body.style.removeProperty('--btn-scale');
 });
 
 function measure(el: HTMLElement): { w: number; h: number } {
@@ -35,10 +32,10 @@ function measure(el: HTMLElement): { w: number; h: number } {
   return { w: r.width, h: r.height };
 }
 
-function expectAtLeastFloor(el: HTMLElement, label: string, floor = TOUCH_FLOOR): void {
+function expectAtLeastFloor(el: HTMLElement, label: string): void {
   const { w, h } = measure(el);
-  expect(w, `${label} width ${w} < ${floor}`).toBeGreaterThanOrEqual(floor - EPSILON);
-  expect(h, `${label} height ${h} < ${floor}`).toBeGreaterThanOrEqual(floor - EPSILON);
+  expect(w, `${label} width ${w} < ${TOUCH_FLOOR}`).toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
+  expect(h, `${label} height ${h} < ${TOUCH_FLOOR}`).toBeGreaterThanOrEqual(TOUCH_FLOOR - EPSILON);
 }
 
 function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
@@ -51,86 +48,74 @@ function el(tag: string, attrs: Record<string, string> = {}): HTMLElement {
   return node;
 }
 
-describe('mobile target-size: primary in-game touch controls are >=48x48 in landscape', () => {
-  it('mobile action-ring controls (slot, attack, page toggle, Target swap, Jump)', () => {
-    // Mount the approved logical order. CSS turns this stable source order into
-    // the two-row pad without scaling any interactive ancestor.
+describe('mobile target-size: in-game touch controls are >=40x40 in landscape', () => {
+  it('mobile action-ring controls (slot, attack, page toggle, Target swap, Use)', () => {
+    // The paged action ring replaced the desktop #actionbar on touch (which is
+    // display:none under body.mobile-touch); its sizes resolve from the
+    // --mobile-ring-* variables on the ring container, so the buttons must be
+    // measured inside it, mirroring the real index.html/play.html markup (the
+    // Target swap and Use helpers live in the ring's crescent hollow, not the
+    // left utility cluster).
     const ring = el('div', { id: 'mobile-action-ring' });
-    const a1 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '0' });
-    const a2 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
+    const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '1' });
     const attack = el('button', { id: 'mobile-action-attack' });
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
+    const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    const a3 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
-    const a4 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '3' });
-    const a5 = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '4' });
-    const jump = el('button', { id: 'mobile-jump' });
-    ring.append(a1, a2, attack, targetCycle, toggle, a3, a4, a5, jump);
+    ring.append(slot, attack, targetCycle, interact, toggle);
     document.body.appendChild(ring);
-    expectAtLeastFloor(a1, '.mobile-action-slot');
+    expectAtLeastFloor(slot, '.mobile-action-slot');
     expectAtLeastFloor(attack, '#mobile-action-attack');
     expectAtLeastFloor(targetCycle, '#mobile-target-cycle');
-    expectAtLeastFloor(jump, '#mobile-jump');
+    expectAtLeastFloor(interact, '#mobile-interact');
     expectAtLeastFloor(toggle, '#mobile-action-page-toggle');
   });
 
   it('the compact-tier ring keeps every control at the floor (smallest sizes)', () => {
-    // The compact tier changes placement, never the 48px hitbox floor.
+    // hud-mobile-compact re-tunes every --mobile-ring-* var downward for short
+    // landscape phones, then the 0.85 mobile-chrome-scale shrinks them further; the
+    // smallest (toggle 46 * 0.85 = 39.1) is clamped back up to the 40px floor via
+    // max(40px, ...), and Target/Use (50 * 0.85 = 42.5) still clear it.
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const ring = el('div', { id: 'mobile-action-ring' });
     const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
     const attack = el('button', { id: 'mobile-action-attack' });
     const targetCycle = el('button', { id: 'mobile-target-cycle' });
-    const jump = el('button', { id: 'mobile-jump' });
+    const interact = el('button', { id: 'mobile-interact' });
     const toggle = el('button', { id: 'mobile-action-page-toggle' });
-    ring.append(slot, attack, targetCycle, jump, toggle);
+    ring.append(slot, attack, targetCycle, interact, toggle);
     document.body.appendChild(ring);
     expectAtLeastFloor(slot, 'compact .mobile-action-slot');
     expectAtLeastFloor(attack, 'compact #mobile-action-attack');
     expectAtLeastFloor(targetCycle, 'compact #mobile-target-cycle');
-    expectAtLeastFloor(jump, 'compact #mobile-jump');
+    expectAtLeastFloor(interact, 'compact #mobile-interact');
     expectAtLeastFloor(toggle, 'compact #mobile-action-page-toggle');
   });
 
-  it('the compact direct menu keeps Chat, Quests, and More at the floor', () => {
-    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+  it('the left utility cluster (Autorun/Jump) and the Chat/More pair', () => {
+    const cluster = el('div', { id: 'mobile-utility-cluster' });
+    const autorun = el('button', { id: 'mobile-autorun', class: 'mobile-btn' });
+    const jump = el('button', { id: 'mobile-jump', class: 'mobile-btn' });
+    cluster.append(autorun, jump);
     const combat = el('div', { id: 'mobile-combat-controls' });
     const chat = el('button', { id: 'mobile-chat', class: 'mobile-btn' });
-    const quest = el('button', { id: 'mobile-quest', class: 'mobile-btn' });
     const more = el('button', { id: 'mobile-more', class: 'mobile-btn' });
-    combat.append(chat, quest, more);
-    document.body.append(combat);
+    combat.append(chat, more);
+    document.body.append(cluster, combat);
+    expectAtLeastFloor(autorun, '#mobile-autorun');
+    expectAtLeastFloor(jump, '#mobile-jump');
     expectAtLeastFloor(chat, '#mobile-chat');
-    expectAtLeastFloor(quest, '#mobile-quest');
     expectAtLeastFloor(more, '#mobile-more');
-  });
-
-  it('the Consumables toggle and populated 3 x 2 slots stay at the floor', () => {
-    document.body.classList.add('mobile-consumables-open');
-    const consumables = el('div', { id: 'mobile-consumables' });
-    const toggle = el('button', { id: 'mobile-consumables-toggle' });
-    const row = el('div', { id: 'mobile-consumables-row' });
-    const slots = Array.from({ length: 6 }, (_, index) =>
-      el('button', {
-        class: 'mobile-consumable-slot',
-        'data-consumable-index': String(index),
-      }),
-    );
-    row.append(...slots);
-    consumables.append(toggle, row);
-    document.body.append(consumables);
-    expectAtLeastFloor(toggle, '#mobile-consumables-toggle');
-    for (const [index, slot] of slots.entries()) {
-      expectAtLeastFloor(slot, `.mobile-consumable-slot[${index}]`);
-    }
   });
 
   it('party-member rows (role=button tap targets)', () => {
     const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
+    const rows = el('div', { class: 'party-rows' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
-    frames.appendChild(row);
+    rows.appendChild(row);
+    frames.appendChild(rows);
     document.body.appendChild(frames);
-    expectAtLeastFloor(row, 'party-frame', LEGACY_TOUCH_FLOOR);
+    expectAtLeastFloor(row, 'party-frame');
   });
 
   it('the party leave button', () => {
@@ -139,7 +124,7 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     leave.textContent = 'Leave Party';
     frames.appendChild(leave);
     document.body.appendChild(frames);
-    expectAtLeastFloor(leave, '#party-leave', LEGACY_TOUCH_FLOOR);
+    expectAtLeastFloor(leave, '#party-leave');
   });
 
   it('the mobile More-tray close button', () => {
@@ -150,7 +135,19 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     title.appendChild(close);
     tray.appendChild(title);
     document.body.appendChild(tray);
-    expectAtLeastFloor(close, '#mobile-more-close', LEGACY_TOUCH_FLOOR);
+    expectAtLeastFloor(close, '#mobile-more-close');
+  });
+
+  it('the always-present Donate button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const donate = el('button', { id: 'mobile-donate', class: 'mobile-btn' });
+    donate.textContent = 'Donate';
+    grid.appendChild(donate);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(donate, '#mobile-donate');
   });
 
   it('the movement / camera joystick', () => {
@@ -174,7 +171,7 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     zoom.style.width = '32px';
     zoom.style.height = '32px';
     document.body.appendChild(zoom);
-    expectAtLeastFloor(zoom, '.map-zoom-btn', LEGACY_TOUCH_FLOOR);
+    expectAtLeastFloor(zoom, '.map-zoom-btn');
   });
 });
 

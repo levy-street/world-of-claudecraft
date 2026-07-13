@@ -1,11 +1,15 @@
 // Authoritative sound-effect catalog — consumed by scripts/gen_sfx.mjs.
-// Each entry: { key, prompt, duration (seconds 0.5–30), loop? }.
+// Each entry: { key, prompt, duration (seconds 0.5 to 30), loop?, generator?,
+// custom? }. Additional takes are discovered from <key>_1.mp3, <key>_2.mp3,
+// and so on. The runtime cycles those files in numeric order.
 // Human-readable design + spatial behaviour: docs/design/sound_effects.md.
 //
 // Keys map to public/audio/sfx/<key>.mp3 and to src/game/sfx_manifest.generated.ts.
 // Prompts are written for the ElevenLabs Sound Effects model: concise, concrete,
 // single-event, "no music, no speech" where it matters. Footsteps/impacts are ONE
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
+
+import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 
 const FOOT = (key, surface) => ({
   key,
@@ -193,6 +197,13 @@ export const SFX = [
     prompt:
       'Earthy nature magic growing: rustling leaves and a low primal hum building. Seamless loop, no music.',
   },
+  // Per-ability cast loop override (custom recording, not ElevenLabs). See
+  // castKeyForAbility in src/ui/hud.ts: lightning_bolt uses this clip instead
+  // of its school default (arcane).
+  { key: 'cast_lightning_bolt', custom: true, loop: true },
+  // Chain Heal's one-shot cast clip (custom recording). See src/ui/hud.ts:
+  // the castStart handler plays this instead of the nature cast loop.
+  { key: 'cast_chain_heal', custom: true, loop: false },
 
   // --- Spell projectiles ----------------------------------------------------
   {
@@ -451,6 +462,30 @@ export const SFX = [
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
+
+  // --- Lockpick minigame (custom recordings, not ElevenLabs) ------------------
+  // custom: true means gen_sfx.mjs will never call the API for these, even with
+  // --force. Drop the MP3 into public/audio/sfx/ and add an entry here to register
+  // any future custom recording in the same way.
+  { key: 'lockpick_advanced_1', custom: true },
+  { key: 'lockpick_advanced_2', custom: true },
+  { key: 'lockpick_advanced_3', custom: true },
+  { key: 'lockpick_advanced_4', custom: true },
+  { key: 'lockpick_begin', custom: true },
+  { key: 'lockpick_bind', custom: true },
+  { key: 'lockpick_bonus', custom: true },
+  { key: 'lockpick_end', custom: true },
+  { key: 'lockpick_fail', custom: true },
+  { key: 'lockpick_page_cleared', custom: true },
+  { key: 'lockpick_retry', custom: true },
+  { key: 'lockpick_slip', custom: true },
+  { key: 'lockpick_success', custom: true },
+  { key: 'lockpick_trap', custom: true },
+
+  // --- Interface and event feedback ----------------------------------------
+  // These are generated locally by scripts/gen_ui_sfx.mjs. Keeping them in the
+  // authoritative catalog makes every live GameAudio cue editable in SFX Studio.
+  ...UI_SFX_CATALOG,
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

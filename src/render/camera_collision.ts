@@ -20,8 +20,8 @@ function compensatedFov(baseFov: number, maxFov: number, apparentT: number, pull
   const safePull = Math.max(1e-3, pullT);
   const ratio = Math.max(1, apparentT / safePull);
   if (ratio <= 1.001) return baseFov;
-  const baseRad = baseFov * Math.PI / 180;
-  const fov = 2 * Math.atan(Math.tan(baseRad / 2) * ratio) * 180 / Math.PI;
+  const baseRad = (baseFov * Math.PI) / 180;
+  const fov = (2 * Math.atan(Math.tan(baseRad / 2) * ratio) * 180) / Math.PI;
   return Math.min(maxFov, Math.max(baseFov, fov));
 }
 
@@ -46,9 +46,8 @@ export function stepCameraOcclusion(
 ): CameraOcclusionState {
   const hard = clamp01(hardLimit);
   const soft = clamp01(softLimit);
-  const softTarget = hard >= 1 && soft < 1
-    ? hard + (soft - hard) * Math.min(1, Math.max(0, softWeight))
-    : hard;
+  const softTarget =
+    hard >= 1 && soft < 1 ? hard + (soft - hard) * Math.min(1, Math.max(0, softWeight)) : hard;
   const target = Math.min(hard, softTarget);
   const rate = target < state.pullT ? pullInRate : pullOutRate;
   const easedPull = expEase(clamp01(state.pullT), target, rate, dt);

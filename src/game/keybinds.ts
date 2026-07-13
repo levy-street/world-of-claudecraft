@@ -208,6 +208,18 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyU'],
   },
+  // The Book of Deeds parks on the shifted layer of KeyZ, like the
+  // Shift+digit secondary bar: the bare letter stays free (the persistence
+  // suite and player muscle memory both treat KeyZ as the rebindable spare),
+  // and the shipped default survives the interface-overhaul revert unchanged.
+  // Rebindable like any other action.
+  {
+    id: 'deeds',
+    label: 'Book of Deeds',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyZ'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',
@@ -221,6 +233,32 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'held',
     defaults: ['KeyX'],
+  },
+  // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
+  // action-bar 1..5 stay free; every one is rebindable like any other action. The
+  // handlers live in main.ts (onPet -> the IWorld pet commands).
+  {
+    id: 'petAttack',
+    label: 'Pet: Attack',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit1'],
+  },
+  { id: 'petStop', label: 'Pet: Stop', category: 'Pet', kind: 'edge', defaults: ['Ctrl+Digit2'] },
+  { id: 'petTaunt', label: 'Pet: Taunt', category: 'Pet', kind: 'edge', defaults: ['Ctrl+Digit3'] },
+  {
+    id: 'petDefensive',
+    label: 'Pet: Defensive',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit4'],
+  },
+  {
+    id: 'petAggressive',
+    label: 'Pet: Aggressive',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit5'],
   },
   // Action bar (slot 0 = Attack)
   ...SLOT_DEFAULTS.map(
@@ -384,6 +422,22 @@ export function keyLabel(combo: string | null): string {
   const code = comboCode(combo);
   const head = combo.slice(0, combo.length - code.length); // "Shift+" or ""
   return head + codeLabel(code);
+}
+
+/**
+ * Compact keycap form of a binding label for the tiny UI keycaps (a side-menu
+ * button is 34px wide): lowercase, with modifier words shortened to classic
+ * one-letter prefixes, so "Shift+Z" reads "s-z" and stays inside the cap.
+ * Full-length surfaces (aria labels, tooltips, the keybind options rows) keep
+ * keyLabel/primaryLabel untouched.
+ */
+export function keyCapLabel(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/shift\+/g, 's-')
+    .replace(/ctrl\+/g, 'c-')
+    .replace(/alt\+/g, 'a-')
+    .replace(/meta\+/g, 'm-');
 }
 
 export class Keybinds {

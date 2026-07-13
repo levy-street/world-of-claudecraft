@@ -10,6 +10,7 @@ release-steam/
 # generated main-process runtime bundles (scripts/electron-vendor.mjs)
 electron/vendor/
 media-cache/
+sfx-runtime/
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)
 src/ui/i18n.resolved.generated/*.tmp
@@ -90,3 +91,20 @@ discord_bot_info.txt
 
 # bot build output
 dist-bot/
+
+# Local multibox / farming automation + session logs (never part of the game repo)
+/logs/
+/memory/
+/multibox.tokens.json
+/scripts/multibox*
+/scripts/agent/
+/scripts/companion.*
+/scripts/browser_auth.mjs
+/scripts/token_sink.mjs
+/scripts/_farm_supervisor.sh
+/scripts/_multibox_backup/
+/scripts/MULTIBOX.md
+/scripts/hunter_agent*.mjs
+/scripts/hunter_agents.sh
+/scripts/gravewyrm_trio.mjs
+/TESTING-TALENTS-2-0.md

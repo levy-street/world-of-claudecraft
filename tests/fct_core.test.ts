@@ -76,6 +76,7 @@ describe('describeFct: color token by kind + flags', () => {
     heal: { self: 'heal', other: 'heal' },
     xp: { self: 'xp', other: 'xp' },
     'rested-xp': { self: 'rested-xp', other: 'rested-xp' },
+    honor: { self: 'honor', other: 'honor' },
     'self-note': { self: 'self-note', other: 'self-note' },
   };
 
@@ -125,6 +126,7 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds)', 
       'heal',
       'xp',
       'rested-xp',
+      'honor',
       'self-note',
     ] as FctKind[]) {
       const d = describeFct(makeEvent({ kind, crit: true }), 0.9);
@@ -212,7 +214,7 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
   it('treats informational / avoidance floaters as NON-damage (kept on low)', () => {
     // These are the low-volume floaters the low-tier drop must NOT shed: progression,
     // the self-note UX hint, heals, and avoidance words.
-    const nonDamage: FctKind[] = ['miss', 'dodge', 'heal', 'xp', 'rested-xp', 'self-note'];
+    const nonDamage: FctKind[] = ['miss', 'dodge', 'heal', 'xp', 'rested-xp', 'honor', 'self-note'];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);
   });
 });

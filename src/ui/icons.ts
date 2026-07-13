@@ -9,6 +9,7 @@
 // has a proper icon. Results are cached as data URLs.
 
 import { ABILITIES, ITEMS } from '../sim/data';
+import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
@@ -1640,6 +1641,36 @@ const PRIMITIVES = {
     ctx.arc(-6, 6, 1.3, 0, TAU);
     ctx.fill();
   },
+  bell(ctx, pal) {
+    // hand-bell silhouette: dome + flared lip, crown loop above, clapper below
+    ctx.beginPath();
+    ctx.moveTo(-13, 12);
+    ctx.bezierCurveTo(-13, 2, -11, -14, 0, -17);
+    ctx.bezierCurveTo(11, -14, 13, 2, 13, 12);
+    ctx.lineTo(17, 16);
+    ctx.lineTo(-17, 16);
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -12, -16, 10, 14, [
+      [0, pal.light],
+      [0.55, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.dark, 1.2);
+    ctx.beginPath();
+    ctx.arc(0, -19, 3.2, 0, TAU);
+    ctx.strokeStyle = pal.dark;
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+    noShadow(ctx);
+    ctx.beginPath();
+    ctx.arc(0, 21, 3.6, 0, TAU);
+    ctx.fillStyle = rad(ctx, -1, 20, 4.2, [
+      [0, pal.light],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+  },
   lightning(ctx, pal) {
     ctx.shadowColor = pal.glow;
     ctx.shadowBlur = 8;
@@ -2238,6 +2269,14 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
+  // Baseline class interrupts (physical spell-kicks).
+  pummel: r('fury', 'steel', ['fist'], ['motion']),
+  kick: r('leather', 'steel', ['boot'], ['motion']),
+  counterspell: r('arcane', 'steel', ['fist', { p: 'sunburst', ...TR }]),
+  counter_shot: r('nature', 'gold', ['sword', { p: 'sunburst', ...TR }]),
+  rebuke: r('holy', 'gold', ['fist'], ['glow']),
+  skull_bash: r('earth', 'earthBrown', ['paw'], ['motion']),
+  spell_lock: r('shadow', 'steel', ['fist'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
@@ -2310,6 +2349,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   divine_protection: r('holy', 'silverWhite', ['shield'], ['glow']),
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
+  holy_taunt: r('holy', 'holyGold', ['roar'], ['arcs']),
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
@@ -2342,6 +2382,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   lightning_bolt: r('storm', 'sky', ['lightning'], ['glow']),
   rockbiter_weapon: r('earth', 'earthBrown', ['fist'], ['crack']),
   healing_wave: r('frost', 'sky', ['droplet'], ['arcs', 'sparkle']),
+  chain_heal: r('nature', 'sky', ['droplet'], ['arcs', 'glow']),
   earth_shock: r('earth', 'earthBrown', [{ p: 'lightning', pal: 'earthBrown' }], ['crack']),
   lightning_shield: r('storm', 'sky', ['shield', { p: 'lightning', s: 0.6 }], ['glow']),
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),
@@ -2395,6 +2436,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
   scorch: r('fire', 'ember', ['flame'], ['motion']),
   ice_barrier: r('frost', 'ice', ['shield'], ['glow']),
+  crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
   ambush: r('shadow', 'steel', ['dagger'], ['motion']),
@@ -2432,6 +2474,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
+  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -2446,11 +2489,33 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
+  holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
+  holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
+  bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
+  trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
+  wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
+  arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
+  combustion: r('fire', 'ember', ['flame'], ['sparkle']),
+  icy_veins: r('frost', 'ice', ['snowflake'], ['glow']),
+  cold_blood: r('frost', 'steel', ['dagger'], ['glow']),
+  blade_flurry: r('fury', 'steel', ['sword', { p: 'sword', ...BR }], ['motion']),
+  hemorrhage: r('blood', 'blood', ['dagger', { p: 'droplet', ...BR }], ['drips']),
+  power_infusion: r('holy', 'arcanePink', ['sunburst'], ['sparkle']),
+  holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
+  shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
+  elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
+  siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
+  conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
+  moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
+  swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). Palettes step up with
-  // the quality tier so the bag reads richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
+  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
+  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
+  // richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -2733,6 +2798,61 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   talent_haste: r('storm', 'sky', ['lightning']),
   talent_choice: r('arcane', 'arcanePink', ['gem'], ['sparkle']),
   talent_generic: r('steel', 'steel', ['sigil_rune']),
+  // Book of Deeds display-category base crests (deed_cat_<category>), one per
+  // sidebar bucket; hidden deeds share the Feats shelf crest. Resolution
+  // (bespoke first, else the category base) is deedCrestId in deeds_view.ts.
+  deed_cat_progression: r('treasure', 'gold', ['sunburst'], ['glow']),
+  deed_cat_combat: r('fury', 'blood', [
+    { p: 'sword', x: -6, rot: -0.42 },
+    { p: 'sword', x: 6, rot: 0.42 },
+  ]),
+  deed_cat_dungeon: r('shadow', 'silverWhite', ['skull', { p: 'sword', ...BIG }]),
+  deed_cat_delve: r('earth', 'gold', ['candle'], ['glow']),
+  deed_cat_chronicle: r('parchment', 'gold', ['scroll']),
+  deed_cat_collection: r('treasure', 'gold', ['gem'], ['sparkle']),
+  deed_cat_pvp: r('fury', 'gold', ['fist'], ['motion']),
+  deed_cat_social: r('holy', 'pink', ['heart']),
+  deed_cat_exploration: r('nature', 'earthBrown', ['boot'], ['motion']),
+  deed_cat_feat: r('parchment', 'silverWhite', ['wing'], ['glow']),
+  // Bespoke marquee crests (deed_<id>): the ~20-deed highlight subset of the
+  // launch catalog's Steam marquee list (title/border capstones and iconic
+  // milestones); every other deed renders its category base above.
+  deed_prog_veteran: r('steel', 'leather', ['shield', { p: 'sunburst', ...TL }]),
+  deed_prog_eternal: r('arcane', 'holyGold', ['sunburst'], ['glow', 'arcs']),
+  deed_prog_prestige: r('storm', 'gold', [{ p: 'wing', ...BIG }, 'sunburst'], ['glow']),
+  deed_prog_level_cap: r('storm', 'silverWhite', ['staff', { p: 'sunburst', ...TR }]),
+  deed_cmb_first_blood: r('blood', 'steel', [
+    { p: 'sword', x: -5, rot: -0.42 },
+    { p: 'sword', x: 5, rot: 0.42 },
+    { p: 'droplet', ...TL, pal: 'blood' },
+  ]),
+  deed_cmb_thunzharr_unbroken: r('storm', 'sky', ['lightning'], ['crack', 'glow']),
+  deed_dgn_nythraxis: r('fire', 'ember', [{ p: 'shield', ...BIG }, 'claw_slash'], ['glow']),
+  deed_dgn_korzul_flawless: r('shadow', 'bone', [
+    'skull',
+    { p: 'sword', y: 4, rot: Math.PI, s: 0.8 },
+  ]),
+  deed_dgn_nythraxis_deathless: r('holy', 'silverWhite', ['skull'], ['arcs', 'glow']),
+  deed_dgn_deepward: r('shadow', 'gold', ['shield', { p: 'gem', ...TL }], ['glow']),
+  deed_dlv_nhalia_bells: r('shadow', 'silverWhite', ['bell'], ['glow']),
+  deed_dlv_tumbler_premium: r('treasure', 'gold', ['crate', { p: 'gem', ...TL }], ['sparkle']),
+  deed_chr_vale_chapter_iii: r('nature', 'leafGreen', ['scroll', { p: 'leaf', ...TL }]),
+  deed_chr_marsh_chapter_iii: r('drink', 'venom', ['scroll', { p: 'droplet', ...TL }]),
+  deed_chr_peaks_chapter_iii: r('frost', 'sky', ['scroll', { p: 'snowflake', ...TL }]),
+  deed_col_discovery_250: r('treasure', 'gold', ['crate'], ['sparkle', 'glow']),
+  deed_col_seven_regalia: r('treasure', 'arcanePink', ['helm', { p: 'gem', ...TL }], ['sparkle']),
+  deed_pvp_arena_1v1_1900: r('fury', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sword'], ['glow']),
+  deed_pvp_vcup_wins_25: r('nature', 'gold', ['roar', { p: 'coin', ...BR }]),
+  deed_soc_wyrms_hoard: r(
+    'treasure',
+    'gold',
+    [
+      { p: 'coin', x: -8, y: 8, s: 0.8 },
+      { p: 'coin', x: 8, y: -6 },
+    ],
+    ['sparkle'],
+  ),
+  deed_exp_world_traveler: r('nature', 'sky', ['crosshair', { p: 'boot', ...BR }], ['glow']),
 };
 
 // ---------------------------------------------------------------------------
@@ -3517,8 +3637,11 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags
+  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  'gravewoven_bag',
   'linen_pouch',
+  'mistcallers_duffel',
+  'travelers_knapsack',
   'wolfhide_satchel',
   // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)
   'copper_mining_pick',
@@ -3548,9 +3671,31 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'unknown_alien_weaponry',
 ]);
 
-/** Static URL of an item's image icon, or null if it uses a recipe. */
+// UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
+// records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
+// looted, equipped, or unequipped, so it has no item def. Kept apart from ITEM_IMAGE_IDS so
+// the item guard (tests/item_icons.test.ts) keeps asserting that every wired ITEM id is a
+// real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
+export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
+
+/** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
-  return ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
+  return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
+}
+
+// Book of Deeds crest ids are shaped `deed_<deedId>` (deeds_view.ts deedCrestId). Those whose
+// deed ships committed painted art (public/ui/deeds/<deedId>.webp, listed in DEED_IMAGE_IDS)
+// resolve to that static WebP. Mirrors itemImageUrl. The `deed_cat_<category>` base crests and
+// every non-deed crest id (class crests, talent crests) prefix-strip to something not in the set,
+// so they return null and fall through to their procedural recipe: a missing image never breaks
+// a consumer.
+const DEED_ICON_DIR = '/ui/deeds';
+const DEED_CREST_PREFIX = 'deed_';
+/** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
+export function deedImageUrl(crestId: string): string | null {
+  if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
+  const deedId = crestId.slice(DEED_CREST_PREFIX.length);
+  return DEED_IMAGE_IDS.has(deedId) ? `${DEED_ICON_DIR}/${deedId}.webp` : null;
 }
 
 const urlCache = new Map<string, string>();
@@ -3621,6 +3766,16 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
   // for generic aura_<kind> ids, so those still fall through to the procedural recipe.
   if (kind === 'ability' || kind === 'aura') {
     const img = abilityImageUrl(id);
+    if (img) return img;
+  }
+  // Deed crests with committed painted art short-circuit to the static WebP. A URL-only path is
+  // sufficient: deed crests are only ever drawn into the Book of Deeds window <img> tags (cards
+  // and the recent strip) through this function, never through the synchronous iconCanvas path
+  // (that is class-crest portraits only, unit_portrait_painter.ts), so no canvas is needed. Every
+  // other crest id (class/talent crests, the deed_cat_* bases, bespoke procedural recipes) returns
+  // null here and falls through to the composited canvas below.
+  if (kind === 'crest') {
+    const img = deedImageUrl(id);
     if (img) return img;
   }
   const key = `${kind}|${id}|${size}`;

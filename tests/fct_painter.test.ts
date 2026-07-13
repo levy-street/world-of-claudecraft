@@ -595,6 +595,7 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     'fct-heal': '#3ce63c',
     'fct-xp': '#b974ff',
     'fct-rested-xp': '#4a9eff',
+    'fct-honor': '#ffd100',
     'fct-self-note': '#ff8c66',
   };
 

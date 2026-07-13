@@ -49,6 +49,28 @@
     letter-spacing: 0.2px;
     margin-top: -1px;
   }
+  /* Book of Deeds title: a subtitle line under a player's name */
+  .np-title {
+    font-size: 10px;
+    font-style: italic;
+    color: #ffe9a0;
+    font-family: var(--title-font);
+    letter-spacing: 0.2px;
+    margin-top: -1px;
+  }
+  /* AI-operated-account tag, inline to the left of a player's name. The painter
+     toggles .ai-tag (the shared gradient mark, see its own section below) rather
+     than writing a colour, so no hex literal lives in the TS; without that class
+     the slot collapses, exactly like the hidden badges above. */
+  .np-ai {
+    display: none;
+    font-size: 11px;
+    vertical-align: middle;
+    margin-right: 3px;
+  }
+  .np-ai.ai-tag {
+    display: inline-block;
+  }
   /* $WOC holder-tier flair badge, inline to the left of a player's name */
   .np-tier {
     display: inline-block;
@@ -347,6 +369,25 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--gold-dim);
+  }
+  .tut-next-tips {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b8ad8e;
+  }
+  .tut-next-tips-title {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff14;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 3px;
   }
   .tut-skip {
     margin-top: 11px;
@@ -738,6 +779,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     text-shadow: 1px 1px 2px #000;
+  }
+  /* Book of Deeds title decoration inside the name line: muted gold, INLINE in
+     the same nowrap ellipsized line (the frame keeps its single-line height;
+     a long name-plus-title combo ellipsizes, the classic-frame behavior). The
+     class declaration wins over the hostile/friendly color the target name
+     inherits from its parent's inline style. */
+  .uf-name .uf-title {
+    color: var(--gold-dim);
+    font-weight: normal;
   }
   .bar {
     position: relative;
@@ -1961,6 +2011,91 @@
     color: var(--color-text-success);
   }
 
+  /* ---------- deed tracker ---------- */
+  /* Book of Deeds watchlist: a glanceable strip under the quest tracker.
+     The header mirrors the quest tracker's collapsible button chrome and is
+     a real tab stop (gold focus ring below, the qt-header shape); the lines
+     are the painter's fixed pool, shown/hidden through the elided writers. */
+  #deed-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  #deed-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #deed-tracker .dt-header:hover {
+    color: #fff;
+  }
+  #deed-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #deed-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #deed-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #deed-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #deed-tracker .dt-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  #deed-tracker .dt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  #deed-tracker .dt-bar {
+    flex: 0 0 56px;
+    height: 6px;
+    border: 1px solid #3a3325;
+    border-radius: 3px;
+    background: #14110b;
+    overflow: hidden;
+  }
+  #deed-tracker .dt-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#e6c76a, #a8842f);
+  }
+  #deed-tracker .dt-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+
   /* ---------- delve tracker ---------- */
   #delve-tracker {
     width: 100%;
@@ -2766,7 +2901,8 @@
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
      auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#b974ff); rested
-     xp (#4a9eff); the self note (#ff8c66). Crit stays the separate .fct.crit class. */
+     xp (#4a9eff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
+     .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
     color: #bbb;
@@ -2790,6 +2926,9 @@
   }
   .fct-rested-xp {
     color: #4a9eff;
+  }
+  .fct-honor {
+    color: #ffd100;
   }
   .fct-self-note {
     color: #ff8c66;
@@ -4024,6 +4163,100 @@
     background-position: center;
   }
 
+  /* ---------- ai account tag ---------- */
+  /* ONE class for all three surfaces the operator-set AI mark lands on: the chat
+     line (beside the sender name), the overhead nameplate (.np-ai), and the target
+     unit frame's flair line. An animated rainbow so it reads instantly as a mark
+     and never as part of the name.
+     GAMEPLAY-NEUTRAL: this is identity, never actionable state, and every arm below
+     may calm the MOTION but must leave the resting gradient fully painted. Hiding or
+     delaying the tag on a cheaper tier would be a settings-driven information
+     difference, which the graphics-neutrality invariant forbids. */
+  .ai-tag {
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    /* Muted rainbow, not neon: the tag sits next to the sender name and must read as
+       a quiet mark, never as the brightest thing in the chat log. These stops are
+       desaturated and darkened well below the channel colours around them, so the
+       name stays the thing your eye lands on. The first colour REPEATS at the end so
+       the sweep wraps seamlessly. */
+    background-image: linear-gradient(90deg, #c07079, #c0996f, #74b394, #7398bd, #9a80bd, #c07079);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* A text-shadow paints BEHIND the clipped background, so it smears straight
+       through the transparent glyphs. Both hosts set one (.chat-pane div and
+       .nameplate), so it is cleared here and the legibility halo is redrawn as a
+       drop-shadow of the painted pixels instead. */
+    text-shadow: none;
+    filter: drop-shadow(0 1px 1px #000);
+    /* One full rainbow sweep per cycle (see the keyframes), so this duration reads
+       literally: 22s per sweep, a slow drift rather than a strobe. */
+    animation: ai-tag-shift 22s linear infinite;
+    /* Ambient: paused + duration-calmed by the effect-tier tokens (no change at
+       full Ultra, where --fx-ambient-anim=running and --motion-scale=1). */
+    animation-duration: calc(22s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  /* Chat only. The nameplate tag carries its own margin (.np-ai) and the unit-frame
+     flair line is a flex row with its own gap, so putting this on the shared .ai-tag
+     would double the spacing on both. In chat the tag butts straight against the
+     sender name, so the breathing room is added here and nowhere else. */
+  #chatlog .ai-tag {
+    margin-right: 3px;
+  }
+  /* Player-menu header. The tag is nested INSIDE .ctx-title-name (the header is a
+     flex row with a 9px gap, so a sibling would drift away from the name it
+     qualifies). The header font is the display serif, which the bracketed literal
+     inherits; nudge the size down so it does not out-weigh the name beside it. */
+  .ctx-title-ai {
+    margin-right: 5px;
+    font-size: 0.85em;
+  }
+  /* -150%, not -300%. background-position percentages resolve against
+     (element width - image width), which at background-size: 300% is -2W, so -150%
+     travels exactly 3W: ONE image width, i.e. one seamless rainbow sweep per cycle.
+     -300% travelled two, which silently made the tag cycle twice as fast as its
+     duration suggested. Keep this an integer multiple of the tile or the loop jumps. */
+  @keyframes ai-tag-shift {
+    from {
+      background-position: 0 50%;
+    }
+    to {
+      background-position: -150% 50%;
+    }
+  }
+  /* Reduced motion stops the SCROLL only; the tag keeps its full resting gradient. */
+  @media (prefers-reduced-motion: reduce) {
+    .ai-tag {
+      animation: none;
+    }
+  }
+  /* The forced palette has no gradients, and background-clip: text over it would
+     leave `color: transparent` with nothing to paint, i.e. an invisible tag. Fall
+     back to plain system text so the mark survives high-contrast mode. */
+  @media (forced-colors: active) {
+    .ai-tag {
+      background-image: none;
+      -webkit-background-clip: border-box;
+      background-clip: border-box;
+      color: CanvasText;
+      filter: none;
+    }
+  }
+  /* Stream-link rows in the player context menu: the platform brand mark sits
+     inline with the row label. */
+  #ctx-menu .ctx-item.ctx-stream {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  #ctx-menu .ctx-item .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+
   /* ---------- prompts (invite/trade/duel) ---------- */
   #prompt-stack {
     position: absolute;
@@ -4238,5 +4471,25 @@
   .mail-indicator-count {
     font: 700 11px var(--title-font);
     letter-spacing: 0.4px;
+  }
+  /* ---------- intro logo overlay ---------- */
+  /* Wordmark shown fading in/hold/out over the opening of the first-spawn intro
+     cinematic (spawn_cinematic.ts): intro_logo_overlay.ts drives opacity/display
+     from the pure logo_fade.ts curve each frame, so this rule only sets the
+     static look and the base hidden state. Centered over the canvas, above the
+     HUD (which the intro hides) but never intercepting input. */
+  #intro-logo {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(46vw, 420px);
+    max-width: 90vw;
+    height: auto;
+    z-index: 40;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 14px #000a);
   }
 }

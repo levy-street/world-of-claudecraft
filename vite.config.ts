@@ -346,6 +346,17 @@ export default defineConfig({
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
       },
+      output: {
+        // three.js almost never changes between our releases and is the single
+        // heaviest dependency in the game/editor bundles; splitting it into its
+        // own chunk lets the browser fetch it in parallel with app code and
+        // reuse the browser cache across app-only redeploys (its content hash
+        // stays stable unless the three version itself bumps).
+        manualChunks(id: string): string | undefined {
+          if (id.includes('node_modules/three/')) return 'vendor-three';
+          return undefined;
+        },
+      },
     },
   },
   test: {
@@ -358,6 +369,7 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    globalSetup: ['./tests/global_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a

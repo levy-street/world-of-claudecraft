@@ -2,8 +2,9 @@
 // jewelry (src/sim/content/heroic_vendor.ts). Server-authoritative like the
 // delve shop (delves/runs.ts delveBuyShopItem): the client only sends intent,
 // everything re-validates here. The one deliberate divergence from the delve
-// shop is the CURRENCY: Heroic Marks are an inventory item (a personal boss
-// drop), not a PlayerMeta counter, so the price debits the buyer's bags.
+// shop is the CURRENCY: Heroic Marks are an inventory item awarded directly
+// when an eligible heroic final boss dies, not a PlayerMeta counter, so the
+// price debits the buyer's bags.
 //
 // `src/sim`-pure (no DOM/Three, no wall-clock, draws no rng).
 

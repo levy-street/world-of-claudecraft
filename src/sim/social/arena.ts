@@ -18,6 +18,7 @@
 // are consumed here via SimContext callbacks (points-at Sim until A3 flips them).
 
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
+import * as deedsMod from '../deeds';
 import {
   ARENA_SPAWN_A,
   ARENA_SPAWN_B,
@@ -25,6 +26,7 @@ import {
   ARENA_SPAWNS_B_2v2,
 } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
 import type { ArenaMatch, ArenaQueueUnit, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -747,6 +749,10 @@ export function startArenaMatch(
     ratingA: arenaTeamRating(ctx, teamA, format),
     ratingB: arenaTeamRating(ctx, teamB, format),
     defeated: new Set(),
+    resultRecorded: false,
+    practice: isFiesta && metas.some((meta) => meta?.isFiestaBot === true),
+    honorTeamAKey: honorTeamIdentity(ctx, teamA),
+    honorTeamBKey: honorTeamIdentity(ctx, teamB),
     fiesta: isFiesta ? ctx.createFiestaState() : undefined,
   };
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
@@ -884,6 +890,13 @@ export function endArenaMatch(
   winnerTeam: 'A' | 'B' | null,
   reason: 'defeat' | 'timeout' | 'forfeit',
 ): void {
+  if (match.resultRecorded) {
+    // A disconnect during the five-second aftermath must clean up the instance,
+    // but must never score Elo or honor a second time.
+    if (reason === 'forfeit') returnFromArena(ctx, match);
+    return;
+  }
+  match.resultRecorded = true;
   const ratingA0 = match.ratingA;
   const ratingB0 = match.ratingB;
   // Fiesta and Protect Yumi are unranked play: they never move the Elo ladder.
@@ -902,6 +915,8 @@ export function endArenaMatch(
   const scoreTeam = (team: 'A' | 'B', delta: number, won: boolean | null) => {
     const pids = team === 'A' ? match.teamA : match.teamB;
     const enemies = team === 'A' ? match.teamB : match.teamA;
+    const opponentTeamKey =
+      (team === 'A' ? match.honorTeamBKey : match.honorTeamAKey) ?? honorTeamIdentity(ctx, enemies);
     const enemyNames = enemies.map((pid) => ctx.players.get(pid)?.name ?? '?').join(' & ');
     for (const pid of pids) {
       const meta = ctx.players.get(pid);
@@ -916,8 +931,12 @@ export function endArenaMatch(
           delta,
           won,
         ));
+        if (won === true) awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
+        if (match.fiesta && !match.practice && reason !== 'forfeit') {
+          awardFiestaCompletionHonor(ctx, meta, opponentTeamKey, won === true);
+        }
       }
       ctx.emit({
         type: 'arenaEnd',
@@ -941,6 +960,11 @@ export function endArenaMatch(
   const wonB = winnerTeam === null ? null : winnerTeam === 'B';
   scoreTeam('A', deltaA, wonA);
   scoreTeam('B', -deltaA, wonB);
+
+  // Ranked standings feed the meter deeds; the Fiesta end-of-bout moments
+  // resolve while augment picks are still on the meta. A forfeit is not a
+  // completed bout (a timeout is: the bout ran its full clock).
+  deedsMod.onArenaMatchEndForDeeds(ctx, match, winnerTeam, reason !== 'forfeit');
 
   if (reason === 'forfeit') {
     returnFromArena(ctx, match);
@@ -996,6 +1020,9 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
       if (meta) {
         ctx.fiestaRestoreChar(meta, e);
         ctx.clearFiestaAugments(meta, e);
+        // The evaluator skips standardized fighters; re-evaluate at the real
+        // level after restore.
+        ctx.markDeedsDirty(meta.entityId);
       }
     }
     resetForArena(ctx, e);
