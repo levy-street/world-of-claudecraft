@@ -862,6 +862,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/tools/trowel.glb": "/media/models/tools/trowel.b784024949a2.glb",
   "models/tools/wrench_a.glb": "/media/models/tools/wrench_a.78edf83bb489.glb",
   "models/tools/wrench_b.glb": "/media/models/tools/wrench_b.39c8130f9836.glb",
+  "models/tutorial/training_post.glb": "/media/models/tutorial/training_post.a1b03486a0fe.glb",
   "models/weapons/adv_axe_1handed.glb": "/media/models/weapons/adv_axe_1handed.ad0dce00d81a.glb",
   "models/weapons/adv_axe_2handed.glb": "/media/models/weapons/adv_axe_2handed.6acbd833dff9.glb",
   "models/weapons/adv_dagger.glb": "/media/models/weapons/adv_dagger.a34bbbdb0ea0.glb",
