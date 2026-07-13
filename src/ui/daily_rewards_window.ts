@@ -91,6 +91,8 @@ export class DailyRewardsWindow {
   private storeReady = false;
   private storeError = false;
   private storePriceChanged = false;
+  private paintedStoreBody: HTMLElement | null = null;
+  private paintedStoreMarkup: string | null = null;
 
   private readonly wheelValues = [20, 30, 40, 50, 75, 100, 150, 250];
 
@@ -315,7 +317,10 @@ export class DailyRewardsWindow {
 
   private paintStore(body: HTMLElement): void {
     if (this.storeError || this.storeBalance === null) {
-      body.innerHTML = `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`;
+      this.replaceStoreBody(
+        body,
+        `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`,
+      );
       return;
     }
     const balance = formatNumber(this.storeBalance, { maximumFractionDigits: 0 });
@@ -323,11 +328,12 @@ export class DailyRewardsWindow {
     const notice = this.storePriceChanged
       ? `<div class="woc-store-notice" role="status">${esc(t('hudChrome.wocStore.priceChanged'))}</div>`
       : '';
-    body.innerHTML =
+    const markup =
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
       armory;
+    if (!this.replaceStoreBody(body, markup)) return;
     body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
       this.openClaudiumFromStore();
     });
@@ -337,6 +343,19 @@ export class DailyRewardsWindow {
         if (row) this.openArmoryInspect(row);
       });
     });
+  }
+
+  /** Keep background polling data-fresh without rebuilding an identical store
+   *  subtree. Replacing the covered window's DOM invalidates the overlapping
+   *  Claudium compositor layer in some browsers and exposes the game canvas for
+   *  a frame. A changed balance, catalog, ownership, equipment, or locale still
+   *  produces different markup and repaints normally. */
+  private replaceStoreBody(body: HTMLElement, markup: string): boolean {
+    if (this.paintedStoreBody === body && this.paintedStoreMarkup === markup) return false;
+    body.innerHTML = markup;
+    this.paintedStoreBody = body;
+    this.paintedStoreMarkup = markup;
+    return true;
   }
 
   private armorySectionHtml(section: ArmorySection): string {
@@ -527,6 +546,9 @@ export class DailyRewardsWindow {
   private paint(view: DailyRewardsView): void {
     const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
     if (!body) return;
+    // The same body hosts both tabs. Mark it as non-store content so returning
+    // to the Store tab always restores its markup even when its model is unchanged.
+    this.paintedStoreBody = null;
     if (view.kind === 'loading') {
       body.innerHTML = `<div class="dr-empty" role="status">${esc(t('hudChrome.dailyRewards.loading'))}</div>`;
       return;

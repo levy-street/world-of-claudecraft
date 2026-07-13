@@ -41,6 +41,119 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
 }
 
 describe('DailyRewardsWindow store refresh behavior', () => {
+  it('does not rebuild an unchanged store body during a background refresh', () => {
+    let html = '';
+    let writes = 0;
+    const body = {
+      dataset: {},
+      get innerHTML() {
+        return html;
+      },
+      set innerHTML(value: string) {
+        html = value;
+        writes += 1;
+      },
+      querySelector: () => null,
+      querySelectorAll: () => [],
+    };
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(body),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+    });
+    Object.assign(window as unknown as Record<string, unknown>, {
+      storeBalance: 750,
+      armorySections: [],
+    });
+
+    const paintStore = (
+      window as unknown as { paintStore(body: HTMLElement): void }
+    ).paintStore.bind(window);
+    paintStore(body as unknown as HTMLElement);
+    paintStore(body as unknown as HTMLElement);
+
+    expect(writes).toBe(1);
+  });
+
+  it('rebuilds the store body when its visible state changes', () => {
+    let html = '';
+    let writes = 0;
+    const body = {
+      dataset: {},
+      get innerHTML() {
+        return html;
+      },
+      set innerHTML(value: string) {
+        html = value;
+        writes += 1;
+      },
+      querySelector: () => null,
+      querySelectorAll: () => [],
+    };
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(body),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+    });
+    Object.assign(window as unknown as Record<string, unknown>, {
+      storeBalance: 750,
+      armorySections: [],
+    });
+
+    const paintStore = (
+      window as unknown as { paintStore(body: HTMLElement): void }
+    ).paintStore.bind(window);
+    paintStore(body as unknown as HTMLElement);
+    Object.assign(window as unknown as Record<string, unknown>, { storeBalance: 1_250 });
+    paintStore(body as unknown as HTMLElement);
+
+    expect(writes).toBe(2);
+    expect(html).toContain('1,250');
+  });
+
+  it('restores unchanged store markup after the rewards tab occupied the shared body', () => {
+    let writes = 0;
+    const body = {
+      dataset: {},
+      innerHTML: '',
+      querySelector: () => null,
+      querySelectorAll: () => [],
+    };
+    Object.defineProperty(body, 'innerHTML', {
+      get: () => '',
+      set: () => {
+        writes += 1;
+      },
+    });
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(body),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+    });
+    Object.assign(window as unknown as Record<string, unknown>, {
+      storeBalance: 750,
+      armorySections: [],
+    });
+
+    const paintStore = (
+      window as unknown as { paintStore(body: HTMLElement): void }
+    ).paintStore.bind(window);
+    const paintRewards = (
+      window as unknown as { paint(view: { kind: 'error'; message: string }): void }
+    ).paint.bind(window);
+    paintStore(body as unknown as HTMLElement);
+    paintRewards({ kind: 'error', message: 'unavailable' });
+    paintStore(body as unknown as HTMLElement);
+
+    expect(writes).toBe(3);
+  });
+
   it('preserves the last successful store state when a background snapshot is unavailable', async () => {
     const body = {
       innerHTML: 'existing store',
