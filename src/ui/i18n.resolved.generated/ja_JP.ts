@@ -686,13 +686,29 @@ export const ja_JP: EnTranslations = {
       "highContrast": "高コントラスト",
       "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
     },
+    "warfare": {
+      "honorAmount": "名誉 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "名誉: {amount}",
+      "honorFloat": "名誉 +{amount}",
+      "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "notEnoughHonor": "名誉が足りません。",
+      "reasons": {
+        "arenaWin": "アリーナ勝利",
+        "fiestaKill": "フィエスタ撃破",
+        "fiestaComplete": "フィエスタ完遂",
+        "fiestaWin": "フィエスタ勝利"
+      }
+    },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
-        "hasteRating": "ヘイストレーティング"
+        "hasteRating": "ヘイストレーティング",
+        "warfare": "ウォーフェア"
       },
+      "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
         "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
@@ -706,7 +722,8 @@ export const ja_JP: EnTranslations = {
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
-        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。"
+        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -958,6 +975,19 @@ export const ja_JP: EnTranslations = {
     "party": {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
+    },
+    "playerMenu": {
+      "info": "プレイヤー情報",
+      "block": "ブロック",
+      "unblock": "ブロック解除",
+      "openFor": "{name} のプレイヤーメニューを開く",
+      "profileUnavailable": "{name} のプロフィールが見つかりません。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI操作アカウント",
+      "watchTwitch": "Twitch で視聴",
+      "watchX": "X で見る",
+      "watchKick": "Kick で視聴",
+      "watchYouTube": "YouTube で視聴"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -1478,7 +1508,15 @@ export const ja_JP: EnTranslations = {
     },
     "social": {
       "lastSeen": "最終ログイン: {when}",
-      "lastSeenNever": "なし"
+      "lastSeenNever": "なし",
+      "ignoredTab": "無視中",
+      "blockedTab": "ブロック",
+      "ignoredEmpty": "誰も無視していません。",
+      "blockedEmpty": "誰もブロックしていません。",
+      "blockSearchPlaceholder": "プレイヤー名",
+      "blockAction": "ブロック",
+      "nowBlocking": "{name} をブロックしました。",
+      "stopBlockingTitle": "{name} のブロックを解除"
     },
     "gathering": {
       "title": "採集",
@@ -5910,6 +5948,98 @@ export const ja_JP: EnTranslations = {
         "name": "滾る怒り",
         "description": "滾る怒りに身を任せ、怒りを20生成します。（戦士タレント）"
       },
+      "crusader_strike": {
+        "name": "クルセイダー ストライク",
+        "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
+      },
+      "chain_heal": {
+        "name": "チェインヒール",
+        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
+      },
+      "metamorphosis": {
+        "name": "悪魔変身",
+        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
+      },
+      "holy_shock": {
+        "name": "ホーリーショック",
+        "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"
+      },
+      "holy_shield": {
+        "name": "ホーリーシールド",
+        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+      },
+      "bestial_wrath": {
+        "name": "野獣の怒り",
+        "description": "野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）"
+      },
+      "trueshot_aura": {
+        "name": "トゥルーショットオーラ",
+        "description": "近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）"
+      },
+      "wyvern_sting": {
+        "name": "ワイバーンスティング",
+        "description": "遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）"
+      },
+      "arcane_power": {
+        "name": "アーケインパワー",
+        "description": "10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）"
+      },
+      "combustion": {
+        "name": "コンバッション",
+        "description": "15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）"
+      },
+      "icy_veins": {
+        "name": "アイシーヴェインズ",
+        "description": "10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）"
+      },
+      "cold_blood": {
+        "name": "コールドブラッド",
+        "description": "殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）"
+      },
+      "blade_flurry": {
+        "name": "ブレードフラリー",
+        "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
+      },
+      "hemorrhage": {
+        "name": "ヘモリッジ",
+        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
+      },
+      "power_infusion": {
+        "name": "パワーインフュージョン",
+        "description": "味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）"
+      },
+      "holy_nova": {
+        "name": "ホーリーノヴァ",
+        "description": "聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）"
+      },
+      "shadowform": {
+        "name": "シャドウフォーム",
+        "description": "シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）"
+      },
+      "elemental_mastery": {
+        "name": "エレメンタルマスタリー",
+        "description": "元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）"
+      },
+      "siphon_life": {
+        "name": "サイフォンライフ",
+        "description": "敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）"
+      },
+      "conflagrate": {
+        "name": "コンフラグレート",
+        "description": "敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）"
+      },
+      "moonkin_form": {
+        "name": "ムーンキンフォーム",
+        "description": "ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）"
+      },
+      "feral_charge": {
+        "name": "フェラルチャージ",
+        "description": "敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）"
+      },
+      "swiftmend": {
+        "name": "スウィフトメンド",
+        "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）"
+      },
       "summon_imp": {
         "name": "エンバーキンの召喚",
         "description": "ウォーロックの命令に従うエンバーキンを召喚します。エンバーキンは遠くから敵にアッシュボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
@@ -5937,6 +6067,34 @@ export const ja_JP: EnTranslations = {
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
         "description": "レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+      },
+      "pummel": {
+        "name": "顎砕き",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "kick": {
+        "name": "ブーツ",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "counterspell": {
+        "name": "スペルブレイク",
+        "description": "対象の呪文を打ち消し、6秒間その系統の呪文を封じる。"
+      },
+      "counter_shot": {
+        "name": "沈黙の一射",
+        "description": "素早い一射で対象の詠唱を中断し、4秒間その系統を封じる。"
+      },
+      "rebuke": {
+        "name": "叱咤",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "skull_bash": {
+        "name": "頭突き",
+        "description": "突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。"
+      },
+      "spell_lock": {
+        "name": "猿轡",
+        "description": "詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -6580,6 +6738,126 @@ export const ja_JP: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "サンペタル草"
+      },
+      "furyforged_warhelm": {
+        "name": "憤怒鋳りの戦兜"
+      },
+      "furyforged_warspaulders": {
+        "name": "憤怒鋳りの戦肩当て"
+      },
+      "furyforged_warplate": {
+        "name": "憤怒鋳りの戦鎧"
+      },
+      "furyforged_girdle": {
+        "name": "憤怒鋳りの腰帯"
+      },
+      "furyforged_legguards": {
+        "name": "憤怒鋳りの脚当て"
+      },
+      "furyforged_gauntlets": {
+        "name": "憤怒鋳りの篭手"
+      },
+      "furyforged_sabatons": {
+        "name": "憤怒鋳りの戦靴"
+      },
+      "stormbound_crown": {
+        "name": "嵐縛りの王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "嵐縛りの肩当て"
+      },
+      "stormbound_hauberk": {
+        "name": "嵐縛りの鎖帷子"
+      },
+      "stormbound_waistguard": {
+        "name": "嵐縛りの腰守り"
+      },
+      "stormbound_legmail": {
+        "name": "嵐縛りの脚鎖"
+      },
+      "stormbound_handguards": {
+        "name": "嵐縛りの手甲"
+      },
+      "stormbound_greaves": {
+        "name": "嵐縛りの脛当て"
+      },
+      "ashstalker_cowl": {
+        "name": "灰追いの頭巾"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "灰追いの肩守り"
+      },
+      "ashstalker_harness": {
+        "name": "灰追いの胴具"
+      },
+      "ashstalker_waistband": {
+        "name": "灰追いの腰帯"
+      },
+      "ashstalker_legguards": {
+        "name": "灰追いの脚当て"
+      },
+      "ashstalker_grips": {
+        "name": "灰追いの手甲"
+      },
+      "ashstalker_treads": {
+        "name": "灰追いの足袋"
+      },
+      "cinderweave_cowl": {
+        "name": "熾火織りの頭巾"
+      },
+      "cinderweave_mantle": {
+        "name": "熾火織りの肩衣"
+      },
+      "cinderweave_raiment": {
+        "name": "熾火織りの法衣"
+      },
+      "cinderweave_cord": {
+        "name": "熾火織りの腰紐"
+      },
+      "cinderweave_legwraps": {
+        "name": "熾火織りの脚巻き"
+      },
+      "cinderweave_handwraps": {
+        "name": "熾火織りの手巻き"
+      },
+      "cinderweave_slippers": {
+        "name": "熾火織りの上履き"
+      },
+      "final_oath_medallion": {
+        "name": "最後の誓いのメダリオン"
+      },
+      "razorwind_torque": {
+        "name": "刃風の首輪"
+      },
+      "cinder_sigil_pendant": {
+        "name": "熾火印のペンダント"
+      },
+      "iron_vow_band": {
+        "name": "鉄の誓いの指輪"
+      },
+      "unbroken_circle": {
+        "name": "不壊の円環"
+      },
+      "fleetblood_band": {
+        "name": "疾血の指輪"
+      },
+      "last_step_signet": {
+        "name": "最後の一歩の印章"
+      },
+      "ashen_focus_ring": {
+        "name": "灰燼の集中指輪"
+      },
+      "spellbreakers_seal": {
+        "name": "呪文砕きの印章"
+      },
+      "final_argument_greatblade": {
+        "name": "最後の論駁の大剣"
+      },
+      "first_blood_razor": {
+        "name": "初血の剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "熾火硝子の戦杖"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
@@ -7717,6 +7995,11 @@ export const ja_JP: EnTranslations = {
         "name": "補給係ヴェックス",
         "title": "英雄補給係",
         "greeting": "英雄の深部の証があれば、ハイウォッチ一の指輪とペンダントが手に入る。あなたの証を見せてくれ。"
+      },
+      "fury": {
+        "name": "フューリー",
+        "title": "名誉補給官",
+        "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",

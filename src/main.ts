@@ -5726,7 +5726,7 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // invite on the shells' community links and is the fallback when the server-fed
 // discordInviteUrl() is not known yet (logged out, offline).
 const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';
-const DONATE_URL = 'https://github.com/sponsors/levy-street';
+const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 

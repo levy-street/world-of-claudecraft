@@ -1201,6 +1201,25 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Tampilkan Lencana Pengembang',
   'hudChrome.options.groundReticle': 'Retikel bidik darat',
   'hudChrome.options.startAttackOnAbility': 'Serangan Otomatis Saat Memakai Kemampuan',
+  'hudChrome.playerMenu.info': 'Info pemain',
+  'hudChrome.playerMenu.block': 'Blokir',
+  'hudChrome.playerMenu.unblock': 'Buka blokir',
+  'hudChrome.playerMenu.openFor': 'Buka menu pemain {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Profil {name} tidak ditemukan.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Akun yang dijalankan AI',
+  'hudChrome.playerMenu.watchTwitch': 'Tonton di Twitch',
+  'hudChrome.playerMenu.watchX': 'Lihat di X',
+  'hudChrome.playerMenu.watchKick': 'Tonton di Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Tonton di YouTube',
+  'hudChrome.social.ignoredTab': 'Diabaikan',
+  'hudChrome.social.ignoredEmpty': 'Kamu tidak mengabaikan siapa pun.',
+  'hudChrome.social.blockedEmpty': 'Kamu belum memblokir siapa pun.',
+  'hudChrome.social.blockSearchPlaceholder': 'Nama pemain',
+  'hudChrome.social.blockAction': 'Blokir',
+  'hudChrome.social.nowBlocking': '{name} diblokir.',
+  'hudChrome.social.blockedTab': 'Diblokir',
+  'hudChrome.social.stopBlockingTitle': 'Buka blokir {name}',
   'hudChrome.party.promoteLeader': 'Angkat jadi Pemimpin',
   'hudChrome.plurals.playersMatching.few':
     'Siapa: {count} pemain yang cocok dengan "{query}" di {realm}.',
@@ -2022,6 +2041,72 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     'Melontarkan panah energi alam sebesar {damage} kerusakan Alam.',
   'entities.abilities.wrath.name': 'Wildbolt',
+  'entities.abilities.holy_shock.name': 'Kejutan Suci',
+  'entities.abilities.holy_shock.description':
+    'Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)',
+  'entities.abilities.holy_shield.name': 'Perisai Suci',
+  'entities.abilities.holy_shield.description':
+    'Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)',
+  'entities.abilities.bestial_wrath.name': 'Murka Buas',
+  'entities.abilities.bestial_wrath.description':
+    'Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)',
+  'entities.abilities.trueshot_aura.name': 'Aura Tembakan Jitu',
+  'entities.abilities.trueshot_aura.description':
+    'Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)',
+  'entities.abilities.wyvern_sting.name': 'Sengatan Wivern',
+  'entities.abilities.wyvern_sting.description':
+    'Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)',
+  'entities.abilities.arcane_power.name': 'Kekuatan Arkan',
+  'entities.abilities.arcane_power.description':
+    'Meningkatkan kerusakan mantra sebesar 20% dan haste mantra sebesar 10% selama 10 dtk. (signature Arcane)',
+  'entities.abilities.combustion.name': 'Pembakaran',
+  'entities.abilities.combustion.description':
+    'Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)',
+  'entities.abilities.icy_veins.name': 'Urat Es',
+  'entities.abilities.icy_veins.description':
+    'Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)',
+  'entities.abilities.cold_blood.name': 'Darah Dingin',
+  'entities.abilities.cold_blood.description':
+    'Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)',
+  'entities.abilities.blade_flurry.name': 'Tebasan Bertubi',
+  'entities.abilities.blade_flurry.description':
+    'Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)',
+  'entities.abilities.hemorrhage.name': 'Pendarahan',
+  'entities.abilities.hemorrhage.description':
+    'Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)',
+  'entities.abilities.power_infusion.name': 'Infusi Kekuatan',
+  'entities.abilities.power_infusion.description':
+    'Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)',
+  'entities.abilities.holy_nova.name': 'Nova Suci',
+  'entities.abilities.holy_nova.description':
+    'Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)',
+  'entities.abilities.shadowform.name': 'Wujud Bayangan',
+  'entities.abilities.shadowform.description':
+    'Mengambil wujud bayangan, memperkuat sihir bayangan sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Bayangan)',
+  'entities.abilities.elemental_mastery.name': 'Penguasaan Elemen',
+  'entities.abilities.elemental_mastery.description':
+    'Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)',
+  'entities.abilities.siphon_life.name': 'Sifon Nyawa',
+  'entities.abilities.siphon_life.description':
+    'Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)',
+  'entities.abilities.conflagrate.name': 'Kobaran Api',
+  'entities.abilities.conflagrate.description':
+    'Menghabiskan Pembakaran milikmu pada musuh untuk menyulutnya dengan {damage} kerusakan Api. (ciri khas Penghancuran)',
+  'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
+  'entities.abilities.moonkin_form.description':
+    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
+  'entities.abilities.feral_charge.name': 'Terjangan Liar',
+  'entities.abilities.feral_charge.description':
+    'Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)',
+  'entities.abilities.swiftmend.name': 'Pemulihan Cepat',
+  'entities.abilities.swiftmend.description':
+    'Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)',
+  'entities.abilities.crusader_strike.name': 'Serangan Tentara Salib',
+  'entities.abilities.crusader_strike.description':
+    'Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)',
+  'entities.abilities.metamorphosis.name': 'Metamorfosis',
+  'entities.abilities.metamorphosis.description':
+    'Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)',
   'entities.delves.collapsed_reliquary.enterText': 'Kau menuruni reliquary yang runtuh.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Kau memanjat kembali menuju Bruder Halven di reruntuhan reliquary.',

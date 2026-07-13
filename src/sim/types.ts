@@ -1,5 +1,6 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 
@@ -44,6 +45,18 @@ export function hasteFractionFromRating(rating: number): number {
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+
+export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
+
+// Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
+// by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
+// the soft daily taper independently of who was faced.
+export interface HonorArenaDailyState {
+  date: string;
+  winsByOpponent: Record<string, number>;
+  fiestaCompletionsByOpponent: Record<string, number>;
+  totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, the classic-era value.
@@ -183,6 +196,9 @@ export type AuraKind =
   | 'attackspeed'
   | 'debuff_ap'
   | 'buff_ap'
+  | 'buff_ap_pct'
+  | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -190,6 +206,10 @@ export type AuraKind =
   | 'buff_speed'
   | 'buff_haste'
   | 'buff_spellpower'
+  | 'buff_spellcrit'
+  | 'buff_spelldmg'
+  | 'buff_spellhaste'
+  | 'cast_shield'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -203,6 +223,13 @@ export type AuraKind =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
+  | 'form_moonkin'
+  | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
@@ -223,6 +250,7 @@ export type AuraKind =
   | 'blind'
   | 'disarm'
   | 'expose'
+  | 'bleed_vuln'
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
@@ -273,6 +301,7 @@ export interface Aura {
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
 export type CrowdControlDrCategory =
@@ -296,7 +325,16 @@ export interface Stats {
   int: number;
   spi: number;
   armor: number;
+  // Fractions derived from PvP ratings on equipped gear. They affect hostile
+  // player-vs-player damage only; PvE never reads them.
+  pvpOffense: number;
+  pvpDefense: number;
 }
+
+// The six class/item attributes authored in content. WARFARE fractions are
+// derived from ratings at runtime and are never authored as base growth or
+// direct item stats.
+export type CoreStats = Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>;
 
 export interface WeaponInfo {
   min: number;
@@ -377,7 +415,7 @@ interface BaseItemDef {
   name: string;
   slot?: ItemSlot;
   weapon?: WeaponInfo;
-  stats?: Partial<Stats>;
+  stats?: Partial<CoreStats>;
   // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
@@ -385,6 +423,13 @@ interface BaseItemDef {
   // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
+  // combat clamps them again at the PvP caps before applying damage.
+  pvpOffenseRating?: number;
+  pvpDefenseRating?: number;
+  // Honor price for a Quartermaster purchase. An honor-only item omits
+  // buyValue; both fields may coexist when a vendor charges both currencies.
+  priceHonor?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -393,10 +438,10 @@ interface BaseItemDef {
   noDiscard?: boolean;
   noMarketList?: boolean;
   // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
-  // listed on the World Market, or destroyed (right-click discard). Currency-like
-  // reward tokens (heroic_mark) use this so they can only be spent at their vendor,
-  // never handed off or thrown away. Enforced in social/trade.ts, mail/post_office.ts,
-  // market.ts, and items.ts (discardItem/sellItem/sellAllJunk).
+  // listed on the World Market, or sold. Destruction is controlled separately by
+  // noDiscard so bound equipment can still be cleaned out while currency-like
+  // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
+  // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
@@ -1373,6 +1418,9 @@ export type AbilityEffect =
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
+  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
+  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -1391,13 +1439,28 @@ export type AbilityEffect =
       party?: boolean;
     } // fortitude/might/mark on a friendly target
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  | { type: 'dot'; total: number; duration: number; interval: number }
+  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  // Bounce damage: the caster's directDamage already hit the primary target; this arcs
+  // from that target to the nearest not-yet-hit hostile within `radius`, up to `jumps`
+  // enemies (the primary and the caster are excluded), each jump dealing `falloff`x the
+  // last. The hop pick is DETERMINISTIC (nearest by distance, then lowest id), mirroring
+  // chainHeal, so the only rng is the one base roll plus each hit's crit. Used by
+  // Hallowed Wall (Protection paladin signature).
+  | {
+      type: 'chainDamage';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
+  | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
       min: number;
@@ -1408,6 +1471,15 @@ export type AbilityEffect =
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
+  // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
+  | {
+      type: 'aoeAllyAttackPower';
+      amount?: number;
+      apPct?: number;
+      duration: number;
+      radius: number;
+    }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
@@ -1424,6 +1496,13 @@ export type AbilityEffect =
   | { type: 'sportDash'; distance: number; catchBall?: boolean }
   | { type: 'sportShove'; distance: number }
   | {
+      type: 'consumeAura';
+      auraIds?: string[];
+      auraKind?: 'dot' | 'hot';
+      deal?: { min: number; max: number };
+      heal?: { min: number; max: number };
+    }
+  | {
       type: 'selfBuff';
       kind: AuraKind;
       value: number;
@@ -1433,11 +1512,16 @@ export type AbilityEffect =
       charges?: number;
       internalCooldown?: number;
     }
+  | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
+  | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
+  // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
+  // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
+  | { type: 'feralCharge' }
   // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
   // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
   // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
@@ -1493,7 +1577,7 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
-  targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
+  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -1508,6 +1592,9 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Castable while shapeshifted without requiring a SPECIFIC form (Feral Instinct works in
+  // both Cat and Bear Form). Exempts the ability from the "can't act while shapeshifted" lock.
+  usableInForm?: boolean;
   // Mutually exclusive self-buff group: casting one ability in the group cancels
   // any active buff from a sibling in the same group (e.g. hunter aspects, where
   // only one aspect may be active at a time). Distinct from form toggles, which
@@ -1802,6 +1889,13 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
+  // so a mastery only strengthens the crits it is meant to. Added to the matching base
+  // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
+  // crits 2 + critDmgPhysBonus, heal crits 1.5 + critDmgHealBonus.
+  critDmgSpellBonus: number;
+  critDmgPhysBonus: number;
+  critDmgHealBonus: number;
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
@@ -2022,6 +2116,13 @@ export interface Entity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Account flair (cosmetic, operator-set from the admin dashboard; the sim
+  // never reads either): the AI-operated mark that prefixes the name with [AI],
+  // and an official streamer's platform links for the player menu. `streamerLinks`
+  // is present only when the account's streamer flag is actually on (the server
+  // gates it in wireStreamerLinks), so on the client "has links" IS "is a streamer".
+  aiAccount?: boolean;
+  streamerLinks?: StreamerLinks;
 }
 
 export interface NythraxisWardChannel {
@@ -2128,6 +2229,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
+  | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
   // level past the cap (milestone unlocks ride the deedUnlocked event since
@@ -2223,6 +2325,13 @@ export type SimEvent = { pid?: number } & (
         | 'roll';
       entityId?: number;
       to?: string;
+      // Account flair of the SENDER, attached by the server at fan-out (the sim
+      // never sets it). Sparse: absent for a normal player, so an ordinary chat
+      // line is unchanged on the wire. It rides the event rather than being read
+      // off the sender's entity because general/world/lfg/guild chat reaches you
+      // from players far outside your ~120yd interest scope, where no entity
+      // record exists locally.
+      flair?: ChatSenderFlair;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a
@@ -2372,7 +2481,7 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning';
+      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning' | 'chainHeal';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

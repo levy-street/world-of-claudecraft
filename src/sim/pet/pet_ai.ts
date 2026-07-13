@@ -123,7 +123,8 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
       if (pet.swingTimer <= 0) {
         if (ranged) petRangedAttack(ctx, pet, target, ranged);
         else ctx.mobSwing(pet, target);
-        pet.swingTimer = pet.weapon.speed * ctx.swingIntervalMult(pet);
+        // pet_spellhaste (Metamorphosis) speeds the demon's attack/cast cadence.
+        pet.swingTimer = (pet.weapon.speed * ctx.swingIntervalMult(pet)) / petHasteMult(pet);
       }
     }
     return;
@@ -218,6 +219,25 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   ctx.moveToward(pet, aim, speed);
 }
 
+function petDamageMult(ctx: SimContext, pet: Entity): number {
+  if (pet.ownerId === null) return 1;
+  let mult = 1;
+  for (const a of pet.auras) {
+    if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+  }
+  const ownerMeta = ctx.players.get(pet.ownerId);
+  if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
+  return mult;
+}
+
+// Pet attack/cast speed multiplier from pet_spellhaste auras (Metamorphosis: +20% cast
+// speed on the demon). value is a fraction (0.2 = +20%); the swing interval divides by it.
+function petHasteMult(pet: Entity): number {
+  let bonus = 0;
+  for (const a of pet.auras) if (a.kind === 'pet_spellhaste') bonus += a.value;
+  return 1 + Math.max(0, bonus);
+}
+
 /** A ranged demon pet (imp) hurls a spell-school bolt: a telegraphed
  *  projectile that bypasses armor, mirroring the player caster path. Damage
  *  comes from the mob's weapon range + AP, exactly like its melee siblings. */
@@ -242,6 +262,7 @@ export function petRangedAttack(
       ctx.rng.range(src.weapon.min, src.weapon.max) +
       (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
     if (crit) dmg *= 2;
+    dmg *= petDamageMult(ctx, src);
     ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
   });
 }

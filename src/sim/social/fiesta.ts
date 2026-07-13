@@ -41,6 +41,7 @@ import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
 import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import { awardFiestaKillHonor } from '../pvp';
 import { Rng } from '../rng';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -88,6 +89,7 @@ export function createFiestaState(ctx: SimContext): FiestaState {
     respawn: new Map(),
     deaths: new Map(),
     kills: new Map(),
+    honorKillsByPair: new Map(),
     streak: new Map(),
     lastKill: new Map(),
     pending: new Map(),
@@ -219,7 +221,7 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   meta.fiestaRestore = { level: e.level, xp: meta.xp, talents: cloneAllocation(meta.talents) };
   e.level = FIESTA_STANDARD_LEVEL;
   meta.talents = defaultBuild(meta.cls, talentPointsAtLevel(FIESTA_STANDARD_LEVEL));
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
+  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
   recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
@@ -232,7 +234,7 @@ export function fiestaRestoreChar(meta: PlayerMeta, e: Entity): void {
   e.level = snap.level;
   meta.xp = snap.xp;
   meta.talents = snap.talents;
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
+  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.fiestaRestore = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
   meta.wireRev++; // real talents restored, refresh the wire promptly
@@ -350,6 +352,9 @@ export function fiestaTakedown(
   else if (killerTeam === 'B') f.scoreB += points;
   if (killerMeta) killerMeta.counters.kills++;
   f.kills.set(killerPid, (f.kills.get(killerPid) ?? 0) + 1);
+  if (killerMeta && !match.practice && ctx.isArenaCrossTeam(match, killerPid, victim.id)) {
+    awardFiestaKillHonor(ctx, killerMeta, victim.id, f.honorKillsByPair);
+  }
 
   fiestaDown(ctx, match, victim, killerPid);
 

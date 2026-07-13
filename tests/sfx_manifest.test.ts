@@ -143,9 +143,9 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 26 UI cues in one 137-key inventory', () => {
+  it('keeps the release catalog and all 26 UI cues in one 138-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(137);
+    expect(keys.size).toBe(138);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
     for (const key of [
       'cast_lightning_bolt',
@@ -158,7 +158,7 @@ describe('buildManifest', () => {
     }
     expect(keys.has('mob_murloc_attack')).toBe(false);
     expect(keys.has('mob_kobold_attack')).toBe(false);
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(137);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(138);
   });
 });
 

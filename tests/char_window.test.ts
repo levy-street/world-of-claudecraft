@@ -54,6 +54,12 @@ describe('char_window: WCAG 2.2 AA', () => {
 });
 
 describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
+  it('renders one player-facing Warfare stat row', () => {
+    expect(painter).toContain("'warfare'");
+    expect(painter).not.toContain("'pvpOffense'");
+    expect(painter).not.toContain("'pvpDefense'");
+  });
+
   it('drives the paperdoll off the pure char_view core', () => {
     expect(painter).toContain('buildPaperdollView(world.equipment, ITEMS)');
   });

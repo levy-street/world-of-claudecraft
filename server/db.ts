@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
+import {
+  type AccountFlair,
+  EMPTY_ACCOUNT_FLAIR,
+  normalizeAccountFlair,
+} from '../src/sim/account_flair';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
@@ -158,6 +163,18 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
+-- Operator-set account flair (cosmetic, no gameplay effect): the "AI-operated
+-- account" mark that prefixes the character name with [AI], and an official
+-- streamer's platform links. Both are written ONLY from the admin dashboard
+-- (moderation.act) and audited in account_moderation_actions. streamer_links is
+-- a JSONB bag keyed by platform; it is UNTRUSTED at read time and always run back
+-- through normalizeAccountFlair (src/sim/account_flair.ts), which is also the one
+-- gate the write path uses, so a link that somehow reached the column cannot
+-- reach a client. is_streamer is kept separate from the links so an operator can
+-- switch the flair off without losing the URLs they typed.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_ai BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_streamer BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS streamer_links JSONB NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMPTZ;
 -- Whether the account has a password the OWNER set (and therefore can log in with
@@ -919,6 +936,26 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
 export async function loadAccountCosmetics(accountId: number): Promise<AccountCosmetics> {
   const res = await pool.query('SELECT cosmetics FROM accounts WHERE id = $1', [accountId]);
   return normalizeAccountCosmetics(res.rows[0]?.cosmetics);
+}
+
+/**
+ * The account's operator-set flair (AI mark + streamer links). The stored JSONB is
+ * treated as untrusted: the row always goes back through normalizeAccountFlair, so
+ * a link that is not a plain https URL on the platform's own host is dropped here
+ * rather than shipped to a client. An unknown account reads as no flair.
+ */
+export async function loadAccountFlair(accountId: number): Promise<AccountFlair> {
+  const res = await pool.query(
+    'SELECT is_ai, is_streamer, streamer_links FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  const row = res.rows[0];
+  if (!row) return EMPTY_ACCOUNT_FLAIR;
+  return normalizeAccountFlair({
+    ai: row.is_ai,
+    streamer: row.is_streamer,
+    links: row.streamer_links,
+  });
 }
 
 async function saveAccountCosmetics(

@@ -686,13 +686,29 @@ export const nl_NL: EnTranslations = {
       "highContrast": "Hoog contrast",
       "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
       "names": {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
-        "hasteRating": "Snelheidswaardering"
+        "hasteRating": "Snelheidswaardering",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
         "agi": "Scherpt je reflexen en mikken, wat meerdere van je gevechtsstatistieken verbetert.",
@@ -706,7 +722,8 @@ export const nl_NL: EnTranslations = {
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
-        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid."
+        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
@@ -958,6 +975,19 @@ export const nl_NL: EnTranslations = {
     "party": {
       "promoteLeader": "Bevorderen tot leider",
       "inviteUsage": "Wie wil je uitnodigen? Gebruik: /invite <naam>."
+    },
+    "playerMenu": {
+      "info": "Spelerinfo",
+      "block": "Blokkeren",
+      "unblock": "Deblokkeren",
+      "openFor": "Spelersmenu voor {name} openen",
+      "profileUnavailable": "Geen profiel gevonden voor {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Door AI bestuurd account",
+      "watchTwitch": "Bekijken op Twitch",
+      "watchX": "Bekijken op X",
+      "watchKick": "Bekijken op Kick",
+      "watchYouTube": "Bekijken op YouTube"
     },
     "lootSettings": {
       "title": "Buitinstellingen",
@@ -1478,7 +1508,15 @@ export const nl_NL: EnTranslations = {
     },
     "social": {
       "lastSeen": "Laatst gezien: {when}",
-      "lastSeenNever": "nooit"
+      "lastSeenNever": "nooit",
+      "ignoredTab": "Genegeerd",
+      "blockedTab": "Geblokkeerd",
+      "ignoredEmpty": "Je negeert niemand.",
+      "blockedEmpty": "Je hebt niemand geblokkeerd.",
+      "blockSearchPlaceholder": "Spelersnaam",
+      "blockAction": "Blokkeren",
+      "nowBlocking": "{name} geblokkeerd.",
+      "stopBlockingTitle": "{name} deblokkeren"
     },
     "gathering": {
       "title": "Verzamelen",
@@ -5910,6 +5948,98 @@ export const nl_NL: EnTranslations = {
         "name": "Kolkende Woede",
         "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
+      "crusader_strike": {
+        "name": "Kruisvaardersslag",
+        "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfose",
+        "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
+      },
+      "holy_shock": {
+        "name": "Heilige schok",
+        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+      },
+      "holy_shield": {
+        "name": "Heilig schild",
+        "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+      },
+      "bestial_wrath": {
+        "name": "Beestachtige woede",
+        "description": "Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)"
+      },
+      "trueshot_aura": {
+        "name": "Zuiver schot-aura",
+        "description": "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsteek",
+        "description": "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)"
+      },
+      "arcane_power": {
+        "name": "Arcanekracht",
+        "description": "Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)"
+      },
+      "combustion": {
+        "name": "Verbranding",
+        "description": "Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)"
+      },
+      "icy_veins": {
+        "name": "IJzige Aders",
+        "description": "Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)"
+      },
+      "cold_blood": {
+        "name": "Koud bloed",
+        "description": "Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenvlaag",
+        "description": "Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)"
+      },
+      "hemorrhage": {
+        "name": "Bloeding",
+        "description": "Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)"
+      },
+      "power_infusion": {
+        "name": "Krachtinfusie",
+        "description": "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)"
+      },
+      "holy_nova": {
+        "name": "Heilige nova",
+        "description": "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)"
+      },
+      "shadowform": {
+        "name": "Schaduwvorm",
+        "description": "Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementaire meesterschap",
+        "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
+      },
+      "siphon_life": {
+        "name": "Levenshevel",
+        "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "conflagrate": {
+        "name": "Ontvlamming",
+        "description": "Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)"
+      },
+      "moonkin_form": {
+        "name": "Maanuilvorm",
+        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
+      },
+      "feral_charge": {
+        "name": "Wilde stormloop",
+        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+      },
+      "swiftmend": {
+        "name": "Snelle genezing",
+        "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
       "summon_imp": {
         "name": "Emberkin Oproepen",
         "description": "Roept een Emberkin op onder bevel van de Heksenmeester. De Emberkin slingert van veraf Ashbolts naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
@@ -5937,6 +6067,34 @@ export const nl_NL: EnTranslations = {
       "summon_doomguard": {
         "name": "Wraithborn Oproepen",
         "description": "Bindt een Wraithborn aan je wil, een elite-demon die van veraf zware Schaduwschade laat regenen. Een lange afkoeltijd beteugelt zijn verwoestende kracht. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
+      },
+      "pummel": {
+        "name": "Jawcrack",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "kick": {
+        "name": "Boot",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+      },
+      "counter_shot": {
+        "name": "Hushing Shot",
+        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+      },
+      "rebuke": {
+        "name": "Reproach",
+        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+      },
+      "skull_bash": {
+        "name": "Headbutt",
+        "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
+      },
+      "spell_lock": {
+        "name": "Gag Order",
+        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -6580,6 +6738,126 @@ export const nl_NL: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Zonnepetaalkruid"
+      },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
@@ -7717,6 +7995,11 @@ export const nl_NL: EnTranslations = {
         "name": "Kwartiermeester Vex",
         "title": "Heroïsche Kwartiermeester",
         "greeting": "Bewijs van de heroïsche diepten koopt de fijnste ringen en hangers in Hoogwacht. Laat me je merken zien."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Verhalenmeester Caddis",

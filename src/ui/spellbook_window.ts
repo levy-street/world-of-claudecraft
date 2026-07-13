@@ -159,9 +159,16 @@ export class SpellbookWindow {
     this.lastKnownSig = SpellbookWindow.knownSig(world.known);
     const classId = world.cfg.playerClass;
     const cls = CLASSES[classId];
+    // The kit list is the display order, but spec signatures and other talent grants are
+    // known WITHOUT being in the base kit (e.g. mortal_strike, chain_heal, stormstrike), so
+    // append any known-but-not-in-kit ability so the spellbook shows everything the player has.
+    const kit = cls.abilities;
+    const grantedExtra = world.known
+      .map((k) => k.def.id)
+      .filter((id) => !kit.includes(id) && !!ABILITIES[id]);
     const view = buildSpellbookView({
       classId,
-      abilities: cls.abilities,
+      abilities: [...kit, ...grantedExtra],
       known: world.known,
       barAbilityIds: this.deps.barAbilityIds(),
       abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),

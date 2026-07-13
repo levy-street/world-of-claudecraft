@@ -243,7 +243,12 @@ describe('reconcile through GameServer.join', () => {
       members: [],
       events: [],
     };
-    vi.spyOn(server.social, 'snapshot').mockResolvedValue({ friends: [], blocks: [], guild });
+    vi.spyOn(server.social, 'snapshot').mockResolvedValue({
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild,
+    });
     const setPlayerGuild = vi.spyOn(server.sim, 'setPlayerGuild');
     const fc = fakeWs();
     const session = server.join(fc.ws as never, 7, 42, 'Guilded', 'warrior', null);

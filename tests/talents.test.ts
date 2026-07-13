@@ -288,7 +288,7 @@ describe('precomputed modifiers', () => {
     expect(mods.spec).toBe('arms');
     expect(mods.role).toBe('dps');
     expect(mods.grants.some((g) => g.ability === 'mortal_strike')).toBe(true);
-    expect(mods.global.meleeDmgPct).toBeCloseTo(0.1); // Sharpened Blades mastery
+    expect(mods.global.meleeDmgPct).toBeCloseTo(0.15); // Sharpened Blades mastery
   });
 
   it('makes every chosen spec signature available at the first talent level', () => {
@@ -325,7 +325,7 @@ describe('precomputed modifiers', () => {
         alloc({ spec: 'discipline', ranks: { disc_twin_disciplines: 1 } }),
       ),
     ).find((k) => k.def.id === 'power_word_shield')!;
-    expect(effOf(shield).amount).toBe(56); // 48 * (1 + 8% mastery + 8% talent)
+    expect(effOf(shield).amount).toBe(67); // 48 * 1.30 mastery * 1.08 talent
 
     const fort = abilitiesKnownAt(
       'priest',
@@ -349,7 +349,8 @@ describe('precomputed modifiers', () => {
         alloc({ spec: 'retribution', ranks: { ret_seal_command: 2 } }),
       ),
     ).find((k) => k.def.id === 'seal_of_righteousness')!;
-    expect(effOf(seal)).toMatchObject({ bonus: 16, judgeMin: 44, judgeMax: 64 }); // mastery + 2 talent ranks
+    expect(effOf(seal)).toMatchObject({ bonus: 18, judgeMin: 48, judgeMax: 70 });
+    // 2 talent ranks plus 20% retribution spell mastery.
   });
 });
 
@@ -482,8 +483,8 @@ describe('Sim integration — active talents & ability modifiers', () => {
     const buffed = effOf(
       abilitiesKnownAt('warrior', 20, mods).find((k) => k.def.id === 'overpower'),
     ).bonus;
-    // Arms mastery (+10% melee) + Improved Overpower r2 (+50%) => x1.60
-    expect(buffed).toBe(Math.round(baseBonus * 1.6));
+    // Arms mastery (+15% melee) + Improved Overpower r2 (+50%) => x1.65
+    expect(buffed).toBe(Math.round(baseBonus * 1.65));
     expect(buffed).toBeGreaterThan(baseBonus);
     // shared content data must NOT be mutated by the modifier pass
     const baseAgain = effOf(
@@ -555,15 +556,15 @@ describe('Sim integration — active talents & ability modifiers', () => {
         ),
       ).find((k) => k.def.id === 'cleave'),
     ).min;
-    expect(sweeping).toBe(Math.round(baseMin * 1.4)); // arms mastery .10 + sweeping .30
-    expect(impale).toBe(Math.round(baseMin * 1.1)); // arms mastery only; impale is crit
+    expect(sweeping).toBe(Math.round(baseMin * 1.45)); // arms mastery .15 + sweeping .30
+    expect(impale).toBe(Math.round(baseMin * 1.15)); // arms mastery only; impale is crit
   });
 
-  it('tank-role Vengeance Mastery multiplies generated threat (+30%)', () => {
+  it('tank-role Vengeance Mastery multiplies generated threat (+50%)', () => {
     const sunderThreat = (vengeance: boolean): number => {
       const sim = new Sim({ seed: 3, playerClass: 'warrior' });
       sim.setPlayerLevel(20);
-      if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+30% threat)
+      if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+50% threat)
       const mob = nearestMob(sim);
       sim.player.pos.x = mob.pos.x;
       sim.player.pos.z = mob.pos.z - 3;
@@ -579,8 +580,8 @@ describe('Sim integration — active talents & ability modifiers', () => {
     expect(base).toBeGreaterThan(0);
     // ~+30% (a tiny constant "seed" threat on combat entry isn't multiplied, so
     // assert the band rather than the exact ratio): clearly boosted, not doubled.
-    expect(venge / base).toBeGreaterThan(1.25);
-    expect(venge / base).toBeLessThan(1.31);
+    expect(venge / base).toBeGreaterThan(1.4);
+    expect(venge / base).toBeLessThan(1.55);
   });
 });
 

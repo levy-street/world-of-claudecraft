@@ -32,9 +32,10 @@ describe('social_window: no magic values', () => {
 describe('social_window: WAI-ARIA tabs', () => {
   it('renders the tab strip as a role=tablist with role=tab + aria-selected + roving tabindex', () => {
     expect(painter).toContain('role="tablist"');
-    // Exactly four real tabs (friends / guild / ignore / raid), each a role=tab. The
-    // closing quote in /role="tab"/ does NOT match role="tablist" / role="tabpanel".
-    expect(painter.match(/role="tab"/g)?.length).toBe(4);
+    // Exactly five real tabs (friends / guild / ignore / block / raid), each a role=tab:
+    // ignore and block are two distinct tiers and get a tab each. The closing quote in
+    // /role="tab"/ does NOT match role="tablist" / role="tabpanel".
+    expect(painter.match(/role="tab"/g)?.length).toBe(5);
     expect(painter).toContain('aria-selected="${tab ===');
     expect(painter).toContain('tabindex="${tab ===');
     expect(painter).toContain('aria-controls="soc-body-panel"');
