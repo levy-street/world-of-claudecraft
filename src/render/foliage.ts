@@ -27,14 +27,16 @@ import { grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
-// Models come from the Quaternius Stylized Nature MegaKit (CC0), shipped via
-// scripts/assets/specs/foliage.json -> public/models/foliage/*.glb and
+// Models come from the Quaternius Stylized Nature MegaKit and the KayKit
+// Forest Nature Pack (both CC0), shipped via scripts/assets/specs/foliage.json
+// + forest_pack.json -> public/models/foliage/*.glb and
 // preloaded at module import (main.ts awaits assetsReady() before the
 // Renderer is constructed, so buildFoliage can read the cache synchronously).
 //
 // - Placement still comes from the deterministic generateDecorations(seed)
-//   field (sim untouched): kind 'tree' = pine, 'tree2' = oak (marsh: swamp
-//   trees split between twisted + dead models), 'rock' = boulders.
+//   field (sim untouched): kind 'tree' = pine, 'tree2' = oak (vale: split
+//   between oaks and KayKit forest trees; marsh: swamp trees split between
+//   twisted + dead models), 'rock' = boulders.
 // - Trees/rocks stay InstancedMeshes bucketed per (2 x-halves x 200u z-band)
 //   so frustum/fog culling drops whole off-screen forests. Each bucket picks
 //   a small deterministic subset of the model variants (hash of the bucket
@@ -83,6 +85,8 @@ const FOLIAGE_MODEL_URLS_HIGH = {
   bushFlowers: [`${MODEL_DIR}bush_flowers.glb`],
   fern: [`${MODEL_DIR}fern.glb`],
   mushroom: [`${MODEL_DIR}mushroom.glb`],
+  forestTree: [1, 2, 3, 4, 5].map((i) => `${MODEL_DIR}forest_tree_${i}.glb`),
+  forestBush: [1, 2, 3, 4].map((i) => `${MODEL_DIR}forest_bush_${i}.glb`),
 };
 const FOLIAGE_MODEL_URLS_LOW = {
   pine: [1].map((i) => `${MODEL_DIR}pine_${i}.glb`),
@@ -94,6 +98,8 @@ const FOLIAGE_MODEL_URLS_LOW = {
   bushFlowers: [`${MODEL_DIR}bush_flowers.glb`],
   fern: [`${MODEL_DIR}fern.glb`],
   mushroom: [`${MODEL_DIR}mushroom.glb`],
+  forestTree: [`${MODEL_DIR}forest_tree_2.glb`],
+  forestBush: [`${MODEL_DIR}forest_bush_1.glb`],
 };
 const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS_HIGH;
 
@@ -377,6 +383,10 @@ const MAT_POLICY: Record<string, MatPolicy> = {
   Bark_DeadTree: { leaf: false, windMul: 0, roughness: 0.95 },
   Rocks: { leaf: false, windMul: 0, roughness: 1.0 },
   Mushrooms: { leaf: false, windMul: 0, roughness: 0.9 },
+  // KayKit Forest pack: every model is one solid mesh on a shared gradient
+  // atlas (no alpha-card canopy), so the whole piece stays rigid front-side;
+  // trunk and canopy share this material, which rules out leaf-only sway.
+  forest: { leaf: false, windMul: 0, roughness: 0.9 },
 };
 const DEFAULT_POLICY: MatPolicy = { leaf: false, windMul: 0, roughness: 0.95 };
 const LEAF_ALPHA_TEST = 0.4;
@@ -632,10 +642,12 @@ export function buildFoliageMaterialPrewarmGroup(): THREE.Group {
     ...MODEL_URLS.twisted,
     ...MODEL_URLS.dead,
     ...MODEL_URLS.rock,
+    ...MODEL_URLS.forestTree,
     MODEL_URLS.bush[0],
     MODEL_URLS.bushFlowers[0],
     MODEL_URLS.fern[0],
     MODEL_URLS.mushroom[0],
+    MODEL_URLS.forestBush[0],
   ];
   for (const url of speciesUrls) {
     for (const part of extractParts(url)) add(part.geometry, part.material);
@@ -949,6 +961,19 @@ function buildTrees(
     castBarkShadow: true,
     proxyShape: 'dead',
   };
+  const forestTreeSpec: SpeciesSpec = {
+    sets: MODEL_URLS.forestTree.map(extractParts),
+    perBucket: treeVariants,
+    salt: 63,
+    // the shipped variants stand 5.8-10.8u tall, already oak-sized
+    baseScale: 1.0,
+    sink: 0.05,
+    leafTint: OAK_TINT,
+    // one solid trunk+canopy part (no leaf material): it must cast or the
+    // tree goes shadowless, exactly like the dead trees
+    castBarkShadow: true,
+    proxyShape: 'round',
+  };
 
   // rocks: 3 single variants + a merged 3-boulder cluster, each in a mossy-top
   // and a snow-dusted colorway (baked vertex colors over the rock texture)
@@ -985,7 +1010,13 @@ function buildTrees(
   for (const bucket of buckets.values()) {
     const { items } = bucket;
     const pines = items.filter((d) => d.kind === 'tree');
-    const oaks = items.filter((d) => d.kind === 'tree2' && d.biome !== 'marsh');
+    const broadleafs = items.filter((d) => d.kind === 'tree2' && d.biome !== 'marsh');
+    // vale broadleafs split between Quaternius oaks and KayKit forest trees
+    // (same hash-split pattern as the marsh twisted/dead split below)
+    const isForestTree = (d: Decoration): boolean =>
+      d.biome === 'vale' && hashAt(d.x, d.z, 23) < 0.45;
+    const oaks = broadleafs.filter((d) => !isForestTree(d));
+    const forestTrees = broadleafs.filter(isForestTree);
     const swamps = items.filter((d) => d.kind === 'tree2' && d.biome === 'marsh');
     // marsh swamp trees split between twisted (mossy) and dead (bare) models
     const twisteds = swamps.filter((d) => hashAt(d.x, d.z, 19) >= 0.35);
@@ -1025,6 +1056,7 @@ function buildTrees(
 
     placeSpecies(parent, seed, bucket, pines, pineSpec, register, hideRegistry);
     placeSpecies(parent, seed, bucket, oaks, oakSpec, register, hideRegistry);
+    placeSpecies(parent, seed, bucket, forestTrees, forestTreeSpec, register, hideRegistry);
     placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register, hideRegistry);
     placeSpecies(parent, seed, bucket, deads, deadSpec, register, hideRegistry);
 
@@ -1186,12 +1218,17 @@ function generateDressing(seed: number): DressingSpot[] {
 }
 
 function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]): void {
-  const kindParts: Record<DressKind, ModelPart[]> = {
-    bush: extractParts(MODEL_URLS.bush[0]),
-    bushFlowers: extractParts(MODEL_URLS.bushFlowers[0]),
-    fern: extractParts(MODEL_URLS.fern[0]),
-    mushroom: extractParts(MODEL_URLS.mushroom[0]),
+  // Variant lists per kind: bushes mix the Quaternius bush with the KayKit
+  // forest bushes. Per bucket a small deterministic variant subset is drawn
+  // (the trees' start+stride pattern) so variety stays high without
+  // multiplying dressing draw calls; each spot hash-picks within the subset.
+  const kindVariants: Record<DressKind, ModelPart[][]> = {
+    bush: [MODEL_URLS.bush[0], ...MODEL_URLS.forestBush].map(extractParts),
+    bushFlowers: [extractParts(MODEL_URLS.bushFlowers[0])],
+    fern: [extractParts(MODEL_URLS.fern[0])],
+    mushroom: [extractParts(MODEL_URLS.mushroom[0])],
   };
+  const dressVariantsPerBucket = GFX.leanFoliage ? 1 : 2;
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
     const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
@@ -1200,7 +1237,8 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     else buckets.set(key, [spot]);
   }
 
-  for (const spots of buckets.values()) {
+  for (const [key, spots] of buckets) {
+    const [band, col] = key.split(':').map(Number);
     let minX = Infinity,
       maxX = -Infinity,
       minZ = Infinity,
@@ -1227,41 +1265,50 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     const maxKinds = 4;
     const kept = [...byKind.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, maxKinds);
     for (const [kind, list] of kept) {
-      for (const part of kindParts[kind]) {
-        const im = new THREE.InstancedMesh(part.geometry, part.material, list.length);
-        list.forEach((s, i) => {
-          const y = terrainHeight(s.x, s.z, seed);
-          q.setFromAxisAngle(up, hashAt(s.x, s.z, 46) * Math.PI * 2);
-          m.compose(v.set(s.x, y - 0.04 * s.scale, s.z), q, sv.set(s.scale, s.scale, s.scale));
-          im.setMatrixAt(i, m);
-          if (kind === 'mushroom') {
-            // mushrooms keep their painted cap colors — brightness jitter only
-            im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
-          } else {
-            im.setColorAt(
-              i,
-              softTint(
-                s.x,
-                s.z,
-                DRESS_TINT[zoneBiomeAt(s.z)],
-                c,
-                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
-              ),
-            );
-          }
-        });
-        im.receiveShadow = true; // dressing casts nothing: too small to matter
-        parent.add(im);
-        registry.push({
-          mesh: im,
-          x: bx,
-          z: bz,
-          radius: bRadius,
-          maxDist: lodDists().dressFar,
-          lod: 'dressing',
-          ...bucketMeshCost(im),
-        });
+      const variants = kindVariants[kind];
+      const subset = variantSubset(dressVariantsPerBucket, variants.length, band, col, 49);
+      const byVariant: DressingSpot[][] = subset.map(() => []);
+      for (const s of list) {
+        byVariant[Math.floor(hashAt(s.x, s.z, 48) * subset.length) % subset.length].push(s);
       }
+      byVariant.forEach((vList, si) => {
+        if (vList.length === 0) return;
+        for (const part of variants[subset[si]]) {
+          const im = new THREE.InstancedMesh(part.geometry, part.material, vList.length);
+          vList.forEach((s, i) => {
+            const y = terrainHeight(s.x, s.z, seed);
+            q.setFromAxisAngle(up, hashAt(s.x, s.z, 46) * Math.PI * 2);
+            m.compose(v.set(s.x, y - 0.04 * s.scale, s.z), q, sv.set(s.scale, s.scale, s.scale));
+            im.setMatrixAt(i, m);
+            if (kind === 'mushroom') {
+              // mushrooms keep their painted cap colors — brightness jitter only
+              im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
+            } else {
+              im.setColorAt(
+                i,
+                softTint(
+                  s.x,
+                  s.z,
+                  DRESS_TINT[zoneBiomeAt(s.z)],
+                  c,
+                  GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
+                ),
+              );
+            }
+          });
+          im.receiveShadow = true; // dressing casts nothing: too small to matter
+          parent.add(im);
+          registry.push({
+            mesh: im,
+            x: bx,
+            z: bz,
+            radius: bRadius,
+            maxDist: lodDists().dressFar,
+            lod: 'dressing',
+            ...bucketMeshCost(im),
+          });
+        }
+      });
     }
   }
 }
