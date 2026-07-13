@@ -2,7 +2,7 @@
 // grip every movable .window.panel gets from src/ui/window_resize.ts). DOM-free
 // so Vitest drives it directly: the controller feeds it plain numbers.
 //
-// Space conventions mirror the drag logic in hud.ts (setWindowPixelPosition):
+// Space conventions mirror window_drag.ts and Hud.setWindowPixelPosition:
 // pointer clientX/clientY and getBoundingClientRect() arrive in *visual* (zoomed)
 // space, while style.width/height are author lengths the browser multiplies by
 // the #ui `zoom`. Corner hit-testing happens in visual space (rect + pointer +

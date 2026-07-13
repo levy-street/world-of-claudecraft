@@ -2741,6 +2741,21 @@
   }
 
   /* ---------- claudium ---------- */
+  /* These are the two largest overlapping HUD surfaces. Paint containment keeps
+     an internal refresh or moving sibling from invalidating the WebGL canvas
+     behind their opaque frames. Isolation also keeps their stacking contexts
+     independent when Chromium reallocates layers with DevTools open. */
+  #daily-rewards-window,
+  #claudium-window {
+    contain: paint;
+    isolation: isolate;
+  }
+  /* Promote these large layers only while they overlap. Keeping the promotion
+     conditional avoids permanently reserving two Retina-sized GPU surfaces. */
+  body.store-stack-open #daily-rewards-window,
+  body.store-stack-open #claudium-window {
+    will-change: transform;
+  }
   #claudium-window {
     width: min(940px, calc(100vw - 40px));
     max-height: calc(100vh - 40px);
@@ -2757,6 +2772,17 @@
   body.frosted-panels #claudium-window {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+  /* A live window drag is intentionally a reduced-effects moment. The moving
+     window is compositor-translated by window_drag.ts, while the covered store
+     pauses its decorative border raster and both large shadows use a smaller
+     damage region until the final left/top position is committed. */
+  body.window-drag-active #daily-rewards-window,
+  body.window-drag-active #claudium-window {
+    box-shadow: 0 12px 36px rgb(0 0 0 / 72%);
+  }
+  body.window-drag-active .armory-section.rarity-legendary .armory-card {
+    animation-play-state: paused;
   }
   .cl-body {
     max-height: calc(100vh - 96px);

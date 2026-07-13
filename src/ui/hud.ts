@@ -427,8 +427,14 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import {
+  installWindowDrag,
+  isWindowDragPreviewMutation,
+  type WindowDragController,
+} from './window_drag';
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
+import { stackedWindowsVisible } from './window_stack_state_core';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -1283,12 +1289,7 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
-  private windowDrag: {
-    el: HTMLElement;
-    pointerId: number;
-    offsetX: number;
-    offsetY: number;
-  } | null = null;
+  private windowDragController: WindowDragController | null = null;
   // Movable/resizable chat box: current geometry (null = stock CSS default) plus
   // the in-progress pointer gesture, if any. See chat_window.ts for the math.
   private chatBox: ChatBoxGeometry | null = null;
@@ -1931,6 +1932,7 @@ export class Hud {
       markResizableWindow(el);
     };
     this.windowObserver = new MutationObserver((mutations) => {
+      const windowsToSync = new Set<HTMLElement>();
       for (const m of mutations) {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
@@ -1941,61 +1943,24 @@ export class Hud {
           continue;
         }
         if (m.target instanceof HTMLElement && m.target.matches('.window.panel')) {
-          this.syncWindowOpenState(m.target);
+          if (isWindowDragPreviewMutation(m.attributeName, m.target)) continue;
+          windowsToSync.add(m.target);
         }
       }
+      for (const win of windowsToSync) this.syncWindowOpenState(win);
     });
     document.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
     this.windowObserver.observe(document.body, { childList: true, subtree: true });
     this.syncAnyWindowOpenState();
 
-    document.addEventListener('pointerdown', (ev) => {
-      const target = ev.target as HTMLElement | null;
-      const el = target?.closest?.('.window.panel') as HTMLElement | null;
-      // The confirm prompt is a fixed topmost modal, not a managed window:
-      // no raise (bringWindowToFront would demote it into the window band)
-      // and no drag.
-      if (!el || el.id === 'confirm-dialog') return;
-      this.bringWindowToFront(el);
-      if (ev.button !== 0 || !target || !this.isWindowDragHandle(target, el)) return;
-      ev.preventDefault();
-      this.hideTooltip();
-      const rect = el.getBoundingClientRect();
-      this.setWindowPixelPosition(el, rect.left, rect.top, rect);
-      this.windowDrag = {
-        el,
-        pointerId: ev.pointerId,
-        offsetX: ev.clientX - rect.left,
-        offsetY: ev.clientY - rect.top,
-      };
-      el.classList.add('window-dragging');
-      el.dataset.windowMoved = '1';
-      try {
-        target.setPointerCapture?.(ev.pointerId);
-      } catch {
-        /* synthetic/legacy pointer without active capture */
-      }
+    this.windowDragController = installWindowDrag({
+      getScale: () => getUiScale(),
+      isDragHandle: (target, el) => this.isWindowDragHandle(target, el),
+      bringToFront: (el) => this.bringWindowToFront(el),
+      hideTooltip: () => this.hideTooltip(),
+      pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
     });
-    document.addEventListener('pointermove', (ev) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      ev.preventDefault();
-      const rect = drag.el.getBoundingClientRect();
-      this.setWindowPixelPosition(
-        drag.el,
-        ev.clientX - drag.offsetX,
-        ev.clientY - drag.offsetY,
-        rect,
-      );
-    });
-    const endDrag = (ev: PointerEvent) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      drag.el.classList.remove('window-dragging');
-      this.windowDrag = null;
-    };
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
     installWindowResize({
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
@@ -2048,6 +2013,15 @@ export class Hud {
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
+    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
+    document.body.classList.toggle(
+      'store-stack-open',
+      stackedWindowsVisible(
+        !!storeWindow && this.isWindowVisible(storeWindow),
+        !!claudiumWindow && this.isWindowVisible(claudiumWindow),
+      ),
+    );
     const mapWindow = document.getElementById('map-window');
     const questLogWindow = document.getElementById('quest-log-window');
     document.body.classList.toggle(
@@ -2237,7 +2211,7 @@ export class Hud {
   }
 
   private closeManagedWindow(el: HTMLElement): void {
-    if (this.windowDrag?.el === el) this.windowDrag = null;
+    this.windowDragController?.cancel(el);
     delete el.dataset.windowOpen;
     switch (el.id) {
       case 'confirm-dialog':

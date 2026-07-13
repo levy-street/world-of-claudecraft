@@ -124,6 +124,43 @@ describe('WOC Store window contract', () => {
     expect(rule?.[1]).toMatch(/(?:^|\n)\s+backdrop-filter: none;/);
   });
 
+  it('isolates stacked store paint and pauses decorative raster work during window drag', () => {
+    const containment = componentsCss.match(
+      /#daily-rewards-window,\s*#claudium-window \{([^}]*)\}/,
+    );
+    expect(containment).not.toBeNull();
+    expect(containment?.[1]).toContain('contain: paint;');
+    expect(containment?.[1]).toContain('isolation: isolate;');
+    const stackSync = hud.slice(
+      hud.indexOf("document.body.classList.toggle(\n      'store-stack-open'"),
+      hud.indexOf("document.body.classList.toggle(\n      'mobile-map-quest-open'"),
+    );
+    expect(stackSync).toContain('stackedWindowsVisible(');
+    expect(stackSync).toContain('!!storeWindow && this.isWindowVisible(storeWindow)');
+    expect(stackSync).toContain('!!claudiumWindow && this.isWindowVisible(claudiumWindow)');
+    expect(hud).toContain('isWindowDragPreviewMutation(m.attributeName, m.target)');
+    const dailyRewardsDeps = hud.slice(
+      hud.indexOf('private readonly dailyRewardsWindow = new DailyRewardsWindow({'),
+      hud.indexOf('// Claudium (server-authoritative soft currency) window.'),
+    );
+    expect(dailyRewardsDeps).toContain("root: () => $('#daily-rewards-window')");
+    expect(dailyRewardsDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+    const claudiumDeps = hud.slice(
+      hud.indexOf('private readonly claudiumWindow = new ClaudiumWindow({'),
+      hud.indexOf('// Spellbook window painter'),
+    );
+    expect(claudiumDeps).toContain("root: () => $('#claudium-window')");
+    expect(claudiumDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+    const stackedLayers = componentsCss.match(
+      /body\.store-stack-open #daily-rewards-window,\s*body\.store-stack-open #claudium-window \{([^}]*)\}/,
+    );
+    expect(stackedLayers?.[1]).toContain('will-change: transform;');
+    expect(componentsCss).toContain(
+      'body.window-drag-active .armory-section.rarity-legendary .armory-card',
+    );
+    expect(componentsCss).toContain('animation-play-state: paused;');
+  });
+
   it('keeps storefront content mounted while a background refresh is loading', () => {
     expect(storeWindow).toContain('data-woc-store-loading');
     expect(storeWindow).toContain(

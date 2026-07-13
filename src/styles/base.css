@@ -517,6 +517,8 @@
   }
   .window.window-dragging {
     cursor: move;
+    user-select: none;
+    will-change: transform;
   }
   .x-btn {
     color: #c9b27a;
