@@ -48,7 +48,8 @@ export interface TutorialSceneDeps {
   suspendInput(suspended: boolean): void;
   /** Stage an entity at an exact spot; returns its entity id. */
   spawnMob(templateId: string, x: number, z: number, facing: number): number | null;
-  spawnNpc(npcId: string, x: number, z: number, facing: number): number | null;
+  /** `facing` omitted = the NPC's own authored facing (see sim/tutorial_stage.ts). */
+  spawnNpc(npcId: string, x: number, z: number, facing?: number): number | null;
   /** Pop a burst of school-colored VFX on an entity. */
   burst(entityId: number, school: string): void;
   /** True when the player has asked for reduced motion (OS query or in-game switch). */
@@ -152,12 +153,9 @@ export class TutorialScenePlayer {
 
   private fireCue(cue: string): void {
     if (cue === CUE_SPAWN_WARDEN) {
-      const id = this.deps.spawnNpc(
-        WARDEN_NPC_ID,
-        DAWNHAVEN_WARDEN_POS.x,
-        DAWNHAVEN_WARDEN_POS.z,
-        Math.PI / 2,
-      );
+      // No facing override: her NpcDef already says which way she looks (down the
+      // path the player walks up), and that record is the one source of truth.
+      const id = this.deps.spawnNpc(WARDEN_NPC_ID, DAWNHAVEN_WARDEN_POS.x, DAWNHAVEN_WARDEN_POS.z);
       if (id !== null) this.deps.burst(id, 'holy');
       return;
     }

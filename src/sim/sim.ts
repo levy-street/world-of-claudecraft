@@ -6847,7 +6847,7 @@ export class Sim {
     return tutorialStageMod.spawnStagedMob(this.ctx, templateId, x, z, facing);
   }
 
-  spawnStagedNpc(npcId: string, x: number, z: number, facing = 0): number | null {
+  spawnStagedNpc(npcId: string, x: number, z: number, facing?: number): number | null {
     return tutorialStageMod.spawnStagedNpc(this.ctx, npcId, x, z, facing);
   }
 

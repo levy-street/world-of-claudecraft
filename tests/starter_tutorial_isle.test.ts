@@ -203,6 +203,32 @@ describe('Dawnhaven Isle content', () => {
     });
   });
 
+  it('a staged NPC keeps the facing its record authored', () => {
+    // The Warden is staged in by a cinematic, and she has to be looking DOWN the path
+    // the player just walked up, not off at the horizon. Her NpcDef says so; a
+    // `facing = 0` default on the staging helper would silently spin every staged NPC
+    // north whatever its record said.
+    withIsle(() => {
+      const sim = new Sim({
+        seed: DAWNHAVEN_SEED,
+        playerClass: 'priest',
+        playerName: 'Test',
+        world: DAWNHAVEN_WORLD,
+      });
+      const id = sim.spawnStagedNpc(
+        'dawnhaven_warden',
+        DAWNHAVEN_WARDEN_POS.x,
+        DAWNHAVEN_WARDEN_POS.z,
+      );
+      const warden = sim.entities.get(id!)!;
+      expect(warden.facing).toBe(NPCS.dawnhaven_warden.facing);
+      expect(warden.facing).not.toBe(0);
+      // ...and an explicit override still wins, for a scene that wants one.
+      const turned = sim.entities.get(sim.spawnStagedNpc('dawnhaven_warden', 5, 5, 1.25)!)!;
+      expect(turned.facing).toBe(1.25);
+    });
+  });
+
   it('a staged spawn draws no rng', () => {
     withIsle(() => {
       const sim = new Sim({

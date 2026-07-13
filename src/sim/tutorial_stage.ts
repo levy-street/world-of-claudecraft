@@ -36,19 +36,27 @@ export function spawnStagedMob(
   return mob.id;
 }
 
-/** Place an NPC at an exact spot. Returns its entity id, or null if unknown. */
+/**
+ * Place an NPC at an exact spot. Returns its entity id, or null if unknown.
+ *
+ * `facing` defaults to the NPC's OWN authored facing, not to 0: an NpcDef carries a
+ * facing precisely so the content decides which way it looks, and a hardcoded 0
+ * default would silently spin every staged NPC to face north whatever its record
+ * says.
+ */
 export function spawnStagedNpc(
   ctx: SimContext,
   npcId: string,
   x: number,
   z: number,
-  facing = 0,
+  facing?: number,
 ): number | null {
   const def = NPCS[npcId];
   if (!def) return null;
   const npc = createNpc(ctx.nextId++, def, ctx.groundPos(x, z));
-  npc.facing = facing;
-  npc.prevFacing = facing;
+  const look = facing ?? def.facing;
+  npc.facing = look;
+  npc.prevFacing = look;
   ctx.addEntity(npc);
   return npc.id;
 }
