@@ -78,7 +78,7 @@ async function shot(name, cam, target, settleMs = 1800) {
       p.pos.z = c.z - (dz / dl) * 3;
       p.prevPos.x = p.pos.x;
       p.prevPos.z = p.pos.z;
-      g.renderer.editorCam = {
+      g.renderer.freeCam = {
         pos: { x: c.x, y: gy + c.h, z: c.z },
         target: { x: t.x, y: gy + t.h, z: t.z },
       };
