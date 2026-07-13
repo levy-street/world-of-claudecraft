@@ -18,7 +18,7 @@ const DEEP = WATER_LEVEL - 0.8; // impassable deep water       (-5.3)
 const g = (x, z) => groundHeight(x, z, SEED);
 const tag = (x, z) => {
   const h = g(x, z);
-  return h < DEEP ? 'DEEP🌊' : h < SWIM ? 'swim' : h < WATER_LEVEL ? 'wade' : 'DRY';
+  return h < DEEP ? 'DEEP' : h < SWIM ? 'swim' : h < WATER_LEVEL ? 'wade' : 'DRY';
 };
 
 console.log(`WATER_LEVEL=${WATER_LEVEL}  swim<${SWIM}  deep<${DEEP}\n`);

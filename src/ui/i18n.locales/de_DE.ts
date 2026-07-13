@@ -133,7 +133,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.spectateBody':
     'Im Stadion läuft immer nur ein Spiel, und jeder kann einfach vorbeikommen und von den Rängen aus zusehen.',
   'hudChrome.keybinds.valecup': 'Talpokal',
-  'hudChrome.mobile.dailyRewards': 'Belohnungen',
+  'hudChrome.mobile.dailyRewards': 'Shop',
   'hudChrome.perf.labels.predLead': 'Prädiktionsvorlauf',
   'hudChrome.townFocus.budgetLabel': 'Verbleibende Punkte: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Fokus auf {component} verringern',
@@ -7123,4 +7123,358 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Hoch auf dem Thornpeak nimmt der Sturm über Stormcrag zuweilen Gestalt an. Thunzharr, der Erwachende Gipfel erhebt sich dort in stetigem Rhythmus, ein Elementar von Schlachtzugsstärke, in der offenen Welt von allen bekämpft, die dem Ruf folgen, und er wird umso mächtiger, je mehr Herausforderer sich ihm entgegenstellen. Jeder, der sich dem Kampf anschließt, verdient seinen eigenen Wurf auf seine Beute, nach den Regeln der Schlachtzugssperre gewährt, und sein Fall währt lange genug, dass die Gefallenen zurücklaufen und ihr Recht einfordern können. Sammle mehr Schwerter, als du zu brauchen glaubst.',
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',
+  'entities.abilities.chain_heal.description':
+    'Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)',
+  'entities.abilities.chain_heal.name': 'Chain Heal',
+  'entities.abilities.counter_shot.description':
+    'Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
+  'entities.abilities.counter_shot.name': 'Hushing Shot',
+  'entities.abilities.counterspell.description':
+    'Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken.',
+  'entities.abilities.counterspell.name': 'Spellbreak',
+  'entities.abilities.holy_taunt.description':
+    'Verspottet das Ziel: Eure Bedrohung steigt auf den Wert seines meistgehassten Feindes, und es wird 3 Sek. lang gezwungen, Euch anzugreifen.',
+  'entities.abilities.holy_taunt.name': 'Sacred Goad',
+  'entities.abilities.kick.description':
+    'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
+  'entities.abilities.kick.name': 'Boot',
+  'entities.abilities.pummel.description':
+    'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
+  'entities.abilities.pummel.name': 'Jawcrack',
+  'entities.abilities.rebuke.description':
+    'Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken.',
+  'entities.abilities.rebuke.name': 'Reproach',
+  'entities.abilities.skull_bash.description':
+    'Ein vorstoßender Kopfstoß, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
+  'entities.abilities.skull_bash.name': 'Headbutt',
+  'entities.abilities.spell_lock.description':
+    'Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken.',
+  'entities.abilities.spell_lock.name': 'Gag Order',
+  'entities.items.ashen_focus_ring.name': 'Aschener Fokusring',
+  'entities.items.ashstalker_cowl.name': 'Aschenpirscher-Kapuze',
+  'entities.items.ashstalker_grips.name': 'Aschenpirscher-Handschützer',
+  'entities.items.ashstalker_harness.name': 'Aschenpirscher-Harnisch',
+  'entities.items.ashstalker_legguards.name': 'Aschenpirscher-Beinschützer',
+  'entities.items.ashstalker_shoulderguards.name': 'Aschenpirscher-Schulterschützer',
+  'entities.items.ashstalker_treads.name': 'Aschenpirscher-Stiefel',
+  'entities.items.ashstalker_waistband.name': 'Aschenpirscher-Hüftgurt',
+  'entities.items.cinder_sigil_pendant.name': 'Anhänger des Glutsiegels',
+  'entities.items.cinderweave_cord.name': 'Kordel aus Glutgewebe',
+  'entities.items.cinderweave_cowl.name': 'Kapuze aus Glutgewebe',
+  'entities.items.cinderweave_handwraps.name': 'Handwickel aus Glutgewebe',
+  'entities.items.cinderweave_legwraps.name': 'Beinwickel aus Glutgewebe',
+  'entities.items.cinderweave_mantle.name': 'Mantel aus Glutgewebe',
+  'entities.items.cinderweave_raiment.name': 'Gewand aus Glutgewebe',
+  'entities.items.cinderweave_slippers.name': 'Schuhe aus Glutgewebe',
+  'entities.items.emberglass_warstaff.name': 'Glutglas-Kriegsstab',
+  'entities.items.final_argument_greatblade.name': 'Großklinge des letzten Arguments',
+  'entities.items.final_oath_medallion.name': 'Medaillon des letzten Eides',
+  'entities.items.first_blood_razor.name': 'Klinge des ersten Blutes',
+  'entities.items.fleetblood_band.name': 'Flinkblut-Reif',
+  'entities.items.furyforged_gauntlets.name': 'Zorngeschmiedete Stulpen',
+  'entities.items.furyforged_girdle.name': 'Zorngeschmiedeter Gürtel',
+  'entities.items.furyforged_legguards.name': 'Zorngeschmiedete Beinschützer',
+  'entities.items.furyforged_sabatons.name': 'Zorngeschmiedete Plattenstiefel',
+  'entities.items.furyforged_warhelm.name': 'Zorngeschmiedeter Kriegshelm',
+  'entities.items.furyforged_warplate.name': 'Zorngeschmiedete Kriegsplatte',
+  'entities.items.furyforged_warspaulders.name': 'Zorngeschmiedete Kriegsschulterstücke',
+  'entities.items.iron_vow_band.name': 'Reif des eisernen Eids',
+  'entities.items.last_step_signet.name': 'Siegelring des letzten Schritts',
+  'entities.items.razorwind_torque.name': 'Halsreif des Klingenwinds',
+  'entities.items.spellbreakers_seal.name': 'Siegel des Zauberbrechers',
+  'entities.items.stormbound_crown.name': 'Sturmgebundene Krone',
+  'entities.items.stormbound_greaves.name': 'Sturmgebundene Beinschienen',
+  'entities.items.stormbound_handguards.name': 'Sturmgebundene Handschützer',
+  'entities.items.stormbound_hauberk.name': 'Sturmgebundene Halsberge',
+  'entities.items.stormbound_legmail.name': 'Sturmgebundene Kettenbeinlinge',
+  'entities.items.stormbound_spaulders.name': 'Sturmgebundene Schulterstücke',
+  'entities.items.stormbound_waistguard.name': 'Sturmgebundener Hüftschutz',
+  'entities.items.unbroken_circle.name': 'Der ungebrochene Kreis',
+  'entities.npcs.fury.greeting':
+    'Der Sand erinnert sich an jeden Sieg. Gib deine Ehre mit Bedacht aus.',
+  'entities.npcs.fury.name': 'WUT',
+  'entities.npcs.fury.title': 'Ehrenquartiermeister',
+  'hudChrome.claudium.amountLabel': 'Menge',
+  'hudChrome.claudium.balanceLabel': 'Guthaben',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Kaufen',
+  'hudChrome.claudium.buyTitle': 'Claudium kaufen',
+  'hudChrome.claudium.buyUnavailable': 'Käufe sind derzeit nicht verfügbar.',
+  'hudChrome.claudium.checkoutClose': 'Bezahlvorgang schließen',
+  'hudChrome.claudium.checkoutFailed':
+    'Der Bezahlvorgang konnte nicht geladen werden. Bitte versuche es erneut.',
+  'hudChrome.claudium.checkoutLoading': 'Bezahlvorgang wird geladen...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'Die Transaktion wurde gesendet, aber das Claudium wurde noch nicht gutgeschrieben. Bitte versuche es gleich noch einmal.',
+  'hudChrome.claudium.checkoutPending':
+    'Die Transaktion wird verarbeitet. Bestätige sie in deiner Wallet und lass dieses Fenster geöffnet.',
+  'hudChrome.claudium.checkoutPendingButton': 'Wird verarbeitet',
+  'hudChrome.claudium.checkoutTitle': 'Kauf abschließen',
+  'hudChrome.claudium.checkoutUnavailable': 'Dieser Claudium-Kauf ist derzeit nicht verfügbar.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Verbinde eine Solana-Wallet, bevor du Claudium mit Kryptowährung kaufst.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Diese Wallet kann Solana-Transaktionen weder signieren noch senden.',
+  'hudChrome.claudium.close': 'Claudium-Fenster schließen',
+  'hudChrome.claudium.disclosure':
+    'Claudium ist eine nicht rücktauschbare Spielwährung: Du kaufst es mit echtem Geld und gibst es für kosmetische Inhalte aus. Es kann weder eingelöst noch übertragen oder ausgezahlt werden.',
+  'hudChrome.claudium.hideAmounts': 'Zusätzliche Claudium-Mengen ausblenden',
+  'hudChrome.claudium.kindCosmetic': 'Kosmetik',
+  'hudChrome.claudium.kindItem': 'Gegenstand',
+  'hudChrome.claudium.kindSkin': 'Skin',
+  'hudChrome.claudium.loading': 'Claudium wird geladen...',
+  'hudChrome.claudium.open': 'Claudium-Fenster öffnen',
+  'hudChrome.claudium.railLabel': 'Zahlungsart',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC deaktiviert.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Karte',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': '20% Rabatt',
+  'hudChrome.claudium.railWocUnavailable': 'WOC-Preise sind derzeit nicht verfügbar.',
+  'hudChrome.claudium.showAmounts': 'Alle Claudium-Mengen anzeigen',
+  'hudChrome.claudium.skuRow': '{claudium} Claudium für {usd}',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Einlösen',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Derzeit sind keine kosmetischen Inhalte verfügbar.',
+  'hudChrome.claudium.storeTitle': 'Kosmetikshop',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Der Claudium-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Verwerten: Sammle Handwerksmaterialien aus diesem Kadaver (Haut, Fangzahn, Seide und ähnliche Komponenten), unabhängig von der Beute. Jeder kann Kadaver verwerten, aber einen bestimmten Kadaver darf nur ein Spieler verwerten.',
+  'hudChrome.deeds.openBookHint': 'Buch der Taten öffnen',
+  'hudChrome.loot.takeAllTooltip':
+    'Alles nehmen: Sammle alle Münzen und Gegenstände in diesem Beutefenster.',
+  'hudChrome.statInfo.desc.warfare':
+    'Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Kriegsführung',
+  'hudChrome.statInfo.warfareValue': '+{increase}% verursacht / -{reduction}% erlitten',
+  'hudChrome.tutorial.nextTipMap':
+    'Sieh auf der Weltkarte ({key}) nach, wo Quests auf dich warten.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Öffne dein Questlog ({key}), um deine nächste Aufgabe in der Nähe zu finden.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Öffne Soziales ({key}), um eine Gruppe für schwierigere Kämpfe zu finden.',
+  'hudChrome.tutorial.nextTipsTitle': 'Wie geht es weiter?',
+  'hudChrome.tutorial.slayTargetHint':
+    'Neu im Kampf? Drücke {targetKey} oder klicke auf einen Wolf, um ihn anzuvisieren. Nutze dann eine Fähigkeit in deiner Aktionsleiste, um ihn anzugreifen.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Neu im Kampf? Tippe auf einen Wolf, um ihn anzuvisieren. Tippe dann auf eine Fähigkeit in deiner Aktionsleiste, um ihn anzugreifen.',
+  'hudChrome.warfare.balance': 'Ehre: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} Ehre',
+  'hudChrome.warfare.honorFloat': '+{amount} Ehre',
+  'hudChrome.warfare.honorGain': 'Du erhältst {amount} Ehre ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Nicht genug Ehre.',
+  'hudChrome.warfare.reasons.arenaWin': 'Arenasieg',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta abgeschlossen',
+  'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-Ausschaltung',
+  'hudChrome.warfare.reasons.fiestaWin': 'Fiesta-Sieg',
+  'hudChrome.wocStore.applied': 'Angewendet',
+  'hudChrome.wocStore.apply': 'Skin anwenden',
+  'hudChrome.wocStore.armoryBody':
+    'Limitierte Waffenskins aus der Waffenkammer von Saison 1. Accountweit, rein kosmetisch und für alle in deiner Umgebung sichtbar.',
+  'hudChrome.wocStore.armoryEyebrow': 'Saison 1',
+  'hudChrome.wocStore.armoryTitle': 'Die Waffenkammer',
+  'hudChrome.wocStore.badge.flagship': 'Flaggschiff',
+  'hudChrome.wocStore.badge.hero': 'Held',
+  'hudChrome.wocStore.balance': 'Claudium-Guthaben',
+  'hudChrome.wocStore.buyClaudium': 'Claudium kaufen',
+  'hudChrome.wocStore.buySkin': 'Skin kaufen',
+  'hudChrome.wocStore.cancel': 'Abbrechen',
+  'hudChrome.wocStore.close': 'WOC-Shop schließen',
+  'hudChrome.wocStore.collectionLine': 'Kollektion: {collection}',
+  'hudChrome.wocStore.collections.emberwrought': 'Glutgeschmiedet',
+  'hudChrome.wocStore.collections.fallen_star': 'Gefallener Stern',
+  'hudChrome.wocStore.collections.guildmark': 'Gildenzeichen',
+  'hudChrome.wocStore.collections.hoarfrost': 'Raureif',
+  'hudChrome.wocStore.confirmBody': '{item} für {cost} Claudium kaufen?',
+  'hudChrome.wocStore.confirmPurchase': 'Kaufen',
+  'hudChrome.wocStore.confirmTitle': 'Kosmetikkauf bestätigen',
+  'hudChrome.wocStore.detach': 'Skin entfernen',
+  'hudChrome.wocStore.equipHint':
+    'Rüste eine Waffe des Typs {type} aus, um diesen Skin anzuwenden.',
+  'hudChrome.wocStore.error':
+    'Der WOC-Shop ist derzeit nicht verfügbar. Bitte versuche es gleich noch einmal.',
+  'hudChrome.wocStore.inspectAria': '{item} ansehen',
+  'hudChrome.wocStore.loading': 'WOC-Shop wird geladen...',
+  'hudChrome.wocStore.lore': 'Hintergrund',
+  'hudChrome.wocStore.needMoreBody': 'Dir fehlen {shortfall} Claudium, um {item} zu kaufen.',
+  'hudChrome.wocStore.needMoreTitle': 'Mehr Claudium benötigt',
+  'hudChrome.wocStore.owned': 'Im Besitz',
+  'hudChrome.wocStore.priceChanged':
+    'Der Preis hat sich vor Abschluss des Kaufs geändert. Prüfe den aktualisierten Preis und bestätige den Kauf erneut.',
+  'hudChrome.wocStore.rarity.epic': 'Episch',
+  'hudChrome.wocStore.rarity.legendary': 'Legendär',
+  'hudChrome.wocStore.rarity.rare': 'Selten',
+  'hudChrome.wocStore.rarity.uncommon': 'Ungewöhnlich',
+  'hudChrome.wocStore.rewardsTab': 'Tägliche Belohnungen',
+  'hudChrome.wocStore.scene.day': 'Tag',
+  'hudChrome.wocStore.scene.dusk': 'Dämmerung',
+  'hudChrome.wocStore.scene.night': 'Nacht',
+  'hudChrome.wocStore.sceneLabel': 'Szenenbeleuchtung',
+  'hudChrome.wocStore.seasonOne': 'Saison 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Kurze, geschwärzte Klinge mit glühend glutorangenen Adern, einem winzigen schwelenden Edelstein im Knauf, Asche und Funken.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'Eine Gassenklinge, in deren Knaufstein das Feuer des Berges geschmuggelt wurde, ein stiller Scherz eines Waffenschmieds: Selbst ein Beutelschneider könnte eine Glut der ersten Schmiede tragen. Geschwärzt, von orangefarbenen Adern durchzogen und in der Scheide stets eine Spur zu warm. Ziehst du sie im Dunkel unter Highwatch, erhellt ihr Glühen deine Hand gerade genug, um die Lücke in der Deckung eines Mannes zu finden.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Aschenfunken-Messer',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'Ein Splitter eines gefallenen Sterns: eine flüssiggolden glühende Schneide auf kosmosschwarzem Metall, ein heller Sternenpartikel, der den Knauf umkreist, und eine feine Polarlichtspur.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Das kleinste Stück des Sterns, das Aldric aus dem Krater barg, und nach mancher Einschätzung das gefährlichste. Ein einzelner Splitter jenes fremdartigen Herzens, dessen flüssiggoldene Schneide auf kosmosschwarzem Metall ruht, während ein einsamer Sternenpartikel den Knauf umkreist wie ein Mond, der seine Welt verloren hat. Er wiegt fast nichts und durchtrennt fast alles. Klein genug, um ihn zu verbergen, und hell genug, um ihn im Dunkeln an seinem eigenen Licht zu finden.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Fangzahn des gefallenen Sterns',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Poliertes stählernes Axtblatt, Messingkappe und Schaftfedern an einem lackierten Eschenholzstiel, sauber gewickelter Griff und Schmiedemarke.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    'Eine gemarkte Axt ist eine Prahlerei, die man in der Hand halten kann. Messingkappe und Schaftfedern sind halb Rüstung, halb Signatur: Sie bewahren den Stiel vor dem Splittern und fangen das Licht der Taverne ein, damit jeder erkennt, dass du Rüstungsschmied Hodes Arbeit gekauft hast und kein ausgemustertes Milizstück. „Was schneidet, verkaufe ich“, sagt der Schmied aus Highwatch. Diese hier schneidet.',
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Messingkappen-Beil',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Hartholzstab mit gedrechseltem Messingkronenknauf, Messingzwinge und gefärbtem Lederband.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Aus abgelagertem Hartholz gedrechselt und mit einem Messingknauf gekrönt, wie ihn die Schmiede von Eastbrook zu Hunderten gießen, aber einzeln vollenden. Er gehört Reisenden, die am Tor von Fenbridge und an der Mauer von Highwatch gleichermaßen ernst genommen werden wollen. Ein Wanderstab, der nie wirklich zum Wandern gebraucht wurde. Das gefärbte Band passt zu einem Mantel, dessen Preis man ihm ansieht.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Messingkronen-Wanderstab',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Dunkle Klinge aus geschmiedetem Stahl, Hohlkehle mit glühend glutorangenen Runen, Hitzerisse und ein schwelender Edelstein in der Parierstange.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    'Die erste Klinge, die nicht in Wasser, sondern in Gesegneter Glut aus Stormcrag abgeschreckt wurde. Die Schmiede von Highwatch schwören, diese Kohlen „brennen blau und rein, weil der Berg sich an seinen alten Eid erinnert“. In die Hohlkehle gebettet, glimmt dieses Feuer glutorange und erlischt nicht. Selbst in der kältesten Nacht an der Mauer bleiben die Runen unter der bloßen Hand warm. Glutbrand muss nie entzündet werden. Die Klinge weigert sich schlicht, auszugehen.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Glutbrand',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Armbrust aus geschwärztem Stahl, glutorangefarbenes Leuchten aus Rissen in den Wurfarmen und eine glimmende Kohle im Schaft.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Die seltsamste der glutgeschmiedeten Waffen: Das Feuer des Berges wurde in eine Maschine gegossen. Orangefarbenes Licht sickert aus Rissen in den Wurfarmen, und eine glimmende Kohle im Schaft verhindert, dass die Sehne in Thornpeaks Kälte oder Mirefens Nässe je steif wird. Ihre Bolzen verlassen die Rinne bereits warm und treffen noch heißer. Die Antwort eines Jägers auf eine Mauer, an der auch der Feind die Kälte nicht spürt.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Glutspanner',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'Goldene Sternensplitter, die einen flüssiggoldenen Kern umkreisen, ein kosmosschwarzer Schaft mit eingeätzten Sternbildern und aufwärts windende Polarlichtbänder.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    'Ein Schaft aus Sternenmetall, gekrönt von einem flüssiggoldenen Kern und einem Ring goldener Splitter, die ihn langsam und endlos umkreisen: ein kleiner Kosmos, gezeichnet mit Sternbildern, die keinem Himmel über Thornpeak gleichen. Polarlicht windet sich daran empor wie Rauch, der vergessen hat aufzusteigen. Seine Träger behaupteten, sie könnten die Leere darin kreisen spüren, so wie Ysoleis See „das Mondlicht trinkt“: geduldig, kalt und zurückblickend.',
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch, Turm der endlosen Leere',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Axt aus geschwärztem Eisen, durch deren Blatt glutorangefarbene Risse schimmern, ein Edelstein wie eine gehütete Kohle und Hitzeschleier.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Rüstungsschmied Hode arbeitete eine lebende Kohle aus Bergfeuer in das Herz des Axtblatts ein, sodass die Schneide zwischen den Schlägen nie ganz abkühlt. Beim Abschwung atmen die Risse orangefarbenes Licht, als wecke der Schlag etwas, das die erste Schmiede schlafend im Eisen zurückließ. Man sagt, ein Stormcrag-Elementar habe die Glut dafür hergegeben. Wenn der Wind aufkommt, erzählt man sich in Highwatch vieles.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Glutbiss',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Ein gefangener, flüssiggoldener Partikel eines sterbenden Sterns, umhüllt von kreisenden Funken, auf einem kosmosschwarzen Schaft mit leuchtenden Sternbildern.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Nicht der gefallene Stern selbst, sondern der letzte Partikel eines sterbenden Sterns: eine einzelne flüssiggoldene Glut einer längst erloschenen Sonne, umhüllt von den Funken ihres letzten Lichts. In den kosmosschwarzen Schaft sind die Sternbilder geätzt, die ihren Tod beobachteten. Die Bauern von Mirefen sagen, er erfülle jedem einen Wunsch, der ihn in der tiefsten Abenddämmerung hält. Sie sagen auch, jede Seele, die ihn trug, habe sich mehr Zeit gewünscht, und der Ertränkte Mond habe keinem diesen Wunsch gewährt.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Glutwunsch, Funke der sterbenden Sonne',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Zauberstab aus geschwärztem Metall mit einer glühenden Kohle in eisernen Klauen, haarfeinen Hitzerissen und warmem Licht aus seinem Inneren.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'Der Zauberstab, der seiner Güteklasse den Namen gab. Als ein Waffenschmied aus Highwatch erstmals eine Kohle aus Bergfeuer in eiserne Klauen setzte und sie einer sterblichen Hand gehorchen ließ, nannten selbst die Priester des Lichts das Werk nicht länger Ketzerei, sondern nützlich. Warm, geduldig und still gefährlich: Die Glut an seiner Spitze brennt ununterbrochen, seit einer Zeit, bevor sein Besitzer den ersten Atemzug tat.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Glutgeschmiedeter Zauberstab',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Absurd überdimensionierte Sternenkanone: ein kosmosschwarzer Lauf mit leuchtend goldenen Sternbildern, eine trichterförmige Mündung mit einem flüssiggoldenen Kometengeschoss, Messingbeschläge und eine hölzerne Schulterstütze.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    'Die Schmiede, die den gefallenen Stern bearbeiteten, schufen sechs Relikte daraus und hatten noch immer ein ganzes Fass Sternenmetall übrig. Zu diesem Zeitpunkt hatten die Lehrlinge bereits eigene Vorstellungen. Was vom Amboss kam, ist entweder die erste Feuerwaffe des Reiches oder seine kleinste Belagerungsmaschine: eine Schulterkanone, die weniger einen Schuss abgibt, als einen zweiten, diesmal gezielten Stern anzufordern. Bruder Aldric weigerte sich, sie zu segnen. Etwas derart Lautes, so meinte er, sei dem Himmel längst aufgefallen. Jäger lieben sie. Nichts in ihrem Schussfeld tat das je.',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, der zweite gefallene Stern',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'Eine einzelne Spitze aus leuchtendem cyanfarbenem Gletschereis, Raureif, der aus einem silbernen Kragen blüht, und schwacher kalter Nebel.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    'Eine Spitze aus leuchtendem Gletschereis, die angeblich aus dem tiefen Bergsee unterhalb des Heiligtums gebrochen wurde, wo die Kälte des Berges Zähne hat. Raureif blüht endlos aus ihrem silbernen Kragen und schmilzt weder im Feuer noch im Sommer. Magier halten sie wegen der Kälte nah, die sie ihrer Arbeit verleiht, und in jenen Nächten fern, in denen sie sich zur Krypta von Nythraxis zu neigen und zu lauschen scheint.',
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Splitter von Everwinter',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Lackierter Recurvebogen aus Walnussholz, Wurfarmenden aus Messing, gewachste Leinensehne und Gildenstempel auf dem Mittelstück.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Was im Reich einer Gilde am nächsten kommt, ist der Stempel eines Pfeilmachers auf dem Mittelstück, ein Versprechen über das Werk, wie das Siegel eines Winzers auf einem Fass. Lackiertes Walnussholz, Messing an den Wurfarmenden und eine gewachste Leinensehne, die selbst im Regen von Mirefen nicht ausfranst. Jede Verbindung rechtfertigt den Preis. Zieh ihn einmal jenseits des Witwendickichts, und jedes Gegenargument verstummt.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Gildenbogen des Pfeilmachers',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Eisenbeschlagener Stab, gekrönt von einem leuchtenden Glutkern im Käfig, Glutrunen entlang des Schafts und aufsteigendes Hitzeflimmern.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Eine lebende Kohle aus Bergfeuer, an der Krone in einen Eisenkäfig gesperrt. Lehrmeister Caddis nennt sie den Beweis, dass sich das Feuer der ersten Schmiede zum Dienen binden lässt und nicht nur zum Versiegeln. Hitzeflimmern steigt in einem dünnen, endlosen Band davon auf. Ein Magier mit diesem Stab braucht weder Schmiede noch Wachfeuer. Die Glut, so flüstert man, wurde aus Voskar Glutschwinges eigenem Atem geschöpft und ist seither nicht erkaltet.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Schmiedeherz-Stab',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Unheilvoll dünner Dolch aus klarem blauem Eis, eine leuchtende cyanfarbene Ader in der Mitte, nadelfeine Frostkristalle und ein Griff aus Raureif.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Dünn wie ein angehaltener Atem und doppelt so kalt: ein Splitter des Thornpeak-Gletschers, entlang einer einzigen leuchtenden Ader geschliffen, so scharf, dass die Wunde zufriert, bevor das Blut ans Fließen denkt. Sein Name stammt von der Grabeskälte, welche die Toten von den Gipfeln herabtragen. Er muss nie geschärft werden. Eis wird nicht stumpf, bemerkt Lehrmeister Caddis trocken, es wartet nur.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Reifnadel',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Axtkopf aus durchscheinendem blauem Gletschereis, ein rissiges, cyanfarben leuchtendes Inneres, starrende Frostkristalle und ein Stiel mit einer Spur aus kaltem Dunst.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Aus dem blauen Herzen des Thornpeak-Gletschers gehauen, wo zwei Jahrhunderte Eis die Kälte pressten, bis sie von selbst zu leuchten begann. Selbst in Ruhe zieht die Axt Dunst hinter sich her, und das Krachen ihres Aufpralls klingt wie eine Gletscherspalte, die sich unter dem Pirscherkamm öffnet. Highwatch überlässt seine Gefallenen dort oben dem Eis. Diese Waffe soll das Tauwetter und alles, was es erwecken würde, in Schach halten.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Gletscherspalter',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Klinge aus gebläutem Stahl, bronzene Parierstange in Fischschwanzform, Griff aus blaugrün gefärbtem Leder und ein kleines eingeprägtes Gildensiegel.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Wo eine gewöhnliche geschmiedete Klinge namenlos bleibt, ist diese signiert. Ein Waffenschmied verdient das Recht, sein Zeichen in die Fehlschärfe zu schlagen, erst wenn der Händler des Weltmarkts für seinen Stahl bürgt, und für Schmied Haldrens Zeichen wird gebürgt. Gegen die Feuchtigkeit des Tals gebläut und bis aufs Haar ausbalanciert. Für den Stempel zahlt man ebenso viel wie für das Schwert, und er ist es wert.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Gildenzeichen-Ritterschwert',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Schlanker Dolch aus gehärtetem Stahl, Handschutz und Knaufmutter aus Bronze, dunkelgrüner Kordelgriff und eingeprägtes Siegel.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Was ein Mann von Rang trägt, wenn das Schwert zu Hause bleibt: schlank, gehärtet und mit demselben Zeichen versehen, das eine volle Klinge auszeichnet, am Gürtel getragen wie ein Siegelring mit Schneide. Unauffällig für alle, die den Nachweis eines Waffenschmieds nicht zu lesen wissen. Quartiermeisterin Bree bewahrt in Highwatch eine Schublade davon für Offiziere auf, die sich den Respekt der Mauer verdient haben.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Gildenzeichen-Dolch',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Versilberter Stab, gekrönt von einem schwebenden, langsam kreisenden Splitter aus leuchtendem cyanfarbenem Eis, der Kristalle und kalten Dunst ausstrahlt.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'Der Stab jener Wache, die an der Mauer von Highwatch niemals schläft. Seine Krone ist ein Splitter cyanfarbenen Bergseeeises, der frei über dem Silber schwebt und sich langsam aus eigener Kraft dreht: immer, so schwören die Wächter, zu der Kälte hin, die sich unter den Gipfeln sammelt. Die Wacht zu tragen bedeutet, in einer einzigen Nacht zweihundert Jahre Wache zu halten und zu versprechen, niemals wegzusehen.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Raureifwacht',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Gebogene Klinge aus blassem Gletschereis, gezackte Raureifkristalle entlang des Rückens, ein leuchtender cyanfarbener Frostkern in der Hohlkehle und eine Parierstange aus Eiszapfen.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    'Das Aushängeschild der gefrorenen Güteklasse und die Waffe, nach der jeder Sammler zuerst greift. Eiszahn wurde aus einem Fangzahn des Gletschers geschnitzt, der Thornpeak über Highwatch krönt, nicht geschmiedet. Sein cyanfarbener Kern brennt so kalt wie das Licht auf dem Glimmermere. Er bereift selbst die Luft, die er durchschneidet. Die Mauerwächter schwören, ein Soldat habe ihn in jener Nacht getragen, als der hohe Schnee den Wyrmkult zurückhielt, und damit „der Mauer einen Winter erkauft“.',
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Eiszahn',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Schlanker, tiefrot lackierter Zauberstab, zwei polierte Messingringe und eine kleine abgerundete Messingspitze.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Tiefroter Lack in sieben sorgfältigen Schichten, zweimal mit poliertem Messing eingefasst: die Art Zauberstab, die ein Heckenmagier auf dem Weltmarkt kauft, sobald er echte Münzen verlangt und sich damit sehen lassen will. Er leitet das Licht nicht besser als ein Birkenzweig. Doch auf der Ladentheke des Händlers glänzt er prächtig, und bei kleiner Magie war der Glaube daran schon immer die halbe Wirkung.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Lackierter Zauberstab',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Meteorisches Sternenmetall, ein flüssiggoldener Kern entlang des Schafts, kosmosschwarze Wurfarme mit eingeätzten Sternbildern und ein eingelegter Bolzen aus reinem Sternenfeuer.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    'Aus rohem meteorischem Sternenmetall geschmiedet, während der Krater von Mirefen noch glühte. Trümmer, die „zu heiß zum Anfassen“ waren, wurden zu kosmosschwarzen Wurfarmen mit eingeätzten Sternbildern gehämmert, ein flüssiggoldener Kern in den Schaft gebettet. Die Armbrust legt keinen Bolzen ein, sondern beschwört einen: einen Schaft aus Sternenfeuer, abgeschossen wie ein Urteil und einschlagend wie dessen Vollstreckung. Als Highwatch fürchtete, selbst die todlose Krone von Nythraxis sei nicht das Schlimmste unter den Gipfeln, wollte man diese Waffe auf der Mauer. Ziele mit Bedacht.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name':
+    'Meteorlatch, das jüngste Gericht des Himmels',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Gezackte Eiskristalle um einen leuchtenden cyanfarbenen Kern, Raureif, der an einem versilberten Stiel hinabkriecht.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    'Nicht geschnitzt, sondern gewachsen: Eis aus Thornpeak wurde um einen kalten cyanfarbenen Kern gezogen, bis es so hart war wie Hodes bester Stahl. Raureif kriecht am versilberten Stiel zur Hand hinab und erreicht sie doch nie ganz. Wo die Waffe trifft, gefriert Wasser. Wo sie ruht, wird der Boden weiß. Die Grabeskälte der Gipfel, klein genug gemacht, um sie gegen jene Dinge zu schwingen, die die Mauer erklimmen.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Reifbrecher',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Axtkopf wie ein zerrissenes Stück Nachthimmel, flüssiggoldene Risse und eingeätzte Sternbilder, schwebende Sternenlichtsplitter und Polarlichtschimmer entlang der Schneide.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Vom Kraterrand geschlagen, wo der gefallene Stern das Spiegelbild des Himmels aus Mirefen riss und eine Wunde hinterließ, die noch immer dampft. Der Axtkopf gleicht einem Stück zerrissener Nacht: flüssiggoldene Risse, Sternbilder, die kein Gelehrter in Highwatch benennen kann, und Polarlicht, das bei jedem Schwung von der Schneide blutet. Bruder Aldric segnete die Axt und weigerte sich, sie zu berühren. Wer sie hebt, hält das Loch in Händen, das der Himmel hinterließ.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Himmelsreißer, Wunde des Firmaments',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Dunkle Eisenflansche, die entlang ihrer inneren Risse glutorange leuchten, und ein Edelstein mit flüssigem Kern im Kopf.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    'Ein Streitkolben mit eigener Feuerstelle: Ein Stein mit flüssigem Kern, vom Siegel des Heiligtums abgesplittert und „mit Bergfeuer geschmiedet“, glüht in seinem Kopf. Die Flansche fühlen sich warm an und werden dort, wo sie treffen, noch heißer. Ein Sergeant aus Highwatch schwört, ein Schlag hinterlasse einen blauen Fleck, der bis zum Morgen schwach leuchtet. Das Feuer des Berges, endlich zum Brechen bestimmt statt zum Versiegeln.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Schwelsturz',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Großschwert aus einem gefallenen Stern, ein flüssiggoldener Kern, der die kosmosschwarze, von Sternenlicht gesäumte Klinge teilt, goldene Splitter um die Parierstange und ein Polarlichtband.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    'Als der Stern vom westlichen Himmel fiel und jenseits des Witwendickichts „wie eine Schmiede“ zerbarst, barg Bruder Aldric sein noch schwelendes Herz aus dem Krater von Mirefen und flehte die Schmiede des Reiches an, „etwas zu bearbeiten, das nicht in diese Welt gehört“. Sie schufen daraus ein einziges Großschwert: Solheim. Sein flüssiggoldener Kern teilt die kosmosschwarze Klinge wie die Morgendämmerung den Nachthimmel, und Splitter aus Sternenmetall umkreisen die Parierstange auf Bahnen, die keine Hand bestimmte. Nur eines wurde je geschmiedet. Ein zweites wird es nicht geben.',
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, letztes Licht der Morgenröte',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Ein gefangener flüssiggoldener Sternenkern, umringt von kreisenden Splittern, kosmosschwarze Flansche mit Adern aus Sternenlicht und aus den Nähten strömendes Polarlicht.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    'Ein Sternenkern, im Augenblick vor seinem Tod eingefangen, umringt von den Trümmern, die mit ihm fielen, und einen Fingerbreit vor dem Vergessen erstarrt. In seinen kosmosschwarzen Flanschen fließt gefangenes Sternenlicht, und beim Heben strömt Polarlicht aus den Nähten. Die alten Priester des Lichts nannten einen fallenden Stern ein Urteil, einen von oben verhängten Spruch, den kein Schild aufhalten sollte, und benannten diese Waffe nach jenem Stern, der auf Mirefen niederging.',
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Sternenfall, Urteil des Himmels',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Sechsflanschiger Kopf aus gehärtetem Blaustahl, Kragen und Knauf aus Messing und ein Griff aus weinrotem Leder.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Sechs Flansche aus gebläutem, gehärtetem Stahl, jeder geschliffen, um einen Helm aufzubrechen, mit Messing eingefasst und in weinrotes Leder gewickelt. Die Waffenschmiede des Reiches fertigen keine hässlichen Waffen, selbst wenn deren Arbeit brutal ist. Dieses Stück wurde über den Weltmarkt in Auftrag gegeben und nicht vom Regal genommen. Irgendwo liegt ein Hauptbuch mit dem Namen eines stolzen Käufers und der Summe, die er Hode dafür zahlte.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Gehärteter Flanschstreitkolben',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Bogen aus versilbertem Stahl und blauem Eis, ein leuchtender cyanfarbener Frostkern im Mittelstück, ein eingelegter Pfeil aus massivem Eis und kalter Dunst.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    'Ein Bogen aus versilbertem Stahl und Eis aus Thornpeak. In seinem Mittelstück leuchtet ein kalter cyanfarbener Kern, der den Pfeil an der Sehne festfriert. Bei jedem Spannen bildet sich ein neuer Pfeil aus massivem Gletschereis. Der Bogenschütze auf der Mauer trägt keinen Köcher, nur die Kälte. Mit einem solchen Bogen hielt Highwatch den Pirscherkamm während einer Belagerung: ein einziger Schütze, so sagt man, und ein Winter voller Pfeile, die schon immer dort gewesen waren.',
+  'hudChrome.wocStore.skins.winterbite.name': 'Winterbiss',
+  'hudChrome.wocStore.storeTab': 'Shop',
+  'hudChrome.wocStore.tabsLabel': 'Bereiche des WOC-Shops',
+  'hudChrome.wocStore.title': 'WOC-Shop',
+  'hudChrome.wocStore.tryOn': 'Ausprobieren',
+  'hudChrome.wocStore.unavailable': 'Nicht verfügbar',
+  'hudChrome.wocStore.viewModeLabel': 'Vorschaumodus',
+  'hudChrome.wocStore.weaponOnly': 'Nur Waffe',
+  'hudChrome.wocStore.wtype.axe': 'Axt',
+  'hudChrome.wocStore.wtype.bow': 'Bogen',
+  'hudChrome.wocStore.wtype.crossbow': 'Armbrust',
+  'hudChrome.wocStore.wtype.dagger': 'Dolch',
+  'hudChrome.wocStore.wtype.mace': 'Streitkolben',
+  'hudChrome.wocStore.wtype.staff': 'Stab',
+  'hudChrome.wocStore.wtype.sword': 'Schwert',
+  'hudChrome.wocStore.wtype.wand': 'Zauberstab',
 };

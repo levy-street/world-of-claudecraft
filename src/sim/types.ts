@@ -484,6 +484,20 @@ export type ItemSlot = EquipSlot | 'ring';
 
 export type SkinCatalog = 'class' | 'mech';
 
+// Season 1 Armory weapon-skin cosmetics (src/sim/content/weapon_skins.ts). The
+// loadout is the account-wide "applied skin per weapon type" selection; a skin
+// only shows while a weapon of its type is equipped (weapon_skin_rules.ts).
+export type WeaponSkinType =
+  | 'sword'
+  | 'axe'
+  | 'mace'
+  | 'dagger'
+  | 'staff'
+  | 'wand'
+  | 'bow'
+  | 'crossbow';
+export type WeaponSkinLoadout = Partial<Record<WeaponSkinType, string>>;
+
 export type ItemUse =
   | { type: 'fishing' }
   | { type: 'mechChroma'; chromaId: string }
@@ -800,10 +814,6 @@ export interface LootSlot extends InvSlot {
   personalFor?: number[];
   // Need/greed loot that everyone passed on becomes free-for-all corpse loot.
   openToAll?: boolean;
-  // Shared personal (participation tokens, e.g. Heroic Marks): a single loot
-  // action by ANY listed player grants `count` copies to EVERY player in
-  // `personalFor`, then consumes the slot. No one has to loot their own copy.
-  sharedPersonal?: boolean;
 }
 
 export interface CorpseLoot {
@@ -2391,6 +2401,10 @@ export interface Entity {
   // every non-player entity. Owned by src/sim/spirit.ts.
   ghost: boolean;
   corpsePos: Vec3 | null;
+  // Unique exit entity of the live instance claim where corpsePos was captured.
+  // Null for world corpses and saved ghosts. Instance exits are recreated on
+  // every claim, so stale corpse coordinates cannot match a recycled slot.
+  corpseInstanceId: number | null;
   scale: number;
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
@@ -2403,6 +2417,17 @@ export interface Entity {
   // client maps it to a held offhand model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `oh`). The sim never reads it for gameplay.
   offhandItemId: string | null;
+
+  // Account-wide weapon-skin loadout (players only; empty otherwise): the applied
+  // skin id per weapon type. Seeded by the host (server: account cosmetics;
+  // offline Sim: session-local via changeWeaponSkin). Sim-side source for the
+  // weaponSkinId resolution below; never read for gameplay.
+  weaponSkinLoadout: WeaponSkinLoadout;
+  // Resolved active weapon-skin id (players only; null otherwise): the loadout
+  // entry matching the equipped mainhand's weapon type, or null when none
+  // applies. Render-only: the client swaps the held weapon model and rarity VFX.
+  // Recomputed in recalcPlayerStats and synced in identity fields (terse `wsk`).
+  weaponSkinId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,
@@ -2548,6 +2573,9 @@ export type SimEvent = { pid?: number } & (
       school: string;
       ability: string | null;
       kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      // Presentation-only correlation: this hit belongs to a ranged shot whose
+      // one-shot animation already began at projectile launch.
+      attackAnimationStarted?: true;
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -2818,6 +2846,9 @@ export type SimEvent = { pid?: number } & (
       // The casting ability's id, carried only by fx kinds whose visual varies per
       // ability (shouts pick their wave colour; weapon auras identify the buff).
       ability?: string;
+      // Stable presentation discriminator; renderers must not infer a player
+      // attack animation from school or an English ability label.
+      attackAnimation?: 'ranged-shot';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

@@ -107,6 +107,9 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
+  /** Localized launcher for the Claudium store, empty when the feature is not available. */
+  claudiumLauncherHtml(): string;
+  openClaudium(): void;
   hideTooltip(): void;
   /** True when this click is the release of a long-press tooltip peek, so the
    *  stack's action (use / sell / deposit / feed) must be SUPPRESSED. Wired to the
@@ -225,8 +228,11 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     el.appendChild(moneyRow);
+    moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
+      this.deps.openClaudium();
+    });
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the

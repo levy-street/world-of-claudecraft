@@ -17,7 +17,6 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
-import { NYTHRAXIS_LAYOUT } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -27,6 +26,7 @@ import {
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_ROOM_RADIUS,
   type Vec3,
 } from '../types';
 import {
@@ -37,6 +37,7 @@ import {
 } from './difficulty';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
+const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
 const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
@@ -49,10 +50,38 @@ export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
   return instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
 }
 
+// Unique live-claim identity at a position. The exit entity is recreated on
+// every claim, unlike the reusable dungeon/slot coordinates, so released
+// corpses can be bound without trusting a stale body in a recycled slot.
+export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
+  for (const inst of ctx.instances) {
+    if (inst.partyKey === null || inst.exitId === null) continue;
+    if (instanceClaimContains(ctx, inst, pos)) return inst.exitId;
+  }
+  return null;
+}
+
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
 function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
   return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
+}
+
+function instanceClaimContains(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
+  const origin = instanceOriginOf(inst);
+  if (instanceContains(origin, pos)) return true;
+  if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
+  const boss = inst.mobIds
+    .map((id) => ctx.entities.get(id))
+    .find((entity) => entity?.templateId === NYTHRAXIS_BOSS_ID);
+  // The raid room is wider than the generic instance footprint, so its claim
+  // includes the side wings. Keep that wider circle clipped to this slot's z
+  // band or it reaches into the adjacent arena slot 500 yards away.
+  return (
+    !!boss &&
+    Math.abs(pos.z - origin.z) < 250 &&
+    dist2d(pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS
+  );
 }
 
 // Difficulty-scoped lockout key: heroic clears lock beside the normal key, so
@@ -279,31 +308,19 @@ function isDefeatedNythraxisParticipant(ctx: SimContext, inst: InstanceSlot, pid
   return false;
 }
 
-function nythraxisArenaContains(inst: InstanceSlot, pos: Vec3): boolean {
-  const floorHalfX = NYTHRAXIS_LAYOUT.floorHalfX;
-  if (floorHalfX === undefined) return false;
-  const origin = instanceOriginOf(inst);
-  const localX = pos.x - origin.x;
-  const localZ = pos.z - origin.z;
-  return (
-    Math.abs(localX) <= floorHalfX &&
-    localZ >= NYTHRAXIS_LAYOUT.zMin &&
-    localZ <= NYTHRAXIS_LAYOUT.zMax
-  );
-}
-
 function defeatedNythraxisCorpseRunClaim(
   ctx: SimContext,
   partyKey: string,
   p: Entity,
 ): InstanceSlot | undefined {
   const corpsePos = p.corpsePos;
-  if (!p.ghost || !corpsePos) return undefined;
+  if (!p.ghost || !corpsePos || p.corpseInstanceId === null) return undefined;
   const inst = ctx.instances.find(
     (candidate) =>
       candidate.dungeonId === 'nythraxis_boss_arena' &&
       candidate.partyKey === partyKey &&
-      nythraxisArenaContains(candidate, corpsePos),
+      candidate.exitId === p.corpseInstanceId &&
+      instanceClaimContains(ctx, candidate, corpsePos),
   );
   if (!inst || !isDefeatedNythraxisParticipant(ctx, inst, p.id)) return undefined;
   return inst;
@@ -440,15 +457,18 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
 // was the old rule, and it let a door-camper or an early-released ghost escape
 // the daily lockout and later claim a fresh run for the whole locked party.
 export function instanceLockoutMetas(ctx: SimContext, inst: InstanceSlot): PlayerMeta[] {
-  const origin = instanceOriginOf(inst);
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (meta.leaving) continue;
     if (instanceKeyFor(ctx, meta.entityId) === inst.partyKey) {
       out.push(meta);
       continue;
     }
     const e = ctx.entities.get(meta.entityId);
-    if (e && instanceContains(origin, e.pos)) out.push(meta);
+    const matchingInstanceCorpse =
+      e?.ghost && e.corpsePos && e.corpseInstanceId === inst.exitId ? e.corpsePos : null;
+    const lockoutPos = matchingInstanceCorpse ?? e?.pos;
+    if (lockoutPos && instanceClaimContains(ctx, inst, lockoutPos)) out.push(meta);
   }
   return out;
 }
@@ -470,85 +490,45 @@ function lockToHeroicClaim(
   meta.raidLockouts.set(lockId, lockedUntil);
 }
 
-// Heroic KILL lockout, the sibling of awardHeroicMarks on the death path.
-// combat/damage.ts calls it for EVERY mob death (credit or no credit): when the
-// dead mob is the final boss of a heroic claim, the whole owning group (plus
-// anyone inside) is locked to that heroic dungeon until the daily reset (the
-// same realm-local boundary the Nythraxis raid uses), scoped to the :heroic
-// key so the normal difficulty is never consumed. Marks stay participation-
-// gated below; the lockout deliberately is not. Death-time reward recipients
-// (a departed tap holder) are the third arm of the union, stamped in
-// awardHeroicMarks where that snapshot exists.
-export function grantHeroicKillLockout(ctx: SimContext, mob: Entity): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (!inst || inst.difficulty !== 'heroic') return;
-  const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning || mob.templateId !== tuning.finalBossId) return;
-  const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  for (const meta of instanceLockoutMetas(ctx, inst)) {
-    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
-  }
+function heroicRewardWindowToken(lockedUntil: number): string {
+  return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
-// Heroic participation reward: the final boss of a heroic instance drops
-// Heroic Marks for every eligible participant (marksPerParticipant on the
-// tuning record: 1 for the five-mans, 3 for the Nythraxis raid). `recipients`
-// is the same downed-members-included snapshot handleDeath uses for XP and
-// loot rights. The marks ride ONE shared-personal slot (personalFor lists
-// every earner, count is the per-participant payout): whoever loots the
-// corpse hands every earner their marks at once, and nobody can take another
-// player's. Draws no rng, so the corpse loot draw order is untouched. The
-// daily LOCKOUT is not granted here: it covers
-// the whole owning group, credit or no credit (grantHeroicKillLockout above).
-//
-// Daily income gate: each dungeon pays a given character at most once per host
-// UTC day (delveDaily pattern), so the instance-reset farm cannot print marks.
-// The stamp lands when the personal slots are CREATED (not when looted): an
-// unlooted corpse still consumed that day's slot, like the delve first-clear
-// XP set.
+// Settle a heroic final-boss kill in one synchronous mutation. The whole group
+// owning the claim (plus anyone still inside) receives the realm-reset lockout,
+// while the death-time participation snapshot receives the configured marks.
+// A recipient already locked for this reset is not paid again. This makes the
+// authoritative lockout boundary the only income gate and removes the former
+// UTC-day mismatch. Marks go straight into inventory, so corpse cleanup, a UI
+// failure, or logout cannot persist an entitlement without its reward.
 export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
-  if (recipients.length === 0) return;
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (!inst || inst.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
-  const loot = mob.loot ?? { copper: 0, items: [] };
-  // Death-time reward recipients are the third arm of the kill-lockout union
-  // (grantHeroicKillLockout covers the owning group and the occupants): a tap
-  // holder who left the party and the instance before the kill still walks
-  // away with the mark slot and the corpse loot rights, so they must carry the
-  // daily lockout too. Stamped before the marks daily gate below, like the
-  // pre-split code, so an already-marked recipient is still locked.
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  const earners: number[] = [];
-  for (const meta of recipients) {
-    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
-    // `utcDay` comes from the host, never the wall clock (determinism). Both
-    // hosts stamp it (server/game.ts, main.ts); with an empty day the set
-    // simply never resets, the same semantics as delveDaily.
-    const today = ctx.utcDay;
-    if (today && meta.heroicDaily.date !== today) {
-      meta.heroicDaily = { date: today, marked: new Set() };
+  const rewardWindow = heroicRewardWindowToken(lockedUntil);
+  const rewardIds = new Set(recipients.map((meta) => meta.entityId));
+  const lockoutRecipients = new Map<number, PlayerMeta>();
+  for (const meta of instanceLockoutMetas(ctx, inst)) lockoutRecipients.set(meta.entityId, meta);
+  // A tap holder who left both party and instance before the kill remains in
+  // the death snapshot and must receive the same lockout as their reward.
+  for (const meta of recipients) lockoutRecipients.set(meta.entityId, meta);
+
+  for (const meta of lockoutRecipients.values()) {
+    const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
+    if (!alreadyLocked && rewardIds.has(meta.entityId)) {
+      ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+      // The Book of Deeds daily circuit observes successful rewards, but it is
+      // telemetry only: the realm-reset lockout above remains the income gate.
+      if (meta.heroicDaily.date !== rewardWindow) {
+        meta.heroicDaily = { date: rewardWindow, marked: new Set() };
+      }
+      meta.heroicDaily.marked.add(inst.dungeonId);
+      ctx.markDeedsDirty(meta.entityId);
     }
-    if (meta.heroicDaily.marked.has(inst.dungeonId)) continue;
-    meta.heroicDaily.marked.add(inst.dungeonId);
-    earners.push(meta.entityId);
-    // The heroic-mark circuit flag re-checks.
-    ctx.markDeedsDirty(meta.entityId);
+    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
   }
-  if (earners.length === 0) return;
-  // One shared-personal slot for the whole party: whoever loots the corpse hands
-  // every earner their marks at once, so no one has to reach the body and click
-  // their own copy. `count` is the per-participant payout (1 for a five-man, 3
-  // for the raid); the loot handler grants that many to each id in `personalFor`.
-  loot.items.push({
-    itemId: HEROIC_MARK_ITEM_ID,
-    count: tuning.marksPerParticipant,
-    personalFor: earners,
-    sharedPersonal: true,
-  });
-  mob.loot = loot;
-  mob.lootable = true;
 }
 
 export function updateInstances(ctx: SimContext): void {

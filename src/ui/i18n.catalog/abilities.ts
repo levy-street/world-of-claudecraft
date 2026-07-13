@@ -890,6 +890,11 @@ const classAbilityNamesEn = {
         'A massive surge of healing: restores {damage} health. 10 min cooldown.',
       ],
       [
+        'holy_taunt',
+        'Sacred Goad',
+        'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+      ],
+      [
         'flash_of_light',
         'Lightmend',
         'A quick, efficient burst of Light that heals a friendly target for {damage}.',
@@ -1824,6 +1829,11 @@ export const classAbilityNames = {
           'Una enorme oleada de sanación: restaura 250 de salud. Tiempo de reutilización de 10 min.',
         ],
         [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        ],
+        [
           'flash_of_light',
           'Destello de Luz',
           'Un destello de Luz rápido y eficiente que sana a un objetivo amistoso por {damage}.',
@@ -2722,6 +2732,11 @@ export const classAbilityNames = {
           'Une vague de soins massive: rend 250 points de vie. Temps de recharge de 10 min.',
         ],
         [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        ],
+        [
           'flash_of_light',
           'Éclair lumineux',
           'Un éclair de Lumière rapide et efficace qui rend {damage} points de vie à une cible alliée.',
@@ -3547,6 +3562,11 @@ export const classAbilityNames = {
           'Una grande ondata di guarigione: ripristina 250 salute. Tempo di recupero di 10 min.',
         ],
         [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        ],
+        [
           'flash_of_light',
           'Lampo di Luce',
           'Un lampo di Luce rapido ed efficiente che cura un bersaglio alleato di {damage}.',
@@ -4370,6 +4390,11 @@ export const classAbilityNames = {
           'Ein gewaltiger Heilungsstoß: Stellt 250 Gesundheit wieder her. 10 Min. Abklingzeit.',
         ],
         [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        ],
+        [
           'flash_of_light',
           'Lichtblitz',
           'Ein schneller, effizienter Lichtblitz, der ein freundliches Ziel um {damage} heilt.',
@@ -5092,6 +5117,11 @@ export const classAbilityNames = {
         ['divine_protection', '圣佑术', '神圣护盾吸收 50 点伤害，持续 10 秒。'],
         ['hammer_of_justice', '制裁之锤', '使目标昏迷 3 秒。'],
         ['lay_on_hands', '圣疗术', '巨大的治疗涌流：恢复 250 点生命值。10 分钟冷却时间。'],
+        [
+          'holy_taunt',
+          '神圣嘲讽',
+          '嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。',
+        ],
         ['flash_of_light', '圣光闪现', '快速而高效的圣光，为一个友方目标恢复 {damage} 点生命值。'],
         ['exorcism', '驱邪术', '以神圣怒火驱逐邪恶，造成 {damage} 点神圣伤害。'],
         ['consecration', '奉献', '奉献你脚下的土地，灼烧附近敌人，造成 {damage} 点神圣伤害。'],
@@ -5575,6 +5605,11 @@ export const classAbilityNames = {
         ['divine_protection', '聖佑術', '神聖護盾吸收 50 點傷害，持續 10 秒。'],
         ['hammer_of_justice', '制裁之錘', '使目標昏迷 3 秒。'],
         ['lay_on_hands', '聖療術', '巨大的治療湧流：恢復 250 點生命值。10 分鐘冷卻時間。'],
+        [
+          'holy_taunt',
+          '神聖嘲諷',
+          '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
+        ],
         ['flash_of_light', '聖光閃現', '快速而高效的聖光，為一個友方目標恢復 {damage} 點生命值。'],
         ['exorcism', '驅邪術', '以神聖怒火驅逐邪惡，造成 {damage} 點神聖傷害。'],
         ['consecration', '奉獻', '奉獻你腳下的土地，灼燒附近敵人，造成 {damage} 點神聖傷害。'],
@@ -6121,6 +6156,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           '신의 축복',
           '막대한 치유의 힘으로 생명력 250을 회복시킵니다. 재사용 대기시간 10분.',
+        ],
+        [
+          'holy_taunt',
+          '신성한 도발',
+          '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
         ],
         [
           'flash_of_light',
@@ -6860,6 +6900,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'レイ・オン・ハンズ',
           '大きな癒やしの波で体力を250回復します。クールダウン10分。',
+        ],
+        [
+          'holy_taunt',
+          '聖なる挑発',
+          '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
         ],
         [
           'flash_of_light',
@@ -7627,6 +7672,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Imposição de Mãos',
           'Uma onda massiva de cura: restaura 250 de vida. Recarga de 10 min.',
+        ],
+        [
+          'holy_taunt',
+          'Sacred Goad',
+          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -8430,6 +8480,11 @@ export const classAbilityNames = {
           'lay_on_hands',
           'Возложение рук',
           'Мощный поток исцеления: восстанавливает 250 здоровья. Время восстановления 10 мин.',
+        ],
+        [
+          'holy_taunt',
+          'Священная провокация',
+          'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
         ],
         [
           'flash_of_light',

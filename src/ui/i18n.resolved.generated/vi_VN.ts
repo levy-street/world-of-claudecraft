@@ -244,6 +244,263 @@ export const vi_VN: EnTranslations = {
         "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
       }
     },
+    "wocStore": {
+      "title": "Cửa hàng WOC",
+      "close": "Đóng cửa hàng WOC",
+      "tabsLabel": "Các phần của Cửa hàng WOC",
+      "storeTab": "Cửa hàng",
+      "rewardsTab": "Phần thưởng hàng ngày",
+      "loading": "Đang tải Cửa hàng WOC...",
+      "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
+      "balance": "Số dư Claudium",
+      "buyClaudium": "Mua Claudium",
+      "owned": "Sở hữu",
+      "needMoreTitle": "Cần thêm Claudium",
+      "needMoreBody": "Bạn cần thêm {shortfall} Claudium để mua {item}.",
+      "cancel": "Hủy",
+      "confirmTitle": "Xác nhận mua mỹ phẩm",
+      "confirmBody": "Mua {item} với giá {cost} Claudium?",
+      "confirmPurchase": "Mua",
+      "priceChanged": "Giá đã thay đổi trước khi việc mua hàng hoàn tất. Xem lại giá đã làm mới và xác nhận lại.",
+      "armoryEyebrow": "Mùa 1",
+      "armoryTitle": "Kho Vũ Khí",
+      "armoryBody": "Ngoại hình vũ khí giới hạn từ Kho Vũ Khí Mùa 1. Dùng chung toàn tài khoản, hoàn toàn mang tính thẩm mỹ và hiển thị với mọi người xung quanh bạn.",
+      "collectionLine": "Bộ sưu tập {collection}",
+      "collections": {
+        "guildmark": "Nhãn hiệu bang hội",
+        "emberwrought": "Emberwrought",
+        "hoarfrost": "Sương muối",
+        "fallen_star": "Sao rơi"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Kiếm Guildmark",
+          "look": "Lưỡi thép xanh, thanh bảo vệ đuôi cá bằng đồng, tay cầm bằng da nhuộm màu xanh mòng két, huy hiệu bang hội được đóng dấu nhỏ.",
+          "lore": "Trường hợp lưỡi rèn được ẩn danh, cái này được ký tên. Một thợ chế tạo áo giáp chỉ có quyền đưa nhãn hiệu của mình vào ricasso khi Thương nhân của Chợ Thế giới xác nhận cho thép của anh ta và nhãn hiệu của Smith Haldren được xác nhận. Màu xanh lam trên nền ẩm ướt của xứ Vale, cân đối với một sợi tóc. Bạn trả tiền cho con tem nhiều như thanh kiếm, và nó đáng giá."
+        },
+        "brasscap_axe": {
+          "name": "Rìu Chụp Đồng",
+          "look": "Mũi thép được đánh bóng, nắp và lưỡi bằng đồng trên thân tro sơn mài, bọc gọn gàng, tem của nhà sản xuất.",
+          "lore": "Một chiếc rìu được đóng dấu là một niềm tự hào mà bạn có thể nắm giữ. Mũ đồng và langets là một nửa áo giáp, một nửa đặc trưng: chúng giữ cho một nửa không bị tách ra và bắt ánh sáng trong quán rượu để mọi người biết rằng bạn đã mua tác phẩm của Armorer Hode chứ không phải đồ cũ của dân quân. “Nếu nó cắt, tôi sẽ bán nó,” thợ rèn Highwatch nói. Cái này cắt."
+        },
+        "tempered_flanged_mace": {
+          "name": "Chùy Cánh Tôi Luyện",
+          "look": "Đầu bằng thép xanh được tôi luyện sáu mặt, cổ và chuôi bằng đồng, tay cầm bằng da màu đỏ rượu vang.",
+          "lore": "Sáu mặt bích bằng thép tôi luyện xanh, mỗi mặt được mài để mở mũ, được bọc bằng đồng và quấn bằng da màu đỏ rượu vang. Những người thợ chế tạo vũ khí của vương quốc không tạo ra những vũ khí xấu xí ngay cả khi công việc rất tàn bạo. Cái này được ủy quyền thông qua Thị trường Thế giới, không phải lấy ra khỏi giá; ở đâu đó có một cuốn sổ cái ghi tên một người mua đáng tự hào và số tiền anh ta đã trả cho Hode để mua nó."
+        },
+        "guildmark_dirk": {
+          "name": "Đoản Kiếm Guildmark",
+          "look": "Dao găm bằng thép cường lực mỏng, phần bảo vệ và đai ốc chuôi kiếm bằng đồng, tay cầm dây màu xanh đậm, dấu hiệu được đóng dấu.",
+          "lore": "Điều mà một người đàn ông tự chế mặc khi đeo thanh kiếm ở nhà: thanh mảnh, tôi luyện, được đóng dấu giống như dấu chứng nhận một lưỡi kiếm đầy đủ, đeo trên thắt lưng như một con dấu có lưỡi. Nói giảm đi cho tất cả mọi người trừ những người có thể đọc được bằng chứng của người chế tạo áo giáp. Sĩ quan quân sự Bree giữ một ngăn kéo đựng chúng ở Highwatch dành cho những sĩ quan được bức tường tôn trọng."
+        },
+        "brasscrown_staff": {
+          "name": "Trượng Bộ Hành Brasscrown",
+          "look": "Mặt trượng bằng gỗ cứng có núm vặn bằng đồng thau, vòng sắt bằng đồng, dây da nhuộm.",
+          "lore": "Được làm từ gỗ cứng dày dặn và được bọc bằng đồng thau, hàng trăm thợ rèn ở Eastbrook đã đúc được hàng trăm chiếc nhưng chỉ có một chiếc hoàn hảo. Nó thuộc loại du khách muốn được coi trọng ở cổng Fenbridge cũng như bức tường của Highwatch. Một chiếc gậy đi bộ chưa bao giờ thực sự cần thiết để đi bộ; dải băng nhuộm phù hợp với chiếc áo khoác mà bạn có thể đoán được giá của nó."
+        },
+        "lacquered_wand": {
+          "name": "Thanh sơn mài",
+          "look": "Đũa sơn mài mảnh màu đỏ đậm, hai dải đồng thau đánh bóng, đầu đũa tròn nhỏ bằng đồng.",
+          "lore": "Sơn mài màu đỏ đậm trong bảy chiếc áo khoác kiên nhẫn, được buộc hai lần bằng đồng thau bóng loáng: loại đũa phép mà một pháp sư hàng rào mua ở Chợ Thế giới sau khi họ bắt đầu tính tiền thật và muốn xem nó. Nó truyền ánh sáng không tốt hơn một cây bạch dương. Nhưng nó tỏa sáng rực rỡ khắp quầy hàng của Người buôn bán và một nửa phép thuật nhỏ luôn được tin tưởng."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Cây cung của hội Fletcher",
+          "look": "Nơ uốn cong bằng gỗ óc chó sơn mài, đầu ống bằng đồng, dây vải lanh phủ sáp, tem hội trên thanh nâng.",
+          "lore": "Thứ gần gũi nhất mà vương quốc có với một hội là một con tem của Fletcher trên nắp thùng, một lời hứa về những gì bên trong, cách một người bán rượu vang niêm phong một chiếc thùng. Gỗ óc chó sơn mài, đầu cánh bằng đồng, một sợi dây bằng vải lanh phủ sáp không bị sờn khi gặp mưa Mirefen. Mỗi khớp tranh luận về giá cả. Vẽ nó một lần qua Widow Thicket và cuộc tranh luận sẽ thắng."
+        },
+        "cinderbrand_sword": {
+          "name": "Cinderbrand",
+          "look": "Lưỡi kiếm bằng thép rèn màu sẫm, đầy những chữ rune màu cam hồng rực rỡ, những vết nứt do nhiệt, một viên ngọc đang cháy âm ỉ trên tấm chắn bảo vệ.",
+          "lore": "Lưỡi kiếm đầu tiên được tôi không phải trong nước mà ở Embers may mắn được cào từ Stormcrag, những viên than mà thợ rèn Highwatch thề rằng 'cháy xanh và sạch sẽ, bởi vì ngọn núi vẫn nhớ lời thề xưa của nó.' Ngân Hàng được đổ đầy hơn, ngọn lửa đó sẽ cháy âm ỉ màu cam hồng và sẽ không chết; những chữ rune giữ ấm cho bàn tay trần trong đêm lạnh giá nhất của bức tường. Cinderbrand không bao giờ cần ánh sáng. Nó chỉ đơn giản là từ chối đi ra ngoài."
+        },
+        "emberbite_axe": {
+          "name": "Emberbite",
+          "look": "Rìu sắt đen với những vết nứt màu cam hồng phát sáng xuyên qua lưỡi rìu, một viên đá quý bằng than đá, những tia nhiệt.",
+          "lore": "Armorer Hode đã đưa than lửa núi sống vào tâm của mũi khoan, do đó, cạnh này không bao giờ thực sự nguội đi giữa các cú đánh. Các vết nứt có màu cam khi thực hiện cú đánh xuống, như thể cú đánh đánh thức thứ gì đó mà lần rèn đầu tiên đã ngủ yên trong bàn ủi. Người ta nói rằng một nguyên tố Stormcrag đã từ bỏ cục than hồng để có được nó; họ nói rất nhiều điều ở Highwatch khi gió nổi lên."
+        },
+        "smoulderfall_mace": {
+          "name": "Smoulderfall",
+          "look": "Những mặt bích bằng sắt sẫm màu phát sáng màu cam hồng dọc theo các vết nứt bên trong, một viên ngọc nóng chảy ở phần đầu.",
+          "lore": "Một chiếc chùy có lò sưởi riêng: một viên đá có lõi nóng chảy được mài ra từ dấu ấn Sanctum được 'làm bằng lửa núi', phát sáng trên đầu. Các mặt bích giữ ấm khi chạm vào và ấm hơn ở nơi tiếp đất; một trung sĩ Highwatch thề rằng một đòn từ nó sẽ để lại vết bầm tím mờ nhạt cho đến sáng. Ngọn lửa của ngọn núi cuối cùng được tạo ra để phá vỡ chứ không phải để hàn kín."
+        },
+        "ashspark_dagger": {
+          "name": "Đoản Đao Tia Tro",
+          "look": "Lưỡi kiếm ngắn màu đen có đường vân màu cam hồng rực, một viên ngọc nhỏ đang âm ỉ ở chuôi kiếm, tro và tia lửa.",
+          "lore": "Một lưỡi kiếm trong ngõ hẻm với ngọn lửa của ngọn núi được lén nhét vào chuôi đá bằng đá, một trò đùa thầm lặng của một người thợ chế tạo áo giáp: ngay cả một chiếc ví cắt cũng có thể mang theo một viên than hồng của lần rèn đầu tiên. Màu đen, có gân màu cam, luôn có màu quá ấm ở vỏ. Vẽ nó trong bóng tối dưới Highwatch và ánh sáng chiếu vào bàn tay của bạn vừa đủ để tìm ra khoảng trống trong sự đề phòng của một người đàn ông."
+        },
+        "forgeheart_staff": {
+          "name": "Trượng Forgeheart",
+          "look": "Cây trượng bọc sắt có gắn lõi than hồng phát sáng trong lồng, than hồng chảy lên trục, tỏa nhiệt lung linh.",
+          "lore": "Một cục than sống của lửa núi được lồng sắt ở đỉnh đầu. Loremaster Caddis gọi đó là bằng chứng cho thấy ngọn lửa của lần rèn đầu tiên có thể có tác dụng chứ không chỉ để phong ấn. Ánh sáng lung linh tỏa ra từ nó thành một dải ruy băng mỏng, vô tận; một pháp sư mang theo một người không bao giờ muốn có lò rèn hay người gác lửa. Họ thì thầm, cục than hồng được rút ra từ hơi thở của chính Voskar the Emberwing, và kể từ đó nó không hề nguội đi."
+        },
+        "emberwrought_wand": {
+          "name": "Cây Đũa Phép Emberwrought",
+          "look": "Cây đũa phép bằng kim loại đen có đầu than hồng rực trong móng sắt, những vết nứt do nhiệt ở chân tóc, ánh sáng ấm áp bên trong.",
+          "lore": "Cây đũa phép đặt tên cho lớp. Khi một thợ chế tạo áo giáp của Highwatch lần đầu tiên đặt một cục than lửa vào móng vuốt sắt và bắt nó đáp trả bàn tay phàm trần, ngay cả Tu Sĩ của Ánh sáng cũng ngừng gọi nó là dị giáo và bắt đầu gọi nó là hữu ích. Ấm áp, kiên nhẫn và âm thầm nguy hiểm: cục than hồng ở đầu nó đã cháy rụi, không hề vỡ, kể từ trước khi chủ nhân của nó kịp thở."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Cinderlatch",
+          "look": "Nỏ thép đen, ánh sáng màu cam hồng rỉ ra từ vết nứt trên mũi khoan, than cháy âm ỉ trong máy xới.",
+          "lore": "Điều kỳ lạ nhất trong lò rèn than hồng: lửa núi đổ vào máy. Màu cam rỉ ra từ các vết nứt trên máy xới, và than cháy âm ỉ trong máy xới giữ cho sợi dây không bao giờ bị cứng lại trong cái lạnh ở Thornpeak hoặc ẩm ướt ở Mirefen. Các bu lông của nó rời khỏi rãnh đã ấm và tiếp đất ấm hơn. Câu trả lời của người thợ săn về bức tường mà kẻ thù cũng không cảm thấy lạnh giá."
+        },
+        "ice_fang_sword": {
+          "name": "Nanh băng",
+          "look": "Lưỡi cong làm bằng băng băng nhạt, những tinh thể sương muối lởm chởm dọc theo sống lưng, một lõi đông lạnh màu lục lam phát sáng ở lớp chắn ngang đầy đặn hơn bằng băng.",
+          "lore": "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Wyrmcult, và 'đã mua được bức tường trong mùa đông'."
+        },
+        "glaciersplit_axe": {
+          "name": "Rìu Tách Băng",
+          "look": "Phần đầu là băng băng xanh mờ, bên trong nứt nẻ màu lục lam phát sáng, những tinh thể băng giá dựng đứng, một nửa vệt hơi lạnh kéo theo.",
+          "lore": "Được đẽo từ trái tim xanh của sông băng Thornpeak, nơi hai thế kỷ băng đã ép cái lạnh cho đến khi nó tự phát sáng. Nó để lại hơi nước ngay cả khi ở trạng thái nghỉ và vết nứt khi hạ cánh là một khe hở dưới Rình Rậper Ridge. Highwatch cho nó rơi xuống băng trên đó; vì vậy đây là vũ khí dùng để ngăn chặn sự tan băng, và bất kể sự tan băng nào sẽ xảy ra."
+        },
+        "rimecrusher_mace": {
+          "name": "Chùy Nghiền Băng Rimecrusher",
+          "look": "Cụm tinh thể băng lởm chởm xung quanh lõi màu lục lam rực sáng, sương muối lan xuống một nửa màu bạc.",
+          "lore": "Không được chạm khắc nhưng đã trưởng thành: Băng Thornpeak quấn quanh lõi màu lục lam lạnh lẽo cho đến khi nó cứng lại như loại thép tốt nhất của Hode. Sương muối bò dọc theo nửa thân bạc về phía bàn tay và không bao giờ đến nữa. Nơi nó chạm tới, nước đóng băng; nơi nó nằm, mặt đất trắng xóa. Cái lạnh thấu xương của những đỉnh núi, đủ nhỏ để có thể đu đưa những vật leo lên tường."
+        },
+        "frostbite_dagger": {
+          "name": "Kim Băng Giá",
+          "look": "Con dao găm mỏng đến mức độc ác có lớp băng trong xanh, một đường gân màu lục lam phát sáng ở giữa, những tinh thể băng giá như kim, chuôi kiếm sương muối.",
+          "lore": "Mỏng như hơi thở và lạnh gấp đôi: một mảnh sông băng Thornpeak được mài giũa thành một đường mạch phát sáng duy nhất, sắc bén đến mức vết thương sẽ đông cứng lại trước khi máu kịp chảy. Tên của nó được mượn từ ngôi mộ lạnh lẽo mà người chết mang xuống khỏi đỉnh núi. Nó không bao giờ cần mài giũa; băng không buồn tẻ, Loremaster Caddis khô khốc lưu ý, nó chỉ chờ đợi."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Trượng Canh Gác Sương Giá",
+          "look": "Quyền trượng bạc được đội một mảnh băng màu lục lam phát sáng, đang trôi nổi, quay chậm, các tinh thể tỏa ra và hơi lạnh.",
+          "lore": "Cây trượng của đội canh gác không bao giờ ngủ trên tường thành Highwatch. Vương miện của nó là một mảnh băng màu lục lam lơ lửng khỏi lớp bạc và tự xoay chậm rãi; người lính gác thề rằng nó luôn hướng về cái lạnh tụ lại dưới các đỉnh núi. Mang Vigil nghĩa là đứng gác hai trăm năm chỉ trong một đêm và hứa không rời mắt."
+        },
+        "everwinter_wand": {
+          "name": "Mảnh vỡ của Everwinter",
+          "look": "Một nhánh băng sông băng màu lục lam phát sáng, sương muối nở ra từ cổ áo bạc, sương mù lạnh lẽo.",
+          "lore": "Một nhánh băng sông băng phát sáng, được cho là bị vỡ ra từ vùng đất sâu bên dưới Sanctum, nơi cái lạnh của ngọn núi có răng. Sương muối nở không ngừng từ vòng cổ bạc của nó và không bao giờ tan, không phải do lửa hay mùa hè. Pháp Sư giữ nó ở gần vì cái lạnh mà nó mang lại cho công việc của họ, và giữ nó ở xa vào những đêm nó dường như nghiêng về phía hầm mộ của Nythraxis và lắng nghe."
+        },
+        "winterbite": {
+          "name": "Nanh Đông",
+          "look": "Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.",
+          "lore": "Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Ánh sáng bình minh cuối cùng",
+          "look": "Đại kiếm được rèn từ một ngôi sao sa ngã, lõi vàng nóng chảy tách ra khỏi lưỡi kiếm, thép đen vũ trụ được viền trong ánh sao, những mảnh vàng quay quanh người bảo vệ, dải băng cực quang.",
+          "lore": "Khi ngôi sao rơi khỏi bầu trời phía tây và 'nổ tung như một lò rèn' bên ngoài Widow Thicket, Anh Aldric đã kéo trái tim vẫn còn âm ỉ của nó ra khỏi miệng núi lửa Mirefen và cầu xin những người thợ rèn của vương quốc làm việc 'một thứ không thuộc về thế giới này.' Họ đã tạo ra một thanh đại kiếm từ nó: Solheim. Lõi vàng nóng chảy của nó xẻ đôi lưỡi kiếm đen vũ trụ như bình minh làm nứt bầu trời đêm, và những mảnh kim loại hình sao quay quanh người bảo vệ trên những con đường không có bàn tay định sẵn. Chỉ có một chiếc được rèn. Sẽ không có cái khác."
+        },
+        "skyrender_axe": {
+          "name": "Skyrender, Vết Thương Thiên Không",
+          "look": "Đầu giống như một mảnh trời đêm bị xé nát, những vết nứt bằng vàng nóng chảy và những hình khắc của chòm sao, những mảnh ánh sao lơ lửng, một vệt cực quang lung linh kéo dài ở rìa.",
+          "lore": "Bị đánh từ vành miệng núi lửa, nơi ngôi sao rơi xé toạc hình ảnh phản chiếu của bầu trời ra khỏi Mirefen và để lại vết thương vẫn còn bốc hơi. Cái đầu trông giống như một mảnh màn đêm bị xé nát: những vết nứt vàng nóng chảy, những chòm sao mà không học giả nào ở Highwatch có thể đặt tên, một luồng cực quang chảy ra từ mép sau mỗi cú vung. Anh Aldric đã ban phước cho nó và không chạm vào nó. Nâng nó lên là giữ lại cái lỗ mà trời để lại."
+        },
+        "starfall_mace": {
+          "name": "Starfall, Phán Quyết Thiên Đường",
+          "look": "Lõi sao bằng vàng nóng chảy bị giam giữ được bao quanh bởi các mảnh quay quanh, các mặt bích màu đen vũ trụ có vân ánh sao, cực quang tràn ra từ các đường nối.",
+          "lore": "Một lõi sao bắt được khoảnh khắc trước khi nó chết, bao quanh bởi những mảnh vụn rơi xuống cùng với nó, đóng băng một inch từ quên lãng. Các mặt bích màu đen vũ trụ của nó chạy với ánh sáng sao bị mắc kẹt và cực quang tràn ra từ các đường nối khi nó được nâng lên. Tu Sĩ cũ của Ánh sáng gọi ngôi sao băng là một sự phán xét, một phán quyết được truyền lại từ trên cao rằng không có tấm khiên nào có ý nghĩa ngăn chặn và đặt tên này theo tên cái đã giáng xuống Mirefen."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Nanh Sao Rơi",
+          "look": "Một mảnh sao rơi, viền vàng nóng chảy phát sáng trên nền kim loại đen vũ trụ, một ngôi sao sáng quay quanh chuôi dao, một vệt cực quang mỏng.",
+          "lore": "Mảnh nhỏ nhất của ngôi sao Aldric đã kéo ra khỏi miệng núi lửa và theo một số tính toán thì đây là mảnh nguy hiểm nhất. Một mảnh duy nhất của trái tim thuộc thế giới khác, cạnh vàng nóng chảy của nó cưỡi trên kim loại đen vũ trụ, một ngôi sao đơn độc quay quanh chuôi kiếm như một mặt trăng mất đi thế giới. Nó gần như không nặng chút nào và có thể chia cắt hầu hết mọi thứ. Đủ nhỏ để ẩn nấp, đủ sáng để tìm thấy trong bóng tối bằng chính ánh sáng của nó."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Đỉnh Hư Không Vô Tận",
+          "look": "Cụm sao vàng quay quanh lõi vàng nóng chảy, trục màu đen vũ trụ được khắc hình chòm sao, dải băng cực quang uốn lượn hướng lên trên.",
+          "lore": "Một trục kim loại hình sao có lõi vàng nóng chảy và một vòng gồm các mảnh vàng di chuyển xung quanh nó theo quỹ đạo chậm rãi, vô tận: một vũ trụ nhỏ, được khắc bằng các chòm sao không phù hợp với bầu trời trên Thornpeak. Cực quang cuộn lên theo chiều dài của nó như làn khói quên bay lên. Những người chịu đựng nó khẳng định họ có thể cảm nhận được khoảng trống xuyên qua nó, giống như cách Ysolei 'uống ánh trăng': kiên nhẫn, lạnh lùng và nhìn lại."
+        },
+        "emberwish_wand": {
+          "name": "Emberwish, Hạt Mặt Trời Chết",
+          "look": "Vi trần sao chết bằng vàng nóng chảy bị giam giữ được bao bọc trong các tia lửa quay quanh, trục màu đen vũ trụ khắc các chòm sao phát sáng.",
+          "lore": "Không phải bản thân ngôi sao sa ngã mà là hạt bụi cuối cùng của một ngôi sao đang hấp hối: một đốm than hồng vàng nóng chảy duy nhất của mặt trời đã tắt, bao bọc trong những tia lửa là ánh sáng cuối cùng của nó. Trục màu đen vũ trụ của nó được khắc các chòm sao đã chứng kiến ​​nó chết. Những người trồng trọt ở Mirefen nói rằng nó ban một điều ước cho bất cứ ai giữ nó vào lúc hoàng hôn thực sự; họ cũng nói rằng mọi linh hồn nắm giữ nó đều mong muốn có thêm thời gian, và Mặt trăng chết đuối không ban cho ai trong số họ bất kỳ điều gì."
+        },
+        "encore_bow": {
+          "name": "Encore, Ngôi Sao Rơi Thứ Hai",
+          "look": "Khẩu pháo sao cỡ lớn hài hước: nòng súng màu đen vũ trụ được khắc các chòm sao vàng rực rỡ, mõm chuông loe có vỏ sao chổi bằng vàng nóng chảy bên trong, phụ kiện bằng đồng, báng vai bằng gỗ.",
+          "lore": "Những người thợ rèn làm việc với ngôi sao sa ngã đã tạo ra sáu di vật từ nó và vẫn còn sót lại một thùng kim loại sao, và khi đó những người học việc đã có ý kiến. Thứ xuất hiện từ chiếc đe là khẩu súng đầu tiên của vương quốc hoặc động cơ bao vây nhỏ nhất của nó: một khẩu pháo đeo vai không bắn quá nhiều như yêu cầu của ngôi sao thứ hai, nhằm mục đích. Anh Aldric từ chối chúc phúc cho nó, lý luận rằng bất cứ điều gì ồn ào như vậy thì trời cũng đã để ý đến rồi. Thợ Săn yêu thích nó. Không có gì hạ cấp bao giờ có."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlatch, Phán quyết cuối cùng của bầu trời",
+          "look": "Sao băng kim loại, lõi vàng nóng chảy dọc theo máy xới, các chi màu đen vũ trụ khắc các chòm sao, một tia lửa sao thuần khiết có chốt.",
+          "lore": "Được rèn từ kim loại sao băng thô trong khi miệng núi lửa Mirefen vẫn phát sáng, các mảnh vụn 'quá nóng để xử lý', được rèn thành các nhánh của vũ trụ màu đen được khắc các chòm sao, một lõi vàng nóng chảy dọc theo máy xới. Nó không chọc vào chốt mà gợi lên một điều: một trục lửa sao, lỏng lẻo như một lời phán quyết và đáp xuống như phần cuối của một tia lửa. Khi Highwatch lo sợ ngay cả chiếc vương miện bất tử của Nythraxis cũng có thể không phải là thứ tồi tệ nhất dưới đỉnh núi, thì đây chính là vũ khí mà họ muốn có trên tường thành. Hãy nhắm thật tốt."
+        }
+      },
+      "seasonOne": "Mùa 1",
+      "rarity": {
+        "uncommon": "Không phổ biến",
+        "rare": "Hiếm",
+        "epic": "Sử Thi",
+        "legendary": "Huyền thoại"
+      },
+      "wtype": {
+        "sword": "Gươm",
+        "axe": "Rìu",
+        "mace": "Chùy",
+        "dagger": "Dao găm",
+        "staff": "Trượng",
+        "wand": "Đũa phép",
+        "bow": "Cung",
+        "crossbow": "Nỏ"
+      },
+      "badge": {
+        "flagship": "Chủ lực",
+        "hero": "Anh hùng"
+      },
+      "inspectAria": "Kiểm tra {item}",
+      "viewModeLabel": "Chế độ xem trước",
+      "tryOn": "Dùng thử",
+      "weaponOnly": "Chỉ vũ khí",
+      "sceneLabel": "Chiếu sáng cảnh",
+      "scene": {
+        "day": "Ngày",
+        "dusk": "Chạng vạng",
+        "night": "Đêm"
+      },
+      "lore": "Truyền thuyết",
+      "buySkin": "Mua ngoại hình",
+      "unavailable": "Không khả dụng",
+      "applied": "Đã áp dụng",
+      "apply": "Áp dụng ngoại hình",
+      "detach": "Gỡ ngoại hình",
+      "equipHint": "Hãy trang bị {type} để áp dụng ngoại hình này."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Mở Claudium",
+      "close": "Đóng Claudium",
+      "loading": "Đang tải Claudium...",
+      "balanceLabel": "Số dư",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.",
+      "disclosure": "Claudium là loại tiền mềm một chiều: mua bằng tiền và tiêu vào mỹ phẩm. Nó không thể được đổi, chuyển nhượng hoặc rút tiền mặt.",
+      "buyTitle": "Mua Claudium",
+      "railLabel": "Phương thức thanh toán",
+      "railStripe": "Thẻ",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "Giảm 20%",
+      "railWocUnavailable": "Giá WOC hiện không có sẵn.",
+      "railNativeUnavailable": "SOL/WOC hiện không khả dụng.",
+      "amountLabel": "Số lượng",
+      "showAmounts": "Hiển thị tất cả số lượng Claudium",
+      "hideAmounts": "Ẩn số lượng Claudium bổ sung",
+      "skuRow": "{usd} đổi lấy {claudium} Claudium",
+      "buyButton": "Mua",
+      "buyUnavailable": "Mua hàng không có sẵn ngay bây giờ.",
+      "storeTitle": "Cửa hàng mỹ phẩm",
+      "storeEmpty": "Không có mỹ phẩm có sẵn ngay bây giờ.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Đổi",
+      "kindCosmetic": "Mỹ phẩm",
+      "kindSkin": "Ngoại hình",
+      "kindItem": "Vật phẩm",
+      "checkoutTitle": "Hoàn tất mua hàng",
+      "checkoutClose": "Đóng thanh toán",
+      "checkoutLoading": "Đang tải thanh toán...",
+      "checkoutPending": "Giao dịch đang được tiến hành. Xác nhận trong ví của bạn và giữ bảng này mở.",
+      "checkoutPendingButton": "Xử lý",
+      "checkoutFailed": "Không thể tải thanh toán. Vui lòng thử lại.",
+      "checkoutUnavailable": "Việc mua Claudium đó hiện không khả dụng.",
+      "checkoutWalletRequired": "Kết nối ví Solana trước khi mua Claudium bằng tiền điện tử.",
+      "checkoutWalletUnsupported": "Ví này không thể ký và gửi giao dịch Solana.",
+      "checkoutNotSettled": "Giao dịch đã được gửi nhưng Claudium vẫn chưa được ghi có. Vui lòng thử lại trong thời gian ngắn."
+    },
     "theme": {
       "preset": "Giao Diện UI",
       "customColors": "Màu Tùy Chỉnh",
@@ -318,7 +575,7 @@ export const vi_VN: EnTranslations = {
     "mobile": {
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
-      "dailyRewards": "Thưởng",
+      "dailyRewards": "Cửa hàng",
       "deeds": "Kỳ Công",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
@@ -340,12 +597,12 @@ export const vi_VN: EnTranslations = {
       "talkBodyTouch": "Đứng gần Thống Soái Redbrook và chạm nút Dùng để nói chuyện, rồi nhận nhiệm vụ của ông.",
       "returnBodyTouch": "Nhiệm vụ của bạn đã xong. Trở về chỗ Thống Soái Redbrook và chạm nút Dùng để nộp.",
       "doneBodyTouch": "Bạn đã nắm cơ bản rồi, {name}. Thung Lũng giờ là của bạn để khám phá. Chạm Thêm, rồi Nhiệm Vụ, để xem lại nhật ký nhiệm vụ bất cứ lúc nào. Săn lùng vui vẻ.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Mới tham gia chiến đấu? Nhấn {targetKey} hoặc nhấp vào một con sói để nhắm mục tiêu vào nó, sau đó sử dụng khả năng trên thanh hành động để tấn công nó.",
+      "slayTargetHintTouch": "Mới tham gia chiến đấu? Chạm vào con sói để nhắm mục tiêu, sau đó chạm vào khả năng của thanh hành động để tấn công nó.",
+      "nextTipsTitle": "Tiếp theo sẽ ở đâu",
+      "nextTipQuestLog": "Mở Nhật ký nhiệm vụ ({key}) của bạn để tìm nhiệm vụ tiếp theo ở gần.",
+      "nextTipMap": "Kiểm tra Bản đồ thế giới ({key}) để xem nhiệm vụ đang chờ ở đâu.",
+      "nextTipSocial": "Mở Xã Hội ({key}) để tìm nhóm có những trận chiến khó khăn hơn."
     },
     "widgets": {
       "clockTitle": "Giờ địa phương - nhấp để chuyển 12/24 giờ",
@@ -706,17 +963,17 @@ export const vi_VN: EnTranslations = {
       "highContrastAria": "Bật/tắt nền tương phản cao: tắt đoạn phim nền chuyển động để chữ trên màn hình bắt đầu vẫn dễ đọc"
     },
     "warfare": {
-      "honorAmount": "{amount} Honor",
+      "honorAmount": "Danh dự {amount}",
       "dualPrice": "{money} + {honor}",
-      "balance": "Honor: {amount}",
-      "honorFloat": "+{amount} Honor",
-      "honorGain": "You gain {amount} Honor ({reason}).",
-      "notEnoughHonor": "Not enough Honor.",
+      "balance": "Danh dự: {amount}",
+      "honorFloat": "+{amount} Danh dự",
+      "honorGain": "Bạn nhận được Danh dự {amount} ({reason}).",
+      "notEnoughHonor": "Không đủ danh dự.",
       "reasons": {
-        "arenaWin": "Arena victory",
-        "fiestaKill": "Fiesta takedown",
-        "fiestaComplete": "Fiesta completed",
-        "fiestaWin": "Fiesta victory"
+        "arenaWin": "Chiến thắng đấu trường",
+        "fiestaKill": "Hạ gục trong Fiesta",
+        "fiestaComplete": "Fiesta đã hoàn thành",
+        "fiestaWin": "Chiến thắng Fiesta"
       }
     },
     "statInfo": {
@@ -727,9 +984,9 @@ export const vi_VN: EnTranslations = {
         "hasteRating": "Chỉ Số Thần Tốc",
         "haste": "Haste",
         "parry": "Parry",
-        "warfare": "Warfare"
+        "warfare": "Chiến Tranh"
       },
-      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
+      "warfareValue": "+{increase}% gây ra / -{reduction}% nhận vào",
       "desc": {
         "str": "Tăng sức công kích, giúp đòn vũ khí của bạn đánh mạnh hơn.",
         "agi": "Mài giũa phản xạ và độ chính xác của bạn, cải thiện một số chỉ số chiến đấu.",
@@ -746,7 +1003,7 @@ export const vi_VN: EnTranslations = {
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
         "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
-        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
+        "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Công Kích",
@@ -972,7 +1229,7 @@ export const vi_VN: EnTranslations = {
     "corpseHarvest": {
       "title": "Thu Hoạch",
       "harvestButton": "Thu Hoạch",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Thu hoạch: thu thập nguyên liệu chế tạo từ xác chết này (da, răng nanh, lụa và các thành phần tương tự), tách biệt với bất kỳ chiến lợi phẩm nào. Bất cứ ai cũng có thể thu hoạch; chỉ một người chơi có thể thu hoạch một xác chết nhất định.",
       "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
@@ -1182,7 +1439,7 @@ export const vi_VN: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Rương",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Lấy Tất Cả: thu thập mọi xu và vật phẩm trong cửa sổ chiến lợi phẩm này."
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
@@ -1646,7 +1903,7 @@ export const vi_VN: EnTranslations = {
       "trackerLabel": "Kỳ Công",
       "collapseHint": "Thu gọn bảng theo dõi kỳ công",
       "expandHint": "Mở rộng bảng theo dõi kỳ công",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Mở Sách Kỳ Công",
       "charTitleLabel": "Danh Hiệu",
       "charTitleNone": "Chưa chọn danh hiệu",
       "charOpenBook": "Sách Kỳ Công",
@@ -5431,8 +5688,8 @@ export const vi_VN: EnTranslations = {
         "description": "Làm rung chuyển khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi 1.5 giây."
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "name": "Hồi Máu Liên Hoàn",
+        "description": "Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)"
       },
       "heroic_strike": {
         "name": "Đòn Cướp Phá",
@@ -5681,6 +5938,10 @@ export const vi_VN: EnTranslations = {
       "lay_on_hands": {
         "name": "Nghi Thức Cuối Cùng",
         "description": "Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút."
+      },
+      "holy_taunt": {
+        "name": "Khiêu Khích Thánh",
+        "description": "Chế nhạo mục tiêu: mối đe dọa của bạn tăng lên tương đương với kẻ thù đáng ghét nhất của nó và nó buộc phải tấn công bạn trong 3 giây."
       },
       "flash_of_light": {
         "name": "Ánh Quang Hàn Gắn",
@@ -6219,8 +6480,8 @@ export const vi_VN: EnTranslations = {
         "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "pummel": {
-        "name": "Pummel",
-        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+        "name": "Đấm Dồn Dập",
+        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
       "heroic_leap": {
         "name": "Heroic Leap",
@@ -6259,28 +6520,28 @@ export const vi_VN: EnTranslations = {
         "description": "Ràng buộc một Wraithborn theo ý chí của bạn, một con quỷ tinh nhuệ trút sát thương Bóng Tối nặng nề từ xa. Thời gian hồi chiêu dài kìm hãm sức mạnh tàn phá của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
       "kick": {
-        "name": "Boot",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Cú Đá",
+        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
       "counterspell": {
-        "name": "Spellbreak",
-        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+        "name": "Phản Phép",
+        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
       },
       "counter_shot": {
-        "name": "Hushing Shot",
-        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Phát Bắn Phản Đòn",
+        "description": "Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
       },
       "rebuke": {
-        "name": "Reproach",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Quở Trách",
+        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
       "skull_bash": {
-        "name": "Headbutt",
-        "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Húc Sọ",
+        "description": "Một cú húc đầu lao tới làm gián đoạn niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+        "name": "Khóa Phép",
+        "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -6926,124 +7187,124 @@ export const vi_VN: EnTranslations = {
         "name": "Thảo Dược Cánh Mặt Trời"
       },
       "furyforged_warhelm": {
-        "name": "Furyforged Warhelm"
+        "name": "Mũ Chiến Furyforged"
       },
       "furyforged_warspaulders": {
-        "name": "Furyforged Warspaulders"
+        "name": "Giáp Vai Furyforged"
       },
       "furyforged_warplate": {
-        "name": "Furyforged Warplate"
+        "name": "Giáp Tấm Furyforged"
       },
       "furyforged_girdle": {
-        "name": "Furyforged Girdle"
+        "name": "Đai Lưng Furyforged"
       },
       "furyforged_legguards": {
-        "name": "Furyforged Legguards"
+        "name": "Giáp Chân Furyforged"
       },
       "furyforged_gauntlets": {
-        "name": "Furyforged Gauntlets"
+        "name": "Găng Tay Furyforged"
       },
       "furyforged_sabatons": {
-        "name": "Furyforged Sabatons"
+        "name": "Ủng Giáp Furyforged"
       },
       "stormbound_crown": {
-        "name": "Stormbound Crown"
+        "name": "Vương Miện Stormbound"
       },
       "stormbound_spaulders": {
-        "name": "Stormbound Spaulders"
+        "name": "Giáp Vai Stormbound"
       },
       "stormbound_hauberk": {
-        "name": "Stormbound Hauberk"
+        "name": "Áo Giáp Xích Stormbound"
       },
       "stormbound_waistguard": {
-        "name": "Stormbound Waistguard"
+        "name": "Đai Lưng Stormbound"
       },
       "stormbound_legmail": {
-        "name": "Stormbound Legmail"
+        "name": "Giáp Xích Chân Stormbound"
       },
       "stormbound_handguards": {
-        "name": "Stormbound Handguards"
+        "name": "Giáp Tay Stormbound"
       },
       "stormbound_greaves": {
-        "name": "Stormbound Greaves"
+        "name": "Giáp Ống Chân Stormbound"
       },
       "ashstalker_cowl": {
-        "name": "Ashstalker Cowl"
+        "name": "Mũ Trùm Ashstalker"
       },
       "ashstalker_shoulderguards": {
-        "name": "Ashstalker Shoulderguards"
+        "name": "Giáp Vai Ashstalker"
       },
       "ashstalker_harness": {
-        "name": "Ashstalker Harness"
+        "name": "Giáp Thân Ashstalker"
       },
       "ashstalker_waistband": {
-        "name": "Ashstalker Waistband"
+        "name": "Thắt lưng Ashstalker"
       },
       "ashstalker_legguards": {
-        "name": "Ashstalker Legguards"
+        "name": "Giáp Chân Ashstalker"
       },
       "ashstalker_grips": {
-        "name": "Ashstalker Grips"
+        "name": "Găng Tay Ashstalker"
       },
       "ashstalker_treads": {
-        "name": "Ashstalker Treads"
+        "name": "Giày Ashstalker"
       },
       "cinderweave_cowl": {
-        "name": "Cinderweave Cowl"
+        "name": "Mũ Trùm Cinderweave"
       },
       "cinderweave_mantle": {
-        "name": "Cinderweave Mantle"
+        "name": "Áo Choàng Vai Cinderweave"
       },
       "cinderweave_raiment": {
-        "name": "Cinderweave Raiment"
+        "name": "Pháp Bào Cinderweave"
       },
       "cinderweave_cord": {
-        "name": "Cinderweave Cord"
+        "name": "Dây Lưng Cinderweave"
       },
       "cinderweave_legwraps": {
-        "name": "Cinderweave Legwraps"
+        "name": "Băng Chân Cinderweave"
       },
       "cinderweave_handwraps": {
-        "name": "Cinderweave Handwraps"
+        "name": "Băng Tay Cinderweave"
       },
       "cinderweave_slippers": {
-        "name": "Cinderweave Slippers"
+        "name": "Hài Cinderweave"
       },
       "final_oath_medallion": {
-        "name": "Medallion of the Final Oath"
+        "name": "Huy Chương Lời Thề Cuối"
       },
       "razorwind_torque": {
-        "name": "Razorwind Torque"
+        "name": "Kiềng Cổ Razorwind"
       },
       "cinder_sigil_pendant": {
-        "name": "Cinder-Sigil Pendant"
+        "name": "Mặt dây chuyền Cinder-Sigil"
       },
       "iron_vow_band": {
-        "name": "Iron Vow Band"
+        "name": "Nhẫn Lời Thề Sắt"
       },
       "unbroken_circle": {
-        "name": "The Unbroken Circle"
+        "name": "Vòng Tròn Bất Diệt"
       },
       "fleetblood_band": {
-        "name": "Fleetblood Band"
+        "name": "Nhẫn Fleetblood"
       },
       "last_step_signet": {
-        "name": "Last-Step Signet"
+        "name": "Nhẫn Ấn Bước Cuối"
       },
       "ashen_focus_ring": {
-        "name": "Ashen Focus Ring"
+        "name": "Nhẫn Hội Tụ Tro Tàn"
       },
       "spellbreakers_seal": {
-        "name": "Spellbreaker's Seal"
+        "name": "Ấn Phá Phép"
       },
       "final_argument_greatblade": {
-        "name": "Final Argument Greatblade"
+        "name": "Đại Kiếm Lời Biện Luận Cuối"
       },
       "first_blood_razor": {
-        "name": "First-Blood Razor"
+        "name": "Lưỡi Dao Máu Đầu"
       },
       "emberglass_warstaff": {
-        "name": "Emberglass Warstaff"
+        "name": "Chiến Trượng Emberglass"
       },
       "bristleback_maul": {
         "name": "Búa Gallowglass"
@@ -8195,9 +8456,9 @@ export const vi_VN: EnTranslations = {
         "greeting": "Bằng chứng chinh phục những vực sâu Anh Hùng mua được những chiếc nhẫn và mặt dây chuyền tinh xảo nhất Highwatch. Cho ta xem dấu ấn của ngươi."
       },
       "fury": {
-        "name": "FURY",
-        "title": "Honor Quartermaster",
-        "greeting": "The sands remember every victory. Spend your honor well."
+        "name": "NỘ KHÍ",
+        "title": "Thủ Lĩnh Danh Dự",
+        "greeting": "Cát nhớ từng chiến thắng. Hãy dành danh dự của bạn thật tốt."
       },
       "loremaster_caddis": {
         "name": "Sử Gia Caddis",

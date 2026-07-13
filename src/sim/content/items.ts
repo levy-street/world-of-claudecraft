@@ -673,7 +673,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
   },
   // Heroic-dungeon participation token: the final boss of a heroic instance
-  // drops one personal mark per eligible participant (awardHeroicMarks in
+  // directly awards marks to every eligible participant (awardHeroicMarks in
   // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   heroic_mark: {
     id: 'heroic_mark',

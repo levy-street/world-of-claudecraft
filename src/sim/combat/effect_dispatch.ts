@@ -196,8 +196,9 @@ export function runEffects(
   res: ResolvedAbility,
   // Bladed Echo (combat/area_echo.ts): applyAbility resolved this cast as
   // echo-eligible ONCE at the ability level, so a multi-strike cast (Red
-  // Harvest) echoes every strike and consumes a single charge below.
-  opts?: { areaEcho?: boolean },
+  // Harvest) echoes every strike and consumes a single charge below. Also carries
+  // attackAnimationStarted (ranged-shot animation timing, v0.25.0).
+  opts?: { areaEcho?: boolean; attackAnimationStarted?: boolean },
 ): void {
   const ability = res.def;
   const isSpell = ability.school !== 'physical';
@@ -207,6 +208,7 @@ export function runEffects(
   // actually dealt single-target hostile damage; gates the charge consumption
   // after the loop (a fully whiffed cast keeps its charge).
   let areaEchoDealt = false;
+  const attackAnimationStarted = opts?.attackAnimationStarted ?? false;
   // Sweeping Strikes (Arms): a worn window makes each single-target strike clip
   // one nearby enemy for 75%. Aura-driven (no charge), resolved once per cast
   // like the echo. SWEEP_MULT is the reduced fraction.
@@ -398,6 +400,8 @@ export function runEffects(
           'hit',
           false,
           threatOpts,
+          true,
+          attackAnimationStarted,
         );
         // Bladed Echo: replay the SAME resolved amount (already rolled, post
         // crit/armor; no new rng draw) onto enemies near the primary target.
@@ -451,6 +455,8 @@ export function runEffects(
           'hit',
           false,
           threatOpts,
+          true,
+          attackAnimationStarted,
         );
         break;
       }
@@ -541,25 +547,30 @@ export function runEffects(
           // mobs); isFriendlyTo filters to healable allies, so one scan suffices.
           // The pick is a deterministic min (hp fraction, then distance, then id),
           // so it is independent of grid iteration order (no rng here).
-          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.jumpRange ?? eff.radius ?? 0, (e, d2) => {
-            if (e.dead || chain.includes(e)) return;
-            // Allies only: players and player-owned pets (what a friendly-target
-            // heal may hit), never a hostile or an NPC bystander.
-            if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
-            // hp/maxHp are integers, so equal fractions compute the identical float:
-            // an EXACT ladder (frac, then distance, then id) is transitive and thus
-            // order-independent, no epsilon window needed.
-            const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-            const better =
-              best === null ||
-              frac < bestFrac ||
-              (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
-            if (better) {
-              best = e;
-              bestFrac = frac;
-              bestD2 = d2;
-            }
-          });
+          ctx.grid.forEachInRadius(
+            from.pos.x,
+            from.pos.z,
+            eff.jumpRange ?? eff.radius ?? 0,
+            (e, d2) => {
+              if (e.dead || chain.includes(e)) return;
+              // Allies only: players and player-owned pets (what a friendly-target
+              // heal may hit), never a hostile or an NPC bystander.
+              if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
+              // hp/maxHp are integers, so equal fractions compute the identical float:
+              // an EXACT ladder (frac, then distance, then id) is transitive and thus
+              // order-independent, no epsilon window needed.
+              const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
+              const better =
+                best === null ||
+                frac < bestFrac ||
+                (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
+              if (better) {
+                best = e;
+                bestFrac = frac;
+                bestD2 = d2;
+              }
+            },
+          );
           if (best === null) break;
           chain.push(best);
         }
@@ -674,7 +685,19 @@ export function runEffects(
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
         if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= 1.5 + p.critDmgSpellBonus;
-        ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
+        ctx.dealDamage(
+          p,
+          target,
+          Math.round(dmg),
+          crit,
+          'holy',
+          ability.name,
+          'hit',
+          false,
+          undefined,
+          true,
+          attackAnimationStarted,
+        );
         noteSpellHit(ctx, p, crit);
         break;
       }
@@ -1019,6 +1042,8 @@ export function runEffects(
             'hit',
             false,
             threatOpts,
+            true,
+            attackAnimationStarted,
           );
           // Paired stun rider (Faultline): each enemy actually struck is also
           // stunned, mirroring the single-target 'stun' case (shared PvP DR,
@@ -1523,7 +1548,19 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
-          ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
+          ctx.dealDamage(
+            p,
+            m,
+            Math.round(dmg),
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            undefined,
+            true,
+            attackAnimationStarted,
+          );
           if (!m.dead && ctx.isHostileTo(p, m)) {
             ctx.applyRootAura(
               p,

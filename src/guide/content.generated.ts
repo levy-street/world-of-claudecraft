@@ -409,6 +409,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Last Rite"
       },
       {
+        "id": "holy_taunt",
+        "name": "Sacred Goad"
+      },
+      {
         "id": "flash_of_light",
         "name": "Lightmend"
       },
@@ -1383,7 +1387,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Brightwood Glade",
       "The Sowfield"
     ],
-    "welcome": "Find Marshal Redbrook in town — he has work for you.",
+    "welcome": "Find Marshal Redbrook in town - he has work for you.",
     "families": [
       "beast",
       "spider",
@@ -1439,7 +1443,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Revenant Fields",
       "Gravewyrm Sanctum"
     ],
-    "welcome": "Captain Thessaly holds the wall at Highwatch — barely.",
+    "welcome": "Captain Thessaly holds the wall at Highwatch - barely.",
     "families": [
       "beast",
       "mudfin",

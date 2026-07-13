@@ -96,6 +96,12 @@ import {
   type TalentModifiers,
   talentPointsAtLevel,
 } from './content/talents';
+import {
+  resolveActiveWeaponSkin,
+  weaponSkinTypeMatches,
+  withWeaponSkinApplied,
+} from './content/weapon_skin_rules';
+import { WEAPON_SKINS } from './content/weapon_skins';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
@@ -190,6 +196,7 @@ import {
   lootRollGroupStatus as lootRollGroupStatusImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
+  removePlayerFromLootRolls,
   resolveLootRoll as resolveLootRollImpl,
   rollLoot as rollLootImpl,
   setPartyLootMaster as setPartyLootMasterImpl,
@@ -323,7 +330,7 @@ import {
   awardHeroicMarks as awardHeroicMarksImpl,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
-  grantHeroicKillLockout as grantHeroicKillLockoutImpl,
+  instanceClaimIdAt as instanceClaimIdAtImpl,
   instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
   instanceOriginOf as instanceOriginOfImpl,
@@ -433,6 +440,7 @@ import {
   type OverheadEmoteId,
   PARRY_FRONT_ARC,
   PARTY_MEMBER_AURA_CAP,
+  PARTY_XP_RANGE,
   type PetMode,
   type PlayerClass,
   type QuestProgress,
@@ -455,6 +463,8 @@ import {
   type VcNationId,
   type Vec3,
   virtualLevel,
+  type WeaponSkinLoadout,
+  type WeaponSkinType,
   xpToReachLevel,
 } from './types';
 import {
@@ -515,7 +525,6 @@ const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 // (I1: read only by enterDungeon's raid gate).
 // DAMAGE_IDLE_DESPAWN_SECONDS / DAMAGE_IDLE_DESPAWN_MOB_IDS moved to entity_roster.ts
 // (the despawn prologue's home); imported above for the damage-path timer reset.
-// PARTY_XP_RANGE moved to types.ts (C1; read by the damage-core xp-split + M1 assist); no longer imported by sim.ts.
 // RESTED_* rested-XP tuning + isResting/updateRested moved to progression/xp.ts (G1b),
 // the only code that reads them.
 // A2: DUEL_COUNTDOWN/DUEL_FORFEIT_DISTANCE moved to social/duel.ts; the Ashen
@@ -1038,10 +1047,14 @@ export interface PlayerMeta {
   // Set only while standing in a town hub; adds a bonus to that component's
   // #1142 harvest yield, on top of the universal baseline, never below it.
   townFocus: Record<string, number>;
-  // Heroic-mark daily income gate (persisted): dungeon ids whose heroic final
-  // boss already paid this player a Heroic Mark on `date` (host UTC day).
-  // See awardHeroicMarks in instances/dungeons.ts; at most 4 marks per day.
+  // Heroic reset-window circuit progress for the Book of Deeds. Reward eligibility
+  // is gated only by raidLockouts; this persisted field records which distinct
+  // heroic clears contributed to one authoritative reset window without gating rewards.
   heroicDaily: { date: string; marked: Set<string> };
+  // Set synchronously when authoritative leave teardown begins, before its
+  // first persistence await. Session-only: reward and lockout snapshots ignore
+  // the departing player so no post-save mutation is discarded on removal.
+  leaving?: boolean;
   // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
   // eligibility gate and the rendered raid-lockout countdown are one value. See
   // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
@@ -1321,7 +1334,12 @@ export class Sim {
   // social systems
   // parties / partyByPid / partyInvites / nextPartyId moved to the PartyMachine
   // (src/sim/social/party.ts, session A1); reached via `this.party`.
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  accountCosmetics: AccountCosmetics = {
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+  };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
   trades = new Map<number, TradeSession>(); // pid -> shared session (both pids point at it)
@@ -2208,6 +2226,7 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    this.preparePlayerLeave(pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -2262,6 +2281,64 @@ export class Sim {
     deedsMod.dropDeedSessionState(this.ctx, pid);
     if (this.primaryId === pid)
       this.primaryId = this.players.size > 0 ? [...this.players.keys()][0] : -1;
+  }
+
+  // The online server calls this before serializing a leave. Keep it idempotent
+  // because removePlayer calls it again as an offline/headless safety net.
+  preparePlayerLeave(pid: number): void {
+    const meta = this.players.get(pid);
+    if (!meta) return;
+    meta.leaving = true;
+    // Trades are not escrowed. Cancel before the leave snapshot so the other
+    // party cannot confirm during the persistence await and receive an item
+    // that the departing character's already-captured save still contains.
+    if (this.trades.has(pid)) this.tradeCancel(pid);
+    // Forfeit unresolved rolls while the player, party, and source corpse are
+    // still live, so every item goes to a remaining candidate or back to loot.
+    removePlayerFromLootRolls(this.ctx, pid);
+    const party = this.partyOf(pid);
+    // Re-anchor taps before persistence yields. This preserves the party's
+    // death-time corpse rights and loot strategy after the original tapper is
+    // removed, and lets an already-queued leaver DoT settle a fatal heroic hit
+    // through an eligible remaining participant. Without a qualified party
+    // member, clearing the tap mirrors immediate removal.
+    for (const entity of this.entities.values()) {
+      if (entity.kind === 'mob' && entity.tappedById === pid) {
+        entity.tappedById = this.replacementTapperForLeave(entity, pid, party?.members ?? []);
+      }
+    }
+  }
+
+  private replacementTapperForLeave(
+    mob: Entity,
+    leavingPid: number,
+    partyPids: number[],
+  ): number | null {
+    const instance = this.instances.find(
+      (slot) => slot.partyKey !== null && slot.mobIds.includes(mob.id),
+    );
+    for (const candidatePid of partyPids) {
+      if (candidatePid === leavingPid) continue;
+      const candidate = this.players.get(candidatePid);
+      const entity = this.entities.get(candidatePid);
+      if (!candidate || candidate.leaving || !entity) continue;
+      // A corpse already owns an authoritative death-time recipient snapshot.
+      // Re-anchor only to someone in that snapshot, irrespective of where they
+      // moved after the kill.
+      if (mob.lootRecipientIds && mob.lootRecipientIds.length > 0) {
+        if (mob.lootRecipientIds.includes(candidatePid)) return candidatePid;
+        continue;
+      }
+      const matchingInstanceCorpse =
+        entity.ghost &&
+        entity.corpsePos &&
+        (!instance || entity.corpseInstanceId === instance.exitId)
+          ? entity.corpsePos
+          : null;
+      const participationPos = matchingInstanceCorpse ?? entity.pos;
+      if (dist2d(participationPos, mob.pos) <= PARTY_XP_RANGE) return candidatePid;
+    }
+    return null;
   }
 
   serializeCharacter(pid: number): CharacterState | null {
@@ -2444,6 +2521,65 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  /** Replace a player's whole weapon-skin loadout (host seed: the server pushes
+   *  the account-wide selection at join; offline keeps session-local state) and
+   *  re-resolve the active skin against the equipped mainhand. Cosmetic only. */
+  setWeaponSkinLoadout(pid: number, loadout: WeaponSkinLoadout): void {
+    const e = this.entities.get(pid);
+    if (!e || e.kind !== 'player') return;
+    const next: WeaponSkinLoadout = {};
+    for (const [t, skinId] of Object.entries(loadout)) {
+      if (typeof skinId !== 'string') continue;
+      const def = WEAPON_SKINS[skinId];
+      if (def && def.weaponType === t) next[def.weaponType] = skinId;
+    }
+    e.weaponSkinLoadout = next;
+    // For player entities templateId is the class id (createPlayer).
+    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next);
+    this.mirrorWeaponSkinLoadout(pid, e);
+  }
+
+  /** Keep the local player's accountCosmetics view of the loadout in step with
+   *  the entity, so the store's applied badges read the same on BOTH hosts
+   *  (ClientWorld mirrors optimistically; offline Sim mirrors here). */
+  private mirrorWeaponSkinLoadout(pid: number, e: Entity): void {
+    if (pid !== this.primaryId) return;
+    const weaponSkinLoadout: Record<string, string> = {};
+    for (const [t, skinId] of Object.entries(e.weaponSkinLoadout)) {
+      if (skinId) weaponSkinLoadout[t] = skinId;
+    }
+    this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout };
+  }
+
+  /** Apply (skinId) or detach (null + weaponType) one weapon-skin loadout entry.
+   *  Applying requires a weapon of the skin's type equipped right now (the
+   *  account-ownership gate is the server's, before this call). Returns whether
+   *  the loadout changed. */
+  setWeaponSkin(pid: number, skinId: string | null, weaponType?: WeaponSkinType): boolean {
+    const e = this.entities.get(pid);
+    if (!e || e.kind !== 'player') return false;
+    const cls = e.templateId;
+    if (skinId !== null) {
+      const def = WEAPON_SKINS[skinId];
+      if (!def) return false;
+      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType)) return false;
+      e.weaponSkinLoadout = withWeaponSkinApplied(e.weaponSkinLoadout, skinId) ?? {};
+    } else {
+      const t = weaponType;
+      if (!t || !e.weaponSkinLoadout[t]) return false;
+      const next = { ...e.weaponSkinLoadout };
+      delete next[t];
+      e.weaponSkinLoadout = next;
+    }
+    e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
+    this.mirrorWeaponSkinLoadout(pid, e);
+    return true;
+  }
+
+  changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
+    this.setWeaponSkin(this.primaryId, skinId, weaponType);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
@@ -3087,8 +3223,29 @@ export class Sim {
       updateYumiActive: (match) => yumiMod.updateYumiActive(sim.ctx, match),
       yumiPlayerDown: (match, victim, killerPid) =>
         yumiMod.yumiPlayerDown(sim.ctx, match, victim, killerPid),
-      yumiCatDamaged: (match, source, cat, amount, crit, school, ability, kind) =>
-        yumiMod.yumiCatDamaged(sim.ctx, match, source, cat, amount, crit, school, ability, kind),
+      yumiCatDamaged: (
+        match,
+        source,
+        cat,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        attackAnimationStarted,
+      ) =>
+        yumiMod.yumiCatDamaged(
+          sim.ctx,
+          match,
+          source,
+          cat,
+          amount,
+          crit,
+          school,
+          ability,
+          kind,
+          attackAnimationStarted,
+        ),
       cleanupYumiMatch: (match) => yumiMod.cleanupYumiMatch(sim.ctx, match),
       // A2: isArenaCrossTeam/arenaTeamOf/endArenaMatch/endDuel (above) now forward to
       // social/arena.ts + social/duel.ts via Sim's thin delegates. The block below is
@@ -3167,14 +3324,12 @@ export class Sim {
       raidResetMs: sim.raidResetMs.bind(sim),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
+      instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
-      // Kill-site heroic daily lockout (instances/dungeons): C1's death hub calls it
-      // for every mob death, credit or no credit; late-bound arrow, no Sim facade.
-      grantHeroicKillLockout: (mob) => grantHeroicKillLockoutImpl(sim.ctx, mob),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -4753,6 +4908,7 @@ export class Sim {
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
+    attackAnimationStarted = false,
     alreadyFinal = false,
   ): void {
     dealDamageImpl(
@@ -4767,6 +4923,7 @@ export class Sim {
       noRage,
       threatOpts,
       direct,
+      attackAnimationStarted,
       alreadyFinal,
     );
   }
@@ -7363,8 +7520,8 @@ export class Sim {
     );
   }
 
-  // Owned by instances/dungeons (heroic final-boss participation marks); the
-  // C1 death hub reaches it through the seam, this delegate keeps the facade.
+  // Owned by instances/dungeons (heroic final-boss reward + lockout settlement);
+  // the C1 death hub reaches it through the seam, this delegate keeps the facade.
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void {
     awardHeroicMarksImpl(this.ctx, mob, recipients);
   }
@@ -7485,6 +7642,10 @@ export class Sim {
 
   instanceSlotAt(pos: Vec3): number | null {
     return instanceSlotAtImpl(this.ctx, pos);
+  }
+
+  instanceClaimIdAt(pos: Vec3): number | null {
+    return instanceClaimIdAtImpl(this.ctx, pos);
   }
 
   instanceInfoAt(pos: Vec3): { slot: number; dungeonId: string } | null {

@@ -4,11 +4,14 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS } from '../../sim/data';
 import { weaponHand } from '../../sim/equipment_rules';
 import type { OverheadEmoteId } from '../../world_api';
 import type { FormTint } from '../form_tint';
 import { GFX } from '../gfx';
+import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
+import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
   type AnimState,
   type BaseState,
@@ -28,12 +31,58 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import {
+  disposeOwnedWeaponSkinMaterials,
+  markOwnedWeaponSkinMaterials,
+} from './weapon_skin_materials';
 
 export type { AnimState, BaseState } from './anim_state';
+
+// Current canvas height in device pixels, pushed by the renderer on resolution
+// changes so newly created weapon-skin VFX rigs size their point sprites right.
+let weaponVfxViewportHeight = 1080;
+
+export function setWeaponVfxViewportHeight(heightPx: number): void {
+  weaponVfxViewportHeight = Math.max(1, Math.round(heightPx));
+}
+
+// The VFX rig sizes point sprites for the inspector's 35 degree vertical fov.
+// Rendering under a different camera needs an equivalent-height correction or
+// particles draw the wrong size (the 60 degree world camera showed them ~1.8x
+// too large). Each visual carries the factor for the camera it renders under.
+const VFX_RIG_FOV_DEG = 35;
+
+export function weaponVfxSpriteScaleForFov(fovDeg: number): number {
+  return Math.tan((VFX_RIG_FOV_DEG * Math.PI) / 360) / Math.tan((fovDeg * Math.PI) / 360);
+}
+
+// World camera default (CAMERA_BASE_FOV = 60 in renderer.ts).
+const WORLD_FOV_SPRITE_SCALE = weaponVfxSpriteScaleForFov(60);
+
+// Scratch quaternions for the per-frame bow orientation pin (no allocation).
+const BOW_Q_ROOT = new THREE.Quaternion();
+const BOW_Q_B = new THREE.Quaternion();
+const BOW_Q_TARGET = new THREE.Quaternion();
+// Root-relative aim orientation a firing bow blends to: upright limbs (the
+// variant convention authors limbs along +Y), STRING toward the archer (the
+// belly faces the target), the full profile square to the aim.
+const BOW_AIM_QUAT = new THREE.Quaternion().setFromEuler(
+  new THREE.Euler(0, -Math.PI / 2, 0, 'XYZ'),
+);
+// Root-relative carry for a bow-slot gun outside the shot: muzzle (authored
+// along +Y) pitched forward to the horizon, then rolled a quarter turn about
+// the barrel so the handle lies parallel to the hunter's body instead of
+// jutting out sideways. The shot itself keeps the hand-tuned grip.
+const GUN_CARRY_QUAT = new THREE.Quaternion()
+  .setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0, 'XYZ'))
+  .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2));
+const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
 const HIT_REACT_COOLDOWN = 0.9;
+
 // Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
@@ -94,6 +143,18 @@ export class CharacterVisual {
   private skinIndex: number;
   private mainhandItemId: string | null;
   private offhandItemId: string | null;
+  private weaponSkinId: string | null = null;
+  private weaponVfx: WeaponVfxHandle[] = [];
+  // Skin payloads whose orientation blends to a root-relative pin (see
+  // applySkinOrientation): bows aim upright DURING the shot, bow-slot guns
+  // carry forward OUTSIDE it. qGrip is the authored grip-local orientation.
+  private orientPins: {
+    payload: THREE.Object3D;
+    qGrip: THREE.Quaternion;
+    blend: number;
+    duringShot: boolean;
+  }[] = [];
+  private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -224,7 +285,7 @@ export class CharacterVisual {
     this.root.add(this.clickProxy);
 
     this.mixer = new THREE.AnimationMixer(this.model);
-    for (const name of clipNamesOf(prep.def)) {
+    for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
       const clip = prep.clips.get(name);
       if (clip) this.actions.set(name, this.mixer.clipAction(clip));
     }
@@ -337,7 +398,7 @@ export class CharacterVisual {
     // A mapped ability plays its specific swing clip (if the model has it);
     // a plain auto then swings by weapon style (two-hander overhead / dual
     // wield double chop) when the manifest maps one, and everything else
-    // rotates through the generic attack clips for variety.
+    // rotates through the skin's own or the generic attack clips for variety.
     const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
     if (override && this.action(override)) {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
@@ -349,10 +410,13 @@ export class CharacterVisual {
       this.playOneShot(handClip, this.def.attackTimeScale ?? 1.3);
       return;
     }
-    const clips = this.def.clips.attack;
+    // An equipped weapon skin can carry its own swing clip set (e.g. a bow-slot
+    // gun's shoulder-aim); it replaces the generic rotation when present.
+    const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
+    const clips = skinAttack?.clips ?? this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
-    this.playOneShot(name, this.def.attackTimeScale ?? 1.3);
+    this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
   }
 
   /** 'dualwield' when both hands hold weapons (checked first: a Titan's Grip
@@ -547,7 +611,10 @@ export class CharacterVisual {
     this.originalMaterials.clear();
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
+      // VFX rig meshes stay out of the ghost/restore cycle: their shader
+      // materials are owned by the weapon-skin handle, never overlaid.
+      if (mesh.isMesh && !mesh.userData.weaponVfxMesh)
+        this.originalMaterials.set(mesh, mesh.material);
     });
     this.applyVisualMaterials();
   }
@@ -560,8 +627,46 @@ export class CharacterVisual {
     if (mainhandItemId === this.mainhandItemId && offhandItemId === this.offhandItemId) return;
     this.mainhandItemId = mainhandItemId;
     this.offhandItemId = offhandItemId;
-    if (!this.def.weaponSlots?.length) return;
-    setHeldItems(this.model, this.def, [mainhandItemId, offhandItemId]);
+    this.reattachHeldWeapon();
+  }
+
+  /** Apply or clear a Season 1 Armory weapon-skin cosmetic: the skin's model
+   *  replaces the held weapon (all swap slots, or the hunter's fixed ranged
+   *  attach) and its rarity VFX ride the new payloads. Null restores the
+   *  equipped item's own model. */
+  setWeaponSkin(weaponSkinId: string | null): void {
+    if (weaponSkinId === this.weaponSkinId) return;
+    this.weaponSkinId = weaponSkinId;
+    this.reattachHeldWeapon();
+  }
+
+  private reattachHeldWeapon(): void {
+    if (!this.def.weaponSlots?.length && !this.weaponSkinId) return;
+    this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
+    const payloads = setHeldItems(
+      this.model,
+      this.def,
+      [this.mainhandItemId, this.offhandItemId],
+      this.weaponSkinId,
+    );
+    // Ranged skins take a root-relative orientation pin (position always rides
+    // the hand): a bow aims upright WHILE the shot one-shot plays (the string
+    // hand rolls a glued bow sideways mid-draw); a bow-slot gun carries muzzle
+    // forward OUTSIDE the shot (the hanging idle arm points it at the ground)
+    // and keeps the hand-tuned grip during the shouldered aim
+    // (applySkinOrientation each frame).
+    {
+      const mode = weaponSkinOrientPin(this.weaponSkinId);
+      this.orientPins = mode
+        ? payloads.map((payload) => ({
+            payload,
+            qGrip: payload.quaternion.clone(),
+            blend: 0,
+            duringShot: mode === 'aimDuringShot',
+          }))
+        : [];
+    }
     applyMaterials(
       this.model,
       this.def,
@@ -569,11 +674,30 @@ export class CharacterVisual {
       skinTexture(this.key, this.skinIndex),
       skinEmissiveTexture(this.key, this.skinIndex),
     );
+    // A VFX-tier skin's emissive derive mutates its payload materials in place,
+    // so give each payload exclusive clones BEFORE the caster snapshot: the
+    // shared tinted-material cache must never carry derived state (two players
+    // with one skin, or a rogue's two hands, would corrupt each other), and the
+    // ghost/stealth snapshot below must target the clones the rig restores.
+    if (this.weaponSkinVfxSpec()) {
+      for (const payload of payloads) {
+        payload.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map((m) => m.clone())
+            : mesh.material.clone();
+          mesh.userData.weaponSkinIsolated = true;
+          markOwnedWeaponSkinMaterials(mesh);
+        });
+      }
+    }
     // the model graph changed (weapon meshes added/removed): rebuild the caster
     // list and re-snapshot originals, then re-apply ghost/stealth overlays.
     this.originalMaterials.clear();
     this.rebuildCasters();
     this.applyVisualMaterials();
+    this.buildWeaponVfx(payloads);
     this.rebuildWeaponAura();
   }
 
@@ -624,13 +748,111 @@ export class CharacterVisual {
     });
   }
 
+  private weaponSkinVfxSpec() {
+    const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
+    return skin ? (WEAPON_VFX[skin.model] ?? null) : null;
+  }
+
+  /** Attach the skin's rarity VFX rig to each held payload (in-hand mode: no
+   *  backdrop dome, no ground pool; emissive + particles ride the weapon). */
+  private buildWeaponVfx(payloads: THREE.Object3D[]): void {
+    const skin = this.weaponSkinId ? WEAPON_SKINS[this.weaponSkinId] : null;
+    const spec = skin ? (WEAPON_VFX[skin.model] ?? null) : null;
+    if (!skin || !spec) return;
+    for (const payload of payloads) {
+      const handle = createWeaponVfx(payload, spec, { grounded: false });
+      handle.setBackdropVisible(false);
+      handle.setTuning(weaponVfxTuningFor(skin.model, spec.tier));
+      handle.setPixelScale(weaponVfxViewportHeight * this.weaponVfxSpriteScale);
+      // Tag the rig's own scene nodes: applyMaterials must never tint its
+      // ShaderMaterials and the shadow pass has no business with sprite shells.
+      handle.group.traverse((o) => {
+        o.userData.weaponVfxMesh = true;
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh) mesh.castShadow = false;
+      });
+      this.weaponVfx.push(handle);
+    }
+  }
+
+  /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
+   *  without an active skin; the renderer calls it once per entity per frame.
+   *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
+  updateWeaponVfx(dt: number): void {
+    this.applySkinOrientation(dt);
+    for (const handle of this.weaponVfx) handle.update(dt);
+  }
+
+  /** Blend pinned skin payloads between the authored grip glue and their
+   *  root-relative pin: a bow to BOW_AIM_QUAT while the shot one-shot plays, a
+   *  bow-slot gun to GUN_CARRY_QUAT everywhere BUT the shot (and never while
+   *  dead: a corpse's weapon just lies with the hand). Position always follows
+   *  the hand. No-op without pinned payloads. */
+  private applySkinOrientation(dt: number): void {
+    if (this.orientPins.length === 0) return;
+    const shot = this.currentIsOneShot && !this.currentOneShotIsEmote;
+    const step = dt / BOW_PIN_BLEND_S;
+    this.root.getWorldQuaternion(BOW_Q_ROOT);
+    for (const entry of this.orientPins) {
+      const parent = entry.payload.parent;
+      if (!parent) continue;
+      const engaged = !this.deadLock && (entry.duringShot ? shot : !shot);
+      entry.blend = Math.min(1, Math.max(0, entry.blend + (engaged ? step : -step)));
+      if (entry.blend === 0) {
+        entry.payload.quaternion.copy(entry.qGrip);
+        continue;
+      }
+      // pinned local = parentWorld^-1 * rootWorld * pin target
+      parent.getWorldQuaternion(BOW_Q_B).invert();
+      BOW_Q_TARGET.copy(BOW_Q_B)
+        .multiply(BOW_Q_ROOT)
+        .multiply(entry.duringShot ? BOW_AIM_QUAT : GUN_CARRY_QUAT);
+      entry.payload.quaternion.copy(entry.qGrip).slerp(BOW_Q_TARGET, entry.blend);
+    }
+  }
+
+  /** Re-scale VFX point sprites after a viewport/pixel-ratio change. */
+  setWeaponVfxPixelScale(heightPx: number): void {
+    for (const handle of this.weaponVfx) {
+      handle.setPixelScale(heightPx * this.weaponVfxSpriteScale);
+    }
+  }
+
+  /** Set the camera fov this visual renders under (preview rigs differ from the
+   *  world camera); re-scales any live VFX sprites to match. */
+  setWeaponVfxCameraFov(fovDeg: number): void {
+    this.weaponVfxSpriteScale = weaponVfxSpriteScaleForFov(fovDeg);
+  }
+
+  private disposeWeaponVfx(): void {
+    for (const handle of this.weaponVfx) handle.dispose();
+    this.weaponVfx.length = 0;
+  }
+
+  private disposeWeaponSkinMaterials(): void {
+    disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
+      this.ghostMaterials,
+      this.soulRendMaterials,
+    ]);
+  }
+
+  private disposeEffectMaterials(): void {
+    const materials = new Set<THREE.Material>([
+      ...this.ghostMaterials.values(),
+      ...this.soulRendMaterials.values(),
+    ]);
+    for (const material of materials) material.dispose();
+    this.ghostMaterials.clear();
+    this.soulRendMaterials.clear();
+  }
+
   /** Rebuild the shadow-caster list and original-material snapshot after the model
    *  graph changes (a weapon swap adds/removes bone-child meshes). */
   private rebuildCasters(): void {
     this.casters.length = 0;
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
+      if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
       if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
@@ -646,6 +868,9 @@ export class CharacterVisual {
       (mesh.material as THREE.Material).dispose();
     }
     this.weaponAuraMeshes.length = 0;
+    this.disposeWeaponVfx();
+    this.disposeWeaponSkinMaterials();
+    this.disposeEffectMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();

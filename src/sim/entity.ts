@@ -1,5 +1,6 @@
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
+import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
 import { pvpFractionsFromRatings } from './pvp';
@@ -179,12 +180,15 @@ function baseEntity(id: number, pos: Vec3): Entity {
     dead: false,
     ghost: false,
     corpsePos: null,
+    corpseInstanceId: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
     offhandItemId: null,
+    weaponSkinLoadout: {},
+    weaponSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',
@@ -494,6 +498,10 @@ export function recalcPlayerStats(
       ITEMS[equipment.offhand]?.kind === 'held_offhand')
       ? equipment.offhand
       : null;
+  // Resolve the active weapon-skin cosmetic against the (possibly changed)
+  // mainhand: swapping to a different weapon type drops a non-matching skin and
+  // re-shows the matching one automatically. Cosmetic only; never feeds stats.
+  e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.

@@ -117,7 +117,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.spectateBody':
     'En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.',
   'hudChrome.keybinds.valecup': 'Dalcupen',
-  'hudChrome.mobile.dailyRewards': 'Belöningar',
+  'hudChrome.mobile.dailyRewards': 'Butik',
   'hudChrome.perf.labels.predLead': 'Prediktionsförsprång',
   'hudChrome.townFocus.budgetLabel': 'Poäng kvar: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Minska fokus på {component}',
@@ -6968,4 +6968,351 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.',
   'guide.worldPage.worldBossTitle': 'När berget vaknar: världsbossen',
+  'entities.abilities.chain_heal.description':
+    'Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)',
+  'entities.abilities.chain_heal.name': 'Kedjeläkning',
+  'entities.abilities.counter_shot.description':
+    'Ett snabbt skott som avbryter målets besvärjelse och låser den magiskolan i 4 sek.',
+  'entities.abilities.counter_shot.name': 'Dämpande Skott',
+  'entities.abilities.counterspell.description':
+    'Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 6 sek.',
+  'entities.abilities.counterspell.name': 'Besvärjelsebrott',
+  'entities.abilities.holy_taunt.description':
+    'Hånar målet: ditt hot stiger till samma nivå som dess mest hatade fiendes, och målet tvingas attackera dig i 3 sek.',
+  'entities.abilities.holy_taunt.name': 'Helig Sporre',
+  'entities.abilities.kick.description':
+    'Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 4 sek.',
+  'entities.abilities.kick.name': 'Spark',
+  'entities.abilities.pummel.description':
+    'Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 4 sek.',
+  'entities.abilities.pummel.name': 'Käkkross',
+  'entities.abilities.rebuke.description':
+    'Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 4 sek.',
+  'entities.abilities.rebuke.name': 'Förebråelse',
+  'entities.abilities.skull_bash.description':
+    'En framåtstötande skallning som avbryter målets besvärjelse och låser den magiskolan i 4 sek.',
+  'entities.abilities.skull_bash.name': 'Skallning',
+  'entities.abilities.spell_lock.description':
+    'Tystar målet mitt i en besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 5 sek.',
+  'entities.abilities.spell_lock.name': 'Munkavle',
+  'entities.items.ashen_focus_ring.name': 'Askgrå Fokusring',
+  'entities.items.ashstalker_cowl.name': 'Asksmygarens Huva',
+  'entities.items.ashstalker_grips.name': 'Asksmygarens Grepp',
+  'entities.items.ashstalker_harness.name': 'Asksmygarens Sele',
+  'entities.items.ashstalker_legguards.name': 'Asksmygarens Benskydd',
+  'entities.items.ashstalker_shoulderguards.name': 'Asksmygarens Axelskydd',
+  'entities.items.ashstalker_treads.name': 'Asksmygarens Stövlar',
+  'entities.items.ashstalker_waistband.name': 'Asksmygarens Midjebälte',
+  'entities.items.cinder_sigil_pendant.name': 'Glödsigillets Hängsmycke',
+  'entities.items.cinderweave_cord.name': 'Glödvävt Snöre',
+  'entities.items.cinderweave_cowl.name': 'Glödvävd Huva',
+  'entities.items.cinderweave_handwraps.name': 'Glödvävda Handlindor',
+  'entities.items.cinderweave_legwraps.name': 'Glödvävda Benlindor',
+  'entities.items.cinderweave_mantle.name': 'Glödvävd Axelmantel',
+  'entities.items.cinderweave_raiment.name': 'Glödvävd Skrud',
+  'entities.items.cinderweave_slippers.name': 'Glödvävda Skor',
+  'entities.items.emberglass_warstaff.name': 'Glödglas-Krigsstav',
+  'entities.items.final_argument_greatblade.name': 'Slutargumentets Storklinga',
+  'entities.items.final_oath_medallion.name': 'Den Sista Edens Medaljong',
+  'entities.items.first_blood_razor.name': 'Förstablodskniv',
+  'entities.items.fleetblood_band.name': 'Snabbblodsring',
+  'entities.items.furyforged_gauntlets.name': 'Raserismidda Stridshandskar',
+  'entities.items.furyforged_girdle.name': 'Raserismidd Gördel',
+  'entities.items.furyforged_legguards.name': 'Raserismidda Benskydd',
+  'entities.items.furyforged_sabatons.name': 'Raserismidda Plåtstövlar',
+  'entities.items.furyforged_warhelm.name': 'Raserismidd Krigshjälm',
+  'entities.items.furyforged_warplate.name': 'Raserismidd Krigsplåt',
+  'entities.items.furyforged_warspaulders.name': 'Raserismidda Krigsaxlar',
+  'entities.items.iron_vow_band.name': 'Järnedens Ring',
+  'entities.items.last_step_signet.name': 'Sista Stegets Signetring',
+  'entities.items.razorwind_torque.name': 'Eggvindens Halsring',
+  'entities.items.spellbreakers_seal.name': 'Besvärjelsebrytarens Sigill',
+  'entities.items.stormbound_crown.name': 'Stormbunden Krona',
+  'entities.items.stormbound_greaves.name': 'Stormbundna Benskenor',
+  'entities.items.stormbound_handguards.name': 'Stormbundna Handskydd',
+  'entities.items.stormbound_hauberk.name': 'Stormbunden Ringbrynja',
+  'entities.items.stormbound_legmail.name': 'Stormbundna Benbrynjor',
+  'entities.items.stormbound_spaulders.name': 'Stormbundna Axelplåtar',
+  'entities.items.stormbound_waistguard.name': 'Stormbundet Midjeskydd',
+  'entities.items.unbroken_circle.name': 'Den Obrutna Cirkeln',
+  'entities.npcs.fury.greeting': 'Sanden minns varje seger. Spendera din ära väl.',
+  'entities.npcs.fury.name': 'RASERI',
+  'entities.npcs.fury.title': 'Hederskvartermästare',
+  'hudChrome.claudium.amountLabel': 'Belopp',
+  'hudChrome.claudium.balanceLabel': 'Saldo',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Köp',
+  'hudChrome.claudium.buyTitle': 'Köp Claudium',
+  'hudChrome.claudium.buyUnavailable': 'Det går inte att genomföra köp just nu.',
+  'hudChrome.claudium.checkoutClose': 'Stäng betalningsfönstret',
+  'hudChrome.claudium.checkoutFailed': 'Det gick inte att ladda kassan. Försök igen.',
+  'hudChrome.claudium.checkoutLoading': 'Laddar kassan...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'Transaktionen skickades men Claudium har inte krediterats ännu. Försök snart igen.',
+  'hudChrome.claudium.checkoutPending':
+    'Transaktion pågår. Bekräfta i din plånbok och håll denna panel öppen.',
+  'hudChrome.claudium.checkoutPendingButton': 'Bearbetar',
+  'hudChrome.claudium.checkoutTitle': 'Slutför köp',
+  'hudChrome.claudium.checkoutUnavailable': 'Det Claudium-köpet är inte tillgängligt just nu.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Anslut en Solana-plånbok innan du köper Claudium med krypto.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Denna plånbok kan inte signera och skicka Solana-transaktioner.',
+  'hudChrome.claudium.close': 'Stäng Claudium',
+  'hudChrome.claudium.disclosure':
+    'Claudium är en virtuell valuta som bara går åt ett håll: köp den för pengar och använd den till kosmetika. Den kan inte växlas in, överföras eller betalas ut.',
+  'hudChrome.claudium.hideAmounts': 'Dölj extra Claudium-belopp',
+  'hudChrome.claudium.kindCosmetic': 'Kosmetisk',
+  'hudChrome.claudium.kindItem': 'Föremål',
+  'hudChrome.claudium.kindSkin': 'Skin',
+  'hudChrome.claudium.loading': 'Laddar Claudium...',
+  'hudChrome.claudium.open': 'Öppna Claudium',
+  'hudChrome.claudium.railLabel': 'Betalningsmetod',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC är avstängt.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Kort',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': '20% rabatt',
+  'hudChrome.claudium.railWocUnavailable': 'WOC-priser är inte tillgängliga just nu.',
+  'hudChrome.claudium.showAmounts': 'Visa alla Claudium-belopp',
+  'hudChrome.claudium.skuRow': '{usd} för {claudium} Claudium',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Lös in',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Inga kosmetika är tillgängliga just nu.',
+  'hudChrome.claudium.storeTitle': 'Kosmetisk butik',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Claudium-butiken är inte tillgänglig just nu. Ditt saldo och dina köp påverkas inte. Försök igen om en stund.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Skörda: samla hantverksmaterial från liket (skinn, huggtand, silke och liknande delar), separat från dess byte. Vem som helst kan skörda, men varje lik kan bara skördas av en spelare.',
+  'hudChrome.deeds.openBookHint': 'Öppna Bedrifternas bok',
+  'hudChrome.loot.takeAllTooltip': 'Ta allt: samla alla mynt och föremål i bytesfönstret.',
+  'hudChrome.statInfo.desc.warfare':
+    'Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Krigföring',
+  'hudChrome.statInfo.warfareValue': '+{increase}% tillfogad / -{reduction}% mottagen',
+  'hudChrome.tutorial.nextTipMap': 'Kolla världskartan ({key}) för att se var uppdragen väntar.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Öppna din uppdragslogg ({key}) för att hitta nästa uppgift i närheten.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Öppna Socialt ({key}) för att hitta en grupp för tuffare slagsmål.',
+  'hudChrome.tutorial.nextTipsTitle': 'Vart härnäst?',
+  'hudChrome.tutorial.slayTargetHint':
+    'Ny i strid? Tryck på {targetKey} eller klicka på en varg för att välja den som mål. Använd sedan en förmåga på handlingsraden för att attackera den.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Ny i strid? Tryck på en varg för att välja den som mål och tryck sedan på en förmåga på handlingsraden för att attackera den.',
+  'hudChrome.warfare.balance': 'Heder: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} Heder',
+  'hudChrome.warfare.honorFloat': '+{amount} Heder',
+  'hudChrome.warfare.honorGain': 'Du får {amount} Heder ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Inte tillräckligt med heder.',
+  'hudChrome.warfare.reasons.arenaWin': 'Arenaseger',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta avklarad',
+  'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-nedtagning',
+  'hudChrome.warfare.reasons.fiestaWin': 'Fiesta-seger',
+  'hudChrome.wocStore.applied': 'Aktivt',
+  'hudChrome.wocStore.apply': 'Använd skin',
+  'hudChrome.wocStore.armoryBody':
+    'Begränsade vapenskins från säsong 1-vapenhuset. De gäller för hela kontot, är helt kosmetiska och visas för alla i din omgivning.',
+  'hudChrome.wocStore.armoryEyebrow': 'Säsong 1',
+  'hudChrome.wocStore.armoryTitle': 'Vapenhuset',
+  'hudChrome.wocStore.badge.flagship': 'Flaggskepp',
+  'hudChrome.wocStore.badge.hero': 'Hjälte',
+  'hudChrome.wocStore.balance': 'Claudium-saldo',
+  'hudChrome.wocStore.buyClaudium': 'Köp Claudium',
+  'hudChrome.wocStore.buySkin': 'Köp skin',
+  'hudChrome.wocStore.cancel': 'Avbryt',
+  'hudChrome.wocStore.close': 'Stäng WOC-butiken',
+  'hudChrome.wocStore.collectionLine': '{collection}-samlingen',
+  'hudChrome.wocStore.collections.emberwrought': 'Glödsmidd',
+  'hudChrome.wocStore.collections.fallen_star': 'Fallen stjärna',
+  'hudChrome.wocStore.collections.guildmark': 'Gillesmärke',
+  'hudChrome.wocStore.collections.hoarfrost': 'Rimfrost',
+  'hudChrome.wocStore.confirmBody': 'Köpa {item} för {cost} Claudium?',
+  'hudChrome.wocStore.confirmPurchase': 'Köp',
+  'hudChrome.wocStore.confirmTitle': 'Bekräfta köp av kosmetika',
+  'hudChrome.wocStore.detach': 'Ta bort skin',
+  'hudChrome.wocStore.equipHint': 'Utrusta ett vapen av typen {type} för att använda detta skin.',
+  'hudChrome.wocStore.error': 'WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.',
+  'hudChrome.wocStore.inspectAria': 'Inspektera {item}',
+  'hudChrome.wocStore.loading': 'Laddar WOC-butiken...',
+  'hudChrome.wocStore.lore': 'Bakgrundshistoria',
+  'hudChrome.wocStore.needMoreBody': 'Du behöver {shortfall} mer Claudium för att köpa {item}.',
+  'hudChrome.wocStore.needMoreTitle': 'Mer Claudium krävs',
+  'hudChrome.wocStore.owned': 'I din ägo',
+  'hudChrome.wocStore.priceChanged':
+    'Priset ändrades innan köpet slutfördes. Granska det uppdaterade priset och bekräfta igen.',
+  'hudChrome.wocStore.rarity.epic': 'Episk',
+  'hudChrome.wocStore.rarity.legendary': 'Legendarisk',
+  'hudChrome.wocStore.rarity.rare': 'Sällsynt',
+  'hudChrome.wocStore.rarity.uncommon': 'Ovanlig',
+  'hudChrome.wocStore.rewardsTab': 'Dagliga belöningar',
+  'hudChrome.wocStore.scene.day': 'Dag',
+  'hudChrome.wocStore.scene.dusk': 'Skymning',
+  'hudChrome.wocStore.scene.night': 'Natt',
+  'hudChrome.wocStore.sceneLabel': 'Förhandsvisningens ljus',
+  'hudChrome.wocStore.seasonOne': 'Säsong 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Kort svärtat blad ådrat med glödande glöd-orange, en liten pyrande pärla i stift, aska och gnista.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'En bakvägsklinga med bergets eld insmugglad in i sin klacksten, en rustningsmans tysta skämt: till och med en pungväska kan bära en glöd av det första smidet. Svärtad, ådrad med orange, alltid en nyans för varm i slidan. Rita den i mörkret under Highwatch och glöden tänder din hand precis tillräckligt för att hitta luckan i en mans vakt.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Askgnistkniv',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'En flisa av en fallen stjärna, glödande kant av smält guld på kosmossvart metall, ett ljust stjärnskott som kretsar kring kulan, ett tunt norrskensspår.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Den minsta biten av stjärnan Aldric hämtades från kratern, och enligt vissa beräkningar den farligaste. En enda flisa av det där andra världsliga hjärtat, dess smälta guldkant som rider på kosmossvart metall, en ensam stjärna som cirkulerar runt klotet som en måne som förlorade sin värld. Den väger nästan ingenting och delar nästan vad som helst. Liten nog att gömma sig, tillräckligt ljus för att hitta i mörkret av sitt eget ljus.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Den Fallna Stjärnans Huggtand',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Bits av polerat stål, mässingslock och långets på lackat askskaft, snyggt omslag, tillverkarstämpel.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    'En stämplad yxa är ett skryt du kan hålla. Mässingsmössan och langets är halvt rustning, hälften signatur: de hindrar skaftet från att splittras och de fångar krogljuset så att alla vet att du köpte Armorer Hodes verk, inte en milis-hand-me-down. "Om det skär, säljer jag det", säger Highwatch-smeden. Den här skär.',
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Mässingshätteyxa',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Lövträstav toppad med en svarvad mässingskrona, mässingshylsa, färgat läderband.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Svängd av kryddat lövträ och krönt med en mässingsfinal som Eastbrook-smederna gjutna i hundra men perfekt av en. Det tillhör den sortens resenär som vill bli tagen på allvar vid både Fenbridges gate och Highwatchs mur. En käpp som aldrig riktigt har behövt gå; det färgade bandet matchar en kappa du kan gissa priset på.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Mässingskronans Vandringsstav',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Blad av mörkt smidd stål, fylligare fylld med glödande glödorange runor, värmesprickor, en pyrande pärla i skyddet.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    'Det första bladet släckte inte i vatten utan i Blessed Embers krattade från Stormcrag, kolen som Highwatch-smederna svär "bränna blått och rent, eftersom berget minns sin gamla ed." Banken in i den fylligare, den glöder glödorange och kommer inte att dö; runorna håller sig varma till bar hand på väggens kallaste natt. Cinderbrand behöver aldrig belysning. Den vägrar helt enkelt gå ut.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Glödbrand',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Armborst i svärtat stål, glödorange glöd som sipprar från sprickor i stöttan, ett pyrande kol i rorkulten.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Det märkligaste av det glödsmidda: bergets eld strömmade in i en maskin. Apelsin sipprar från sprickor i rodret, och ett rykande kol i rorkulten hindrar snöret från att någonsin stelna i Thornpeaks kyla eller Mirefens fukt. Dess bultar lämnar spåret redan varmt och landar varmare. En jägares svar på en mur där fienden inte heller känner kylan.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Glödlås',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'En kretsande klunga av gyllene stjärnskärvor runt en kärna av smält guld, konstellationsetsad kosmossvart skaft, norrskensband som slingrar sig uppåt.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    'Ett skaft av stjärnmetall krönt med en kärna av smält guld och en ring av gyllene skärvor som marscherar runt den i långsam, oändlig omloppsbana: ett litet kosmos, etsat med konstellationer som inte matchar någon himmel över Thornpeak. Aurora slingrar sig upp på längden som rök som glömt att stiga. De som bar det hävdade att de kunde känna tomrummet som vänder sig genom det, på det sätt som Ysoleis bara "dricker månskenet": tålmodig och kall, och ser tillbaka.',
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch, Den Oändliga Tomhetens Spira',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Yxa av svärtat järn med glödorange sprickor som glöder genom bettet, en kolpärla, värmebitar.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Armorer Hode arbetade med ett levande kol av bergseld i hjärtat av biten, så kanten svalnar aldrig riktigt mellan slagen. Sprickorna andas orange på nedgången, som om strejken väcker något som det första smidet lämnade och sov i järnet. De säger att en Stormcrag-elemental gav upp glöden för det; de säger väldigt många saker på Highwatch när det blåser.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Glödbett',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Infångad smält-guld döende stjärna inklädd i kretsande gnistor, kosmossvart skaft etsat med glödande konstellationer.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Inte den fallna stjärnan i sig utan den sista fläcken av en döende: en enda glöd av en sol i smält guld som redan slocknat, insvept i gnistor som var dess slutliga ljus. Dess kosmossvarta skaft är etsat med konstellationerna som såg den dö. Mirefen-torparna säger att den ger en önskan till den som håller den i sann skymning; de säger också att varje själ som höll den önskade sig mer tid och att den drunknade månen inte gav någon av dem någon.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Glödönskan, Den Döende Solens Gnista',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Svartmetalltrollstav spetsad med glödande glödkol i järnklor, hårfäste värmesprickor, varmt inre ljus.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'Trollstaven som döpte betyget. När en Highwatch pansarmakare först satte ett kol av bergseld i järnklor och fick det att svara på en dödlig hand, slutade till och med Prästs of the Light att kalla det kätteri och började kalla det användbart. Varm, tålmodig och tyst farlig: glöden i spetsen har bränt, obruten, sedan innan dess ägare drog andan.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Glödsmidd Trollstav',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Komiskt överdimensionerad stjärnkanon: en kosmossvart pipa etsat med glödande gyllene konstellationer, en utsvängd klockmunkorg med ett kometskal av smält guld som sitter inuti, mässingsbeslag, en axelstock av trä.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    'Smederna som bearbetade den fallna stjärnan gjorde sex reliker av den och hade fortfarande en tunnas stjärnmetall över, och då hade lärlingarna åsikter. Det som kom från städet är antingen rikets första pistol eller dess minsta belägringsmotor: en axelkanon som inte så mycket tappar ett skott som begär en andra stjärna, riktad. Broder Aldric vägrade att välsigna den och resonerade att allt så högt redan har märkts av himlen. Jägares älskar det. Inget downrange någonsin har.',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, Den Andra Fallande Stjärnan',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'En enda spik av glödande cyan glaciäris, rimfrost som blommar från en silverkrage, svag kall dimma.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    'En spik av glödande glaciäris, som sägs vara bruten från den djupa tjärnen nedanför Sanctum, där bergets kyla har tänder. Rimfrost blommar oändligt från sin silverkrage och smälter aldrig, varken av eld eller vid sommar. Magikers håller det nära för kylan det lånar deras arbete, och håller det långt på nätterna som det verkar luta sig mot Nythraxis krypta, och lyssna.',
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Evigvinterns Skärva',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Lackad valnötsbåge, lemspetsar i mässing, vaxat linnesnöre, en guildstämpel på stigaren.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Det närmaste riket har ett skrå är en fletchers stämpel på risern, ett löfte om vad som finns inuti, hur en vinodlare förseglar ett fat. Lackerad valnöt, mässing vid benspetsarna, ett vaxat linnesnöre som inte fransar sig genom ett Mirefen-regn. Varje led argumenterar för priset. Dra den en gång förbi änkesnåret och argumentet vinner.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Pilmakarskråets Båge',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Järnskodd stav krönt med en burad glödande glödkärna, glödrunor uppför skaftet, stigande värmeskimmer.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Ett levande kol av bergseld i bur i järn vid sin krona. Loremaster Caddis kallar det bevis på att elden från det första smidet kan bindas till att tjäna, inte bara för att försegla. Värmeskimmer stiger ur den i ett tunt, ändlöst band; en magiker som bär en vill aldrig ha en smedja eller en vakteld. Glöden, viskar de, drogs från glödvingen Voskars egna andetag, och den har inte svalnat sedan dess.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Smedjehjärtats Stav',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Oväldigt tunn dolk av klarblå is, en glödande cyan ven i mitten, nålfrostkristaller, rimfrostfäste.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Tunn som ett uppehållet andetag och dubbelt så kall: en splinta av Thornpeak-glaciären finslipad till en enda glödande ven, så angelägen att såret fryses till innan blodet kommer ihåg att rinna. Dess namn är lånat från den gravkyla som de döda bär ner från topparna. Den behöver aldrig skärpas; isen mattas inte, konstaterar Loremaster Caddis torrt, den bara väntar.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Rimnål',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Huvud av genomskinlig blå glaciär-is, sprucken inre glödande cyan, frostkristaller som strular, en skaft släpande kall ånga.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Huggen från Thornpeak-glaciärens blåa hjärta, där två århundraden av is har pressat kylan tills den lyser av sig själv. Den släpar efter ånga även i vila, och sprickan när den landar är en spricka som öppnar sig under Smygjagaer Ridge. Highwatch ger sina fall till isen där uppe; så det här är ett vapen som är tänkt att hålla tjällossningen, och vad töningen än skulle väcka, på avstånd.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Glaciärklyvare',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Blånat stålblad, korsskydd för fisksvans i brons, krickfärgat lädergrepp, liten stämplad guild sigil.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Där smidesbladet är anonymt är detta signerat. En rustningsman förtjänar rätten att sänka sitt märke i ricasson först när världsmarknadens handlare går i god för sitt stål och Smith Haldrens märke går i god för. Blånad mot Vales fuktiga, balanserad till ett hårstrå. Du betalar för stämpeln lika mycket som svärdet, och det är värt det.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Gillesmärkt Väpnarsvärd',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Smal dirk i härdat stål, bronsskydd och mutter, mörkgrönt snörgrepp, stämplad sigil.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Vilken gjord man bär när svärdet stannar hemma: smal, tempererad, stämplad med samma märke som intygar ett helt blad, bärs på bältet som en signet med kant. Underskattat för alla utom de som kan läsa en rustningsmans bevis. Quartermaster Bree har en låda med dem på Highwatch för officerare som har förtjänat murens respekt.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Gillesmärkt Dirk',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Försilvrad stav krönt med en flytande, långsamt roterande skärva av glödande cyan is, utstrålande kristaller och kall ånga.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'Personalen på klockan som aldrig sover på Highwatchs vägg. Dess krona är en skärva av cyan tjärris som flyter fri från silvret och vänder sig, sakta, av sig själv: alltid, svär vakten, mot kylan som samlas under topparna. Att bära Vigil är att stå tvåhundra års vakt på en enda natt, och lova att inte titta bort.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Rimfrostvaka',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Böjt blad av blek glaciäris, taggiga rimkristaller längs ryggraden, en glödande cyan frusen kärna i den fylligare, istappars tvärskyddet.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    'Flaggskeppet för den frysta sorten, och den bit som varje samlare når först. Ice Fang ristades, inte smidd, från en huggtand på glaciären som täcker Thornpeak ovanför Highwatch, dess cyankärna brinner kallt som ljuset från Glimmermere. Den rimmar själva luften den skär. Väggvakten svär att en soldat bar den natten när de höga snön höll Wyrmcult tillbaka och "köpte muren en vinter."',
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Ishuggtand',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Smal djupröd lackerad stav, två polerade mässingsband, liten rundad mässingsspets.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Djupröd lack i sju tålmodiga rockar, bandade två gånger i polerad mässing: den typ av trollstav som en häckmagare köper från världsmarknaden när de väl har börjat ladda äkta mynt och vill titta på det. Den kanaliserar ljuset inte bättre än en björkpinne. Men det lyser magnifikt över köpmannens disk, och hälften av mindre magi har alltid trotts.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Lackerad Stav',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Meteorisk stjärnmetall, smält guldkärna längs med rorkulten, kosmossvarta lemmar etsade med konstellationer, en knackad bult av ren sjöstjärna.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    'Smidd av rå, meteorisk stjärnmetall medan Mirefen-kratern fortfarande glödde, skräp "för varmt att hantera", hamrade in i lemmar av kosmossvart etsade med konstellationer, en kärna av smält guld låg längs med rorkulten. Den knackar ingen bult utan frammanar en: ett skaft av sjöstjärna, löst som en dom och landar som slutet på en. När Highwatch fruktade att ens Nythraxis dödlösa krona kanske inte var det värsta under topparna, var det här vapnet de ville ha på väggen. Sikta det väl.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name': 'Meteorlås, Himlens Sista Dom',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'En klunga av taggiga iskristaller runt en glödande cyankärna, rimfrost kryper nerför en försilvrad skaft.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    'Inte huggen men odlad: Thornpeak-isen slingrade sig runt en kall cyankärna tills den stelnade lika hårt som Hodes bästa stål. Rimfrosten kryper nerför den silverfärgade skaftet mot handen och kommer aldrig riktigt fram. Där det slår till fryser vattnet; där den vilar bleker marken. Topparnas gravkyla, gjorda tillräckligt små för att svänga mot sakerna som klättrar på väggen.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Rimkross',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Huvudet som ett sönderrivet stycke natthimmel, sprickor i smält guld och etsningar av stjärnbild, skärvor av stjärnljus som svävar, ett norrskensskimmer som svävar längs kanten.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Slås från kraterns kant, där den fallna stjärnan slet ut himlens egen reflektion ur Mirefen och lämnade ett sår som fortfarande ångar. Huvudet ser ut som en bit sönderriven natt: sprickor i smält guld, konstellationer som ingen forskare på Highwatch kan nämna, ett norrsken som blöder från kanten med varje sväng. Broder Aldric välsignade den och ville inte röra den. Att lyfta det är att hålla hålet himlen kvar.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Himmelsrivare, Firmamentets Sår',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Mörka järnflänsar som lyser glödorange längs sina inre sprickor, en pärla med smält kärna i huvudet.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    "En mace som bär sin egen härd: en sten med smält kärna avhuggen från Sanctum-sälen som var 'smidd med bergseld', som glödde i huvudet. Flänsarna förblir varma vid beröring och varmare där de landar; en Highwatch-sergeant svär att ett slag från den lämnar ett blåmärke som lyser svagt till morgonen. Bergets eld gjorde äntligen till att bryta i stället för att täta.",
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Glödfall',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Storsvärd smidd av en fallen stjärna, kärna av smält guld som delar bladet, kosmossvart stål kantat i stjärnljus, gyllene skärvor som kretsar kring skyddet, norrskensband.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    "När stjärnan föll från den västra himlen och 'brast som en smedja' bortom Änkesnåret, drog broder Aldric sitt fortfarande glödande hjärta från Mirefen-kratern och bad rikets smeder att arbeta 'en sak som inte tillhör denna värld'. De gjorde ett stort svärd av det: Solheim. Dess smälta guldkärna delar det kosmossvarta bladet som en gryning som spricker en natthimmel, och skärvor av stjärnmetall kretsar runt vakten på vägar utan handfast. Endast en har någonsin förfalskats. Det blir ingen annan.",
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, gryningens sista ljus',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Infångad stjärnkärna av smält guld omgiven av kretsande fragment, kosmossvarta flänsar med stjärnljus, norrsken som rinner ut från sömmarna.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    'En stjärnkärna fångade ögonblicket innan den dog, omringad av skräpet som föll med den, frusna en tum från glömskan. Dess kosmossvarta flänsar löper med instängt stjärnljus, och norrsken rinner ut från sömmarna när den höjs. Ljusets gamla Präst kallade en fallande stjärna för en dom, en dom avkunnad från ovan att ingen sköld var menad att stoppa, och döpte detta efter den som kom ner på Mirefen.',
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Stjärnfall, himlens dom',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Sexflänsad härdat blå stålhuvud, mässingskrage och axel, vinrött lädergrepp.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Sex flänsar av blånat, härdat stål, var och en slipad för att öppna ett rodret, täckta i mässing och lindade i vinrött läder. Rikets pansarmän tillverkar inte fula vapen även när arbetet är brutalt. Den här beställdes genom världsmarknaden, inte drogs från ett ställ; någonstans finns det en reskontra med en stolt köpares namn och summan han betalade Hode för det.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Härdad Flänsklubba',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Försilvrat stål och blå-is båge, en glödande cyan frusen kärna i stigaren, en nockad pil av solid is, kall ånga.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    'En båge av försilvrat stål och Thornpeak-is, dess stigare upplyst av en kall cyan kärna som fryser pilen till snöret. Det knackar ett schakt av fast glaciär-is som reformerar varje dragning; bågskytten bär inget koger på väggen, bara kylan. Highwatch höll Smygjagaer Ridge genom en belägring med en liknande: en enda bågeskytt, säger de, och en vinter med pilar som alltid redan fanns där.',
+  'hudChrome.wocStore.skins.winterbite.name': 'Vinterbett',
+  'hudChrome.wocStore.storeTab': 'Butik',
+  'hudChrome.wocStore.tabsLabel': 'Delar av WOC-butiken',
+  'hudChrome.wocStore.title': 'WOC-butik',
+  'hudChrome.wocStore.tryOn': 'Prova',
+  'hudChrome.wocStore.unavailable': 'Inte tillgänglig',
+  'hudChrome.wocStore.viewModeLabel': 'Förhandsgranskningsläge',
+  'hudChrome.wocStore.weaponOnly': 'Endast vapen',
+  'hudChrome.wocStore.wtype.axe': 'Yxa',
+  'hudChrome.wocStore.wtype.bow': 'Båge',
+  'hudChrome.wocStore.wtype.crossbow': 'Armborst',
+  'hudChrome.wocStore.wtype.dagger': 'Dolk',
+  'hudChrome.wocStore.wtype.mace': 'Stridsklubba',
+  'hudChrome.wocStore.wtype.staff': 'Stav',
+  'hudChrome.wocStore.wtype.sword': 'Svärd',
+  'hudChrome.wocStore.wtype.wand': 'Trollstav',
 };

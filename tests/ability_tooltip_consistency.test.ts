@@ -49,6 +49,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   rallying_cry: [5],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
+  holy_taunt: [3],
   growl: [3],
   // "attack power +8 plus 2 per level": the cat-form AP constants in
   // recalcPlayerStats (entity.ts), not effect fields.

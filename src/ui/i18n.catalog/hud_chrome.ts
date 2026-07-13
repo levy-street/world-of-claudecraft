@@ -7,6 +7,8 @@
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
+import { armoryCollectionStrings, armorySkinStrings } from './armory';
+
 export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
@@ -110,6 +112,122 @@ export const hudChromeStrings = {
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
     },
+  },
+  wocStore: {
+    title: 'WOC Store',
+    close: 'Close WOC Store',
+    tabsLabel: 'WOC Store sections',
+    storeTab: 'Store',
+    rewardsTab: 'Daily Rewards',
+    loading: 'Loading WOC Store...',
+    error: 'The WOC Store is unavailable right now. Please try again shortly.',
+    balance: 'Claudium Balance',
+    buyClaudium: 'Purchase Claudium',
+    owned: 'Owned',
+    needMoreTitle: 'More Claudium Required',
+    needMoreBody: 'You need {shortfall} more Claudium to purchase {item}.',
+    cancel: 'Cancel',
+    confirmTitle: 'Confirm Cosmetic Purchase',
+    confirmBody: 'Purchase {item} for {cost} Claudium?',
+    confirmPurchase: 'Purchase',
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Season 1 Armory (weapon skins). English copy comes from the dedicated
+    // Armory i18n catalog; the sim registry remains mechanical and locale-free.
+    armoryEyebrow: 'Season 1',
+    armoryTitle: 'The Armory',
+    armoryBody:
+      'Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.',
+    collectionLine: '{collection} Collection',
+    collections: armoryCollectionStrings,
+    skins: armorySkinStrings,
+    seasonOne: 'Season 1',
+    rarity: {
+      uncommon: 'Uncommon',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary',
+    },
+    wtype: {
+      sword: 'Sword',
+      axe: 'Axe',
+      mace: 'Mace',
+      dagger: 'Dagger',
+      staff: 'Staff',
+      wand: 'Wand',
+      bow: 'Bow',
+      crossbow: 'Crossbow',
+    },
+    badge: {
+      flagship: 'Flagship',
+      hero: 'Hero',
+    },
+    inspectAria: 'Inspect {item}',
+    viewModeLabel: 'Preview mode',
+    tryOn: 'Try it on',
+    weaponOnly: 'Weapon only',
+    sceneLabel: 'Scene lighting',
+    scene: {
+      day: 'Day',
+      dusk: 'Dusk',
+      night: 'Night',
+    },
+    lore: 'Lore',
+    buySkin: 'Purchase Skin',
+    unavailable: 'Unavailable',
+    applied: 'Applied',
+    apply: 'Apply Skin',
+    detach: 'Detach Skin',
+    equipHint: 'Equip a {type} to apply this skin.',
+  },
+  // CLAUDIUM: a server-authoritative soft currency. The game renders only what the
+  // economy service returns (balance, SKU credits, prices, store costs); it
+  // computes nothing. One-way: buy with money, spend on cosmetics, never cashes out.
+  claudium: {
+    title: 'Claudium',
+    open: 'Open Claudium',
+    close: 'Close Claudium',
+    loading: 'Loading Claudium...',
+    balanceLabel: 'Balance',
+    balanceUnit: '{amount} Claudium',
+    solBalance: 'SOL: {amount}',
+    wocBalance: 'WOC: {amount}',
+    unavailable:
+      'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
+    disclosure:
+      'Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.',
+    buyTitle: 'Buy Claudium',
+    railLabel: 'Payment method',
+    railStripe: 'Card',
+    railSol: 'SOL',
+    railWoc: 'WOC',
+    railWocDiscount: '20% off',
+    railWocUnavailable: 'WOC pricing is unavailable right now.',
+    railNativeUnavailable: 'SOL/WOC off.',
+    amountLabel: 'Amount',
+    showAmounts: 'Show all Claudium amounts',
+    hideAmounts: 'Hide extra Claudium amounts',
+    skuRow: '{usd} for {claudium} Claudium',
+    buyButton: 'Buy',
+    buyUnavailable: 'Purchasing is unavailable right now.',
+    storeTitle: 'Cosmetic Store',
+    storeEmpty: 'No cosmetics are available right now.',
+    storeCost: '{amount} Claudium',
+    spendButton: 'Redeem',
+    kindCosmetic: 'Cosmetic',
+    kindSkin: 'Skin',
+    kindItem: 'Item',
+    checkoutTitle: 'Complete purchase',
+    checkoutClose: 'Close checkout',
+    checkoutLoading: 'Loading checkout...',
+    checkoutPending: 'Transaction in progress. Confirm in your wallet and keep this panel open.',
+    checkoutPendingButton: 'Processing',
+    checkoutFailed: 'Checkout could not be loaded. Please try again.',
+    checkoutUnavailable: 'That Claudium purchase is not available right now.',
+    checkoutWalletRequired: 'Connect a Solana wallet before buying Claudium with crypto.',
+    checkoutWalletUnsupported: 'This wallet cannot sign and send Solana transactions.',
+    checkoutNotSettled:
+      'The transaction was sent but Claudium was not credited yet. Please try again shortly.',
   },
   theme: {
     preset: 'UI Theme',
@@ -250,7 +368,7 @@ export const hudChromeStrings = {
   mobile: {
     jump: 'Jump',
     leaderboard: 'Ranks',
-    dailyRewards: 'Rewards',
+    dailyRewards: 'Store',
     deeds: 'Deeds',
     nameplates: 'Names',
     haptics: 'Haptics',

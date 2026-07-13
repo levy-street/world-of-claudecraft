@@ -43,9 +43,18 @@ import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
-import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
+import {
+  type AnimState,
+  type CharacterVisual,
+  createCharacterVisual,
+  setWeaponVfxViewportHeight,
+} from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
+import {
+  playerRangedAttackAlreadyStarted,
+  playerRangedAttackStartsAtLaunch,
+} from './characters/skin_attack';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
@@ -91,6 +100,11 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import {
+  applyPointLightBudget,
+  type RankedPointLight,
+  reconcileViewPointLights,
+} from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
@@ -611,6 +625,7 @@ export interface EntityView {
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped mainhand, diffed for live held-item swaps
   offhandItemId: string | null; // last-rendered equipped offhand, diffed for live held-item swaps
+  weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -1012,12 +1027,7 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: {
-    light: THREE.PointLight;
-    d2: number;
-    worldPos: THREE.Vector3;
-    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
-  }[] = [];
+  private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -1676,7 +1686,12 @@ export class Renderer {
       this.post.composer.setPixelRatio(ratio);
       this.post.setSize(this.viewport.width, this.viewport.height);
     }
-    this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
+    this.vfx.setViewportScale(devicePxHeight, 60);
+    // Weapon-skin VFX point sprites size against the device-pixel height too:
+    // future rigs read the module value, live rigs re-scale in place.
+    setWeaponVfxViewportHeight(devicePxHeight);
+    for (const v of this.views.values()) v.visual?.setWeaponVfxPixelScale(devicePxHeight);
   }
 
   /** Tone-mapping exposure multiplier (1.0 = the default look). */
@@ -2997,10 +3012,9 @@ export class Renderer {
     switch (ev.type) {
       case 'spellfx':
         if (ev.fx === 'windup') {
-          // A petSpell windup telegraph: start the throw animation NOW; the
+          // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
-          // the clip's release pose (the acolyte def's attackTimeScale is
-          // tuned so both meet).
+          // the clip's release pose.
           this.triggerAttack(ev.sourceId);
           break;
         }
@@ -3018,6 +3032,14 @@ export class Renderer {
           // request; Sanguine's green mainhand imbue stays aura-driven.
           this.triggerAttack(ev.sourceId, ev.ability);
           break;
+        }
+        // Player ranged attacks begin when their projectile launches. The live
+        // CharacterVisual chooses the authored crossbow/default clip or the bow
+        // skin's cosmetic draw override without changing the sim timeline.
+        if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
+            this.triggerAttack(ev.sourceId);
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
@@ -3054,10 +3076,17 @@ export class Renderer {
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         break;
       }
-      case 'damage':
-        // every melee/ranged swing animates the attacker for all to see; a
-        // mapped ability picks its own swing clip (attackByAbility), else rotates
-        if (ev.school === 'physical' && ev.sourceId !== -1)
+      case 'damage': {
+        // Every melee/ranged swing animates the attacker for all to see; a mapped
+        // ability picks its own swing clip (attackByAbility), else rotates. A ranged
+        // projectile carrying the typed launch cue already began its cosmetic
+        // one-shot, so do not restart that same shot when its damage lands.
+        const source = this.sim.entities.get(ev.sourceId);
+        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
+          source?.kind,
+          ev.attackAnimationStarted,
+        );
+        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
@@ -3065,6 +3094,7 @@ export class Renderer {
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
         break;
+      }
       case 'heal2':
         if (ev.amount > 0 || ev.crit) this.vfx.healGlow(ev.targetId);
         break;
@@ -3650,22 +3680,12 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
-    const viewLights: THREE.PointLight[] = [];
-    group.traverse((o) => {
-      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
-    });
-    if (viewLights.length > 0) {
-      for (const light of viewLights) {
-        // Remember the design intensity ONCE: pooled object views are reused, and by
-        // the time one is re-taken the budget may have dimmed the light to 0, so
-        // reading it again would stick it dark. userData persists on the pooled light.
-        if (typeof light.userData.budgetBase !== 'number')
-          light.userData.budgetBase = light.intensity;
-        this.viewLights.push(light);
-      }
+    const reconciledLights = reconcileViewPointLights(group, [], this.viewLights);
+    const viewLights = reconciledLights.lights;
+    if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light-budget rebuild caches light.getWorldPosition, and r165's
+      // the light budget reads light.getWorldPosition, and r165's
       // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
       // ancestor, so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
@@ -3726,6 +3746,8 @@ export class Renderer {
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
       offhandItemId: e.offhandItemId,
+      // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
+      weaponSkinId: null,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3803,7 +3825,18 @@ export class Renderer {
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current held items
     v.offhandItemId = e.offhandItemId;
+    v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.group.add(next.root);
+    this.reconcileViewLights(v);
+  }
+
+  private reconcileViewLights(v: EntityView): void {
+    const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
+    if (!reconciled.changed) return;
+    v.viewLights = reconciled.lights;
+    this.lightRankDirty = true;
+    if (v.viewLights.length > 0) this.lightOwnerGroups.add(v.group);
+    else this.lightOwnerGroups.delete(v.group);
   }
 
   triggerAttack(entityId: number, abilityId?: string): void {
@@ -4183,6 +4216,7 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
         const i = this.viewLights.indexOf(light);
@@ -4592,9 +4626,17 @@ export class Renderer {
       // live held-item swap, equipped mainhand/offhand changed (self equip or a
       // peer's gear update); classes with fixed props no-op.
       if (e.mainhandItemId !== v.mainhandItemId || e.offhandItemId !== v.offhandItemId) {
-        v.mainhandItemId = e.mainhandItemId;
         v.offhandItemId = e.offhandItemId;
         v.visual.setWeapons(e.mainhandItemId, e.offhandItemId);
+        this.reconcileViewLights(v);
+      }
+
+      // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
+      // or a peer, via the identity wire); replaces the held model + rarity VFX
+      if (e.weaponSkinId !== v.weaponSkinId) {
+        v.weaponSkinId = e.weaponSkinId;
+        v.visual.setWeaponSkin(e.weaponSkinId);
+        this.reconcileViewLights(v);
       }
       v.visual.setWeaponAura(e.auras.some((a) => a.id === 'sanguine_aura'));
 
@@ -4791,6 +4833,9 @@ export class Renderer {
         else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
       active.update(dt, st, animate);
+      // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
+      // few uniform writes per handle, so they stay smooth at every LOD tier
+      v.visual.updateWeaponVfx(dt);
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -5258,9 +5303,9 @@ export class Renderer {
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
   // but only the nearest GFX.maxPointLights within range shine each frame.
-  // Rank entries are pooled (extended only when interiors add lights) and
-  // world positions cached once — the lights never move — so this hot loop
-  // allocates nothing and skips the sort while the budget isn't contended.
+  // Rank entries are pooled (extended only when interiors or view lights change).
+  // Static world positions stay cached; moving weapon VFX refresh into their
+  // existing vectors, so this hot loop allocates nothing.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
     // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
@@ -5268,7 +5313,8 @@ export class Renderer {
     // numPointLights would change as it streams in/out and recompile every lit
     // material. Rebuild only when the set changes (dirty), or when fire lights grow
     // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. View positions are cached at rebuild; lights never move.
+    // refreshes distances. Static positions are cached; dynamic weapon-light
+    // positions refresh in applyPointLightBudget.
     const want = this.fireLights.length + this.viewLights.length;
     if (this.lightRankDirty || ranked.length !== want) {
       ranked.length = 0;
@@ -5278,19 +5324,22 @@ export class Renderer {
           d2: 0,
           worldPos: light.getWorldPosition(new THREE.Vector3()),
           base: null,
+          dynamic: false,
         });
       }
       for (const light of this.viewLights) {
         const stored = light.userData.budgetBase;
         const base = typeof stored === 'number' ? stored : light.intensity;
-        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+        const dynamic = light.userData.budgetDynamic === true;
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: dynamic ? null : base,
+          dynamic,
+        });
       }
       this.lightRankDirty = false;
-    }
-    for (const entry of ranked) {
-      const dx = entry.worldPos.x - px,
-        dz = entry.worldPos.z - pz;
-      entry.d2 = dx * dx + dz * dz;
     }
     // Keep a CONSTANT number of point lights `visible` so numPointLights in every
     // material's program cache key never changes as the player travels. Three counts
@@ -5303,19 +5352,7 @@ export class Renderer {
     // governor (effectivePointLights) only changes how many SHINE, not the count.
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
-    for (let i = 0; i < ranked.length; i++) {
-      const entry = ranked[i];
-      const counted = i < visibleCount;
-      entry.light.visible = counted;
-      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
-      if (entry.base !== null) {
-        // view light: no flicker pass restores it, so drive its intensity directly
-        entry.light.intensity = shine ? entry.base : 0;
-      } else if (counted && !shine) {
-        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
-      }
-    }
+    applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only

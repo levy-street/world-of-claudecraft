@@ -2182,4 +2182,20 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%);');
     expect(hudMobileCss).toContain('z-index: 95 !important;');
   });
+  it('keeps desktop rolls above managed windows and the mobile bag sheet above rolls', () => {
+    const railZ = Number(componentsCss.match(/#loot-rolls \{[\s\S]*?z-index:\s*(\d+);/)?.[1]);
+    const managedFloors = [
+      ...hudTs.matchAll(/(?:private windowZ =|this\.windowZ =)\s*(\d+);/g),
+    ].map((match) => Number(match[1]));
+    expect(Number.isFinite(railZ)).toBe(true);
+    expect(managedFloors).toHaveLength(2); // initial value + normalization reset
+    for (const floor of managedFloors) {
+      // Desktop Bags shares the roll rail's bottom-right footprint, so the first
+      // managed window must remain below it.
+      expect(floor + 1, `first managed z-index overlaps loot rail ${railZ}`).toBeLessThan(railZ);
+    }
+    // On mobile Bags is a full-screen modal sheet. !important intentionally
+    // beats the inline managed-window value without changing desktop stacking.
+    expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
+  });
 });

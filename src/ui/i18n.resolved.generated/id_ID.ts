@@ -244,6 +244,263 @@ export const id_ID: EnTranslations = {
         "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
       }
     },
+    "wocStore": {
+      "title": "Toko WOC",
+      "close": "Tutup Toko WOC",
+      "tabsLabel": "Bagian Toko WOC",
+      "storeTab": "Toko",
+      "rewardsTab": "Hadiah Harian",
+      "loading": "Memuat Toko WOC...",
+      "error": "Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.",
+      "balance": "Saldo Claudium",
+      "buyClaudium": "Beli Claudium",
+      "owned": "Dimiliki",
+      "needMoreTitle": "Dibutuhkan Lebih Banyak Claudium",
+      "needMoreBody": "Anda memerlukan {shortfall} lebih banyak Claudium untuk membeli {item}.",
+      "cancel": "Batal",
+      "confirmTitle": "Konfirmasi Pembelian Kosmetik",
+      "confirmBody": "Beli {item} untuk {cost} Claudium?",
+      "confirmPurchase": "Beli",
+      "priceChanged": "Harga berubah sebelum pembelian selesai. Tinjau harga baru dan konfirmasi lagi.",
+      "armoryEyebrow": "Musim 1",
+      "armoryTitle": "Gudang Senjata",
+      "armoryBody": "Tampilan senjata edisi terbatas dari Gudang Senjata Musim 1. Berlaku untuk seluruh akun, murni kosmetik, dan terlihat oleh semua pemain di sekitar Anda.",
+      "collectionLine": "{collection} Koleksi",
+      "collections": {
+        "guildmark": "Tanda Serikat",
+        "emberwrought": "Emberwrought",
+        "hoarfrost": "Embun beku",
+        "fallen_star": "Bintang Jatuh"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Pedang Guildmark",
+          "look": "Bilah baja berwarna biru, pelindung ekor ikan perunggu, pegangan kulit berwarna biru kehijauan, lambang serikat kecil yang dicap.",
+          "lore": "Jika mata pisau tempa tidak disebutkan namanya, maka yang ini ditandatangani. Seorang pembuat senjata berhak untuk memasukkan mereknya ke dalam ricasso hanya setelah Pedagang Pasar Dunia menjamin bajanya, dan merek Smith Haldren dijamin. Biru di balik kelembapan Lembah, seimbang hingga sehelai rambut. Anda membayar perangko itu sebanyak pedang, dan itu sepadan."
+        },
+        "brasscap_axe": {
+          "name": "Kapak Brasscap",
+          "look": "Mata kapak baja poles, tudung dan penguat kuningan pada gagang kayu ash berpernis, balutan rapi, serta cap pembuat.",
+          "lore": "Kapak bercap adalah kebanggaan yang dapat digenggam. Tudung dan penguat kuningannya melindungi gagang sekaligus menandai karya Armorer Hode. 'Kalau dapat membelah, akan kujual,' kata sang pandai besi Highwatch. Kapak ini membelah."
+        },
+        "tempered_flanged_mace": {
+          "name": "Gada Bersirip Tempa",
+          "look": "Kepala baja biru tempered enam flensa, kerah dan gagang kuningan, pegangan kulit berwarna merah anggur.",
+          "lore": "Enam flensa dari baja berwarna biru yang ditempa, masing-masing digiling untuk membuka helm, ditutup dengan kuningan dan digulung dengan kulit berwarna merah anggur. Para pembuat senjata di dunia ini tidak membuat senjata jelek meskipun pekerjaannya brutal. Yang ini dipesan melalui Pasar Dunia, bukan dikeluarkan dari rak; di suatu tempat ada buku besar dengan nama pembeli yang bangga dan jumlah yang dia bayarkan kepada Hode untuk itu."
+        },
+        "guildmark_dirk": {
+          "name": "Belati Guildmark",
+          "look": "Dirk baja tempered ramping, pelindung perunggu dan mur gagang, pegangan tali hijau tua, lambang bercap.",
+          "lore": "Apa yang dikenakan manusia saat pedang tetap berada di rumah: ramping, temper, dicap dengan tanda yang sama yang mengesahkan bilah penuh, dikenakan di ikat pinggang seperti meterai dengan ujung. Disengaja untuk semua orang kecuali mereka yang bisa membaca bukti pembuat senjata. Quartermaster Bree menyimpan lacinya di Highwatch untuk petugas yang mendapat rasa hormat dari tembok."
+        },
+        "brasscrown_staff": {
+          "name": "Tongkat Jalan Brasscrown",
+          "look": "Tongkat kayu keras di atasnya diberi finial mahkota kuningan, ferrule kuningan, dan tali kulit yang diwarnai.",
+          "lore": "Dibuat dari kayu keras yang sudah dibumbui dan dimahkotai dengan finial kuningan yang dibuat oleh seratus pandai besi Eastbrook, tetapi sempurna satu per satu. Itu milik tipe pelancong yang ingin dianggap serius di gerbang Fenbridge dan tembok Highwatch. Tongkat jalan yang tidak pernah benar-benar perlu berjalan; pita yang diwarnai cocok dengan mantel yang harganya bisa Anda tebak."
+        },
+        "lacquered_wand": {
+          "name": "Tongkat Sihir Berpernis",
+          "look": "Tongkat ramping berpernis merah tua, dua pita kuningan mengilap, ujung kuningan bulat kecil.",
+          "lore": "Pernis merah tua dalam tujuh mantel pasien, diikat dua kali dalam kuningan yang dipoles: jenis tongkat yang dibeli oleh penyihir pagar dari Pasar Dunia setelah mereka mulai menagih koin asli dan ingin melihatnya. Ia menyalurkan Cahaya tidak lebih baik dari batang kayu birch. Tapi itu berkilauan dengan indah di konter Merchant, dan setengah dari sihir kecil selalu dipercaya."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Busur Serikat Fletcher",
+          "look": "Busur recurve kenari yang dipernis, ujung dahan kuningan, tali linen berlapis lilin, stempel guild di bagian riser.",
+          "lore": "Hal yang paling mirip dengan sebuah guild adalah sebuah stempel fletcher di atas riser, sebuah janji tentang apa yang ada di dalamnya, seperti cara seorang penjual anggur menyegel tong. Kayu kenari yang dipernis, kuningan di ujung dahannya, tali linen berlapis lilin yang tidak akan robek saat hujan Mirefen. Setiap tempat memperdebatkan harga. Gambarkan sekali melewati Belukar Janda dan argumennya menang."
+        },
+        "cinderbrand_sword": {
+          "name": "Pedang Cinderbrand",
+          "look": "Bilah baja tempa gelap, alur bilah berisi rune jingga menyala, retakan panas, dan permata membara pada pelindung.",
+          "lore": "Bilah pertama yang ditempa bukan dengan air, melainkan Bara Terberkati dari Stormcrag. Api yang dituang ke alur bilah terus membara jingga, dan rune-nya tetap hangat bahkan pada malam terdingin di tembok. Cinderbrand tidak perlu dinyalakan. Apinya memang menolak padam."
+        },
+        "emberbite_axe": {
+          "name": "Kapak Emberbite",
+          "look": "Kapak besi menghitam dengan retakan jingga menyala menembus mata kapaknya, permata batu bara, gumpalan panas.",
+          "lore": "Armorer Hode menanamkan bara api gunung ke pusat mata kapak, sehingga tepinya tidak pernah benar-benar dingin di antara ayunan. Retakannya menyala jingga saat menghantam, seakan setiap pukulan membangunkan sisa tempaan pertama yang tertidur di dalam besi."
+        },
+        "smoulderfall_mace": {
+          "name": "Gada Smoulderfall",
+          "look": "Flensa besi gelap bersinar oranye terang di sepanjang celah bagian dalamnya, permata dengan inti cair di kepala.",
+          "lore": "Sebuah gada yang membawa perapiannya sendiri: sebuah batu dengan inti cair yang terkelupas dari segel Sanctum yang 'ditempa dengan api gunung', dipasang bercahaya di kepalanya. Flensanya tetap hangat saat disentuh dan lebih hangat di tempat mendaratnya; seorang sersan Highwatch bersumpah pukulannya akan meninggalkan memar yang samar-samar bersinar sampai pagi. Api gunung, pada akhirnya dibuat untuk memecahkan bukannya menyegel."
+        },
+        "ashspark_dagger": {
+          "name": "Belati Ashspark",
+          "look": "Bilah pendek menghitam dengan urat oranye menyala, permata kecil yang membara di gagangnya, abu, dan percikan api.",
+          "lore": "Bilah jalanan yang menyimpan api gunung di permata gagangnya, bukti bahwa senjata sekecil apa pun dapat membawa bara dari tempaan pertama. Cabutlah di lorong gelap Highwatch dan sinarnya cukup terang untuk menemukan celah pada zirah lawan."
+        },
+        "forgeheart_staff": {
+          "name": "Tongkat Forgeheart",
+          "look": "Tongkat bersepatu besi dimahkotai dengan inti bara api yang terkurung, bara api naik ke batangnya, menimbulkan kilau panas.",
+          "lore": "Bara hidup dari api gunung dikurung dalam besi pada mahkotanya. Loremaster Caddis menyebutnya bukti bahwa api tempaan pertama dapat diikat untuk berkarya, bukan hanya menyegel. Kilau panas mengalir darinya tanpa henti, dan konon bara itu diambil dari napas Voskar sang Emberwing sendiri."
+        },
+        "emberwrought_wand": {
+          "name": "Tongkat Sihir Emberwrought",
+          "look": "Tongkat logam menghitam dengan ujung bara api menyala di cakar besi, retakan panas di garis rambut, cahaya batin yang hangat.",
+          "lore": "Tongkat sihir yang memberi nama pada koleksi ini. Saat pembuat senjata Highwatch mengurung bara gunung di dalam cakar besi dan membuatnya tunduk pada tangan manusia, bahkan para Pendeta Cahaya berhenti menyebutnya sesat. Bara pada ujungnya telah menyala tanpa putus sejak sebelum pemiliknya lahir."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Busur Silang Cinderlatch",
+          "look": "Busur silang baja menghitam, cahaya jingga merembes dari retakan badan, dan bara membara pada gagangnya.",
+          "lore": "Relik paling aneh dari koleksi Emberwrought: api gunung dituangkan ke dalam sebuah mesin. Bara pada gagangnya menjaga tali tetap lentur di dinginnya Thornpeak maupun lembapnya Mirefen, sementara setiap baut melesat hangat dan menghantam lebih panas."
+        },
+        "ice_fang_sword": {
+          "name": "Taring Es",
+          "look": "Bilah es glasial pucat yang melengkung, kristal rime bergerigi di sepanjang tulang belakang, inti beku sian yang bersinar di pelindung es yang lebih penuh.",
+          "lore": "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Wyrmcult, dan 'membeli tembok itu untuk musim dingin.'"
+        },
+        "glaciersplit_axe": {
+          "name": "Kapak Pembelah Gletser",
+          "look": "Bagian atas es gletser berwarna biru tembus pandang, bagian dalam yang retak bercahaya warna biru kehijauan, kristal es yang meremang, tangkai yang mengeluarkan uap dingin.",
+          "lore": "Dipahat dari jantung biru gletser Thornpeak, tempat dua abad tekanan membuat dingin itu bercahaya. Kapak ini tetap mengeluarkan uap saat diam, dan hantamannya retak seperti jurang di bawah Prowler Ridge. Highwatch pernah kehilangan benteng karena es yang mencair, maka senjata ini dibuat untuk menghentikan pencairan berikut segala yang datang sesudahnya."
+        },
+        "rimecrusher_mace": {
+          "name": "Gada Rimecrusher",
+          "look": "Gugusan kristal es bergerigi di sekitar inti cyan yang bersinar, embun beku merambat ke batang berwarna perak.",
+          "lore": "Tidak diukir tetapi ditumbuhkan: Es Thornpeak dibujuk di sekitar inti cyan yang dingin hingga mengeras seperti baja terbaik Hode. Embun beku merambat ke tangkai perak menuju tangan dan tidak pernah sampai. Saat terkena serangan, air membeku; di mana ia berada, tanah menjadi putih. Puncaknya yang sangat dingin, dibuat cukup kecil untuk berayun pada benda-benda yang memanjat tembok."
+        },
+        "frostbite_dagger": {
+          "name": "Jarum Embun Beku",
+          "look": "Belati yang sangat tipis dari es biru jernih, urat cyan bercahaya di tengahnya, kristal es berbentuk jarum, gagang embun beku.",
+          "lore": "Tipis seperti nafas yang tertahan dan dua kali lebih dingin: serpihan gletser Thornpeak diasah menjadi satu pembuluh darah yang bersinar, begitu tajam sehingga lukanya membeku dan tertutup sebelum darah kembali mengalir. Namanya dipinjam dari rasa dingin yang dibawa orang mati dari puncak. Ia tidak perlu diasah; es tidak tumpul, kata Loremaster Caddis datar, ia hanya menunggu."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Tongkat Penjagaan Hoarfrost",
+          "look": "Tongkat perak dimahkotai dengan pecahan es cyan bercahaya yang mengambang dan berputar perlahan, memancarkan kristal dan uap dingin.",
+          "lore": "Tongkat milik penjaga yang tak pernah tidur di tembok Highwatch. Mahkotanya berupa pecahan es berwarna biru kehijauan yang melayang bebas dari perak dan berputar perlahan dengan sendirinya, selalu mengarah ke hawa dingin yang berkumpul di bawah puncak, demikian sumpah sang penjaga. Membawa Vigil berarti berjaga selama dua ratus tahun dalam satu malam dan berjanji untuk tidak memalingkan muka."
+        },
+        "everwinter_wand": {
+          "name": "Pecahan Everwinter",
+          "look": "Sepotong es gletser cyan yang bersinar, embun beku yang mekar dari kerah perak, kabut dingin yang samar.",
+          "lore": "Pecahan es gletser bercahaya yang konon berasal dari kedalaman di bawah Sanctum, tempat hawa dingin gunung memiliki taring. Embun beku terus mekar dari kerah peraknya dan tidak mencair oleh api ataupun musim panas. Para Penyihir menyimpannya dekat saat bekerja, tetapi menjauhkannya ketika tongkat itu seolah mencondongkan diri untuk mendengar ruang bawah tanah Nythraxis."
+        },
+        "winterbite": {
+          "name": "Busur Winterbite",
+          "look": "Baja berwarna perak dan busur es biru, inti beku sian yang bersinar di bagian atas, panah es padat, uap dingin.",
+          "lore": "Busur dari baja perak dan es Thornpeak, dengan inti biru dingin yang membekukan anak panah pada talinya. Setiap tarikan membentuk kembali sebatang es gletser, sehingga pemanah di tembok tidak membawa tabung panah, hanya hawa dingin. Konon Highwatch mempertahankan Prowler Ridge sepanjang pengepungan dengan satu pemanah dan persediaan anak panah selama musim dingin."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Cahaya Fajar Terakhir",
+          "look": "Pedang besar yang ditempa dari bintang jatuh, inti emas cair membelah bilahnya, baja hitam kosmos bertepi cahaya bintang, pecahan emas mengorbit pelindungnya, pita aurora.",
+          "lore": "Ketika bintang itu jatuh dari langit barat dan 'meledak seperti bengkel' di luar Belukar Janda, Saudara Aldric menarik jantungnya yang masih membara dari kawah Mirefen dan memohon kepada para pandai besi di dunia ini untuk mengerjakan 'sesuatu yang bukan milik dunia ini'. Mereka membuat satu pedang hebat: Solheim. Inti emas cairnya membelah bilah hitam kosmos seperti fajar yang membelah langit malam, dan pecahan logam bintang mengorbit penjaga di jalur yang tidak dapat diatur oleh tangan. Hanya satu yang pernah dipalsukan. Tidak akan ada yang lain."
+        },
+        "skyrender_axe": {
+          "name": "Skyrender, Luka Cakrawala",
+          "look": "Kepala seperti potongan langit malam yang terkoyak, retakan emas cair dan ukiran konstelasi, pecahan cahaya bintang melayang, kilau aurora membuntuti tepinya.",
+          "lore": "Dipukul dari tepi kawah, tempat bintang jatuh merobek pantulan langit dari Mirefen dan meninggalkan luka yang masih mengepul. Kepalanya tampak seperti sepotong malam yang terkoyak: retakan emas cair, konstelasi yang tidak dapat disebutkan namanya oleh sarjana di Highwatch, aurora yang keluar dari tepinya dengan setiap ayunan. Saudara Aldric memberkatinya dan tidak mau menyentuhnya. Mengangkatnya berarti menahan lubang yang ditinggalkan langit."
+        },
+        "starfall_mace": {
+          "name": "Starfall, Penghakiman Surga",
+          "look": "Inti bintang emas cair yang dikelilingi pecahan-pecahan yang mengorbit, sayap hitam kosmos berurat cahaya bintang, aurora memancar dari lapisannya.",
+          "lore": "Inti bintang ditangkap sesaat sebelum mati dan dikelilingi pecahan yang jatuh bersamanya. Cahaya bintang mengalir pada sirip hitam kosmosnya, sementara aurora keluar dari sambungan saat gada diangkat. Para Pendeta Cahaya lama menyebut bintang jatuh itu penghakiman dari langit yang tak dapat dihentikan perisai mana pun."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Taring Bintang Jatuh",
+          "look": "Sepotong bintang jatuh, tepian emas cair bercahaya pada logam hitam kosmos, butiran bintang terang yang mengorbit gagangnya, jejak aurora tipis.",
+          "lore": "Bagian terkecil dari bintang yang diangkut Aldric dari kawah, dan menurut beberapa orang paling berbahaya. Sepotong jantung dunia lain itu, ujung emasnya yang meleleh menunggangi logam hitam kosmos, satu-satunya bintang yang mengelilingi gagangnya seperti bulan yang kehilangan dunianya. Beratnya hampir tidak ada dan dapat membagi hampir semua hal. Cukup kecil untuk disembunyikan, cukup terang untuk ditemukan dalam kegelapan dengan cahayanya sendiri."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Puncak Kekosongan yang Tak Berujung",
+          "look": "Gugusan pecahan bintang emas yang mengorbit di sekitar inti emas cair, poros hitam kosmos yang terukir konstelasi, pita aurora yang berkelok-kelok ke atas.",
+          "lore": "Sebuah batang logam bintang yang dimahkotai dengan inti emas cair dan cincin pecahan emas yang mengelilinginya dalam orbit lambat dan tak berujung: sebuah kosmos kecil, terukir rasi bintang yang tak tertandingi langit di atas Thornpeak. Aurora memanjang seperti asap yang lupa naik. Mereka yang memakainya menyatakan bahwa mereka dapat merasakan kekosongan yang melewatinya, seperti cara Ysolei sekadar 'meminum cahaya bulan': sabar, dingin, dan menoleh ke belakang."
+        },
+        "emberwish_wand": {
+          "name": "Emberwish, Serpih Matahari Mati",
+          "look": "Serpih emas cair dari bintang sekarat, dikelilingi percikan yang mengorbit, pada batang hitam kosmos berukir rasi bintang bercahaya.",
+          "lore": "Bukan bintang jatuh itu sendiri, melainkan butiran terakhir dari bintang yang sedang sekarat: sebutir bara emas cair dari matahari yang telah padam, diselimuti percikan api yang merupakan cahaya terakhirnya. Batangnya yang berwarna hitam kosmos terukir rasi bintang yang menyaksikannya mati. Para crofter Mirefen mengatakan bahwa itu mengabulkan satu permintaan kepada siapa pun yang memegangnya saat senja; mereka juga mengatakan setiap jiwa yang memegangnya menginginkan lebih banyak waktu, dan Bulan Tenggelam tidak mengabulkan satu pun dari mereka."
+        },
+        "encore_bow": {
+          "name": "Encore, Bintang Jatuh Kedua",
+          "look": "Meriam bintang berukuran sangat besar: laras hitam kosmos yang diukir dengan konstelasi emas yang bersinar, moncong lonceng yang melebar dengan cangkang komet emas cair di dalamnya, perlengkapan kuningan, dan sandaran bahu kayu.",
+          "lore": "Setelah enam relik ditempa dari bintang jatuh, para pekerja magang mengubah sisa logamnya menjadi meriam bahu. Ia tidak sekadar menembak, melainkan memanggil bintang kedua ke arah sasaran. Saudara Aldric menolak memberkatinya karena suaranya pasti sudah menarik perhatian surga. Para Pemburu menyukainya. Tak ada sasaran di depannya yang pernah berpendapat lain."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlatch, Penghakiman Terakhir Langit",
+          "look": "Bintang-logam meteorik, inti emas cair di sepanjang batangnya, anggota badan berwarna hitam kosmos yang diukir dengan konstelasi, kumpulan api bintang murni.",
+          "lore": "Ditempa dari logam bintang meteorik saat kawah Mirefen masih bersinar, puing-puing 'terlalu panas untuk ditangani,' ditempa menjadi bagian-bagian kosmos hitam yang diukir dengan konstelasi, inti emas cair membelok di sepanjang batang penggarap. Ia tidak melontarkan baut apa pun, melainkan memunculkan satu: sebatang api bintang, dilepaskan seperti sebuah vonis dan mendarat seperti sebuah akhir dari sebuah vonis. Ketika Highwatch takut bahkan mahkota Nythraxis yang tak pernah mati mungkin bukanlah yang terburuk di bawah puncak, inilah senjata yang mereka inginkan di dinding. Bidik dengan baik."
+        }
+      },
+      "seasonOne": "Musim 1",
+      "rarity": {
+        "uncommon": "Tidak Umum",
+        "rare": "Langka",
+        "epic": "Epik",
+        "legendary": "Legendaris"
+      },
+      "wtype": {
+        "sword": "Pedang",
+        "axe": "Kapak",
+        "mace": "Gada",
+        "dagger": "Belati",
+        "staff": "Tongkat",
+        "wand": "Tongkat sihir",
+        "bow": "Busur",
+        "crossbow": "Busur silang"
+      },
+      "badge": {
+        "flagship": "Unggulan",
+        "hero": "Pahlawan"
+      },
+      "inspectAria": "Periksa {item}",
+      "viewModeLabel": "Modus pratinjau",
+      "tryOn": "Coba Pakai",
+      "weaponOnly": "Senjata saja",
+      "sceneLabel": "Pencahayaan pemandangan",
+      "scene": {
+        "day": "Hari",
+        "dusk": "Senja",
+        "night": "Malam"
+      },
+      "lore": "Kisah",
+      "buySkin": "Beli Tampilan",
+      "unavailable": "Tidak tersedia",
+      "applied": "Diterapkan",
+      "apply": "Terapkan Tampilan",
+      "detach": "Lepaskan Tampilan",
+      "equipHint": "Kenakan {type} untuk menerapkan tampilan ini."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Buka Claudium",
+      "close": "Tutup Claudium",
+      "loading": "Memuat Claudium...",
+      "balanceLabel": "Saldo",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "Toko Claudium tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.",
+      "disclosure": "Claudium adalah mata uang lunak satu arah: beli dengan uang dan belanjakan untuk kosmetik. Itu tidak dapat ditebus, ditransfer, atau diuangkan.",
+      "buyTitle": "Beli Claudium",
+      "railLabel": "Metode pembayaran",
+      "railStripe": "Kartu",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "Diskon 20%.",
+      "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
+      "railNativeUnavailable": "SOL/WOC tidak tersedia.",
+      "amountLabel": "Jumlah",
+      "showAmounts": "Tampilkan semua jumlah Claudium",
+      "hideAmounts": "Sembunyikan jumlah Claudium tambahan",
+      "skuRow": "{usd} untuk {claudium} Claudium",
+      "buyButton": "Beli",
+      "buyUnavailable": "Pembelian tidak tersedia saat ini.",
+      "storeTitle": "Toko Kosmetik",
+      "storeEmpty": "Tidak ada kosmetik yang tersedia saat ini.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Tukar",
+      "kindCosmetic": "Kosmetik",
+      "kindSkin": "Tampilan",
+      "kindItem": "Barang",
+      "checkoutTitle": "Selesaikan pembelian",
+      "checkoutClose": "Tutup pembayaran",
+      "checkoutLoading": "Memuat pembayaran...",
+      "checkoutPending": "Transaksi sedang berlangsung. Konfirmasikan di dompet Anda dan biarkan panel ini tetap terbuka.",
+      "checkoutPendingButton": "Diproses",
+      "checkoutFailed": "Pembayaran tidak dapat dimuat. Silakan coba lagi.",
+      "checkoutUnavailable": "Pembelian Claudium tersebut tidak tersedia saat ini.",
+      "checkoutWalletRequired": "Hubungkan dompet Solana sebelum membeli Claudium dengan kripto.",
+      "checkoutWalletUnsupported": "Dompet ini tidak dapat menandatangani dan mengirim transaksi Solana.",
+      "checkoutNotSettled": "Transaksi sudah terkirim tetapi Claudium belum dikreditkan. Silakan coba lagi sebentar lagi."
+    },
     "theme": {
       "preset": "Tema UI",
       "customColors": "Warna Kustom",
@@ -318,7 +575,7 @@ export const id_ID: EnTranslations = {
     "mobile": {
       "jump": "Lompat",
       "leaderboard": "Peringkat",
-      "dailyRewards": "Hadiah",
+      "dailyRewards": "Toko",
       "deeds": "Jasa",
       "nameplates": "Nama",
       "haptics": "Haptik",
@@ -340,12 +597,12 @@ export const id_ID: EnTranslations = {
       "talkBodyTouch": "Berdirilah dekat Marshal Redbrook dan ketuk tombol Use untuk berbicara, lalu terima tugasnya.",
       "returnBodyTouch": "Tugas Anda selesai. Kembalilah ke Marshal Redbrook dan ketuk tombol Use untuk menyerahkannya.",
       "doneBodyTouch": "Anda sudah menguasai dasarnya, {name}. Lembah ini milik Anda untuk dijelajahi. Ketuk More, lalu Quests, untuk meninjau catatan misi Anda kapan saja. Selamat berburu.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Baru berperang? Tekan {targetKey} atau klik serigala untuk menargetkannya, lalu gunakan kemampuan bilah tindakan untuk menyerangnya.",
+      "slayTargetHintTouch": "Baru berperang? Ketuk serigala untuk menargetkannya, lalu ketuk kemampuan bilah tindakan untuk menyerangnya.",
+      "nextTipsTitle": "Ke mana selanjutnya",
+      "nextTipQuestLog": "Buka Log Quest Anda ({key}) untuk menemukan tugas berikutnya di sekitar.",
+      "nextTipMap": "Periksa Peta Dunia ({key}) untuk melihat di mana misi menunggu.",
+      "nextTipSocial": "Buka Sosial ({key}) untuk menemukan grup untuk pertarungan yang lebih sulit."
     },
     "widgets": {
       "clockTitle": "Waktu lokal - klik untuk beralih 12/24 jam",
@@ -706,17 +963,17 @@ export const id_ID: EnTranslations = {
       "highContrastAria": "Alihkan latar belakang kontras tinggi: menonaktifkan cuplikan bergerak agar teks layar mulai tetap terbaca"
     },
     "warfare": {
-      "honorAmount": "{amount} Honor",
+      "honorAmount": "{amount} Kehormatan",
       "dualPrice": "{money} + {honor}",
-      "balance": "Honor: {amount}",
-      "honorFloat": "+{amount} Honor",
-      "honorGain": "You gain {amount} Honor ({reason}).",
-      "notEnoughHonor": "Not enough Honor.",
+      "balance": "Kehormatan: {amount}",
+      "honorFloat": "+{amount} Kehormatan",
+      "honorGain": "Anda mendapatkan Kehormatan {amount} ({reason}).",
+      "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
-        "arenaWin": "Arena victory",
-        "fiestaKill": "Fiesta takedown",
-        "fiestaComplete": "Fiesta completed",
-        "fiestaWin": "Fiesta victory"
+        "arenaWin": "Kemenangan arena",
+        "fiestaKill": "Eliminasi Fiesta",
+        "fiestaComplete": "Fiesta selesai",
+        "fiestaWin": "Kemenangan Fiesta"
       }
     },
     "statInfo": {
@@ -727,9 +984,9 @@ export const id_ID: EnTranslations = {
         "hasteRating": "Rating Kecepatan",
         "haste": "Haste",
         "parry": "Parry",
-        "warfare": "Warfare"
+        "warfare": "Perang"
       },
-      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
+      "warfareValue": "+{increase}% dibagikan / -{reduction}% diambil",
       "desc": {
         "str": "Meningkatkan daya serang Anda, sehingga serangan senjata Anda menghantam lebih keras.",
         "agi": "Mempertajam refleks dan bidikan Anda, meningkatkan beberapa statistik tempur Anda.",
@@ -746,7 +1003,7 @@ export const id_ID: EnTranslations = {
         "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.",
         "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
-        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
+        "warfare": "Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Daya Serang",
@@ -972,7 +1229,7 @@ export const id_ID: EnTranslations = {
     "corpseHarvest": {
       "title": "Panen",
       "harvestButton": "Panen",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Panen: kumpulkan bahan kerajinan dari mayat ini (kulit, taring, sutra, dan komponen serupa), pisahkan dari jarahan apa pun. Siapapun bisa memanen; hanya satu pemain yang dapat memanen mayat tertentu.",
       "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
@@ -1182,7 +1439,7 @@ export const id_ID: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Peti",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Ambil Semua: kumpulkan setiap koin dan item di jendela jarahan ini."
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
@@ -1646,7 +1903,7 @@ export const id_ID: EnTranslations = {
       "trackerLabel": "Jasa",
       "collapseHint": "Ciutkan pelacak jasa",
       "expandHint": "Bentangkan pelacak jasa",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Buka Kitab Jasa",
       "charTitleLabel": "Gelar",
       "charTitleNone": "Belum ada gelar dipilih",
       "charOpenBook": "Kitab Jasa",
@@ -5431,8 +5688,8 @@ export const id_ID: EnTranslations = {
         "description": "Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik."
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "name": "Penyembuhan Berantai",
+        "description": "Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)"
       },
       "heroic_strike": {
         "name": "Serangan Perampas",
@@ -5681,6 +5938,10 @@ export const id_ID: EnTranslations = {
       "lay_on_hands": {
         "name": "Ritus Terakhir",
         "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
+      },
+      "holy_taunt": {
+        "name": "Hasutan Suci",
+        "description": "Mengejek target: ancaman Anda meningkat untuk menyamai musuh yang paling dibencinya dan ia terpaksa menyerang Anda selama 3 detik."
       },
       "flash_of_light": {
         "name": "Lightmend",
@@ -6219,8 +6480,8 @@ export const id_ID: EnTranslations = {
         "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "pummel": {
-        "name": "Pummel",
-        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+        "name": "Pukulan Bertubi",
+        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
       },
       "heroic_leap": {
         "name": "Heroic Leap",
@@ -6259,28 +6520,28 @@ export const id_ID: EnTranslations = {
         "description": "Mengikat Wraithborn pada kehendakmu, iblis elit yang menghujani kerusakan Bayangan berat dari kejauhan. Waktu jeda yang panjang membatasi kekuatannya yang menghancurkan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
       },
       "kick": {
-        "name": "Boot",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Tendangan",
+        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
       },
       "counterspell": {
-        "name": "Spellbreak",
-        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+        "name": "Penangkal Mantra",
+        "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
       },
       "counter_shot": {
-        "name": "Hushing Shot",
-        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Tembakan Penangkal",
+        "description": "Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik."
       },
       "rebuke": {
-        "name": "Reproach",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Teguran",
+        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
       },
       "skull_bash": {
-        "name": "Headbutt",
-        "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Hantaman Tengkorak",
+        "description": "Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik."
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+        "name": "Kunci Mantra",
+        "description": "Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -6926,124 +7187,124 @@ export const id_ID: EnTranslations = {
         "name": "Herba Kelopak Matahari"
       },
       "furyforged_warhelm": {
-        "name": "Furyforged Warhelm"
+        "name": "Helm Perang Furyforged"
       },
       "furyforged_warspaulders": {
-        "name": "Furyforged Warspaulders"
+        "name": "Pelindung Bahu Furyforged"
       },
       "furyforged_warplate": {
-        "name": "Furyforged Warplate"
+        "name": "Zirah Perang Furyforged"
       },
       "furyforged_girdle": {
-        "name": "Furyforged Girdle"
+        "name": "Sabuk Furyforged"
       },
       "furyforged_legguards": {
-        "name": "Furyforged Legguards"
+        "name": "Pelindung Kaki Furyforged"
       },
       "furyforged_gauntlets": {
-        "name": "Furyforged Gauntlets"
+        "name": "Sarung Tangan Furyforged"
       },
       "furyforged_sabatons": {
-        "name": "Furyforged Sabatons"
+        "name": "Sepatu Zirah Furyforged"
       },
       "stormbound_crown": {
-        "name": "Stormbound Crown"
+        "name": "Mahkota Stormbound"
       },
       "stormbound_spaulders": {
-        "name": "Stormbound Spaulders"
+        "name": "Pelindung Bahu Stormbound"
       },
       "stormbound_hauberk": {
-        "name": "Stormbound Hauberk"
+        "name": "Zirah Rantai Stormbound"
       },
       "stormbound_waistguard": {
-        "name": "Stormbound Waistguard"
+        "name": "Pelindung Pinggang Stormbound"
       },
       "stormbound_legmail": {
-        "name": "Stormbound Legmail"
+        "name": "Zirah Rantai Kaki Stormbound"
       },
       "stormbound_handguards": {
-        "name": "Stormbound Handguards"
+        "name": "Pelindung Tangan Stormbound"
       },
       "stormbound_greaves": {
-        "name": "Stormbound Greaves"
+        "name": "Pelindung Betis Stormbound"
       },
       "ashstalker_cowl": {
-        "name": "Ashstalker Cowl"
+        "name": "Kerudung Ashstalker"
       },
       "ashstalker_shoulderguards": {
-        "name": "Ashstalker Shoulderguards"
+        "name": "Pelindung Bahu Ashstalker"
       },
       "ashstalker_harness": {
-        "name": "Ashstalker Harness"
+        "name": "Zirah Dada Ashstalker"
       },
       "ashstalker_waistband": {
-        "name": "Ashstalker Waistband"
+        "name": "Ikat Pinggang Ashstalker"
       },
       "ashstalker_legguards": {
-        "name": "Ashstalker Legguards"
+        "name": "Pelindung Kaki Ashstalker"
       },
       "ashstalker_grips": {
-        "name": "Ashstalker Grips"
+        "name": "Genggaman Ashstalker"
       },
       "ashstalker_treads": {
-        "name": "Ashstalker Treads"
+        "name": "Tapak Ashstalker"
       },
       "cinderweave_cowl": {
-        "name": "Cinderweave Cowl"
+        "name": "Kerudung Cinderweave"
       },
       "cinderweave_mantle": {
-        "name": "Cinderweave Mantle"
+        "name": "Mantel Cinderweave"
       },
       "cinderweave_raiment": {
-        "name": "Cinderweave Raiment"
+        "name": "Pakaian Cinderweave"
       },
       "cinderweave_cord": {
-        "name": "Cinderweave Cord"
+        "name": "Ikat Pinggang Cinderweave"
       },
       "cinderweave_legwraps": {
-        "name": "Cinderweave Legwraps"
+        "name": "Pembungkus Kaki Cinderweave"
       },
       "cinderweave_handwraps": {
-        "name": "Cinderweave Handwraps"
+        "name": "Bungkus Tangan Cinderweave"
       },
       "cinderweave_slippers": {
-        "name": "Cinderweave Slippers"
+        "name": "Sandal Cinderweave"
       },
       "final_oath_medallion": {
-        "name": "Medallion of the Final Oath"
+        "name": "Medali Sumpah Terakhir"
       },
       "razorwind_torque": {
-        "name": "Razorwind Torque"
+        "name": "Kalung Razorwind"
       },
       "cinder_sigil_pendant": {
-        "name": "Cinder-Sigil Pendant"
+        "name": "Liontin Cinder-Sigil"
       },
       "iron_vow_band": {
-        "name": "Iron Vow Band"
+        "name": "Cincin Sumpah Besi"
       },
       "unbroken_circle": {
-        "name": "The Unbroken Circle"
+        "name": "Lingkaran yang Tak Terputus"
       },
       "fleetblood_band": {
-        "name": "Fleetblood Band"
+        "name": "Cincin Fleetblood"
       },
       "last_step_signet": {
-        "name": "Last-Step Signet"
+        "name": "Cincin Meterai Langkah Terakhir"
       },
       "ashen_focus_ring": {
-        "name": "Ashen Focus Ring"
+        "name": "Cincin Fokus Ashen"
       },
       "spellbreakers_seal": {
-        "name": "Spellbreaker's Seal"
+        "name": "Segel Pemecah Mantra"
       },
       "final_argument_greatblade": {
-        "name": "Final Argument Greatblade"
+        "name": "Pedang Besar Argumen Terakhir"
       },
       "first_blood_razor": {
-        "name": "First-Blood Razor"
+        "name": "Bilah Darah Pertama"
       },
       "emberglass_warstaff": {
-        "name": "Emberglass Warstaff"
+        "name": "Tongkat Perang Emberglass"
       },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
@@ -8195,9 +8456,9 @@ export const id_ID: EnTranslations = {
         "greeting": "Bukti dari kedalaman heroik dapat membeli cincin dan liontin terbaik di Highwatch. Tunjukkan tanda-tandamu."
       },
       "fury": {
-        "name": "FURY",
-        "title": "Honor Quartermaster",
-        "greeting": "The sands remember every victory. Spend your honor well."
+        "name": "AMARAH",
+        "title": "Kepala Suku Kehormatan",
+        "greeting": "Pasir mengingat setiap kemenangan. Habiskan kehormatanmu dengan baik."
       },
       "loremaster_caddis": {
         "name": "Ahli Sejarah Caddis",

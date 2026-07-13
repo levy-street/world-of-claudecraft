@@ -244,6 +244,263 @@ export const tr_TR: EnTranslations = {
         "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC Mağazası",
+      "close": "WOC Mağazasını Kapat",
+      "tabsLabel": "WOC Mağaza bölümleri",
+      "storeTab": "Mağaza",
+      "rewardsTab": "Günlük Ödüller",
+      "loading": "WOC Mağazası yükleniyor...",
+      "error": "WOC Mağazası şu anda kullanılamıyor. Lütfen kısa süre sonra tekrar deneyin.",
+      "balance": "Claudium Bakiyesi",
+      "buyClaudium": "Claudium'u satın al",
+      "owned": "Sahip",
+      "needMoreTitle": "Daha Fazla Claudium Gerekli",
+      "needMoreBody": "{item} satın almak için {shortfall} daha fazla Claudium'a ihtiyacınız var.",
+      "cancel": "İptal",
+      "confirmTitle": "Kozmetik Satın Alma İşlemini Onaylayın",
+      "confirmBody": "{cost} Claudium için {item} satın alınsın mı?",
+      "confirmPurchase": "Satın Al",
+      "priceChanged": "Satın alma işlemi tamamlanmadan önce fiyat değişti. Yenilenen fiyatı inceleyin ve tekrar onaylayın.",
+      "armoryEyebrow": "1. Sezon",
+      "armoryTitle": "Cephanelik",
+      "armoryBody": "1. Sezon Cephaneliğinden sınırlı silah görünümleri. Hesap çapında, tamamen kozmetik ve etrafınızdaki herkese gösterilir.",
+      "collectionLine": "{collection} Koleksiyon",
+      "collections": {
+        "guildmark": "Lonca İşareti",
+        "emberwrought": "Kordan yapılmış",
+        "hoarfrost": "Kırağı",
+        "fallen_star": "Düşen Yıldız"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Guildmark Silahlanma Kılıcı",
+          "look": "Mavileştirilmiş çelik bıçak, bronz balık kuyruğu çapraz koruma, deniz mavisi boyalı deri kabza, küçük damgalı lonca arması.",
+          "lore": "Dövme bıçağın anonim olduğu yerde bu imzalıdır. Bir zırh ustası, ancak Dünya Pazarı Tüccarının çeliğine kefil olması ve Smith Haldren'in işaretine kefil olması durumunda, ricasso'ya damgasını vurma hakkını kazanır. Vadi'nin nemine karşı maviye dönmüş, kıl kadar dengelenmiş. Pul için kılıç kadar para ödüyorsun ve buna değer."
+        },
+        "brasscap_axe": {
+          "name": "Pirinç Başlıklı Balta",
+          "look": "Cilalı çelik uç, pirinç kapak ve cilalı dişbudak sap üzerinde langetler, düzenli ambalaj, bir yapımcının damgası.",
+          "lore": "Damgalı bir balta, sahip olabileceğiniz bir övünmedir. Pirinç başlık ve langetler yarı zırh, yarı imzadır: sapın kırılmasını önlerler ve meyhanenin ışığını yakalarlar, böylece herkes sizin bir milis kuvvetinin değil, Armorer Hode'un işini satın aldığınızı bilir. Highwatch demircisi, 'Kesilirse satarım' diyor. Bu kesiyor."
+        },
+        "tempered_flanged_mace": {
+          "name": "Temperlenmiş Flanşlı Topuz",
+          "look": "Altı flanşlı temperlenmiş mavi çelik başlık, pirinç yaka ve kulp, şarap kırmızısı deri kavrama.",
+          "lore": "Her biri bir miğfer açmak için taşlanmış, mavileştirilmiş, temperlenmiş çelikten altı flanş, pirinç kapaklı ve şarap kırmızısı deriyle sarılmış. Diyarın zırhçıları, iş acımasız olsa bile çirkin silahlar yapmıyor. Bu, Dünya Pazarı aracılığıyla sipariş edildi, öylece rafa kaldırılmadı; bir yerlerde gururlu bir alıcının adının ve bunun için Hode'a ödediği meblağın yazılı olduğu bir defter var."
+        },
+        "guildmark_dirk": {
+          "name": "Lonca İşareti Dirk",
+          "look": "İnce temperlenmiş çelik kama, bronz koruma ve kulplu somun, koyu yeşil kordon kabza, damgalı arma.",
+          "lore": "Kılıç evde kaldığında saygın bir adam ne giyer: ince, temperli, dolu bir bıçağı onaylayan aynı işaretle damgalanmış, kenarı olan bir mühür gibi kemere takılı. Bir zırhçının kanıtını okuyabilenler dışında herkes için hafife alınmıştır. Malzeme Sorumlusu Bree, duvarın saygısını kazanmış subaylar için Highwatch'ta bunlardan bir çekmece tutuyor."
+        },
+        "brasscrown_staff": {
+          "name": "Brasscrown Yürüyüş Asası",
+          "look": "Sert ahşap asa, tornalanmış pirinç taç kaplaması, pirinç yüksük ve boyalı deri bantla taçlandırılmıştır.",
+          "lore": "Tecrübeli sert ağaçtan yapılmış ve Eastbrook demircilerinin yüz kişi tarafından döküldüğü, ancak birer birer mükemmel olan pirinç bir arma ile taçlandırılmıştır. Hem Fenbridge'in kapısında hem de Highwatch'ın duvarında ciddiye alınmak isteyen gezginlere ait. Hiçbir zaman gerçekten yürümeye ihtiyaç duymamış bir baston; boyalı bant fiyatını tahmin edebileceğiniz bir paltoyla eşleşiyor."
+        },
+        "lacquered_wand": {
+          "name": "Lake Çubuk",
+          "look": "İnce koyu kırmızı lake çubuk, iki cilalı pirinç bant, küçük yuvarlak pirinç uç.",
+          "lore": "Yedi hasta ceketi içindeki koyu kırmızı cila, iki kez cilalı pirinçle bantlanmış: Bir çit büyücüsünün, gerçek parayı almaya başladığında ve bakmak istediğinde Dünya Piyasasından satın aldığı türden bir asa. Işığı bir huş ağacı çubuğundan daha iyi bir şekilde iletmez. Ama Tüccar'ın tezgahının üzerinde muhteşem bir şekilde parlıyor ve küçük büyülerin yarısına her zaman inanılıyor."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Fletcher'ın Lonca Yayı",
+          "look": "Lake ceviz olimpik yay, pirinç dal uçları, mumlu keten ip, yükselticide bir lonca damgası.",
+          "lore": "Diyarın bir loncaya en yakın şeyi, yükselticideki bir fletcher damgası, içinde ne olduğuna dair bir söz, bir şarapçının fıçıyı mühürleme şeklidir. Lake ceviz, kol uçlarında pirinç, Mirefen yağmurunda yıpranmayacak mumlu keten ip. Her ortak fiyat için tartışır. Dul Çalılığı'nı geçtikten sonra onu çekerseniz tartışma kazanır."
+        },
+        "cinderbrand_sword": {
+          "name": "Cinderbrand",
+          "look": "Koyu renkli dövme çelikten yapılmış bıçak, daha dolgun, parlayan köz-turuncu rünlerle, ısı çatlaklarıyla ve korumada için için yanan bir mücevherle dolu.",
+          "lore": "İlk bıçak suda değil Stormcrag'den toplanmış Kutsanmış Közlerde söndürüldü; Yüksekgözcü demircilerinin 'mavi ve temiz yanacağına, çünkü dağ eski yeminini hatırladığına' yemin ettiği kömürler. Banka daha dolgun hale getirildi, o ateş kor-turuncu için için yanıyor ve ölmeyecek; Duvarın en soğuk gecesinde rünler çıplak el kadar sıcak kalır. Cinderbrand'ın asla aydınlatmaya ihtiyacı yoktur. Sadece dışarı çıkmayı reddediyor."
+        },
+        "emberbite_axe": {
+          "name": "Korbit",
+          "look": "Ucunda kor turuncusu çatlaklar parlayan kararmış demirden bir balta, kömürden yapılmış bir mücevher, ısı parçacıkları.",
+          "lore": "Zırhçı Hode, ucun kalbine canlı bir dağ ateşi kömürü işledi, böylece darbeler arasında kenar asla tam olarak soğumaz. Düşüşte çatlaklar turuncu renkte soluklaşıyor, sanki darbe ilk dövmenin demirin içinde bıraktığı bir şeyi uyandırıyormuş gibi. Bir Stormcrag elementalinin bunun için közden vazgeçtiğini söylüyorlar; Rüzgar estiğinde Highwatch'ta pek çok şey söylerler."
+        },
+        "smoulderfall_mace": {
+          "name": "için için yanan yağış",
+          "look": "İç çatlakları boyunca kor-turuncu renkte parlayan koyu demir flanşlar, kafanın içinde erimiş çekirdekli bir mücevher.",
+          "lore": "Kendi ocağını taşıyan bir topuz: Sanctum mühründen yontulmuş, 'dağ ateşiyle dövülmüş', kafanın içine parıldayan erimiş özlü bir taş. Flanşlar dokunulduğunda sıcak kalır ve indikleri yerde daha sıcak olur; Bir Highwatch çavuşu, darbenin sabaha kadar hafifçe parlayan bir morluk bıraktığına yemin ediyor. Sonunda dağın ateşi mühürlemekten çok kırmaya yaradı."
+        },
+        "ashspark_dagger": {
+          "name": "Külkıvılcımı Şiv",
+          "look": "Parıldayan kor-turuncu damarlarla kaplı kısa kararmış bıçak, kulpunda için için yanan küçük bir mücevher, kül ve kıvılcım.",
+          "lore": "Kulplu taşına dağın ateşinin gizlice sokulduğu bir arka sokak bıçağı, bir zırhçının sessiz şakası: bir yankesici bile ilk dövmenin közünü taşıyabilir. Kararmış, turuncu damarlı, kılıfında her zaman fazla sıcak bir gölge. Karanlıkta Highwatch'ın altına çizdiğinizde, parıltı elinizi bir adamın korumasındaki boşluğu bulmaya yetecek kadar aydınlatır."
+        },
+        "forgeheart_staff": {
+          "name": "Forgeheart Çıta",
+          "look": "Kafesli, kor halindeki bir çekirdekle taçlandırılmış demir nallı asa, kor şafttan yukarı doğru akıyor ve ısıyla parıldamaya başlıyor.",
+          "lore": "Tepesinde demirle kafeslenmiş dağ ateşinden canlı bir kömür. İlim Ustası Caddis, bunu ilk dövme ateşinin sadece mühürlemek için değil, aynı zamanda hizmet etmek için de gerekli olabileceğinin kanıtı olarak adlandırıyor. Isı parıltısı ince, sonsuz bir şerit halinde ondan yükseliyor; birini taşıyan bir büyücü asla bir demir ocağı ya da nöbet ateşi istemez. Közün, Korkanatlı Voskar'ın kendi nefesinden alındığını ve o zamandan beri soğumadığını fısıldıyorlar."
+        },
+        "emberwrought_wand": {
+          "name": "Kordan Dövülmüş Değnek",
+          "look": "Ucunda demir pençelerde parlayan köz kömürü bulunan kararmış metal değnek, kılcal ısı çatlakları, sıcak iç ışık.",
+          "lore": "Dereceyi adlandıran asa. Bir Highwatch zırhçısı ilk kez dağ ateşinden bir kömürü demir pençelere yerleştirdiğinde ve onu ölümlü bir ele yanıt verdiğinde, Işığın Rahip'leri bile ona sapkınlık demeyi bıraktı ve onu yararlı olarak adlandırmaya başladı. Sıcak, sabırlı ve sessizce tehlikeli: Ucundaki kor, sahibi nefes almadan önce bile yanmış, kırılmamış."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Külçe mandalı",
+          "look": "Karartılmış çelik arbalet, dürtükteki çatlaklardan kor-turuncu bir parıltı sızıyor, yekede için için yanan bir kömür.",
+          "lore": "Közde dövülenlerin en tuhafı: Dağın ateşi bir makineye döküldü. Dürtüdeki çatlaklardan turuncu sızıyor ve yekede için için yanan bir kömür, telin Thornpeak'in soğuğunda veya Mirefen'in rutubetinde sertleşmesini engelliyor. Cıvataları oluğu zaten sıcak bırakır ve daha sıcak bir iniş yapar. Düşmanın soğuğu hissetmediği bir duvara avcının cevabı."
+        },
+        "ice_fang_sword": {
+          "name": "Buz Dişi",
+          "look": "Soluk buzul buzunun kavisli bıçağı, omurga boyunca sivri uçlu kırağı kristalleri, daha dolgun, buz saçağı çapraz korumasında parlak camgöbeği donmuş bir çekirdek.",
+          "lore": "Dondurulmuş sınıfın amiral gemisi ve her koleksiyoncunun ilk ulaştığı parça. Ice Fang, Highwatch'ın yukarısındaki Thornpeak'i çevreleyen buzulun bir dişinden oyulmuş, dövülmemiş, camgöbeği çekirdeği Glimmermere'in ışığı kadar soğuktu. Kestiği havayı çevreliyor. Duvar muhafızı, yoğun kar yağışının Wyrmkült'ü geride bıraktığı gece onu bir askerin taşıdığına ve 'duvarı bir kış satın aldığına' yemin etti."
+        },
+        "glaciersplit_axe": {
+          "name": "Buzul yarılması",
+          "look": "Yarı saydam mavi buzul buzunun başı, çatlak iç kısmı parlak camgöbeği, don kristalleri kıllanıyor, soğuk buharı sürükleyen bir sap.",
+          "lore": "İki yüzyıllık buzun soğuğu kendi kendine parıldayana kadar bastırdığı Thornpeak buzulunun mavi kalbinden yontulmuş. Dinlenme halindeyken bile buharı takip ediyor ve inişindeki çatlak, Sinsi Sokulmaer Sırtı'nın altındaki bir yarık açıklığıdır. Highwatch, düşüşünü orada buza veriyor; yani bu, buzların erimesini ve erimenin uyandıracağı her şeyi uzak tutmayı amaçlayan bir silah."
+        },
+        "rimecrusher_mace": {
+          "name": "Kıraç Kırıcı",
+          "look": "Parlayan camgöbeği çekirdeğin etrafındaki pürüzlü buz kristallerinden oluşan bir küme, kırağı gümüş rengi bir saptan aşağıya doğru sürünüyor.",
+          "lore": "Oyulmamış ama büyütülmüş: Thornpeak buzu, Hode'un en iyi çeliği kadar sertleşene kadar soğuk bir camgöbeği çekirdeğin etrafında dolaştı. Kırağı gümüş kaplı saptan ele doğru sürünüyor ve asla tam olarak ulaşamıyor. Çarptığı yerde su donar; durduğu yerde zemin ağarır. Zirvelerin mezar soğuğu, duvara tırmanan şeylere sallanabilecek kadar küçüktü."
+        },
+        "frostbite_dagger": {
+          "name": "Kırağı İğnesi",
+          "look": "Berrak mavi buzdan çok ince bir hançer, ortasında parlayan camgöbeği bir damar, iğne şeklinde don kristalleri, kırağı kabzası.",
+          "lore": "Tutulan bir nefes kadar ince ve iki kat daha soğuk: Thornpeak buzulunun bir parçası tek bir parlak damar halinde bilenmiş, o kadar keskin ki, kan akmayı hatırlamadan yara donup kapanıyor. Adını, ölülerin zirvelerden aşağıya taşıdığı mezar soğuğundan almıştır. Hiçbir zaman keskinleştirilmesine ihtiyaç duymaz; Loremaster Caddis kuru bir sesle, buzun donuklaşmadığını, yalnızca beklediğini belirtiyor."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Kırağı Nöbeti",
+          "look": "Yüzen, yavaşça dönen parlak camgöbeği buz parçası, yayılan kristaller ve soğuk buharla taçlandırılmış gümüş kaplı asa.",
+          "lore": "Highwatch duvarında asla uyumayan nöbetçinin asası. Tacı, gümüşten bağımsız süzülen ve yavaşça kendi kendine dönen camgöbeği bir buz parçasıdır; muhafızın yeminine göre daima zirvelerin altında biriken soğuğa yönelir. Vigil'i taşımak, tek bir gecede iki yüz yıl nöbet tutmak ve gözünü ayırmamaya söz vermektir."
+        },
+        "everwinter_wand": {
+          "name": "Everwinter Parçası",
+          "look": "Parıldayan camgöbeği buzul buzundan tek bir sivri uç, gümüş bir yakadan çiçek açan kırağı, hafif soğuk sis.",
+          "lore": "Dağın soğuğunun dişlerinin olduğu Sanctum'un altındaki derin dağ gölünden kırıldığı söylenen parlak bir buzul buz parçası. Kırağı gümüş tasmasından sonsuzca çiçek açar ve ne ateşle ne de yazla asla erimez. Büyücü'ler, işlerini kolaylaştıracak soğuktan dolayı onu yakın tutuyorlar ve Nythraxis'in mezarına doğru eğildiği ve dinlediği gecelerde de onu uzakta tutuyorlar."
+        },
+        "winterbite": {
+          "name": "Kış ısırığı",
+          "look": "Gümüş rengi çelik ve mavi buz yay, yükselticide parlayan camgöbeği donmuş çekirdek, katı buz ve soğuk buhardan oluşan çentikli bir ok.",
+          "lore": "Gümüş rengi çelikten ve Thornpeak buzundan yapılmış bir yay; yükselticisi, okun teline doğru donmasını sağlayan soğuk camgöbeği bir çekirdekle aydınlatılıyor. Her çekişi yeniden şekillendiren katı buzul buzundan oluşan bir şaftı çentikliyor; okçu duvarda ok kılıfı taşımaz, sadece soğuktur. Highwatch, Sinsi Sokulmaer Ridge'i buna benzer biriyle kuşatma altında tuttu: Söylediklerine göre tek bir okçu ve her zaman orada olan bir kışa yetecek kadar ok vardı."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Şafağın Son Işığı",
+          "look": "Düşmüş bir yıldızdan dövülmüş büyük kılıç, bıçağı bölen erimiş altın çekirdek, yıldız ışığında kenarları çevrelenmiş kozmos siyahı çelik, muhafızın etrafında dönen altın parçalar, aurora şeridi.",
+          "lore": "Yıldız batı göklerinden düştüğünde ve Dul Çalılığı'nın ötesinde 'bir demir ocağı gibi patladığında', Kardeş Aldric onun hala için için yanan kalbini Mirefen kraterinden çıkardı ve diyarın demircilerine 'bu dünyaya ait olmayan bir şey' yapmaları için yalvardı. Bundan büyük bir kelime çıkardılar: Solheim. Erimiş altın çekirdeği, gece gökyüzünü çatlatan şafak gibi kozmos karası kılıcı böler ve yıldız metali parçaları, elle ayarlanmayan yollardaki muhafızların yörüngesinde döner. Sadece bir tanesi dövüldü. Başka bir şey olmayacak."
+        },
+        "skyrender_axe": {
+          "name": "Skyrender, Gökkubbenin Yarası",
+          "look": "Parçalanmış bir gece gökyüzü parçası gibi kafa, erimiş altın çatlaklar ve takımyıldız gravürleri, havada asılı duran yıldız ışığı parçacıkları, kenarlarda bir kutup ışığı parıltısı.",
+          "lore": "Düşen yıldızın gökyüzündeki yansımasını Mirefen'den kopardığı ve hâlâ dumanı tüten bir yara bıraktığı kraterin kenarından vurulmuş. Kafa parçalanmış bir gece parçasına benziyor: erimiş altın çatlaklar, Highwatch'taki hiçbir bilginin adını koyamadığı takımyıldızlar, her vuruşta kenarından kanayan bir kutup ışığı. Kardeş Aldric onu kutsadı ve ona dokunmadı. Onu kaldırmak, göklerin bıraktığı deliği tutmaktır."
+        },
+        "starfall_mace": {
+          "name": "Yıldız Düşüşü, Göklerin Yargısı",
+          "look": "Yörüngedeki parçalarla çevrelenmiş tutsak erimiş altın yıldız çekirdeği, yıldız ışığıyla damarlanmış kozmos siyahı flanşlar, dikişlerden aurora saçılıyor.",
+          "lore": "Bir yıldız çekirdeği ölmeden hemen önce yakalandı, kendisiyle birlikte düşen enkazla çevrelendi, unutulmaktan bir santim uzakta dondu. Kozmos siyahı kenarları sıkışmış yıldız ışığıyla akıyor ve kaldırıldığında dikişlerden aurora saçılıyor. Işığın eski Rahip'leri kayan bir yıldıza yargı adını verdiler; hiçbir kalkanın durmaması gerektiğine dair yukarıdan verilen bir karar ve buna Mirefen'e düşen yıldızın adını verdiler."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Düşen Yıldızın Dişi",
+          "look": "Düşmüş bir yıldızın bir şeridi, kozmos siyahı metal üzerinde erimiş altın renginde parlayan kenar, kulpun etrafında dönen parlak bir yıldız zerresi, ince bir aurora izi.",
+          "lore": "Aldric'in kraterden çıkardığı yıldızın en küçük parçası ve bazı hesaplamalara göre en tehlikelisi. O uhrevi kalbin tek bir şeridi, erimiş altın kenarı kozmos siyahı metale biniyor, dünyasını kaybetmiş bir ay gibi kulpun etrafında dönen yalnız bir yıldız zerresi. Neredeyse hiçbir ağırlığı yoktur ve neredeyse her şeyi parçalara ayırır. Saklanacak kadar küçük, karanlıkta kendi ışığıyla bulunabilecek kadar parlak."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Sonsuz Boşluğun Kulesi",
+          "look": "Erimiş altın bir çekirdeğin etrafında dönen altın yıldız parçacıkları kümesi, takımyıldızlarla kazınmış kozmos siyahı şaft, yukarıya doğru kıvrılan aurora şeritleri.",
+          "lore": "Erimiş altın bir çekirdekle taçlandırılmış bir yıldız metali şaftı ve etrafında yavaş, sonsuz bir yörüngede dolaşan altın parçalardan oluşan bir halka: Thornpeak'in üzerindeki hiçbir gökyüzüne benzemeyen takımyıldızlarla kazınmış küçük bir evren. Aurora, yükselmeyi unutmuş bir duman gibi kıvrılıyor. Onu taşıyanlar, Ysolei'nin sadece 'ay ışığını içmesi' gibi, içinden geçen boşluğu hissedebildiklerini iddia ettiler: sabırlı, soğuk ve geriye bakan."
+        },
+        "emberwish_wand": {
+          "name": "Emberwish, Ölen Güneşin Parçacığı",
+          "look": "Yörüngede dönen kıvılcımlarla çevrelenmiş, tutsak erimiş altın ölmekte olan yıldız zerresi, parlayan takımyıldızlarla kaplanmış kozmos siyahı şaft.",
+          "lore": "Düşen yıldızın kendisi değil, ölmekte olan bir yıldızın son zerresi: çoktan sönmüş bir güneşin, son ışığı olan kıvılcımlarla çevrelenmiş tek bir erimiş altın köz. Kozmos siyahı gövdesi, ölümünü izleyen takımyıldızlarla kazınmış. Mirefen çiftçileri, onu gerçek alacakaranlıkta tutan kişinin bir dileğini yerine getirdiğini söylüyor; ayrıca onu tutan her ruhun daha fazla zaman dilediğini ve Boğulmuş Ay'ın hiçbirine zaman tanımadığını söylüyorlar."
+        },
+        "encore_bow": {
+          "name": "Encore, İkinci Kayan Yıldız",
+          "look": "Komik derecede büyük yıldız topu: parıldayan altın takımyıldızlarla süslenmiş kozmos siyahı bir namlu, içinde erimiş altın kuyruklu yıldız kabuğunun oturduğu genişletilmiş çan namlusu, pirinç donanımlar, ahşap bir omuz kundak.",
+          "lore": "Düşen yıldızı işleyen demirciler ondan altı kutsal emanet yaptılar ve hâlâ bir fıçı değerinde yıldız metali kalmıştı ve o zamana kadar çırakların fikirleri vardı. Örsten çıkan şey ya diyarın ilk silahı ya da en küçük kuşatma motoruydu: atış kaybetmeyen, ikinci bir yıldızı hedef alan bir omuz topu. Kardeş Aldric, bu kadar gürültülü olan her şeyin cennet tarafından zaten fark edildiğini düşünerek onu kutsamayı reddetti. Avcı'ler buna bayılıyor. Aşağı seviyede hiçbir şey olmadı."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlatch, Gökyüzünün Son Yargısı",
+          "look": "Yeke boyunca meteorik yıldız metali, erimiş altın çekirdek, takımyıldızlarla kazınmış kozmos siyahı uzuvlar, saf yıldız ateşinden oluşan çentikli bir ok.",
+          "lore": "Mirefen krateri hala parlarken, ham meteorik yıldız metalinden dövülmüş, enkaz 'taşınamayacak kadar sıcak', takımyıldızlarla kazınmış kozmos siyahı uzuvlara dövülmüş, erimiş altın bir çekirdek yeke boyunca yığılmış. Hiçbir sürgüyü takmıyor ama bir tanesini çağrıştırıyor: bir hüküm gibi serbest bırakılan ve bir hükmün sonu gibi inen bir yıldız ateşi şaftı. Highwatch, Nythraxis'in ölümsüz tacının bile zirvelerin altındaki en kötü şey olamayacağından korkarken, duvarda olmasını istedikleri silah bu. İyi hedefleyin."
+        }
+      },
+      "seasonOne": "1. Sezon",
+      "rarity": {
+        "uncommon": "Yaygın olmayan",
+        "rare": "Nadir",
+        "epic": "Destansı",
+        "legendary": "Efsanevi"
+      },
+      "wtype": {
+        "sword": "Kılıç",
+        "axe": "Balta",
+        "mace": "Topuz",
+        "dagger": "Hançer",
+        "staff": "Asa",
+        "wand": "Değnek",
+        "bow": "Yay",
+        "crossbow": "Arbalet"
+      },
+      "badge": {
+        "flagship": "Amiral gemisi",
+        "hero": "Kahraman"
+      },
+      "inspectAria": "{item}'yi inceleyin",
+      "viewModeLabel": "Önizleme modu",
+      "tryOn": "Deneyin",
+      "weaponOnly": "Yalnızca silah",
+      "sceneLabel": "Sahne aydınlatması",
+      "scene": {
+        "day": "Gün",
+        "dusk": "Alacakaranlık",
+        "night": "Gece"
+      },
+      "lore": "Hikaye",
+      "buySkin": "Görünüm Satın Alın",
+      "unavailable": "Kullanılamıyor",
+      "applied": "Uygulandı",
+      "apply": "Görünümü Uygula",
+      "detach": "Görünümü Kaldır",
+      "equipHint": "Bu görünümü uygulamak için bir {type} donatın."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Claudium'u aç",
+      "close": "Claudium'u kapat",
+      "loading": "Claudium yükleniyor...",
+      "balanceLabel": "Bakiye",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "Claudium mağazası şu anda kullanılamıyor. Bakiyeniz ve satın alımlarınız etkilenmez; lütfen kısa süre sonra tekrar kontrol edin.",
+      "disclosure": "Claudium tek yönlü yumuşak bir para birimidir: Parayla satın alın ve kozmetik ürünlerine harcayın. Kullanılamaz, devredilemez veya nakde çevrilemez.",
+      "buyTitle": "Claudium'u satın al",
+      "railLabel": "Ödeme yöntemi",
+      "railStripe": "Kart",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "%20 indirim",
+      "railWocUnavailable": "WOC fiyatlandırması şu anda mevcut değil.",
+      "railNativeUnavailable": "SOL/WOC şu anda kullanılamıyor.",
+      "amountLabel": "Miktar",
+      "showAmounts": "Tüm Claudium miktarlarını göster",
+      "hideAmounts": "Ekstra Claudium miktarlarını gizle",
+      "skuRow": "{claudium} Claudium için {usd}",
+      "buyButton": "Satın Al",
+      "buyUnavailable": "Şu anda satın alma işlemi yapılamıyor.",
+      "storeTitle": "Kozmetik Mağazası",
+      "storeEmpty": "Şu anda kozmetik mevcut değil.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Kullan",
+      "kindCosmetic": "Kozmetik",
+      "kindSkin": "Görünüm",
+      "kindItem": "Öğe",
+      "checkoutTitle": "Satın alma işlemini tamamla",
+      "checkoutClose": "Ödemeyi kapat",
+      "checkoutLoading": "Ödeme yükleniyor...",
+      "checkoutPending": "İşlem devam ediyor. Cüzdanınızda onaylayın ve bu paneli açık tutun.",
+      "checkoutPendingButton": "İşleme",
+      "checkoutFailed": "Ödeme yüklenemedi. Lütfen tekrar deneyin.",
+      "checkoutUnavailable": "Bu Claudium satın alımı şu anda mevcut değil.",
+      "checkoutWalletRequired": "Claudium'u kriptoyla satın almadan önce bir Solana cüzdanı bağlayın.",
+      "checkoutWalletUnsupported": "Bu cüzdan Solana işlemlerini imzalayamaz ve gönderemez.",
+      "checkoutNotSettled": "İşlem gönderildi ancak Claudium'a henüz para yatırılmadı. Lütfen kısa süre sonra tekrar deneyin."
+    },
     "theme": {
       "preset": "Arayüz Teması",
       "customColors": "Özel Renkler",
@@ -318,7 +575,7 @@ export const tr_TR: EnTranslations = {
     "mobile": {
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
-      "dailyRewards": "Ödüller",
+      "dailyRewards": "Mağaza",
       "deeds": "Yiğitlikler",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
@@ -340,12 +597,12 @@ export const tr_TR: EnTranslations = {
       "talkBodyTouch": "Mareşal Redbrook'a yaklaş ve konuşmak için Kullan düğmesine dokun, ardından görevini kabul et.",
       "returnBodyTouch": "Görevin tamamlandı. Mareşal Redbrook'a dön ve teslim etmek için Kullan düğmesine dokun.",
       "doneBodyTouch": "Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla'ya, ardından Görevler'e dokun. İyi avlar.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Dövüşte yeni misiniz? Hedeflemek için {targetKey} tuşuna basın veya bir kurda tıklayın, ardından ona saldırmak için bir eylem çubuğu özelliğini kullanın.",
+      "slayTargetHintTouch": "Dövüşte yeni misiniz? Hedef almak için bir kurda dokunun, ardından ona saldırmak için bir eylem çubuğu yeteneğine dokunun.",
+      "nextTipsTitle": "Sonraki nereye",
+      "nextTipQuestLog": "Yakındaki bir sonraki görevinizi bulmak için Görev Günlüğünüzü ({key}) açın.",
+      "nextTipMap": "Görevlerin sizi nerede beklediğini görmek için Dünya Haritasını ({key}) kontrol edin.",
+      "nextTipSocial": "Daha zorlu dövüşler için bir grup bulmak üzere Sosyal ({key}) dosyasını açın."
     },
     "widgets": {
       "clockTitle": "Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla",
@@ -706,17 +963,17 @@ export const tr_TR: EnTranslations = {
       "highContrastAria": "Yüksek kontrastlı arka planı aç/kapat: hareketli tanıtımı devre dışı bırakır, böylece başlangıç ekranı metni okunaklı kalır"
     },
     "warfare": {
-      "honorAmount": "{amount} Honor",
+      "honorAmount": "{amount} Onur",
       "dualPrice": "{money} + {honor}",
-      "balance": "Honor: {amount}",
-      "honorFloat": "+{amount} Honor",
-      "honorGain": "You gain {amount} Honor ({reason}).",
-      "notEnoughHonor": "Not enough Honor.",
+      "balance": "Onur: {amount}",
+      "honorFloat": "+{amount} Onur",
+      "honorGain": "{amount} Onur ({reason}) kazanırsınız.",
+      "notEnoughHonor": "Yeterli Onur yok.",
       "reasons": {
-        "arenaWin": "Arena victory",
-        "fiestaKill": "Fiesta takedown",
-        "fiestaComplete": "Fiesta completed",
-        "fiestaWin": "Fiesta victory"
+        "arenaWin": "Arena zaferi",
+        "fiestaKill": "Fiesta avlaması",
+        "fiestaComplete": "Fiesta tamamlandı",
+        "fiestaWin": "Fiesta zaferi"
       }
     },
     "statInfo": {
@@ -727,9 +984,9 @@ export const tr_TR: EnTranslations = {
         "hasteRating": "Hız Puanı",
         "haste": "Haste",
         "parry": "Parry",
-        "warfare": "Warfare"
+        "warfare": "Harp"
       },
-      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
+      "warfareValue": "+{increase}% verilen / -{reduction}% alınan",
       "desc": {
         "str": "Saldırı gücünü artırır, böylece silah darbelerin daha sert iner.",
         "agi": "Reflekslerini ve nişan alma yeteneğini keskinleştirir, birçok savaş istatistiğini geliştirir.",
@@ -746,7 +1003,7 @@ export const tr_TR: EnTranslations = {
         "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",
         "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
-        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
+        "warfare": "Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır."
       },
       "effects": {
         "attackPower": "+{value} Saldırı Gücü",
@@ -972,7 +1229,7 @@ export const tr_TR: EnTranslations = {
     "corpseHarvest": {
       "title": "Toplama",
       "harvestButton": "Topla",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Hasat: Bu cesetten işçilik malzemelerini (deri, diş, ipek ve benzeri bileşenler) herhangi bir ganimetten ayrı olarak toplayın. Herkes hasat yapabilir; belirli bir cesedi yalnızca bir oyuncu toplayabilir.",
       "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
@@ -1182,7 +1439,7 @@ export const tr_TR: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Sandık",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Tümü'yi alın: bu ganimet penceresindeki tüm paraları ve eşyaları toplayın."
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
@@ -1646,7 +1903,7 @@ export const tr_TR: EnTranslations = {
       "trackerLabel": "Yiğitlikler",
       "collapseHint": "Yiğitlik takipçisini daralt",
       "expandHint": "Yiğitlik takipçisini genişlet",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Yiğitlikler Kitabı'nı açın",
       "charTitleLabel": "Unvan",
       "charTitleNone": "Unvan seçilmedi",
       "charOpenBook": "Yiğitlikler Kitabı",
@@ -5431,8 +5688,8 @@ export const tr_TR: EnTranslations = {
         "description": "Hedef alanı 6 saniye boyunca sarsar ve düşmanları her 1.5 saniyede bir {damage} Doğa hasarıyla hırpalar."
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "name": "Zincirleme İyileştirme",
+        "description": "Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)"
       },
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
@@ -5681,6 +5938,10 @@ export const tr_TR: EnTranslations = {
       "lay_on_hands": {
         "name": "Son Ayin",
         "description": "Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi."
+      },
+      "holy_taunt": {
+        "name": "Kutsal Tahrik",
+        "description": "Hedefi alaya alır: Tehditiniz en nefret ettiği düşmanla eşleşecek şekilde yükselir ve 3 saniye boyunca size saldırmak zorunda kalır."
       },
       "flash_of_light": {
         "name": "Işık Şifası",
@@ -6219,8 +6480,8 @@ export const tr_TR: EnTranslations = {
         "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "pummel": {
-        "name": "Pummel",
-        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+        "name": "Yumruklama",
+        "description": "Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller."
       },
       "heroic_leap": {
         "name": "Heroic Leap",
@@ -6259,28 +6520,28 @@ export const tr_TR: EnTranslations = {
         "description": "Bir Wraithborn'u iradene bağlar: uzaktan ağır Gölge hasarı yağdıran seçkin bir iblis. Uzun bir bekleme süresi yıkıcı gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."
       },
       "kick": {
-        "name": "Boot",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Tekme",
+        "description": "Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller."
       },
       "counterspell": {
-        "name": "Spellbreak",
-        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+        "name": "Karşı Büyü",
+        "description": "Hedefin büyü kullanımına karşı koyar ve 6 saniye boyunca o okuldan büyü yapılmasını engeller."
       },
       "counter_shot": {
-        "name": "Hushing Shot",
-        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Karşı Atış",
+        "description": "Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış."
       },
       "rebuke": {
-        "name": "Reproach",
-        "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
+        "name": "Azar",
+        "description": "Hedefin büyüsünü keser ve 4 saniye boyunca o okuldan büyü yapılmasını engeller."
       },
       "skull_bash": {
-        "name": "Headbutt",
-        "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
+        "name": "Kafatası Darbesi",
+        "description": "Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen bir kafa vuruşu."
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+        "name": "Büyü Kilidi",
+        "description": "Hedefi kullanım sırasında susturur ve 5 saniye boyunca o okuldan atış yapılmasını engeller."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -6926,124 +7187,124 @@ export const tr_TR: EnTranslations = {
         "name": "Güneş Yaprağı Otu"
       },
       "furyforged_warhelm": {
-        "name": "Furyforged Warhelm"
+        "name": "Furyforged Savaş Miğferi"
       },
       "furyforged_warspaulders": {
-        "name": "Furyforged Warspaulders"
+        "name": "Furyforged Savaş Omuzlukları"
       },
       "furyforged_warplate": {
-        "name": "Furyforged Warplate"
+        "name": "Öfkeyle Dövülmüş Savaş Plakası"
       },
       "furyforged_girdle": {
-        "name": "Furyforged Girdle"
+        "name": "Öfkeyle Dövülmüş Kuşak"
       },
       "furyforged_legguards": {
-        "name": "Furyforged Legguards"
+        "name": "Öfkeyle Dövülmüş Bacak Korumaları"
       },
       "furyforged_gauntlets": {
-        "name": "Furyforged Gauntlets"
+        "name": "Furyforged Eldivenler"
       },
       "furyforged_sabatons": {
-        "name": "Furyforged Sabatons"
+        "name": "Öfkeyle dövülmüş Sabatonlar"
       },
       "stormbound_crown": {
-        "name": "Stormbound Crown"
+        "name": "Fırtınaya Bağlı Taç"
       },
       "stormbound_spaulders": {
-        "name": "Stormbound Spaulders"
+        "name": "Fırtınaya Bağlı Omuzluklar"
       },
       "stormbound_hauberk": {
-        "name": "Stormbound Hauberk"
+        "name": "Fırtınaya Bağlı Hauberk"
       },
       "stormbound_waistguard": {
-        "name": "Stormbound Waistguard"
+        "name": "Fırtınaya Bağlı Bel Koruması"
       },
       "stormbound_legmail": {
-        "name": "Stormbound Legmail"
+        "name": "Fırtınaya Bağlı Bacak Zırhı"
       },
       "stormbound_handguards": {
-        "name": "Stormbound Handguards"
+        "name": "Fırtınaya Bağlı El Korumaları"
       },
       "stormbound_greaves": {
-        "name": "Stormbound Greaves"
+        "name": "Fırtınaya Bağlı Dizlikler"
       },
       "ashstalker_cowl": {
-        "name": "Ashstalker Cowl"
+        "name": "Kül Avcısı Kukuletası"
       },
       "ashstalker_shoulderguards": {
-        "name": "Ashstalker Shoulderguards"
+        "name": "Kül Avcısı Omuzlukları"
       },
       "ashstalker_harness": {
-        "name": "Ashstalker Harness"
+        "name": "Kül Avcısı Göğüslüğü"
       },
       "ashstalker_waistband": {
-        "name": "Ashstalker Waistband"
+        "name": "Kül Avcısı Kemeri"
       },
       "ashstalker_legguards": {
-        "name": "Ashstalker Legguards"
+        "name": "Kül Avcısı Bacak Korumaları"
       },
       "ashstalker_grips": {
-        "name": "Ashstalker Grips"
+        "name": "Kül Avcısı Eldivenleri"
       },
       "ashstalker_treads": {
-        "name": "Ashstalker Treads"
+        "name": "Kül Avcısı Adımları"
       },
       "cinderweave_cowl": {
-        "name": "Cinderweave Cowl"
+        "name": "Cinderweave Kukuletası"
       },
       "cinderweave_mantle": {
-        "name": "Cinderweave Mantle"
+        "name": "Kül Örgüsü Manto"
       },
       "cinderweave_raiment": {
-        "name": "Cinderweave Raiment"
+        "name": "Kül Dokuma Elbisesi"
       },
       "cinderweave_cord": {
-        "name": "Cinderweave Cord"
+        "name": "Kül Örgüsü Kordon"
       },
       "cinderweave_legwraps": {
-        "name": "Cinderweave Legwraps"
+        "name": "Cinderweave Bacak Sargıları"
       },
       "cinderweave_handwraps": {
-        "name": "Cinderweave Handwraps"
+        "name": "Cinderweave El Sargıları"
       },
       "cinderweave_slippers": {
-        "name": "Cinderweave Slippers"
+        "name": "Cinderweave Terlik"
       },
       "final_oath_medallion": {
-        "name": "Medallion of the Final Oath"
+        "name": "Son Yemin Madalyonu"
       },
       "razorwind_torque": {
-        "name": "Razorwind Torque"
+        "name": "Razorwind Boyunluğu"
       },
       "cinder_sigil_pendant": {
-        "name": "Cinder-Sigil Pendant"
+        "name": "Cinder-Sigil Kolye"
       },
       "iron_vow_band": {
-        "name": "Iron Vow Band"
+        "name": "Demir Yemin Yüzüğü"
       },
       "unbroken_circle": {
-        "name": "The Unbroken Circle"
+        "name": "Kesintisiz Çember"
       },
       "fleetblood_band": {
-        "name": "Fleetblood Band"
+        "name": "Fleetblood Yüzüğü"
       },
       "last_step_signet": {
-        "name": "Last-Step Signet"
+        "name": "Son Adım Mührü"
       },
       "ashen_focus_ring": {
-        "name": "Ashen Focus Ring"
+        "name": "Kül Rengi Odak Halkası"
       },
       "spellbreakers_seal": {
-        "name": "Spellbreaker's Seal"
+        "name": "Büyü Kırıcı Mührü"
       },
       "final_argument_greatblade": {
-        "name": "Final Argument Greatblade"
+        "name": "Son Tartışmanın Büyük Kılıcı"
       },
       "first_blood_razor": {
-        "name": "First-Blood Razor"
+        "name": "İlk Kanlı Ustura"
       },
       "emberglass_warstaff": {
-        "name": "Emberglass Warstaff"
+        "name": "Korgözlü Savaş Asası"
       },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"
@@ -8195,9 +8456,9 @@ export const tr_TR: EnTranslations = {
         "greeting": "Kahramanca derinliklerin kanıtı, Highwatch'taki en iyi yüzükleri ve kolyeleri satın alır. Nişanlarını göster bana."
       },
       "fury": {
-        "name": "FURY",
-        "title": "Honor Quartermaster",
-        "greeting": "The sands remember every victory. Spend your honor well."
+        "name": "ÖFKE",
+        "title": "Onur Malzeme Sorumlusu",
+        "greeting": "Kumlar her zaferi hatırlar. Onurunu iyi harca."
       },
       "loremaster_caddis": {
         "name": "İrfan Ustası Caddis",

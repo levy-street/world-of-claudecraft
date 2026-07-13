@@ -22,6 +22,14 @@ import {
   CHARACTER_DELETE_POLICY,
   CHARACTER_RENAME_POLICY,
   CHARACTER_TAKEOVER_POLICY,
+  CLAUDIUM_CONFIRM_POLICY,
+  CLAUDIUM_CONFIRM_PRE_AUTH_POLICY,
+  CLAUDIUM_PURCHASE_POLICY,
+  CLAUDIUM_PURCHASE_PRE_AUTH_POLICY,
+  CLAUDIUM_QUOTE_POLICY,
+  CLAUDIUM_QUOTE_PRE_AUTH_POLICY,
+  CLAUDIUM_SPEND_POLICY,
+  CLAUDIUM_SPEND_PRE_AUTH_POLICY,
   DISCORD_POLICY,
   PUBLIC_READ_POLICY,
   type RateLimitPolicy,
@@ -35,10 +43,15 @@ import type { RateLimitOutcome, RateLimitStore } from '../../../server/http/type
 import {
   CARD_UPLOAD_MAX_PER_MINUTE,
   CHARACTER_MUTATION_MAX_PER_MINUTE,
+  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CLAUDIUM_SPEND_MAX_PER_MINUTE,
   DISCORD_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
   REPORTS_CREATE_MAX_PER_MINUTE,
   resetCardUploadRateLimits,
+  resetClaudiumMutationRateLimits,
   resetDiscordRateLimits,
   resetRateLimitClock,
   resetWalletLinkRateLimits,
@@ -95,6 +108,7 @@ beforeEach(() => {
   setRateLimitClock(() => PINNED);
   resetWocBalanceRateLimits();
   resetCardUploadRateLimits();
+  resetClaudiumMutationRateLimits();
 });
 
 afterEach(() => {
@@ -103,6 +117,7 @@ afterEach(() => {
   setRateLimitTier2Store(null);
   resetWocBalanceRateLimits();
   resetCardUploadRateLimits();
+  resetClaudiumMutationRateLimits();
   resetTier2ErrorLogThrottle();
 });
 
@@ -370,6 +385,14 @@ describe('rateLimit: policy derivation guard', () => {
       { policy: WOC_BALANCE_POLICY, limit: WOC_BALANCE_MAX_PER_MINUTE },
       { policy: CARD_UPLOAD_POLICY, limit: CARD_UPLOAD_MAX_PER_MINUTE },
       { policy: WALLET_LINK_POLICY, limit: WALLET_LINK_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_PURCHASE_PRE_AUTH_POLICY, limit: CLAUDIUM_PURCHASE_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_QUOTE_PRE_AUTH_POLICY, limit: CLAUDIUM_QUOTE_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_CONFIRM_PRE_AUTH_POLICY, limit: CLAUDIUM_CONFIRM_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_SPEND_PRE_AUTH_POLICY, limit: CLAUDIUM_SPEND_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_PURCHASE_POLICY, limit: CLAUDIUM_PURCHASE_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_QUOTE_POLICY, limit: CLAUDIUM_QUOTE_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_CONFIRM_POLICY, limit: CLAUDIUM_CONFIRM_MAX_PER_MINUTE },
+      { policy: CLAUDIUM_SPEND_POLICY, limit: CLAUDIUM_SPEND_MAX_PER_MINUTE },
       { policy: CHARACTER_CREATE_POLICY, limit: CHARACTER_MUTATION_MAX_PER_MINUTE },
       { policy: CHARACTER_RENAME_POLICY, limit: CHARACTER_MUTATION_MAX_PER_MINUTE },
       { policy: CHARACTER_DELETE_POLICY, limit: CHARACTER_MUTATION_MAX_PER_MINUTE },

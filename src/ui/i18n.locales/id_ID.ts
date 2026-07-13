@@ -167,7 +167,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.spectateBody':
     'Satu pertandingan berlangsung pada satu waktu di stadion, dan siapa pun bisa datang menonton dari tribun.',
   'hudChrome.keybinds.valecup': 'Piala Lembah',
-  'hudChrome.mobile.dailyRewards': 'Hadiah',
+  'hudChrome.mobile.dailyRewards': 'Toko',
   'hudChrome.perf.labels.predLead': 'Jarak Prediksi',
   'hudChrome.townFocus.budgetLabel': 'Sisa poin: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Kurangi fokus pada {component}',
@@ -7052,4 +7052,355 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Tinggi di Thornpeak, badai di atas Stormcrag kadang menghimpun sebuah wujud. Thunzharr, sang Puncak yang Terjaga bangkit di sana dengan irama tetap, sesosok elemental sekuat raid yang dilawan di dunia terbuka oleh siapa pun yang menjawab panggilan, dan ia tumbuh makin perkasa makin banyak penantang yang berdiri melawannya. Setiap orang yang bergabung dalam pertarungan memperoleh undian rampasannya sendiri, dihormati dengan ketentuan kunci raid, dan kejatuhannya bertahan cukup lama bagi yang gugur untuk berlari kembali dan menuntut haknya. Kumpulkan lebih banyak pedang daripada yang kamu kira kamu butuhkan.',
   'guide.worldPage.worldBossTitle': 'Saat puncak terjaga: sang bos dunia',
+  'entities.abilities.chain_heal.description':
+    'Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)',
+  'entities.abilities.chain_heal.name': 'Penyembuhan Berantai',
+  'entities.abilities.counter_shot.description':
+    'Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik.',
+  'entities.abilities.counter_shot.name': 'Tembakan Penangkal',
+  'entities.abilities.counterspell.description':
+    'Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik.',
+  'entities.abilities.counterspell.name': 'Penangkal Mantra',
+  'entities.abilities.holy_taunt.description':
+    'Mengejek target: ancaman Anda meningkat untuk menyamai musuh yang paling dibencinya dan ia terpaksa menyerang Anda selama 3 detik.',
+  'entities.abilities.holy_taunt.name': 'Hasutan Suci',
+  'entities.abilities.kick.description':
+    'Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik.',
+  'entities.abilities.kick.name': 'Tendangan',
+  'entities.abilities.pummel.description':
+    'Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik.',
+  'entities.abilities.pummel.name': 'Pukulan Bertubi',
+  'entities.abilities.rebuke.description':
+    'Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik.',
+  'entities.abilities.rebuke.name': 'Teguran',
+  'entities.abilities.skull_bash.description':
+    'Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik.',
+  'entities.abilities.skull_bash.name': 'Hantaman Tengkorak',
+  'entities.abilities.spell_lock.description':
+    'Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik.',
+  'entities.abilities.spell_lock.name': 'Kunci Mantra',
+  'entities.items.ashen_focus_ring.name': 'Cincin Fokus Ashen',
+  'entities.items.ashstalker_cowl.name': 'Kerudung Ashstalker',
+  'entities.items.ashstalker_grips.name': 'Genggaman Ashstalker',
+  'entities.items.ashstalker_harness.name': 'Zirah Dada Ashstalker',
+  'entities.items.ashstalker_legguards.name': 'Pelindung Kaki Ashstalker',
+  'entities.items.ashstalker_shoulderguards.name': 'Pelindung Bahu Ashstalker',
+  'entities.items.ashstalker_treads.name': 'Tapak Ashstalker',
+  'entities.items.ashstalker_waistband.name': 'Ikat Pinggang Ashstalker',
+  'entities.items.cinder_sigil_pendant.name': 'Liontin Cinder-Sigil',
+  'entities.items.cinderweave_cord.name': 'Ikat Pinggang Cinderweave',
+  'entities.items.cinderweave_cowl.name': 'Kerudung Cinderweave',
+  'entities.items.cinderweave_handwraps.name': 'Bungkus Tangan Cinderweave',
+  'entities.items.cinderweave_legwraps.name': 'Pembungkus Kaki Cinderweave',
+  'entities.items.cinderweave_mantle.name': 'Mantel Cinderweave',
+  'entities.items.cinderweave_raiment.name': 'Pakaian Cinderweave',
+  'entities.items.cinderweave_slippers.name': 'Sandal Cinderweave',
+  'entities.items.emberglass_warstaff.name': 'Tongkat Perang Emberglass',
+  'entities.items.final_argument_greatblade.name': 'Pedang Besar Argumen Terakhir',
+  'entities.items.final_oath_medallion.name': 'Medali Sumpah Terakhir',
+  'entities.items.first_blood_razor.name': 'Bilah Darah Pertama',
+  'entities.items.fleetblood_band.name': 'Cincin Fleetblood',
+  'entities.items.furyforged_gauntlets.name': 'Sarung Tangan Furyforged',
+  'entities.items.furyforged_girdle.name': 'Sabuk Furyforged',
+  'entities.items.furyforged_legguards.name': 'Pelindung Kaki Furyforged',
+  'entities.items.furyforged_sabatons.name': 'Sepatu Zirah Furyforged',
+  'entities.items.furyforged_warhelm.name': 'Helm Perang Furyforged',
+  'entities.items.furyforged_warplate.name': 'Zirah Perang Furyforged',
+  'entities.items.furyforged_warspaulders.name': 'Pelindung Bahu Furyforged',
+  'entities.items.iron_vow_band.name': 'Cincin Sumpah Besi',
+  'entities.items.last_step_signet.name': 'Cincin Meterai Langkah Terakhir',
+  'entities.items.razorwind_torque.name': 'Kalung Razorwind',
+  'entities.items.spellbreakers_seal.name': 'Segel Pemecah Mantra',
+  'entities.items.stormbound_crown.name': 'Mahkota Stormbound',
+  'entities.items.stormbound_greaves.name': 'Pelindung Betis Stormbound',
+  'entities.items.stormbound_handguards.name': 'Pelindung Tangan Stormbound',
+  'entities.items.stormbound_hauberk.name': 'Zirah Rantai Stormbound',
+  'entities.items.stormbound_legmail.name': 'Zirah Rantai Kaki Stormbound',
+  'entities.items.stormbound_spaulders.name': 'Pelindung Bahu Stormbound',
+  'entities.items.stormbound_waistguard.name': 'Pelindung Pinggang Stormbound',
+  'entities.items.unbroken_circle.name': 'Lingkaran yang Tak Terputus',
+  'entities.npcs.fury.greeting':
+    'Pasir mengingat setiap kemenangan. Habiskan kehormatanmu dengan baik.',
+  'entities.npcs.fury.name': 'AMARAH',
+  'entities.npcs.fury.title': 'Kepala Suku Kehormatan',
+  'hudChrome.claudium.amountLabel': 'Jumlah',
+  'hudChrome.claudium.balanceLabel': 'Saldo',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Beli',
+  'hudChrome.claudium.buyTitle': 'Beli Claudium',
+  'hudChrome.claudium.buyUnavailable': 'Pembelian tidak tersedia saat ini.',
+  'hudChrome.claudium.checkoutClose': 'Tutup pembayaran',
+  'hudChrome.claudium.checkoutFailed': 'Pembayaran tidak dapat dimuat. Silakan coba lagi.',
+  'hudChrome.claudium.checkoutLoading': 'Memuat pembayaran...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'Transaksi sudah terkirim tetapi Claudium belum dikreditkan. Silakan coba lagi sebentar lagi.',
+  'hudChrome.claudium.checkoutPending':
+    'Transaksi sedang berlangsung. Konfirmasikan di dompet Anda dan biarkan panel ini tetap terbuka.',
+  'hudChrome.claudium.checkoutPendingButton': 'Diproses',
+  'hudChrome.claudium.checkoutTitle': 'Selesaikan pembelian',
+  'hudChrome.claudium.checkoutUnavailable': 'Pembelian Claudium tersebut tidak tersedia saat ini.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Hubungkan dompet Solana sebelum membeli Claudium dengan kripto.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Dompet ini tidak dapat menandatangani dan mengirim transaksi Solana.',
+  'hudChrome.claudium.close': 'Tutup Claudium',
+  'hudChrome.claudium.disclosure':
+    'Claudium adalah mata uang lunak satu arah: beli dengan uang dan belanjakan untuk kosmetik. Itu tidak dapat ditebus, ditransfer, atau diuangkan.',
+  'hudChrome.claudium.hideAmounts': 'Sembunyikan jumlah Claudium tambahan',
+  'hudChrome.claudium.kindCosmetic': 'Kosmetik',
+  'hudChrome.claudium.kindItem': 'Barang',
+  'hudChrome.claudium.kindSkin': 'Tampilan',
+  'hudChrome.claudium.loading': 'Memuat Claudium...',
+  'hudChrome.claudium.open': 'Buka Claudium',
+  'hudChrome.claudium.railLabel': 'Metode pembayaran',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC tidak tersedia.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Kartu',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': 'Diskon 20%.',
+  'hudChrome.claudium.railWocUnavailable': 'Harga WOC tidak tersedia saat ini.',
+  'hudChrome.claudium.showAmounts': 'Tampilkan semua jumlah Claudium',
+  'hudChrome.claudium.skuRow': '{usd} untuk {claudium} Claudium',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Tukar',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Tidak ada kosmetik yang tersedia saat ini.',
+  'hudChrome.claudium.storeTitle': 'Toko Kosmetik',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Toko Claudium tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Panen: kumpulkan bahan kerajinan dari mayat ini (kulit, taring, sutra, dan komponen serupa), pisahkan dari jarahan apa pun. Siapapun bisa memanen; hanya satu pemain yang dapat memanen mayat tertentu.',
+  'hudChrome.deeds.openBookHint': 'Buka Kitab Jasa',
+  'hudChrome.loot.takeAllTooltip':
+    'Ambil Semua: kumpulkan setiap koin dan item di jendela jarahan ini.',
+  'hudChrome.statInfo.desc.warfare':
+    'Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Perang',
+  'hudChrome.statInfo.warfareValue': '+{increase}% dibagikan / -{reduction}% diambil',
+  'hudChrome.tutorial.nextTipMap':
+    'Periksa Peta Dunia ({key}) untuk melihat di mana misi menunggu.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Buka Log Quest Anda ({key}) untuk menemukan tugas berikutnya di sekitar.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Buka Sosial ({key}) untuk menemukan grup untuk pertarungan yang lebih sulit.',
+  'hudChrome.tutorial.nextTipsTitle': 'Ke mana selanjutnya',
+  'hudChrome.tutorial.slayTargetHint':
+    'Baru berperang? Tekan {targetKey} atau klik serigala untuk menargetkannya, lalu gunakan kemampuan bilah tindakan untuk menyerangnya.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Baru berperang? Ketuk serigala untuk menargetkannya, lalu ketuk kemampuan bilah tindakan untuk menyerangnya.',
+  'hudChrome.warfare.balance': 'Kehormatan: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} Kehormatan',
+  'hudChrome.warfare.honorFloat': '+{amount} Kehormatan',
+  'hudChrome.warfare.honorGain': 'Anda mendapatkan Kehormatan {amount} ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Tidak cukup Kehormatan.',
+  'hudChrome.warfare.reasons.arenaWin': 'Kemenangan arena',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta selesai',
+  'hudChrome.warfare.reasons.fiestaKill': 'Eliminasi Fiesta',
+  'hudChrome.warfare.reasons.fiestaWin': 'Kemenangan Fiesta',
+  'hudChrome.wocStore.applied': 'Diterapkan',
+  'hudChrome.wocStore.apply': 'Terapkan Tampilan',
+  'hudChrome.wocStore.armoryBody':
+    'Tampilan senjata edisi terbatas dari Gudang Senjata Musim 1. Berlaku untuk seluruh akun, murni kosmetik, dan terlihat oleh semua pemain di sekitar Anda.',
+  'hudChrome.wocStore.armoryEyebrow': 'Musim 1',
+  'hudChrome.wocStore.armoryTitle': 'Gudang Senjata',
+  'hudChrome.wocStore.badge.flagship': 'Unggulan',
+  'hudChrome.wocStore.badge.hero': 'Pahlawan',
+  'hudChrome.wocStore.balance': 'Saldo Claudium',
+  'hudChrome.wocStore.buyClaudium': 'Beli Claudium',
+  'hudChrome.wocStore.buySkin': 'Beli Tampilan',
+  'hudChrome.wocStore.cancel': 'Batal',
+  'hudChrome.wocStore.close': 'Tutup Toko WOC',
+  'hudChrome.wocStore.collectionLine': '{collection} Koleksi',
+  'hudChrome.wocStore.collections.emberwrought': 'Emberwrought',
+  'hudChrome.wocStore.collections.fallen_star': 'Bintang Jatuh',
+  'hudChrome.wocStore.collections.guildmark': 'Tanda Serikat',
+  'hudChrome.wocStore.collections.hoarfrost': 'Embun beku',
+  'hudChrome.wocStore.confirmBody': 'Beli {item} untuk {cost} Claudium?',
+  'hudChrome.wocStore.confirmPurchase': 'Beli',
+  'hudChrome.wocStore.confirmTitle': 'Konfirmasi Pembelian Kosmetik',
+  'hudChrome.wocStore.detach': 'Lepaskan Tampilan',
+  'hudChrome.wocStore.equipHint': 'Kenakan {type} untuk menerapkan tampilan ini.',
+  'hudChrome.wocStore.error': 'Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.',
+  'hudChrome.wocStore.inspectAria': 'Periksa {item}',
+  'hudChrome.wocStore.loading': 'Memuat Toko WOC...',
+  'hudChrome.wocStore.lore': 'Kisah',
+  'hudChrome.wocStore.needMoreBody':
+    'Anda memerlukan {shortfall} lebih banyak Claudium untuk membeli {item}.',
+  'hudChrome.wocStore.needMoreTitle': 'Dibutuhkan Lebih Banyak Claudium',
+  'hudChrome.wocStore.owned': 'Dimiliki',
+  'hudChrome.wocStore.priceChanged':
+    'Harga berubah sebelum pembelian selesai. Tinjau harga baru dan konfirmasi lagi.',
+  'hudChrome.wocStore.rarity.epic': 'Epik',
+  'hudChrome.wocStore.rarity.legendary': 'Legendaris',
+  'hudChrome.wocStore.rarity.rare': 'Langka',
+  'hudChrome.wocStore.rarity.uncommon': 'Tidak Umum',
+  'hudChrome.wocStore.rewardsTab': 'Hadiah Harian',
+  'hudChrome.wocStore.scene.day': 'Hari',
+  'hudChrome.wocStore.scene.dusk': 'Senja',
+  'hudChrome.wocStore.scene.night': 'Malam',
+  'hudChrome.wocStore.sceneLabel': 'Pencahayaan pemandangan',
+  'hudChrome.wocStore.seasonOne': 'Musim 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Bilah pendek menghitam dengan urat oranye menyala, permata kecil yang membara di gagangnya, abu, dan percikan api.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'Bilah jalanan yang menyimpan api gunung di permata gagangnya, bukti bahwa senjata sekecil apa pun dapat membawa bara dari tempaan pertama. Cabutlah di lorong gelap Highwatch dan sinarnya cukup terang untuk menemukan celah pada zirah lawan.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Belati Ashspark',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'Sepotong bintang jatuh, tepian emas cair bercahaya pada logam hitam kosmos, butiran bintang terang yang mengorbit gagangnya, jejak aurora tipis.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Bagian terkecil dari bintang yang diangkut Aldric dari kawah, dan menurut beberapa orang paling berbahaya. Sepotong jantung dunia lain itu, ujung emasnya yang meleleh menunggangi logam hitam kosmos, satu-satunya bintang yang mengelilingi gagangnya seperti bulan yang kehilangan dunianya. Beratnya hampir tidak ada dan dapat membagi hampir semua hal. Cukup kecil untuk disembunyikan, cukup terang untuk ditemukan dalam kegelapan dengan cahayanya sendiri.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Taring Bintang Jatuh',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Mata kapak baja poles, tudung dan penguat kuningan pada gagang kayu ash berpernis, balutan rapi, serta cap pembuat.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    "Kapak bercap adalah kebanggaan yang dapat digenggam. Tudung dan penguat kuningannya melindungi gagang sekaligus menandai karya Armorer Hode. 'Kalau dapat membelah, akan kujual,' kata sang pandai besi Highwatch. Kapak ini membelah.",
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Kapak Brasscap',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Tongkat kayu keras di atasnya diberi finial mahkota kuningan, ferrule kuningan, dan tali kulit yang diwarnai.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Dibuat dari kayu keras yang sudah dibumbui dan dimahkotai dengan finial kuningan yang dibuat oleh seratus pandai besi Eastbrook, tetapi sempurna satu per satu. Itu milik tipe pelancong yang ingin dianggap serius di gerbang Fenbridge dan tembok Highwatch. Tongkat jalan yang tidak pernah benar-benar perlu berjalan; pita yang diwarnai cocok dengan mantel yang harganya bisa Anda tebak.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Tongkat Jalan Brasscrown',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Bilah baja tempa gelap, alur bilah berisi rune jingga menyala, retakan panas, dan permata membara pada pelindung.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    'Bilah pertama yang ditempa bukan dengan air, melainkan Bara Terberkati dari Stormcrag. Api yang dituang ke alur bilah terus membara jingga, dan rune-nya tetap hangat bahkan pada malam terdingin di tembok. Cinderbrand tidak perlu dinyalakan. Apinya memang menolak padam.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Pedang Cinderbrand',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Busur silang baja menghitam, cahaya jingga merembes dari retakan badan, dan bara membara pada gagangnya.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Relik paling aneh dari koleksi Emberwrought: api gunung dituangkan ke dalam sebuah mesin. Bara pada gagangnya menjaga tali tetap lentur di dinginnya Thornpeak maupun lembapnya Mirefen, sementara setiap baut melesat hangat dan menghantam lebih panas.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Busur Silang Cinderlatch',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'Gugusan pecahan bintang emas yang mengorbit di sekitar inti emas cair, poros hitam kosmos yang terukir konstelasi, pita aurora yang berkelok-kelok ke atas.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    "Sebuah batang logam bintang yang dimahkotai dengan inti emas cair dan cincin pecahan emas yang mengelilinginya dalam orbit lambat dan tak berujung: sebuah kosmos kecil, terukir rasi bintang yang tak tertandingi langit di atas Thornpeak. Aurora memanjang seperti asap yang lupa naik. Mereka yang memakainya menyatakan bahwa mereka dapat merasakan kekosongan yang melewatinya, seperti cara Ysolei sekadar 'meminum cahaya bulan': sabar, dingin, dan menoleh ke belakang.",
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch, Puncak Kekosongan yang Tak Berujung',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Kapak besi menghitam dengan retakan jingga menyala menembus mata kapaknya, permata batu bara, gumpalan panas.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Armorer Hode menanamkan bara api gunung ke pusat mata kapak, sehingga tepinya tidak pernah benar-benar dingin di antara ayunan. Retakannya menyala jingga saat menghantam, seakan setiap pukulan membangunkan sisa tempaan pertama yang tertidur di dalam besi.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Kapak Emberbite',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Serpih emas cair dari bintang sekarat, dikelilingi percikan yang mengorbit, pada batang hitam kosmos berukir rasi bintang bercahaya.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Bukan bintang jatuh itu sendiri, melainkan butiran terakhir dari bintang yang sedang sekarat: sebutir bara emas cair dari matahari yang telah padam, diselimuti percikan api yang merupakan cahaya terakhirnya. Batangnya yang berwarna hitam kosmos terukir rasi bintang yang menyaksikannya mati. Para crofter Mirefen mengatakan bahwa itu mengabulkan satu permintaan kepada siapa pun yang memegangnya saat senja; mereka juga mengatakan setiap jiwa yang memegangnya menginginkan lebih banyak waktu, dan Bulan Tenggelam tidak mengabulkan satu pun dari mereka.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Emberwish, Serpih Matahari Mati',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Tongkat logam menghitam dengan ujung bara api menyala di cakar besi, retakan panas di garis rambut, cahaya batin yang hangat.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'Tongkat sihir yang memberi nama pada koleksi ini. Saat pembuat senjata Highwatch mengurung bara gunung di dalam cakar besi dan membuatnya tunduk pada tangan manusia, bahkan para Pendeta Cahaya berhenti menyebutnya sesat. Bara pada ujungnya telah menyala tanpa putus sejak sebelum pemiliknya lahir.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Tongkat Sihir Emberwrought',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Meriam bintang berukuran sangat besar: laras hitam kosmos yang diukir dengan konstelasi emas yang bersinar, moncong lonceng yang melebar dengan cangkang komet emas cair di dalamnya, perlengkapan kuningan, dan sandaran bahu kayu.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    'Setelah enam relik ditempa dari bintang jatuh, para pekerja magang mengubah sisa logamnya menjadi meriam bahu. Ia tidak sekadar menembak, melainkan memanggil bintang kedua ke arah sasaran. Saudara Aldric menolak memberkatinya karena suaranya pasti sudah menarik perhatian surga. Para Pemburu menyukainya. Tak ada sasaran di depannya yang pernah berpendapat lain.',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, Bintang Jatuh Kedua',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'Sepotong es gletser cyan yang bersinar, embun beku yang mekar dari kerah perak, kabut dingin yang samar.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    'Pecahan es gletser bercahaya yang konon berasal dari kedalaman di bawah Sanctum, tempat hawa dingin gunung memiliki taring. Embun beku terus mekar dari kerah peraknya dan tidak mencair oleh api ataupun musim panas. Para Penyihir menyimpannya dekat saat bekerja, tetapi menjauhkannya ketika tongkat itu seolah mencondongkan diri untuk mendengar ruang bawah tanah Nythraxis.',
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Pecahan Everwinter',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Busur recurve kenari yang dipernis, ujung dahan kuningan, tali linen berlapis lilin, stempel guild di bagian riser.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Hal yang paling mirip dengan sebuah guild adalah sebuah stempel fletcher di atas riser, sebuah janji tentang apa yang ada di dalamnya, seperti cara seorang penjual anggur menyegel tong. Kayu kenari yang dipernis, kuningan di ujung dahannya, tali linen berlapis lilin yang tidak akan robek saat hujan Mirefen. Setiap tempat memperdebatkan harga. Gambarkan sekali melewati Belukar Janda dan argumennya menang.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Busur Serikat Fletcher',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Tongkat bersepatu besi dimahkotai dengan inti bara api yang terkurung, bara api naik ke batangnya, menimbulkan kilau panas.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Bara hidup dari api gunung dikurung dalam besi pada mahkotanya. Loremaster Caddis menyebutnya bukti bahwa api tempaan pertama dapat diikat untuk berkarya, bukan hanya menyegel. Kilau panas mengalir darinya tanpa henti, dan konon bara itu diambil dari napas Voskar sang Emberwing sendiri.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Tongkat Forgeheart',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Belati yang sangat tipis dari es biru jernih, urat cyan bercahaya di tengahnya, kristal es berbentuk jarum, gagang embun beku.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Tipis seperti nafas yang tertahan dan dua kali lebih dingin: serpihan gletser Thornpeak diasah menjadi satu pembuluh darah yang bersinar, begitu tajam sehingga lukanya membeku dan tertutup sebelum darah kembali mengalir. Namanya dipinjam dari rasa dingin yang dibawa orang mati dari puncak. Ia tidak perlu diasah; es tidak tumpul, kata Loremaster Caddis datar, ia hanya menunggu.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Jarum Embun Beku',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Bagian atas es gletser berwarna biru tembus pandang, bagian dalam yang retak bercahaya warna biru kehijauan, kristal es yang meremang, tangkai yang mengeluarkan uap dingin.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Dipahat dari jantung biru gletser Thornpeak, tempat dua abad tekanan membuat dingin itu bercahaya. Kapak ini tetap mengeluarkan uap saat diam, dan hantamannya retak seperti jurang di bawah Prowler Ridge. Highwatch pernah kehilangan benteng karena es yang mencair, maka senjata ini dibuat untuk menghentikan pencairan berikut segala yang datang sesudahnya.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Kapak Pembelah Gletser',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Bilah baja berwarna biru, pelindung ekor ikan perunggu, pegangan kulit berwarna biru kehijauan, lambang serikat kecil yang dicap.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Jika mata pisau tempa tidak disebutkan namanya, maka yang ini ditandatangani. Seorang pembuat senjata berhak untuk memasukkan mereknya ke dalam ricasso hanya setelah Pedagang Pasar Dunia menjamin bajanya, dan merek Smith Haldren dijamin. Biru di balik kelembapan Lembah, seimbang hingga sehelai rambut. Anda membayar perangko itu sebanyak pedang, dan itu sepadan.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Pedang Guildmark',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Dirk baja tempered ramping, pelindung perunggu dan mur gagang, pegangan tali hijau tua, lambang bercap.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Apa yang dikenakan manusia saat pedang tetap berada di rumah: ramping, temper, dicap dengan tanda yang sama yang mengesahkan bilah penuh, dikenakan di ikat pinggang seperti meterai dengan ujung. Disengaja untuk semua orang kecuali mereka yang bisa membaca bukti pembuat senjata. Quartermaster Bree menyimpan lacinya di Highwatch untuk petugas yang mendapat rasa hormat dari tembok.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Belati Guildmark',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Tongkat perak dimahkotai dengan pecahan es cyan bercahaya yang mengambang dan berputar perlahan, memancarkan kristal dan uap dingin.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'Tongkat milik penjaga yang tak pernah tidur di tembok Highwatch. Mahkotanya berupa pecahan es berwarna biru kehijauan yang melayang bebas dari perak dan berputar perlahan dengan sendirinya, selalu mengarah ke hawa dingin yang berkumpul di bawah puncak, demikian sumpah sang penjaga. Membawa Vigil berarti berjaga selama dua ratus tahun dalam satu malam dan berjanji untuk tidak memalingkan muka.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Tongkat Penjagaan Hoarfrost',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Bilah es glasial pucat yang melengkung, kristal rime bergerigi di sepanjang tulang belakang, inti beku sian yang bersinar di pelindung es yang lebih penuh.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    "Unggulan dari kelas beku, dan barang yang pertama kali diraih oleh setiap kolektor. Ice Fang diukir, bukan ditempa, dari taring gletser yang menutupi Thornpeak di atas Highwatch, inti cyannya terbakar dingin seperti cahaya dari Glimmermere. Itu sama dengan udara yang dipotongnya. Penjaga tembok bersumpah bahwa seorang tentara membawanya pada malam ketika salju tinggi menahan Wyrmcult, dan 'membeli tembok itu untuk musim dingin.'",
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Taring Es',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Tongkat ramping berpernis merah tua, dua pita kuningan mengilap, ujung kuningan bulat kecil.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Pernis merah tua dalam tujuh mantel pasien, diikat dua kali dalam kuningan yang dipoles: jenis tongkat yang dibeli oleh penyihir pagar dari Pasar Dunia setelah mereka mulai menagih koin asli dan ingin melihatnya. Ia menyalurkan Cahaya tidak lebih baik dari batang kayu birch. Tapi itu berkilauan dengan indah di konter Merchant, dan setengah dari sihir kecil selalu dipercaya.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Tongkat Sihir Berpernis',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Bintang-logam meteorik, inti emas cair di sepanjang batangnya, anggota badan berwarna hitam kosmos yang diukir dengan konstelasi, kumpulan api bintang murni.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    "Ditempa dari logam bintang meteorik saat kawah Mirefen masih bersinar, puing-puing 'terlalu panas untuk ditangani,' ditempa menjadi bagian-bagian kosmos hitam yang diukir dengan konstelasi, inti emas cair membelok di sepanjang batang penggarap. Ia tidak melontarkan baut apa pun, melainkan memunculkan satu: sebatang api bintang, dilepaskan seperti sebuah vonis dan mendarat seperti sebuah akhir dari sebuah vonis. Ketika Highwatch takut bahkan mahkota Nythraxis yang tak pernah mati mungkin bukanlah yang terburuk di bawah puncak, inilah senjata yang mereka inginkan di dinding. Bidik dengan baik.",
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name': 'Meteorlatch, Penghakiman Terakhir Langit',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Gugusan kristal es bergerigi di sekitar inti cyan yang bersinar, embun beku merambat ke batang berwarna perak.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    'Tidak diukir tetapi ditumbuhkan: Es Thornpeak dibujuk di sekitar inti cyan yang dingin hingga mengeras seperti baja terbaik Hode. Embun beku merambat ke tangkai perak menuju tangan dan tidak pernah sampai. Saat terkena serangan, air membeku; di mana ia berada, tanah menjadi putih. Puncaknya yang sangat dingin, dibuat cukup kecil untuk berayun pada benda-benda yang memanjat tembok.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Gada Rimecrusher',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Kepala seperti potongan langit malam yang terkoyak, retakan emas cair dan ukiran konstelasi, pecahan cahaya bintang melayang, kilau aurora membuntuti tepinya.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Dipukul dari tepi kawah, tempat bintang jatuh merobek pantulan langit dari Mirefen dan meninggalkan luka yang masih mengepul. Kepalanya tampak seperti sepotong malam yang terkoyak: retakan emas cair, konstelasi yang tidak dapat disebutkan namanya oleh sarjana di Highwatch, aurora yang keluar dari tepinya dengan setiap ayunan. Saudara Aldric memberkatinya dan tidak mau menyentuhnya. Mengangkatnya berarti menahan lubang yang ditinggalkan langit.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Skyrender, Luka Cakrawala',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Flensa besi gelap bersinar oranye terang di sepanjang celah bagian dalamnya, permata dengan inti cair di kepala.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    "Sebuah gada yang membawa perapiannya sendiri: sebuah batu dengan inti cair yang terkelupas dari segel Sanctum yang 'ditempa dengan api gunung', dipasang bercahaya di kepalanya. Flensanya tetap hangat saat disentuh dan lebih hangat di tempat mendaratnya; seorang sersan Highwatch bersumpah pukulannya akan meninggalkan memar yang samar-samar bersinar sampai pagi. Api gunung, pada akhirnya dibuat untuk memecahkan bukannya menyegel.",
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Gada Smoulderfall',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Pedang besar yang ditempa dari bintang jatuh, inti emas cair membelah bilahnya, baja hitam kosmos bertepi cahaya bintang, pecahan emas mengorbit pelindungnya, pita aurora.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    "Ketika bintang itu jatuh dari langit barat dan 'meledak seperti bengkel' di luar Belukar Janda, Saudara Aldric menarik jantungnya yang masih membara dari kawah Mirefen dan memohon kepada para pandai besi di dunia ini untuk mengerjakan 'sesuatu yang bukan milik dunia ini'. Mereka membuat satu pedang hebat: Solheim. Inti emas cairnya membelah bilah hitam kosmos seperti fajar yang membelah langit malam, dan pecahan logam bintang mengorbit penjaga di jalur yang tidak dapat diatur oleh tangan. Hanya satu yang pernah dipalsukan. Tidak akan ada yang lain.",
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, Cahaya Fajar Terakhir',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Inti bintang emas cair yang dikelilingi pecahan-pecahan yang mengorbit, sayap hitam kosmos berurat cahaya bintang, aurora memancar dari lapisannya.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    'Inti bintang ditangkap sesaat sebelum mati dan dikelilingi pecahan yang jatuh bersamanya. Cahaya bintang mengalir pada sirip hitam kosmosnya, sementara aurora keluar dari sambungan saat gada diangkat. Para Pendeta Cahaya lama menyebut bintang jatuh itu penghakiman dari langit yang tak dapat dihentikan perisai mana pun.',
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Starfall, Penghakiman Surga',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Kepala baja biru tempered enam flensa, kerah dan gagang kuningan, pegangan kulit berwarna merah anggur.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Enam flensa dari baja berwarna biru yang ditempa, masing-masing digiling untuk membuka helm, ditutup dengan kuningan dan digulung dengan kulit berwarna merah anggur. Para pembuat senjata di dunia ini tidak membuat senjata jelek meskipun pekerjaannya brutal. Yang ini dipesan melalui Pasar Dunia, bukan dikeluarkan dari rak; di suatu tempat ada buku besar dengan nama pembeli yang bangga dan jumlah yang dia bayarkan kepada Hode untuk itu.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Gada Bersirip Tempa',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Baja berwarna perak dan busur es biru, inti beku sian yang bersinar di bagian atas, panah es padat, uap dingin.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    'Busur dari baja perak dan es Thornpeak, dengan inti biru dingin yang membekukan anak panah pada talinya. Setiap tarikan membentuk kembali sebatang es gletser, sehingga pemanah di tembok tidak membawa tabung panah, hanya hawa dingin. Konon Highwatch mempertahankan Prowler Ridge sepanjang pengepungan dengan satu pemanah dan persediaan anak panah selama musim dingin.',
+  'hudChrome.wocStore.skins.winterbite.name': 'Busur Winterbite',
+  'hudChrome.wocStore.storeTab': 'Toko',
+  'hudChrome.wocStore.tabsLabel': 'Bagian Toko WOC',
+  'hudChrome.wocStore.title': 'Toko WOC',
+  'hudChrome.wocStore.tryOn': 'Coba Pakai',
+  'hudChrome.wocStore.unavailable': 'Tidak tersedia',
+  'hudChrome.wocStore.viewModeLabel': 'Modus pratinjau',
+  'hudChrome.wocStore.weaponOnly': 'Senjata saja',
+  'hudChrome.wocStore.wtype.axe': 'Kapak',
+  'hudChrome.wocStore.wtype.bow': 'Busur',
+  'hudChrome.wocStore.wtype.crossbow': 'Busur silang',
+  'hudChrome.wocStore.wtype.dagger': 'Belati',
+  'hudChrome.wocStore.wtype.mace': 'Gada',
+  'hudChrome.wocStore.wtype.staff': 'Tongkat',
+  'hudChrome.wocStore.wtype.sword': 'Pedang',
+  'hudChrome.wocStore.wtype.wand': 'Tongkat sihir',
 };

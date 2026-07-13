@@ -14,6 +14,7 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
+import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -202,6 +203,8 @@ import {
 import { appendChatLineParts, CHAT_MESSAGE_TOKEN, CHAT_NAME_TOKEN, chatAiTagEl } from './chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
 import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
+import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
+import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -462,8 +465,14 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import {
+  installWindowDrag,
+  isWindowDragPreviewMutation,
+  type WindowDragController,
+} from './window_drag';
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
+import { stackedWindowsVisible } from './window_stack_state_core';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -524,6 +533,37 @@ export interface GamepadBindingsHooks {
 export interface ReportHooks {
   submit(targetPid: number, reason: string, details: string): Promise<void>;
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
+}
+
+/**
+ * Online-only glue that backs the Claudium store window. main.ts wires this from
+ * the client economy SDK (which hits the game server's /api/claudium/* routes).
+ * snapshot() reads the current service state; buy()/spend() begin the client-signed
+ * purchase / cosmetic-redeem flows. All values originate in the economy service.
+ */
+export interface ClaudiumHooks {
+  balance(): Promise<number | null>;
+  storeSnapshot(): Promise<{
+    available: boolean;
+    balance: number | null;
+    storeItems: readonly ClaudiumStoreItem[];
+  }>;
+  snapshot(): Promise<ClaudiumSnapshot>;
+  buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  spend(
+    itemId: string,
+    kind: 'cosmetic' | 'skin' | 'item',
+    expectedCostClaudium: number,
+  ): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
+}
+
+export interface HudFeatures {
+  dailyRewardsEnabled: boolean;
 }
 
 export interface BugReportPayload {
@@ -1192,9 +1232,12 @@ export class Hud {
     number,
     { event: Extract<SimEvent, { type: 'lootRoll' }>; receivedAt: number; durationMs: number }
   >();
-  // rolls the player has answered or let expire locally; suppresses the
-  // snapshot reconcile from re-showing them until the server drops the roll
-  private dismissedLootRolls = new Set<number>();
+  // rolls the player has answered or let expire locally, mapped to the wall-clock
+  // time of that dismissal. The reconcile keeps them out of the DOM while the
+  // authoritative mirror still lists them open, re-showing only if one stays open
+  // past a short grace (a genuinely dropped submit) so a normal answer does not
+  // flash back; the entry is forgotten once the server drops the roll.
+  private dismissedLootRolls = new Map<number, number>();
   // shown rolls already observed in the open-roll mirror at least once, so their
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
@@ -1315,12 +1358,7 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
-  private windowDrag: {
-    el: HTMLElement;
-    pointerId: number;
-    offsetX: number;
-    offsetY: number;
-  } | null = null;
+  private windowDragController: WindowDragController | null = null;
   // Movable/resizable chat box: current geometry (null = stock CSS default) plus
   // the in-progress pointer gesture, if any. See chat_window.ts for the math.
   private chatBox: ChatBoxGeometry | null = null;
@@ -1421,6 +1459,7 @@ export class Hud {
     private sim: IWorld,
     private renderer: Renderer,
     private keybinds: Keybinds,
+    private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim);
@@ -1569,6 +1608,7 @@ export class Hud {
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
@@ -1967,6 +2007,7 @@ export class Hud {
       markResizableWindow(el);
     };
     this.windowObserver = new MutationObserver((mutations) => {
+      const windowsToSync = new Set<HTMLElement>();
       for (const m of mutations) {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
@@ -1977,58 +2018,24 @@ export class Hud {
           continue;
         }
         if (m.target instanceof HTMLElement && m.target.matches('.window.panel')) {
-          this.syncWindowOpenState(m.target);
+          if (isWindowDragPreviewMutation(m.attributeName, m.target)) continue;
+          windowsToSync.add(m.target);
         }
       }
+      for (const win of windowsToSync) this.syncWindowOpenState(win);
     });
     document.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
     this.windowObserver.observe(document.body, { childList: true, subtree: true });
     this.syncAnyWindowOpenState();
 
-    document.addEventListener('pointerdown', (ev) => {
-      const target = ev.target as HTMLElement | null;
-      const el = target?.closest?.('.window.panel') as HTMLElement | null;
-      if (!el) return;
-      this.bringWindowToFront(el);
-      if (ev.button !== 0 || !target || !this.isWindowDragHandle(target, el)) return;
-      ev.preventDefault();
-      this.hideTooltip();
-      const rect = el.getBoundingClientRect();
-      this.setWindowPixelPosition(el, rect.left, rect.top, rect);
-      this.windowDrag = {
-        el,
-        pointerId: ev.pointerId,
-        offsetX: ev.clientX - rect.left,
-        offsetY: ev.clientY - rect.top,
-      };
-      el.classList.add('window-dragging');
-      el.dataset.windowMoved = '1';
-      try {
-        target.setPointerCapture?.(ev.pointerId);
-      } catch {
-        /* synthetic/legacy pointer without active capture */
-      }
+    this.windowDragController = installWindowDrag({
+      getScale: () => getUiScale(),
+      isDragHandle: (target, el) => this.isWindowDragHandle(target, el),
+      bringToFront: (el) => this.bringWindowToFront(el),
+      hideTooltip: () => this.hideTooltip(),
+      pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
     });
-    document.addEventListener('pointermove', (ev) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      ev.preventDefault();
-      const rect = drag.el.getBoundingClientRect();
-      this.setWindowPixelPosition(
-        drag.el,
-        ev.clientX - drag.offsetX,
-        ev.clientY - drag.offsetY,
-        rect,
-      );
-    });
-    const endDrag = (ev: PointerEvent) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      drag.el.classList.remove('window-dragging');
-      this.windowDrag = null;
-    };
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
     installWindowResize({
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
@@ -2081,6 +2088,15 @@ export class Hud {
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
+    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
+    document.body.classList.toggle(
+      'store-stack-open',
+      stackedWindowsVisible(
+        !!storeWindow && this.isWindowVisible(storeWindow),
+        !!claudiumWindow && this.isWindowVisible(claudiumWindow),
+      ),
+    );
     const mapWindow = document.getElementById('map-window');
     const questLogWindow = document.getElementById('quest-log-window');
     document.body.classList.toggle(
@@ -2129,13 +2145,22 @@ export class Hud {
   }
 
   private bringWindowToFront(el: HTMLElement): void {
+    // The confirm/input prompt is the topmost modal by definition and never
+    // joins the 50-89 window band: banding it (a pointerdown raise, or the
+    // normalize sweep) drops it BEHIND the armory inspect overlay (z 90), so a
+    // real mouse press on the dialog demotes it mid-click and its own OK
+    // button becomes unclickable (the "phantom dead confirm" bug).
+    if (el.id === 'confirm-dialog') {
+      el.style.zIndex = String(Math.max(this.windowZValue(el), 95));
+      return;
+    }
     if (this.windowZ >= 89) this.normalizeWindowZ();
     el.style.zIndex = String(++this.windowZ);
   }
 
   private normalizeWindowZ(): void {
     const open = [...document.querySelectorAll<HTMLElement>('.window.panel')]
-      .filter((el) => this.isWindowVisible(el))
+      .filter((el) => el.id !== 'confirm-dialog' && this.isWindowVisible(el))
       .sort((a, b) => this.windowZValue(a) - this.windowZValue(b));
     this.windowZ = 50;
     for (const el of open) el.style.zIndex = String(++this.windowZ);
@@ -2261,7 +2286,7 @@ export class Hud {
   }
 
   private closeManagedWindow(el: HTMLElement): void {
-    if (this.windowDrag?.el === el) this.windowDrag = null;
+    this.windowDragController?.cancel(el);
     delete el.dataset.windowOpen;
     switch (el.id) {
       case 'confirm-dialog':
@@ -3721,6 +3746,8 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
+    openClaudium: () => this.toggleClaudium(),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -4030,11 +4057,62 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
-    showChestButton: () => this.showDailyRewardsChestButton(),
-    setShowChestButton: (show) => this.setDailyRewardsChestButtonPreference(show),
+    storeEnabled: () => this.claudiumHooks !== null,
+    storeSnapshot: async () => {
+      const snapshot = await this.claudiumHooks?.storeSnapshot();
+      if (!snapshot) return { available: false, balance: null, items: [] };
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return {
+        available: snapshot.available,
+        balance: snapshot.balance,
+        items: [...snapshot.storeItems],
+      };
+    },
+    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
+      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
+      if (result?.balance !== null && result?.balance !== undefined) {
+        this.setClaudiumLauncherBalance(result.balance);
+      }
+      return (
+        result ?? {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        }
+      );
+    },
+    openClaudium: () => this.toggleClaudium(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // Claudium (server-authoritative soft currency) window. main.ts injects the
+  // economy hooks when online via attachClaudium; until then (and offline) the
+  // hooks are null and the window renders its clean disabled/empty state. The
+  // window computes NOTHING; every number rides in through these hooks.
+  private claudiumHooks: ClaudiumHooks | null = null;
+  private claudiumLauncherBalance: number | null = null;
+  private claudiumLauncherBalancePending = false;
+  private claudiumLauncherBalanceLastMs = 0;
+  private claudiumLauncherBalanceSeq = 0;
+  private readonly claudiumWindow = new ClaudiumWindow({
+    root: () => $('#claudium-window'),
+    closeOthers: () => this.closeOtherWindows('#claudium-window'),
+    snapshot: async () => {
+      const snapshot =
+        (await this.claudiumHooks?.snapshot()) ??
+        ({
+          balance: null,
+          skus: [],
+          nativeRails: { sol: false, woc: false },
+        } satisfies ClaudiumSnapshot);
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return snapshot;
+    },
+    buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
+    ...this.windowFocus('#claudium-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -4175,6 +4253,46 @@ export class Hud {
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+  }
+
+  private claudiumLauncherHtml(): string {
+    if (!this.claudiumHooks) return '';
+    this.refreshClaudiumLauncherBalance();
+    const label =
+      this.claudiumLauncherBalance === null
+        ? '--'
+        : formatNumber(this.claudiumLauncherBalance, { maximumFractionDigits: 0 });
+    const aria = t('hudChrome.claudium.open');
+    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+  }
+
+  private setClaudiumLauncherBalance(balance: number | null): void {
+    this.claudiumLauncherBalance = balance;
+    this.claudiumLauncherBalanceLastMs = Date.now();
+  }
+
+  private refreshClaudiumLauncherBalance(force = false): void {
+    if (!this.claudiumHooks || this.claudiumLauncherBalancePending) return;
+    const now = Date.now();
+    if (!force && now - this.claudiumLauncherBalanceLastMs < 30_000) return;
+    this.claudiumLauncherBalancePending = true;
+    const seq = ++this.claudiumLauncherBalanceSeq;
+    void this.claudiumHooks
+      .balance()
+      .then((balance) => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(balance);
+        if ($('#bags').style.display !== 'none') this.renderBags();
+      })
+      .catch(() => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(null);
+      })
+      .finally(() => {
+        if (seq === this.claudiumLauncherBalanceSeq) {
+          this.claudiumLauncherBalancePending = false;
+        }
+      });
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -4792,6 +4910,7 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    this.syncDailyRewardsSurfaceLabels();
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -6798,10 +6917,26 @@ export class Hud {
   }
 
   private dailyRewardsEnabled(): boolean {
-    return !(
-      document.body.classList.contains('native-app') &&
-      document.body.classList.contains('mobile-touch')
-    );
+    return this.features.dailyRewardsEnabled;
+  }
+
+  private syncDailyRewardsSurfaceLabels(): void {
+    const storeEnabled = this.claudiumHooks !== null;
+    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
+    const title = t(titleKey);
+    for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
+      if (!button) continue;
+      button.setAttribute('data-i18n-title', titleKey);
+      button.setAttribute('data-i18n-aria', titleKey);
+      button.title = title;
+      button.setAttribute('aria-label', title);
+    }
+    const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
+    if (label) {
+      label.setAttribute('data-i18n', labelKey);
+      label.textContent = t(labelKey);
+    }
   }
 
   private showDailyRewardsChestButton(): boolean {
@@ -11519,7 +11654,7 @@ export class Hud {
   private submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.sim.submitLootRoll(rollId, choice);
     this.activeLootRolls.delete(rollId);
-    this.dismissedLootRolls.add(rollId);
+    this.dismissedLootRolls.set(rollId, performance.now());
     this.renderLootRolls();
   }
 
@@ -11543,11 +11678,15 @@ export class Hud {
       return;
     }
     const promptById = new Map(open.map((p) => [p.rollId, p] as const));
+    const dismissedAt: Record<number, number> = {};
+    for (const [id, at] of this.dismissedLootRolls) dismissedAt[id] = at;
     const decision = computeLootRollReconcile({
       open: open.map((p) => p.rollId),
       shown: [...this.activeLootRolls.keys()],
-      dismissed: [...this.dismissedLootRolls],
+      dismissed: [...this.dismissedLootRolls.keys()],
       confirmed: [...this.confirmedLootRolls],
+      dismissedAt,
+      nowMs: performance.now(),
     });
     this.confirmedLootRolls = new Set(decision.confirmed);
     for (const id of decision.toPrune) this.dismissedLootRolls.delete(id); // server confirmed it is gone
@@ -11597,6 +11736,7 @@ export class Hud {
       statuses,
       [...this.activeLootRolls.keys()],
       this.sim.playerId,
+      !this.isMobileLayout(),
     );
     const fp = lootRollStatusFingerprint(rows);
     if (fp === this.lootRollStatusFp) return;
@@ -11621,7 +11761,9 @@ export class Hud {
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
         this.activeLootRolls.delete(rollId);
-        this.dismissedLootRolls.add(rollId); // expired locally; don't let reconcile re-show it
+        // Expired locally: stamp the dismissal so reconcile only re-shows it if
+        // the server still lists it open past the grace, not on the next frame.
+        this.dismissedLootRolls.set(rollId, now);
         changed = true;
       }
     }
@@ -12360,6 +12502,9 @@ export class Hud {
 
   onCosmeticsChanged(): void {
     this.renderCharIfOpen();
+    // A grant or apply from another session on the account (or a server
+    // correction of an optimistic apply) must refresh an open armory too.
+    this.dailyRewardsWindow.onCosmeticsChanged();
   }
 
   private renderCharIfOpen(): void {
@@ -13533,6 +13678,10 @@ export class Hud {
       `<div class="cd-actions"><button type="button" class="btn" data-cancel>${esc(cancelText)}</button><button type="button" class="btn cd-ok" data-ok>${esc(okText)}</button></div>`;
     document.body.appendChild(el);
     this.bringWindowToFront(el);
+    // A confirm prompt is the topmost modal by definition: the window band tops
+    // out at 89 and the armory inspect overlay sits at 90, so floor it above
+    // both or a purchase confirmation opens invisibly underneath.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 95));
     this.confirmTrap = this.focusManager.open({ root: () => el });
     el.querySelector<HTMLElement>('[data-ok]')?.focus();
     const close = () => {
@@ -13775,6 +13924,32 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
     this.refreshDailyRewardsLauncher(true);
+  }
+
+  /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
+  attachClaudium(hooks: ClaudiumHooks): void {
+    this.claudiumHooks = hooks;
+    this.syncDailyRewardsSurfaceLabels();
+    this.claudiumLauncherBalance = null;
+    this.claudiumLauncherBalanceLastMs = 0;
+    this.claudiumLauncherBalanceSeq++;
+    this.claudiumLauncherBalancePending = false;
+    this.refreshClaudiumLauncherBalance(true);
+  }
+
+  /**
+   * Open or close the Claudium store. Always renders: with no hooks (offline or the
+   * service off) the window shows its clean disabled state, never a boot crash.
+   */
+  toggleClaudium(): void {
+    if (!this.claudiumHooks) return;
+    this.claudiumWindow.toggle();
+  }
+
+  async refreshClaudium(): Promise<void> {
+    this.refreshClaudiumLauncherBalance(true);
+    if (!this.claudiumWindow.isOpen) return;
+    await this.claudiumWindow.render();
   }
 
   // -------------------------------------------------------------------------

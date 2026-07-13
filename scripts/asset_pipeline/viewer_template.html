@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WoC Asset Library</title>
+<style>
+  :root {
+    --bg: #14171d; --panel: #1b1f27; --panel2: #22272f; --line: #343b45;
+    --text: #d8d3c5; --dim: #8b8578; --gold: #c9a959; --green: #67b06a;
+    --amber: #d8a03d; --blue: #6da3d8; --red: #d86a5a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.45 -apple-system, 'Segoe UI', sans-serif; }
+  header { padding: 14px 20px 10px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 5; }
+  header h1 { font-size: 17px; color: var(--gold); letter-spacing: 0.4px; }
+  header .sub { color: var(--dim); font-size: 12px; margin-top: 2px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .controls input[type=search] { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 6px 10px; width: 220px; font-size: 13px; }
+  .controls select { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 6px 8px; font-size: 13px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); background: var(--bg); color: var(--dim); border-radius: 14px; padding: 4px 11px; font-size: 12px; cursor: pointer; user-select: none; }
+  .chip.on { border-color: var(--gold); color: var(--gold); background: rgba(201, 169, 89, 0.08); }
+  main { padding: 16px 20px 60px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.12s; }
+  .card:hover, .card:focus-visible { border-color: var(--gold); outline: none; }
+  .card .img { aspect-ratio: 1; background: #10131a; display: flex; align-items: center; justify-content: center; }
+  .card img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .card .noimg { color: var(--dim); font-size: 12px; }
+  .card .meta { padding: 8px 10px; }
+  .card .name { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card .tags { display: flex; gap: 6px; align-items: center; margin-top: 4px; color: var(--dim); font-size: 11px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.ok { background: var(--green); } .dot.orphan { background: var(--amber); }
+  .dot.gen { background: var(--blue); } .dot.err { background: var(--red); }
+  .count { color: var(--dim); font-size: 12px; margin: 0 0 10px; }
+  /* Detail overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.82); display: none; z-index: 10; }
+  .overlay.open { display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .detail { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; width: min(1100px, 96vw); max-height: 92vh; display: flex; overflow: hidden; position: relative; }
+  .viewpane { width: 46%; min-width: 320px; background: #10131a; display: flex; flex-direction: column; border-right: 1px solid var(--line); }
+  .viewpane .big { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 340px; position: relative; }
+  .viewpane .big img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .viewpane .big canvas { width: 100%; height: 100%; display: block; cursor: grab; }
+  .viewpane .big canvas:active { cursor: grabbing; }
+  .livebar { display: flex; gap: 10px; align-items: center; padding: 7px 10px; background: var(--panel2); border-top: 1px solid var(--line); font-size: 12px; color: var(--dim); flex-wrap: wrap; }
+  .livebar select { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 6px; font-size: 12px; max-width: 200px; }
+  .livebar label { display: flex; gap: 4px; align-items: center; cursor: pointer; color: var(--text); }
+  .livebar .status { margin-left: auto; color: var(--dim); }
+  .livebar button { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 9px; font-size: 12px; cursor: pointer; }
+  .livebar button:hover { border-color: var(--gold); color: var(--gold); }
+  .livebar button:disabled { opacity: 0.4; cursor: default; }
+  .gripbar { display: none; gap: 8px 6px; align-items: center; padding: 6px 10px; background: var(--panel2); border-top: 1px solid var(--line); font-size: 11px; color: var(--dim); flex-wrap: wrap; }
+  .gripbar.on { display: flex; }
+  /* FX tuning sliders (VFX weapons in live mode only) */
+  .fxbar { display: none; gap: 6px 10px; align-items: center; padding: 6px 10px; background: var(--panel2); border-top: 1px solid var(--line); font-size: 11px; color: var(--dim); flex-wrap: wrap; }
+  .fxbar.on { display: flex; }
+  .fxbar .glabel { color: var(--gold); text-transform: uppercase; letter-spacing: 0.6px; font-size: 10px; }
+  .fxbar label { display: flex; gap: 4px; align-items: center; color: var(--text); }
+  .fxbar input[type=range] { width: 64px; accent-color: var(--gold); }
+  .fxbar button { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
+  .fxbar button:hover { border-color: var(--gold); color: var(--gold); }
+  .fxbar .gstatus { color: var(--dim); margin-left: auto; }
+  .gripbar .glabel { color: var(--gold); text-transform: uppercase; letter-spacing: 0.6px; font-size: 10px; }
+  .gripbar label { display: flex; gap: 3px; align-items: center; color: var(--text); }
+  .gripbar input { width: 52px; background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 4px; padding: 2px 4px; font-size: 11px; }
+  .gripbar button { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 9px; font-size: 11px; cursor: pointer; }
+  .gripbar button:hover { border-color: var(--gold); color: var(--gold); }
+  .gripbar button:disabled { opacity: 0.4; cursor: default; }
+  .gripbar .gstatus { color: var(--dim); margin-left: auto; }
+  .strip { display: flex; gap: 6px; padding: 8px; overflow-x: auto; background: var(--panel2); border-top: 1px solid var(--line); }
+  .strip img { width: 56px; height: 56px; object-fit: contain; background: #10131a; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; flex-shrink: 0; }
+  .strip img.on { border-color: var(--gold); }
+  .strip .lbl { font-size: 9px; color: var(--dim); text-align: center; width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .inspector { flex: 1; overflow-y: auto; padding: 16px 18px; }
+  .inspector h2 { font-size: 16px; color: var(--gold); margin-bottom: 2px; }
+  .inspector .path { color: var(--dim); font-size: 11px; font-family: ui-monospace, monospace; word-break: break-all; margin-bottom: 12px; }
+  .inspector h3 { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.8px; margin: 14px 0 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  td, th { padding: 3px 8px 3px 0; text-align: left; vertical-align: top; }
+  td:first-child { color: var(--dim); white-space: nowrap; width: 110px; }
+  th { color: var(--dim); font-weight: 500; font-size: 11px; }
+  .pill { display: inline-block; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; margin: 1px 3px 1px 0; font-size: 11px; }
+  .pill.gold { color: var(--gold); border-color: rgba(201, 169, 89, 0.5); }
+  .pill.green { color: var(--green); } .pill.amber { color: var(--amber); }
+  .pill.blue { color: var(--blue); } .pill.red { color: var(--red); }
+  .mono { font-family: ui-monospace, monospace; font-size: 11.5px; }
+  /* Armory Codex rarity banner (injected by the live viewer for VFX weapons) */
+  .vfxband { border: 1px solid var(--line); border-radius: 8px; padding: 10px 44px 10px 12px; margin: 0 0 14px; background: linear-gradient(160deg, rgba(255,255,255,0.03), rgba(0,0,0,0.18)); }
+  .vfxband-rare { border-color: rgba(0, 112, 221, 0.55); box-shadow: 0 0 18px rgba(255, 122, 30, 0.07) inset, 0 0 14px rgba(0, 112, 221, 0.1); }
+  .vfxband-epic { border-color: rgba(163, 53, 238, 0.55); box-shadow: 0 0 18px rgba(120, 190, 255, 0.09) inset, 0 0 14px rgba(163, 53, 238, 0.1); }
+  .vfxband-legendary { border-color: rgba(255, 128, 0, 0.55); box-shadow: 0 0 18px rgba(255, 170, 60, 0.1) inset, 0 0 14px rgba(255, 128, 0, 0.12); }
+  .vfxband-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .vfxband-tier { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .vfxband-rare .vfxband-tier { color: #4da3ff; }
+  .vfxband-epic .vfxband-tier { color: #c77dff; }
+  .vfxband-legendary .vfxband-tier { color: #ffab4d; }
+  .vfxband-dots i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-left: 3px; background: var(--line); }
+  .vfxband-rare .vfxband-dots i.on { background: #0070dd; box-shadow: 0 0 6px rgba(0, 112, 221, 0.8); }
+  .vfxband-epic .vfxband-dots i.on { background: #a335ee; box-shadow: 0 0 6px rgba(163, 53, 238, 0.8); }
+  .vfxband-legendary .vfxband-dots i.on { background: #ff8000; box-shadow: 0 0 6px rgba(255, 128, 0, 0.8); }
+  .vfxband-name { font-size: 15px; margin-top: 5px; }
+  .vfxband-rare .vfxband-name { color: #a9d0ff; }
+  .vfxband-epic .vfxband-name { color: #d9b8ff; }
+  .vfxband-legendary .vfxband-name { color: #ffd9a3; }
+  .vfxband-hero { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); border: 1px solid rgba(201, 169, 89, 0.5); border-radius: 9px; padding: 1px 7px; vertical-align: 2px; margin-left: 6px; }
+  .vfxband-lore { color: var(--dim); font-size: 12px; font-style: italic; margin-top: 5px; line-height: 1.5; }
+  .vfxband-fx { color: var(--dim); font-size: 11px; margin-top: 7px; opacity: 0.85; }
+  .closebtn { position: absolute; top: 12px; right: 14px; z-index: 4; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; background: var(--panel2); border: 1px solid var(--line); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 22px; line-height: 1; }
+  .closebtn:hover { color: #fff; background: var(--red); border-color: var(--red); }
+  .delbtn { position: absolute; bottom: 14px; right: 18px; z-index: 3; background: var(--panel); border: 1px solid #7a2b2b; color: #e0736f; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; }
+  .delbtn:hover { color: #fff; background: #7a2b2b; border-color: #a33; }
+  .createbtn { position: absolute; top: 14px; right: 20px; z-index: 6; background: var(--gold); color: #14171d; border: 1px solid var(--gold); border-radius: 7px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .createbtn:hover { filter: brightness(1.08); }
+  /* When an asset detail is open, drop the floating +Create FAB so it does not sit on top of the relocated Delete button. */
+  #overlay.open ~ .wz-fab { display: none; }
+  .navhint { color: var(--dim); font-size: 11px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <button type="button" id="headercreate" class="createbtn" title="Create a new asset">+ Create asset</button>
+  <h1>World of ClaudeCraft: Asset Library</h1>
+  <div class="sub" id="subtitle"></div>
+  <div class="controls">
+    <input type="search" id="search" placeholder="Search name or path" aria-label="Search assets" />
+    <div class="chips" id="catChips"></div>
+    <select id="status" aria-label="Registration filter">
+      <option value="all">All statuses</option>
+      <option value="registered">Registered</option>
+      <option value="orphan">Unreferenced</option>
+      <option value="generated">Generated (pipeline)</option>
+      <option value="error">Errors</option>
+    </select>
+    <select id="sort" aria-label="Sort">
+      <option value="name">Sort: name</option>
+      <option value="bytes">Sort: size</option>
+      <option value="tris">Sort: tris</option>
+    </select>
+  </div>
+</header>
+<main>
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="detail" role="dialog" aria-modal="true" aria-label="Asset detail">
+    <button type="button" class="closebtn" id="closebtn" title="Close (Esc)" aria-label="Close">×</button>
+    <button type="button" class="delbtn" id="delasset" style="display:none" title="Permanently delete this generated asset and free its name">Delete</button>
+    <div class="viewpane">
+      <div class="big">
+        <canvas id="live" style="display:none"></canvas>
+        <img id="bigimg" alt="" />
+      </div>
+      <div class="livebar" id="livebar" style="display:none">
+        <label for="clipsel">anim</label>
+        <select id="clipsel" aria-label="Animation clip"></select>
+        <span id="heldbywrap" style="display:flex;gap:6px;align-items:center">
+          <label for="heldby">held by</label>
+          <select id="heldby" aria-label="Held by character"></select>
+        </span>
+        <label><input type="checkbox" id="ctxtoggle" /> vs player</label>
+        <label id="vfxwrap" style="display:none" title="Armory Codex rarity effects (bloom, particles, cast light)"><input type="checkbox" id="vfxtoggle" checked /> VFX</label>
+        <span id="scenewrap" style="display:flex;gap:4px;align-items:center">
+          <label for="scenesel">scene</label>
+          <select id="scenesel" aria-label="Preview scene lighting" title="Preview the asset under different world lighting"></select>
+        </span>
+        <span class="status" id="livestatus"></span>
+        <span class="glabel">model</span>
+        <button type="button" id="revealfinder" title="reveal this file in Finder so you can drag it straight into Blender">Reveal in Finder</button>
+        <button type="button" id="updatemodel" title="replace this model with a newer .glb from disk (stays uncompressed)">Update Model&hellip;</button>
+        <button type="button" id="compressexport" title="compress to game format and export to ~/Documents/WOC Assets">Compress &amp; Export</button>
+        <span class="status" id="exportstatus"></span>
+      </div>
+      <div class="fxbar" id="fxbar">
+        <span class="glabel">fx tuning</span>
+        <label title="emissive core intensity">glow<input type="range" id="fxglow" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="bloom strength">bloom<input type="range" id="fxbloom" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="cast light">light<input type="range" id="fxlight" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="core star sprite">core<input type="range" id="fxcore" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="orbiting motes">motes<input type="range" id="fxmotes" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="aurora ribbons">aurora<input type="range" id="fxaurora" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="vapor / ember drift">mist<input type="range" id="fxmist" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="surface twinkles">sparkle<input type="range" id="fxsparkle" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="fresnel rim shell">shell<input type="range" id="fxshell" min="0" max="2" step="0.05" value="1" /></label>
+        <label title="ground light pool">pool<input type="range" id="fxpool" min="0" max="2" step="0.05" value="1" /></label>
+        <button type="button" id="fxreset" title="reset all fx channels to the authored 1.0x">Reset</button>
+        <button type="button" id="fxsave" title="write this weapon's fx tuning to src/render/weapon_vfx_tuning.ts so the game uses it">Save VFX</button>
+        <span class="gstatus" id="fxstatus"></span>
+      </div>
+      <div class="gripbar" id="gripbar">
+        <span class="glabel">grip fit</span>
+        <label>mv x<input type="number" id="gmx" step="0.01" aria-label="grip move x" /></label>
+        <label>y<input type="number" id="gmy" step="0.01" aria-label="grip move y" /></label>
+        <label>z<input type="number" id="gmz" step="0.01" aria-label="grip move z" /></label>
+        <label>rot x<input type="number" id="grx" step="5" aria-label="grip rotate x degrees" /></label>
+        <label>y<input type="number" id="gry" step="5" aria-label="grip rotate y degrees" /></label>
+        <label>z<input type="number" id="grz" step="5" aria-label="grip rotate z degrees" /></label>
+        <label>scale<input type="number" id="gscale" step="0.05" aria-label="grip scale" /></label>
+        <span class="glabel">gizmo</span>
+        <button type="button" id="gizmove" title="drag to move the anchor (X/Y/Z)">Move</button>
+        <button type="button" id="gizrot" title="drag to rotate the anchor (X/Y/Z)">Rotate</button>
+        <button type="button" id="gripsave">Save</button>
+        <button type="button" id="gripreset">Reset</button>
+        <span class="gstatus" id="gripstatus"></span>
+      </div>
+      <div class="strip" id="strip"></div>
+    </div>
+    <div class="inspector" id="inspector"></div>
+  </div>
+</div>
+
+<script>
+const DATA = __ASSET_DATA__;
+const assets = DATA.assets;
+// Rewritten to true by `library --serve` (which also injects viewer_live.js).
+// Static file open leaves it false and uses the rendered thumbnail strip.
+window.__LIVE__ = false;
+const kb = (n) => n >= 1048576 ? `${(n / 1048576).toFixed(2)} MB` : `${(n / 1024).toFixed(0)} KB`;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+// Filters persist across reloads (survives a page refresh AND the reload after a
+// delete) via localStorage, so the library reopens on the same category/search/
+// sort you left it on.
+const FILTER_KEY = 'woc_asset_lib_filters';
+function loadFilters() {
+  try { return JSON.parse(localStorage.getItem(FILTER_KEY)) || {}; } catch { return {}; }
+}
+function saveFilters() {
+  try {
+    localStorage.setItem(FILTER_KEY, JSON.stringify(
+      { search: state.search, cat: state.cat, status: state.status, sort: state.sort }));
+  } catch { /* private mode / quota: filters just won't persist */ }
+}
+const _f = loadFilters();
+const state = {
+  search: typeof _f.search === 'string' ? _f.search : '',
+  cat: typeof _f.cat === 'string' ? _f.cat : 'all',
+  status: typeof _f.status === 'string' ? _f.status : 'all',
+  sort: typeof _f.sort === 'string' ? _f.sort : 'name',
+  open: -1,
+  filtered: [],
+};
+
+// A public/ asset URL that resolves in both modes: /repo/public/* when served,
+// ../../../public/* relative to the emitted index.html when opened as a file.
+function pubUrl(publicRel) {
+  return window.__LIVE__ ? `/repo/public/${publicRel}` : `../../../public/${publicRel}`;
+}
+
+// Character models a weapon can be "held by" in the live viewer: every player
+// class body plus any generated skin-model bodies (they carry handslot bones).
+function characterOptions() {
+  const opts = [];
+  for (const a of assets) {
+    if (a.kind === 'model' && a.category === 'chars/players' && a.repoGlb) {
+      opts.push({ label: a.name, repoGlb: a.repoGlb });
+    }
+    if (a.kind === 'job' && a.job?.lane === 'skinmodel' && a.repoGlb) {
+      opts.push({ label: `${a.name.replace(/^skinmodel: /, '')} (generated)`, repoGlb: a.repoGlb });
+    }
+  }
+  return opts.sort((x, y) => x.label.localeCompare(y.label));
+}
+
+function statusOf(a) {
+  if (a.error) return 'error';
+  if (a.registration?.generated) return 'generated';
+  return a.registration?.referenced ? 'registered' : 'orphan';
+}
+const DOT = { registered: 'ok', orphan: 'orphan', generated: 'gen', error: 'err' };
+
+function categories() {
+  const cats = [...new Set(assets.map((a) => a.category))].sort();
+  return ['all', ...cats];
+}
+
+function applyFilters() {
+  const q = state.search.toLowerCase();
+  state.filtered = assets.filter((a) => {
+    if (state.cat !== 'all' && a.category !== state.cat) return false;
+    if (state.status !== 'all' && statusOf(a) !== state.status) return false;
+    if (q && !(a.name.toLowerCase().includes(q) || a.path.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  const key = state.sort;
+  state.filtered.sort((a, b) =>
+    key === 'name' ? a.name.localeCompare(b.name)
+    : key === 'bytes' ? (b.bytes ?? 0) - (a.bytes ?? 0)
+    : (b.inspect?.tris ?? 0) - (a.inspect?.tris ?? 0));
+}
+
+function renderGrid() {
+  applyFilters();
+  document.getElementById('count').textContent =
+    `${state.filtered.length} of ${assets.length} assets`;
+  const grid = document.getElementById('grid');
+  grid.innerHTML = state.filtered.map((a, i) => {
+    const img = a.thumb
+      ? `<img loading="lazy" src="${esc(a.thumb)}" alt="" />`
+      : `<span class="noimg">${a.error ? 'render failed' : 'no preview'}</span>`;
+    const tris = a.inspect ? `${a.inspect.tris} tris` : '';
+    const clips = a.inspect?.clips?.length ? ` · ${a.inspect.clips.length} clips` : '';
+    return `<div class="card" tabindex="0" role="button" data-i="${i}">` +
+      `<div class="img">${img}</div>` +
+      `<div class="meta"><div class="name" title="${esc(a.name)}">${esc(a.name)}</div>` +
+      `<div class="tags"><span class="dot ${DOT[statusOf(a)]}"></span>` +
+      `${esc(a.category)} · ${kb(a.bytes ?? 0)}${tris ? ` · ${tris}` : ''}${clips}` +
+      '</div></div></div>';
+  }).join('');
+}
+
+function pills(list, cls) {
+  return (list ?? []).map((x) => `<span class="pill ${cls ?? ''}">${esc(x)}</span>`).join('') || '<span class="pill">none</span>';
+}
+
+function inspectorHtml(a) {
+  const st = statusOf(a);
+  let h = `<h2>${esc(a.name)}</h2><div class="path">${esc(a.path)}</div>`;
+  h += `<span class="pill ${st === 'registered' ? 'green' : st === 'orphan' ? 'amber' : st === 'generated' ? 'blue' : 'red'}">${st}</span>`;
+  h += `<span class="pill">${esc(a.category)}</span>`;
+  if (a.family) h += `<span class="pill gold">family: ${esc(a.family)}</span>`;
+  if (a.error) h += `<h3>Error</h3><div class="mono">${esc(a.error)}</div>`;
+
+  if (a.inspect) {
+    const i = a.inspect;
+    const b = i.bounds;
+    const dims = b ? [0, 1, 2].map((k) => (b.max[k] - b.min[k]).toFixed(2)).join(' x ') : '?';
+    h += '<h3>Geometry</h3><table>' +
+      `<tr><td>size</td><td>${kb(a.bytes)}</td></tr>` +
+      `<tr><td>triangles</td><td>${i.tris} (${i.verts} verts, ${i.meshes} meshes)</td></tr>` +
+      `<tr><td>dimensions</td><td class="mono">${dims}</td></tr>` +
+      (b ? `<tr><td>base / grip y</td><td class="mono">${b.min[1].toFixed(3)} .. ${b.max[1].toFixed(3)}</td></tr>` : '') +
+      `<tr><td>rig</td><td>${i.skins ? `${i.skins} skin, ${i.joints} joints` : 'static'}</td></tr>` +
+      '</table>';
+    h += `<h3>Materials</h3>${pills(i.materials.map((m) => m ?? 'unnamed'))}`;
+    if (i.textures.length) {
+      h += '<h3>Textures</h3><table><tr><th>name</th><th>type</th><th>size</th><th>bytes</th></tr>' +
+        i.textures.map((t) => `<tr><td>${esc(t.name ?? '?')}</td><td>${esc((t.mime ?? '').replace('image/', ''))}</td><td>${t.width}x${t.height}</td><td>${kb(t.bytes)}</td></tr>`).join('') + '</table>';
+    } else if (a.kind === 'model') {
+      h += '<h3>Textures</h3><span class="pill">untextured (color factors)</span>';
+    }
+    if (i.clips?.length) {
+      h += `<h3>Animation clips (${i.clips.length})</h3><table>` +
+        i.clips.map((c) => `<tr><td>${esc(c.name)}</td><td>${c.duration}s</td></tr>`).join('') + '</table>';
+    }
+  }
+
+  const r = a.registration ?? {};
+  h += '<h3>Registration</h3><table>';
+  if (a.category === 'weapons') {
+    h += `<tr><td>grip family</td><td>${r.gripFamily ? `<span class="pill gold">${esc(r.gripFamily)}</span>` : '<span class="pill amber">not in KAYKIT_WEAPON_ACCESSORY</span>'}</td></tr>`;
+    h += `<tr><td>item ids</td><td>${pills(r.itemIds, 'green')}</td></tr>`;
+    h += `<tr><td>HUD icon</td><td>${r.icon ? `<img src="${esc(pubUrl(r.icon))}" width="40" style="vertical-align:middle;border-radius:4px" alt="icon" /> ${esc(r.icon)}` : '<span class="pill amber">missing</span>'}</td></tr>`;
+    if (r.visualKeys?.length) h += `<tr><td>visual attach</td><td>${pills(r.visualKeys, 'blue')}</td></tr>`;
+  } else if (a.kind === 'skin' && a.category === 'skins') {
+    h += `<tr><td>model</td><td>${esc(a.model)}.glb (classes: ${esc((a.classes ?? []).join(', '))})</td></tr>`;
+    h += `<tr><td>skin slots</td><td>${r.isBase ? '<span class="pill gold">base atlas (default look source)</span>' : pills((r.slots ?? []).map((s) => `${s.key} [${s.index}]`), 'green')}</td></tr>`;
+  } else if (a.kind === 'skin') {
+    h += `<tr><td>chroma id</td><td class="mono">${esc(a.chromaId)}</td></tr>`;
+    h += `<tr><td>rank</td><td>${r.rank ? `<span class="pill ${r.rank === 'epic' ? 'gold' : 'green'}">${esc(r.rank)}</span>` : '<span class="pill amber">not in MECH_CHROMAS</span>'}</td></tr>`;
+    h += `<tr><td>emissive map</td><td>${r.hasEmissive ? 'yes (epic glow)' : 'no'}</td></tr>`;
+  } else if (a.kind === 'job') {
+    const j = a.job;
+    h += `<tr><td>lane</td><td>${esc(j.lane)}</td></tr>`;
+    h += `<tr><td>steps</td><td>${Object.entries(j.steps).map(([k, v]) => `<span class="pill ${v === 'done' ? 'green' : v === 'failed' ? 'red' : ''}">${esc(k)}</span>`).join('')}</td></tr>`;
+    if (j.validation) {
+      h += `<tr><td>validation</td><td>${j.validation.ok ? '<span class="pill green">ok</span>' : pills(j.validation.errors, 'red')}${j.validation.warnings?.length ? `<br/>${pills(j.validation.warnings, 'amber')}` : ''}</td></tr>`;
+    }
+    h += `<tr><td>tripo tasks</td><td class="mono">${Object.entries(j.tasks).map(([k, v]) => `${esc(k)}: ${esc(v)}`).join('<br/>')}</td></tr>`;
+  } else {
+    h += `<tr><td>visual keys</td><td>${pills(r.visualKeys, 'blue')}</td></tr>`;
+    h += `<tr><td>referenced in src</td><td>${r.referenced ? '<span class="pill green">yes</span>' : '<span class="pill amber">no reference found</span>'}</td></tr>`;
+  }
+  h += '</table>';
+  if (a.hash) h += `<div class="navhint">content hash ${esc(a.hash)} · arrows navigate, Esc closes</div>`;
+  return h;
+}
+
+function detailImages(a) {
+  const imgs = [];
+  if (a.thumb) imgs.push({ label: 'hero', src: a.thumb });
+  if (a.held) imgs.push({ label: 'in hand', src: a.held });
+  if (a.heldRight) imgs.push({ label: 'side', src: a.heldRight });
+  if (a.atlas) imgs.push({ label: 'atlas', src: a.atlas });
+  for (const p of a.clipFrames ?? []) {
+    imgs.push({ label: p.split('/').pop().replace(/^clip_|\.png$/g, ''), src: p });
+  }
+  for (const p of a.previews ?? []) {
+    imgs.push({ label: p.split('/').pop().replace(/\.png$/, ''), src: p });
+  }
+  return imgs;
+}
+
+function openDetail(i) {
+  state.open = i;
+  const a = state.filtered[i];
+  if (!a) return;
+  // Deep-linkable detail: #a=<name> mirrors the open asset (replaceState so
+  // history does not fill up while arrow-navigating).
+  try { history.replaceState(null, '', `#a=${encodeURIComponent(a.name)}`); } catch { /* file:// */ }
+  // Delete is offered ONLY for generated/imported assets (server marks them
+  // deletable); base/shipped assets have no button.
+  document.getElementById('delasset').style.display = a.registration?.deletable ? '' : 'none';
+  const big = document.getElementById('bigimg');
+  const strip = document.getElementById('strip');
+  const canvas = document.getElementById('live');
+  const livebar = document.getElementById('livebar');
+  const useLive = window.__LIVE__ && window.LiveViewer && a.repoGlb;
+
+  // In live mode the 3D canvas replaces the static frame strip; do NOT populate
+  // the strip imgs (their file:// relative srcs would still fetch under display
+  // none and 404 on the served route). Only build the strip for static open.
+  if (useLive) {
+    strip.innerHTML = '';
+    strip.style.display = 'none';
+  } else {
+    const imgs = detailImages(a);
+    big.src = imgs[0]?.src ?? '';
+    strip.style.display = 'flex';
+    strip.innerHTML = imgs.map((im, k) =>
+      `<div><img src="${esc(im.src)}" data-k="${k}" class="${k === 0 ? 'on' : ''}" alt="${esc(im.label)}" /><div class="lbl">${esc(im.label)}</div></div>`).join('');
+    strip.querySelectorAll('img').forEach((el) => {
+      el.addEventListener('click', () => {
+        big.src = imgs[Number(el.dataset.k)].src;
+        for (const x of strip.querySelectorAll('img')) x.classList.remove('on');
+        el.classList.add('on');
+      });
+    });
+  }
+  document.getElementById('inspector').innerHTML = inspectorHtml(a);
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('inspector').scrollTop = 0;
+  if (window.WizardUI) window.WizardUI.onDetail(a);
+
+  if (useLive) {
+    big.style.display = 'none';
+    canvas.style.display = 'block';
+    livebar.style.display = 'flex';
+    window.LiveViewer.open(a, {
+      canvas,
+      clipSelect: document.getElementById('clipsel'),
+      statusEl: document.getElementById('livestatus'),
+      contextToggle: document.getElementById('ctxtoggle'),
+      heldBySelect: document.getElementById('heldby'),
+      charOptions: characterOptions(),
+      gripBar: document.getElementById('gripbar'),
+      gripInputs: {
+        mx: document.getElementById('gmx'), my: document.getElementById('gmy'), mz: document.getElementById('gmz'),
+        rx: document.getElementById('grx'), ry: document.getElementById('gry'), rz: document.getElementById('grz'),
+        scale: document.getElementById('gscale'),
+      },
+      gripSaveBtn: document.getElementById('gripsave'),
+      gripResetBtn: document.getElementById('gripreset'),
+      gripStatusEl: document.getElementById('gripstatus'),
+      gizmoMoveBtn: document.getElementById('gizmove'),
+      gizmoRotBtn: document.getElementById('gizrot'),
+      updateBtn: document.getElementById('updatemodel'),
+      exportBtn: document.getElementById('compressexport'),
+      exportStatusEl: document.getElementById('exportstatus'),
+      vfxToggle: document.getElementById('vfxtoggle'),
+      inspectorEl: document.getElementById('inspector'),
+      sceneSelect: document.getElementById('scenesel'),
+      fxBar: document.getElementById('fxbar'),
+      fxInputs: {
+        glow: document.getElementById('fxglow'), bloom: document.getElementById('fxbloom'),
+        light: document.getElementById('fxlight'), core: document.getElementById('fxcore'),
+        motes: document.getElementById('fxmotes'), aurora: document.getElementById('fxaurora'),
+        mist: document.getElementById('fxmist'), sparkle: document.getElementById('fxsparkle'),
+        shell: document.getElementById('fxshell'), pool: document.getElementById('fxpool'),
+      },
+      fxResetBtn: document.getElementById('fxreset'),
+      fxSaveBtn: document.getElementById('fxsave'),
+      fxStatusEl: document.getElementById('fxstatus'),
+    });
+  } else {
+    if (window.LiveViewer) window.LiveViewer.close();
+    canvas.style.display = 'none';
+    livebar.style.display = 'none';
+    document.getElementById('gripbar').classList.remove('on');
+    big.style.display = '';
+  }
+}
+function closeDetail() {
+  state.open = -1;
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('gripbar').classList.remove('on');
+  if (window.LiveViewer) window.LiveViewer.close();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch { /* file:// */ }
+}
+
+// Open an asset by exact name (the #a=<name> deep link). Clears any filter
+// that would hide it, then opens its detail overlay.
+function openByName(name) {
+  if (!name) return;
+  let idx = state.filtered.findIndex((a) => a.name === name);
+  if (idx === -1) {
+    if (!assets.some((a) => a.name === name)) return;
+    state.search = '';
+    state.cat = 'all';
+    state.status = 'all';
+    document.getElementById('search').value = '';
+    document.getElementById('status').value = 'all';
+    for (const x of document.querySelectorAll('#catChips .chip')) {
+      x.classList.toggle('on', x.dataset.cat === 'all');
+    }
+    saveFilters();
+    renderGrid();
+    idx = state.filtered.findIndex((a) => a.name === name);
+  }
+  if (idx !== -1) openDetail(idx);
+}
+
+// Wiring
+document.getElementById('subtitle').textContent =
+  `${assets.length} assets · generated ${DATA.generatedAt.replace('T', ' ').slice(0, 19)} UTC`;
+// Header "Create asset" button: mirrors the floating +Create FAB (both open the
+// wizard via openNew). The wizard only exists when served live, so hide the
+// button in static-file mode where there is no backend to run a generation.
+(() => {
+  const hc = document.getElementById('headercreate');
+  if (!hc) return;
+  if (window.__LIVE__) hc.addEventListener('click', () => { if (window.WizardUI) window.WizardUI.openNew(); });
+  else hc.style.display = 'none';
+})();
+const chipBox = document.getElementById('catChips');
+// Reflect the restored filters into the controls before first render. Drop a
+// stored category that no longer exists so the grid never renders empty-and-stuck.
+if (!categories().includes(state.cat)) state.cat = 'all';
+document.getElementById('search').value = state.search;
+document.getElementById('status').value = state.status;
+document.getElementById('sort').value = state.sort;
+chipBox.innerHTML = categories().map((c) =>
+  `<span class="chip${c === state.cat ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)}</span>`).join('');
+chipBox.addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  state.cat = chip.dataset.cat;
+  for (const x of chipBox.querySelectorAll('.chip')) x.classList.toggle('on', x === chip);
+  saveFilters();
+  renderGrid();
+});
+document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value; saveFilters(); renderGrid(); });
+document.getElementById('status').addEventListener('change', (e) => { state.status = e.target.value; saveFilters(); renderGrid(); });
+document.getElementById('sort').addEventListener('change', (e) => { state.sort = e.target.value; saveFilters(); renderGrid(); });
+document.getElementById('grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (card) openDetail(Number(card.dataset.i));
+});
+document.getElementById('grid').addEventListener('keydown', (e) => {
+  const card = e.target.closest('.card');
+  if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(Number(card.dataset.i)); }
+});
+document.getElementById('closebtn').addEventListener('click', closeDetail);
+document.getElementById('delasset').addEventListener('click', async () => {
+  const a = state.filtered[state.open];
+  if (!a || !a.registration?.deletable) return;
+  const key = a.weaponKey || a.name.replace(/^[^:]+:\s*/, '');
+  if (!confirm(`Permanently delete "${a.name}" and all its files (model, icon, generation job)?` +
+    '\n\nThis cannot be undone. The name will be freed so you can re-generate with it later.')) return;
+  try {
+    const resp = await fetch('/api/asset/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, jobId: a.job?.id || a.registration?.jobId || null }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert(`Delete failed: ${data.error || resp.status}`); return; }
+    location.reload(); // re-inventory without the deleted asset; persisted filter holds the view
+  } catch (err) {
+    alert(`Delete failed: ${err.message || err}`);
+  }
+});
+// "Reveal in Finder": open the OS file browser at this asset's file (the weapon
+// .glb, or a skin's texture atlas) so it can be dragged straight into Blender.
+// Server-only: it hits the /api route, and the livebar hosting the button is
+// shown exclusively in --serve mode, so the fetch always has a backend.
+document.getElementById('revealfinder').addEventListener('click', async () => {
+  const a = state.filtered[state.open];
+  const btn = document.getElementById('revealfinder');
+  if (!a) return;
+  const path = a.repoAtlas || a.repoGlb;
+  const flash = (msg) => { btn.textContent = msg; setTimeout(() => { btn.textContent = 'Reveal in Finder'; }, 1600); };
+  if (!path) { flash('No file on disk'); return; }
+  btn.disabled = true;
+  try {
+    const resp = await fetch('/api/asset/reveal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    const ok = resp.ok && data.ok;
+    if (!ok) console.warn('reveal failed:', data.error || resp.status);
+    flash(ok ? 'Revealed' : 'Reveal failed');
+  } catch (err) {
+    console.warn('reveal failed:', err);
+    flash('Reveal failed');
+  } finally {
+    btn.disabled = false;
+  }
+});
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('overlay')) closeDetail();
+});
+document.addEventListener('keydown', (e) => {
+  if (state.open === -1) return;
+  if (e.key === 'Escape') closeDetail();
+  if (e.key === 'ArrowRight' && state.open < state.filtered.length - 1) openDetail(state.open + 1);
+  if (e.key === 'ArrowLeft' && state.open > 0) openDetail(state.open - 1);
+});
+window.addEventListener('hashchange', () => {
+  const m = location.hash.match(/^#a=(.+)$/);
+  if (m) openByName(decodeURIComponent(m[1]));
+});
+renderGrid();
+{
+  // Honor a #a=<name> deep link on load. The live viewer module loads after
+  // this inline script, so wait a tick for window.LiveViewer to exist.
+  const m = location.hash.match(/^#a=(.+)$/);
+  if (m) setTimeout(() => openByName(decodeURIComponent(m[1])), 60);
+}
+</script>
+</body>
+</html>

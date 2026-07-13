@@ -133,7 +133,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.spectateBody':
     'Allo stadio si gioca una partita alla volta, e chiunque può avvicinarsi e guardare dagli spalti.',
   'hudChrome.keybinds.valecup': 'Coppa della Valle',
-  'hudChrome.mobile.dailyRewards': 'Ricompense',
+  'hudChrome.mobile.dailyRewards': 'Negozio',
   'hudChrome.perf.labels.predLead': 'Anticipo di predizione',
   'hudChrome.townFocus.budgetLabel': 'Punti rimanenti: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Riduci la priorità di {component}',
@@ -7085,4 +7085,355 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
   'guide.worldPage.worldBossTitle': 'Quando la vetta si desta: il boss del mondo',
+  'entities.abilities.chain_heal.description':
+    'Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)',
+  'entities.abilities.chain_heal.name': 'Guarigione a Catena',
+  'entities.abilities.counter_shot.description':
+    "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s.",
+  'entities.abilities.counter_shot.name': 'Tiro Silenziante',
+  'entities.abilities.counterspell.description':
+    "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 6 s.",
+  'entities.abilities.counterspell.name': 'Spezzaincantesimi',
+  'entities.abilities.holy_taunt.description':
+    'Provoca il bersaglio: la tua minaccia sale al livello del suo nemico più odiato e lo costringe ad attaccarti per 3 s.',
+  'entities.abilities.holy_taunt.name': 'Pungolo Sacro',
+  'entities.abilities.kick.description':
+    "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s.",
+  'entities.abilities.kick.name': 'Calcio',
+  'entities.abilities.pummel.description':
+    "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s.",
+  'entities.abilities.pummel.name': 'Spaccamascella',
+  'entities.abilities.rebuke.description':
+    "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s.",
+  'entities.abilities.rebuke.name': 'Rimprovero',
+  'entities.abilities.skull_bash.description':
+    "Una testata in affondo che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s.",
+  'entities.abilities.skull_bash.name': 'Testata',
+  'entities.abilities.spell_lock.description':
+    'Silenzia il bersaglio durante il lancio e impedisce di lanciare incantesimi di quella scuola per 5 s.',
+  'entities.abilities.spell_lock.name': 'Ordine del Silenzio',
+  'entities.items.ashen_focus_ring.name': 'Anello della Concentrazione Cinerea',
+  'entities.items.ashstalker_cowl.name': 'Cappuccio del Braccatore delle Ceneri',
+  'entities.items.ashstalker_grips.name': 'Guanti del Braccatore delle Ceneri',
+  'entities.items.ashstalker_harness.name': 'Imbracatura del Braccatore delle Ceneri',
+  'entities.items.ashstalker_legguards.name': 'Gambali del Braccatore delle Ceneri',
+  'entities.items.ashstalker_shoulderguards.name': 'Spallacci del Braccatore delle Ceneri',
+  'entities.items.ashstalker_treads.name': 'Calzari del Braccatore delle Ceneri',
+  'entities.items.ashstalker_waistband.name': 'Cintura del Braccatore delle Ceneri',
+  'entities.items.cinder_sigil_pendant.name': 'Ciondolo del Sigillo di Brace',
+  'entities.items.cinderweave_cord.name': 'Corda di Telacenere',
+  'entities.items.cinderweave_cowl.name': 'Cappuccio di Telacenere',
+  'entities.items.cinderweave_handwraps.name': 'Fasce di Telacenere',
+  'entities.items.cinderweave_legwraps.name': 'Gambali di Telacenere',
+  'entities.items.cinderweave_mantle.name': 'Mantello di Telacenere',
+  'entities.items.cinderweave_raiment.name': 'Veste di Telacenere',
+  'entities.items.cinderweave_slippers.name': 'Pantofole di Telacenere',
+  'entities.items.emberglass_warstaff.name': 'Bastone da Guerra Vetrobrace',
+  'entities.items.final_argument_greatblade.name': "Spadone dell'Argomento Finale",
+  'entities.items.final_oath_medallion.name': 'Medaglione del Giuramento Finale',
+  'entities.items.first_blood_razor.name': 'Lama del Primo Sangue',
+  'entities.items.fleetblood_band.name': 'Anello del Sangue Veloce',
+  'entities.items.furyforged_gauntlets.name': 'Manopole Furiaforgiate',
+  'entities.items.furyforged_girdle.name': 'Cintura Furiaforgiata',
+  'entities.items.furyforged_legguards.name': 'Gambali Furiaforgiati',
+  'entities.items.furyforged_sabatons.name': 'Calzari Furiaforgiati',
+  'entities.items.furyforged_warhelm.name': 'Elmo da Guerra Furiaforgiato',
+  'entities.items.furyforged_warplate.name': 'Corazza da Guerra Furiaforgiata',
+  'entities.items.furyforged_warspaulders.name': 'Spallacci da Guerra Furiaforgiati',
+  'entities.items.iron_vow_band.name': 'Anello del Voto di Ferro',
+  'entities.items.last_step_signet.name': "Sigillo dell'Ultimo Passo",
+  'entities.items.razorwind_torque.name': 'Collare del Vento Tagliente',
+  'entities.items.spellbreakers_seal.name': 'Sigillo dello Spezzaincantesimi',
+  'entities.items.stormbound_crown.name': 'Corona della Tempesta',
+  'entities.items.stormbound_greaves.name': 'Schinieri della Tempesta',
+  'entities.items.stormbound_handguards.name': 'Guardamani della Tempesta',
+  'entities.items.stormbound_hauberk.name': 'Usbergo della Tempesta',
+  'entities.items.stormbound_legmail.name': 'Gambali di Maglia della Tempesta',
+  'entities.items.stormbound_spaulders.name': 'Spallacci della Tempesta',
+  'entities.items.stormbound_waistguard.name': 'Cintura della Tempesta',
+  'entities.items.unbroken_circle.name': 'Il Cerchio Ininterrotto',
+  'entities.npcs.fury.greeting': 'Le sabbie ricordano ogni vittoria. Spendi bene il tuo onore.',
+  'entities.npcs.fury.name': 'FURIA',
+  'entities.npcs.fury.title': "Quartiermastro d'Onore",
+  'hudChrome.claudium.amountLabel': 'Quantità',
+  'hudChrome.claudium.balanceLabel': 'Saldo',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Acquista',
+  'hudChrome.claudium.buyTitle': 'Acquista Claudium',
+  'hudChrome.claudium.buyUnavailable': "L'acquisto non è disponibile al momento.",
+  'hudChrome.claudium.checkoutClose': 'Chiudi il pagamento',
+  'hudChrome.claudium.checkoutFailed': 'Impossibile caricare il pagamento. Riprova.',
+  'hudChrome.claudium.checkoutLoading': 'Caricamento del pagamento...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'La transazione è stata inviata, ma Claudium non è ancora stato accreditato. Riprova tra poco.',
+  'hudChrome.claudium.checkoutPending':
+    'Transazione in corso. Conferma nel tuo portafoglio e mantieni questo pannello aperto.',
+  'hudChrome.claudium.checkoutPendingButton': 'In elaborazione',
+  'hudChrome.claudium.checkoutTitle': "Completa l'acquisto",
+  'hudChrome.claudium.checkoutUnavailable': "L'acquisto di Claudium non è disponibile al momento.",
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Collega un portafoglio Solana prima di acquistare Claudium con criptovaluta.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Questo portafoglio non può firmare e inviare transazioni Solana.',
+  'hudChrome.claudium.close': 'Chiudi Claudium',
+  'hudChrome.claudium.disclosure':
+    'Claudium è una valuta virtuale a senso unico: puoi acquistarlo con denaro reale e spenderlo in cosmetici. Non può essere riscattato, trasferito o convertito in denaro.',
+  'hudChrome.claudium.hideAmounts': 'Nascondi importi extra di Claudium',
+  'hudChrome.claudium.kindCosmetic': 'Cosmetico',
+  'hudChrome.claudium.kindItem': 'Oggetto',
+  'hudChrome.claudium.kindSkin': 'Aspetto',
+  'hudChrome.claudium.loading': 'Caricamento di Claudium...',
+  'hudChrome.claudium.open': 'Apri Claudium',
+  'hudChrome.claudium.railLabel': 'Metodo di pagamento',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC non disponibile.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Carta',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': '20% di sconto',
+  'hudChrome.claudium.railWocUnavailable': 'I prezzi WOC non sono disponibili al momento.',
+  'hudChrome.claudium.showAmounts': 'Mostra tutti gli importi di Claudium',
+  'hudChrome.claudium.skuRow': '{usd} per {claudium} Claudium',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Riscatta',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Nessun cosmetico è disponibile al momento.',
+  'hudChrome.claudium.storeTitle': 'Negozio di cosmetici',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Il negozio Claudium non è disponibile al momento. Il tuo saldo e i tuoi acquisti non subiranno modifiche. Riprova tra poco.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Raccolta: recupera da questo cadavere materiali per la creazione (pelle, zanne, seta e componenti simili), separati dal bottino. Chiunque può raccogliere, ma ogni cadavere può essere raccolto da un solo giocatore.',
+  'hudChrome.deeds.openBookHint': 'Apri il Libro delle Imprese',
+  'hudChrome.loot.takeAllTooltip':
+    'Prendi tutto: raccogli tutte le monete e gli oggetti in questa finestra del bottino.',
+  'hudChrome.statInfo.desc.warfare':
+    'Aumenta il danno inflitto ai giocatori del {increase}% e riduce il danno subito dai giocatori del {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Guerra',
+  'hudChrome.statInfo.warfareValue': '+{increase}% inflitti / -{reduction}% subiti',
+  'hudChrome.tutorial.nextTipMap':
+    'Controlla la mappa del mondo ({key}) per vedere dove ti aspettano le missioni.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Apri il registro delle missioni ({key}) per trovare la tua prossima attività nelle vicinanze.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Apri la finestra Sociale ({key}) per trovare un gruppo per gli scontri più impegnativi.',
+  'hudChrome.tutorial.nextTipsTitle': 'Dove andare dopo',
+  'hudChrome.tutorial.slayTargetHint':
+    "Non conosci ancora il combattimento? Premi {targetKey} o fai clic su un lupo per selezionarlo, poi usa un'abilità della barra delle azioni per attaccarlo.",
+  'hudChrome.tutorial.slayTargetHintTouch':
+    "Non conosci ancora il combattimento? Tocca un lupo per selezionarlo, poi tocca un'abilità della barra delle azioni per attaccarlo.",
+  'hudChrome.warfare.balance': 'Onore: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} Onore',
+  'hudChrome.warfare.honorFloat': '+{amount} Onore',
+  'hudChrome.warfare.honorGain': 'Ottieni {amount} Onore ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Onore insufficiente.',
+  'hudChrome.warfare.reasons.arenaWin': "Vittoria nell'Arena",
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta completata',
+  'hudChrome.warfare.reasons.fiestaKill': 'Abbattimento della Fiesta',
+  'hudChrome.warfare.reasons.fiestaWin': 'Vittoria nella Fiesta',
+  'hudChrome.wocStore.applied': 'Applicato',
+  'hudChrome.wocStore.apply': 'Applica aspetto',
+  'hudChrome.wocStore.armoryBody':
+    "Aspetti per armi in edizione limitata dall'Armeria della Stagione 1. Disponibili per tutto l'account, puramente cosmetici e visibili a chiunque ti circondi.",
+  'hudChrome.wocStore.armoryEyebrow': 'Stagione 1',
+  'hudChrome.wocStore.armoryTitle': "L'Armeria",
+  'hudChrome.wocStore.badge.flagship': 'Pezzo forte',
+  'hudChrome.wocStore.badge.hero': 'Eroe',
+  'hudChrome.wocStore.balance': 'Saldo Claudium',
+  'hudChrome.wocStore.buyClaudium': 'Acquista Claudium',
+  'hudChrome.wocStore.buySkin': 'Acquista aspetto',
+  'hudChrome.wocStore.cancel': 'Annulla',
+  'hudChrome.wocStore.close': 'Chiudi il negozio WOC',
+  'hudChrome.wocStore.collectionLine': 'Collezione {collection}',
+  'hudChrome.wocStore.collections.emberwrought': 'Forgiato nella Brace',
+  'hudChrome.wocStore.collections.fallen_star': 'Stella Caduta',
+  'hudChrome.wocStore.collections.guildmark': 'Marchio della gilda',
+  'hudChrome.wocStore.collections.hoarfrost': 'Brina',
+  'hudChrome.wocStore.confirmBody': 'Acquistare {item} per {cost} Claudium?',
+  'hudChrome.wocStore.confirmPurchase': 'Acquista',
+  'hudChrome.wocStore.confirmTitle': "Conferma l'acquisto del cosmetico",
+  'hudChrome.wocStore.detach': 'Rimuovi aspetto',
+  'hudChrome.wocStore.equipHint': "Equipaggia un'arma di tipo {type} per applicare questo aspetto.",
+  'hudChrome.wocStore.error':
+    'Il negozio WOC non è al momento disponibile. Per favore riprova a breve.',
+  'hudChrome.wocStore.inspectAria': 'Esamina {item}',
+  'hudChrome.wocStore.loading': 'Caricamento del negozio WOC...',
+  'hudChrome.wocStore.lore': 'Storia',
+  'hudChrome.wocStore.needMoreBody': 'Ti servono altri {shortfall} Claudium per acquistare {item}.',
+  'hudChrome.wocStore.needMoreTitle': 'Servono altri Claudium',
+  'hudChrome.wocStore.owned': 'In possesso',
+  'hudChrome.wocStore.priceChanged':
+    "Il prezzo è cambiato prima del completamento dell'acquisto. Controlla il prezzo aggiornato e conferma di nuovo.",
+  'hudChrome.wocStore.rarity.epic': 'Epico',
+  'hudChrome.wocStore.rarity.legendary': 'Leggendario',
+  'hudChrome.wocStore.rarity.rare': 'Raro',
+  'hudChrome.wocStore.rarity.uncommon': 'Non comune',
+  'hudChrome.wocStore.rewardsTab': 'Premi giornalieri',
+  'hudChrome.wocStore.scene.day': 'Giorno',
+  'hudChrome.wocStore.scene.dusk': 'Crepuscolo',
+  'hudChrome.wocStore.scene.night': 'Notte',
+  'hudChrome.wocStore.sceneLabel': 'Illuminazione della scena',
+  'hudChrome.wocStore.seasonOne': 'Stagione 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Lama corta annerita venata di un brillante arancione brace, una piccola gemma fumante nel pomo, cenere e scintilla.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    "Una lama da vicolo con il fuoco della montagna contrabbandato nella pietra del pomo, una battuta sommessa di un armaiolo: persino un tagliaborse può portare con sé una brace della prima forgiatura. Annerita e venata d'arancio, resta sempre un po' troppo calda nel fodero. Sguainala al buio sotto Highwatch e il bagliore illuminerà la tua mano quanto basta per trovare un varco nella guardia di un uomo.",
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Pugnale di Ashscintilla',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    "Un frammento di stella caduta, un bordo luminoso d'oro fuso su un metallo nero cosmo, un granello di stella luminoso che orbita attorno al pomo, una sottile scia di aurora.",
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    "Il pezzo più piccolo della stella che Aldric ha recuperato dal cratere e, secondo alcuni calcoli, il più pericoloso. Un singolo frammento di quel cuore ultraterreno, il suo bordo d'oro fuso che cavalca il metallo nero cosmo, un granello di stella solitario che circonda il pomo come una luna che ha perso il suo mondo. Non pesa quasi nulla e separa quasi tutto. Abbastanza piccolo da nascondersi, abbastanza luminoso da essere trovato nell'oscurità con la propria luce.",
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Zanna della Stella Caduta',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Punta in acciaio lucido, cappuccio e lancette in ottone su manico in frassino laccato, rivestimento ordinato, timbro del produttore.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    "Un'ascia stampata è un vanto che puoi tenere. Il cappuccio e le linguette di ottone sono metà armatura e metà firma: impediscono che l'impugnatura si spezzi e catturano la luce della taverna, così tutti sanno che hai comprato un'opera dell'armaiolo Hode, non un pezzo di seconda mano della milizia. \"Se taglia, lo vendo\", dice il fabbro dell'Highwatch. Questo taglia.",
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Ascia con cappuccio in ottone',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Bastone in legno duro sormontato da un terminale a corona in ottone tornito, puntale in ottone, fascia in pelle tinta.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Trasformato in legno duro stagionato e coronato da un terminale in ottone, i fabbri Eastbrook hanno fuso a centinaia ma perfetti uno per uno. Appartiene al tipo di viaggiatore che vuole essere preso sul serio sia al cancello di Fenbridge che al muro di Highwatch. Un bastone da passeggio che non ha mai veramente avuto bisogno di camminare; la fascia in tinta si abbina ad un cappotto di cui si può intuire il prezzo.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': "Bastone da passeggio della Corona d'Ottone",
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Lama in acciaio forgiato scuro, piena di rune color ambra brillante, crepe dovute al calore, una gemma fumante nella guardia.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    'La prima lama temprata non nell\'acqua, ma nelle Braci Benedette raccolte a Stormcrag, carboni che i fabbri di Highwatch giurano "brucino azzurri e puri, perché la montagna ricorda il suo antico giuramento". Racchiuso nella scanalatura, quel fuoco arde color brace e non muore; le rune restano calde al tocco nella notte più fredda sulla muraglia. Marchiobrace non deve mai essere accesa. Semplicemente si rifiuta di spegnersi.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Marchiobrace',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    "Balestra d'acciaio annerito, bagliore arancione che filtra dalle fessure nel pungolo, carbone fumante nella barra del timone.",
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    "Il più strano tra gli oggetti forgiati nella brace: il fuoco della montagna riversato in una macchina. Il bagliore arancione filtra dalle fessure dell'arco, mentre un carbone fumante nel fusto impedisce alla corda di irrigidirsi nel freddo di Thornpeak o nell'umidità di Mirefen. I suoi dardi lasciano la scanalatura già caldi e colpiscono ancora più roventi. La risposta di un cacciatore per una muraglia dove neppure il nemico sente il freddo.",
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Fermobrace',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    "Grappolo orbitante di frammenti di stelle dorati attorno a un nucleo d'oro fuso, un albero nero cosmo inciso con costellazioni, nastri di aurora che si avvolgono verso l'alto.",
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    "Un'asta di metallo stellare coronata da un nucleo d'oro fuso e un anello di schegge dorate che marciano attorno ad essa in un'orbita lenta e infinita: un piccolo cosmo, inciso con costellazioni che non corrispondono al cielo sopra Thornpeak. L'aurora si snoda per tutta la sua lunghezza come fumo che ha dimenticato di salire. Coloro che lo sopportavano affermavano di poter sentire il vuoto che lo attraversava, nel modo in cui Ysolei semplicemente \"beve la luce della luna\": paziente, fredda e guardando indietro.",
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Marciacosmo, Guglia del Vuoto Infinito',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Ascia di ferro annerito con incrinature color arancio che brillano attraverso la punta, una gemma di carbone accumulato, filamenti di calore.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    "L'armaiolo Hode ha inserito un carbone ardente di fuoco di montagna nel cuore del morso, quindi il bordo non si raffredda mai veramente tra un colpo e l'altro. Le crepe respirano arancione durante il rallentamento, come se il colpo risvegliasse qualcosa che la prima forgiatura aveva lasciato addormentato nel ferro. Dicono che un elementale di Stormcrag abbia rinunciato alla brace per questo; dicono un sacco di cose a Highwatch quando il vento è alto.",
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Morsobrace',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Prigioniero di particelle di stella morente in oro fuso avvolte in scintille orbitanti, asta nera come il cosmo incisa con costellazioni luminose.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    "Non la stella caduta in sé, ma l'ultimo granello di una stella morente: un'unica brace d'oro fuso di un sole già spento, avvolta nelle scintille che erano la sua luce finale. Sul suo fusto nero come il cosmo sono incise le costellazioni che lo hanno visto morire. I contadini di Mirefen dicono che esaudisce un desiderio a chiunque lo tenga al tramonto; dicono anche che ogni anima che lo possedeva desiderava più tempo, e che la Luna Annegata non ne concesse a nessuno di loro.",
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Desideriobrace, Favilla del Sole Morente',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Bacchetta di metallo annerito con sulla punta un carbone ardente in artigli di ferro, sottili crepe dovute al calore, calda luce interiore.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'La bacchetta che ha dato il nome al grado. Quando un armaiolo di Alta Guardia per primo mise un carbone di fuoco di montagna in artigli di ferro e lo fece rispondere a una mano mortale, anche gli Sacerdote della Luce smisero di chiamarla eresia e iniziarono a chiamarla utile. Caldo, paziente e silenziosamente pericoloso: la brace sulla sua punta brucia, ininterrotta, da prima che il suo proprietario prendesse fiato.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Bacchetta forgiata in brace',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    "Cannone stellare comicamente sovradimensionato: una canna nero cosmo incisa con costellazioni dorate luminose, una volata a campana svasata con un guscio di cometa in oro fuso inserito all'interno, raccordi in ottone, calcio a spalla in legno.",
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    "I fabbri che lavorarono la stella caduta ne ricavarono sei reliquie e si ritrovarono ancora con un barile di metallo stellare, quando ormai gli apprendisti avevano le proprie idee. Dall'incudine uscì il primo cannone del reame o la sua più piccola macchina d'assedio: un cannone da spalla che, più che sparare, richiede una seconda stella con tanto di bersaglio. Fratello Aldric rifiutò di benedirlo: qualcosa di tanto rumoroso era già stato notato dal cielo. I cacciatori lo adorano. Nulla sulla sua traiettoria ha mai condiviso l'entusiasmo.",
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, la seconda stella cadente',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    "Un singolo picco di brillante ghiacciaio azzurro, brina che fiorisce da un collare d'argento, debole nebbia fredda.",
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    "Una punta di ghiaccio glaciale luminoso, che si dice provenga dal profondo laghetto sotto il Sanctum, dove il freddo della montagna ha i denti. La brina fiorisce senza fine dal collare d'argento e non si scioglie mai, né al fuoco né d'estate. I maghi la tengono vicina per il gelo che presta alle loro opere, ma la allontanano nelle notti in cui sembra inclinarsi verso la cripta di Nythraxis e mettersi in ascolto.",
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Frammento di Sempreinverno',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    "Arco ricurvo in noce laccato, puntali dei flettenti in ottone, corda di lino cerato e marchio della gilda sull'impugnatura.",
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    "La cosa più simile a una gilda che esista nel reame è il marchio di un frecciaio sull'impugnatura, una promessa su ciò che racchiude, come il sigillo di un vignaiolo su una botte. Noce laccato, ottone sui puntali e una corda di lino cerato che non si sfilaccia sotto la pioggia di Mirefen. Ogni giuntura giustifica il prezzo. Tendilo una volta oltre il Folto delle vedove e non avrai più dubbi.",
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Arco della Gilda dei Frecciai',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Bastone rivestito di ferro coronato da un nucleo di brace splendente ingabbiata, rune di brace lungo il fusto, un crescente luccichio di calore.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Un carbone vivo del fuoco della montagna, ingabbiato nel ferro sulla corona. Il Maestro del sapere Caddis lo considera la prova che il fuoco della prima forgiatura può essere vincolato al servizio, non soltanto alla custodia dei sigilli. Un tremolio di calore sale in un nastro sottile e infinito; a un mago che lo porta non manca mai né una forgia né un fuoco di guardia. Si sussurra che la brace provenga dal respiro di Voskar Aladibrace e che da allora non si sia mai raffreddata.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Bastone di Forgeheart',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Pugnale malvagiamente sottile di ghiaccio blu chiaro, una vena ciano brillante al centro, cristalli di ghiaccio aghiformi, impugnatura di brina.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Sottile come un respiro trattenuto e fredda il doppio: una scheggia del ghiacciaio di Thornpeak affilata fino a lasciare una sola vena luminosa, così tagliente che la ferita gela prima che il sangue si ricordi di scorrere. Il nome viene dal gelo sepolcrale che i morti portano giù dalle vette. Non serve mai affilarla: il ghiaccio non perde il filo, osserva asciutto il Maestro del sapere Caddis, aspetta soltanto.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Ago di brina',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Testa di ghiacciaio blu traslucido, interno incrinato che brilla di ciano, cristalli di brina irti, un manico che lascia dietro di sé vapore freddo.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    "Ricavata dal cuore azzurro del ghiacciaio di Thornpeak, dove due secoli di ghiaccio hanno compresso il freddo finché non ha cominciato a brillare da solo. Lascia una scia di vapore anche a riposo, e il suo schianto ricorda un crepaccio che si apre sotto la Cresta del braccatore. Highwatch affida i suoi caduti al ghiaccio lassù: questa è un'arma fatta per tenere a bada il disgelo e qualunque cosa possa risvegliare.",
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Spaccatura del ghiacciaio',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Lama in acciaio azzurrato, guardia a coda di pesce in bronzo, impugnatura in pelle tinta verde acqua, piccolo sigillo della gilda stampato.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    "Se una lama comune è anonima, questa porta una firma. Un armaiolo ottiene il diritto di incidere il proprio marchio sul ricasso solo quando il Mercante del Mercato Mondiale garantisce per il suo acciaio, e quello del fabbro Haldren è garantito. Brunita contro l'umidità della Valle e bilanciata al capello. Paghi il marchio quanto la spada, e ne vale la pena.",
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name':
+    'Spada da armamento del marchio della gilda',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Pugnale sottile in acciaio temperato, guardia e dado del pomello in bronzo, impugnatura del cordone verde scuro, sigillo stampato.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Ciò che porta un uomo affermato quando la spada resta a casa: sottile, temperato e impresso con lo stesso marchio che certifica una lama intera, indossato alla cintura come un sigillo affilato. Discreto per tutti, tranne per chi sa leggere la prova di un armaiolo. Il Quartiermastro Bree ne tiene un cassetto a Highwatch per gli ufficiali che si sono guadagnati il rispetto della muraglia.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Marchio della Gilda Dirk',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Bastone argentato coronato da un frammento fluttuante di brillante ghiaccio ciano che ruota lentamente, irradiando cristalli e vapore freddo.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    "Il bastone della guardia che non dorme mai sulla muraglia di Highwatch. La corona è una scheggia di ghiaccio ciano del lago montano, sospesa libera dall'argento e capace di ruotare lentamente da sola: sempre, giurano le guardie, verso il freddo che si raccoglie sotto le vette. Portare la Veglia significa sostenere duecento anni di guardia in una sola notte e promettere di non distogliere lo sguardo.",
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Veglia della brina',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Lama curva di ghiaccio glaciale pallido, cristalli di brina frastagliati lungo la spina dorsale, un nucleo ghiacciato di colore ciano brillante nella guardia trasversale di ghiacciolo più piena.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    'Il pezzo forte della serie gelata, il primo che ogni collezionista desidera. Zanna di Ghiaccio fu scolpita, non forgiata, da una zanna del ghiacciaio che corona Thornpeak sopra Highwatch; il nucleo ciano arde di un freddo pari alla luce del Glimmermere. Ricopre di brina persino l\'aria che taglia. Le guardie della muraglia giurano che un soldato la portasse la notte in cui le alte nevi respinsero il Culto del Wyrm e "regalò alla muraglia un altro inverno".',
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Zanna di ghiaccio',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Bacchetta sottile laccata rosso intenso, due fasce in ottone lucido, piccola punta arrotondata in ottone.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Lacca rosso intenso in sette cappotti pazienti, fasciata due volte in ottone lucido: il tipo di bacchetta che un mago siepe compra al Mercato Mondiale una volta che ha iniziato a caricare monete vere e vuole guardarla. Incanala la Luce non meglio di un bastone di betulla. Ma brilla magnificamente sul bancone del Mercante, e si è sempre creduto a metà della magia minore.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Asta laccata',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    "Metallo stellare meteoritico, nucleo d'oro fuso lungo la barra, arti neri come il cosmo incisi con costellazioni, un dardo incoccato di puro fuoco stellare.",
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    'Forgiato con metallo stellare meteorico grezzo mentre il cratere Mirefen ancora brillava, detriti "troppo caldi da maneggiare", martellati in arti di nero cosmo inciso con costellazioni, un nucleo di oro fuso appoggiato lungo la barra. Non scaglia alcun fulmine ma ne evoca uno: un raggio di fuoco stellare, scagliato come un verdetto e che atterra come la fine di uno. Quando Highwatch temeva che perfino la corona immortale di Nythraxis potesse non essere la cosa peggiore sotto le vette, questa era l\'arma che volevano sulle mura. Mira bene.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name': 'Fermometeora, Ultimo Giudizio del Cielo',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Grappolo di cristalli di ghiaccio frastagliati attorno a un nucleo ciano brillante, brina che striscia lungo un manico argentato.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    "Non scolpito ma cresciuto: il ghiaccio di Thornpeak si avvolse attorno a un freddo nucleo ciano finché non divenne duro come il miglior acciaio di Hode. La brina si insinua lungo il manico argentato verso la mano e non arriva mai del tutto. Dove colpisce, l'acqua gela; dove riposa, la terra imbianca. Il freddo mortale delle vette, reso abbastanza piccolo da dondolarsi contro le cose che si arrampicano sulla parete.",
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Frantoio',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    "La testa sembra un pezzo strappato di cielo notturno, crepe d'oro fuso e incisioni di costellazioni, frammenti di luce stellare sospesi, uno scintillio di aurora che segue il bordo.",
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    "Battuto dal bordo del cratere, dove la stella caduta strappò da Mirefen il riflesso del cielo e lasciò una ferita che ancora fuma. La testa sembra un pezzo di notte lacerata: crepe d'oro fuso, costellazioni che nessuno studioso di Highwatch riesce a nominare, un'aurora che sanguina dal bordo a ogni oscillazione. Il fratello Aldric lo benedisse e non lo toccò. Sollevarlo significa tenere il buco lasciato dal cielo.",
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Squarciacielo, Ferita del Firmamento',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Flange di ferro scuro che brillano di un arancione acceso lungo le fessure interne, una gemma dal nucleo fuso nella testa.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    'Una mazza che trasporta il proprio focolare: una pietra dal nucleo fuso scheggiata dal sigillo del Sanctum che è stata "lavorata con il fuoco di montagna", incastonata ardente nella testa. Le flange rimangono calde al tatto e più calde dove atterrano; un sergente di Highwatch giura che un colpo lascerà un livido che brillerà debolmente fino al mattino. Il fuoco della montagna, finalmente fatto per spezzare invece che per sigillare.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Caduta fumante',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    "Spadone forgiato da una stella caduta, nucleo d'oro fuso che divide la lama, acciaio nero cosmo bordato di luce stellare, frammenti dorati che orbitano attorno alla guardia, nastro aurora.",
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    'Quando la stella cadde dal cielo occidentale ed "esplose come una fucina" oltre il Boschetto della Vedova, fratello Aldric estrasse il suo cuore ancora fumante dal cratere Mirefen e implorò i fabbri del regno di lavorare "una cosa che non appartiene a questo mondo". Ne hanno fatto uno spadone: Solheim. Il suo nucleo d\'oro fuso divide la lama nera del cosmo come l\'alba che squarcia un cielo notturno, e schegge di metallo stellare orbitano attorno alla guardia su sentieri non tracciati da mano. Ne è stato forgiato solo uno. Non ce ne sarà un altro.',
+  'hudChrome.wocStore.skins.solheim_sword.name': "Solheim, L'ultima luce dell'alba",
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    "Nucleo stellare prigioniero d'oro fuso circondato da frammenti orbitanti, flange nere come il cosmo venate di luce stellare, aurora che fuoriesce dalle cuciture.",
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    "Un nucleo stellare catturato un istante prima di morire, circondato dai detriti caduti con esso, congelato a un centimetro dall'oblio. Le sue flange nere come il cosmo scorrono con la luce stellare intrappolata, e l'aurora fuoriesce dalle giunture quando viene sollevata. I vecchi Sacerdote della Luce chiamavano una stella cadente un giudizio, un verdetto emesso dall'alto che nessuno scudo doveva fermare, e la chiamavano in onore di quella caduta su Mirefen.",
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Caduta Stellare, Giudizio dei Cieli',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Testa a sei flange in acciaio temperato blu, collare e pomo in ottone, impugnatura in cuoio rosso vino.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    "Sei flange di acciaio azzurrato e temperato, ciascuna rettificata per aprire un elmo, ricoperte di ottone e avvolte in pelle rosso vino. Gli armaioli del regno non creano armi brutte, anche quando il lavoro è brutale. Questo è stato commissionato tramite il mercato mondiale, non tirato fuori da uno scaffale; da qualche parte c'è un registro con il nome di un orgoglioso acquirente e la somma che ha pagato a Hode per averlo.",
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Mazza flangiata temperata',
+  'hudChrome.wocStore.skins.winterbite.look':
+    "Arco di acciaio argentato e ghiaccio azzurro, nucleo ciano ghiacciato e luminoso nell'impugnatura, freccia di ghiaccio massiccio incoccata e vapore freddo.",
+  'hudChrome.wocStore.skins.winterbite.lore':
+    "Un arco di acciaio argentato e ghiaccio di Thornpeak, con l'impugnatura illuminata da un freddo nucleo ciano che congela la freccia alla corda. Incocca un dardo di ghiaccio glaciale che si riforma a ogni tiro; sulla muraglia l'arciere non porta una faretra, soltanto il freddo. Highwatch resistette a un assedio sulla Cresta del braccatore grazie a un arco simile: un solo arciere, si dice, e frecce per un intero inverno, sempre già pronte.",
+  'hudChrome.wocStore.skins.winterbite.name': 'Morso invernale',
+  'hudChrome.wocStore.storeTab': 'Negozio',
+  'hudChrome.wocStore.tabsLabel': 'Sezioni del negozio WOC',
+  'hudChrome.wocStore.title': 'Negozio WOC',
+  'hudChrome.wocStore.tryOn': 'Provalo',
+  'hudChrome.wocStore.unavailable': 'Non disponibile',
+  'hudChrome.wocStore.viewModeLabel': 'Modalità di anteprima',
+  'hudChrome.wocStore.weaponOnly': 'Solo arma',
+  'hudChrome.wocStore.wtype.axe': 'Ascia',
+  'hudChrome.wocStore.wtype.bow': 'Arco',
+  'hudChrome.wocStore.wtype.crossbow': 'Balestra',
+  'hudChrome.wocStore.wtype.dagger': 'Pugnale',
+  'hudChrome.wocStore.wtype.mace': 'Mazza',
+  'hudChrome.wocStore.wtype.staff': 'Personale',
+  'hudChrome.wocStore.wtype.sword': 'Spada',
+  'hudChrome.wocStore.wtype.wand': 'Bacchetta',
 };

@@ -1,4 +1,4 @@
-// Deterministic SHA-256 of the resolved 14-locale translation table.
+// Deterministic SHA-256 of the resolved 21-locale translation table.
 //
 // This is the byte-equivalence safety net for the i18n scaling refactor: every
 // behavior-preserving change must leave the resolved table byte-identical, proven
@@ -11,11 +11,11 @@
 //   node scripts/i18n_resolved_hash.mjs --write    (re)write src/ui/i18n.resolved.sha256
 //   node scripts/i18n_resolved_hash.mjs --check     compare against the committed baseline; exit 1 on mismatch
 
-import * as esbuild from 'esbuild';
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as esbuild from 'esbuild';
 
 const root = process.cwd();
 // Only the GAME table is SHA-gated here. The admin resolved table
@@ -74,8 +74,8 @@ function readBaseline() {
 }
 
 // Run as a CLI only when invoked directly (not when imported by the test).
-const invokedDirectly = process.argv[1]
-  && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+const invokedDirectly =
+  process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (invokedDirectly) {
   const mode = process.argv[2];
@@ -88,7 +88,9 @@ if (invokedDirectly) {
     const baseline = readBaseline();
     if (baseline !== sha256) {
       console.error(`MISMATCH: resolved table hash ${sha256} != baseline ${baseline}`);
-      console.error('The resolved 14-locale table changed. For a behavior-preserving change this is a bug, not a re-baseline.');
+      console.error(
+        'The resolved 21-locale table changed. For a behavior-preserving change this is a bug, not a re-baseline.',
+      );
       process.exit(1);
     }
     console.log('OK: resolved table matches the committed baseline.');

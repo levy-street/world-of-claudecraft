@@ -17,15 +17,15 @@ permissions:
 #   pr-gate       cheap, English-only-legal tier. Runs on pull requests, on pushes
 #                 to non-release branches (main, dev-*), and on manual dispatch.
 #                 It runs `npm test` WITHOUT I18N_RELEASE_TIER, so the release-only
-#                 checks (s3_localized, copied-English rendered content, 14-locale
+#                 checks (s3_localized, copied-English rendered content, 21-locale
 #                 key parity, empty-`pending`) are skipped. What it still enforces:
-#                 tsc against the dense generated artifact, registry-in-sync,
+#                 game/admin typechecks, registry-in-sync,
 #                 s3_registered (every emit maps to a registered key/RULE), and
 #                 placeholder parity for the translations that actually exist. An
 #                 English-only PR (sparse overlay) passes here.
 #
-#   release-gate  full 14-locale tier. Runs on pushes to release/** only, with
-#                 I18N_RELEASE_TIER=1 so the release-only checks RUN. A merely
+#   release-gate  full 21-locale tier. Runs on release/** pushes and on the
+#                 release-to-main PR merge result, with I18N_RELEASE_TIER=1. A merely
 #                 `pending` (untranslated) key cannot survive this gate.
 #
 # Both tiers also typecheck and build env/server/client; the release tier is a
@@ -60,9 +60,6 @@ jobs:
   # Biome-eligible file (docs, assets, generated i18n).
   lint:
     name: Format + lint (Biome, changed files)
-    # Release branches are already validated on push. A release-to-main PR would
-    # otherwise run this changed-file ratchet against the entire release delta.
-    if: github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')
     runs-on: ubuntu-latest
 
     steps:
@@ -102,9 +99,32 @@ jobs:
           BASE_REF_RESOLVED: ${{ steps.base.outputs.ref }}
         run: npx @biomejs/biome ci --changed --since="$BASE_REF_RESOLVED" --no-errors-on-unmatched
 
+  browser-gate:
+    name: Browser regressions (Chromium)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser regressions
+        run: npm run test:browser
+
   pr-gate:
     name: PR gate (English-only legal)
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -150,7 +170,7 @@ jobs:
         run: npm test
 
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run check:types
 
       - name: Build headless environment
         run: npm run build:env
@@ -162,8 +182,8 @@ jobs:
         run: npm run build
 
   release-gate:
-    name: Release gate (full 14-locale)
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/')
+    name: Release gate (full 21-locale)
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     runs-on: ubuntu-latest
 
     # The release tier; this single flag turns on every release-only check.
@@ -206,11 +226,11 @@ jobs:
       - name: Malicious-code gate
         run: npm run security:gate
 
-      - name: Run tests (release tier - 14-locale + empty-pending)
+      - name: Run tests (release tier - 21-locale + empty-pending)
         run: npm test
 
       - name: Typecheck
-        run: npx tsc --noEmit
+        run: npm run check:types
 
       - name: Build headless environment
         run: npm run build:env

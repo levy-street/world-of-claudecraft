@@ -1,4 +1,4 @@
-// rotation_test.mjs — in-session verification of the optimized DPS/threat rotations.
+// rotation_test.mjs - in-session verification of the optimized DPS/threat rotations.
 // Exercises the real exported rotate() from multibox_brain.mjs with mock bots at various
 // levels + mana, and prints the ability each class casts. No server, no realm, no ban risk.
 //   run:  node scripts/rotation_test.mjs
@@ -8,7 +8,7 @@ import { rotate } from './multibox_brain.mjs';
 // hasImp defaults true so the rotation tables show the COMBAT rotation (Imp already out), not the
 // one-time summon. `ticks` runs rotate() repeatedly on the SAME target to reveal a multi-step
 // sequence (e.g. the warlock's DoT opener → Shadow Bolt filler). Mana isn't consumed in the mock,
-// so affordability stays true across ticks — fine for showing which abilities fire in what order.
+// so affordability stays true across ticks - fine for showing which abilities fire in what order.
 function makeBot(
   cls,
   lv,
@@ -62,14 +62,14 @@ function castSeq(cls, lv, manaFrac, ticks, opts = {}) {
 }
 
 const DPS = ['warrior', 'hunter', 'mage', 'warlock', 'shaman'];
-console.log('\n=== DPS rotation — top ability cast, FULL mana, by level ===');
+console.log('\n=== DPS rotation - top ability cast, FULL mana, by level ===');
 console.log('class'.padEnd(9), ['L4', 'L8', 'L10', 'L14', 'L16'].map((s) => s.padEnd(16)).join(''));
 for (const cls of DPS) {
   const row = [4, 8, 10, 14, 16].map((lv) => mockBot(cls, lv, 1.0).padEnd(16)).join('');
   console.log(cls.padEnd(9), row);
 }
 
-console.log('\n=== mana management — same classes at LOW mana (10%) vs full ===');
+console.log('\n=== mana management - same classes at LOW mana (10%) vs full ===');
 for (const cls of ['mage', 'warlock', 'shaman', 'hunter']) {
   console.log(
     cls.padEnd(9),
@@ -122,7 +122,7 @@ console.log(
 console.log(
   'paladin, NO seal up →',
   mockBot('paladin', 8, 1.0),
-  '(always re-seal first — Seal buffs every swing with holy damage)',
+  '(always re-seal first - Seal buffs every swing with holy damage)',
 );
 for (const lv of [2, 4, 14, 18])
   console.log(
@@ -130,14 +130,14 @@ for (const lv of [2, 4, 14, 18])
     castSeq('paladin', lv, 1.0, 5, { hasSeal: true }),
   );
 console.log(
-  '   (L2: just melee+seal · L4: +judgement · L14: +exorcism · L18: +consecration — each gated to its learn level)',
+  '   (L2: just melee+seal · L4: +judgement · L14: +exorcism · L18: +consecration - each gated to its learn level)',
 );
 
 console.log('\n=== shaman rotation grows per level (in range, full mana) ===');
 for (const lv of [1, 4, 10])
   console.log(`shaman L${String(lv).padEnd(2)} →`, castSeq('shaman', lv, 1.0, 4, { dist: 10 }));
 console.log(
-  '   (L1: lightning_bolt · L4: +earth_shock · L10: +flame_shock — gated to learn level)',
+  '   (L1: lightning_bolt · L4: +earth_shock · L10: +flame_shock - gated to learn level)',
 );
 
 console.log('\n=== shaman shock is range-gated (≤19y) ===');

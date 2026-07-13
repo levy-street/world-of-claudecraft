@@ -227,9 +227,9 @@ export interface SimContextCallbacks {
   // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
   // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
   // slash command and instances/dungeons reach them through the seam.
-  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it after
-  // rollLoot so a heroic final-boss corpse gains one personal Heroic Mark slot per
-  // eligible participant (no rng draws).
+  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
+  // once per death to settle a heroic final boss's direct participant rewards
+  // and whole-claim realm-reset lockout together (no rng draws).
   lockoutNowMs(): number;
   // The next raid-reset instant (epoch ms) for a given lockout "now". The host owns
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
@@ -237,17 +237,12 @@ export interface SimContextCallbacks {
   raidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
+  instanceClaimIdAt(pos: Vec3): number | null;
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
-  // grantHeroicKillLockout is awardHeroicMarks' sibling on the death path, owned by
-  // instances/dungeons: the C1 death hub calls it for EVERY mob death (credit or no
-  // credit). A heroic claim's final-boss kill locks the whole owning group (plus
-  // anyone inside the instance) to the :heroic key until the daily reset, so the
-  // lockout cannot be dodged by camping the door or releasing before the kill.
-  grantHeroicKillLockout(mob: Entity): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -263,6 +258,7 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    attackAnimationStarted?: boolean,
     // Amount is already fully source-modified (redirect shares); skip source-output mods.
     alreadyFinal?: boolean,
   ): void;
@@ -321,6 +317,7 @@ export interface SimContextCallbacks {
     school: string,
     ability: string | null,
     kind: 'hit' | 'miss' | 'dodge',
+    attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
@@ -631,7 +628,7 @@ export interface SimContextCallbacks {
     meta: PlayerMeta,
     target: Entity | null,
     res: ResolvedAbility,
-    opts?: { areaEcho?: boolean },
+    opts?: { areaEcho?: boolean; attackAnimationStarted?: boolean },
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
@@ -938,12 +935,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
+    instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
-    grantHeroicKillLockout: host.grantHeroicKillLockout,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,

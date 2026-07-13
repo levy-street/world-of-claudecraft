@@ -93,6 +93,7 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  attackAnimationStarted = false,
   // The amount is ALREADY fully source-modified (e.g. a Fiendlore share of damage the
   // owner already took): skip the source-output mods (Defensive Stance's own-damage cut,
   // Weakening Hex) so they are not applied a second time. Target-side amps, absorb, death,
@@ -108,6 +109,7 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase
   // transitions. Gated on devCommands so it can NEVER apply in production (where gm
@@ -335,6 +337,7 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
+          attackAnimationStarted,
           // The share is already fully source-modified: don't re-apply the source's
           // Defensive Stance cut / Weakening Hex to the pet's portion.
           true,
@@ -363,6 +366,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
@@ -408,6 +412,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
@@ -436,6 +441,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
@@ -468,6 +474,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
@@ -486,7 +493,17 @@ export function dealDamage(
   if (target.kind === 'mob') {
     const ymatch = ctx.yumiCatMatches.get(target.id);
     if (ymatch) {
-      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
+      ctx.yumiCatDamaged(
+        ymatch,
+        source,
+        target,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        attackAnimationStarted,
+      );
       return;
     }
   }
@@ -501,6 +518,7 @@ export function dealDamage(
     school,
     ability,
     kind,
+    ...attackAnimation,
   });
 
   if (amount > 0) {
@@ -559,8 +577,9 @@ export function dealDamage(
     target.tappedById === null &&
     amount > 0
   ) {
-    if (source.kind === 'player') target.tappedById = source.id;
-    else if (source.ownerId !== null) target.tappedById = source.ownerId;
+    const sourcePid = source.kind === 'player' ? source.id : source.ownerId;
+    const sourceMeta = sourcePid !== null ? ctx.players.get(sourcePid) : null;
+    if (sourceMeta && !sourceMeta.leaving) target.tappedById = sourcePid;
   }
 
   // World-boss loot roster: every player (or pet owner) who lands a hit on a world
@@ -842,11 +861,6 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         mobId: 'reliquary_bonewalker',
       });
     }
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
-    // Heroic daily lockout lands HERE, on the kill itself (credit or no credit),
-    // for the whole group that owns the claim: the marks award further down is
-    // credit- and participation-gated, so it must not carry the lockout.
-    ctx.grantHeroicKillLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =
@@ -885,11 +899,26 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst
 
-    // credit goes to the tapping player (fall back to the killer)
-    const creditId = e.tappedById ?? (killer?.kind === 'player' ? killer.id : null);
+    // Credit goes to the tapping player, unless authoritative leave teardown
+    // already froze that character before its persistence await. Immediate
+    // removal would clear the tap, so mirror that result and fall back to the
+    // live killing player instead of dropping the whole party's reward.
+    const tapperMeta = e.tappedById !== null ? ctx.players.get(e.tappedById) : null;
+    const killerPid = killer?.kind === 'player' ? killer.id : (killer?.ownerId ?? null);
+    const killerMeta = killerPid !== null ? ctx.players.get(killerPid) : null;
+    const creditId =
+      e.tappedById !== null && tapperMeta && !tapperMeta.leaving
+        ? e.tappedById
+        : killerPid !== null && killerMeta && !killerMeta.leaving
+          ? killerPid
+          : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    if (meta && creditEntity) {
+    const rewardInstance = ctx.instances.find(
+      (inst) => inst.partyKey !== null && inst.mobIds.includes(e.id),
+    );
+    let heroicRewardRecipients: PlayerMeta[] = [];
+    if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.
@@ -905,10 +934,28 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         for (const mPid of party.members) {
           const mMeta = ctx.players.get(mPid);
           const mE = ctx.entities.get(mPid);
-          if (mMeta && mE && dist2d(mE.pos, e.pos) <= PARTY_XP_RANGE) eligible.push(mMeta);
+          // A released player entity stands at the graveyard, but their body is
+          // still where they fell. Use that corpse position for the kill-time
+          // participation snapshot so releasing during the final seconds does
+          // not erase XP, loot-roll, or Heroic Mark rights.
+          const matchingInstanceCorpse =
+            mE?.ghost &&
+            mE.corpsePos &&
+            (!rewardInstance || mE.corpseInstanceId === rewardInstance.exitId)
+              ? mE.corpsePos
+              : null;
+          const participationPos = matchingInstanceCorpse ?? mE?.pos;
+          if (
+            mMeta &&
+            !mMeta.leaving &&
+            participationPos &&
+            dist2d(participationPos, e.pos) <= PARTY_XP_RANGE
+          )
+            eligible.push(mMeta);
         }
       }
       if (eligible.length === 0) eligible.push(meta);
+      heroicRewardRecipients = eligible;
       e.lootRecipientIds = eligible.map((member) => member.entityId);
       const bonus = GROUP_XP_BONUS[Math.min(eligible.length, GROUP_XP_BONUS.length) - 1];
 
@@ -996,13 +1043,18 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll.
       if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
-      // A heroic final boss additionally carries one personal Heroic Mark per
-      // eligible participant (no-op outside a heroic instance; draws no rng).
-      ctx.awardHeroicMarks(e, eligible);
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
     }
+    // Settle the heroic reward and its realm-reset lockout together. This runs
+    // even without player credit so the owning group cannot dodge the lockout;
+    // only the participation snapshot above receives marks.
+    ctx.awardHeroicMarks(e, heroicRewardRecipients);
+    // Nythraxis normal and heroic raid lockouts use a wider room sweep than
+    // generic dungeon claims. Run it after heroic settlement so its lock stamp
+    // cannot make first-clear participants look previously rewarded.
+    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
     if (worldBossContribs) {

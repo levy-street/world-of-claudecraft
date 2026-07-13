@@ -118,7 +118,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.spectateBody':
     'Er wordt één wedstrijd tegelijk gespeeld in het stadion, en iedereen kan aan komen lopen en toekijken vanaf de tribunes.',
   'hudChrome.keybinds.valecup': 'Dalbeker',
-  'hudChrome.mobile.dailyRewards': 'Beloningen',
+  'hudChrome.mobile.dailyRewards': 'Winkel',
   'hudChrome.perf.labels.predLead': 'Predictievoorsprong',
   'hudChrome.townFocus.budgetLabel': 'Punten over: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Verminder de focus op {component}',
@@ -7057,4 +7057,356 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Hoog op Doorntop verzamelt de storm boven Stormcrag soms een gedaante. Thunzharr, de Ontwakende Piek verrijst daar met een vast ritme, een elementaal met de kracht van een raid, bevochten in de open wereld door wie de roep beantwoordt, en hij wordt machtiger naarmate meer uitdagers tegen hem opstaan. Iedereen die zich in het gevecht mengt, verdient zijn eigen worp van zijn buit, geëerd op raidlockout-voorwaarden, en zijn val blijft lang genoeg hangen zodat de gevallenen kunnen terugrennen om hun deel op te eisen. Verzamel meer zwaarden dan je denkt nodig te hebben.',
   'guide.worldPage.worldBossTitle': 'Wanneer de piek ontwaakt: de wereldbaas',
+  'entities.abilities.chain_heal.description':
+    'Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 andere bondgenoten in de buurt. Elke sprong geneest 50% minder. (Herstelkenmerk)',
+  'entities.abilities.chain_heal.name': 'Kettinggenezing',
+  'entities.abilities.counter_shot.description':
+    'Een snel schot dat de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt.',
+  'entities.abilities.counter_shot.name': 'Dempingsschot',
+  'entities.abilities.counterspell.description':
+    'Onderbreekt de spreuk van het doelwit en verhindert het 6 sec lang spreuken uit die magieschool uit te spreken.',
+  'entities.abilities.counterspell.name': 'Spreukbreuk',
+  'entities.abilities.holy_taunt.description':
+    'Tart het doelwit: je dreiging stijgt tot die van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen.',
+  'entities.abilities.holy_taunt.name': 'Heilige Aansporing',
+  'entities.abilities.kick.description':
+    'Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken.',
+  'entities.abilities.kick.name': 'Schop',
+  'entities.abilities.pummel.description':
+    'Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken.',
+  'entities.abilities.pummel.name': 'Kaakbreker',
+  'entities.abilities.rebuke.description':
+    'Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken.',
+  'entities.abilities.rebuke.name': 'Berisping',
+  'entities.abilities.skull_bash.description':
+    'Een uitvallende kopstoot die de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt.',
+  'entities.abilities.skull_bash.name': 'Kopstoot',
+  'entities.abilities.spell_lock.description':
+    'Legt het doelwit tijdens een spreuk het zwijgen op en verhindert het 5 sec lang spreuken uit die magieschool uit te spreken.',
+  'entities.abilities.spell_lock.name': 'Spreukverbod',
+  'entities.items.ashen_focus_ring.name': 'Asgrauwe Focusring',
+  'entities.items.ashstalker_cowl.name': 'Kap van de Asjager',
+  'entities.items.ashstalker_grips.name': 'Handgrepen van de Asjager',
+  'entities.items.ashstalker_harness.name': 'Harnas van de Asjager',
+  'entities.items.ashstalker_legguards.name': 'Beenbeschermers van de Asjager',
+  'entities.items.ashstalker_shoulderguards.name': 'Schouderbeschermers van de Asjager',
+  'entities.items.ashstalker_treads.name': 'Laarzen van de Asjager',
+  'entities.items.ashstalker_waistband.name': 'Tailleband van de Asjager',
+  'entities.items.cinder_sigil_pendant.name': 'Hanger van het Sintelzegel',
+  'entities.items.cinderweave_cord.name': 'Sintelgeweven Koord',
+  'entities.items.cinderweave_cowl.name': 'Sintelgeweven Kap',
+  'entities.items.cinderweave_handwraps.name': 'Sintelgeweven Handwikkels',
+  'entities.items.cinderweave_legwraps.name': 'Sintelgeweven Beenwikkels',
+  'entities.items.cinderweave_mantle.name': 'Sintelgeweven Schoudermantel',
+  'entities.items.cinderweave_raiment.name': 'Sintelgeweven Gewaad',
+  'entities.items.cinderweave_slippers.name': 'Sintelgeweven Schoenen',
+  'entities.items.emberglass_warstaff.name': 'Sintelglazen Oorlogsstaf',
+  'entities.items.final_argument_greatblade.name': 'Grootkling van het Slotargument',
+  'entities.items.final_oath_medallion.name': 'Medaillon van de Laatste Eed',
+  'entities.items.first_blood_razor.name': 'Eerstebloedmes',
+  'entities.items.fleetblood_band.name': 'Snelbloedring',
+  'entities.items.furyforged_gauntlets.name': 'Woedegesmede Strijdhandschoenen',
+  'entities.items.furyforged_girdle.name': 'Woedegesmede Gordel',
+  'entities.items.furyforged_legguards.name': 'Woedegesmede Beenbeschermers',
+  'entities.items.furyforged_sabatons.name': 'Woedegesmede Plaatlaarzen',
+  'entities.items.furyforged_warhelm.name': 'Woedegesmede Oorlogshelm',
+  'entities.items.furyforged_warplate.name': 'Woedegesmede Oorlogsplaat',
+  'entities.items.furyforged_warspaulders.name': 'Woedegesmede Oorlogsschouderplaten',
+  'entities.items.iron_vow_band.name': 'Ring van de IJzeren Eed',
+  'entities.items.last_step_signet.name': 'Zegelring van de Laatste Stap',
+  'entities.items.razorwind_torque.name': 'Halsring van de Snijwind',
+  'entities.items.spellbreakers_seal.name': 'Zegel van de Spreukbreker',
+  'entities.items.stormbound_crown.name': 'Stormgebonden Kroon',
+  'entities.items.stormbound_greaves.name': 'Stormgebonden Scheenplaten',
+  'entities.items.stormbound_handguards.name': 'Stormgebonden Handbeschermers',
+  'entities.items.stormbound_hauberk.name': 'Stormgebonden Maliënkolder',
+  'entities.items.stormbound_legmail.name': 'Stormgebonden Beenmaliën',
+  'entities.items.stormbound_spaulders.name': 'Stormgebonden Schouderplaten',
+  'entities.items.stormbound_waistguard.name': 'Stormgebonden Taillebeschermer',
+  'entities.items.unbroken_circle.name': 'De Ongebroken Cirkel',
+  'entities.npcs.fury.greeting': 'Het zand herinnert zich elke overwinning. Besteed je eer goed.',
+  'entities.npcs.fury.name': 'WOEDE',
+  'entities.npcs.fury.title': 'Erekwartiermeester',
+  'hudChrome.claudium.amountLabel': 'Hoeveelheid',
+  'hudChrome.claudium.balanceLabel': 'Saldo',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Kopen',
+  'hudChrome.claudium.buyTitle': 'Claudium kopen',
+  'hudChrome.claudium.buyUnavailable': 'Aankoop is momenteel niet mogelijk.',
+  'hudChrome.claudium.checkoutClose': 'Betaalvenster sluiten',
+  'hudChrome.claudium.checkoutFailed': 'Afrekenen kon niet worden geladen. Probeer het opnieuw.',
+  'hudChrome.claudium.checkoutLoading': 'Afrekenen laden...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'De transactie is verzonden, maar Claudium is nog niet gecrediteerd. Probeer het binnenkort opnieuw.',
+  'hudChrome.claudium.checkoutPending':
+    'Transactie in behandeling. Bevestig deze in je wallet en houd dit paneel open.',
+  'hudChrome.claudium.checkoutPendingButton': 'Bezig',
+  'hudChrome.claudium.checkoutTitle': 'Aankoop voltooien',
+  'hudChrome.claudium.checkoutUnavailable':
+    'Die aankoop van Claudium is momenteel niet beschikbaar.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Koppel een Solana-wallet voordat je Claudium met cryptovaluta koopt.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Deze wallet kan geen Solana-transacties ondertekenen en verzenden.',
+  'hudChrome.claudium.close': 'Claudium sluiten',
+  'hudChrome.claudium.disclosure':
+    'Claudium is een virtuele valuta die maar één kant op gaat: koop het met geld en besteed het aan cosmetica. Het kan niet worden ingewisseld, overgedragen of uitbetaald.',
+  'hudChrome.claudium.hideAmounts': 'Verberg extra Claudium-bedragen',
+  'hudChrome.claudium.kindCosmetic': 'Cosmetica',
+  'hudChrome.claudium.kindItem': 'Item',
+  'hudChrome.claudium.kindSkin': 'Skin',
+  'hudChrome.claudium.loading': 'Claudium laden...',
+  'hudChrome.claudium.open': 'Claudium openen',
+  'hudChrome.claudium.railLabel': 'Betaalmethode',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC staat uit.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Kaart',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': '20% korting',
+  'hudChrome.claudium.railWocUnavailable': 'WOC-prijzen zijn momenteel niet beschikbaar.',
+  'hudChrome.claudium.showAmounts': 'Toon alle Claudium-bedragen',
+  'hudChrome.claudium.skuRow': '{usd} voor {claudium} Claudium',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Besteden',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Er zijn momenteel geen cosmetica beschikbaar.',
+  'hudChrome.claudium.storeTitle': 'Cosmetische winkel',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'De Claudium-winkel is momenteel niet beschikbaar. Je saldo en aankopen zijn niet aangetast. Probeer het binnenkort opnieuw.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Oogsten: verzamel ambachtsmaterialen van dit lijk (vel, hoektand, zijde en vergelijkbare onderdelen), los van de buit. Iedereen kan oogsten, maar elk lijk kan maar door één speler worden geoogst.',
+  'hudChrome.deeds.openBookHint': 'Open het Boek der Daden',
+  'hudChrome.loot.takeAllTooltip':
+    'Alles nemen: verzamel alle munten en voorwerpen in dit buitvenster.',
+  'hudChrome.statInfo.desc.warfare':
+    'Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Oorlogvoering',
+  'hudChrome.statInfo.warfareValue': '+{increase}% toegebracht / -{reduction}% opgelopen',
+  'hudChrome.tutorial.nextTipMap':
+    'Bekijk de wereldkaart ({key}) om te zien waar speurtochten wachten.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Open je questlogboek ({key}) om je volgende taak in de buurt te vinden.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Open Sociaal ({key}) om een groep te vinden voor zwaardere gevechten.',
+  'hudChrome.tutorial.nextTipsTitle': 'Waar nu heen?',
+  'hudChrome.tutorial.slayTargetHint':
+    'Nog niet vertrouwd met gevechten? Druk op {targetKey} of klik op een wolf om die als doelwit te kiezen. Gebruik daarna een vaardigheid op je actiebalk om aan te vallen.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Nog niet vertrouwd met gevechten? Tik op een wolf om die als doelwit te kiezen en tik daarna op een vaardigheid op je actiebalk om aan te vallen.',
+  'hudChrome.warfare.balance': 'Eer: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} Eer',
+  'hudChrome.warfare.honorFloat': '+{amount} Eer',
+  'hudChrome.warfare.honorGain': 'Je krijgt {amount} eer ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Niet genoeg eer.',
+  'hudChrome.warfare.reasons.arenaWin': 'Arena-overwinning',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta voltooid',
+  'hudChrome.warfare.reasons.fiestaKill': 'Fiesta-uitschakeling',
+  'hudChrome.warfare.reasons.fiestaWin': 'Fiesta-overwinning',
+  'hudChrome.wocStore.applied': 'In gebruik',
+  'hudChrome.wocStore.apply': 'Skin toepassen',
+  'hudChrome.wocStore.armoryBody':
+    'Gelimiteerde wapenskins uit de Wapenkamer van seizoen 1. Ze gelden voor je hele account, zijn puur cosmetisch en zijn zichtbaar voor iedereen om je heen.',
+  'hudChrome.wocStore.armoryEyebrow': 'Seizoen 1',
+  'hudChrome.wocStore.armoryTitle': 'Het Arsenaal',
+  'hudChrome.wocStore.badge.flagship': 'Vlaggenschip',
+  'hudChrome.wocStore.badge.hero': 'Held',
+  'hudChrome.wocStore.balance': 'Claudium-saldo',
+  'hudChrome.wocStore.buyClaudium': 'Claudium kopen',
+  'hudChrome.wocStore.buySkin': 'Skin kopen',
+  'hudChrome.wocStore.cancel': 'Annuleren',
+  'hudChrome.wocStore.close': 'WOC-winkel sluiten',
+  'hudChrome.wocStore.collectionLine': '{collection}-collectie',
+  'hudChrome.wocStore.collections.emberwrought': 'Sintelgesmeed',
+  'hudChrome.wocStore.collections.fallen_star': 'Gevallen ster',
+  'hudChrome.wocStore.collections.guildmark': 'Gildemerk',
+  'hudChrome.wocStore.collections.hoarfrost': 'Rijp',
+  'hudChrome.wocStore.confirmBody': '{item} voor {cost} Claudium kopen?',
+  'hudChrome.wocStore.confirmPurchase': 'Kopen',
+  'hudChrome.wocStore.confirmTitle': 'Cosmetische aankoop bevestigen',
+  'hudChrome.wocStore.detach': 'Skin verwijderen',
+  'hudChrome.wocStore.equipHint': 'Rust een {type} uit om deze skin aan te brengen.',
+  'hudChrome.wocStore.error':
+    'De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.',
+  'hudChrome.wocStore.inspectAria': 'Inspecteer {item}',
+  'hudChrome.wocStore.loading': 'WOC-winkel laden...',
+  'hudChrome.wocStore.lore': 'Achtergrondverhaal',
+  'hudChrome.wocStore.needMoreBody': 'Je hebt {shortfall} meer Claudium nodig om {item} te kopen.',
+  'hudChrome.wocStore.needMoreTitle': 'Meer Claudium vereist',
+  'hudChrome.wocStore.owned': 'In bezit',
+  'hudChrome.wocStore.priceChanged':
+    'De prijs veranderde voordat de aankoop voltooid was. Bekijk de vernieuwde prijs en bevestig opnieuw.',
+  'hudChrome.wocStore.rarity.epic': 'Episch',
+  'hudChrome.wocStore.rarity.legendary': 'Legendarisch',
+  'hudChrome.wocStore.rarity.rare': 'Zeldzaam',
+  'hudChrome.wocStore.rarity.uncommon': 'Ongewoon',
+  'hudChrome.wocStore.rewardsTab': 'Dagelijkse beloningen',
+  'hudChrome.wocStore.scene.day': 'Dag',
+  'hudChrome.wocStore.scene.dusk': 'Schemering',
+  'hudChrome.wocStore.scene.night': 'Nacht',
+  'hudChrome.wocStore.sceneLabel': 'Voorbeeldbelichting',
+  'hudChrome.wocStore.seasonOne': 'Seizoen 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Kort, zwartgeblakerd lemmet dooraderd met gloeiend sinteloranje, een klein smeulend juweeltje in de pommel, as en vonk.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'Een mes uit een steegje met het vuur van de berg in de pommelsteen gesmokkeld, de stille grap van een wapensmid: zelfs een handtas zou een sintel van het eerste smeedstuk kunnen bevatten. Zwartgeblakerd, oranje geaderd, altijd een tintje te warm in de schede. Teken het in het donker onder Highwatch en de gloed verlicht je hand net genoeg om het gat in de bewaker van een man te vinden.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Asvonkmes',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'Een stukje van een gevallen ster, een gloeiende rand van gesmolten goud op kosmoszwart metaal, een heldere sterdeeltjes die rond de pommel cirkelen, een dun auroraspoor.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Het kleinste stukje van de ster dat Aldric uit de krater haalde, en volgens sommigen het gevaarlijkste. Eén enkel stukje van dat buitenaardse hart, met de gesmolten gouden rand op kosmoszwart metaal, een eenzame sterstof die rond de pommel cirkelt als een maan die zijn wereld heeft verloren. Hij weegt bijna niets en deelt bijna alles. Klein genoeg om te verbergen, helder genoeg om in het donker door zijn eigen licht te vinden.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Hoektand van de Gevallen Ster',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Bit van gepolijst staal, messing dop en langets op een gelakte essenhouten heft, netjes omwikkeld, een stempel van de maker.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    "Een gestempelde bijl is een opschepperij die je kunt koesteren. De koperen dop en langets zijn half pantser, half signatuur: ze zorgen ervoor dat het heft niet splijt en vangen het licht van de herberg op, zodat iedereen weet dat je het werk van Armorer Hode hebt gekocht, en niet het werk van een militie. 'Als het bezuinigt, verkoop ik het', zegt de Highwatch-smid. Deze snijdt.",
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Messingkapbijl',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Hardhouten staf met daarop een gedraaide koperen kroonknop, koperen ring en geverfde leren band.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Gemaakt van doorgewinterd hardhout en bekroond met een koperen kruisbloem die door de Eastbrook-smeden per honderd is gegoten, maar perfect door één. Het behoort tot het soort reiziger dat zowel bij de poort van Fenbridge als bij de muur van Highwatch serieus genomen wil worden. Een wandelstok die nooit echt heeft hoeven lopen; de geverfde band past bij een jas waarvan je de prijs wel kunt raden.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Messingkroon-Wandelstaf',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Mes van donker gesmeed staal, voller gevuld met gloeiende sinteloranje runen, hittescheuren en een smeulend juweel in de beschermer.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    "Het eerste mes werd niet in water geblust, maar in gezegende sintels, geharkt uit Stormcrag, de kolen waarvan de Highwatch-smeden zweren dat ze 'blauw en schoon branden, omdat de berg zich zijn oude eed herinnert.' In de volle laag smeult dat vuur sinteloranje en zal niet doven; de runen blijven warm tot aan de blote hand tijdens de koudste nacht van de muur. Cinderbrand heeft nooit verlichting nodig. Het weigert eenvoudigweg om naar buiten te gaan.",
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Sintelbrand',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Een kruisboog van zwart staal, een sinteloranje gloed die uit de scheuren in de prikstok sijpelde, een smeulende kool in de helmstok.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Het vreemdste van de gesmeed sintels: het vuur van de berg stroomde in een machine. Sinaasappel sijpelt uit de scheuren in de prikstok, en een smeulende kool in de helmstok zorgt ervoor dat de snaar nooit verstijft in de kou van Thornpeak of de vochtigheid van Mirefen. De bouten verlaten de groef al warm en het land warmer. Het antwoord van een jager op een muur waar de vijand de kou ook niet voelt.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Sintelslot',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'Ronddraaiende cluster van gouden sterrenscherven rond een kern van gesmolten goud, een door sterrenbeelden geëtste kosmoszwarte schacht, aurora-linten die naar boven kronkelen.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    "Een schacht van stermetaal bekroond met een kern van gesmolten goud en een ring van gouden scherven die er in een langzame, eindeloze baan omheen marcheren: een kleine kosmos, geëtst met sterrenbeelden die bij geen enkele hemel boven Thornpeak passen. Aurora slingert zich omhoog als rook die vergat op te stijgen. Degenen die het droegen, beweerden dat ze de leegte er doorheen konden voelen stromen, zoals Ysolei louter 'het maanlicht drinkt': geduldig en koud, en terugkijkend.",
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch, Spits van de Eindeloze Leegte',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Een bijl van zwart ijzer met oranje-oranje scheuren die door het bit heen gloeien, een steenkoolsteen, sliertjes hitte.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Armorer Hode werkte een steenkool van bergvuur in het hart van het bit, zodat de rand tussen de slagen nooit echt afkoelt. De scheuren ademen oranje tijdens de neerwaartse beweging, alsof de slag iets wakker maakt dat door het eerste smeden in het ijzer is blijven slapen. Ze zeggen dat een Stormcrag-elementaal de kolen ervoor heeft opgegeven; ze zeggen heel veel dingen bij Highwatch als de wind op is.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Sintelbeet',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Gevangen gesmolten gouden stervende sterrenstof omhuld door rondcirkelende vonken, kosmoszwarte schacht geëtst met gloeiende sterrenbeelden.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Niet de gevallen ster zelf, maar het laatste splintertje van een stervende: een enkele gesmolten gouden gloed van een zon die al is uitgedoofd, omhuld door de vonken die het laatste licht vormden. De kosmoszwarte schacht is geëtst met de sterrenbeelden die hem zagen sterven. De Mirefen-boeren zeggen dat het één wens vervult voor degene die het in de echte schemering vasthoudt; ze zeggen ook dat elke ziel die het vasthield meer tijd wenste, en dat de Verdronken Maan niemand van hen dat gunde.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Sintelwens, Vonk van de Stervende Zon',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Zwartgeblakerde metalen toverstok met een gloeiende kolenkool in ijzeren klauwen, haarscheurtjes in de hitte, warm innerlijk licht.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    "De toverstaf die het cijfer noemde. Toen een Highwatch-wapenmaker voor het eerst een steenkool van bergvuur in ijzeren klauwen stak en deze een sterfelijke hand liet beantwoorden, noemden zelfs de Priester's van het Licht het niet langer ketterij en begonnen het nuttig te noemen. Warm, geduldig en stilletjes gevaarlijk: het kooltje aan de punt brandt al onafgebroken voordat de eigenaar ademhaalde.",
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Sintelgesmede Toverstaf',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Komisch extra groot sterrenkanon: een kosmoszwarte loop geëtst met gloeiende gouden sterrenbeelden, een uitlopende klokkenmond met daarin een gesmolten gouden komeetschelp, koperen fittingen, een houten schouderkolf.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    "De smeden die de gevallen ster bewerkten, maakten er zes relikwieën van en hadden nog een vat stermetaal over, en tegen die tijd hadden de leerlingen er een mening over. Wat uit het aambeeld kwam, is het eerste kanon van het rijk, of de kleinste belegeringsmachine: een schouderkanon dat niet zozeer een schot loslaat als wel een tweede ster vraagt, gericht. Broeder Aldric weigerde het te zegenen, omdat hij redeneerde dat alles wat zo luid is al door de hemel is opgemerkt. Jager's zijn er dol op. Er is niets downrange ooit gebeurd.",
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, de tweede vallende ster',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'Een enkele piek van gloeiend cyaan gletsjerijs, rijp die uit een zilveren kraag bloeit, zwakke koude mist.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    "Een piek van gloeiend gletsjerijs, naar verluidt gebroken uit het diepe bergmeer onder het Sanctum, waar de kou van de berg tanden heeft. Rijp bloeit eindeloos uit zijn zilveren kraag en smelt nooit, niet door vuur, noch door de zomer. Magiër's houden het dichtbij vanwege de kou die het hun werk leent, en houden het ver weg op de avonden dat het naar de crypte van Nythraxis lijkt te leunen en te luisteren.",
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Scherf van de Eeuwige Winter',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Gelakte notenhouten recurvestrijkstok, messing uiteinden van de ledematen, gewaxte linnen snaar, een gildestempel op de stijgbuis.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Wat het rijk het dichtst bij een gilde brengt, is een stempel van een fletcher op de stijgleiding, een belofte over wat erin zit, zoals een wijnboer een vat verzegelt. Gelakt walnoothout, messing aan de uiteinden van de ledematen, een gewaxt linnen koord dat niet rafelt door een Mirefen-regen. Elke joint pleit voor de prijs. Trek het één keer voorbij het Widow Struikgewas en het argument wint.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Boog van het Pijlenmakersgilde',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Met ijzer beslagen staf bekroond met een gekooide gloeiende sintelkern, sintelrunen omhoog in de schacht, opstijgende hitte-glinstering.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Een levende steenkool van bergvuur, aan de kruin in ijzer gekooid. Loremaster Caddis noemt het het bewijs dat het vuur van het eerste smeden kan dienen om te dienen, en niet alleen om te verzegelen. Warmte-glinstering stijgt eruit op in een dun, eindeloos lint; een magiër die iemand draagt, heeft nooit behoefte aan een smederij of een wachtvuur. De sintel, zo fluisteren ze, werd uit de adem van Voskar de Sintelvleugel gehaald, en is sindsdien niet meer afgekoeld.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Smeedhartstaf',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Een griezelig dunne dolk van helderblauw ijs, een gloeiende cyaanader in het midden, naaldvorstkristallen en een rijp gevest.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Dun als een ingehouden adem en twee keer zo koud: een splinter van de Thornpeak-gletsjer aangescherpt tot een enkele gloeiende ader, zo scherp dat de wond dichtgevroren is voordat het bloed eraan denkt te stromen. De naam is ontleend aan de ernstige kou die de doden van de bergtoppen meedragen. Het hoeft nooit te worden verscherpt; ijs wordt niet dof, merkt Loremaster Caddis droogjes op, het wacht alleen maar.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Rijpnaald',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Een kop van doorschijnend blauw gletsjerijs, een gebarsten binnenkant van gloeiend cyaan, borstelige ijskristallen en een handvat dat koude damp achterlaat.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Gehouwen uit het blauwe hart van de Thornpeak-gletsjer, waar twee eeuwen ijs de kou hebben onderdrukt totdat deze uit zichzelf gloeit. Zelfs in rust laat hij damp achter, en de scheur waarin hij landt is een gletsjerspleet onder de Besluipener Ridge. Highwatch geeft zijn gevallenen daarboven aan het ijs; dit is dus een wapen dat bedoeld is om de dooi, en wat de dooi ook zou veroorzaken, op afstand te houden.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Gletsjersplijter',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Geblauwd stalen lemmet, bronzen vissenstaart pareerstang, groenblauw geverfde leren handgreep, klein gestempeld gildeteken.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Waar het gesmeed mes anoniem is, is deze gesigneerd. Een wapensmid krijgt pas het recht om zijn stempel in de ricasso te slaan als de koopman van de Wereldmarkt voor zijn staal instaat, en voor het merk van Smith Haldren. Blauwgeblakerd tegen het vocht van de Vale, tot op een haartje uitgebalanceerd. Je betaalt evenveel voor de postzegel als voor het zwaard, en het is het waard.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Gildemerk-Wapenzwaard',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Slanke dirk van gehard staal, bronzen beschermkap en pommelmoer, donkergroene koordgreep, gestempeld sigil.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Wat een gevestigd heer draagt wanneer het zwaard thuisblijft: slank, gehard en gestempeld met hetzelfde merk dat een volledige kling waarmerkt, aan de riem gedragen als een zegelring met een snede. Onopvallend voor iedereen behalve wie het bewijs van een pantsersmid kan lezen. Kwartiermeester Bree bewaart er in Hoogwacht een lade vol van voor officieren die het respect van de muur hebben verdiend.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Gildemerk-Dirk',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Verzilverde staf bekroond met een zwevende, langzaam roterende scherf van gloeiend cyaanijs, waaruit kristallen en koude damp voortkomen.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'De staf van de wacht die nooit aan de muur van Highwatch slaapt. De kroon is een scherf cyaan-tarn-ijs dat vrij van het zilver drijft en langzaam uit zichzelf draait: altijd, zo zweert de bewaker, in de richting van de kou die zich onder de toppen verzamelt. Het dragen van de wake betekent tweehonderd jaar wacht houden in één nacht, en beloven niet weg te kijken.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Rijpwake',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Gebogen blad van bleek gletsjerijs, gekartelde rijpkristallen langs de ruggengraat, een gloeiende cyaan bevroren kern in de vollere, ijspegelpareerstang.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    "Het vlaggenschip van de diepvriesklasse, en het stuk waar elke verzamelaar als eerste naar reikt. Ice Fang was gesneden, niet gesmeed, uit een hoektand van de gletsjer die Thornpeak boven Highwatch afdekt, waarvan de cyaan kern koud brandde als het licht van de Glimmermere. Het rijpt de lucht die het snijdt. De muurwachter zweert dat één soldaat hem heeft gedragen op de avond dat de hoge sneeuw de Wyrmcult tegenhield, en 'de muur voor een winter heeft gekocht'.",
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'IJstand',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Slanke, dieprood gelakte toverstaf, twee gepolijste koperen banden, kleine ronde koperen punt.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Dieprode lak in zeven geduldige jassen, tweemaal omwikkeld met gepolijst koper: het soort toverstok dat een heggenmagiër op de Wereldmarkt koopt zodra ze echte munten zijn gaan opladen en ernaar willen kijken. Het kanaliseert het licht niet beter dan een berkenstok. Maar het glanst prachtig over de toonbank van de Koopman, en de helft van de kleine magie is altijd geloofd.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Gelakte Staf',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Meteorisch stermetaal, gesmolten gouden kern langs de helmstok, kosmoszwarte ledematen geëtst met sterrenbeelden, een nokvormige straal van puur sterrenvuur.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    "Gesmeed uit ruw meteorisch stermetaal terwijl de Mirefen-krater nog gloeide, puin 'te heet om te hanteren', in kosmoszwarte ledematen gehamerd met sterrenbeelden, en een gesmolten gouden kern langs de helmstok. Het slaat geen grendel, maar roept er een op: een straal van sterrenvuur, losgelaten als een vonnis en neerkomend als het einde van een. Toen Highwatch vreesde dat zelfs de onsterfelijke kroon van Nythraxis misschien niet het ergste onder de toppen zou zijn, was dit het wapen dat ze aan de muur wilden hebben. Richt het goed.",
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name':
+    'Meteoorslot, Het Laatste Oordeel van de Hemel',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Een cluster van grillige ijskristallen rond een gloeiende cyaankern, terwijl rijp langs een verzilverde steel naar beneden kruipt.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    "Niet uitgesneden maar gegroeid: Thornpeak-ijs lokte rond een koude cyaankern totdat het zo hard werd als Hode's beste staal. Rijm kruipt langs het verzilverde handvat naar de hand en komt nooit helemaal aan. Waar het toeslaat, bevriest het water; waar het rust, wordt de grond wit. De ernstige kou van de toppen, klein genoeg gemaakt om te slingeren naar de dingen die tegen de muur klimmen.",
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Rijpverbrijzelaar',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Hoofd als een gescheurd stuk nachtelijke hemel, scheuren van gesmolten goud en etsen van sterrenbeelden, zwevende scherven van sterrenlicht, een aurora-glans langs de rand.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Geslagen vanaf de rand van de krater, waar de gevallen ster het spiegelbeeld van de hemel uit Mirefen scheurde en een wond achterliet die nog steeds stoomt. Het hoofd ziet eruit als een stuk verscheurde nacht: scheuren van gesmolten goud, sterrenbeelden die geen wetenschapper bij Highwatch kan noemen, een aurora die bij elke beweging van de rand bloedt. Broeder Aldric zegende het en wilde het niet aanraken. Het optillen betekent het gat vasthouden dat de hemel achterliet.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Hemelsplijter, De Wond van het Firmament',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Donkere ijzeren flenzen gloeien sinteloranje langs de binnenste scheuren, een edelsteen met gesmolten kern in de kop.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    "Een strijdknots die zijn eigen haard draagt: een steen met gesmolten kern, afgebroken van het Sanctum-zegel en 'gesmeed met bergvuur', gloeiend in het hoofd. De flenzen blijven warm aanvoelen en warmer waar ze landen; een Highwatch-sergeant zweert dat een klap ervan een blauwe plek achterlaat die tot de ochtend zwak gloeit. Het vuur van de berg, eindelijk gemaakt om te breken in plaats van te verzegelen.",
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Smeulval',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Een grootzwaard gesmeed uit een gevallen ster, een kern van gesmolten goud die het lemmet splijt, kosmoszwart staal met een rand in sterrenlicht, gouden scherven die rond de bewaker cirkelen, een aurora-lint.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    "Toen de ster uit de westelijke hemel viel en 'als een smidse' voorbij het weduwenstruikgewas barstte, trok broeder Aldric zijn nog smeulende hart uit de Mirefen-krater en smeekte de smeden van het rijk om 'iets te maken dat niet tot deze wereld behoort'. Ze hebben er één grootzwaard van gemaakt: Solheim. De gesmolten gouden kern splijt het kosmoszwarte blad als de dageraad die een nachtelijke hemel kraakt, en scherven van stermetaal cirkelen rond de bewaker op paden waar geen hand voor is ingesteld. Er is er maar één ooit vervalst. Er zal geen ander zijn.",
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, Laatste licht van de dageraad',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Gevangen gesmolten gouden sterkern omringd door rondcirkelende fragmenten, kosmoszwarte flenzen dooraderd met sterrenlicht, aurora die uit de naden spat.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    "Een sterkern werd gevangen vlak voordat hij stierf, omringd door het puin dat ermee viel, bevroren op een paar centimeter afstand van de vergetelheid. De kosmoszwarte flenzen lopen door van opgesloten sterrenlicht, en aurora komt uit de naden wanneer het omhoog wordt gebracht. De oude Priester's van het Licht noemden een vallende ster een oordeel, een oordeel van bovenaf dat geen enkel schild mocht tegenhouden, en noemden dit naar degene die op Mirefen neerkwam.",
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Sterrenval, Oordeel van de Hemel',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Kop van gehard blauw staal met zes flenzen, messing kraag en pommel, wijnrood leren handvat.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Zes flenzen van geblauwd, gehard staal, elk geslepen om een helm open te breken, afgewerkt met messing en omwikkeld met wijnrood leer. De pantsersmeden van het rijk maken geen lelijke wapens, zelfs niet wanneer het werk bruut is. Deze werd via de Wereldmarkt besteld en niet zomaar uit een rek gepakt. Ergens ligt een grootboek met de naam van een trotse koper en het bedrag dat hij Hode ervoor betaalde.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Geharde flensknots',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Boog van verzilverd staal en blauw ijs, een gloeiende cyaan bevroren kern in de stijgbuis, een nokvormige pijl van massief ijs, koude damp.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    "Een boog van verzilverd staal en ijs uit Doorntop, met in het middenstuk een koude cyaankern die de pijl aan de pees vastvriest. De boog legt een schacht van massief gletsjerijs aan die zich bij elke trek opnieuw vormt. De schutter draagt op de muur geen pijlkoker, alleen de kou. Met zo'n boog hield Hoogwacht de Belagerrug tijdens een belegering: één schutter, zo wordt verteld, en een wintervoorraad pijlen die er altijd al waren.",
+  'hudChrome.wocStore.skins.winterbite.name': 'Winterbeet',
+  'hudChrome.wocStore.storeTab': 'Winkel',
+  'hudChrome.wocStore.tabsLabel': 'Onderdelen van de WOC-winkel',
+  'hudChrome.wocStore.title': 'WOC-winkel',
+  'hudChrome.wocStore.tryOn': 'Uitproberen',
+  'hudChrome.wocStore.unavailable': 'Niet beschikbaar',
+  'hudChrome.wocStore.viewModeLabel': 'Voorbeeldmodus',
+  'hudChrome.wocStore.weaponOnly': 'Alleen wapen',
+  'hudChrome.wocStore.wtype.axe': 'Bijl',
+  'hudChrome.wocStore.wtype.bow': 'Boog',
+  'hudChrome.wocStore.wtype.crossbow': 'Kruisboog',
+  'hudChrome.wocStore.wtype.dagger': 'Dolk',
+  'hudChrome.wocStore.wtype.mace': 'Foelie',
+  'hudChrome.wocStore.wtype.staff': 'Staf',
+  'hudChrome.wocStore.wtype.sword': 'Zwaard',
+  'hudChrome.wocStore.wtype.wand': 'Toverstaf',
 };

@@ -13,6 +13,12 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  setAccountWeaponSkinLoadout: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+  })),
 }));
 
 import { saveCharacterState } from '../server/db';
@@ -504,6 +510,8 @@ describe('delta snapshots', () => {
       accountCosmetics: {
         completedQuestIds: ['q_aldrics_fallen_star'],
         mechChromaIds: ['amber_crimson'],
+        weaponSkinIds: [],
+        weaponSkinLoadout: {},
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -514,6 +522,8 @@ describe('delta snapshots', () => {
     expect(snap.self.cosmetics).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
 
     const client = bareClient(session.pid);
@@ -521,6 +531,8 @@ describe('delta snapshots', () => {
     expect(client.accountCosmetics).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
   });
 
@@ -2070,6 +2082,155 @@ describe('held weapon wire (mainhandItemId)', () => {
   });
 });
 
+// Season 1 Armory: the active weapon-skin cosmetic rides the identity wire
+// (terse key `wsk`, render-only like `mh`). Identity resend is a JSON compare,
+// so an apply AND a detach must each produce a fresh full record for viewers;
+// lite records leave the decoded value untouched.
+describe('weapon skin wire (weaponSkinId)', () => {
+  it('keeps the online optimistic bow and crossbow loadout mutually exclusive', () => {
+    const client = bareClient(99);
+    const internals = client as any;
+    internals.connected = false;
+    internals.accountCosmetics = {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: ['winterbite', 'meteorlatch_crossbow'],
+      weaponSkinLoadout: {},
+    };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 99,
+        k: 'player',
+        tid: 'hunter',
+        nm: 'Ranger',
+        lv: 5,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        mh: 'rusty_hatchet',
+        res: 0,
+        mres: 100,
+        rtype: 'focus',
+      },
+    });
+
+    client.changeWeaponSkin('winterbite', 'bow');
+    client.changeWeaponSkin('meteorlatch_crossbow', 'crossbow');
+    expect(client.player.weaponSkinLoadout).toEqual({ crossbow: 'meteorlatch_crossbow' });
+    expect(client.accountCosmetics.weaponSkinLoadout).toEqual({
+      crossbow: 'meteorlatch_crossbow',
+    });
+
+    client.changeWeaponSkin('winterbite', 'bow');
+    expect(client.player.weaponSkinLoadout).toEqual({ bow: 'winterbite' });
+    expect(client.accountCosmetics.weaponSkinLoadout).toEqual({ bow: 'winterbite' });
+  });
+
+  it('carries the active skin through wireEntity only while one is applied', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    expect(wireEntity(e).wsk).toBeUndefined();
+
+    // a fresh warrior holds worn_sword (a sword), so the sword skin attaches
+    expect(sim.setWeaponSkin(pid, 'ice_fang_sword')).toBe(true);
+    expect(wireEntity(e).wsk).toBe('ice_fang_sword');
+
+    // detaching drops the key from the wire entirely
+    sim.setWeaponSkin(pid, null, 'sword');
+    expect(wireEntity(e).wsk).toBeUndefined();
+  });
+
+  it('restores entity.weaponSkinId from a full record; a lite record preserves it', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, wsk: 'ice_fang_sword' }] });
+    expect(client.entities.get(7)?.weaponSkinId).toBe('ice_fang_sword');
+
+    // a lite record (no identity fields) leaves the applied skin in place
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ id: 7, x: 1, y: 0, z: 1, f: 0, hp: 100, mhp: 100 }],
+    });
+    expect(client.entities.get(7)?.weaponSkinId).toBe('ice_fang_sword');
+
+    // a later full record without `wsk` means "no skin applied" → reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.weaponSkinId).toBeNull();
+  });
+
+  it('broadcasts wsk to nearby sessions as a full record on apply and drops it on detach', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const joined = server.join(fcA.ws, 1, 1, 'Skinner', 'warrior', null, false, {
+      accountCosmetics: {
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: ['ice_fang_sword'],
+        weaponSkinLoadout: {},
+      },
+    });
+    if ('error' in joined) throw new Error(joined.error);
+    const a = joined;
+    a.blockListLoaded = true;
+    const fcB = fakeWs();
+    joinServer(server, fcB, 2, 'Watcher');
+
+    // Before the apply, B's first-sight full record of A carries no wsk.
+    broadcast(server);
+    const before = lastSnap(fcB.sent)?.ents.find((r: any) => r.id === a.pid);
+    expect(before?.k).toBe('player');
+    expect(before?.wsk).toBeUndefined();
+
+    server.handleMessage(
+      a,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'change_weapon_skin',
+        skin: 'ice_fang_sword',
+        wtype: 'sword',
+      }),
+    );
+    fcB.sent.length = 0;
+    server.sim.tick(); // the wire cache re-serializes identity once per sim tick
+    broadcast(server);
+    const applied = lastSnap(fcB.sent)?.ents.find((r: any) => r.id === a.pid);
+    // identity changed, so B receives a FULL record (k present) with the skin
+    expect(applied?.k).toBe('player');
+    expect(applied?.wsk).toBe('ice_fang_sword');
+
+    server.handleMessage(
+      a,
+      JSON.stringify({ t: 'cmd', cmd: 'change_weapon_skin', skin: null, wtype: 'sword' }),
+    );
+    fcB.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const detached = lastSnap(fcB.sent)?.ents.find((r: any) => r.id === a.pid);
+    // the detach re-sends identity too, now without the wsk key
+    expect(detached?.k).toBe('player');
+    expect(detached?.wsk).toBeUndefined();
+  });
+});
+
 describe('delve self-state mirrors over the wire', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -2502,6 +2663,8 @@ function dirtyEveryDeltaField(): {
   leader.accountCosmetics = {
     completedQuestIds: ['q_aldrics_fallen_star'],
     mechChromaIds: ['amber_crimson'],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
   };
 
   // Player Entity fields.
@@ -2587,6 +2750,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.accountCosmetics).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
     expect([...client.questLog.values()]).toEqual([
       { questId: 'q_widows', counts: [10, 0], state: 'active' },

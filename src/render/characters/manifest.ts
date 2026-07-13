@@ -3,6 +3,7 @@
 // Pure data + dispatch — no three.js imports, no loading.
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
@@ -299,6 +300,21 @@ export function itemHeldModelUrls(): string[] {
   ];
 }
 
+/** GLB url for a Season 1 Armory weapon-skin cosmetic, or null for no/unknown
+ *  skin. The skin model replaces the equipped item's held model (same bone, its
+ *  own KAYKIT_WEAPON_ACCESSORY grip family + WEAPON_GRIP_OVERRIDES fine-tune). */
+export function weaponSkinModelUrl(skinId: string | null | undefined): string | null {
+  if (!skinId) return null;
+  const def = WEAPON_SKINS[skinId];
+  return def ? `${WEAPONS}/${def.model}.glb` : null;
+}
+
+/** Distinct weapon-skin GLB urls, preloaded like item weapon models: any nearby
+ *  player can have a skin applied, and the attach path is synchronous. */
+export function weaponSkinModelUrls(): string[] {
+  return [...new Set(Object.values(WEAPON_SKINS).map((def) => `${WEAPONS}/${def.model}.glb`))];
+}
+
 const LOW_URL_ALIAS: Record<string, string> = {
   'models/chars/players/rogue_hooded.glb': 'models/chars/players/rogue.glb',
 };
@@ -503,6 +519,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Ranged_Shoot']),
+    // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
+    // with a bow displayed the shot plays a draw instead of the crossbow
+    // shoulder-aim (visual.ts weaponSkinAttackClips).
+    animUrls: [`${PLAYERS}/bow_anims.glb`],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -1261,6 +1281,9 @@ export function manifestUrls(): string[] {
   // Equipped held-item models a player may swap to at runtime (any nearby
   // player's gear), so they are resolved-and-ready when setHeldItems attaches them.
   for (const url of itemHeldModelUrls()) urls.add(url);
+  // Season 1 Armory weapon-skin models: also attachable on any nearby player at
+  // any moment (account-wide cosmetics), so they preload with the same sweep.
+  for (const url of weaponSkinModelUrls()) urls.add(url);
   return [...urls];
 }
 

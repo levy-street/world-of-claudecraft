@@ -14,6 +14,251 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.wocStore.title': 'WOC 商店',
+  'hudChrome.wocStore.close': '關閉 WOC 商店',
+  'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',
+  'hudChrome.wocStore.storeTab': '商店',
+  'hudChrome.wocStore.rewardsTab': '每日獎勵',
+  'hudChrome.wocStore.loading': '正在載入 WOC 商店…',
+  'hudChrome.wocStore.error': 'WOC 商店目前無法使用，請稍後再試。',
+  'hudChrome.wocStore.balance': 'Claudium 餘額',
+  'hudChrome.wocStore.buyClaudium': '購買 Claudium',
+  'hudChrome.wocStore.owned': '已擁有',
+  'hudChrome.wocStore.needMoreTitle': '需要更多 Claudium',
+  'hudChrome.wocStore.needMoreBody': '還需要 {shortfall} Claudium 才能購買 {item}。',
+  'hudChrome.wocStore.cancel': '取消',
+  'hudChrome.wocStore.confirmTitle': '確認購買外觀',
+  'hudChrome.wocStore.confirmBody': '要用 {cost} Claudium 購買 {item} 嗎？',
+  'hudChrome.wocStore.confirmPurchase': '購買',
+  'hudChrome.wocStore.armoryEyebrow': '第一賽季',
+  'hudChrome.wocStore.armoryTitle': '兵器庫',
+  'hudChrome.wocStore.armoryBody':
+    '第一賽季兵器庫限定武器外觀。全帳號通用，純裝飾性，周圍所有玩家都能看到。',
+  'hudChrome.wocStore.collectionLine': '{collection}系列',
+  'hudChrome.wocStore.seasonOne': '第一賽季',
+  'hudChrome.wocStore.rarity.uncommon': '優秀',
+  'hudChrome.wocStore.rarity.rare': '精良',
+  'hudChrome.wocStore.rarity.epic': '史詩',
+  'hudChrome.wocStore.rarity.legendary': '傳說',
+  'hudChrome.wocStore.wtype.sword': '劍',
+  'hudChrome.wocStore.wtype.axe': '斧',
+  'hudChrome.wocStore.wtype.mace': '錘',
+  'hudChrome.wocStore.wtype.dagger': '匕首',
+  'hudChrome.wocStore.wtype.staff': '法杖',
+  'hudChrome.wocStore.wtype.wand': '魔杖',
+  'hudChrome.wocStore.wtype.bow': '弓',
+  'hudChrome.wocStore.wtype.crossbow': '弩',
+  'hudChrome.wocStore.badge.flagship': '旗艦',
+  'hudChrome.wocStore.badge.hero': '英雄',
+  'hudChrome.wocStore.inspectAria': '檢視{item}',
+  'hudChrome.wocStore.viewModeLabel': '預覽模式',
+  'hudChrome.wocStore.tryOn': '試穿',
+  'hudChrome.wocStore.weaponOnly': '僅武器',
+  'hudChrome.wocStore.sceneLabel': '場景光照',
+  'hudChrome.wocStore.scene.day': '白天',
+  'hudChrome.wocStore.scene.dusk': '黃昏',
+  'hudChrome.wocStore.scene.night': '夜晚',
+  'hudChrome.wocStore.lore': '背景故事',
+  'hudChrome.wocStore.buySkin': '購買外觀',
+  'hudChrome.wocStore.unavailable': '暫不可用',
+  'hudChrome.wocStore.applied': '已裝備',
+  'hudChrome.wocStore.apply': '裝備外觀',
+  'hudChrome.wocStore.detach': '卸下外觀',
+  'hudChrome.wocStore.equipHint': '裝備{type}後才能使用此外觀。',
+  'hudChrome.wocStore.priceChanged': '購買完成前價格已變更。請查看刷新後的價格並再次確認。',
+  'hudChrome.wocStore.collections.guildmark': '公會印記',
+  'hudChrome.wocStore.collections.emberwrought': '餘燼鍛造',
+  'hudChrome.wocStore.collections.hoarfrost': '白霜',
+  'hudChrome.wocStore.collections.fallen_star': '隕星',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': '公會印記武裝劍',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    '發藍鋼劍刃、青銅魚尾形十字護手、青綠色染皮握柄，以及一枚小巧的公會鋼印。',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    '一般成品劍無名無姓，這一把卻有署名。只有當 World Market 的 Merchant 願為其鋼材作保，鎧甲匠才有權在劍根刻下自己的印記；Smith Haldren 的印記正有這份擔保。劍身經發藍處理，足以抵禦 the Vale 的濕氣，平衡精準至毫釐。你付的錢有一半買的是鋼印，但它物有所值。',
+  'hudChrome.wocStore.skins.brasscap_axe.name': '黃銅帽手斧',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    '拋光鋼斧刃，漆製白蠟木柄上裝有黃銅頂帽與護木鐵，纏帶整潔，並刻有匠人鋼印。',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    '帶有鋼印的斧頭是握在手中的炫耀。黃銅頂帽和護木鐵一半是護甲，一半是簽名：既防斧柄劈裂，也映著酒館燈火，讓人人都知道你買的是 Armorer Hode 的作品，不是民兵傳下來的舊貨。「能砍，我就賣。」Highwatch 的鐵匠如此說。這一把確實能砍。',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': '淬火凸緣錘',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    '六稜淬火藍鋼鎚頭、黃銅頸環與柄首，以及酒紅色皮革握柄。',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    '六道發藍淬火鋼棱，每一道都磨得足以劈開頭盔，再配黃銅端飾與酒紅皮革。即使用途再殘酷，王國的鎧甲匠也不肯造醜陋的武器。這一把經 World Market 專門委製，並非貨架上的現成貨；某處帳簿裡還寫著那位自豪買家的名字，以及他付給 Hode 的價錢。',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': '公會印記短劍',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    '纖細的淬火鋼短劍、青銅護手與柄尾螺帽、深綠色繩纏握柄，以及壓印徽記。',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    '這是有身份者把長劍留在家中時佩戴的武器：纖細、淬火，蓋著與整柄長劍同樣的認證鋼印，掛在腰間，如同一枚帶刃的印戒。除非懂得鎧甲匠的憑證，否則只會覺得它低調。 Quartermaster Bree 在 Highwatch 留著整整一抽屜，專供贏得城牆敬意的軍官。',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': '黃銅冠手杖',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    '硬木杖頂裝有車製黃銅冠飾，配黃銅杖腳與染色皮帶。',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    '杖身取自風乾硬木，頂上是 Eastbrook 鐵匠成百鑄造卻件件精修的黃銅冠飾。它屬於那種無論走到 Fenbridge 城門或 Highwatch 城牆，都希望被認真對待的旅人。這根手杖從未真正需要支撐步伐；染色皮帶與那件一眼便知價值不菲的外套恰好相配。',
+  'hudChrome.wocStore.skins.lacquered_wand.name': '漆木短杖',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    '纖細的深紅漆杖，飾有兩道拋光黃銅環和小巧圓潤的黃銅杖頭。',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    '深紅漆面耐心塗了七層，再以兩道拋光黃銅束起。這正是鄉野法師開始收取真金白銀後，會從 World Market 買來裝點門面的法杖。它引導 Light 的能力並不比白樺枝更強，卻能在 Merchant 的櫃檯上耀眼奪目；小法術向來有一半靠別人相信。',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': '製弓師公會弓',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    '漆製胡桃木反曲弓、黃銅弓梢、上蠟亞麻弦，弓把上刻有公會鋼印。',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    '弓把上的製弓師鋼印，是王國最接近公會憑證的東西；它承諾著弓身內在的品質，就像釀酒師為木桶封印。漆製胡桃木、黃銅弓梢，還有經上蠟、不會在 Mirefen 雨中磨損的亞麻弦，每一處接合都在為價格辯護。越過 Widow Thicket 後拉一次弓，這場辯論有了答案。',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': '燼痕',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    '深色鍛鋼劍刃，血槽中嵌著橘紅發光符文與熱裂紋，護手內有一枚陰燃寶石。',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    '這是第一把不用水淬火，而以從 Stormcrag 耙出的 Blessed Embers 淬煉的劍。 Highwatch 的鐵匠發誓，那些煤火「燃得湛藍而純淨，因為山仍記得古老的誓言」。火焰被封進血槽後只餘橙紅暗燃，卻永不熄滅；即便在城牆最寒冷的夜晚，符文也能溫暖裸手。 Cinderbrand 從不需要點燃，它只是拒絕熄滅。',
+  'hudChrome.wocStore.skins.emberbite_axe.name': '餘燼之噬',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    '燻黑鐵斧，斧刃間透出橘紅裂光，嵌有一顆封存炭火的寶石，周圍熱氣繚繞。',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Armorer Hode 把一塊山火活炭鍛造進斧刃核心，使刃口在兩次揮砍之間也從未真正冷卻。下劈時裂縫吐出橙光，彷彿撞擊喚醒了初次鍛造時沉睡在鐵裡的東西。有人說一隻 Stormcrag 元素為此交出了餘燼；Highwatch 起風時，人們總是會說出許多故事。',
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': '悶燃墜擊',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    '黑鐵鎚稜的內側裂縫泛著橙紅光芒，鎚頭中嵌有熔核寶石。',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    '這柄戰鎚自備爐火：從那道「以山火鑄成」的 Sanctum 封印上鑿下一塊熔核石，嵌在鎚頭中發光。鎚稜觸手溫熱，落下時更燙；一名 Highwatch 中士發誓，被它擊中的瘀傷會微微發亮直到清晨。山中之火終於不再用於封印，而用於破壞。',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': '灰火匕',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    '短小的燻黑刀刃遍布橙紅發光紋路，柄首嵌著微小的陰燃寶石，灰燼與火星相隨。',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    '一把將山火偷藏進柄首寶石的巷戰短刀，也是鎧甲匠無聲的玩笑：就連扒手也能帶著初次鍛造的一點餘燼。刀身燻黑、橙紋密布，在鞘中總比應有的溫度更暖。在 Highwatch 下方的黑暗中拔出它，微光恰好能照亮你的手，也足以找到對手守勢中的縫隙。',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': '爐心法杖',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    '鐵箍法杖頂端囚著發光餘燼核心，火焰符文沿著杖身攀升，熱浪在上方搖曳。',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    '一塊山火活炭被囚在杖冠的鐵籠中。 Loremaster Caddis 稱它證明了初次鍛造之火不僅能用於封印，也能被束縛來服務。熱浪化為纖細而無盡的絲帶升起；攜帶它的法師永遠不缺少鍛爐或守夜火。傳言這塊餘燼取自 Voskar the Emberwing 的吐息，自此從未冷卻。',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': '餘燼鍛造魔杖',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    '燻黑金屬魔杖，鐵爪扣住發光炭火，細微熱裂紋間透出溫暖內光。',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    '正是這根魔杖為整個品級命名。 Highwatch 的鎧甲匠第一次以鐵爪扣住山火餘炭，並讓它聽命於凡人之手時，就連 Light 的祭司也不再稱其為異端，轉而說它很實用。溫暖、耐心，又悄悄危險：杖尖的餘燼從主人出生前便持續燃燒，從未中斷。',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': '燼鎖',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    '燻黑鋼弩，弩臂裂縫滲出橘紅光芒，弩身封著一塊陰燃煤炭。',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    '這是餘燼鍛造中最奇怪的一件：把山火灌進一台機械。橙光從弩臂裂縫滲出，弩身內的陰燃煤炭令弓弦在 Thornpeak 的嚴寒或 Mirefen 的濕氣中都不會僵硬。弩矢離槽時已有溫度，命中時更為灼熱。對於城牆外那些同樣不畏嚴寒的敵人，這是獵人的回答。',
+  'hudChrome.wocStore.skins.ice_fang_sword.name': '冰牙',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    '蒼白冰河彎刃，刃背生鋸齒狀霜晶，血槽內有發光的青藍冰核，護手如冰柱。',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    '這是冰封品級的旗艦，也是每位收藏家最先伸手的一件。 Ice Fang 並非鍛造，而是從覆蓋 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青藍核心寒冷燃燒，如 Glimmermere 水面的冷光。它劈過之處連空氣都會結霜。城牆守衛發誓，大雪擋住 Wyrmcult 的那一夜，一名士兵帶著它，「為城牆買下了一個冬天」。',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': '裂冰',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    '半透明藍色冰川斧頭，裂開的內部泛著青藍光，霜晶密布，斧柄拖曳寒霧。',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    '它鑿自 Thornpeak 冰川的藍色核心，兩個世紀的重壓把寒意壓到自行發光。即使靜止也拖著白霧，落下時的巨響如同 Stalker Ridge 下方裂開一道冰隙。 Highwatch 將陣亡者交給那裡的冰雪；因此這件武器生來便要阻擋融雪，以及融雪可能喚醒的一切。',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': '霜碎',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    '鋸齒狀冰晶簇擁著發光的青藍核心，白霜沿著鍍銀錘柄向下蔓延。',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    '它不是雕刻出來，而是生長而成：匠人誘導 Thornpeak 寒冰包裹青藍冷核，直到堅硬得不遜於 Hode 最好的鋼。白霜沿著鍍銀錘柄爬向手掌，卻始終差一點觸及。它擊中之處水會凍結，停放之處地面會變成泛白。山峰的墓穴寒意，被縮小到足以揮向那些攀爬城牆之物。',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': '霜針',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    '透明藍冰製成的極細匕首，中央貫穿青藍發光脈絡，針狀霜晶與白霜覆蓋刀柄。',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    '薄如屏息，卻比呼吸冷上兩倍：一片 Thornpeak 冰川碎屑被磨成單一發光脈絡，鋒利到傷口會在血液想起流動前先被凍結。它的名字借自死者從群峰帶下的墓穴寒意。它從不需要磨刃；Loremaster Caddis 冷冷地說，冰不會變鈍，它只會等待。',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': '白霜守望',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    '鍍銀法杖頂端漂浮著緩慢旋轉的青藍冰片，放射霜晶與寒霧。',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    '這是 Highwatch 城牆上永不沉睡的守望之杖。杖冠是一片青藍湖冰，脫離銀托懸浮，並自行緩緩轉動；守衛發誓，它總是指向群峰下正在聚集的寒意。攜帶這份守望，便是在一夜間站完兩百年的崗，並承諾絕不移開目光。',
+  'hudChrome.wocStore.skins.everwinter_wand.name': '永冬碎片',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    '一根發光的青藍冰川尖刺，白霜從銀環綻開，周圍浮著淡淡寒霧。',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    '一根發光的冰川尖刺，據說折自 Sanctum 下方的深潭，那裡的山寒長著利齒。白霜不斷從銀環綻放，無論烈火或盛夏都無法使它融化。法師將它貼身攜帶，借寒意輔助施法；但在它似乎傾向 Nythraxis 墓室並靜靜聆聽的夜晚，又會把它放得遠遠的。',
+  'hudChrome.wocStore.skins.winterbite.name': '寒冬之噬',
+  'hudChrome.wocStore.skins.winterbite.look':
+    '鍍銀鋼與藍冰製成的弓，弓把內有青藍冰核，弦上搭著實冰箭矢，寒霧繚繞。',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    '這把弓由鍍銀鋼與 Thornpeak 寒冰製成，弓把內的青藍冷核將箭凍結在弦上。每次拉弓都會重新凝成一支冰川實冰箭；城牆上的弓手不帶箭袋，只攜寒意。 Highwatch 曾靠一把這樣的弓守住遭圍攻的 Stalker Ridge：據說只有一名弓手，以及一整個冬天取之不盡的箭。',
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim，黎明最後之光',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    '以隕星鍛造成的巨劍，熔金核心貫裂劍刃，宇宙黑鋼邊緣閃著星光，金色碎片環繞護手，極光如帶。',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    '那顆星從西方天空墜落，在 Widow Thicket 之外「如鍛爐般爆裂」時，Brother Aldric 從 Mirefen 隕坑取出仍在陰燃的星核，懇求王國鐵匠加工「並不屬於這個世界的東西」。他們將其鍛造成唯一一柄巨劍：Solheim。熔金核心如黎明撕開夜空般劈開宇宙黑刃，星金碎片沿著無人設定的軌道繞護手運行。世上只鍛造成這一把，也絕對不會有第二把。',
+  'hudChrome.wocStore.skins.skyrender_axe.name': '裂天者，蒼穹之傷',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    '斧頭像一塊撕裂的夜空，遍布熔金裂縫與星座刻紋，星光碎片懸浮，刃後拖著極光。',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    '它鍛造自隕坑邊緣，那裡墜星從 Mirefen 水面撕走了天空的倒影，留下至今仍冒蒸汽的傷口。斧頭像一片被扯下的夜：熔金裂縫、Highwatch 學者也叫不出名字的星座，以及每次揮舞都從刃緣流出的極光。 Brother Aldric 為它賜福，卻拒絕碰觸。舉起它，就像握住蒼穹留下的缺口。',
+  'hudChrome.wocStore.skins.starfall_mace.name': '星隕，諸天裁決',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    '被囚的熔金星核由軌道碎片環繞，宇宙黑錘棱中流淌星光，極光從接縫處溢出。',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    '一顆星核在死亡前一瞬被捕獲，隨它墜落的殘片環繞四周，永遠停在湮滅前最後一寸。宇宙黑錘棱中流淌著被困的星光，舉起時極光便從接縫處溢出。古老的 Light 祭司稱流星為裁決，是從天而降、任何盾牌都無意阻擋的判決；此錘便以墜落 Mirefen 的那顆星命名。',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr，隕星之牙',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    '一片隕星碎屑，宇宙黑金屬上燃著熔金刃光，明亮星塵繞柄首運行，拖出細薄極光。',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    '這是 Aldric 從隕坑帶回的星體中最小的一片，也有人認為它最危險。異界星核的一縷碎片，熔金刃緣貼著宇宙黑金屬，一顆孤獨星塵如失去世界的月亮般繞柄首運行。它幾乎沒有重量，卻幾乎能切開一切。小到足以藏匿，也亮到能憑自身光芒在黑暗中尋回。',
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch，無盡虛空尖塔',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    '金色星片環繞熔金核心運行，宇宙黑杖身刻滿星座，極光絲帶向上盤繞。',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    '星金杖身頂著熔金核心，金色碎片沿著緩慢而無盡的軌道環行，宛如一座微型宇宙；其星座不屬於 Thornpeak 上空的任何天幕。極光如忘記升起的煙，沿著杖身向上纏繞。曾持有它的人說能感覺到虛空在杖中轉動，就像 Ysolei 的湖水「飲下月光」：耐心、寒冷，並回望著你。',
+  'hudChrome.wocStore.skins.emberwish_wand.name': '餘燼之願，垂死太陽之火種',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    '被囚的熔金垂死星火由火星環繞，宇宙黑杖身刻發光星座。',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    '這並非隕星本身，而是一顆垂死恆星最後的微光：一輪早已熄滅的太陽留下的熔金餘燼，周圍盤旋著它最後的火花。宇宙黑杖身刻有見證其死亡的星座。 Mirefen 佃農說，真黃昏時持有它便可許下一個願望；他們也說，每個持有過它的靈魂都只願獲得更多時間，而 Drowned Moon 從未答應任何人。',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore，第二顆墜星',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    '誇張巨大的星砲：宇宙黑砲管刻著金色發光星座，喇叭形砲口內裝有熔金彗星彈，搭配黃銅構件與木質肩托。',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    '加工隕星的鐵匠造出六件遺物後，還剩下整整一砲管星金；到了那時，學徒們也有了自己的主意。鐵砧上誕生的東西，要嘛是王國第一支火槍，要嘛是最小的攻城器：一門肩扛星炮，與其說它發射彈丸，不如說它瞄準後請求第二顆星落下。 Brother Aldric 拒絕賜福，理由是如此響亮的東西早已被天堂注意。獵人深愛它，射線前方的一切從未如此。',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name': '星隕鎖扣，天空最後的裁決',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    '隕星金屬弩身，熔金核心貫穿弩托，宇宙黑弩臂刻滿星座，弦上搭著純星火之矢。',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    '它在 Mirefen 隕坑仍發著光時，以「燙得無法觸碰」的原始隕星金屬鍛造成；碎片被敲成刻滿星座的宇宙黑弩臂，熔金核心沿弩托封存。它不搭弩矢，而是召來一束星火：發射如宣判，落地如判決的終結。當 Highwatch 擔心 Nythraxis 的不死王冠或許還不是群峰下最可怕的東西時，他們希望城牆上擺著的正是這件武器。務必瞄準。',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.open': '開啟 Claudium',
+  'hudChrome.claudium.close': '關閉 Claudium',
+  'hudChrome.claudium.loading': '正在載入 Claudium…',
+  'hudChrome.claudium.balanceLabel': '餘額',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.unavailable':
+    'Claudium 商店目前無法使用。您的餘額與購買不受影響，請稍後再試。',
+  'hudChrome.claudium.disclosure':
+    'Claudium 是單向軟貨幣：可用金錢購買並用於兌換外觀物品，不能贖回、轉讓或兌現。',
+  'hudChrome.claudium.buyTitle': '購買 Claudium',
+  'hudChrome.claudium.railLabel': '付款方式',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC 無法使用',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': '信用卡',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': '優惠 20%',
+  'hudChrome.claudium.solBalance': 'SOL：{amount}',
+  'hudChrome.claudium.wocBalance': 'WOC：{amount}',
+  'hudChrome.claudium.railWocUnavailable': 'WOC 定價目前無法使用。',
+  'hudChrome.claudium.amountLabel': '數量',
+  'hudChrome.claudium.showAmounts': '顯示所有 Claudium 數量',
+  'hudChrome.claudium.hideAmounts': '隱藏其他 Claudium 數量',
+  'hudChrome.claudium.skuRow': '{usd} 可購買 {claudium} Claudium',
+  'hudChrome.claudium.buyUnavailable': '目前無法購買。',
+  'hudChrome.claudium.storeTitle': '外觀商店',
+  'hudChrome.claudium.storeEmpty': '目前沒有可用的外觀物品。',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.spendButton': '兌換',
+  'hudChrome.claudium.kindCosmetic': '外觀物品',
+  'hudChrome.claudium.kindItem': '物品',
+  'hudChrome.claudium.kindSkin': '外觀',
+  'hudChrome.claudium.buyButton': '購買',
+  'hudChrome.claudium.checkoutTitle': '完成購買',
+  'hudChrome.claudium.checkoutClose': '關閉結帳',
+  'hudChrome.claudium.checkoutLoading': '正在載入結帳頁面…',
+  'hudChrome.claudium.checkoutPending': '交易處理中。請在錢包中確認，並保持此面板開啟。',
+  'hudChrome.claudium.checkoutPendingButton': '處理中',
+  'hudChrome.claudium.checkoutFailed': '無法載入結帳頁面，請再試一次。',
+  'hudChrome.claudium.checkoutUnavailable': '該 Claudium 購買項目目前無法使用。',
+  'hudChrome.claudium.checkoutWalletRequired':
+    '使用加密貨幣購買 Claudium 前，請先連接 Solana 錢包。',
+  'hudChrome.claudium.checkoutWalletUnsupported': '此錢包無法簽署及傳送 Solana 交易。',
+  'hudChrome.claudium.checkoutNotSettled': '交易已傳送，但 Claudium 尚未入帳，請稍後再試。',
   'hudChrome.itemHeroicTag': '[英雄]',
   'hudChrome.readyCheck.notInPartyError': '你必須加入隊伍才能發起就緒確認。',
   'hudChrome.readyCheck.inProgressError': '就緒確認已在進行中。',
@@ -1951,6 +2196,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
   'entities.abilities.lay_on_hands.description':
     '巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。',
+  'entities.abilities.holy_taunt.name': '神聖挑釁',
+  'entities.abilities.holy_taunt.description':
+    '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
   'entities.abilities.flash_of_light.name': '光癒術',
   'entities.abilities.flash_of_light.description':
     '快速而高效的聖光迸發，為一個友方目標恢復 {damage} 點生命值。',
@@ -3599,7 +3847,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.hotbarPageAria': '顯示下一組技能',
   'hudChrome.mobile.jump': '跳躍',
   'hudChrome.mobile.leaderboard': '排行榜',
-  'hudChrome.mobile.dailyRewards': '獎勵',
+  'hudChrome.mobile.dailyRewards': '商店',
   'hudChrome.mobile.deeds': '功績',
   'hudChrome.mobile.nameplates': '名條',
   'hudChrome.mobile.targetCycle': '切換目標',

@@ -566,6 +566,7 @@ export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] 
   const origin = inst ? ctx.instanceOriginOf(inst) : null;
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (meta.leaving) continue;
     const p = ctx.entities.get(meta.entityId);
     if (!p || dist2d(p.pos, boss.spawnPos) > NYTHRAXIS_ROOM_RADIUS) continue;
     if (origin !== null && Math.abs(p.pos.z - origin.z) >= 250) continue;

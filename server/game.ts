@@ -13,6 +13,8 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
+import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
+import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
   DUNGEON_X_THRESHOLD,
@@ -86,6 +88,7 @@ import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from '.
 import {
   closePlaySession,
   grantAccountMechChroma,
+  grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
@@ -100,6 +103,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  setAccountWeaponSkinLoadout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -443,6 +447,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'change_weapon_skin',
   'prestige',
   'market_list',
   'market_buy',
@@ -756,6 +761,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skin) out.sk = e.skin;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held item model (render-only)
+  if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -1043,6 +1049,10 @@ export class GameServer {
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  // Weapon-skin loadouts are whole-record replacements in their dedicated paid
+  // state row. Keep one FIFO per account so rapid apply/detach commands cannot
+  // commit on separate pool clients in reverse order and resurrect stale state.
+  private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -2069,10 +2079,26 @@ export class GameServer {
   }
 
   private mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics): AccountCosmetics {
+    // The weapon-skin reads stay nullish-tolerant: pre-weapon-skin callers and
+    // test doubles still hand over the older two-field shape at runtime.
     return {
       completedQuestIds: [...new Set([...a.completedQuestIds, ...b.completedQuestIds])],
       mechChromaIds: [...new Set([...a.mechChromaIds, ...b.mechChromaIds])],
+      // Ownership is additive (a purchase is never un-bought here); the applied
+      // loadout is last-write-wins so a detach (key removed in the fresh state)
+      // never resurrects from the stale side.
+      weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
+      weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
     };
+  }
+
+  /** The account loadout filtered to owned skins, as the Sim seeds it. */
+  private ownedWeaponSkinLoadout(cosmetics: AccountCosmetics): Record<string, string> {
+    const out: Record<string, string> = {};
+    for (const [t, skinId] of Object.entries(cosmetics.weaponSkinLoadout ?? {})) {
+      if (skinId && (cosmetics.weaponSkinIds ?? []).includes(skinId)) out[t] = skinId;
+    }
+    return out;
   }
 
   private rememberAccountCosmetics(
@@ -2080,7 +2106,12 @@ export class GameServer {
     cosmetics: AccountCosmetics,
   ): AccountCosmetics {
     const merged = this.mergeAccountCosmetics(
-      this.accountCosmeticsByAccount.get(accountId) ?? { completedQuestIds: [], mechChromaIds: [] },
+      this.accountCosmeticsByAccount.get(accountId) ?? {
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: [],
+        weaponSkinLoadout: {},
+      },
       cosmetics,
     );
     this.accountCosmeticsByAccount.set(accountId, merged);
@@ -2093,6 +2124,7 @@ export class GameServer {
       if (live.accountId !== accountId) continue;
       live.accountCosmetics = merged;
       this.applyAccountQuestLockouts(live.pid, merged);
+      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
       this.resyncQuests(live);
     }
   }
@@ -2101,12 +2133,15 @@ export class GameServer {
     const exact = {
       completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
       mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
+      weaponSkinIds: [...new Set(cosmetics.weaponSkinIds ?? [])],
+      weaponSkinLoadout: { ...(cosmetics.weaponSkinLoadout ?? {}) },
     };
     this.accountCosmeticsByAccount.set(accountId, exact);
     for (const live of this.clients.values()) {
       if (live.accountId !== accountId) continue;
       live.accountCosmetics = exact;
       this.applyAccountQuestLockouts(live.pid, exact);
+      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(exact));
       this.resyncQuests(live);
     }
   }
@@ -2146,6 +2181,30 @@ export class GameServer {
       .catch((err) => console.error('failed to grant swag mech chroma:', err));
   }
 
+  /**
+   * Mirror Season 1 Armory weapon-skin ownership into accounts.cosmetics and
+   * push it to any live session on the account. Injected into the Claudium
+   * spend/store routes via configureClaudiumRuntime (server/claudium.ts); the
+   * economy service's grant ledger stays the purchase source of truth.
+   */
+  grantWeaponSkinsToAccount(accountId: number, skinIds: string[]): void {
+    const known = skinIds.filter((id) => WEAPON_SKINS[id]);
+    if (known.length === 0) return;
+    const current = this.accountCosmeticsByAccount.get(accountId);
+    if (current && known.every((id) => current.weaponSkinIds.includes(id))) return;
+    // Optimistic live union first (mirrors noteAccountMechChroma): the buyer can
+    // hit Apply the moment the spend response lands, without racing the write.
+    if (current) {
+      this.updateLiveAccountCosmetics(accountId, {
+        ...current,
+        weaponSkinIds: [...new Set([...current.weaponSkinIds, ...known])],
+      });
+    }
+    void grantAccountWeaponSkins(accountId, known)
+      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
+      .catch((err) => console.error('failed to grant account weapon skins:', err));
+  }
+
   private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
     const skin = mechChromaSkinIndex(chromaId);
     const itemId = mechChromaItemId(chromaId);
@@ -2166,6 +2225,55 @@ export class GameServer {
     void revokeAccountMechChroma(session.accountId, chromaId)
       .then((cosmetics) => this.replaceLiveAccountCosmetics(session.accountId, cosmetics))
       .catch((err) => console.error('failed to remove account mech chroma:', err));
+  }
+
+  /** Apply (skinId set) or detach (skinId null + wtype) a Season 1 Armory weapon
+   *  skin. Server-authoritative: the account must own the skin, and the Sim
+   *  re-validates that a weapon of the skin's type is equipped right now. The
+   *  loadout is account state, so every session on the account updates live. */
+  private changeAccountWeaponSkin(
+    session: ClientSession,
+    skinId: string | null,
+    wtype?: string,
+  ): void {
+    const current = session.accountCosmetics;
+    let weaponSkinLoadout: Record<string, string>;
+    if (skinId !== null) {
+      const def = WEAPON_SKINS[skinId];
+      if (!def) return;
+      if (!current.weaponSkinIds.includes(skinId)) return; // must own it (anti-forge)
+      if (!this.sim.setWeaponSkin(session.pid, skinId)) return; // type-match gate
+      weaponSkinLoadout = withWeaponSkinApplied(current.weaponSkinLoadout, skinId) ?? {};
+    } else {
+      if (!wtype || !isWeaponSkinType(wtype)) return;
+      if (!current.weaponSkinLoadout[wtype]) return;
+      this.sim.setWeaponSkin(session.pid, null, wtype);
+      weaponSkinLoadout = { ...current.weaponSkinLoadout };
+      delete weaponSkinLoadout[wtype];
+    }
+    this.updateLiveAccountCosmetics(session.accountId, { ...current, weaponSkinLoadout });
+    this.enqueueWeaponSkinLoadoutSave(session.accountId, weaponSkinLoadout);
+  }
+
+  private enqueueWeaponSkinLoadoutSave(
+    accountId: number,
+    weaponSkinLoadout: Record<string, string>,
+  ): void {
+    const snapshot = { ...weaponSkinLoadout };
+    const previous = this.weaponSkinLoadoutSaveQueues.get(accountId);
+    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      await setAccountWeaponSkinLoadout(accountId, snapshot);
+    });
+    this.weaponSkinLoadoutSaveQueues.set(accountId, run);
+    const cleanup = (): void => {
+      if (this.weaponSkinLoadoutSaveQueues.get(accountId) === run) {
+        this.weaponSkinLoadoutSaveQueues.delete(accountId);
+      }
+    };
+    void run.then(cleanup, (err) => {
+      console.error('failed to save weapon skin loadout:', err);
+      cleanup();
+    });
   }
 
   join(
@@ -2238,9 +2346,17 @@ export class GameServer {
     }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,
-      meta.accountCosmetics ?? { completedQuestIds: [], mechChromaIds: [] },
+      meta.accountCosmetics ?? {
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: [],
+        weaponSkinLoadout: {},
+      },
     );
     this.applyAccountQuestLockouts(pid, accountCosmetics);
+    // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
+    // applied skin shows from the first snapshot (owned skins only).
+    this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
     const sessionIp = meta.ip ?? '';
     const botTrackingContext = this.botDetector.createTrackingContext(
       { accountId, characterId, name, ip: sessionIp },
@@ -2581,6 +2697,11 @@ export class GameServer {
     // remaining player's win/honor durable if both combatants disconnect close
     // together; removePlayer repeats the idempotent cleanup after the save.
     this.sim.arenaResolveDesertion(session.pid);
+    // Freeze reward eligibility and reconcile pending loot before the leave
+    // snapshot. saveCharacterOnLeave awaits the database; without this
+    // synchronous prefix, a roll or boss death can mutate the character after
+    // serialization and removePlayer then discards that unsaved reward.
+    this.sim.preparePlayerLeave(session.pid);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
@@ -3263,6 +3384,10 @@ export class GameServer {
   // -------------------------------------------------------------------------
 
   handleMessage(session: ClientSession, raw: string): void {
+    // A socket can deliver already-buffered frames after leave() removes its
+    // session and starts the awaited persistence flush. Never let that stale
+    // authority mutate live state after the character snapshot was captured.
+    if (session.left || this.clients.get(session.pid) !== session) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
     const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
@@ -3585,6 +3710,15 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
+      // Season 1 Armory: apply (skin: string) or detach (skin: null + wtype) a
+      // purchased weapon skin. Ownership is checked against account cosmetics
+      // here; the Sim re-validates the equipped-weapon-type match.
+      case 'change_weapon_skin': {
+        const skinId = typeof msg.skin === 'string' ? msg.skin : null;
+        const wtype = typeof msg.wtype === 'string' ? msg.wtype : undefined;
+        if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
+        break;
+      }
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':

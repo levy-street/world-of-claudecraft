@@ -185,9 +185,16 @@ For off-box safety, sync the directory to S3 occasionally:
   route answers `steam.disabled`, the mirror is inert, and no client renders
   link UI. To enable, set `STEAM_ENABLED=1` plus the Steamworks `STEAM_APP_ID`
   and a publisher Web API key in `STEAM_WEB_API_KEY` (partner.steam-api.com)
-  in the server runtime env. The key is a secret: it must never appear in
-  logs or client code. Linking is a cosmetic mirror for deed achievements
-  only; login with Steam does not exist.
+  in the server runtime env. Docker Compose passes these three variables from
+  the host `.env` into the game container. The key is a secret: it must never
+  appear in logs or client code. Linking is a cosmetic mirror for deed
+  achievements only; login with Steam does not exist.
+- **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
+  game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
+  run directly on the host. For the Compose game container with a host-run
+  economy service, use `http://host.docker.internal:8798/v1/claudium/`.
+  A separately deployed economy service should use its internal or remote DNS
+  URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
