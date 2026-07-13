@@ -1264,6 +1264,8 @@ export const de_DE: EnTranslations = {
     "bags": {
       "cannotDestroy": "Dieser Gegenstand kann nicht zerstört werden.",
       "rightClickDestroy": "Rechtsklick zum Zerstören",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",

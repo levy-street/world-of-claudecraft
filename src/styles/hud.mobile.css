@@ -2760,6 +2760,53 @@
     overflow-x: hidden;
     overflow-y: auto;
   }
+  /* The character sheet docks its bags companion side by side on touch, exactly like
+     the bank cluster (body.bank-open above): a full-height panel split 50/50 at the
+     viewport centre, driven by body.char-bags-paired (hud.ts syncCharBagsPairing).
+     Without it the bags would cover the paperdoll on a phone and the drag-to-equip
+     gesture would have no visible socket to land on. The bank/vendor clusters own the
+     bags companion when they are up, so the pure core stands down there. */
+  body.mobile-touch.char-bags-paired #char-window,
+  body.mobile-touch.char-bags-paired #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  /* Sheet LEFT (its own body scrolls), bags RIGHT (the .bag-grid scrolls). */
+  body.mobile-touch.char-bags-paired #char-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.char-bags-paired #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  /* The six category chips wrap to two rows at half-viewport width and eat the grid,
+     so keep them one horizontally scrollable row inside the cluster (the bank pairing
+     does the same); nothing is hidden and every chip keeps its full tap height. */
+  body.mobile-touch.char-bags-paired #bags .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch.char-bags-paired #bags .bag-chip {
+    flex: 0 0 auto;
+  }
   /* Keep the character sheet in one vertical flow on touch. Vertical scrolling is
      acceptable here, while CSS multi-column can create off-screen columns in short
      landscape viewports and force horizontal scrolling. */

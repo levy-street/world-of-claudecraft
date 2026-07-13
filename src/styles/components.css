@@ -8213,6 +8213,47 @@
     outline-offset: -4px;
     box-shadow: 0 0 14px rgba(202, 164, 114, 0.5);
   }
+  /* The mirror gesture: a bag stack dragged toward the paperdoll lights only the
+     sockets that would actually TAKE it, so the drag never promises an equip the
+     drop then refuses. Same dashed-gold treatment as the bags drop above. */
+  .equip-slot.drop-target {
+    outline: 2px dashed rgba(255, 218, 160, 0.85);
+    outline-offset: -2px;
+    box-shadow: 0 0 10px rgba(202, 164, 114, 0.45);
+  }
+  /* Every bag stack is draggable (to a paperdoll socket, an action-bar slot, or out
+     onto the world to destroy), so the grab cursor is the affordance. */
+  .bag-item[draggable="true"] {
+    cursor: var(--cursor-grab);
+  }
+  /* The touch drag's floating ghost: the item icon riding under the finger. It must
+     never eat the hit test that resolves the drop target beneath it. */
+  .touch-drag-ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translate(
+      calc(var(--touch-drag-x, 0px) - 50%),
+      calc(var(--touch-drag-y, 0px) - 50%)
+    );
+    width: 44px;
+    height: 44px;
+    pointer-events: none;
+    opacity: 0.85;
+    z-index: 120;
+  }
+  .touch-drag-ghost .item-icon {
+    width: 100%;
+    height: 100%;
+  }
+  /* The source row stays visible but recedes while its stack is in flight. */
+  .bag-item.touch-drag-source {
+    opacity: 0.45;
+  }
+  /* The finger owns the stack once the drag arms: no page/grid scrolling under it. */
+  body.touch-item-dragging {
+    touch-action: none;
+  }
 
   /* ---------- The Ravenpost (mailbox) ---------- */
   #mailbox-window {

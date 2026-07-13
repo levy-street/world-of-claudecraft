@@ -159,6 +159,7 @@ import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
 import { CastBarPainter } from './cast_bar_painter';
+import { charBagsPaired } from './char_bags_pairing_core';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
 import {
@@ -306,6 +307,7 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { itemStatDeltas } from './item_compare';
+import { ItemDragState } from './item_drag_state';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
@@ -461,6 +463,7 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
+import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -964,6 +967,11 @@ export class Hud {
     null;
   // Set while dragging an equipped piece out of the paperdoll onto the bags window.
   private dragUnequipSlot: EquipSlot | null = null;
+  // The mirror gesture: the bag stack currently being dragged OUT of the bags, read
+  // by its two drop targets (a paperdoll socket equips it, the world destroys it).
+  // The windows publish and read it through their deps; the state itself is a shared
+  // module, not another cross-window field cluster on this coordinator.
+  private readonly itemDragState = new ItemDragState();
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
@@ -1852,6 +1860,16 @@ export class Hud {
       this.renderBags();
       this.renderCharIfOpen();
     });
+    // The mirror gesture: drop a bag stack on the WORLD to throw it away (the classic
+    // binding that replaced right-click-destroys). It only opens the destroy prompt;
+    // nothing is ever destroyed by the drop itself.
+    installWorldDropTarget({
+      root: () => $('#game-canvas'),
+      state: this.itemDragState,
+      destroyAction: (itemId) => this.bagsWindow.destroyAction(itemId),
+      promptDestroy: (itemId, count) => this.bagsWindow.promptDestroy(itemId, count),
+      showBlocked: () => this.bagsWindow.showDestroyBlocked(),
+    });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
@@ -2269,6 +2287,7 @@ export class Hud {
       case 'char-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.charWindow.close();
+        this.syncCharBagsPairing();
         break;
       case 'trade-window':
         this.sim.tradeCancel();
@@ -3713,6 +3732,10 @@ export class Hud {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
     clearActionDropTargets: () => this.clearActionDropTargets(),
+    dragState: this.itemDragState,
+    isTouchHud: () => document.body.classList.contains('mobile-touch'),
+    markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
+    dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
   });
   // World Market window painter (market_view.ts core + market_window.ts painter).
   // It composes the shared presentation bag (icon/money/tooltip) and owns the
@@ -3924,6 +3947,9 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
+    dragState: this.itemDragState,
+    renderBags: () => this.renderBags(),
+    showError: (text) => this.showError(text),
   });
   // Options window painter (options_view.ts core + options_window.ts painter). The
   // window renders no item rows, so it composes no PainterHostPresentation bag; it
@@ -12084,6 +12110,9 @@ export class Hud {
     if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
       document.body.classList.remove('bank-open');
     }
+    // The char-sheet companion undocks too: with the bags gone the sheet takes the
+    // full screen back rather than staying a half-width orphan.
+    this.syncCharBagsPairing();
   }
 
   // The Book of Deeds trio (keybind toggle, chronicler/char-panel opens, Esc
@@ -12190,6 +12219,7 @@ export class Hud {
       // not take this close branch and play the close sound (issue #1538).
       audio.bagClose();
       this.bagsWindow.close();
+      this.syncCharBagsPairing();
       return;
     }
     this.closeOtherWindows('#bags');
@@ -12201,6 +12231,8 @@ export class Hud {
     // onBagsClosed drops the class while the bank stays up; idempotent on desktop,
     // which never undocks).
     if (this.bankWindow.isOpen) document.body.classList.add('bank-open');
+    // Dock the char-sheet pairing when its companion opens (the touch cluster).
+    this.syncCharBagsPairing();
     audio.bagOpen();
     // Pull a fresh on-chain $WOC balance for the footer; the async result
     // re-renders the bag via the onWalletUiChange listener wired in the ctor.
@@ -12236,6 +12268,22 @@ export class Hud {
 
   toggleChar(): void {
     this.charWindow.toggle();
+    this.syncCharBagsPairing();
+  }
+
+  // Dock the character sheet and the bags as one 50/50 cluster on touch (the pure
+  // charBagsPaired decides), so the bags do not sit ON TOP of the paperdoll and the
+  // drag-to-equip gesture has a visible socket to land on. Called from every path
+  // that opens or closes either window; idempotent, and a no-op on desktop.
+  private syncCharBagsPairing(): void {
+    const paired = charBagsPaired({
+      touch: document.body.classList.contains('mobile-touch'),
+      charOpen: this.charWindow.isOpen,
+      bagsShown: bagsWindowShown($('#bags').style.display),
+      bankOpen: this.bankWindow.isOpen,
+      vendorOpen: this.vendorOpen,
+    });
+    document.body.classList.toggle('char-bags-paired', paired);
   }
 
   private renderCharPreview(): void {

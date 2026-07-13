@@ -1264,6 +1264,8 @@ export const cs_CZ: EnTranslations = {
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
       "rightClickDestroy": "Zničíš pravým kliknutím",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",

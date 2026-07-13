@@ -1264,6 +1264,8 @@ export const id_ID: EnTranslations = {
     "bags": {
       "cannotDestroy": "Item ini tidak dapat dihancurkan.",
       "rightClickDestroy": "Klik kanan untuk menghancurkan",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",

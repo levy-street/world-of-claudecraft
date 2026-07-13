@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "es_ES": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "fr_FR": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "fr_CA": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "de_DE": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "nl_NL": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "pl_PL": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "id_ID": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "tr_TR": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "sv_SE": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "vi_VN": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ],
+  "da_DK": [
+    "hudChrome.bags.dragDestroyHint",
+    "hudChrome.bags.dragEquipHint"
+  ]
 };

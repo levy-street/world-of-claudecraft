@@ -1264,6 +1264,8 @@ export const tr_TR: EnTranslations = {
     "bags": {
       "cannotDestroy": "Bu eşya yok edilemez.",
       "rightClickDestroy": "Yok etmek için sağ tıkla",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
