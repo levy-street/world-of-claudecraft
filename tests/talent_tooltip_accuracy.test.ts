@@ -31,6 +31,12 @@ const PCT_FIELDS = new Set([
   'cooldownPct',
   'castPct',
   'buffPct',
+  // Recompense (warrior prot mastery): armor granted as a fraction of Strength
+  // (entity.ts folds s.str * armorFromStrPct), shown as "70% of your Strength".
+  'armorFromStrPct',
+  // Master Armorer (warrior arms mastery): fraction of extra damage while wielding
+  // a two-handed weapon, applied at runtime in combat/damage.ts, shown as "10%".
+  'masteryTwoHandDmgPct',
 ]);
 
 // Each effect magnitude as the exact token the tooltip should contain: pcts as "N%",

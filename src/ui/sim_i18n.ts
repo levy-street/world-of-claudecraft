@@ -268,6 +268,9 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  'aura.bladedEcho': 'Bladed Echo',
+  'aura.emboldened': 'Emboldened',
+  'aura.enraged': 'Enraged',
 } as const;
 
 const petEnTable = {
@@ -492,6 +495,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   es: {
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
+    'aura.enraged': 'Enfurecido',
     'groundPickup.supplyCrateDeny': 'El cajón está cerrado con clavos.',
     'groundPickup.gravecallerSigilDeny': 'El sigilo repele tu tacto.',
     'groundPickup.ledgerPageDeny':
@@ -4223,6 +4227,15 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
+  // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
+  // src/sim/content/classes.ts); shown on the buff bar and combat log.
+  'Bladed Echo': 'aura.bladedEcho',
+  // Emboldening Roar's armed guaranteed-crit buff (the aoeAllySureCrit case in
+  // src/sim/combat/effect_dispatch.ts); shown on the buff bar and combat log.
+  Emboldened: 'aura.emboldened',
+  // Fury Enrage buff (the enrageChance case in src/sim/combat/effect_dispatch.ts),
+  // procced by Bloodletting and Desenfreno / Rampage; shown on the buff bar.
+  Enraged: 'aura.enraged',
 };
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
@@ -5756,6 +5769,7 @@ const RULES: Rule[] = [
   { re: /^The door is locked\.$/, build: () => t('sim.delve.doorLocked') },
   { re: /^Strike the wall to break through\.$/, build: () => t('sim.delve.strikeWall') },
   { re: /^Nothing happens\.$/, build: () => t('sim.delve.nothingHappens') },
+  { re: /^Nothing to consume\.$/, build: () => t('hud.errors.nothingToConsume') },
   { re: /^Unknown companion\.$/, build: () => t('sim.delve.unknownCompanion') },
   {
     re: /^This companion is already fully upgraded\.$/,

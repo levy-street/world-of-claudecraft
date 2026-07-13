@@ -472,6 +472,7 @@ describe('talent primitive P2: cast while moving', () => {
       castPct: 0,
       buffPct: 0,
       castWhileMoving: true,
+      bonusCharges: 0,
       addEffects: [],
     };
     const fb = abilitiesKnownAt('mage', 20, mods).find((k) => k.def.id === 'fireball');
@@ -546,6 +547,7 @@ describe('talent primitives P4/P5', () => {
       castPct: 0,
       buffPct: 0,
       castWhileMoving: false,
+      bonusCharges: 0,
       addEffects: [added],
     };
 

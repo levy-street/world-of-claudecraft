@@ -514,6 +514,34 @@
     max-width: 100%;
     pointer-events: auto;
   }
+  /* Target of Target (showTargetOfTarget option): a smaller twin of the target
+     frame, a #target-frame child anchored under the frame's RIGHT edge so it clears
+     the debuff strip that hangs below-left. Shrunk with zoom (compounding the
+     target frame's children-zoom, so it stays proportional), and shown by its own
+     unit_frame painter only when the target-of-target is known. Portrait + name +
+     hp bar only: no resource rail, cast bar, elite tag, or level chip. */
+  #totarget-frame {
+    position: absolute;
+    right: -6px;
+    top: calc(100% + 6px);
+    z-index: 7;
+    zoom: 0.74;
+    display: none;
+  }
+  #totarget-frame .uf-bars {
+    order: 1;
+    width: 132px;
+    margin-left: 0;
+    margin-right: -16px;
+    border-radius: 6px 11px 11px 6px;
+    padding: 4px 22px 4px 8px;
+  }
+  #totarget-frame .portrait-wrap {
+    order: 2;
+  }
+  #totarget-frame .level-chip {
+    display: none;
+  }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
      the frame for dragging and locks it back. Sits just outside the top-right
@@ -804,7 +832,10 @@
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {
     position: absolute;
-    inset: 0;
+    left: var(--absorb-start, 0%);
+    top: 0;
+    bottom: 0;
+    right: auto;
     width: 100%;
     transform-origin: left;
     transform: scaleX(0);
@@ -1343,6 +1374,56 @@
     font-weight: bold;
     pointer-events: none;
   }
+  /* Warrior stance bar: a small in-flow row of stance toggles above the action
+     bars, only for warriors (JS flips display to flex; hidden by default). */
+  #stancebar {
+    display: none;
+    margin: 2px 0 0 0;
+    padding: 0;
+  }
+  .stancebar-group {
+    display: flex;
+    gap: 4px;
+  }
+  .stance-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    position: relative;
+    border: 2px solid #4a3d1d;
+    border-radius: 6px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: #f3df9a;
+    cursor: var(--cursor-point);
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    user-select: none;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+  }
+  .stance-btn .icon-label {
+    position: absolute;
+    inset: 1px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  .stance-btn:hover {
+    border-color: var(--gold);
+  }
+  .stance-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .stance-btn.active {
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 0 0 1px #ffd10066,
+      0 0 6px #ffd10033;
+  }
   #actionbar,
   #actionbar2 {
     display: flex;
@@ -1455,6 +1536,33 @@
     box-shadow:
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
+  }
+  /* Free-cost proc glow (Battle Trance): the classic pulsing gold rim on the
+     covered abilities. Actionable info: never gated by a graphics tier; the
+     pulse (motion only) stops under reduced motion, the steady glow stays. */
+  .action-btn.proc {
+    border-color: #ffd97a;
+    box-shadow:
+      0 0 12px #ffcf40e6,
+      inset 0 0 6px #ffcf4066;
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
+  @keyframes abtn-proc-pulse {
+    from {
+      box-shadow:
+        0 0 7px #ffcf40b0,
+        inset 0 0 4px #ffcf4044;
+    }
+    to {
+      box-shadow:
+        0 0 15px #ffcf40f0,
+        inset 0 0 7px #ffcf4088;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .action-btn.proc {
+      animation: none;
+    }
   }
   .action-btn:not(.empty)[draggable="true"] {
     cursor: grab;

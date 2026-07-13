@@ -48,7 +48,9 @@ export type StatId =
   | 'critChance'
   | 'dodge'
   | 'critRating'
-  | 'hasteRating';
+  | 'hasteRating'
+  | 'haste'
+  | 'parry';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -146,6 +148,10 @@ export interface StatTooltipInput {
   critRating: number;
   /** entity.hasteRating, the accumulated haste rating from gear + set bonuses. */
   hasteRating: number;
+  /** entity haste fraction (0.25 = 25% faster swings/casts), 0..1+. */
+  haste: number;
+  /** entity.parryChance, 0..1 (chance to fully avoid a frontal melee attack). */
+  parryChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -336,6 +342,21 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.hasteRating;
       break;
     }
+    case 'haste': {
+      // Shown as a percent (25 = +25% faster swings/casts). No base-chance note:
+      // it starts at 0 and comes from gear set bonuses + buffs like Enrage.
+      isPrimary = false;
+      statValue = input.haste * 100;
+      break;
+    }
+    case 'parry': {
+      // Front-only avoidance, shown as a percent like dodge (a parry class starts
+      // at a base chance; casters stay at 0).
+      isPrimary = false;
+      statValue = input.parryChance * 100;
+      baseChanceNote = true;
+      break;
+    }
   }
 
   return {
@@ -483,6 +504,14 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // description carries the meaning, so no per-source breakdown line.
     case 'critRating':
     case 'hasteRating':
+      return sources;
+    // Haste comes straight off gear set bonuses + buffs (Enrage); the value plus
+    // its description carries the meaning, so no per-source breakdown line.
+    case 'haste':
+      return sources;
+    // Parry is a base chance plus Strength scaling; the value + description carry
+    // the meaning, so no per-source breakdown line for now.
+    case 'parry':
       return sources;
   }
 }

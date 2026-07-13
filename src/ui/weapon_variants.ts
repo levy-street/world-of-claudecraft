@@ -22,6 +22,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
+  eastbrook_greatsword: 'adv_sword_2handed',
+  highwatch_greatsword: 'adv_sword_2handed',
   verlans_oathblade: 'adv_sword_2handed',
   moonscale_saber: 'adv_sword_2handed',
   wyrmfang_greatblade: 'adv_sword_2handed_color', // EPIC: gold greatblade

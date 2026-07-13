@@ -420,6 +420,68 @@ export class Vfx {
     this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
   }
 
+  // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
+  // from the source ally to the target, denser and softer than a nuke beam so it
+  // reads as flowing healing water rather than crackling lightning. Each hop of the
+  // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
+  // the burst at each ally, so this method only draws the connecting cord.
+  chainHealArc(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const core = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(2.4));
+    const soft = new THREE.Color(0x86e86a).multiplyScalar(hdr(1.7));
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const len = Math.hypot(dx, dz);
+    if (len <= 0.001 && Math.abs(dy) <= 0.001) return;
+    // Arc height scales with distance so a long jump bows more; capped so a short
+    // hop still curves. The lift peaks at the midpoint (sin(pi*f)).
+    const lift = Math.min(1.6, 0.5 + len * 0.12);
+    const steps = Math.min(34, Math.max(12, Math.ceil(len / 0.8)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const arc = Math.sin(f * Math.PI) * lift;
+      const jitterX = (Math.random() - 0.5) * 0.1;
+      const jitterZ = (Math.random() - 0.5) * 0.1;
+      // Alternate a bright core sprite and a soft glow so the cord has depth.
+      const bright = i % 2 === 0;
+      this.spawn(
+        from.x + dx * f + jitterX,
+        from.y + dy * f + arc + (Math.random() - 0.5) * 0.08,
+        from.z + dz * f + jitterZ,
+        0,
+        0.4,
+        0,
+        bright ? core : soft,
+        bright ? 0.42 : 0.55,
+        0.5 + Math.random() * 0.18,
+        -0.4,
+        bright ? SPR.glowCore : SPR.glowSoft,
+      );
+    }
+    // A few rising sparkles along the cord for the living-water feel.
+    const sparkles = this.scaledCount(8);
+    for (let i = 0; i < sparkles; i++) {
+      const f = Math.random();
+      const arc = Math.sin(f * Math.PI) * lift;
+      this.spawn(
+        from.x + dx * f + (Math.random() - 0.5) * 0.3,
+        from.y + dy * f + arc + 0.1,
+        from.z + dz * f + (Math.random() - 0.5) * 0.3,
+        0,
+        1.3 + Math.random() * 0.8,
+        0,
+        core,
+        0.28,
+        0.55 + Math.random() * 0.3,
+        -1.4,
+        SPR.sparkle,
+      );
+    }
+  }
+
   // A "bolt-shaped" traveling projectile: fires a homing bolt with the SAME
   // travel + impact timing as a normal spell projectile (so the damage lands when
   // it arrives, no flash-then-wait), but its flying head renders as a short jagged
@@ -505,6 +567,71 @@ export class Vfx {
         i % 4 === 0 ? SPR.magicRune : SPR.sparkle,
       );
     }
+  }
+
+  // Warrior shout: a ground-hugging shockwave of embers rolling outward from the
+  // caster (the classic "battle shout ring"), plus a vertical roar flare at the
+  // chest. The colour is per-shout (blood red for Iron Bellow, gold for the
+  // bolster cry, ...) so the shouts read differently at a glance.
+  shoutwave(centerId: number, colorHex: number): void {
+    const at = this.anchor(centerId, 0.12);
+    if (!at) return;
+    const c = new THREE.Color(colorHex).multiplyScalar(hdr(1.7));
+    const dim = new THREE.Color(colorHex).multiplyScalar(hdr(0.9));
+    // centre ring flash sells the detonation instant
+    this.spawn(at.x, at.y + 0.25, at.z, 0, 0.25, 0, c, 2.0, 0.45, 0, SPR.ring, 0);
+    // the travelling rim: ground-hugging embers all moving radially at the same
+    // speed FORM the expanding ring; every third is a flame lick that climbs a
+    // little so the rim flickers like the reference (jagged fire edge).
+    const count = this.scaledCount(52);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + Math.random() * 0.12;
+      const sp = 9.5 + Math.random() * 2;
+      const flame = i % 3 === 0;
+      this.spawn(
+        at.x + Math.sin(a) * 0.5,
+        at.y + 0.15,
+        at.z + Math.cos(a) * 0.5,
+        Math.sin(a) * sp,
+        flame ? 1.4 + Math.random() * 0.8 : 0.35,
+        Math.cos(a) * sp,
+        flame ? c : dim,
+        flame ? 0.85 : 0.55,
+        0.8,
+        flame ? -1.5 : 3,
+        flame ? SPR.flame : SPR.sparkle,
+      );
+    }
+    // the roar itself: a bright flare bursting up from the caster's chest
+    this.spawn(at.x, at.y + 1.25, at.z, 0, 2.4, 0, c, 1.5, 0.4, 0, SPR.flash, 0);
+    this.spawn(at.x, at.y + 1.0, at.z, 0, 1.2, 0, dim, 1.1, 0.5, 0, SPR.firePuff);
+  }
+
+  // Recklessness body imbue: red flame licks crawling up the caster for as long
+  // as the buff holds (the renderer calls this every frame while the aura is up,
+  // castSparkle-style; the emitChance throttle keeps the particle budget flat).
+  recklessFlame(entityId: number, dt: number): void {
+    if (!this.emitChance(26, dt)) return;
+    const at = this.anchor(entityId, 0.25);
+    if (!at) return;
+    const hot = new THREE.Color(0xff2a12).multiplyScalar(hdr(1.5));
+    const ember = new THREE.Color(0xff6a2a).multiplyScalar(hdr(1.0));
+    const a = Math.random() * Math.PI * 2;
+    const r = 0.28 + Math.random() * 0.18;
+    const flame = Math.random() < 0.65;
+    this.spawn(
+      at.x + Math.sin(a) * r,
+      at.y + Math.random() * 0.9,
+      at.z + Math.cos(a) * r,
+      Math.sin(a) * 0.15,
+      1.1 + Math.random() * 0.9,
+      Math.cos(a) * 0.15,
+      flame ? hot : ember,
+      flame ? 0.5 : 0.3,
+      0.55,
+      -1.2,
+      flame ? SPR.flame : SPR.firePuff,
+    );
   }
 
   healGlow(targetId: number): void {

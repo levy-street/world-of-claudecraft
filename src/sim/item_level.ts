@@ -187,7 +187,13 @@ export function itemFromRaid(itemId: string): boolean {
 // quest objects, cosmetics) can exist in the item model, but should not get an
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
-  return !!item.slot && (item.kind === 'armor' || item.kind === 'weapon');
+  return (
+    !!item.slot &&
+    (item.kind === 'armor' ||
+      item.kind === 'weapon' ||
+      item.kind === 'shield' ||
+      item.kind === 'held_offhand')
+  );
 }
 
 // The item level (tier number) shown in the tooltip, or undefined when there is no

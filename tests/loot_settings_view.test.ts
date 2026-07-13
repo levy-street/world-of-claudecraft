@@ -9,6 +9,7 @@ const member = (pid: number, name: string): PartyMemberInfo => ({
   level: 40,
   hp: 100,
   mhp: 100,
+  absorb: 0,
   res: 100,
   mres: 100,
   rtype: 'rage',

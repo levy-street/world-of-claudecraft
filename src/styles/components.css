@@ -2013,9 +2013,14 @@
   }
 
   /* ---------- talents ---------- */
-  /* talents & specializations panel */
+  /* talents & specializations panel. Opens BIG (owner call: opening talents
+     should feel like an event): most of the viewport width plus a tall body,
+     WoW-frame style. Mobile keeps its own full-screen window treatment. */
   #talents-window {
-    width: min(600px, calc(100vw - 24px));
+    width: min(1160px, calc(100vw - 48px));
+  }
+  #talents-window #tal-body {
+    min-height: min(50vh, 540px);
   }
   .tal-tabs {
     display: flex;
@@ -2091,6 +2096,128 @@
   .tal-tree {
     position: relative;
     margin: 6px auto;
+  }
+  /* Choice-row talents tab (talent_rows_tab.ts), MoP band layout: each tier is
+     one compact horizontal band (level badge + three icon-and-name pills), so
+     all six tiers fit without scrolling; descriptions live in the hover
+     tooltip. Picked = gold; locked rows dim + disable. */
+  .tal-rows {
+    display: flex;
+    flex-direction: column;
+    /* Fill the tall body and DISTRIBUTE the six bands across it (owner call:
+       no dead black space under the level-20 row); gap is the minimum spacing
+       when the viewport is short. */
+    justify-content: space-between;
+    min-height: min(48vh, 520px);
+    gap: 8px;
+    margin: 8px 0 4px;
+  }
+  .tal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .tal-row-lv {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-size: 13px;
+  }
+  .tal-row-lv.locked {
+    border-color: var(--border);
+    color: var(--color-text-muted);
+  }
+  .tal-row-opts {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .tal-row.locked .tal-row-opts {
+    opacity: 0.45;
+  }
+  .tal-row-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    text-align: left;
+    padding: 8px 12px;
+    font: inherit;
+    color: var(--color-text-light);
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .tal-row-opt img {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border-radius: 6px;
+  }
+  .tal-row-opt b {
+    font-size: 13.5px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-row-opt:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+  }
+  .tal-row-opt:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .tal-row-opt.picked {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
+  .tal-row-opt.picked b {
+    color: var(--gold);
+  }
+  .tal-row-opt:disabled {
+    cursor: default;
+  }
+  /* An option whose mechanic is not implemented yet: dimmed, with a small
+     "Coming soon" badge instead of a pickable pill. */
+  .tal-row-opt.pending {
+    opacity: 0.55;
+  }
+  .tal-row-opt.pending img {
+    filter: grayscale(0.8);
+  }
+  .tal-soon {
+    margin-left: auto;
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  @media (max-width: 640px) {
+    .tal-row {
+      flex-wrap: wrap;
+    }
+    .tal-row-opts {
+      grid-template-columns: 1fr;
+      flex-basis: 100%;
+    }
   }
   .tal-arrows {
     position: absolute;
@@ -2250,6 +2377,86 @@
     z-index: 4;
     box-shadow: 0 1px 4px #000a;
   }
+  /* WoW-style specialization grid: all specs shown at once as full panels. */
+  .ts-specs-grid {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+    align-items: stretch;
+    /* Fill the tall talents body so the panels stretch to it instead of
+       leaving dead space below. The Specialization tab hides the point header +
+       help line, so the panels reclaim that room and run taller here. */
+    min-height: min(56vh, 560px);
+  }
+  .ts-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid #463a1c;
+    border-radius: 8px;
+    background: #1a1409;
+    cursor: var(--cursor-point);
+  }
+  .ts-panel.sel {
+    border-color: #ffd100;
+    background: #2c2410;
+    box-shadow:
+      inset 0 0 0 1px #ffd10055,
+      0 0 12px #b8902a55;
+  }
+  .ts-panel-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ts-panel .ts-icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #15110a;
+    color: #fff;
+    border: 1px solid #5a4a22;
+    font:
+      30px / 1 "Apple Color Emoji",
+      "Segoe UI Emoji",
+      var(--body-font);
+    text-shadow: 0 1px 2px #000;
+  }
+  .ts-panel .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
+  }
+  .ts-panel.sel .ts-icon {
+    border-color: #ffd100;
+    box-shadow: 0 0 8px #ffd10066;
+  }
+  .ts-panel-title {
+    text-align: center;
+    min-width: 0;
+  }
+  .ts-panel .ts-name {
+    font-size: 15px;
+    color: #fff;
+    font-family: var(--title-font);
+  }
+  .ts-panel .ts-role {
+    font-size: 10px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
   .tal-specs {
     display: flex;
     gap: 8px;
@@ -2305,6 +2512,14 @@
       var(--body-font);
     text-shadow: 0 1px 2px #000;
   }
+  .tal-spec .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
+  }
   .tal-spec.sel .ts-icon {
     border-color: #ffd100;
     box-shadow: 0 0 8px #ffd10066;
@@ -2320,6 +2535,148 @@
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
+  }
+  /* Specialization detail panel (under the selected spec's card). */
+  .ts-details {
+    margin: 2px 2px 4px;
+  }
+  .ts-det-desc {
+    font-size: 14px;
+    color: #e8d6a0;
+    line-height: 1.5;
+    margin-bottom: 11px;
+    text-align: center;
+  }
+  /* Compact meta: primary attribute as a small content-hugging chip, complexity as a
+     lone colored line (no heavy box), matching the WoW-style spec screen reference. */
+  .ts-det-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 11px;
+  }
+  .ts-det-attr {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 4px 10px;
+    border: 1px solid #5a4a22;
+    border-radius: 5px;
+    background: #191207;
+  }
+  .ts-det-attr-cap,
+  .ts-det-cx-cap {
+    font-size: 10px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+  .ts-det-attr-val {
+    font-size: 14px;
+    color: #ffd97a;
+    font-weight: 700;
+  }
+  .ts-det-cx {
+    font-size: 13px;
+    font-weight: 700;
+    padding-left: 2px;
+  }
+  .ts-cx-low {
+    color: #7fc77f;
+  }
+  .ts-cx-medium {
+    color: var(--gold);
+  }
+  .ts-cx-high {
+    color: #e07a5a;
+  }
+  /* Standalone section heading (the example-abilities strip). */
+  .ts-det-label {
+    font-size: 12px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .ts-det-mastery {
+    font-size: 11px;
+    color: #c8b888;
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    background: #14100a;
+  }
+  .ts-det-mastery b {
+    color: var(--gold);
+  }
+  /* The example strip + the primary action are the card's bottom group: push them
+     together to the bottom (margin-top:auto on the block) so the empty space is one
+     gap ABOVE them, not a big gap between the examples and the button. Centered. */
+  .ts-ex-block {
+    margin-top: auto;
+    text-align: center;
+  }
+  .ts-ex-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .ts-ex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    gap: 3px;
+    cursor: var(--cursor-point);
+    border-radius: 6px;
+    outline: none;
+  }
+  .ts-ex:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  .ts-ex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #5a4a22;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #15110a;
+  }
+  .ts-ex:hover .ts-ex-icon,
+  .ts-ex:focus-visible .ts-ex-icon {
+    border-color: var(--gold);
+  }
+  .ts-ex:hover .ts-ex-name {
+    color: #fff;
+  }
+  .ts-ex-name {
+    font-size: 9px;
+    color: #b8a878;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .ts-view-talents {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    margin-right: 0;
+  }
+  /* When the example strip is present it already pins the bottom group, so the button
+     sits directly under it instead of taking its own auto gap. */
+  .ts-view-talents.has-ex {
+    margin-top: 0;
+  }
+  /* The currently-selected spec's button reads as the primary/committed action. */
+  .ts-view-talents.primary {
+    background: linear-gradient(#b8902a, #8a6a1c 55%, #6a4f12);
+    color: #fff;
+    border-color: #ffd100;
   }
   .tal-mastery {
     font-size: 11px;
@@ -2339,84 +2696,140 @@
     line-height: 1.35;
     color: #a99b76;
   }
+  /* The WoW-style loadout bar: one compact dropdown button, bottom-left; the
+     menu opens UPWARD (anchored above the button) with the saved builds and
+     the save/import/export/reset actions. */
   .tal-foot {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.9fr);
-    gap: 8px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
     margin-top: 10px;
     border-top: 1px solid #463a1c;
     padding-top: 8px;
   }
-  .tal-build-card {
-    display: grid;
-    gap: 6px;
-    align-content: start;
-    padding: 7px;
-    border: 1px solid #3f341a;
-    border-radius: 6px;
-    background: #120e08;
-    box-shadow: inset 0 0 0 1px #0008;
-  }
-  .tal-build-current {
-    background: #171208;
-    border-color: #59461d;
-  }
-  .tal-build-create {
-    background: #10120d;
-  }
-  .tal-build-head {
-    display: flex;
-    gap: 7px;
+  .tal-loadout-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-  }
-  .tal-build-head .ui-dd {
-    min-width: 132px;
-    flex: 1 1 150px;
-    font-family: var(--body-font);
-  }
-  .tal-build-actions {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .tal-build-help {
-    font-size: 11px;
-    line-height: 1.35;
-    color: #a99b76;
-  }
-  .tal-foot .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .tal-foot .btn.tal-primary {
-    border-color: #8f7025;
+    gap: 9px;
+    max-width: 260px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12.5px;
     color: #ffe6a8;
-    background: linear-gradient(#7a5f21, #4d3810);
+    background: linear-gradient(#3a2e14, #241a0c);
+    border: 1px solid #8f7025;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  .tal-foot .btn.tal-secondary {
-    color: var(--color-text-muted);
-    border-color: #4b3d1d;
-    background: #171208;
+  .tal-loadout-btn:hover {
+    border-color: var(--gold);
   }
-  .tal-foot .btn[disabled] {
-    opacity: 0.45;
-    pointer-events: none;
-    cursor: not-allowed;
+  .tal-loadout-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
   }
-  .tal-foot select,
-  .tal-foot input {
-    background: #14100a;
+  .tal-loadout-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-loadout-caret {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid var(--gold);
+    flex: 0 0 auto;
+  }
+  .tal-loadout-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 6px);
+    min-width: 240px;
+    max-width: 320px;
+    padding: 5px;
+    background: linear-gradient(#1d1710, #120e08);
+    border: 1px solid #59461d;
+    border-radius: 7px;
+    box-shadow: 0 10px 26px -8px #000;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .tal-lo-row {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .tal-lo-row.active .tal-lo-pick {
+    color: var(--gold);
+    background: #241c0c;
+  }
+  .tal-lo-item,
+  .tal-lo-pick {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    padding: 6px 9px;
+    font: inherit;
+    font-size: 12px;
     color: #e8dcb0;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    font-size: 11px;
-    padding: 4px;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-lo-item:hover:not(:disabled),
+  .tal-lo-pick:hover {
+    background: #2a2110;
+    color: #ffe6a8;
+  }
+  .tal-lo-item:focus-visible,
+  .tal-lo-pick:focus-visible,
+  .tal-lo-del:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -1px;
+  }
+  .tal-lo-item:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .tal-lo-new {
+    color: var(--gold);
+  }
+  .tal-lo-del {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+  .tal-lo-del:hover {
+    color: var(--color-hostile, #d8413f);
+    background: #2a1210;
+  }
+  .tal-lo-del svg {
+    width: 12px;
+    height: 12px;
+  }
+  .tal-lo-sep {
+    height: 1px;
+    margin: 4px 6px;
+    background: #463a1c;
+  }
+  .tal-lo-empty {
+    padding: 6px 9px;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
   }
   .tal-spacer {
     flex: 1;

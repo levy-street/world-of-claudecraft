@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ABILITIES,
   abilitiesKnownAt,
   CLASSES,
   CRYPT_SPAWNS,
@@ -98,9 +99,14 @@ describe('nine classes', () => {
       // Expanded kits can exceed the 12 action-bar slots; overflow remains
       // available from the spellbook and can be dragged onto the bar.
       expect(CLASSES[cls].abilities.length).toBeGreaterThan(0);
-      // the full kit resolves at MAX_LEVEL; the 10-20 band still has things to learn
+      // At MAX_LEVEL a no-spec player resolves every ability EXCEPT the ones
+      // reserved for a committed spec (the warrior redesign gates its spec kits
+      // behind `specs`). So the resolvable no-spec kit is EXACTLY the ungated
+      // abilities: for the 8 classes with no spec gates that stays the whole list.
       const kit = abilitiesKnownAt(cls, MAX_LEVEL);
-      expect(kit.length).toBe(CLASSES[cls].abilities.length);
+      const ungated = CLASSES[cls].abilities.filter((id) => !ABILITIES[id]?.specs);
+      expect(new Set(kit.map((k) => k.def.id))).toEqual(new Set(ungated));
+      // the 10-20 band still has things to learn
       expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);

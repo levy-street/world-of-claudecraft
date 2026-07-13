@@ -542,11 +542,14 @@ export const guideStrings = {
   // press it). Keyed by the sim ability id.
   abilityHook: {
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
+    revenge:
+      'A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.',
     battle_shout: 'A rallying cry that raises attack power for the party.',
     commanding_shout: 'Bolsters stamina so everyone has more staying power in a fight.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     rend: 'Opens a bleed that wears the target down over time.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
+    hamstring: "Slashes the target's legs to slow it so it cannot run you down.",
     seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',

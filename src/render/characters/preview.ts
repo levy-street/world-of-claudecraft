@@ -105,17 +105,18 @@ export class CharacterPreview {
     this.animate();
   }
 
-  /** Set the active character model by player class. Pass `weaponItemId` to hold a
-   *  specific weapon (e.g. the character sheet shows the equipped mainhand); omit it
-   *  to default to the class start weapon (so the creation turntable matches the
-   *  freshly created character in-world). */
-  setClass(cls: PlayerClass, weaponItemId?: string | null): void {
+  /** Set the active character model by player class. Pass held item ids to mirror a
+   *  live equipment state; omit them to default to the class start weapon. */
+  setClass(cls: PlayerClass, mainhandItemId?: string | null, offhandItemId?: string | null): void {
     if (this.destroyed) return;
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
     this.appearanceSig = null;
-    const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
-    this.setVisualKey(`player_${cls}`, weapon);
+    const weapon =
+      mainhandItemId !== undefined ? mainhandItemId : (CLASSES[cls].startWeapon ?? null);
+    const offhand =
+      offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
+    this.setVisualKey(`player_${cls}`, weapon, null, offhand);
   }
 
   /** Show a character's real, in-world appearance: the class rig or the Combat Mech
@@ -130,14 +131,14 @@ export class CharacterPreview {
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
     if (a.skinCatalog === 'mech' && !mechAssetsReady()) {
-      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null);
+      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null, null, a.offhandItemId ?? null);
       void preloadMechAssets().then(() => {
         if (!this.destroyed && this.appearanceSig === sig) this.setAppearance(a);
       });
       return;
     }
     const v = previewAppearanceVisual(a);
-    this.setVisualKey(v.visualKey, v.weaponItemId, v.weaponOverride);
+    this.setVisualKey(v.visualKey, v.mainhandItemId, v.weaponOverride, v.offhandItemId);
   }
 
   /** Set the active model by raw visual key (e.g. `player_mech` for the cosmetic
@@ -146,8 +147,9 @@ export class CharacterPreview {
    *  dual-wields), matching the in-world render. */
   setVisualKey(
     visualKey: string,
-    weaponItemId: string | null = null,
+    mainhandItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
+    offhandItemId: string | null = null,
   ): void {
     if (this.destroyed) return;
     // Clean up current visual if it exists
@@ -162,7 +164,8 @@ export class CharacterPreview {
         visualKey,
         0xffffff,
         this.currentSkin,
-        weaponItemId,
+        mainhandItemId,
+        offhandItemId,
         weaponOverride,
       );
       this.characterGroup.add(this.currentVisual.root);

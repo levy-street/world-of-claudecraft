@@ -1222,6 +1222,18 @@ describe('dev bot: a whisperable test dummy', () => {
     expect(sim.players.get(a)!.lastWhisperFrom).toBe('ASASAS');
   });
 
+  it('a party invite to a dev bot is auto-accepted (no client to click Accept)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph'); // primary
+    const botPid = sim.spawnDevBot('BOTTY');
+    expect(botPid).toBeGreaterThanOrEqual(0);
+    sim.partyInvite(botPid, a);
+    const party = sim.partyInfo; // reads the primary player's party
+    expect(party).toBeTruthy();
+    expect(party?.members.some((m) => m.pid === botPid)).toBe(true);
+    expect(party?.members.some((m) => m.pid === a)).toBe(true);
+  });
+
   it('the /dev bot command spawns a bot only when dev commands are on', () => {
     const on = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
     const a = on.addPlayer('warrior', 'Aleph');

@@ -100,6 +100,9 @@ describe('mob_swing module: runMobSwingAffixes', () => {
     const p = sim.player as any;
     const meta = (sim as any).players.get(p.id);
     const armorBefore = p.stats.armor;
+    // Drop the warrior's spawn-seeded Battle Stance so Devour Magic eats the
+    // pushed test buff (the first devourable in order), not the stance.
+    p.auras.length = 0;
     p.auras.push({
       id: 'devour_test',
       name: 'Test Armor',

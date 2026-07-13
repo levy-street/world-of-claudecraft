@@ -19,29 +19,30 @@
 // properties via TAL_COLOR; the tree geometry comes from the core's named layout
 // constants. No em dashes anywhere (the mastery / choice separator is ASCII " - ").
 
+import { ROW_COUNT, type RowPicks, rowTreeFor } from '../sim/content/talent_rows';
 import {
   cloneAllocation,
   exportBuild,
-  FIRST_TALENT_LEVEL,
   importBuild,
   type SavedLoadout,
   type TalentAllocation,
-  type TalentNode,
   talentsFor,
   validateAllocation,
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
-import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import type { PlayerClass } from '../sim/types';
+import { SPEC_CARD_INFO } from './class_details_data';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { t } from './i18n';
+import { type TranslationKey, t } from './i18n';
+import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
-import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
-import { talentTreeFitScale } from './talent_tree_fit';
-import { buildTalentsView, type TalentsView, type TalentTreeVM } from './talents_view';
+import { paintTalentRowsTab } from './talent_rows_tab';
+import { buildTalentRowsView } from './talent_rows_view';
+import { buildTalentsView, type TalentsView } from './talents_view';
 import { svgIcon } from './ui_icons';
 
 /**
@@ -67,6 +68,18 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   currentAllocation(): TalentAllocation;
   activeLoadout(): number;
   loadouts(): readonly SavedLoadout[];
+  /**
+   * Rich tooltip HTML for an ability id (name, cost/range, cast/cooldown,
+   * resolved description), reusing the HUD's shared ability tooltip. Used by the
+   * spec preview so a new player can read what each example ability does before
+   * committing. Returns null for an unknown id.
+   */
+  abilityTooltip(abilityId: string): string | null;
+  // Choice-row talents (the Pandaria-style rows tab): live picks + level reads,
+  // and the server-validated pick command (IWorld.pickRowTalent).
+  rowPicks(): RowPicks;
+  playerLevel(): number;
+  pickRow(rowIndex: number, optionId: string | null): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
   // Loadout commit surface (server-authoritative IWorld; the only commit path).
@@ -75,13 +88,6 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   deleteLoadout(index: number): void;
   applyLoadoutBar(bar: (string | null)[]): void;
   // Shared HUD chrome components.
-  buildDropdown(
-    options: { value: string; label: string }[],
-    current: string,
-    onChange: (value: string) => void,
-    placeholder: string,
-    a11y: { ariaLabel?: string; labelledBy?: string },
-  ): HTMLElement;
   inputDialog(opts: {
     title: string;
     label?: string;
@@ -120,16 +126,35 @@ const TAL_COLOR = {
   dormant: 'var(--color-talent-dormant)',
 } as const;
 
+const SPEC_ICON_DIR = '/ui/specs';
+
+function specIconUrl(cls: PlayerClass, specId: string): string | null {
+  if (cls === 'warrior' && (specId === 'arms' || specId === 'fury' || specId === 'prot')) {
+    return `${SPEC_ICON_DIR}/${cls}/${specId}.webp`;
+  }
+  return null;
+}
+
 function signatureName(abilityId: string): string {
   return ABILITIES[abilityId]
     ? tEntity({ kind: 'ability', id: abilityId, field: 'name' })
     : abilityId;
 }
 
+function specIconHtml(cls: PlayerClass, specId: string, fallbackIcon: string): string {
+  const url = specIconUrl(cls, specId);
+  return url
+    ? `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`
+    : `<div class="ts-icon">${esc(fallbackIcon)}</div>`;
+}
+
 export class TalentsWindow {
-  private tab: 'class' | 'spec' = 'class';
+  private tab: 'spec' | 'rows' = 'spec';
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // The document-level dismiss handler while the loadout menu is open (cleared
+  // by closeLoadoutMenu, and defensively by render/close so it never leaks).
+  private dismissLoadoutMenu: ((e: Event) => void) | null = null;
 
   constructor(private readonly deps: TalentsWindowDeps) {}
 
@@ -144,6 +169,7 @@ export class TalentsWindow {
   /** Close the window: hide, drop the tooltip, discard the buffer, restore focus. */
   close(): void {
     const el = this.deps.root();
+    this.closeLoadoutMenu(el);
     el.style.display = 'none';
     this.deps.hideTooltip();
     this.deps.setStage(null);
@@ -154,6 +180,11 @@ export class TalentsWindow {
 
   render(): void {
     const el = this.deps.root();
+    // A repaint wipes the loadout menu's DOM; drop its document listener too.
+    if (this.dismissLoadoutMenu) {
+      document.removeEventListener('pointerdown', this.dismissLoadoutMenu, true);
+      this.dismissLoadoutMenu = null;
+    }
     // Early-return when hidden AND no staged buffer (nothing to repaint).
     if (el.style.display !== 'block' && this.deps.getStage() === null) return;
     // WCAG 2.2 AA: name the focus-trapped root so AT users entering the trap
@@ -183,19 +214,33 @@ export class TalentsWindow {
     }
     const total = this.deps.totalPoints();
     const view = buildTalentsView(stage, cls, total);
+    // The choice-row (Choices) tab renders only for a class with authored rows AND
+    // only once a spec is committed: choices are spec-flavored and mean nothing with
+    // no spec, so the tab stays hidden until you pick one, and a stale rows view
+    // snaps back to the spec tab. Its badge counts picked rows out of ROW_COUNT (6),
+    // never the old classic talent-point total.
+    const rowTree = rowTreeFor(cls);
+    const specChosen = stage.spec !== null;
+    const rowsAvailable = !!rowTree && specChosen;
+    const rowsVm = buildTalentRowsView(rowTree, this.deps.rowPicks(), this.deps.playerLevel());
+    if (!rowsAvailable && this.tab === 'rows') this.tab = 'spec';
+    const rowsTab = rowsAvailable
+      ? `<div class="tal-tab${this.tab === 'rows' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'rows' ? '0' : '-1'}" aria-selected="${this.tab === 'rows'}" aria-controls="tal-body" data-tab="rows"><span class="tal-tab-label">${t('hudChrome.talentRows.tab')}</span><span class="tt-pts">${rowsVm.pickedCount}/${ROW_COUNT}</span></div>`
+      : '';
 
+    // No point-economy header any more: the point-spending Class tree tab is gone,
+    // so the two remaining tabs (Specialization, Choices) never spend talent points.
+    // The Choices tab carries its own picked/total badge instead.
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
-      `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
-      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
-      `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
-      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
+      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span></div>` +
+      rowsTab +
       `</div><div id="tal-body" role="tabpanel"></div>` +
       this.footerHtml(view);
 
     const switchTab = (tab: HTMLElement): void => {
-      this.tab = tab.dataset.tab as 'class' | 'spec';
+      this.tab = tab.dataset.tab as 'spec' | 'rows';
       this.render();
     };
     // WAI-ARIA tabs: roving arrow navigation (Left/Right/Home/End) plus Enter/Space.
@@ -222,11 +267,19 @@ export class TalentsWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
 
     const body = el.querySelector('#tal-body') as HTMLElement;
-    if (this.tab === 'class') {
-      const tree = document.createElement('div');
-      tree.className = 'tal-tree';
-      body.appendChild(tree);
-      this.paintTree(tree, view.classTree, stage);
+    if (this.tab === 'rows') {
+      paintTalentRowsTab(body, rowsVm, {
+        attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
+        pickRow: (rowIndex, optionId) => this.deps.pickRow(rowIndex, optionId),
+        // Repaint now (offline Sim applies instantly), then once more shortly
+        // after so the ONLINE mirror's authoritative tal snapshot lands too.
+        rerender: () => {
+          this.render();
+          window.setTimeout(() => {
+            if (this.deps.root().style.display === 'block' && this.tab === 'rows') this.render();
+          }, 300);
+        },
+      });
     } else {
       this.paintSpecTab(body, view, stage);
     }
@@ -234,172 +287,98 @@ export class TalentsWindow {
   }
 
   private paintSpecTab(body: HTMLElement, view: TalentsView, stage: TalentAllocation): void {
-    const picker = document.createElement('div');
-    picker.className = 'tal-specs';
-    picker.setAttribute('role', 'radiogroup');
-    picker.setAttribute('aria-label', t('game.talents.specTab'));
-    // WAI-ARIA radiogroup: arrow keys move focus among the spec radios and select on
-    // move (setSpec re-renders; the root persists, so focus the new selected card).
-    const specCards: { el: HTMLElement; id: string }[] = [];
+    const cls = this.deps.playerClass();
+    // All specs shown at once as full side-by-side panels (WoW-style spec screen):
+    // every spec's icon, role, description, primary attribute, complexity, and
+    // example abilities are visible without clicking; a click selects the spec and
+    // the selected one gets the View talents button (jumps to the Choices tab).
+    const grid = document.createElement('div');
+    grid.className = 'ts-specs-grid';
+    grid.setAttribute('role', 'radiogroup');
+    grid.setAttribute('aria-label', t('game.talents.specTab'));
+    const panels: { el: HTMLElement; id: string }[] = [];
     for (const specVM of view.specs) {
       const sp = specVM.spec;
-      const card = document.createElement('div');
       const selected = specVM.selected;
-      card.className = `tal-spec${selected ? ' sel' : ''}`;
-      card.setAttribute('role', 'radio');
-      card.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
-      card.setAttribute('aria-checked', String(selected));
+      const info = SPEC_CARD_INFO[sp.id];
       const specName = tTalent({ kind: 'talentSpec', spec: sp, field: 'name' });
-      const specDescription = tTalent({ kind: 'talentSpec', spec: sp, field: 'description' });
+      const specDesc = tTalent({ kind: 'talentSpec', spec: sp, field: 'description' });
       const masteryName = tTalent({ kind: 'talentMastery', spec: sp, field: 'name' });
-      const masteryDescription = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
-      card.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
-      card.innerHTML = `<div class="ts-icon">${esc(sp.icon)}</div><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div>`;
-      this.deps.attachTooltip(
-        card,
-        () =>
-          `<div class="tt-title">${esc(specName)}</div><div class="tt-sub">${esc(specDescription)}</div>` +
-          `<div class="tt-sub" style="color:${TAL_COLOR.signature}">${t('game.talents.signature')}: ${esc(signatureName(sp.signature))}</div>` +
-          `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(masteryName)} - ${esc(masteryDescription)}</div>`,
-      );
-      card.addEventListener('click', () => this.setSpec(stage, sp.id));
-      card.addEventListener('keydown', (e) => {
+      const masteryDesc = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
+      const panel = document.createElement('div');
+      panel.className = `ts-panel${selected ? ' sel' : ''}`;
+      panel.setAttribute('role', 'radio');
+      panel.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
+      panel.setAttribute('aria-checked', String(selected));
+      panel.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
+      let html =
+        `<div class="ts-panel-head">${specIconHtml(cls, sp.id, sp.icon)}` +
+        `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div></div></div>` +
+        `<div class="ts-det-desc">${esc(specDesc)}</div>`;
+      if (info) {
+        const statLabel = t(`itemUi.stats.${info.primaryStat}` as TranslationKey);
+        const cxKey = (
+          info.complexity === 'low'
+            ? 'hudChrome.specPanel.complexityLow'
+            : info.complexity === 'high'
+              ? 'hudChrome.specPanel.complexityHigh'
+              : 'hudChrome.specPanel.complexityMedium'
+        ) as TranslationKey;
+        html +=
+          `<div class="ts-det-meta">` +
+          `<div class="ts-det-attr"><span class="ts-det-attr-cap">${t('hudChrome.specPanel.primaryAttr')}</span><span class="ts-det-attr-val">${esc(statLabel)}</span></div>` +
+          `<div class="ts-det-cx ts-cx-${info.complexity}"><span class="ts-det-cx-cap">${t('hudChrome.specPanel.complexity')}</span> ${t(cxKey)}</div>` +
+          `</div>`;
+      }
+      html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDesc)}</div>`;
+      if (info?.examples.length) {
+        html += `<div class="ts-ex-block"><div class="ts-det-label">${t('hudChrome.specPanel.exampleAbilities')}</div><div class="ts-ex-list">`;
+        for (const id of info.examples) {
+          const name = signatureName(id);
+          html += `<div class="ts-ex" tabindex="0" data-ability="${esc(id)}"><span class="ts-ex-icon" style="background-image:url(${iconDataUrl('ability', id)})" aria-hidden="true"></span><span class="ts-ex-name">${esc(name)}</span></div>`;
+        }
+        html += '</div></div>';
+      }
+      panel.innerHTML = html;
+      // Hover/focus tooltip per example ability: reuse the HUD's rich ability
+      // tooltip so a new player can read what each does before committing.
+      for (const exEl of Array.from(panel.querySelectorAll<HTMLElement>('.ts-ex'))) {
+        const id = exEl.dataset.ability ?? '';
+        exEl.setAttribute('aria-label', signatureName(id));
+        this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
+      }
+      // Every panel gets a View talents button: clicking it SELECTS that spec (it
+      // stages the choice, exactly like clicking the panel) and jumps to the
+      // Choices tab, so a new player picks a spec and lands on its talents in one
+      // click. The selected spec's button reads as the primary action.
+      const viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = `btn ts-view-talents${selected ? ' primary' : ''}${info?.examples.length ? ' has-ex' : ''}`;
+      viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
+      viewBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (stage.spec !== sp.id) this.setSpec(stage, sp.id);
+        this.tab = 'rows';
+        this.render();
+      });
+      panel.appendChild(viewBtn);
+      panel.addEventListener('click', () => this.setSpec(stage, sp.id));
+      panel.addEventListener('keydown', (e) => {
         const ke = e as KeyboardEvent;
-        const i = specCards.findIndex((c) => c.el === card);
-        const next = rovingTarget(ke.key, i, specCards.length, 'both');
+        const i = panels.findIndex((c) => c.el === panel);
+        const next = rovingTarget(ke.key, i, panels.length, 'both');
         if (next !== null) {
           ke.preventDefault();
-          this.setSpec(stage, specCards[next].id);
-          (this.deps.root().querySelector('.tal-spec.sel') as HTMLElement | null)?.focus();
+          this.setSpec(stage, panels[next].id);
+          (this.deps.root().querySelector('.ts-panel.sel') as HTMLElement | null)?.focus();
           return;
         }
         this.keyboardActivate(ke, () => this.setSpec(stage, sp.id));
       });
-      specCards.push({ el: card, id: sp.id });
-      picker.appendChild(card);
+      panels.push({ el: panel, id: sp.id });
+      grid.appendChild(panel);
     }
-    body.appendChild(picker);
-    const sp = view.selectedSpec;
-    if (!sp) {
-      const e = document.createElement('div');
-      e.className = 'tal-empty';
-      e.textContent = t('game.talents.chooseSpec');
-      body.appendChild(e);
-      return;
-    }
-    const m = document.createElement('div');
-    m.className = 'tal-mastery';
-    m.innerHTML = `<b>${t('game.talents.mastery')}: ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> - ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}`;
-    body.appendChild(m);
-    const tree = document.createElement('div');
-    tree.className = 'tal-tree';
-    body.appendChild(tree);
-    if (view.specTree) this.paintTree(tree, view.specTree, stage);
-  }
-
-  private paintTree(host: HTMLElement, treeVM: TalentTreeVM, stage: TalentAllocation): void {
-    if (treeVM.empty) {
-      host.innerHTML = `<div class="tal-empty">${t('game.talents.pickSpecFirst')}</div>`;
-      return;
-    }
-    host.style.width = `${treeVM.width}px`;
-    host.style.height = `${treeVM.height}px`;
-
-    let svg = `<svg class="tal-arrows" width="${treeVM.width}" height="${treeVM.height}">`;
-    for (const a of treeVM.arrows)
-      svg += `<line x1="${a.x1}" y1="${a.y1}" x2="${a.x2}" y2="${a.y2}" style="stroke:${a.filled ? TAL_COLOR.arrow : TAL_COLOR.arrowDim};stroke-width:2"/>`;
-    host.insertAdjacentHTML('beforeend', `${svg}</svg>`);
-
-    for (const vm of treeVM.nodes) {
-      const n = vm.node;
-      const div = document.createElement('div');
-      div.className = `tal-node ${vm.shape} ${vm.state}`;
-      div.setAttribute('role', 'button');
-      div.setAttribute('tabindex', '0');
-      div.setAttribute('aria-pressed', String(vm.ranks > 0));
-      if (vm.disabled) div.setAttribute('aria-disabled', 'true');
-      const nodeName = tTalent({ kind: 'talentNode', node: n, field: 'name' });
-      const chosenLabel = vm.chosen
-        ? `, ${tTalent({ kind: 'talentChoice', choice: vm.chosen, field: 'name' })}`
-        : '';
-      div.setAttribute(
-        'aria-label',
-        `${nodeName}${chosenLabel}, ${t('game.talents.rank')} ${vm.ranks}/${vm.maxRank}`,
-      );
-      div.style.left = `${vm.left}px`;
-      div.style.top = `${vm.top}px`;
-      const icon = document.createElement('span');
-      icon.className = 'tal-icon';
-      icon.style.backgroundImage = `url(${vm.chosen ? talentChoiceIconDataUrl(vm.chosen) : talentNodeIconDataUrl(n)})`;
-      div.appendChild(icon);
-      if (vm.ranks > 0 || n.maxRank > 1) {
-        const badge = document.createElement('span');
-        badge.className = 'tal-rank';
-        badge.textContent = `${vm.ranks}/${vm.maxRank}`;
-        div.appendChild(badge);
-      }
-      this.deps.attachTooltip(div, () => this.talentTooltip(n, stage, vm.state === 'dormant'));
-      div.addEventListener('click', () => {
-        // octagon choice nodes open a classic-MMO-style option flyout; others add a rank
-        if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
-        else this.nodeClick(stage, n);
-      });
-      div.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Backspace' || ke.key === 'Delete') {
-          ke.preventDefault();
-          this.nodeRemove(stage, n);
-          return;
-        }
-        this.keyboardActivate(ke, () => {
-          if (n.kind === 'choice') this.openChoicePopup(div, n, stage);
-          else this.nodeClick(stage, n);
-        });
-      });
-      div.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        this.nodeRemove(stage, n);
-      });
-      host.appendChild(div);
-    }
-    this.fitTreeToMobileViewport(host, treeVM.width, treeVM.height);
-  }
-
-  // Char/talents mobile landscape redo (issue 1577 follow-up): the tree is a
-  // fixed pixel grid (host.style.width/height above), so on a mobile-touch
-  // landscape phone we scale the whole grid down to whatever room #tal-body
-  // actually has, via the pure talentTreeFitScale, so a full tree reads in one
-  // view instead of needing an internal scroll to see it. Desktop is untouched
-  // (early-return keeps host at its native, unscaled size there).
-  private fitTreeToMobileViewport(host: HTMLElement, width: number, height: number): void {
-    if (!document.body.classList.contains('mobile-touch')) return;
-    const body = host.parentElement;
-    if (!body) return;
-    // #tal-body sizes to its OWN content (it is not a flex child with a capped
-    // height), so its bounding rect grows with the tree instead of reporting
-    // the room actually left in the viewport. The scrollable box on mobile is
-    // the whole #talents-window (inset:0 in hud.mobile.css), so measure the
-    // remaining space below tal-body's own top, clipped to the visible window.
-    const win = this.deps.root();
-    const winRect = win.getBoundingClientRect();
-    const bodyTop = body.getBoundingClientRect().top;
-    const availableWidth = body.clientWidth || winRect.width;
-    const availableHeight = Math.min(winRect.bottom, window.innerHeight) - bodyTop;
-    if (availableWidth <= 0 || availableHeight <= 0) return;
-    const scale = talentTreeFitScale(width, height, availableWidth, availableHeight);
-    host.style.transformOrigin = 'top left';
-    host.style.transform = scale < 1 ? `scale(${scale})` : '';
-    // .tal-tree's base rule is `margin: 6px auto` (desktop centers it); auto
-    // horizontal centering measures the tree's UNSCALED width, so left it alone
-    // it would push the shrunk tree off to the right. Pin both margins
-    // explicitly and collapse the now-empty right/bottom margin box back to
-    // the scaled visual size, so the window doesn't reserve the tree's full
-    // unscaled footprint and force a scrollbar anyway (transform never changes
-    // the layout box it applies to).
-    host.style.marginLeft = scale < 1 ? '0' : '';
-    host.style.marginTop = scale < 1 ? '0' : '';
-    host.style.marginRight = scale < 1 ? `${-(width * (1 - scale))}px` : '';
-    host.style.marginBottom = scale < 1 ? `${-(height * (1 - scale))}px` : '';
+    body.appendChild(grid);
   }
 
   private setSpec(stage: TalentAllocation, specId: string): void {
@@ -416,215 +395,61 @@ export class TalentsWindow {
     this.render();
   }
 
-  private nodeClick(stage: TalentAllocation, n: TalentNode): void {
-    const cls = this.deps.playerClass();
-    const total = this.deps.totalPoints();
-    const ranks = stage.ranks[n.id] ?? 0;
-    if (ranks >= n.maxRank) return;
-    const cand = cloneAllocation(stage);
-    cand.ranks[n.id] = ranks + 1;
-    if (!validateAllocation(cls, cand, total).ok) return;
-    stage.ranks[n.id] = ranks + 1;
-    this.render();
-  }
-
-  private nodeRemove(stage: TalentAllocation, n: TalentNode): void {
-    const ranks = stage.ranks[n.id] ?? 0;
-    if (ranks <= 0) return;
-    if (ranks - 1 <= 0) {
-      delete stage.ranks[n.id];
-      delete stage.choices[n.id];
-    } else stage.ranks[n.id] = ranks - 1;
-    this.render();
-  }
-
-  private talentTooltip(n: TalentNode, stage: TalentAllocation, isDormant: boolean): string {
-    const ranks = stage.ranks[n.id] ?? 0;
-    let html = `<div class="tt-title">${esc(tTalent({ kind: 'talentNode', node: n, field: 'name' }))}</div><div class="tt-sub">${esc(tTalent({ kind: 'talentNode', node: n, field: 'description' }))}</div>`;
-    if (n.kind === 'choice') {
-      for (const o of n.choices ?? []) {
-        const sel = stage.choices[n.id] === o.id;
-        html += `<div class="tt-sub" style="color:${sel ? TAL_COLOR.choiceSel : TAL_COLOR.choiceDim}"><span class="tt-opt-icon" style="background-image:url(${esc(talentChoiceIconDataUrl(o))})"></span> ${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'name' }))} - ${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'description' }))}</div>`;
-      }
-      html += `<div class="tt-sub" style="color:${TAL_COLOR.hint}">${t('game.talents.cycleHint')}</div>`;
-    } else {
-      html += `<div class="tt-sub">${t('game.talents.rank')} ${ranks}/${n.maxRank}</div>`;
-    }
-    const ct = talentsFor(this.deps.playerClass());
-    if (n.requires?.length) {
-      const names = n.requires
-        .map((r) => {
-          const required = ct?.nodes.find((x) => x.id === r);
-          return required ? tTalent({ kind: 'talentNode', node: required, field: 'name' }) : r;
-        })
-        .join(', ');
-      html += `<div class="tt-sub" style="color:${TAL_COLOR.requires}">${t('game.talents.requires')}: ${esc(names)}</div>`;
-    }
-    if (n.pointsGate)
-      html += `<div class="tt-sub" style="color:${TAL_COLOR.requires}">${n.pointsGate} ${t('game.talents.pointsGate')}</div>`;
-    if (isDormant)
-      html += `<div class="tt-sub" style="color:${TAL_COLOR.dormant}">${t('game.talents.dormant')}</div>`;
-    html += `<div class="tt-sub" style="color:${TAL_COLOR.hint}">${t('game.talents.editHint')}</div>`;
-    return html;
-  }
-
-  // classic-MMO-style choice-node picker: clicking an octagon node opens a flyout of
-  // its options; selecting one assigns it (spending a point if needed). Anchored to
-  // the node, closes on click-away.
-  private openChoicePopup(anchor: HTMLElement, node: TalentNode, stage: TalentAllocation): void {
-    document.getElementById('tal-choice-pop')?.remove();
-    const cls = this.deps.playerClass();
-    const total = this.deps.totalPoints();
-    const ranks = stage.ranks[node.id] ?? 0;
-    const pop = document.createElement('div');
-    pop.id = 'tal-choice-pop';
-    pop.className = 'tal-choice-pop';
-    pop.setAttribute('role', 'menu');
-    pop.setAttribute('aria-label', tTalent({ kind: 'talentNode', node, field: 'name' }));
-    // Roving tabindex: only the selected option (else the first) is in the tab order;
-    // the Arrow/Home/End handler below moves focus among the rest (so the
-    // role=menu announces a pattern the keyboard actually implements).
-    const choices = node.choices ?? [];
-    const selIdx = choices.findIndex((o) => stage.choices[node.id] === o.id);
-    const rovingIdx = selIdx >= 0 ? selIdx : 0;
-    pop.innerHTML = choices
-      .map((o, i) => {
-        const sel = stage.choices[node.id] === o.id;
-        return (
-          `<div class="tal-choice-opt${sel ? ' sel' : ''}" role="menuitemradio" tabindex="${i === rovingIdx ? '0' : '-1'}" aria-checked="${sel}" data-opt="${esc(o.id)}"><span class="tco-icon" style="background-image:url(${esc(talentChoiceIconDataUrl(o))})"></span>` +
-          `<span class="tco-text"><b>${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'name' }))}</b><span>${esc(tTalent({ kind: 'talentChoice', choice: o, field: 'description' }))}</span></span></div>`
-        );
-      })
-      .join('');
-    document.body.appendChild(pop);
-    const r = anchor.getBoundingClientRect();
-    const preferredLeft = r.left + r.width / 2 - pop.offsetWidth / 2;
-    const left = Math.max(8, Math.min(window.innerWidth - pop.offsetWidth - 8, preferredLeft));
-    const top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.bottom + 12));
-    const caretLeft = Math.max(14, Math.min(pop.offsetWidth - 14, r.left + r.width / 2 - left));
-    pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
-    pop.style.setProperty('--tal-choice-caret-left', `${caretLeft}px`);
-    // One idempotent close path. returnFocus lands focus back on the still-attached
-    // anchor (Escape / outside click / Tab-out / can't-afford); a successful choose()
-    // re-renders the tree, detaching its anchor, so it dismisses WITHOUT a refocus and
-    // lets render() own focus. The body.contains guard keeps a stale anchor from being
-    // focused if it was already rebuilt.
-    let dismissed = false;
-    const dismiss = (returnFocus: boolean): void => {
-      if (dismissed) return;
-      dismissed = true;
-      pop.remove();
-      if (returnFocus && document.body.contains(anchor)) anchor.focus();
-    };
-    const choose = (optEl: Element): void => {
-      const optId = optEl.getAttribute('data-opt') ?? '';
-      if (ranks === 0) {
-        const cand = cloneAllocation(stage);
-        cand.ranks[node.id] = 1;
-        cand.choices[node.id] = optId;
-        if (!validateAllocation(cls, cand, total).ok) {
-          dismiss(true); // can't afford / gated: no re-render, so return focus to the node
-          return;
-        }
-        stage.ranks[node.id] = 1;
-      }
-      stage.choices[node.id] = optId;
-      dismiss(false);
-      this.render();
-    };
-    const opts = Array.from(pop.querySelectorAll<HTMLElement>('.tal-choice-opt'));
-    // Move the roving focus among the options (no selection on move; Enter/Space picks).
-    const focusOpt = (idx: number): void => {
-      const n = opts.length;
-      if (n === 0) return;
-      const next = ((idx % n) + n) % n;
-      opts.forEach((o, j) => {
-        o.setAttribute('tabindex', j === next ? '0' : '-1');
-      });
-      opts[next].focus();
-    };
-    opts.forEach((optEl, i) => {
-      optEl.addEventListener('click', (e) => {
-        e.stopPropagation();
-        choose(optEl);
-      });
-      optEl.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Escape') {
-          ke.preventDefault();
-          dismiss(true);
-          return;
-        }
-        const next = rovingTarget(ke.key, i, opts.length, 'both');
-        if (next !== null) {
-          ke.preventDefault();
-          focusOpt(next);
-          return;
-        }
-        this.keyboardActivate(ke, () => choose(optEl));
-      });
-    });
-    focusOpt(rovingIdx);
-    // The popup is appended to document.body (its position:fixed math needs the
-    // viewport, and the .window transform would otherwise become its containing
-    // block), so it lives OUTSIDE the talents dialog's focus trap. Dismiss it the
-    // moment focus leaves it (Tab-out, click-away), returning focus to the anchor, so
-    // a keyboard user can never escape the dialog through the flyout.
-    pop.addEventListener('focusout', (e) => {
-      if (!pop.contains((e as FocusEvent).relatedTarget as Node | null)) dismiss(true);
-    });
-    // A click anywhere outside also dismisses it (added a tick later so the opening
-    // click does not immediately close it). dismiss() is idempotent; the contains(pop)
-    // guard means a stale listener left by a popup that was replaced (opening a second
-    // choice node removes the first via getElementById without calling its dismiss) no
-    // longer fires and cannot yank focus to the old anchor.
-    setTimeout(
-      () =>
-        document.addEventListener(
-          'click',
-          () => {
-            if (document.body.contains(pop)) dismiss(true);
-          },
-          { once: true },
-        ),
-      0,
-    );
-  }
-
-  private footerHtml(view: TalentsView): string {
-    const valid = view.valid;
+  // The WoW-style loadout bar: ONE compact dropdown button, bottom-left. The
+  // menu (built on demand by wireFooter) opens upward with the saved builds,
+  // save/new, import/export, and reset. Replaces the old two-card footer.
+  private footerHtml(_view: TalentsView): string {
+    const activeIdx = this.deps.activeLoadout();
+    const active = activeIdx >= 0 ? this.deps.loadouts()[activeIdx] : null;
+    const label = active ? active.name : t('hudChrome.talentRows.defaultLoadout');
     return (
       `<div class="tal-foot">` +
-      `<section class="tal-build-card tal-build-current" aria-label="${esc(t('game.talents.currentBuild'))}">` +
-      `<div class="tal-build-head"><span>${t('game.talents.currentBuild')}</span><span class="tal-loadslot"></span></div>` +
-      `<div class="tal-build-actions">` +
-      `<button class="btn tal-primary" data-act="save"${valid ? '' : ' disabled'}>${t('game.talents.saveBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="export">${t('game.talents.export')}</button>` +
-      `<button class="btn tal-secondary" data-act="del"${this.deps.activeLoadout() >= 0 ? '' : ' disabled'}>${t('game.talents.deleteBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="clear"${view.spent > 0 ? '' : ' disabled'}>${t('game.talents.clear')}</button>` +
-      `</div>` +
-      `<div class="tal-build-help">${t('game.talents.currentBuildHint')}</div>` +
-      `</section>` +
-      `<section class="tal-build-card tal-build-create" aria-label="${esc(t('game.talents.createBuild'))}">` +
-      `<div class="tal-build-head"><span>${t('game.talents.createBuild')}</span></div>` +
-      `<div class="tal-build-actions">` +
-      `<button class="btn tal-primary" data-act="new"${valid ? '' : ' disabled'}>${t('game.talents.newBuild')}</button>` +
-      `<button class="btn tal-secondary" data-act="import">${t('game.talents.import')}</button>` +
-      `</div>` +
-      `<div class="tal-build-help">${t('game.talents.createBuildHint')}</div>` +
-      `</section>` +
+      `<button type="button" class="tal-loadout-btn" data-act="loadout-menu"` +
+      ` aria-haspopup="menu" aria-expanded="false">` +
+      `<span class="tal-loadout-name">${esc(label)}</span>` +
+      `<span class="tal-loadout-caret" aria-hidden="true"></span>` +
+      `</button>` +
       `</div>`
     );
   }
 
   private wireFooter(el: HTMLElement, stage: TalentAllocation, total: number): void {
-    const cls = this.deps.playerClass();
-    el.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
-      stage.ranks = {};
-      stage.choices = {};
-      this.render();
+    const btn = el.querySelector<HTMLButtonElement>('[data-act="loadout-menu"]');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const existing = el.querySelector('.tal-loadout-menu');
+      if (existing) {
+        this.closeLoadoutMenu(el);
+        return;
+      }
+      this.openLoadoutMenu(el, btn, stage, total);
     });
+  }
+
+  private closeLoadoutMenu(el: HTMLElement): void {
+    el.querySelector('.tal-loadout-menu')?.remove();
+    el.querySelector('[data-act="loadout-menu"]')?.setAttribute('aria-expanded', 'false');
+    if (this.dismissLoadoutMenu) {
+      document.removeEventListener('pointerdown', this.dismissLoadoutMenu, true);
+      this.dismissLoadoutMenu = null;
+    }
+  }
+
+  // Build the upward WoW-style loadout menu: the saved builds (pick + delete),
+  // then save-current / new / import / export / reset. Every commit path is the
+  // same server-authoritative logic the old two-card footer used.
+  private openLoadoutMenu(
+    el: HTMLElement,
+    btn: HTMLButtonElement,
+    stage: TalentAllocation,
+    total: number,
+  ): void {
+    const cls = this.deps.playerClass();
+    const valid = validateAllocation(cls, stage, total).ok;
+    const spent = Object.values(stage.ranks).reduce((a, b) => a + b, 0);
+    const loadouts = this.deps.loadouts();
+    const activeIdx = this.deps.activeLoadout();
+
     const saveStagedBuild = (name: string): void => {
       const n = name.trim();
       if (!n) return;
@@ -642,104 +467,161 @@ export class TalentsWindow {
         onOk: saveStagedBuild,
       });
     };
-    el.querySelector('[data-act="save"]')?.addEventListener('click', () => {
-      if (!validateAllocation(cls, stage, total).ok) {
-        this.deps.showError(t('game.talents.buildInvalid'));
-        return;
-      }
-      const activeLoadout = this.deps.activeLoadout();
-      const active = activeLoadout >= 0 ? this.deps.loadouts()[activeLoadout] : null;
-      if (active) saveStagedBuild(active.name);
-      else promptNewBuild();
-    });
-    el.querySelector('[data-act="new"]')?.addEventListener('click', () => {
-      if (!validateAllocation(cls, stage, total).ok) {
-        this.deps.showError(t('game.talents.buildInvalid'));
-        return;
-      }
-      promptNewBuild();
-    });
-    // in-app loadout dropdown (shared component, no native <select>)
-    const slot = el.querySelector('.tal-loadslot');
-    if (slot) {
-      const loadouts = this.deps.loadouts();
-      const activeLoadout = this.deps.activeLoadout();
-      const opts = loadouts.length
-        ? loadouts.map((l, i) => ({ value: String(i), label: l.name }))
-        : [{ value: '-1', label: t('game.talents.noBuilds') }];
-      const current = activeLoadout >= 0 ? String(activeLoadout) : loadouts.length ? '' : '-1';
-      slot.replaceWith(
-        this.deps.buildDropdown(
-          opts,
-          current,
-          (v) => {
-            const i = parseInt(v, 10);
-            const lo = this.deps.loadouts()[i];
-            if (!lo) return;
-            this.deps.switchLoadout(i);
-            this.deps.applyLoadoutBar(lo.bar);
-            this.deps.setStage(cloneAllocation(lo.alloc));
+
+    const menu = document.createElement('div');
+    menu.className = 'tal-loadout-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', t('game.talents.loadouts'));
+
+    const item = (
+      label: string,
+      opts: { disabled?: boolean; cls?: string; onPick?: () => void },
+    ): HTMLButtonElement => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `tal-lo-item${opts.cls ? ` ${opts.cls}` : ''}`;
+      b.setAttribute('role', 'menuitem');
+      b.textContent = label;
+      if (opts.disabled) b.disabled = true;
+      if (opts.onPick) b.addEventListener('click', opts.onPick);
+      return b;
+    };
+
+    // Saved builds: pick applies (server re-validated), the X deletes.
+    if (loadouts.length === 0) {
+      const none = document.createElement('div');
+      none.className = 'tal-lo-empty';
+      none.textContent = t('game.talents.noBuilds');
+      menu.appendChild(none);
+    }
+    loadouts.forEach((lo, i) => {
+      const row = document.createElement('div');
+      row.className = `tal-lo-row${i === activeIdx ? ' active' : ''}`;
+      const pick = item(lo.name, {
+        cls: 'tal-lo-pick',
+        onPick: () => {
+          this.deps.switchLoadout(i);
+          this.deps.applyLoadoutBar(lo.bar);
+          this.deps.setStage(cloneAllocation(lo.alloc));
+          this.render();
+        },
+      });
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'tal-lo-del';
+      del.setAttribute('aria-label', `${t('game.talents.deleteBuild')}: ${lo.name}`);
+      del.innerHTML = svgIcon('close');
+      del.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeLoadoutMenu(el);
+        this.deps.confirmDialog(
+          t('game.talents.deleteBuildTitle'),
+          t('game.talents.deleteBuildBody', { name: lo.name }),
+          t('game.talents.deleteBuildConfirm'),
+          t('game.talents.cancel'),
+          () => {
+            this.deps.deleteLoadout(i);
             this.render();
           },
-          t('game.talents.loadouts'),
-          { ariaLabel: t('game.talents.loadouts') },
-        ),
-      );
-    }
-    el.querySelector('[data-act="del"]')?.addEventListener('click', () => {
-      const activeLoadout = this.deps.activeLoadout();
-      if (activeLoadout < 0) {
-        this.deps.showError(t('game.talents.selectBuildFirst'));
-        return;
-      }
-      const active = this.deps.loadouts()[activeLoadout];
-      if (!active) {
-        this.deps.showError(t('game.talents.selectBuildFirst'));
-        return;
-      }
-      const body = t('game.talents.deleteBuildBody', { name: active.name });
-      this.deps.confirmDialog(
-        t('game.talents.deleteBuildTitle'),
-        body,
-        t('game.talents.deleteBuildConfirm'),
-        t('game.talents.cancel'),
-        () => {
-          this.deps.deleteLoadout(this.deps.activeLoadout());
+        );
+      });
+      row.append(pick, del);
+      menu.appendChild(row);
+    });
+
+    const sep = document.createElement('div');
+    sep.className = 'tal-lo-sep';
+    menu.appendChild(sep);
+
+    menu.appendChild(
+      item(t('game.talents.saveBuild'), {
+        disabled: !valid,
+        onPick: () => {
+          this.closeLoadoutMenu(el);
+          const active = activeIdx >= 0 ? this.deps.loadouts()[activeIdx] : null;
+          if (active) saveStagedBuild(active.name);
+          else promptNewBuild();
+        },
+      }),
+    );
+    menu.appendChild(
+      item(t('game.talents.newBuild'), {
+        cls: 'tal-lo-new',
+        disabled: !valid,
+        onPick: () => {
+          this.closeLoadoutMenu(el);
+          promptNewBuild();
+        },
+      }),
+    );
+    menu.appendChild(
+      item(t('game.talents.import'), {
+        onPick: () => {
+          this.closeLoadoutMenu(el);
+          this.deps.inputDialog({
+            title: t('game.talents.import'),
+            label: t('game.talents.importPrompt'),
+            placeholder: 'eyJ2Ijox…',
+            multiline: true,
+            okText: t('game.talents.import'),
+            onOk: (str) => {
+              const res = importBuild(str.trim());
+              if (!res.ok || res.cls !== cls) {
+                this.deps.showError(t('game.talents.invalidBuild'));
+                return;
+              }
+              this.deps.setStage(res.alloc);
+              this.render();
+            },
+          });
+        },
+      }),
+    );
+    menu.appendChild(
+      item(t('game.talents.export'), {
+        onPick: () => {
+          this.closeLoadoutMenu(el);
+          const active = activeIdx >= 0 ? this.deps.loadouts()[activeIdx] : null;
+          this.deps.inputDialog({
+            title: t('game.talents.export'),
+            label: t('game.talents.exportTitle'),
+            value: exportBuild(cls, active?.alloc ?? stage),
+            multiline: true,
+            readOnly: true,
+            copy: true,
+            cancelText: t('game.talents.close'),
+          });
+        },
+      }),
+    );
+    menu.appendChild(
+      item(t('game.talents.clear'), {
+        disabled: spent === 0,
+        onPick: () => {
+          stage.ranks = {};
+          stage.choices = {};
           this.render();
         },
-      );
+      }),
+    );
+
+    btn.parentElement?.appendChild(menu);
+    btn.setAttribute('aria-expanded', 'true');
+    (menu.querySelector('.tal-lo-item, .tal-lo-pick') as HTMLElement | null)?.focus();
+    menu.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Escape') {
+        e.stopPropagation();
+        this.closeLoadoutMenu(el);
+        btn.focus();
+      }
     });
-    el.querySelector('[data-act="export"]')?.addEventListener('click', () => {
-      const activeLoadout = this.deps.activeLoadout();
-      const active = activeLoadout >= 0 ? this.deps.loadouts()[activeLoadout] : null;
-      this.deps.inputDialog({
-        title: t('game.talents.export'),
-        label: t('game.talents.exportTitle'),
-        value: exportBuild(cls, active?.alloc ?? stage),
-        multiline: true,
-        readOnly: true,
-        copy: true,
-        cancelText: t('game.talents.close'),
-      });
-    });
-    el.querySelector('[data-act="import"]')?.addEventListener('click', () => {
-      this.deps.inputDialog({
-        title: t('game.talents.import'),
-        label: t('game.talents.importPrompt'),
-        placeholder: 'eyJ2Ijox…',
-        multiline: true,
-        okText: t('game.talents.import'),
-        onOk: (str) => {
-          const res = importBuild(str.trim());
-          if (!res.ok || res.cls !== cls) {
-            this.deps.showError(t('game.talents.invalidBuild'));
-            return;
-          }
-          this.deps.setStage(res.alloc);
-          this.render();
-        },
-      });
-    });
+    // Dismiss on any pointer press outside the menu/button (capture phase so a
+    // click that also opens something else still closes this menu first).
+    this.dismissLoadoutMenu = (e: Event) => {
+      const target = e.target as Node;
+      if (!menu.contains(target) && !btn.contains(target)) this.closeLoadoutMenu(el);
+    };
+    document.addEventListener('pointerdown', this.dismissLoadoutMenu, true);
   }
 
   private keyboardActivate(e: KeyboardEvent, action: () => void): void {

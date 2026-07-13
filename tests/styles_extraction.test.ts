@@ -140,6 +140,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
   it('flips Vite to the Lightning CSS transformer with browserslist-derived targets', () => {
     expect(viteConfig).toContain("transformer: 'lightningcss'");
     expect(viteConfig).toContain('browserslistToTargets');
-    expect(viteConfig).toContain('loadBrowserslistFloors');
+    // pr/1320 inlines the parser as parseBrowserslistFloors; accept either wiring.
+    expect(viteConfig).toMatch(/loadBrowserslistFloors|parseBrowserslistFloors/);
   });
 });

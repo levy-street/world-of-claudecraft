@@ -400,6 +400,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'applyTalents',
   'respec',
   'setSpec',
+  'pickRowTalent',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',
@@ -693,6 +694,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
+  if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held item model (render-only)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -794,6 +796,12 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  // A player's/bot's SELECTED target (mobs use aggroTargetId above): rides so the
+  // client can render the target-of-target frame for a PLAYER target, exactly as
+  // `aggro` already enables it for a mob/pet target. Emitted only for an entity that
+  // HAS a target (players/bots in combat), so idle mobs (targetId stays null) add
+  // nothing. The SELF record still carries its own precise `target` field.
+  if (e.targetId !== null) out.tgt = e.targetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
@@ -3121,7 +3129,16 @@ export class GameServer {
         }
         break;
       case 'cast':
-        if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid);
+        if (typeof msg.ability === 'string') {
+          // Optional mouseover-cast override: an explicit friendly-target id.
+          // The sim validates it (friendly, alive, in range) and falls back to
+          // the classic current-target-else-self resolution when invalid.
+          if (typeof msg.target === 'number') {
+            sim.castAbilityOn(msg.ability, msg.target | 0, pid);
+          } else {
+            sim.castAbility(msg.ability, pid);
+          }
+        }
         break;
       case 'cancel_aura':
         if (typeof msg.aura === 'string') sim.cancelAura(msg.aura, pid);
@@ -3679,6 +3696,17 @@ export class GameServer {
       case 'setSpec':
         sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);
         break;
+      // Choice-row talents: the pick is re-validated inside the Sim (level gate,
+      // row membership, out-of-combat lock). Fields type-checked + length-capped.
+      case 'pickRowTalent': {
+        const row = typeof msg.row === 'number' ? msg.row | 0 : -1;
+        const option =
+          typeof msg.option === 'string' && msg.option.length <= 64 ? msg.option : null;
+        if (row >= 0 && (option !== null || msg.option === null)) {
+          sim.pickRowTalent(row, option, pid);
+        }
+        break;
+      }
       case 'saveLoadout': {
         const alloc = talentAllocationFromWire(msg.alloc) ?? undefined;
         if (typeof msg.name === 'string')
@@ -4268,6 +4296,7 @@ export class GameServer {
       dodge: p.dodgeChance,
       crat: p.critRating,
       hrat: p.hasteRating,
+      parry: p.parryChance,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
@@ -4306,6 +4335,13 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
+    // Charge-limited ability stored-use counts (Double Charge): {abilityId:
+    // spent}. The recharge timer itself rides `cds`; the client derives the
+    // max from its own talent rebake. Empty for everyone untalented.
+    maybe(
+      'chg',
+      p.charges ? Object.fromEntries([...p.charges.entries()].map(([k, v]) => [k, v.spent])) : {},
+    );
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));
@@ -4388,6 +4424,7 @@ export class GameServer {
         role: meta.talentMods.role,
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
+        rowPicks: meta.rowPicks,
       });
       // Vale Cup sport-kit flag ({ role } | null): while set, the client's
       // action bar rebuilds the role kit instead of the class kit. Rides the
@@ -4420,6 +4457,10 @@ export class GameServer {
                 level: e.level,
                 hp: e.hp,
                 mhp: e.maxHp,
+                absorb: e.auras.reduce(
+                  (sum, aura) => sum + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+                  0,
+                ),
                 res: Math.round(e.resource),
                 mres: e.maxResource,
                 rtype: e.resourceType,

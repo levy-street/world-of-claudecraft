@@ -80,6 +80,13 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
     }
+    case 'aoeHeal':
+      // AoE heals take the same per-target coefficient penalty as aoeDamage.
+      return directHealBonus(scaling.spellPower, res.castTime, true);
+    case 'consumeAura':
+      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
+      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      return 0;
     case 'drainTick':
       return channelTickBonus(power, def);
     case 'dot': {
@@ -113,11 +120,15 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
     (eff) =>
       eff.type === 'directDamage' ||
       eff.type === 'heal' ||
+      eff.type === 'chainHeal' ||
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
+      // Heroic Leap: the landing blast is nested in repositionToAim.landingAoe
+      // (fired on touchdown), so $d reads that when present.
+      (eff.type === 'repositionToAim' && eff.landingAoe != null) ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
@@ -149,7 +160,10 @@ export function abilityOverTimeEffect(
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    if (eff.type === 'aoeAttackPower') return eff.amount;
+    // aoeAttackPower reads its flat `amount`, or a `pct` reduction as a whole
+    // percent (Direhowl's 0.2 -> 20 for the "{buff}%" tooltip).
+    if (eff.type === 'aoeAttackPower')
+      return eff.amount ?? (eff.pct != null ? eff.pct * 100 : null);
   }
   return null;
 }

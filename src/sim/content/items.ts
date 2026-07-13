@@ -901,6 +901,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
     buyValue: 1400,
   },
+  eastbrook_greatsword: {
+    id: 'eastbrook_greatsword',
+    name: 'Eastbrook Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    // Two-handers trade the offhand (no shield, no dual wield) for a slow, heavy
+    // swing at a 10 to 15% DPS premium over the one-hand whites of the same stock.
+    weapon: { min: 9, max: 15, speed: 3.4 },
+    sellValue: 160,
+    buyValue: 1600,
+  },
   vale_carving_knife: {
     id: 'vale_carving_knife',
     name: 'Vale Carving Knife',
@@ -921,6 +934,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1 },
     sellValue: 150,
     buyValue: 1500,
+  },
+  eastbrook_buckler: {
+    id: 'eastbrook_buckler',
+    name: 'Eastbrook Buckler',
+    kind: 'shield',
+    slot: 'offhand',
+    blockValue: 6,
+    quality: 'common',
+    stats: { armor: 34, sta: 1 },
+    sellValue: 130,
+    buyValue: 1300,
+    requiredClass: WAR,
   },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',

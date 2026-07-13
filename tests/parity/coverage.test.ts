@@ -879,4 +879,29 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   });
+
+  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+    const rec = run('warrior_row_capstones');
+    const sim = rec.sim as any;
+    const pid = sim.playerId;
+    const ev = rec.allEvents as Ev[];
+    // Double Charge: BOTH stored uses were spent while one recharge timer ran;
+    // the classic single-cooldown gate would have blocked cast #2.
+    expect(rec.notes.chargeSpent).toBe(2);
+    expect(rec.notes.chargeRecharging).toBe(true);
+    // Intimidating Shout feared a wolf; Lingering Dread armed its threshold.
+    const feared = entities(rec).find((e) =>
+      e.auras?.some((a: any) => a.id === 'fear_incap'),
+    ) as any;
+    expect(feared).toBeTruthy();
+    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
+    expect(fear.breaksOnDamage).toBe(true);
+    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // Victory Rush: the on-kill strike healed the player.
+    expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
+      true,
+    );
+    // Bladestorm: the self-centered channel pulsed damage.
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
+  });
 });

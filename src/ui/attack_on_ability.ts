@@ -28,31 +28,62 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
+  aoeHeal: 'other',
   groundAoE: 'damage',
   aoeRoot: 'damage',
+  consumeAura: 'other',
   drainTick: 'damage',
   judgement: 'damage',
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
+  chainHeal: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
   lifeTap: 'other',
   buffTarget: 'other',
+  // Breachmaker's source-scoped vulnerability debuff is a non-breaking amp; the
+  // ability's paired weaponStrike is what classifies it as an attack.
+  debuffTargetSource: 'other',
   slow: 'other',
   root: 'other',
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
+  // Choice-row talents: an AoE slow is a non-breaking snare; the Avatar
+  // control-break and the Sanguine party buff are pure utility.
+  aoeSlow: 'other',
+  // Fear BREAKS on damage: an auto swing would shatter it (see 'breakCC').
+  aoeFear: 'breakCC',
+  breakControl: 'other',
+  partyMeleeBuff: 'other',
+  // PR #1348 base-kit rescues: the leap's relocation is utility (its
+  // aoeDamage rider classifies the ability); the rallying AP buff likewise.
+  repositionToAim: 'other',
+  aoeAllyAttackPower: 'other',
+  aoeAllyMaxHp: 'other',
+  // Fury support cooldowns: the group guaranteed-crit buff and the self
+  // HoT are both pure utility, never an attack.
+  aoeAllySureCrit: 'other',
+  selfHotPctMax: 'other',
   selfBuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
+  // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's
+  // weaponStrikes classify it).
+  enrageChance: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
+  selfHealPctMax: 'other',
   charge: 'other',
   sunder: 'other',
   faerieFire: 'other',
+  // Prot kit: the Iron Resolve absorb shield is pure utility; the Defiant
+  // Bellow aoe taunt already forces the mobs onto the caster, no swing needed
+  // to engage (mirrors the single-target 'taunt' classification).
+  absorbSpentResource: 'other',
+  aoeTaunt: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',
@@ -80,7 +111,7 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   for (const e of effects) {
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
-    if (cls === 'damage') damaging = true;
+    if (cls === 'damage' || (e.type === 'consumeAura' && e.deal !== undefined)) damaging = true;
   }
   return damaging;
 }

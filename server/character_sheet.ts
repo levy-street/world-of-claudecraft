@@ -14,7 +14,11 @@
 // the talents specLabel, virtualLevel via the types helper.
 
 import {
-  computeTalentModifiers,
+  computeModifiersWithRows,
+  rowTreeFor,
+  sanitizeRowPicks,
+} from '../src/sim/content/talent_rows';
+import {
   emptyAllocation,
   specLabel,
   type TalentAllocation,
@@ -125,7 +129,11 @@ function normalizeAllocation(state: CharacterState): TalentAllocation {
 
 function talentMods(cls: PlayerClass, state: CharacterState): TalentModifiers | undefined {
   try {
-    return computeTalentModifiers(cls, normalizeAllocation(state));
+    // The REAL build: point tree + choice-row picks, matching the in-game bake
+    // (addPlayer/recomputeTalents). Picks come straight from persisted state, so
+    // they get the same sanitize (unknown ids and above-level rows dropped).
+    const picks = sanitizeRowPicks(rowTreeFor(cls), state.rowPicks, state.level ?? 1);
+    return computeModifiersWithRows(cls, normalizeAllocation(state), picks);
   } catch {
     return undefined; // never let a malformed allocation break a public read
   }

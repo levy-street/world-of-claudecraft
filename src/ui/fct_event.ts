@@ -18,8 +18,8 @@ import type { FctKind } from './fct_core';
 export type FctSpawnSource =
   | {
       readonly type: 'damage';
-      /** The damage event's kind: an avoidance word (miss/dodge/resist) or a landed hit. */
-      readonly damageKind: 'miss' | 'dodge' | 'resist' | 'hit';
+      /** The damage event's kind: an avoidance word (miss/dodge/parry/resist) or a landed hit. */
+      readonly damageKind: 'miss' | 'dodge' | 'parry' | 'resist' | 'hit';
       /** Whether an ability fired (a landed hit splits damage-done into -ability vs -auto). */
       readonly ability: boolean;
       readonly crit: boolean;
@@ -49,8 +49,18 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
   switch (src.type) {
     case 'damage': {
       // Avoidance words always float; self vs other only flips the colour token.
-      if (src.damageKind === 'miss' || src.damageKind === 'dodge' || src.damageKind === 'resist')
-        return { kind: src.damageKind, isSelf: src.isPlayerTarget, crit: false };
+      // Parry reuses the dodge colour token (its own word is spread on at the call site).
+      if (
+        src.damageKind === 'miss' ||
+        src.damageKind === 'dodge' ||
+        src.damageKind === 'parry' ||
+        src.damageKind === 'resist'
+      )
+        return {
+          kind: src.damageKind === 'parry' ? 'dodge' : src.damageKind,
+          isSelf: src.isPlayerTarget,
+          crit: false,
+        };
       // A landed hit: the player dealing it (and not to itself) floats damage-done; the
       // player taking it floats damage-taken; a hit between two non-player entities floats
       // nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ... else if

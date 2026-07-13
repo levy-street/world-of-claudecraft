@@ -1520,6 +1520,10 @@ async function startGame(
       );
       return;
     }
+    if (key === 'showTargetOfTarget') {
+      hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
+      return;
+    }
     if (key === 'showDailyRewardsChest') {
       hud.setDailyRewardsChestButtonVisible(settings.set('showDailyRewardsChest', !!value));
       return;
@@ -4383,6 +4387,7 @@ function charselectAppearance(c: CharacterSummary): PreviewAppearance {
     skin: c.skin ?? 0,
     skinCatalog: c.skinCatalog ?? 'class',
     mainhandItemId: c.mainhandItemId ?? null,
+    offhandItemId: c.offhandItemId ?? null,
   };
 }
 
@@ -4547,11 +4552,20 @@ function renderClassDetails(
         }
       }
       const abilityName = tEntity({ kind: 'ability', id: a.id, field: 'name' });
+      // {rage}: base (rank 1) gainResource total, mirroring the in-game tooltip
+      // splice (Blood Toll's "Generates {rage} rage ...").
+      const rageGained = a.effects.reduce(
+        (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
+        0,
+      );
       const resolvedDesc = tEntity({
         kind: 'ability',
         id: a.id,
         field: 'description',
-        values: { damage: dmgText },
+        values: {
+          damage: dmgText,
+          rage: rageGained > 0 ? formatClassDetailNumber(rageGained) : '',
+        },
       });
 
       return `

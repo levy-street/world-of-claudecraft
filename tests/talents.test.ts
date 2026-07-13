@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
+  ABILITIES,
+  abilitiesKnownAt,
+  CLASSES,
+  type KnownAbility,
+} from '../src/sim/content/classes';
+import type { ChoiceRowOption } from '../src/sim/content/talent_rows';
+import {
+  type ClassTalents,
   computeTalentModifiers,
   dormantNodes,
   emptyAllocation,
@@ -14,15 +21,28 @@ import {
   TALENT_BUILD_VERSION,
   TALENTS,
   type TalentAllocation,
+  type TalentEffect,
   talentPointsAtLevel,
   talentsFor,
   validateAllocation,
   validateTalentTree,
 } from '../src/sim/content/talents';
+import { WARRIOR_ROWS } from '../src/sim/content/warrior_rows';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, dist2d, MAX_LEVEL } from '../src/sim/types';
+import {
+  type AbilityEffect,
+  ALL_CLASSES,
+  dist2d,
+  type Entity,
+  emptyMoveInput,
+  MAX_LEVEL,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
-import { talentChoiceIconRef, talentNodeIconRef } from '../src/ui/talent_icons';
+import {
+  talentChoiceIconRef,
+  talentEffectIconRef,
+  talentNodeIconRef,
+} from '../src/ui/talent_icons';
 
 const alloc = (over: Partial<TalentAllocation> = {}): TalentAllocation => ({
   ...emptyAllocation(),
@@ -35,9 +55,30 @@ function warriorAtCap(seed = 7): Sim {
   return sim;
 }
 
-function nearestMob(sim: Sim) {
-  let best: any = null,
-    bestD = Infinity;
+function requireValue<T>(value: T | null | undefined, message: string): T {
+  expect(value, message).toBeTruthy();
+  if (value == null) throw new Error(message);
+  return value;
+}
+
+function requireTree(cls: (typeof ALL_CLASSES)[number]): ClassTalents {
+  return requireValue(talentsFor(cls), `Missing talent tree for ${cls}`);
+}
+
+function requireMeta(sim: Sim, pid: number) {
+  return requireValue(sim.meta(pid), `Missing player meta for ${pid}`);
+}
+
+function requireKnown(known: readonly KnownAbility[], id: string): KnownAbility {
+  return requireValue(
+    known.find((k) => k.def.id === id),
+    `Missing known ability ${id}`,
+  );
+}
+
+function nearestMob(sim: Sim): Entity {
+  let best: Entity | null = null;
+  let bestD = Infinity;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
     const d = dist2d(sim.player.pos, e.pos);
@@ -46,47 +87,97 @@ function nearestMob(sim: Sim) {
       best = e;
     }
   }
-  return best;
+  return requireValue(best, 'Expected a nearby mob');
 }
 
-const effOf = (k: any, i = 0) => k.effects[i] as any;
+const effOf = (k: Pick<KnownAbility, 'effects'> | undefined, i = 0): AbilityEffect =>
+  requireValue(requireValue(k, 'Missing known ability').effects[i], `Missing effect ${i}`);
+
+function effectOfType<TType extends AbilityEffect['type']>(
+  k: Pick<KnownAbility, 'effects'> | undefined,
+  type: TType,
+  i = 0,
+): Extract<AbilityEffect, { type: TType }> {
+  const effect = effOf(k, i);
+  expect(effect.type).toBe(type);
+  if (effect.type !== type) {
+    throw new Error(`Expected effect type ${type}, got ${effect.type}`);
+  }
+  return effect as Extract<AbilityEffect, { type: TType }>;
+}
+
+// Resolve a spec-gated ability's RAW (unmodified) effects: a grant bypasses the
+// spec filter (spec-gating 2026-07-07) without applying any spec mastery, so the
+// resolved effect is the pristine base to snapshot against.
+const grantMods = (ability: string) => {
+  const m = computeTalentModifiers('warrior', alloc());
+  m.grants.push({ ability, rank: 1 });
+  return m;
+};
 
 describe('talent tree validation (load-time)', () => {
   it('every registered tree is structurally valid', () => {
     for (const ct of Object.values(TALENTS)) {
-      expect(ct).toBeTruthy();
-      expect(validateTalentTree(ct!)).toEqual([]);
+      expect(validateTalentTree(requireValue(ct, 'Missing registered talent tree'))).toEqual([]);
     }
   });
 
   it('registers all playable classes with populated class and spec trees', () => {
     for (const cls of ALL_CLASSES) {
-      const ct = talentsFor(cls);
-      expect(ct, cls).toBeTruthy();
-      expect(ct!.specs, cls).toHaveLength(3);
-      expect(ct!.nodes.filter((n) => n.tree === 'class').length, cls).toBeGreaterThanOrEqual(7);
-      for (const s of ct!.specs) {
+      const ct = requireTree(cls);
+      expect(ct.specs, cls).toHaveLength(3);
+      expect(ct.nodes.filter((n) => n.tree === 'class').length, cls).toBeGreaterThanOrEqual(7);
+      for (const s of ct.specs) {
+        // Arms sits at 5 nodes since the obsolete Improved Brute Swing was
+        // removed (Brute Swing is instant now, so its cast-time reduction did
+        // nothing); every other spec keeps the 6-node floor.
+        const floor = cls === 'warrior' && s.id === 'arms' ? 5 : 6;
         expect(
-          ct!.nodes.filter((n) => n.tree === 'spec' && n.specId === s.id).length,
+          ct.nodes.filter((n) => n.tree === 'spec' && n.specId === s.id).length,
           `${cls}:${s.id}`,
-        ).toBeGreaterThanOrEqual(6);
+        ).toBeGreaterThanOrEqual(floor);
       }
     }
   });
 
+  it('no longer carries the obsolete Improved Brute Swing node (slam is instant)', () => {
+    // arms_imp_slam reduced the cast time of slam, which is instant by owner
+    // decision, so the node was removed. Nothing may still require it.
+    const ct = requireTree('warrior');
+    expect(ct.nodes.some((n) => n.id === 'arms_imp_slam')).toBe(false);
+    expect(ct.nodes.some((n) => (n.requires ?? []).includes('arms_imp_slam'))).toBe(false);
+  });
+
   it('references only abilities that exist', () => {
     for (const cls of ALL_CLASSES) {
-      const ct = talentsFor(cls)!;
+      const ct = requireTree(cls);
       for (const s of ct.specs)
         expect(ABILITIES[s.signature], `${cls}:${s.id}:${s.signature}`).toBeTruthy();
       for (const node of ct.nodes) {
-        const effects = [node.effect, ...(node.choices ?? []).map((c) => c.effect)].filter(Boolean);
+        const effects = [node.effect, ...(node.choices ?? []).map((c) => c.effect)].filter(
+          (eff): eff is TalentEffect => Boolean(eff),
+        );
         for (const eff of effects) {
-          if (eff!.grant)
-            expect(ABILITIES[eff!.grant.ability], `${node.id}:${eff!.grant.ability}`).toBeTruthy();
-          for (const mod of eff!.ability ?? [])
+          if (eff.grant)
+            expect(ABILITIES[eff.grant.ability], `${node.id}:${eff.grant.ability}`).toBeTruthy();
+          for (const mod of eff.ability ?? [])
             expect(ABILITIES[mod.ability], `${node.id}:${mod.ability}`).toBeTruthy();
         }
+      }
+    }
+  });
+
+  it('keeps every spec signature grant-only', () => {
+    const kitAbilities = new Set<string>();
+    for (const cls of ALL_CLASSES) {
+      for (const abilityId of CLASSES[cls].abilities) kitAbilities.add(abilityId);
+    }
+
+    for (const cls of ALL_CLASSES) {
+      const ct = requireTree(cls);
+      for (const s of ct.specs) {
+        expect(ABILITIES[s.signature], `${cls}:${s.id}:${s.signature}`).toBeTruthy();
+        expect(kitAbilities.has(s.signature), `${cls}:${s.id}:${s.signature}`).toBe(false);
       }
     }
   });
@@ -94,7 +185,7 @@ describe('talent tree validation (load-time)', () => {
   it('derives painted icons for the release v0.7 class talent trees', () => {
     const affected = ['shaman', 'hunter', 'druid', 'paladin', 'rogue', 'mage', 'warlock'] as const;
     for (const cls of affected) {
-      const ct = talentsFor(cls)!;
+      const ct = requireTree(cls);
       for (const node of ct.nodes) {
         const nodeIcon = talentNodeIconRef(node);
         expect(nodeIcon.kind, `${cls}:${node.id}`).toMatch(/^(ability|crest)$/);
@@ -108,10 +199,59 @@ describe('talent tree validation (load-time)', () => {
     }
   });
 
+  it('maps the warrior Bloodbath row to its custom image-backed icon id', () => {
+    const choice = requireValue(
+      WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_bloodbath'),
+      'Missing warrior Bloodbath row',
+    );
+    expect(talentEffectIconRef(choice.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'bloodbath',
+    });
+  });
+
+  it('maps the warrior global-only row talents to their custom image-backed icon ids', () => {
+    const byId = (id: string): ChoiceRowOption =>
+      requireValue(
+        WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === id),
+        `Missing warrior row option ${id}`,
+      );
+    const secondWind = byId('war_row_second_wind');
+    const colossalMight = byId('war_row_colossal_might');
+    const pursuit = byId('war_row_pursuit');
+    const lingeringDread = byId('war_row_lingering_dread');
+    const angerManagement = byId('war_row_anger_management');
+    const battleRhythm = byId('war_row_battle_rhythm');
+    expect(talentEffectIconRef(secondWind.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'second_wind',
+    });
+    expect(talentEffectIconRef(colossalMight.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'colossal_might',
+    });
+    expect(talentEffectIconRef(pursuit.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'pursuit',
+    });
+    expect(talentEffectIconRef(lingeringDread.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'lingering_dread',
+    });
+    expect(talentEffectIconRef(angerManagement.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'anger_management',
+    });
+    expect(talentEffectIconRef(battleRhythm.effect, 'choice')).toEqual({
+      kind: 'ability',
+      id: 'battle_rhythm',
+    });
+  });
+
   it('detects cycles in the requires graph', () => {
     const broken = {
       class: 'warrior' as const,
-      specs: talentsFor('warrior')!.specs,
+      specs: requireTree('warrior').specs,
       nodes: [
         {
           id: 'a',
@@ -149,7 +289,7 @@ describe('talent tree validation (load-time)', () => {
   it('flags prereqs that reference a missing node', () => {
     const broken = {
       class: 'warrior' as const,
-      specs: talentsFor('warrior')!.specs,
+      specs: requireTree('warrior').specs,
       nodes: [
         {
           id: 'a',
@@ -288,12 +428,14 @@ describe('precomputed modifiers', () => {
     expect(mods.spec).toBe('arms');
     expect(mods.role).toBe('dps');
     expect(mods.grants.some((g) => g.ability === 'mortal_strike')).toBe(true);
-    expect(mods.global.meleeDmgPct).toBeCloseTo(0.1); // Sharpened Blades mastery
+    // Master Armorer applies its +10% at HIT time (2H-gated, combat/damage.ts), not
+    // as a baked ability mod, so the precomputed melee mult stays 0.
+    expect(mods.global.meleeDmgPct).toBe(0);
   });
 
   it('makes every chosen spec signature available at the first talent level', () => {
     for (const cls of ALL_CLASSES) {
-      const ct = talentsFor(cls)!;
+      const ct = requireTree(cls);
       for (const s of ct.specs) {
         const known = abilitiesKnownAt(
           cls,
@@ -302,6 +444,21 @@ describe('precomputed modifiers', () => {
         );
         expect(
           known.some((k) => k.def.id === s.signature),
+          `${cls}:${s.id}:${s.signature}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('grants every chosen spec signature through the sim known set', () => {
+    for (const cls of ALL_CLASSES) {
+      const ct = requireTree(cls);
+      for (const s of ct.specs) {
+        const sim = new Sim({ seed: 9, playerClass: cls });
+        sim.setPlayerLevel(FIRST_TALENT_LEVEL);
+        expect(sim.setSpec(s.id), `${cls}:${s.id}`).toBe(true);
+        expect(
+          sim.known.some((k) => k.def.id === s.signature),
           `${cls}:${s.id}:${s.signature}`,
         ).toBe(true);
       }
@@ -317,39 +474,52 @@ describe('precomputed modifiers', () => {
   });
 
   it('applies ability modifiers to shields, buffs, and imbues, not only damage spells', () => {
-    const shield = abilitiesKnownAt(
-      'priest',
-      10,
-      computeTalentModifiers(
+    const shield = requireKnown(
+      abilitiesKnownAt(
         'priest',
-        alloc({ spec: 'discipline', ranks: { disc_twin_disciplines: 1 } }),
+        10,
+        computeTalentModifiers(
+          'priest',
+          alloc({ spec: 'discipline', ranks: { disc_twin_disciplines: 1 } }),
+        ),
       ),
-    ).find((k) => k.def.id === 'power_word_shield')!;
-    expect(effOf(shield).amount).toBe(56); // 48 * (1 + 8% mastery + 8% talent)
+      'power_word_shield',
+    );
+    expect(effectOfType(shield, 'absorb').amount).toBe(56); // 48 * (1 + 8% mastery + 8% talent)
 
-    const fort = abilitiesKnownAt(
-      'priest',
-      20,
-      computeTalentModifiers('priest', alloc({ ranks: { pri_imp_fortitude: 2 } })),
-    ).find((k) => k.def.id === 'power_word_fortitude')!;
-    expect(effOf(fort).value).toBe(7); // 5% stamina * 1.40 (percent-points survive the round)
+    const fort = requireKnown(
+      abilitiesKnownAt(
+        'priest',
+        20,
+        computeTalentModifiers('priest', alloc({ ranks: { pri_imp_fortitude: 2 } })),
+      ),
+      'power_word_fortitude',
+    );
+    // buff_sta_pct base 5% raised +40% by pri_imp_fortitude r2 (percent-points survive the round)
+    expect(effectOfType(fort, 'buffTarget').value).toBe(7); // 5% stamina * 1.40
 
-    const demonSkin = abilitiesKnownAt(
-      'warlock',
-      20,
-      computeTalentModifiers('warlock', alloc({ ranks: { wlk_demonic_skin: 2 } })),
-    ).find((k) => k.def.id === 'demon_skin')!;
-    expect(effOf(demonSkin).value).toBe(112); // 80 armor * 1.40
+    const demonSkin = requireKnown(
+      abilitiesKnownAt(
+        'warlock',
+        20,
+        computeTalentModifiers('warlock', alloc({ ranks: { wlk_demonic_skin: 2 } })),
+      ),
+      'demon_skin',
+    );
+    expect(effectOfType(demonSkin, 'selfBuff').value).toBe(112); // 80 armor * 1.40
 
-    const seal = abilitiesKnownAt(
-      'paladin',
-      20,
-      computeTalentModifiers(
+    const seal = requireKnown(
+      abilitiesKnownAt(
         'paladin',
-        alloc({ spec: 'retribution', ranks: { ret_seal_command: 2 } }),
+        20,
+        computeTalentModifiers(
+          'paladin',
+          alloc({ spec: 'retribution', ranks: { ret_seal_command: 2 } }),
+        ),
       ),
-    ).find((k) => k.def.id === 'seal_of_righteousness')!;
-    expect(effOf(seal)).toMatchObject({ bonus: 16, judgeMin: 44, judgeMax: 64 }); // mastery + 2 talent ranks
+      'seal_of_righteousness',
+    );
+    expect(effectOfType(seal, 'imbue')).toMatchObject({ bonus: 16, judgeMin: 44, judgeMax: 64 }); // mastery + 2 talent ranks
   });
 });
 
@@ -424,12 +594,12 @@ describe('Sim integration — passive talents', () => {
   it('persists talents across serialize -> addPlayer (JSONB round-trip, no migration)', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms', ranks: { war_cruelty: 2, arms_imp_overpower: 2 } }));
-    const state = sim.serializeCharacter(sim.playerId)!;
+    const state = requireValue(sim.serializeCharacter(sim.playerId), 'Missing serialized state');
     expect(state.talents).toBeTruthy();
 
     const sim2 = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Reloaded', { state });
-    const meta = sim2.meta(pid)!;
+    const meta = requireMeta(sim2, pid);
     expect(meta.talents.spec).toBe('arms');
     expect(meta.talents.ranks.war_cruelty).toBe(2);
     expect(meta.talents.ranks.arms_imp_overpower).toBe(2);
@@ -441,7 +611,7 @@ describe('Sim integration — passive talents', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms', ranks: { war_cruelty: 2, arms_imp_overpower: 2 } }));
     expect(sim.setSpec('fury')).toBe(true);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = requireMeta(sim, sim.playerId);
     expect(meta.talents.spec).toBe('fury');
     expect(meta.talents.ranks.arms_imp_overpower).toBeUndefined(); // pruned
     expect(meta.talents.ranks.war_cruelty).toBe(2); // class tree kept
@@ -464,74 +634,80 @@ describe('Sim integration — active talents & ability modifiers', () => {
     expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(false); // Arms signature gone
   });
 
-  it('gates specialization choice to the first talent level', () => {
+  it('gates specialization to the spec-unlock level (5): blocked at 4, allowed at 5', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
-    sim.setPlayerLevel(5);
-    expect(sim.setSpec('arms')).toBe(false);
+    sim.setPlayerLevel(4);
+    expect(sim.setSpec('arms')).toBe(false); // below SPEC_UNLOCK_LEVEL
     expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(false);
+    // Spec unlocks at level 5, even though talent POINTS still start at 10.
+    sim.setPlayerLevel(5);
+    expect(sim.setSpec('arms')).toBe(true);
+    expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(true); // signature granted
   });
 
   it('snapshot-locks Overpower damage before/after Improved Overpower (+ Arms mastery)', () => {
-    const baseBonus = effOf(
-      abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'overpower'),
+    const baseBonus = effectOfType(
+      abilitiesKnownAt('warrior', 20, grantMods('overpower')).find((k) => k.def.id === 'overpower'),
+      'weaponStrike',
     ).bonus;
     const mods = computeTalentModifiers(
       'warrior',
       alloc({ spec: 'arms', ranks: { arms_imp_overpower: 2 } }),
     );
-    const buffed = effOf(
+    const buffed = effectOfType(
       abilitiesKnownAt('warrior', 20, mods).find((k) => k.def.id === 'overpower'),
+      'weaponStrike',
     ).bonus;
-    // Arms mastery (+10% melee) + Improved Overpower r2 (+50%) => x1.60
-    expect(buffed).toBe(Math.round(baseBonus * 1.6));
+    // Improved Overpower r2 (+50%) => x1.50. Master Armorer's +10% is now hit-time
+    // (2H-gated), so it no longer bakes into the precomputed ability bonus.
+    expect(buffed).toBe(Math.round(baseBonus * 1.5));
     expect(buffed).toBeGreaterThan(baseBonus);
     // shared content data must NOT be mutated by the modifier pass
-    const baseAgain = effOf(
-      abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'overpower'),
+    const baseAgain = effectOfType(
+      abilitiesKnownAt('warrior', 20, grantMods('overpower')).find((k) => k.def.id === 'overpower'),
+      'weaponStrike',
     ).bonus;
     expect(baseAgain).toBe(baseBonus);
   });
 
   it('snapshot-locks Heroic Strike cost before/after Improved Heroic Strike', () => {
-    const baseCost = abilitiesKnownAt('warrior', 20).find(
-      (k) => k.def.id === 'heroic_strike',
-    )!.cost;
+    const baseCost = requireKnown(abilitiesKnownAt('warrior', 20), 'heroic_strike').cost;
     const mods = computeTalentModifiers(
       'warrior',
       alloc({ ranks: { war_toughness: 1, war_imp_heroic_strike: 2 } }),
     );
-    const cost = abilitiesKnownAt('warrior', 20, mods).find(
-      (k) => k.def.id === 'heroic_strike',
-    )!.cost;
+    const cost = requireKnown(abilitiesKnownAt('warrior', 20, mods), 'heroic_strike').cost;
     expect(cost).toBe(Math.round(baseCost * 0.8)); // -20%
   });
 
   it('applies cooldown and cast-time modifiers', () => {
-    const taunt = abilitiesKnownAt(
-      'warrior',
-      20,
-      computeTalentModifiers(
+    const taunt = requireKnown(
+      abilitiesKnownAt(
         'warrior',
-        alloc({
-          spec: 'prot',
-          ranks: { prot_choice: 1 },
-          choices: { prot_choice: 'pc_imp_taunt' },
-        }),
+        20,
+        computeTalentModifiers(
+          'warrior',
+          alloc({
+            spec: 'prot',
+            ranks: { prot_choice: 1 },
+            choices: { prot_choice: 'pc_imp_taunt' },
+          }),
+        ),
       ),
-    ).find((k) => k.def.id === 'taunt')!;
+      'taunt',
+    );
     expect(taunt.cooldown).toBeCloseTo(10 * 0.8); // Improved Taunt -20% -> 8s
-
-    const slam = abilitiesKnownAt(
-      'warrior',
-      20,
-      computeTalentModifiers('warrior', alloc({ spec: 'arms', ranks: { arms_imp_slam: 2 } })),
-    ).find((k) => k.def.id === 'slam')!;
-    expect(slam.castTime).toBeCloseTo(1.5 * 0.5); // Improved Slam r2 -50% -> 0.75s
+    // (The castPct fold itself is covered by the caster-class talents, e.g.
+    // mage fireball; the warrior no longer has a cast-time talent since slam
+    // went instant and Improved Brute Swing was removed.)
   });
 
   it('a choice node applies only the chosen option ability mod', () => {
-    const baseMin = effOf(abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'cleave')).min;
-    const sweeping = effOf(
+    const baseMin = effectOfType(
+      abilitiesKnownAt('warrior', 20, grantMods('cleave')).find((k) => k.def.id === 'cleave'),
+      'aoeDamage',
+    ).min;
+    const sweeping = effectOfType(
       abilitiesKnownAt(
         'warrior',
         20,
@@ -544,8 +720,9 @@ describe('Sim integration — active talents & ability modifiers', () => {
           }),
         ),
       ).find((k) => k.def.id === 'cleave'),
+      'aoeDamage',
     ).min;
-    const impale = effOf(
+    const impale = effectOfType(
       abilitiesKnownAt(
         'warrior',
         20,
@@ -554,13 +731,20 @@ describe('Sim integration — active talents & ability modifiers', () => {
           alloc({ spec: 'arms', ranks: { arms_choice: 1 }, choices: { arms_choice: 'ac_impale' } }),
         ),
       ).find((k) => k.def.id === 'cleave'),
+      'aoeDamage',
     ).min;
-    expect(sweeping).toBe(Math.round(baseMin * 1.4)); // arms mastery .10 + sweeping .30
-    expect(impale).toBe(Math.round(baseMin * 1.1)); // arms mastery only; impale is crit
+    // Master Armorer's +10% is now hit-time (2H-gated), so only the chosen row
+    // option's ability mod bakes into the precomputed damage here.
+    expect(sweeping).toBe(Math.round(baseMin * 1.3)); // sweeping .30
+    expect(impale).toBe(baseMin); // impale is a crit option, no damage mod
   });
 
   it('tank-role Vengeance Mastery multiplies generated threat (+30%)', () => {
-    const sunderThreat = (vengeance: boolean): number => {
+    // Hobbling Cut (hamstring) is an ungated damage strike EVERY warrior knows, so
+    // its damage-driven threat isolates the +30% Recompense threat mastery.
+    // (Brute Swing is now arms/prot-gated so a no-spec warrior cannot cast it, and
+    // sunder's flat threat is prot-only, so neither can be the base case.)
+    const hamstringThreat = (vengeance: boolean): number => {
       const sim = new Sim({ seed: 3, playerClass: 'warrior' });
       sim.setPlayerLevel(20);
       if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+30% threat)
@@ -571,11 +755,11 @@ describe('Sim integration — active talents & ability modifiers', () => {
       sim.player.facing = Math.atan2(mob.pos.x - sim.player.pos.x, mob.pos.z - sim.player.pos.z);
       sim.player.resource = 100;
       sim.targetEntity(mob.id);
-      sim.castAbility('sunder_armor');
+      sim.castAbility('hamstring');
       return mob.threat.get(sim.playerId) ?? 0;
     };
-    const base = sunderThreat(false);
-    const venge = sunderThreat(true);
+    const base = hamstringThreat(false);
+    const venge = hamstringThreat(true);
     expect(base).toBeGreaterThan(0);
     // ~+30% (a tiny constant "seed" threat on combat entry isn't multiplied, so
     // assert the band rather than the exact ratio): clearly boosted, not doubled.
@@ -662,12 +846,23 @@ describe('Sim integration — loadouts & build strings', () => {
 });
 
 describe('ClientWorld path (online display reflects server state)', () => {
-  function bareClient(pid: number): any {
-    const c: any = Object.create(ClientWorld.prototype);
+  type BareClient = ClientWorld & {
+    known: KnownAbility[];
+  };
+
+  type BareClientInternals = {
+    applySnapshot(snapshot: unknown): void;
+    eventQueue: unknown[];
+    mouselookFacing: number | null;
+  };
+
+  function bareClient(pid: number): BareClient {
+    const c = Object.create(ClientWorld.prototype) as BareClient;
+    const internals = c as unknown as BareClientInternals;
     c.cfg = { seed: 20061, playerClass: 'warrior' };
     c.entities = new Map();
     c.playerId = pid;
-    c.moveInput = {};
+    c.moveInput = emptyMoveInput();
     c.inventory = [];
     c.equipment = {};
     c.copper = 0;
@@ -679,11 +874,11 @@ describe('ClientWorld path (online display reflects server state)', () => {
     c.snapInterval = 50;
     c.pendingFacingDelta = 0;
     c.connected = true;
-    c.eventQueue = [];
-    c.mouselookFacing = null;
+    internals.eventQueue = [];
+    internals.mouselookFacing = null;
     return c;
   }
-  const selfWire = (over: any = {}) => ({
+  const selfWire = (over: Record<string, unknown> = {}) => ({
     id: 1,
     k: 'player',
     tid: 'warrior',
@@ -713,7 +908,8 @@ describe('ClientWorld path (online display reflects server state)', () => {
 
   it('decodes the talent snapshot field and recomputes known with granted abilities', () => {
     const c = bareClient(1);
-    c.applySnapshot({
+    const internals = c as unknown as BareClientInternals;
+    internals.applySnapshot({
       t: 'snap',
       tick: 1,
       time: 0,
@@ -734,7 +930,7 @@ describe('ClientWorld path (online display reflects server state)', () => {
     expect(c.loadouts.length).toBe(1);
     expect(c.activeLoadout).toBe(0);
     // the client resolves known with the precomputed mods -> shield_slam granted
-    expect(c.known.some((k: any) => k.def.id === 'shield_slam')).toBe(true);
+    expect(c.known.some((k) => k.def.id === 'shield_slam')).toBe(true);
     expect(c.talentPoints()).toMatchObject({ total: 11, spent: 2 });
   });
 });
@@ -802,6 +998,14 @@ describe('repairAllocation (load-time revalidation)', () => {
     expect(repaired.ranks.arms_imp_overpower).toBeUndefined();
   });
 
+  it('keeps a spec with zero points when spec-unlocked, strips it when not (decoupled from points)', () => {
+    const a = alloc({ spec: 'arms', ranks: {} });
+    // A level-4 load (specUnlocked=false): the spec is illegal and dropped.
+    expect(repairAllocation('warrior', a, 0, false).spec).toBeNull();
+    // Spec-unlocked (level >= 5) keeps the spec even with zero talent points.
+    expect(repairAllocation('warrior', a, 0, true).spec).toBe('arms');
+  });
+
   it('rolls back a choice node whose points-gate is no longer met', () => {
     // war_tactical_choice has pointsGate 5; persist it with a VALID option id but
     // only 2 points above its row, so the validate-then-rollback branch fires and
@@ -814,6 +1018,21 @@ describe('repairAllocation (load-time revalidation)', () => {
     expect(repaired.ranks.war_toughness).toBe(2);
     expect(repaired.ranks.war_tactical_choice).toBeUndefined();
     expect(repaired.choices.war_tactical_choice).toBeUndefined();
+    expect(validateAllocation('warrior', repaired, 11).ok).toBe(true);
+  });
+
+  it('drops ranks in a removed node (arms_imp_slam) without throwing, refunding the points', () => {
+    // A persisted build from before the obsolete Improved Brute Swing talent
+    // was removed still carries ranks under its id. Repair must drop the
+    // unknown node, keep the still-valid picks, and refund the spent points.
+    const a = alloc({ spec: 'arms', ranks: { arms_imp_overpower: 2, arms_imp_slam: 2 } });
+    let repaired!: TalentAllocation;
+    expect(() => {
+      repaired = repairAllocation('warrior', a, 11);
+    }).not.toThrow();
+    expect(repaired.ranks.arms_imp_slam).toBeUndefined();
+    expect(repaired.ranks.arms_imp_overpower).toBe(2);
+    expect(pointsSpent(repaired)).toBe(2);
     expect(validateAllocation('warrior', repaired, 11).ok).toBe(true);
   });
 
@@ -845,17 +1064,19 @@ describe('persisted talents are revalidated on load (FR security)', () => {
   it('trims an over-budget persisted build and does not grant its stats on load', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms', ranks: { war_cruelty: 3, arms_imp_overpower: 2 } }));
-    const state = sim.serializeCharacter(sim.playerId)!;
+    const state = requireValue(sim.serializeCharacter(sim.playerId), 'Missing serialized state');
     // Tamper: a level-5 character (0 talent points) carrying a max-level build.
     state.level = 5;
 
     const sim2 = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Tampered', { state });
-    const meta = sim2.meta(pid)!;
-    // 0 points available at level 5 -> nothing survives.
+    const meta = requireMeta(sim2, pid);
+    // 0 points available at level 5 -> the over-budget RANKS are trimmed to nothing,
+    // but the spec itself is legal from level 5 (decoupled from talent points) so it
+    // is kept with its mastery. The tampered per-rank bonuses do NOT survive.
     expect(pointsSpent(meta.talents)).toBe(0);
     expect(meta.talentMods.abilities.overpower?.dmgPct ?? 0).toBe(0);
-    expect(meta.talentMods.spec).toBeNull();
+    expect(meta.talentMods.spec).toBe('arms');
   });
 
   it('deleting the active loadout never auto-applies an illegal next loadout', () => {
@@ -865,7 +1086,7 @@ describe('persisted talents are revalidated on load (FR security)', () => {
     sim.saveLoadout('A', [], alloc({ spec: 'arms', ranks: { war_cruelty: 2 } }));
     // Loadout 1: an illegal (over-budget) build injected directly, as a tampered
     // save would arrive. saveLoadout would have rejected it, so inject it raw.
-    const meta = sim.meta(sim.playerId)!;
+    const meta = requireMeta(sim, sim.playerId);
     meta.loadouts.push({
       name: 'Bad',
       alloc: alloc({
@@ -892,10 +1113,10 @@ describe('persisted talents are revalidated on load (FR security)', () => {
   it('still loads a legitimately valid build unchanged', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms', ranks: { war_cruelty: 2, arms_imp_overpower: 2 } }));
-    const state = sim.serializeCharacter(sim.playerId)!;
+    const state = requireValue(sim.serializeCharacter(sim.playerId), 'Missing serialized state');
     const sim2 = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
     const pid = sim2.addPlayer('warrior', 'Honest', { state });
-    const meta = sim2.meta(pid)!;
+    const meta = requireMeta(sim2, pid);
     expect(meta.talents.ranks.war_cruelty).toBe(2);
     expect(meta.talents.ranks.arms_imp_overpower).toBe(2);
     expect(meta.talentMods.abilities.overpower.dmgPct).toBeCloseTo(0.5);
@@ -906,12 +1127,16 @@ describe('performance invariant (no per-tick tree walk)', () => {
   it('keeps the resolved known-ability set stable across many ticks', () => {
     const sim = warriorAtCap();
     sim.applyTalents(alloc({ spec: 'arms', ranks: { arms_imp_overpower: 2 } }));
-    const knownRef = sim.meta(sim.playerId)!.known;
-    const overpowerRef = knownRef.find((k) => k.def.id === 'overpower');
-    expect(overpowerRef).toBeTruthy();
+    const knownRef = requireMeta(sim, sim.playerId).known;
+    const overpowerRef = requireValue(
+      knownRef.find((k) => k.def.id === 'overpower'),
+      'Missing Overpower in known set',
+    );
     for (let i = 0; i < 600; i++) sim.tick(); // 30s of ticks
     // identical array + object identity => talents resolved once, never per tick
-    expect(sim.meta(sim.playerId)!.known).toBe(knownRef);
-    expect(sim.meta(sim.playerId)!.known.find((k) => k.def.id === 'overpower')).toBe(overpowerRef);
+    expect(requireMeta(sim, sim.playerId).known).toBe(knownRef);
+    expect(requireMeta(sim, sim.playerId).known.find((k) => k.def.id === 'overpower')).toBe(
+      overpowerRef,
+    );
   });
 });

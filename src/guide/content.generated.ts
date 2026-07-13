@@ -115,24 +115,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Reaver Strike"
       },
       {
-        "id": "battle_shout",
-        "name": "Iron Bellow"
+        "id": "revenge",
+        "name": "Revenge"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
+        "id": "battle_shout",
+        "name": "Iron Bellow"
       },
       {
         "id": "charge",
         "name": "Onrush"
       },
       {
-        "id": "rend",
-        "name": "Deep Gash"
-      },
-      {
         "id": "thunder_clap",
         "name": "Quaking Blow"
+      },
+      {
+        "id": "hamstring",
+        "name": "Hobbling Cut"
       }
     ],
     "abilities": [
@@ -141,20 +141,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Reaver Strike"
       },
       {
+        "id": "revenge",
+        "name": "Revenge"
+      },
+      {
         "id": "battle_shout",
         "name": "Iron Bellow"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
-      },
-      {
         "id": "charge",
         "name": "Onrush"
-      },
-      {
-        "id": "rend",
-        "name": "Deep Gash"
       },
       {
         "id": "thunder_clap",
@@ -173,16 +169,68 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Redhand"
       },
       {
+        "id": "raging_gale",
+        "name": "Twinstrike"
+      },
+      {
+        "id": "raised_guard",
+        "name": "Raised Guard"
+      },
+      {
+        "id": "pummel",
+        "name": "Pummel"
+      },
+      {
         "id": "execute",
         "name": "Early Grave"
+      },
+      {
+        "id": "furious_mending",
+        "name": "Furious Mending"
+      },
+      {
+        "id": "iron_resolve",
+        "name": "Iron Resolve"
       },
       {
         "id": "slam",
         "name": "Brute Swing"
       },
       {
+        "id": "red_harvest",
+        "name": "Red Harvest"
+      },
+      {
+        "id": "faultline",
+        "name": "Faultline"
+      },
+      {
+        "id": "heroic_leap",
+        "name": "Heroic Leap"
+      },
+      {
         "id": "cleave",
         "name": "Reaping Arc"
+      },
+      {
+        "id": "rallying_cry",
+        "name": "Rallying Cry"
+      },
+      {
+        "id": "emboldening_roar",
+        "name": "Emboldening Roar"
+      },
+      {
+        "id": "defiant_bellow",
+        "name": "Defiant Bellow"
+      },
+      {
+        "id": "battle_stance",
+        "name": "Battle Stance"
+      },
+      {
+        "id": "berserker_stance",
+        "name": "Berserker Stance"
       },
       {
         "id": "defensive_stance",
@@ -193,12 +241,56 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Direhowl"
       },
       {
+        "id": "intimidating_shout",
+        "name": "Intimidating Shout"
+      },
+      {
         "id": "sunder_armor",
         "name": "Armor Shear"
       },
       {
         "id": "taunt",
         "name": "Goad"
+      },
+      {
+        "id": "measured_fury",
+        "name": "Measured Fury"
+      },
+      {
+        "id": "seasoned_soldier",
+        "name": "Seasoned Soldier"
+      },
+      {
+        "id": "sudden_death",
+        "name": "Sudden Death"
+      },
+      {
+        "id": "diabolical_twinstrike",
+        "name": "Diabolical Twinstrike"
+      },
+      {
+        "id": "cleaving_blows",
+        "name": "Cleaving Blows"
+      },
+      {
+        "id": "breachmaker",
+        "name": "Breachmaker"
+      },
+      {
+        "id": "die_by_sword",
+        "name": "Die by the Sword"
+      },
+      {
+        "id": "sweeping_strikes",
+        "name": "Widening Arc"
+      },
+      {
+        "id": "deep_wounds",
+        "name": "Gaping Wounds"
+      },
+      {
+        "id": "enrage_passive",
+        "name": "Mayhem"
       }
     ],
     "model": "player_warrior",
@@ -218,19 +310,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "holy",
         "name": "Sacrament",
         "role": "healer",
-        "signature": "flash_of_light"
+        "signature": "holy_shock"
       },
       {
         "id": "protection",
         "name": "Vigil",
         "role": "tank",
-        "signature": "righteous_fury"
+        "signature": "holy_shield"
       },
       {
         "id": "retribution",
         "name": "Requital",
         "role": "dps",
-        "signature": "judgement"
+        "signature": "repentance"
       }
     ],
     "signatureAbilities": [
@@ -328,19 +420,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "beast_mastery",
         "name": "Packlord",
         "role": "dps",
-        "signature": "tame_beast"
+        "signature": "bestial_wrath"
       },
       {
         "id": "marksmanship",
         "name": "Coldsight",
         "role": "dps",
-        "signature": "aimed_shot"
+        "signature": "trueshot_aura"
       },
       {
         "id": "survival",
         "name": "Fieldcraft",
         "role": "dps",
-        "signature": "wing_clip"
+        "signature": "wyvern_sting"
       }
     ],
     "signatureAbilities": [
@@ -446,19 +538,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "assassination",
         "name": "Knifework",
         "role": "dps",
-        "signature": "eviscerate"
+        "signature": "cold_blood"
       },
       {
         "id": "combat",
         "name": "Thuggery",
         "role": "dps",
-        "signature": "adrenaline_rush"
+        "signature": "blade_flurry"
       },
       {
         "id": "subtlety",
         "name": "Skulduggery",
         "role": "dps",
-        "signature": "ambush"
+        "signature": "hemorrhage"
       }
     ],
     "signatureAbilities": [
@@ -589,19 +681,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "discipline",
         "name": "Doctrine",
         "role": "healer",
-        "signature": "power_word_shield"
+        "signature": "power_infusion"
       },
       {
         "id": "holy",
         "name": "Benison",
         "role": "healer",
-        "signature": "flash_heal"
+        "signature": "holy_nova"
       },
       {
         "id": "shadow",
         "name": "Vespers",
         "role": "dps",
-        "signature": "mind_flay"
+        "signature": "shadowform"
       }
     ],
     "signatureAbilities": [
@@ -673,8 +765,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_priest",
-    "tint": "#f0e9d6",
-    "still": "/guide-stills/player_priest__f0e9d6.webp"
+    "still": "/guide-stills/player_priest.webp"
   },
   {
     "id": "shaman",
@@ -689,19 +780,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "elemental",
         "name": "Thundercall",
         "role": "dps",
-        "signature": "lightning_bolt"
+        "signature": "elemental_mastery"
       },
       {
         "id": "enhancement",
         "name": "Warspirit",
         "role": "dps",
-        "signature": "stormstrike"
+        "signature": "shamanistic_rage"
       },
       {
         "id": "restoration",
         "name": "Spiritmend",
         "role": "healer",
-        "signature": "healing_wave"
+        "signature": "natures_swiftness"
       }
     ],
     "signatureAbilities": [
@@ -772,6 +863,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Shadewolf"
       },
       {
+        "id": "chain_heal",
+        "name": "Chain Heal"
+      },
+      {
         "id": "stormstrike",
         "name": "Ancestral Strike"
       },
@@ -796,19 +891,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "arcane",
         "name": "Aethermancy",
         "role": "dps",
-        "signature": "arcane_missiles"
+        "signature": "arcane_power"
       },
       {
         "id": "fire",
         "name": "Pyromancy",
         "role": "dps",
-        "signature": "scorch"
+        "signature": "combustion"
       },
       {
         "id": "frost",
         "name": "Cryomancy",
         "role": "dps",
-        "signature": "ice_barrier"
+        "signature": "cone_of_cold"
       }
     ],
     "signatureAbilities": [
@@ -914,19 +1009,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "affliction",
         "name": "Hexcraft",
         "role": "dps",
-        "signature": "drain_life"
+        "signature": "siphon_life"
       },
       {
         "id": "demonology",
         "name": "Pactbound",
         "role": "dps",
-        "signature": "demon_skin"
+        "signature": "fel_domination"
       },
       {
         "id": "destruction",
         "name": "Ruination",
         "role": "dps",
-        "signature": "shadowburn"
+        "signature": "conflagrate"
       }
     ],
     "signatureAbilities": [
@@ -1047,19 +1142,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "balance",
         "name": "Moongrove",
         "role": "dps",
-        "signature": "starfire"
+        "signature": "moonkin_form"
       },
       {
         "id": "feral",
         "name": "Wildfang",
         "role": "tank",
-        "signature": "bear_form"
+        "signature": "feral_charge"
       },
       {
         "id": "restoration",
         "name": "Groveheart",
         "role": "healer",
-        "signature": "regrowth"
+        "signature": "swiftmend"
       }
     ],
     "signatureAbilities": [
@@ -1801,6 +1896,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/sword_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ]
   },
@@ -1812,6 +1911,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_square.glb",
+        "bone": "handslot.l"
       }
     ]
   },
@@ -1854,8 +1957,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
-    ],
-    "tintStrength": 0.5
+    ]
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -1868,6 +1970,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ],
     "tintStrength": 0.4

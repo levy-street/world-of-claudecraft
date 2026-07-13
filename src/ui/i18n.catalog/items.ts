@@ -16,6 +16,7 @@ const itemStringsEn = {
     },
     slots: {
       mainhand: 'Main Hand',
+      twoHand: 'Two-Hand',
       helmet: 'Helmet',
       neck: 'Neck',
       shoulder: 'Shoulder',
@@ -210,6 +211,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mano principal',
+        twoHand: 'Dos manos',
         helmet: 'Cabeza',
         neck: 'Cuello',
         shoulder: 'Hombros',
@@ -370,6 +372,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Main droite',
+        twoHand: 'Deux mains',
         helmet: 'Tête',
         neck: 'Cou',
         shoulder: 'Épaules',
@@ -531,6 +534,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mano principale',
+        twoHand: 'Due mani',
         helmet: 'Testa',
         neck: 'Collo',
         shoulder: 'Spalle',
@@ -688,6 +692,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Waffenhand',
+        twoHand: 'Zweihändig',
         helmet: 'Kopf',
         neck: 'Hals',
         shoulder: 'Schultern',
@@ -847,6 +852,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '主手',
+        twoHand: '双手',
         helmet: '头部',
         neck: '颈部',
         shoulder: '肩部',
@@ -999,6 +1005,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '主手',
+        twoHand: '雙手',
         helmet: '頭部',
         neck: '頸部',
         shoulder: '肩部',
@@ -1151,6 +1158,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '주장비',
+        twoHand: '양손',
         helmet: '머리',
         neck: '목',
         shoulder: '어깨',
@@ -1307,6 +1315,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'メインハンド',
+        twoHand: '両手',
         helmet: '頭',
         neck: '首',
         shoulder: '肩',
@@ -1463,6 +1472,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mão principal',
+        twoHand: 'Duas mãos',
         helmet: 'Cabeça',
         neck: 'Pescoço',
         shoulder: 'Ombros',
@@ -1619,6 +1629,7 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Правая рука',
+        twoHand: 'Двуручное',
         helmet: 'Голова',
         neck: 'Шея',
         shoulder: 'Плечи',

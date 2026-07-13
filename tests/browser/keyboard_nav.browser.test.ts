@@ -144,7 +144,6 @@ describe('keyboard-nav: a REAL window painter through the captureFocus bridge', 
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
-        buildDropdown: () => document.createElement('div'),
       }),
     );
     opener.focus();

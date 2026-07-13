@@ -1075,6 +1075,11 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       heroic_mark: { name: 'Heroic Mark' },
+      // Warrior offhand/2H gear (PR #1734): shields + the two vendor greatswords.
+      eastbrook_buckler: { name: 'Eastbrook Buckler' },
+      highwatch_wallshield: { name: 'Highwatch Wallshield' },
+      eastbrook_greatsword: { name: 'Eastbrook Greatsword' },
+      highwatch_greatsword: { name: 'Highwatch Greatsword' },
       morthens_cryptforged_hauberk: { name: "Morthen's Cryptforged Hauberk" },
       shadowpulse_handwraps: { name: 'Shadowpulse Handwraps' },
       bonechill_striders: { name: 'Bonechill Striders' },

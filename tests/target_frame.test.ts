@@ -110,7 +110,8 @@ function targetDescriptor(e: Entity): UnitFrameDescriptor {
   return {
     present: true,
     hpFrac: t.hp / Math.max(1, t.maxHp),
-    hpText: t.dead ? 'Dead' : `${t.hp} / ${t.maxHp}`,
+    hpText: t.dead ? 'Dead' : `${t.hp}/${t.maxHp}`,
+    showAbsorbText: !t.dead,
     resourceKind: t.dead || !t.resourceType ? 'none' : t.resourceType,
     resFrac: t.dead || !t.resourceType ? 0 : t.resource / Math.max(1, t.maxResource),
     resText: t.dead || !t.resourceType ? '' : `${Math.round(t.resource)} / ${t.maxResource}`,
@@ -141,6 +142,7 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // the whole view is identical across hosts.
     expect(fromClient).toEqual(fromSim);
     expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
+    expect(fromSim.hpText).toBe('420/600 (90)');
     expect(fromSim.resClass).toBe('mana'); // a caster target shows its power bar
     expect(fromSim.resText).toBe('350 / 500');
     // A resource-less beast (rtype null) turns every type class off: the bar hides.

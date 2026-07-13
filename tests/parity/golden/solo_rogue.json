@@ -8,14 +8,14 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 143,
-  "drawDigest": "9dafb67b",
+  "draws": 151,
+  "drawDigest": "358c9fed",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "7301c7f4",
+      "state": "3cf6ed35",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,7 +46,8 @@
           "entityId": 405,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -59,6 +60,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -75,6 +84,7 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
+          "dualWielding": true,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -85,8 +95,15 @@
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -124,44 +141,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "460b794c",
-      "events": "33293b2e",
+      "state": "d40a2ed0",
+      "events": "2ce1c7a7",
       "rng": {
-        "draws": 9,
-        "digest": "8ecad8de"
+        "draws": 12,
+        "digest": "69c49488"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "636ce5b6",
-      "events": "e29847dc",
+      "state": "d4141869",
+      "events": "d79475a7",
       "rng": {
-        "draws": 15,
-        "digest": "843b3bf7"
+        "draws": 21,
+        "digest": "6b9fce63"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "3e84eb60",
-      "events": "57dccdba",
+      "state": "d54e40d7",
+      "events": "e3502640",
       "rng": {
-        "draws": 90,
-        "digest": "0f3d4b16"
+        "draws": 98,
+        "digest": "dcfe7e75"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 407,
-      "state": "69ee5cea",
+      "state": "52e341fd",
       "events": "741638a5",
       "rng": {
-        "draws": 143,
-        "digest": "9dafb67b"
+        "draws": 151,
+        "digest": "358c9fed"
       },
       "label": "final",
       "players": [
@@ -181,8 +198,8 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 79,
-            "damageTaken": 9
+            "damageDealt": 103,
+            "damageTaken": 26
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -191,7 +208,8 @@
           "entityId": 405,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -205,6 +223,14 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -223,10 +249,11 @@
           "critChance": 0.076,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.076,
+          "dualWielding": true,
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49991,
+          "hp": 49974,
           "id": 405,
           "inCombat": true,
           "kind": "player",
@@ -235,8 +262,16 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandSwingTimer": 0.05,
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.063,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,
@@ -282,7 +317,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8921,
+          "hp": 8897,
           "id": 406,
           "inCombat": true,
           "kind": "mob",
@@ -319,7 +354,7 @@
           "threat": [
             [
               405,
-              80
+              104
             ]
           ],
           "weapon": {

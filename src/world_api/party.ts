@@ -25,6 +25,7 @@ export interface PartyMemberInfo {
   level: number;
   hp: number;
   mhp: number;
+  absorb: number;
   res: number;
   mres: number;
   rtype: ResourceType | null;

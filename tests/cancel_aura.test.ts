@@ -55,6 +55,7 @@ describe('Sim.cancelAura', () => {
   it('is a no-op for an unknown aura id', () => {
     const sim = makeSim();
     const p = sim.player;
+    p.auras.length = 0; // drop the warrior's spawn-seeded Battle Stance for an exact count
     p.auras.push(buff({ sourceId: p.id }));
     sim.cancelAura('absent');
     expect(p.auras).toHaveLength(1);

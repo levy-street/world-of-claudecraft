@@ -14,7 +14,11 @@ function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   sim.setPlayerLevel(20, pid);
   sim.addItem(itemId, 1, pid);
   sim.equipItem(itemId, pid);
-  return sim.meta(pid)!;
+  const meta = sim.meta(pid);
+  if (!meta) {
+    throw new Error(`Missing player meta for ${pid}`);
+  }
+  return meta;
 }
 
 describe('armor proficiencies', () => {
@@ -38,7 +42,13 @@ describe('armor proficiencies', () => {
 
   it('allows warrior-style weapons for warriors, rogues, hunters, shamans, and paladins', () => {
     expect(equip('warrior', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
-    expect(equip('rogue', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
+    // Rogues dual-wield (owner 2026-07-09): a one-hand weapon auto-routes to the off
+    // hand when the main hand already holds the starter dagger, so the proficiency
+    // check verifies it lands in EITHER hand, not specifically the main hand.
+    const rogueEq = equip('rogue', 'kingsbane_last_oath').equipment;
+    expect(
+      rogueEq.mainhand === 'kingsbane_last_oath' || rogueEq.offhand === 'kingsbane_last_oath',
+    ).toBe(true);
     expect(equip('hunter', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('shaman', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('paladin', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
@@ -67,6 +77,13 @@ describe('armor proficiencies', () => {
     expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe(
       'staff_of_the_gravewyrm',
     );
+  });
+
+  it('allows shields for warrior-style classes and keeps cloth casters out', () => {
+    expect(equip('warrior', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('paladin', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('shaman', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('mage', 'eastbrook_buckler').equipment.offhand).toBeUndefined();
   });
 });
 

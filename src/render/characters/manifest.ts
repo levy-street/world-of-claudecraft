@@ -18,8 +18,17 @@ export interface ClipMap {
   idle: string;
   walk: string;
   run: string;
-  /** one-shot swing clips, rotated per attack */
+  /** one-shot swing clips, rotated per attack (auto-attacks + un-mapped abilities) */
   attack: string[];
+  /** optional per-ability swing override (ability id -> clip name): a specific
+   *  attack ability plays its mapped clip instead of the round-robin. The clip
+   *  must exist in the model; missing keys/clips fall back to `attack`. */
+  attackByAbility?: Record<string, string>;
+  /** optional weapon-style swing override for plain autos: a two-handed
+   *  mainhand (or a weapon in each hand) swings its matching clip instead of
+   *  the round-robin. Ability overrides still win; missing clips fall back
+   *  to `attack`. Cosmetic only, timing untouched. */
+  attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
@@ -62,11 +71,11 @@ export interface VisualDef {
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
   attach?: AttachDef[];
-  /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
-   *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
-   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). Usually [0]
-   *  (the mainhand); the rogue lists [0, 1] so a dagger shows in BOTH hands. A fixed
-   *  offhand left off this list stays as authored (the warlock spellbook). */
+  /** Indices into `attach` whose model is replaced by equipped hand-held items.
+   *  Slot order is mainhand first, offhand second when present. undefined/empty =
+   *  held props never change with gear (hunter keeps its crossbow; mobs/NPCs are
+   *  fixed). A fixed offhand left off this list stays as authored (the warlock
+   *  spellbook). */
   weaponSlots?: number[];
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
@@ -86,6 +95,9 @@ export interface VisualDef {
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
+  /** Glowing ring parented behind the head bone (the priest's Light halo).
+   *  Value is the glow color; geometry/placement live in visual.ts. */
+  halo?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -262,20 +274,29 @@ const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 
-/** GLB url for an equipped mainhand item's held weapon model, or null if the item
- *  has no mapped model (then the class default attach is kept). Mirrors the bag
- *  icon via the shared ITEM_WEAPON_VARIANTS map, so held weapon == inventory icon. */
-export function itemWeaponModelUrl(itemId: string | null | undefined): string | null {
+const ITEM_OFFHAND_MODELS: Record<string, string> = {
+  eastbrook_buckler: 'shield_round',
+  highwatch_wallshield: 'shield_square',
+};
+
+/** GLB url for an equipped held item model, or null if the item has no mapped
+ *  model. Weapons mirror the bag icon via ITEM_WEAPON_VARIANTS; shields and
+ *  other offhands use a small render-only map. */
+export function itemHeldModelUrl(itemId: string | null | undefined): string | null {
   if (!itemId) return null;
-  const key = ITEM_WEAPON_VARIANTS[itemId];
+  const key = ITEM_WEAPON_VARIANTS[itemId] ?? ITEM_OFFHAND_MODELS[itemId];
   return key ? `${WEAPONS}/${key}.glb` : null;
 }
 
-/** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
- *  setWeapon can attach any equipped weapon synchronously (resolvedGltf throws on
- *  an un-preloaded url). */
-export function itemWeaponModelUrls(): string[] {
-  return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
+/** Distinct held-item GLB urls (weapons + offhands), for the boot preload sweep. */
+export function itemHeldModelUrls(): string[] {
+  return [
+    ...new Set(
+      [...Object.values(ITEM_WEAPON_VARIANTS), ...Object.values(ITEM_OFFHAND_MODELS)].map(
+        (key) => `${WEAPONS}/${key}.glb`,
+      ),
+    ),
+  ];
 }
 
 const LOW_URL_ALIAS: Record<string, string> = {
@@ -329,14 +350,18 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
   ],
+  // Priest and mage share the mage.glb rig but each gets its OWN default look
+  // (index 0 is a real recolored atlas, not the embedded texture): white-and-
+  // gold linen for the priest, night-indigo with muted gold trim and glowing
+  // eyes for the mage. The alt skins stay the shared mage set.
   player_priest: [
-    null,
+    `${SKINS_DIR}/priest/base.png`,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
   ],
   player_mage: [
-    null,
+    `${SKINS_DIR}/mage/night.png`,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
@@ -372,6 +397,9 @@ export const SKINS: Record<string, (string | null)[]> = {
 // Emissive (glow) maps keyed exactly like SKINS, applied to .emissiveMap when a
 // skin index has one. Only the Combat Mech epics glow; null entries mean no glow.
 export const SKIN_EMISSIVE: Record<string, (string | null)[]> = {
+  // The mage's default night look glows at the eye tile only (the hood-shadow
+  // fantasy: faint light-blue eyes under a dark cowl).
+  player_mage: [`${SKINS_DIR}/mage/night_emis.png`, null, null, null],
   player_mech: MECH_CHROMAS.map(mechEmissiveUrl),
 };
 
@@ -409,20 +437,67 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    // Auto-attacks rotate the two 1H swings; specific abilities override to a
+    // clip that fits their weight. knight.glb only ships 4 melee clips, so the
+    // heavy 2H chop stands in for finishers and the dual chop for fury flurries.
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      // Weapon-style autos: a greatsword swings the two-handed overhead, a
+      // Fury dual wielder the double chop; one-handers keep the rotation.
+      attackByHand: {
+        twohand: '2H_Melee_Attack_Chop',
+        dualwield: 'Dualwield_Melee_Attack_Chop',
+      },
+      attackByAbility: {
+        // Heavy finishers / big single hits: the two-handed overhead.
+        mortal_strike: '2H_Melee_Attack_Chop',
+        execute: '2H_Melee_Attack_Chop',
+        slam: '2H_Melee_Attack_Chop',
+        red_harvest: '2H_Melee_Attack_Chop',
+        breachmaker: '2H_Melee_Attack_Chop',
+        shield_slam: '2H_Melee_Attack_Chop',
+        // Fury multi-hits: the dual chop reads as a fast flurry.
+        raging_gale: 'Dualwield_Melee_Attack_Chop',
+        bloodthirst: 'Dualwield_Melee_Attack_Chop',
+        // Sweeping / downward strikes: the 1H overhead chop.
+        cleave: '1H_Melee_Attack_Chop',
+        thunder_clap: '1H_Melee_Attack_Chop',
+        faultline: '1H_Melee_Attack_Chop',
+        revenge: '1H_Melee_Attack_Chop',
+        // Quick strikes: the diagonal slice.
+        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+        overpower: '1H_Melee_Attack_Slice_Diagonal',
+        rend: '1H_Melee_Attack_Slice_Diagonal',
+        hamstring: '1H_Melee_Attack_Slice_Diagonal',
+        // Cast flourishes (castFx-driven, not damage swings): Sanguine Aura
+        // raises the blade skyward; Raised Guard plants behind the shield.
+        sanguine_aura: 'Spellcast_Raise',
+        raised_guard: 'Block',
+      },
+    },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
   },
   player_paladin: {
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      // Paladins can wield the vendor greatswords; no dual wield.
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
   },
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
@@ -441,7 +516,7 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
-    weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
+    weaponSlots: [0, 1], // mainhand in right, offhand in left
   },
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
@@ -450,16 +525,24 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
-    tint: 0xf0e9d6,
-    tintStrength: 0.5,
+    // the white-linen look lives in the default atlas (SKINS index 0); no tint,
+    // it would also warm the face
+    halo: 0xffd766,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      // Shamans can wield the vendor greatswords; no dual wield.
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
     tint: 0x6f8fc9,
     tintStrength: 0.4,
   },
@@ -509,8 +592,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
     // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
     // model just like every other class. The sword is only the no-weapon default.
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
     lazyPreload: true,
   },
 
@@ -1139,7 +1225,7 @@ export function visualKeyFor(e: Entity): string {
  *  as a player entity's templateId, so this applies the same offline and online. */
 export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
   const classDef = VISUALS[`player_${cls}`];
-  if (!classDef || (classDef.weaponSlots?.length ?? 0) < 2) return null;
+  if (!classDef?.attach || !classDef.weaponSlots?.length) return null;
   return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
 }
 
@@ -1152,9 +1238,9 @@ export function manifestUrls(): string[] {
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
-  // Equipped-weapon models a player may swap to at runtime (any nearby player's
-  // gear), so they are resolved-and-ready when setWeapon attaches them.
-  for (const url of itemWeaponModelUrls()) urls.add(url);
+  // Equipped held-item models a player may swap to at runtime (any nearby
+  // player's gear), so they are resolved-and-ready when setHeldItems attaches them.
+  for (const url of itemHeldModelUrls()) urls.add(url);
   return [...urls];
 }
 

@@ -25,7 +25,7 @@ describe('abilityStartsAutoAttack', () => {
   });
 
   it('does not engage on heals or self/ally buffs', () => {
-    expect(abilityStartsAutoAttack(effectsOf('battle_shout'))).toBe(false); // selfBuff
+    expect(abilityStartsAutoAttack(effectsOf('battle_shout'))).toBe(false); // aoeAllyAttackPower (group buff)
     expect(abilityStartsAutoAttack(effectsOf('mark_of_the_wild'))).toBe(false); // buffTarget (friendly)
   });
 

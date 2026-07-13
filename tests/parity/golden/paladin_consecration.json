@@ -8,14 +8,14 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 932,
-  "drawDigest": "34d01e34",
+  "draws": 922,
+  "drawDigest": "2223edd7",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "d2923341",
+      "state": "e55adbba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,6 +63,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -91,6 +99,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.061,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -127,7 +136,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "4fa2ac6f",
+      "state": "5bd0a5e3",
       "events": "78472286",
       "rng": {
         "draws": 4,
@@ -138,7 +147,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "49c2c606",
+      "state": "ee17f36e",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -149,7 +158,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "92af29ea",
+      "state": "f64b1616",
       "events": "93f4f111",
       "rng": {
         "draws": 80,
@@ -160,7 +169,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "55253aa9",
+      "state": "14bda391",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -171,7 +180,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "43ad5343",
+      "state": "bd239431",
       "events": "a511432c",
       "rng": {
         "draws": 270,
@@ -182,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "7d8b14ba",
+      "state": "8b9bc694",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -193,7 +202,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 407,
-      "state": "18e9852e",
+      "state": "f011b540",
       "events": "993e6f90",
       "rng": {
         "draws": 501,
@@ -204,7 +213,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 407,
-      "state": "6876dca4",
+      "state": "4018fcf0",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -215,33 +224,33 @@
       "tick": 180,
       "time": 9,
       "nextId": 407,
-      "state": "e647bbc6",
-      "events": "f3585c8e",
+      "state": "ec2ddf42",
+      "events": "cbaa5e77",
       "rng": {
-        "draws": 765,
-        "digest": "84d7375c"
+        "draws": 762,
+        "digest": "29ec1562"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 407,
-      "state": "5cf3da5b",
+      "state": "8c321a45",
       "events": "741638a5",
       "rng": {
-        "draws": 931,
-        "digest": "5764acf5"
+        "draws": 922,
+        "digest": "2223edd7"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 407,
-      "state": "ee59fd43",
+      "state": "c30e7f6b",
       "events": "741638a5",
       "rng": {
-        "draws": 932,
-        "digest": "34d01e34"
+        "draws": 922,
+        "digest": "2223edd7"
       },
       "label": "final",
       "players": [
@@ -262,7 +271,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 164,
-            "damageTaken": 22
+            "damageTaken": 14
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -289,6 +298,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -300,14 +317,14 @@
         {
           "aiState": "idle",
           "attackPower": 120,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.068,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49978,
+          "hp": 49986,
           "id": 405,
           "inCombat": true,
           "kind": "player",
@@ -318,6 +335,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -352,7 +370,7 @@
         {
           "aggroTargetId": 405,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

@@ -867,6 +867,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   e.swingTimer = 0;
   e.chargeTargetId = null;
   e.chargePath = [];
+  e.leap = null;
   e.followTargetId = null;
   e.combatTimer = 99;
   e.inCombat = false;

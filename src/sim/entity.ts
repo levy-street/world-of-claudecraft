@@ -1,3 +1,4 @@
+import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
@@ -11,10 +12,18 @@ import type {
   Vec3,
 } from './types';
 import {
+  AVATAR_SCALE,
+  BERSERKER_CRIT_CHANCE,
   cloneItemInstancePayload,
   critFractionFromRating,
+  DIE_BY_SWORD_DODGE,
+  ENRAGE_HASTE_PCT,
   EQUIP_SLOTS,
   hasteFractionFromRating,
+  PARRY_BASE,
+  PARRY_CLASSES,
+  PARRY_STR_PER,
+  SHIELD_BLOCK_BASE,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -45,6 +54,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     overheadEmoteSeq: 0,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
+    offhandWeapon: null,
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
@@ -57,6 +67,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critRating: 0,
     hasteRating: 0,
     dodgeChance: 0.05,
+    parryChance: 0,
+    blockChance: 0,
+    blockValue: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     moveSpeed: 7,
@@ -64,15 +77,17 @@ function baseEntity(id: number, pos: Vec3): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    offhandSwingTimer: 0,
+    dualWielding: false,
     inCombat: false,
     combatTimer: 99,
     auras: [],
     stealthed: false,
     ccDr: new Map(),
     castingAbility: null,
+    castTargetId: null,
     castRemaining: 0,
     castTotal: 0,
-    castTargetId: null,
     castAim: null,
     channeling: false,
     channelTickTimer: 0,
@@ -92,6 +107,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     chargeTargetId: null,
     chargeTimeLeft: 0,
     chargePath: [],
+    leap: null,
     followTargetId: null,
     sitting: false,
     eating: null,
@@ -153,6 +169,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    offhandItemId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',
@@ -168,6 +185,15 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   e.level = 1;
   e.resourceType = def.resourceType;
   e.color = def.color;
+  // A warrior is born in Battle Stance (the spec-agnostic offensive default); the
+  // per-tick reconcile (combat/warrior_stances.ensureWarriorStance) swaps it to
+  // Berserker once Fury is committed. Seeding it at creation, not on the first
+  // live tick, keeps a caller's post-spawn stat pokes (e.g. an inflated maxHp in
+  // a test) from being wiped by a tick-1 stance recalcPlayerStats.
+  if (cls === 'warrior') {
+    const stance = buildStanceAura(BATTLE_STANCE, id);
+    if (stance) e.auras.push(stance);
+  }
   return e;
 }
 
@@ -262,6 +288,8 @@ export function recalcPlayerStats(
   // Buff auras
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
+  let bonusCrit = 0;
+  let bonusHaste = 0; // Fury Enrage folds +25% haste here (real haste: swings + casts)
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
@@ -273,6 +301,7 @@ export function recalcPlayerStats(
   let staPct = 0;
   let buffArmorPct = 0;
   let buffApPct = 0;
+  let maxHpPctAura = 0; // Rallying Cry: summed buff_maxhp_pct fractions
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -291,6 +320,7 @@ export function recalcPlayerStats(
       s.int += a.value;
       s.spi += a.value;
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
+    else if (a.kind === 'buff_maxhp_pct') maxHpPctAura += a.value;
     else if (a.kind === 'buff_allstats_pct') {
       // Percentage drain on the whole stat block (Resurrection Sickness: value
       // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
@@ -303,6 +333,21 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    // Die by the Sword: its "+100% parry" is modelled as a big dodge boost.
+    else if (a.kind === 'die_by_sword') bonusDodge += DIE_BY_SWORD_DODGE;
+    // Choice-row talent buffs: additive crit chance while worn. buff_crit is the
+    // generic kind; buff_reckless carries Recklessness' +20% crit half (its rage
+    // half lives in rageGenAuraMult); a bloodbath aura's value is its per-stack
+    // crit times the current stacks. Expiry re-runs this recalc via the
+    // statsDirty pass in combat/auras.ts, so each bonus falls off with its aura.
+    else if (a.kind === 'buff_crit' || a.kind === 'buff_reckless' || a.kind === 'bloodbath')
+      bonusCrit += a.value;
+    // Berserker Stance (Fury): a flat additive crit-chance bonus while worn. Its
+    // crit-DAMAGE half lives in combat/damage.ts (berserkerCritDamage).
+    else if (a.kind === 'berserker_stance') bonusCrit += BERSERKER_CRIT_CHANCE;
+    // Fury Enrage: +25% haste while worn, folded into the real haste stat below so
+    // it speeds swings AND casts and shows in the Haste stat (never touches GCD).
+    else if (a.kind === 'enrage') bonusHaste += ENRAGE_HASTE_PCT;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
     // integer-rounding talent value multiplier; converted to a fraction here.
@@ -311,8 +356,14 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
     else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
     else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
+    // Avatar: the colossus transform grows the body by the fixed scale (its
+    // aura value carries the damage amp, consumed in dealDamage).
+    else if (a.kind === 'buff_avatar') scaleMul *= AVATAR_SCALE;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
+    // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
+    // the form aura's value, so the bonus lives and dies with the one toggle.
+    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') bonusSp += a.value;
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -356,6 +407,9 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
+  // Protection's Vanguard: bonus armor from Strength, added (on the fully-summed
+  // Strength) before the armor multiplier so armorPct amplifies it too.
+  if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
@@ -368,11 +422,26 @@ export function recalcPlayerStats(
   // until the wearer is high enough level. The mainhand still stays worn (see
   // e.mainhandItemId below) so the weapon model keeps rendering.
   const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
   const weapon =
-    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+    mainhand?.kind === 'weapon' && meetsLevelRequirement(lvl, mainhand)
       ? mainhand.weapon
       : { min: 1, max: 2, speed: 2 };
+  const offhandWeapon =
+    offhand?.kind === 'weapon' && meetsLevelRequirement(lvl, offhand) ? offhand.weapon : null;
   e.weapon = weapon;
+  e.offhandWeapon = offhandWeapon;
+  e.dualWielding = !!(
+    offhandWeapon &&
+    mainhand?.kind === 'weapon' &&
+    meetsLevelRequirement(lvl, mainhand)
+  );
+  e.blockChance =
+    offhand?.kind === 'shield' && meetsLevelRequirement(lvl, offhand) ? SHIELD_BLOCK_BASE : 0;
+  e.blockValue =
+    offhand?.kind === 'shield' && meetsLevelRequirement(lvl, offhand)
+      ? (offhand.blockValue ?? 0)
+      : 0;
   // The equipped mainhand item id: drives the held weapon model on the client
   // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
   // (combat/equip_procs.ts, which re-applies the level gate above so an inert
@@ -381,6 +450,13 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  e.offhandItemId =
+    equipment.offhand &&
+    (ITEMS[equipment.offhand]?.kind === 'weapon' ||
+      ITEMS[equipment.offhand]?.kind === 'shield' ||
+      ITEMS[equipment.offhand]?.kind === 'held_offhand')
+      ? equipment.offhand
+      : null;
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
@@ -425,27 +501,35 @@ export function recalcPlayerStats(
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  e.meleeHaste = hasteFrac;
-  e.rangedHaste = hasteFrac;
-  e.spellHaste = hasteFrac;
+  // hasteFrac folds set-bonus + rating haste; bonusHaste adds Fury Enrage's +25%.
+  e.meleeHaste = hasteFrac + bonusHaste;
+  e.rangedHaste = hasteFrac + bonusHaste;
+  e.spellHaste = hasteFrac + bonusHaste;
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
-  // Crit: ~1% per 20 agi at low level
+  // Crit: ~1% per 20 agi at low level (+ buff_crit auras summed above, + crit rating)
   e.critChance =
     0.05 +
     s.agi * 0.0005 +
     (mods?.stats.crit ?? 0) +
     setEff.crit +
+    bonusCrit +
     critFractionFromRating(e.critRating);
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
+  // Parry: only weapon classes parry, strength-driven (mirrors dodge/agi). Pure
+  // casters keep 0. The FRONTAL gate is enforced at the swing (mobSwing), not here.
+  e.parryChance = PARRY_CLASSES.has(cls) ? Math.max(0, PARRY_BASE + s.str * PARRY_STR_PER) : 0;
 
   const hpFrac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
   if (bearForm) e.maxHp = Math.round(e.maxHp * 1.15);
   if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
+  // Rallying Cry: a temporary maximum-health fraction. The hpFrac restore
+  // below scales CURRENT health with it (gain on apply, drop on expiry).
+  if (maxHpPctAura !== 0) e.maxHp = Math.max(1, Math.round(e.maxHp * (1 + maxHpPctAura)));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));

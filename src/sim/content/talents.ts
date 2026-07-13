@@ -44,6 +44,9 @@ export interface StatModEffect {
   apPct?: number;
   staPct?: number;
   armorPct?: number;
+  // Bonus armor equal to this fraction of the wearer's Strength (Protection's
+  // Vanguard: 0.70 = +70% of Strength as armor), folded in recalcPlayerStats.
+  armorFromStrPct?: number;
   maxHpPct?: number;
   // Primary-attribute multipliers (0.10 = +10%). Applied to the fully-summed attribute
   // (base + per-level + gear + auras + flat talent bonuses) in recalcPlayerStats, so a
@@ -65,6 +68,7 @@ export interface AbilityModEffect {
   castPct?: number; // -0.50 = half cast time
   buffPct?: number; // +0.20 = +20% to this ability's selfBuff/buffTarget value (e.g. Improved Devotion Aura)
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
+  bonusCharges?: number; // +N stored uses (Double Charge); base is 1
   addEffects?: AbilityEffect[];
 }
 
@@ -76,6 +80,33 @@ export interface GlobalModEffect {
   healPct?: number; // healing done
   threatPct?: number; // bonus threat (tank role)
   critVsRooted?: number; // additive spell crit chance against rooted targets
+  // Rage-generation multipliers (warrior choice rows, e.g. Anger Management).
+  // `autoRagePct` scales the rage minted by auto-attack damage dealt;
+  // `abilityRagePct` scales ability-granted rage (gainResource, Charge's burst).
+  // Rage from TAKING damage is deliberately unscaled by either.
+  autoRagePct?: number;
+  abilityRagePct?: number;
+  // Warrior choice-row passives, read by their runtime hooks (all 0 = off):
+  // Pursuit's on-kill speed burst (+fraction, handleDeath), Second Wind's
+  // in-combat regen below 35% health (fraction of max HP per second,
+  // updateRegen), Battle Rhythm's every-3rd-cast empower (a 0/1 flag,
+  // runEffects), Bloodbath's per-stack on-kill crit+damage fraction
+  // (handleDeath), and Colossal Might's cooldown seconds shaved per rage spent
+  // (spendAbilityCost).
+  onKillSpeedPct?: number;
+  secondWindPctPerSec?: number;
+  battleRhythm?: number;
+  bloodbathPct?: number;
+  cdrPerRage?: number;
+  // Lingering Dread: fraction of the target's max health a fear the player
+  // applies can soak before breaking (0 = classic break on any damage).
+  fearBreakPct?: number;
+  // Master Armorer (Arms mastery): fraction of extra physical damage dealt WHILE
+  // wielding a two-handed weapon. Declares the magnitude so the tooltip is
+  // effect-backed, but is applied only by the 2H-gated hook in combat/damage.ts
+  // (never folded into the generic meleeDmgPct path), so it never double-counts
+  // and never leaks to one-handed builds.
+  masteryTwoHandDmgPct?: number;
 }
 
 export interface TalentEffect {
@@ -160,6 +191,7 @@ export interface ResolvedAbilityMod {
   castPct: number;
   buffPct: number;
   castWhileMoving: boolean;
+  bonusCharges: number;
   addEffects: AbilityEffect[];
 }
 
@@ -208,6 +240,12 @@ function nodeIndex(ct: ClassTalents): Map<string, TalentNode> {
 // ---------------------------------------------------------------------------
 
 export const FIRST_TALENT_LEVEL = 10;
+
+// Spec identity (the signature ability + mastery + spec-gated kit) unlocks EARLIER
+// than talent POINTS: a specialization may be committed from SPEC_UNLOCK_LEVEL, but
+// points still accrue from FIRST_TALENT_LEVEL (talentPointsAtLevel is unchanged), so
+// the talent tree and point economy are untouched. A spec below this level is illegal.
+export const SPEC_UNLOCK_LEVEL = 5;
 
 export function talentPointsAtLevel(level: number): number {
   return Math.max(0, Math.min(level, MAX_LEVEL) - (FIRST_TALENT_LEVEL - 1));
@@ -454,14 +492,19 @@ export function repairAllocation(
   cls: PlayerClass,
   alloc: TalentAllocation,
   availablePoints: number,
+  // Spec unlock is DECOUPLED from talent points: a spec is legal from SPEC_UNLOCK_LEVEL
+  // even with zero points. Callers that know the level pass `level >= SPEC_UNLOCK_LEVEL`;
+  // the default (`availablePoints > 0`, the pre-decoupling proxy) is a conservative
+  // fallback for callers that only have the point budget.
+  specUnlocked: boolean = availablePoints > 0,
 ): TalentAllocation {
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
-  // A spec needs a known id AND at least one talent point available; below
-  // FIRST_TALENT_LEVEL (availablePoints === 0) a spec is illegal (it would still
-  // grant the signature ability + mastery passive), matching the apply-time gate.
+  // A spec needs a known id AND the wearer to be spec-unlocked (specUnlocked); below
+  // SPEC_UNLOCK_LEVEL a spec is illegal (it would still grant the signature ability +
+  // mastery passive), matching the apply-time gate.
   const spec =
-    alloc.spec !== null && availablePoints > 0 && ct.specs.some((s) => s.id === alloc.spec)
+    alloc.spec !== null && specUnlocked && ct.specs.some((s) => s.id === alloc.spec)
       ? alloc.spec
       : null;
   const out: TalentAllocation = { spec, ranks: {}, choices: {} };
@@ -516,6 +559,7 @@ function zeroStats(): Required<StatModEffect> {
     apPct: 0,
     staPct: 0,
     armorPct: 0,
+    armorFromStrPct: 0,
     maxHpPct: 0,
     strPct: 0,
     agiPct: 0,
@@ -524,7 +568,22 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
+  return {
+    meleeDmgPct: 0,
+    spellDmgPct: 0,
+    healPct: 0,
+    threatPct: 0,
+    critVsRooted: 0,
+    autoRagePct: 0,
+    abilityRagePct: 0,
+    onKillSpeedPct: 0,
+    secondWindPctPerSec: 0,
+    battleRhythm: 0,
+    bloodbathPct: 0,
+    cdrPerRage: 0,
+    fearBreakPct: 0,
+    masteryTwoHandDmgPct: 0,
+  };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
@@ -535,6 +594,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    bonusCharges: 0,
     addEffects: [],
   };
 }
@@ -550,7 +610,11 @@ export function emptyModifiers(): TalentModifiers {
   };
 }
 
-function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
+export function accumulate(
+  mods: TalentModifiers,
+  eff: TalentEffect | undefined,
+  mult: number,
+): void {
   if (!eff) return;
   if (eff.stats) {
     const s = mods.stats,
@@ -567,6 +631,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     s.apPct += (e.apPct ?? 0) * mult;
     s.staPct += (e.staPct ?? 0) * mult;
     s.armorPct += (e.armorPct ?? 0) * mult;
+    s.armorFromStrPct += (e.armorFromStrPct ?? 0) * mult;
     s.maxHpPct += (e.maxHpPct ?? 0) * mult;
     s.strPct += (e.strPct ?? 0) * mult;
     s.agiPct += (e.agiPct ?? 0) * mult;
@@ -581,6 +646,15 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.healPct += (e.healPct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
+    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
+    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
+    g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
+    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
+    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
+    g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
+    g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
+    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
+    g.masteryTwoHandDmgPct += (e.masteryTwoHandDmgPct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];
@@ -595,6 +669,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
     if (am.castWhileMoving) cur.castWhileMoving = true;
+    cur.bonusCharges += (am.bonusCharges ?? 0) * mult;
     // Added effects are rank-1 semantics, not multiplied by talent rank.
     if (am.addEffects) cur.addEffects.push(...am.addEffects);
   }

@@ -86,6 +86,13 @@ describe('threat from damage', () => {
   it('defensive stance: -10% damage dealt, x1.3 threat on what lands', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    // Guarded Stance (defensive_stance) is arms/prot-gated base kit (2026-07-07),
+    // and a warrior is always in a stance now, so a no-spec warrior is forced back
+    // to Battle Stance by the reconcile. Commit ARMS (not prot) so Guarded is a
+    // valid, kept stance: threatModifier reads only the aura, and Arms has no
+    // threat mastery, so the x1.3 stance threat stays isolated (prot's +30%
+    // Recompense would skew it).
+    sim.setSpec('arms');
     sim.castAbility('defensive_stance');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
@@ -94,10 +101,11 @@ describe('threat from damage', () => {
     hit(sim, sim.player, wolf, 100);
     // 100 -> 90 actual damage, 90 * 1.3 threat + 1 seed
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(90 * DEFENSIVE_STANCE_THREAT_MULT + 1, 5);
-    // stance is a toggle
-    for (let i = 0; i < 30; i++) sim.tick();
-    sim.castAbility('defensive_stance');
+    // Stances swap (never toggle to nothing): casting Battle Stance drops Guarded.
+    sim.castAbility('battle_stance');
+    sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(false);
+    expect(sim.player.auras.some((a) => a.kind === 'battle_stance')).toBe(true);
   });
 
   it('bear form multiplies threat by 1.3', () => {
@@ -161,6 +169,9 @@ describe('threat from damage', () => {
     sim.setPlayerLevel(8);
     expect(sim.resolvedAbility('heroic_strike')!.threatFlat).toBe(39);
     sim.setPlayerLevel(10);
+    // Armor Shear (sunder_armor) is arms/prot-gated base kit (2026-07-07): commit
+    // prot so it resolves (its flat threat value is unchanged by the spec commit).
+    expect(sim.setSpec('prot')).toBe(true);
     expect(sim.resolvedAbility('sunder_armor')!.threatFlat).toBe(100);
   });
 });
@@ -406,9 +417,12 @@ describe('taunt and growl', () => {
 });
 
 describe('sunder armor', () => {
-  it('stacks an armor debuff and generates stance-scaled flat threat', () => {
+  // Sink two sunders onto a beefed wolf and report [armor stacks, caster threat].
+  // spec is the committed warrior spec ('prot', 'arms', or null for no spec).
+  function sunderTwice(spec: 'prot' | 'arms' | null): { applications: number; threat: number } {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    if (spec) expect(sim.setSpec(spec)).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
@@ -425,13 +439,32 @@ describe('sunder armor', () => {
       applications = aura?.stacks ?? 0;
     }
     expect(applications).toBeGreaterThanOrEqual(2);
-    // Sunder is now a PERCENT armor reduction: 2% of base armor per stack.
+    // Sunder is a PERCENT armor reduction: 2% of base armor per stack.
     expect((sim as any).effectiveArmor(wolf)).toBe(
       armorBefore * (1 - SUNDER_ARMOR_PCT_PER_STACK * applications),
     );
-    // 100 flat threat per landed sunder (no stance up) + auto-attack noise is
-    // excluded because auto-attack never started
-    expect(wolf.threat.get(sim.playerId)).toBeGreaterThanOrEqual(100 * applications);
+    return { applications, threat: wolf.threat.get(sim.playerId) ?? 0 };
+  }
+
+  it('for Protection the high flat threat lands (>= 100 per application, x1.3 mastery)', () => {
+    const { applications, threat } = sunderTwice('prot');
+    // rank-1 flat 100 per sunder, scaled by the +30% Recompense threat mastery.
+    expect(threat).toBeGreaterThanOrEqual(100 * applications);
+  });
+
+  it('only committed Protection can sunder; Arms and no-spec cannot (Armor Shear prot-only 2026-07-08)', () => {
+    // Arms restructure 2026-07-08: Armor Shear is Protection-only now, so neither a
+    // committed Arms warrior nor a no-spec warrior knows or can resolve it.
+    for (const spec of ['arms', null] as const) {
+      const sim = makeSim('warrior');
+      sim.setPlayerLevel(10);
+      if (spec) expect(sim.setSpec(spec)).toBe(true);
+      expect(
+        sim.known.some((k) => k.def.id === 'sunder_armor'),
+        `${spec} known`,
+      ).toBe(false);
+      expect(sim.resolvedAbility('sunder_armor'), `${spec} resolve`).toBeNull();
+    }
   });
 });
 
@@ -1012,7 +1045,8 @@ describe('druid forms', () => {
 
     hit(sim, wolf, sim.player, 30);
 
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // rageFromTaking(30, 20) = 30 / 20 = 1.5 (the *1.5 divisor was dropped).
+    expect(sim.player.resource).toBeCloseTo(1.5, 5);
   });
 
   it('bear charge is learned with Bruin Form and only works while shifted', () => {

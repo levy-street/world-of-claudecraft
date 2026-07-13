@@ -74,14 +74,14 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     roleType: 'hybrid',
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.staves',
-  }
+  },
 };
 
 // Three curated "signature" abilities per class, shown on the select screen.
 // Each entry MUST be a real ability that the class can learn, enforced by
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
-  warrior: ['charge', 'heroic_strike', 'rend'],
+  warrior: ['charge', 'heroic_strike', 'execute'],
   paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
   hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
@@ -89,5 +89,34 @@ export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
   mage: ['fireball', 'frostbolt', 'polymorph'],
   warlock: ['shadow_bolt', 'corruption', 'life_tap'],
-  druid: ['wrath', 'bear_form', 'rejuvenation']
+  druid: ['wrath', 'bear_form', 'rejuvenation'],
+};
+
+// Spec-card presentation for the Specialization screen. Keyed by spec id. `primaryStat`
+// is the attribute the spec scales with (a StatId reused for its localized itemUi.stats.*
+// label); `complexity` is an owner-tunable designer call; `examples` are 3-4 real,
+// learnable ability ids that showcase the spec (must exist in ABILITIES). Specs absent
+// here render the basic card (icon + name + role) with no detail rows. Warrior first.
+export type SpecComplexity = 'low' | 'medium' | 'high';
+export interface SpecCardInfo {
+  primaryStat: 'str' | 'agi' | 'int' | 'spi' | 'sta';
+  complexity: SpecComplexity;
+  examples: string[];
+}
+export const SPEC_CARD_INFO: Record<string, SpecCardInfo> = {
+  arms: {
+    primaryStat: 'str',
+    complexity: 'medium',
+    examples: ['mortal_strike', 'overpower', 'sweeping_strikes', 'execute'],
+  },
+  fury: {
+    primaryStat: 'str',
+    complexity: 'high',
+    examples: ['bloodthirst', 'raging_gale', 'red_harvest', 'whirlwind'],
+  },
+  prot: {
+    primaryStat: 'str',
+    complexity: 'medium',
+    examples: ['shield_slam', 'revenge', 'thunder_clap', 'sunder_armor'],
+  },
 };

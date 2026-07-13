@@ -91,6 +91,7 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  auras?: { kind: string }[];
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -105,6 +106,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
+      auras: opts.auras ?? [],
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],

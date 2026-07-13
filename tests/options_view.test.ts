@@ -281,9 +281,11 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'startAttackOnAbilityUse',
       'walkByAutoloot',
       'groundReticle',
+      'mouseoverCast',
       'aurasOnPlayerFrame',
       'showItemLevel',
       'showSecondaryActionBar',
+      'showTargetOfTarget',
       'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });

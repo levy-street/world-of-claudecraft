@@ -37,7 +37,6 @@ import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
-  type AuraKind,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -290,7 +289,11 @@ export function formReadout(e: Entity): string {
       a.kind === 'form_bear' ||
       a.kind === 'form_cat' ||
       a.kind === 'form_travel' ||
+      a.kind === 'form_moonkin' ||
+      a.kind === 'form_shadow' ||
       a.kind === 'defensive_stance' ||
+      a.kind === 'battle_stance' ||
+      a.kind === 'berserker_stance' ||
       a.kind === 'stealth',
   );
   if (!form) return 'You are not in any form or stance.';
@@ -432,6 +435,7 @@ export function questReadout(meta: PlayerMeta): string {
 export function gearReadout(meta: PlayerMeta): string {
   const slots: [EquipSlot, string][] = [
     ['mainhand', 'Main Hand'],
+    ['offhand', 'Off Hand'],
     ['helmet', 'Helmet'],
     ['shoulder', 'Shoulder'],
     ['chest', 'Chest'],

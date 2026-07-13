@@ -73,6 +73,8 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'form_cat',
   'form_travel',
   'defensive_stance',
+  'battle_stance',
+  'berserker_stance',
 ]);
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.

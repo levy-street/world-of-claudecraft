@@ -871,26 +871,27 @@ describe('i18n Localization Key Coverage', () => {
 
     // Hard data-regression pin. The sentinel check above proves the {buff} token
     // survives interpolation everywhere but is value-agnostic, so it cannot catch
-    // a silent balance change. commanding_shout is the ability the old blanket $b
-    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
+    // a silent balance change. commanding_shout (the old anchor) was retired from
+    // the warrior kit (see tests/commanding_shout.test.ts), so the pin anchors on
+    // battle_shout: its $b resolves to the rank-1 party AP buff via the same
     // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
     // the picker) changes, and rendering with it confirms the EN description
     // interpolates the real number instead of a stale hardcoded one.
-    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
-      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    const battleShout = abilitiesKnownAt('warrior', ABILITIES.battle_shout.learnLevel).find(
+      (known) => known.def.id === 'battle_shout' && known.rank === 1,
     );
-    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
-    const commandingShoutBuff = abilityBuffValue(commandingShout!);
-    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
+    expect(battleShout, 'battle_shout rank 1 resolves').toBeTruthy();
+    const battleShoutBuff = abilityBuffValue(battleShout!);
+    expect(battleShoutBuff, 'battle_shout rank-1 party AP buff').toBe(10);
     setLanguage('en');
-    const commandingShoutDesc = tEntity({
+    const battleShoutDesc = tEntity({
       kind: 'ability',
-      id: 'commanding_shout',
+      id: 'battle_shout',
       field: 'description',
-      values: { buff: String(commandingShoutBuff) },
+      values: { buff: String(battleShoutBuff) },
     });
-    expect(commandingShoutDesc).toContain('6');
-    expect(commandingShoutDesc).not.toContain('{buff}');
+    expect(battleShoutDesc).toContain('10');
+    expect(battleShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {

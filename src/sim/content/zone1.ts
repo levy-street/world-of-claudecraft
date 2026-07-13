@@ -608,8 +608,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     vendorItems: [
       'eastbrook_arming_sword',
       'bronzework_mace',
+      'eastbrook_greatsword',
       'vale_carving_knife',
       'hickory_shortstaff',
+      'eastbrook_buckler',
       'eastbrook_chain_vest',
       'valespun_robe',
       'tanned_leather_jerkin',

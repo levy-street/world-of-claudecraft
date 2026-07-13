@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import {
   abilitiesKnownAt,
   DEEPFEN_SHALLOWS_LAKE,
@@ -21,12 +22,13 @@ import {
   rageFromDealing,
   rageFromTaking,
   type SimEvent,
+  STANCE_RAGE_GEN,
   spellHitChance,
   xpForLevel,
 } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
-function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
+function makeSim(cls: 'warrior' | 'mage' | 'rogue' | 'hunter' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 
@@ -140,15 +142,20 @@ describe('classic formulas', () => {
   it('rage conversion matches the vanilla constant', () => {
     expect(rageConversion(1)).toBeCloseTo(0.0091 + 3.23 + 4.27, 4);
     expect(rageConversion(10)).toBeCloseTo(0.91 + 32.3 + 4.27, 4);
-    // a 7.5-damage hit at level 1 generates ~7.5 rage
-    expect(rageFromDealing(7.51, 1)).toBeCloseTo(7.5, 1);
+    // The outgoing-damage rage constant is 9 (owner 2026-07-09, toned down from 18
+    // which roughly doubled classic rage income and flooded the bar at low levels).
+    // Feeding the level-1 conversion divisor as the damage cancels it, isolating the
+    // constant exactly.
+    expect(rageFromDealing(rageConversion(1), 1)).toBeCloseTo(9, 5);
   });
 
   it('rage from taking damage scales from attacker level', () => {
-    expect(rageFromTaking(90, 60)).toBeCloseTo(1, 5);
-    expect(rageFromTaking(450, 60)).toBeCloseTo(5, 5);
-    expect(rageFromTaking(900, 60)).toBeCloseTo(10, 5);
-    expect(rageFromTaking(30, 20)).toBeCloseTo(1, 5);
+    // damage / max(1, attackerLevel), no 1.5 divisor: re-adding *1.5 gives
+    // 1/5/10/1 and fails these pins.
+    expect(rageFromTaking(90, 60)).toBeCloseTo(1.5, 5);
+    expect(rageFromTaking(450, 60)).toBeCloseTo(7.5, 5);
+    expect(rageFromTaking(900, 60)).toBeCloseTo(15, 5);
+    expect(rageFromTaking(30, 20)).toBeCloseTo(1.5, 5);
   });
 
   it('mob xp follows the 45+5L rule with gray cutoffs', () => {
@@ -179,10 +186,18 @@ describe('classic formulas', () => {
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike', 'battle_shout']);
-    const w10 = abilitiesKnownAt('warrior', 10);
+    // Iron Bellow (battle_shout) is the warrior's standardized raid buff, learned
+    // at level 1 like the rest of the raid-buff family; Battle Stance is a level-1
+    // baseline stance (excludeSpecs fury), so a no-spec warrior starts with both.
+    expect(w1).toEqual(['heroic_strike', 'battle_shout', 'battle_stance']);
+    // Redhand (overpower) is arms-gated base kit (2026-07-07): hidden with no
+    // spec, so commit arms to confirm it unlocks (with the ungated staples) at 10.
+    const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
+    const w10 = abilitiesKnownAt('warrior', 10, armsMods);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
-    const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
+    // Reaver Strike (heroic_strike) now excludes arms too (2026-07-08), so read its
+    // rank via the no-spec kit which keeps it: rank 2 at level 10.
+    const hs10 = abilitiesKnownAt('warrior', 10).find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
     const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
     expect(m8).toContain('polymorph');
@@ -190,8 +205,8 @@ describe('classic formulas', () => {
   });
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {
-    // warrior: heroic strike rank 4 at 20; execute unlocks at 14, not before
-    expect(abilitiesKnownAt('warrior', 13).map((k) => k.def.id)).not.toContain('execute');
+    // warrior: heroic strike rank 4 at 20; execute unlocks at 12, not before
+    expect(abilitiesKnownAt('warrior', 11).map((k) => k.def.id)).not.toContain('execute');
     const w20 = abilitiesKnownAt('warrior', 20);
     expect(w20.map((k) => k.def.id)).toContain('execute');
     const hs20 = w20.find((k) => k.def.id === 'heroic_strike')!;
@@ -385,7 +400,9 @@ describe('combat', () => {
     wolf.level = 20;
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // rageFromTaking(30, 20) = 30 / 20 = 1.5 (no 1.5 divisor anymore).
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) at the mint.
+    expect(sim.player.resource).toBeCloseTo(1.5 * (1 + STANCE_RAGE_GEN), 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
@@ -597,21 +614,23 @@ describe('combat', () => {
     expect(wolf.auras.some((a: any) => a.kind === 'polymorph')).toBe(false);
   });
 
-  it('overpower requires a dodge proc', () => {
-    const sim = makeSim('warrior');
+  // The dodge-proc gate now lives on the hunter's Counterfang (warrior Redhand
+  // was reworked into the free rage builder, tests/battle_trance.test.ts).
+  it('mongoose_bite requires a dodge proc', () => {
+    const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
     facePlayerAt(sim, wolf);
     sim.player.resource = 50;
-    sim.castAbility('overpower');
+    sim.castAbility('mongoose_bite');
     let _events = sim.tick();
     // without a dodge proc it errors
     expect(sim.counters.damageDealt).toBe(0);
     // simulate a dodge proc
     sim.player.overpowerUntil = sim.time + 5;
-    sim.castAbility('overpower');
+    sim.castAbility('mongoose_bite');
     _events = sim.tick();
     expect(sim.counters.damageDealt).toBeGreaterThan(0);
   });
@@ -1424,13 +1443,32 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_shout']);
+    // At level 1 a no-spec warrior knows Reaver Strike, the level-1 Iron Bellow
+    // raid buff (battle_shout), and the level-1 Battle Stance; rend unlocks at 5.
+    expect(sim.known.map((k) => k.def.id)).toEqual([
+      'heroic_strike',
+      'battle_shout',
+      'battle_stance',
+    ]);
     const _events: any[] = [];
-    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
-    expect(sim.player.level).toBe(4);
+    // to level 5: Onrush (charge) unlocks at 4, Deep Gash (rend) at 5
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + xpForLevel(4) + 10);
+    expect(sim.player.level).toBe(5);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    expect(sim.known.map((k) => k.def.id)).toContain('rend');
+    // Deep Gash (rend) was retired from the warrior kit 2026-07-08: no warrior
+    // learns it now (its ABILITIES def survives but is in no kit list). Gaping
+    // Wounds (deep_wounds) is an arms-gated passive at level 9: hidden with no
+    // spec, present under arms from level 9. (Spec itself unlocks at level 5.)
+    expect(sim.known.map((k) => k.def.id)).not.toContain('rend');
+    expect(sim.known.map((k) => k.def.id)).not.toContain('deep_wounds');
+    const armsAt9 = abilitiesKnownAt(
+      'warrior',
+      9,
+      computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' }),
+    );
+    expect(armsAt9.map((k) => k.def.id)).not.toContain('rend');
+    expect(armsAt9.map((k) => k.def.id)).toContain('deep_wounds');
   });
 
   it('caps at max level', () => {

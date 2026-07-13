@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { Aura, SimEvent } from '../src/sim/types';
+import type { Aura, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -12,15 +12,25 @@ function errors(events: SimEvent[]): Extract<SimEvent, { type: 'error' }>[] {
 
 function timedAura(over: Partial<Aura>): Aura {
   return {
-    id: 'x', name: 'Effect', kind: 'dot', remaining: 10, duration: 10,
-    value: 0, sourceId: 0, school: 'physical', ...over,
+    id: 'x',
+    name: 'Effect',
+    kind: 'dot',
+    remaining: 10,
+    duration: 10,
+    value: 0,
+    sourceId: 0,
+    school: 'physical',
+    ...over,
   };
 }
 
+// These use a mage: a warrior now auto-carries a Battle Stance aura, which would
+// show up as an extra active effect and skew the class-agnostic /buffs formatting
+// assertions. The command itself is class-independent.
 describe('/buffs command', () => {
   it('reports no active effects when the aura list is empty', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     sim.chat('/buffs', a);
@@ -32,10 +42,12 @@ describe('/buffs command', () => {
 
   it('lists each active aura with its ceil-rounded remaining seconds', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
     const e = sim.entities.get(a)!;
-    e.auras.push(timedAura({ id: 'battle_shout', name: 'Battle Shout', kind: 'buff_ap', remaining: 118 }));
+    e.auras.push(
+      timedAura({ id: 'battle_shout', name: 'Battle Shout', kind: 'buff_ap', remaining: 118 }),
+    );
     e.auras.push(timedAura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 3.2 }));
 
     sim.chat('/buffs', a);
@@ -47,7 +59,7 @@ describe('/buffs command', () => {
 
   it('accepts the /buff and /auras aliases', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     for (const cmd of ['/buff', '/auras']) {
@@ -60,7 +72,7 @@ describe('/buffs command', () => {
 
   it('is self-only: produces no chat event and is not logged', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     const result = sim.chat('/buffs', a);

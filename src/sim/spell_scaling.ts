@@ -86,8 +86,10 @@ export function directHitBonus(
 // spells"): instants use the 1.5 floor, like a direct nuke. `castTimeSec` is the
 // rank-resolved cast time (res.castTime), so higher ranks and talent-hastened
 // heals scale correctly.
-export function directHealBonus(spellPower: number, castTimeSec: number): number {
-  return Math.round(spellPower * directSpellCoeff(castTimeSec));
+// `aoe` applies the same per-target coefficient penalty aoeDamage takes, so an
+// AoE heal (Holy Nova) does not get full single-target scaling on every target.
+export function directHealBonus(spellPower: number, castTimeSec: number, aoe = false): number {
+  return Math.round(spellPower * directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1));
 }
 
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)

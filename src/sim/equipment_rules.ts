@@ -1,4 +1,4 @@
-import type { ArmorType, EquipSlot, ItemDef, PlayerClass } from './types';
+import type { ArmorType, EquipSlot, ItemDef, PlayerClass, WeaponItemDef } from './types';
 
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
@@ -73,13 +73,53 @@ export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
   return null;
 }
 
+export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+}
+
+// Titan's Grip (owner decision 2026-07-10): a Fury warrior dual-wields
+// two-handers, one in EACH weapon slot (and may mix 2H with 1H). Weapons only:
+// a shield still never sits with a two-handed mainhand, for anyone.
+export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'warrior' && spec === 'fury';
+}
+
+export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
+  return item.hand ?? 'onehand';
+}
+
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
+  if (item.kind === 'shield' || item.kind === 'held_offhand') {
+    if (item.requiredClass) return item.requiredClass.includes(cls);
+    return true;
+  }
   const weaponArchetype = weaponArchetypeForItem(item);
   if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(cls);
   if (item.requiredClass) return item.requiredClass.includes(cls);
   return true;
+}
+
+export function canEquipItemInSlot(
+  cls: PlayerClass,
+  item: ItemDef,
+  slot: EquipSlot,
+  spec?: string | null,
+): boolean {
+  if (!canEquipItem(cls, item)) return false;
+  if (item.kind === 'armor') {
+    // Rings declare slot 'ring' but bind to either physical ring slot.
+    if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+    return item.slot === slot;
+  }
+  if (item.kind === 'shield' || item.kind === 'held_offhand') return slot === 'offhand';
+  if (item.kind !== 'weapon') return item.slot === slot;
+  const hand = weaponHand(item);
+  if (slot === 'mainhand') return true;
+  if (slot !== 'offhand') return false;
+  if (!canDualWield(cls, spec)) return false;
+  return hand === 'onehand' || (hand === 'twohand' && canDualWieldTwoHand(cls, spec));
 }

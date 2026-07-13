@@ -27,6 +27,7 @@ type Ev = {
   kind?: string;
   school?: string;
   ability?: string | null;
+  fx?: string;
   sourceId?: number;
   targetId?: number;
   amount?: number;
@@ -202,6 +203,27 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
       events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
+  });
+
+  it('a ranged attacker whose swing timer is still up does NOT fire (once per weapon interval, not per tick)', () => {
+    // Regression: the dual-wield-aware guard sits AFTER the ranged branch, so a
+    // ranged attacker needs its own swing-timer gate before it or it re-enters
+    // and fires on all 20 ticks per second (review round 2, item 1).
+    const { sim, p, meta } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 8, 20);
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    const shots = (evs: Ev[]): Ev[] =>
+      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
+    // First tick: one legitimate shot fired, and the timer is armed to the interval.
+    const first = capture(sim);
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(first)).toHaveLength(1);
+    expect(p.swingTimer).toBeGreaterThan(0);
+    // Next 10 ticks (0.5s, still well inside a ~2.3s interval): no further shots.
+    const rest = capture(sim);
+    for (let i = 0; i < 10; i++) updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(rest)).toHaveLength(0);
   });
 
   it('the swing timer decrements every tick even while not auto-attacking', () => {

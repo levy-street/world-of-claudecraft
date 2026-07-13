@@ -79,6 +79,7 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procGlow: false,
     ariaLabel: 'A',
     keybindLabel: 'K',
     ...over,
@@ -121,6 +122,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'unusable', true] },
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
+      { m: 'toggleClass', args: [el.btn, 'proc', false] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
@@ -197,6 +199,7 @@ function idleWorld(): ActionBarWorldInput {
       potionCdRemaining: 0,
       queuedOnSwing: null,
       pos: { x: 0, y: 0, z: 0 },
+      auras: [],
     },
     target: null,
     inventory: [],
