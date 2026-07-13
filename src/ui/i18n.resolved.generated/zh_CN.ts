@@ -686,13 +686,29 @@ export const zh_CN: EnTranslations = {
       "highContrast": "高对比度",
       "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰"
     },
+    "warfare": {
+      "honorAmount": "{amount} 点荣誉",
+      "dualPrice": "{money} + {honor}",
+      "balance": "荣誉：{amount}",
+      "honorFloat": "+{amount} 荣誉",
+      "honorGain": "你获得了 {amount} 点荣誉（{reason}）。",
+      "notEnoughHonor": "荣誉不足。",
+      "reasons": {
+        "arenaWin": "竞技场胜利",
+        "fiestaKill": "嘉年华击倒",
+        "fiestaComplete": "完成嘉年华",
+        "fiestaWin": "嘉年华胜利"
+      }
+    },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
-        "hasteRating": "急速等级"
+        "hasteRating": "急速等级",
+        "warfare": "战争"
       },
+      "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
         "agi": "提高你的反应和准度，强化你的多项战斗属性。",
@@ -706,7 +722,8 @@ export const zh_CN: EnTranslations = {
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
-        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。"
+        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
+        "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -6718,6 +6735,126 @@ export const zh_CN: EnTranslations = {
       "sunpetal_herb": {
         "name": "阳瓣草"
       },
+      "furyforged_warhelm": {
+        "name": "怒铸战盔"
+      },
+      "furyforged_warspaulders": {
+        "name": "怒铸战肩"
+      },
+      "furyforged_warplate": {
+        "name": "怒铸战甲"
+      },
+      "furyforged_girdle": {
+        "name": "怒铸腰带"
+      },
+      "furyforged_legguards": {
+        "name": "怒铸护腿"
+      },
+      "furyforged_gauntlets": {
+        "name": "怒铸护手"
+      },
+      "furyforged_sabatons": {
+        "name": "怒铸战靴"
+      },
+      "stormbound_crown": {
+        "name": "缚雷王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "缚雷肩甲"
+      },
+      "stormbound_hauberk": {
+        "name": "缚雷锁甲"
+      },
+      "stormbound_waistguard": {
+        "name": "缚雷护腰"
+      },
+      "stormbound_legmail": {
+        "name": "缚雷腿甲"
+      },
+      "stormbound_handguards": {
+        "name": "缚雷护手"
+      },
+      "stormbound_greaves": {
+        "name": "缚雷胫甲"
+      },
+      "ashstalker_cowl": {
+        "name": "猎烬兜帽"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "猎烬护肩"
+      },
+      "ashstalker_harness": {
+        "name": "猎烬胸甲"
+      },
+      "ashstalker_waistband": {
+        "name": "猎烬腰带"
+      },
+      "ashstalker_legguards": {
+        "name": "猎烬护腿"
+      },
+      "ashstalker_grips": {
+        "name": "猎烬护手"
+      },
+      "ashstalker_treads": {
+        "name": "猎烬软靴"
+      },
+      "cinderweave_cowl": {
+        "name": "织烬兜帽"
+      },
+      "cinderweave_mantle": {
+        "name": "织烬披肩"
+      },
+      "cinderweave_raiment": {
+        "name": "织烬法衣"
+      },
+      "cinderweave_cord": {
+        "name": "织烬腰绳"
+      },
+      "cinderweave_legwraps": {
+        "name": "织烬裹腿"
+      },
+      "cinderweave_handwraps": {
+        "name": "织烬裹手"
+      },
+      "cinderweave_slippers": {
+        "name": "织烬便鞋"
+      },
+      "final_oath_medallion": {
+        "name": "最终誓约勋章"
+      },
+      "razorwind_torque": {
+        "name": "剃风颈环"
+      },
+      "cinder_sigil_pendant": {
+        "name": "烬印坠饰"
+      },
+      "iron_vow_band": {
+        "name": "铁誓指环"
+      },
+      "unbroken_circle": {
+        "name": "不破之环"
+      },
+      "fleetblood_band": {
+        "name": "疾血指环"
+      },
+      "last_step_signet": {
+        "name": "末步徽戒"
+      },
+      "ashen_focus_ring": {
+        "name": "灰烬专注戒指"
+      },
+      "spellbreakers_seal": {
+        "name": "破法者之印"
+      },
+      "final_argument_greatblade": {
+        "name": "最终论断巨刃"
+      },
+      "first_blood_razor": {
+        "name": "初血剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "烬晶战杖"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
       },
@@ -7854,6 +7991,11 @@ export const zh_CN: EnTranslations = {
         "name": "军需官维克斯",
         "title": "英雄军需官",
         "greeting": "英雄深渊的凭证能换来高崖望最上等的戒指和吊坠。把你的徽记拿给我看。"
+      },
+      "fury": {
+        "name": "怒焰",
+        "title": "荣誉军需官",
+        "greeting": "战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。"
       },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",

@@ -686,13 +686,29 @@ export const pl_PL: EnTranslations = {
       "highContrast": "Wysoki kontrast",
       "highContrastAria": "Przełącz tło o wysokim kontraście: wyłącza ruchomy zwiastun, aby tekst ekranu startowego pozostał czytelny"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
       "names": {
         "spellPower": "Moc zaklęć",
         "critRating": "Ocena krytyczna",
-        "hasteRating": "Ocena pośpiechu"
+        "hasteRating": "Ocena pośpiechu",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Zwiększa twoją moc ataku, więc twoje ciosy bronią są mocniejsze.",
         "agi": "Wyostrza twój refleks i celność, poprawiając kilka twoich statystyk bojowych.",
@@ -706,7 +722,8 @@ export const pl_PL: EnTranslations = {
         "critChance": "Twoja szansa na zadanie ataku krytycznego, zadającego podwójne obrażenia.",
         "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń.",
         "critRating": "Ocena krytyczna z twojego ekwipunku i bonusów zestawów, zwiększająca szansę na trafienie krytyczne. Około 10 oceny daje 1% trafienia krytycznego.",
-        "hasteRating": "Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu."
+        "hasteRating": "Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} mocy ataku",
@@ -6718,6 +6735,126 @@ export const pl_PL: EnTranslations = {
       "sunpetal_herb": {
         "name": "Ziele Słonecznego Płatka"
       },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
+      },
       "bristleback_maul": {
         "name": "Młot Gallowglass"
       },
@@ -7854,6 +7991,11 @@ export const pl_PL: EnTranslations = {
         "name": "Kwatermistrz Vex",
         "title": "Heroiczny kwatermistrz",
         "greeting": "Dowód z heroicznych głębin kupi najlepsze pierścienie i wisiory w Wysokiej Straży. Pokaż mi swoje znaki."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Mistrz Wiedzy Caddis",

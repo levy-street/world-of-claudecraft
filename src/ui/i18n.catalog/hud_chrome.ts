@@ -796,6 +796,20 @@ export const hudChromeStrings = {
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
   },
+  warfare: {
+    honorAmount: '{amount} Honor',
+    dualPrice: '{money} + {honor}',
+    balance: 'Honor: {amount}',
+    honorFloat: '+{amount} Honor',
+    honorGain: 'You gain {amount} Honor ({reason}).',
+    notEnoughHonor: 'Not enough Honor.',
+    reasons: {
+      arenaWin: 'Arena victory',
+      fiestaKill: 'Fiesta takedown',
+      fiestaComplete: 'Fiesta completed',
+      fiestaWin: 'Fiesta victory',
+    },
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -812,7 +826,9 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      warfare: 'Warfare',
     },
+    warfareValue: '+{increase}% dealt / -{reduction}% taken',
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
@@ -831,6 +847,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      warfare:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {

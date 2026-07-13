@@ -686,13 +686,29 @@ export const ko_KR: EnTranslations = {
       "highContrast": "고대비",
       "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
     },
+    "warfare": {
+      "honorAmount": "명예 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "명예: {amount}",
+      "honorFloat": "명예 +{amount}",
+      "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "notEnoughHonor": "명예가 부족합니다.",
+      "reasons": {
+        "arenaWin": "투기장 승리",
+        "fiestaKill": "피에스타 처치",
+        "fiestaComplete": "피에스타 완료",
+        "fiestaWin": "피에스타 승리"
+      }
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
-        "hasteRating": "가속 등급"
+        "hasteRating": "가속 등급",
+        "warfare": "워페어"
       },
+      "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
         "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
@@ -706,7 +722,8 @@ export const ko_KR: EnTranslations = {
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
-        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속."
+        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -6718,6 +6735,126 @@ export const ko_KR: EnTranslations = {
       "sunpetal_herb": {
         "name": "태양꽃잎 약초"
       },
+      "furyforged_warhelm": {
+        "name": "분노벼림 전투투구"
+      },
+      "furyforged_warspaulders": {
+        "name": "분노벼림 전투어깨갑옷"
+      },
+      "furyforged_warplate": {
+        "name": "분노벼림 전투흉갑"
+      },
+      "furyforged_girdle": {
+        "name": "분노벼림 요대"
+      },
+      "furyforged_legguards": {
+        "name": "분노벼림 다리보호대"
+      },
+      "furyforged_gauntlets": {
+        "name": "분노벼림 건틀릿"
+      },
+      "furyforged_sabatons": {
+        "name": "분노벼림 전투장화"
+      },
+      "stormbound_crown": {
+        "name": "폭풍결속 왕관"
+      },
+      "stormbound_spaulders": {
+        "name": "폭풍결속 어깨갑옷"
+      },
+      "stormbound_hauberk": {
+        "name": "폭풍결속 사슬갑옷"
+      },
+      "stormbound_waistguard": {
+        "name": "폭풍결속 허리보호대"
+      },
+      "stormbound_legmail": {
+        "name": "폭풍결속 다리사슬갑옷"
+      },
+      "stormbound_handguards": {
+        "name": "폭풍결속 손보호대"
+      },
+      "stormbound_greaves": {
+        "name": "폭풍결속 경갑"
+      },
+      "ashstalker_cowl": {
+        "name": "잿빛추적자 두건"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "잿빛추적자 어깨보호대"
+      },
+      "ashstalker_harness": {
+        "name": "잿빛추적자 멜빵갑옷"
+      },
+      "ashstalker_waistband": {
+        "name": "잿빛추적자 허리띠"
+      },
+      "ashstalker_legguards": {
+        "name": "잿빛추적자 다리보호대"
+      },
+      "ashstalker_grips": {
+        "name": "잿빛추적자 장갑"
+      },
+      "ashstalker_treads": {
+        "name": "잿빛추적자 발덮개"
+      },
+      "cinderweave_cowl": {
+        "name": "불씨매듭 두건"
+      },
+      "cinderweave_mantle": {
+        "name": "불씨매듭 어깨망토"
+      },
+      "cinderweave_raiment": {
+        "name": "불씨매듭 예복"
+      },
+      "cinderweave_cord": {
+        "name": "불씨매듭 장식끈"
+      },
+      "cinderweave_legwraps": {
+        "name": "불씨매듭 다리싸개"
+      },
+      "cinderweave_handwraps": {
+        "name": "불씨매듭 손싸개"
+      },
+      "cinderweave_slippers": {
+        "name": "불씨매듭 덧신"
+      },
+      "final_oath_medallion": {
+        "name": "최후의 맹세 메달"
+      },
+      "razorwind_torque": {
+        "name": "칼바람 목가리개"
+      },
+      "cinder_sigil_pendant": {
+        "name": "불씨 인장 목걸이"
+      },
+      "iron_vow_band": {
+        "name": "강철 맹세의 반지"
+      },
+      "unbroken_circle": {
+        "name": "깨지지 않는 고리"
+      },
+      "fleetblood_band": {
+        "name": "쾌혈의 반지"
+      },
+      "last_step_signet": {
+        "name": "마지막 걸음의 인장"
+      },
+      "ashen_focus_ring": {
+        "name": "잿빛 집중의 반지"
+      },
+      "spellbreakers_seal": {
+        "name": "주문파괴자의 인장"
+      },
+      "final_argument_greatblade": {
+        "name": "최후 논박의 대검"
+      },
+      "first_blood_razor": {
+        "name": "첫 피의 면도날"
+      },
+      "emberglass_warstaff": {
+        "name": "불씨유리 전투지팡이"
+      },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
       },
@@ -7854,6 +7991,11 @@ export const ko_KR: EnTranslations = {
         "name": "병참장교 벡스",
         "title": "영웅 병참장교",
         "greeting": "영웅 던전의 증표는 하이워치 최고의 반지와 펜던트로 바꿀 수 있소. 징표를 보여 주시오."
+      },
+      "fury": {
+        "name": "퓨리",
+        "title": "명예 병참장교",
+        "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",

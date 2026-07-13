@@ -2901,7 +2901,8 @@
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
      auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#b974ff); rested
-     xp (#4a9eff); the self note (#ff8c66). Crit stays the separate .fct.crit class. */
+     xp (#4a9eff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
+     .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
     color: #bbb;
@@ -2925,6 +2926,9 @@
   }
   .fct-rested-xp {
     color: #4a9eff;
+  }
+  .fct-honor {
+    color: #ffd100;
   }
   .fct-self-note {
     color: #ff8c66;

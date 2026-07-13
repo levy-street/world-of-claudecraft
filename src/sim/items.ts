@@ -72,7 +72,7 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
-  if (def.noDiscard || def.soulbound) return;
+  if (def.noDiscard) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
   removePreferFungible(ctx, itemId, discardCount, meta.entityId);
@@ -311,7 +311,17 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'That item is not sold here.');
     return;
   }
-  if (!def?.buyValue) {
+  const copperUnitPrice =
+    def?.buyValue !== undefined && Number.isFinite(def.buyValue) && def.buyValue > 0
+      ? def.buyValue
+      : 0;
+  const honorPrice =
+    def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
+      ? Math.floor(def.priceHonor)
+      : 0;
+  const hasCopperPrice = copperUnitPrice > 0;
+  const hasHonorPrice = honorPrice > 0;
+  if (!def || (!hasCopperPrice && !hasHonorPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -329,16 +339,22 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
   const qty = vendorStackSize(def);
-  const cost = def.buyValue * qty;
-  if (meta.copper < cost) {
+  const copperCost = copperUnitPrice * qty;
+  const honorCost = honorPrice;
+  if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  if (meta.honor < honorCost) {
+    ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  meta.copper -= cost;
+  meta.copper -= copperCost;
+  meta.honor -= honorCost;
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }

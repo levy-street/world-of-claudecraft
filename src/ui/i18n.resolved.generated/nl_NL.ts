@@ -686,13 +686,29 @@ export const nl_NL: EnTranslations = {
       "highContrast": "Hoog contrast",
       "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
       "names": {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
-        "hasteRating": "Snelheidswaardering"
+        "hasteRating": "Snelheidswaardering",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
         "agi": "Scherpt je reflexen en mikken, wat meerdere van je gevechtsstatistieken verbetert.",
@@ -706,7 +722,8 @@ export const nl_NL: EnTranslations = {
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
-        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid."
+        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
@@ -6718,6 +6735,126 @@ export const nl_NL: EnTranslations = {
       "sunpetal_herb": {
         "name": "Zonnepetaalkruid"
       },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
       },
@@ -7854,6 +7991,11 @@ export const nl_NL: EnTranslations = {
         "name": "Kwartiermeester Vex",
         "title": "Heroïsche Kwartiermeester",
         "greeting": "Bewijs van de heroïsche diepten koopt de fijnste ringen en hangers in Hoogwacht. Laat me je merken zien."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Verhalenmeester Caddis",

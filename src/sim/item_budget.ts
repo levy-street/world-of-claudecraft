@@ -4,7 +4,7 @@
 // item_level.ts (the source-index-aware readouts) and content/heroic_variants.ts
 // (which runs at data-eval time, before item_level finishes initializing) can share
 // this math without an import cycle. item_level.ts re-exports these for back-compat.
-import type { ItemDef, ItemSlot, Stats } from './types';
+import type { CoreStats, ItemDef, ItemSlot } from './types';
 
 // The five primary attributes an item can carry (armor is handled separately: it
 // is an armor-class/slot property, not part of the comparable stat budget).
@@ -114,8 +114,11 @@ export function primaryStatBudget(
 // makes it deterministic (ties broken by PRIMARY_STATS order). Note: under a very
 // lopsided ratio with a tiny budget a minor attribute can still round to 0; the
 // authored tiers use balanced ratios where every attribute survives.
-export function normalizePrimaryStats(stats: Partial<Stats>, budget: number): Partial<Stats> {
-  const out: Partial<Stats> = {};
+export function normalizePrimaryStats(
+  stats: Partial<CoreStats>,
+  budget: number,
+): Partial<CoreStats> {
+  const out: Partial<CoreStats> = {};
   if (stats.armor !== undefined) out.armor = stats.armor;
   const present = PRIMARY_STATS.filter((k) => (stats[k] ?? 0) > 0);
   const total = present.reduce((a, k) => a + (stats[k] ?? 0), 0);

@@ -686,13 +686,29 @@ export const it_IT: EnTranslations = {
       "highContrast": "Contrasto elevato",
       "highContrastAria": "Attiva/disattiva lo sfondo a contrasto elevato: disabilita il trailer in movimento per mantenere leggibile il testo della schermata iniziale"
     },
+    "warfare": {
+      "honorAmount": "{amount} Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} Honor",
+      "honorGain": "You gain {amount} Honor ({reason}).",
+      "notEnoughHonor": "Not enough Honor.",
+      "reasons": {
+        "arenaWin": "Arena victory",
+        "fiestaKill": "Fiesta takedown",
+        "fiestaComplete": "Fiesta completed",
+        "fiestaWin": "Fiesta victory"
+      }
+    },
     "statInfo": {
       "fromYour": "Dai tuoi {value} punti {stat}:",
       "names": {
         "spellPower": "Potere Magico",
         "critRating": "Indice di critico",
-        "hasteRating": "Indice di celerità"
+        "hasteRating": "Indice di celerità",
+        "warfare": "Warfare"
       },
+      "warfareValue": "+{increase}% dealt / -{reduction}% taken",
       "desc": {
         "str": "Aumenta la tua potenza d'attacco, così i colpi della tua arma sono più potenti.",
         "agi": "Affina i tuoi riflessi e la tua mira, migliorando diverse delle tue statistiche di combattimento.",
@@ -706,7 +722,8 @@ export const it_IT: EnTranslations = {
         "critChance": "La tua probabilità che un attacco colpisca in modo critico, infliggendo danni doppi.",
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni.",
         "critRating": "Indice di critico dal tuo equipaggiamento e dai bonus di set, che aumenta la tua probabilità di colpo critico. Circa 10 punti conferiscono l'1% di critico.",
-        "hasteRating": "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità."
+        "hasteRating": "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità.",
+        "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Potenza d'attacco",
@@ -6718,6 +6735,126 @@ export const it_IT: EnTranslations = {
       "sunpetal_herb": {
         "name": "Erba Petalosole"
       },
+      "furyforged_warhelm": {
+        "name": "Furyforged Warhelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Furyforged Warspaulders"
+      },
+      "furyforged_warplate": {
+        "name": "Furyforged Warplate"
+      },
+      "furyforged_girdle": {
+        "name": "Furyforged Girdle"
+      },
+      "furyforged_legguards": {
+        "name": "Furyforged Legguards"
+      },
+      "furyforged_gauntlets": {
+        "name": "Furyforged Gauntlets"
+      },
+      "furyforged_sabatons": {
+        "name": "Furyforged Sabatons"
+      },
+      "stormbound_crown": {
+        "name": "Stormbound Crown"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbound Spaulders"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbound Hauberk"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbound Waistguard"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbound Legmail"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbound Handguards"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbound Greaves"
+      },
+      "ashstalker_cowl": {
+        "name": "Ashstalker Cowl"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Ashstalker Shoulderguards"
+      },
+      "ashstalker_harness": {
+        "name": "Ashstalker Harness"
+      },
+      "ashstalker_waistband": {
+        "name": "Ashstalker Waistband"
+      },
+      "ashstalker_legguards": {
+        "name": "Ashstalker Legguards"
+      },
+      "ashstalker_grips": {
+        "name": "Ashstalker Grips"
+      },
+      "ashstalker_treads": {
+        "name": "Ashstalker Treads"
+      },
+      "cinderweave_cowl": {
+        "name": "Cinderweave Cowl"
+      },
+      "cinderweave_mantle": {
+        "name": "Cinderweave Mantle"
+      },
+      "cinderweave_raiment": {
+        "name": "Cinderweave Raiment"
+      },
+      "cinderweave_cord": {
+        "name": "Cinderweave Cord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Cinderweave Legwraps"
+      },
+      "cinderweave_handwraps": {
+        "name": "Cinderweave Handwraps"
+      },
+      "cinderweave_slippers": {
+        "name": "Cinderweave Slippers"
+      },
+      "final_oath_medallion": {
+        "name": "Medallion of the Final Oath"
+      },
+      "razorwind_torque": {
+        "name": "Razorwind Torque"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Cinder-Sigil Pendant"
+      },
+      "iron_vow_band": {
+        "name": "Iron Vow Band"
+      },
+      "unbroken_circle": {
+        "name": "The Unbroken Circle"
+      },
+      "fleetblood_band": {
+        "name": "Fleetblood Band"
+      },
+      "last_step_signet": {
+        "name": "Last-Step Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Ashen Focus Ring"
+      },
+      "spellbreakers_seal": {
+        "name": "Spellbreaker's Seal"
+      },
+      "final_argument_greatblade": {
+        "name": "Final Argument Greatblade"
+      },
+      "first_blood_razor": {
+        "name": "First-Blood Razor"
+      },
+      "emberglass_warstaff": {
+        "name": "Emberglass Warstaff"
+      },
       "bristleback_maul": {
         "name": "Martello Gallowglass"
       },
@@ -7854,6 +7991,11 @@ export const it_IT: EnTranslations = {
         "name": "Quartiermastro Vex",
         "title": "Quartiermastro Eroico",
         "greeting": "La prova degli abissi eroici compra gli anelli e i pendenti più pregiati di Highwatch. Mostrami i tuoi marchi."
+      },
+      "fury": {
+        "name": "FURY",
+        "title": "Honor Quartermaster",
+        "greeting": "The sands remember every victory. Spend your honor well."
       },
       "loremaster_caddis": {
         "name": "Maestro del sapere Caddis",

@@ -28,6 +28,7 @@ import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
+import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -172,6 +173,20 @@ export function dealDamage(
   }
 
   const sourcePlayer = ctx.pvpController(source);
+
+  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
+  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
+  // dealDamage receives post-mitigation damage, so this deterministic step sits
+  // after the upstream armor/resist roll and before absorb shields.
+  if (
+    amount > 0 &&
+    source?.kind === 'player' &&
+    target.kind === 'player' &&
+    source.id !== target.id &&
+    ctx.isHostileTo(source, target)
+  ) {
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+  }
 
   // The Vale Cup: nobody bleeds at the Sowfield. Any damage between two seated
   // cup fighters is floored to 0 BEFORE absorb shields soak it, belt and

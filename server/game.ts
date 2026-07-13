@@ -2569,6 +2569,10 @@ export class GameServer {
     // benched slot and the counted loss are in the state serializeCharacter
     // persists (idempotent: removePlayer runs it again harmlessly below).
     this.sim.vcupResolveDesertion(session.pid);
+    // Arena forfeit accounting also resolves before persistence. This keeps the
+    // remaining player's win/honor durable if both combatants disconnect close
+    // together; removePlayer repeats the idempotent cleanup after the save.
+    this.sim.arenaResolveDesertion(session.pid);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
@@ -4610,6 +4614,10 @@ export class GameServer {
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
     maybe('duel', this.duelWire(anchorSession.pid));
+    // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
+    // session receives both, then they ride only on earn/spend changes.
+    maybe('honor', meta.honor);
+    maybe('lhonor', meta.lifetimeHonor);
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

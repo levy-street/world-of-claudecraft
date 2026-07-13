@@ -686,13 +686,29 @@ export const ja_JP: EnTranslations = {
       "highContrast": "高コントラスト",
       "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
     },
+    "warfare": {
+      "honorAmount": "名誉 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "名誉: {amount}",
+      "honorFloat": "名誉 +{amount}",
+      "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "notEnoughHonor": "名誉が足りません。",
+      "reasons": {
+        "arenaWin": "アリーナ勝利",
+        "fiestaKill": "フィエスタ撃破",
+        "fiestaComplete": "フィエスタ完遂",
+        "fiestaWin": "フィエスタ勝利"
+      }
+    },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
-        "hasteRating": "ヘイストレーティング"
+        "hasteRating": "ヘイストレーティング",
+        "warfare": "ウォーフェア"
       },
+      "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
         "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
@@ -706,7 +722,8 @@ export const ja_JP: EnTranslations = {
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
-        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。"
+        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -6718,6 +6735,126 @@ export const ja_JP: EnTranslations = {
       "sunpetal_herb": {
         "name": "サンペタル草"
       },
+      "furyforged_warhelm": {
+        "name": "憤怒鋳りの戦兜"
+      },
+      "furyforged_warspaulders": {
+        "name": "憤怒鋳りの戦肩当て"
+      },
+      "furyforged_warplate": {
+        "name": "憤怒鋳りの戦鎧"
+      },
+      "furyforged_girdle": {
+        "name": "憤怒鋳りの腰帯"
+      },
+      "furyforged_legguards": {
+        "name": "憤怒鋳りの脚当て"
+      },
+      "furyforged_gauntlets": {
+        "name": "憤怒鋳りの篭手"
+      },
+      "furyforged_sabatons": {
+        "name": "憤怒鋳りの戦靴"
+      },
+      "stormbound_crown": {
+        "name": "嵐縛りの王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "嵐縛りの肩当て"
+      },
+      "stormbound_hauberk": {
+        "name": "嵐縛りの鎖帷子"
+      },
+      "stormbound_waistguard": {
+        "name": "嵐縛りの腰守り"
+      },
+      "stormbound_legmail": {
+        "name": "嵐縛りの脚鎖"
+      },
+      "stormbound_handguards": {
+        "name": "嵐縛りの手甲"
+      },
+      "stormbound_greaves": {
+        "name": "嵐縛りの脛当て"
+      },
+      "ashstalker_cowl": {
+        "name": "灰追いの頭巾"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "灰追いの肩守り"
+      },
+      "ashstalker_harness": {
+        "name": "灰追いの胴具"
+      },
+      "ashstalker_waistband": {
+        "name": "灰追いの腰帯"
+      },
+      "ashstalker_legguards": {
+        "name": "灰追いの脚当て"
+      },
+      "ashstalker_grips": {
+        "name": "灰追いの手甲"
+      },
+      "ashstalker_treads": {
+        "name": "灰追いの足袋"
+      },
+      "cinderweave_cowl": {
+        "name": "熾火織りの頭巾"
+      },
+      "cinderweave_mantle": {
+        "name": "熾火織りの肩衣"
+      },
+      "cinderweave_raiment": {
+        "name": "熾火織りの法衣"
+      },
+      "cinderweave_cord": {
+        "name": "熾火織りの腰紐"
+      },
+      "cinderweave_legwraps": {
+        "name": "熾火織りの脚巻き"
+      },
+      "cinderweave_handwraps": {
+        "name": "熾火織りの手巻き"
+      },
+      "cinderweave_slippers": {
+        "name": "熾火織りの上履き"
+      },
+      "final_oath_medallion": {
+        "name": "最後の誓いのメダリオン"
+      },
+      "razorwind_torque": {
+        "name": "刃風の首輪"
+      },
+      "cinder_sigil_pendant": {
+        "name": "熾火印のペンダント"
+      },
+      "iron_vow_band": {
+        "name": "鉄の誓いの指輪"
+      },
+      "unbroken_circle": {
+        "name": "不壊の円環"
+      },
+      "fleetblood_band": {
+        "name": "疾血の指輪"
+      },
+      "last_step_signet": {
+        "name": "最後の一歩の印章"
+      },
+      "ashen_focus_ring": {
+        "name": "灰燼の集中指輪"
+      },
+      "spellbreakers_seal": {
+        "name": "呪文砕きの印章"
+      },
+      "final_argument_greatblade": {
+        "name": "最後の論駁の大剣"
+      },
+      "first_blood_razor": {
+        "name": "初血の剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "熾火硝子の戦杖"
+      },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
       },
@@ -7854,6 +7991,11 @@ export const ja_JP: EnTranslations = {
         "name": "補給係ヴェックス",
         "title": "英雄補給係",
         "greeting": "英雄の深部の証があれば、ハイウォッチ一の指輪とペンダントが手に入る。あなたの証を見せてくれ。"
+      },
+      "fury": {
+        "name": "フューリー",
+        "title": "名誉補給官",
+        "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",
