@@ -57,7 +57,8 @@ export type UiIconName =
   | 'lock'
   | 'mail'
   | 'ball'
-  | 'book';
+  | 'book'
+  | 'trash';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -121,6 +122,11 @@ const ICONS: Record<UiIconName, string> = {
   // ── hand-authored geometrics ─────────────────────────────────────────────
   close:
     '<path d="M115 80 256 221 397 80 432 115 291 256 432 397 397 432 256 291 115 432 80 397 221 256 80 115Z"/>',
+  // hand-authored: a waste bin (lid, body, two staves). The destructive-but-quiet
+  // affordance: the character-select delete control, which must READ as a delete
+  // without competing with the Enter World call to action beside it.
+  trash:
+    '<path d="M200 56h112a16 16 0 0 1 16 16v16h96v40H88V88h96V72a16 16 0 0 1 16-16zm16 32h80V80h-80zM120 152h272l-20 280a32 32 0 0 1-32 30H172a32 32 0 0 1-32-30zm88 48v216h32V200zm64 0v216h32V200z"/>',
   prev: '<path d="M336 96 136 256 336 416Z"/>',
   next: '<path d="M176 96 376 256 176 416Z"/>',
   more: '<path d="M94 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M222 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M350 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0Z"/>',
