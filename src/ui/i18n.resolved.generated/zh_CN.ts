@@ -1875,6 +1875,81 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    },
+    "starterTutorial": {
+      "stepLabel": "Step {current} of {total}",
+      "skip": "离开小岛",
+      "leave": "启程前往大陆",
+      "doneTitle": "守望者很满意",
+      "doneBody": "站着不动能教的，我都教完了。剩下的，得先做砸几回才学得会。去吧，大陆在等你，它可不会像我这么客气。",
+      "objectiveDone": "{label}：完成",
+      "objectiveCount": "{label}: {current} of {total}",
+      "scenes": {
+        "wardenReveal": "一名女子从神龛石的光里走出来，拍掉外套上的盐粒，仿佛整个上午都在等你。",
+        "yardReveal": "这就是练武场。三个稻草假人，耐心堪比圣徒，危险程度也差不多。",
+        "wolfReveal": "灌木丛动了。那就是所谓的怪物：一个活生生、非常想要你命的东西。它有一条生命条。在它清空你的之前，先清空它的。"
+      },
+      "steps": {
+        "land": "潮水又给我送来一个。沙滩上有条上坡的路，坡顶的小丘上有座神龛。自己走上来。我不会为任何人扯着嗓子喊。",
+        "enlist": "我这儿有活儿，你两手空空。走近点，跟我对话，把任务接下来。",
+        "target": "这岛上除了我的假人，没什么东西会站着不动等你。练武场在东边。挑一个出来，把它设为你的目标。",
+        "strike": "现在，打它。靠近，动手。自动攻击一旦开始就会自己持续下去，所以别站在那儿欣赏。",
+        "hunt": "三只海滩狼随潮水上了岸，一直盯着我的山羊。往西，下到洼地去。走吧。",
+        "spoils": "杀了却不搜一遍，绝不能就这么走开。拾取一只狼，把它的尖牙取出来。",
+        "report": "回我这儿来。任务不是杀完就算完，是回报了才算完。"
+      },
+      "objective": {
+        "land": "抵达守望者处",
+        "enlist": "接受任务",
+        "target": "选中一个{mob}",
+        "strike": "自动攻击命中次数",
+        "hunt": "击杀海滩狼",
+        "spoils": "Take a {item}",
+        "report": "向守望者复命",
+        "abilityHit": "{ability}命中",
+        "auraUp": "{ability}生效中",
+        "healSelf": "治疗自己",
+        "rangedHit": "远距离自动射击命中",
+        "petSummoned": "召唤恶魔"
+      },
+      "class": {
+        "warrior": {
+          "signature": "挥砍会积攒怒气，而怒气就是用来花的。对假人命中两次{ability}。",
+          "mastery": "战士就是要故意闹出动静。开启{ability}，让整座岛都听见。"
+        },
+        "paladin": {
+          "signature": "你的力量是借来的，而借来的力量必须开口去求。用{ability}为你的武器打上印记。",
+          "mastery": "圣光在烧灼别的东西之前，先会治愈自己人。治疗自己一次，感受一下是什么撑着一名圣骑士不倒。"
+        },
+        "hunter": {
+          "signature": "猎人也有被逼到角落的时候，而被逼到角落的猎人最好清楚刀刃是干什么用的。用{ability}招呼假人两次。",
+          "mastery": "现在，按规矩来一遍。后退到它够不着你的地方再开火：站在那儿打出三次自动射击。"
+        },
+        "rogue": {
+          "signature": "割，然后接着割。命中三次{ability}，看着连击点在它身上一点点叠起来。",
+          "mastery": "连击点攒着一文不值。花掉它们：用{ability}了结这个假人。"
+        },
+        "priest": {
+          "signature": "带着獠牙的信仰。用{ability}打这个假人两次。",
+          "mastery": "还有能治愈的信仰。治疗自己一次。这个习惯你迟早用得上。"
+        },
+        "mage": {
+          "signature": "先放火，问题免谈。对假人命中两次{ability}。",
+          "mastery": "布甲烧得快，所以给自己披上比布更靠得住的东西。把{ability}挂上。"
+        },
+        "warlock": {
+          "signature": "把手伸进黑暗，抓上一把，朝什么东西扔过去。对假人命中两次{ability}。",
+          "mastery": "不管别人怎么跟你说，没有哪个术士是独自上路的。召唤你的恶魔。"
+        },
+        "druid": {
+          "signature": "只要问得客气，荒野自会回应。对假人命中两次{ability}。",
+          "mastery": "现在，为你自己开一次口。把{ability}施放在自己身上。"
+        },
+        "shaman": {
+          "signature": "今天，风暴站在你这边。对假人命中两次{ability}。",
+          "mastery": "先有磐石，才有风暴。用{ability}灌注你的武器。"
+        }
+      }
     }
   },
   "apiError": {
@@ -4571,6 +4646,13 @@ export const zh_CN: EnTranslations = {
     "sortName": "名称",
     "sortRecent": "最近游玩",
     "sortPlaytime": "游戏时长"
+  },
+  "starterTutorial": {
+    "title": "要不要绕个小路？",
+    "body": "这是你的第一个{className}。有一座供新冒险者练手的训练小岛，岛上的守望者会带你弄清自己的职业到底该怎么打。只需几分钟，而且完全可以不去。",
+    "note": "你的角色会保持你创建时的样子。在岛上获得的一切都不会跟着你回来。",
+    "accept": "启航前往曙港",
+    "decline": "跳过，我认得路"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -8048,6 +8130,12 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "dawnhaven_dummy": {
+        "name": "练习假人"
+      },
+      "dawnhaven_strandwolf": {
+        "name": "海滩狼"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -8322,6 +8410,11 @@ export const zh_CN: EnTranslations = {
         "name": "编年史者赞茜",
         "title": "荆峰高地编年史",
         "greeting": "高山什么都不会忘记，{playerName}，我也一样。让我看看你都做过什么吧。"
+      },
+      "dawnhaven_warden": {
+        "name": "守望者芬娜·洛克",
+        "title": "曙港的守护者",
+        "greeting": "还站着，还喘着气呢，{className}？很好。这岛有的是耐心，狼可没有。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -9142,6 +9235,16 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_dawnhaven_wolves": {
+        "title": "守望者的考验",
+        "text": "三只海滩狼随潮水上了岸，从那以后就一直盯着我的山羊。{playerName}，沿西边的小路下到洼地去，让我看看你在练武场上学到了什么。",
+        "completion": "干净利落。你可以去比我这儿更大的岛了。",
+        "objectives": {
+          "0": {
+            "label": "击杀海滩狼"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -9309,6 +9412,24 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          }
+        }
+      },
+      "dawnhaven_isle": {
+        "name": "曙港岛",
+        "welcome": "守望者洛克正在小路尽头等你。",
+        "pois": {
+          "0": {
+            "label": "登岸滩"
+          },
+          "1": {
+            "label": "守望者的憩所"
+          },
+          "2": {
+            "label": "练武场"
+          },
+          "3": {
+            "label": "狼洼地"
           }
         }
       }
