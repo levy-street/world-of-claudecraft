@@ -848,7 +848,10 @@ function applyAbility(
       return;
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
+    // Read the captured local (p.castTargetId is nulled above), matching the
+    // friendly and hostile branches; a smart heal/nuke like Holy Shock resolves
+    // its target here.
+    target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
     if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
       ctx.error(p.id, 'You have no target.');
       return;

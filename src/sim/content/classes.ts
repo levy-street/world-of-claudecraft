@@ -303,7 +303,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_shock',
       'frostbrand_weapon',
       'ghost_wolf',
-      'stormstrike',
       'earthquake',
     ],
     color: 0x0070de,
