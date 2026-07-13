@@ -17,9 +17,9 @@ vi.mock('../../server/db', () => ({
 import { GameServer, SIM_LAP_PHASES } from '../../server/game';
 import { Sim } from '../../src/sim/sim';
 
-// Drive the capture window the way the world loop does: advance sim ticks, feed the
-// profiler a synthetic per-tick sample, then run the finalize check, until the window
-// closes.
+// Drive 60 nominal samples into the capture, then move its wall deadline to now and
+// finalize. Production closes on wall time; this helper keeps the percentile sample
+// assertions deterministic without making the unit test wait three seconds.
 function runCaptureWindow(server: GameServer, perTickMs: number): void {
   const sim = (server as unknown as { sim: { tick: () => unknown; tickCount: number } }).sim;
   const profiler = (
@@ -30,17 +30,13 @@ function runCaptureWindow(server: GameServer, perTickMs: number): void {
   const finalize = (
     server as unknown as { finalizePerfCaptureIfDue: () => void }
   ).finalizePerfCaptureIfDue.bind(server);
-  const endTick = (server as unknown as { perfCaptureEndsAtTick: number | null })
-    .perfCaptureEndsAtTick;
-  if (endTick === null) throw new Error('no capture in flight');
-  let guard = 0;
-  while (sim.tickCount < endTick) {
-    if (++guard > 5000) throw new Error('capture window never closed');
+  for (let i = 0; i < 60; i++) {
     sim.tick();
     profiler.add('total', perTickMs);
     profiler.commit(perTickMs);
-    finalize();
   }
+  (server as unknown as { perfCaptureDeadlineNs: bigint }).perfCaptureDeadlineNs = 0n;
+  finalize();
 }
 
 const detailActive = (server: GameServer): boolean =>
@@ -49,7 +45,12 @@ const detailActive = (server: GameServer): boolean =>
 describe('tick perf capture lifecycle', () => {
   it('is idle before any capture', () => {
     const server = new GameServer();
-    expect(server.perfCaptureStatus()).toEqual({ capturing: false, endsAt: null, last: null });
+    expect(server.perfCaptureStatus()).toEqual({
+      captureId: null,
+      capturing: false,
+      endsAt: null,
+      last: null,
+    });
     expect(detailActive(server)).toBe(false);
   });
 
@@ -58,6 +59,7 @@ describe('tick perf capture lifecycle', () => {
     const before = Date.now();
     const started = server.startPerfCapture(3000);
     expect(started.capturing).toBe(true);
+    expect(started.captureId).toMatch(/^[0-9a-f-]{36}$/);
     expect(started.endsAt).not.toBeNull();
     expect(started.endsAt!).toBeGreaterThanOrEqual(before + 3000);
     // The detailed sub-phase timing is on for the duration of the window.
@@ -72,6 +74,9 @@ describe('tick perf capture lifecycle', () => {
     // ...and the switch is back off so the steady-state loop pays nothing.
     expect(detailActive(server)).toBe(false);
     expect(status.last).not.toBeNull();
+    expect(status.last?.captureId).toBe(started.captureId);
+    expect(status.last?.loopCallbacks).toBe(0);
+    expect(status.last?.simTicks).toBe(0);
     expect(status.last!.durationMs).toBe(3000);
     expect(status.last!.online).toBe(0);
     // The frozen profile reflects the window's samples (7 ms every tick -> mean 7).
@@ -97,15 +102,63 @@ describe('tick perf capture lifecycle', () => {
     expect(duration(def)).toBe(10_000);
   });
 
-  it('restarts the window on a second capture, discarding the earlier profiler state', () => {
+  it('ends by wall time even when many sim ticks run during one saturated window', () => {
+    const server = new GameServer();
+    const profiler = (
+      server as unknown as {
+        tickProfiler: { commit: (ms: number) => void };
+      }
+    ).tickProfiler;
+    const finalize = (
+      server as unknown as { finalizePerfCaptureIfDue: () => void }
+    ).finalizePerfCaptureIfDue.bind(server);
+    server.startPerfCapture(3000);
+
+    // Catch-up work can advance far more than 60 sim ticks without reaching the
+    // monotonic deadline. It must not close the capture early.
+    for (let i = 0; i < 100; i++) {
+      server.sim.tick();
+      profiler.commit(7);
+      finalize();
+    }
+    expect(server.perfCaptureStatus().capturing).toBe(true);
+
+    (server as unknown as { perfCaptureDeadlineNs: bigint }).perfCaptureDeadlineNs = 0n;
+    finalize();
+    expect(server.perfCaptureStatus().capturing).toBe(false);
+  });
+
+  it('records catch-up sim ticks separately from loop callbacks', () => {
     const server = new GameServer();
     server.startPerfCapture(3000);
-    const firstEnd = (server as unknown as { perfCaptureEndsAtTick: number }).perfCaptureEndsAtTick;
-    // A second start resets the profiler and schedules a fresh end tick further out.
-    server.startPerfCapture(6000);
-    const secondEnd = (server as unknown as { perfCaptureEndsAtTick: number })
-      .perfCaptureEndsAtTick;
+    const internal = server as unknown as {
+      recordPerfCaptureCallback: (ticksRun: number) => void;
+      perfCaptureDeadlineNs: bigint;
+      finalizePerfCaptureIfDue: () => void;
+    };
+    internal.recordPerfCaptureCallback(1);
+    internal.recordPerfCaptureCallback(3);
+    internal.recordPerfCaptureCallback(0);
+    internal.perfCaptureDeadlineNs = 0n;
+    internal.finalizePerfCaptureIfDue();
+
+    expect(server.perfCaptureStatus().last).toMatchObject({
+      loopCallbacks: 3,
+      simTicks: 4,
+      catchUpCallbacks: 1,
+      maxTicksPerCallback: 3,
+    });
+  });
+
+  it('restarts the window on a second capture, discarding the earlier profiler state', () => {
+    const server = new GameServer();
+    const first = server.startPerfCapture(3000);
+    const firstEnd = (server as unknown as { perfCaptureEndsAtMs: number }).perfCaptureEndsAtMs;
+    // A second start resets the profiler and schedules a fresh wall deadline further out.
+    const second = server.startPerfCapture(6000);
+    const secondEnd = (server as unknown as { perfCaptureEndsAtMs: number }).perfCaptureEndsAtMs;
     expect(secondEnd).toBeGreaterThan(firstEnd);
+    expect(second.captureId).not.toBe(first.captureId);
     expect(server.perfCaptureStatus().capturing).toBe(true);
     expect(detailActive(server)).toBe(true);
   });

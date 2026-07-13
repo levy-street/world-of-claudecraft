@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "15758ac30c4f362540d0849a4e76bfe17f5c103747f54084f333e44ae593b9fe",
-  "catalogHash": "97e993ac2db85487c1f08a99757fb735c377c28a9721adf6cfedc0bf94506358",
+  "bundleId": "fa619638bd355e0a7c4f4e29347926c28aa5975ba90fba569dc7dd9b0bd2c5df",
+  "catalogHash": "b30ce54cb7d99765d45cb05f60ad394a6b2f081af6853fc9e191edc75b270baa",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -143,6 +143,18 @@
           "url": "/audio/sfx/cast_arcane.mp3?v=c3d6820b7952",
           "bytes": 55840,
           "sha256": "c3d6820b7952609c81f141604dd6e117053404ef6b96c912f6225dd7a58a11c0"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "cast_chain_heal": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/cast_chain_heal.wav?v=fa283673672a",
+          "bytes": 489644,
+          "sha256": "fa283673672a39cd532dfe65e343f923fbb19cc87f14dfad8e9d9edc8c858ca7"
         }
       ],
       "gain": 1,

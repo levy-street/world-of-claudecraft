@@ -959,6 +959,19 @@ export const es: EnTranslations = {
       "promoteLeader": "Promover a líder",
       "inviteUsage": "¿Invitar a quién? Uso: /invite <nombre>."
     },
+    "playerMenu": {
+      "info": "Info del jugador",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "openFor": "Abrir el menú de jugador de {name}",
+      "profileUnavailable": "No se encontró el perfil de {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Cuenta operada por IA",
+      "watchTwitch": "Ver en Twitch",
+      "watchX": "Ver en X",
+      "watchKick": "Ver en Kick",
+      "watchYouTube": "Ver en YouTube"
+    },
     "lootSettings": {
       "title": "Ajustes de botín",
       "close": "Cerrar ajustes de botín",
@@ -1478,7 +1491,15 @@ export const es: EnTranslations = {
     },
     "social": {
       "lastSeen": "Última conexión: {when}",
-      "lastSeenNever": "nunca"
+      "lastSeenNever": "nunca",
+      "ignoredTab": "Ignorados",
+      "blockedTab": "Bloqueados",
+      "ignoredEmpty": "No estás ignorando a nadie.",
+      "blockedEmpty": "No has bloqueado a nadie.",
+      "blockSearchPlaceholder": "Nombre del jugador",
+      "blockAction": "Bloquear",
+      "nowBlocking": "{name} bloqueado.",
+      "stopBlockingTitle": "Dejar de bloquear a {name}"
     },
     "gathering": {
       "title": "Recolección",
@@ -5912,7 +5933,7 @@ export const es: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -7204,15 +7225,6 @@ export const es: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
       },
-      "deathless_warguard_legmail": {
-        "name": "Malla de piernas del Guardián Imperecedero"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Desgarralmas"
-      },
-      "scourgehide_carapace": {
-        "name": "Caparazón de piel de Azote"
-      },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
       },
@@ -7251,9 +7263,6 @@ export const es: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
-      },
-      "soulforged_warplate": {
-        "name": "Coraza de guerra forjada en almas"
       },
       "stormcallers_focus": {
         "name": "Foco del Invocador de Tormentas"
@@ -7568,6 +7577,15 @@ export const es: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardián Imperecedero"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imperecedero"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Cuchillo Imperecedero"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"

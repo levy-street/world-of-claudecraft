@@ -91,10 +91,19 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   }
 }
 
-export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): void {
+export function enterDungeon(
+  ctx: SimContext,
+  dungeonId: string,
+  pid?: number,
+  // [dev] /dev raid: skip the raid-group requirement and the Nythraxis attunement
+  // so a lone tester can zone into the raid. Dev-gated (never in production). The
+  // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
+  devBypass = false,
+): void {
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return;
+  const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
   // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
@@ -106,11 +115,11 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return;
   }
-  if (!party?.raid && raidRequired) {
+  if (!party?.raid && raidRequired && !bypass) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta)) {
+  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta) && !bypass) {
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return;
   }

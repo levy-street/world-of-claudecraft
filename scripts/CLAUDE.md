@@ -45,6 +45,7 @@ imported by a type-checked Vitest suite carries a hand-written `.d.mts` next to 
 | Scaffold / release | `new_endpoint.mjs` (`new:endpoint`, scaffolds a `RouteDef` module on the `server/http/` pipeline, see `server/http/CLAUDE.md`), `release_version.mjs` (`release:check`/`release:prepare`), `version_sync.mjs` (`version:sync`), `electron-dev.mjs`/`electron-build.mjs` (`electron:*`; both bundle vendor deps via `electron-vendor.mjs`) | none |
 | Data export | `export_loot_spreadsheet.mjs` (esbuild-bundles `src/sim` to a loot sheet in `docs/`) | none |
 | Admin / dev utils | `grant_admin.mjs`, `create_gm.mjs`; one-off DB migrations are `.ts` via `tsx` (`db:*` scripts) | `DATABASE_URL` |
+| Production ops | `prod_cpu_monitor*.mjs` (supervised CPU incident capture + immutable in-image PID/profile helpers) | exact-command restricted SSH access to the production container; optional mode-0600 staff token for `ops.perf` tick detail |
 | Local realms | `dev-realms.mjs` (launches built server processes) | built server (`npm run realms`) |
 | Helper | `browser_path.mjs` (resolves Chrome/Edge/Chromium; override `BROWSER_PATH=`), shared pure helpers in `lib/` | none |
 

@@ -25,6 +25,11 @@ import {
 } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
+import {
+  type ChatSenderFlair,
+  normalizeStreamerLink,
+  type StreamerLinks,
+} from '../sim/account_flair';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -109,6 +114,7 @@ import {
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
+  type CharacterProfile,
   type DailyRewardStatus,
   type DelveRunInfo,
   type IWorld,
@@ -175,6 +181,14 @@ import {
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from './chat_channels';
+import {
+  ignoreKey,
+  type PlayerSocialFlags,
+  parseIgnoreList,
+  resolvePlayerSocialFlags,
+  serializeIgnoreList,
+} from './chat_ignore_core';
+import { appendChatLineParts, CHAT_MESSAGE_TOKEN, CHAT_NAME_TOKEN, chatAiTagEl } from './chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
 import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
 import { formatClockTime } from './clock';
@@ -360,7 +374,13 @@ import {
   type PublishedCard,
   publishCard,
 } from './player_card_share';
-import { chatPlayerContextActions } from './player_context_menu';
+import {
+  chatPlayerContextActions,
+  type PlayerContextAction,
+  type PlayerContextActionId,
+  streamerActionPlatform,
+  streamerMenuActions,
+} from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
@@ -722,7 +742,11 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
 
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
-const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
+// The OFFLINE ignore store. Online, the ignore list is server-persisted and
+// arrives on the `social` frame, so this set is not consulted at all (see the
+// chat event filter): keeping a second, name-keyed local list live online is
+// exactly how you get "I unignored them and still cannot see them".
+const LOCAL_IGNORES_KEY = 'woc_ignored_chat_names';
 // Classic-style chat tabs: the ordered channel tabs the player has opened, and the
 // tab that was active last session. The built-in `all`/`combat` views are
 // implicit and never stored.
@@ -1279,7 +1303,7 @@ export class Hud {
   private playerFrameMover: MovableFrame | null = null;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
-  private ignoredChatNames = new Set<string>();
+  private localIgnoredNames = new Set<string>();
   private lastHudFastAt = 0;
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
@@ -1351,7 +1375,7 @@ export class Hud {
     private renderer: Renderer,
     private keybinds: Keybinds,
   ) {
-    this.ignoredChatNames = this.loadIgnoredChatNames();
+    this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim);
     this.initChatTabs();
     this.initChatBoxGeometry();
@@ -8975,7 +8999,11 @@ export class Hud {
           this.refreshGossip();
           break;
         case 'chat': {
-          if (this.isChatIgnored(ev.from)) break;
+          // OFFLINE ONLY. Online, the server drops an ignored player's public chat
+          // before it reaches us (and honours the whisper/roll carve-outs), so
+          // consulting the local list here as well would resurrect stale ignores
+          // the player has since cleared from their account.
+          if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
@@ -8985,6 +9013,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -8996,6 +9025,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9010,6 +9040,7 @@ export class Hud {
                   CHAT_TEMPLATE_KEYS.toWhisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
                 );
               else {
                 this.chatLogFrom(
@@ -9019,6 +9050,7 @@ export class Hud {
                   CHAT_TEMPLATE_KEYS.whisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
                   ev.fromTitle,
                 );
                 audio.whisper();
@@ -9032,6 +9064,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.general,
                 'general',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9043,6 +9076,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.world,
                 'world',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9054,6 +9088,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.lfg,
                 'lfg',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9065,6 +9100,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.guild,
                 'guild',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9076,6 +9112,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.officer,
                 'officer',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9087,6 +9124,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.emote,
                 'emote',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9098,6 +9136,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.roll,
                 'roll',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9109,6 +9148,7 @@ export class Hud {
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
+                ev.flair,
                 ev.fromTitle,
               );
               break;
@@ -9807,6 +9847,7 @@ export class Hud {
     templateKey: TranslationKey,
     chan: string,
     fromPid?: number,
+    flair?: ChatSenderFlair,
     fromTitle?: string,
   ): void {
     const wasNearBottom =
@@ -9822,41 +9863,41 @@ export class Hud {
     // deed id on the event, localized here); the context-menu handlers below
     // close over the RAW `name`, so whisper/social lookups stay unaffected.
     sender.textContent = titledDisplayName(name, fromTitle);
-    sender.title = t('hud.chat.rightClickName', { name });
+    sender.title = t('hudChrome.playerMenu.openFor', { name });
     sender.setAttribute('role', 'button');
-    sender.setAttribute('aria-label', t('hud.chat.rightClickName', { name }));
+    sender.setAttribute('aria-label', t('hudChrome.playerMenu.openFor', { name }));
     sender.tabIndex = 0;
+    // Anchor the menu under the name itself for a click/tap/keyboard open, and at
+    // the cursor for a right-click.
+    const openUnderName = () => {
+      const rect = sender.getBoundingClientRect();
+      this.openChatPlayerContextMenu(name, rect.left, rect.bottom, sender);
+    };
+    // bindTouchTap covers BOTH paths: any touch pointer (the browser only
+    // synthesizes `click` for the PRIMARY one, so a bare click binding goes dead
+    // while the other thumb is steering) AND the ordinary mouse/keyboard click.
+    // Do NOT also addEventListener('click', ...) here: bindTouchTap binds click
+    // itself, so the handler would fire twice per click and the second call would
+    // hit the toggle branch below and slam the menu shut the instant it opened.
+    bindTouchTap(sender, openUnderName);
     sender.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
-      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY);
+      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY, sender);
     });
     sender.addEventListener('keydown', (ev) => {
       if (ev.key !== 'Enter' && ev.key !== ' ') return;
       ev.preventDefault();
-      const rect = sender.getBoundingClientRect();
-      this.openChatPlayerContextMenu(name, rect.left, rect.bottom);
+      openUnderName();
     });
-    const nameToken = '__WOC_CHAT_NAME__';
-    const messageToken = '__WOC_CHAT_MESSAGE__';
-    const rendered = t(templateKey, { name: nameToken, message: messageToken });
-    let senderAppended = false;
-    let messageAppended = false;
-    for (const part of rendered.split(/(__WOC_CHAT_NAME__|__WOC_CHAT_MESSAGE__)/)) {
-      if (part === nameToken) {
-        div.append(sender);
-        senderAppended = true;
-      } else if (part === messageToken) {
-        this.appendChatMessageBody(div, text, fromPid);
-        messageAppended = true;
-      } else if (part) {
-        div.append(document.createTextNode(part));
-      }
-    }
-    if (!senderAppended || !messageAppended) {
-      div.textContent = '';
-      div.append(sender, document.createTextNode(': '));
-      this.appendChatMessageBody(div, text, fromPid);
-    }
+    // The [AI] tag rides the {name} slot, not the head of the line: the localized
+    // templates read '[General] {name}: {message}', so it must sit beside the name
+    // and not look like part of the channel prefix (see ./chat_line).
+    const rendered = t(templateKey, { name: CHAT_NAME_TOKEN, message: CHAT_MESSAGE_TOKEN });
+    appendChatLineParts(div, rendered, {
+      aiTag: flair?.ai ? chatAiTagEl(document) : null,
+      sender,
+      appendBody: (parent) => this.appendChatMessageBody(parent, text, fromPid),
+    });
     this.chatLogEl.appendChild(div);
     // Announce the player-chat line through the tab-independent #chat-live region.
     this.announceChatLine(div);
@@ -13629,26 +13670,102 @@ export class Hud {
     }
   }
 
+  /**
+   * The stream-link rows both player menus share. Resolved by NAME through
+   * IWorld.accountFlair, which works for a player far outside your ~120yd interest
+   * scope (a name you only ever saw in chat); the live entity's wire fields are the
+   * fallback for the in-view case. streamerMenuActions re-validates every URL, so a
+   * link that is not a plain https URL on that platform's own host never becomes a
+   * row at all.
+   */
+  private streamerLinksFor(name: string, ent?: Entity): StreamerLinks | undefined {
+    return (
+      this.sim.accountFlair(name)?.links ?? (ent?.kind === 'player' ? ent.streamerLinks : undefined)
+    );
+  }
+
+  private streamerActionsFor(name: string, ent?: Entity): PlayerContextAction[] {
+    return streamerMenuActions(this.streamerLinksFor(name, ent));
+  }
+
+  /**
+   * Is this account AI-operated? Same two sources, same precedence as
+   * streamerLinksFor: the by-name flair cache first (so it resolves for a player who
+   * is nowhere near you and only ever spoke in chat), then the live entity.
+   */
+  private isAiAccount(name: string, ent?: Entity): boolean {
+    return (
+      this.sim.accountFlair(name)?.ai ?? (ent?.kind === 'player' ? ent.aiAccount === true : false)
+    );
+  }
+
+  /**
+   * The player-menu header: portrait chip, then the name, with the [AI] mark inside
+   * the name span rather than beside it. The header is a flex row with a wide gap, so
+   * a sibling tag would drift away from the name it qualifies; nested, it stays glued
+   * to the name and the name's ellipsis still governs the overflow. Shared by both
+   * player menus (chat-name and nameplate) so the two cannot drift apart.
+   */
+  private ctxPlayerTitleHtml(name: string, entCls: PlayerClass | null, ent?: Entity): string {
+    const chip = entCls
+      ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' })
+      : '';
+    const label = esc(t('hudChrome.playerMenu.aiTagTitle'));
+    const ai = this.isAiAccount(name, ent)
+      ? `<span class="ai-tag ctx-title-ai" role="img" aria-label="${label}" title="${label}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`
+      : '';
+    return `<div class="ctx-title ctx-title-player">${chip}<span class="ctx-title-name">${ai}${esc(name)}</span></div>`;
+  }
+
+  /**
+   * NEVER interpolate `action.href` into this markup, not even inside a quoted
+   * attribute. A streamer link is operator-entered text, and while
+   * normalizeStreamerLink pins it to an https URL on the platform's own host, the
+   * WHATWG URL parser leaves a single quote (and `&`) UNENCODED in the path: a
+   * legal-but-hostile `https://twitch.tv/a'onmouseover=alert(1)'` would break out
+   * of a single-quoted or unquoted attribute. The href is deliberately kept in the
+   * JS `actions` array and handed straight to window.open by openStreamerLink, so
+   * it never becomes HTML. Only the fixed enum id, the fixed-registry icon, and an
+   * esc()'d t() label are interpolated here. tests/chat_context_menu.test.ts pins this.
+   */
+  private ctxItemHtml(action: PlayerContextAction): string {
+    const icon = action.icon ? svgIcon(action.icon) : '';
+    return `<div class="ctx-item${action.icon ? ' ctx-stream' : ''}" data-act="${action.id}">${icon}${esc(action.label)}</div>`;
+  }
+
+  /**
+   * Open a stream-link row's channel, if `act` is one; false for every other row.
+   * The URL is re-validated HERE, at click time, even though the server validated it
+   * on write and streamerLinkList validated it again when the row was built: this is
+   * the last gate before an operator-entered string reaches window.open.
+   */
+  private openStreamerLink(act: string, actions: PlayerContextAction[]): boolean {
+    const platform = streamerActionPlatform(act as PlayerContextActionId);
+    if (!platform) return false;
+    const url = normalizeStreamerLink(platform, actions.find((a) => a.id === act)?.href);
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   openContextMenu(pid: number, name: string, x: number, y: number): void {
     const el = $('#ctx-menu');
     const party = this.sim.partyInfo;
     const isLeader = party?.leader === this.sim.playerId;
     const isMember = !!party?.members.some((m) => m.pid === pid);
-    // online play exposes persistent friends/ignore/guild; offline falls back
-    // to the client-only chat ignore stored in localStorage
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const inGuildWithInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Same flag resolution the chat-name menu uses, so the two menus can never
+    // disagree about whether this player is muted, blocked, friended or guilded.
+    const flags = this.playerSocialFlags(name);
+    const { online, isFriend, ignored, blocked } = flags;
+    const inGuildWithInvite = flags.canGuildInvite;
+    const alreadyGuilded = flags.alreadyGuilded;
     const ent = this.sim.entities.get(pid);
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    let html = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    if (entCls)
-      html += `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`;
+    // An official streamer's own channels lead, right under the title, exactly as
+    // they do on the chat-name menu (both build their rows from streamerMenuActions).
+    const streamActions = this.streamerActionsFor(name, ent);
+    let html = this.ctxPlayerTitleHtml(name, entCls, ent);
+    html += streamActions.map((a) => this.ctxItemHtml(a)).join('');
+    html += `<div class="ctx-item" data-act="info">${esc(t('hudChrome.playerMenu.info'))}</div>`;
     if (pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="whisper">${esc(t('hud.chat.context.whisper'))}</div>`;
     if (!isMember)
@@ -13659,17 +13776,9 @@ export class Hud {
       html += `<div class="ctx-item" data-act="${isFriend ? 'unfriend' : 'friend'}">${esc(t(isFriend ? 'hud.chat.context.removeFriend' : 'hud.chat.context.addFriend'))}</div>`;
     if (inGuildWithInvite && !alreadyGuilded)
       html += `<div class="ctx-item" data-act="ginvite">${esc(t('hud.chat.context.inviteGuild'))}</div>`;
-    html += `<div class="ctx-item" data-act="ignore">${esc(
-      t(
-        ignored
-          ? online
-            ? 'hud.chat.context.unignore'
-            : 'hud.chat.context.unignoreChat'
-          : online
-            ? 'hud.chat.context.ignore'
-            : 'hud.chat.context.ignoreChat',
-      ),
-    )}</div>`;
+    html += `<div class="ctx-item" data-act="ignore">${esc(t(ignored ? 'hud.chat.context.unignore' : 'hud.chat.context.ignore'))}</div>`;
+    if (online)
+      html += `<div class="ctx-item" data-act="block">${esc(t(blocked ? 'hudChrome.playerMenu.unblock' : 'hudChrome.playerMenu.block'))}</div>`;
     if (this.reportHooks && pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="report">${esc(t('hud.chat.context.report'))}</div>`;
     if (isLeader && isMember && pid !== this.sim.playerId) {
@@ -13692,7 +13801,8 @@ export class Hud {
     this.placePopupAt(el, x, y, 170, ctxReserveBottom);
     this.keepPopupOnScreen(el);
     this.bindContextMenuActions((act) => {
-      if (act === 'inspect') this.openInspect(pid);
+      if (this.openStreamerLink(act, streamActions)) return;
+      if (act === 'info') this.openPlayerInfo(name, pid);
       else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') this.sim.partyInvite(pid);
       else if (act === 'trade') this.sim.tradeRequest(pid);
@@ -13700,11 +13810,9 @@ export class Hud {
       else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ pid, name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, blocked);
+      else if (act === 'report') this.openReportWindow({ pid, name });
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
@@ -13719,9 +13827,13 @@ export class Hud {
     const tier = target.discordTier ?? 0;
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
     const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
+    // The AI mark rides this line too, so it has to be in BOTH the early-out below
+    // and the signature: without it an AI account carrying no Discord/dev flair
+    // would never render the line at all, and a live flag flip would never repaint.
+    const isAi = target.aiAccount === true;
     if (
       target.kind !== 'player' ||
-      (!tier && !target.discordName && !target.discordRole && !devIdx)
+      (!tier && !target.discordName && !target.discordRole && !devIdx && !isAi)
     ) {
       if (this.targetDiscordSig !== '') {
         this.targetDiscordSig = '';
@@ -13733,7 +13845,7 @@ export class Hud {
     // This runs every frame the target frame updates; only rebuild when the Discord
     // content actually changes (else a fresh <img> per frame would re-fetch the
     // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
+    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}|${isAi ? 1 : 0}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
     const parts: string[] = [];
@@ -13756,6 +13868,20 @@ export class Hud {
     if (devDef) {
       parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
     }
+    if (isAi) {
+      // The shared .ai-tag mark, and deliberately NOT a .uf-dc-chip: the chip rules
+      // live UNLAYERED in index.extra.css, and unlayered CSS beats every @layer rule,
+      // so the chip's own color/background would override the gradient in
+      // @layer components and paint straight over it. The flair line is a flex row,
+      // so a bare span sits inline beside the chips anyway.
+      parts.push(
+        // role=img + aria-label, not just title: this is a DISCLOSURE, and assistive
+        // tech announces `title` inconsistently on a non-focusable span. Screen-reader
+        // users must hear "AI-operated account", not the bare "[AI]" literal (or, if
+        // the title is skipped entirely, nothing at all). Mirrors chatAiTagEl.
+        `<span class="ai-tag" role="img" aria-label="${esc(t('hudChrome.playerMenu.aiTagTitle'))}" title="${esc(t('hudChrome.playerMenu.aiTagTitle'))}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`,
+      );
+    }
     el.innerHTML = parts.join('');
     // Hide the external Discord avatar if its CDN image fails to load, so the line
     // never shows the browser's broken-image placeholder (the nickname stays).
@@ -13766,6 +13892,39 @@ export class Hud {
 
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
+  /**
+   * The out-of-range Player Info card: the same #inspect-window, painted from the
+   * public character sheet. Deliberately thinner than openInspect: no worn gear,
+   * no wallet balance, no Discord/GitHub identity. Those live on the per-entity
+   * wire and stay proximity-gated, so standing next to someone still shows you
+   * strictly more than looking their name up from chat.
+   */
+  private openRemoteProfile(profile: CharacterProfile): void {
+    const cls = profile.cls as PlayerClass;
+    const el = $('#inspect-window');
+    this.closeOtherWindows('#inspect-window');
+    const guildHtml = profile.guild ? `<div class="inspect-meta">${esc(profile.guild)}</div>` : '';
+    el.innerHTML =
+      `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
+      `<div class="inspect-card">` +
+      portraitChipHtml({ cls, skin: profile.skin, name: profile.name, variant: 'lg' }) +
+      `<div class="inspect-name">${esc(profile.name)}</div>` +
+      `<div class="inspect-meta">${esc(
+        t('itemUi.equipment.levelClass', {
+          level: formatNumber(profile.level, { maximumFractionDigits: 0 }),
+          className: classDisplayName(cls),
+        }),
+      )}</div>` +
+      guildHtml +
+      `</div>`;
+    hydratePortraits(el);
+    el.querySelector('[data-close]')?.addEventListener('click', () => {
+      el.style.display = 'none';
+    });
+    el.style.display = 'block';
+  }
+
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
@@ -14052,59 +14211,88 @@ export class Hud {
     });
   }
 
-  private openChatPlayerContextMenu(name: string, x: number, y: number): void {
+  private openChatPlayerContextMenu(
+    name: string,
+    x: number,
+    y: number,
+    opener?: HTMLElement,
+  ): void {
     const el = $('#ctx-menu');
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const canGuildInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Clicking the same name twice closes the menu. Without this branch, the
+    // outside-click dismiss refuses to close a menu whose opener was clicked
+    // (it treats the opener as "inside"), so the second click would silently
+    // re-open it instead of toggling it shut.
+    if (opener && el.style.display === 'block' && this.ctxMenuOpener === opener) {
+      this.closeContextMenu();
+      return;
+    }
+    const flags = this.playerSocialFlags(name);
+    // A portrait chip only when the player is close enough to have a live entity;
+    // for a name seen in /world or /lfg the title is name-only. Player Info still
+    // works either way (it falls back to the public character sheet).
+    const livePidForMenu = this.playerPidByName(name);
+    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const actions = chatPlayerContextActions({
       playerName: name,
       selfName: this.sim.player.name,
-      online,
-      isFriend,
-      ignored,
-      canGuildInvite,
-      alreadyGuilded,
+      online: flags.online,
+      isFriend: flags.isFriend,
+      ignored: flags.ignored,
+      blocked: flags.blocked,
+      canGuildInvite: flags.canGuildInvite,
+      alreadyGuilded: flags.alreadyGuilded,
       canReport: !!this.reportHooks?.submitByName,
+      streamerLinks: this.streamerLinksFor(name, ent),
     });
-    // If the player is in view we know their class+skin, so show a portrait and
-    // a "View Profile" entry; otherwise the menu is name-only as before.
-    const livePidForMenu = this.playerPidByName(name);
-    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    const titleHtml = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    const inspectHtml = entCls
-      ? `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`
-      : '';
-    el.innerHTML =
-      titleHtml +
-      inspectHtml +
-      actions.map((a) => `<div class="ctx-item" data-act="${a.id}">${esc(a.label)}</div>`).join('');
+    const titleHtml = this.ctxPlayerTitleHtml(name, entCls, ent);
+    el.innerHTML = titleHtml + actions.map((a) => this.ctxItemHtml(a)).join('');
     hydratePortraits(el);
     el.style.display = 'block';
-    this.placePopupAt(el, x, y, 170, 240);
+    // Reserve the real height (title + one row per action) instead of a fixed 240,
+    // which the mobile 40px item floor now overflows.
+    const reserveBottom = 80 + actions.length * (this.isMobileLayout() ? 44 : 28);
+    this.placePopupAt(el, x, y, 170, reserveBottom);
     this.keepPopupOnScreen(el);
+    this.ctxMenuOpener = opener ?? null;
     this.bindContextMenuActions((act) => {
+      if (this.openStreamerLink(act, actions)) return;
       const livePid = this.playerPidByName(name);
-      if (act === 'inspect') {
-        if (livePid !== null) this.openInspect(livePid);
-      } else if (act === 'whisper') this.startWhisper(name);
+      if (act === 'info') this.openPlayerInfo(name, livePid);
+      else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') {
+        // Route by NAME, not by pid: a chat name from /world, /lfg or /guild has
+        // no entity inside our ~120yd interest scope, but the server-side sim
+        // resolves /invite against every player on the realm.
         if (livePid !== null) this.sim.partyInvite(livePid);
-        else this.showError(t('hud.system.playerNotNearby'));
+        else this.sim.chat(`/invite ${name}`);
       } else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, flags.ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, flags.blocked);
+      else if (act === 'report') this.openReportWindow({ name });
+    });
+  }
+
+  /**
+   * Player Info for a name. In view we have the live entity, so open the full
+   * inspect card (gear + $WOC/Discord/dev flair, all of which ride the
+   * proximity-gated entity wire). Out of view, fall back to the PUBLIC character
+   * sheet, which is the same subset the crawlable /c/<name> page already serves,
+   * so looking someone up from chat exposes nothing new about them.
+   */
+  private openPlayerInfo(name: string, pid: number | null): void {
+    if (pid !== null && this.sim.entities.get(pid)?.kind === 'player') {
+      this.openInspect(pid);
+      return;
+    }
+    void this.sim.characterProfile(name).then((profile) => {
+      if (!profile) {
+        this.showError(t('hudChrome.playerMenu.profileUnavailable', { name }));
+        return;
+      }
+      this.openRemoteProfile(profile);
     });
   }
 
@@ -14220,43 +14408,53 @@ export class Hud {
     return keyByMessage[text] ? t(keyByMessage[text]) : t('hud.report.failed');
   }
 
-  private chatIgnoreKey(name: string): string {
-    return name.trim().toLowerCase();
+  /** The per-player flags both context menus render from. */
+  private playerSocialFlags(name: string): PlayerSocialFlags {
+    return resolvePlayerSocialFlags(name, this.sim.socialInfo, this.localIgnoredNames);
   }
 
-  private isChatIgnored(name: string): boolean {
-    return this.ignoredChatNames.has(this.chatIgnoreKey(name));
-  }
-
-  private loadIgnoredChatNames(): Set<string> {
+  private loadLocalIgnoredNames(): Set<string> {
     try {
-      const raw = localStorage.getItem(IGNORED_CHAT_NAMES_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return new Set(
-        Array.isArray(parsed)
-          ? parsed.filter((name): name is string => typeof name === 'string')
-          : [],
-      );
+      return parseIgnoreList(localStorage.getItem(LOCAL_IGNORES_KEY));
     } catch {
       return new Set();
     }
   }
 
-  private saveIgnoredChatNames(): void {
-    localStorage.setItem(IGNORED_CHAT_NAMES_KEY, JSON.stringify([...this.ignoredChatNames]));
+  private saveLocalIgnoredNames(): void {
+    try {
+      localStorage.setItem(LOCAL_IGNORES_KEY, serializeIgnoreList(this.localIgnoredNames));
+    } catch {
+      // a full or blocked localStorage must never break chat
+    }
   }
 
-  private toggleChatIgnore(name: string): void {
-    const key = this.chatIgnoreKey(name);
+  /**
+   * Toggle an ignore. Online the server owns the list (it is what filters the
+   * chat before it ever reaches us, and it follows the account to another
+   * browser); offline there is no server, so the local set is the whole store.
+   */
+  private togglePlayerIgnore(name: string, ignored: boolean): void {
+    if (this.sim.socialInfo !== null) {
+      ignored ? this.sim.ignoreRemove(name) : this.sim.ignoreAdd(name);
+      return;
+    }
+    const key = ignoreKey(name);
     if (!key) return;
-    if (this.ignoredChatNames.has(key)) {
-      this.ignoredChatNames.delete(key);
+    if (this.localIgnoredNames.has(key)) {
+      this.localIgnoredNames.delete(key);
       this.log(t('hud.system.noLongerIgnoring', { name }), '#aaf');
     } else {
-      this.ignoredChatNames.add(key);
+      this.localIgnoredNames.add(key);
       this.log(t('hud.system.ignoringChat', { name }), '#aaf');
     }
-    this.saveIgnoredChatNames();
+    this.saveLocalIgnoredNames();
+  }
+
+  /** Blocking is a server-side social action, so it only exists online. */
+  private togglePlayerBlock(name: string, blocked: boolean): void {
+    if (this.sim.socialInfo === null) return;
+    blocked ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
   }
 
   closeContextMenu(): void {
@@ -14784,13 +14982,15 @@ function abilityRangeLine(def: AbilityDef): string | null {
 
 // The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
 // mastery) PLUS active buff_spellhaste auras (Arcane Power, Icy Veins, Metamorphosis).
-// Mirrors the sim's spellHasteMult so a shown cast time never disagrees with the real one,
-// and an activated haste cooldown visibly shortens every cast tooltip.
+// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
+// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
+// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
+// the sim-combat helper across the seam, so the formula is kept identical here by hand.
 function playerSpellHasteFrac(p: Entity | null | undefined): number {
   if (!p) return 0;
   let frac = p.spellHaste;
   for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
-  return frac;
+  return Math.max(0, frac);
 }
 
 // `spellHaste` (the live character's total spell haste, a fraction) shortens the shown

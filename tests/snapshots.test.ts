@@ -359,6 +359,65 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 });
 
+// Operator-set account flair (the [AI] mark + an official streamer's links). The
+// wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
+// server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only
+// the decode (a hand-built wire record) would let the server rename or drop the key
+// with every test still green, which is exactly the hole this closes.
+describe('account flair over the wire', () => {
+  const LINKS = { twitch: 'https://twitch.tv/someone', youtube: 'https://youtu.be/abc' };
+
+  it('mirrors the AI mark and the streamer links onto another player client', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+    // What the server stamps on the entity once an operator sets the flair
+    // (GameServer.applyAccountFlairLive; the wireStreamerLinks gate runs there).
+    e.aiAccount = true;
+    e.streamerLinks = { ...LINKS };
+
+    const wire = wireEntity(e);
+    expect(wire.ai).toBe(1); // the wire key is `ai`, encoded as 1 (sparse)
+    expect(wire.slk).toEqual(LINKS); // the wire key is `slk`
+
+    // A DIFFERENT player's client seeing this streamer in the world.
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.aiAccount).toBe(true);
+    expect(mirrored.streamerLinks).toEqual(LINKS);
+  });
+
+  it('leaves an ordinary player unmarked, with neither key on the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+
+    const wire = wireEntity(e);
+    // Absent, not `ai: 0` / `slk: {}`: an ordinary player's identity record must be
+    // byte-unchanged by this feature, or every entity on screen pays for it.
+    expect(wire).not.toHaveProperty('ai');
+    expect(wire).not.toHaveProperty('slk');
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.aiAccount).toBe(false);
+    expect(mirrored.streamerLinks).toBeUndefined();
+  });
+
+  it('drops a hostile link at the client boundary even if one reached the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const e = sim.player;
+    // The server gates this twice (admin write + wireStreamerLinks), so this record
+    // cannot occur in production. The point is that the CLIENT re-sanitizes anyway:
+    // a link that survives to a client must never reach window.open.
+    const wire = { ...wireEntity(e), slk: { twitch: 'javascript:alert(1)' } };
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(e.id)!.streamerLinks).toBeUndefined();
+  });
+});
+
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
@@ -1253,7 +1312,7 @@ describe('/who command', () => {
     expect(text).not.toContain('Gimel');
   });
 
-  it('waits for the requester ignore list before showing online players', () => {
+  it('waits for the requester block list before showing online players', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const self = joinServer(server, fc, 1, 'Aleph');
@@ -1264,11 +1323,11 @@ describe('/who command', () => {
     server.handleMessage(self, JSON.stringify({ t: 'cmd', cmd: 'chat', text: '/who' }));
 
     expect(eventTexts(fc.sent)).toContain(
-      'Your ignore list is still loading. Try /who again in a moment.',
+      'Your block list is still loading. Try /who again in a moment.',
     );
   });
 
-  it('omits players whose own ignore list is still loading', () => {
+  it('omits players whose own block list is still loading', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const self = joinServer(server, fc, 1, 'Aleph');

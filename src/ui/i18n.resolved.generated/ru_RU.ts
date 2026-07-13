@@ -959,6 +959,19 @@ export const ru_RU: EnTranslations = {
       "promoteLeader": "Назначить лидером",
       "inviteUsage": "Кого пригласить? Использование: /invite <имя>."
     },
+    "playerMenu": {
+      "info": "Об игроке",
+      "block": "Заблокировать",
+      "unblock": "Разблокировать",
+      "openFor": "Открыть меню игрока {name}",
+      "profileUnavailable": "Профиль игрока {name} не найден.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Аккаунт под управлением ИИ",
+      "watchTwitch": "Смотреть на Twitch",
+      "watchX": "Открыть в X",
+      "watchKick": "Смотреть на Kick",
+      "watchYouTube": "Смотреть на YouTube"
+    },
     "lootSettings": {
       "title": "Настройки добычи",
       "close": "Закрыть настройки добычи",
@@ -1478,7 +1491,15 @@ export const ru_RU: EnTranslations = {
     },
     "social": {
       "lastSeen": "Последний вход: {when}",
-      "lastSeenNever": "никогда"
+      "lastSeenNever": "никогда",
+      "ignoredTab": "Игнорируемые",
+      "blockedTab": "Заблокированные",
+      "ignoredEmpty": "Вы никого не игнорируете.",
+      "blockedEmpty": "Вы никого не заблокировали.",
+      "blockSearchPlaceholder": "Имя персонажа",
+      "blockAction": "Заблокировать",
+      "nowBlocking": "{name} заблокирован.",
+      "stopBlockingTitle": "Разблокировать {name}"
     },
     "gathering": {
       "title": "Собирательство",
@@ -7204,15 +7225,6 @@ export const ru_RU: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Скипетр бессмертного двора"
       },
-      "deathless_warguard_legmail": {
-        "name": "Ножные латы бессмертного стража"
-      },
-      "soulrend_diadem": {
-        "name": "Диадема разрыва души"
-      },
-      "scourgehide_carapace": {
-        "name": "Панцирь бичевой шкуры"
-      },
       "cryptplate_helm": {
         "name": "Гробничный латный шлем"
       },
@@ -7251,9 +7263,6 @@ export const ru_RU: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"
-      },
-      "soulforged_warplate": {
-        "name": "Душекованый боевой доспех"
       },
       "stormcallers_focus": {
         "name": "Средоточие буревестника"
@@ -7568,6 +7577,15 @@ export const ru_RU: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Нитраксис, Бич Торнпика"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Олдрен, бессмертный страж"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Малрик, бессмертный иерофант"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Восс, бессмертный клинок"
       },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"

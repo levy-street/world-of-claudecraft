@@ -959,6 +959,19 @@ export const en_XA: EnTranslations = {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",
       "inviteUsage": "[Íñʋíţé ŵĥóɱ? Úšáĝé: /íñʋíţé <ñáɱé>.]"
     },
+    "playerMenu": {
+      "info": "[Þļáýéŕ Íñƒó]",
+      "block": "[Ɓļóçķ]",
+      "unblock": "[Úñƀļóçķ]",
+      "openFor": "[Óþéñ þļáýéŕ ɱéñú ƒóŕ {name}]",
+      "profileUnavailable": "[Ñó þŕóƒíļé ƒóúñð ƒóŕ {name}.]",
+      "aiTag": "[[ÁÍ]]",
+      "aiTagTitle": "[ÁÍ-óþéŕáţéð áççóúñţ]",
+      "watchTwitch": "[Ŵáţçĥ óñ Ţŵíţçĥ]",
+      "watchX": "[Ʋíéŵ óñ Ẋ]",
+      "watchKick": "[Ŵáţçĥ óñ Ķíçķ]",
+      "watchYouTube": "[Ŵáţçĥ óñ ÝóúŢúƀé]"
+    },
     "lootSettings": {
       "title": "[Ļóóţ Šéţţíñĝš]",
       "close": "[Çļóšé ļóóţ šéţţíñĝš]",
@@ -1478,7 +1491,15 @@ export const en_XA: EnTranslations = {
     },
     "social": {
       "lastSeen": "[Ļášţ šééñ: {when}]",
-      "lastSeenNever": "[ñéʋéŕ]"
+      "lastSeenNever": "[ñéʋéŕ]",
+      "ignoredTab": "[Íĝñóŕéð]",
+      "blockedTab": "[Ɓļóçķéð]",
+      "ignoredEmpty": "[Ýóú áŕé ñóţ íĝñóŕíñĝ áñýóñé.]",
+      "blockedEmpty": "[Ýóú ĥáʋé ñóţ ƀļóçķéð áñýóñé.]",
+      "blockSearchPlaceholder": "[Þļáýéŕ ñáɱé]",
+      "blockAction": "[Ɓļóçķ]",
+      "nowBlocking": "[Ɓļóçķéð {name}.]",
+      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]"
     },
     "gathering": {
       "title": "[Ĝáţĥéŕíñĝ]",
@@ -5912,7 +5933,7 @@ export const en_XA: EnTranslations = {
       },
       "chain_heal": {
         "name": "[Çĥáíñ Ĥéáļ]",
-        "description": "[Ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ á ļáŕĝé áɱóúñţ, ţĥéñ ĵúɱþš ţó úþ ţó 2 áððíţíóñáļ ñéáŕƀý áļļíéš, ĥéáļíñĝ ƒóŕ 40% ļéšš ŵíţĥ éáçĥ ĵúɱþ. (Ŕéšţóŕáţíóñ šíĝñáţúŕé)]"
+        "description": "[Ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ á ļáŕĝé áɱóúñţ, ţĥéñ ĵúɱþš ţó úþ ţó 2 áððíţíóñáļ ñéáŕƀý áļļíéš, ĥéáļíñĝ ƒóŕ 50% ļéšš ŵíţĥ éáçĥ ĵúɱþ. (Ŕéšţóŕáţíóñ šíĝñáţúŕé)]"
       },
       "metamorphosis": {
         "name": "[Ðŕéáð Ášþéçţ]",
@@ -7204,15 +7225,6 @@ export const en_XA: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "[Šçéþţéŕ óƒ ţĥé Ðéáţĥļéšš Çóúŕţ]"
       },
-      "deathless_warguard_legmail": {
-        "name": "[Ðéáţĥļéšš Ŵáŕĝúáŕð Ļéĝɱáíļ]"
-      },
-      "soulrend_diadem": {
-        "name": "[Šóúļŕéñð Ðíáðéɱ]"
-      },
-      "scourgehide_carapace": {
-        "name": "[Šçóúŕĝéĥíðé Çáŕáþáçé]"
-      },
       "cryptplate_helm": {
         "name": "[Çŕýþţþļáţé Ĥéļɱ]"
       },
@@ -7251,9 +7263,6 @@ export const en_XA: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "[Ðéáţĥļéšš Ĝŕéáţƀļáðé]"
-      },
-      "soulforged_warplate": {
-        "name": "[Šóúļƒóŕĝéð Ŵáŕþļáţé]"
       },
       "stormcallers_focus": {
         "name": "[Šţóŕɱçáļļéŕ'š Ƒóçúš]"
@@ -7568,6 +7577,15 @@ export const en_XA: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "[Šþíŕíţ óƒ Áļðŕéñ]"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "[Šþíŕíţ óƒ Ɱáļŕíç]"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "[Šþíŕíţ óƒ Ʋóšš]"
       },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"

@@ -40,7 +40,7 @@ import {
   spendResource as spendResourceImpl,
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
-import { isRooted, isStunned } from './combat/cc';
+import { isLockedOut, isRooted, isSilenced, isStunned } from './combat/cc';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -194,6 +194,7 @@ import {
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
 } from './mob/combat_profile';
+import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -4162,6 +4163,7 @@ export class Sim {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
     if (
       this.isNythraxisRaidEnemy(target) &&
+      !nythraxis.isNythraxisControllableAdd(target) && // priest + stalker are meant to be CC'd
       this.isNythraxisControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !this.isNythraxisScriptedControl(target, aura)
@@ -4360,6 +4362,14 @@ export class Sim {
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
+    // A mob flagged ignoreTaunt (special add AI) or a training dummy takes the
+    // threat (it shows on the meters) but never turns, forces, or fights: without
+    // this guard a taunt (or an area taunt like Defiant Bellow in range) force-
+    // aggroed it permanently and pinned the attacker in combat forever.
+    if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
+      this.enterCombat(p, mob);
+      return;
+    }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
       return;
@@ -5039,6 +5049,7 @@ export class Sim {
         !tmpl.desperateHeal &&
         !tmpl.mendAlly &&
         !tmpl.wardAllies &&
+        !tmpl.channelHeal &&
         !tmpl.rally &&
         !tmpl.warcry)
     )
@@ -5175,6 +5186,82 @@ export class Sim {
               school,
             });
           }
+        }
+      }
+    }
+    // Channeled ESCALATING heal ("Hierophant's Mending"): heal the strongest
+    // friendly mob in range (its protectee, the raid boss) for a base amount plus
+    // a ramp that grows each uninterrupted tick. Any stun/incapacitate/silence
+    // (isStunned covers stun/incap/polymorph) breaks the channel and RESETS the
+    // ramp, so a raid that fails to lock the caster down watches the boss heal for
+    // more and more. The caster is CC-able by design (ccImmune: false).
+    if (tmpl.channelHeal) {
+      const ch = tmpl.channelHeal;
+      // Stun, a true silence, OR a school lockout (a real interrupt: Kick / Pummel /
+      // Counterspell lands a lockout of the channel's school) all break the channel
+      // and reset the ramp. This is what makes the interruptible cast bar honest.
+      const interrupted =
+        this.ctx.isStunned(mob) || isSilenced(mob) || isLockedOut(mob, ch.school ?? 'shadow');
+      if (interrupted) {
+        // Clear the (scripted) channel bar so a stunned/interrupted healer is not
+        // left rendering a frozen cast; updateHealerHold re-arms it once free.
+        if (mob.castingAbility === NYTHRAXIS_SPIRIT_MENDING_CAST_ID) {
+          mob.castingAbility = null;
+          mob.castTotal = 0;
+          mob.castRemaining = 0;
+          mob.channeling = false;
+        }
+        if (mob.channelRamp > 0) {
+          mob.channelRamp = 0;
+          if (!tmpl.quietMechanics)
+            this.emit({
+              type: 'log',
+              text: `${ch.name} is interrupted!`,
+              color: '#ffcc66',
+              entityId: mob.id,
+            });
+        }
+        mob.channelTimer = ch.every;
+      } else {
+        mob.channelTimer -= DT;
+        if (mob.channelTimer <= 0) {
+          mob.channelTimer = ch.every;
+          let protectee: Entity | null = null;
+          for (const ally of this.entities.values()) {
+            if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
+            if (ally.hostile !== mob.hostile || ally.id === mob.id) continue; // same-faction, not self
+            if (dist2d(ally.pos, mob.pos) > ch.radius) continue;
+            if (!protectee || ally.maxHp > protectee.maxHp) protectee = ally; // the boss = biggest pool
+          }
+          if (protectee && protectee.hp < protectee.maxHp) {
+            const amount = Math.round(
+              Math.min(ch.maxHeal, ch.baseHeal + mob.channelRamp) * (mob.mechanicHealMult ?? 1),
+            );
+            const school = ch.school ?? 'shadow';
+            this.emit({
+              type: 'spellfx',
+              sourceId: mob.id,
+              targetId: protectee.id,
+              school,
+              fx: 'beam',
+            });
+            // Reuse the existing "{name} channels {mechanic}." log shape (localized
+            // by the broad channels rule in sim_i18n.ts); the heal amount surfaces
+            // through the heal event + beam above, so no bespoke number string ships.
+            // quietMechanics healers (the Nythraxis spirit adds) stay silent: the
+            // beam + heal event are enough, no per-tick chat line.
+            if (!tmpl.quietMechanics)
+              this.emit({
+                type: 'log',
+                text: `${mob.name} channels ${ch.name}.`,
+                color: '#66ff99',
+                entityId: mob.id,
+              });
+            this.applyHeal(mob, protectee, amount, ch.name);
+          }
+          // The ramp grows each uninterrupted tick (capped so base+ramp never
+          // exceeds maxHeal), so an ignored channel heals more and more over time.
+          mob.channelRamp = Math.min(ch.maxHeal - ch.baseHeal, mob.channelRamp + ch.rampAdd);
         }
       }
     }
@@ -6281,6 +6368,8 @@ export class Sim {
   friendRemove(_name: string): void {}
   blockAdd(_name: string): void {}
   blockRemove(_name: string): void {}
+  ignoreAdd(_name: string): void {}
+  ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
   guildAccept(): void {}
@@ -6295,6 +6384,15 @@ export class Sim {
   guildEventRemove(_eventId: number): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
+  }
+  characterProfile(_name: string): Promise<import('../world_api').CharacterProfile | null> {
+    return Promise.resolve(null);
+  }
+  // Account flair is operator-set on an ACCOUNT, and offline play has none, so the
+  // offline world never has any to report. The sim must never read this for
+  // gameplay either way: it is cosmetic, server-set, and confers no effect.
+  accountFlair(_name: string): import('./account_flair').PlayerFlair | null {
+    return null;
   }
 
   private updateDuels(): void {

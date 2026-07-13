@@ -959,6 +959,19 @@ export const de_DE: EnTranslations = {
       "promoteLeader": "Zum Anführer befördern",
       "inviteUsage": "Wen einladen? Verwendung: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Spielerinfo",
+      "block": "Blockieren",
+      "unblock": "Blockierung aufheben",
+      "openFor": "Spielermenü für {name} öffnen",
+      "profileUnavailable": "Kein Profil für {name} gefunden.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "KI-gesteuertes Konto",
+      "watchTwitch": "Auf Twitch ansehen",
+      "watchX": "Auf X ansehen",
+      "watchKick": "Auf Kick ansehen",
+      "watchYouTube": "Auf YouTube ansehen"
+    },
     "lootSettings": {
       "title": "Beute-Einstellungen",
       "close": "Beute-Einstellungen schließen",
@@ -1478,7 +1491,15 @@ export const de_DE: EnTranslations = {
     },
     "social": {
       "lastSeen": "Zuletzt gesehen: {when}",
-      "lastSeenNever": "nie"
+      "lastSeenNever": "nie",
+      "ignoredTab": "Ignoriert",
+      "blockedTab": "Blockiert",
+      "ignoredEmpty": "Du ignorierst niemanden.",
+      "blockedEmpty": "Du hast niemanden blockiert.",
+      "blockSearchPlaceholder": "Spielername",
+      "blockAction": "Blockieren",
+      "nowBlocking": "{name} blockiert.",
+      "stopBlockingTitle": "{name} nicht mehr blockieren"
     },
     "gathering": {
       "title": "Sammeln",
@@ -5912,7 +5933,7 @@ export const de_DE: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorphose",
@@ -7204,15 +7225,6 @@ export const de_DE: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Zepter des Todlosen Hofes"
       },
-      "deathless_warguard_legmail": {
-        "name": "Todlose Beinkette der Kriegswache"
-      },
-      "soulrend_diadem": {
-        "name": "Seelenriss-Diadem"
-      },
-      "scourgehide_carapace": {
-        "name": "Geißelhaut-Panzer"
-      },
       "cryptplate_helm": {
         "name": "Gruftplatten-Helm"
       },
@@ -7251,9 +7263,6 @@ export const de_DE: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"
-      },
-      "soulforged_warplate": {
-        "name": "Seelengeschmiedete Kriegsplatte"
       },
       "stormcallers_focus": {
         "name": "Fokus des Sturmrufers"
@@ -7568,6 +7577,15 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Todlose Kriegswache"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Todloser Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Todlose Klinge"
       },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"

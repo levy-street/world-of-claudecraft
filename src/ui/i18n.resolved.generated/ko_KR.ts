@@ -959,6 +959,19 @@ export const ko_KR: EnTranslations = {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
     },
+    "playerMenu": {
+      "info": "플레이어 정보",
+      "block": "차단",
+      "unblock": "차단 해제",
+      "openFor": "{name} 님의 플레이어 메뉴 열기",
+      "profileUnavailable": "{name} 님의 프로필을 찾을 수 없습니다.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 운영 계정",
+      "watchTwitch": "Twitch에서 시청",
+      "watchX": "X에서 보기",
+      "watchKick": "Kick에서 시청",
+      "watchYouTube": "YouTube에서 시청"
+    },
     "lootSettings": {
       "title": "전리품 설정",
       "close": "전리품 설정 닫기",
@@ -1478,7 +1491,15 @@ export const ko_KR: EnTranslations = {
     },
     "social": {
       "lastSeen": "마지막 접속: {when}",
-      "lastSeenNever": "없음"
+      "lastSeenNever": "없음",
+      "ignoredTab": "무시됨",
+      "blockedTab": "차단",
+      "ignoredEmpty": "아무도 무시하고 있지 않습니다.",
+      "blockedEmpty": "아무도 차단하지 않았습니다.",
+      "blockSearchPlaceholder": "플레이어 이름",
+      "blockAction": "차단",
+      "nowBlocking": "{name} 님을 차단했습니다.",
+      "stopBlockingTitle": "{name} 님 차단 해제"
     },
     "gathering": {
       "title": "채집",
@@ -7204,15 +7225,6 @@ export const ko_KR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "불사 궁정의 홀"
       },
-      "deathless_warguard_legmail": {
-        "name": "불사 전쟁수호 다리갑옷"
-      },
-      "soulrend_diadem": {
-        "name": "영혼분열 왕관"
-      },
-      "scourgehide_carapace": {
-        "name": "재앙가죽 갑각"
-      },
       "cryptplate_helm": {
         "name": "묘지판금 투구"
       },
@@ -7251,9 +7263,6 @@ export const ko_KR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "불사 대검"
-      },
-      "soulforged_warplate": {
-        "name": "혼주조 전투갑옷"
       },
       "stormcallers_focus": {
         "name": "폭풍소환사의 매개체"
@@ -7568,6 +7577,15 @@ export const ko_KR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "죽지 않는 전쟁수호병 알드렌"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "죽지 않는 대사제 말릭"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "죽지 않는 칼날 보스"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"

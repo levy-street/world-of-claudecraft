@@ -4073,7 +4073,11 @@
   /* ---------- social ---------- */
   /* social: friends / guild / ignore */
   #social-window {
-    width: 348px;
+    /* Wider than the other windows: the tab rail carries FIVE tabs (Friends,
+       Guild, Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
+       roster rows carry a name + rank + zone + last-seen line. */
+    width: 520px;
+    max-width: calc(100vw - 24px);
     height: 560px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
@@ -4082,6 +4086,19 @@
   }
   #social-window.open {
     display: flex;
+  }
+  /* The social rail carries FIVE tabs (Friends, Guild, Ignored, Blocked, Raid) and
+     is the only frame rail that should span the window, so scope the fill here
+     rather than touching the shared `.tab` grammar. `flex: 1 0 auto` grows each tab
+     to share the width but never shrinks one below its own text, so a long locale
+     label (Russian "Игнорируемые" is far wider than "Ignored") overflows into the
+     rail's existing horizontal scroll instead of being clipped. */
+  #social-window .tab-rail {
+    padding: 0;
+  }
+  #social-window .tab {
+    flex: 1 0 auto;
+    text-align: center;
   }
   .soc-realm-tag {
     color: #7fd4ff;

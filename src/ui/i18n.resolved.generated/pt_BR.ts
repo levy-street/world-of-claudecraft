@@ -959,6 +959,19 @@ export const pt_BR: EnTranslations = {
       "promoteLeader": "Promover a Líder",
       "inviteUsage": "Convidar quem? Uso: /invite <nome>."
     },
+    "playerMenu": {
+      "info": "Info do jogador",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "openFor": "Abrir o menu do jogador {name}",
+      "profileUnavailable": "Nenhum perfil encontrado para {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Conta operada por IA",
+      "watchTwitch": "Assistir na Twitch",
+      "watchX": "Ver no X",
+      "watchKick": "Assistir na Kick",
+      "watchYouTube": "Assistir no YouTube"
+    },
     "lootSettings": {
       "title": "Configurações de Saque",
       "close": "Fechar configurações de saque",
@@ -1478,7 +1491,15 @@ export const pt_BR: EnTranslations = {
     },
     "social": {
       "lastSeen": "Visto por último: {when}",
-      "lastSeenNever": "nunca"
+      "lastSeenNever": "nunca",
+      "ignoredTab": "Ignorados",
+      "blockedTab": "Bloqueados",
+      "ignoredEmpty": "Você não está ignorando ninguém.",
+      "blockedEmpty": "Você não bloqueou ninguém.",
+      "blockSearchPlaceholder": "Nome do jogador",
+      "blockAction": "Bloquear",
+      "nowBlocking": "{name} bloqueado.",
+      "stopBlockingTitle": "Parar de bloquear {name}"
     },
     "gathering": {
       "title": "Coleta",
@@ -5912,7 +5933,7 @@ export const pt_BR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -7204,15 +7225,6 @@ export const pt_BR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro da Corte Imortal"
       },
-      "deathless_warguard_legmail": {
-        "name": "Malha de Pernas Imortal da Guarda de Guerra"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Dilacera-Almas"
-      },
-      "scourgehide_carapace": {
-        "name": "Carapaça de Couro do Flagelo"
-      },
       "cryptplate_helm": {
         "name": "Elmo de Placas da Cripta"
       },
@@ -7251,9 +7263,6 @@ export const pt_BR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Grande Lâmina Imortal"
-      },
-      "soulforged_warplate": {
-        "name": "Placa de Guerra Forjada na Alma"
       },
       "stormcallers_focus": {
         "name": "Foco do Invocador da Tempestade"
@@ -7568,6 +7577,15 @@ export const pt_BR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guarda de Guerra Imortal"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imortal"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lâmina Imortal"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"

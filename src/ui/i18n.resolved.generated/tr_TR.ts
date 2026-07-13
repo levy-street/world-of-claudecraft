@@ -959,6 +959,19 @@ export const tr_TR: EnTranslations = {
       "promoteLeader": "Lider Yap",
       "inviteUsage": "Kimi davet edeyim? Kullanım: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Oyuncu bilgisi",
+      "block": "Engelle",
+      "unblock": "Engeli kaldır",
+      "openFor": "{name} için oyuncu menüsünü aç",
+      "profileUnavailable": "{name} için profil bulunamadı.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Yapay zeka ile yönetilen hesap",
+      "watchTwitch": "Twitch'te izle",
+      "watchX": "X'te görüntüle",
+      "watchKick": "Kick'te izle",
+      "watchYouTube": "YouTube'da izle"
+    },
     "lootSettings": {
       "title": "Ganimet Ayarları",
       "close": "Ganimet ayarlarını kapat",
@@ -1478,7 +1491,15 @@ export const tr_TR: EnTranslations = {
     },
     "social": {
       "lastSeen": "Son görülme: {when}",
-      "lastSeenNever": "hiç"
+      "lastSeenNever": "hiç",
+      "ignoredTab": "Yok sayılanlar",
+      "blockedTab": "Engellenenler",
+      "ignoredEmpty": "Kimseyi yok saymıyorsun.",
+      "blockedEmpty": "Kimseyi engellemedin.",
+      "blockSearchPlaceholder": "Oyuncu adı",
+      "blockAction": "Engelle",
+      "nowBlocking": "{name} engellendi.",
+      "stopBlockingTitle": "{name} engelini kaldır"
     },
     "gathering": {
       "title": "Toplama",
@@ -5912,7 +5933,7 @@ export const tr_TR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfoz",
@@ -7204,15 +7225,6 @@ export const tr_TR: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Ölümsüz Saray Asası"
       },
-      "deathless_warguard_legmail": {
-        "name": "Ölümsüz Savaşmuhafızı Bacak Zırhı"
-      },
-      "soulrend_diadem": {
-        "name": "Ruhyırtan Tacı"
-      },
-      "scourgehide_carapace": {
-        "name": "Afetpostu Kabuğu"
-      },
       "cryptplate_helm": {
         "name": "Mezarzırh Miğferi"
       },
@@ -7251,9 +7263,6 @@ export const tr_TR: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Ölümsüz Pala"
-      },
-      "soulforged_warplate": {
-        "name": "Ruhdövümü Savaş Zırhı"
       },
       "stormcallers_focus": {
         "name": "Fırtınaçağıranın Odağı"
@@ -7568,6 +7577,15 @@ export const tr_TR: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Ölümsüz Savaşmuhafızı"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Ölümsüz Başrahip"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Ölümsüz Bıçak"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"

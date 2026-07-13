@@ -76,6 +76,9 @@ const MOB_IDS = [
   'bound_guardian',
   'nythraxis_skeleton_warrior',
   'nythraxis_scourge_of_thornpeak',
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',

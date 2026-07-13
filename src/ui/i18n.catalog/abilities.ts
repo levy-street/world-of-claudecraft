@@ -1190,7 +1190,7 @@ const classAbilityNamesEn = {
       [
         'chain_heal',
         'Chain Heal',
-        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)',
+        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
       ],
       [
         'metamorphosis',

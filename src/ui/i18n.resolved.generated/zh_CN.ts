@@ -959,6 +959,19 @@ export const zh_CN: EnTranslations = {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"
     },
+    "playerMenu": {
+      "info": "玩家信息",
+      "block": "屏蔽",
+      "unblock": "取消屏蔽",
+      "openFor": "打开 {name} 的玩家菜单",
+      "profileUnavailable": "未找到 {name} 的资料。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 操作的账号",
+      "watchTwitch": "在 Twitch 观看",
+      "watchX": "在 X 查看",
+      "watchKick": "在 Kick 观看",
+      "watchYouTube": "在 YouTube 观看"
+    },
     "lootSettings": {
       "title": "拾取设置",
       "close": "关闭拾取设置",
@@ -1478,7 +1491,15 @@ export const zh_CN: EnTranslations = {
     },
     "social": {
       "lastSeen": "最后在线: {when}",
-      "lastSeenNever": "从未"
+      "lastSeenNever": "从未",
+      "ignoredTab": "已忽略",
+      "blockedTab": "屏蔽",
+      "ignoredEmpty": "你没有忽略任何人。",
+      "blockedEmpty": "你没有屏蔽任何人。",
+      "blockSearchPlaceholder": "玩家名称",
+      "blockAction": "屏蔽",
+      "nowBlocking": "已屏蔽 {name}。",
+      "stopBlockingTitle": "取消对 {name} 的屏蔽"
     },
     "gathering": {
       "title": "采集",
@@ -7204,15 +7225,6 @@ export const zh_CN: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死王庭权杖"
       },
-      "deathless_warguard_legmail": {
-        "name": "不死战卫腿甲"
-      },
-      "soulrend_diadem": {
-        "name": "裂魂冠冕"
-      },
-      "scourgehide_carapace": {
-        "name": "灾祸之皮甲壳"
-      },
       "cryptplate_helm": {
         "name": "墓板头盔"
       },
@@ -7251,9 +7263,6 @@ export const zh_CN: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死巨刃"
-      },
-      "soulforged_warplate": {
-        "name": "铸魂战甲"
       },
       "stormcallers_focus": {
         "name": "唤雷之核"
@@ -7568,6 +7577,15 @@ export const zh_CN: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奥德伦，亡魂战卫"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "马尔里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"

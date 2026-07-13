@@ -148,6 +148,90 @@ describe('spec masteries', () => {
     expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(16);
   });
 
+  it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
+    // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
+    // either would still pass a helper-only assertion). Same seed + fixed rolls + an
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
+    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    const setup = (spec: string) => {
+      const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec(spec);
+      const pet = createMob(9101, MOBS.forest_wolf, 20, sim.player.pos);
+      pet.ownerId = sim.player.id;
+      pet.weapon = { ...pet.weapon, min: 100, max: 100 };
+      pet.swingTimer = 0;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+      const dummy = createMob(9102, MOBS.forest_wolf, 20, {
+        x: sim.player.pos.x,
+        y: sim.player.pos.y,
+        z: sim.player.pos.z + 2,
+      });
+      dummy.maxHp = dummy.hp = 100000;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      return { sim, pet, dummy };
+    };
+    const dealtMelee = (spec: string): number => {
+      const { sim, pet, dummy } = setup(spec);
+      const before = dummy.hp;
+      (sim as unknown as { mobSwing(a: Entity, b: Entity): void }).mobSwing(pet, dummy);
+      return before - dummy.hp;
+    };
+    const dealtRanged = (spec: string): number => {
+      const { sim, pet, dummy } = setup(spec);
+      const spell = {
+        name: 'Test Bolt',
+        school: 'nature' as const,
+        min: 100,
+        max: 100,
+        range: 100,
+        every: 2,
+      };
+      const before = dummy.hp;
+      (
+        sim as unknown as { updateRangedPetAttack(p: Entity, t: Entity, s: typeof spell): void }
+      ).updateRangedPetAttack(pet, dummy, spell);
+      return before - dummy.hp;
+    };
+    const meleeBm = dealtMelee('beast_mastery');
+    const meleeNone = dealtMelee('marksmanship');
+    expect(meleeNone).toBeGreaterThan(0);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+
+    const rangedBm = dealtRanged('beast_mastery');
+    const rangedNone = dealtRanged('marksmanship');
+    expect(rangedNone).toBeGreaterThan(0);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+  });
+
+  it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('affliction'); // grants the Veinleech signature (siphon_life)
+    const caster = sim.player;
+    caster.hp = Math.round(caster.maxHp * 0.5); // leave room for the leech to heal
+    const target = createMob(9201, MOBS.forest_wolf, 20, {
+      x: caster.pos.x,
+      y: caster.pos.y,
+      z: caster.pos.z + 3,
+    });
+    target.hostile = true;
+    target.maxHp = target.hp = 100000;
+    (sim as unknown as { addEntity(e: Entity): void }).addEntity(target);
+    sim.targetEntity(target.id);
+    caster.facing = Math.atan2(target.pos.x - caster.pos.x, target.pos.z - caster.pos.z);
+    sim.castAbility('siphon_life');
+
+    // Tick until a dot tick lands; the leech emits a heal2 whose target is the caster.
+    let selfHeal = false;
+    for (let i = 0; i < 20 * 6 && !selfHeal; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'heal2' && ev.targetId === caster.id && ev.amount > 0) selfHeal = true;
+      }
+    }
+    expect(selfHeal).toBe(true);
+  });
+
   it('applies passive stat, pet damage, damage-share, and heal-crit masteries at runtime', () => {
     const rogue = new Sim({ seed: 4, playerClass: 'rogue', autoEquip: true });
     rogue.setPlayerLevel(20);

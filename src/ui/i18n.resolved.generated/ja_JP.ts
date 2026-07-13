@@ -959,6 +959,19 @@ export const ja_JP: EnTranslations = {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
     },
+    "playerMenu": {
+      "info": "プレイヤー情報",
+      "block": "ブロック",
+      "unblock": "ブロック解除",
+      "openFor": "{name} のプレイヤーメニューを開く",
+      "profileUnavailable": "{name} のプロフィールが見つかりません。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI操作アカウント",
+      "watchTwitch": "Twitch で視聴",
+      "watchX": "X で見る",
+      "watchKick": "Kick で視聴",
+      "watchYouTube": "YouTube で視聴"
+    },
     "lootSettings": {
       "title": "分配設定",
       "close": "分配設定を閉じる",
@@ -1478,7 +1491,15 @@ export const ja_JP: EnTranslations = {
     },
     "social": {
       "lastSeen": "最終ログイン: {when}",
-      "lastSeenNever": "なし"
+      "lastSeenNever": "なし",
+      "ignoredTab": "無視中",
+      "blockedTab": "ブロック",
+      "ignoredEmpty": "誰も無視していません。",
+      "blockedEmpty": "誰もブロックしていません。",
+      "blockSearchPlaceholder": "プレイヤー名",
+      "blockAction": "ブロック",
+      "nowBlocking": "{name} をブロックしました。",
+      "stopBlockingTitle": "{name} のブロックを解除"
     },
     "gathering": {
       "title": "採集",
@@ -7204,15 +7225,6 @@ export const ja_JP: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死の宮廷の笏"
       },
-      "deathless_warguard_legmail": {
-        "name": "不死の戦衛レッグメイル"
-      },
-      "soulrend_diadem": {
-        "name": "ソウルレンドの宝冠"
-      },
-      "scourgehide_carapace": {
-        "name": "スカージハイドの甲殻"
-      },
       "cryptplate_helm": {
         "name": "クリプトプレートヘルム"
       },
@@ -7251,9 +7263,6 @@ export const ja_JP: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死の大剣"
-      },
-      "soulforged_warplate": {
-        "name": "魂鍛の戦甲"
       },
       "stormcallers_focus": {
         "name": "ストームコーラーの焦点"
@@ -7568,6 +7577,15 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"

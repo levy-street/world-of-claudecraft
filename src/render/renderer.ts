@@ -562,6 +562,7 @@ export interface EntityView {
   devTierValue: number; // last-applied devTier, to diff cheaply
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
   discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
+  aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -3486,6 +3487,13 @@ export class Renderer {
     // CDN); if it fails to load, hide it rather than leave the browser's broken-image
     // placeholder on the plate. Attached once here; the element is reused per entity.
     attachAvatarFallback(discordEl);
+    // operator-set AI-account tag, inline before the name. A SEPARATE span, never a
+    // restyled .np-name: the name's black text-shadow is what keeps it legible over
+    // bright terrain, and the tag's background-clip: text cannot coexist with it.
+    // Keeping them apart also lets an AI account who is also Discord staff keep its
+    // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
+    const aiEl = document.createElement('span');
+    aiEl.className = 'np-ai';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3520,6 +3528,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       nameEl,
       titleEl,
       guildEl,
@@ -3583,6 +3592,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       sparkle,
       objectMesh,
       objectPoolKey,

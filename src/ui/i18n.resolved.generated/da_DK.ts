@@ -959,6 +959,19 @@ export const da_DK: EnTranslations = {
       "promoteLeader": "Forfrem til leder",
       "inviteUsage": "Invitér hvem? Brug: /invite <navn>."
     },
+    "playerMenu": {
+      "info": "Spilleroplysninger",
+      "block": "Blokér",
+      "unblock": "Fjern blokering",
+      "openFor": "Åbn spillermenuen for {name}",
+      "profileUnavailable": "Ingen profil fundet for {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI-styret konto",
+      "watchTwitch": "Se på Twitch",
+      "watchX": "Vis på X",
+      "watchKick": "Se på Kick",
+      "watchYouTube": "Se på YouTube"
+    },
     "lootSettings": {
       "title": "Bytteindstillinger",
       "close": "Luk byttindstillinger",
@@ -1478,7 +1491,15 @@ export const da_DK: EnTranslations = {
     },
     "social": {
       "lastSeen": "Sidst set: {when}",
-      "lastSeenNever": "aldrig"
+      "lastSeenNever": "aldrig",
+      "ignoredTab": "Ignorerede",
+      "blockedTab": "Blokerede",
+      "ignoredEmpty": "Du ignorerer ingen.",
+      "blockedEmpty": "Du har ikke blokeret nogen.",
+      "blockSearchPlaceholder": "Spillernavn",
+      "blockAction": "Blokér",
+      "nowBlocking": "{name} blokeret.",
+      "stopBlockingTitle": "Fjern blokering af {name}"
     },
     "gathering": {
       "title": "Indsamling",
@@ -5912,7 +5933,7 @@ export const da_DK: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -7204,15 +7225,6 @@ export const da_DK: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scepter fra Det Udødelige Hof"
       },
-      "deathless_warguard_legmail": {
-        "name": "Udødelig Krigsvagt-Benbrynje"
-      },
-      "soulrend_diadem": {
-        "name": "Sjæleflæng-Diadem"
-      },
-      "scourgehide_carapace": {
-        "name": "Svøbehud-Panser"
-      },
       "cryptplate_helm": {
         "name": "Kryptplade-Hjelm"
       },
@@ -7251,9 +7263,6 @@ export const da_DK: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Udødelig Storklinge"
-      },
-      "soulforged_warplate": {
-        "name": "Sjælesmedet Krigsplade"
       },
       "stormcallers_focus": {
         "name": "Stormkalderens Fokus"
@@ -7568,6 +7577,15 @@ export const da_DK: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Den Udødelige Krigsvagt"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Den Udødelige Hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Den Udødelige Kniv"
       },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"

@@ -959,6 +959,19 @@ export const vi_VN: EnTranslations = {
       "promoteLeader": "Thăng Làm Đội Trưởng",
       "inviteUsage": "Mời ai? Cách dùng: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Thông tin người chơi",
+      "block": "Chặn",
+      "unblock": "Bỏ chặn",
+      "openFor": "Mở menu người chơi {name}",
+      "profileUnavailable": "Không tìm thấy hồ sơ của {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Tài khoản do AI điều khiển",
+      "watchTwitch": "Xem trên Twitch",
+      "watchX": "Xem trên X",
+      "watchKick": "Xem trên Kick",
+      "watchYouTube": "Xem trên YouTube"
+    },
     "lootSettings": {
       "title": "Cài Đặt Chiến Lợi Phẩm",
       "close": "Đóng cài đặt chiến lợi phẩm",
@@ -1478,7 +1491,15 @@ export const vi_VN: EnTranslations = {
     },
     "social": {
       "lastSeen": "Lần cuối trực tuyến: {when}",
-      "lastSeenNever": "chưa bao giờ"
+      "lastSeenNever": "chưa bao giờ",
+      "ignoredTab": "Đã bỏ qua",
+      "blockedTab": "Đã chặn",
+      "ignoredEmpty": "Bạn không bỏ qua ai.",
+      "blockedEmpty": "Bạn chưa chặn ai.",
+      "blockSearchPlaceholder": "Tên người chơi",
+      "blockAction": "Chặn",
+      "nowBlocking": "Đã chặn {name}.",
+      "stopBlockingTitle": "Bỏ chặn {name}"
     },
     "gathering": {
       "title": "Thu thập",
@@ -5912,7 +5933,7 @@ export const vi_VN: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -7204,15 +7225,6 @@ export const vi_VN: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Vương Trượng Triều Đình Bất Tử"
       },
-      "deathless_warguard_legmail": {
-        "name": "Giáp Chân Lưới Vệ Chiến Bất Tử"
-      },
-      "soulrend_diadem": {
-        "name": "Vương Miện Xé Hồn"
-      },
-      "scourgehide_carapace": {
-        "name": "Giáp Mai Da Tai Ương"
-      },
       "cryptplate_helm": {
         "name": "Mũ Giáp Tấm Hầm Mộ"
       },
@@ -7251,9 +7263,6 @@ export const vi_VN: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Đại Kiếm Bất Tử"
-      },
-      "soulforged_warplate": {
-        "name": "Chiến Giáp Rèn Hồn"
       },
       "stormcallers_focus": {
         "name": "Pháp Khí của Kẻ Gọi Bão"
@@ -7568,6 +7577,15 @@ export const vi_VN: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tai Họa Đỉnh Gai"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Vệ Chiến Bất Tử"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Đại Tư Tế Bất Tử"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lưỡi Dao Bất Tử"
       },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"

@@ -1157,6 +1157,29 @@ export const hudChromeStrings = {
     // without a name (the invite itself has no proximity gate).
     inviteUsage: 'Invite whom? Usage: /invite <name>.',
   },
+  // The player context menu (click a name in chat, or right-click a unit frame).
+  // Ignore is the chat-only tier: it hides their public chat from you (its
+  // Ignore/Unignore labels are the existing hud.chat.context.* keys). Block is the
+  // heavy tier: it also drops invites, whispers, mail and /who visibility.
+  // Neither is the ADMIN "mute", which is a staff silence, not a player action.
+  playerMenu: {
+    info: 'Player Info',
+    block: 'Block',
+    unblock: 'Unblock',
+    // Accessible name on a clickable chat sender name.
+    openFor: 'Open player menu for {name}',
+    // Shown when a profile lookup for an out-of-range player finds nothing.
+    profileUnavailable: 'No profile found for {name}.',
+    // Operator-set account flair. The tag itself is the bracketed literal every
+    // classic client shows beside a name; the title is its hover explanation.
+    aiTag: '[AI]',
+    aiTagTitle: 'AI-operated account',
+    // Player-menu rows linking out to an official streamer's own channel.
+    watchTwitch: 'Watch on Twitch',
+    watchX: 'View on X',
+    watchKick: 'Watch on Kick',
+    watchYouTube: 'Watch on YouTube',
+  },
   lootSettings: {
     title: 'Loot Settings',
     close: 'Close loot settings',
@@ -1778,6 +1801,16 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+    // The two PLAYER chat-filter tiers get a tab each. Ignored is chat-only;
+    // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
+    ignoredTab: 'Ignored',
+    blockedTab: 'Blocked',
+    ignoredEmpty: 'You are not ignoring anyone.',
+    blockedEmpty: 'You have not blocked anyone.',
+    blockSearchPlaceholder: 'Player name',
+    blockAction: 'Block',
+    nowBlocking: 'Blocked {name}.',
+    stopBlockingTitle: 'Stop blocking {name}',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

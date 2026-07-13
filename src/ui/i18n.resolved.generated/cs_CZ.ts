@@ -959,6 +959,19 @@ export const cs_CZ: EnTranslations = {
       "promoteLeader": "Povýšit na vůdce",
       "inviteUsage": "Koho pozvat? Použití: /invite <jméno>."
     },
+    "playerMenu": {
+      "info": "Informace o hráči",
+      "block": "Zablokovat",
+      "unblock": "Odblokovat",
+      "openFor": "Otevřít nabídku hráče {name}",
+      "profileUnavailable": "Profil hráče {name} nebyl nalezen.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Účet ovládaný AI",
+      "watchTwitch": "Sledovat na Twitchi",
+      "watchX": "Zobrazit na X",
+      "watchKick": "Sledovat na Kicku",
+      "watchYouTube": "Sledovat na YouTube"
+    },
     "lootSettings": {
       "title": "Nastavení kořisti",
       "close": "Zavřít nastavení kořisti",
@@ -1478,7 +1491,15 @@ export const cs_CZ: EnTranslations = {
     },
     "social": {
       "lastSeen": "Naposledy viděn(a): {when}",
-      "lastSeenNever": "nikdy"
+      "lastSeenNever": "nikdy",
+      "ignoredTab": "Ignorovaní",
+      "blockedTab": "Zablokovaní",
+      "ignoredEmpty": "Nikoho neignoruješ.",
+      "blockedEmpty": "Nikoho jsi nezablokoval.",
+      "blockSearchPlaceholder": "Jméno hráče",
+      "blockAction": "Zablokovat",
+      "nowBlocking": "{name} zablokován.",
+      "stopBlockingTitle": "Odblokovat hráče {name}"
     },
     "gathering": {
       "title": "Sběr",
@@ -5912,7 +5933,7 @@ export const cs_CZ: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Dread Aspect",
@@ -7204,15 +7225,6 @@ export const cs_CZ: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Žezlo nesmrtelného dvora"
       },
-      "deathless_warguard_legmail": {
-        "name": "Nesmrtelné nohavice válečné stráže"
-      },
-      "soulrend_diadem": {
-        "name": "Diadém rozervání duše"
-      },
-      "scourgehide_carapace": {
-        "name": "Krunýř z kůže pohromy"
-      },
       "cryptplate_helm": {
         "name": "Kryptoplátová helma"
       },
@@ -7251,9 +7263,6 @@ export const cs_CZ: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"
-      },
-      "soulforged_warplate": {
-        "name": "Duší kovaný válečný plát"
       },
       "stormcallers_focus": {
         "name": "Ohnisko volání vichru"
@@ -7568,6 +7577,15 @@ export const cs_CZ: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, nesmrtelná válečná stráž"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, nesmrtelný hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, nesmrtelný nůž"
       },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"

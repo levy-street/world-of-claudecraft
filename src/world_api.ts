@@ -84,6 +84,10 @@ import type { IWorldTrade } from './world_api/trade';
 import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
+// Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
+// because the server, the client mirror, and the HUD must all agree on its shape;
+// it rides through this seam so render/ui never import a concrete world.
+export type { PlayerFlair, StreamerLinks, StreamerPlatform } from './sim/account_flair';
 export type {
   DeedsLeaderboardPage,
   DevLeaderboardPage,
@@ -145,6 +149,7 @@ export type {
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
+  CharacterProfile,
   CharacterSearchResult,
   FriendInfo,
   GuildEventInfo,
@@ -359,6 +364,10 @@ export const COMMAND_NAMES = [
   'vcup_bet',
   'vcup_practice',
   'deed_set_title',
+  // personal chat ignores: the chat-only sibling of block_add/block_remove.
+  // (An admin "mute" is a moderation action, not a wire command.)
+  'ignore_add',
+  'ignore_remove',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -512,11 +521,15 @@ export const COMMAND_FACETS = {
   // IWorldSocialGraph: friends/blocks/guild commands (online only; resolved
   // server-side by character name, handled by the #4 SocialService). socialInfo
   // arrives via the social/socialpos frames (no command); searchCharacters is a REST
-  // GET (no wire command); social_refresh is a dispatch-only server push (untagged).
+  // GET (no wire command); accountFlair is a pure local read of the flair the entity
+  // wire and the chat event already carry (no command); social_refresh is a
+  // dispatch-only server push (untagged).
   friend_add: 'IWorldSocialGraph',
   friend_remove: 'IWorldSocialGraph',
   block_add: 'IWorldSocialGraph',
   block_remove: 'IWorldSocialGraph',
+  ignore_add: 'IWorldSocialGraph',
+  ignore_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',

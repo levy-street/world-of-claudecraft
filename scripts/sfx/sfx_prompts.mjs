@@ -201,6 +201,9 @@ export const SFX = [
   // castKeyForAbility in src/ui/hud.ts: lightning_bolt uses this clip instead
   // of its school default (arcane).
   { key: 'cast_lightning_bolt', custom: true, loop: true },
+  // Chain Heal's one-shot cast clip (custom recording). See src/ui/hud.ts:
+  // the castStart handler plays this instead of the nature cast loop.
+  { key: 'cast_chain_heal', custom: true, loop: false },
 
   // --- Spell projectiles ----------------------------------------------------
   {

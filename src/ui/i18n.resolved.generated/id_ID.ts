@@ -959,6 +959,19 @@ export const id_ID: EnTranslations = {
       "promoteLeader": "Angkat jadi Pemimpin",
       "inviteUsage": "Mengundang siapa? Penggunaan: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Info pemain",
+      "block": "Blokir",
+      "unblock": "Buka blokir",
+      "openFor": "Buka menu pemain {name}",
+      "profileUnavailable": "Profil {name} tidak ditemukan.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Akun yang dijalankan AI",
+      "watchTwitch": "Tonton di Twitch",
+      "watchX": "Lihat di X",
+      "watchKick": "Tonton di Kick",
+      "watchYouTube": "Tonton di YouTube"
+    },
     "lootSettings": {
       "title": "Pengaturan Jarahan",
       "close": "Tutup pengaturan jarahan",
@@ -1478,7 +1491,15 @@ export const id_ID: EnTranslations = {
     },
     "social": {
       "lastSeen": "Terakhir terlihat: {when}",
-      "lastSeenNever": "tidak pernah"
+      "lastSeenNever": "tidak pernah",
+      "ignoredTab": "Diabaikan",
+      "blockedTab": "Diblokir",
+      "ignoredEmpty": "Kamu tidak mengabaikan siapa pun.",
+      "blockedEmpty": "Kamu belum memblokir siapa pun.",
+      "blockSearchPlaceholder": "Nama pemain",
+      "blockAction": "Blokir",
+      "nowBlocking": "{name} diblokir.",
+      "stopBlockingTitle": "Buka blokir {name}"
     },
     "gathering": {
       "title": "Pengumpulan",
@@ -5912,7 +5933,7 @@ export const id_ID: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -7204,15 +7225,6 @@ export const id_ID: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Tongkat Kebesaran Istana Nirmaut"
       },
-      "deathless_warguard_legmail": {
-        "name": "Zirah Kaki Garda Perang Nirmaut"
-      },
-      "soulrend_diadem": {
-        "name": "Diadem Pengoyak Jiwa"
-      },
-      "scourgehide_carapace": {
-        "name": "Karapas Kulit Sampar"
-      },
       "cryptplate_helm": {
         "name": "Helm Lempeng Kripta"
       },
@@ -7251,9 +7263,6 @@ export const id_ID: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"
-      },
-      "soulforged_warplate": {
-        "name": "Zirah Perang Tempaan Jiwa"
       },
       "stormcallers_focus": {
         "name": "Fokus Pemanggil Badai"
@@ -7568,6 +7577,15 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garda Perang Nirmaut"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofan Nirmaut"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Belati Nirmaut"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
