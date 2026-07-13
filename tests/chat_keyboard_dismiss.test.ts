@@ -3,7 +3,10 @@
 // the composer is hidden, which recovers the mobile-chat viewport). DOM-free, Node-tested.
 
 import { describe, expect, it } from 'vitest';
-import { shouldRecoverOnComposerBlur } from '../src/game/chat_keyboard_dismiss';
+import {
+  composerBlurViewportAction,
+  shouldRecoverOnComposerBlur,
+} from '../src/game/chat_keyboard_dismiss';
 
 describe('shouldRecoverOnComposerBlur (dismiss keeps chat open in read view)', () => {
   it('recovers on a blur only when the composer is already hidden (the close path)', () => {
@@ -19,5 +22,11 @@ describe('shouldRecoverOnComposerBlur (dismiss keeps chat open in read view)', (
     expect(shouldRecoverOnComposerBlur('block')).toBe(false);
     expect(shouldRecoverOnComposerBlur('')).toBe(false);
     expect(shouldRecoverOnComposerBlur('flex')).toBe(false);
+  });
+
+  it('keeps a visible mobile composer blur passive while the browser dismisses its keyboard', () => {
+    expect(composerBlurViewportAction('block', true)).toBe('none');
+    expect(composerBlurViewportAction('none', true)).toBe('recover');
+    expect(composerBlurViewportAction('block', false)).toBe('none');
   });
 });

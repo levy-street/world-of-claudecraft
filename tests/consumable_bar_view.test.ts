@@ -4,6 +4,7 @@ import {
   CONSUMABLE_BAR_SLOTS,
   CONSUMABLE_KIND_ORDER,
   consumableBarItems,
+  resolveConsumableBarLayout,
 } from '../src/ui/consumable_bar_view';
 
 // Minimal synthetic item table: the core reads only `kind` off the def, so a
@@ -106,5 +107,35 @@ describe('consumableBarItems', () => {
   it('returns empty for an empty or consumable-free inventory', () => {
     expect(consumableBarItems([], lookup, ['stale'])).toEqual([]);
     expect(consumableBarItems(inv('sword', 'pelt'), lookup, [])).toEqual([]);
+  });
+});
+
+describe('resolveConsumableBarLayout', () => {
+  it('pads the existing automatic ordering to all six slots', () => {
+    expect(
+      resolveConsumableBarLayout(inv('water', 'bread', 'healing_potion'), lookup, null, []),
+    ).toEqual(['healing_potion', 'bread', 'water', null, null, null]);
+  });
+
+  it('renders a valid custom layout exactly', () => {
+    const custom = ['water', null, 'bread', null, 'healing_potion', null];
+    expect(resolveConsumableBarLayout([], lookup, custom, [])).toEqual(custom);
+  });
+
+  it('keeps valid assigned ids when inventory count is zero', () => {
+    expect(
+      resolveConsumableBarLayout([], lookup, ['bread', null, null, null, null, null], []),
+    ).toEqual(['bread', null, null, null, null, null]);
+  });
+
+  it('turns invalid custom ids and duplicates into empty slots', () => {
+    expect(
+      resolveConsumableBarLayout(
+        [],
+        lookup,
+        ['sword', 'bread', 'bread', 'missing', null, null],
+        [],
+      ),
+    ).toEqual([null, 'bread', null, null, null, null]);
   });
 });

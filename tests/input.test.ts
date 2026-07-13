@@ -112,6 +112,33 @@ describe('Input camera zoom', () => {
 });
 
 describe('Input autorun', () => {
+  it('force-clears keyboard, jump, held slots, emote, and autorun for the HUD editor', () => {
+    const { cb, input, windowListeners } = makeInput();
+    input.setAutorun(true);
+    windowListeners.get('keydown')?.({
+      code: 'Space',
+      key: ' ',
+      repeat: false,
+      target: null,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('keydown')?.({
+      code: 'Digit1',
+      key: '1',
+      repeat: false,
+      target: null,
+      preventDefault: vi.fn(),
+    });
+
+    input.setHudEditorActive(true);
+
+    expect(input.autorun).toBe(false);
+    expect(input.readMoveInput()).toMatchObject({ forward: false, jump: false });
+    expect(cb.onAbilityUp).toHaveBeenCalledWith(0);
+    input.setHudEditorActive(false);
+    expect(input.readMoveInput()).toMatchObject({ forward: false, jump: false });
+  });
+
   it('toggleAutorun flips state and feeds forward into readMoveInput', () => {
     const { input } = makeInput();
     expect(input.autorun).toBe(false);

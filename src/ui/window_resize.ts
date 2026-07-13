@@ -31,6 +31,9 @@ export interface WindowResizeDeps {
   pinWindow(el: HTMLElement, rect: DOMRect): void;
   /** Coarse-pointer probe; defaults to a matchMedia check. */
   isCoarsePointer?(): boolean;
+  /** Touch-layout probe (body.mobile-touch): inset-pinned mobile sheets keep
+   *  resize disabled; the centered Spellbook card is the safe exception. */
+  isTouchLayout?(): boolean;
 }
 
 // Windows whose body is not reflowable content: fixed-size boards/popups and
@@ -102,6 +105,11 @@ export function installWindowResize(deps: WindowResizeDeps): () => void {
     if (!target?.closest) return null;
     const el = target.closest<HTMLElement>('.window.panel');
     if (!el || !el.classList.contains('window-resizable')) return null;
+    // Most touch windows are inset-pinned sheets (top AND bottom). Pinning one
+    // at engage time would drop the bottom constraint and make it content-tall.
+    // Spellbook is now a centered, viewport-capped card, so its visible resize
+    // grip is safe and expected to work in mobile landscape.
+    if (deps.isTouchLayout?.() && el.id !== 'spellbook') return null;
     if (target.closest('button, input, textarea, select, a, [draggable="true"]')) return null;
     const rect = el.getBoundingClientRect();
     const z = deps.getScale();

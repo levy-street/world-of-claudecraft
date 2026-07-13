@@ -146,19 +146,19 @@ describe('mobile chat centered/large/in-front layout', () => {
     expect(wrap).not.toMatch(/--mobile-chat-bottom/);
   });
 
-  it('gives the read panel a drag-to-resize bottom handle (persisted)', () => {
-    // The panel's bottom inset is player-resizable: a bottom grabber drives
-    // --mobile-chat-bottom, clamped in CSS so a saved value stays valid across orientations.
-    expect(hudMobileCss).toContain('.chat-mobile-resize {\n    display: none;\n  }');
-    const handle = ruleBody('body\\.mobile-touch\\.mobile-chat-open \\.chat-mobile-resize');
-    expect(handle).toMatch(/display:\s*flex/);
-    // A vertical drag must resize, not scroll the log/page; and a high z-index keeps it
-    // above any overlay (so nothing can swallow the drag).
-    expect(handle).toMatch(/touch-action:\s*none/);
-    expect(Number(handle.match(/z-index:\s*(\d+)/)?.[1] ?? '0')).toBeGreaterThanOrEqual(200);
-    // hud.ts creates the handle as a body-level element (high z) and persists the size.
-    expect(hudTs).toContain("resizeHandle.className = 'chat-mobile-resize';");
-    expect(hudTs).toContain('document.body.appendChild(resizeHandle)');
+  it('reuses the in-panel corner grip for mobile resizing and hides it under other windows', () => {
+    const grip = ruleBody(
+      'body\\.mobile-touch\\.mobile-chat-open:not\\(\\.mobile-window-open\\):not\\(\\.mobile-keyboard-open\\)\\s+\\.chat-resize-grip',
+    );
+    expect(grip).toMatch(/display:\s*block/);
+    expect(grip).toMatch(/width:\s*40px/);
+    expect(grip).toMatch(/height:\s*40px/);
+    expect(grip).toMatch(/touch-action:\s*none/);
+    // The old body-level bar escaped the chat stacking context and painted over Talents.
+    expect(hudMobileCss).not.toContain('.chat-mobile-resize');
+    expect(hudTs).not.toContain("resizeHandle.className = 'chat-mobile-resize';");
+    expect(hudTs).not.toContain('document.body.appendChild(resizeHandle)');
+    expect(hudTs).toContain('this.onMobileChatResizeStart(ev, grip)');
     expect(hudTs).toContain("document.documentElement.style.setProperty('--mobile-chat-bottom'");
     expect(hudTs).toContain('localStorage.setItem(MOBILE_CHAT_BOTTOM_KEY');
   });

@@ -37,6 +37,7 @@ const plainCanvasChild = new FakeTarget();
 
 function baseCtx(overrides: Partial<TouchRouterContext> = {}): TouchRouterContext {
   return {
+    editorOpen: false,
     menuOpen: false,
     isMovementZone: (t) => t === moveZoneTarget,
     isCombatButton: (t) => isInteractiveHudElement(t),
@@ -113,6 +114,14 @@ describe('getTouchOwner: ownership per start zone', () => {
 });
 
 describe('getTouchOwner: priority order', () => {
+  it('editorOpen owns every target before menu, movement, combat, and camera', () => {
+    for (const target of [windowChrome, moveZoneTarget, combatButton, canvas, plainCanvasChild]) {
+      expect(getTouchOwner({ target }, baseCtx({ editorOpen: true, menuOpen: true }))).toBe(
+        'editor',
+      );
+    }
+  });
+
   it('menuOpen wins over every other classification', () => {
     // moveZoneTarget would otherwise resolve to movement; menuOpen must override it.
     expect(getTouchOwner({ target: moveZoneTarget }, baseCtx({ menuOpen: true }))).toBe('menu');
@@ -146,6 +155,14 @@ describe('camera blocked over interactive elements and when menuOpen', () => {
 });
 
 describe('TouchOwnerLedger lifecycle', () => {
+  it('records editor ownership like every other pointer owner', () => {
+    const ledger = new TouchOwnerLedger();
+    ledger.set(9, 'editor');
+    expect(ledger.isOwnedBy(9, 'editor')).toBe(true);
+    ledger.releaseAll();
+    expect(ledger.size).toBe(0);
+  });
+
   it('down -> move keeps the recorded owner', () => {
     const ledger = new TouchOwnerLedger();
     ledger.set(1, 'camera');

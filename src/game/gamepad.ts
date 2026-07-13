@@ -27,6 +27,9 @@ export interface GamepadCallbacks {
   // Reuses the host's existing keybind/UI dispatch; jump & autorun are handled
   // here against Input directly and never reach this.
   onAction(id: string): void;
+  // True while a higher-level surface, such as the mobile HUD editor, owns all
+  // gameplay input. Checked before menu and virtual-cursor modes.
+  isInputBlocked?(): boolean;
   // True while any interactive HUD window is open, switching the pad into the
   // virtual-cursor UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
@@ -176,6 +179,14 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.hideCursor();
       this.prevPressed = cur;
+      return;
+    }
+
+    if (this.cb.isInputBlocked?.()) {
+      this.input.clearGamepadMove();
+      this.hideCursor();
+      this.prevPressed = cur;
+      this.lastHealth = this.cb.getPlayerHealth?.() ?? null;
       return;
     }
 

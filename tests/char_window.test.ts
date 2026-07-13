@@ -51,6 +51,15 @@ describe('char_window: WCAG 2.2 AA', () => {
     expect(painter).toContain('this.doUnequip(slot, true)'); // x button keeps focus
     expect(painter).toContain('document.getElementById'); // looks up the rebuilt slot row
   });
+
+  it('dismisses the item description after refocusing the rebuilt unequipped slot', () => {
+    // Online unequip can repaint once from a stale equipment snapshot. The
+    // rebuilt row may therefore still own an item tooltip when it receives
+    // focus, so focus first and hide the synchronously opened tooltip second.
+    expect(painter).toMatch(
+      /if \(rebuilt instanceof HTMLElement\) \{\s*rebuilt\.focus\(\);\s*this\.deps\.hideTooltip\(\);\s*\}/,
+    );
+  });
 });
 
 describe('char_window: paperdoll core + HUD-owned preview boundary', () => {

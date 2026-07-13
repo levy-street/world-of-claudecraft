@@ -54,8 +54,10 @@ export interface PainterHostPresentation {
   moneyHtml(copper: number): string;
   /** Full item tooltip markup (name, stats, compare). */
   itemTooltip(item: ItemDef): string;
-  /** Attach a lazily-built tooltip to an element. */
-  attachTooltip(el: HTMLElement, html: () => string): void;
+  /** Attach a lazily-built tooltip to an element. The optional live guard lets a
+   *  composite mobile interaction suppress callbacks that were queued before its
+   *  dialog opened, without removing the normal desktop hover affordance. */
+  attachTooltip(el: HTMLElement, html: () => string, enabled?: () => boolean): void;
 }
 
 /**

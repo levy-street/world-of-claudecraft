@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampMobilePage,
+  effectiveMobilePageCount,
   MOBILE_ACTION_PAGE_COUNT,
   MOBILE_ACTION_SOURCE_SLOT_COUNT,
   MOBILE_ACTIONS_PER_PAGE,
@@ -11,9 +12,10 @@ import {
 } from '../src/ui/mobile_action_page_view';
 
 describe('mobilePageCount', () => {
-  it('defaults to 2 pages for the default 10-slot span', () => {
-    expect(mobilePageCount()).toBe(2);
-    expect(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT)).toBe(2);
+  it('supports four pages for the default 20-slot mobile span', () => {
+    expect(mobilePageCount()).toBe(4);
+    expect(mobilePageCount(MOBILE_ACTION_SOURCE_SLOT_COUNT)).toBe(4);
+    expect(MOBILE_ACTION_PAGE_COUNT).toBe(mobilePageCount());
   });
 
   it('is parameterized: a different total slot count rounds up', () => {
@@ -29,6 +31,7 @@ describe('clampMobilePage', () => {
   it('leaves an in-range page unchanged', () => {
     expect(clampMobilePage(0)).toBe(0);
     expect(clampMobilePage(1)).toBe(1);
+    expect(clampMobilePage(2)).toBe(2);
   });
 
   it('clamps a negative page to 0', () => {
@@ -37,8 +40,8 @@ describe('clampMobilePage', () => {
   });
 
   it('clamps an overflowing page to the last page', () => {
-    expect(clampMobilePage(2)).toBe(1);
-    expect(clampMobilePage(999)).toBe(1);
+    expect(clampMobilePage(3)).toBe(3);
+    expect(clampMobilePage(999)).toBe(3);
   });
 
   it('falls back to 0 for NaN', () => {
@@ -60,6 +63,14 @@ describe('sourceSlotForMobileButton', () => {
     expect(sourceSlotForMobileButton(1, 4)).toBe(10);
   });
 
+  it('page 2 index 4 maps to source slot 15', () => {
+    expect(sourceSlotForMobileButton(2, 4)).toBe(15);
+  });
+
+  it('page 3 index 4 maps to source slot 20', () => {
+    expect(sourceSlotForMobileButton(3, 4)).toBe(20);
+  });
+
   it('never returns slot 0 across every page/button combination', () => {
     for (let page = 0; page < MOBILE_ACTION_PAGE_COUNT; page++) {
       for (let i = 0; i < MOBILE_ACTIONS_PER_PAGE; i++) {
@@ -73,24 +84,80 @@ describe('sourceSlotsForMobilePage', () => {
   it('returns 5 slots for a page', () => {
     expect(sourceSlotsForMobilePage(0)).toHaveLength(MOBILE_ACTIONS_PER_PAGE);
     expect(sourceSlotsForMobilePage(1)).toHaveLength(MOBILE_ACTIONS_PER_PAGE);
+    expect(sourceSlotsForMobilePage(2)).toHaveLength(MOBILE_ACTIONS_PER_PAGE);
+    expect(sourceSlotsForMobilePage(3)).toHaveLength(MOBILE_ACTIONS_PER_PAGE);
   });
 
-  it('page 0 covers slots 1-5, page 1 covers slots 6-10', () => {
+  it('covers source slots 1-20 across four pages', () => {
     expect(sourceSlotsForMobilePage(0)).toEqual([1, 2, 3, 4, 5]);
     expect(sourceSlotsForMobilePage(1)).toEqual([6, 7, 8, 9, 10]);
+    expect(sourceSlotsForMobilePage(2)).toEqual([11, 12, 13, 14, 15]);
+    expect(sourceSlotsForMobilePage(3)).toEqual([16, 17, 18, 19, 20]);
   });
 
-  it('the two default pages are disjoint and jointly cover slots 1-10', () => {
-    const all = [...sourceSlotsForMobilePage(0), ...sourceSlotsForMobilePage(1)];
+  it('the four default pages are disjoint and jointly cover slots 1-20', () => {
+    const all = [
+      ...sourceSlotsForMobilePage(0),
+      ...sourceSlotsForMobilePage(1),
+      ...sourceSlotsForMobilePage(2),
+      ...sourceSlotsForMobilePage(3),
+    ];
     expect(new Set(all).size).toBe(all.length);
-    expect(all.sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(all.sort((a, b) => a - b)).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    ]);
+  });
+});
+
+describe('effectiveMobilePageCount', () => {
+  it('keeps the configured minimum when higher pages are empty', () => {
+    expect(
+      effectiveMobilePageCount(
+        2,
+        Array.from({ length: 22 }, () => null),
+      ),
+    ).toBe(2);
+  });
+
+  it('reveals the highest occupied mobile page for abilities and items', () => {
+    const actions = Array<{ type: string; id: string } | null>(22).fill(null);
+    actions[10] = { type: 'ability', id: 'a' };
+    expect(effectiveMobilePageCount(2, actions)).toBe(3);
+    actions[15] = { type: 'item', id: 'food' };
+    expect(effectiveMobilePageCount(2, actions)).toBe(4);
+  });
+
+  it('ignores desktop-only slots 21 and 22', () => {
+    const actions = Array<{ type: string; id: string } | null>(22).fill(null);
+    actions[20] = { type: 'ability', id: 'desktop-a' };
+    actions[21] = { type: 'item', id: 'desktop-item' };
+    expect(effectiveMobilePageCount(2, actions)).toBe(2);
+  });
+
+  it('shrinks after the highest mobile page is emptied', () => {
+    const actions = Array<{ type: 'ability'; id: string } | null>(22).fill(null);
+    actions[15] = { type: 'ability', id: 'a' };
+    expect(effectiveMobilePageCount(2, actions)).toBe(4);
+    actions[15] = null;
+    expect(effectiveMobilePageCount(2, actions)).toBe(2);
+  });
+
+  it('ignores corrupt non-action occupancy and defaults invalid minimums', () => {
+    const actions: unknown[] = Array(22).fill(null);
+    actions[15] = 'corrupt';
+    actions[16] = { type: 'other', id: 'not-an-action' };
+
+    expect(effectiveMobilePageCount(Number.NaN, actions)).toBe(2);
+    expect(effectiveMobilePageCount(Number.POSITIVE_INFINITY, actions)).toBe(2);
   });
 });
 
 describe('nextMobilePage', () => {
-  it('wraps 0 -> 1 -> 0 for the default 2-page span', () => {
+  it('wraps 0 -> 1 -> 2 -> 3 -> 0 for the default 4-page span', () => {
     expect(nextMobilePage(0)).toBe(1);
-    expect(nextMobilePage(1)).toBe(0);
+    expect(nextMobilePage(1)).toBe(2);
+    expect(nextMobilePage(2)).toBe(3);
+    expect(nextMobilePage(3)).toBe(0);
   });
 
   it('clamps an out-of-range page before advancing', () => {

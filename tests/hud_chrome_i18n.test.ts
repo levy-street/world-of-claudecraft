@@ -58,6 +58,47 @@ describe('hudChrome.* keys (English-only catalog module)', () => {
   });
 });
 
+describe('mobile HUD editor vocabulary', () => {
+  it('resolves representative launcher, scene, surface, manipulation, and transaction labels', () => {
+    setLanguage('en');
+    expect(t('hudChrome.mobileHudEditor.launcher')).toBe('Customize Mobile Layout');
+    expect(t('hudChrome.mobileHudEditor.scene.arenaFiesta')).toBe('Arena Fiesta');
+    expect(t('hudChrome.mobileHudEditor.surface.controlMovement')).toBe('Movement');
+    expect(t('hudChrome.mobileHudEditor.surface.protectedValeCupBriefing')).toBe(
+      'Vale Cup Briefing',
+    );
+    expect(t('hudChrome.mobileHudEditor.control.nudgeLeft')).toBe('Move left');
+    expect(t('hudChrome.mobileHudEditor.control.resetSelected')).toBe('Reset Selected');
+    expect(t('hudChrome.mobileHudEditor.save')).toBe('Save');
+    expect(t('hudChrome.mobileHudEditor.cancel')).toBe('Cancel');
+  });
+
+  it('interpolates accessible selection, failure, fallback, and storage messages', () => {
+    setLanguage('en');
+    expect(t('hudChrome.mobileHudEditor.status.selected', { surface: 'Party' })).toBe(
+      'Selected: Party',
+    );
+    expect(
+      t('hudChrome.mobileHudEditor.failure.overlap', { surface: 'Party', other: 'View' }),
+    ).toBe('Party overlaps View.');
+    expect(t('hudChrome.mobileHudEditor.failure.outOfBounds', { surface: 'Movement' })).toBe(
+      'Movement is outside the safe area.',
+    );
+    expect(t('hudChrome.mobileHudEditor.runtimeFallback', { profile: 'Phone' })).toBe(
+      'The Phone layout does not fit this viewport. Built-in defaults are active temporarily.',
+    );
+    expect(t('hudChrome.mobileHudEditor.storageError')).toBe(
+      'Could not save the mobile layout. Your draft is still open.',
+    );
+    expect(
+      t('hudChrome.mobileHudEditor.failureWithContext', {
+        message: 'Attack overlaps Target.',
+        context: 'Arena Standard',
+      }),
+    ).toBe('Attack overlaps Target. (Arena Standard)');
+  });
+});
+
 // The settings sliders that the sweep routed through formatNumber: en output must stay
 // byte-identical to the historical hand-rolled "50%" / "90°" forms.
 describe('settings-slider formatter en byte-identity', () => {

@@ -135,6 +135,7 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import { resolveViewportResize } from './viewport_resize_core';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
@@ -1578,17 +1579,28 @@ export class Renderer {
   }
 
   private resizeViewport(measured = this.measureViewport()): void {
-    this.viewport = measured;
-    this.camera.aspect = this.viewport.width / this.viewport.height;
-    this.camera.updateProjectionMatrix();
+    const change = resolveViewportResize(
+      { ...this.viewport, pixelRatio: this.webgl.getPixelRatio() },
+      { ...measured, pixelRatio: this.effectivePixelRatio() },
+    );
+    if (!change.resolutionChanged) return;
+    if (change.sizeChanged) {
+      this.viewport = measured;
+      this.camera.aspect = this.viewport.width / this.viewport.height;
+      this.camera.updateProjectionMatrix();
+    }
     this.applyResolution();
+  }
+
+  private effectivePixelRatio(): number {
+    return Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
   }
 
   // Push the current device pixel ratio (× renderScale, still capped by the
   // tier) to the renderer, composer, and vfx. Shared by resize and the
   // render-scale setting so a window resize never drops the chosen scale.
   private applyResolution(): void {
-    const ratio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale;
+    const ratio = this.effectivePixelRatio();
     this.webgl.setPixelRatio(ratio);
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     if (this.post) {

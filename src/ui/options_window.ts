@@ -224,6 +224,10 @@ export interface OptionsWindowDeps {
   setChatTimestamps(on: boolean): void;
   getChatClock(): ChatClock;
   setChatClock(clock: ChatClock): void;
+  /** Whether the mobile HUD layout editor can open here (touch landscape only). */
+  canCustomizeMobileHud(): boolean;
+  /** Open the mobile HUD layout editor (the row closes the menu first). */
+  openMobileHudEditor(): void;
 }
 
 /** The online account seam behind the deed-broadcast row (OptionsHooks.deedBroadcasts). */
@@ -526,8 +530,36 @@ export class OptionsWindow {
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
           break;
+        case 'action':
+          this.mobileHudEditorActionRow(parent, c.labelKey);
+          break;
       }
     }
+  }
+
+  // The mobile HUD layout editor launcher: a keyless action row (no setting, no
+  // reset participation). Closes the menu first so the editor owns the whole
+  // touch surface when it opens.
+  private mobileHudEditorActionRow(parent: HTMLElement, labelKey: TranslationKey): void {
+    const label = t(labelKey);
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = label;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn';
+    button.dataset.mobileHudAction = 'open-editor';
+    button.textContent = label;
+    button.setAttribute('aria-label', label);
+    button.addEventListener('click', () => {
+      audio.click();
+      this.close();
+      this.deps.openMobileHudEditor();
+    });
+    row.append(name, button);
+    parent.appendChild(row);
   }
 
   // A labelled slider bound to a numeric setting; live-applies via the hook.
@@ -978,10 +1010,17 @@ export class OptionsWindow {
     this.languageSelect(body);
     this.renderThemeControls(body);
     const hooks = this.deps.options();
-    if (hooks)
-      this.applyControls(body, buildInterfaceControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderInterface(),
+    if (hooks) {
+      const controls = buildInterfaceControls(
+        this.settingsSource(hooks),
+        {
+          touch: useTouchInterface(),
+          nativeShell: isNativeAppShell(),
+        },
+        { mobileHudEditor: useTouchInterface() && this.deps.canCustomizeMobileHud() },
       );
+      this.applyControls(body, controls, hooks, () => this.renderInterface());
+    }
 
     // On/off toggle for chat timestamps.
     const tsRow = document.createElement('div');

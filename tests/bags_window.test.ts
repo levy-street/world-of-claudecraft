@@ -129,6 +129,63 @@ describe('bags_window: bank-deposit mode wiring', () => {
 });
 
 describe('bags_window: touch peek + bank-cluster close', () => {
+  it('dismisses the item description after refocusing from a successful mobile action', () => {
+    // Equip/use may repaint from a still-stale online snapshot, so focusing the
+    // rebuilt source row can synchronously reopen its focus tooltip. Hide only
+    // AFTER that deliberate focus to prevent a description for an item whose
+    // server-confirmed state is already changing.
+    expect(painter).toMatch(
+      /focusTarget\?\.focus\(\);\s*this\.deps\.hideTooltip\(\);\s*this\.deps\.renderCharIfOpen\(\);/,
+    );
+  });
+
+  it('opens the item action menu for a normal mobile tap before any item command', () => {
+    expect(painter).toContain("document.body.classList.contains('mobile-touch')");
+    expect(painter).toContain('mobileBagItemActions(item, mode)');
+    expect(painter).toMatch(
+      /const mobileView = mobileBagItemActions\(item, mode\);[\s\S]{0,260}?if \(document\.body\.classList\.contains\('mobile-touch'\) && !mobileView\.directAction\) \{[\s\S]{0,180}?this\.openMobileItemActions\(s, item, row, mobileView\);\s*return;/,
+    );
+  });
+
+  it('forwards the item-tooltip live guard through the shared HUD presentation bag', () => {
+    expect(hud).toContain(
+      'attachTooltip: (el, html, enabled) => this.attachTooltip(el, html, enabled),',
+    );
+    expect(painter).toContain('() => !this.mobileItemTooltipSuppressed,');
+    expect(painter).toContain('this.releaseMobileItemTooltipGuardAfterFocus();');
+  });
+
+  it('keeps desktop and every transactional mode on the existing direct switch', () => {
+    expect(painter).toContain(
+      'const action = mobileView.directAction ?? bagItemAction(item, mode);',
+    );
+    for (const arm of [
+      'trade',
+      'mailAttach',
+      'marketSell',
+      'vendorSell',
+      'bankDeposit',
+      'petFeed',
+    ]) {
+      expect(painter).toContain(`case '${arm}':`);
+    }
+  });
+
+  it('routes menu Destroy through the existing confirmation and revalidates the stack reference', () => {
+    expect(painter).toContain('bagStackIndex(this.deps.world().inventory, slot) < 0');
+    expect(painter).toMatch(/this\.showDiscardItemPrompt\(\s*slot\.itemId,/);
+  });
+
+  it('passes the canonical item tooltip into the persistent mobile detail pane', () => {
+    expect(painter).toContain('itemDetailsHtml: this.deps.itemTooltip(item),');
+  });
+
+  it('routes Link to Chat without using, equipping, or destroying the item', () => {
+    expect(painter).toMatch(
+      /if \(action === 'linkToChat'\) \{\s*this\.close\(\);\s*this\.deps\.insertItemChatLink\(slot\.itemId\);\s*return true;\s*\}/,
+    );
+  });
+
   it('consults the shared peek guard FIRST in the bag cell click', () => {
     // On touch, a long-press peek shows the tooltip; the release click must consume
     // the peek and inspect the stack instead of running its action (use/sell/deposit/

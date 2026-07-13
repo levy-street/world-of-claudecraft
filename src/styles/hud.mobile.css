@@ -35,6 +35,13 @@
        clamped with max()/clamp() so the effective size holds at 40px. */
     --mobile-chrome-scale: 0.85;
   }
+  /* iOS 26 can move viewport-fixed descendants when browser chrome or the
+     software keyboard changes. A transformed, stable-size body becomes their
+     containing block, so the whole game remains one document-anchored surface. */
+  body.mobile-touch.game-active {
+    position: relative;
+    transform: translateZ(0);
+  }
   /* ---------- mobile touch controls (runtime-gated with body.mobile-touch + game-active) ---------- */
   #mobile-controls {
     display: none;
@@ -108,8 +115,14 @@
   body.mobile-touch.game-active #ui {
     z-index: 80;
   }
+  body.mobile-touch.game-active.mobile-center-message-visible #ui {
+    z-index: 1000;
+  }
   body.mobile-touch.mobile-more-open #mobile-controls {
     z-index: 140;
+  }
+  body.mobile-touch.mobile-consumables-open:not(.mobile-window-open) #mobile-controls {
+    z-index: 84;
   }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,
@@ -271,6 +284,8 @@
     border-color: #d8c46bb8;
   }
   body.mobile-touch #mobile-autorun-target.locked {
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
     color: #fff7c7;
     border-color: var(--gold);
     box-shadow:
@@ -407,7 +422,7 @@
     border-color: var(--gold);
     color: #fff;
   }
-  body.mobile-touch .mobile-btn:not(.is-on)#mobile-haptics {
+  body.mobile-touch #mobile-extra-controls .mobile-btn:not(.is-on) {
     opacity: 0.55;
   }
   body.mobile-touch .mobile-btn .mobile-label {
@@ -451,6 +466,8 @@
   body.mobile-touch #mobile-action-ring {
     --mobile-action-hit: 48px;
     --mobile-action-face: 40px;
+    --mobile-target-face: 44px;
+    --mobile-target-raise: 3px;
     --mobile-jump-face: 46px;
     --mobile-attack-face: 36px;
     --mobile-page-face: 32px;
@@ -465,8 +482,8 @@
     grid-template-columns: repeat(4, var(--mobile-action-hit)) var(--mobile-jump-hit);
     grid-template-rows: var(--mobile-action-hit) var(--mobile-jump-hit);
     grid-template-areas:
-      ". a1 a2 attack target"
-      "page a3 a4 a5 jump";
+      ". a1 a2 a5 target"
+      "page a3 a4 attack jump";
     gap: var(--mobile-action-gap);
     align-items: center;
     justify-items: center;
@@ -533,8 +550,12 @@
   body.mobile-touch .mobile-action-slot[data-mobile-index="4"] {
     grid-area: a5;
   }
-  body.mobile-touch #mobile-target-cycle {
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle {
     grid-area: target;
+    --mobile-control-face: var(--mobile-target-face);
+  }
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle::before {
+    transform: translate(-50%, calc(-50% - var(--mobile-target-raise))) scale(var(--btn-scale, 1));
   }
   body.mobile-touch #mobile-action-ring #mobile-jump {
     grid-area: jump;
@@ -559,6 +580,10 @@
     width: 22px;
     height: 22px;
   }
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
   body.mobile-touch #mobile-target-cycle .mobile-label,
   body.mobile-touch #mobile-action-ring #mobile-jump .mobile-label {
     display: block;
@@ -566,6 +591,9 @@
     font-size: 8px;
     font-family: var(--ui-font);
     color: #d8b98a;
+  }
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle .mobile-label {
+    font-size: 9px;
   }
   body.mobile-touch #mobile-action-ring > #mobile-action-page-toggle {
     grid-area: page;
@@ -602,6 +630,10 @@
   body.mobile-touch #mobile-action-ring > button > .mobile-action-page-indicator {
     transform: scale(var(--btn-scale, 1));
     transform-origin: center;
+  }
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle > .ui-icon,
+  body.mobile-touch #mobile-action-ring > #mobile-target-cycle > .mobile-label {
+    transform: translateY(calc(-1 * var(--mobile-target-raise))) scale(var(--btn-scale, 1));
   }
   /* Cooldown sweep + used-flash + state dimming reuse the SAME classes/structure
      as .action-btn (cd-overlay height% sweep, .empty/.unusable/.oor/.queued),
@@ -710,19 +742,6 @@
     --mobile-control-border: var(--gold);
     --mobile-control-shadow: 0 0 12px #ffd100aa, inset 0 0 0 1px #ffd10077;
   }
-  body.mobile-touch #mobile-action-attack.queued::after {
-    content: "";
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    width: 8px;
-    height: 8px;
-    border: 2px solid currentColor;
-    border-radius: 2px;
-    background: currentColor;
-    box-shadow: 0 0 0 1px #000;
-    pointer-events: none;
-  }
   body.mobile-touch #mobile-action-ring button.used {
     --mobile-control-border: var(--gold);
   }
@@ -749,11 +768,6 @@
     body.mobile-touch #mobile-action-attack.queued::before {
       outline: 2px solid CanvasText;
       outline-offset: -4px;
-    }
-    body.mobile-touch #mobile-action-attack.queued::after {
-      border-color: CanvasText;
-      background: CanvasText;
-      box-shadow: none;
     }
   }
   /* Consumables drawer: a quiet chip immediately inward of the move joystick
@@ -796,11 +810,9 @@
     width: 40px;
     height: 40px;
     inset: 4px;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
-    border-radius: 10px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    border: 2px solid #4a3d1d;
+    border-radius: 14px;
+    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
     box-shadow:
       inset 0 1px 0 #ffffff14,
       0 2px 8px #0009;
@@ -809,7 +821,7 @@
   body.mobile-touch #mobile-consumables-toggle .ui-icon {
     width: 14px;
     height: 14px;
-    transform: scale(var(--btn-scale, 1));
+    transform: translateX(1px) scale(var(--btn-scale, 1));
     transform-origin: center;
     position: relative;
     z-index: 1;
@@ -827,7 +839,13 @@
     border-color: var(--gold-dim);
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
-    transform: rotate(90deg) scale(var(--btn-scale, 1));
+    transform: translateX(-1px) scaleX(-1) scale(var(--btn-scale, 1));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-consumables-toggle .ui-icon {
+    transform: translateX(-1px) scaleX(-1) scale(var(--btn-scale, 1));
+  }
+  body.mobile-touch.mobile-left-handed.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
+    transform: translateX(1px) scale(var(--btn-scale, 1));
   }
   /* A 3 x 2 grid anchored to the toggle's bottom edge grows upward and inward. */
   body.mobile-touch #mobile-consumables-row {
@@ -843,6 +861,9 @@
   body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
     display: grid;
   }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables {
+    z-index: 100;
+  }
   body.mobile-touch .mobile-consumable-slot {
     position: relative;
     width: 48px;
@@ -855,7 +876,7 @@
     background: transparent;
     color: #eee8ff;
     cursor: var(--cursor-point);
-    overflow: hidden;
+    overflow: visible;
     box-shadow: none;
   }
   body.mobile-touch .mobile-consumable-slot:active .icon-label {
@@ -1035,31 +1056,14 @@
     flex: 0 0 18px;
   }
   /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
-  body.mobile-touch #mobile-extra-controls .mobile-btn.active {
+  body.mobile-touch #mobile-extra-controls .mobile-btn.is-on {
     border-color: var(--gold);
     box-shadow:
       0 0 8px #ffd10066,
       inset 0 0 6px #ffd10033;
   }
-  body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
+  body.mobile-touch #mobile-extra-controls .mobile-btn.is-on .mobile-label {
     color: var(--gold);
-  }
-  /* music toggle: a diagonal slash over the note signals "off" (mirrors #mm-music) */
-  body.mobile-touch #mobile-music {
-    position: relative;
-  }
-  body.mobile-touch #mobile-music.mm-muted::after {
-    content: "";
-    position: absolute;
-    left: 21px;
-    top: 50%;
-    width: 24px;
-    height: 2px;
-    border-radius: 2px;
-    background: #f0e8d2;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
   }
   body.mobile-touch #bottom-bar {
     left: calc(max(18px, env(safe-area-inset-left)) + 172px);
@@ -1345,46 +1349,22 @@
     border: 1px solid var(--gold-dim, #6f5a2a);
     border-radius: 8px;
   }
-  /* Mobile chat resize handle (hud.ts creates it as a BODY-LEVEL element): a visible grab
-     bar pinned to the open panel's bottom edge via the SAME --mobile-chat-bottom var, so it
-     tracks the panel with no JS. A very high z-index keeps it above any overlay (the mystery
-     white bar included), and touch-action:none makes a drag a resize, not a scroll. Shown
-     only while the read panel is open. */
-  .chat-mobile-resize {
-    display: none;
-  }
-  body.mobile-touch.mobile-chat-open .chat-mobile-resize {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    width: var(--mobile-chat-w);
-    /* Straddle the panel's bottom edge: the 30px bar is centred on the edge (edge - 15px). */
-    bottom: calc(
-      env(safe-area-inset-bottom) +
-      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px)) -
-      15px
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    z-index: 300;
+  /* Reuse the chat frame's classic corner grip on touch. It stays inside the chat
+     stacking context, so a Talents/Bag/etc. window covers it naturally. The selector
+     also removes it while another window or the keyboard owns the foreground. */
+  body.mobile-touch.mobile-chat-open:not(.mobile-window-open):not(.mobile-keyboard-open)
+  .chat-resize-grip {
+    display: block;
+    width: 40px;
+    height: 40px;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    opacity: 0.75;
     touch-action: none;
-    cursor: ns-resize;
-    pointer-events: auto;
-    border-radius: 0 0 8px 8px;
-    background: color-mix(in srgb, var(--panel-base, #14121c) 82%, transparent);
-    box-shadow: inset 0 1px 0 #ffffff10;
-  }
-  body.mobile-touch.mobile-chat-open .chat-mobile-resize::before {
-    content: "";
-    width: 56px;
-    height: 6px;
-    border-radius: 3px;
-    background: var(--gold-dim, #6f5a2a);
-    box-shadow:
-      0 0 0 1px #00000066,
-      inset 0 1px 0 #ffffff33;
+    background-size: 18px 18px;
+    background-position: right 4px bottom 4px;
+    background-repeat: no-repeat;
   }
   /* The tab strip keeps its natural height; the log frame fills the rest of the panel
      (the ~4-line strip cap only applies while closed or peeking). */
@@ -1730,6 +1710,7 @@
     border-color: var(--gold-dim);
     transform: rotate(90deg);
   }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-rows,
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame,
   body.mobile-touch #party-frames:not(.party-expanded) #party-leave {
     display: none;
@@ -1743,6 +1724,94 @@
     right: max(20px, calc(env(safe-area-inset-right) + 10px));
     top: calc(max(140px, env(safe-area-inset-top)) + 36px);
     max-width: calc(180px * var(--mobile-chrome-scale, 1));
+  }
+  /* Aura art keeps the dense 28px classic face (34px for the player's own
+     emphasized target aura), but the live mobile control and flex layout slot
+     are 40px. The parent retains the painter-owned background image at zero
+     paint size so the centered pseudo-face can inherit it without hot-path DOM
+     changes. Duration and stack copy never intercepts the tooltip/cancel hit. */
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff {
+    width: 40px;
+    height: 40px;
+    border-color: transparent;
+    background-color: transparent;
+    background-size: 0 0;
+    box-shadow: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-buff);
+    border-radius: 4px;
+    background-color: #10141c;
+    background-image: inherit;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff.debuff::before {
+    border-width: 2px;
+    border-color: var(--color-debuff);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="fire"]::before {
+    border-color: var(--color-debuff-fire);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="frost"]::before {
+    border-color: var(--color-debuff-frost);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="arcane"]::before {
+    border-color: var(--color-debuff-arcane);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="shadow"]::before {
+    border-color: var(--color-debuff-shadow);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="nature"]::before {
+    border-color: var(--color-debuff-nature);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="holy"]::before {
+    border-color: var(--color-debuff-holy);
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff.own::before {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.own:not(.debuff)::before {
+    border-color: var(--color-primary);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.cancelable:hover::before {
+    border-color: var(--color-gold, #d8b56b);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff > .dur {
+    bottom: 0;
   }
   body.mobile-touch #minimap-wrap {
     right: max(20px, calc(env(safe-area-inset-right) + 10px));
@@ -1875,8 +1944,8 @@
     right: auto;
     grid-template-columns: var(--mobile-jump-hit) repeat(4, var(--mobile-action-hit));
     grid-template-areas:
-      "target attack a2 a1 ."
-      "jump a5 a4 a3 page";
+      "target a5 a2 a1 ."
+      "jump attack a4 a3 page";
   }
   body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
     /* Left-handed mirrors the move joystick to the right (above) AND the ring
@@ -1980,12 +2049,14 @@
     top: calc(env(safe-area-inset-top) + 122px);
   }
   body.mobile-touch .window {
+    --mobile-scroll-end-space: max(18px, calc(12px + env(safe-area-inset-bottom)));
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
        body-level windows OUTSIDE the zoomed #ui (the confirm/input dialog),
        which pin --window-scale to 1 (see the shell note in layout.css). */
     max-height: calc(var(--app-vh) / var(--window-scale, 1) - 40px);
     padding-bottom: max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)));
+    scroll-padding-bottom: var(--mobile-scroll-end-space);
     box-sizing: border-box;
   }
   /* Mobile border restyle: every mobile window (.window.panel covers bags,
@@ -2448,9 +2519,31 @@
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
   }
-  body.mobile-touch :is(.bag-grid, .bank-scroll, .soc-body, .ql-detail-body) {
-    padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
-    scroll-padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+  /* A window can delegate scrolling to one of these inner surfaces. Give every
+     delegated scroll owner the same safe end-space as the root sheet, so its
+     final row/action never rests against or underneath the lower frame edge. */
+  body.mobile-touch .window
+    :is(
+      .bag-grid,
+      .bank-scroll,
+      .soc-body,
+      .ql-list,
+      .ql-detail-body,
+      .spell-list,
+      .lb-body,
+      .dr-body,
+      .dr-leaderboard-ranks,
+      .delve-shop-list,
+      .bag-item-action-details,
+      .bag-item-action-controls,
+      #market-body,
+      #mailbox-body,
+      .mail-reading-body,
+      .cal-day-pane,
+      #discord-window .dc-body
+    ) {
+    padding-bottom: var(--mobile-scroll-end-space);
+    scroll-padding-bottom: var(--mobile-scroll-end-space);
     box-sizing: border-box;
   }
   body.mobile-touch .bag-chips {
@@ -2539,16 +2632,29 @@
   body.mobile-touch #player-card-modal .pc-link-input {
     font-size: 16px;
   }
-  /* Mobile enemy select tooltip: compact and anchored from hud.ts to the left of
-     the minimap so it does not cover the bottom-right action controls. */
+  /* Mobile mob inspection tooltip: compact and positioned from hud.ts below the
+     rendered minimap so it stays clear of navigation and bottom action controls. */
   body.mobile-touch #tooltip.mob-tooltip {
+    box-sizing: border-box;
+    width: min(184px, calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
     max-width: min(
-      188px,
+      184px,
       calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right))
     );
     padding: 5px 7px;
     line-height: 1.25;
     font-size: calc(10px * var(--tooltip-scale, 1));
+  }
+  body.mobile-touch #tooltip.mob-tooltip.mob-tooltip-clipped {
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0,
+      #000 calc(100% - 14px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%);
   }
   body.mobile-touch #tooltip.mob-tooltip .tt-title {
     font-size: calc(12px * var(--tooltip-scale, 1));
@@ -2710,6 +2816,55 @@
   body.mobile-touch #options-menu.perf-wide {
     width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
+  }
+  body.mobile-touch #spellbook {
+    --spellbook-edge-padding: 8px;
+    /* Drive the compact edges through the shared window pad instead of a direct
+       padding override: the sticky header's negative margins and sticky top
+       mirror --window-pad (layout.css), so a direct padding-top override left
+       the title plate overshooting the frame on the top and both sides. */
+    --window-pad: var(--spellbook-edge-padding);
+    /* The bottom edge matches the sides: the LIST is the scroll container
+       (rows clip inside their own box, never against the frame), so the
+       generic mobile .window bottom reservation (18px plus safe area) only
+       read as a fat empty band under the last row. */
+    padding-bottom: var(--window-pad);
+    top: max(4px, env(safe-area-inset-top));
+    /* Size to content instead of pinning to the viewport bottom: a short
+       list (or the compact picker state) left a huge empty stretch above
+       the lower frame. The cap keeps the old pin's viewport clearance. */
+    height: auto;
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      max(4px, env(safe-area-inset-top)) -
+      max(4px, env(safe-area-inset-bottom))
+    );
+    container-type: inline-size;
+  }
+  /* The window itself must not scroll on touch: rows used to slide under the
+     floating title plate and clip only at the frame's inner edge (visibly
+     crossing the beveled gold hairline), and the plate itself crept 8px up
+     once the shared sticky offset engaged. The open sheet is a flex column
+     (title, status, picker, list) whose LIST is the one scroll container, so
+     rows clip at the list box inside the window padding and the title never
+     moves. Gated on the hud's open stamp, since an ungated display would
+     override the closed state's inline display:none. */
+  body.mobile-touch #spellbook[data-window-open="1"] {
+    display: flex !important;
+    flex-direction: column;
+    overflow-y: hidden;
+  }
+  body.mobile-touch #spellbook .spell-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* No extra scroll-end reservation inside the list (the shared 18px rule
+       for delegated scroll surfaces): the window's own compact bottom pad is
+       the visible gap, keeping the end of the list symmetric with the sides. */
+    padding-bottom: 0;
+    scroll-padding-bottom: 0;
   }
   body.mobile-touch.vendor-open #vendor-window,
   body.mobile-touch.vendor-open #bags {
@@ -3085,9 +3240,16 @@
     max-height: none;
     transform: none;
     z-index: 95 !important;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   body.mobile-touch #talents-window #tal-body {
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: visible;
   }
   /* The class/spec tab switch already exists on desktop (tal-tabs); on mobile
      it is the mechanism issue 1577's redo leans on to see one tree at a time
@@ -3108,9 +3270,59 @@
     box-sizing: border-box;
     font-size: 16px;
   }
+  /* Seat the header actions on the same column as the row +/x controls: the
+     header plate itself already sits --window-pad inside the frame (its inline
+     margins are zeroed in the .panel-title rule below), and the rows keep a
+     4px inner right padding, so a 4px inset lines both X columns up. */
+  body.mobile-touch #spellbook > .panel-title > .panel-title-actions {
+    inset-inline-end: 4px;
+  }
+  body.mobile-touch #spellbook > .panel-title {
+    /* A floating plate INSIDE the frame, not an edge-to-edge bar: the shared
+       negative inline margins reach the border box and paint over the beveled
+       inner gold hairline on both sides. Content width plus all-corner radius
+       keeps the frame decoration fully visible around it. Static in the flex
+       column (not sticky): the shared sticky offset moved the plate 8px up
+       once the old window scroll engaged. */
+    position: relative;
+    top: 0;
+    flex: 0 0 auto;
+    margin-top: 0;
+    margin-inline: 0;
+    border-radius: 4px;
+  }
   body.mobile-touch #spellbook .spell-row {
     min-height: 52px;
     padding-right: 4px;
+  }
+  body.mobile-touch #spellbook .spell-row:hover {
+    background: transparent;
+  }
+  body.mobile-touch #spellbook.spell-slot-picker-open .spell-sub {
+    display: none;
+  }
+  body.mobile-touch #spellbook.spell-slot-picker-open {
+    height: auto;
+    overflow-y: hidden;
+    display: flex !important;
+    flex-direction: column;
+  }
+  body.mobile-touch #spellbook.spell-slot-picker-open > .panel-title {
+    position: relative;
+    top: 0;
+    flex: 0 0 auto;
+    margin-bottom: 0;
+  }
+  body.mobile-touch #spellbook.spell-slot-picker-open > .spell-slot-picker,
+  body.mobile-touch #spellbook.spell-slot-picker-open > .spell-assignment-status {
+    position: static;
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #spellbook.spell-slot-picker-open .spell-list {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
   }
   body.mobile-touch #spellbook .spell-hotbar-toggle {
     min-width: 40px;
@@ -3142,19 +3354,168 @@
     padding: 0 12px;
     font-size: 14px;
   }
-  /* Touch-only mobile action-ring page label on bar-assigned spellbook rows
-     (Phase 4). Small, unobtrusive: it only exists to point a touch player at
-     the ring page holding the ability they just added. */
-  body.mobile-touch #spellbook .spell-mobile-page {
-    flex: 0 0 auto;
-    align-self: center;
-    margin-inline-start: 4px;
-    padding: 2px 6px;
+  body.mobile-touch #spellbook .spell-touch-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-inline-start: auto;
+  }
+  body.mobile-touch #spellbook .spell-assignment-chip,
+  body.mobile-touch #spellbook .spell-hotbar-remove,
+  body.mobile-touch #spellbook .spell-slot-picker-close {
+    min-height: 40px;
     border: 1px solid #4a3d1d;
-    border-radius: 4px;
-    font-size: 10px;
-    color: #c8b888;
+    border-radius: 6px;
+    background: #171722e8;
+    color: var(--gold);
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-close {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 48px;
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-close .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle,
+  body.mobile-touch #spellbook .spell-hotbar-remove,
+  body.mobile-touch #spellbook .spell-assignment-chip {
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: var(--gold);
+    font: 700 14px / 1 var(--ui-font);
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 6px #0008;
+  }
+  body.mobile-touch #spellbook .spell-assignment-chip {
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 8px;
     white-space: nowrap;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-add {
+    font-size: 20px;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-remove {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-remove .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  body.mobile-touch #spellbook .spell-slot-picker {
+    position: sticky;
+    top: 54px;
+    z-index: 2;
+    display: grid;
+    gap: 6px;
+    /* Symmetric inner padding: the strip sat flush under the title with its
+       controls starting at the very top edge while keeping an 8px bottom. */
+    padding: 8px;
+    border-block: 1px solid #4a3d1d;
+    background: #101018f2;
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-tabs,
+  body.mobile-touch #spellbook .spell-slot-picker-destinations {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-tabs [role="tab"],
+  body.mobile-touch #spellbook .spell-slot-destination {
+    min-width: 48px;
+    min-height: 48px;
+    box-sizing: border-box;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: #171722e8;
+    color: var(--gold);
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-tabs [aria-selected="true"],
+  body.mobile-touch #spellbook .spell-slot-destination[aria-current="true"] {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+  body.mobile-touch #spellbook .spell-slot-destination:focus-visible,
+  body.mobile-touch #spellbook .spell-slot-picker-tabs [role="tab"]:focus-visible,
+  body.mobile-touch #spellbook .spell-assignment-chip:focus-visible,
+  body.mobile-touch #spellbook .spell-hotbar-remove:focus-visible,
+  body.mobile-touch #spellbook .spell-slot-picker-close:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+  body.mobile-touch #spellbook .spell-slot-destination {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    padding: 3px;
+  }
+  body.mobile-touch #spellbook .spell-slot-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background-position: center;
+    background-size: cover;
+  }
+  body.mobile-touch #spellbook .spell-slot-picker-status {
+    min-height: 1em;
+    text-align: center;
+  }
+  body.mobile-touch.mobile-left-handed #spellbook .spell-slot-picker-tabs,
+  body.mobile-touch.mobile-left-handed #spellbook .spell-slot-picker-destinations {
+    flex-direction: row-reverse;
+  }
+  @media (max-height: 480px) and (orientation: landscape) {
+    body.mobile-touch #spellbook .spell-slot-picker {
+      --spell-picker-control-size: clamp(40px, calc((100cqw - 60px) / 10), 48px);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x;
+      scrollbar-width: thin;
+      padding-inline: 4px;
+    }
+    body.mobile-touch #spellbook .spell-slot-picker-tabs,
+    body.mobile-touch #spellbook .spell-slot-picker-destinations {
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+    }
+    body.mobile-touch #spellbook .spell-slot-picker-tabs [role="tab"],
+    body.mobile-touch #spellbook .spell-slot-destination,
+    body.mobile-touch #spellbook .spell-slot-picker-close {
+      width: var(--spell-picker-control-size);
+      min-width: var(--spell-picker-control-size);
+      height: var(--spell-picker-control-size);
+      min-height: var(--spell-picker-control-size);
+      flex-basis: var(--spell-picker-control-size);
+    }
+    body.mobile-touch #spellbook .spell-slot-icon {
+      width: clamp(22px, calc(var(--spell-picker-control-size) - 20px), 28px);
+      height: clamp(22px, calc(var(--spell-picker-control-size) - 20px), 28px);
+    }
+    body.mobile-touch #spellbook .spell-slot-destination.has-occupant .spell-slot-label {
+      display: none;
+    }
   }
   body.mobile-touch #quest-dialog .qd-list-item,
   body.mobile-touch #quest-log-window .ql-item,
@@ -3173,18 +3534,37 @@
   body.mobile-touch #quest-log-window .ql-empty {
     font-size: 16px;
   }
+  /* Quest Log uses one vertical scroll owner per column. Its old outer-sheet
+     scroll plus inner narrative scroll pushed the fixed Abandon footer below
+     the clipped root on short landscape phones. The named offset is the 92px
+     sheet reservation plus the 58px title band and 18px scroll-end gap. */
+  body.mobile-touch #quest-log-window {
+    --mobile-quest-log-content-offset: 168px;
+    overflow: hidden;
+  }
   body.mobile-touch #quest-log-window .ql-cols {
     gap: var(--spacing-sm);
+    height: min(
+      380px,
+      calc(var(--app-vh) / var(--ui-scale, 1) - var(--mobile-quest-log-content-offset))
+    );
     min-width: 0;
+    min-height: 0;
   }
   body.mobile-touch #quest-log-window .ql-list {
     width: min(42%, 220px);
     min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
   }
   body.mobile-touch #quest-log-window .ql-detail {
     min-width: 0;
+    min-height: 0;
+    height: 100%;
+    max-height: none;
   }
   body.mobile-touch #quest-log-window .ql-detail-body {
+    flex: 1 1 auto;
     min-width: 0;
   }
   body.mobile-touch #options-menu .btn {
@@ -3332,6 +3712,7 @@
     width: 100%;
     height: auto;
     display: block;
+    touch-action: none;
   }
   body.mobile-touch #map-close {
     right: 5px;
@@ -4014,32 +4395,11 @@
     body.mobile-touch #mobile-preflight-steps {
       font-size: 11px;
     }
-    /* Issue 1577 round 2 (11): a further landscape improvement on top of the
-       full-screen fit-to-view talent tree. Flow the window as a wrapping row so
-       the tree (#tal-body) and the build/loadout controls (.tal-foot) sit side
-       by side (two columns) instead of the foot stacking below and stealing the
-       vertical room the tree fits into. The header/help/tabs stay full width on
-       top. The tree's fit-to-view scale (fitTreeToMobileViewport) measures
-       #tal-body live, so it adapts to the narrower-but-taller column
-       automatically. */
-    body.mobile-touch #talents-window {
-      column-count: 2;
-      column-gap: 14px;
-      box-sizing: border-box;
-    }
-    body.mobile-touch #talents-window > * {
-      break-inside: avoid;
-    }
-    body.mobile-touch #talents-window > .panel-title,
-    body.mobile-touch #talents-window > .tal-head,
-    body.mobile-touch #talents-window > .tal-help,
-    body.mobile-touch #talents-window > .tal-tabs {
-      column-span: all;
-    }
+    /* Talents stay in one document flow in landscape too. The whole window owns
+       vertical scrolling, so the tree, specializations, and build controls follow
+       each other top-to-bottom instead of fragmenting into CSS columns. */
     body.mobile-touch #talents-window > .tal-foot {
-      margin-top: 0;
-      border-top: 0;
-      padding-top: 0;
+      margin-top: 12px;
     }
   }
   /* Re-homed from the char-select responsive block in shell.css: narrow-width
@@ -4119,7 +4479,9 @@
   body.mobile-touch.hud-mobile-compact #minimap-wrap {
     /* Keep compact phones slightly tighter than the landscape baseline while
        still making the minimap materially larger than the old 0.44 scale. */
-    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+    transform: scale(
+      var(--mobile-minimap-layout-scale, calc(0.57 * var(--mobile-chrome-scale, 1)))
+    );
   }
   /* A short landscape phone (the compact tier's primary trigger) has too little
      vertical room for a full chat log AND the action pad at once; drop the log
@@ -4158,6 +4520,7 @@
   body.mobile-touch.hud-mobile-tablet #mobile-action-ring {
     --mobile-action-hit: 56px;
     --mobile-action-face: 46px;
+    --mobile-target-face: 50px;
     --mobile-jump-face: 52px;
     --mobile-attack-face: 42px;
     --mobile-page-face: 38px;
@@ -4184,18 +4547,18 @@
   body.mobile-touch {
     --mobile-map-size: 85px;
     --mobile-direct-menu-width: 256px;
-    --mobile-player-frame-scale: 0.9;
-    --mobile-target-frame-ratio: 0.8;
+    --mobile-player-frame-scale: 1;
+    --mobile-target-frame-ratio: 0.9;
     --mobile-player-frame-source-height: 68px;
     --mobile-camera-joystick-size: 96px;
   }
   body.mobile-touch.hud-mobile-compact {
     --mobile-direct-menu-width: 152px;
-    --mobile-player-frame-scale: 0.62;
+    --mobile-player-frame-scale: 0.72;
     --mobile-camera-joystick-size: 82px;
   }
   body.mobile-touch.hud-mobile-tablet {
-    --mobile-player-frame-scale: 1;
+    --mobile-player-frame-scale: 1.1;
   }
   body.mobile-touch.game-active #mobile-controls {
     --mobile-camera-zone-width: min(30vw, 220px);
@@ -4279,7 +4642,9 @@
     left: max(6px, env(safe-area-inset-left));
     right: auto;
     top: max(6px, env(safe-area-inset-top));
-    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+    transform: scale(
+      var(--mobile-minimap-layout-scale, calc(0.57 * var(--mobile-chrome-scale, 1)))
+    );
     transform-origin: left top;
   }
   body.mobile-touch #target-frame,
@@ -4342,7 +4707,7 @@
       12px -
       var(--mobile-camera-zone-width)
     );
-    --mobile-camera-zone-top: max(84px, calc(env(safe-area-inset-top) + 80px));
+    --mobile-camera-zone-top: max(110px, calc(env(safe-area-inset-top) + 106px));
   }
   body.mobile-touch.mobile-left-handed.mobile-camera-joystick-on.game-active #mobile-controls {
     --mobile-camera-zone-left: calc(
@@ -4471,19 +4836,26 @@
       transform: none;
       transform-origin: right top;
     }
-    body.mobile-touch #target-frame,
-    body.mobile-touch.mobile-left-handed #target-frame {
+    /* Keep the responsive target frame centered across phone and tablet tiers.
+       It stays high enough to leave the world center readable while matching
+       the player's safe-area-aware horizontal axis. */
+    body.mobile-touch #target-frame {
       left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
       right: auto;
-      top: calc(max(6px, env(safe-area-inset-top)) + 48px);
+      top: max(8px, env(safe-area-inset-top));
       transform: translateX(-50%)
         scale(
           calc(
             var(--mobile-player-frame-scale, 0.9) *
-            var(--mobile-target-frame-ratio, 0.8) *
+            var(--mobile-target-frame-ratio, 0.9) *
             var(--mobile-chrome-scale, 1)
           )
         );
+      transform-origin: center top;
+    }
+    body.mobile-touch.mobile-left-handed #target-frame {
+      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
+      right: auto;
       transform-origin: center top;
     }
     body.mobile-touch #party-chip {
@@ -4545,7 +4917,10 @@
     /* Pet commands keep a 40px hitbox, but shed the desktop panel and dark button
        tiles. Only the 32px art is visible, leaving more world around the command row. */
     body.mobile-touch #petbar {
+      /* Keep the command row and stance toggle docked to the petbar's bottom
+         edge while the expanded stance options grow upward. */
       gap: 4px;
+      align-items: flex-end;
     }
     body.mobile-touch #petbar .petbar-group {
       gap: 0;
@@ -4554,6 +4929,11 @@
       outline: 0;
       background: transparent;
       box-shadow: none;
+    }
+    body.mobile-touch #petbar .petbar-stances.expanded {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 3px;
     }
     body.mobile-touch #petbar .pet-btn {
       width: 40px;
@@ -4566,6 +4946,12 @@
       inset: 4px;
       border-radius: 50%;
       box-shadow: 0 2px 5px #000b;
+    }
+    body.mobile-touch #petbar .pet-stance-option .icon-label {
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 1px #b9974f,
+        0 2px 5px #000b;
     }
     body.mobile-touch #petbar .pet-btn.active,
     body.mobile-touch #petbar .pet-btn.autocast {
@@ -4609,21 +4995,17 @@
     body.mobile-touch.hud-mobile-tablet #petbar {
       bottom: calc(154px + env(safe-area-inset-bottom));
     }
-    /* Compact keeps the disclosure low, immediately beyond the fixed movement
-       capture zone. Carried items fill rightward toward the centered player
-       frame, then wrap upward in two-column rows. The action-side safe inset
-       lifts only the drawer when the centered player frame shifts toward it. */
+    /* Compact keeps the complete disclosure group above the fixed movement zone.
+       Carried items fill inward in three columns, then wrap upward into row two. */
     body.mobile-touch.hud-mobile-compact #mobile-consumables {
       left: max(136px, calc(env(safe-area-inset-left) + 136px));
+      bottom: calc(68px + env(safe-area-inset-bottom));
     }
     body.mobile-touch.hud-mobile-compact #mobile-consumables-row {
       left: calc(48px + 6px);
       right: auto;
-      bottom: calc(
-        max(env(safe-area-inset-left), env(safe-area-inset-right)) +
-        min(8px, max(env(safe-area-inset-left), env(safe-area-inset-right)))
-      );
-      width: 100px;
+      bottom: 0;
+      width: 152px;
     }
     body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-row {
       display: flex;
@@ -4640,6 +5022,36 @@
     body.mobile-touch.hud-mobile-compact.mobile-left-handed.mobile-consumables-open
       #mobile-consumables-row {
       flex-direction: row-reverse;
+    }
+  }
+
+  body.mobile-touch .bag-item-action,
+  body.mobile-touch .bag-item-destination,
+  body.mobile-touch .bag-item-action-reset,
+  body.mobile-touch .bag-item-action-close {
+    min-width: 40px;
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+  body.mobile-touch .bag-item-action:focus-visible,
+  body.mobile-touch .bag-item-destination:focus-visible,
+  body.mobile-touch .bag-item-action-reset:focus-visible,
+  body.mobile-touch .bag-item-action-close:focus-visible {
+    outline-width: 3px;
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch .bag-item-action-sheet,
+    body.mobile-touch .bag-item-action-detail-pane,
+    body.mobile-touch .bag-item-action,
+    body.mobile-touch .bag-item-destination,
+    body.mobile-touch .bag-item-action-reset,
+    body.mobile-touch .bag-item-action-close {
+      border: 1px solid CanvasText;
+    }
+    body.mobile-touch .bag-item-destination.current {
+      forced-color-adjust: none;
+      color: HighlightText;
+      background: Highlight;
     }
   }
 
@@ -4692,4 +5104,1196 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
+
+  /* ---------- mobile custom HUD layout ---------- */
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="0"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a1-x);
+    top: var(--mobile-hud-action-a1-y);
+    width: var(--mobile-hud-action-a1-width);
+    height: var(--mobile-hud-action-a1-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a1-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="1"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a2-x);
+    top: var(--mobile-hud-action-a2-y);
+    width: var(--mobile-hud-action-a2-width);
+    height: var(--mobile-hud-action-a2-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a2-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="2"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a3-x);
+    top: var(--mobile-hud-action-a3-y);
+    width: var(--mobile-hud-action-a3-width);
+    height: var(--mobile-hud-action-a3-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a3-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="3"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a4-x);
+    top: var(--mobile-hud-action-a4-y);
+    width: var(--mobile-hud-action-a4-width);
+    height: var(--mobile-hud-action-a4-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a4-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #mobile-action-ring
+    > .mobile-action-slot[data-mobile-index="4"] {
+    position: fixed;
+    left: var(--mobile-hud-action-a5-x);
+    top: var(--mobile-hud-action-a5-y);
+    width: var(--mobile-hud-action-a5-width);
+    height: var(--mobile-hud-action-a5-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-a5-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-attack {
+    position: fixed;
+    left: var(--mobile-hud-action-attack-x);
+    top: var(--mobile-hud-action-attack-y);
+    width: var(--mobile-hud-action-attack-width);
+    height: var(--mobile-hud-action-attack-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-attack-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-target-cycle {
+    position: fixed;
+    left: var(--mobile-hud-action-target-x);
+    top: var(--mobile-hud-action-target-y);
+    width: var(--mobile-hud-action-target-width);
+    height: var(--mobile-hud-action-target-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-target-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-jump {
+    position: fixed;
+    left: var(--mobile-hud-action-jump_use-x);
+    top: var(--mobile-hud-action-jump_use-y);
+    width: var(--mobile-hud-action-jump_use-width);
+    height: var(--mobile-hud-action-jump_use-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-jump_use-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-page-toggle {
+    position: fixed;
+    left: var(--mobile-hud-action-page-x);
+    top: var(--mobile-hud-action-page-y);
+    width: var(--mobile-hud-action-page-width);
+    height: var(--mobile-hud-action-page-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-action-page-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-ring > button {
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls {
+    left: var(--mobile-hud-menu-top-x);
+    right: auto;
+    top: var(--mobile-hud-menu-top-y);
+    bottom: auto;
+    width: var(--mobile-hud-menu-top-width);
+    height: var(--mobile-hud-menu-top-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-menu-top-scale);
+    transform-origin: left top;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls > .mobile-btn {
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-wrap {
+    --mobile-minimap-layout-scale: 1;
+    position: fixed;
+    left: var(--mobile-hud-minimap-cluster-x);
+    right: auto;
+    top: var(--mobile-hud-minimap-cluster-y);
+    bottom: auto;
+    width: var(--mobile-hud-minimap-cluster-width);
+    height: var(--mobile-hud-minimap-cluster-height);
+    display: block;
+    text-align: left;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-minimap-cluster-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-disc {
+    position: absolute;
+    left: 0;
+    top: 18px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-disc,
+  body.mobile-touch.mobile-hud-custom-active #minimap {
+    width: 98px;
+    height: 98px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #zone-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: auto;
+    width: 98px;
+    margin: 0;
+    line-height: 16px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-coords {
+    position: absolute;
+    left: 49px;
+    top: 76px;
+    margin: 0;
+    translate: -50% 0;
+    z-index: 4;
+  }
+  body.mobile-touch.mobile-hud-custom-active #compass {
+    position: absolute;
+    left: 0;
+    top: 112px;
+    width: 98px;
+    margin: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-clock {
+    position: absolute;
+    left: 49px;
+    top: 80px;
+    bottom: auto;
+    margin: 0;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    translate: -50% 0;
+    transform: scale(1.25);
+    transform-origin: center top;
+    z-index: 5;
+  }
+  body.mobile-touch.mobile-hud-custom-active #raid-lockout,
+  body.mobile-touch.mobile-hud-custom-active #mail-indicator {
+    left: 96px;
+    right: auto;
+    width: 44px;
+    height: 44px;
+    transform: scale(1.25);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #raid-lockout {
+    top: 18px;
+    bottom: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#zone-label, #minimap-coords, #compass),
+  body.mobile-touch.mobile-hud-custom-active :is(#zone-label, #minimap-coords, #compass) * {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mail-indicator {
+    top: 74px;
+    bottom: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #player-frame {
+    left: var(--mobile-hud-frame-player-x);
+    right: auto;
+    top: var(--mobile-hud-frame-player-y);
+    bottom: auto;
+    width: var(--mobile-hud-frame-player-width);
+    height: var(--mobile-hud-frame-player-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-player-scale);
+    transform-origin: left top;
+  }
+  /* Custom HUD scaling owns the complete Player/Target geometry. The desktop
+     frame-size sliders zoom their children, which would otherwise compound with
+     the custom root scale and make validation smaller than the painted frame. */
+  body.mobile-touch.mobile-hud-custom-active #player-frame > :not(.tf-move-btn),
+  body.mobile-touch.mobile-hud-custom-active #target-frame > :not(.tf-move-btn) {
+    zoom: 1;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar,
+  body.mobile-touch.mobile-hud-custom-active #swingbar {
+    left: var(--mobile-hud-frame-player-x);
+    right: auto;
+    bottom: auto;
+    width: var(--mobile-hud-frame-player-width);
+    min-width: 0;
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-player-scale);
+    transform-origin: left top;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar *,
+  body.mobile-touch.mobile-hud-custom-active #swingbar * {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar {
+    top: calc(var(--mobile-hud-frame-player-y) - var(--mobile-hud-frame-player-castbar-top-offset));
+  }
+  body.mobile-touch.mobile-hud-custom-active #swingbar {
+    top: calc(
+      var(--mobile-hud-frame-player-y) -
+      var(--mobile-hud-frame-player-swingbar-top-offset)
+    );
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame {
+    left: var(--mobile-hud-frame-target-x);
+    right: auto;
+    top: var(--mobile-hud-frame-target-y);
+    bottom: auto;
+    width: var(--mobile-hud-frame-target-width);
+    height: var(--mobile-hud-frame-target-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-frame-target-scale);
+    transform-origin: left top;
+  }
+  /* Target aura tooltips remain usable in custom mode. Keep the unbounded
+     painter output inside one registered horizontal viewport instead of
+     allowing a long aura list to grow over arbitrary gameplay controls. */
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs {
+    top: 74px;
+    left: 0;
+    width: 236px;
+    max-width: 236px;
+    height: 47px;
+    margin: 0;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs > .buff {
+    flex: 0 0 auto;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #target-frame
+    > #tf-debuffs
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    left: var(--mobile-hud-auras-player_buffs-x);
+    right: auto;
+    top: var(--mobile-hud-auras-player_buffs-y);
+    bottom: auto;
+    width: var(--mobile-hud-auras-player_buffs-width);
+    height: var(--mobile-hud-auras-player_buffs-height);
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-auras-player_buffs-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar {
+    left: var(--mobile-hud-auras-player_debuffs-x);
+    right: auto;
+    top: var(--mobile-hud-auras-player_debuffs-y);
+    bottom: auto;
+    width: var(--mobile-hud-auras-player_debuffs-width);
+    height: var(--mobile-hud-auras-player_debuffs-height);
+    max-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-auras-player_debuffs-scale);
+    transform-origin: left top;
+    flex-direction: var(--mobile-hud-auras-player_debuffs-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    flex-direction: var(--mobile-hud-auras-player_buffs-flow);
+  }
+  /* Player auras expose tooltips (and buffs expose cancel), so their icons are
+     blocking controls. Blank viewport space stays camera-click-through while
+     the finite viewport scrolls every painter-owned icon into reach. */
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar) {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 4px;
+    overflow-x: var(--mobile-hud-auras-player_buffs-overflow-x, auto);
+    overflow-y: var(--mobile-hud-auras-player_buffs-overflow-y, hidden);
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar {
+    overflow-x: var(--mobile-hud-auras-player_debuffs-overflow-x, auto);
+    overflow-y: var(--mobile-hud-auras-player_debuffs-overflow-y, hidden);
+    touch-action: var(--mobile-hud-auras-player_debuffs-touch-action, pan-x);
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    touch-action: var(--mobile-hud-auras-player_buffs-touch-action, pan-x);
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar)::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar) > .buff {
+    flex: 0 0 auto;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(#buff-bar, #debuff-bar)
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar > .buff > .dur {
+    bottom: var(--mobile-hud-auras-player_buffs-duration-bottom, -13px);
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar > .buff > .dur {
+    bottom: var(--mobile-hud-auras-player_debuffs-duration-bottom, -13px);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff
+    > .stacks {
+    top: 0;
+    right: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #deed-tracker {
+    position: fixed;
+    left: var(--mobile-hud-tracker-deeds-x);
+    right: auto;
+    top: var(--mobile-hud-tracker-deeds-y);
+    bottom: auto;
+    width: var(--mobile-hud-tracker-deeds-width);
+    height: var(--mobile-hud-tracker-deeds-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-tracker-deeds-scale);
+    transform-origin: left top;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #deed-tracker .dt-header {
+    width: 100%;
+    min-height: 40px;
+    justify-content: center;
+    gap: 3px;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+  /* The phone profile uses the tracker header as a compact count chip; its
+     full localized name remains the editor/ARIA label and the tablet keeps the
+     wider header. */
+  body.mobile-touch.mobile-hud-custom-active.hud-mobile-compact #deed-tracker .dt-label,
+  body.mobile-touch.mobile-hud-custom-active.hud-mobile-standard #deed-tracker .dt-label {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-move-zone {
+    left: var(--mobile-hud-control-movement-x);
+    right: auto;
+    top: var(--mobile-hud-control-movement-y);
+    bottom: auto;
+    width: var(--mobile-hud-control-movement-width);
+    min-width: 112px;
+    max-width: none;
+    height: var(--mobile-hud-control-movement-height);
+    min-height: 112px;
+    max-height: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-control-movement-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-move-joystick:not(.floating) {
+    --mobile-joystick-layout-scale: 1;
+    left: calc(var(--mobile-hud-control-movement-x) + 8px);
+    right: auto;
+    top: calc(
+      var(--mobile-hud-control-movement-y) +
+      var(--mobile-hud-control-movement-height) -
+      118px
+    );
+    bottom: auto;
+    transform: none;
+    scale: var(--mobile-hud-control-movement-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-camera-joystick {
+    --mobile-joystick-layout-scale: 1;
+    left: var(--mobile-hud-control-view-interactive-x);
+    right: auto;
+    top: var(--mobile-hud-control-view-interactive-y);
+    bottom: auto;
+    width: var(--mobile-hud-control-view-interactive-width);
+    min-width: 0;
+    max-width: none;
+    height: var(--mobile-hud-control-view-interactive-height);
+    min-height: 0;
+    max-height: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-control-view-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active:not(.mobile-camera-joystick-on)
+    #mobile-camera-joystick {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables {
+    left: var(--mobile-hud-utility-consumables-x);
+    right: auto;
+    top: var(--mobile-hud-utility-consumables-y);
+    bottom: auto;
+    width: var(--mobile-hud-utility-consumables-width);
+    height: var(--mobile-hud-utility-consumables-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-utility-consumables-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables-toggle {
+    position: absolute;
+    left: var(--mobile-hud-utility-consumables-toggle-left);
+    right: var(--mobile-hud-utility-consumables-toggle-right);
+    top: var(--mobile-hud-utility-consumables-toggle-top);
+    bottom: var(--mobile-hud-utility-consumables-toggle-bottom);
+    min-width: 48px;
+    min-height: 48px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables-row {
+    left: var(--mobile-hud-utility-consumables-row-left);
+    right: var(--mobile-hud-utility-consumables-row-right);
+    top: var(--mobile-hud-utility-consumables-row-top);
+    bottom: var(--mobile-hud-utility-consumables-row-bottom);
+    grid-template-columns: var(--mobile-hud-utility-consumables-grid-columns);
+    grid-template-rows: var(--mobile-hud-utility-consumables-grid-rows);
+    direction: var(--mobile-hud-utility-consumables-item-direction);
+  }
+  /* Compact and handedness rules above this layer have extra class
+     specificity. Reassert the registry-owned geometry, and force Grid so the
+     vertical opening variants cannot inherit the compact horizontal flex row. */
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #mobile-consumables {
+    left: var(--mobile-hud-utility-consumables-x);
+    right: auto;
+    top: var(--mobile-hud-utility-consumables-y);
+    bottom: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #mobile-consumables-row {
+    left: var(--mobile-hud-utility-consumables-row-left);
+    right: var(--mobile-hud-utility-consumables-row-right);
+    top: var(--mobile-hud-utility-consumables-row-top);
+    bottom: var(--mobile-hud-utility-consumables-row-bottom);
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-consumables-open #mobile-consumables-row {
+    display: grid;
+    width: auto;
+    flex-flow: initial;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls {
+    flex-direction: var(--mobile-hud-menu-top-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames {
+    position: fixed;
+    left: var(--mobile-hud-party-x);
+    right: auto;
+    top: var(--mobile-hud-party-y);
+    bottom: auto;
+    width: var(--mobile-hud-party-width);
+    height: var(--mobile-hud-party-height);
+    display: flex;
+    flex-direction: var(--mobile-hud-party-flow);
+    gap: 4px;
+    align-items: flex-start;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-party-scale);
+    transform-origin: left top;
+  }
+  /* A collapsed Party must expose only its chip at runtime. The editor paints
+     the separate pointer-through max-state envelope, so this hidden scroll
+     viewport must never remain as a transparent camera/input deadzone. */
+  body.mobile-touch.mobile-hud-custom-active #party-frames.party-expanded .party-rows {
+    display: flex;
+    flex-direction: var(--mobile-hud-party-flow);
+    flex: 0 0 auto;
+    width: var(--mobile-hud-party-members-width);
+    height: var(--mobile-hud-party-members-height);
+    max-width: var(--mobile-hud-party-members-max-width);
+    max-height: var(--mobile-hud-party-members-max-height);
+    gap: 4px;
+    overflow-x: var(--mobile-hud-party-members-overflow-x);
+    overflow-y: var(--mobile-hud-party-members-overflow-y);
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+    scrollbar-width: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-rows::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-frame,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-chip,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-leave {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    min-width: 40px;
+    min-height: 40px;
+    margin: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-frame {
+    width: 68px;
+    height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-chip,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-leave {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar {
+    left: var(--mobile-hud-pet-commands-x);
+    right: auto;
+    top: var(--mobile-hud-pet-commands-y);
+    bottom: auto;
+    width: var(--mobile-hud-pet-commands-width);
+    height: var(--mobile-hud-pet-commands-height);
+    flex-direction: var(--mobile-hud-pet-commands-flow);
+    overflow-x: var(--mobile-hud-pet-commands-overflow-x, auto);
+    overflow-y: var(--mobile-hud-pet-commands-overflow-y, hidden);
+    overscroll-behavior: contain;
+    touch-action: var(--mobile-hud-pet-commands-touch-action, pan-x);
+    scrollbar-width: none;
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-pet-commands-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #petbar {
+    left: var(--mobile-hud-pet-commands-x);
+    right: auto;
+    top: var(--mobile-hud-pet-commands-y);
+    bottom: auto;
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar .petbar-group {
+    flex-direction: var(--mobile-hud-pet-commands-flow);
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar .petbar-stances.expanded {
+    gap: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #petbar .pet-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(
+      #arena-status,
+      #fiesta-score,
+      #fiesta-pending,
+      #yumi-hud,
+      #vcup-indicator,
+      #vcup-match-hud,
+      #vcup-charge,
+      #delve-tracker
+    ) {
+    right: auto;
+    bottom: auto;
+    transform: none;
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #arena-status {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-generic-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-generic-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-generic-width);
+    height: var(--mobile-hud-status-arena-generic-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-generic-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #fiesta-score {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-fiesta_score-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-fiesta_score-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-fiesta_score-width);
+    height: var(--mobile-hud-status-arena-fiesta_score-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-fiesta_score-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #fiesta-pending {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-fiesta_pending-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-fiesta_pending-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-fiesta_pending-width);
+    height: var(--mobile-hud-status-arena-fiesta_pending-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-fiesta_pending-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud {
+    position: fixed;
+    left: var(--mobile-hud-status-arena-yumi-x);
+    right: auto;
+    top: var(--mobile-hud-status-arena-yumi-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-arena-yumi-width);
+    height: var(--mobile-hud-status-arena-yumi-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-arena-yumi-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) {
+    box-sizing: border-box;
+    gap: 8px;
+    padding: 6px 8px 6px 148px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) .yh-name {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) .yh-track {
+    width: 88px;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #yumi-hud:not(.collapsed) {
+    padding-left: 140px;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #yumi-hud:not(.collapsed)
+    .yh-track {
+    width: 68px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud .yh-toggle {
+    position: absolute;
+    /* The bordered root contributes one CSS pixel to the containing block;
+       these author offsets make the visual hitbox match registry x=92,y=7. */
+    left: 91px;
+    top: 6px;
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-indicator {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-indicator-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-indicator-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-indicator-width);
+    height: var(--mobile-hud-status-vale_cup-indicator-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-indicator-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #vcup-indicator {
+    overflow: hidden;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #vcup-indicator
+    .vcupi-title {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-match-hud {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-match-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-match-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-match-width);
+    height: var(--mobile-hud-status-vale_cup-match-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-match-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #vcup-charge {
+    position: fixed;
+    left: var(--mobile-hud-status-vale_cup-charge-x);
+    right: auto;
+    top: var(--mobile-hud-status-vale_cup-charge-y);
+    bottom: auto;
+    width: var(--mobile-hud-status-vale_cup-charge-width);
+    height: var(--mobile-hud-status-vale_cup-charge-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-status-vale_cup-charge-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker {
+    position: fixed;
+    left: var(--mobile-hud-tracker-delve-x);
+    right: auto;
+    top: var(--mobile-hud-tracker-delve-y);
+    bottom: auto;
+    width: var(--mobile-hud-tracker-delve-width);
+    height: var(--mobile-hud-tracker-delve-height);
+    translate: 0 0;
+    scale: var(--mobile-hud-tracker-delve-scale);
+    box-sizing: border-box;
+    padding-top: 40px;
+    padding-bottom: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker > :not(.dt-affix-row),
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-label {
+    pointer-events: none;
+  }
+  /* Delve copy may overlap ordinary HUD as information, but its affix tooltips
+     are real controls. Pin the mixed surface's only interactive region to the
+     registry-owned pocket so validation and runtime input cannot diverge. */
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-row {
+    position: absolute;
+    left: 88px;
+    right: auto;
+    top: 0;
+    bottom: auto;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    margin: 0;
+    flex-wrap: nowrap;
+    overflow: visible;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-label {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-icon {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    [data-mobile-hud-overlap-policy="informational-overlay"] {
+    z-index: 100;
+    pointer-events: none !important;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    [data-mobile-hud-overlap-policy="informational-overlay"]
+    * {
+    pointer-events: none !important;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud {
+    z-index: 100;
+  }
+  /* ---------- mobile custom HUD layout end ---------- */
+
+  /* ---------- mobile custom HUD editor ---------- */
+  @media (orientation: landscape) {
+    body.mobile-touch.game-active.mobile-hud-editor-open.mobile-center-message-visible #ui {
+      z-index: 80;
+    }
+    body.mobile-touch.mobile-hud-editor-open #banner {
+      position: fixed;
+      z-index: 1001;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      grid-template: minmax(0, 1fr) auto / minmax(0, 1fr);
+      color: #fff8dc;
+      pointer-events: auto;
+      touch-action: auto;
+      isolation: isolate;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-stage {
+      position: relative;
+      grid-area: 1 / 1 / 3 / 2;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      touch-action: none;
+      background: transparent;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-preview {
+      position: absolute;
+      inset: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 0;
+      border-radius: 12px;
+      outline: 1px solid #d1ba6d70;
+      outline-offset: -1px;
+      background: transparent;
+    }
+    body.mobile-touch.mobile-hud-editor-open [data-mobile-hud-editor-visual] {
+      opacity: 0.45 !important;
+      pointer-events: none !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      #mobile-camera-joystick[data-mobile-hud-editor-visual="control.view"] {
+      display: block !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      [data-mobile-hud-editor-visual][data-mobile-hud-editor-state="selected"] {
+      opacity: 1 !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open [data-mobile-hud-editor-hidden="true"] {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-selectors {
+      min-width: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-contexts {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 8px;
+      background: #171923f2;
+      color: #fff7d4;
+      padding: 4px 32px 4px 8px;
+      font-size: 16px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy {
+      position: absolute;
+      box-sizing: border-box;
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #fff7d4;
+      pointer-events: auto;
+      touch-action: none;
+      cursor: move;
+      z-index: 2;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-frame {
+      position: absolute;
+      z-index: 1;
+      box-sizing: border-box;
+      display: grid;
+      grid-template: auto minmax(0, 1fr) auto / auto minmax(0, 1fr);
+      gap: 3px 5px;
+      padding: 0;
+      border: 1px dashed transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+      pointer-events: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-layout-envelope {
+      position: absolute;
+      z-index: 0;
+      box-sizing: border-box;
+      display: block;
+      overflow: hidden;
+      border: 1px dotted #e3c66a4d;
+      border-radius: 8px;
+      background: #e3c66a0a;
+      color: #fff4bd;
+      pointer-events: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-layout-envelope[data-mobile-hud-envelope-kind="state-envelope"] {
+      border-style: dashed;
+      border-color: #e3c66a80;
+      background:
+        repeating-linear-gradient(135deg, #e3c66a12 0 5px, transparent 5px 12px), #17130b24;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-layout-envelope-label {
+      position: absolute;
+      inset: 2px auto auto 4px;
+      max-width: calc(100% - 8px);
+      overflow: hidden;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-layout-envelope[data-mobile-hud-envelope-kind="state-envelope"]
+      .mobile-hud-editor-layout-envelope-label {
+      opacity: 0.78;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-overlap-policy="informational-overlay"] {
+      z-index: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="movable"] {
+      min-width: 48px;
+      min-height: 48px;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      :is(.mobile-hud-editor-contexts, .mobile-hud-editor-dock, .mobile-hud-editor-inspector)
+      button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"] {
+      color: #cbeaff;
+      pointer-events: none;
+      cursor: default;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"]
+      .mobile-hud-editor-proxy-frame {
+      border-style: dotted;
+      border-color: #8fc7e8a8;
+      background: #36596d38;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-placeholder="when-empty"][data-mobile-hud-live-visual="false"]
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      background: #2f281b70;
+      box-shadow: inset 0 0 12px #0007;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy.is-selected {
+      outline: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-selected
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      outline: 3px solid var(--gold, #e3c66a);
+      outline-offset: -3px;
+      box-shadow: 0 0 14px #e3c66a55;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-selected
+      .mobile-hud-editor-layout-envelope {
+      border-color: var(--gold, #e3c66a);
+      background-color: #e3c66a1c;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"].is-selected
+      .mobile-hud-editor-proxy-frame {
+      border-color: #f4dc858f;
+      outline: 3px solid var(--gold, #e3c66a);
+      outline-offset: 2px;
+      box-shadow: 0 0 18px #e3c66a70;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-invalid
+      .mobile-hud-editor-proxy-frame {
+      border-color: var(--color-border-invalid, #ff8f85);
+      outline: 3px solid var(--color-border-invalid, #ff8f85);
+      outline-offset: -3px;
+      box-shadow: 0 0 0 2px #260c0ccc;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy.is-invalid
+      .mobile-hud-editor-layout-envelope {
+      border-color: var(--color-border-invalid, #ff8f85);
+      background-color: #ff8f851f;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy:focus-visible {
+      outline: 3px solid var(--color-border-focus);
+      outline-offset: 3px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-icon {
+      grid-area: 1 / 1;
+      width: 18px;
+      height: 18px;
+      align-self: center;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-label {
+      grid-area: 1 / 2;
+      min-width: 0;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      :is(.mobile-hud-editor-proxy.is-selected, .mobile-hud-editor-proxy.is-invalid)
+      .mobile-hud-editor-proxy-label {
+      opacity: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-live-visual="true"]
+      .mobile-hud-editor-proxy-label {
+      opacity: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy[data-mobile-hud-placeholder="when-empty"][data-mobile-hud-live-visual="false"]
+      .mobile-hud-editor-proxy-label {
+      opacity: 1;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-error {
+      grid-area: 3 / 1 / 4 / 3;
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      color: #ffd0cc;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor-proxy:not(.is-invalid)
+      .mobile-hud-editor-proxy-error {
+      display: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-preview.is-failing-preview {
+      outline-color: var(--color-border-invalid, #ff8f85);
+      box-shadow: 0 0 0 2px #ff8f8559;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-dock {
+      position: fixed;
+      left: 50%;
+      top: calc(50% - 16px);
+      z-index: 4;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 6px;
+      width: min(
+        330px,
+        calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      max-height: calc(100vh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      padding: 8px;
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 12px;
+      background: var(--mobile-glass-bg, linear-gradient(160deg, #201d13eb, #0b0a08f0));
+      box-shadow: 0 5px 20px #000b;
+      -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+      backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+      translate: -50% -50%;
+      overflow: auto;
+      touch-action: pan-y;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-drag-handle {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border: 1px dashed #f4dc858f;
+      border-radius: 8px;
+      cursor: move;
+      touch-action: none;
+      background: radial-gradient(circle, #f4dc85 1.5px, transparent 2px) center / 7px 7px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-actions {
+      grid-column: 2;
+      display: flex;
+      gap: 4px;
+      justify-content: end;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-selectors {
+      grid-column: 1 / -1;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-inspector {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 44px 44px minmax(0, 1fr) minmax(0, 1fr);
+      gap: 6px;
+      min-width: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-status {
+      grid-column: 1 / -1;
+      display: none;
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 40px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-status.is-invalid {
+      display: block;
+      border: 1px solid var(--color-border-invalid, #ff8f85);
+      background: #3c1111e6;
+      color: #ffd0cc;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor button,
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor [role="button"] {
+      min-width: 40px;
+      min-height: 40px;
+      touch-action: manipulation;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor .mobile-hud-editor-drag-handle {
+      touch-action: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor
+      button:not(.mobile-hud-editor-proxy) {
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 8px;
+      background: #171923e8;
+      color: #fff7d4;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    body.mobile-touch.mobile-hud-editor-open
+      .mobile-hud-editor
+      [data-mobile-hud-action="save"]:disabled {
+      opacity: 0.4;
+      filter: saturate(0.3);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-world-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-world-vale_cup_indicator
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-standard
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-pending
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-respawn
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-offer
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-fiesta-respawn_offer
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-base
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-respawn
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-arena-yumi-returning
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-briefing
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-match
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-match-charge
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-vale_cup-spectator-betting
+      .mobile-hud-editor-preview,
+    body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-instance-delve
+      .mobile-hud-editor-preview {
+      --mobile-hud-editor-context-active: 1;
+    }
+  }
+  /* ---------- mobile custom HUD editor end ---------- */
 }

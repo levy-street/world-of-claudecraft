@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   activePvpOpponentIds,
   findNearbyInteraction,
@@ -723,6 +723,30 @@ describe('isLiveAttackTarget', () => {
 });
 
 describe('handlePickedEntity', () => {
+  it('reports a nearby NPC dialogue as an interaction but plain targeting as no interaction', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const npc = stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, npc],
+      ]),
+      targetEntity: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      openQuestDialog: vi.fn(),
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(true);
+    expect(hud.openQuestDialog).toHaveBeenCalledWith(2);
+
+    npc.pos = { x: 99, y: 0, z: 0 };
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
+  });
+
   it('targets and starts auto-attack on a hostile mob on right-click', () => {
     // Right-clicking an enemy targets AND begins auto-attack, the classic-MMO
     // convention the attack ability tooltip documents ("Right-clicking an enemy
@@ -761,7 +785,7 @@ describe('handlePickedEntity', () => {
       closeContextMenu: () => {},
     };
 
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
 
     expect(targetId).toBe(2);
     expect(attacks).toBe(1);
@@ -844,7 +868,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
 
   it('a ghost right-clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
     expect(calls).not.toContain('openDelveBoard');
     expect(calls).toContain('showError');
@@ -852,14 +876,14 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
 
   it('a ghost left-clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
-    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
     expect(calls).not.toContain('openDelveBoard');
   });
 
   it('a dead-unreleased player clicking a quest NPC does not open the quest dialog', () => {
     const { world, hud, calls } = rig({ dead: true, ghost: false }, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openQuestDialog');
   });
 
@@ -871,7 +895,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       pos: { x: 3, y: 0, z: 0 },
     });
     const { world, hud, calls } = rig({ dead: true, ghost: true }, healer);
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(true);
     expect(calls).toContain('resurrectAtSpiritHealer');
     expect(calls).not.toContain('openQuestDialog');
   });
@@ -885,15 +909,15 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       pos: { x: 3, y: 0, z: 0 },
     });
     const { world, hud, calls } = rig({ dead: true, ghost: true }, mailbox);
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
     expect(calls).not.toContain('openMailbox');
-    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(false);
     expect(calls).not.toContain('openMailbox');
   });
 
   it('an alive player clicking a quest NPC still opens the quest dialog', () => {
     const { world, hud, calls } = rig({}, questNpc());
-    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(true);
     expect(calls).toContain('openQuestDialog');
   });
 });

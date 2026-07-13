@@ -19,6 +19,7 @@ type HotbarHarness = {
     known: { def: { id: string } }[];
     cupInfo: { match: { team: number | null } } | null;
   };
+  spellbookWindow: { closePicker(): boolean };
   activeHotbarForm: string;
   hotbarActions: HotbarAction[];
   loadedSlotMapFromStorage: boolean;
@@ -60,6 +61,7 @@ function makeHarness(
     known: knownAbilityIds.map((id) => ({ def: { id } })),
     cupInfo: null,
   };
+  hud.spellbookWindow = { closePicker: vi.fn(() => false) };
   hud.activeHotbarForm = 'normal';
   hud.hotbarActions = initialBar;
   hud.loadedSlotMapFromStorage = false;
@@ -353,6 +355,7 @@ describe('stealth action-bar persistence', () => {
     hud.syncActiveHotbarForm();
 
     expect(hud.mobileHotbarDrag).toBeNull();
+    expect(hud.spellbookWindow.closePicker).toHaveBeenCalledOnce();
     expect(window.clearTimeout).toHaveBeenCalledWith(99);
   });
 });

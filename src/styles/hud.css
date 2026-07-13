@@ -1003,6 +1003,8 @@
     display: none;
   }
   .buff {
+    -webkit-appearance: none;
+    appearance: none;
     width: 28px;
     height: 28px;
     border: 1px solid var(--color-buff);
@@ -1051,12 +1053,17 @@
   .buff.own:not(.debuff) {
     border-color: var(--color-primary);
   }
-  /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
+  /* The player's own cancelable buffs: desktop right-click or a deliberate
+     mobile hold drops one; the hover cue remains desktop-only affordance. */
   .buff.cancelable {
     cursor: context-menu;
   }
   .buff.cancelable:hover {
     border-color: var(--color-gold, #d8b56b);
+  }
+  .buff:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .buff .dur {
     position: absolute;
@@ -1313,6 +1320,10 @@
     background: linear-gradient(170deg, #15131fdd, #09080edd);
     box-shadow: 0 2px 8px #000c;
   }
+  .petbar-stances.expanded {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
   .pet-btn {
     width: 40px;
     height: 40px;
@@ -1329,6 +1340,14 @@
     box-shadow:
       inset 0 1px 0 #ffffff18,
       0 2px 4px #0009;
+  }
+  .pet-btn.pet-stance-option {
+    border-color: #8f7540;
+    background: linear-gradient(145deg, #2b2418, #15120d);
+  }
+  .pet-btn.pet-stance-option .icon-label {
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px #d2b56a66;
   }
   .pet-btn .icon-label {
     position: absolute;
@@ -3744,6 +3763,7 @@
     font-family: var(--title-font);
     letter-spacing: 1px;
     white-space: nowrap;
+    z-index: 1000;
   }
   /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
      stacked at the top-center, above the zone banner's slot, the classic

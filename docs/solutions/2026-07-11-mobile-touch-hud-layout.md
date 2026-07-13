@@ -6,6 +6,15 @@ The compact landscape HUD now treats camera control as a first-class input surfa
 
 This work follows the contextual interaction slice documented in [Mobile Context Interact](2026-07-10-mobile-context-interact.md), implements the approved [Mobile Touch HUD Layout PRD](../prd/mobile-compact-landscape-hud.md), and integrates the joystick Autorun and portrait gate already present on `release/v0.24.0`.
 
+## Readability follow-up
+
+[Mobile HUD Readability Adjustments](../specs/2026-07-11-mobile-hud-readability-adjustments.md)
+supersedes the original compact drawer and frame constants. The transient mob description now
+anchors eight visual pixels below the minimap and mirrors with it. Player scales are `0.72`, `1`,
+and `1.1` across compact, standard, and tablet tiers; Target uses ratio `0.9`. Six Consumables
+render as three columns by two rows beside the disclosure on every landscape tier, including the
+compact left-handed mirror.
+
 ## What We Learned
 
 - A touch HUD cannot be validated from isolated control rectangles. The useful invariant is a complete populated topology: Party expanded, Target active, pet commands visible, Consumables open, maximum control scale, safe-area insets, and both handedness modes.
@@ -18,7 +27,8 @@ This work follows the contextual interaction slice documented in [Mobile Context
 
 ## Decisions
 
-- Keep the action pad ordered as A1/A2 Attack Target and A3/A4/A5 contextual Jump/Use, with the infrequently used page switch beside A3.
+- Keep the action pad ordered as A1/A2/A5/Target and A3/A4/Attack/Jump/Use, with Attack directly below A5 and the infrequently used page switch beside A3.
+- Expose three fixed mobile action pages over source slots 1 through 15. Keep the compact page indicator as the current number only: 1, 2, or 3.
 - Keep the movement joystick slightly compact and leave the opposite lower side as the camera view zone; show the optional view joystick only when enabled.
 - Place the Consumables disclosure immediately inward of the movement zone. Open items toward the hero frame, then wrap upward, and mirror the whole topology in left-handed mode.
 - Keep Party in one compact top row beside the minimap, use an icon-only Leave Party control with a full touch target, and keep Target centered one row below and smaller than the player frame.
@@ -29,3 +39,29 @@ This work follows the contextual interaction slice documented in [Mobile Context
 
 - Use the committed compact, Party/Target, tablet, Consumables, and left-handed screenshots in the draft PR.
 - Keep the rendered mobile cluster matrix and strict overlap audit in the contribution gate whenever future HUD work changes anchors, safe-area math, or touch targets.
+# Dynamic mobile pages and Spellbook assignment extension
+
+The touch action pad now exposes a configured minimum of two through four pages while deriving
+the effective count from occupied source slots 1 through 20. Attack remains fixed, the automatic
+six-item Consumables drawer remains separate, and persisted slots 21 and 22 remain honest
+desktop overflow.
+
+Touch Spellbook rows use exact assignment state instead of bar membership alone. An equipped
+ability shows a localized P/A or Desktop chip and a separate Remove control. Add and the chip
+open an inline four-tab picker with five stable destinations. Assignment clears every old copy,
+overwrites the target without swapping, persists the active form bar, and selects the destination
+HUD page. Desktop first-free Add and drag/swap behavior are unchanged.
+
+The picker captures the current character/form storage token and rejects stale callbacks. It
+closes before form, loadout, or reset replacement, and the shared Escape dispatcher closes the
+picker before the Spellbook. Hotbar signature refresh keeps open chips and destinations current
+without layout reads on every frame.
+
+Evidence added in this extension:
+
+- `docs/screenshots/mobile-hud-layout/after-compact-spellbook-picker.png`
+- four-page and effective-count unit coverage
+- exact overwrite, duplicate cleanup, and invalid-target unit coverage
+- Spellbook assignment, picker accessibility, focus, and lifecycle guards
+- real-browser picker assignment across all four pages, occupied-item overwrite, full-bar Add,
+  selected-HUD-page update, handedness, geometry, and overlap checks

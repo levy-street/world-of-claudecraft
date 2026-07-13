@@ -153,10 +153,10 @@ describe('installWindowResize tap safety', () => {
   // Window at (100,100), 400x300 author px, scale 1: SE client corner (500,400).
   const CORNER = { x: 495, y: 395 };
 
-  const setup = () => {
+  const setup = (opts: { touchLayout?: boolean; windowId?: string } = {}) => {
     const classes = new Set<string>(['window', 'panel']);
     const el: any = {
-      id: 'quest-log-window',
+      id: opts.windowId ?? 'quest-log-window',
       dataset: {} as Record<string, string>,
       style: {} as Record<string, string>,
       classList: {
@@ -195,6 +195,7 @@ describe('installWindowResize tap safety', () => {
       getScale: () => 1,
       pinWindow: (_target, rect) => pins.push(rect),
       isCoarsePointer: () => false,
+      isTouchLayout: () => opts.touchLayout ?? false,
     });
     const fire = (type: string, ev: Record<string, unknown>) => {
       for (const fn of [...(listeners.get(type) ?? [])]) {
@@ -269,6 +270,54 @@ describe('installWindowResize tap safety', () => {
         clientY: CORNER.y,
       });
       expect(pins).toHaveLength(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it('never engages a resize on the touch layout (sheets stay inset-pinned)', () => {
+    // Mobile windows are edge-pinned sheets (top AND bottom): the engage-time
+    // pin freezes inline left/top with bottom:auto, which drops the bottom pin
+    // and leaves the sheet content-tall (offscreen and unscrollable). A scroll
+    // flick that starts in the SE corner band must therefore never resize.
+    const { el, pins, fire, restore } = setup({ touchLayout: true });
+    try {
+      fire('pointerdown', { pointerType: 'touch', clientX: CORNER.x, clientY: CORNER.y });
+      fire('pointermove', {
+        pointerType: 'touch',
+        clientX: CORNER.x + RESIZE_ENGAGE_SLOP_TOUCH + 40,
+        clientY: CORNER.y + 40,
+      });
+      expect(pins).toHaveLength(0);
+      expect(el.style).toEqual({});
+      expect(el.dataset).toEqual({});
+    } finally {
+      restore();
+    }
+  });
+
+  it('resizes the centered spellbook card on the touch layout', () => {
+    const { el, pins, fire, restore } = setup({ touchLayout: true, windowId: 'spellbook' });
+    try {
+      fire('pointerdown', {
+        pointerType: 'touch',
+        clientX: CORNER.x,
+        clientY: CORNER.y,
+      });
+      fire('pointermove', {
+        pointerType: 'touch',
+        clientX: CORNER.x - RESIZE_ENGAGE_SLOP_TOUCH - 40,
+        clientY: CORNER.y - 40,
+      });
+      expect(pins).toHaveLength(1);
+      expect(el.dataset.windowMoved).toBe('1');
+      fire('pointermove', {
+        pointerType: 'touch',
+        clientX: CORNER.x - RESIZE_ENGAGE_SLOP_TOUCH - 80,
+        clientY: CORNER.y - 70,
+      });
+      expect(el.style.width).toBe('360px');
+      expect(el.style.height).toBe('270px');
     } finally {
       restore();
     }

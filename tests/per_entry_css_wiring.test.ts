@@ -57,6 +57,13 @@ describe('per-entry CSS wiring + #rotate-device gate', () => {
     expect(indexExtra).not.toMatch(/#rotate-device[^}]*display:\s*none\s*!important/);
   });
 
+  it('index.extra.css removes the duplicate Discord CTA input layer during mobile gameplay', () => {
+    expect(indexExtra).toMatch(
+      /body\.mobile-touch\.game-active #discord-cta-banner\s*\{[^}]*display:\s*none/,
+    );
+    expect(playExtra).not.toMatch(/body\.mobile-touch\.game-active #discord-cta-banner/);
+  });
+
   it('play.extra.css shows #rotate-device in portrait (play side of the gate)', () => {
     expect(playExtra).toMatch(/@layer play-extra\b/);
     expect(playExtra).toMatch(/orientation:\s*portrait/);

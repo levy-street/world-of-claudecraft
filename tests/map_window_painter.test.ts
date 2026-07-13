@@ -88,3 +88,11 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('bg: this.mapZoneBg(zone)');
   });
 });
+
+describe('map window touch zoom', () => {
+  it('routes a two-pointer map gesture through the existing zoomMap clamp', () => {
+    expect(hud).toContain('mapPinchZoomFactor');
+    expect(hud).toContain('this.zoomMap(factor)');
+    expect(hud).toContain("mapCanvas.addEventListener('pointercancel', endMapPinch)");
+  });
+});

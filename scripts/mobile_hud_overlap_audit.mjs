@@ -1513,6 +1513,50 @@ try {
         }
       }
 
+      // Quest Log has a fixed action footer below an independently scrollable
+      // narrative pane. The sheet itself must not become a second scroll owner:
+      // that pushes the Abandon button below the clipped outer viewport on short
+      // landscape phones. Keep the whole footer inside the root with a visible
+      // end gap, while the body remains the vertical scroll surface.
+      if (w.id === 'quest-log-window') {
+        const questScroll = await page.evaluate(() => {
+          const root = document.getElementById('quest-log-window');
+          const body = root?.querySelector('.ql-detail-body');
+          const action = root?.querySelector('.ql-detail-actions .btn');
+          if (!(root instanceof HTMLElement) || !(body instanceof HTMLElement) || !action)
+            return null;
+          const rootRect = root.getBoundingClientRect();
+          const actionRect = action.getBoundingClientRect();
+          return {
+            outerOverflow: root.scrollHeight - root.clientHeight,
+            actionEndGap: rootRect.bottom - actionRect.bottom,
+            bodyOverflowY: getComputedStyle(body).overflowY,
+          };
+        });
+        if (!questScroll) {
+          bViolation(`window ${w.toggle} @${width}: quest footer geometry is not measurable`);
+        } else {
+          if (questScroll.outerOverflow > 4) {
+            bViolation(
+              `window ${w.toggle} @${width}: quest sheet owns ${questScroll.outerOverflow}px ` +
+                'of outer vertical scroll; only .ql-detail-body should scroll',
+            );
+          }
+          if (questScroll.actionEndGap < 8) {
+            bViolation(
+              `window ${w.toggle} @${width}: Abandon footer end gap ` +
+                `${questScroll.actionEndGap.toFixed(1)}px < 8px`,
+            );
+          }
+          if (!/(auto|scroll)/.test(questScroll.bodyOverflowY)) {
+            bViolation(
+              `window ${w.toggle} @${width}: .ql-detail-body is not the scroll owner ` +
+                `(overflow-y:${questScroll.bodyOverflowY})`,
+            );
+          }
+        }
+      }
+
       await page.screenshot({ path: `${SHOT_DIR}/passB_${w.toggle}_${width}.png` });
 
       // (3) closeAll clears mobile-window-open.

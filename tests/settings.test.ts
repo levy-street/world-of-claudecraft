@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   clickMoveButtonLabel,
   normalizeClickMoveButton,
+  normalizeMobileActionPageMinimum,
   SETTING_RANGES,
   Settings,
 } from '../src/game/settings';
@@ -23,6 +24,46 @@ function installStorage(): void {
 beforeEach(() => installStorage());
 
 describe('Settings', () => {
+  it('normalizes the mobile action page minimum to a discrete value from 2 to 4', () => {
+    expect(normalizeMobileActionPageMinimum(1.4)).toBe(2);
+    expect(normalizeMobileActionPageMinimum(2.6)).toBe(3);
+    expect(normalizeMobileActionPageMinimum(99)).toBe(4);
+    expect(normalizeMobileActionPageMinimum(Number.NaN)).toBe(2);
+    expect(normalizeMobileActionPageMinimum(Number.POSITIVE_INFINITY)).toBe(2);
+    expect(normalizeMobileActionPageMinimum('4')).toBe(2);
+    expect(normalizeMobileActionPageMinimum(undefined)).toBe(2);
+  });
+
+  it('defaults the mobile action page minimum to two pages', () => {
+    const settings = new Settings();
+
+    expect(SETTING_RANGES.mobileActionPageMinimum).toEqual({ min: 2, max: 4, def: 2 });
+    expect(settings.get('mobileActionPageMinimum')).toBe(2);
+  });
+
+  it('rounds and persists the mobile action page minimum when written', () => {
+    const settings = new Settings();
+
+    expect(settings.set('mobileActionPageMinimum', 2.6)).toBe(3);
+    expect(new Settings().get('mobileActionPageMinimum')).toBe(3);
+  });
+
+  it('defaults non-finite mobile action page minimum writes and restores it on reset', () => {
+    const settings = new Settings();
+    expect(settings.set('mobileActionPageMinimum', Number.NaN)).toBe(2);
+    settings.set('mobileActionPageMinimum', 4);
+    settings.reset();
+    expect(settings.get('mobileActionPageMinimum')).toBe(2);
+  });
+
+  it('defaults invalid persisted mobile action page minimum values', () => {
+    localStorage.setItem('woc_settings', JSON.stringify({ mobileActionPageMinimum: '4' }));
+    expect(new Settings().get('mobileActionPageMinimum')).toBe(2);
+
+    localStorage.setItem('woc_settings', '{"mobileActionPageMinimum":null}');
+    expect(new Settings().get('mobileActionPageMinimum')).toBe(2);
+  });
+
   it('defaults fresh sessions and initial logins to the medium graphics preset', () => {
     const s = new Settings();
 

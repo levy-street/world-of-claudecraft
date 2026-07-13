@@ -261,6 +261,8 @@ export const shellStrings = {
       androidInstallDetail:
         'For fullscreen on Android, install this page or add it to your Home screen first.',
       androidInstallStep: 'In Chrome, tap the menu, then Install app or Add to Home screen.',
+      androidSamsungInstallStep:
+        'In Samsung Internet, tap the menu, then Install app or Add to Home screen.',
       androidOpenStep: 'Open World of ClaudeCraft from the new icon.',
       otherStandaloneDetail: 'Keep your device in landscape fullscreen.',
       otherInstallDetail:

@@ -17,6 +17,7 @@ import {
   buildOverworldMapModel,
   MAP_DETAIL_ZOOM,
   MAP_MAX_ZOOM,
+  mapPinchZoomFactor,
   mapWindowMode,
   npcMarkerAt,
   type OverworldMapInput,
@@ -112,6 +113,19 @@ function makeDelveWorld(shape: 'sim' | 'client'): IWorld {
 }
 
 const NO_DECOR: Decoration[] = [];
+
+describe('map pinch zoom', () => {
+  it('maps finger spread and pinch to the existing multiplicative map zoom', () => {
+    expect(mapPinchZoomFactor(100, 150)).toBeCloseTo(1.5);
+    expect(mapPinchZoomFactor(150, 100)).toBeCloseTo(2 / 3);
+  });
+
+  it('ignores small two-finger jitter and invalid distances', () => {
+    expect(mapPinchZoomFactor(100, 107)).toBe(1);
+    expect(mapPinchZoomFactor(0, 100)).toBe(1);
+    expect(mapPinchZoomFactor(100, Number.NaN)).toBe(1);
+  });
+});
 
 function input(
   world: IWorld,

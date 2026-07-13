@@ -259,6 +259,22 @@ describe('vale_cup_charge: painter and stylesheet stay coupled', () => {
   });
 });
 
+describe('Hud Vale Cup charge state seam', () => {
+  it('exposes only a read-only charging boolean for runtime context normalization', () => {
+    expect(hud).toContain('isValeCupShootCharging(): boolean {');
+    const getter = hud.slice(
+      hud.indexOf('isValeCupShootCharging(): boolean {'),
+      hud.indexOf('\n  }', hud.indexOf('isValeCupShootCharging(): boolean {')) + 4,
+    );
+    expect(getter).toContain('return this.shootChargeSlot !== null;');
+    expect(getter).not.toContain('shootChargeStartMs');
+    expect(getter).not.toMatch(/this\.shootChargeSlot\s*=(?!=)/);
+    expect(hud).toContain('this.shootChargeSlot = slot;');
+    expect(hud).toContain('this.shootChargeSlot = null;');
+    expect(hud).toContain('if (view.cancel) this.shootChargeSlot = null;');
+  });
+});
+
 describe('vale_cup hud.ts call sites', () => {
   it("redraws the open window + both painters from hud.update()'s mediumHud band", () => {
     expect(hud).toContain(

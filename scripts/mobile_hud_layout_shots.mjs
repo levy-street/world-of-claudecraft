@@ -4,7 +4,7 @@
 //   SHOT_PHASE=before URL=http://127.0.0.1:5174/ node scripts/mobile_hud_layout_shots.mjs
 //   SHOT_PHASE=after  URL=http://127.0.0.1:5173/ node scripts/mobile_hud_layout_shots.mjs
 //
-// Five landscape PNGs are written under docs/screenshots/mobile-hud-layout/.
+// Six landscape PNGs are written under docs/screenshots/mobile-hud-layout/.
 
 import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -61,6 +61,7 @@ const SHOTS = [
     partyExpanded: false,
     petActive: true,
     cameraJoystick: true,
+    safeArea: { top: 0, right: 0, bottom: 21, left: 44 },
   },
   {
     name: 'compact-left-handed',
@@ -68,11 +69,33 @@ const SHOTS = [
     height: 360,
     dsf: 3,
     leftHanded: true,
-    consumablesOpen: false,
+    consumablesOpen: true,
     partyExpanded: false,
     petActive: true,
+    safeArea: { top: 0, right: 44, bottom: 21, left: 0 },
+  },
+  {
+    name: 'compact-spellbook-picker',
+    width: 740,
+    height: 360,
+    dsf: 3,
+    leftHanded: false,
+    consumablesOpen: false,
+    partyExpanded: false,
+    spellbookPicker: true,
   },
 ];
+const requestedShotNames = new Set(
+  (process.env.SHOT_NAMES ?? '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean),
+);
+const selectedShots =
+  requestedShotNames.size > 0 ? SHOTS.filter((shot) => requestedShotNames.has(shot.name)) : SHOTS;
+if (selectedShots.length !== (requestedShotNames.size || SHOTS.length)) {
+  throw new Error(`Unknown SHOT_NAMES entry: ${process.env.SHOT_NAMES}`);
+}
 
 async function flipViewport(page, cdp, shot) {
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -86,6 +109,9 @@ async function flipViewport(page, cdp, shot) {
     positionY: 0,
   });
   await cdp.send('Emulation.resetPageScaleFactor').catch(() => {});
+  await cdp.send('Emulation.setSafeAreaInsetsOverride', {
+    insets: shot.safeArea ?? { top: 0, right: 0, bottom: 0, left: 0 },
+  });
   await page.evaluate(() => {
     document.body.classList.add('mobile-touch', 'game-active');
     window.dispatchEvent(new Event('resize'));
@@ -123,11 +149,18 @@ async function buildState(page) {
       sim.partyInvite(pid);
       sim.partyAccept(pid);
     }
-    if (!sim.inventory.some((slot) => slot.itemId === 'minor_healing_potion')) {
-      sim.inventory.push({ itemId: 'minor_healing_potion', count: 3 });
-    }
-    if (!sim.inventory.some((slot) => slot.itemId === 'minor_mana_potion')) {
-      sim.inventory.push({ itemId: 'minor_mana_potion', count: 3 });
+    const screenshotConsumables = [
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'elixir_of_the_bear',
+      'roasted_boar',
+      'conjured_bread',
+      'conjured_water',
+    ];
+    for (const itemId of screenshotConsumables) {
+      if (!sim.inventory.some((slot) => slot.itemId === itemId)) {
+        sim.inventory.push({ itemId, count: 3 });
+      }
     }
     player.hp = Math.max(1, player.maxHp - 60);
     let best = null;
@@ -187,6 +220,43 @@ async function applyShotState(page, shot) {
     window.__game.hud?.update?.(0.05);
   }, shot);
   await sleep(500);
+  if (shot.spellbookPicker) {
+    await page.evaluate(() => window.__game.hud.toggleSpellbook());
+    await page.waitForSelector('#spellbook .spell-assignment-chip, #spellbook .spell-hotbar-add');
+    await page.$eval('#spellbook .spell-assignment-chip, #spellbook .spell-hotbar-add', (button) =>
+      button.click(),
+    );
+    await page.waitForSelector('#spellbook .spell-slot-picker');
+    await sleep(300);
+  }
+}
+
+async function showShotMobTooltip(page) {
+  return page.evaluate(() => {
+    const game = window.__game;
+    const mob = [...game.sim.entities.values()].find(
+      (entity) => entity.kind === 'mob' && entity.hostile && !entity.dead,
+    );
+    if (!mob) return false;
+    const hud = game.hud;
+    hud.__layoutShotClearMobTooltip = hud.clearMobHoverTooltip;
+    hud.clearMobHoverTooltip = () => {};
+    hud.lastMobTooltipId = null;
+    hud.showMobHoverTooltip(mob, new Set());
+    hud.positionVisibleMobileMobTooltip();
+    return true;
+  });
+}
+
+async function restoreShotMobTooltip(page) {
+  await page.evaluate(() => {
+    const hud = window.__game?.hud;
+    const original = hud?.__layoutShotClearMobTooltip;
+    if (!hud || !original) return;
+    hud.clearMobHoverTooltip = original;
+    delete hud.__layoutShotClearMobTooltip;
+    original.call(hud);
+  });
 }
 
 mkdirSync(OUT_DIR, { recursive: true });
@@ -224,15 +294,17 @@ try {
   });
   await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 
-  for (const shot of SHOTS) {
+  for (const shot of selectedShots) {
     if (shot.petActive) await ensureShotPet(page);
     await flipViewport(page, cdp, shot);
     await applyShotState(page, shot);
+    if (!(await showShotMobTooltip(page))) failures.push(`${shot.name}: no mob tooltip target`);
     const path = `${OUT_DIR}/${PHASE}-${shot.name}.png`;
     const screenshot = await page.screenshot();
     await sharp(screenshot)
       .extract({ left: 0, top: 0, width: shot.width, height: shot.height })
       .toFile(path);
+    await restoreShotMobTooltip(page);
     console.log(`captured ${path}`);
   }
 

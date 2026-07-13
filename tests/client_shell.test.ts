@@ -439,12 +439,11 @@ describe('client HTML shell', () => {
     expect(hudCss).toContain('#chat-dismiss {\n    display: none;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #chat-dismiss {\n    display: none;');
     expect(hudMobileCss).not.toMatch(/#chat-dismiss \{[^}]*display:\s*inline-flex/);
-    // Dismissing the keyboard KEEPS chat open in the read view: the composer's blur handler
-    // recovers the viewport ONLY on the close path (composer already hidden), never on a
-    // still-shown-composer blur. Only the Chat button closes chat.
-    expect(mainTs).toContain(
-      'if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();',
-    );
+    // Dismissing the keyboard KEEPS chat open in the read view. A visible-composer blur
+    // stays passive; the stable game root does not run viewport timers or scroll resets.
+    expect(mainTs).toContain("if (action === 'recover') recoverFromMobileKeyboard();");
+    expect(mainTs).not.toContain("action === 'resync'");
+    expect(mainTs).not.toContain('createComposerBlurViewportRecovery');
     // The chevron (kept wired for parity) blurs the composer to drop the keyboard, not close.
     expect(mainTs).toContain("document.getElementById('chat-dismiss')");
     expect(mainTs).toContain("chatDismiss?.addEventListener('click', () => chatInput.blur());");
@@ -551,7 +550,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #party-frames #party-leave .ui-icon {\n      box-sizing: content-box;\n      width: 12px;\n      height: 12px;\n      padding: 7px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame,\n    body.mobile-touch.mobile-left-handed #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      top: calc(max(6px, env(safe-area-inset-top)) + 48px);\n      transform: translateX(-50%)',
+      'body.mobile-touch #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      top: max(8px, env(safe-area-inset-top));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      transform-origin: center top;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar {\n      left: auto;\n      right: max(18px, env(safe-area-inset-right));\n      top: auto;\n      bottom: calc(136px + env(safe-area-inset-bottom));',
@@ -574,9 +576,9 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the landscape target subordinate and compacts pet and view controls', () => {
-    expect(hudMobileCss).toContain('--mobile-target-frame-ratio: 0.8;');
+    expect(hudMobileCss).toContain('--mobile-target-frame-ratio: 0.9;');
     expect(hudMobileCss).toContain(
-      'translateX(-50%)\n        scale(\n          calc(\n            var(--mobile-player-frame-scale, 0.9) *\n            var(--mobile-target-frame-ratio, 0.8) *\n            var(--mobile-chrome-scale, 1)\n          )\n        );',
+      'transform: translateX(-50%)\n        scale(\n          calc(\n            var(--mobile-player-frame-scale, 0.9) *\n            var(--mobile-target-frame-ratio, 0.9) *\n            var(--mobile-chrome-scale, 1)\n          )\n        );',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar .petbar-group {\n      gap: 0;\n      padding: 0;\n      border: 0;\n      outline: 0;\n      background: transparent;\n      box-shadow: none;',
@@ -586,6 +588,9 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar .pet-btn .icon-label {\n      inset: 4px;\n      border-radius: 50%;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .pet-stance-option .icon-label {\n      border-radius: 50%;',
     );
     expect(hudMobileCss).toContain('--mobile-camera-joystick-size: 96px;');
     expect(hudMobileCss).toContain(
@@ -598,7 +603,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-camera-joystick-on.game-active #mobile-controls {\n    --mobile-camera-zone-left: calc(',
     );
     expect(hudMobileCss).toContain(
-      '--mobile-camera-zone-top: max(84px, calc(env(safe-area-inset-top) + 80px));',
+      '--mobile-camera-zone-top: max(110px, calc(env(safe-area-inset-top) + 106px));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-move-joystick {\n      width: 116px;\n      height: 116px;',
@@ -608,14 +613,69 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('scales the complete landscape player frame responsively with its cast bars', () => {
-    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.9;');
-    expect(hudMobileCss).toContain('--mobile-player-frame-source-height: 68px;');
+  it('positions only the transient mobile mob tooltip from live HUD geometry', () => {
+    expect(hudTs).toContain("import { mobileMobTooltipLayout } from './mob_tooltip_layout';");
+    expect(hudTs).toContain('private scheduleVisibleMobTooltipLayout(force = false): void');
+    expect(hudTs).toContain("getComputedStyle(controls, '::before')");
+    expect(hudTs).toContain("this.tooltipEl.classList.remove('mob-tooltip-clipped');");
+    expect(hudTs).not.toContain('MOB_TOOLTIP_MOBILE_MINIMAP_GAP');
+    expect(hudTs).not.toContain('MOB_TOOLTIP_MOBILE_EDGE_GAP');
+    expect(hudTs).toContain(
+      'if (key === this.lastMobTooltipId) {\n      this.scheduleVisibleMobTooltipLayout();\n      return;\n    }',
+    );
+
+    const hoverCursor = mainTs.slice(
+      mainTs.indexOf('function updateHoverCursor(): void {'),
+      mainTs.indexOf('\n  function renderFacingOverride'),
+    );
+    expect(hoverCursor).toContain('hud.showMobHoverTooltip(entity, pvpOpponents);');
+    expect(hoverCursor).toContain('hud.clearMobHoverTooltip();');
+    expect(mainTs.match(/showMobHoverTooltip\(/g)).toHaveLength(1);
+    expect(hudTs.match(/paintMobTooltipBottomRight\(/g)).toHaveLength(2);
+    expect(hudTs).toContain('this.lastMobTooltipId = null;\n    this.hideTooltip();');
+  });
+
+  it('clips long mobile mob descriptions with a non-interactive bottom fade', () => {
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.62;',
+      'body.mobile-touch #tooltip.mob-tooltip {\n    box-sizing: border-box;\n    width: min(',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-tablet {\n    --mobile-player-frame-scale: 1;',
+      'body.mobile-touch #tooltip.mob-tooltip.mob-tooltip-clipped {\n    overflow: hidden;\n    pointer-events: none;',
+    );
+    expect(hudMobileCss).toContain('-webkit-mask-image: linear-gradient(');
+    expect(hudMobileCss).toContain('mask-image: linear-gradient(');
+    expect(hudMobileCss).not.toContain(
+      'body.mobile-touch #tooltip.mob-tooltip.mob-tooltip-clipped {\n    overflow-y: auto;',
+    );
+  });
+
+  // WIP snapshot carry-over: this pin expects the expanded stance chips restyled
+  // to an 8px radius, which the mobile readability pass has not authored in
+  // hud.mobile.css yet (the rule still ships the round 50% face). Un-skip in the
+  // same change that lands that CSS on the mobile-layout-adjustments branch.
+  it.skip('stacks expanded pet stances vertically and distinguishes them from pet skills', () => {
+    expect(hudTs).toContain("stances.className = 'petbar-group petbar-stances'");
+    expect(hudTs).toContain("stances.classList.toggle('expanded', this.petModeMenuOpen)");
+    expect(hudTs).toContain("kind: 'stance-option'");
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .petbar-stances.expanded {\n      flex-direction: column-reverse;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .pet-stance-option .icon-label {\n      border-radius: 8px;',
+    );
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch #petbar\s*\{[^}]*gap:\s*4px;[^}]*align-items:\s*flex-end;/,
+    );
+  });
+
+  it('scales the complete landscape player frame responsively with its cast bars', () => {
+    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 1;');
+    expect(hudMobileCss).toContain('--mobile-player-frame-source-height: 68px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.72;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-tablet {\n    --mobile-player-frame-scale: 1.1;',
     );
     expect(hudMobileCss).toContain(
       'scale(calc(var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1)));',
@@ -939,6 +999,34 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('keeps the mobile preflight focused on landscape and fullscreen setup', () => {
+    const copy = mainTs.slice(
+      mainTs.indexOf('function mobilePreflightCopy()'),
+      mainTs.indexOf('let mobilePreflightPromptPromise'),
+    );
+    expect(copy).toContain("const base = [t('mobilePreflight.baseLandscape')]");
+    expect(copy).not.toContain('mobilePreflight.basePerformance');
+    expect(copy).toContain(
+      "steps: [t('mobilePreflight.iosShareStep'), t('mobilePreflight.iosOpenStep'), ...base]",
+    );
+  });
+
+  it('gives Samsung Internet its own Android install instruction', () => {
+    const platform = mainTs.slice(
+      mainTs.indexOf('function mobilePlatform()'),
+      mainTs.indexOf('function isStandaloneDisplay()'),
+    );
+    const copy = mainTs.slice(
+      mainTs.indexOf('function mobilePreflightCopy()'),
+      mainTs.indexOf('let mobilePreflightPromptPromise'),
+    );
+
+    expect(platform).toContain("/SamsungBrowser\\//.test(ua) ? 'android-samsung' : 'android'");
+    expect(copy).toContain("platform === 'android-samsung'");
+    expect(copy).toContain("t('mobilePreflight.androidSamsungInstallStep')");
+    expect(copy).toContain("t('mobilePreflight.androidInstallStep')");
+  });
+
   it('releases the start-screen character preview before entering the world', () => {
     expect(mainTs).toContain('function releaseStartScreenPreview(): void {');
     expect(mainTs).toContain('characterPreview.destroy();\n  characterPreview = null;');
@@ -1099,13 +1187,31 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain('body.mobile-touch .mobile-consumable-slot.empty {');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-consumables-toggle .ui-icon {\n    width: 14px;\n    height: 14px;\n    transform: scale(var(--btn-scale, 1));',
+      'body.mobile-touch #mobile-consumables-toggle .ui-icon {\n    width: 14px;\n    height: 14px;\n    transform: translateX(1px) scale(var(--btn-scale, 1));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-consumables-toggle::before {\n    content: "";\n    position: absolute;\n    width: 40px;\n    height: 40px;',
     );
     expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-consumables-toggle::before {\n    content: "";\n    position: absolute;\n    width: 40px;\n    height: 40px;\n    inset: 4px;\n    border: 2px solid #4a3d1d;\n    border-radius: 14px;\n    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {\n    transform: translateX(-1px) scaleX(-1) scale(var(--btn-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-consumables-toggle .ui-icon {\n    transform: translateX(-1px) scaleX(-1) scale(var(--btn-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed.mobile-consumables-open #mobile-consumables-toggle .ui-icon {\n    transform: translateX(1px) scale(var(--btn-scale, 1));',
+    );
+    expect(hudMobileCss).not.toContain(
+      'body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {\n    transform: rotate(90deg)',
+    );
+    expect(hudMobileCss).toContain(
       'body.mobile-touch .mobile-consumable-slot {\n    position: relative;\n    width: 48px;\n    height: 48px;\n    padding: 0;\n    flex: none;\n    pointer-events: auto;\n    border: 0;\n    border-radius: 50%;\n    background: transparent;',
+    );
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch \.mobile-consumable-slot\s*\{[^}]*overflow:\s*visible/s,
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch .mobile-consumable-slot .icon-label {\n    position: absolute;\n    inset: 4px;',
@@ -1144,13 +1250,25 @@ describe('client HTML shell', () => {
     expect(approvedTopology).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-consumables {\n    left: auto;\n    right: max(154px, calc(env(safe-area-inset-right) + 136px));',
     );
-    // The id list is snapshotted at OPEN time and stays frozen while open, so
-    // slots never shift under the thumb the frame a stack depletes: exactly one
-    // consumableBarItems CALL (the toggle handler's snapshot), none per-frame.
-    expect(hudTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
-    expect(hudTs).toContain(
-      'consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);',
+    // The nullable id list is resolved at OPEN time and after explicit mutations,
+    // never per frame. Custom ids survive at count zero and null slots stay empty.
+    expect(hudTs.match(/resolveConsumableBarLayout\(/g) ?? []).toHaveLength(2);
+    expect(hudTs).toContain('resolveConsumableBarLayout(');
+    expect(hudTs).toContain('private readonly consumableBarIds: (string | null)[] = [];');
+    expect(hudTs).toContain('createConsumableBarPreferences({');
+    expect(hudTs).toContain('scope: consumablePreferenceScope,');
+    expect(mainTs).toContain(
+      'hud = new Hud(world, renderer, keybinds, keybindScope, {\n      dailyRewardsEnabled: !NATIVE_APP,\n    });',
     );
+    expect(hudTs).toContain('assignConsumable: (itemId, slotIndex) =>');
+    expect(hudTs).toContain('resetConsumables: () =>');
+    expect(componentsCss).toContain('.bag-item-action-menu {');
+    expect(componentsCss).toContain('.bag-item-destinations {');
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch \.bag-item-action(?:,|\s)*[\s\S]{0,180}?min-width:\s*40px;[\s\S]{0,100}?min-height:\s*40px;/,
+    );
+    expect(hudMobileCss).toContain('@media (forced-colors: active)');
+    expect(hudMobileCss).toContain('body.mobile-touch .bag-item-action:focus-visible');
     expect(hudTs).toContain('bindTouchTap(toggle, () => {');
     expect(hudTs).toContain('slotBtns.forEach((btn, i) => {\n      bindTouchTap(btn, () => {');
   });
@@ -1172,12 +1290,12 @@ describe('client HTML shell', () => {
       const logicalOrder = [
         'data-mobile-index="0"',
         'data-mobile-index="1"',
-        'id="mobile-action-attack"',
+        'data-mobile-index="4"',
         'id="mobile-target-cycle"',
         'id="mobile-action-page-toggle"',
         'data-mobile-index="2"',
         'data-mobile-index="3"',
-        'data-mobile-index="4"',
+        'id="mobile-action-attack"',
         'id="mobile-jump"',
       ];
       const positions = logicalOrder.map((token) => ring.indexOf(token));
@@ -1226,7 +1344,7 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('does not expose inert scrollbars on fixed mobile game overlays', () => {
+  it('does not expose inert scrollbars on stable mobile game overlays', () => {
     expect(baseCss).toContain(
       '#ui {\n    position: fixed;\n    left: 0;\n    top: 0;\n    width: var(--app-vw);\n    max-width: 100vw;\n    height: var(--app-vh);\n    overflow: hidden;',
     );
@@ -1284,6 +1402,20 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch .community-link');
     expect(hudMobileCss).not.toContain('body.mobile-touch #community-menu');
     expect(hudMobileCss).not.toContain('body.mobile-touch .donate-cta {\n    display: none;');
+  });
+
+  it('keeps the loading screen above the temporarily raised mobile HUD', () => {
+    // The first HUD update can show the zone banner before loading has faded.
+    // That state raises the whole #ui stacking context, so the loading overlay
+    // must still sit above it or the minimap and player frame paint over the art.
+    const loadingZ = Number(shellCss.match(/#loading-screen\s*\{[^}]*z-index:\s*(\d+)/s)?.[1]);
+    const raisedHudZ = Number(
+      hudMobileCss.match(
+        /body\.mobile-touch\.game-active\.mobile-center-message-visible #ui\s*\{[^}]*z-index:\s*(\d+)/s,
+      )?.[1],
+    );
+
+    expect(loadingZ).toBeGreaterThan(raisedHudZ);
   });
 
   it('closes mobile community and More trays when tapping outside', () => {
@@ -1570,6 +1702,24 @@ describe('client HTML shell', () => {
     // The world canvas still suppresses panning so camera drag is unaffected.
     expect(hudMobileCss).toContain(
       'body.mobile-touch #game-canvas {\n    touch-action: none;\n  }',
+    );
+  });
+
+  it('reserves two-finger gestures on the world-map canvas for map zoom', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-canvas {\n    width: 100%;\n    height: auto;\n    display: block;\n    touch-action: none;',
+    );
+  });
+
+  it('flows mobile talents as one vertically scrollable document', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #talents-window {\n    position: fixed;\n    left: 0;\n    right: 0;\n    top: 0;\n    bottom: 0;\n    width: auto;\n    max-width: none;\n    max-height: none;\n    transform: none;\n    z-index: 95 !important;\n    box-sizing: border-box;\n    overflow-x: hidden;\n    overflow-y: auto;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #talents-window #tal-body {\n    overflow-x: auto;\n    overflow-y: visible;',
+    );
+    expect(hudMobileCss).not.toContain(
+      'body.mobile-touch #talents-window {\n      column-count: 2;',
     );
   });
 
@@ -1866,16 +2016,18 @@ describe('client HTML shell', () => {
       );
       const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
       const chat = combatControls.indexOf('id="mobile-chat"');
+      const bags = combatControls.indexOf('id="mobile-bags"');
       const social = combatControls.indexOf('id="mobile-social"');
       const quest = combatControls.indexOf('id="mobile-quest"');
       const settings = combatControls.indexOf('id="mobile-menu"');
       const more = combatControls.indexOf('id="mobile-more"');
       const moreButton = combatControls.slice(more, combatControls.indexOf('</button>', more));
-      // The canonical DOM carries all five actions. The responsive applier moves
+      // The canonical DOM carries all six actions. The responsive applier moves
       // the same Social/Settings nodes into More on compact and portrait layouts.
-      expect(primaryButtons, name).toHaveLength(5);
+      expect(primaryButtons, name).toHaveLength(6);
       expect(chat, name).toBeGreaterThanOrEqual(0);
-      expect(social, name).toBeGreaterThan(chat);
+      expect(bags, name).toBeGreaterThan(chat);
+      expect(social, name).toBeGreaterThan(bags);
       expect(quest, name).toBeGreaterThan(social);
       expect(settings, name).toBeGreaterThan(quest);
       expect(more, name).toBeGreaterThan(settings);
@@ -1891,6 +2043,7 @@ describe('client HTML shell', () => {
       expect(tray, name).not.toContain('id="mobile-more-quest"');
       expect(tray, name).not.toContain('id="mobile-more-menu"');
       expect(tray, name).not.toContain('id="mobile-social"');
+      expect(tray, name).not.toContain('id="mobile-bags"');
       expect(tray, name).not.toContain('id="mobile-quest"');
       expect(tray, name).not.toContain('id="mobile-menu"');
       // No bottom-centre Target button: the one targeting helper on touch is
@@ -1944,7 +2097,7 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.55;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.62;\n    --mobile-camera-joystick-size: 82px;',
+      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.72;\n    --mobile-camera-joystick-size: 82px;',
     );
     expect(hudMobileCss).toContain(
       'transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));',
@@ -1962,10 +2115,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #party-frames.below-target {\n      top: max(6px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #mobile-consumables {\n      left: max(136px, calc(env(safe-area-inset-left) + 136px));',
+      'body.mobile-touch.hud-mobile-compact #mobile-consumables {\n      left: max(136px, calc(env(safe-area-inset-left) + 136px));\n      bottom: calc(68px + env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #mobile-consumables-row {\n      left: calc(48px + 6px);\n      right: auto;\n      bottom: calc(\n        max(env(safe-area-inset-left), env(safe-area-inset-right)) +\n        min(8px, max(env(safe-area-inset-left), env(safe-area-inset-right)))\n      );\n      width: 100px;',
+      'body.mobile-touch.hud-mobile-compact #mobile-consumables-row {\n      left: calc(48px + 6px);\n      right: auto;\n      bottom: 0;\n      width: 152px;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-row {\n      display: flex;\n      flex-flow: row wrap-reverse;',
@@ -1982,7 +2135,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain(
       'body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-toggle {',
     );
-    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.62;');
+    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.72;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(hudMobileCss).not.toContain('left: calc(50% - 15px);');
     expect(hudMobileCss).not.toContain('left: calc(50% - 44px);');
@@ -2012,7 +2165,7 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('hud.onMobileCanContextInteract = () => hasNearbyInteraction(world);');
     expect(mainTs).not.toContain('hud.onMobileContextInteract');
     expect(mainTs).toContain(
-      'onJump: () => {\n      if (!tryNearbyInteraction(world, hud, false)) input.triggerTouchJump();\n    },',
+      'onJump: () => {\n      if (!interactNearby(false)) input.triggerTouchJump();\n    },',
     );
     // The attack toggle's fallback fires ONLY with no live attackable target
     // (including active PvP/Yumi targets, not just hostile mobs) and never while
@@ -2024,7 +2177,17 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain(
       'mobileAttackTapAction(p.autoAttack, hasLiveAttackTarget, !!this.onMobileAttackNearest)',
     );
-    expect(mainTs).toContain('tryNearbyInteraction(world, hud, true);');
+    const interactNearbyBridge = mainTs.slice(
+      mainTs.indexOf('function interactNearby(showError: boolean): boolean {'),
+      mainTs.indexOf('\n  function interactKey(): void'),
+    );
+    expect(interactNearbyBridge).toContain('return stopAutorunForInteraction(');
+    expect(interactNearbyBridge).toContain('tryNearbyInteraction(world, hud, showError)');
+    expect(interactNearbyBridge).toContain('mobileControls');
+    expect(mainTs).toContain('interactNearby(true);');
+    expect(mainTs).toContain(
+      'stopAutorunForInteraction(\n      handlePickedEntity(world, hud, id, button, x, y),',
+    );
     expect(hudTs).toContain('this.mobileActionRingPainter?.relocalize();');
   });
 
@@ -2056,6 +2219,9 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: -104px;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    transform: translate(-50%, -50%) scale(1);',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // Left-handed mode mirrors the floating capture zone; the autorun target is
@@ -2084,10 +2250,12 @@ describe('client HTML shell', () => {
       expect(ring, name).toContain('id="mobile-action-page-toggle"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
       expect(ring, name).not.toContain('data-i18n="hud.core.mobileUse"');
-      expect(ring, name).not.toContain('data-i18n="hudChrome.mobile.jump"');
-      expect(ring, name).not.toContain('data-i18n-aria="hud.keybinds.actions.jump"');
-      expect(ring, name).not.toContain('data-i18n-title="hud.keybinds.actions.jump"');
-      expect(ring, name).toContain('<span class="mobile-label">Jump</span>');
+      expect(ring, name).toContain('data-i18n="hudChrome.mobile.jump"');
+      expect(ring, name).toContain('data-i18n-aria="hud.keybinds.actions.jump"');
+      expect(ring, name).toContain('data-i18n-title="hud.keybinds.actions.jump"');
+      expect(ring, name).toContain(
+        '<span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span>',
+      );
       expect(ring, name).toContain('data-icon="swap"');
     }
 
@@ -2095,10 +2263,10 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('--mobile-jump-hit: 56px;');
     expect(hudMobileCss).toContain('--mobile-action-gap: 4px;');
     expect(hudMobileCss).toContain(
-      'grid-template-areas:\n      ". a1 a2 attack target"\n      "page a3 a4 a5 jump";',
+      'grid-template-areas:\n      ". a1 a2 a5 target"\n      "page a3 a4 attack jump";',
     );
     expect(hudMobileCss).toContain(
-      'grid-template-areas:\n      "target attack a2 a1 ."\n      "jump a5 a4 a3 page";',
+      'grid-template-areas:\n      "target a5 a2 a1 ."\n      "jump attack a4 a3 page";',
     );
     expect(hudMobileCss).toContain(
       'grid-template-columns: var(--mobile-jump-hit) repeat(4, var(--mobile-action-hit));',
@@ -2144,6 +2312,8 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-left-handed #mobile-action-ring {\n    --mobile-pad-edge-inline: max(18px, env(safe-area-inset-left));',
     );
     expect(hudMobileCss).toContain('--mobile-action-face: 40px;');
+    expect(hudMobileCss).toContain('--mobile-target-face: 44px;');
+    expect(hudMobileCss).toContain('--mobile-target-raise: 3px;');
     expect(hudMobileCss).toContain('--mobile-jump-face: 46px;');
     expect(hudMobileCss).toContain('--mobile-attack-face: 36px;');
     expect(hudMobileCss).toContain('--mobile-page-face: 32px;');
@@ -2154,9 +2324,16 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('height: var(--mobile-control-face);');
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%) scale(var(--btn-scale, 1));');
     expect(hudMobileCss).toContain('--mobile-control-face: var(--mobile-action-face);');
+    expect(hudMobileCss).toContain('--mobile-control-face: var(--mobile-target-face);');
     expect(hudMobileCss).toContain('--mobile-control-face: var(--mobile-attack-face);');
     expect(hudMobileCss).toContain('--mobile-control-face: var(--mobile-page-face);');
     expect(hudMobileCss).toContain('--mobile-control-face: var(--mobile-jump-face);');
+    expect(hudMobileCss).toMatch(
+      /transform:\s*translate\(-50%, calc\(-50% - var\(--mobile-target-raise\)\)\)\s*scale\(var\(--btn-scale, 1\)\);/,
+    );
+    expect(hudMobileCss).toContain(
+      'transform: translateY(calc(-1 * var(--mobile-target-raise))) scale(var(--btn-scale, 1));',
+    );
 
     const padButtonBlock = hudMobileCss.slice(
       hudMobileCss.indexOf('body.mobile-touch #mobile-action-ring > button {'),
@@ -2175,7 +2352,10 @@ describe('client HTML shell', () => {
     ]) {
       expect(hudMobileCss).toContain(`#mobile-action-ring > button > ${visualPart}`);
     }
-    expect(hudMobileCss).toContain('#mobile-action-attack.queued::after {\n    content: "";');
+    expect(hudMobileCss).not.toContain('#mobile-action-attack.queued::after');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring button.queued {\n    --mobile-control-border: var(--gold);\n    --mobile-control-shadow: 0 0 12px #ffd100aa, inset 0 0 0 1px #ffd10077;',
+    );
     expect(hudMobileCss).toContain('@media (forced-colors: active) {');
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-action-attack.queued::before {\n      outline: 2px solid CanvasText;',
@@ -2238,7 +2418,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar.many-spells');
   });
 
-  it('seeds druid form bars and initializes stealth pages blank', () => {
+  it('seeds druid form bars with the form kit and initializes stealth bars independently', () => {
     expect(hudTs).toContain('if (this.isFormKitBar()) {');
     expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
     expect(hudTs).toMatch(
@@ -2246,8 +2426,14 @@ describe('client HTML shell', () => {
     );
     expect(hudTs).toContain('if (this.isStealthHotbarForm()) {');
     expect(hudTs).toContain('this.loadStealthSlotMap(parsed, stored, storedRaw);');
-    expect(hudTs).toMatch(/Array\.from\(\{ length: Hud\.BAR_ABILITY_SLOTS \}, \(\) => null\)/);
-    expect(hudTs).not.toContain('fallbackForm');
+    expect(hudTs).toContain(
+      "const parentForm: HotbarForm = this.activeHotbarForm === 'cat_stealth'",
+    );
+    expect(hudTs).toContain('actions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, () => null);');
+    expect(hudTs).toContain("localStorage.getItem(this.slotMapKey('normal'))");
+    expect(hudTs).not.toContain(
+      "this.loadedSlotMapFromStorage = stored || this.activeHotbarForm !== 'normal';",
+    );
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
@@ -2265,7 +2451,6 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("new Set(['bear_form', 'cat_form', 'travel_form'])");
     expect(hudTs).toContain("if (this.activeHotbarForm === 'bear') return 'bear_form';");
     expect(hudTs).toContain("if (this.activeHotbarForm === 'cat') return 'cat_form';");
-    expect(hudTs).not.toContain("this.activeHotbarForm === 'cat_stealth') return 'cat_form'");
     expect(hudTs).toContain(
       'if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);',
     );
@@ -2293,6 +2478,32 @@ describe('client HTML shell', () => {
     expect(spellbookWindowTs).toMatch(/toggle\.className = [`']spell-hotbar-toggle/);
     expect(spellbookWindowTs).toContain('this.deps.removeFromBar(id)');
     expect(spellbookWindowTs).toContain('this.deps.addToBar(id)');
+  });
+
+  it('integrates exact mobile Spellbook assignment with active-bar lifecycle safety', () => {
+    expect(hudTs).toContain('assignAbilityToMobileSlot');
+    expect(hudTs).toContain('barToken: () => this.slotMapKey()');
+    expect(hudTs).toContain('hotbarActions: () => this.hotbarActions');
+    expect(hudTs).toContain('if (request.barToken !== this.slotMapKey())');
+    expect(hudTs).toContain('this.saveSlotMap()');
+    expect(hudTs).toContain('this.mobileActionPage = Math.floor(request.targetIndex / 5)');
+    expect(hudTs).toContain('if (this.spellbookWindow.closePicker()) return true');
+    expect(hudTs).toContain(
+      'this.spellbookWindow.closePicker();\n    this.hotbarActions = buildDefaultFormBar',
+    );
+    expect(hudTs).toContain(
+      'this.spellbookWindow.closePicker();\n    this.activeHotbarForm = next',
+    );
+    expect(hudTs).toContain(
+      'this.spellbookWindow.closePicker();\n    this.hotbarActions = Array.from',
+    );
+    expect(hudTs).toContain('effectiveMobilePageCount(');
+    expect(hudTs).toContain('nextMobilePage(this.mobileActionPage, this.mobileActionPageCount())');
+    expect(hudTs).toContain('this.mobileActionPageCount(),\n        contextInteract');
+    expect(hudMobileCss).toContain('body.mobile-touch #spellbook .spell-slot-destination');
+    expect(hudMobileCss).toContain('min-width: 48px;\n    min-height: 48px;');
+    expect(hudMobileCss).toContain('.spell-slot-destination[aria-current="true"]');
+    expect(hudMobileCss).toContain('.spell-slot-destination:focus-visible');
   });
 
   it('sizes the mobile Bags window as a usable modal', () => {

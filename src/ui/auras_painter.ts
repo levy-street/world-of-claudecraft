@@ -70,13 +70,21 @@ export interface AurasPainterDeps {
    *  'aura', iconKey)})`). Called only when an aura's icon key changes. */
   resolveIconUrl(iconKey: string): string;
   /** Render the tooltip HTML from the LIVE aura name + remaining (host: the
-   *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, reading the
-   *  pooled record's current fields. */
+   *  tt-title/tt-sub markup with esc + tPlural). Called lazily on hover, focus,
+   *  or mobile tap, reading the pooled record's current fields. */
   renderTooltip(name: string, remaining: number, effectHtml: string): string;
   /** Attach a lazily-built tooltip to a node (host: Hud.attachTooltip). Called ONCE per
    *  pooled node; the closure reads the live record. */
-  attachTooltip(el: HTMLElement, html: () => string): void;
-  /** Optional: attach the right-click-cancel handler to a pooled node ONCE (the painter
+  attachTooltip(el: HTMLElement, html: () => string): (() => void) | void;
+  /** Optional touch-only tap owner. The host receives the tooltip's imperative
+   *  show callback and a LIVE cancel id so tap can show/swap/toggle, while a
+   *  slop-guarded hold may cancel only a helpful player aura. */
+  attachTapTooltip?(
+    el: HTMLElement,
+    showTooltip: () => void,
+    cancelableAuraId: () => string | null,
+  ): void;
+  /** Optional: attach the desktop right-click-cancel handler to a pooled node ONCE (the painter
    *  never calls addEventListener itself; that listener churn is banned on the hot painter,
    *  exactly like the tooltip's attachTooltip). Supplied ONLY to the player buff-bar painter.
    *  `cancelableAuraId` is read live on right-click: it returns the aura id to cancel, or null
@@ -212,6 +220,7 @@ export class AurasPainter {
       // stylesheet renders it as a border the icon meaning does not depend on.
       this.writers.toggleClass(rec.el, DEBUFF_CLASS, s.isDebuff);
       this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
+      if (this.deps.attachTapTooltip) this.writers.setAttr(rec.el, 'aria-label', s.name);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
       this.writers.setText(rec.dur, s.durationText);
@@ -239,7 +248,13 @@ export class AurasPainter {
    *  closure reads the returned record's LIVE name/remaining, so it survives recycling
    *  (Top risk 3). */
   private createNode(): PooledAura {
-    const el = this.doc.createElement('div');
+    // Main player/target strips own tap activation, so those auras are native
+    // buttons with a live accessible name. Status-only party mini auras retain
+    // their noninteractive div semantics: making their 16px glyphs buttons
+    // would nest an interactive control inside the member's role=button row.
+    const tapInteractive = this.deps.attachTapTooltip !== undefined;
+    const el = this.doc.createElement(tapInteractive ? 'button' : 'div');
+    if (tapInteractive) (el as HTMLButtonElement).type = 'button';
     el.className = BUFF_CLASS;
     const dur = this.doc.createElement('div');
     dur.className = DUR_CLASS;
@@ -260,12 +275,16 @@ export class AurasPainter {
       lastIconKey: null,
       seen: 0,
     };
-    this.deps.attachTooltip(el, () =>
+    const showTooltip = this.deps.attachTooltip(el, () =>
       this.deps.renderTooltip(rec.name, rec.remaining, rec.effectHtml),
     );
-    // Right-click-cancel: attached ONCE per pooled node via the injected helper (the
-    // buff-bar painter only). The closure reads the live record so a recycled node cancels
-    // its current aura, and returns null unless the node currently shows a cancelable buff.
+    if (showTooltip) {
+      this.deps.attachTapTooltip?.(el, showTooltip, () => (rec.cancelable ? rec.auraId : null));
+    }
+    // Desktop right-click-cancel: attached ONCE per pooled node via the injected
+    // helper (the buff-bar painter only). Mobile hold cancellation uses the same
+    // live closure through attachTapTooltip above. A recycled node therefore
+    // always targets its current aura and never a captured predecessor.
     this.deps.attachCancel?.(el, () => (rec.cancelable ? rec.auraId : null));
     return rec;
   }

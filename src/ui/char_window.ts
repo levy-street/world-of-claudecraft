@@ -317,7 +317,13 @@ export class CharWindow {
     this.deps.unequip(slot);
     if (keepFocus) {
       const rebuilt = document.getElementById(`equip-slot-${slot}`);
-      this.deps.restoreFocus(rebuilt instanceof HTMLElement ? rebuilt : null);
+      // Online unequip can rebuild once from the pre-ack equipment snapshot.
+      // Focusing that still-occupied row synchronously opens its item tooltip,
+      // so keep the a11y focus return but dismiss the obsolete description.
+      if (rebuilt instanceof HTMLElement) {
+        rebuilt.focus();
+        this.deps.hideTooltip();
+      }
     }
   }
 }

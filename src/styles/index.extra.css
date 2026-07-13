@@ -283,3 +283,9 @@
     font-size: 12.5px;
   }
 }
+/* The persistent mobile game entry already exposes Discord in More. Keeping
+   this account CTA over live landscape gameplay would create an unregistered
+   top-level input layer above player-authored HUD controls. */
+body.mobile-touch.game-active #discord-cta-banner {
+  display: none;
+}

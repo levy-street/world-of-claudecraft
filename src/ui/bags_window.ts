@@ -32,6 +32,8 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { BagItemActionMenu } from './bag_item_action_menu';
+import { type MobileBagItemActionsView, mobileBagItemActions } from './bag_item_actions_view';
 import {
   type BagMode,
   bagDestroyAction,
@@ -152,6 +154,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
   showError(text: string): void;
+  consumableLayout(): readonly (string | null)[] | null;
+  consumablesCustom(): boolean;
+  assignConsumable(itemId: string, slotIndex: number): boolean;
+  resetConsumables(): boolean;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
@@ -175,8 +181,23 @@ export class BagsWindow {
   // (WCAG 2.4.3). Null when bags was opened by a pointer-driven cross-window path
   // (vendor / mobile), where a null restore is a safe no-op.
   private openerFocus: HTMLElement | null = null;
+  private readonly itemActionMenu: BagItemActionMenu;
+  private selectedMobileStack: InvSlot | null = null;
+  private mobileItemTooltipSuppressed = false;
+  private mobileItemTooltipGuardEpoch = 0;
 
-  constructor(private readonly deps: BagsWindowDeps) {}
+  constructor(private readonly deps: BagsWindowDeps) {
+    this.itemActionMenu = new BagItemActionMenu({
+      showError: (text) => this.deps.showError(text),
+      restoreFocus: (target) => {
+        this.deps.restoreFocus(target);
+        this.releaseMobileItemTooltipGuardAfterFocus();
+      },
+      onDismiss: () => {
+        this.selectedMobileStack = null;
+      },
+    });
+  }
 
   /** Record the element that opened the window, so close() can return focus to it.
    *  Called by the HUD's toggleBags on the keyboard/minimap open path. */
@@ -200,6 +221,9 @@ export class BagsWindow {
     // an orphaned aria-modal dialog floating over the closed window, then clear the inert
     // it set: a hidden window must never stay inert or the next open shows a dead grid.
     dismissBagPrompts();
+    this.itemActionMenu.close(false);
+    this.selectedMobileStack = null;
+    this.releaseMobileItemTooltipGuardNow();
     el.style.display = 'none';
     el.inert = false;
     this.deps.hideTooltip();
@@ -212,6 +236,8 @@ export class BagsWindow {
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
+    const selected = this.selectedMobileStack;
+    this.itemActionMenu.close(false);
     // .bag-grid (not #bags) is the scroll container; it is recreated on every
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
@@ -250,6 +276,25 @@ export class BagsWindow {
       }
       this.close();
     });
+    if (selected) {
+      const index = bagStackIndex(world.inventory, selected);
+      const item = index >= 0 ? ITEMS[selected.itemId] : undefined;
+      const mode = this.bagMode();
+      const mobileView = item ? mobileBagItemActions(item, mode) : null;
+      if (
+        index >= 0 &&
+        item &&
+        mobileView &&
+        !mobileView.directAction &&
+        document.body.classList.contains('mobile-touch')
+      ) {
+        const row = el.querySelector<HTMLElement>(`[data-inventory-index="${index}"]`);
+        this.openMobileItemActions(selected, item, row, mobileView);
+      } else {
+        this.selectedMobileStack = null;
+        this.releaseMobileItemTooltipGuardNow();
+      }
+    }
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -449,6 +494,7 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
+      row.dataset.inventoryIndex = String(bagStackIndex(world.inventory, s));
       row.innerHTML = `${this.deps.itemIcon(item)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
@@ -463,7 +509,13 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        const action = bagItemAction(item, this.bagMode());
+        const mode = this.bagMode();
+        const mobileView = mobileBagItemActions(item, mode);
+        if (document.body.classList.contains('mobile-touch') && !mobileView.directAction) {
+          this.openMobileItemActions(s, item, row, mobileView);
+          return;
+        }
+        const action = mobileView.directAction ?? bagItemAction(item, mode);
         switch (action) {
           case 'transferBlockedSoulbound':
             this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -586,28 +638,35 @@ export class BagsWindow {
           this.deps.clearActionDropTargets();
         });
       }
-      this.deps.attachTooltip(row, () => {
-        const mode = this.bagMode();
-        const key = bagTooltipHintKey(item, mode);
-        const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
-        // Advertise the shift-click partial deposit on a splittable stack, the bank
-        // window's withdrawPartialHint twin (tied to the deposit hint arm so a
-        // blocked quest item never shows it).
-        const partial =
-          key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
-            ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
+      this.deps.attachTooltip(
+        row,
+        () => {
+          const mode = this.bagMode();
+          const key = bagTooltipHintKey(item, mode);
+          const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
+          // Advertise the shift-click partial deposit on a splittable stack, the bank
+          // window's withdrawPartialHint twin (tied to the deposit hint arm so a
+          // blocked quest item never shows it).
+          const partial =
+            key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
+              ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
+              : '';
+          // Advertise the right-click destroy affordance (issue 1501) only when the item is
+          // actually destroyable here, so junk items are discoverable without a menu.
+          const destroy =
+            bagDestroyAction(item, mode) === 'discard'
+              ? `<div class="tt-sub">${esc(t('hudChrome.bags.rightClickDestroy'))}</div>`
+              : '';
+          const link = bagShiftLinks(mode)
+            ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
             : '';
-        // Advertise the right-click destroy affordance (issue 1501) only when the item is
-        // actually destroyable here, so junk items are discoverable without a menu.
-        const destroy =
-          bagDestroyAction(item, mode) === 'discard'
-            ? `<div class="tt-sub">${esc(t('hudChrome.bags.rightClickDestroy'))}</div>`
-            : '';
-        const link = bagShiftLinks(mode)
-          ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
-          : '';
-        return this.deps.itemTooltip(item) + extra + partial + destroy + link;
-      });
+          return this.deps.itemTooltip(item) + extra + partial + destroy + link;
+        },
+        // The action sheet owns the selected item's description on touch. A
+        // focus/long-press tooltip callback may already be queued when the tap
+        // opens it, so guard every future paint until the sheet is dismissed.
+        () => !this.mobileItemTooltipSuppressed,
+      );
       grid.appendChild(row);
     }
     // Free-slot squares (unfiltered view only): the classic empty sockets that
@@ -643,6 +702,92 @@ export class BagsWindow {
       bankDeposit: this.deps.isBankOpen(),
       petFeed: this.deps.pendingPetFeed(),
     };
+  }
+
+  private openMobileItemActions(
+    slot: InvSlot,
+    item: (typeof ITEMS)[string],
+    opener: HTMLElement | null,
+    view: MobileBagItemActionsView,
+  ): void {
+    this.selectedMobileStack = slot;
+    this.mobileItemTooltipGuardEpoch++;
+    this.mobileItemTooltipSuppressed = true;
+    this.deps.hideTooltip();
+    this.itemActionMenu.open({
+      host: this.deps.root(),
+      itemId: slot.itemId,
+      itemName: itemDisplayName(item),
+      itemDetailsHtml: this.deps.itemTooltip(item),
+      actions: view.actions,
+      canAssignConsumable: view.canAssignConsumable,
+      layout: this.deps.consumableLayout(),
+      customLayout: this.deps.consumablesCustom(),
+      itemNameForId: (itemId) => {
+        const assigned = ITEMS[itemId];
+        return assigned ? itemDisplayName(assigned) : itemId;
+      },
+      onAction: (action) => {
+        if (bagStackIndex(this.deps.world().inventory, slot) < 0) return false;
+        if (action === 'linkToChat') {
+          this.close();
+          this.deps.insertItemChatLink(slot.itemId);
+          return true;
+        }
+        this.selectedMobileStack = null;
+        if (action === 'destroy') {
+          this.showDiscardItemPrompt(slot.itemId, Math.max(1, Math.floor(slot.count)), opener);
+          return true;
+        }
+        if (action === 'equipBag') this.deps.world().equipBag(slot.itemId);
+        else this.deps.world().useItem(slot.itemId);
+        this.deps.hideTooltip();
+        queueMicrotask(() => {
+          this.render();
+          const liveIndex = bagStackIndex(this.deps.world().inventory, slot);
+          const focusTarget =
+            liveIndex >= 0
+              ? this.deps.root().querySelector<HTMLElement>(`[data-inventory-index="${liveIndex}"]`)
+              : this.deps.root().querySelector<HTMLElement>('[data-close]');
+          // A programmatic focus on a row rebuilt from a still-stale online
+          // snapshot synchronously opens its focus tooltip. The item command has
+          // already succeeded, so dismiss that obsolete description after focus.
+          focusTarget?.focus();
+          this.deps.hideTooltip();
+          this.deps.renderCharIfOpen();
+        });
+        return true;
+      },
+      onAssign: (slotIndex) => {
+        if (bagStackIndex(this.deps.world().inventory, slot) < 0) return false;
+        const ok = this.deps.assignConsumable(slot.itemId, slotIndex);
+        if (ok) this.selectedMobileStack = null;
+        return ok;
+      },
+      onReset: () => {
+        const ok = this.deps.resetConsumables();
+        if (ok) this.selectedMobileStack = null;
+        return ok;
+      },
+      opener,
+    });
+  }
+
+  private releaseMobileItemTooltipGuardAfterFocus(): void {
+    const epoch = this.mobileItemTooltipGuardEpoch;
+    // FocusManager.restore() focuses on its own setTimeout(0). Queue this after
+    // that callback so the returned row remains guarded while focusin settles,
+    // then hide any stale paint before normal hover/long-press is re-enabled.
+    window.setTimeout(() => {
+      if (epoch !== this.mobileItemTooltipGuardEpoch) return;
+      this.mobileItemTooltipSuppressed = false;
+      this.deps.hideTooltip();
+    }, 0);
+  }
+
+  private releaseMobileItemTooltipGuardNow(): void {
+    this.mobileItemTooltipGuardEpoch++;
+    this.mobileItemTooltipSuppressed = false;
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
@@ -749,11 +894,15 @@ export class BagsWindow {
     return { dismiss, dismissAndReturn };
   }
 
-  private showDiscardItemPrompt(itemId: string, maxCount: number): void {
+  private showDiscardItemPrompt(
+    itemId: string,
+    maxCount: number,
+    openerOverride?: HTMLElement | null,
+  ): void {
     document.querySelectorAll('.discard-item-prompt').forEach((el) => {
       el.remove();
     });
-    const opener = document.activeElement as HTMLElement | null;
+    const opener = openerOverride ?? (document.activeElement as HTMLElement | null);
     const item = ITEMS[itemId];
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;

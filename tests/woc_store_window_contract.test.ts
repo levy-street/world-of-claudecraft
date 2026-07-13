@@ -184,7 +184,7 @@ describe('WOC Store window contract', () => {
 
   it('keeps the store, Claudium, and Daily Rewards surfaces out of native builds', () => {
     expect(main).toContain(
-      'hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });',
+      'hud = new Hud(world, renderer, keybinds, keybindScope, {\n      dailyRewardsEnabled: !NATIVE_APP,\n    });',
     );
     expect(main).toContain('if (!NATIVE_APP) hud.attachClaudium(claudiumHooks);');
     expect(hud).toContain('storeEnabled: () => this.claudiumHooks !== null');

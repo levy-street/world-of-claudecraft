@@ -62,6 +62,23 @@ export function placeAbilityOnSlot(
   return next;
 }
 
+/** Assign an ability to one of the twenty mobile source slots. Unlike desktop
+ * drag placement this is an overwrite command, not a swap: every old copy is
+ * cleared before the target receives the selected ability. */
+export function assignAbilityToMobileSlot(
+  actions: readonly HotbarAction[],
+  abilityId: string,
+  targetIndex: number,
+): { actions: HotbarAction[]; changed: boolean } {
+  if (!Number.isInteger(targetIndex) || targetIndex < 0 || targetIndex >= 20)
+    return { actions: [...actions], changed: false };
+  const next = actions.map((action) =>
+    action?.type === 'ability' && action.id === abilityId ? null : action,
+  );
+  next[targetIndex] = { type: 'ability', id: abilityId };
+  return { actions: next, changed: !hotbarActionsEqual(actions, next) };
+}
+
 export function clearHotbarSlot(
   actions: readonly HotbarAction[],
   targetIndex: number,

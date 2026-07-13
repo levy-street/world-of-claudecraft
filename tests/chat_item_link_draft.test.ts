@@ -34,10 +34,12 @@ describe('item links in a chat draft', () => {
       pendingChatLinks: Map<string, string>;
       activeChatTab: string;
       activeChatPlaceholder: () => string;
+      onOpenChatComposer: () => void;
     };
     draftHud.pendingChatLinks = new Map();
     draftHud.activeChatTab = 'all';
     draftHud.activeChatPlaceholder = () => 'Chat';
+    draftHud.onOpenChatComposer = vi.fn();
 
     setLanguage('en');
     const baseId = 'moonshroud_robe';
@@ -48,6 +50,7 @@ describe('item links in a chat draft', () => {
     hud.insertItemChatLink(heroicId);
 
     expect(input.value).toBe('[Moonwrack Robe] [Moonwrack Robe]');
+    expect(draftHud.onOpenChatComposer).toHaveBeenCalledTimes(2);
     expect(hud.composeChatSend(input.value)).toBe(`[[i:${baseId}]] [[i:${heroicId}]]`);
   }, 15_000);
 });

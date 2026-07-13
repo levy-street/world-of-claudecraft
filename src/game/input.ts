@@ -396,6 +396,24 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
+  setHudEditorActive(on: boolean): void {
+    if (!on) {
+      this.setSuspendMovement(false);
+      return;
+    }
+    const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0 || this.autorun;
+    this.suspendMovement = true;
+    this.keys.clear();
+    this.keyJumpUntil = 0;
+    this.autorun = false;
+    if (this.emoteWheelHeldCodes.size > 0) {
+      this.emoteWheelHeldCodes.clear();
+      this.cb.onEmoteWheel(false);
+    }
+    this.releaseHeldSlots();
+    if (hadHeldInput) this.noteIntent('move');
+  }
+
   captureNextKey(cb: (code: string | null) => void): void {
     this.captureCb = cb;
   }

@@ -6,6 +6,8 @@
 // document.body. Kept host-agnostic so it is Vitest-driven directly and passes
 // the tests/architecture.test.ts purity scans (no DOM globals, no
 // Math.random/Date.now/performance.now).
+import type { MobileHudProfileId } from './mobile_hud_editor_types';
+
 //
 // TIERING RATIONALE (thresholds are named constants, not magic numbers):
 // - compact: a small or short viewport where the full desktop-scaled HUD
@@ -37,6 +39,10 @@ export const TABLET_MIN_WIDTH_PX = 1000;
 
 export type MobileHudTier = 'compact' | 'standard' | 'tablet';
 export type MobileMenuPlacement = 'compact' | 'full';
+
+export function mobileHudProfileForTier(tier: MobileHudTier): MobileHudProfileId {
+  return tier === 'tablet' ? 'tablet' : 'phone';
+}
 
 export interface MobileHudLayoutInput {
   /** CSS viewport width in pixels. */

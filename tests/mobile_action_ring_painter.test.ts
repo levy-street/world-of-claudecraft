@@ -18,6 +18,7 @@ import {
 } from '../src/ui/action_bar_view';
 import {
   clampMobilePage,
+  MOBILE_ACTION_PAGE_COUNT,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from '../src/ui/mobile_action_page_view';
@@ -159,6 +160,18 @@ describe('mobile action ring: source-slot state per page', () => {
     expect(view.tick(idleWorld()).slots[1].abilityId).toBe('frostbolt');
   });
 
+  it('the same button index shows source slot 11 on page 2', () => {
+    const pageBox = { page: 0 };
+    const bySlot = new Map<number, ActionBarAbility>([
+      [1, ability('fireball')],
+      [11, ability('frostbolt')],
+    ]);
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
+    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('fireball');
+    pageBox.page = nextMobilePage(nextMobilePage(pageBox.page));
+    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('frostbolt');
+  });
+
   it('an empty source slot renders the empty kind on the ring', () => {
     const pageBox = { page: 0 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
@@ -202,7 +215,7 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
     const pageBox = { page: 0 };
     const bySlot = new Map<number, ActionBarAbility>([[1, ability('fireball', { cooldown: 6 })]]);
     const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
-    painter.paint(view.tick(idleWorld()), pageBox.page, 2);
+    painter.paint(view.tick(idleWorld()), pageBox.page, MOBILE_ACTION_PAGE_COUNT);
 
     // Same call shapes as the desktop ActionBarPainter (icon write, count, cd
     // overlay, cd text, class toggles, aria, keybind) for the bound slot 1.
@@ -237,21 +250,21 @@ describe('MobileActionRingPainter: accessible Attack toggle state', () => {
     const world = idleWorld();
     world.player.autoAttack = true;
 
-    painter.paint(view.tick(world), 0, 2);
+    painter.paint(view.tick(world), 0, MOBILE_ACTION_PAGE_COUNT);
     expect(calls).toContainEqual({
       m: 'setAttr',
       args: [els[0].btn, 'aria-pressed', 'true'],
     });
 
     calls.length = 0;
-    painter.paint(view.tick(world), 0, 2);
+    painter.paint(view.tick(world), 0, MOBILE_ACTION_PAGE_COUNT);
     expect(calls).not.toContainEqual({
       m: 'setAttr',
       args: [els[0].btn, 'aria-pressed', 'true'],
     });
 
     world.player.autoAttack = false;
-    painter.paint(view.tick(world), 0, 2);
+    painter.paint(view.tick(world), 0, MOBILE_ACTION_PAGE_COUNT);
     expect(calls).toContainEqual({
       m: 'setAttr',
       args: [els[0].btn, 'aria-pressed', 'false'],
@@ -281,11 +294,11 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     );
     const pageBox = { page: 0 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
-    painter.paint(view.tick(idleWorld()), 0, 2);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT);
 
     expect(calls).toContainEqual({
       m: 'setText',
-      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":1,"count":4}'],
     });
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -358,15 +371,15 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     const pageBox = { page: 0 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
 
-    painter.paint(view.tick(idleWorld()), 0, 2);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT);
     const writesAfterFirst = counts.writes;
-    painter.paint(view.tick(idleWorld()), 0, 2);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT);
     // No NEW indicator/toggle writes on the second, unchanged-page paint (the
     // per-slot bar writes may also elide since state is unchanged too, so total
     // writes should not grow at all).
     expect(counts.writes).toBe(writesAfterFirst);
 
-    painter.paint(view.tick(idleWorld()), 1, 2);
+    painter.paint(view.tick(idleWorld()), 2, MOBILE_ACTION_PAGE_COUNT);
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
   });
 
@@ -391,7 +404,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     );
     const view = createActionBarView({ slots: ringDescriptor({ page: 0 }, new Map()) }, fakeDeps());
 
-    painter.paint(view.tick(idleWorld()), 0, 2, true);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT, true);
 
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -420,7 +433,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     calls.length = 0;
     locale = 'cs_CZ';
     painter.relocalize();
-    painter.paint(view.tick(idleWorld()), 0, 2, true);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT, true);
     expect(calls).toContainEqual({
       m: 'setAttr',
       args: [jumpButton, 'aria-label', 'cs_CZ:hud.keybinds.actions.interact'],
@@ -435,7 +448,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     });
     expect(calls).toContainEqual({
       m: 'setText',
-      args: [indicator, 'cs_CZ:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+      args: [indicator, 'cs_CZ:hudChrome.mobile.actionPageIndicator|{"page":1,"count":4}'],
     });
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -443,7 +456,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     });
 
     calls.length = 0;
-    painter.paint(view.tick(idleWorld()), 0, 2, false);
+    painter.paint(view.tick(idleWorld()), 0, MOBILE_ACTION_PAGE_COUNT, false);
     expect(calls).toContainEqual({
       m: 'setAttr',
       args: [jumpButton, 'aria-label', 'cs_CZ:hud.keybinds.actions.jump'],
@@ -474,7 +487,7 @@ describe('mobile action ring: alloc stability', () => {
     let call = 0;
     assertAllocationStable(
       () => {
-        pageBox.page = call % 2;
+        pageBox.page = call % MOBILE_ACTION_PAGE_COUNT;
         call++;
         return view.tick(idleWorld());
       },

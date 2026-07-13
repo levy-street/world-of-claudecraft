@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
+  assignAbilityToMobileSlot,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
@@ -61,6 +62,71 @@ describe('hotbar action parsing', () => {
 });
 
 describe('hotbar action placement', () => {
+  it('moves a mobile ability by clearing its old slot and overwriting the target', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'frost_armor' },
+      { type: 'item' as const, id: 'baked_bread' },
+      null,
+    ];
+
+    const result = assignAbilityToMobileSlot(slots, 'fireball', 2);
+
+    expect(result).toEqual({
+      actions: [
+        null,
+        { type: 'ability', id: 'frost_armor' },
+        { type: 'ability', id: 'fireball' },
+        null,
+      ],
+      changed: true,
+    });
+  });
+
+  it('cleans duplicate ability assignments even when the target already matches', () => {
+    const slots = Array<null | { type: 'ability'; id: string }>(22).fill(null);
+    slots[1] = { type: 'ability', id: 'fireball' };
+    slots[8] = { type: 'ability', id: 'fireball' };
+
+    const result = assignAbilityToMobileSlot(slots, 'fireball', 1);
+
+    expect(result.actions[1]).toEqual({ type: 'ability', id: 'fireball' });
+    expect(result.actions[8]).toBeNull();
+    expect(result.changed).toBe(true);
+  });
+
+  it('rejects mobile assignment targets outside slots 1 through 20', () => {
+    const slots = Array<null | { type: 'ability'; id: string }>(22).fill(null);
+
+    expect(assignAbilityToMobileSlot(slots, 'fireball', 20)).toEqual({
+      actions: slots,
+      changed: false,
+    });
+  });
+
+  it('rejects non-integer mobile assignment targets without mutating indexed slots', () => {
+    const slots = Array<null | { type: 'ability'; id: string }>(22).fill(null);
+
+    expect(assignAbilityToMobileSlot(slots, 'fireball', 1.5)).toEqual({
+      actions: slots,
+      changed: false,
+    });
+    expect(assignAbilityToMobileSlot(slots, 'fireball', Number.NaN)).toEqual({
+      actions: slots,
+      changed: false,
+    });
+  });
+
+  it('returns a canonical no-op when the ability already occupies only the target', () => {
+    const slots = Array<null | { type: 'ability'; id: string }>(22).fill(null);
+    slots[4] = { type: 'ability', id: 'fireball' };
+
+    expect(assignAbilityToMobileSlot(slots, 'fireball', 4)).toEqual({
+      actions: slots,
+      changed: false,
+    });
+  });
+
   it('places a spellbook ability onto the target action slot', () => {
     const slots = [
       { type: 'ability' as const, id: 'fireball' },

@@ -8,6 +8,12 @@
 | Product spec | [Mobile Touch HUD Layout PRD](../prd/mobile-compact-landscape-hud.md) |
 | Required base | [PR #1724: joystick autorun lock](https://github.com/levy-street/world-of-claudecraft/pull/1724) |
 
+> Superseded follow-up: [Mobile HUD Readability Adjustments](2026-07-11-mobile-hud-readability-adjustments.md)
+> replaces the historical compact 2 x 3 drawer and `0.62 / 0.9 / 1.0` frame constants recorded
+> below. The current contract is 3 x 2 Consumables on every landscape tier, player scales
+> `0.72 / 1 / 1.1`, Target ratio `0.9`, and transient mob details below the minimap. T29 through
+> T34 remain as implementation history, not current layout requirements.
+
 ## Outcome
 
 Replace the radial mobile action ring with the approved two-row action pad, preserve the contextual Jump/Use WIP, reserve a measurable canvas camera-start zone, move the minimap and compact menu to opposite top corners, place the automatic Consumables drawer beside the movement joystick, and validate the complete topology across landscape touch tiers, handedness, safe areas, settings extremes, and populated HUD states.
@@ -50,7 +56,7 @@ touch tier, Party now occupies one top row immediately inward of the minimap and
 when handedness mirrors. The row contains the Party disclosure, all expanded 68px member cards,
 and the compact close-icon Leave control. Target owns a separate row 48px below the safe top edge
 and is centered within the safe viewport width. The complete player frame and its cast/swing bars
-share a responsive scale of 0.62 on compact phones, 0.9 on standard touch screens, and 1.0 on
+share a responsive scale of 0.72 on compact phones, 1 on standard touch screens, and 1.1 on
 tablets. Player chrome is also centered within the safe width so a landscape notch moves it away
 from the action pad without reducing its size.
 
@@ -159,10 +165,10 @@ PR #1724 is expected to overlap `index.html`, `play.html`, `src/game/mobile_cont
 
 Update the solution note only if the rebase changes an already documented behavior. Do not overwrite or recapture the existing context-interaction evidence as part of the layout work.
 
-### Consume unchanged
+### Consume and extend
 
 - `src/ui/mobile_action_page_view.ts`
-  - `MOBILE_ACTIONS_PER_PAGE`, `mobilePageCount`, `sourceSlotForMobileButton`, `sourceSlotsForMobilePage`, `nextMobilePage`.
+  - Keep `MOBILE_ACTIONS_PER_PAGE` at five and extend the shared source span to 15 slots, producing three pages through the existing `mobilePageCount`, `sourceSlotForMobileButton`, `sourceSlotsForMobilePage`, and `nextMobilePage` arithmetic.
 - `src/ui/consumable_bar_view.ts`
   - `CONSUMABLE_BAR_SLOTS`, `CONSUMABLE_KIND_ORDER`, `consumableBarItems`.
 - `src/ui/action_bar_view.ts`
@@ -191,14 +197,14 @@ Keep `#mobile-action-ring`, `MobileActionRingPainter`, `buildMobileActionRing`, 
 Both HTML entries use this logical DOM order inside `#mobile-action-ring`:
 
 ```text
-A1, A2, Attack, Target, Page, A3, A4, A5, Jump/Use
+A1, A2, A5, Target, Page, A3, A4, Attack, Jump/Use
 ```
 
 CSS grid areas place them as:
 
 ```text
-.     A1  A2  Attack  Target
-Page  A3  A4  A5      Jump/Use
+.     A1  A2  A5      Target
+Page  A3  A4  Attack  Jump/Use
 ```
 
 The five ability elements retain `data-mobile-index="0"` through `"4"`. `Hud` continues sorting by that index, so markup interleaving does not change source-slot mapping.
@@ -273,7 +279,7 @@ Do not apply `transform: scale(var(--btn-scale))` to the hitbox element. Use an 
 
 ### Attack active state
 
-Keep `ActionBarSlotState.queued` as the source for active auto-attack. `ActionBarPainter` continues toggling `.queued`. `MobileActionRingPainter` adds a write-elided `aria-pressed="true|false"` update on the fixed Attack button. CSS renders a non-color active marker from `.queued`, with an explicit forced-colors treatment. No attack behavior changes.
+Keep `ActionBarSlotState.queued` as the source for active auto-attack. `ActionBarPainter` continues toggling `.queued`. `MobileActionRingPainter` adds a write-elided `aria-pressed="true|false"` update on the fixed Attack button. CSS renders the active state through the stronger queued outline and glow, with an explicit forced-colors treatment, without adding a detached corner marker. No attack behavior changes.
 
 ## Dependency graph
 
@@ -395,7 +401,7 @@ T3 through T5 and T6 through T8 may be developed independently after T1, but int
 
 - **Summary:** Enforce the 48px gameplay floor while making Attack visually tertiary and Jump/Use primary.
 - **Files:** `tests/client_shell.test.ts`, `src/styles/hud.mobile.css`, `src/ui/mobile_action_ring_painter.ts`.
-- **Changes:** Introduce the named size/gap variables, keep button boxes unscaled, scale inner faces only, set Jump/Use to 56px in compact, add at least 4px gaps, render Attack's `.queued` marker without color alone, and add forced-colors and reduced-motion rules. Define measurable face variables so the rendered order is Jump/Use highest; abilities and Target next; Attack below them; Page lowest. Enumerate `.ui-icon`, `.icon-label`, `.mobile-label`, `.item-count`, `.cd-overlay`, `.cdtext`, `.keybind`, and the page indicator so no interactive ancestor receives `--btn-scale`.
+- **Changes:** Introduce the named size/gap variables, keep button boxes unscaled, scale inner faces only, set Jump/Use to 56px in compact, add at least 4px gaps, render Attack's `.queued` state as an outline and glow without a detached marker, and add forced-colors and reduced-motion rules. Define measurable face variables so the rendered order is Jump/Use highest; abilities and Target next; Attack below them; Page lowest. Enumerate `.ui-icon`, `.icon-label`, `.mobile-label`, `.item-count`, `.cd-overlay`, `.cdtext`, `.keybind`, and the page indicator so no interactive ancestor receives `--btn-scale`.
 - **Tests:** Add source-contract failures for unscaled hitboxes, complete descendant ownership, measurable face hierarchy, and active-state fallback; run `npx vitest run tests/client_shell.test.ts tests/mobile_action_ring_painter.test.ts`. T22 adds decisive computed-style comparisons across tiers and scales.
 - **Interfaces:** Consumes `.queued` and `aria-pressed` from T4. Produces minimum hitbox and emphasis tokens for every tier.
 - **Dependencies:** T4 and T9.
@@ -440,7 +446,7 @@ T3 through T5 and T6 through T8 may be developed independently after T1, but int
 
 - **Summary:** Mirror side ownership and internal pad proximity, not only the two joysticks.
 - **Files:** `tests/client_shell.test.ts`, `src/styles/hud.mobile.css`.
-- **Changes:** Move joystick/map to the right, Party inward-left beside the map, Consumables inward-left, action pad and camera zone left, and menu right-to-left to the top-left. Keep Target and player chrome safe-centered. Pin the mirrored grid explicitly as `Target Attack A2 A1 . / Jump A5 A4 A3 Page`, so Jump/Use and Target are nearest the left thumb and Page remains farthest away. Do not change source-slot mapping or labels.
+- **Changes:** Move joystick/map to the right, Party inward-left beside the map, Consumables inward-left, action pad and camera zone left, and menu right-to-left to the top-left. Keep Target and player chrome safe-centered. Pin the mirrored grid explicitly as `Target A5 A2 A1 . / Jump Attack A4 A3 Page`, so Jump/Use and Target are nearest the left thumb and Page remains farthest away. Do not change source-slot mapping or labels.
 - **Tests:** Add source-contract assertions for all mirrored anchors; run `npx vitest run tests/client_shell.test.ts tests/settings.test.ts`; inspect the 740x360 left-handed state.
 - **Interfaces:** Consumes `body.mobile-left-handed`. Produces a complete mirror for T21-T25, with no JS action remapping.
 - **Dependencies:** T13.
@@ -510,7 +516,7 @@ T3 through T5 and T6 through T8 may be developed independently after T1, but int
 
 - **Summary:** Convert the old radial checker into a rectangular action-cluster gate before adding topology relations.
 - **Files:** `scripts/mobile_cluster_layout_check.mjs`, `scripts/lib/overlap_geometry.mjs`.
-- **Changes:** Remove standalone Autorun and ring-circle assumptions; measure all nine pad buttons, compact/full menu inventory, integrated joystick Autorun target, Consumables, and optional camera joystick; enforce on-screen boxes, the 48px floor, at least 4px gaps, right-handed approved order, and the exact left-handed `Target Attack A2 A1 . / Jump A5 A4 A3 Page` mirror.
+- **Changes:** Remove standalone Autorun and ring-circle assumptions; measure all nine pad buttons, compact/full menu inventory, integrated joystick Autorun target, Consumables, and optional camera joystick; enforce on-screen boxes, the 48px floor, at least 4px gaps, right-handed approved order, and the exact left-handed `Target A5 A2 A1 . / Jump Attack A4 A3 Page` mirror.
 - **Tests:** With the dev server running, execute right/left baselines for all seven landscape profiles and the minimum/maximum 740x360 scale states. Require zero failures.
 - **Interfaces:** Consumes T20 state setup and real `getBoundingClientRect` records. Produces base cluster evidence for AC 1, 6, 12, 13, and 14.
 - **Dependencies:** T20.
@@ -765,7 +771,7 @@ typecheck, environment build, server build, and client build.
 | 2. Explicit tertiary Attack, unchanged behavior | T3, T4, T10, T22 | interaction/painter tests; forced-colors contract; rendered hierarchy at every tier/scale |
 | 3. Stable contextual Jump/Use while moving | T3, T4, T5 | interaction, painter, and two-pointer control tests |
 | 4. Direct unchanged Target | T6, T9 | shell contract; existing `onCycleTarget` control tests; T21 inventory |
-| 5. Pages map 1-5 and 6-10 | T6 | unchanged `mobile_action_page_view` tests plus shell inventory |
+| 5. Pages map 1-5, 6-10, and 11-15 | T6 | `mobile_action_page_view`, ring painter, and spellbook view tests plus shell inventory |
 | 6. Page left of A3, tap-only | T5, T9, T14 | control tests; T21 right/left grid-order geometry |
 | 7. Camera rectangle meets minimum and all 3 x 3 points drag | T17, T23 | router tests; containing-block-aware probe dimensions; canvas hit test and classifier at all nine points |
 | 8. Full HUD has no forbidden overlaps and keeps approved relations | T11-T16, T22, T24, T25, T31 | rendered relation gate plus persistent/stress overlap audits |

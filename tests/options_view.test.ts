@@ -33,17 +33,25 @@ function makeSource(
 }
 
 // Render-order signature for a control list: a slider/toggle/boolToggle/choice
-// shows as its setting key, a note as note:<key>, the music toggle as musicToggle.
+// shows as its setting key, a note as note:<key>, the music toggle as musicToggle,
+// a keyless action row as action:<actionId>.
 function keysOf(controls: OptionsControl[]): string[] {
   return controls.map((c) => {
     if (c.control === 'note') return `note:${c.textKey}`;
     if (c.control === 'musicToggle') return 'musicToggle';
+    if (c.control === 'action') return `action:${c.actionId}`;
     return c.key;
   });
 }
 
 function find(controls: OptionsControl[], key: string): OptionsControl | undefined {
-  return controls.find((c) => c.control !== 'note' && c.control !== 'musicToggle' && c.key === key);
+  return controls.find(
+    (c) =>
+      c.control !== 'note' &&
+      c.control !== 'musicToggle' &&
+      c.control !== 'action' &&
+      c.key === key,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -257,6 +265,23 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
 });
 
 describe('options_view: interface dispatch matrix (cluster 5)', () => {
+  it('offers the discrete mobile page minimum only for touch interfaces', () => {
+    const source = makeSource({ mobileActionPageMinimum: 3 });
+    const touch = buildInterfaceControls(source, { touch: true, nativeShell: false });
+    const desktop = buildInterfaceControls(source, { touch: false, nativeShell: false });
+
+    expect(find(touch, 'mobileActionPageMinimum')).toMatchObject({
+      control: 'choice',
+      current: 3,
+      rerender: false,
+    });
+    const control = find(touch, 'mobileActionPageMinimum');
+    if (control?.control === 'choice') {
+      expect(control.options.map((option) => option.value)).toEqual([2, 3, 4]);
+    }
+    expect(find(desktop, 'mobileActionPageMinimum')).toBeUndefined();
+  });
+
   it('lists the comfort sliders then the comfort + accessibility bool toggles', () => {
     const controls = buildInterfaceControls(makeSource());
     expect(keysOf(controls)).toEqual([
@@ -287,6 +312,23 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+  });
+
+  it('offers the mobile HUD editor launcher first, and only when opted in', () => {
+    const touchEnv = { touch: true, nativeShell: false };
+    // Default (desktop / ineligible): no keyless action row at all.
+    expect(keysOf(buildInterfaceControls(makeSource()))).not.toContain('action:mobileHudEditor');
+    expect(
+      keysOf(buildInterfaceControls(makeSource(), touchEnv, { mobileHudEditor: false })),
+    ).not.toContain('action:mobileHudEditor');
+    // Touch landscape with the editor available: the launcher leads the panel.
+    const controls = buildInterfaceControls(makeSource(), touchEnv, { mobileHudEditor: true });
+    expect(keysOf(controls)[0]).toBe('action:mobileHudEditor');
+    expect(controls[0]).toMatchObject({
+      control: 'action',
+      actionId: 'mobileHudEditor',
+      labelKey: 'hudChrome.mobileHudEditor.launcher',
+    });
   });
 
   it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
