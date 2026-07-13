@@ -139,6 +139,13 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // BOTH passes, proving the migrated leaderboardHandler devs fork is byte-identical
   // to the legacy handleApi arm.
   { name: 'leaderboard_devs', method: 'GET', url: '/api/leaderboard?board=devs' },
+  // ?board=deeds (the account-level Renown board): dual-served like the other
+  // boards, so the anonymous shape must stay byte-identical on both dispatch
+  // paths (the shared buildDeedsBoard builder + the same main.ts cache). Only
+  // the present-but-invalid bearer diverges (legacy lenient-anonymous vs the
+  // router-validated 401), the authz-gap-close class, and a token lookup is a
+  // db read so it cannot live in this db-free corpus anyway.
+  { name: 'leaderboard_deeds', method: 'GET', url: '/api/leaderboard?board=deeds' },
   { name: 'leaderboard_scope_global', method: 'GET', url: '/api/leaderboard?scope=global' },
   { name: 'leaderboard_scope_realm', method: 'GET', url: '/api/leaderboard?scope=realm' },
   { name: 'leaderboard_limit5', method: 'GET', url: '/api/leaderboard?limit=5' },
@@ -421,6 +428,40 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(oldCap.status).toBe(405);
     expect(newCap.status).toBe(oldCap.status);
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
+  });
+
+  it('the /api/status steam advert DIVERGES under STEAM_ENABLED=1: false on legacy, true on new', async () => {
+    // The Steam surface exists only as registry RouteDefs (server/steam/routes.ts),
+    // which the legacy ladder never serves, so every /api/steam/* 404s on the legacy
+    // arm. The legacy /api/status arm therefore HARDCODES steam.enabled=false:
+    // advertising a capability whose routes 404 on that same arm would strand a
+    // client into a dead link flow. The migrated statusHandler reads the real
+    // steamEnabled(), where the routes are live. So under the flag this is a
+    // DELIBERATE divergence, not a parity break. Only the steam field is compared
+    // (the names[] list is the separate labeled name-list-trim deviation). With the
+    // flag OFF both arms read false, which is why the corpus status_get row (and the
+    // legacy golden) stay clean; this covers the ON state.
+    const { oldCap, newCap } = await captureWithEnv({ STEAM_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/status' }),
+    );
+    expect(oldCap.status).toBe(200);
+    expect(newCap.status).toBe(200);
+    expect(JSON.parse(oldCap.body as string).steam).toEqual({ enabled: false });
+    expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
+  });
+
+  it('the Steam link surface 404s on the legacy ladder but is served on the new arm', async () => {
+    // /api/steam/status is a registry-only RouteDef. Under legacy dispatch the ladder
+    // has no such arm, so it falls through to 404; under new dispatch the router
+    // serves it. With STEAM_ENABLED=1 and no bearer the served handler answers 401 at
+    // the read-tier auth gate (BEARER pattern miss, before any db read), which is the
+    // point: NON-404 proves the route exists on the new arm. This is the concrete
+    // reason the legacy /api/status advert must read false.
+    const { oldCap, newCap } = await captureWithEnv({ STEAM_ENABLED: '1' }, () =>
+      makeReq({ method: 'GET', url: '/api/steam/status' }),
+    );
+    expect(oldCap.status).toBe(404);
+    expect(newCap.status).not.toBe(404);
   });
 
   it('GET /api/perf-report is identical old-vs-new and is a 404 (re-pins the masked /api/perf-report)', async () => {

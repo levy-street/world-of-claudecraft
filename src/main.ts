@@ -158,6 +158,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
   type DiscordAccountStatus,
@@ -209,6 +210,7 @@ import {
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
+import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -872,14 +874,15 @@ async function startGame(
   // Paint the loading screen before anything can block, assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Lazy locale flip: fetch the active locale's chunk and make it resident before the HUD
-  // renders (mountGameUi -> translatePage fans out hundreds of t() calls). It sits behind the
-  // loading screen (already painted above), so a stored non-en visitor never sees an English
-  // flash. This is now a REAL per-locale network request, so guard it: startGame is
-  // void-invoked (see the call sites) with no .catch, and English is always resident, so a
-  // failed fetch must fall back to English and keep booting rather than reject unhandled.
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
+  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
+  // painted above), so a stored non-en visitor never sees an English flash. This is now a
+  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
+  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
+  // to English and keep booting rather than reject unhandled.
   try {
-    await ensureLocaleLoaded(getLanguage());
+    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
@@ -1213,6 +1216,9 @@ async function startGame(
           case 'discord':
             toggleDiscordPanel();
             break;
+          case 'deeds':
+            hud.toggleDeeds();
+            break;
           case 'chat':
             openChat();
             break;
@@ -1268,6 +1274,7 @@ async function startGame(
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
+    onDeeds: () => hud.toggleDeeds(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
@@ -1364,6 +1371,9 @@ async function startGame(
         break;
       case 'discord':
         toggleDiscordPanel();
+        break;
+      case 'deeds':
+        hud.toggleDeeds();
         break;
       case 'chat':
         openChat();
@@ -1723,6 +1733,16 @@ async function startGame(
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
     refreshWocBalance: () => refreshWocBalanceOnDemand(),
+    // Deed-broadcast opt-out: online only (an offline character has no account
+    // row); the options row hides itself when this seam is absent.
+    ...(online
+      ? {
+          deedBroadcasts: {
+            get: () => api.deedBroadcasts(),
+            set: (enabled: boolean) => api.setDeedBroadcasts(enabled),
+          },
+        }
+      : {}),
     perfOverlay: {
       get: () => perfConfig.get(),
       patch: (p) => {
@@ -4825,9 +4845,9 @@ async function changeLanguage(
 ): Promise<boolean> {
   onStatus?.(t('settings.languageLoading'));
   try {
-    await ensureLocaleLoaded(selected);
+    await Promise.all([ensureLocaleLoaded(selected), ensureDeedLocalesLoaded(selected)]);
   } catch {
-    // The locale chunk failed to load. Keep the already-resident locale and tell the user.
+    // A locale chunk failed to load. Keep the already-resident locale and tell the user.
     onStatus?.(t('settings.languageLoadFailed'));
     return false;
   }
@@ -6691,12 +6711,17 @@ function wireStartScreens(): void {
     }
   };
   void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
+  // The deed locale chunk renders no homepage text, so it never gates the reveal; warm it in
+  // parallel so entering the world does not pay the fetch. The rejection is swallowed: the
+  // startGame await re-runs the load (in-flight cleared on reject) and owns the fallback.
+  void ensureDeedLocalesLoaded(bootLang).catch(() => {});
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
   wireHomepageMusicToggle();
   wireWallet();
   wireGithubLink();
+  wireSteamLink(api);
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -6733,6 +6758,7 @@ function wireStartScreens(): void {
     if (await completeDesktopBrowserLogin()) return;
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
+    void refreshSteamLinkStatus(api);
     // Mandatory recovery-email capture: block realm entry until a pre-email account
     // sets one (a fresh signup already has it, so this is a no-op there).
     await maybePromptRecoveryEmail();
@@ -6806,20 +6832,27 @@ function wireStartScreens(): void {
     handleKeyboardActivation(e as KeyboardEvent, handleOnlineSelect),
   );
 
-  offlineBtn.addEventListener('click', handleOfflineSelect);
-  offlineBtn.addEventListener('keydown', (e) =>
-    handleKeyboardActivation(e as KeyboardEvent, handleOfflineSelect),
-  );
+  // play.html is online-only: it ships no #btn-offline compat trigger, no
+  // #offline-select panel, and no realm dropdown, so every offline / dropdown
+  // hook below resolves defensively and skips wiring when the markup is absent.
+  if (offlineBtn) {
+    offlineBtn.addEventListener('click', handleOfflineSelect);
+    offlineBtn.addEventListener('keydown', (e) =>
+      handleKeyboardActivation(e as KeyboardEvent, handleOfflineSelect),
+    );
+  }
 
   // --- Play console: realm dropdown + single Play CTA -----------------------
   // The dropdown only chooses the destination (defaults to Online); the Play
   // button commits, routing to the same online/offline flows as the legacy cards.
+  // play.html has no dropdown: its Play button commits straight to online below.
   const serverSelect = $('#server-select');
-  const serverTrigger = $('#server-select-trigger') as HTMLButtonElement;
+  const serverTrigger = $('#server-select-trigger') as HTMLButtonElement | null;
   const serverMenu = $('#server-select-menu');
   const serverValue = $('#server-select-value');
   const serverSub = $('#server-select-sub');
-  const serverTriggerDot = serverTrigger.querySelector('.server-dot') as HTMLElement | null;
+  const serverTriggerDot = (serverTrigger?.querySelector('.server-dot') ??
+    null) as HTMLElement | null;
   const btnPlay = $('#btn-play') as HTMLButtonElement;
 
   if (serverSelect && serverTrigger && serverMenu && btnPlay) {
@@ -6946,16 +6979,24 @@ function wireStartScreens(): void {
     });
 
     applyServerMode('online');
+  } else if (btnPlay) {
+    // Online-only entry (play.html): no realm dropdown in the console, so the
+    // Play button commits straight to the online flow.
+    btnPlay.addEventListener('click', handleOnlineSelect);
   }
 
-  btnStartOffline.addEventListener('click', () => {
-    const selCard = document.querySelector('#offline-select .mini-class.sel') as HTMLElement | null;
-    if (selCard) {
-      handleOfflineStart(selCard.dataset.class as PlayerClass);
-    } else {
-      offlineError.textContent = t('errors.selectClass');
-    }
-  });
+  if (btnStartOffline) {
+    btnStartOffline.addEventListener('click', () => {
+      const selCard = document.querySelector(
+        '#offline-select .mini-class.sel',
+      ) as HTMLElement | null;
+      if (selCard) {
+        handleOfflineStart(selCard.dataset.class as PlayerClass);
+      } else {
+        offlineError.textContent = t('errors.selectClass');
+      }
+    });
+  }
 
   // offline class chips
   document.querySelectorAll('#offline-select .mini-class').forEach((card) => {
@@ -7066,7 +7107,7 @@ function wireStartScreens(): void {
     offlineNameInput.classList.remove('user-invalid-fallback');
     offlineNameInput.removeAttribute('aria-invalid');
   };
-  offlineBackBtn.addEventListener('click', handleOfflineBack);
+  if (offlineBackBtn) offlineBackBtn.addEventListener('click', handleOfflineBack);
 
   // login
   const doAuth = async (mode: 'login' | 'register') => {
@@ -7532,8 +7573,9 @@ function wireStartScreens(): void {
     }
   });
 
-  // Wire dynamic validation clearing on typing
-  [offlineNameInput, newCharNameInput].forEach((input) => {
+  // Wire dynamic validation clearing on typing. The offline name input only
+  // exists on the landing page (play.html is online-only), so skip a missing one.
+  [offlineNameInput, newCharNameInput].filter(Boolean).forEach((input) => {
     const errorEl = input.id === 'char-name' ? offlineError : charselectError;
     input.addEventListener('input', () => {
       errorEl.textContent = '';
@@ -7776,6 +7818,7 @@ function wireStartScreens(): void {
     enterLoggedInChrome();
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
+    void refreshSteamLinkStatus(api);
     // A Discord login usually captured the email already, but confirm and prompt
     // if it did not (e.g. the address was missing on the Discord account).
     void maybePromptRecoveryEmail().then(() => goToLoggedInPlay());
@@ -7969,6 +8012,7 @@ function wireStartScreens(): void {
     // unverified and disconnected (the bug that forced a re-sign on every reload).
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
+    void refreshSteamLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one.
@@ -8168,9 +8212,11 @@ function wireStartScreens(): void {
 
   // Initialize 3D character preview once assets are ready
   assetsReady().then(() => {
-    const activePanelId = ['#charselect-panel', '#offline-select'].find(
-      (id) => !$(id).hasAttribute('hidden'),
-    );
+    // Resolve each panel defensively: play.html (online-only) has no #offline-select.
+    const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
+      const panel = $(id) as HTMLElement | null;
+      return panel !== null && !panel.hasAttribute('hidden');
+    });
     const containerId =
       activePanelId === '#offline-select'
         ? '#offline-preview-container'

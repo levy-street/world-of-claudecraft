@@ -172,6 +172,24 @@ export const ERROR_CODES = deepFreeze({
   'discord.swag_tier': { params: [] },
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
+  'deeds.invalid_input': { params: [] },
+
+  // --- Steam link family codes (server/steam/). The whole surface is
+  // env-gated: with STEAM_ENABLED unset every route answers steam.disabled.
+  // Linking is cosmetic-mirror only; login with Steam does not exist. ---
+
+  // The Steam surface is not enabled on this server (feature-off 503).
+  'steam.disabled': { params: [] },
+  // The session ticket failed shape or upstream verification (400).
+  'steam.invalid_ticket': { params: [] },
+  // The ticket verified but the Steam account is VAC- or publisher-banned (403).
+  'steam.banned': { params: [] },
+  // This account already has a linked Steam account (409).
+  'steam.already_linked': { params: [] },
+  // That Steam account is linked to a different account (409).
+  'steam.account_taken': { params: [] },
+  // The Steam Web API could not be reached or answered garbage (503).
+  'steam.upstream': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

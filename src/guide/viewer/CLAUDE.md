@@ -1,8 +1,9 @@
 # src/guide/viewer/ : interactive 3D model viewer
 
 A self-contained turntable that loads ONE game model (a GLB) on demand and lets the
-reader drag to rotate it. Embedded on the class, bestiary, and warlock pages, and the
-full `/wiki/models` gallery.
+reader drag to rotate it. Embedded on the class detail pages (including the warlock pet
+section) and driving the full `/wiki/models` gallery; the bestiary uses static
+pre-rendered stills and links to the gallery.
 
 ## Why standalone (not the renderer's preview)
 The renderer's `src/render/characters` pipeline (`CharacterVisual`, `CharacterPreview`)
@@ -16,7 +17,7 @@ GLB, not the whole set.
 ## Data
 Model specs are baked by `scripts/wiki/build_content.mjs` from the renderer's `VisualDef`
 manifest into `GUIDE_MODELS` (`src/guide/content.generated.ts`), deduped by visual key.
-Each class/creature/pet carries a `model` (visual key) and optional `tint` (hex). Do not
+Each class/druid form/creature/pet carries a `model` (visual key) and optional `tint` (hex). Do not
 hand-edit the generated file; change the manifest or the generator and run `npm run
 wiki:content`.
 
@@ -35,6 +36,13 @@ from `embed.ts`/`mount.ts`/`index.ts` or a page. The only path to three is the d
 `import('./scene')` inside `mount.ts`. `index.ts` re-exports `ModelViewer` as a *type
 only*.
 
+**Module-first: where a new feature lands.** New behavior goes on the correct side of the
+split above: pure math (like `framing.ts`) is its own Node-testable module in the lazy
+chunk; markup/wiring goes in `embed.ts`/`mount.ts`; pages import only the `index.ts`
+barrel. Tests live in `tests/guide_viewer_*.test.ts` (embed, mount, framing,
+skin_bounds); fix viewer bugs test-first there (a failing test that reproduces the bug,
+then the smallest green change).
+
 ## Page contract
 - `render()`: emit `modelViewerEmbed({ modelKey, tint, name, poster, still, autoplay? })`. The
   pre-rendered `still` (a transparent WebP of this exact figure, baked by `npm run wiki:stills`)
@@ -43,6 +51,12 @@ only*.
   on its own (see Accessibility / performance for the gating).
 - `mount()`: call `wireModelViewers(root)` and return its cleanup. For the gallery, call
   `createViewer(stage, label)` and drive `load(spec, tint)` from the picker.
+- **Always return `mount()`'s cleanup and call it on navigate:** the viewer must hand the
+  WebGL context back (`forceContextLoss`) and dispose the renderer, its tint-material
+  clones, and the cloned skeletons' bone textures, including when `destroy()` races an
+  in-flight `load()` (destroy is idempotent; a late-resolving load disposes its own
+  build). Regression pins: `tests/guide_viewer_mount.test.ts` and
+  `tests/guide_viewer_skin_bounds.test.ts`.
 
 ## Accessibility / performance
 - Loads only on reader activation ("View in 3D"), with ONE scoped exception: an
@@ -50,7 +64,7 @@ only*.
   gated on WebGL support AND `prefers-reduced-motion: no-preference`. A one-shot
   IntersectionObserver in `mount.ts` keeps the GLB download deferred until the figure is on
   screen. No WebGL or reduced-motion -> the still poster + "View in 3D" button remain (the
-  graceful 2D fallback); no other embed (bestiary, warlock pets) autoplays.
+  graceful 2D fallback); no other embed (the warlock pet cards) autoplays.
 - Respects `prefers-reduced-motion` (no auto-spin, no autoplay); drag + arrow keys still work.
 - Pauses rendering while scrolled offscreen (IntersectionObserver).
 - No WebGL -> the embed stays on its 2D poster (`data-state="nowebgl"`).

@@ -158,6 +158,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    title: null,
   };
 }
 

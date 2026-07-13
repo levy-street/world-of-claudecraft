@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
+      "nextId": 408,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 409,
-      "state": "41f07ef7",
-      "events": "11fa1beb",
+      "nextId": 412,
+      "state": "ca5fe110",
+      "events": "40e930a1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,9 +41,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 409,
-      "state": "91863671",
-      "events": "90b217f1",
+      "nextId": 412,
+      "state": "e31fea8a",
+      "events": "b46d41a9",
       "rng": {
         "draws": 28,
         "digest": "35d4471d"
@@ -52,9 +52,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 409,
-      "state": "1cc9e26f",
-      "events": "d13b86f9",
+      "nextId": 412,
+      "state": "1f13cf14",
+      "events": "3a440865",
       "rng": {
         "draws": 138,
         "digest": "22786cdd"
@@ -63,9 +63,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 409,
-      "state": "90f28975",
-      "events": "669c1069",
+      "nextId": 412,
+      "state": "abadcf12",
+      "events": "8025fc6d",
       "rng": {
         "draws": 294,
         "digest": "5f2d9bca"
@@ -74,9 +74,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 409,
-      "state": "4a6b02d2",
-      "events": "21143105",
+      "nextId": 412,
+      "state": "239cbe11",
+      "events": "ea0dab16",
       "rng": {
         "draws": 300,
         "digest": "bf906891"
@@ -102,9 +102,20 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 50
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -157,9 +168,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -218,9 +239,18 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -273,9 +303,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_hatchet",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -326,7 +366,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 104.05,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -375,7 +415,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -426,7 +466,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 4950,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -477,7 +517,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 848,
-          "id": 408,
+          "id": 411,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -521,9 +561,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 409,
-      "state": "899526b6",
-      "events": "09d8010d",
+      "nextId": 412,
+      "state": "ca41cd0f",
+      "events": "988754a2",
       "rng": {
         "draws": 300,
         "digest": "bf906891"
@@ -549,9 +589,20 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 100
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -604,9 +655,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -665,9 +726,18 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -720,9 +790,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_hatchet",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -773,7 +853,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 104.05,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -822,7 +902,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -871,7 +951,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 4900,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -922,7 +1002,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 848,
-          "id": 408,
+          "id": 411,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -966,9 +1046,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 409,
-      "state": "a1161e44",
-      "events": "a5541b1d",
+      "nextId": 412,
+      "state": "42ab5a11",
+      "events": "85d9b432",
       "rng": {
         "draws": 300,
         "digest": "bf906891"
@@ -995,9 +1075,20 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 5000
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1050,9 +1141,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1112,9 +1213,18 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1167,9 +1277,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_hatchet",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1220,7 +1340,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 104.05,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1269,7 +1389,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 418,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1318,7 +1438,7 @@
           "dodgeChance": 0.1345,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1369,7 +1489,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 848,
-          "id": 408,
+          "id": 411,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1413,8 +1533,8 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 409,
-      "state": "ee0dc90e",
+      "nextId": 412,
+      "state": "308dbd19",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1424,8 +1544,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 409,
-      "state": "6f6257a6",
+      "nextId": 412,
+      "state": "35fa1f01",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1453,9 +1573,20 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 5000
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1508,9 +1639,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1570,9 +1711,18 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1625,9 +1775,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_hatchet",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -1679,7 +1839,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 106.1,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1728,7 +1888,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 106.1,
           "hp": 418,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1778,7 +1938,7 @@
           "dodgeChance": 0.1345,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1829,7 +1989,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
           "hp": 848,
-          "id": 408,
+          "id": 411,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

@@ -49,6 +49,11 @@ export interface PlayerCardData {
   /** Attack power, DPS, crit, dodge, etc. */
   combatStats: PlayerCardStat[];
   gear: PlayerCardGear[];
+  /** The selected Book of Deeds title as LOCALIZED DISPLAY TEXT (resolved at
+   *  the build site via deedTitleText, never a deed id). Absent or '' for an
+   *  untitled player: the card then draws byte-identical to the pre-title
+   *  layout (cardTitleLayout returns null and nothing extra is drawn). */
+  titleText?: string;
   /** Realm percentile by lifetime XP (e.g. 3 = top 3%), or null to hide it. */
   topPercent: number | null;
   /** Verified linked wallet's $WOC balance (null when unlinked). Drives the badge. */
@@ -176,11 +181,37 @@ function fillTextClamped(
 const TITLE_FONT = 'Cinzel, Georgia, serif';
 const BODY_FONT = '"Alegreya Sans", "Segoe UI", system-ui, sans-serif';
 
+// The header text column: every header line (name, subtitle, realm, title)
+// starts here, clamped left of the right-edge column that keeps text clear of
+// the top-right brand mark. Shared by drawHeader and cardTitleLayout so the
+// title line can never drift from the header origin.
+const HEADER_X = 478;
+const HEADER_RIGHT_EDGE = 1018;
+
 // The full brand lockup (C-shield emblem + "WORLD OF CLAUDECRAFT" wordmark),
 // served from /public. Same-origin, so drawing it does not taint the canvas.
 // Loaded best-effort: if it's missing the footer falls back to a text wordmark
 // rather than failing the whole card.
 const LOGO_URL = '/woc-logo-hero.webp';
+
+/** Where the title line sits on the header, or null when nothing may draw.
+ *  Pure (no canvas): the caller passes the measured realm-line width so the
+ *  title starts past it on the same y=158 baseline, clamped left of the
+ *  RIGHT_EDGE (1018) column every header line respects. Null for an absent /
+ *  empty / whitespace titleText, and for a residual box too narrow to read,
+ *  which is what keeps an untitled card byte-identical (the one draw call is
+ *  guarded on this returning non-null). */
+export function cardTitleLayout(
+  titleText: string | undefined,
+  realmLineWidth: number,
+): { text: string; x: number; y: number; maxW: number } | null {
+  const text = (titleText ?? '').trim();
+  if (!text) return null;
+  const x = HEADER_X + Math.ceil(realmLineWidth) + 16;
+  const maxW = HEADER_RIGHT_EDGE - x;
+  if (maxW < 40) return null; // an extreme realm line: skip rather than clip to noise
+  return { text, x, y: 158, maxW };
+}
 
 /** Format a realm percentile as a card chip label. */
 function formatTopPercent(pct: number): string {
@@ -285,7 +316,7 @@ function drawHeader(
   pctBadge: HTMLImageElement | null,
   pctTier: PercentileTier | null,
 ): void {
-  const x = 478;
+  const x = HEADER_X;
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 8;
@@ -304,7 +335,7 @@ function drawHeader(
   // percentile keeps a plain gold chip. Measure it first so we can reserve room and
   // clamp the subtitle — otherwise a wordy localized "Level N Class" could push the
   // medal + chip off the right edge.
-  const RIGHT_EDGE = 1018; // keep the flex left of the brand mark (matches the name's clamp)
+  const RIGHT_EDGE = HEADER_RIGHT_EDGE; // keep the flex left of the brand mark (matches the name's clamp)
   const padX = 12;
   const chipY = 109;
   const chipH = 26;
@@ -345,13 +376,22 @@ function drawHeader(
 
   ctx.fillStyle = COL.muted;
   ctx.font = `400 19px ${BODY_FONT}`;
-  ctx.fillText(
-    data.realm
-      ? t('playerCard.realmSubtitle', { realm: data.realm })
-      : t('playerCard.defaultRealm'),
-    x,
-    158,
-  );
+  const realmLine = data.realm
+    ? t('playerCard.realmSubtitle', { realm: data.realm })
+    : t('playerCard.defaultRealm');
+  ctx.fillText(realmLine, x, 158);
+
+  // The selected Book of Deeds title, a small gold read beside the realm line.
+  // The header stack under the name is fully allocated (subtitle + flex chip
+  // y109-135, realm y158, dev badge band y168-190, stats panel y196), so the
+  // title shares the realm baseline instead of claiming a new line: an
+  // untitled card draws NOTHING here and stays byte-identical.
+  const titleLine = cardTitleLayout(data.titleText, ctx.measureText(realmLine).width);
+  if (titleLine) {
+    ctx.fillStyle = COL.goldDim;
+    ctx.font = `600 19px ${BODY_FONT}`;
+    fillTextClamped(ctx, titleLine.text, titleLine.x, titleLine.y, titleLine.maxW);
+  }
 }
 
 function drawBadge(

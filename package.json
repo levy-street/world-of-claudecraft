@@ -58,6 +58,7 @@
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
+    "assets:deeds": "node scripts/convert_deed_icons_webp.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
@@ -140,6 +141,9 @@
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "4.1.8"
+  },
+  "optionalDependencies": {
+    "steamworks.js": "^0.4.0"
   },
   "build": {
     "appId": "com.worldofclaudecraft.desktop",

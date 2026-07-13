@@ -248,6 +248,8 @@ export function rollLoot(
 function grantLootCopper(ctx: SimContext, meta: PlayerMeta, amount: number): void {
   meta.copper += amount;
   meta.counters.lootCopper += amount;
+  // The persisted lifetime twin of the session counter above.
+  ctx.bumpDeedStat(meta, 'lootCopper', amount);
   ctx.emit({ type: 'loot', text: `You loot ${formatMoney(amount)}.`, pid: meta.entityId });
 }
 

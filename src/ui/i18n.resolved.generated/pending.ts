@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -21,6 +22,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -31,6 +33,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -41,6 +44,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -52,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -62,6 +67,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -76,6 +82,7 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -87,6 +94,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -97,6 +105,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -107,6 +116,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -117,6 +127,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -127,6 +138,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -137,6 +149,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -147,6 +160,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",
@@ -157,6 +171,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "hudChrome.corpseHarvest.harvestButtonTooltip",
+    "hudChrome.deeds.openBookHint",
     "hudChrome.loot.takeAllTooltip",
     "hudChrome.tutorial.nextTipMap",
     "hudChrome.tutorial.nextTipQuestLog",

@@ -25,16 +25,16 @@ export const ZONE3_ZONE: ZoneDef = {
   graveyard: { x: 15, z: 645 },
   lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
-    { x: 0, z: 660, label: 'Highwatch' },
-    { x: -50, z: 590, label: 'Stalker Ridge' },
-    { x: 85, z: 615, label: 'Deeprock Burrows' },
-    { x: -90, z: 700, label: 'Ogre Foothills' },
-    { x: -130, z: 740, label: "Drogmar's War-Camp" },
-    { x: 110, z: 760, label: 'Stormcrag' },
-    { x: -70, z: 770, label: 'The Glimmermere' },
-    { x: 55, z: 820, label: 'Wyrmcult Tents' },
-    { x: -40, z: 830, label: 'Revenant Fields' },
-    { x: 0, z: 880, label: 'Gravewyrm Sanctum' },
+    { x: 0, z: 660, label: 'Highwatch', id: 'highwatch' },
+    { x: -50, z: 590, label: 'Stalker Ridge', id: 'stalker_ridge' },
+    { x: 85, z: 615, label: 'Deeprock Burrows', id: 'deeprock_burrows' },
+    { x: -90, z: 700, label: 'Ogre Foothills', id: 'ogre_foothills' },
+    { x: -130, z: 740, label: "Drogmar's War-Camp", id: 'drogmars_war_camp' },
+    { x: 110, z: 760, label: 'Stormcrag', id: 'stormcrag' },
+    { x: -70, z: 770, label: 'The Glimmermere', id: 'the_glimmermere' },
+    { x: 55, z: 820, label: 'Wyrmcult Tents', id: 'wyrmcult_tents' },
+    { x: -40, z: 830, label: 'Revenant Fields', id: 'revenant_fields' },
+    { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch — barely.',
 };
@@ -1091,6 +1091,16 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'cragwalker_boots',
       'windguard_leggings',
       'simple_fishing_pole',
+      // Tier 4/5 hub-recipe reagents (items.ts): Bree is the trade-goods
+      // vendor inside the crafting hub radius, so every requiresHubStation
+      // recipe has a live reagent source (prog_tools_of_the_trade needs at
+      // least one hub craft to be possible).
+      'thorium_ore',
+      'arcanite_bar',
+      'ashwood_log',
+      'elderwood_log',
+      'goldleaf_herb',
+      'sunpetal_herb',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
@@ -1154,6 +1164,22 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: [],
     banker: true,
     greeting: 'Every crate, coffer, and trinket is safe with the Gilded Strongbox.',
+  },
+  chronicler_edda_hartwell: {
+    // Display name renamed to Zenzie (maintainer call). The template id is
+    // retained for save compatibility: player saves persist it as the
+    // npc:chronicler_edda_hartwell visited mark, and it is the locale key stem.
+    id: 'chronicler_edda_hartwell',
+    name: 'Chronicler Zenzie',
+    title: 'The Peaks Chronicle',
+    // On the south road shoulder below the square, facing south over the road
+    // up from Fenbridge (clear of the house footprint at {8,650}; nearest
+    // authored neighbor ~15 units, she had been wedged into the gate cluster).
+    pos: { x: 2, z: 643 },
+    facing: 3.1,
+    color: 0x5a6fd6, // cool indigo: the chronicler tint is her identity (shared mage visual)
+    questIds: [],
+    greeting: 'The mountain forgets nothing, $N, and neither do I. Let us see what you have done.',
   },
 };
 

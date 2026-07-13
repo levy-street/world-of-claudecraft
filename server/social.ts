@@ -35,6 +35,9 @@ export interface CharInfo extends CharRef {
 }
 
 export interface FriendEntry extends CharInfo {
+  // The selected Book of Deeds title: a deed id (never display text; the
+  // client localizes through deed_i18n), null when untitled.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
@@ -47,6 +50,8 @@ export interface GuildMemberEntry extends CharInfo {
   // ISO-8601 timestamp of the member's most recent world-entry, or null if never
   // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
   lastLogin: string | null;
+  // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
@@ -87,7 +92,9 @@ export interface SocialDb {
   // friends (one-directional, classic style: no acceptance needed)
   addFriend(charId: number, friendId: number): Promise<void>;
   removeFriend(charId: number, friendId: number): Promise<void>;
-  listFriends(charId: number): Promise<CharInfo[]>;
+  // activeTitle is the friend's selected Book of Deeds title (a deed id the
+  // client localizes, never English; the charactersForDeedsBoard read shape).
+  listFriends(charId: number): Promise<(CharInfo & { activeTitle: string | null })[]>;
   whoFriended(charId: number): Promise<number[]>; // reverse lookup
   // blocks (one-directional ignore)
   addBlock(charId: number, blockedId: number): Promise<void>;
@@ -116,7 +123,9 @@ export interface SocialDb {
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
   guildMembers(
     guildId: number,
-  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]>;
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  >;
   // guild calendar events (the event calendar's guild lane)
   guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
   guildEventCount(guildId: number, fromDay: string): Promise<number>;
@@ -135,6 +144,11 @@ export interface SocialDb {
 export interface SocialActor {
   characterId: number;
   name: string;
+  // The actor's selected Book of Deeds title (a deed id, never display text),
+  // read from the LIVE sim meta by the caller (game.ts actorFor). Absent when
+  // the actor has no live meta or no title: an untitled relay line beats a
+  // stale db read. SocialService itself stays sim-ignorant.
+  activeTitle?: string | null;
 }
 
 // Presence + delivery, provided by game.ts. Keeps this module ignorant of
@@ -152,6 +166,11 @@ export interface SocialTransport {
   pushSnapshot(characterId: number): void;
   // a character's block set changed; refresh the in-memory chat filter
   onBlocksChanged(characterId: number, blockedIds: number[]): void;
+  // the character just FOUNDED a guild (create committed, never a join or a
+  // refused create): the transport owner credits the founder's deed stat
+  // (guildsFounded is the one server-produced DeedStatKey; see its doc in
+  // src/sim/types.ts)
+  onGuildFounded(characterId: number): void;
   // true if `recipientId` has `senderCharacterId` on their ignore list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isIgnoring(recipientId: number, senderCharacterId: number): boolean;
@@ -160,11 +179,18 @@ export interface SocialTransport {
 export type SocialEvent =
   | { type: 'log'; text: string; color?: string }
   | { type: 'error'; text: string }
-  | { type: 'chat'; from: string; text: string; channel: 'guild' | 'officer' }
+  // fromTitle mirrors the sim chat event's optional field (a deed id the
+  // client localizes through deed_i18n, never display text); omitted for an
+  // untitled sender.
+  | { type: 'chat'; from: string; fromTitle?: string; text: string; channel: 'guild' | 'officer' }
   | { type: 'guildInvite'; fromName: string; guildName: string }
   // Structured guild-calendar outcome; the client renders the visible line
   // from the code (the sim's mailResult convention, so no server English here).
-  | { type: 'calendarResult'; code: CalendarResultCode };
+  | { type: 'calendarResult'; code: CalendarResultCode }
+  // A guildmate's or followed friend's marquee deed unlock. Carries the deed
+  // ID only, never English (the client composes the line from deed_i18n plus
+  // its own chrome key, the calendarResult convention).
+  | { type: 'deedBroadcast'; characterName: string; deedId: string };
 
 export type CalendarResultCode =
   | 'created'
@@ -460,6 +486,10 @@ export class SocialService {
       );
       return;
     }
+    // Founder credit rides the transport seam: soc_guild_founded reads the
+    // guildsFounded deed stat, which only this success arm may ever produce
+    // (a refused create above must never reach it).
+    this.tx.onGuildFounded(actor.characterId);
     this.info(
       actor.characterId,
       `You found the guild <${name}>! You are its Guild Master.`,
@@ -740,7 +770,13 @@ export class SocialService {
       this.err(actor.characterId, 'You are not in a guild.');
       return false;
     }
-    const event: SocialEvent = { type: 'chat', from: actor.name, text, channel: 'guild' };
+    const event: SocialEvent = {
+      type: 'chat',
+      from: actor.name,
+      ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      text,
+      channel: 'guild',
+    };
     const members = await this.db.guildMembers(membership.guildId);
     for (const m of members) {
       if (!this.tx.isOnline(m.id)) continue;
@@ -750,6 +786,37 @@ export class SocialService {
       this.tx.deliver(m.id, [event]);
     }
     return true;
+  }
+
+  // Fan one marquee deed unlock out to the earner's online guildmates and the
+  // players who friended the earner (friends are one-directional: whoever put
+  // the earner on THEIR list chose to follow them, the position-push rule).
+  // Pure delivery: the caller (game.ts) has already applied the marquee bar,
+  // the retro gate, and the earner's opt-out; this resolves the audience and
+  // filters it BIDIRECTIONALLY: each recipient's ignore list is honoured like
+  // guild chat, and the earner's own block list also excludes a recipient
+  // (blockAdd only unfriends the earner's edge, so a blocked follower would
+  // otherwise stay in whoFriended and keep hearing these). The earner never
+  // receives it (their own toast is client-side from the sim event).
+  async broadcastDeedUnlock(actor: SocialActor, deedId: string): Promise<void> {
+    const event: SocialEvent = { type: 'deedBroadcast', characterName: actor.name, deedId };
+    const [membership, followerIds, earnerBlockedIds] = await Promise.all([
+      this.db.guildMembership(actor.characterId),
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const earnerBlocked = new Set(earnerBlockedIds);
+    const audience = new Set<number>(followerIds);
+    if (membership) {
+      for (const m of await this.db.guildMembers(membership.guildId)) audience.add(m.id);
+    }
+    for (const id of audience) {
+      if (id === actor.characterId) continue;
+      if (!this.tx.isOnline(id)) continue;
+      if (this.tx.isIgnoring(id, actor.characterId)) continue;
+      if (earnerBlocked.has(id)) continue;
+      this.tx.deliver(id, [event]);
+    }
   }
 
   // Officer chat (/o): officers + Guild Master only, delivered to the same.
@@ -772,7 +839,15 @@ export class SocialService {
       if ((m.rank === 'officer' || m.rank === 'leader') && this.tx.isOnline(m.id)) {
         // honour the recipient's ignore list, just like guild/say/whisper
         if (m.id !== actor.characterId && this.tx.isIgnoring(m.id, actor.characterId)) continue;
-        this.tx.deliver(m.id, [{ type: 'chat', from: actor.name, text, channel: 'officer' }]);
+        this.tx.deliver(m.id, [
+          {
+            type: 'chat',
+            from: actor.name,
+            ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+            text,
+            channel: 'officer',
+          },
+        ]);
       }
     }
     return true;

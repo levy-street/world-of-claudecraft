@@ -313,6 +313,7 @@
 
     <div id="right-tracker-stack">
       <div id="quest-tracker"></div>
+      <div id="deed-tracker"></div>
       <div id="delve-tracker"></div>
     </div>
 
@@ -403,6 +404,7 @@
     <div id="market-window" class="window panel"></div>
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
+    <div id="deeds-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
@@ -417,6 +419,7 @@
       <button type="button" class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
       <button type="button" class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
       <button type="button" class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
+      <button type="button" class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
       <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button type="button" class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
@@ -969,6 +972,23 @@
                   <div class="cs-wallet-help" id="github-help" data-i18n="hudChrome.devBadge.link.benefits">Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.</div>
                 </div>
               </div>
+              <div class="cs-wallet cs-steam-group" id="cs-steam-group" hidden>
+                <span class="cs-wallet-label" data-i18n="hudChrome.steam.title">Steam</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-steam-link" data-i18n-title="hudChrome.steam.link" data-i18n-aria="hudChrome.steam.link" title="Link Steam" aria-label="Link Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16.5" cy="8" r="3.5"></circle><circle cx="7" cy="17" r="2.5"></circle><path d="M9.2 15.3 13.6 10.6"></path></svg>
+                      <span id="steam-label" data-i18n="hudChrome.steam.link">Link Steam</span>
+                    </button>
+                    <span class="wallet-status" id="steam-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-steam-unlink" data-i18n-title="hudChrome.steam.unlink" data-i18n-aria="hudChrome.steam.unlink" title="Unlink Steam" aria-label="Unlink Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="hudChrome.steam.unlink">Unlink Steam</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="steam-help" data-i18n="hudChrome.steam.benefits">Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.</div>
+                </div>
+              </div>
             </div>
           </header>
           <div class="cs-body">
@@ -1446,6 +1466,7 @@
           <button type="button" class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
           <button type="button" class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
           <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
+          <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
           <button type="button" class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
           <button type="button" class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>

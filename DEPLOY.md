@@ -1,4 +1,4 @@
-# Deploying World of Claudecraft on AWS
+# Deploying World of ClaudeCraft on AWS
 
 > **Levy Street production** is deployed via Ansible, not this document:
 > the `eastbrook_game` role in the internal `ansible-scripts` repo runs
@@ -8,7 +8,7 @@
 > pulls and redeploys. The guide below is the generic, standalone path.
 
 One EC2 instance runs everything: the game server, Postgres, MediaWiki, and Caddy
-(TLS reverse proxy). Sized for a small population — a `t4g.small`
+(TLS reverse proxy). Sized for a small population, a `t4g.small`
 (~$14/month all-in) is comfortable for a handful of concurrent players.
 
 ## 1. Confirm the repo is public
@@ -28,10 +28,10 @@ In the EC2 console:
 | AMI | Ubuntu Server 24.04 LTS (**arm64**) |
 | Instance type | `t4g.small` (2 vCPU Graviton, 2 GB) |
 | Storage | 20 GB gp3 |
-| Security group | Inbound: **22** (your IP only), **80**, **443** — nothing else |
+| Security group | Inbound: **22** (your IP only), **80**, **443**, nothing else |
 | User data | Paste `deploy/user-data.sh` with `DOMAIN` filled in |
 
-Leave `DOMAIN=""` if you want to test by IP first over plain HTTP —
+Leave `DOMAIN=""` if you want to test by IP first over plain HTTP,
 you can set the domain later (step 4).
 
 Allocate an **Elastic IP** and associate it with the instance so the
@@ -50,7 +50,7 @@ ssh ubuntu@<elastic-ip> sudo tail -f /var/log/eastbrook-setup.log
 ## 3. Point DNS at it
 
 Create an **A record** for your domain (e.g. `play.example.com`) pointing
-at the Elastic IP. In Route 53: Hosted zone → Create record → A →
+at the Elastic IP. In Route 53: Hosted zone, Create record, type A,
 the Elastic IP.
 
 ## 4. Turn on TLS (if you started without a domain)
@@ -144,7 +144,7 @@ For off-box safety, sync the directory to S3 occasionally:
   are blocked server-side and escalate from a warning to account-wide timed mutes
   (durations editable in the same tab). `CHAT_CENSOR_LIST` / `CHAT_CENSOR_FILE`
   are still read **once**, on the first boot of a fresh database, to seed the soft
-  list — after that they are ignored and the dashboard is authoritative.
+  list; after that they are ignored and the dashboard is authoritative.
 - **Realms (horizontal scaling)**: each server process serves one realm,
   set by `REALM_NAME` (default `Claudemoon`). To add a realm, run another
   process against the **same** `DATABASE_URL` with a different `REALM_NAME`
@@ -179,6 +179,15 @@ For off-box safety, sync the directory to S3 occasionally:
   the canonical token mint and should only be overridden if that mint changes.
   Set `PUBLIC_ORIGIN` in single-realm production so shared player-card pages
   emit stable absolute Open Graph URLs.
+- **Steam link + achievement mirror**: players can link a Steam account so
+  their Book of Deeds achievements mirror to Steam (`server/steam/`). It is
+  **off until configured**: with `STEAM_ENABLED` unset, every `/api/steam`
+  route answers `steam.disabled`, the mirror is inert, and no client renders
+  link UI. To enable, set `STEAM_ENABLED=1` plus the Steamworks `STEAM_APP_ID`
+  and a publisher Web API key in `STEAM_WEB_API_KEY` (partner.steam-api.com)
+  in the server runtime env. The key is a secret: it must never appear in
+  logs or client code. Linking is a cosmetic mirror for deed achievements
+  only; login with Steam does not exist.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
@@ -189,7 +198,7 @@ For off-box safety, sync the directory to S3 occasionally:
   so the same rule applies to deploys that run `docker compose build`: the private
   checkout must exist before the image is built. That directory is not part of the
   public checkout. At build time, confirm which implementation was picked:
-  `[build:server] bot detector: stub (no-op)` vs `… bot detector: private`.
+  `[build:server] bot detector: stub (no-op)` vs `... bot detector: private`.
 - **Anti-bot runtime knobs**: `MAX_WS_PER_IP_HARD` (default `20`) caps simultaneous
   WebSocket connections per source IP; extra connections are refused at the
   handshake. `ANTIBOT_ENFORCE=1` lets the detector act on its findings (e.g. kick);
@@ -218,7 +227,7 @@ For off-box safety, sync the directory to S3 occasionally:
   line to take the default, or set an explicit value (`CHAT_LOG_RETENTION_DAYS=0`
   is still keep-forever).
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
-- If the instance ever feels tight, stop → change instance type →
+- If the instance ever feels tight, stop, change instance type,
   start. Everything lives in Docker plus one EBS volume, so nothing
   else changes.
 
@@ -275,7 +284,7 @@ server health) is served by the same game server process:
   `npm run dev`).
 
 Access requires signing in with a game account that has the `is_admin`
-flag. The hostname only selects which HTML shell is served — every
+flag. The hostname only selects which HTML shell is served; every
 `/admin/api/*` call is checked against the account flag.
 
 Grant the first admin:

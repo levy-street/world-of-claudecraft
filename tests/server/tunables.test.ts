@@ -22,6 +22,7 @@ import {
   PUBLIC_READ_POLICY,
   type RateLimitPolicy,
   REPORTS_CREATE_POLICY,
+  STEAM_LINK_POLICY,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
 } from '../../server/http/middleware/rate_limit';
@@ -47,6 +48,7 @@ import {
   MAP_MUTATION_MAX_PER_MINUTE,
   PUBLIC_READ_MAX_PER_MINUTE,
   REPORTS_CREATE_MAX_PER_MINUTE,
+  STEAM_LINK_MAX_PER_MINUTE,
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
@@ -136,6 +138,12 @@ describe('rate-limit POLICIES derive from the limiter constants and hold their v
       name: 'wallet_link',
       source: WALLET_LINK_MAX_PER_MINUTE,
       limit: 10,
+    },
+    {
+      policy: STEAM_LINK_POLICY,
+      name: 'steam_link',
+      source: STEAM_LINK_MAX_PER_MINUTE,
+      limit: 5,
     },
     {
       policy: CHARACTER_CREATE_POLICY,

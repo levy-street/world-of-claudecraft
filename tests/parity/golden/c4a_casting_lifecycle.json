@@ -21,7 +21,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
+      "nextId": 408,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -35,9 +35,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 409,
-      "state": "f366c44e",
-      "events": "cecb02cc",
+      "nextId": 412,
+      "state": "aba3c601",
+      "events": "95cc9f36",
       "rng": {
         "draws": 2,
         "digest": "a0fe8174"
@@ -63,9 +63,33 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -86,6 +110,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -109,9 +134,33 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -132,6 +181,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -155,9 +205,33 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -178,6 +252,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -190,7 +265,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2.95,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3,
           "castingAbility": "fireball",
           "comboUntil": -1,
@@ -202,7 +277,7 @@
           "fiveSecondRule": 99.05,
           "gcdRemaining": 1.45,
           "hp": 19960,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -235,7 +310,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -254,7 +329,7 @@
           "fallStartY": -0.348038,
           "fiveSecondRule": 99.05,
           "hp": 20000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -303,7 +378,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 99.05,
           "hp": 20000,
-          "id": 407,
+          "id": 410,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -343,7 +418,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -354,7 +429,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -385,7 +460,7 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               1
             ]
           ],
@@ -406,9 +481,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 409,
-      "state": "ae821dcd",
-      "events": "a54f5dee",
+      "nextId": 412,
+      "state": "5146572c",
+      "events": "a8f3aac3",
       "rng": {
         "draws": 5,
         "digest": "fafaf5ab"
@@ -417,8 +492,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 409,
-      "state": "c57df9bd",
+      "nextId": 412,
+      "state": "15992c74",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -428,8 +503,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 409,
-      "state": "ccd510ce",
+      "nextId": 412,
+      "state": "0b7c7baf",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -439,9 +514,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 409,
-      "state": "510c51e4",
-      "events": "a8084a91",
+      "nextId": 412,
+      "state": "699a9a76",
+      "events": "b5f3a54d",
       "rng": {
         "draws": 5,
         "digest": "fafaf5ab"
@@ -450,8 +525,8 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 409,
-      "state": "e0bdb802",
+      "nextId": 412,
+      "state": "14ac3b64",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -461,8 +536,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 409,
-      "state": "a6f723d3",
+      "nextId": 412,
+      "state": "ef5579b9",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -472,8 +547,8 @@
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 409,
-      "state": "3d246155",
+      "nextId": 412,
+      "state": "28584b2f",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -483,8 +558,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 409,
-      "state": "a170df8a",
+      "nextId": 412,
+      "state": "bc249ac0",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -494,9 +569,9 @@
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 409,
-      "state": "40f96f2f",
-      "events": "c186acdc",
+      "nextId": 412,
+      "state": "0fd1f44d",
+      "events": "530a3ce1",
       "rng": {
         "draws": 26,
         "digest": "94eddb8f"
@@ -505,8 +580,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 409,
-      "state": "fc5eda5f",
+      "nextId": 412,
+      "state": "91933711",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -516,8 +591,8 @@
     {
       "tick": 55,
       "time": 2.75,
-      "nextId": 409,
-      "state": "9b780308",
+      "nextId": 412,
+      "state": "0915459e",
       "events": "741638a5",
       "rng": {
         "draws": 68,
@@ -527,8 +602,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 409,
-      "state": "6e43da6d",
+      "nextId": 412,
+      "state": "4953f8b3",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -538,8 +613,8 @@
     {
       "tick": 65,
       "time": 3.25,
-      "nextId": 409,
-      "state": "b831e52c",
+      "nextId": 412,
+      "state": "a3c45fd6",
       "events": "741638a5",
       "rng": {
         "draws": 104,
@@ -549,8 +624,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 409,
-      "state": "536b7fca",
+      "nextId": 412,
+      "state": "a57166b4",
       "events": "741638a5",
       "rng": {
         "draws": 128,
@@ -560,8 +635,8 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 409,
-      "state": "3a721d93",
+      "nextId": 412,
+      "state": "b4fc8095",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -571,9 +646,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 409,
-      "state": "b9388b64",
-      "events": "b3301486",
+      "nextId": 412,
+      "state": "b0e1c53c",
+      "events": "f60a06e4",
       "rng": {
         "draws": 162,
         "digest": "310e2512"
@@ -582,9 +657,9 @@
     {
       "tick": 85,
       "time": 4.25,
-      "nextId": 409,
-      "state": "bf0ccb98",
-      "events": "1f242d33",
+      "nextId": 412,
+      "state": "893194c8",
+      "events": "65392795",
       "rng": {
         "draws": 202,
         "digest": "8297c5da"
@@ -593,8 +668,8 @@
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 409,
-      "state": "7ad6a7a4",
+      "nextId": 412,
+      "state": "98872c7a",
       "events": "741638a5",
       "rng": {
         "draws": 227,
@@ -604,8 +679,8 @@
     {
       "tick": 95,
       "time": 4.75,
-      "nextId": 409,
-      "state": "c497acbe",
+      "nextId": 412,
+      "state": "a9ab07ae",
       "events": "741638a5",
       "rng": {
         "draws": 266,
@@ -615,8 +690,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 409,
-      "state": "6ef09f87",
+      "nextId": 412,
+      "state": "4194912d",
       "events": "741638a5",
       "rng": {
         "draws": 288,
@@ -626,8 +701,8 @@
     {
       "tick": 105,
       "time": 5.25,
-      "nextId": 409,
-      "state": "9a128006",
+      "nextId": 412,
+      "state": "2606cc5e",
       "events": "741638a5",
       "rng": {
         "draws": 302,
@@ -637,8 +712,8 @@
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 409,
-      "state": "d734906c",
+      "nextId": 412,
+      "state": "1ecefcde",
       "events": "741638a5",
       "rng": {
         "draws": 323,
@@ -648,8 +723,8 @@
     {
       "tick": 115,
       "time": 5.75,
-      "nextId": 409,
-      "state": "92da4474",
+      "nextId": 412,
+      "state": "bae66024",
       "events": "741638a5",
       "rng": {
         "draws": 363,
@@ -659,8 +734,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 409,
-      "state": "cfe76961",
+      "nextId": 412,
+      "state": "1a99e22f",
       "events": "741638a5",
       "rng": {
         "draws": 384,
@@ -670,9 +745,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 409,
-      "state": "0bd0578b",
-      "events": "7e7ce1de",
+      "nextId": 412,
+      "state": "c0db0037",
+      "events": "dd2fd5a4",
       "rng": {
         "draws": 429,
         "digest": "2fe488d5"
@@ -681,8 +756,8 @@
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 409,
-      "state": "cdc5c453",
+      "nextId": 412,
+      "state": "d75be509",
       "events": "741638a5",
       "rng": {
         "draws": 461,
@@ -692,8 +767,8 @@
     {
       "tick": 135,
       "time": 6.75,
-      "nextId": 409,
-      "state": "16c9b904",
+      "nextId": 412,
+      "state": "e2598e1c",
       "events": "741638a5",
       "rng": {
         "draws": 499,
@@ -703,8 +778,8 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 409,
-      "state": "47f0be39",
+      "nextId": 412,
+      "state": "4b7ed793",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -714,8 +789,8 @@
     {
       "tick": 145,
       "time": 7.25,
-      "nextId": 409,
-      "state": "f2863163",
+      "nextId": 412,
+      "state": "a4ea6967",
       "events": "741638a5",
       "rng": {
         "draws": 552,
@@ -725,8 +800,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 409,
-      "state": "cf3e909b",
+      "nextId": 412,
+      "state": "524fec29",
       "events": "741638a5",
       "rng": {
         "draws": 585,
@@ -736,8 +811,8 @@
     {
       "tick": 155,
       "time": 7.75,
-      "nextId": 409,
-      "state": "616bbb57",
+      "nextId": 412,
+      "state": "76d578eb",
       "events": "741638a5",
       "rng": {
         "draws": 618,
@@ -747,8 +822,8 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 409,
-      "state": "7afa762c",
+      "nextId": 412,
+      "state": "6c9ac906",
       "events": "741638a5",
       "rng": {
         "draws": 634,
@@ -758,9 +833,9 @@
     {
       "tick": 165,
       "time": 8.25,
-      "nextId": 409,
-      "state": "c11dbd62",
-      "events": "9d3263fd",
+      "nextId": 412,
+      "state": "72caee38",
+      "events": "a6371e40",
       "rng": {
         "draws": 667,
         "digest": "49c21e71"
@@ -769,8 +844,8 @@
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 409,
-      "state": "8443d11c",
+      "nextId": 412,
+      "state": "1928e050",
       "events": "741638a5",
       "rng": {
         "draws": 697,
@@ -780,8 +855,8 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 409,
-      "state": "a8eff8d4",
+      "nextId": 412,
+      "state": "f8567bd2",
       "events": "741638a5",
       "rng": {
         "draws": 734,
@@ -791,8 +866,8 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 409,
-      "state": "3cd4d1f7",
+      "nextId": 412,
+      "state": "682ba62f",
       "events": "741638a5",
       "rng": {
         "draws": 767,
@@ -802,8 +877,8 @@
     {
       "tick": 184,
       "time": 9.2,
-      "nextId": 409,
-      "state": "82fb5f37",
+      "nextId": 412,
+      "state": "84d94315",
       "events": "741638a5",
       "rng": {
         "draws": 783,
@@ -831,9 +906,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 67
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -854,6 +958,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -877,9 +982,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -900,6 +1032,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -923,9 +1056,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -946,6 +1106,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -958,7 +1119,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 0.35,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3.5,
           "castingAbility": "fireball",
           "combatTimer": 1.1,
@@ -970,7 +1131,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 5.25,
           "hp": 19894,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -1004,7 +1165,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -1023,7 +1184,7 @@
           "fallStartY": -0.348038,
           "fiveSecondRule": 108.2,
           "hp": 20000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1072,7 +1233,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 108.2,
           "hp": 20000,
-          "id": 407,
+          "id": 410,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1112,7 +1273,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "auras": [
             {
@@ -1122,7 +1283,7 @@
               "name": "Cinderbolt",
               "remaining": 0.9,
               "school": "fire",
-              "sourceId": 405,
+              "sourceId": 408,
               "tickInterval": 2,
               "tickTimer": 0.9,
               "value": 2
@@ -1138,7 +1299,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199933,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1167,11 +1328,11 @@
             "armor": 70
           },
           "swingTimer": 0.9,
-          "tappedById": 405,
+          "tappedById": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               68
             ]
           ],
@@ -1192,8 +1353,8 @@
     {
       "tick": 185,
       "time": 9.25,
-      "nextId": 409,
-      "state": "37550c5c",
+      "nextId": 412,
+      "state": "64d28218",
       "events": "741638a5",
       "rng": {
         "draws": 792,
@@ -1203,8 +1364,8 @@
     {
       "tick": 190,
       "time": 9.5,
-      "nextId": 409,
-      "state": "655414f4",
+      "nextId": 412,
+      "state": "924f3702",
       "events": "741638a5",
       "rng": {
         "draws": 829,
@@ -1214,9 +1375,9 @@
     {
       "tick": 195,
       "time": 9.75,
-      "nextId": 409,
-      "state": "fe63fe5e",
-      "events": "225e5dbc",
+      "nextId": 412,
+      "state": "083aa8cf",
+      "events": "05b75496",
       "rng": {
         "draws": 865,
         "digest": "2d92a8a3"
@@ -1225,8 +1386,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 409,
-      "state": "de4742d2",
+      "nextId": 412,
+      "state": "ddc9fe75",
       "events": "741638a5",
       "rng": {
         "draws": 900,
@@ -1236,9 +1397,9 @@
     {
       "tick": 205,
       "time": 10.25,
-      "nextId": 409,
-      "state": "a042f029",
-      "events": "b219d68c",
+      "nextId": 412,
+      "state": "b32d7513",
+      "events": "4cbb7c82",
       "rng": {
         "draws": 922,
         "digest": "b9f4bdf5"
@@ -1247,9 +1408,9 @@
     {
       "tick": 206,
       "time": 10.3,
-      "nextId": 409,
-      "state": "440eb3ef",
-      "events": "28d4b790",
+      "nextId": 412,
+      "state": "8ef3fe60",
+      "events": "f00fc3a9",
       "rng": {
         "draws": 934,
         "digest": "d7c0ee21"
@@ -1276,9 +1437,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 136
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1299,6 +1489,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1322,9 +1513,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1345,6 +1563,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1368,9 +1587,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1391,6 +1637,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1403,7 +1650,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 2.25,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.2,
@@ -1416,7 +1663,7 @@
           "fiveSecondRule": 0.8,
           "gcdRemaining": 0.7,
           "hp": 19879,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -1449,7 +1696,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -1468,7 +1715,7 @@
               "name": "Silenced",
               "remaining": 3.95,
               "school": "physical",
-              "sourceId": 408
+              "sourceId": 411
             }
           ],
           "castTotal": 2,
@@ -1481,7 +1728,7 @@
           "fiveSecondRule": 109.3,
           "gcdRemaining": 1.4,
           "hp": 19000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1530,7 +1777,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 109.3,
           "hp": 20000,
-          "id": 407,
+          "id": 410,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1570,7 +1817,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "auras": [
             {
@@ -1580,7 +1827,7 @@
               "name": "Cinderbolt",
               "remaining": 5.35,
               "school": "fire",
-              "sourceId": 405,
+              "sourceId": 408,
               "tickInterval": 2,
               "tickTimer": 1.35,
               "value": 2
@@ -1596,7 +1843,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199864,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1625,11 +1872,11 @@
             "armor": 70
           },
           "swingTimer": 1.8,
-          "tappedById": 405,
+          "tappedById": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               137
             ]
           ],
@@ -1650,9 +1897,9 @@
     {
       "tick": 210,
       "time": 10.5,
-      "nextId": 409,
-      "state": "8fd93aa7",
-      "events": "da7b67ec",
+      "nextId": 412,
+      "state": "2a3499b4",
+      "events": "ba7d73b0",
       "rng": {
         "draws": 957,
         "digest": "7abd165d"
@@ -1661,8 +1908,8 @@
     {
       "tick": 215,
       "time": 10.75,
-      "nextId": 409,
-      "state": "a039e592",
+      "nextId": 412,
+      "state": "c426fe59",
       "events": "741638a5",
       "rng": {
         "draws": 982,
@@ -1672,8 +1919,8 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 409,
-      "state": "c4dfb42d",
+      "nextId": 412,
+      "state": "cc45a216",
       "events": "741638a5",
       "rng": {
         "draws": 1002,
@@ -1683,8 +1930,8 @@
     {
       "tick": 225,
       "time": 11.25,
-      "nextId": 409,
-      "state": "00f12a8f",
+      "nextId": 412,
+      "state": "ff07be2e",
       "events": "741638a5",
       "rng": {
         "draws": 1023,
@@ -1694,9 +1941,9 @@
     {
       "tick": 228,
       "time": 11.4,
-      "nextId": 409,
-      "state": "7278efda",
-      "events": "bcece559",
+      "nextId": 412,
+      "state": "104ba2c3",
+      "events": "3955dfcd",
       "rng": {
         "draws": 1037,
         "digest": "424650f4"
@@ -1723,9 +1970,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 136
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1746,6 +2022,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1769,9 +2046,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1792,6 +2096,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1817,9 +2122,36 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1840,6 +2172,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1852,7 +2185,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 1.15,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 1.3,
@@ -1864,7 +2197,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 1.9,
           "hp": 19879,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -1897,7 +2230,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -1916,7 +2249,7 @@
               "name": "Silenced",
               "remaining": 2.85,
               "school": "physical",
-              "sourceId": 408
+              "sourceId": 411
             }
           ],
           "castTotal": 2,
@@ -1929,7 +2262,7 @@
           "fiveSecondRule": 110.4,
           "gcdRemaining": 0.3,
           "hp": 19000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -1971,7 +2304,7 @@
           "aiState": "idle",
           "attackPower": 11,
           "castRemaining": 2.65,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 5,
           "castingAbility": "drain_life",
           "channelTickEvery": 1,
@@ -1986,7 +2319,7 @@
           "fiveSecondRule": 1.1,
           "gcdRemaining": 0.4,
           "hp": 19460,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2019,7 +2352,7 @@
             "sta": 26,
             "str": 11
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -2028,7 +2361,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "auras": [
             {
@@ -2038,7 +2371,7 @@
               "name": "Cinderbolt",
               "remaining": 4.25,
               "school": "fire",
-              "sourceId": 405,
+              "sourceId": 408,
               "tickInterval": 2,
               "tickTimer": 0.25,
               "value": 2
@@ -2053,7 +2386,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199864,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2082,11 +2415,11 @@
             "armor": 70
           },
           "swingTimer": 0.7,
-          "tappedById": 405,
+          "tappedById": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               137
             ]
           ],
@@ -2107,9 +2440,9 @@
     {
       "tick": 230,
       "time": 11.5,
-      "nextId": 409,
-      "state": "daed8d84",
-      "events": "81b41966",
+      "nextId": 412,
+      "state": "86b14bf4",
+      "events": "f814eaa4",
       "rng": {
         "draws": 1047,
         "digest": "81c990f7"
@@ -2118,9 +2451,9 @@
     {
       "tick": 235,
       "time": 11.75,
-      "nextId": 409,
-      "state": "abf19969",
-      "events": "fff751bd",
+      "nextId": 412,
+      "state": "9ff2bff7",
+      "events": "8cdfadc3",
       "rng": {
         "draws": 1069,
         "digest": "0bf340d7"
@@ -2129,9 +2462,9 @@
     {
       "tick": 236,
       "time": 11.8,
-      "nextId": 409,
-      "state": "73c1d093",
-      "events": "03e7272b",
+      "nextId": 412,
+      "state": "b237ef03",
+      "events": "22158541",
       "rng": {
         "draws": 1074,
         "digest": "df3913f0"
@@ -2158,9 +2491,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 138
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2181,6 +2543,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2204,9 +2567,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2227,6 +2617,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2253,9 +2644,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 13
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2276,6 +2696,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2288,7 +2709,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 0.75,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.15,
@@ -2300,7 +2721,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.3,
           "hp": 19879,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2333,7 +2754,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -2352,7 +2773,7 @@
               "name": "Silenced",
               "remaining": 2.45,
               "school": "physical",
-              "sourceId": 408
+              "sourceId": 411
             }
           ],
           "castTotal": 2,
@@ -2364,7 +2785,7 @@
           "fallStartY": -0.348038,
           "fiveSecondRule": 110.8,
           "hp": 19000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2416,7 +2837,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 1.5,
           "hp": 19453,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2449,7 +2870,7 @@
             "sta": 26,
             "str": 11
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -2458,7 +2879,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "auras": [
             {
@@ -2468,7 +2889,7 @@
               "name": "Cinderbolt",
               "remaining": 3.85,
               "school": "fire",
-              "sourceId": 405,
+              "sourceId": 408,
               "tickInterval": 2,
               "tickTimer": 1.85,
               "value": 2
@@ -2483,7 +2904,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199849,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2512,15 +2933,15 @@
             "armor": 70
           },
           "swingTimer": 0.3,
-          "tappedById": 405,
+          "tappedById": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               139
             ],
             [
-              407,
+              410,
               19.5
             ]
           ],
@@ -2541,8 +2962,8 @@
     {
       "tick": 240,
       "time": 12,
-      "nextId": 409,
-      "state": "3e2f8f04",
+      "nextId": 412,
+      "state": "02c019ce",
       "events": "741638a5",
       "rng": {
         "draws": 1085,
@@ -2552,8 +2973,8 @@
     {
       "tick": 241,
       "time": 12.05,
-      "nextId": 409,
-      "state": "aa448170",
+      "nextId": 412,
+      "state": "1115d9c2",
       "events": "741638a5",
       "rng": {
         "draws": 1093,
@@ -2581,9 +3002,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 138
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2604,6 +3054,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2627,9 +3078,36 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2650,6 +3128,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2676,9 +3155,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 13
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:reliquary_hill"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 407,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2699,6 +3207,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2711,7 +3220,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 0.5,
-          "castTargetId": 408,
+          "castTargetId": 411,
           "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.4,
@@ -2723,7 +3232,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.55,
           "hp": 19879,
-          "id": 405,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2756,7 +3265,7 @@
             "sta": 25,
             "str": 10
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -2775,7 +3284,7 @@
               "name": "Silenced",
               "remaining": 2.2,
               "school": "physical",
-              "sourceId": 408
+              "sourceId": 411
             }
           ],
           "castTotal": 2,
@@ -2787,7 +3296,7 @@
           "fallStartY": -0.348038,
           "fiveSecondRule": 111.05,
           "hp": 19009,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 12,
           "lootFfaTimer": "Infinity",
@@ -2840,7 +3349,7 @@
           "fallStartY": -0.20935,
           "fiveSecondRule": 1.75,
           "hp": 19453,
-          "id": 407,
+          "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -2873,7 +3382,7 @@
             "sta": 26,
             "str": 11
           },
-          "targetId": 408,
+          "targetId": 411,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -2882,7 +3391,7 @@
           }
         },
         {
-          "aggroTargetId": 405,
+          "aggroTargetId": 408,
           "aiState": "attack",
           "auras": [
             {
@@ -2892,7 +3401,7 @@
               "name": "Cinderbolt",
               "remaining": 3.6,
               "school": "fire",
-              "sourceId": 405,
+              "sourceId": 408,
               "tickInterval": 2,
               "tickTimer": 1.6,
               "value": 2
@@ -2908,7 +3417,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199849,
-          "id": 408,
+          "id": 411,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2937,15 +3446,15 @@
             "armor": 70
           },
           "swingTimer": 0.05,
-          "tappedById": 405,
+          "tappedById": 408,
           "templateId": "forest_wolf",
           "threat": [
             [
-              405,
+              408,
               139
             ],
             [
-              407,
+              410,
               19.5
             ]
           ],

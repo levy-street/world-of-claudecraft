@@ -2967,7 +2967,8 @@
        dangling underneath. Overrides the base .cs-wallet row layout (label
        beside actions, separator border-top), which the card/mobile layouts
        keep. */
-    body:not(.mobile-touch) #charselect-panel.cs-wow :is(.cs-wallet-group, .cs-github-group) {
+    body:not(.mobile-touch) #charselect-panel.cs-wow
+      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group) {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;

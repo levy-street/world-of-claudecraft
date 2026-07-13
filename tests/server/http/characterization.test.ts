@@ -193,6 +193,16 @@ describe('main /api characterization: leaderboard payload shapes (empty cache)',
     );
   });
 
+  it('GET /api/leaderboard?board=deeds Renown board (anonymous, empty cache)', async () => {
+    // The account-level Renown board: fixed scope 'global', metric 'renown',
+    // no self row for an anonymous caller. The pool-less refresh serves the
+    // deterministic empty page, like the other board fixtures.
+    await characterize(
+      'leaderboard_deeds',
+      makeReq({ method: 'GET', url: '/api/leaderboard?board=deeds' }),
+    );
+  });
+
   it('GET /api/leaderboard?scope=global global scope', async () => {
     await characterize(
       'leaderboard_scope_global',

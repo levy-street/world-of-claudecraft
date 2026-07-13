@@ -68,6 +68,8 @@ export function prestige(ctx: SimContext, pid?: number): boolean {
   if (!canPrestige(r.e.level, r.meta.lifetimeXp, r.meta.prestigeRank)) return false;
   r.meta.xp = 0;
   r.meta.prestigeRank += 1;
+  // The prestige rank is a persisted deed trigger input, so re-check.
+  ctx.markDeedsDirty(r.meta.entityId);
   ctx.emit({
     type: 'log',
     pid: r.e.id,

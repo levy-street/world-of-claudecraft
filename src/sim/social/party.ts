@@ -156,7 +156,9 @@ export class PartyMachine {
     const leaderMeta = this.ctx.players.get(invite.fromPid);
     if (!leaderMeta) return;
     let party = this.partyOf(invite.fromPid);
+    let created = false;
     if (!party) {
+      created = true;
       const dungeonDifficulty = leaderMeta.dungeonDifficulty;
       party = {
         id: this.nextPartyId++,
@@ -179,6 +181,10 @@ export class PartyMachine {
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
+    // Forming the party is the inviter's join too; the accepter counts on
+    // every successful join.
+    if (created) this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
+    this.ctx.bumpDeedStat(r.meta, 'partiesJoined', 1);
     for (const mPid of party.members) {
       this.ctx.emit({
         type: 'log',

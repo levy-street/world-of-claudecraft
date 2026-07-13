@@ -238,6 +238,8 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
   if (questItemId && ctx.canAddItem(questItemId, 1, meta.entityId)) {
     ctx.addItem(questItemId, 1, meta.entityId);
   }
+  // Zone gather mark: one entry per zone and node type ever harvested.
+  ctx.markVisited(meta, `gather:${node.zoneId}:${node.type}`);
   // Character XP for the harvest (profession_xp.ts), tier-scaled and
   // level-gated the same way kill XP is: a max-level player farming a
   // trivial (gray) node gets zero.
