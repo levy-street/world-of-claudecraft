@@ -1126,9 +1126,11 @@ const FAMILY_KEYS: Record<string, string> = {
   elemental: 'mob_elemental',
   dragonkin: 'mob_dragonkin',
   demon: 'mob_demonalt',
-  // No mob is data-tagged 'reptile' yet (deepfen_spearjaw is still 'beast'
-  // pending its own retag PR); reuse its model as the family default so the
-  // fallback is sane the moment that retag lands.
+  // deepfen_spearjaw already has an explicit MOB_KEYS override to mob_spearjaw
+  // (visualKeyFor checks MOB_KEYS first), so this default stays unreachable
+  // for it even after its family retag. It only matters for a future reptile
+  // mob with no override of its own; reuse the same model so that fallback
+  // is sane too.
   reptile: 'mob_spearjaw',
 };
 

@@ -47,9 +47,8 @@ const MOB_VOICE_CUES = {
     death: 'mob_dragonkin_death',
   },
   demon: { aggro: 'mob_demon_aggro', attack: 'mob_demon_attack', death: 'mob_demon_death' },
-  // No mob is data-tagged 'reptile' yet: this is scaffolding so a future
-  // retag (deepfen_spearjaw, currently 'beast') is a pure content change,
-  // no further code needed.
+  // deepfen_spearjaw (The Drowned Litany delve) is the family's first mob:
+  // a velociraptor model, retagged from its former 'beast' mistag.
   reptile: {
     aggro: 'mob_reptile_aggro',
     attack: 'mob_reptile_attack',

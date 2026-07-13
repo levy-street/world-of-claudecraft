@@ -212,6 +212,13 @@ describe('combat SFX policy', () => {
     expect(mobVoiceCue('forest_wolf', 'attack', () => false)).toBe('mob_beast_attack');
   });
 
+  it('resolves the reptile family for its first real mob', () => {
+    expect(mobVoiceFamily('deepfen_spearjaw')).toBe('reptile');
+    expect(mobVoiceCue('deepfen_spearjaw', 'aggro')).toBe('mob_reptile_aggro');
+    expect(mobVoiceCue('deepfen_spearjaw', 'attack')).toBe('mob_reptile_attack');
+    expect(mobVoiceCue('deepfen_spearjaw', 'death')).toBe('mob_reptile_death');
+  });
+
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {
     const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
