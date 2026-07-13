@@ -138,6 +138,37 @@ export const TARGETS = [
       return open ? { clip: '#char-window' } : {};
     },
   },
+  // World-scenery vantages for prop dressing changes: teleport the offline player
+  // to a zone1 landmark, aim the chase cam at it, and shoot the full frame.
+  ...[
+    { key: 'village-market', label: 'Village market + well', x: 0.5, z: -2, yaw: 0 },
+    { key: 'village-smithy', label: 'Smithy stall', x: 6.5, z: 14, yaw: 0.71 },
+    { key: 'inn-porch', label: 'Inn porch', x: 17.5, z: -12, yaw: -0.74 },
+    { key: 'mine-entrance', label: 'Mine entrance', x: -83, z: -63, yaw: -2.34 },
+    { key: 'fishing-dock', label: 'Fishing dock', x: -68, z: 57, yaw: 0.94 },
+  ].map(({ key, label, x, z, yaw }) => ({
+    key,
+    label,
+    when: ['render/props'],
+    async capture(page) {
+      await page.evaluate(
+        (px, pz, pyaw) => {
+          const g = window.__game;
+          const p = g?.sim?.player;
+          if (!p?.pos) return;
+          p.pos.x = px;
+          p.pos.z = pz;
+          p.facing = pyaw;
+          if (g.input) g.input.camYaw = pyaw;
+        },
+        x,
+        z,
+        yaw,
+      );
+      await wait(1400);
+      return {};
+    },
+  })),
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

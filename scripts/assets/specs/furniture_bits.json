@@ -1,0 +1,23 @@
+{
+  "note": "KayKit Furniture Bits 1.0 (CC0). Inn porch seating and table dressing: long table, wood stools, book set. Already low-poly, no simplify (static items must never simplify).",
+  "items": [
+    {
+      "src": "tmp/asset_src/kaykit_furniture_bits/KayKit-Game-Assets-KayKit-Furniture-Bits-1.0-96d5930/addons/kaykit_furniture_bits/Assets/gltf/table_medium_long.gltf",
+      "out": "models/props/table_long.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_furniture_bits/KayKit-Game-Assets-KayKit-Furniture-Bits-1.0-96d5930/addons/kaykit_furniture_bits/Assets/gltf/chair_stool_wood.gltf",
+      "out": "models/props/stool_wood.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_furniture_bits/KayKit-Game-Assets-KayKit-Furniture-Bits-1.0-96d5930/addons/kaykit_furniture_bits/Assets/gltf/book_set.gltf",
+      "out": "models/props/book_set.glb",
+      "type": "static",
+      "maxTex": 256
+    }
+  ]
+}

@@ -102,6 +102,18 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   anvil: { url: '/models/props/anvil.glb', kit: 'qprops' },
   weaponStand: { url: '/models/props/weapon_stand.glb', kit: 'qprops' },
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
+  // KayKit RPG Tools Bits: profession/town dressing (smithy, market, mine, dock)
+  grindstone: { url: '/models/props/grindstone.glb', kit: 'rpgtools' },
+  bucketMetal: { url: '/models/props/bucket_metal.glb', kit: 'rpgtools' },
+  lanternStanding: { url: '/models/props/lantern_standing.glb', kit: 'rpgtools' },
+  journalOpen: { url: '/models/props/journal_open.glb', kit: 'rpgtools' },
+  mapRolled: { url: '/models/props/map_rolled.glb', kit: 'rpgtools' },
+  pickaxe: { url: '/models/props/pickaxe.glb', kit: 'rpgtools' },
+  ropeBundle: { url: '/models/props/rope_bundle.glb', kit: 'rpgtools' },
+  // KayKit Furniture Bits: inn porch seating
+  tableLong: { url: '/models/props/table_long.glb', kit: 'furniture' },
+  stoolWood: { url: '/models/props/stool_wood.glb', kit: 'furniture' },
+  bookSet: { url: '/models/props/book_set.glb', kit: 'furniture' },
   // Meshy-generated portal door used as the overworld Reliquary Hill marker;
   // has its own backing slab so the animated shader plane sits on the front face.
   // No yaw here: the geometry is CACHED and shared by every delve marker, so a
@@ -817,6 +829,34 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
+    if (!lowProps && b.kind === 'inn') {
+      // porch set beside the door (door on the +z face): long table with a book
+      // set and two stools, plus a standing lantern on the other side. Purely
+      // decorative dressing outside the building collider, like foliage.
+      const px = b.w * 0.28;
+      const pz = b.d / 2 + 0.95;
+      addParts(g, 'tableLong', { x: px, z: pz, rot: Math.PI / 2, scale: 1.5 });
+      addParts(g, 'bookSet', { x: px - 0.25, y: 1.12, z: pz, rot: 0.4, scale: 1.4 });
+      addParts(g, 'stoolWood', {
+        x: px - 0.6,
+        z: pz + 0.75,
+        rot: keyRand(key, 5) * Math.PI,
+        scale: 1.4,
+      });
+      addParts(g, 'stoolWood', {
+        x: px + 0.65,
+        z: pz + 0.7,
+        rot: keyRand(key, 6) * Math.PI,
+        scale: 1.4,
+      });
+      addParts(g, 'lanternStanding', { x: -b.w * 0.3, z: b.d / 2 + 0.7, scale: 1.6 });
+      // warm glass core so the porch lantern reads lit at night, matching the
+      // mine entrance wall lantern
+      const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.2, 6), lanternMat);
+      glass.position.set(-b.w * 0.3, 0.55, b.d / 2 + 0.7);
+      noShadow.add(glass);
+      g.add(glass);
+    }
     g.position.set(b.x, y - 0.12, b.z);
     g.rotation.y = b.rot;
     group.add(shadowed(g));
@@ -837,9 +877,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // Smith Haldren (z1) / Armorer Hode (z3): forge-front dressing
       addParts(g, 'anvil', { x: 1.35, z: 1.15, rot: 0.9, scale: 1.35 });
       addParts(g, 'weaponStand', { x: -1.45, z: 0.6, rot: 0.5 + Math.PI, scale: 1.25 });
+      addParts(g, 'grindstone', { x: -0.55, z: 1.5, rot: -0.7, scale: 1.3 });
+      addParts(g, 'bucketMetal', { x: 0.95, z: -0.7, rot: keyRand(key, 4) * Math.PI, scale: 1.1 });
     } else if (!lowProps) {
       addParts(g, 'farmCrate', { x: 1.3, z: 1.05, rot: keyRand(key, 2) * Math.PI, scale: 1.5 });
       addParts(g, 'barrel', { x: -1.35, z: 0.85, rot: keyRand(key, 3) * Math.PI, scale: 1.15 });
+      // merchant's paperwork: an open ledger on the crate, a rolled map on the barrel
+      addParts(g, 'journalOpen', {
+        x: 1.3,
+        y: 1.0,
+        z: 1.05,
+        rot: keyRand(key, 4) * Math.PI,
+        scale: 1.6,
+      });
+      addParts(g, 'mapRolled', {
+        x: -1.35,
+        y: 0.88,
+        z: 0.85,
+        rot: keyRand(key, 5) * Math.PI,
+        scale: 1.5,
+      });
     }
     g.position.set(s.x, ground(s.x, s.z) - 0.06, s.z);
     g.rotation.y = s.rot;
@@ -852,6 +909,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
+    if (!lowProps) {
+      addParts(g, 'bucketMetal', {
+        x: 1.2,
+        z: 0.55,
+        rot: propRand(w.x, w.z, 2) * Math.PI,
+        scale: 1.0,
+      });
+    }
     g.position.set(w.x, ground(w.x, w.z) - 0.1, w.z);
     g.rotation.y = propRand(w.x, w.z, 1) * Math.PI;
     group.add(shadowed(g));
@@ -1161,6 +1226,16 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       addParts(g, 'oreRocks', { x: 2.75, y: 0.78, z: 1.55, rot: 0.9, scale: 2.6 });
       addParts(g, 'oreRocks', { x: 3.4, z: 0.4, rot: 2.2, scale: 1.8 });
     }
+    if (!lowProps && !abandonedCrypt) {
+      // miner's pickaxe leaning against the left mound rock
+      addParts(g, 'pickaxe', {
+        x: -2.05,
+        y: 0.12,
+        z: 0.55,
+        scale: 1.5,
+        euler: new THREE.Euler(-0.85, propRand(m.x, m.z, 21) * Math.PI, 0.12, 'YXZ'),
+      });
+    }
     if (!lowProps) {
       // hanging lantern on the right post
       addParts(g, 'lanternWall', { x: 1.45, y: 2.0, z: 0.28, scale: 1.25 });
@@ -1212,6 +1287,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       });
       addParts(g, 'barrel', { x: 1.45, z: 0.9, rot: keyRand(key, 6) * Math.PI, scale: 1.15 });
       addParts(g, 'crateWooden', { x: -0.6, y: 0.52, z: -2.2, rot: keyRand(key, 7), scale: 0.9 });
+      // coiled mooring rope on the pier deck
+      addParts(g, 'ropeBundle', {
+        x: -0.9,
+        y: 0.52,
+        z: -1.35,
+        rot: keyRand(key, 9) * Math.PI,
+        scale: 1.1,
+      });
     }
     // rowboat beside the deck's far end: floats at water level when the
     // shore dips below it, otherwise sits hauled up on the bank
@@ -1431,7 +1514,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const cv = document.createElement('canvas');
     cv.width = CW;
     cv.height = CH;
-    const ctx = cv.getContext('2d')!;
+    // a fresh canvas always yields a 2d context; the guard only quiets lint
+    const ctx = cv.getContext('2d');
+    if (!ctx) continue;
 
     ctx.fillStyle = '#2b2722';
     ctx.fillRect(0, 0, CW, CH);
@@ -1596,12 +1681,16 @@ function pointInsideFootprint(h: Hideable, x: number, z: number): boolean {
   const dx = x - h.x,
     dz = z - h.z;
   if (h.r !== undefined) return dx * dx + dz * dz < h.r * h.r;
+  // OBB fields are always set when r is undefined; the ?? 0 only quiets lint.
   // world -> OBB local (three.js rotation.y convention), mirrors colliders.rotY
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  const rot = h.rot ?? 0,
+    hw = h.hw ?? 0,
+    hd = h.hd ?? 0;
+  const c = Math.cos(rot),
+    s = Math.sin(rot);
   const lx = dx * c - dz * s;
   const lz = dx * s + dz * c;
-  return Math.abs(lx) < h.hw! && Math.abs(lz) < h.hd!;
+  return Math.abs(lx) < hw && Math.abs(lz) < hd;
 }
 
 function segmentCircleEntry(
@@ -1628,8 +1717,12 @@ function segmentCircleEntry(
 }
 
 function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: number): number {
-  const c = Math.cos(h.rot!),
-    s = Math.sin(h.rot!);
+  // OBB fields are always set when this path runs; the ?? 0 only quiets lint
+  const rot = h.rot ?? 0,
+    hw = h.hw ?? 0,
+    hd = h.hd ?? 0;
+  const c = Math.cos(rot),
+    s = Math.sin(rot);
   const adx = ax - h.x,
     adz = az - h.z;
   const bdx = bx - h.x,
@@ -1638,17 +1731,17 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
   const laz = adx * s + adz * c;
   const lbx = bdx * c - bdz * s;
   const lbz = bdx * s + bdz * c;
-  if (Math.abs(lax) < h.hw! && Math.abs(laz) < h.hd!) return 0;
+  if (Math.abs(lax) < hw && Math.abs(laz) < hd) return 0;
 
   const dx = lbx - lax,
     dz = lbz - laz;
   let tmin = -Infinity,
     tmax = Infinity;
   if (Math.abs(dx) < 1e-9) {
-    if (lax < -h.hw! || lax > h.hw!) return Infinity;
+    if (lax < -hw || lax > hw) return Infinity;
   } else {
-    let t1 = (-h.hw! - lax) / dx,
-      t2 = (h.hw! - lax) / dx;
+    let t1 = (-hw - lax) / dx,
+      t2 = (hw - lax) / dx;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;
@@ -1658,10 +1751,10 @@ function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: nu
     tmax = Math.min(tmax, t2);
   }
   if (Math.abs(dz) < 1e-9) {
-    if (laz < -h.hd! || laz > h.hd!) return Infinity;
+    if (laz < -hd || laz > hd) return Infinity;
   } else {
-    let t1 = (-h.hd! - laz) / dz,
-      t2 = (h.hd! - laz) / dz;
+    let t1 = (-hd - laz) / dz,
+      t2 = (hd - laz) / dz;
     if (t1 > t2) {
       const tmp = t1;
       t1 = t2;
