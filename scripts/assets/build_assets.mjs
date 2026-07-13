@@ -171,7 +171,7 @@ async function processModel(io, item) {
   const seen = new Set();
   for (const anim of root.listAnimations()) {
     let name = stripClipName(anim.getName());
-    if (item.renameClips && item.renameClips[name]) name = item.renameClips[name];
+    if (item.renameClips?.[name]) name = item.renameClips[name];
     const drop = (item.keepClips && !item.keepClips.includes(name)) || seen.has(name);
     if (drop) {
       anim.dispose();
