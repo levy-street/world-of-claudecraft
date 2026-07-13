@@ -27,13 +27,23 @@
 // - "copy": byte-for-byte copy (HDRIs, plain textures).
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { dedup, mergeDocuments, meshopt, prune, resample, textureCompress } from '@gltf-transform/functions';
+import {
+  dedup,
+  mergeDocuments,
+  meshopt,
+  prune,
+  resample,
+  textureCompress,
+} from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import sharp from 'sharp';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+// URL.pathname keeps a leading slash before a Windows drive letter, which
+// path.resolve mangles into "D:\D:\..."; fileURLToPath is correct on every OS.
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 
 function stripClipName(name) {
@@ -55,17 +65,24 @@ function resolveSrc(src) {
 function expandItems(items) {
   const out = [];
   for (const raw of items) {
-    if (!raw.srcDir) { out.push(raw); continue; }
+    if (!raw.srcDir) {
+      out.push(raw);
+      continue;
+    }
     const dir = resolveSrc(raw.srcDir);
     const exts = raw.exts ?? ['.gltf', '.glb'];
-    const files = fs.readdirSync(dir)
+    const files = fs
+      .readdirSync(dir)
       .filter((f) => exts.some((e) => f.toLowerCase().endsWith(e)))
       .sort();
     const { srcDir, outDir, exts: _drop, ...rest } = raw;
     for (const f of files) {
       const name = f
-        .replace(/\.gltf\.glb$/i, '').replace(/\.(gltf|glb)$/i, '')
-        .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        .replace(/\.gltf\.glb$/i, '')
+        .replace(/\.(gltf|glb)$/i, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
       out.push({ ...rest, src: path.join(dir, f), out: `${outDir}/${name}.glb` });
     }
   }
@@ -106,7 +123,8 @@ async function processModel(io, item) {
     }
     for (const scene of root.listScenes()) if (!origScenes.has(scene)) scene.dispose();
     for (const node of root.listNodes()) if (!origNodes.has(node)) node.dispose();
-    if (orphan) console.warn(`  WARN ${item.out}: ${orphan} merged channel(s) had no matching bone`);
+    if (orphan)
+      console.warn(`  WARN ${item.out}: ${orphan} merged channel(s) had no matching bone`);
   }
 
   // Bake standalone prop/weapon meshes onto a bone. KayKit ships weapons as
@@ -118,7 +136,10 @@ async function processModel(io, item) {
   if (item.attachMeshes) {
     for (const att of item.attachMeshes) {
       const bone = root.listNodes().find((n) => n.getName() === att.bone);
-      if (!bone) { console.warn(`  WARN ${item.out}: attach bone '${att.bone}' not found`); continue; }
+      if (!bone) {
+        console.warn(`  WARN ${item.out}: attach bone '${att.bone}' not found`);
+        continue;
+      }
       const before = new Set(root.listScenes());
       mergeDocuments(doc, await io.read(resolveSrc(att.from)));
       for (const scene of root.listScenes()) {
@@ -127,7 +148,10 @@ async function processModel(io, item) {
         const single = roots.length === 1;
         for (const node of roots) {
           scene.removeChild(node);
-          if (single) { node.setTranslation([0, 0, 0]); node.setRotation([0, 0, 0, 1]); }
+          if (single) {
+            node.setTranslation([0, 0, 0]);
+            node.setRotation([0, 0, 0, 1]);
+          }
           bone.addChild(node);
         }
         scene.dispose();
@@ -149,7 +173,10 @@ async function processModel(io, item) {
     let name = stripClipName(anim.getName());
     if (item.renameClips && item.renameClips[name]) name = item.renameClips[name];
     const drop = (item.keepClips && !item.keepClips.includes(name)) || seen.has(name);
-    if (drop) { anim.dispose(); continue; }
+    if (drop) {
+      anim.dispose();
+      continue;
+    }
     seen.add(name);
     anim.setName(name);
   }
@@ -160,9 +187,13 @@ async function processModel(io, item) {
 
   const transforms = [resample(), prune(), dedup()];
   if (item.maxTex) {
-    transforms.push(textureCompress({
-      encoder: sharp, targetFormat: 'webp', resize: [item.maxTex, item.maxTex],
-    }));
+    transforms.push(
+      textureCompress({
+        encoder: sharp,
+        targetFormat: 'webp',
+        resize: [item.maxTex, item.maxTex],
+      }),
+    );
   }
   transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   await doc.transform(...transforms);
@@ -217,7 +248,9 @@ async function main() {
     const defaults = spec.defaults ?? {};
     let items = expandItems(spec.items);
     if (shard) items = items.filter((_, idx) => idx % shard.n === shard.i);
-    console.log(`spec: ${specFile} (${items.length} items${shard ? `, shard ${shard.i}/${shard.n}` : ''})`);
+    console.log(
+      `spec: ${specFile} (${items.length} items${shard ? `, shard ${shard.i}/${shard.n}` : ''})`,
+    );
     for (const raw of items) {
       const item = { ...defaults, ...raw };
       try {
