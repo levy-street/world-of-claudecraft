@@ -850,6 +850,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         scale: 1.4,
       });
       addParts(g, 'lanternStanding', { x: -b.w * 0.3, z: b.d / 2 + 0.7, scale: 1.6 });
+      // warm glass core so the porch lantern reads lit at night, matching the
+      // mine entrance wall lantern
+      const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.2, 6), lanternMat);
+      glass.position.set(-b.w * 0.3, 0.55, b.d / 2 + 0.7);
+      noShadow.add(glass);
+      g.add(glass);
     }
     g.position.set(b.x, y - 0.12, b.z);
     g.rotation.y = b.rot;
