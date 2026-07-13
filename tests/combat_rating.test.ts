@@ -68,19 +68,18 @@ describe('combat ratings', () => {
   });
 
   it('hit rating reduces a player melee miss vs a higher-level (Heroic +3) mob', () => {
-    const attacker = ent({ hitBonus: 0.2 });
     const mob = ent({ kind: 'mob', hostile: true, level: 23 });
-    // Base +3 miss is 44%; 20% hit claws it to 24%.
-    expect(meleeMissChance(20, 23)).toBeCloseTo(0.44);
-    expect(swingMissChance(attacker, mob)).toBeCloseTo(0.24);
+    // The +3 above-level miss is capped at ~26%; 5% hit claws it to ~21%.
+    expect(meleeMissChance(20, 23)).toBeCloseTo(0.26);
+    expect(swingMissChance(ent({ hitBonus: 0.05 }), mob)).toBeCloseTo(0.21);
     // Enough hit floors the miss at 0 (hit-capped), never negative.
     expect(swingMissChance(ent({ hitBonus: 0.9 }), mob)).toBe(0);
   });
 
   it('hit rating reduces spell resist by the same amount', () => {
-    // +3 resist is 43%; 20% hit claws it to 23%.
-    expect(spellResistChance(20, 23)).toBeCloseTo(0.43);
-    expect(spellResistChance(20, 23, 0.2)).toBeCloseTo(0.23);
+    // The +3 above-level resist is capped at ~25%; 5% hit claws it to ~20%.
+    expect(spellResistChance(20, 23)).toBeCloseTo(0.25);
+    expect(spellResistChance(20, 23, 0.05)).toBeCloseTo(0.2);
   });
 
   it('is a no-op with zero hit, preserving the ungeared draw (parity)', () => {
