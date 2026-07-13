@@ -413,6 +413,37 @@ export function resetAssetUploadRateLimits(): void {
   assetUploadAccountAttempts.clear();
 }
 
+// Steam link attempts get their own per-IP AND per-account bucket, mirroring
+// the wallet-link throttle: every allowed attempt costs an upstream
+// AuthenticateUserTicket call, so the budget is deliberately tighter than the
+// wallet's, and a link flood can never burn a player's login budget.
+export const STEAM_LINK_MAX_PER_MINUTE = 5;
+const steamLinkIpAttempts = new Map<string, number[]>();
+const steamLinkAccountAttempts = new Map<number, number[]>();
+
+export function steamLinkRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    steamLinkIpAttempts,
+    requestIp(req),
+    STEAM_LINK_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    steamLinkAccountAttempts,
+    accountId,
+    STEAM_LINK_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Steam link throttles. Test-only: keeps scoped buckets isolated. */
+export function resetSteamLinkRateLimits(): void {
+  steamLinkIpAttempts.clear();
+  steamLinkAccountAttempts.clear();
+}
+
 export function walletLinkRateLimited(
   req: http.IncomingMessage,
   accountId: number,

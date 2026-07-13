@@ -262,6 +262,7 @@
 
     <div id="right-tracker-stack">
       <div id="quest-tracker"></div>
+      <div id="deed-tracker"></div>
       <div id="delve-tracker"></div>
     </div>
 
@@ -357,6 +358,7 @@
     <div id="market-window" class="window panel"></div>
     <div id="mailbox-window" class="window panel"></div>
     <div id="bank-window" class="window panel"></div>
+    <div id="deeds-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
@@ -371,6 +373,7 @@
       <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
       <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
       <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
+      <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
       <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
@@ -468,9 +471,12 @@
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
       <!-- Looping cinematic background video; poster = static key-art for instant paint + fallback. -->
-      <video id="bg-home" class="bg-trailer bg-home" autoplay loop muted playsinline preload="auto" poster="/home-bg.png" aria-hidden="true">
-        <source src="/home-bg.mp4" type="video/mp4" />
-      </video>
+      <!-- Same backdrop as the landing-page hero (index.html). The poster paints
+           instantly; the looping trailer is NOT eagerly fetched (no autoplay, no
+           preload, no <source>): main.ts attaches the source and plays only on
+           capable devices (see applyLandingBackdrop). Phones, Save-Data, reduced
+           motion, and high contrast keep the poster only. -->
+      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
       <div class="portal-ring-reverse"></div>
@@ -532,58 +538,24 @@
         <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
 
         <div id="mode-select">
-          <div class="play-console">
-            <!-- Realm selector: a themed dropdown that defaults to Online and can switch to Offline.
-                 It only chooses the destination; the Play button below commits. -->
-            <div class="server-select" id="server-select" data-mode="online">
-              <button type="button" class="server-select-trigger" id="server-select-trigger"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="server-select-menu"
-                data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline">
-                <span class="server-dot" data-mode="online" aria-hidden="true"></span>
-                <span class="server-select-text">
-                  <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Online</span>
-                  <span class="server-select-sub" id="server-select-sub">
-                    <span class="server-realm-line" data-mode="online">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
-                    </span>
-                    <span class="server-sub-offline" data-mode="offline" data-i18n="mode.serverOfflineSub" hidden>Instant local world</span>
-                  </span>
-                </span>
-                <svg class="server-select-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <ul class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline" hidden>
-                <li class="server-select-option is-selected" id="server-opt-online" role="option" data-mode="online" tabindex="-1" aria-selected="true">
-                  <span class="server-dot" data-mode="online" aria-hidden="true"></span>
-                  <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOnline">Online</span>
-                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</span>
-                    <span class="server-opt-stats">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
-                    </span>
-                  </span>
-                  <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </li>
-                <li class="server-select-option" id="server-opt-offline" role="option" data-mode="offline" tabindex="-1" aria-selected="false">
-                  <span class="server-dot" data-mode="offline" aria-hidden="true"></span>
-                  <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOffline">Offline</span>
-                    <span class="server-opt-desc" data-i18n="mode.offlineDesc">Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.</span>
-                  </span>
-                  <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                </li>
-              </ul>
-            </div>
-
+          <div class="play-console play-console-solo">
+            <!-- /play goes straight to the online realm: no Online/Offline selector on
+                 this entry (the landing page keeps it). The Play button commits directly
+                 to the online flow (login, or realm select when a session is restored). -->
             <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
               <span class="btn-play-sheen" aria-hidden="true"></span>
               <span class="btn-play-label" data-i18n="mode.play">Play</span>
             </button>
+            <div class="play-online-status">
+              <span class="server-dot" data-mode="online" aria-hidden="true"></span>
+              <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+            </div>
           </div>
 
-          <!-- Hidden, non-focusable compatibility triggers. Stable hooks the automated
-               tours / E2E scripts use to drive the online & offline flows directly. -->
+          <!-- Hidden, non-focusable compatibility trigger. Stable hook the automated
+               tours / E2E scripts use to drive the online flow directly. This entry is
+               online-only, so there is no #btn-offline here (index.html keeps both). -->
           <button type="button" id="btn-online" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
-          <button type="button" id="btn-offline" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
 
           <!-- Tip — part of the same play container (divider above). -->
           <div class="play-tip">
@@ -593,7 +565,13 @@
 
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
           <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
-          
+          <!-- First-class onboarding: Continue with Discord at the top of the form. -->
+          <button type="button" class="btn" id="btn-login-discord" hidden style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#5865f2,#404ac4);border-color:#2a2f7a;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+            <svg viewBox="0 0 127.14 96.36" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>
+            <span data-i18n="hudChrome.discord.loginCta">Continue with Discord</span>
+          </button>
+          <div id="auth-or-divider" class="auth-or" hidden><span data-i18n="hudChrome.discord.orEmail">or use email</span></div>
+
           <div class="auth-field">
             <label for="login-user" class="auth-label" data-i18n="auth.username">Username</label>
             <div id="login-user-error" class="auth-field-error" aria-live="polite" data-i18n="auth.usernameError">Please enter your username.</div>
@@ -751,6 +729,23 @@
                   <div class="cs-wallet-help" id="github-help" data-i18n="hudChrome.devBadge.link.benefits">Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.</div>
                 </div>
               </div>
+              <div class="cs-wallet cs-steam-group" id="cs-steam-group" hidden>
+                <span class="cs-wallet-label" data-i18n="hudChrome.steam.title">Steam</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-steam-link" data-i18n-title="hudChrome.steam.link" data-i18n-aria="hudChrome.steam.link" title="Link Steam" aria-label="Link Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16.5" cy="8" r="3.5"></circle><circle cx="7" cy="17" r="2.5"></circle><path d="M9.2 15.3 13.6 10.6"></path></svg>
+                      <span id="steam-label" data-i18n="hudChrome.steam.link">Link Steam</span>
+                    </button>
+                    <span class="wallet-status" id="steam-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-steam-unlink" data-i18n-title="hudChrome.steam.unlink" data-i18n-aria="hudChrome.steam.unlink" title="Unlink Steam" aria-label="Unlink Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="hudChrome.steam.unlink">Unlink Steam</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="steam-help" data-i18n="hudChrome.steam.benefits">Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.</div>
+                </div>
+              </div>
             </div>
           </header>
           <div class="cs-body">
@@ -815,42 +810,9 @@
           </div>
         </div>
 
-        <div id="offline-select" class="panel auth-panel auth-panel-premium cs-wow" hidden>
-          <h2 class="auth-title" data-i18n="auth.offlineCharacter">Offline Character</h2>
-          <div class="charselect-layout">
-            <!-- Left Column: Character Name & Class Chips & Actions -->
-            <div class="charselect-col-left">
-              <div class="char-create">
-                <label for="char-name" class="auth-label" data-i18n="auth.characterName">Character Name</label>
-                <div class="char-input-group">
-                  <input id="char-name" maxlength="16" data-i18n-placeholder="auth.characterNamePlaceholder" placeholder="Character name" value="" aria-describedby="offline-error" autocomplete="off" />
-                  <div id="offline-error" class="auth-error" aria-live="polite"></div>
-                </div>
-                <ul class="mini-class-row" role="list">
-                  <li class="mini-class" data-class="warrior" role="button" tabindex="0" data-i18n-aria="classes.warriorAria" data-i18n="classes.warrior" aria-label="Warrior class" aria-pressed="false">Warrior</li>
-                  <li class="mini-class" data-class="paladin" role="button" tabindex="0" data-i18n-aria="classes.paladinAria" data-i18n="classes.paladin" aria-label="Paladin class" aria-pressed="false">Paladin</li>
-                  <li class="mini-class" data-class="hunter" role="button" tabindex="0" data-i18n-aria="classes.hunterAria" data-i18n="classes.hunter" aria-label="Hunter class" aria-pressed="false">Hunter</li>
-                  <li class="mini-class" data-class="rogue" role="button" tabindex="0" data-i18n-aria="classes.rogueAria" data-i18n="classes.rogue" aria-label="Rogue class" aria-pressed="false">Rogue</li>
-                  <li class="mini-class" data-class="priest" role="button" tabindex="0" data-i18n-aria="classes.priestAria" data-i18n="classes.priest" aria-label="Priest class" aria-pressed="false">Priest</li>
-                  <li class="mini-class" data-class="shaman" role="button" tabindex="0" data-i18n-aria="classes.shamanAria" data-i18n="classes.shaman" aria-label="Shaman class" aria-pressed="false">Shaman</li>
-                  <li class="mini-class" data-class="mage" role="button" tabindex="0" data-i18n-aria="classes.mageAria" data-i18n="classes.mage" aria-label="Mage class" aria-pressed="false">Mage</li>
-                  <li class="mini-class" data-class="warlock" role="button" tabindex="0" data-i18n-aria="classes.warlockAria" data-i18n="classes.warlock" aria-label="Warlock class" aria-pressed="false">Warlock</li>
-                  <li class="mini-class" data-class="druid" role="button" tabindex="0" data-i18n-aria="classes.druidAria" data-i18n="classes.druid" aria-label="Druid class" aria-pressed="false">Druid</li>
-                </ul>
-                <div id="offline-skin-row" class="skin-row" role="list" data-i18n-aria="auth.appearance" aria-label="Skin"></div>
-                <div class="auth-actions">
-                  <button type="button" class="btn btn-primary" id="btn-start-offline" data-i18n="auth.enterWorld">Enter World</button>
-                  <button type="button" class="btn btn-secondary" id="btn-offline-back" data-i18n="auth.back">Back</button>
-                </div>
-              </div>
-            </div>
-            <!-- Right Column: Detailed Class Info & Preview -->
-            <div class="charselect-col-right">
-              <div class="char-preview-container" id="offline-preview-container"></div>
-              <div id="offline-class-details" class="class-details-panel" aria-live="polite"></div>
-            </div>
-          </div>
-        </div>
+        <!-- This entry is online-only: the offline single-player flow (#offline-select)
+             lives on the landing page (index.html); /play goes straight to the online
+             realm. main.ts guards the offline wiring on element presence. -->
       </section>
 
       <section id="highscores-view" class="view-section" hidden aria-hidden="true">
@@ -937,6 +899,10 @@
         </a>
       </div>
       <div id="game-version">v0.24.1</div>
+      </div>
+      <div class="footer-legal-row">
+        <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
+        <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
       </div>
       <div class="footer-lang-row">
         <div class="language-selector">
@@ -1034,6 +1000,8 @@
           <button class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
           <button class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
           <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
+          <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
+          <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
           <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
           <button class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
           <button class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>

@@ -108,6 +108,18 @@ const config = desktopBuilderConfig({
   // makes desktopBuilderConfig throw before anything is built. Set-but-empty
   // means "unset" (derive from the origin), hence || rather than ??.
   updateChannel: process.env.WOC_UPDATE_CHANNEL || null,
+  // The real Steamworks app id for a depot build (stamped into wocDesktop for
+  // electron/steam.cjs). desktopBuilderConfig refuses a steam channel build
+  // without a numeric id, so a depot can never silently ship on the Spacewar
+  // dev id (480); website builds ignore it.
+  steamAppId: process.env.WOC_STEAM_APP_ID || '',
+  // steamworks.js is an optionalDependency, so guard the steam channel against a
+  // tree where its native install silently failed: the depot would otherwise
+  // ship without Steam. desktopBuilderConfig invokes this only for the steam
+  // channel, so website builds never touch node_modules here.
+  steamworksInstalled: () =>
+    existsSync(path.join(root, 'node_modules/steamworks.js/package.json')) &&
+    existsSync(path.join(root, 'node_modules/steamworks.js/dist')),
 });
 const configDir = mkdtempSync(path.join(tmpdir(), 'woc-eb-'));
 const configPath = path.join(configDir, 'electron-builder.json');

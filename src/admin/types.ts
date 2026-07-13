@@ -535,8 +535,13 @@ export interface PerfPhaseStats {
 }
 
 export interface PerfCaptureResult {
+  captureId: string;
   capturedAt: number; // epoch ms the window closed
   durationMs: number;
+  loopCallbacks: number;
+  simTicks: number;
+  catchUpCallbacks: number;
+  maxTicksPerCallback: number;
   online: number;
   simEntities: number;
   profile: {
@@ -547,6 +552,7 @@ export interface PerfCaptureResult {
 }
 
 export interface PerfCaptureStatus {
+  captureId: string | null;
   capturing: boolean;
   endsAt: number | null; // epoch ms the in-flight capture closes
   last: PerfCaptureResult | null;

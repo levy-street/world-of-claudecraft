@@ -141,6 +141,8 @@ export interface MobileControlCallbacks {
   onLeaderboard(): void;
   /** Open the Daily Rewards chest, folded into the More tray on mobile. */
   onDailyRewards(): void;
+  /** Open the Book of Deeds window, folded into the More tray on mobile. */
+  onDeeds(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
   /** Toggle background music; returns whether music is now enabled. */
@@ -451,6 +453,7 @@ export class MobileControls {
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
+    this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {
       const on = this.callbacks.onNameplates();

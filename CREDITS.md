@@ -1,7 +1,8 @@
 # Asset Credits
 
 Bundled third-party art assets are CC0 (public domain dedication) except the
-three.js water normal maps (MIT) and the CraftPix skill-icon packs. The CraftPix
+three.js water normal maps (MIT), the guide webfonts (SIL OFL 1.1), and the
+CraftPix skill-icon packs. The CraftPix
 icon packs were **purchased by the Levy Street account (callum@levystreet.com)**
 and are used under the CraftPix premium royalty-free license. Attribution is
 provided as a courtesy.
@@ -37,7 +38,10 @@ provided as a courtesy.
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset |
 | Meshy creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac from the Drowned Litany, yumi_cat from Protect Yumi, in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids and yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset |
 | Sampled interface and event sound effects (`public/audio/sfx/ui_*.mp3`) | World of ClaudeCraft | Project-generated deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` | Project asset |
+| Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
+| Book of Deeds achievement icons (`public/ui/deeds/*.webp`, one per earnable deed, downscaled from the maintainer's 512px source set to 128px WebP via `scripts/convert_deed_icons_webp.mjs`) | World of ClaudeCraft | Maintainer-commissioned bespoke art, owned by the project | Project asset |
+| Guide webfonts (`public/fonts/*.woff2`: Cinzel by Natanael Gama; Alegreya and Alegreya Sans by Juan Pablo del Peral, Huerta Tipografica; woff2 subsets latin/latin-ext/cyrillic/vietnamese as served by Google Fonts, self-hosted for the /wiki guide) | Natanael Gama; Huerta Tipografica | https://fonts.google.com/specimen/Cinzel , https://fonts.google.com/specimen/Alegreya , https://fonts.google.com/specimen/Alegreya+Sans | SIL OFL 1.1 |
 
 ## Audio
 

@@ -49,6 +49,15 @@
     letter-spacing: 0.2px;
     margin-top: -1px;
   }
+  /* Book of Deeds title: a subtitle line under a player's name */
+  .np-title {
+    font-size: 10px;
+    font-style: italic;
+    color: #ffe9a0;
+    font-family: var(--title-font);
+    letter-spacing: 0.2px;
+    margin-top: -1px;
+  }
   /* $WOC holder-tier flair badge, inline to the left of a player's name */
   .np-tier {
     display: inline-block;
@@ -757,6 +766,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     text-shadow: 1px 1px 2px #000;
+  }
+  /* Book of Deeds title decoration inside the name line: muted gold, INLINE in
+     the same nowrap ellipsized line (the frame keeps its single-line height;
+     a long name-plus-title combo ellipsizes, the classic-frame behavior). The
+     class declaration wins over the hostile/friendly color the target name
+     inherits from its parent's inline style. */
+  .uf-name .uf-title {
+    color: var(--gold-dim);
+    font-weight: normal;
   }
   .bar {
     position: relative;
@@ -1978,6 +1996,91 @@
   .qd-obj.done,
   .quest-complete {
     color: var(--color-text-success);
+  }
+
+  /* ---------- deed tracker ---------- */
+  /* Book of Deeds watchlist: a glanceable strip under the quest tracker.
+     The header mirrors the quest tracker's collapsible button chrome and is
+     a real tab stop (gold focus ring below, the qt-header shape); the lines
+     are the painter's fixed pool, shown/hidden through the elided writers. */
+  #deed-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  #deed-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #deed-tracker .dt-header:hover {
+    color: #fff;
+  }
+  #deed-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #deed-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #deed-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #deed-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #deed-tracker .dt-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  #deed-tracker .dt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  #deed-tracker .dt-bar {
+    flex: 0 0 56px;
+    height: 6px;
+    border: 1px solid #3a3325;
+    border-radius: 3px;
+    background: #14110b;
+    overflow: hidden;
+  }
+  #deed-tracker .dt-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#e6c76a, #a8842f);
+  }
+  #deed-tracker .dt-count {
+    font-size: 11px;
+    opacity: 0.85;
   }
 
   /* ---------- delve tracker ---------- */

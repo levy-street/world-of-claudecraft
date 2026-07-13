@@ -662,9 +662,22 @@ describe('dungeons: heroic boss drops', () => {
     expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
   });
 
-  it('the heroic Nythraxis raid boss drops from its own heroic table', () => {
-    const table = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak.map((e) => e.itemId);
-    const dropped = new Set<string>();
+  it('a heroic Nythraxis kill drops raid-tier heroic set pieces plus one heroic-only weapon', () => {
+    // The explicit heroic raid table carries only the heroic-ONLY extras: the
+    // three bespoke raid weapons in a single roll group (one drops per kill). The
+    // heroic set pieces and legendaries are not listed here: the boss's normal
+    // set-piece and legendary drops auto-upgrade to their raid-tier heroic
+    // variants in a heroic claim (loot/loot_roll.ts + heroic_variants.ts).
+    const heroicTable = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak;
+    const weaponIds = heroicTable.flatMap((e) => (e.itemId ? [e.itemId] : []));
+    const groups = new Set(heroicTable.map((e) => e.rollGroup));
+    expect(groups.size).toBe(1);
+    expect(new Set(weaponIds).size).toBe(3);
+    expect(heroicTable.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
+    for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+
+    const droppedWeapons = new Set<string>();
+    const droppedVariants = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
       const tank = sim.addPlayer('warrior', 'Tank');
@@ -688,11 +701,18 @@ describe('dungeons: heroic boss drops', () => {
         null,
         'hit',
       );
-      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) => table.includes(s.itemId));
-      expect(epics.length, `seed ${seed}`).toBe(2); // one per roll group
-      for (const s of epics) dropped.add(s.itemId);
+      const items = (boss.loot?.items ?? []) as any[];
+      // Exactly one heroic-only weapon per kill (one roll group summing to 1.0).
+      const weapons = items.filter((s) => weaponIds.includes(s.itemId));
+      expect(weapons.length, `seed ${seed} weapons`).toBe(1);
+      for (const s of weapons) droppedWeapons.add(s.itemId);
+      // The set-piece / legendary drops are upgraded to their heroic variants.
+      for (const s of items)
+        if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
     }
-    expect(dropped.size).toBeGreaterThan(2);
+    // Over eight kills all three weapons show up, and the set-piece swap is live.
+    expect(droppedWeapons.size).toBe(3);
+    expect(droppedVariants.size).toBeGreaterThan(2);
   });
 });
 

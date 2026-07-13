@@ -388,6 +388,20 @@ export async function ignoreReport(
   return (res.rowCount ?? 0) > 0;
 }
 
+// Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind, so
+// main.ts can bust the public board caches: a ban delists and an unban relists
+// immediately instead of waiting out a board TTL. Injected at boot the same
+// runtime-injection way as the route modules (this module must not import
+// main.ts). Hooking the write itself, rather than one route, covers every
+// caller: both admin dispatch arms AND the in-game GM sanctions
+// (server/game.ts ModerationService).
+let onAccountModerated: (() => void) | null = null;
+
+/** Inject (or clear) the post-moderation hook. Called once at boot by main.ts. */
+export function setOnAccountModerated(hook: (() => void) | null): void {
+  onAccountModerated = hook;
+}
+
 export async function moderateAccount(input: {
   accountId: number;
   adminAccountId: number;
@@ -471,6 +485,13 @@ export async function moderateAccount(input: {
     throw err;
   } finally {
     client.release();
+  }
+  // The action is committed; a cache-bust failure must never surface as a
+  // failed moderation action, so the hook runs outside the transaction path.
+  try {
+    onAccountModerated?.();
+  } catch (err) {
+    console.error('post-moderation hook failed:', err);
   }
 }
 

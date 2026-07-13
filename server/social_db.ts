@@ -162,14 +162,20 @@ export class PgSocialDb implements SocialDb {
     ]);
   }
 
-  async listFriends(charId: number): Promise<CharInfo[]> {
+  async listFriends(charId: number): Promise<(CharInfo & { activeTitle: string | null })[]> {
+    // state->>'activeTitle' rides the same JOINed characters row (the
+    // charactersForDeedsBoard read precedent in server/db.ts): no extra query.
     const res = await this.pool.query(
-      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm
+      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm,
+              c.state->>'activeTitle' AS active_title
        FROM friendships f JOIN characters c ON c.id = f.friend_id
        WHERE f.character_id = $1 ORDER BY c.name`,
       [charId],
     );
-    return res.rows;
+    return res.rows.map(({ active_title, ...r }) => ({
+      ...r,
+      activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
+    }));
   }
 
   async whoFriended(charId: number): Promise<number[]> {
@@ -333,18 +339,23 @@ export class PgSocialDb implements SocialDb {
 
   async guildMembers(
     guildId: number,
-  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]> {
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  > {
     const res = await this.pool.query(
-      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank
+      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank,
+              c.state->>'activeTitle' AS active_title
        FROM guild_members gm JOIN characters c ON c.id = gm.character_id
        WHERE gm.guild_id = $1 ORDER BY gm.joined_at`,
       [guildId],
     );
     // last_login is a TIMESTAMPTZ; serialize to an ISO string for the wire (never a
-    // raw Date), null when the character has never entered the world.
-    return res.rows.map((r) => ({
+    // raw Date), null when the character has never entered the world. active_title
+    // normalizes exactly like charactersForDeedsBoard (a deed id or null).
+    return res.rows.map(({ active_title, ...r }) => ({
       ...r,
       lastLogin: r.lastLogin ? new Date(r.lastLogin).toISOString() : null,
+      activeTitle: typeof active_title === 'string' && active_title !== '' ? active_title : null,
     }));
   }
 

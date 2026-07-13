@@ -146,7 +146,9 @@ describe('ranked Arena honor', () => {
     arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
 
     for (const pid of match.teamA) {
-      expect(sim.meta(pid)!.honor).toBe(RANKED_ARENA_WIN_HONOR['2v2']);
+      // Pinned to the literal (not the constant) so a wrong 2v2 faucet reddens here.
+      expect(sim.meta(pid)!.honor).toBe(50);
+      expect(RANKED_ARENA_WIN_HONOR['2v2']).toBe(50);
       expect(sim.meta(pid)!.arena2v2Wins).toBe(1);
     }
     for (const pid of match.teamB) {

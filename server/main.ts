@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
+import { DEEDS } from '../src/sim/content/deeds';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -12,7 +13,12 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
+import type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from '../src/world_api';
 import {
   configureAccountRuntime,
   handleAccount2faDisable,
@@ -58,7 +64,7 @@ import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
-import { characterSheet, type SheetRank } from './character_sheet';
+import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
@@ -69,11 +75,13 @@ import {
   bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
+  charactersForDeedsBoard,
   chatMuteStatusForAccount,
   closeOrphanSessions,
   createAccount,
   createCharacterCapped,
   createCompanionToken,
+  deedsBoardRanked,
   deleteCharacter,
   ensureSchema,
   findAccount,
@@ -109,6 +117,20 @@ import {
   topLifetimeXp,
   touchLogin,
 } from './db';
+import { configureDeedsRuntime } from './deeds';
+import {
+  buildDeedsBoardEntries,
+  DEEDS_BOARD_ENTRY_FLOOR,
+  deedsBoardSelf,
+  type RankedDeedsAccount,
+} from './deeds_board';
+import {
+  DEEDS_BOARD_DEMAND_TTL_MS,
+  singleFlight,
+  warmDeedsBoardIfDemanded,
+} from './deeds_board_warm';
+import { deedRarityCounts, recentDeedsForCharacter } from './deeds_db';
+import { deedRecordsIdle, publicRarityPayload } from './deeds_records';
 import {
   type DesktopLoginRouteDeps,
   handleDesktopLoginExchange,
@@ -166,7 +188,7 @@ import {
 import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
-import { configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import { buildDeedsBoard, configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -183,6 +205,7 @@ import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
+  setOnAccountModerated,
 } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
@@ -228,6 +251,7 @@ import {
   sfxBlobIntegrityMatches,
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
+import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -361,6 +385,15 @@ const LEADERBOARD_TTL_MS = 30_000;
 // Cache the full exposed depth (LEADERBOARD_MAX) once per scope; the REST handler
 // pages through it as an in-memory slice, so no extra query per page click.
 const LEADERBOARD_SIZE = LEADERBOARD_MAX;
+// Monotonic generation counter for every player-derived board cache. A refresh
+// captures it before its first await and installs its result only if it is still
+// unchanged when the read returns; bustBoardCaches (the moderation hook) bumps
+// it. This closes a lost-bust race: a ban landing while a refresh is in flight
+// would otherwise be overwritten by that refresh's pre-ban snapshot for up to
+// one TTL cycle. The in-flight caller still gets the computed snapshot; the cache
+// is left null so the NEXT read triggers a fresh refresh whose SQL delists the
+// account via ELIGIBLE_ACCOUNT_SQL.
+let boardEpoch = 0;
 // One cache per scope: 'realm' for the in-game panel, 'global' for the
 // cross-realm home-page board.
 const leaderboardCache: Record<
@@ -372,6 +405,7 @@ const leaderboardCache: Record<
 };
 
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -381,9 +415,12 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
+    // a deed id (never display text); the client localizes via deed_i18n
+    title: r.activeTitle,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  leaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) leaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
 
@@ -412,6 +449,7 @@ const guildLeaderboardCache: Record<
 async function refreshGuildLeaderboard(
   scope: 'realm' | 'global',
 ): Promise<GuildLeaderboardEntry[]> {
+  const epoch = boardEpoch;
   const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
   const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
@@ -421,7 +459,8 @@ async function refreshGuildLeaderboard(
     topLevel: r.topLevel,
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
-  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) guildLeaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
 }
 
@@ -433,6 +472,151 @@ async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLead
   } catch (err) {
     console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
+  }
+}
+
+// Renown (deeds) board cache. Same compute-once/serve-from-memory shape as
+// the boards above, but ONE entry, not one per scope: the board is
+// account-level and accounts span realms, so it is GLOBAL-ONLY by design.
+// `entries` is the public, display-character-faced list (paged by the route;
+// NEVER carries an account id); `ranked` keeps the accountId-keyed ranking
+// INTERNALLY for the self-rank read, and totalRanked is the pre-cap total the
+// percentile uses.
+interface DeedsBoardCache {
+  at: number;
+  entries: DeedsLeaderboardEntry[];
+  ranked: RankedDeedsAccount[];
+  totalRanked: number;
+}
+let deedsBoardCache: DeedsBoardCache | null = null;
+// Wall-clock ms of the last actual deeds-board request in THIS process, 0 before
+// the first. Stamped on the shared read path (ensureDeedsBoard) and read by the
+// warm loop's demand gate so the full-table board read only runs while someone is
+// viewing (see deeds_board_warm.ts). Per-process like the board caches: peer
+// realm processes gate their own warm loops off their own local demand.
+let deedsBoardLastRequestAt = 0;
+
+async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
+  const epoch = boardEpoch;
+  // Renown values are content-owned (never in SQL), so hand the whole content
+  // table to the SQL roll-up as two parallel arrays plus the floor. deedsBoardRanked
+  // aggregates IN Postgres and returns only the ranked accounts, 1:1 with the
+  // former computeDeedsBoard(rows).ranked shape.
+  const deedIds = Object.keys(DEEDS);
+  const renowns = deedIds.map((id) => DEEDS[id].renown);
+  const board = await deedsBoardRanked(deedIds, renowns, DEEDS_BOARD_ENTRY_FLOOR);
+  if (board.unknownDeedIds.length > 0) {
+    // Rows for removed/renamed content are skipped, never scored; surface the
+    // ids so a content rename is noticed instead of silently shrinking scores.
+    console.error('deeds board: skipping unknown deed ids:', board.unknownDeedIds.join(', '));
+  }
+  // buildDeedsBoardEntries faces each ranked account with its display
+  // character and SKIPS an account whose character vanished mid-refresh
+  // (deleted between the row read and this fill; the rows cascade away by the
+  // next refresh), never minting a blank row.
+  const entries = buildDeedsBoardEntries(
+    board.ranked,
+    await charactersForDeedsBoard(board.ranked.map((a) => a.displayCharacterId)),
+  );
+  const cache: DeedsBoardCache = {
+    at: Date.now(),
+    entries,
+    ranked: board.ranked,
+    totalRanked: board.totalRanked,
+  };
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch);
+  // the in-flight caller still gets this snapshot, the next read self-corrects.
+  if (boardEpoch === epoch) deedsBoardCache = cache;
+  return cache;
+}
+
+// Single-flight on the board refresh, covering BOTH read paths: the inline
+// read (ensureDeedsBoard) and the demand-warm loop. The board read is the one
+// full-table roll-up here, so callers racing a cold or just-expired cache (a
+// login-page storm on a fresh process, or a warm tick landing on an inline
+// request, since the warm interval equals the cache TTL) must share ONE
+// refresh: concurrent flights would multiply the most expensive query the
+// process has, and the slower flight would overwrite a newer snapshot with a
+// fresher timestamp.
+const refreshDeedsBoardShared = singleFlight(refreshDeedsBoard);
+
+// Freshness gate shared by the two board reads below: serve the cache inside
+// the TTL, else refresh, else stale-serve (or null before the first success).
+async function ensureDeedsBoard(): Promise<DeedsBoardCache | null> {
+  // Mark demand on every board read (fresh-cache hit included): this is the one
+  // chokepoint both dispatch arms funnel through, and it is never on the warm
+  // path, so the stamp measures real viewer demand and nothing else. It keeps the
+  // warm loop refreshing the board for DEEDS_BOARD_DEMAND_TTL_MS after the last
+  // request; a cold or stale request still refreshes inline just below.
+  deedsBoardLastRequestAt = Date.now();
+  if (deedsBoardCache && Date.now() - deedsBoardCache.at < LEADERBOARD_TTL_MS) {
+    return deedsBoardCache;
+  }
+  try {
+    return await refreshDeedsBoardShared();
+  } catch (err) {
+    console.error('deeds board refresh failed:', err);
+    return deedsBoardCache;
+  }
+}
+
+async function getDeedsLeaderboard(): Promise<DeedsLeaderboardEntry[]> {
+  return (await ensureDeedsBoard())?.entries ?? [];
+}
+
+async function deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null> {
+  const cache = await ensureDeedsBoard();
+  return cache ? deedsBoardSelf(cache.ranked, accountId) : null;
+}
+
+// Moderation delisting in THIS process is immediate, never TTL-bound: null
+// EVERY cached board scope after a successful moderateAccount of any action
+// kind, so a ban delists and an unban relists on the next read here. In the
+// process-per-realm fleet, PEER realm processes keep their own caches and
+// converge within one LEADERBOARD_TTL_MS (the boards' pre-existing staleness
+// ceiling); the SQL exclusion makes their next refresh correct. Arena is
+// served uncached by design, and the daily-rewards board reads run per
+// request (the SQL exclusion in daily_rewards_db.ts is the whole mechanism),
+// so both are already exact fleet-wide with no cache to bust here. Bumping
+// boardEpoch as well as nulling the caches closes the lost-bust race: a refresh
+// already in flight when this fires will decline to install its pre-ban snapshot
+// (see boardEpoch), so a ban cannot be masked for up to a TTL cycle.
+function bustBoardCaches(): void {
+  boardEpoch++;
+  leaderboardCache.realm = null;
+  leaderboardCache.global = null;
+  guildLeaderboardCache.realm = null;
+  guildLeaderboardCache.global = null;
+  deedsBoardCache = null;
+}
+setOnAccountModerated(bustBoardCaches);
+
+// Deed rarity cache. Same compute-once/serve-from-memory shape as the boards
+// above, one entry (the aggregate is global/cross-realm by design). 5 minutes:
+// rarity moves slowly and the refresh scans character_deeds, so the 30 s board
+// TTL is tighter than this read needs. Stale-on-error like the boards; with
+// nothing cached yet a failed refresh serves the empty aggregate (the endpoint
+// stays 200 and clients simply render no rarity lines).
+const DEEDS_RARITY_TTL_MS = 5 * 60_000;
+let deedsRarityCache: {
+  at: number;
+  payload: import('../src/world_api').DeedsRarity;
+} | null = null;
+
+async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity> {
+  if (deedsRarityCache && Date.now() - deedsRarityCache.at < DEEDS_RARITY_TTL_MS) {
+    return deedsRarityCache.payload;
+  }
+  try {
+    // publicRarityPayload strips hidden deeds at refresh time: this cache
+    // feeds an anonymous endpoint, and a hidden deed's existence must not be
+    // enumerable the moment somebody earns it.
+    const payload = publicRarityPayload(await deedRarityCounts());
+    deedsRarityCache = { at: Date.now(), payload };
+    return payload;
+  } catch (err) {
+    console.error('deeds rarity refresh failed:', err);
+    return deedsRarityCache?.payload ?? { totalEligible: 0, earned: {} };
   }
 }
 
@@ -1149,9 +1333,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacterById(target.characterId);
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank] = await Promise.all([
+      const [guild, rank, deedsRecent] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
+        recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
       ]);
       return json(
         res,
@@ -1163,6 +1348,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           origin: publicOrigin(req),
           guild,
           rank: toSheetRank(rank),
+          deedsRecent,
         }),
       );
     }
@@ -1173,9 +1359,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank] = await Promise.all([
+      const [guild, rank, deedsRecent] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
+        recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
       ]);
       return json(
         res,
@@ -1187,6 +1374,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           origin: publicOrigin(req),
           guild,
           rank: toSheetRank(rank),
+          deedsRecent,
         }),
       );
     }
@@ -1426,11 +1614,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       });
     }
     if (req.method === 'GET' && url === '/api/status') {
+      // steam.enabled is the capability advert clients read before rendering any
+      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
+      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
+      // never serves, so every /api/steam/* 404s here. Advertising the capability
+      // on an arm that then 404s it would strand a client into a dead link flow.
+      // Under the default 'new' dispatch the migrated statusHandler
+      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
+      // are live. This is a deliberate divergence from the new arm under
+      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
         players_online: liveGame().clients.size,
         names: [...liveGame().clients.values()].map((s) => s.name),
+        steam: { enabled: false },
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -1485,6 +1683,23 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           metric: 'landedCommits',
           ...devSlice,
         });
+      }
+      // ?board=deeds is the Renown board: ACCOUNTS ranked by lifetime deed
+      // Renown, character-faced. GLOBAL-ONLY by design (accounts span realms),
+      // so ?scope is accepted and ignored and the body always carries scope
+      // 'global' (buildDeedsBoard fixes it). The bearer is resolved LENIENTLY
+      // here, the legacy arms' shape (cf. the realms arm): a missing, invalid,
+      // or locked token serves the board anonymously with no self row, while
+      // the router-owned arm validates a present token (the labeled
+      // authz-gap-close divergence class); anonymous and valid-token responses
+      // are byte-identical on both dispatch paths via the shared builder.
+      if (params.get('board') === 'deeds') {
+        const deedsEntries = await getDeedsLeaderboard();
+        const deedsPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const deedsPage = Number(params.get('page')) || 0;
+        const bearer = await bearerScopeAccount(req).catch(() => null);
+        const self = bearer ? await deedsSelfRank(bearer.accountId) : null;
+        return json(res, 200, buildDeedsBoard(REALM, deedsEntries, deedsPage, deedsPageSize, self));
       }
       const entries = await getLeaderboard(scope);
       // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
@@ -1947,6 +2162,8 @@ configureLeaderboardRuntime({
   getLeaderboard,
   getGuildLeaderboard,
   getDevLeaderboard: () => topContributors(),
+  getDeedsLeaderboard,
+  deedsSelfRank,
   getReleases,
   // A getter, not a value: configureLeaderboardRuntime runs at module load (before
   // startServer primes the config), but leaderboard.ts reads rt.githubRepo only at
@@ -1958,6 +2175,13 @@ configureLeaderboardRuntime({
   releasesMaxLimit: RELEASES_SIZE,
   publicOrigin,
   toSheetRank,
+});
+
+// Inject the main.ts runtime the deeds handlers (server/deeds.ts) need but
+// cannot import without a cycle: the cache-fronted global rarity read. Done at
+// module load, before any request, mirroring configureLeaderboardRuntime above.
+configureDeedsRuntime({
+  deedsRarity: getDeedsRarity,
 });
 
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
@@ -2401,6 +2625,21 @@ export async function startServer(): Promise<http.Server> {
     void refreshGuildLeaderboard('global').catch((err) =>
       console.error('guild leaderboard refresh failed (global):', err),
     );
+    // Demand-gated: the Renown board is a full-table roll-up, so keep it warm
+    // only while it is actually being viewed (a request within
+    // DEEDS_BOARD_DEMAND_TTL_MS). An idle board pays nothing here; a cold or stale
+    // request still refreshes inline on its own read path (ensureDeedsBoard), then
+    // this loop keeps it fresh until demand lapses again.
+    warmDeedsBoardIfDemanded(
+      () => {
+        void refreshDeedsBoardShared().catch((err) =>
+          console.error('deeds board refresh failed:', err),
+        );
+      },
+      deedsBoardLastRequestAt,
+      Date.now(),
+      DEEDS_BOARD_DEMAND_TTL_MS,
+    );
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
@@ -2503,6 +2742,19 @@ export async function startServer(): Promise<http.Server> {
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
     await bankLedgerIdle();
+    // Drain the character_deeds FIFO too: saveAll above already persisted every
+    // blob, and an insert still queued here would be rejected by pool.end() and
+    // go missing until that character's next login (the join reconcile is the
+    // only heal). Rejections log inside the writer, so the drain never throws.
+    await deedRecordsIdle();
+    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
+    // deeds records it observes): an unlock still queued here would be lost on
+    // pool.end(), and the next reconcile (on link or on login) is its only
+    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
+    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
+    // failures are swallowed inside the worker, so this never throws. A no-op
+    // when the mirror is dark.
+    await stopSteamMirror(5000);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log

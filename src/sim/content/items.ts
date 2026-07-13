@@ -608,14 +608,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
   // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
-  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE),
-  // vendor/loot-sourced for now.
+  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE).
+  // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
+  // recipe has a live reagent source; buyValue is the trade-goods staple
+  // markup already used in this file (4x sellValue, travelers_knapsack's
+  // exact ratio, with linen_pouch and spring_water close by at 4.17x), not
+  // a new balance number.
   thorium_ore: {
     id: 'thorium_ore',
     name: 'Thorium Ore',
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   arcanite_bar: {
     id: 'arcanite_bar',
@@ -623,6 +628,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   ashwood_log: {
     id: 'ashwood_log',
@@ -630,6 +636,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   elderwood_log: {
     id: 'elderwood_log',
@@ -637,6 +644,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   goldleaf_herb: {
     id: 'goldleaf_herb',
@@ -644,6 +652,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   sunpetal_herb: {
     id: 'sunpetal_herb',
@@ -651,6 +660,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.

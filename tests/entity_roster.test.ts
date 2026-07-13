@@ -5,6 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
+import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
@@ -127,7 +128,6 @@ function makeCtx() {
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
-    grantHonor: vi.fn(() => 0),
     error: vi.fn(),
     clearEntityMarker,
     pulseGroundAoE,
@@ -217,6 +217,16 @@ function makeCtx() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    deedDirtyPids: new Set<number>(),
+    deedDirtyKeys: new Map<number, Set<string>>(),
+    worldBossEntityIds: [],
+    deedRuntime: createDeedRuntime(),
+    fiestaBotPids: [],
+    bumpDeedStat: vi.fn(),
+    markItemDiscovered: vi.fn(),
+    markVisited: vi.fn(),
+    markDeedsDirty: vi.fn(),
+    grantDeed: vi.fn(() => true),
     grantXp: vi.fn(),
     enterCombat: vi.fn(),
     hexOutputMult: vi.fn(() => 1),

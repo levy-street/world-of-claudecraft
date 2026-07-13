@@ -37,6 +37,14 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     expect(painter).not.toContain('applyBagFilter(');
   });
 
+  it("asks for the backpack icon by the id the art is wired under ('backpack')", () => {
+    // The bar's first socket is the implicit backpack, whose painted art is wired in
+    // icons.ts under exactly this id (UI_ITEM_IMAGE_IDS, guarded by item_icons.test.ts).
+    // Rename the id here and the socket silently falls back to the procedural sack while
+    // every icon guard stays green, so the call site is pinned too.
+    expect(painter).toContain("iconDataUrl('item', 'backpack')");
+  });
+
   it('captures and reapplies the .bag-grid scroll offset across a rebuild', () => {
     expect(painter).toContain(".bag-grid')?.scrollTop");
     expect(painter).toContain('grid.scrollTop = prevScrollTop');

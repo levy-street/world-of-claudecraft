@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -33,7 +34,7 @@ import {
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, t } from '../ui/i18n';
+import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
@@ -233,6 +234,8 @@ export class NameplatePainter {
         this.setNameplateDevTier(v, suppressSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator.
         this.setNameplateDiscord(v, suppressSelf ? undefined : e.discordAvatar, e.discordName);
+        // Book of Deeds title subtitle (the `title` wire field, a deed id).
+        this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
@@ -409,6 +412,24 @@ export class NameplatePainter {
     } else {
       v.devTierEl.removeAttribute('src');
       v.devTierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the Book of Deeds title subtitle under a player's name (the
+  // entity `title` wire field, a deed id; empty means untitled). Cheap-diffed
+  // per (language, title id) so the id-to-text resolution and the DOM write
+  // only run when either changes: no per-frame string work.
+  private setNameplateTitle(v: EntityView, titleId: string | null | undefined): void {
+    const sig = titleId ? `${getLanguage()}|${titleId}` : '';
+    if (sig === v.titleSig) return;
+    v.titleSig = sig;
+    // A stale/unknown deed id (content drift) resolves to '' and hides the line.
+    const text = titleId ? deedTitleText(titleId) : '';
+    if (text !== '') {
+      v.titleEl.textContent = text;
+      v.titleEl.style.display = '';
+    } else {
+      v.titleEl.style.display = 'none';
     }
   }
 

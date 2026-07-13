@@ -29,17 +29,17 @@ export const ZONE1_ZONE: ZoneDef = {
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
-    { x: 0, z: -3, label: 'Eastbrook' },
-    { x: -2, z: 70, label: 'Wolf Run' },
-    { x: 65, z: 0, label: 'Boar Meadow' },
-    { x: -88, z: 82, label: 'Mirror Lake' },
-    { x: -60, z: 4, label: 'Sableweb' },
-    { x: -84, z: -64, label: 'Copper Dig' },
-    { x: 76, z: -76, label: 'Bandit Camp' },
-    { x: 80, z: 80, label: 'Fallen Chapel' },
-    { x: -5, z: -52, label: 'Reliquary Hill' },
-    { x: 40, z: 140, label: 'Brightwood Glade' },
-    { x: -11, z: -112, label: 'The Sowfield' },
+    { x: 0, z: -3, label: 'Eastbrook', id: 'eastbrook' },
+    { x: -2, z: 70, label: 'Wolf Run', id: 'wolf_run' },
+    { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
+    { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
+    { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
+    { x: -84, z: -64, label: 'Copper Dig', id: 'copper_dig' },
+    { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
+    { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
+    { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
+    { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
+    { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
   ],
   welcome: 'Find Marshal Redbrook in town — he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -671,6 +671,21 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     dynamic: true,
     greeting:
       'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
+  },
+  chronicler_saul: {
+    id: 'chronicler_saul',
+    name: 'Saul the Chronicler',
+    title: 'The Vale Chronicle',
+    // Southeast corner of the square, on the quiet side away from the well
+    // cluster and the player start, looking back northwest across the square
+    // (nearest authored neighbor ~13 units; he had been shoulder to shoulder
+    // with the well crowd).
+    pos: { x: 15, z: -16 },
+    facing: 2.4,
+    color: 0xd08a2e, // warm amber: the chronicler tint is his identity (shared mage visual)
+    questIds: [],
+    greeting:
+      'Every deed worth doing is worth writing down twice, $N: once for the ledger and once for the fireside.',
   },
 };
 

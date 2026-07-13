@@ -53,6 +53,9 @@ export interface FriendRow {
   dot: string;
   status: string | undefined;
   zone: string | undefined;
+  /** The selected Book of Deeds title as a DEED ID (null untitled); the
+   *  painter localizes through deed_i18n.ts and hides on ''. */
+  activeTitle: string | null;
 }
 
 /** Friends-tab rows in source order. */
@@ -66,6 +69,7 @@ export function friendRows(social: SocialInfo | null): FriendRow[] {
     dot: socialDot(f.online, f.status),
     status: f.status,
     zone: f.zone,
+    activeTitle: f.activeTitle ?? null,
   }));
 }
 
@@ -91,6 +95,9 @@ export interface GuildRow {
    *  The painter formats it (relative/date) and localizes; the core just
    *  passes it through. */
   lastLogin: string | null;
+  /** The selected Book of Deeds title as a DEED ID (null untitled), as on
+   *  FriendRow. */
+  activeTitle: string | null;
   /** This member's guild rank key ('leader' | 'officer' | 'member'). */
   rank: string;
   /** True when this row is the viewing player. */
@@ -133,6 +140,7 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       status: m.status,
       zone: m.zone,
       lastLogin: m.lastLogin ?? null,
+      activeTitle: m.activeTitle ?? null,
       rank: m.rank,
       self,
       canWhisper: m.online && !self,

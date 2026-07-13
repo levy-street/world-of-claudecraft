@@ -178,6 +178,19 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     ctx.emit({ type: 'log', text: 'Trade complete.', color: '#8df', pid: tPid });
     ctx.emit({ type: 'tradeDone', pid: tPid });
   }
+  // The goods have moved; count the completed trade for both sides, but only when
+  // something actually changed hands. A zero-item, zero-copper double-confirm still
+  // completes (and emits tradeDone), but it is not a trade for deed purposes:
+  // soc_first_trade must not unlock on an empty handshake.
+  const nonEmpty =
+    session.offerA.items.length > 0 ||
+    session.offerB.items.length > 0 ||
+    session.offerA.copper > 0 ||
+    session.offerB.copper > 0;
+  if (nonEmpty) {
+    ctx.bumpDeedStat(metaA, 'tradesCompleted', 1);
+    ctx.bumpDeedStat(metaB, 'tradesCompleted', 1);
+  }
   closeTrade(ctx, session);
 }
 
