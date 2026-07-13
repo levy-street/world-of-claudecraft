@@ -399,6 +399,7 @@ import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
+import { StarterTutorial, type TutorialSceneHooks } from './starter_tutorial';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -1406,6 +1407,10 @@ export class Hud {
   private recomposeOpenCard: (() => void) | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
+  // Dawnhaven Isle's guided tutorial. Inert unless main.ts started a tutorial
+  // session (startStarterTutorial below); the in-world coachmark above is the
+  // separate, always-on onboarding for players who skipped the isle.
+  private starterTutorial = new StarterTutorial();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -6826,7 +6831,12 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
-    this.tutorial.update(sim, this.renderer, this.keybinds);
+    // The two onboardings are mutually exclusive by construction. A tutorial
+    // character on the isle is a FRESH level 1 with no quests, which is exactly what
+    // the in-world coachmark engages on, so without this both cards stack on top of
+    // each other and teach different things at once.
+    if (!this.starterTutorial.running) this.tutorial.update(sim, this.renderer, this.keybinds);
+    this.starterTutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
     this.updateLootRollTimers(now);
@@ -8753,8 +8763,18 @@ export class Hud {
     return false;
   }
 
+  /** Start a Dawnhaven Isle tutorial session. Called by main.ts right after it
+   *  boots the offline tutorial world; a no-op session otherwise. */
+  startStarterTutorial(cls: PlayerClass, hooks: TutorialSceneHooks): void {
+    this.starterTutorial.begin(cls, hooks);
+  }
+
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
+    // The tutorial's class challenges are proven by what the player actually did
+    // (this ability landed, that heal went out), so it reads the same event drain
+    // the log and the FCT do. Inert outside a tutorial session.
+    this.starterTutorial.onEvents(events, sim.playerId);
     // Book of Deeds unlocks batch across the whole drain (handleDeedUnlocks):
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.

@@ -15,7 +15,7 @@
 import type { Keybinds } from '../game/keybinds';
 import type { Renderer } from '../render/renderer';
 import { PLAYER_START, QUESTS, ZONES } from '../sim/data';
-import { dist2d, INTERACT_RANGE } from '../sim/types';
+import { ALL_CLASSES, dist2d, INTERACT_RANGE, type PlayerClass } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n';
 import { formatNumber, t } from './i18n';
@@ -38,7 +38,17 @@ const STARTER_MOB =
 const SPAWN = { x: PLAYER_START.x, y: 0, z: PLAYER_START.z }; // dist2d ignores y
 const MOVE_THRESHOLD = 3; // yards from spawn before "find your footing" is satisfied
 const GIVER_RANGE = INTERACT_RANGE + 2; // matches the sim's accept-quest reach
-const STORAGE_KEY = 'woc.tutorial.v1';
+// Per-CLASS completion, not one global flag. Onboarding is class-shaped (a rogue
+// opening from stealth has nothing to do with a mage's cast bar), and the isle
+// tutorial is offered once per never-played class, so the in-world coachmark that
+// backs it up has to be scoped the same way or a player who did the isle as a mage
+// would still be walked through Eastbrook on their first rogue, and vice versa.
+//
+// v1 was a single 'done' string. It is READ here and migrated: an existing v1 flag
+// means "this player has already been onboarded once", which we honor by treating
+// every class as seen. Nobody who finished the old tutorial gets it again.
+const STORAGE_KEY = 'woc.tutorial.classes.v1';
+const LEGACY_STORAGE_KEY = 'woc.tutorial.v1';
 // Auto-dismiss the closing card after this long. Longer than the mid-tutorial
 // steps (which advance on player action, not a timer) so there is time to read
 // the "where to next" tips below the quest-complete line before it fades.
@@ -83,8 +93,37 @@ export function computeTutorialStep(s: TutorialSnapshot): TutorialStep {
   return 'move';
 }
 
+/** The classes this player has already been onboarded on, in either tutorial. */
+export function seenTutorialClasses(): Set<PlayerClass> {
+  try {
+    // Legacy: a v1 'done' flag means they were onboarded before this was
+    // class-scoped, so nothing should be re-taught to them.
+    if (localStorage.getItem(LEGACY_STORAGE_KEY) === 'done') return new Set(ALL_CLASSES);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((c): c is PlayerClass => ALL_CLASSES.includes(c as PlayerClass)));
+  } catch {
+    return new Set();
+  }
+}
+
+/** Mark a class onboarded. Called when either tutorial finishes or is skipped, so
+ *  completing Dawnhaven Isle as a mage also retires the in-world mage coachmark. */
+export function markTutorialClassSeen(cls: PlayerClass): void {
+  try {
+    const seen = seenTutorialClasses();
+    seen.add(cls);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
+  } catch {
+    /* private mode: worst case the coachmark shows once more */
+  }
+}
+
 export class TutorialOverlay {
-  private completed: boolean;
+  private seen: Set<PlayerClass> = seenTutorialClasses();
+  private cls: PlayerClass | null = null;
   private engaged = false; // decided to run for this (fresh) character
   private step: TutorialStep | null = null;
   private doneSince = 0;
@@ -101,21 +140,24 @@ export class TutorialOverlay {
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
 
-  constructor() {
-    this.completed = readDone();
-  }
-
-  // Called every HUD frame. Cheap no-op once completed or never engaged.
+  // Called every HUD frame. Cheap no-op once this class is onboarded, or while
+  // never engaged.
   update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
-    if (this.completed) return;
     const p = world.player;
     if (!p) return;
+    // A player entity carries its class in `templateId` (Entity.templateId is the
+    // mob/npc template id, or the class for a player). It only becomes readable
+    // once a real player entity is in hand, so the per-class gate is evaluated
+    // here rather than in the constructor.
+    const cls = p.templateId as PlayerClass;
+    if (this.seen.has(cls)) return;
 
     // Engage only for a genuinely fresh character (id-guarded against the online
     // pre-snapshot placeholder — see isFreshCharacter).
     if (!this.engaged) {
       if (!isFreshCharacter(world)) return;
       this.engaged = true;
+      this.cls = cls;
     }
 
     const giver = this.findEntity(world, 'npc', GIVER_NPC);
@@ -376,27 +418,14 @@ export class TutorialOverlay {
   }
 
   private finish(): void {
-    this.completed = true;
+    if (this.cls) {
+      this.seen.add(this.cls);
+      markTutorialClassSeen(this.cls);
+    }
     this.engaged = false;
-    writeDone();
     this.root?.remove();
     this.arrow?.remove();
     this.root = null;
     this.arrow = null;
-  }
-}
-
-function readDone(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === 'done';
-  } catch {
-    return false;
-  }
-}
-function writeDone(): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, 'done');
-  } catch {
-    /* private mode */
   }
 }
