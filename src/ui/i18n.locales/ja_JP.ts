@@ -7222,4 +7222,102 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
+  'hudChrome.starterTutorial.skip': '島を去る',
+  'hudChrome.starterTutorial.leave': '本土へ船出する',
+  'hudChrome.starterTutorial.doneTitle': '守人はご満悦だ',
+  'hudChrome.starterTutorial.doneBody':
+    '突っ立ったまま教えられることは、これで全部だ。あとは下手を打ちながら覚えるしかない。行け、本土が待っている。あそこは私ほど優しくはないぞ。',
+  'hudChrome.starterTutorial.objectiveDone': '{label}: 完了',
+  'hudChrome.starterTutorial.scenes.wardenReveal':
+    '祠の石にさす光の中からひとりの女が歩み出て、朝からずっとおまえを待っていたとでもいうように、上着の潮を払い落とす。',
+  'hudChrome.starterTutorial.scenes.yardReveal':
+    '訓練場だ。藁人形が3体、聖人のように辛抱強く、そして同じくらい無害だ。',
+  'hudChrome.starterTutorial.scenes.wolfReveal':
+    '茂みが動く。あれがモブだ。おまえを殺したくてたまらない生き物のことだ。体力バーがある。こちらのが空になる前に、あちらを空にしろ。',
+  'hudChrome.starterTutorial.steps.land':
+    '潮がまたひとり運んできたか。砂浜から道が伸びていて、その上の丘に祠がある。歩いて登ってこい。私は誰のためにも大声など出さん。',
+  'hudChrome.starterTutorial.steps.enlist':
+    'こちらには仕事があり、おまえの手は空いている。近くに立って話しかけ、任務を受けろ。',
+  'hudChrome.starterTutorial.steps.target':
+    'この島で、おまえのためにじっとしていてくれるのは私の人形だけだ。訓練場は東。1体選んでターゲットにしろ。',
+  'hudChrome.starterTutorial.steps.strike':
+    'さあ叩け。近づいて武器を振り始めろ。自動攻撃は一度始まれば勝手に続く。眺めて突っ立っているな。',
+  'hudChrome.starterTutorial.steps.hunt':
+    '潮に乗って浜辺の狼が3頭上がってきて、私の山羊を狙っている。西へ、窪地へ下りろ。さっさと行け。',
+  'hudChrome.starterTutorial.steps.spoils':
+    '仕留めた獲物を調べもせずに立ち去るな。狼をルートして、牙を抜き取ってこい。',
+  'hudChrome.starterTutorial.steps.report':
+    '私のところへ戻れ。任務は殺し終えたときではなく、報告して初めて終わる。',
+  'hudChrome.starterTutorial.objective.land': '守人のもとへたどり着く',
+  'hudChrome.starterTutorial.objective.enlist': '任務を受ける',
+  'hudChrome.starterTutorial.objective.target': '{mob}をターゲットする',
+  'hudChrome.starterTutorial.objective.strike': '自動攻撃の命中回数',
+  'hudChrome.starterTutorial.objective.hunt': '浜辺の狼の討伐数',
+  'hudChrome.starterTutorial.objective.report': '守人に報告する',
+  'hudChrome.starterTutorial.objective.abilityHit': '{ability}の命中回数',
+  'hudChrome.starterTutorial.objective.auraUp': '{ability}が有効',
+  'hudChrome.starterTutorial.objective.healSelf': '自分自身を回復する',
+  'hudChrome.starterTutorial.objective.rangedHit': '遠距離からの自動射撃の命中回数',
+  'hudChrome.starterTutorial.objective.petSummoned': 'デーモンを召喚',
+  'hudChrome.starterTutorial.class.warrior.signature':
+    '武器を振ればレイジが溜まる。そしてレイジは使うためにある。人形に{ability}を2回当てろ。',
+  'hudChrome.starterTutorial.class.warrior.mastery':
+    '戦士は承知のうえで騒がしい。{ability}を上げて、島じゅうに聞かせてやれ。',
+  'hudChrome.starterTutorial.class.paladin.signature':
+    'おまえの力は借り物だ。借りるものは、まず請わねばならん。{ability}で武器に刻印しろ。',
+  'hudChrome.starterTutorial.class.paladin.mastery':
+    '光は何かを焼く前に、まず身内を癒やす。一度自分を回復して、パラディンを立たせているものを感じてみろ。',
+  'hudChrome.starterTutorial.class.hunter.signature':
+    'ハンターとて追い詰められる。そのとき刃の使い道を知らんようでは困る。人形に{ability}を2回叩き込め。',
+  'hudChrome.starterTutorial.class.hunter.mastery':
+    '次はまともにやれ。相手の届かないところまで下がって撃つ。そこから自動射撃を3発だ。',
+  'hudChrome.starterTutorial.class.rogue.signature':
+    '斬れ、斬り続けろ。{ability}を3回当てて、コンボポイントが積み上がるのを見ておけ。',
+  'hudChrome.starterTutorial.class.rogue.mastery':
+    'ポイントは抱え込んでいても何の値打ちもない。使え。{ability}で人形にとどめを刺せ。',
+  'hudChrome.starterTutorial.class.priest.signature':
+    '牙を持った信仰だ。{ability}で人形を2回打て。',
+  'hudChrome.starterTutorial.class.priest.mastery':
+    'そして癒やす信仰だ。一度自分を回復しろ。その習慣は必ず要る。',
+  'hudChrome.starterTutorial.class.mage.signature':
+    'まず火を放て、問いは後回しどころか無用だ。人形に{ability}を2回当てろ。',
+  'hudChrome.starterTutorial.class.mage.mastery':
+    '布はよく燃える。だから布よりましなものを身に纏え。{ability}を張っておけ。',
+  'hudChrome.starterTutorial.class.warlock.signature':
+    '闇に手を突っ込み、ひとつかみ取って、何かに投げつける。人形に{ability}を2回当てろ。',
+  'hudChrome.starterTutorial.class.warlock.mastery':
+    '誰が何と言おうと、ウォーロックは一人で歩くものではない。デーモンを召喚しろ。',
+  'hudChrome.starterTutorial.class.druid.signature':
+    '野生は、礼を尽くして頼めば応えてくれる。人形に{ability}を2回当てろ。',
+  'hudChrome.starterTutorial.class.druid.mastery':
+    '今度は自分自身のために頼んでみろ。{ability}を自分にかけるんだ。',
+  'hudChrome.starterTutorial.class.shaman.signature':
+    '今日は嵐がおまえの味方だ。人形に{ability}を2回当てろ。',
+  'hudChrome.starterTutorial.class.shaman.mastery':
+    '嵐の前に、まず石だ。{ability}を武器に付与しろ。',
+  'starterTutorial.title': '少し寄り道しませんか',
+  'starterTutorial.body':
+    'あなたにとって初めての{className}です。新米の冒険者のための訓練の島があり、そこにいる守人が、このクラスに実際に何ができるのかを順を追って教えてくれます。数分で終わりますし、受けるかどうかは完全に自由です。',
+  'starterTutorial.note':
+    'キャラクターは作成したときのままです。島で手に入れたものは何ひとつ持ち帰りません。',
+  'starterTutorial.accept': 'ドーンヘイヴンへ渡る',
+  'starterTutorial.decline': 'スキップする、道は心得ています',
+  'entities.mobs.dawnhaven_dummy.name': '訓練用の人形',
+  'entities.mobs.dawnhaven_strandwolf.name': '浜辺の狼',
+  'entities.npcs.dawnhaven_warden.name': '守人フェンナ・ロック',
+  'entities.npcs.dawnhaven_warden.title': 'ドーンヘイヴンの守り手',
+  'entities.npcs.dawnhaven_warden.greeting':
+    '立って息をしているな、{className}か。結構。島は気長だが、狼はそうではない。',
+  'entities.quests.q_dawnhaven_wolves.title': '守人の試練',
+  'entities.quests.q_dawnhaven_wolves.text':
+    '潮に乗って浜辺の狼が3頭上がってきて、それからずっと私の山羊を狙っている。西の道から窪地へ下りて、{playerName}、訓練場で覚えたものを見せてみろ。',
+  'entities.quests.q_dawnhaven_wolves.completion':
+    '見事な手際だ。おまえはもう、私の島より大きな島へ出てよい。',
+  'entities.quests.q_dawnhaven_wolves.objectives.0.label': '浜辺の狼を討伐',
+  'entities.zones.dawnhaven_isle.name': 'ドーンヘイヴン島',
+  'entities.zones.dawnhaven_isle.welcome': '道を上がったところで、守人ロックが待っています。',
+  'entities.zones.dawnhaven_isle.pois.0.label': '船着き場',
+  'entities.zones.dawnhaven_isle.pois.1.label': '守人の憩い',
+  'entities.zones.dawnhaven_isle.pois.2.label': '訓練場',
+  'entities.zones.dawnhaven_isle.pois.3.label': '狼の窪地',
 };

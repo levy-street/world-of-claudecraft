@@ -7208,4 +7208,102 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '몇 가지 자주 쓰는 명령어는 외워 둘 만합니다. /w 이름은 귓속말을 보내고, /r은 마지막으로 받은 귓속말에 답하며, /invite는 상대를 파티로 초대하고, /follow는 친구 뒤를 따라 걷게 하며, /roll은 파티가 함께 볼 주사위를 굴리고, /who는 접속 중인 사람을 보여주며, /afk는 자리 비움으로 표시합니다. 전체 목록은 게임에서 /help를 입력해 확인하세요.',
   'guide.social.slashHeading': '유용한 슬래시 명령어',
+  'hudChrome.starterTutorial.skip': '섬 떠나기',
+  'hudChrome.starterTutorial.leave': '본토로 출항하기',
+  'hudChrome.starterTutorial.doneTitle': '감시관이 만족했다',
+  'hudChrome.starterTutorial.doneBody':
+    '가만히 선 채로 가르칠 수 있는 건 여기까지다. 나머지는 먼저 서투르게 겪어 봐야 배우는 법이다. 가라, 본토가 기다린다. 그곳은 나만큼 다정하지 않을 거다.',
+  'hudChrome.starterTutorial.objectiveDone': '{label}: 완료',
+  'hudChrome.starterTutorial.scenes.wardenReveal':
+    '한 여인이 제단 돌 위의 빛 속에서 걸어 나와, 아침 내내 당신을 기다렸다는 듯 외투에 묻은 소금기를 털어낸다.',
+  'hudChrome.starterTutorial.scenes.yardReveal':
+    '연습장이다. 짚 허수아비 셋이 성인처럼 참을성 있게, 딱 그만큼 위험하지 않게 서 있다.',
+  'hudChrome.starterTutorial.scenes.wolfReveal':
+    '덤불이 흔들린다. 저것이 바로 몹, 당신을 아주 기꺼이 죽이려 드는 살아 있는 것이다. 저것에게도 생명력 바가 있다. 당신 것이 비기 전에 저것부터 비워라.',
+  'hudChrome.starterTutorial.steps.land':
+    '조수가 또 한 명 데려왔군. 모래밭을 따라 오르는 길이 있고, 그 위 언덕에 제단이 있다. 걸어 올라와라. 나는 누구를 향해서도 소리치지 않는다.',
+  'hudChrome.starterTutorial.steps.enlist':
+    '나에게는 일이 있고, 네 손은 비어 있다. 가까이 서서 나에게 말을 걸어 그 일을 받아라.',
+  'hudChrome.starterTutorial.steps.target':
+    '이 섬에서 너를 위해 가만히 있어 주는 건 내 허수아비뿐이다. 연습장은 동쪽이다. 하나 골라서 대상으로 지정해라.',
+  'hudChrome.starterTutorial.steps.strike':
+    '이제 때려라. 바짝 붙어서 휘두르기 시작해라. 자동 공격은 한번 시작되면 알아서 계속되니, 서서 구경만 하고 있지 마라.',
+  'hudChrome.starterTutorial.steps.hunt':
+    '해변늑대 세 마리가 조수를 타고 들어와 내 염소들을 노리고 있다. 서쪽, 골짜기로 내려가라. 어서 가 봐라.',
+  'hudChrome.starterTutorial.steps.spoils':
+    '뒤져 보지도 않은 사냥감을 그냥 두고 오는 법은 없다. 늑대를 약탈해서 송곳니를 꺼내 와라.',
+  'hudChrome.starterTutorial.steps.report':
+    '나에게 돌아와라. 일은 죽이기를 멈췄다고 끝나는 게 아니라, 보고해야 끝나는 거다.',
+  'hudChrome.starterTutorial.objective.land': '감시관에게 도착하기',
+  'hudChrome.starterTutorial.objective.enlist': '임무 수락하기',
+  'hudChrome.starterTutorial.objective.target': '{mob} 대상 지정',
+  'hudChrome.starterTutorial.objective.strike': '적중한 자동 공격',
+  'hudChrome.starterTutorial.objective.hunt': '해변늑대 처치',
+  'hudChrome.starterTutorial.objective.report': '감시관에게 보고하기',
+  'hudChrome.starterTutorial.objective.abilityHit': '{ability} 적중',
+  'hudChrome.starterTutorial.objective.auraUp': '{ability} 활성화',
+  'hudChrome.starterTutorial.objective.healSelf': '자신을 치유하기',
+  'hudChrome.starterTutorial.objective.rangedHit': '원거리에서 적중한 자동 사격',
+  'hudChrome.starterTutorial.objective.petSummoned': '악마 소환',
+  'hudChrome.starterTutorial.class.warrior.signature':
+    '휘두르면 분노가 쌓이고, 분노는 쓰라고 있는 것이다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.',
+  'hudChrome.starterTutorial.class.warrior.mastery':
+    '전사는 일부러 시끄러운 법이다. {ability}을(를) 끌어올려 섬 전체가 듣게 해라.',
+  'hudChrome.starterTutorial.class.paladin.signature':
+    '네 힘은 빌린 것이고, 빌린 힘은 청해야 얻는 것이다. {ability}(으)로 네 무기를 축성해라.',
+  'hudChrome.starterTutorial.class.paladin.mastery':
+    '빛은 무엇을 태우기 전에 제 사람부터 낫게 한다. 자신을 한 번 치유하고, 성기사를 버티게 하는 것이 무엇인지 느껴 봐라.',
+  'hudChrome.starterTutorial.class.hunter.signature':
+    '사냥꾼도 궁지에 몰릴 때가 있고, 궁지에 몰린 사냥꾼은 칼이 무엇에 쓰는 물건인지는 알아야 한다. 허수아비에게 {ability}을(를) 두 번 꽂아 넣어라.',
+  'hudChrome.starterTutorial.class.hunter.mastery':
+    '이제 제대로 해 봐라. 저것의 손이 닿지 않는 곳까지 물러나서 쏴라. 거기서 자동 사격 세 번이다.',
+  'hudChrome.starterTutorial.class.rogue.signature':
+    '베고, 계속 베어라. {ability}을(를) 세 번 적중시키고 연계 점수가 쌓이는 것을 지켜봐라.',
+  'hudChrome.starterTutorial.class.rogue.mastery':
+    '점수는 쌓아 두기만 하면 쓸모가 없다. 써라. {ability}(으)로 허수아비를 끝내 버려라.',
+  'hudChrome.starterTutorial.class.priest.signature':
+    '이빨이 달린 믿음이다. {ability}(으)로 허수아비를 두 번 쳐라.',
+  'hudChrome.starterTutorial.class.priest.mastery':
+    '그리고 낫게 하는 믿음도 있다. 자신을 한 번 치유해라. 그 습관이 곧 필요해질 거다.',
+  'hudChrome.starterTutorial.class.mage.signature':
+    '불부터 지르고, 질문은 하지 않는다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.',
+  'hudChrome.starterTutorial.class.mage.mastery':
+    '천은 빨리 탄다. 그러니 천보다 나은 것을 걸쳐라. {ability}을(를) 걸어 둬라.',
+  'hudChrome.starterTutorial.class.warlock.signature':
+    '어둠 속으로 손을 뻗어 한 줌 움켜쥐고, 무언가를 향해 던져라. 허수아비에게 {ability}을(를) 두 번 적중시켜라.',
+  'hudChrome.starterTutorial.class.warlock.mastery':
+    '남들이 뭐라 하든, 혼자 걷는 흑마법사는 없다. 네 악마를 소환해라.',
+  'hudChrome.starterTutorial.class.druid.signature':
+    '야생은 정중하게 청할 때 답한다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.',
+  'hudChrome.starterTutorial.class.druid.mastery':
+    '이제 네 자신을 위해서도 청해 봐라. 자신에게 {ability}을(를) 걸어라.',
+  'hudChrome.starterTutorial.class.shaman.signature':
+    '오늘은 폭풍이 네 편이다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.',
+  'hudChrome.starterTutorial.class.shaman.mastery':
+    '폭풍보다 바위가 먼저다. {ability}(으)로 네 무기를 강화해라.',
+  'starterTutorial.title': '잠시 돌아가시겠습니까?',
+  'starterTutorial.body':
+    '{className}(으)로는 처음이시군요. 새 모험가를 위한 훈련의 섬이 있고, 그곳의 감시관이 당신의 직업이 실제로 무엇을 하는지 하나씩 알려 줍니다. 몇 분이면 끝나며, 전적으로 선택 사항입니다.',
+  'starterTutorial.note':
+    '캐릭터는 만드신 그대로 유지됩니다. 섬에서 얻은 것은 아무것도 따라오지 않습니다.',
+  'starterTutorial.accept': '던헤이븐으로 출항',
+  'starterTutorial.decline': '건너뛰기, 길은 압니다',
+  'entities.mobs.dawnhaven_dummy.name': '연습용 허수아비',
+  'entities.mobs.dawnhaven_strandwolf.name': '해변늑대',
+  'entities.npcs.dawnhaven_warden.name': '감시관 펜나 로크',
+  'entities.npcs.dawnhaven_warden.title': '던헤이븐의 수호자',
+  'entities.npcs.dawnhaven_warden.greeting':
+    '{className}, 일어나서 숨은 쉬고 있군? 좋다. 섬은 참을성이 있지만, 늑대들은 그렇지 않다.',
+  'entities.quests.q_dawnhaven_wolves.title': '감시관의 시험',
+  'entities.quests.q_dawnhaven_wolves.text':
+    '해변늑대 세 마리가 조수를 타고 들어와 그때부터 내 염소들을 노리고 있다. {playerName}, 서쪽 길을 따라 골짜기로 내려가서 연습장에서 배운 것을 나에게 보여 봐라.',
+  'entities.quests.q_dawnhaven_wolves.completion':
+    '깔끔하군. 이제 내 섬보다 큰 섬으로 갈 준비가 됐다.',
+  'entities.quests.q_dawnhaven_wolves.objectives.0.label': '해변늑대 처치',
+  'entities.zones.dawnhaven_isle.name': '던헤이븐 섬',
+  'entities.zones.dawnhaven_isle.welcome': '길을 따라 올라가면 감시관 로크가 기다리고 있습니다.',
+  'entities.zones.dawnhaven_isle.pois.0.label': '상륙지',
+  'entities.zones.dawnhaven_isle.pois.1.label': '감시관의 쉼터',
+  'entities.zones.dawnhaven_isle.pois.2.label': '연습장',
+  'entities.zones.dawnhaven_isle.pois.3.label': '늑대 골짜기',
 };

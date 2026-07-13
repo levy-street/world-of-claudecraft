@@ -6868,4 +6868,96 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
+  'hudChrome.starterTutorial.skip': '离开小岛',
+  'hudChrome.starterTutorial.leave': '启程前往大陆',
+  'hudChrome.starterTutorial.doneTitle': '守望者很满意',
+  'hudChrome.starterTutorial.doneBody':
+    '站着不动能教的，我都教完了。剩下的，得先做砸几回才学得会。去吧，大陆在等你，它可不会像我这么客气。',
+  'hudChrome.starterTutorial.objectiveDone': '{label}：完成',
+  'hudChrome.starterTutorial.scenes.wardenReveal':
+    '一名女子从神龛石的光里走出来，拍掉外套上的盐粒，仿佛整个上午都在等你。',
+  'hudChrome.starterTutorial.scenes.yardReveal':
+    '这就是练武场。三个稻草假人，耐心堪比圣徒，危险程度也差不多。',
+  'hudChrome.starterTutorial.scenes.wolfReveal':
+    '灌木丛动了。那就是所谓的怪物：一个活生生、非常想要你命的东西。它有一条生命条。在它清空你的之前，先清空它的。',
+  'hudChrome.starterTutorial.steps.land':
+    '潮水又给我送来一个。沙滩上有条上坡的路，坡顶的小丘上有座神龛。自己走上来。我不会为任何人扯着嗓子喊。',
+  'hudChrome.starterTutorial.steps.enlist':
+    '我这儿有活儿，你两手空空。走近点，跟我对话，把任务接下来。',
+  'hudChrome.starterTutorial.steps.target':
+    '这岛上除了我的假人，没什么东西会站着不动等你。练武场在东边。挑一个出来，把它设为你的目标。',
+  'hudChrome.starterTutorial.steps.strike':
+    '现在，打它。靠近，动手。自动攻击一旦开始就会自己持续下去，所以别站在那儿欣赏。',
+  'hudChrome.starterTutorial.steps.hunt':
+    '三只海滩狼随潮水上了岸，一直盯着我的山羊。往西，下到洼地去。走吧。',
+  'hudChrome.starterTutorial.steps.spoils':
+    '杀了却不搜一遍，绝不能就这么走开。拾取一只狼，把它的尖牙取出来。',
+  'hudChrome.starterTutorial.steps.report': '回我这儿来。任务不是杀完就算完，是回报了才算完。',
+  'hudChrome.starterTutorial.objective.land': '抵达守望者处',
+  'hudChrome.starterTutorial.objective.enlist': '接受任务',
+  'hudChrome.starterTutorial.objective.target': '选中一个{mob}',
+  'hudChrome.starterTutorial.objective.strike': '自动攻击命中次数',
+  'hudChrome.starterTutorial.objective.hunt': '击杀海滩狼',
+  'hudChrome.starterTutorial.objective.report': '向守望者复命',
+  'hudChrome.starterTutorial.objective.abilityHit': '{ability}命中',
+  'hudChrome.starterTutorial.objective.auraUp': '{ability}生效中',
+  'hudChrome.starterTutorial.objective.healSelf': '治疗自己',
+  'hudChrome.starterTutorial.objective.rangedHit': '远距离自动射击命中',
+  'hudChrome.starterTutorial.objective.petSummoned': '召唤恶魔',
+  'hudChrome.starterTutorial.class.warrior.signature':
+    '挥砍会积攒怒气，而怒气就是用来花的。对假人命中两次{ability}。',
+  'hudChrome.starterTutorial.class.warrior.mastery':
+    '战士就是要故意闹出动静。开启{ability}，让整座岛都听见。',
+  'hudChrome.starterTutorial.class.paladin.signature':
+    '你的力量是借来的，而借来的力量必须开口去求。用{ability}为你的武器打上印记。',
+  'hudChrome.starterTutorial.class.paladin.mastery':
+    '圣光在烧灼别的东西之前，先会治愈自己人。治疗自己一次，感受一下是什么撑着一名圣骑士不倒。',
+  'hudChrome.starterTutorial.class.hunter.signature':
+    '猎人也有被逼到角落的时候，而被逼到角落的猎人最好清楚刀刃是干什么用的。用{ability}招呼假人两次。',
+  'hudChrome.starterTutorial.class.hunter.mastery':
+    '现在，按规矩来一遍。后退到它够不着你的地方再开火：站在那儿打出三次自动射击。',
+  'hudChrome.starterTutorial.class.rogue.signature':
+    '割，然后接着割。命中三次{ability}，看着连击点在它身上一点点叠起来。',
+  'hudChrome.starterTutorial.class.rogue.mastery':
+    '连击点攒着一文不值。花掉它们：用{ability}了结这个假人。',
+  'hudChrome.starterTutorial.class.priest.signature': '带着獠牙的信仰。用{ability}打这个假人两次。',
+  'hudChrome.starterTutorial.class.priest.mastery':
+    '还有能治愈的信仰。治疗自己一次。这个习惯你迟早用得上。',
+  'hudChrome.starterTutorial.class.mage.signature': '先放火，问题免谈。对假人命中两次{ability}。',
+  'hudChrome.starterTutorial.class.mage.mastery':
+    '布甲烧得快，所以给自己披上比布更靠得住的东西。把{ability}挂上。',
+  'hudChrome.starterTutorial.class.warlock.signature':
+    '把手伸进黑暗，抓上一把，朝什么东西扔过去。对假人命中两次{ability}。',
+  'hudChrome.starterTutorial.class.warlock.mastery':
+    '不管别人怎么跟你说，没有哪个术士是独自上路的。召唤你的恶魔。',
+  'hudChrome.starterTutorial.class.druid.signature':
+    '只要问得客气，荒野自会回应。对假人命中两次{ability}。',
+  'hudChrome.starterTutorial.class.druid.mastery':
+    '现在，为你自己开一次口。把{ability}施放在自己身上。',
+  'hudChrome.starterTutorial.class.shaman.signature':
+    '今天，风暴站在你这边。对假人命中两次{ability}。',
+  'hudChrome.starterTutorial.class.shaman.mastery': '先有磐石，才有风暴。用{ability}灌注你的武器。',
+  'starterTutorial.title': '要不要绕个小路？',
+  'starterTutorial.body':
+    '这是你的第一个{className}。有一座供新冒险者练手的训练小岛，岛上的守望者会带你弄清自己的职业到底该怎么打。只需几分钟，而且完全可以不去。',
+  'starterTutorial.note': '你的角色会保持你创建时的样子。在岛上获得的一切都不会跟着你回来。',
+  'starterTutorial.accept': '启航前往曙港',
+  'starterTutorial.decline': '跳过，我认得路',
+  'entities.mobs.dawnhaven_dummy.name': '练习假人',
+  'entities.mobs.dawnhaven_strandwolf.name': '海滩狼',
+  'entities.npcs.dawnhaven_warden.name': '守望者芬娜·洛克',
+  'entities.npcs.dawnhaven_warden.title': '曙港的守护者',
+  'entities.npcs.dawnhaven_warden.greeting':
+    '还站着，还喘着气呢，{className}？很好。这岛有的是耐心，狼可没有。',
+  'entities.quests.q_dawnhaven_wolves.title': '守望者的考验',
+  'entities.quests.q_dawnhaven_wolves.text':
+    '三只海滩狼随潮水上了岸，从那以后就一直盯着我的山羊。{playerName}，沿西边的小路下到洼地去，让我看看你在练武场上学到了什么。',
+  'entities.quests.q_dawnhaven_wolves.completion': '干净利落。你可以去比我这儿更大的岛了。',
+  'entities.quests.q_dawnhaven_wolves.objectives.0.label': '击杀海滩狼',
+  'entities.zones.dawnhaven_isle.name': '曙港岛',
+  'entities.zones.dawnhaven_isle.welcome': '守望者洛克正在小路尽头等你。',
+  'entities.zones.dawnhaven_isle.pois.0.label': '登岸滩',
+  'entities.zones.dawnhaven_isle.pois.1.label': '守望者的憩所',
+  'entities.zones.dawnhaven_isle.pois.2.label': '练武场',
+  'entities.zones.dawnhaven_isle.pois.3.label': '狼洼地',
 };
