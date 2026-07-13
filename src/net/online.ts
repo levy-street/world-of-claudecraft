@@ -2366,6 +2366,11 @@ export class ClientWorld implements IWorld {
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
+  // Same 'equip' wire token with the aimed slot attached: an older server that
+  // ignores the field simply resolves the slot itself, so the field is additive.
+  equipItemToSlot(itemId: string, slot: EquipSlot): void {
+    this.cmd({ cmd: 'equip', item: itemId, slot });
+  }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }

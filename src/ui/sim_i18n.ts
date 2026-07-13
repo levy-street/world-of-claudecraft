@@ -49,6 +49,9 @@ const baseEnTable = {
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',
   'error.cannotEquip': 'You cannot equip that.',
+  // Refusal when an aimed equip slot (a paperdoll drop target) does not accept the
+  // dragged piece, e.g. a helm dropped on a ring finger (src/sim/items.ts equipItem).
+  'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
   'error.fullHealth': 'You are already at full health.',
