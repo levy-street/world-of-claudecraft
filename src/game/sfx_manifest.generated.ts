@@ -259,21 +259,21 @@ export const SFX_CLIPS =
     ]
   },
   "cast_chain_heal": {
-    "url": "/audio/sfx/cast_chain_heal.wav?v=fa283673672a",
+    "url": "/audio/sfx/cast_chain_heal.mp3?v=ef4a856a904c",
     "loop": false,
     "category": "spells",
     "preload": "lazy",
     "spatial": true,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 489644,
-    "hash": "fa283673672a",
+    "bytes": 62736,
+    "hash": "ef4a856a904c",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/cast_chain_heal.wav?v=fa283673672a",
-        "bytes": 489644,
-        "sha256": "fa283673672a39cd532dfe65e343f923fbb19cc87f14dfad8e9d9edc8c858ca7"
+        "url": "/audio/sfx/cast_chain_heal.mp3?v=ef4a856a904c",
+        "bytes": 62736,
+        "sha256": "ef4a856a904cb7689d39e16ae8d8bd97f8220246ae9784403e1491e9b8ba8ca1"
       }
     ]
   },

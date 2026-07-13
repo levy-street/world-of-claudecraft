@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "fa619638bd355e0a7c4f4e29347926c28aa5975ba90fba569dc7dd9b0bd2c5df",
+  "bundleId": "4d2d27171ea70ab9f954c958c2022e3a9eb46c84431270b31f331d1832a859a6",
   "catalogHash": "b30ce54cb7d99765d45cb05f60ad394a6b2f081af6853fc9e191edc75b270baa",
   "clips": {
     "amb_birds": {
@@ -152,9 +152,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/cast_chain_heal.wav?v=fa283673672a",
-          "bytes": 489644,
-          "sha256": "fa283673672a39cd532dfe65e343f923fbb19cc87f14dfad8e9d9edc8c858ca7"
+          "url": "/audio/sfx/cast_chain_heal.mp3?v=ef4a856a904c",
+          "bytes": 62736,
+          "sha256": "ef4a856a904cb7689d39e16ae8d8bd97f8220246ae9784403e1491e9b8ba8ca1"
         }
       ],
       "gain": 1,
