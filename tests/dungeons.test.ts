@@ -707,7 +707,8 @@ describe('dungeons: heroic boss drops', () => {
       expect(weapons.length, `seed ${seed} weapons`).toBe(1);
       for (const s of weapons) droppedWeapons.add(s.itemId);
       // The set-piece / legendary drops are upgraded to their heroic variants.
-      for (const s of items) if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
+      for (const s of items)
+        if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
     }
     // Over eight kills all three weapons show up, and the set-piece swap is live.
     expect(droppedWeapons.size).toBe(3);
