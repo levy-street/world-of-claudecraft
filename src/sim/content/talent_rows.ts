@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import type { PlayerClass } from '../types';
+import { MAX_LEVEL } from '../types';
 import {
   accumulate,
   computeTalentModifiers,
@@ -137,8 +138,9 @@ export function computeModifiersWithRows(
   cls: PlayerClass,
   alloc: TalentAllocation,
   picks: RowPicks,
+  level = MAX_LEVEL,
 ): TalentModifiers {
-  const mods = computeTalentModifiers(cls, alloc);
+  const mods = computeTalentModifiers(cls, alloc, level);
   const tree = rowTreeFor(cls);
   if (tree) accumulateRowPicks(mods, tree, picks);
   return mods;

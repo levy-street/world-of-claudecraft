@@ -42,10 +42,12 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 
 - **Nine classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
 - **Three open-world zones** from level 1 to 20, nearly 80 quests, and a single connected storyline about the Gravecaller conspiracy.
-- **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, and class-archetype loot.
+- **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, class-archetype loot, and a **Heroic difficulty tier** with richer rewards, plus open-world **world bosses**.
 - **Scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
-- **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns).
-- **Real multiplayer**: parties, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
+- **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns), and the **Vale Cup**, a seasonal boarball tournament.
+- **A Book of Deeds**: an achievement journal of cosmetic titles, badge borders, and Renown, with per-zone Chronicles kept by in-world Chronicler NPCs and a lifetime leaderboard.
+- **Professions**: gathering nodes across every zone, crafting stations in town, and deeper trades to discover, feeding a player-driven **World Market** and the **Ravenpost** mail service.
+- **Real multiplayer**: parties, guilds, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
 - **Localized into 22 locales** through a deterministic, sim-emits-keys pipeline.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
@@ -151,13 +153,13 @@ python python/example_random_agent.py
 ```python
 from wow_env import WoWClassicEnv
 
-env = WoWClassicEnv(player_class="warrior")   # warrior or mage
+env = WoWClassicEnv(player_class="warrior")   # any of the nine classes
 obs, info = env.reset(seed=42)
 obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
 env.close()
 ```
 
-- **Observation and action spaces are content-derived.** Query them from the env's `info` reply at startup rather than hardcoding; they grow with the game. Today the action space is `Discrete(44)` (movement, target, attack, the full ability kit, interact, eat/drink) and the observation is a `Box` of 276 floats (self, abilities, target, nearby mobs, nearest interactable, quest progress).
+- **Observation and action spaces are content-derived.** Query them from the env's `info` reply at startup rather than hardcoding; they grow with the game. The action space is a `Discrete` covering movement, target, attack, the full ability kit, interact, and eat/drink; the observation is a `Box` covering self, abilities, target, nearby mobs, the nearest interactable, and quest progress.
 - **Reward** is a weighted sum of per-tick counter deltas (XP, damage dealt and taken, kills, deaths, quest progress, level-ups), tunable per reset. Each `step` applies one action and advances five sim ticks by default, so roughly four decisions per simulated second.
 - **Deterministic by construction.** No wall clock, no `Math.random`. Seed the reset and the episode replays exactly.
 
@@ -227,9 +229,15 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 ### World and systems
 
+- **Professions**: gather from ore, herb, and timber nodes seeded across every zone, craft at hub-town stations, and trade the results; there are deeper trades (and an archetype system) to discover in play.
+- **The World Market**: a player-driven auction house for gear, materials, and consumables, browsable from the hub towns.
+- **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
+- **Guilds**: charters, rosters, ranks, and guild chat.
+- **Daily rewards**: a login streak with escalating chests.
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
+- **The Book of Deeds**: an achievement journal (default `Shift+Z`) of quests, kills, clears, and delights, paying out cosmetic titles you can wear on your nameplate, in chat, and on the boards, plus a HUD tracker for the deeds you are chasing, per-zone Chronicles kept by Chronicler NPCs, and a lifetime Renown leaderboard; the public list lives at `/wiki/deeds`.
 - **Mob AI**: wander, proximity aggro by level difference, social pulls, chase, leash and reset, corpse loot, and respawns, with a rare spawn (Old Greyjaw) on a long timer.
 - **Fishing** spots with their own loot tables and rare catches.
 - **Cosmetic skins** rolled at uncommon, rare, and epic rarity, purely for looks.
@@ -245,7 +253,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
-| `C` `P` `L` `M` `B` `G` | character, spellbook, quest log, world map, bags, arena |
+| `C` `P` `L` `M` `B` `G` `Shift+Z` | character, spellbook, quest log, world map, bags, arena, deeds |
 | `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
@@ -255,7 +263,7 @@ Touch controls (a movement stick, camera drag, and on-screen action buttons) com
 Three ideas hold the project together:
 
 - **One sim, three hosts.** The same `src/sim/` code runs the offline browser world, the online server, and the RL env. Behavior must be identical everywhere, and the tests exist to keep it that way.
-- **`IWorld` is the only seam.** `src/world_api.ts` defines `IWorld`. The offline `Sim` satisfies it structurally and the online `ClientWorld` implements it by mirroring server snapshots. The renderer and HUD talk only to `IWorld`, never to a concrete world, so a new feature extends the interface first and then both worlds.
+- **`IWorld` is the only seam.** `IWorld` is defined as per-domain facet interfaces under `src/world_api/`, aggregated by `src/world_api.ts`. The offline `Sim` satisfies it structurally and the online `ClientWorld` implements it by mirroring server snapshots. The renderer and HUD talk only to `IWorld`, never to a concrete world, so a new feature extends the matching facet first and then both worlds.
 - **The server is authoritative.** Clients send intent; the server decides outcomes. The client never resolves combat, loot, or economy on its own.
 
 The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one seeded `Rng`, and `src/sim/` carries zero DOM, browser, or Three.js imports. That is what lets the same code bundle into a Node env server, an authoritative game loop, and a browser tab without changing a line.
@@ -265,17 +273,15 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | Path | What it is |
 |---|---|
 | `src/sim/` | Deterministic game core, the source of truth. No DOM or Three dependencies. |
-| `src/sim/content/` | Data as code: the nine classes, abilities, zones, dungeons, items, talents. |
-| `src/render/` | Three.js renderer (procedural geometry, textures, VFX). Reads the world, never mutates it. |
-| `src/game/` | Local input, camera, keybinds, mobile controls, sampled WebAudio SFX, and procedural music. |
-| `src/ui/` | Classic HUD (frames, windows, tooltips, map, floating combat text), procedural icons, i18n. |
-| `src/net/` | Online client: REST auth plus a WebSocket world mirror (`ClientWorld`). |
-| `src/admin/` | Admin dashboard SPA (separate `admin.html` entry). |
+| `src/sim/content/` | Data as code: the nine classes, abilities, zones, dungeons, items, talents, professions, deeds. |
+| `src/` (rest) | Three.js renderer, HUD + styles, input/audio, online mirror, and the admin, guide, and editor SPAs. |
 | `server/` | Authoritative server: HTTP and WS, world loop, Postgres, auth, social, moderation. |
 | `headless/` + `python/` | RL env server (`env_server.ts`) and Python Gym bindings. |
+| `bot/` | Discord bot (roles, relay, activity feed). |
+| `electron/`, `android/`, `ios/` | Desktop (Steam) and native mobile shells. |
 | `tests/` | Vitest suite. |
-| `scripts/` | Asset build plus browser E2E, screenshot, and integration scripts. |
-| `public/` · `docs/` | Static assets (GLB models, textures, HDRIs) and design docs. |
+| `scripts/` | Build, asset, i18n, SFX, screenshot, and browser E2E tooling. |
+| `public/` · `docs/` | Static assets (deployed verbatim to the site) and design docs. |
 
 Most directories carry their own `CLAUDE.md` with local conventions. The full set of
 project invariants lives in the root [`CLAUDE.md`](CLAUDE.md). Codex contributors start
@@ -289,14 +295,17 @@ Combat, leveling, and threat all run on authentic classic-era rules: rage and en
 And almost none of it is a shipped asset. The world is drawn from code:
 
 - Procedural towns, creatures, terrain, water, weather, and real-time shadows, with no 3D model files for the world.
-- Twelve rigged creature families with full walk, attack, cast, sit, and death animations.
+- Rigged creature families with full walk, attack, cast, sit, and death animations.
 - Spell, item, and buff icons painted on canvas at runtime.
-- A complete classic HUD (unit frames, action bars, tooltips, quest log, world map, minimap, floating combat text), sampled spatial/UI sound effects, and a procedural soundtrack.
+- A complete classic HUD (unit frames, action bars, tooltips, quest log, world map, minimap, floating combat text, the Book of Deeds), sampled spatial/UI sound effects, and a procedural soundtrack.
 
 ## Development
 
-The SFX validation tests require `ffmpeg` and `ffprobe` on `PATH`. Install FFmpeg with your
-platform package manager before running `npm test`, `npm run gate`, or the SFX Studio.
+The SFX conformance checks (`npm run sfx:check`) and the audio tests use the bundled
+`ffmpeg-static`/`ffprobe-static` npm packages, so `npm test` needs no system install. The SFX
+Studio and the audio generator scripts shell out to `ffmpeg` on `PATH`, and `npm run gate`
+checks for it up front: install FFmpeg with your platform package manager before running the
+gate or the Studio.
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
@@ -340,4 +349,4 @@ Contributions of every kind are welcome: code, translations, bug reports, and do
 
 The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.
 
-The bundled third-party art assets (models, textures, HDRIs) keep their own licenses, all CC0 public domain except the MIT water normal maps, documented per pack in [CREDITS.md](CREDITS.md).
+The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md).

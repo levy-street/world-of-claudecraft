@@ -5,9 +5,10 @@
 
    play.html is otherwise reconciled to the canonical modules (its inline <style>
    was emptied, so it now renders from the shared src/styles layers exactly like
-   index.html). The ONLY intentional per-entry difference is the #rotate-device
+   index.html). The intentional per-entry differences are: the #rotate-device
    orientation gate (landscape-only in-game): play.html SHOWS the
-   rotate-to-landscape overlay in portrait while in-game, matching index.extra.css.
+   rotate-to-landscape overlay in portrait while in-game, matching index.extra.css;
+   and the online-only play console (/play has no Online/Offline realm selector).
    Layer name is flat (play-extra), NOT dotted, so it is a top-level layer placed
    last by the order below, after hud-mobile. */
 @layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
@@ -17,5 +18,33 @@
     body.mobile-touch.game-active #rotate-device {
       display: flex;
     }
+  }
+
+  /* /play is online-only: the play console is just the Play button over a live
+     players line (no realm selector). Undo the two-column landscape grid the
+     shared hud.mobile.css applies to the selector + button pair. */
+  .play-console-solo,
+  body.mobile-touch .play-console-solo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+  .play-console-solo .btn-play {
+    width: 100%;
+  }
+  .play-online-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-shadow: 1px 1px 2px #000;
+  }
+  .play-online-status .stats-value {
+    color: var(--color-text-light);
   }
 }

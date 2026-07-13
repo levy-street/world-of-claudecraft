@@ -28,7 +28,9 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
+  chainDamage: 'damage',
   aoeHeal: 'other',
+  chainHeal: 'other',
   groundAoE: 'damage',
   aoeRoot: 'damage',
   consumeAura: 'other',
@@ -37,7 +39,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
-  chainHeal: 'other',
+  feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
@@ -62,12 +64,15 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   // aoeDamage rider classifies the ability); the rallying AP buff likewise.
   repositionToAim: 'other',
   aoeAllyAttackPower: 'other',
+  aoeAllyHaste: 'other',
   aoeAllyMaxHp: 'other',
   // Fury support cooldowns: the group guaranteed-crit buff and the self
   // HoT are both pure utility, never an attack.
   aoeAllySureCrit: 'other',
   selfHotPctMax: 'other',
   selfBuff: 'other',
+  petBuff: 'other',
+  applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
   // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's

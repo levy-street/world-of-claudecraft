@@ -2780,6 +2780,107 @@
       margin-top: 4px;
     }
   }
+  /* ---------- mobile deeds (standalone window + tracker) ---------- */
+  /* The Book of Deeds follows the bank's STANDALONE full-screen convention on
+     touch (it has no companion panel, so no 50/50 pairing): fixed inside the
+     safe-area insets, transform reset (neutralizing the desktop centering),
+     max-width unclamped (the base .window clamp divides by --window-scale, not
+     --ui-scale, and under-fills below uiScale 1). The entry list
+     (.deeds-scroll) is the internal scroll container; the title bar, summary,
+     category chips, and filter bar stay pinned chrome. */
+  body.mobile-touch #deeds-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area;
+       this window is already inset-pinned on all four edges, so that rule
+       would double count the inset and eat the short-landscape height
+       budget below. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Category navigation collapses from the desktop sidebar to ONE horizontally
+     scrollable chip row (the bank chip idiom). Nothing hidden: every chip
+     stays reachable by scroll and keeps its full 40px tap height (the
+     components.css touch floor on .deeds-cat). */
+  body.mobile-touch #deeds-window .deeds-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.mobile-touch #deeds-window .deeds-rail {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat {
+    flex: 0 0 auto;
+  }
+  /* The Titles divider is a column-rail idiom; in the chip row it reads as a
+     plain sibling chip. */
+  body.mobile-touch #deeds-window .deeds-cat-titles {
+    margin-top: 0;
+    border-top-color: transparent;
+    border-radius: 4px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat-titles.active {
+    border-top-color: #6a5320;
+  }
+  /* Short landscape phones: the pinned chrome (title bar, summary, recent and
+     nearest strips, chip row, filter bar) can eat the whole panel height and
+     clip the filter bar below the window edge. The strips tighten and the
+     entry list yields to roughly one visible card and scrolls; the
+     components.css 100px floor is what must give, or the flex column pushes
+     the filter bar out (the bank's clipped buy row, which hid exactly because
+     a fresh character DROPS the recent/nearest strips, so verify with the
+     strips present AND absent). */
+  @media (max-height: 480px) {
+    body.mobile-touch #deeds-window .deeds-body {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-summary {
+      padding: 1px 0 2px;
+    }
+    body.mobile-touch #deeds-window .deeds-recent,
+    body.mobile-touch #deeds-window .deeds-nearest {
+      padding-bottom: 2px;
+    }
+  }
+  /* Watchlist tracker on phones: compact rows, the list capped (it is
+     glanceable decoration, the Book itself carries the full watch set) so the
+     strip can never run down into the bottom combat cluster. On the compact
+     tier (every real landscape phone, mobile_hud_layout.ts) the rows fold away
+     entirely and the header stays as a count chip; hud.ts routes that tap to
+     the Book of Deeds window instead of the invisible collapse toggle. */
+  body.mobile-touch #deed-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #deed-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
+    display: none;
+  }
   /* On touch, stack the categories back into a single column so the large
      touch targets keep their full width. */
   body.mobile-touch .kb-cols {

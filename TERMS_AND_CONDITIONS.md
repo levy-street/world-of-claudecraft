@@ -66,7 +66,7 @@ To the fullest extent permitted by law, we are not liable for any loss connected
 
 ## 10. Donations
 
-Donations through GitHub Sponsors are voluntary and are processed by GitHub. Donations are not a purchase, are non-refundable except where the law requires, and do not entitle you to any product, in-game advantage, ownership, equity, token, or other benefit.
+Donations through Ko-fi are voluntary. Ko-fi facilitates payments directly through a third-party payment provider such as PayPal or Stripe. Donations are not a purchase, are non-refundable except where the law requires, and do not entitle you to any product, in-game advantage, ownership, equity, token, or other benefit.
 
 ## 11. Service availability and changes
 
@@ -74,7 +74,7 @@ The Game is in active development and is provided on an evolving basis. We may c
 
 ## 12. Third-party services
 
-The Service links to and relies on third-party services, including GitHub, Discord, the Solana network, and any advertising or analytics providers we use. We do not control these services and are not responsible for them. Your use of them is governed by their terms.
+The Service links to and relies on third-party services, including GitHub, Ko-fi, PayPal, Stripe, Discord, the Solana network, and any advertising or analytics providers we use. We do not control these services and are not responsible for them. Your use of them is governed by their terms.
 
 ## 13. Intellectual property and no affiliation
 

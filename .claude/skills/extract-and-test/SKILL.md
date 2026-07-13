@@ -9,14 +9,14 @@ user-invocable: true
 This repo is built and maintained almost entirely by AI agents and grows by many
 small contributions. The thing that keeps it scalable, and keeps open-source merge
 conflicts small, is that new behavior lands as a focused module behind a known seam,
-not as another block appended to a 10k-line file. This skill is the detailed how-to
+not as another block appended to an already huge coordinator. This skill is the detailed how-to
 behind the root CLAUDE.md "Modularity" section. Apply it whenever you implement a
 feature or fix a bug.
 
 ## The one decision: sibling module or monolith edit
 
-The four logic monoliths (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts`
-~6.4k, `src/render/renderer.ts` ~4.5k) are coordinators, not a license to grow them: do
+The four logic monoliths (`src/ui/hud.ts`, `src/sim/sim.ts`, `src/main.ts`,
+`src/render/renderer.ts`) are coordinators, not a license to grow them: do
 not split them to hit a line count, and do not rewrite them as a side effect of your task,
 but never GROW one either. `src/main.ts` especially is a firewall, not a home (its
 client-bootstrap helpers belong in `src/game/` or `src/ui/` siblings). Before you add a
@@ -41,21 +41,35 @@ you are probably appending behavior that wants its own module.
 
 Do not invent a new architecture. Pick the seam that matches the work:
 
-- **render or ui needs new data or an action:** extend `IWorld` in
-  `src/world_api.ts` first, implement it in BOTH the offline `Sim` (`src/sim/sim.ts`)
-  and the online `ClientWorld` (`src/net/online.ts`), then consume it through
-  `IWorld`. render and ui never import a concrete world. This is the load-bearing
-  parity rule; the `cross-platform-sync` agent audits it.
+- **render or ui needs new data or an action:** extend `IWorld` first. `IWorld` is
+  split into domain facets under `src/world_api/`, re-aggregated by `src/world_api.ts`:
+  add the member to the matching facet file, implement it in BOTH the offline `Sim`
+  (`src/sim/sim.ts`) and the online `ClientWorld` (`src/net/online.ts`), and update the
+  member pins in `tests/world_api_parity.test.ts` in the same change. render and ui
+  never import a concrete world. This is the load-bearing parity rule; the
+  `cross-platform-sync` agent audits it.
+- **New sim SYSTEM behavior (a combat, mob, social, or economy mechanic, not just a
+  data record):** its own module behind the `SimContext` seam
+  (`src/sim/sim_context.ts`), with backing state kept on `Sim` as a live `ctx` view,
+  never a new method cluster on the `sim.ts` coordinator. See `src/sim/CLAUDE.md`.
 - **New game content (mob, quest, item, ability, zone, talent):** a declarative
   record in `src/sim/content/`, merged into the flat tables by `src/sim/data.ts`.
   Never inline a content table in `sim.ts`.
 - **New visual system:** a new `src/render/<thing>.ts` exporting a `build*()` that
   returns a `*View` the renderer owns and calls. Not a new method bank on
   `renderer.ts` (templates: `terrain.ts`, `props.ts`, `foliage.ts`).
-- **New self-contained HUD window or panel:** its own module the HUD composes,
-  rather than a new banner section inside `hud.ts`. This is the direction the HUD
-  modularization is heading; follow it for new windows.
-- **New server command:** validate every field in `dispatchMessage`
+- **New HUD component (a self-contained window OR a per-frame frame/bar):** a
+  DOM-free pure view core (`src/ui/<name>_view.ts` or `_core.ts`, registered in the
+  `UI_PURE_CORES` allowlist that `tests/architecture.test.ts` sweeps) plus a thin
+  write-elided painter on the `PainterHost` seam (`src/ui/painter_host.ts`),
+  instance-parameterized (take a descriptor or id, no hardcoded element id). Reuse a
+  painter FAMILY before writing a bespoke one (a unit-style frame is a
+  `UnitFramePainter`; an extra action bar is a new `ActionBarPainter(descriptor)`).
+  Full recipe: `src/ui/CLAUDE.md`.
+- **New server REST endpoint:** a `RouteDef` module (`server/<domain>.ts` exporting
+  `routes`) registered in `server/http/registry.ts`, never an inline route in
+  `main.ts`. Scaffold with `npm run new:endpoint`; see `server/http/CLAUDE.md`.
+- **New server WS command:** validate every field in `dispatchMessage`
   (`server/game.ts`), then call the `sim.*` method that owns the rule. The outcome
   resolves in the `Sim`, never on the server outside it.
 - **A multi-file subsystem:** a directory with an `index.ts` barrel that exports only

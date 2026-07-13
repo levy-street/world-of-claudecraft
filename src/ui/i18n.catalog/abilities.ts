@@ -625,7 +625,7 @@ const classAbilityNamesEn = {
       [
         'chain_heal',
         'Chain Heal',
-        'Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount.',
+        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
       ],
       [
         'heroic_strike',
@@ -1288,6 +1288,16 @@ const classAbilityNamesEn = {
         'Enter a seething fury, generating 20 rage. (Warrior talent)',
       ],
       [
+        'crusader_strike',
+        'Crusader Strike',
+        'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
+      ],
+      [
+        'metamorphosis',
+        'Dread Aspect',
+        'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
+      ],
+      [
         'holy_shock',
         'Holy Shock',
         'Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)',
@@ -1331,6 +1341,11 @@ const classAbilityNamesEn = {
         'cone_of_cold',
         'Cone of Cold',
         'Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)',
+      ],
+      [
+        'icy_veins',
+        'Icy Veins',
+        'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
       ],
       [
         'cold_blood',
@@ -1501,6 +1516,37 @@ const classAbilityNamesEn = {
         'summon_doomguard',
         'Summon Wraithborn',
         'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      ],
+      // Baseline class interrupts. (pummel is defined above in the warrior kit.)
+      [
+        'kick',
+        'Boot',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'counterspell',
+        'Spellbreak',
+        "Counters the target's spellcast and prevents casting from that school for 6 sec.",
+      ],
+      [
+        'counter_shot',
+        'Hushing Shot',
+        "A snap shot that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'rebuke',
+        'Reproach',
+        "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      ],
+      [
+        'skull_bash',
+        'Headbutt',
+        "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
+      ],
+      [
+        'spell_lock',
+        'Gag Order',
+        'Silences the target mid-cast and prevents casting from that school for 5 sec.',
       ],
     ]),
   },
@@ -2188,6 +2234,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           'Cono de frío',
           'Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)',
+        ],
+        [
+          'icy_veins',
+          'Venas heladas',
+          'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
         ],
         [
           'cold_blood',
@@ -3079,6 +3130,11 @@ export const classAbilityNames = {
           'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)',
         ],
         [
+          'icy_veins',
+          'Veines glaciales',
+          'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
+        ],
+        [
           'cold_blood',
           'Sang froid',
           'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
@@ -3889,6 +3945,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           'Cono di Freddo',
           'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)',
+        ],
+        [
+          'icy_veins',
+          'Vene Gelide',
+          'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
         ],
         [
           'cold_blood',
@@ -4709,6 +4770,11 @@ export const classAbilityNames = {
           'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)',
         ],
         [
+          'icy_veins',
+          'Eisige Adern',
+          'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
+        ],
+        [
           'cold_blood',
           'Kaltblütigkeit',
           'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
@@ -5226,6 +5292,11 @@ export const classAbilityNames = {
         ],
         ['combustion', '燃烧', '集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）'],
         ['cone_of_cold', '冰锥术', '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脉',
+          '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
+        ],
         ['cold_blood', '冷血', '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）'],
         ['blade_flurry', '剑刃乱舞', '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）'],
         [
@@ -5704,6 +5775,11 @@ export const classAbilityNames = {
         ],
         ['combustion', '燃燒', '集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）'],
         ['cone_of_cold', '冰錐術', '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脈',
+          '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
+        ],
         ['cold_blood', '冷血', '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）'],
         ['blade_flurry', '劍刃亂舞', '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）'],
         [
@@ -6377,6 +6453,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           '냉기 돌풍',
           '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
+        ],
+        [
+          'icy_veins',
+          '얼음 핏줄',
+          '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
         ],
         [
           'cold_blood',
@@ -7127,6 +7208,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           'コーンオブコールド',
           '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）',
+        ],
+        [
+          'icy_veins',
+          'アイシーヴェインズ',
+          '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
         ],
         [
           'cold_blood',
@@ -7921,6 +8007,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           'Cone de Frio',
           'Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)',
+        ],
+        [
+          'icy_veins',
+          'Veias Gélidas',
+          'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
         ],
         [
           'cold_blood',
@@ -8739,6 +8830,11 @@ export const classAbilityNames = {
           'cone_of_cold',
           'Конус холода',
           'Поражает ближайших врагов холодом, нанося {damage} ед. урона от магии льда. (знаковое умение Льда)',
+        ],
+        [
+          'icy_veins',
+          'Ледяные жилы',
+          'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
         ],
         [
           'cold_blood',

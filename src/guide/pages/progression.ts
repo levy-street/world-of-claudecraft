@@ -2,12 +2,12 @@
 // zones, rested XP, and what waits at the cap. Spoiler-safe and number-free by design:
 // systems and direction only, no XP amounts, percentages, or timings.
 
-import { t, formatNumber } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import { hrefFor } from '../routes';
-import { lead, related } from './ui';
+import { formatNumber, t } from '../../ui/i18n';
 import { LEVEL_CAP, ZONE_TEASERS } from '../data';
+import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
+import { lead, related } from './ui';
 
 // The three zones, in level-band order, named from the existing world teaser keys.
 const ZONES = ZONE_TEASERS;
@@ -15,13 +15,13 @@ const ZONES = ZONE_TEASERS;
 export const progression: GuidePage = {
   titleKey: 'guide.nav.progression',
   render() {
-    const zones = ZONES
-      .map((z) => `<li class="guide-basic">
+    const zones = ZONES.map(
+      (z) => `<li class="guide-basic">
         <h3>${esc(t(z.nameKey))}</h3>
         <p class="guide-zone-band">${esc(t('guide.progression.bandLabel', { min: formatNumber(z.min), max: formatNumber(z.max) }))}</p>
         <p>${esc(t(z.blurbKey))}</p>
-      </li>`)
-      .join('');
+      </li>`,
+    ).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.nav.progression'))}</h1>
@@ -55,6 +55,7 @@ export const progression: GuidePage = {
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
           { href: hrefFor('reference/combat'), key: 'guide.nav.combat' },
           { href: hrefFor('world'), key: 'guide.nav.world' },
+          { href: hrefFor('deeds'), key: 'guide.nav.deeds' },
         ])}
       </article>`;
   },

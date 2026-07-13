@@ -485,7 +485,7 @@ describe('precomputed modifiers', () => {
       ),
       'power_word_shield',
     );
-    expect(effectOfType(shield, 'absorb').amount).toBe(56); // 48 * (1 + 8% mastery + 8% talent)
+    expect(effectOfType(shield, 'absorb').amount).toBe(67); // 48 * 1.30 mastery * 1.08 talent
 
     const fort = requireKnown(
       abilitiesKnownAt(
@@ -519,7 +519,8 @@ describe('precomputed modifiers', () => {
       ),
       'seal_of_righteousness',
     );
-    expect(effectOfType(seal, 'imbue')).toMatchObject({ bonus: 16, judgeMin: 44, judgeMax: 64 }); // mastery + 2 talent ranks
+    expect(effectOfType(seal, 'imbue')).toMatchObject({ bonus: 18, judgeMin: 48, judgeMax: 70 });
+    // 2 talent ranks plus 20% retribution spell mastery.
   });
 });
 
@@ -747,7 +748,7 @@ describe('Sim integration — active talents & ability modifiers', () => {
     const hamstringThreat = (vengeance: boolean): number => {
       const sim = new Sim({ seed: 3, playerClass: 'warrior' });
       sim.setPlayerLevel(20);
-      if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+30% threat)
+      if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+50% threat)
       const mob = nearestMob(sim);
       sim.player.pos.x = mob.pos.x;
       sim.player.pos.z = mob.pos.z - 3;

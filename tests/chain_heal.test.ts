@@ -3,7 +3,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
-// Chain Heal (shaman): heals the friendly target, then arcs to the most injured
+// Chain Heal (shaman): implementation adopted from Blaine1705's #1434. Heals the friendly target, then arcs to the most injured
 // allies within jump range of the previous hop (players and player pets only),
 // never repeating a target, each hop healing half the previous amount. Every
 // hop emits a spellfx beam so the green arc renders on every client.
@@ -47,6 +47,8 @@ function chainSetup() {
   // Everyone at 18: the allies' health pools comfortably exceed each hop's heal,
   // so heal2 amounts show the raw falloff instead of the missing-hp clamp.
   sim.setPlayerLevel(18, caster);
+  // Chain Heal is the Restoration (Spiritmend) signature: granted on spec pick.
+  sim.setSpec('restoration', caster);
   sim.setPlayerLevel(18, near);
   sim.setPlayerLevel(18, mid);
   sim.setPlayerLevel(18, far);
@@ -92,6 +94,13 @@ describe('chain heal', () => {
     expect(heals[1].amount).toBeLessThanOrEqual(heals[0].amount);
     expect(heals[2].amount).toBeLessThan(heals[0].amount);
 
+    // Exact falloff: both the near (hop 0) and mid (hop 1) hops land raw (hurt enough
+    // to avoid the missing-hp clamp), and every hop scales one shared baseAmount by
+    // `falloff ** i`, so the crit is common to both and hop 1 is exactly HALF of hop 0
+    // (0.5 falloff), never the tooltip's mistaken 40% (a 0.6 ratio) or any other value.
+    // Rounding-tolerant to +/-1 since each hop rounds independently.
+    expect(Math.abs(heals[1].amount - heals[0].amount / 2)).toBeLessThanOrEqual(1);
+
     // (The far mage's exact hp is not asserted: out-of-combat regen ticks during
     // the collection window; its exclusion is proven by the beam/heal target lists.)
     const nearEnt = sim.entities.get(near);
@@ -103,6 +112,7 @@ describe('chain heal', () => {
   it('with no ally in range it heals only the target (a single beam)', () => {
     const sim = new Sim({ seed: 7, playerClass: 'shaman' });
     sim.setPlayerLevel(18);
+    sim.setSpec('restoration');
     teleport(sim, sim.playerId, 0, -40);
     sim.player.hp = Math.round(sim.player.maxHp * 0.4);
     const before = sim.player.hp;

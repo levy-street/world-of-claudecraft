@@ -54,6 +54,7 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'polymorph',
   'attackspeed',
   'sunder',
+  'bleed_vuln',
   'corrode',
   'faerie_fire',
   'spellvuln',
@@ -67,6 +68,10 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
+function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
+}
+
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   if (p.resourceType === 'mana') {
@@ -78,7 +83,10 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
     }
   } else if (p.resourceType === 'energy') {
-    p.resource = Math.min(p.maxResource, p.resource + 20);
+    // Feral Instinct (cat form) grants a buff_energyregen aura (value = fraction, 1 = +100%).
+    let regen = 20;
+    for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
+    p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -172,6 +180,14 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
         if (a.kind === 'dot') {
+          let tickDamage = a.value;
+          if (a.school === 'physical') {
+            let bleedAmp = 0;
+            for (const targetAura of e.auras) {
+              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
+            }
+            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
+          }
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,
@@ -182,7 +198,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           ctx.dealDamage(
             ctx.entities.get(a.sourceId) ?? null,
             e,
-            a.value,
+            tickDamage,
             false,
             a.school,
             a.name,
@@ -196,7 +212,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(a.value * a.leechPct), src.maxHp - src.hp);
+              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
                 ctx.emit({

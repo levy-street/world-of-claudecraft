@@ -150,7 +150,7 @@ describe.sequential('SFX Studio server security', () => {
     try {
       rmSync(sourceLink, { force: true });
       rmSync(executableSource, { force: true });
-      rmSync(escapedSourceDir, { force: true });
+      rmSync(escapedSourceDir, { recursive: true, force: true });
       rmSync(externalSourceDir, { recursive: true, force: true });
       rmSync(externalExportDir, { recursive: true, force: true });
       rmSync(versionAudio, { force: true });

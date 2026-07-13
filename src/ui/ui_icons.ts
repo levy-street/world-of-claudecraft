@@ -33,6 +33,10 @@ export type UiIconName =
   | 'emote'
   // brand mark
   | 'discord'
+  | 'twitch'
+  | 'x'
+  | 'kick'
+  | 'youtube'
   | 'donate'
   | 'chest'
   // hand-authored geometrics
@@ -52,7 +56,8 @@ export type UiIconName =
   | 'vibrate'
   | 'lock'
   | 'mail'
-  | 'ball';
+  | 'ball'
+  | 'book';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -93,6 +98,20 @@ const ICONS: Record<UiIconName, string> = {
   // centered vertically to fit this registry's shared 0 0 512 512 viewBox.
   discord:
     '<g transform="translate(0 62) scale(4.0271)"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></g>',
+  // The four streamer-platform marks the player menu links out to (see
+  // sim/account_flair.ts). Each is that platform's own mark, reproduced monochrome
+  // for identification only (see CREDITS.md), on its native 24 x 24 artboard and
+  // scaled/centered into this registry's shared 0 0 512 512 viewBox like `donate`.
+  // Hand-authored: the Twitch screen (evenodd, so the cut-out screen keeps its two
+  // pupil bars) and the Kick blocky K.
+  twitch:
+    '<g transform="translate(16 16) scale(20)"><path fill-rule="evenodd" d="M6 0 1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0Zm14.571 1.714v9.429l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714ZM11.571 4.714h1.715v5.143H11.57Zm4.715 0H18v5.143h-1.714Z"/></g>',
+  // The same X mark public/links.html draws inline for the project's X profile.
+  x: '<g transform="translate(16 16) scale(20)"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></g>',
+  kick: '<g transform="translate(16 16) scale(20)"><path d="M1.333 0h8v5.333H12V2.667h2.667V0H24v8h-2.667v2.667h-2.666v2.666h2.666V16H24v8h-9.333v-2.667H12v-2.666H9.333V24H1.333Z"/></g>',
+  // The same YouTube mark public/links.html draws inline for the project's channel.
+  youtube:
+    '<g transform="translate(16 16) scale(20)"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></g>',
   // The same filled heart the pre-game shell's Donate community link draws inline
   // (a 24 x 24 artboard), scaled and centered to fit the shared 0 0 512 512 viewBox.
   donate:
@@ -134,6 +153,9 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored boarball (the Vale Cup): a stitched ball, ring + two seams
   // with cross-stitch ticks so it reads at micro-button size
   ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36zM220 238h72v36h-72z"/>',
+  // hand-authored open book (the Book of Deeds): two page leaves meeting at a
+  // spine dip, each page hollowed so the glyph reads at micro-button size
+  book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

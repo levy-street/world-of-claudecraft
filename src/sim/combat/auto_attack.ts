@@ -307,7 +307,7 @@ export function rangedSwing(
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
-    if (crit) dmg *= 2;
+    if (crit) dmg *= 2 + atk.critDmgPhysBonus;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
     ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
@@ -417,7 +417,7 @@ export function meleeSwing(
   const crit =
     ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance) ||
     opts.forceCrit === true;
-  if (crit) dmg *= 2;
+  if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   if (blockChance > 0 && roll < missChance + dodgeChance + blockChance) {
     dmg = Math.max(1, dmg - target.blockValue);

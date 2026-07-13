@@ -1,3 +1,4 @@
+import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
 import { pool } from './db';
 import { REALM } from './realm';
 
@@ -515,6 +516,10 @@ export interface AdminAccountRow {
   characterCount: number;
   maxLevel: number;
   playtimeSeconds: number;
+  // Operator-set account flair. The list carries only the two flags (the links
+  // themselves ride the detail response, where the edit form reads them).
+  isAi: boolean;
+  isStreamer: boolean;
 }
 
 export interface Paginated<T> {
@@ -723,7 +728,7 @@ export async function listAccounts(
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
-              a.banned_at, a.suspended_until,
+              a.banned_at, a.suspended_until, a.is_ai, a.is_streamer,
               count(c.id)::int AS character_count,
               COALESCE(max(c.level), 0)::int AS max_level,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
@@ -750,6 +755,8 @@ export async function listAccounts(
       characterCount: r.character_count,
       maxLevel: r.max_level,
       playtimeSeconds: Number(r.playtime_seconds),
+      isAi: r.is_ai === true,
+      isStreamer: r.is_streamer === true,
     })),
     total: total.rows[0].total,
     page,
@@ -841,6 +848,13 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  // Operator-set account flair, as the dashboard's edit form needs to read it back:
+  // the two flags plus the stored links. The links are re-normalized on the way out
+  // (normalizeAccountFlair), so a value that could not survive the write gate is not
+  // echoed to the dashboard either.
+  isAi: boolean;
+  isStreamer: boolean;
+  streamerLinks: StreamerLinks;
   dailyRewardsBan?: { reason: string; createdAt: string } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
@@ -994,6 +1008,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
               chat_muted_until,
               COALESCE(chat_mute_reason, '') AS chat_mute_reason,
               COALESCE(chat_strikes, 0) AS chat_strikes,
+              is_ai, is_streamer, streamer_links,
               (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
                 AS daily_rewards_ban_reason,
               (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
@@ -1043,6 +1058,11 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
   ]);
   const a = account.rows[0];
   if (!a) return null;
+  const flair = normalizeAccountFlair({
+    ai: a.is_ai,
+    streamer: a.is_streamer,
+    links: a.streamer_links,
+  });
   return {
     id: a.id,
     username: a.username,
@@ -1055,6 +1075,9 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    isAi: flair.ai,
+    isStreamer: flair.streamer,
+    streamerLinks: flair.links,
     dailyRewardsBan:
       a.daily_rewards_ban_reason == null
         ? null

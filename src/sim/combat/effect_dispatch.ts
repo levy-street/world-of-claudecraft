@@ -18,6 +18,7 @@
 import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -53,11 +54,12 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
-import { isRooted } from './cc';
+import { isRootedOrChilled } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { isFormAuraKind } from './forms';
+import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -173,6 +175,19 @@ function consumeMatchingAura(
   });
 }
 
+function friendliesInRadius(ctx: SimContext, source: Entity, radius: number): Entity[] {
+  const out: Entity[] = [];
+  const r2 = radius * radius;
+  for (const e of ctx.entities.values()) {
+    if (e.dead) continue;
+    const dx = e.pos.x - source.pos.x;
+    const dz = e.pos.z - source.pos.z;
+    if (dx * dx + dz * dz > r2) continue;
+    if (e.id === source.id || ctx.isFriendlyTo(source, e)) out.push(e);
+  }
+  return out;
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -209,6 +224,17 @@ export function runEffects(
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
+  // Casting a healing spell drops a Shadow priest out of Shadowform: the form
+  // amplifies Shadow damage but forbids healing (classic Shadowform rule).
+  if (res.effects.some((e) => e.type === 'heal' || e.type === 'hot' || e.type === 'aoeHeal')) {
+    const sf = p.auras.findIndex((a) => a.kind === 'form_shadow');
+    if (sf >= 0) {
+      const lost = p.auras[sf];
+      p.auras.splice(sf, 1);
+      ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
+      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+    }
+  }
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
 
   // Cleaving Blows (Fury passive): casting Red Harvest refunds one charge of
@@ -341,7 +367,8 @@ export function runEffects(
       }
       case 'directDamage': {
         if (!target) break;
-        const rooted = isRooted(target);
+        if (!ctx.isHostileTo(p, target)) break;
+        const rooted = isRootedOrChilled(target);
         const critChance =
           isSpell && rooted
             ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
@@ -358,7 +385,8 @@ export function runEffects(
         // Emboldened: the roll is still drawn; only the outcome is overridden.
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= isSpell ? 1.5 : 2;
+        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
+        if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -389,6 +417,7 @@ export function runEffects(
             threatOpts,
           );
         }
+        if (isSpell) noteSpellHit(ctx, p, crit);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -410,7 +439,7 @@ export function runEffects(
         // Emboldened: the roll is still drawn; only the outcome is overridden.
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) || sureCrit;
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= 2;
+        if (crit) dmg *= 2 + p.critDmgPhysBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -485,6 +514,7 @@ export function runEffects(
         break;
       case 'heal': {
         const healTarget = target ?? p;
+        if (healTarget !== p && ctx.isHostileTo(p, healTarget)) break;
         // Heals scale with Spell Power at the direct cast-time coefficient, the
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =
@@ -497,6 +527,7 @@ export function runEffects(
         // hop choice is DETERMINISTIC (most injured by hp fraction, then nearest,
         // then lowest id), so the only rng draws are the one base roll plus each
         // applyHeal's crit, and the same world state always builds the same chain.
+        // Selection and the per-hop spellfx arc adopted from Blaine1705's #1434.
         const first = target ?? p;
         const baseAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
@@ -510,11 +541,11 @@ export function runEffects(
           // mobs); isFriendlyTo filters to healable allies, so one scan suffices.
           // The pick is a deterministic min (hp fraction, then distance, then id),
           // so it is independent of grid iteration order (no rng here).
-          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.jumpRange, (e, d2) => {
+          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.jumpRange ?? eff.radius ?? 0, (e, d2) => {
             if (e.dead || chain.includes(e)) return;
             // Allies only: players and player-owned pets (what a friendly-target
             // heal may hit), never a hostile or an NPC bystander.
-            if (!ctx.isFriendlyTo(p, e)) return;
+            if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
             // hp/maxHp are integers, so equal fractions compute the identical float:
             // an EXACT ladder (frac, then distance, then id) is transitive and thus
             // order-independent, no epsilon window needed.
@@ -544,6 +575,25 @@ export function runEffects(
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           ctx.applyHeal(p, chain[i], hopAmount, ability.name);
+        }
+        break;
+      }
+      case 'feralCharge': {
+        // Druid Feral signature (Feral Instinct): a form-gated resource burst. Cat Form
+        // (Energy) gains a regeneration buff; Bear Form (Rage) gets an instant Rage jolt.
+        if (p.auras.some((a) => a.kind === 'form_cat')) {
+          ctx.applyAura(p, {
+            id: 'feral_instinct_energy',
+            name: ability.name,
+            kind: 'buff_energyregen',
+            remaining: 10,
+            duration: 10,
+            value: 1,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        } else if (p.auras.some((a) => a.kind === 'form_bear') && p.resourceType === 'rage') {
+          p.resource = Math.min(p.maxResource, p.resource + 50);
         }
         break;
       }
@@ -623,8 +673,9 @@ export function runEffects(
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
         if (sureCrit) sureCritRolled = true;
-        if (crit) dmg *= 1.5;
+        if (crit) dmg *= 1.5 + p.critDmgSpellBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
+        noteSpellHit(ctx, p, crit);
         break;
       }
       case 'interrupt': {
@@ -638,13 +689,19 @@ export function runEffects(
         const interruptedDef =
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
+        // A scripted mob channel (Malric's Mending) resolves to no ability def but
+        // is still meant to be interruptible: a matching school-lockout breaks it in
+        // updateBossMechanics. Everything else that resolves to nothing stays immune.
+        const scriptedChannel = interruptedDef
+          ? undefined
+          : SCRIPTED_INTERRUPTIBLE_CHANNELS[target.castingAbility];
         if (
-          !interruptedDef ||
-          interruptedDef.school === 'physical' ||
-          interruptedDef.uninterruptible
+          (!interruptedDef && !scriptedChannel) ||
+          interruptedDef?.school === 'physical' ||
+          interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef.school;
+        const school = interruptedDef?.school ?? scriptedChannel!.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         // Pummel (owner design): stopping a cast PAYS rage instead of costing
@@ -944,6 +1001,7 @@ export function runEffects(
           eff.softCap && aoeTargets.length > eff.softCap ? eff.softCap / aoeTargets.length : 1;
         for (const m of aoeTargets) {
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -1013,6 +1071,71 @@ export function runEffects(
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           ctx.applyHeal(p, m, healAmount, ability.name);
+        }
+        break;
+      }
+      case 'chainDamage': {
+        // Bounce damage (Hallowed Wall): the directDamage above already hit the primary
+        // target; this arcs from THAT target to the nearest hostiles, up to eff.jumps of
+        // them, excluding the primary and the caster. The hop pick is DETERMINISTIC
+        // (nearest by squared distance, then lowest id), mirroring chainHeal, so the only
+        // rng is the one base roll plus each dealDamage crit.
+        const origin = target ?? p;
+        const chainSpBonus = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
+        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        const hitList: Entity[] = [];
+        const excluded = new Set<number>([p.id]);
+        if (target) excluded.add(target.id);
+        let from: Entity = origin;
+        while (hitList.length < eff.jumps) {
+          let best: Entity | null = null;
+          let bestD2 = Number.POSITIVE_INFINITY;
+          for (const m of ctx.hostilesInRadius(p, from.pos, eff.radius)) {
+            // LoS is checked from the PREVIOUS hop, not the caster: the bolt arcs
+            // enemy-to-enemy, so a wall between the caster and a bounce target must
+            // not block a hop the arc itself has clear line to.
+            if (excluded.has(m.id) || !ctx.hasLineOfSight(from, m)) continue;
+            const dx = m.pos.x - from.pos.x;
+            const dz = m.pos.z - from.pos.z;
+            const d2 = dx * dx + dz * dz;
+            if (best === null || d2 < bestD2 || (d2 === bestD2 && m.id < best.id)) {
+              best = m;
+              bestD2 = d2;
+            }
+          }
+          if (best === null) break;
+          excluded.add(best.id);
+          hitList.push(best);
+          from = best;
+        }
+        for (let i = 0; i < hitList.length; i++) {
+          const m = hitList[i];
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: i === 0 ? origin.id : hitList[i - 1].id,
+            targetId: m.id,
+            school: ability.school,
+            fx: 'projectile',
+          });
+          let dmg = baseAmount * eff.falloff ** i;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          ctx.dealDamage(
+            p,
+            m,
+            Math.max(1, Math.round(dmg)),
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+          );
         }
         break;
       }
@@ -1188,14 +1311,18 @@ export function runEffects(
       }
       case 'aoeAllyAttackPower': {
         // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
-        // nearby allies (Trueshot Aura, Iron Bellow), riding the PR3a
-        // friendlies seam. No party requirement: friendliesInRadius includes
+        // nearby allies (Trueshot Aura, Iron Bellow, Battle Shout), riding the
+        // PR3a friendlies seam. No party requirement: friendliesInRadius includes
         // the caster and every friendly entity within radius.
         //
         // An exclusiveGroup ability here (battle_shout, group 'warrior_shout')
         // first cancels the caster's sibling buffs, mirroring the selfBuff
         // case; a re-cast's own `<id>_ap` aura is skipped (applyAura refreshes
         // it in place). Trueshot Aura has no group, so this is a no-op for it.
+        //
+        // The buff is a flat AP add (buff_ap) OR a percentage add (buff_ap_pct,
+        // Battle Shout / Blessing of Might) when eff.apPct is set; the latter
+        // folds through recalcPlayerStats, so re-run recalc for player targets.
         for (const i of exclusiveAuraConflicts(
           ability.exclusiveGroup,
           `${ability.id}_ap`,
@@ -1206,17 +1333,30 @@ export function runEffects(
           p.auras.splice(i, 1);
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
+        const apKind = eff.apPct !== undefined ? 'buff_ap_pct' : 'buff_ap';
+        const apValue = eff.apPct ?? eff.amount ?? 0;
         for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
           ctx.applyAura(mE, {
             id: `${ability.id}_ap`,
             name: ability.name,
-            kind: 'buff_ap',
+            kind: apKind,
             remaining: eff.duration,
             duration: eff.duration,
-            value: eff.amount,
+            value: apValue,
             sourceId: p.id,
             school: ability.school,
           });
+          if (mE.kind === 'player') {
+            const targetMeta = ctx.players.get(mE.id);
+            if (targetMeta)
+              recalcPlayerStats(
+                mE,
+                targetMeta.cls,
+                targetMeta.equipment,
+                ctx.playerMods(targetMeta),
+                targetMeta.equipmentInstance,
+              );
+          }
         }
         break;
       }
@@ -1351,6 +1491,21 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyHaste': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: ability.id,
+            name: ability.name,
+            kind: 'buff_haste',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',
@@ -1399,12 +1554,15 @@ export function runEffects(
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
           // Emboldened: the roll is still drawn; only the outcome is overridden.
           const crit =
             ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
           if (sureCrit) sureCritRolled = true;
-          if (crit) dmg *= isSpell ? 1.5 : 2;
+          if (crit)
+            dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+          if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
             p,
             target,
@@ -1480,11 +1638,19 @@ export function runEffects(
             break;
           }
         }
+        // An ability can grant SEVERAL self-buffs at once (Arcane Power: spell damage AND
+        // haste; Metamorphosis: damage AND haste). applyAura dedups by (id, sourceId), so
+        // every companion buff needs a distinct id or the last would evict the rest. The
+        // PRIMARY self-buff (the first kind on the DEF) keeps the bare ability id (so its
+        // icon/name resolve and the form/aspect toggle-off still finds it by id); companions
+        // get a kind-suffixed id. Compare by KIND, not object identity: applyTalentMods may
+        // have replaced the resolved effect objects, so a reference check would misfire. A
+        // selfBuff may also carry its own buff identity (aoe_echo: Bladed Gyre arms 'Bladed
+        // Echo' under id 'bladed_echo'), which takes precedence over the primary/companion id.
+        const firstSelfBuffKind = ability.effects.find((e) => e.type === 'selfBuff')?.kind;
+        const isPrimarySelfBuff = eff.kind === firstSelfBuffKind;
         ctx.applyAura(p, {
-          // A selfBuff may carry its own buff identity (aoe_echo: Bladed Gyre
-          // arms 'Bladed Echo' under id 'bladed_echo', so the HUD names the
-          // rider apart from the granting ability); default is the ability's.
-          id: eff.auraId ?? ability.id,
+          id: eff.auraId ?? (isPrimarySelfBuff ? ability.id : `${ability.id}_${eff.kind}`),
           name: eff.auraName ?? ability.name,
           kind: eff.kind,
           remaining: eff.duration,
@@ -1507,6 +1673,41 @@ export function runEffects(
           ctx.playerMods(meta),
           meta.equipmentInstance,
         );
+        break;
+      }
+      case 'petBuff': {
+        const pet = ctx.petOf(p.id);
+        if (!pet) break;
+        // Same multi-buff rule as selfBuff: Metamorphosis buffs the demon's damage AND its
+        // cast speed, so the companion pet-buff needs its own id to survive apply. Match by
+        // kind (applyTalentMods may have replaced the resolved effect objects).
+        const firstPetBuffKind = ability.effects.find((e) => e.type === 'petBuff')?.kind;
+        const isPrimaryPetBuff = eff.kind === firstPetBuffKind;
+        ctx.applyAura(pet, {
+          id: isPrimaryPetBuff ? `${ability.id}_pet` : `${ability.id}_pet_${eff.kind}`,
+          name: ability.name,
+          kind: eff.kind,
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
+      case 'applyDebuff': {
+        if (!target || target.dead) break;
+        ctx.applyAura(target, {
+          id: `${ability.id}_${eff.kind}`,
+          name: ability.name,
+          kind: eff.kind,
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        ctx.enterCombat(p, target);
         break;
       }
       case 'gainResource': {

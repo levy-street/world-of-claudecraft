@@ -1,5 +1,6 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 
@@ -44,6 +45,18 @@ export function hasteFractionFromRating(rating: number): number {
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+
+export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
+
+// Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
+// by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
+// the soft daily taper independently of who was faced.
+export interface HonorArenaDailyState {
+  date: string;
+  winsByOpponent: Record<string, number>;
+  fiestaCompletionsByOpponent: Record<string, number>;
+  totalWins: number;
 }
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, the classic-era value.
@@ -183,6 +196,9 @@ export type AuraKind =
   | 'attackspeed'
   | 'debuff_ap'
   | 'buff_ap'
+  | 'buff_ap_pct'
+  | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -193,6 +209,10 @@ export type AuraKind =
   // Rallying Cry: value = fraction added to maximum health while worn (the
   // recalc keeps the hp fraction, so current health scales with it).
   | 'buff_maxhp_pct'
+  | 'buff_spellcrit'
+  | 'buff_spelldmg'
+  | 'buff_spellhaste'
+  | 'cast_shield'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -208,6 +228,11 @@ export type AuraKind =
   | 'form_travel'
   | 'form_moonkin'
   | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
@@ -242,6 +267,7 @@ export type AuraKind =
   | 'blind'
   | 'disarm'
   | 'expose'
+  | 'bleed_vuln'
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
@@ -401,7 +427,16 @@ export interface Stats {
   int: number;
   spi: number;
   armor: number;
+  // Fractions derived from PvP ratings on equipped gear. They affect hostile
+  // player-vs-player damage only; PvE never reads them.
+  pvpOffense: number;
+  pvpDefense: number;
 }
+
+// The six class/item attributes authored in content. WARFARE fractions are
+// derived from ratings at runtime and are never authored as base growth or
+// direct item stats.
+export type CoreStats = Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>;
 
 export interface WeaponInfo {
   min: number;
@@ -487,7 +522,7 @@ interface BaseItemDef {
   name: string;
   slot?: ItemSlot;
   weapon?: WeaponInfo;
-  stats?: Partial<Stats>;
+  stats?: Partial<CoreStats>;
   // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
@@ -495,6 +530,13 @@ interface BaseItemDef {
   // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
+  // combat clamps them again at the PvP caps before applying damage.
+  pvpOffenseRating?: number;
+  pvpDefenseRating?: number;
+  // Honor price for a Quartermaster purchase. An honor-only item omits
+  // buyValue; both fields may coexist when a vendor charges both currencies.
+  priceHonor?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -503,10 +545,10 @@ interface BaseItemDef {
   noDiscard?: boolean;
   noMarketList?: boolean;
   // Soulbound: the item is bound to its owner. It cannot be traded, mailed,
-  // listed on the World Market, or destroyed (right-click discard). Currency-like
-  // reward tokens (heroic_mark) use this so they can only be spent at their vendor,
-  // never handed off or thrown away. Enforced in social/trade.ts, mail/post_office.ts,
-  // market.ts, and items.ts (discardItem/sellItem/sellAllJunk).
+  // listed on the World Market, or sold. Destruction is controlled separately by
+  // noDiscard so bound equipment can still be cleaned out while currency-like
+  // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
+  // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
@@ -906,6 +948,8 @@ export interface MobTemplate {
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
   // leaves snares landing so most elites can still be kited; a raid boss sets both.
   slowImmune?: boolean;
+  // Ignores taunt/growl forced-target windows. Used by special add AI only.
+  ignoreTaunt?: boolean;
   respawnMult?: number;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
@@ -997,6 +1041,23 @@ export interface MobTemplate {
     every: number;
     amount: number;
     duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
+  // Channeled ESCALATING heal ("Hierophant's Mending"): every `every`s the caster
+  // heals the highest-max-hp friendly mob in `radius` (its protector, e.g. a raid
+  // boss) for `baseHeal` plus a ramp that GROWS by `rampAdd` each uninterrupted
+  // tick, capped so a tick never exceeds `maxHeal`. Any stun/incapacitate/silence
+  // (see combat/cc.ts) breaks the channel and RESETS the ramp to zero, so a raid
+  // that fails to lock the caster down watches the boss heal for more and more.
+  // The caster must be CC-able (template `ccImmune: false`) for the reset to
+  // matter. Rides applyHeal; no new aura kind. Resets on evade/respawn.
+  channelHeal?: {
+    radius: number;
+    every: number;
+    baseHeal: number;
+    rampAdd: number;
+    maxHeal: number;
     name: string;
     school?: Aura['school'];
   };
@@ -1489,15 +1550,18 @@ export type AbilityEffect =
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps` nearby
-  // allies (the most injured within `jumpRange` yards of the previous target, never
-  // repeating one), each hop healing `falloff` of the previous hop's amount.
+  // allies (the most injured within range of the previous target, never repeating one),
+  // each hop healing `falloff` of the previous hop's amount. Range field: mainline uses
+  // `radius`, the warrior-foundation branch authored some rows with `jumpRange`; the
+  // dispatch honors either, so both are optional here.
   | {
       type: 'chainHeal';
       min: number;
       max: number;
       jumps: number;
-      jumpRange: number;
       falloff: number;
+      radius?: number;
+      jumpRange?: number;
     }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
@@ -1565,6 +1629,20 @@ export type AbilityEffect =
       // enemy struck, capped at +5). Deterministic state change, no extra rng.
       rageOnHit?: { base: number; perTarget: number; capTargets: number };
     }
+  // Bounce damage: the caster's directDamage already hit the primary target; this arcs
+  // from that target to the nearest not-yet-hit hostile within `radius`, up to `jumps`
+  // enemies (the primary and the caster are excluded), each jump dealing `falloff`x the
+  // last. The hop pick is DETERMINISTIC (nearest by distance, then lowest id), mirroring
+  // chainHeal, so the only rng is the one base roll plus each hit's crit. Used by
+  // Hallowed Wall (Protection paladin signature).
+  | {
+      type: 'chainDamage';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
@@ -1580,6 +1658,15 @@ export type AbilityEffect =
   // negative buff_dmg_done aura), the owner's Direhowl rework: mobs carry most
   // of their damage on the weapon roll, so a flat AP drain barely dents them.
   | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
+  // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
+  | {
+      type: 'aoeAllyAttackPower';
+      amount?: number;
+      apPct?: number;
+      duration: number;
+      radius: number;
+    }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
@@ -1618,6 +1705,8 @@ export type AbilityEffect =
       auraId?: string;
       auraName?: string;
     }
+  | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
+  | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
@@ -1640,7 +1729,6 @@ export type AbilityEffect =
     }
   // An attack-power BUFF on the caster and party members within radius (the
   // friendly mirror of aoeAttackPower; PR #1348 harvest, Trueshot Aura).
-  | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
   // Emboldening Roar: the caster and friendly players within radius gain the
   // sure_crit aura ('Emboldened'): their next `charges` damaging ability casts
   // are guaranteed critical strikes (combat/sure_crit.ts).
@@ -1660,6 +1748,9 @@ export type AbilityEffect =
   // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
   | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
+  // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
+  // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
+  | { type: 'feralCharge' }
   // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
   // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
   // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
@@ -1757,7 +1848,7 @@ export interface AbilityDef {
   // hand-off (Redhand serves committed Fury as its rage spender until Red
   // Harvest arrives, then retires). Without it exclusion applies at any level.
   excludeSpecsAtLevel?: number;
-  targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
+  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -1777,6 +1868,9 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Castable while shapeshifted without requiring a SPECIFIC form (Feral Instinct works in
+  // both Cat and Bear Form). Exempts the ability from the "can't act while shapeshifted" lock.
+  usableInForm?: boolean;
   // Mutually exclusive self-buff group: casting one ability in the group cancels
   // any active buff from a sibling in the same group (e.g. hunter aspects, where
   // only one aspect may be active at a time). Distinct from form toggles, which
@@ -1904,7 +1998,11 @@ export interface ZoneDef {
   hub: { x: number; z: number; radius: number; name: string };
   graveyard: { x: number; z: number };
   lakes: { x: number; z: number; radius: number }[];
-  pois: { x: number; z: number; label: string }[];
+  // id is the PERSISTED identity of a point of interest (deed visit marks key on
+  // it, so it must never change once shipped); label is display-only and may be
+  // re-worded freely. Optional because user-authored custom maps (MapDocContent
+  // reuses ZoneDef) omit it; every static ZONES poi carries one (content-guarded).
+  pois: { x: number; z: number; label: string; id?: string }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
 }
@@ -2047,6 +2145,11 @@ export interface Entity {
   name: string;
   level: number;
   guild: string;
+  // Book of Deeds display title: a deed id (never display text), null/absent
+  // for untitled players and every mob/npc. Written by the sim title setter
+  // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
+  // rides the identity wire only when non-null.
+  title?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -2088,6 +2191,13 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
+  // so a mastery only strengthens the crits it is meant to. Added to the matching base
+  // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
+  // crits 2 + critDmgPhysBonus, heal crits 1.5 + critDmgHealBonus.
+  critDmgSpellBonus: number;
+  critDmgPhysBonus: number;
+  critDmgHealBonus: number;
   dodgeChance: number;
   parryChance: number; // 0..1: chance to fully avoid a FRONTAL melee attack (parry classes only)
   blockChance: number; // 0..1: passive shield block chance against FRONTAL physical melee hits
@@ -2202,6 +2312,9 @@ export interface Entity {
   detonateTimer: number; // Death Throes fuse on a volatile corpse; Infinity = no pending detonation
   mendTimer: number; // mendAlly support-heal cast countdown
   wardTimer: number; // wardAllies support-shield cast countdown
+  channelTimer: number; // channelHeal escalating-heal tick countdown
+  channelRamp: number; // channelHeal accumulated bonus heal; reset to 0 on interrupt (CC)
+  healProtecteeId?: number | null; // channelHeal: cached protectee (the ally healed), re-scanned lazily
   rallyTimer: number; // rally commander-buff cast countdown
   warcryTimer: number; // warcry ally-haste pulse countdown
   firedSummons: number; // summonAdds thresholds already triggered
@@ -2234,6 +2347,9 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
+  // real game master (who could otherwise deal 100x or have their invuln toggled).
+  devGod?: boolean;
   /** Moderation-jailed player: prisoners are mutually hostile (the jail brawl,
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
@@ -2323,6 +2439,13 @@ export interface Entity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Account flair (cosmetic, operator-set from the admin dashboard; the sim
+  // never reads either): the AI-operated mark that prefixes the name with [AI],
+  // and an official streamer's platform links for the player menu. `streamerLinks`
+  // is present only when the account's streamer flag is actually on (the server
+  // gates it in wireStreamerLinks), so on the client "has links" IS "is a streamer".
+  aiAccount?: boolean;
+  streamerLinks?: StreamerLinks;
 }
 
 export interface NythraxisWardChannel {
@@ -2361,6 +2484,10 @@ export interface NythraxisEncounterState {
   deathlessTimer: number;
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
+  heroicSummonChannelRemaining?: number;
+  dreadCurseTimer?: number;
+  dreadCurseTargetId?: number | null;
+  dreadCurseStacks?: number;
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
@@ -2425,11 +2552,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
+  | { type: 'honor'; amount: number; reason: HonorReason }
   | { type: 'levelup'; level: number }
   // post-cap cosmetic progression (Max-Level XP Overflow): crossing a virtual
-  // level past the cap, and unlocking a cosmetic lifetime-XP milestone
+  // level past the cap (milestone unlocks ride the deedUnlocked event since
+  // the milestone unification; the legacy milestoneUnlocked emit is gone)
   | { type: 'virtualLevelUp'; level: number }
-  | { type: 'milestoneUnlocked'; milestoneId: string }
+  // Book of Deeds unlock (always personal: emitted with pid). Carries the deed
+  // ID only, never English text; `retro` marks the on-join back-credit pass so
+  // the client can batch those into one summary line instead of banner spam.
+  | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | {
@@ -2482,6 +2614,12 @@ export type SimEvent = { pid?: number } & (
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // A guildmate's or followed friend's marquee deed unlock. Emitted only by
+  // the server's SocialService (the sim never sees other players' social
+  // graphs); declared here, like calendarResult, so the one client event
+  // switch stays exhaustively typed. Carries ids and the earner's name only,
+  // never deed text: the client composes the line from deed_i18n.
+  | { type: 'deedBroadcast'; characterName: string; deedId: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is
@@ -2490,6 +2628,11 @@ export type SimEvent = { pid?: number } & (
       type: 'chat';
       fromPid: number;
       from: string;
+      // The speaker's selected Book of Deeds title: a deed id the client
+      // localizes through deed_i18n, never display text. Stamped only at the
+      // PLAYER-sourced emitters (untitled players omit it); mob and boss
+      // yells never carry one.
+      fromTitle?: string;
       text: string;
       channel?:
         | 'say'
@@ -2505,6 +2648,13 @@ export type SimEvent = { pid?: number } & (
         | 'roll';
       entityId?: number;
       to?: string;
+      // Account flair of the SENDER, attached by the server at fan-out (the sim
+      // never sets it). Sparse: absent for a normal player, so an ordinary chat
+      // line is unchanged on the wire. It rides the event rather than being read
+      // off the sender's entity because general/world/lfg/guild chat reaches you
+      // from players far outside your ~120yd interest scope, where no entity
+      // record exists locally.
+      flair?: ChatSenderFlair;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a
@@ -2967,6 +3117,14 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+// The Nythraxis arena room radius (yards from the boss spawn). Shared here so
+// deeds.ts can read it without importing encounters/nythraxis.ts (which itself
+// imports deeds.ts). Membership consumers (the lockout roster and the deed
+// task window) clip this circle to the boss slot's own z band; the in-room
+// combat queries (targeting, wipe detection, the transition stun) use the raw
+// circle, whose cross-slot reach is behind arena walls the movement resolver
+// enforces.
+export const NYTHRAXIS_ROOM_RADIUS = 260;
 // The Drowned Litany finale boss. Used by the drowned_litany_boss driver.
 export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
 // The Tolling Bells projectile mob (Drowned Litany finale): moved exclusively by
@@ -3061,6 +3219,192 @@ export const MILESTONES: MilestoneDef[] = [
   { id: 'mythic', lifetimeXp: 2_500_000, kind: 'border' },
   { id: 'eternal', lifetimeXp: 5_000_000, kind: 'title' },
 ];
+
+// ---------------------------------------------------------------------------
+// The Book of Deeds (achievements). Strictly cosmetic: deeds grant Renown,
+// titles, and nameplate borders, never power, convenience, or actionable
+// information. The catalog lives in content/deeds.ts (DEEDS/DEED_ORDER); the
+// evaluator in deeds.ts grants against these shapes. Names/descs are English
+// content re-localized at the client boundary; the sim only ever emits deed
+// IDS (the deedUnlocked event), never deed text, so the emit surface stays
+// language-agnostic.
+// ---------------------------------------------------------------------------
+
+export type DeedCategory =
+  | 'progression'
+  | 'combat'
+  | 'dungeon'
+  | 'delve'
+  | 'chronicle'
+  | 'collection'
+  | 'pvp'
+  | 'social'
+  | 'exploration'
+  | 'feat'
+  | 'hidden';
+
+// Persisted lifetime counters (DeedStats numeric fields). Each key has exactly
+// one increment site and at least one deed reading it; do not add a counter no
+// deed reads. The one non-sim producer is `guildsFounded`: guild creation
+// resolves entirely in the server social layer, so its bump is the server
+// observer SocialTransport.onGuildFounded (fired by the guildCreate success
+// arm in server/social.ts, wired to the sim in server/game.ts). These
+// are the PERSISTED lifetime surface; the session-scoped RewardCounters (the
+// RL reward channel) stays untouched even where the two double up at a site
+// by design.
+export type DeedStatKey =
+  | 'kills'
+  | 'deaths'
+  | 'damageDealt'
+  | 'crits'
+  | 'dummyDamage'
+  | 'lootCopper'
+  | 'duelsWon'
+  | 'duelsLost'
+  | 'tradesCompleted'
+  | 'mailAttachmentsSent'
+  | 'craftsPerformed'
+  | 'partiesJoined'
+  | 'fullPartyDungeonClears'
+  | 'guildsFounded'
+  | 'marketSaleCopper'
+  | 'groundObjectsLooted'
+  | 'dungeonFinalBossKills'
+  | 'thunzharrKills'
+  | 'bloatCleanKills'
+  | 'hubCraftsPerformed';
+
+// The canonical counter key list (init/serialize iterate it in this fixed
+// order so equal states always serialize byte-equal).
+export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
+  'kills',
+  'deaths',
+  'damageDealt',
+  'crits',
+  'dummyDamage',
+  'lootCopper',
+  'duelsWon',
+  'duelsLost',
+  'tradesCompleted',
+  'mailAttachmentsSent',
+  'craftsPerformed',
+  'partiesJoined',
+  'fullPartyDungeonClears',
+  'guildsFounded',
+  'marketSaleCopper',
+  'groundObjectsLooted',
+  'dungeonFinalBossKills',
+  'thunzharrKills',
+  'bloatCleanKills',
+  'hubCraftsPerformed',
+];
+
+// Numeric readings computed from already-persisted PlayerMeta state (never new
+// tracking). Resolved by the meter table in deeds.ts; a trigger of kind
+// 'meter' grants at reading >= amount and therefore retro-grants on load.
+export type DeedMeterId =
+  | 'prestigeRank'
+  | 'talentPoints'
+  | 'arenaRankedMatches'
+  | 'arenaRankedWins'
+  | 'vcupWins'
+  | 'vcupGuildWins'
+  | 'bankPurchasedSlots'
+  | 'townFocusPoints'
+  | 'delveLoreCount'
+  | 'companionRankBest'
+  | 'itemsDiscoveredCount'
+  | 'poorItemsDiscoveredCount';
+
+// Boolean predicates over already-persisted state (see the flag table in
+// deeds.ts). Like meters, they retro-grant on load.
+export type DeedFlagId =
+  | 'talentSpecChosen'
+  | 'talentCapstone'
+  | 'hasRestedXp'
+  | 'guildMember'
+  | 'allEquipSlotsFilled'
+  | 'nonDefaultSkin'
+  | 'heroicMarkCircuit'
+  | 'companionsBothMax'
+  | 'firstEraCap';
+
+// Discriminated union of DATA records (content carries no functions). The
+// generic evaluator satisfies every kind except 'manual', which is granted
+// only by an explicit grantDeed call at a bespoke sim site (encounter
+// mechanical/perfection/restriction/speed tasks, hidden delights).
+export type DeedTrigger =
+  // Entity.level at or above.
+  | { kind: 'level'; level: number }
+  // PlayerMeta.lifetimeXp at or above (the milestone unification kind).
+  | { kind: 'lifetimeXp'; amount: number }
+  // Membership in questsDone (all of, for the plural form).
+  | { kind: 'quest'; questId: string }
+  | { kind: 'quests'; questIds: string[] }
+  // A lifetime counter from deedStats at or above count.
+  | { kind: 'stat'; stat: DeedStatKey; count: number }
+  // deedStats.dungeonClears (keys '<dungeonId>' and '<dungeonId>:heroic');
+  // difficulty absent sums both keys.
+  | { kind: 'dungeonClears'; dungeonId: string; difficulty?: 'normal' | 'heroic'; count: number }
+  // The EXISTING persisted PlayerMeta.delveClears (keys '<delveId>:<tierId>').
+  // delveId absent sums every key (the all-delves total); tier absent sums the
+  // delve's tiers.
+  | { kind: 'delveClears'; delveId?: string; tier?: 'normal' | 'heroic'; count: number }
+  // The existing persisted Ashen Coliseum standings (one-way unlock: the deed
+  // stays earned if rating later falls).
+  | { kind: 'arenaRating'; bracket: '1v1' | '2v2'; rating: number }
+  // craftSkills: with craftId, that one craft at or above level; without, at
+  // least `count` (default 1) crafts on the ring at or above level.
+  | { kind: 'craftSkill'; craftId?: string; level: number; count?: number }
+  // gatheringProficiency: same shape as craftSkill over the three professions.
+  | { kind: 'gathering'; professionId?: GatheringProfessionId; amount: number; count?: number }
+  // At least `count` (default all) of the listed ids in deedStats.itemsDiscovered.
+  | { kind: 'collectItems'; itemIds: string[]; count?: number }
+  // Membership in deedStats.visited (stable authored marks like 'npc:saul' or
+  // 'poi:eastbrook_vale:eastbrook'; every mark is fed by an explicit site).
+  | { kind: 'visit'; markId: string }
+  | { kind: 'visits'; markIds: string[]; count?: number }
+  // All listed deeds earned, plus (optionally) all listed quests done. The
+  // quest arm exists for the Chronicle chapters, which mix both.
+  | { kind: 'meta'; deedIds: string[]; questIds?: string[] }
+  // A numeric reading over persisted state at or above amount.
+  | { kind: 'meter'; meter: DeedMeterId; amount: number }
+  // A boolean predicate over persisted state.
+  | { kind: 'flag'; flag: DeedFlagId }
+  // Granted only by an explicit grantDeed call at a bespoke sim site. Never
+  // satisfied by the generic evaluator and never retro-granted.
+  | { kind: 'manual' };
+
+// Cosmetic reward carried on the def. The title text / border slug is English
+// content (localized at the client boundary like name/desc).
+export type DeedReward = { kind: 'title'; text: string } | { kind: 'border'; slug: string };
+
+export interface DeedDef {
+  id: string;
+  name: string; // English; client-localized
+  desc: string; // English; client-localized
+  category: DeedCategory;
+  // Renown scale: 5 routine, 10 standard, 25 notable, 50 prestige; 0 for
+  // luck-dependent deeds and every feat. The account score never decreases.
+  renown: 0 | 5 | 10 | 25 | 50;
+  trigger: DeedTrigger;
+  reward?: DeedReward;
+  // Fully invisible until earned (name, desc, and existence).
+  hidden?: boolean;
+  // Zero-Renown trophy shelf; excluded from completion percentages.
+  feat?: boolean;
+}
+
+// Persisted per-character lifetime counters and marks backing deed triggers.
+// Bounded by construction: itemsDiscovered holds only real ITEMS ids and
+// visited only authored marks (both guarded at the write sites).
+export interface DeedStats {
+  counters: Record<DeedStatKey, number>;
+  itemsDiscovered: Set<string>;
+  visited: Set<string>;
+  // '<dungeonId>' (normal) and '<dungeonId>:heroic' final-boss clear counts.
+  dungeonClears: Record<string, number>;
+}
 
 // Prestige cost. Each prestige rank requires a full level-cap bar's worth of
 // post-cap lifetime XP, so prestige rank is a pure function of XP actually
@@ -3479,6 +3823,10 @@ export interface DelveRun {
   surfaceExitId: number | null;
   /** Active lockpicking attempt on the finale chest (single interactor, v1), or null. In-memory only. */
   lockpick: LockSession | null;
+  /** Whole-run roster watermark: the most players ever observed inside this run
+   * at an entry (delves cap at 2). The solo-clear restriction deed reads it at
+   * completion; a mid-run joiner permanently raises it. In-memory only. */
+  deedMaxParty?: number;
   /** Sister Nhalia boss mechanics (The Drowned Litany finale only). */
   nhaliaBoss?: DrownedLitanyBossState;
   /** Drowned Reliquary Rite shrine puzzle (The Drowned Litany finale only). */

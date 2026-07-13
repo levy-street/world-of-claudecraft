@@ -267,8 +267,8 @@ const PALADIN_SPECS: SpecDef[] = [
     'A devoted healer who turns the Light into steady single-target recovery.',
     'holy_shock',
     'Kindled Faith',
-    'Increases all healing done by 12%.',
-    { global: { healPct: 0.12 } },
+    'Your healing spells critically heal for double.',
+    { global: { critDmgHealPct: 0.5 } },
   ),
   spec(
     'protection',
@@ -279,8 +279,8 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'holy_shield',
     'Oathward',
-    'Increases threat by 25% and armor by 10%.',
-    { global: { threatPct: 0.25 }, stats: { armorPct: 0.1 } },
+    'Increases all threat you generate by 50% and your armor by 20%.',
+    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2 } },
   ),
   spec(
     'retribution',
@@ -289,10 +289,10 @@ const PALADIN_SPECS: SpecDef[] = [
     'dps',
     'x',
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
-    'repentance',
+    'crusader_strike',
     'Blood Debt',
-    'Increases melee and spell ability damage by 6%.',
-    { global: { meleeDmgPct: 0.06, spellDmgPct: 0.06 } },
+    'Increases your Holy and physical ability damage by 20%.',
+    { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },
   ),
 ];
 
@@ -745,8 +745,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A wild commander who fights beside a durable companion.',
     'bestial_wrath',
     'Packbond',
-    'Increases maximum health and attack power by 8%.',
-    { stats: { maxHpPct: 0.08, apPct: 0.08 } },
+    'Your pet deals 35% more damage. Increases maximum health by 8%.',
+    { global: { petDmgPct: 0.35 }, stats: { maxHpPct: 0.08 } },
   ),
   spec(
     'marksmanship',
@@ -757,8 +757,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A precise archer built around ranged burst and efficient shots.',
     'trueshot_aura',
     'Iron Aim',
-    'Increases attack power by 12% and critical strike by 2%.',
-    { stats: { apPct: 0.12, crit: 0.02 } },
+    'Increases your ranged ability damage by 20% and critical strike chance by 3%.',
+    { global: { meleeDmgPct: 0.2 }, stats: { crit: 0.03 } },
   ),
   spec(
     'survival',
@@ -769,8 +769,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A skirmisher who controls distance and survives close pressure.',
     'wyvern_sting',
     'Quickblood',
-    'Increases Agility by 10% and dodge by 2%.',
-    { stats: { agiPct: 0.1, dodge: 0.02 } },
+    'Increases your Agility by 15% and physical ability damage by 15%.',
+    { global: { meleeDmgPct: 0.15 }, stats: { agiPct: 0.15 } },
   ),
 ];
 
@@ -1231,8 +1231,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A precision caster using mana efficiency and focused arcane barrages.',
     'arcane_power',
     'Aetheric Flux',
-    'Increases spell damage by 8% and Intellect by 4.',
-    { global: { spellDmgPct: 0.08 }, stats: { int: 4 } },
+    'Increases your spell damage by 15% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
   ),
   spec(
     'fire',
@@ -1243,8 +1243,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A volatile caster built around fast, high-damage Fire spells.',
     'combustion',
     'Afterflame',
-    'Increases critical strike chance by 2%. Increases spell damage by 8%.',
-    { global: { spellDmgPct: 0.08 }, stats: { crit: 0.02 } },
+    'Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
+    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',
@@ -1253,10 +1253,19 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     '#',
     'A controlling caster who trades peak burst for survival and slows.',
-    'cone_of_cold',
+    'icy_veins',
     'Brittlebreak',
-    'Increases armor by 10%. Increases spell damage by 6%.',
-    { global: { spellDmgPct: 0.06 }, stats: { armorPct: 0.1 } },
+    'Increases your Frost spell damage by 25%. Increases armor by 10%.',
+    // The scalable mastery axis is the Frost-kit damage (ability-scoped so the
+    // mage's fire/arcane baseline spells stay untouched); armor is the static
+    // secondary. Crit-vs-rooted identity returns as a Shatter-style row option.
+    {
+      ability: [
+        { ability: 'frostbolt', dmgPct: 0.25 },
+        { ability: 'frost_nova', dmgPct: 0.25 },
+      ],
+      stats: { armorPct: 0.1 },
+    },
   ),
 ];
 
@@ -1701,8 +1710,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A burst specialist using critical strikes and finishers.',
     'cold_blood',
     'Redhanded',
-    'Increases critical strike chance by 3%. Increases Dirt Nap damage by 8%.',
-    { stats: { crit: 0.03 }, ability: [{ ability: 'eviscerate', dmgPct: 0.08 }] },
+    'Increases your bleed damage by 20% and critical strike chance by 3%.',
+    { global: { dotDmgPct: 0.2 }, stats: { crit: 0.03 } },
   ),
   spec(
     'combat',
@@ -1713,8 +1722,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A sustained fighter focused on direct weapon strikes.',
     'blade_flurry',
     "Scrapper's Edge",
-    'Increases melee ability damage by 10%.',
-    { global: { meleeDmgPct: 0.1 } },
+    'Increases attack speed by 10% and reduces melee ability damage by 10%.',
+    { global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 } },
   ),
   spec(
     'subtlety',
@@ -1725,8 +1734,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A stealth attacker built around openers, control, and avoidance.',
     'hemorrhage',
     'False Face',
-    'Increases Agility by 4. Increases critical strike chance by 2%.',
-    { stats: { agi: 4, crit: 0.02 } },
+    'Increases the damage of your critical strikes by 40% and your Agility by 10%.',
+    { global: { critDmgPhysPct: 0.4 }, stats: { agiPct: 0.1 } },
   ),
 ];
 
@@ -2187,8 +2196,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A mitigator who shields allies and heals through controlled efficiency.',
     'power_infusion',
     'Fixed Purpose',
-    'Increases maximum health by 8%. Increases healing done by 8%.',
-    { global: { healPct: 0.08 }, stats: { maxHpPct: 0.08 } },
+    'Your shields absorb 30% more. Increases maximum health by 8%.',
+    { global: { absorbPct: 0.3 }, stats: { maxHpPct: 0.08 } },
   ),
   spec(
     'holy',
@@ -2199,8 +2208,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A direct healer with strong throughput and restorative prayers.',
     'holy_nova',
     'Grave Mercy',
-    'Increases all healing done by 14%.',
-    { global: { healPct: 0.14 } },
+    'Increases all healing you do by 20%.',
+    { global: { healPct: 0.2 } },
   ),
   spec(
     'shadow',
@@ -2211,8 +2220,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A damage caster built around Shadow damage over time and mind spells.',
     'shadowform',
     'Gloamveil',
-    'Increases spell damage by 12% and armor by 8%.',
-    { global: { spellDmgPct: 0.12 }, stats: { armorPct: 0.08 } },
+    'Increases your damage-over-time damage by 15% and your spell damage by 10%.',
+    { global: { dotDmgPct: 0.15, spellDmgPct: 0.1 } },
   ),
 ];
 
@@ -2679,8 +2688,8 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A ranged caster who calls lightning, flame, and frost.',
     'elemental_mastery',
     'Earthen Fury',
-    'Increases critical strike chance by 2%. Increases spell damage by 10%.',
-    { global: { spellDmgPct: 0.1 }, stats: { crit: 0.02 } },
+    'Increases your spell damage by 15% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
   ),
   spec(
     'enhancement',
@@ -2691,8 +2700,8 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A weapon fighter who channels the storm through melee swings.',
     'shamanistic_rage',
     'Skyrend',
-    'Increases attack power by 10. Increases melee ability damage by 10%.',
-    { global: { meleeDmgPct: 0.1 }, stats: { ap: 10 } },
+    'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
+    { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
   ),
   spec(
     'restoration',
@@ -2701,10 +2710,15 @@ const SHAMAN_SPECS: SpecDef[] = [
     'healer',
     '+',
     'A healer using ancestral waves and efficient nature magic.',
-    'natures_swiftness',
+    'chain_heal',
     'Cleansing Tides',
-    'Increases healing done by 14%.',
-    { global: { healPct: 0.14 } },
+    'Your healing spells cost 20% less mana.',
+    {
+      ability: [
+        { ability: 'chain_heal', costPct: -0.2 },
+        { ability: 'healing_wave', costPct: -0.2 },
+      ],
+    },
   ),
 ];
 
@@ -3167,8 +3181,8 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A curse-weaver using damage over time and drains.',
     'siphon_life',
     'Creeping Rot',
-    'Increases Shadow spell damage by 4%.',
-    { global: { spellDmgPct: 0.04 } },
+    'Your damage-over-time effects deal 20% more damage.',
+    { global: { dotDmgPct: 0.2 } },
   ),
   spec(
     'demonology',
@@ -3177,10 +3191,10 @@ const WARLOCK_SPECS: SpecDef[] = [
     'dps',
     '+',
     'A durable warlock who survives through demonic resilience.',
-    'fel_domination',
+    'metamorphosis',
     'Fiendlore',
-    'Increases Stamina by 10%. Increases armor by 10%.',
-    { stats: { staPct: 0.1, armorPct: 0.1 } },
+    '20% of damage you take is redirected to your demon. Increases Stamina by 10%.',
+    { global: { petDmgSharePct: 0.2 }, stats: { staPct: 0.1 } },
   ),
   spec(
     'destruction',
@@ -3188,11 +3202,12 @@ const WARLOCK_SPECS: SpecDef[] = [
     'Ruination',
     'dps',
     'x',
-    'A burst caster using Shadow Bolt, fire, and Shadowburn.',
+    'A burst caster using Gloom Bolt, fire, and Duskfire.',
     'conflagrate',
     'Desolation',
-    'Increases critical strike chance by 2%. Increases spell damage by 3%.',
-    { global: { spellDmgPct: 0.03 }, stats: { crit: 0.02 } },
+    'Your Fire spell critical strikes deal double damage, and ' +
+      'your critical strike chance is increased by 2%.',
+    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
   ),
 ];
 
@@ -3547,7 +3562,10 @@ const DRUID_CLASS: TalentNode[] = [
     'class',
     undefined,
     2,
-    { ability: [{ ability: 'mark_of_the_wild', dmgPct: 0.2 }], stats: { armorPct: 0.03 } },
+    // Wildward (Mark of the Wild) is a stat buff, so its per-rank strengthening rides
+    // buffPct (the dedicated buff-scaling channel), not dmgPct: a damage-power mod no
+    // longer scales a percent buff (that corruption was fixed), so dmgPct here is a no-op.
+    { ability: [{ ability: 'mark_of_the_wild', buffPct: 0.2 }], stats: { armorPct: 0.03 } },
     '+',
     'Improved Wildward',
     'Increases armor by 3% per rank. Increases Wildward damage by 20% per rank.',
@@ -3657,8 +3675,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases Intellect by 4. Increases spell damage by 10%.',
-    { global: { spellDmgPct: 0.1 }, stats: { int: 4 } },
+    'Increases your spell damage by 15% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
   ),
   spec(
     'feral',
@@ -3669,8 +3687,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A shapeshifter who tanks in bear form and fights up close.',
     'feral_charge',
     'Primal Heart',
-    'Increases armor by 8%. Increases threat generated by 20%. Increases melee ability damage by 6%.',
-    { global: { threatPct: 0.2, meleeDmgPct: 0.06 }, stats: { armorPct: 0.08 } },
+    'Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
+    { global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 } },
   ),
   spec(
     'restoration',
@@ -3681,8 +3699,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A healer using heal-over-time effects and efficient nature magic.',
     'swiftmend',
     "Grove's Gift",
-    'Increases healing done by 14%.',
-    { global: { healPct: 0.14 } },
+    'Your heal-over-time effects heal 25% more.',
+    { global: { hotHealPct: 0.25 } },
   ),
 ];
 

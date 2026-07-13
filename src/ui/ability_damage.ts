@@ -56,9 +56,11 @@ export function abilityDamageBonus(
         : directHitBonus(power, def, res.castTime, false);
     case 'aoeDamage':
     case 'aoeRoot':
+    case 'chainDamage':
       // A channelled AoE (Rain of Fire, Hurricane, Volley) pulses through the
       // channel-tick path in casting_lifecycle, which adds channelTickBonus to
-      // each pulse, not the single-cast AoE coefficient.
+      // each pulse, not the single-cast AoE coefficient. chainDamage (Hallowed Wall
+      // bounce) is a one-shot AoE hit, so it takes the same AoE coefficient.
       return def.channel
         ? channelTickBonus(power, def)
         : directHitBonus(power, def, res.castTime, true);
@@ -66,6 +68,13 @@ export function abilityDamageBonus(
       // Each ground pulse is an AoE hit: effect_dispatch snapshots
       // directHitBonus(..., aoe) into the zone's spBonus at cast time.
       return directHitBonus(power, def, res.castTime, true);
+    case 'aoeHeal':
+      // AoE heals take the same per-target coefficient penalty as aoeDamage.
+      return directHealBonus(scaling.spellPower, res.castTime, true);
+    case 'consumeAura':
+      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
+      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      return 0;
     case 'heal':
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
@@ -80,13 +89,6 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
     }
-    case 'aoeHeal':
-      // AoE heals take the same per-target coefficient penalty as aoeDamage.
-      return directHealBonus(scaling.spellPower, res.castTime, true);
-    case 'consumeAura':
-      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
-      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
-      return 0;
     case 'drainTick':
       return channelTickBonus(power, def);
     case 'dot': {
@@ -124,11 +126,13 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
+      eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
       // Heroic Leap: the landing blast is nested in repositionToAim.landingAoe
       // (fired on touchdown), so $d reads that when present.
       (eff.type === 'repositionToAim' && eff.landingAoe != null) ||
+      eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||

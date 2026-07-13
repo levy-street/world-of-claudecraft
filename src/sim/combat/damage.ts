@@ -3,8 +3,9 @@
 // This module owns the post-mitigation damage pipeline: dealDamage's amp/absorb/
 // duel/fiesta/arena routing + death handoff, the two reactive hooks it drives
 // (maybeFrenzyOnHit, reflectSpellWard), the death teardown (handleDeath), and the
-// XP-grant chain (grantXp -> accrueLifetimeXp -> checkMilestones). It is the widest-
-// coupled slice in the refactor, so it consumes a large slice of the SimContext seam.
+// XP-grant chain (grantXp -> accrueLifetimeXp, whose tail marks the player dirty
+// for the Book of Deeds tick-tail evaluator). It is the widest-coupled slice in
+// the refactor, so it consumes a large slice of the SimContext seam.
 //
 // PRIME DIRECTIVE: this is a MOVE, not a rewrite. Every function below is the former
 // `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam) or
@@ -22,10 +23,13 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -41,7 +45,6 @@ import {
   FISHING_CAST_ID,
   isConsuming,
   MAX_LEVEL,
-  MILESTONES,
   mobXpValue,
   NYTHRAXIS_BOSS_ID,
   PARTY_XP_RANGE,
@@ -90,9 +93,14 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  // The amount is ALREADY fully source-modified (e.g. a Fiendlore share of damage the
+  // owner already took): skip the source-output mods (Defensive Stance's own-damage cut,
+  // Weakening Hex) so they are not applied a second time. Target-side amps, absorb, death,
+  // and events still run so the redirected hit lands normally on the pet.
+  alreadyFinal = false,
 ): void {
   if (target.dead) return;
-  if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
+  if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
@@ -100,6 +108,12 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
+  // through raid bosses to inspect drops without one-shotting them past their phase
+  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // marks real, non-fighting game masters). Draws no rng.
+  if (source?.devGod && source.kind === 'player' && ctx.devCommands)
+    amount = Math.round(amount * 100);
 
   // Master Armorer (Arms mastery): extra physical damage you deal WHILE wielding a
   // two-handed weapon. The magnitude lives on the mastery's talent effect
@@ -119,6 +133,7 @@ export function dealDamage(
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
+    !alreadyFinal &&
     source &&
     source.id !== target.id &&
     source.auras.some((a) => a.kind === 'defensive_stance')
@@ -177,7 +192,7 @@ export function dealDamage(
 
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
-  if (source && source.id !== target.id) {
+  if (!alreadyFinal && source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
@@ -236,6 +251,16 @@ export function dealDamage(
     if (physCut > 0) amount = Math.round(amount * Math.max(0, 1 - physCut));
   }
 
+  // Gloamveil Form (Shadowform): while in the form, the caster's SHADOW-school damage
+  // is amplified (classic +15%). School-scoped so only shadow spells benefit, and a
+  // source-output mod (skipped when the amount is already final, e.g. a redirect share).
+  // Every shadow damage path (direct nuke, DoT tick, Mind Flay channel, AoE) funnels
+  // here, so this one site covers them all; the boost is dynamic (it follows the form).
+  if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
+    const form = source.auras.find((a) => a.kind === 'form_shadow');
+    if (form) amount = Math.round(amount * (1 + form.value / 100));
+  }
+
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.
@@ -245,6 +270,20 @@ export function dealDamage(
   }
 
   const sourcePlayer = ctx.pvpController(source);
+
+  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
+  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
+  // dealDamage receives post-mitigation damage, so this deterministic step sits
+  // after the upstream armor/resist roll and before absorb shields.
+  if (
+    amount > 0 &&
+    source?.kind === 'player' &&
+    target.kind === 'player' &&
+    source.id !== target.id &&
+    ctx.isHostileTo(source, target)
+  ) {
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+  }
 
   // The Vale Cup: nobody bleeds at the Sowfield. Any damage between two seated
   // cup fighters is floored to 0 BEFORE absorb shields soak it, belt and
@@ -277,7 +316,34 @@ export function dealDamage(
     }
   }
 
-  // duels end at 1 hp — nobody dies
+  if (target.kind === 'player' && amount > 0) {
+    const meta = ctx.players.get(target.id);
+    const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
+    const pet = share > 0 ? ctx.petOf(target.id) : null;
+    if (pet && !pet.dead) {
+      const redirected = Math.min(amount, Math.round(amount * share));
+      if (redirected > 0) {
+        amount -= redirected;
+        ctx.dealDamage(
+          source,
+          pet,
+          redirected,
+          crit,
+          school,
+          ability,
+          kind,
+          noRage,
+          threatOpts,
+          direct,
+          // The share is already fully source-modified: don't re-apply the source's
+          // Defensive Stance cut / Weakening Hex to the pet's portion.
+          true,
+        );
+      }
+    }
+  }
+
+  // duels end at 1 hp, nobody dies
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     duel &&
@@ -298,6 +364,9 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng; the early
+      // return skips the shared deed site and the session RewardCounters).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
       return;
     }
@@ -340,6 +409,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
     }
@@ -366,6 +437,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
     }
@@ -396,6 +469,8 @@ export function dealDamage(
         ability,
         kind,
       });
+      // Book of Deeds: the clamped terminal hit counts (zero rng).
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
@@ -497,6 +572,11 @@ export function dealDamage(
     const contributorId = source.kind === 'player' ? source.id : source.ownerId;
     if (contributorId !== null) target.bossDamagers.add(contributorId);
   }
+
+  // Book of Deeds bookkeeping (pure state transitions, zero rng): the
+  // persisted lifetime damage counters beside the session RewardCounters
+  // below, plus encounter participant tracking for the roster tasks.
+  if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
@@ -681,6 +761,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   // so a stale mark would otherwise reappear on the respawn
   if (e.kind === 'mob') ctx.clearEntityMarker(e.id);
 
+  // Book of Deeds death bookkeeping runs BEFORE the hate tables are cleared just
+  // below, so its world-boss survival taint and the engaged-room folds observe
+  // the dying player's own pre-death threat: a heal-only contributor leaves no
+  // damage trace, so their live threat entry is the only proof they were engaged,
+  // and the clear loop would erase it out from under the hook. (The player-block
+  // counters and side effects stay below; only this pure read-of-threat moves up.)
+  if (e.kind === 'player') deedsMod.onPlayerDeathForDeeds(ctx, e);
+
   // the dead drop off every hate table (and any taunt lock on them)
   for (const m of ctx.entities.values()) {
     if (m.kind !== 'mob' || m.id === e.id) continue;
@@ -694,6 +782,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
+    // delight, perfection-window taints, the world-boss survival record) already
+    // ran above, before the hate tables were cleared.
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
@@ -908,10 +999,17 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // A heroic final boss additionally carries one personal Heroic Mark per
       // eligible participant (no-op outside a heroic instance; draws no rng).
       ctx.awardHeroicMarks(e, eligible);
+      // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
+      // clears, and the encounter skill tasks that resolve at this death.
+      deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
     }
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.
-    if (worldBossContribs) ctx.rollWorldBossLoot(e, worldBossContribs);
+    if (worldBossContribs) {
+      ctx.rollWorldBossLoot(e, worldBossContribs);
+      // World-boss deeds ride the same never-pruned contributor roster.
+      deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+    }
   }
 }
 
@@ -953,6 +1051,10 @@ export function grantXp(
     meta.xp -= xpForLevel(p.level);
     p.level++;
     meta.counters.levelUps++;
+    // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
+    // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
+    // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
+    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
@@ -966,8 +1068,11 @@ export function grantXp(
 }
 
 // Add to the monotonic lifetime counter, emitting cosmetic virtual-level-up
-// events past the cap and unlocking any newly crossed milestones. Cheap: one
-// add plus an O(log n) table lookup, never touched on the per-tick hot path.
+// events past the cap. Cheap: one add plus an O(log n) table lookup, never
+// touched on the per-tick hot path. The legacy milestone check unified into
+// the Book of Deeds: the dirty mark at the tail hands the lifetime-XP (and
+// level) predicates to the tick-tail evaluator, whose grant path dual-writes
+// unlockedMilestones and emits deedUnlocked as the single grant event.
 function accrueLifetimeXp(ctx: SimContext, amount: number, meta: PlayerMeta, p: Entity): void {
   const atCap = p.level >= MAX_LEVEL;
   const beforeVL = atCap ? virtualLevel(meta.lifetimeXp) : 0;
@@ -984,15 +1089,5 @@ function accrueLifetimeXp(ctx: SimContext, amount: number, meta: PlayerMeta, p: 
       ctx.emit({ type: 'virtualLevelUp', level: v, pid: p.id });
     }
   }
-  checkMilestones(ctx, meta, p);
-}
-
-// Unlock any cosmetic milestone whose lifetime-XP threshold was just crossed.
-function checkMilestones(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
-  for (const m of MILESTONES) {
-    if (meta.lifetimeXp >= m.lifetimeXp && !meta.unlockedMilestones.has(m.id)) {
-      meta.unlockedMilestones.add(m.id);
-      ctx.emit({ type: 'milestoneUnlocked', milestoneId: m.id, pid: p.id });
-    }
-  }
+  ctx.markDeedsDirty(meta.entityId);
 }

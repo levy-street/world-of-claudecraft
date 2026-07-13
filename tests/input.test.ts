@@ -663,6 +663,33 @@ describe('Input Discord keybind', () => {
   });
 });
 
+describe('Input Book of Deeds keybind', () => {
+  it("dispatches onUiKey('deeds') for the default Shift+Z chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('deeds');
+  });
+
+  it('bare KeyZ no longer reaches deeds (Damage Meters owns the letter now)', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('deeds');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input chat keybind', () => {
   it("dispatches onUiKey('chat') for the default Enter key", () => {
     const { cb, windowListeners } = makeInput();

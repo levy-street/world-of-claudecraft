@@ -1,6 +1,15 @@
+import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
+import {
+  type AccountFlair,
+  type ChatSenderFlair,
+  EMPTY_ACCOUNT_FLAIR,
+  hasStreamerLink,
+  wireStreamerLinks,
+} from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { DEEDS } from '../src/sim/content/deeds';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -65,6 +74,11 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { ChatFilter } from './chat_filter';
+import {
+  isChatFilterWrite,
+  isIgnorableChannel,
+  parseChatFilterCommand,
+} from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
 import { dailyRewardService } from './daily_rewards';
@@ -74,6 +88,7 @@ import {
   grantAccountMechChroma,
   heartbeatCharacterLeases,
   insertChatLogs,
+  loadAccountFlair,
   loadMailState,
   loadMarketState,
   markAccountQuestComplete,
@@ -88,6 +103,14 @@ import {
   touchCharacterLogin,
   walletForAccount,
 } from './db';
+import { getDeedBroadcasts } from './deeds_db';
+import {
+  deedRecordsIdle,
+  isHiddenDeedId,
+  isMarqueeDeed,
+  reconcileCharacterDeeds,
+  recordDeedUnlocks,
+} from './deeds_records';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
@@ -119,6 +142,11 @@ import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
+// Imported from the mirror module DIRECTLY (not the ./steam barrel), the same
+// way deeds_records imports onDeedRecorded: the barrel drags routes.ts (and its
+// load-time requireAccount over the db module) into every test that
+// partial-mocks the db, the known overlay-mock breakage class.
+import { reconcileOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
@@ -163,6 +191,13 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
+// because the S3 localization guard scans sendChatNotice literals, and
+// src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
+// account silence and lives in moderation_commands.ts, not here.)
+const IGNORE_USAGE = 'Usage: /ignore <name>, /unignore <name>, /ignorelist.';
+const BLOCK_USAGE = 'Usage: /block <name>, /unblock <name>, /blocklist.';
+
 const CHAT_RATE_BURST = 5;
 const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
@@ -229,6 +264,7 @@ export const SIM_LAP_PHASES = [
   'market',
   'postOffice',
   'delayedEv',
+  'deeds',
   'gridRefresh',
 ].map((n) => `sim.${n}`);
 const ARENA_WIRE_HZ = 0.1;
@@ -430,7 +466,7 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'mailResult',
   'levelup',
   'virtualLevelUp',
-  'milestoneUnlocked',
+  'deedUnlocked', // the earned map + stat block ride the heavy-gated deeds/dstats keys
   'questAccepted',
   'questProgress',
   'questReady',
@@ -465,6 +501,18 @@ export interface ClientSession {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
+  // Operator-set account flair (AI mark + streamer links), loaded at join and kept
+  // current by applyAccountFlairLive. Held on the SESSION, not just the entity,
+  // because chat fan-out has to read the SENDER's flair for recipients who are
+  // nowhere near them (general/world/guild chat crosses the interest scope, where
+  // no entity record exists for the sender).
+  accountFlair: AccountFlair;
+  // The wire-ready ChatSenderFlair derived from accountFlair, or undefined for the
+  // ordinary player with no flair. Cached here (recomputed only in stampAccountFlair,
+  // i.e. at join and when an operator edits) because deriving it re-parses every
+  // stored link through `new URL()`, and the chat path would otherwise pay that on
+  // EVERY line a streamer sends, to every channel.
+  chatFlair: ChatSenderFlair | undefined;
   characterId: number;
   pid: number; // player entity id in the sim
   name: string;
@@ -500,6 +548,12 @@ export interface ClientSession {
   // delivery. Loaded from the DB on join, kept in sync by social commands.
   blockedIds: Set<number>;
   blockListLoaded: boolean;
+  // character ids this player has IGNORED. An ignore is the chat-only sibling of
+  // a block: their PUBLIC chat is dropped before delivery, but their whispers,
+  // rolls, invites and mail still arrive. Loaded on join, kept in sync by the
+  // ignore commands. Distinct from `chatMutedUntil`, which is the ADMIN silence
+  // applied TO this player by staff.
+  ignoredIds: Set<number>;
   // name of the last player to whisper this session, for the /r reply
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
@@ -552,6 +606,13 @@ export interface ClientSession {
   leaseNonce: string | undefined;
   // Behavioral bot-detection state. Ephemeral — reset on every join.
   botTrackingContext: BotTrackingContext;
+  // Deed unlocks awaiting a SUCCESSFUL authoritative save before they may be
+  // published to the character_deeds index (and, chained off it, Steam).
+  // Publishing before the blob is durable creates the one drift direction the
+  // insert-only join reconcile can never heal: records claiming a deed the
+  // character does not have. Event-ordered; drained by saveCharacter up to
+  // the count captured when the blob was serialized.
+  pendingDeedRecords: string[];
   spectating: {
     characterId: number;
     name: string;
@@ -715,11 +776,32 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
   if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
+  if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
+  // Official streamer's platform links (player menu). Already gated by
+  // wireStreamerLinks at the point they were set on the entity, so an account whose
+  // streamer flag is off has none here, whatever is stored against it.
+  if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   if (e.guild) out.gd = e.guild;
+  if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
+  return out;
+}
+
+/**
+ * The flair a chat line carries for its SENDER, or undefined when the account has
+ * none, so an ordinary player's chat event is byte-unchanged on the wire. The links
+ * run through the same wireStreamerLinks gate the entity encoding uses: an account
+ * whose streamer flag is off ships no links here either, whatever is stored.
+ */
+function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
+  const links = wireStreamerLinks(flair);
+  if (!flair.ai && !links) return undefined;
+  const out: ChatSenderFlair = {};
+  if (flair.ai) out.ai = true;
+  if (links) out.links = links;
   return out;
 }
 
@@ -909,8 +991,13 @@ function delay(ms: number): Promise<void> {
 // context needed to read it: when it was taken, how long the window was, and the
 // crowd it was taken under. The admin dashboard renders this.
 export interface PerfCaptureResult {
+  captureId: string; // server-generated correlation id returned when the window starts
   capturedAt: number; // epoch ms the window closed
   durationMs: number; // the (clamped) capture window length
+  loopCallbacks: number; // setInterval callbacks observed during the window
+  simTicks: number; // authoritative sim ticks run across those callbacks
+  catchUpCallbacks: number; // callbacks that ran more than one sim tick
+  maxTicksPerCallback: number;
   online: number; // live sessions at capture close
   simEntities: number; // sim entity count at capture close
   profile: ReturnType<TickProfiler['profile']>;
@@ -919,6 +1006,7 @@ export interface PerfCaptureResult {
 // The /admin/api/perf/tick status envelope: whether a capture is currently running
 // (with when it ends, so the UI can show a countdown), plus the last frozen result.
 export interface PerfCaptureStatus {
+  captureId: string | null; // id of the in-flight capture, or null while idle
   capturing: boolean;
   endsAt: number | null; // epoch ms the in-flight capture closes, or null
   last: PerfCaptureResult | null;
@@ -999,12 +1087,18 @@ export class GameServer {
   // The host-side mark the injected sim perfLap probe diffs against; refreshed just
   // before each sim.tick() call while a detailed capture is active.
   private simLapMark = 0n;
-  // On-demand capture state (admin-triggered). While `perfCaptureEndsAtTick` is set,
-  // the loop is accumulating a fresh detailed window; when the loop reaches that tick
-  // it freezes `lastPerfCapture`. Only the single latest result is kept, in memory.
-  private perfCaptureEndsAtTick: number | null = null;
+  // On-demand capture state (admin-triggered). The deadline is wall-clock based:
+  // a saturated sim may commit far fewer or many more ticks than nominal, but a
+  // requested 30-second incident capture must still finish after about 30 seconds.
+  // Only the single latest result is kept, in memory.
+  private perfCaptureDeadlineNs: bigint | null = null;
   private perfCaptureEndsAtMs = 0;
+  private perfCaptureId: string | null = null;
   private perfCaptureDurationMs = 0;
+  private perfCaptureLoopCallbacks = 0;
+  private perfCaptureSimTicks = 0;
+  private perfCaptureCatchUpCallbacks = 0;
+  private perfCaptureMaxTicksPerCallback = 0;
   private lastPerfCapture: PerfCaptureResult | null = null;
   private bcastGridNs = 0n;
   private bcastSelfNs = 0n;
@@ -1077,7 +1171,14 @@ export class GameServer {
   // -------------------------------------------------------------------------
 
   private actorFor(session: ClientSession): SocialActor {
-    return { characterId: session.characterId, name: session.name };
+    // activeTitle rides from the LIVE sim meta so the guild/officer relay can
+    // stamp the sender's Book of Deeds title (a deed id) without SocialService
+    // ever touching the sim; a session with no live meta stays untitled.
+    return {
+      characterId: session.characterId,
+      name: session.name,
+      activeTitle: this.sim.meta(session.pid)?.activeTitle ?? null,
+    };
   }
 
   private sessionByCharacterId(id: number): ClientSession | null {
@@ -1385,14 +1486,32 @@ export class GameServer {
         const s = this.sessionByCharacterId(id);
         if (s) s.blockedIds = new Set(ids);
       },
-      isIgnoring: (recipientId, senderCharacterId) => {
+      onGuildFounded: (id) => {
+        // The one server-produced deed stat (DeedStatKey doc, src/sim/types.ts):
+        // guild creation resolves in the social layer, so the founder credit is
+        // observed here; the sim's tick tail then grants soc_guild_founded and
+        // the normal unlock observer records and broadcasts it.
+        const s = this.sessionByCharacterId(id);
+        const meta = s ? this.sim.meta(s.pid) : null;
+        if (meta) this.sim.ctx.bumpDeedStat(meta, 'guildsFounded', 1);
+      },
+      isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
       },
+      onIgnoresChanged: (id, ids) => {
+        const s = this.sessionByCharacterId(id);
+        if (s) s.ignoredIds = new Set(ids);
+      },
+      isIgnoringChat: (recipientId, senderCharacterId) => {
+        const s = this.sessionByCharacterId(recipientId);
+        return s ? s.ignoredIds.has(senderCharacterId) : false;
+      },
+      chatFlairFor: (senderCharacterId) => this.sessionByCharacterId(senderCharacterId)?.chatFlair,
     };
   }
 
-  private async sendSocialSnapshot(charId: number): Promise<void> {
+  private async sendSocialSnapshot(charId: number, firstJoin = false): Promise<void> {
     const session = this.sessionByCharacterId(charId);
     if (!session) return;
     try {
@@ -1401,7 +1520,12 @@ export class GameServer {
       // Stamp the guild name onto the player's world entity so it rides the
       // identity wire and shows under their nameplate for everyone nearby. This
       // is the single chokepoint hit on join and on every membership change.
-      this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '');
+      // On the FIRST join-time stamp (firstJoin), a pre-existing guild arrives a
+      // beat after addPlayer's retro pass (the name lives in the social DB, not
+      // the blob), so retroDeeds re-credits soc_guild_joined silently instead of
+      // firing the live banner for an existing member; later changes are genuine
+      // live joins and pass firstJoin false.
+      this.sim.setPlayerGuild(session.pid, snap.guild?.name ?? '', { retroDeeds: firstJoin });
       // remember who to track for the live position push (friends + guildmates)
       session.socialTrackedIds = [
         ...snap.friends.map((f) => f.id),
@@ -1418,13 +1542,25 @@ export class GameServer {
     for (const session of this.clients.values()) {
       const ids = session.socialTrackedIds;
       if (!ids || ids.length === 0) continue;
-      const list: { id: number; x: number; z: number; zone: string; status: PresenceStatus }[] = [];
+      const list: {
+        id: number;
+        x: number;
+        z: number;
+        zone: string;
+        status: PresenceStatus;
+        title: string | null;
+      }[] = [];
       for (const id of ids) {
         const other = this.sessionByCharacterId(id);
         if (!other) continue; // offline — snapshots own the online/offline flip
         const loc = this.presenceOf(other);
         if (loc.x === undefined || loc.z === undefined) continue;
-        list.push({ id, x: loc.x, z: loc.z, zone: loc.zone, status: loc.status });
+        // The live Book of Deeds title (sim meta, no DB read); the `social`
+        // frame's DB-sourced roster value lags the autosave, so this keeps
+        // non-nearby friends/guildmates current without a relog. Always
+        // present so a cleared title propagates as an explicit null.
+        const title = this.sim.meta(other.pid)?.activeTitle ?? null;
+        list.push({ id, x: loc.x, z: loc.z, zone: loc.zone, status: loc.status, title });
       }
       if (list.length > 0) this.send(session, { t: 'socialpos', list });
     }
@@ -1475,6 +1611,7 @@ export class GameServer {
             ticksRun++;
             acc -= DT;
           }
+          this.recordPerfCaptureCallback(ticksRun);
           this.expireLinkdeadSessions();
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
@@ -1684,6 +1821,50 @@ export class GameServer {
     }
   }
 
+  // Load one player's operator-set account flair (AI mark + streamer links) and
+  // stamp it on their entity + session. Best-effort and guarded against the player
+  // leaving mid-fetch, exactly like the Discord/holder/dev flair refreshes above.
+  private async refreshAccountFlair(session: ClientSession): Promise<void> {
+    const flair = await loadAccountFlair(session.accountId);
+    if (this.clients.get(session.pid) !== session) return;
+    this.stampAccountFlair(session, flair);
+  }
+
+  /**
+   * Apply an account's flair to one live session: the entity fields the wire encodes
+   * (the identity diff re-broadcasts them to nearby players on the next snapshot) and
+   * the session copy the chat fan-out reads. `streamerLinks` is set through
+   * wireStreamerLinks, so the entity never carries links for an account whose
+   * streamer flag is off.
+   */
+  private stampAccountFlair(session: ClientSession, flair: AccountFlair): void {
+    session.accountFlair = flair;
+    // Derived once, here, and read straight off the session by every chat fan-out.
+    session.chatFlair = chatSenderFlair(flair);
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return;
+    e.aiAccount = flair.ai ? true : undefined;
+    e.streamerLinks = wireStreamerLinks(flair);
+  }
+
+  /**
+   * Push an operator's account-flair edit onto every live session of that account, so
+   * the AI mark and the streamer links change with no reconnect. Injected into the
+   * admin routes via configureAdminRuntime (server/admin.ts); a no-op when the
+   * account is offline (the next join loads the new row anyway).
+   */
+  applyAccountFlairLive(accountId: number, flair: AccountFlair): void {
+    for (const live of this.clients.values()) {
+      if (live.accountId !== accountId) continue;
+      this.stampAccountFlair(live, flair);
+    }
+  }
+
+  /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
+  private chatFlairForPid(pid: number): ChatSenderFlair | undefined {
+    return this.clients.get(pid)?.chatFlair;
+  }
+
   // Intercept a leading "!" community command in chat (lfg/wts/...): broadcast it
   // in-world and hand it to the bot for Discord cross-post. Returns true when it
   // consumed the line (so it is not sent as normal chat).
@@ -1882,6 +2063,9 @@ export class GameServer {
       meta.questsDone.add(questId);
       meta.questLog.delete(questId);
     }
+    // The bare adds bypass the quest-credit mark site, and the lockout quests
+    // can satisfy quest/meta deed triggers: request a full evaluator pass.
+    if (cosmetics.completedQuestIds.length > 0) this.sim.ctx.markDeedsDirty(pid);
   }
 
   private mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics): AccountCosmetics {
@@ -2066,6 +2250,10 @@ export class GameServer {
       ws,
       accountId,
       accountCosmetics,
+      // Loaded right below by refreshAccountFlair; an account with no flair (every
+      // ordinary player) keeps these empty values and never touches the wire.
+      accountFlair: EMPTY_ACCOUNT_FLAIR,
+      chatFlair: undefined,
       characterId,
       pid,
       name,
@@ -2088,6 +2276,7 @@ export class GameServer {
       chatStrikes: meta.chatStrikes ?? 0,
       blockedIds: new Set(),
       blockListLoaded: false,
+      ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
@@ -2112,6 +2301,7 @@ export class GameServer {
       clientSeed: meta.clientSeed ?? '',
       leaseNonce: meta.leaseNonce,
       botTrackingContext,
+      pendingDeedRecords: [],
       spectating: null,
       jailed: state?.jail ?? null,
       jailVisit: null,
@@ -2127,6 +2317,37 @@ export class GameServer {
     void touchCharacterLogin(characterId).catch((err) =>
       console.error('failed to stamp character last_login:', err),
     );
+    // Book of Deeds drift heal: the character_deeds index is written
+    // fire-and-forget per unlock, and the sim never re-emits a deed already in
+    // the state blob, so a transient per-unlock insert failure leaves the index
+    // one row short forever. Replay this character's whole LIVE earned set
+    // (deedsEarned after addPlayer's retro pass) into the index once per join,
+    // idempotently (ON CONFLICT DO NOTHING). That set is the loaded blob deeds
+    // PLUS the retro/legacy grants the retro pass just added, not only the
+    // loaded ids: every join-time grant is a deterministic function of the
+    // already-durable blob, so a crash that loses the index rows costs nothing
+    // to replay, and the batch is a DB write only (it never calls
+    // onDeedRecorded, so it never drives Steam; Steam's own login catch-up is
+    // reconcileOnLogin below). Fire-and-forget: it never blocks or reorders the
+    // join, and resumes skip it (they return above without reloading state).
+    reconcileCharacterDeeds({ characterId, accountId }, [
+      ...(this.sim.meta(pid)?.deedsEarned.keys() ?? []),
+    ]);
+    // Steam mirror drift heal (the steady-state counterpart to the link-time
+    // reconcile): a live achievement push can exhaust its retry ladder and
+    // drop, and an already-linked account never re-links, so the login
+    // reconcile is the only path that replays it. Chained BEHIND the deeds
+    // records FIFO rather than run beside it: reconcileOnLogin stamps a 6h TTL
+    // then reads earnedDeedIds, so if it ran before the reconcile above healed a
+    // dropped character_deeds row it would miss that id and the TTL would
+    // throttle the retry for 6h. Awaiting the tail first guarantees its read
+    // observes the healed rows. deedRecordsIdle is NOT awaited on the join path
+    // (join latency is unchanged); the continuation is fire-and-forget, fully
+    // guarded, per-account throttled, and a no-op unless STEAM_ENABLED and the
+    // account is linked.
+    void deedRecordsIdle()
+      .then(() => reconcileOnLogin(accountId))
+      .catch(() => {});
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;
@@ -2160,7 +2381,11 @@ export class GameServer {
       t: 'events',
       list: [{ type: 'log', text: `${name} has entered World of ClaudeCraft.`, color: '#ffd100' }],
     });
-    void this.initSocial(session);
+    // firstJoin: the fresh-join path (a resume takes resumeSession, which stamps
+    // the guild with firstJoin false since the entity already carries it), so
+    // the first guild stamp retro-credits an existing member's soc_guild_joined
+    // silently instead of firing the live banner.
+    void this.initSocial(session, true);
     // Stamp the $WOC holder-tier flair (best-effort: a balance read must never
     // affect joining the world).
     void this.refreshHolderTier(session).catch((err) =>
@@ -2173,6 +2398,11 @@ export class GameServer {
     // a contributor-stats read must never affect joining the world).
     void this.refreshDevBadge(session).catch((err) =>
       console.error('dev badge refresh failed:', err),
+    );
+    // Stamp the operator-set account flair (AI mark + streamer links), same
+    // best-effort contract: a flair read must never affect joining the world.
+    void this.refreshAccountFlair(session).catch((err) =>
+      console.error('account flair refresh failed:', err),
     );
     return session;
   }
@@ -2283,14 +2513,19 @@ export class GameServer {
 
   // Load the player's block list, send their friends/ignore/guild panel, and
   // let friends + guildmates know they've come online.
-  private async initSocial(session: ClientSession): Promise<void> {
+  private async initSocial(session: ClientSession, firstJoin = false): Promise<void> {
     try {
       session.blockedIds = new Set(await this.socialDb.blockedIds(session.characterId));
       session.blockListLoaded = true;
     } catch (err) {
       console.error('failed to load block list:', err);
     }
-    await this.sendSocialSnapshot(session.characterId);
+    try {
+      session.ignoredIds = new Set(await this.socialDb.ignoredIds(session.characterId));
+    } catch (err) {
+      console.error('failed to load ignore list:', err);
+    }
+    await this.sendSocialSnapshot(session.characterId, firstJoin);
     await this.social
       .announcePresence({ characterId: session.characterId, name: session.name }, true)
       .catch((err) => console.error('presence announce failed:', err));
@@ -2342,6 +2577,10 @@ export class GameServer {
     // benched slot and the counted loss are in the state serializeCharacter
     // persists (idempotent: removePlayer runs it again harmlessly below).
     this.sim.vcupResolveDesertion(session.pid);
+    // Arena forfeit accounting also resolves before persistence. This keeps the
+    // remaining player's win/honor durable if both combatants disconnect close
+    // together; removePlayer repeats the idempotent cleanup after the save.
+    this.sim.arenaResolveDesertion(session.pid);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
@@ -2397,6 +2636,11 @@ export class GameServer {
     const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
       const state = this.sim.serializeCharacter(session.pid);
       const e = this.sim.entities.get(session.pid);
+      // Captured at serialize time: only unlocks already inside THIS blob may
+      // publish when it lands. An unlock granted while the write is in flight
+      // stays pending for the save queued behind it, so the character_deeds
+      // index (and Steam, chained off it) never runs ahead of durable state.
+      const recordUpTo = session.pendingDeedRecords.length;
       if (state && e) {
         if (session.spectating) {
           state.pos = {
@@ -2445,6 +2689,21 @@ export class GameServer {
           await saveCharacterState(session.characterId, state.level, state);
         }
         session.lastSave = Date.now();
+        // The blob is durable: publish every unlock it contains. A rejected
+        // save skips this (the throw propagates past it), leaving the ids
+        // pending for the next save attempt (the 30s autosave, the next
+        // unlock's save, or the leave save), so a transient failure delays
+        // the public record instead of publishing it ahead of the source.
+        // A returning veteran's first save flushes many pending unlocks at
+        // once; recordDeedUnlocks mirrors the whole spliced slice in ONE
+        // multi-row insert (a single id still takes the single-row path), so a
+        // login storm never serializes N single-row round trips ahead of the
+        // index and the Steam pushes. The capture-at-serialize recordUpTo
+        // watermark is preserved: only ids already inside THIS blob drain now.
+        recordDeedUnlocks(
+          { characterId: session.characterId, accountId: session.accountId },
+          session.pendingDeedRecords.splice(0, recordUpTo),
+        );
       }
     });
     this.characterSaveQueues.set(session.characterId, run);
@@ -2592,46 +2851,66 @@ export class GameServer {
 
   // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
   // window is clean, flips the detailed sub-phase timing on, and schedules the close
-  // `durationMs` (clamped) out in sim ticks. A second call while one is running just
+  // `durationMs` (clamped) out in wall time. A second call while one is running just
   // restarts the window. Returns the resulting status for the caller to echo back.
   startPerfCapture(durationMs = PERF_CAPTURE_DEFAULT_MS): PerfCaptureStatus {
     const clamped = Math.round(
       Math.min(PERF_CAPTURE_MAX_MS, Math.max(PERF_CAPTURE_MIN_MS, durationMs)),
     );
-    const ticks = Math.max(1, Math.round(clamped / (DT * 1000)));
     this.tickProfiler.reset();
     this.perfDetailActive = true;
     this.perfCaptureDurationMs = clamped;
-    this.perfCaptureEndsAtTick = this.sim.tickCount + ticks;
+    this.perfCaptureId = randomUUID();
+    this.perfCaptureLoopCallbacks = 0;
+    this.perfCaptureSimTicks = 0;
+    this.perfCaptureCatchUpCallbacks = 0;
+    this.perfCaptureMaxTicksPerCallback = 0;
     this.perfCaptureEndsAtMs = Date.now() + clamped;
+    this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
   }
 
   // The current capture status: whether one is in flight (with its close time for a UI
   // countdown) and the last frozen result. Read by GET /admin/api/perf/tick.
   perfCaptureStatus(): PerfCaptureStatus {
-    const capturing = this.perfCaptureEndsAtTick !== null;
+    const capturing = this.perfCaptureDeadlineNs !== null;
     return {
+      captureId: capturing ? this.perfCaptureId : null,
       capturing,
       endsAt: capturing ? this.perfCaptureEndsAtMs : null,
       last: this.lastPerfCapture,
     };
   }
 
-  // Close an in-flight capture once the loop reaches its end tick: freeze the profile
+  private recordPerfCaptureCallback(ticksRun: number): void {
+    if (this.perfCaptureDeadlineNs === null) return;
+    this.perfCaptureLoopCallbacks++;
+    this.perfCaptureSimTicks += ticksRun;
+    if (ticksRun > 1) this.perfCaptureCatchUpCallbacks++;
+    this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
+  }
+
+  // Close an in-flight capture once its monotonic deadline passes: freeze the profile
   // and revert the detailed-timing switch to its baseline (env, so PERF_TICK_LOG keeps
   // working). Called once per loop body, right after commit.
   private finalizePerfCaptureIfDue(): void {
-    if (this.perfCaptureEndsAtTick === null) return;
-    if (this.sim.tickCount < this.perfCaptureEndsAtTick) return;
+    if (this.perfCaptureDeadlineNs === null) return;
+    if (process.hrtime.bigint() < this.perfCaptureDeadlineNs) return;
+    if (this.perfCaptureId === null) return;
     this.lastPerfCapture = {
+      captureId: this.perfCaptureId,
       capturedAt: Date.now(),
       durationMs: this.perfCaptureDurationMs,
+      loopCallbacks: this.perfCaptureLoopCallbacks,
+      simTicks: this.perfCaptureSimTicks,
+      catchUpCallbacks: this.perfCaptureCatchUpCallbacks,
+      maxTicksPerCallback: this.perfCaptureMaxTicksPerCallback,
       online: this.clients.size,
       simEntities: this.sim.entities.size,
       profile: this.tickProfiler.profile(),
     };
-    this.perfCaptureEndsAtTick = null;
+    this.perfCaptureDeadlineNs = null;
+    this.perfCaptureId = null;
     this.perfDetailActive = process.env.PERF_TICK_LOG === '1';
   }
 
@@ -3338,6 +3617,13 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text)
         )
           break;
+        // The player's own ignore/block commands. Deliberately BEFORE isChatMuted
+        // and the rate limiter: a GM-silenced player must still be able to manage
+        // their own lists, and a list readout must not burn a chat token toward
+        // the rate-limit cooldown. Deliberately AFTER the moderation router, so
+        // the ADMIN "/mute" is always claimed as the account silence and can
+        // never be shadowed by a player command.
+        if (this.handleChatFilterCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
@@ -3547,6 +3833,14 @@ export class GameServer {
       case 'block_remove':
         if (typeof msg.name === 'string')
           void this.social.blockRemove(this.actorFor(session), msg.name).catch(logSocialErr);
+        break;
+      case 'ignore_add':
+        if (typeof msg.name === 'string')
+          void this.social.ignoreAdd(this.actorFor(session), msg.name).catch(logSocialErr);
+        break;
+      case 'ignore_remove':
+        if (typeof msg.name === 'string')
+          void this.social.ignoreRemove(this.actorFor(session), msg.name).catch(logSocialErr);
         break;
       case 'social_refresh':
         void this.sendSocialSnapshot(session.characterId);
@@ -3889,6 +4183,14 @@ export class GameServer {
         recordBankOp('buy_slots', session, before, sim.bankInfoFor(pid));
         break;
       }
+      // Book of Deeds: select/clear the displayed title. The sim validator
+      // owns every rule (deed earned + title reward; null clears; invalid
+      // input is a silent no-op); the server only shape-checks the payload.
+      case 'deed_set_title':
+        if (msg.deedId === null || typeof msg.deedId === 'string') {
+          sim.setActiveTitle(msg.deedId, pid);
+        }
+        break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.level === 'number') {
@@ -4348,6 +4650,10 @@ export class GameServer {
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
     maybe('duel', this.duelWire(anchorSession.pid));
+    // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
+    // session receives both, then they ride only on earn/spend changes.
+    maybe('honor', meta.honor);
+    maybe('lhonor', meta.lifetimeHonor);
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
@@ -4396,6 +4702,11 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // Book of Deeds: the Renown total and the selected title id, cheap
+    // scalars diffed per tick (grants land from sim sites that never mark
+    // this session dirty, and the title echo must not wait on the heavy gate).
+    maybe('renown', meta.renown);
+    maybe('atitle', meta.activeTitle);
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -4417,6 +4728,22 @@ export class GameServer {
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);
       maybe('milestones', [...meta.unlockedMilestones]);
+      // Book of Deeds: the earned map (deed id -> utcDay) and the COMPLETE
+      // lifetime stat block. Maps and Sets do not survive JSON.stringify, so
+      // both wire as plain objects/arrays and ClientWorld rebuilds the Map
+      // and both Sets on apply. Heavy-gated: deedUnlocked is a
+      // HEAVY_SELF_EVENTS member, so an unlock re-diffs on the next snapshot.
+      // DELIBERATE freshness floor: a stat bump that crosses no unlock
+      // threshold re-wires only on the staggered safety refresh (<=2s), never
+      // per increment; flushing per kill would re-serialize every heavy field
+      // each combat tick, the exact cost this gate exists to avoid.
+      maybe('deeds', Object.fromEntries(meta.deedsEarned));
+      maybe('dstats', {
+        counters: meta.deedStats.counters,
+        itemsDiscovered: [...meta.deedStats.itemsDiscovered],
+        visited: [...meta.deedStats.visited],
+        dungeonClears: meta.deedStats.dungeonClears,
+      });
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,
@@ -4527,7 +4854,28 @@ export class GameServer {
   // dedupes so one moment yields one card.
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
+    // Deed unlocks accumulate per session and record AFTER the loop, behind a
+    // durable character save (see below); only the cosmetic broadcast stays
+    // inline.
+    const deedUnlocks = new Map<ClientSession, string[]>();
     for (const ev of events) {
+      if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (s) {
+          // Observer only: mirror the sim's decision into character_deeds
+          // (fire-and-forget FIFO; retro re-emits and crash-replays are free
+          // under the UNIQUE constraint). Bots have no session, so
+          // this.clients.get filters them naturally, and no client message
+          // reaches this path: the sim alone emits deedUnlocked.
+          const ids = deedUnlocks.get(s);
+          if (ids) ids.push(ev.deedId);
+          else deedUnlocks.set(s, [ev.deedId]);
+          // Marquee unlocks fan out to guildmates and followers; retro
+          // unlocks NEVER broadcast (a veteran's first login after rollout
+          // must not spam their guild).
+          if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
+        }
+      }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -4714,11 +5062,43 @@ export class GameServer {
         );
       }
     }
+    // Durability ordering: the authoritative blob otherwise persists only on
+    // the 30s autosave, so an unlock recorded inline could sit in
+    // character_deeds (and on Steam, which chains off the insert) for up to
+    // 30s before the Book itself is durable; a hard crash in that window
+    // leaves the public record ahead of the source, the one drift direction
+    // the join-time reconcile cannot heal (it is insert-only). So the ids are
+    // queued on the session and saveCharacter publishes them only AFTER its
+    // write lands: a rejected save leaves them pending for the next save
+    // attempt (30s autosave, next unlock, or the leave save) instead of
+    // publishing a record the source never persisted; if no save ever lands
+    // before the process dies, blob and index stay CONSISTENTLY without the
+    // deed, and the marquee broadcast (cosmetic, no durability contract)
+    // already fired above. One save covers every unlock the tick produced for
+    // a session (a retro burst on join is a single blob write);
+    // characterSaveQueues plus the recorder's FIFO preserve per-character
+    // unlock order.
+    for (const [session, deedIds] of deedUnlocks) {
+      session.pendingDeedRecords.push(...deedIds);
+      void this.saveCharacter(session).catch((err) =>
+        console.error(`deed-unlock save failed for ${session.name}:`, err),
+      );
+    }
   }
 
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
+    // Account flair of each chat line's SENDER, resolved once per event (not once
+    // per recipient) and read from the sender's SESSION rather than an entity:
+    // general/world/lfg chat reaches players far outside the sender's interest
+    // scope, where the recipient has no entity record for them. Sparse by design:
+    // an ordinary player's chat event is untouched.
+    for (const ev of events) {
+      if (ev.type !== 'chat') continue;
+      const flair = this.chatFlairForPid(ev.fromPid);
+      if (flair) ev.flair = flair;
+    }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
@@ -4749,6 +5129,16 @@ export class GameServer {
             ev.type === 'chat' &&
             session.blockedIds.size > 0 &&
             this.isBlockedSender(session, ev.fromPid)
+          )
+            continue;
+          // ignore list: drop PUBLIC chat from an ignored character. Unlike a
+          // block this is chat-only, so their whispers and rolls still come through.
+          if (
+            !session.spectating &&
+            ev.type === 'chat' &&
+            session.ignoredIds.size > 0 &&
+            isIgnorableChannel(ev.channel) &&
+            this.isIgnoredSender(session, ev.fromPid)
           )
             continue;
           if (ev.pid !== undefined) {
@@ -4817,6 +5207,57 @@ export class GameServer {
     if (fromPid === recipient.pid) return false;
     const sender = this.clients.get(fromPid);
     return sender ? recipient.blockedIds.has(sender.characterId) : false;
+  }
+
+  // Same pid-to-character-id hop as isBlockedSender, against the ignore set.
+  private isIgnoredSender(recipient: ClientSession, fromPid: number): boolean {
+    if (fromPid === recipient.pid) return false;
+    const sender = this.clients.get(fromPid);
+    return sender ? recipient.ignoredIds.has(sender.characterId) : false;
+  }
+
+  // The player's two chat-filter tiers: ignore (/ignore, /unignore, /ignorelist)
+  // and block (/block, /unblock, /blocklist). Returns true when the text was one
+  // of them and has been handled, so the caller stops before the chat pipeline
+  // treats it as something to broadcast. The ADMIN /mute is a different command
+  // entirely and is claimed earlier, by the moderation router.
+  private handleChatFilterCommand(session: ClientSession, text: string): boolean {
+    const parsed = parseChatFilterCommand(text);
+    if (!parsed) return false;
+    const actor = this.actorFor(session);
+
+    // The two list commands are reads and stay free: they must work even for a
+    // GM-silenced player, and echoing your own list back must never burn a token
+    // toward the chat cooldown. The four WRITE commands each cost a chat token:
+    // they INSERT/DELETE and then push a full social snapshot, so they are the
+    // most expensive thing on the chat path and must not be the one thing on it
+    // that is unmetered.
+    if (isChatFilterWrite(parsed) && !this.consumeChatToken(session)) return true;
+
+    // An if-chain, NOT a switch: tests/command_schema.test.ts scrapes `case '<x>':`
+    // labels out of this region of game.ts to derive the dispatched wire
+    // vocabulary, so switching on these kinds would register 'ignore'/'block'/...
+    // as phantom wire commands and fail the gate.
+    const logErr = (err: unknown) => console.error('ignore/block command failed:', err);
+    const kind = parsed.kind;
+    if (kind === 'ignoreList') {
+      void this.social.ignoreList(actor).catch(logErr);
+    } else if (kind === 'blockList') {
+      void this.social.blockList(actor).catch(logErr);
+    } else if (kind === 'ignore') {
+      if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
+      else void this.social.ignoreAdd(actor, parsed.name).catch(logErr);
+    } else if (kind === 'unignore') {
+      if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
+      else void this.social.ignoreRemove(actor, parsed.name).catch(logErr);
+    } else if (kind === 'block') {
+      if (!parsed.name) this.sendChatNotice(session, BLOCK_USAGE);
+      else void this.social.blockAdd(actor, parsed.name).catch(logErr);
+    } else {
+      if (!parsed.name) this.sendChatNotice(session, BLOCK_USAGE);
+      else void this.social.blockRemove(actor, parsed.name).catch(logErr);
+    }
+    return true;
   }
 
   // ignore list: a party invite, trade request, or duel challenge from a
@@ -4966,6 +5407,31 @@ export class GameServer {
 
   private sendSystemNotice(session: ClientSession, text: string): void {
     this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
+  }
+
+  // Fan a non-retro marquee deed unlock out to the earner's online guildmates
+  // and followers unless the account opted out (accounts.deed_broadcasts).
+  // Fire-and-forget off the loop (the daily-reward observer pattern): the
+  // opt-out read and the audience resolution are async DB work the tick never
+  // awaits, and a failure logs without touching gameplay. The earner's own
+  // toast is client-side from the sim event; no frame is sent to them here.
+  private maybeBroadcastDeedUnlock(session: ClientSession, deedId: string): void {
+    const def = DEEDS[deedId];
+    if (!def || !isMarqueeDeed(def)) return;
+    // Hidden deeds are invisible until earned, EXISTENCE included (the
+    // deeds_records contract every third-party surface honors): a reward can
+    // make one marquee, but the fan-out would hand its id and name to viewers
+    // who have not earned their own copy.
+    if (isHiddenDeedId(deedId)) return;
+    void getDeedBroadcasts(session.accountId)
+      .then((enabled) => {
+        if (!enabled) return;
+        return this.social.broadcastDeedUnlock(
+          { characterId: session.characterId, name: session.name },
+          deedId,
+        );
+      })
+      .catch((err) => console.error('deed broadcast failed:', err));
   }
 
   private sendDailyRewardPointsGained(session: ClientSession, points: number): void {
@@ -5122,7 +5588,7 @@ export class GameServer {
       this.send(session, {
         t: 'events',
         list: [
-          { type: 'error', text: 'Your ignore list is still loading. Try /who again in a moment.' },
+          { type: 'error', text: 'Your block list is still loading. Try /who again in a moment.' },
         ],
       });
       return;

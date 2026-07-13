@@ -244,6 +244,8 @@ export function turnInQuestCore(
   meta.questLog.delete(questId);
   meta.questsDone.add(questId);
   meta.counters.questsCompleted++;
+  // Quest and chapter deed predicates read questsDone, so re-check this player.
+  ctx.markDeedsDirty(meta.entityId);
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({
