@@ -15,6 +15,11 @@ const DEFAULT_BUDGETS_MIB = {
     'models/biome': 4,
     'models/creatures': 4,
     'models/props': 4,
+    // Starter-tutorial props (Dawnhaven Isle). Their own group on purpose: they are
+    // placed ONLY on the offline tutorial map, so they load lazily and a live-world
+    // player never downloads them. Keeping them out of models/props means the isle
+    // can grow without eating the live world's prop budget.
+    'models/tutorial': 4,
     'models/foliage': 4,
     'models/dungeon': 2,
     'models/weapons': 1,
