@@ -83,7 +83,7 @@ export function injectLocaleChunkMap(html, map, placeholder = PLACEHOLDER) {
   return html.split(placeholder).join(json);
 }
 
-// FS orchestrator the Vite closeBundle plugin calls: read the post-build manifest +
+// FS orchestrator the Vite writeBundle plugin calls: read the post-build manifest +
 // loaders source, resolve the hashed locale chunks, and template the lookup into the
 // emitted dist/index.html. Returns the resolved map for logging/tests.
 export function templateModulepreload({ root, outDir, base = '/' }) {

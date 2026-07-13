@@ -65,6 +65,7 @@ import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './
 import { createSuspiciousRegistrationReport } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
 import { captureReferral } from './player_card';
+import { marketingAllowedForRequest } from './privacy_region';
 import {
   authThrottled,
   clearAuthFailures,
@@ -289,18 +290,21 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   });
   // Server-side Meta CAPI conversion event (fire-and-forget; a no-op without
   // META_CAPI env config, and it must never block or fail registration).
-  void authDb.trackAccountCreated(
-    account.id,
-    {
-      email: signupEmail,
-      // RequestMetadata's fields are nullable; the CAPI reader wants string | undefined.
-      ...metaRequestUserData(ctx.req, {
-        ip: meta.ip ?? undefined,
-        userAgent: meta.userAgent ?? undefined,
-      }),
-    },
-    metaEventSourceUrl(ctx.req),
-  );
+  if (marketingAllowedForRequest(ctx.req)) {
+    void authDb.trackAccountCreated(
+      account.id,
+      {
+        email: signupEmail,
+        // RequestMetadata's fields are nullable; the CAPI reader wants string | undefined.
+        ...metaRequestUserData(ctx.req, {
+          ip: meta.ip ?? undefined,
+          userAgent: meta.userAgent ?? undefined,
+        }),
+      },
+      metaEventSourceUrl(ctx.req),
+      true,
+    );
+  }
   void authDb
     .createSuspiciousRegistrationReport({
       accountId: account.id,

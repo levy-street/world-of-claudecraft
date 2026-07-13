@@ -56,8 +56,8 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
+import { navigatorSaveData } from './game/network_hints';
 import { createPerfMonitor } from './game/perf';
-import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
   type GameSettings,
@@ -112,15 +112,10 @@ import { openStripeCheckout } from './net/stripe_checkout';
 // the feature is enabled + used.
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
-import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { preloadMechAssets } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
-import { playerPortraitDataUrl } from './render/characters/portrait';
+import type { CharacterPreview, PreviewAppearance } from './render/characters';
 import { installWebGLContextRelease } from './render/context_release';
-import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
-import { Renderer } from './render/renderer';
+import type { Renderer } from './render/renderer';
 import type { SelfMotionFrame } from './render/self_motion';
-import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
@@ -179,7 +174,7 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { type ClaudiumHooks, Hud } from './ui/hud';
+import type { ClaudiumHooks, Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
   formatDateTime,
@@ -196,7 +191,10 @@ import {
 } from './ui/i18n';
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import { initLandingTwitch } from './ui/landing_twitch';
+import { initLandingXTimeline } from './ui/landing_x_timeline';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { fadeOutMarketingMusic, initMarketingMusic } from './ui/marketing_music';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
@@ -209,8 +207,9 @@ import {
   setReferralProvider,
   setStandingProvider,
 } from './ui/player_card_share';
-import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { initPrivacyConsent } from './ui/privacy_consent';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
+import { mountSharedMarketingHeader } from './ui/shared_marketing_header';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
@@ -232,6 +231,49 @@ import {
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
+mountSharedMarketingHeader({ page: 'play' });
+
+// The public landing page does not need Three.js, the renderer, GLTF loaders, or
+// character models. Load that runtime only after the player opens a character
+// screen or enters the world. Importing Renderer first registers every lazy
+// preload factory before assetsReady() snapshots the registry.
+type RenderRuntime = {
+  Renderer: typeof import('./render/renderer').Renderer;
+  CharacterPreview: typeof import('./render/characters').CharacterPreview;
+  preloadMechAssets: typeof import('./render/characters/assets').preloadMechAssets;
+  skinCount: typeof import('./render/characters/manifest').skinCount;
+  playerPortraitDataUrl: typeof import('./render/characters/portrait').playerPortraitDataUrl;
+  firstRunGraphicsPreset: typeof import('./render/gfx').firstRunGraphicsPreset;
+  GFX: typeof import('./render/gfx').GFX;
+  graphicsPresetLabel: typeof import('./render/gfx').graphicsPresetLabel;
+};
+
+let renderRuntimePromise: Promise<RenderRuntime> | null = null;
+let loadedRenderRuntime: RenderRuntime | null = null;
+
+function loadRenderRuntime(): Promise<RenderRuntime> {
+  renderRuntimePromise ??= Promise.all([
+    import('./render/renderer'),
+    import('./render/characters'),
+    import('./render/characters/assets'),
+    import('./render/characters/manifest'),
+    import('./render/characters/portrait'),
+    import('./render/gfx'),
+  ]).then(([renderer, characters, characterAssets, manifest, portrait, gfx]) => {
+    loadedRenderRuntime = {
+      Renderer: renderer.Renderer,
+      CharacterPreview: characters.CharacterPreview,
+      preloadMechAssets: characterAssets.preloadMechAssets,
+      skinCount: manifest.skinCount,
+      playerPortraitDataUrl: portrait.playerPortraitDataUrl,
+      firstRunGraphicsPreset: gfx.firstRunGraphicsPreset,
+      GFX: gfx.GFX,
+      graphicsPresetLabel: gfx.graphicsPresetLabel,
+    };
+    return loadedRenderRuntime;
+  });
+  return renderRuntimePromise;
+}
 const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -252,8 +294,6 @@ const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph'
 // (src/render/self_motion.ts): ?nopredict restores the pre-prediction behavior.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
-const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
-const HOMEPAGE_MUSIC_VOLUME = 0.225;
 const GRAPHICS_PRESET_HIGH = 3;
 const GRAPHICS_PRESET_ULTRA = 4;
 const LANDING_GRAPHICS_AUTO = 'auto';
@@ -262,6 +302,34 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 document.body.classList.toggle('native-app', NATIVE_APP);
 document.body.classList.toggle('desktop-app', DESKTOP_APP);
 if (NATIVE_APP) document.body.classList.add('mobile-touch');
+const APP_SHELL = document.body.dataset.appShell === 'true';
+const privacyConsent = initPrivacyConsent({ enabled: !DESKTOP_APP && !NATIVE_APP && !APP_SHELL });
+const landingXTimeline = initLandingXTimeline({
+  desktopApp: DESKTOP_APP,
+  nativeApp: NATIVE_APP,
+  iframeTitle: () => t('landing.newsXIframeTitle'),
+  openPrivacyPreferences: () => {
+    void privacyConsent.ready.then(() => privacyConsent.openPreferences());
+  },
+  privacyAllowed: () => privacyConsent.allowed('x'),
+});
+const syncLandingPrivacyServices = (): void => {
+  if (privacyConsent.allowed('x')) {
+    const newsView = document.getElementById('news-view');
+    if (newsView && !newsView.hidden) {
+      requestAnimationFrame(() => landingXTimeline?.load());
+    }
+  }
+  initLandingTwitch({
+    desktopApp: DESKTOP_APP,
+    nativeApp: NATIVE_APP,
+    privacyAllowed: DESKTOP_APP || NATIVE_APP || privacyConsent.allowed('twitch'),
+    requestPrivacyConsent: () => privacyConsent.requestCategory('twitch'),
+  });
+};
+privacyConsent.onChange(syncLandingPrivacyServices);
+syncLandingPrivacyServices();
+void privacyConsent.ready.then(syncLandingPrivacyServices);
 // Electron shell integration: push t()-localized crash-dialog strings to the
 // main process and render the auto-update toast (no-op without the bridge).
 if (DESKTOP_APP) initDesktopShellIntegration();
@@ -274,11 +342,6 @@ let pendingDeleteCharacter: CharacterSummary | null = null;
 // instead of a per-row one; it acts on whichever character is selected. Mobile
 // and narrow layouts keep the per-row buttons and never read this.
 let charselectSelected: CharacterSummary | null = null;
-let homepageMusic: HTMLAudioElement | null = null;
-let homepageMusicStarted = false;
-let homepageMusicMuted = readHomepageMusicMuted();
-let removeHomepageMusicGestureListeners: (() => void) | null = null;
-
 function isNativeRuntime(): boolean {
   if (NATIVE_APP) return true;
   const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
@@ -344,30 +407,14 @@ function escapeHtml(text: string): string {
   });
 }
 
-function readHomepageMusicMuted(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.localStorage.getItem(HOMEPAGE_MUSIC_MUTED_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function saveHomepageMusicMuted(muted: boolean): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(HOMEPAGE_MUSIC_MUTED_KEY, muted ? '1' : '0');
-  } catch {
-    // Private browsing or storage failures should not block the control.
-  }
-}
-
 // --- Cloudflare Turnstile (bot gate on the login/register form) ---------------
 // The site key is injected at build time; when it is empty (local/offline dev or
 // a build without the env var) the widget never renders and the token is '', so
 // the server, which also skips verification without its secret, lets requests
-// through unchanged. The api.js <script> is in index.html.
+// through unchanged. The third-party API is injected only when a web login form
+// first needs the configured widget.
 const TURNSTILE_SITEKEY = String(import.meta.env.VITE_TURNSTILE_SITEKEY ?? '');
+const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 
 interface TurnstileApi {
   render: (el: string | HTMLElement, opts: { sitekey: string }) => string;
@@ -375,26 +422,60 @@ interface TurnstileApi {
   reset: (widgetId?: string) => void;
 }
 let turnstileWidgetId: string | undefined;
+let turnstileScriptPromise: Promise<TurnstileApi | undefined> | null = null;
 
 function turnstileApi(): TurnstileApi | undefined {
   return (window as unknown as { turnstile?: TurnstileApi }).turnstile;
 }
 
-// Render the widget once, retrying until the async api.js script is ready. Safe to
-// call repeatedly (idempotent) and a no-op when no site key is configured. The
-// Electron desktop shell never renders it: Cloudflare rejects the app:// origin
-// (widget error 110200), and the server bypasses Turnstile for desktop origins
-// (passesTurnstile in server/turnstile.ts), so a widget here could only wedge
-// the form.
+function loadTurnstileApi(): Promise<TurnstileApi | undefined> {
+  const ready = turnstileApi();
+  if (ready) return Promise.resolve(ready);
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+
+  turnstileScriptPromise = new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = TURNSTILE_SCRIPT_URL;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener('load', () => resolve(turnstileApi()), { once: true });
+    script.addEventListener(
+      'error',
+      () => {
+        turnstileScriptPromise = null;
+        script.remove();
+        resolve(undefined);
+      },
+      { once: true },
+    );
+    document.head.append(script);
+  });
+  return turnstileScriptPromise;
+}
+
+// Render the widget once when the login/register form is first shown. Safe to call
+// repeatedly (idempotent) and a no-op when no site key is configured. Native uses
+// attestation and Electron's app:// origin is rejected by Cloudflare, so neither
+// application shell loads the web challenge.
 function ensureTurnstile(): void {
-  if (DESKTOP_APP || !TURNSTILE_SITEKEY || turnstileWidgetId !== undefined) return;
-  const ts = turnstileApi();
-  const el = document.getElementById('cf-turnstile-container');
-  if (!ts || !el) {
-    window.setTimeout(ensureTurnstile, 200);
+  if (NATIVE_APP || DESKTOP_APP || !TURNSTILE_SITEKEY || turnstileWidgetId !== undefined) {
     return;
   }
-  turnstileWidgetId = ts.render(el, { sitekey: TURNSTILE_SITEKEY });
+
+  const el = document.getElementById('cf-turnstile-container');
+  if (!el) return;
+
+  const render = (ts: TurnstileApi | undefined): void => {
+    if (!ts || turnstileWidgetId !== undefined || !el.isConnected) return;
+    turnstileWidgetId = ts.render(el, { sitekey: TURNSTILE_SITEKEY });
+  };
+
+  const ready = turnstileApi();
+  if (ready) {
+    render(ready);
+    return;
+  }
+  void loadTurnstileApi().then(render);
 }
 
 // The current single-use token, or '' when verification is not configured / not
@@ -415,6 +496,7 @@ function trackMetaPixel(
   data?: Record<string, unknown>,
   options?: Record<string, unknown>,
 ): void {
+  if (!privacyConsent.allowed('marketing')) return;
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
   if (options) fbq('trackCustom', eventName, data ?? {}, options);
@@ -446,9 +528,9 @@ function trackCommunityLinkClicks(): void {
   });
 }
 
-function localizedSiteUrl(lang: SupportedLanguage): string {
-  if (lang === 'en') return SITE_URL;
-  const url = new URL(SITE_URL);
+function localizedSiteUrl(lang: SupportedLanguage, pathname = '/'): string {
+  const url = new URL(pathname, SITE_URL);
+  if (lang === 'en') return url.toString();
   url.searchParams.set('lang', lang);
   return url.toString();
 }
@@ -856,8 +938,8 @@ async function startGame(
   keybindScope: string,
   playIntro = false,
 ): Promise<void> {
-  // Model/texture/HDRI fetches were kicked off at module import; the renderer
-  // builds its scene synchronously, so everything must be resolved first.
+  // Renderer modules register lazy model/texture/HDRI factories. World entry
+  // starts them after the loading screen paints, then builds the scene synchronously.
   // The loading screen covers the gap - not a silent black screen.
   enterLoadingState(t('loading.world'));
   document.body.classList.add('game-active');
@@ -876,24 +958,30 @@ async function startGame(
   // Paint the loading screen before anything can block, assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
-  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
-  // painted above), so a stored non-en visitor never sees an English flash. This is now a
-  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
-  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
-  // to English and keep booting rather than reject unhandled.
+  // Fetch the active locale (including deed strings), deferred in-world CSS, and
+  // lazy renderer assets in parallel behind the loading screen. English is always
+  // resident, so locale failures fall back softly while required game resources
+  // remain fatal and surface through the existing loading error.
+  const localeReady = Promise.all([
+    ensureLocaleLoaded(getLanguage()),
+    ensureDeedLocalesLoaded(getLanguage()),
+  ]).catch(() => undefined);
+  const gameStylesReady = import('./styles/game.css');
+  const renderRuntimeReady = loadRenderRuntime();
+  const hudRuntimeReady = import('./ui/hud');
   try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
-  } catch {
-    // Soft fallback: English is statically resident; boot in English (the picker can retry).
-  }
-  try {
-    await assetsReady((done, total) => setLoadingProgress(done, total));
+    await Promise.all([
+      localeReady,
+      gameStylesReady,
+      Promise.all([renderRuntimeReady, hudRuntimeReady]).then(() =>
+        assetsReady((done, total) => setLoadingProgress(done, total)),
+      ),
+    ]);
   } catch (err) {
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  const [renderRuntime, hudRuntime] = await Promise.all([renderRuntimeReady, hudRuntimeReady]);
   const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
@@ -917,7 +1005,7 @@ async function startGame(
   // An explicit player choice is never overridden: a recognized device is marked applied on its
   // first boot so it never re-detects, and an inconclusive device returns null so it never
   // overwrites a stored preset.
-  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
+  const autoPreset = renderRuntime.firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
   if (autoPreset !== null) {
     settings.set('graphicsPreset', autoPreset);
     settings.set('graphicsDefaultApplied', true);
@@ -950,7 +1038,7 @@ async function startGame(
   const uiEffectsApplier = new UiEffectsApplier({
     resolve: (osReducedMotion) =>
       resolveUiEffectsProfile({
-        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        presetLabel: renderRuntime.graphicsPresetLabel(settings.get('graphicsPreset')),
         effectsQuality: settings.get('effectsQuality'),
         reduceMotion: osReducedMotion || settings.get('reduceMotion'),
       }),
@@ -961,7 +1049,7 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null);
   try {
-    renderer = new Renderer(world, canvas, nameplates);
+    renderer = new renderRuntime.Renderer(world, canvas, nameplates);
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
@@ -971,7 +1059,9 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });
+    hud = new hudRuntime.Hud(world, renderer, keybinds, {
+      dailyRewardsEnabled: !NATIVE_APP,
+    });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -1446,7 +1536,7 @@ async function startGame(
       engine: browserEnv.engine,
       version: browserEnv.engineVersion,
       mobile: browserEnv.mobile,
-      renderTier: GFX.tier,
+      renderTier: renderRuntime.GFX.tier,
       override,
     });
     const body = document.body.classList;
@@ -2976,12 +3066,18 @@ async function startGame(
       window.setTimeout(() => {
         gameInputReady = true;
         perf.reset();
-        startPerfReporter({
-          perf,
-          settings,
-          tokenProvider: () => api.token,
-          characterIdProvider: () => online?.characterId ?? null,
-        });
+        if (privacyConsent.allowed('analytics')) {
+          void import('./game/perf_reporter')
+            .then(({ startPerfReporter }) => {
+              startPerfReporter({
+                perf,
+                settings,
+                tokenProvider: () => api.token,
+                characterIdProvider: () => online?.characterId ?? null,
+              });
+            })
+            .catch(() => undefined);
+        }
         // Warm the procedural icon cache during idle time so the first
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
@@ -3008,7 +3104,7 @@ async function startGame(
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
-  fadeOutHomepageMusic();
+  fadeOutMarketingMusic();
 }
 
 // ---------------------------------------------------------------------------
@@ -3115,11 +3211,15 @@ const RESET_TOKEN = (() => {
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
+let characterPreviewLoad: Promise<void> | null = null;
+let requestedPreviewPanel: string | null = null;
+let startScreenPreviewReleased = false;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
 
 function releaseStartScreenPreview(): void {
+  startScreenPreviewReleased = true;
   if (!characterPreview) return;
   characterPreview.destroy();
   characterPreview = null;
@@ -3133,10 +3233,12 @@ function renderSkinPicker(
   current: number,
   onPick: (i: number) => void,
 ): void {
+  const runtime = loadedRenderRuntime;
+  if (!runtime) return;
   const row = $(rowId) as HTMLElement | null;
   if (!row) return;
   row.innerHTML = '';
-  const count = skinCount(`player_${cls}`);
+  const count = runtime.skinCount(`player_${cls}`);
   const picker = row.closest('.skin-picker') as HTMLElement | null;
   if (count <= 1) {
     // only the default exists, nothing to pick
@@ -3152,7 +3254,7 @@ function renderSkinPicker(
     b.dataset.skin = String(i);
     b.setAttribute('role', 'listitem');
     b.setAttribute('aria-label', t('auth.chromaOption', { n: i + 1 }));
-    const url = playerPortraitDataUrl(cls, i);
+    const url = runtime.playerPortraitDataUrl(cls, i);
     if (url) {
       const img = document.createElement('img');
       img.src = url;
@@ -3182,6 +3284,8 @@ function renderSkinPicker(
 /** Give each class button a small portrait preview of that class (run once
  *  character assets are ready so portraits render synchronously). */
 function decorateClassChips(): void {
+  const runtime = loadedRenderRuntime;
+  if (!runtime) return;
   document
     .querySelectorAll<HTMLElement>('#charcreate-panel .mini-class, #offline-select .mini-class')
     .forEach((li) => {
@@ -3197,7 +3301,7 @@ function decorateClassChips(): void {
       const img = document.createElement('img');
       img.className = 'mini-class-portrait';
       img.alt = '';
-      const url = playerPortraitDataUrl(cls, 0);
+      const url = runtime.playerPortraitDataUrl(cls, 0);
       if (url) img.src = url;
       li.appendChild(img);
       li.appendChild(label);
@@ -3233,7 +3337,36 @@ function refreshOnlineSkins(cls: PlayerClass): void {
 }
 
 function updatePreviewContainer(panelId: string): void {
-  if (!characterPreview) return;
+  requestedPreviewPanel = panelId;
+  if (!characterPreview) {
+    characterPreviewLoad ??= loadRenderRuntime()
+      .then(async (runtime) => {
+        await assetsReady();
+        return runtime;
+      })
+      .then((runtime) => {
+        if (startScreenPreviewReleased) return;
+        const targetPanel = requestedPreviewPanel;
+        if (!targetPanel) return;
+        const containerId =
+          targetPanel === '#charselect-panel'
+            ? '#online-preview-container'
+            : targetPanel === '#charcreate-panel'
+              ? '#charcreate-preview-container'
+              : '#offline-preview-container';
+        const container = $(containerId);
+        const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
+        if (!container || !canvas) return;
+        characterPreview = new runtime.CharacterPreview(container, canvas);
+        decorateClassChips();
+        updatePreviewContainer(targetPanel);
+      })
+      .catch(() => {
+        // World entry reports asset failures on its loading screen. The optional
+        // character preview simply stays on its static crest fallback.
+      });
+    return;
+  }
   const containerId =
     panelId === '#charselect-panel'
       ? '#online-preview-container'
@@ -3298,29 +3431,90 @@ const hoverTimeouts: Record<string, number | null> = {
   'charcreate-class-details': null,
 };
 
+const homepageMenuMedia = window.matchMedia('(max-width: 1151px)');
+
+function setHeaderNavCurrent(activeNavId: string, currentKind: 'page' | 'location' = 'page'): void {
+  document.querySelectorAll('.nav-link').forEach((link) => {
+    const isCurrent = link.id === activeNavId;
+    link.classList.toggle('active', isCurrent);
+    link.removeAttribute('aria-pressed');
+    if (isCurrent) link.setAttribute('aria-current', currentKind);
+    else link.removeAttribute('aria-current');
+  });
+
+  const activeLink = document.getElementById(activeNavId);
+  const mobileCurrentNavLabel = document.getElementById('mobile-current-nav-label');
+  if (activeLink && mobileCurrentNavLabel) {
+    const activeLabel = activeLink.querySelector<HTMLElement>('.nav-link-label');
+    mobileCurrentNavLabel.textContent = activeLabel?.textContent?.trim() ?? '';
+    const i18nKey = activeLabel?.dataset.i18n;
+    if (i18nKey) mobileCurrentNavLabel.dataset.i18n = i18nKey;
+    else delete mobileCurrentNavLabel.dataset.i18n;
+  }
+}
+
+function syncHomepageDrawerViewportTop(header: HTMLElement): void {
+  const headerBottom = Math.max(0, Math.ceil(header.getBoundingClientRect().bottom));
+  header.style.setProperty('--site-header-drawer-viewport-top', `${headerBottom}px`);
+}
+
+function setHomepageMenuOpen(requestedOpen: boolean, restoreFocus = false): void {
+  const header = document.querySelector<HTMLElement>('.homepage-header');
+  const toggle = document.getElementById('mobile-menu-toggle') as HTMLButtonElement | null;
+  const headerMenu = document.getElementById('header-menu-container') as HTMLElement | null;
+  if (!header || !toggle || !headerMenu) return;
+  syncHomepageDrawerViewportTop(header);
+
+  const disclosureMode = homepageMenuMedia.matches;
+  const open = disclosureMode && requestedOpen;
+  if (!open && restoreFocus && headerMenu.contains(document.activeElement)) toggle.focus();
+
+  header.classList.toggle('menu-open', open);
+  document.body.classList.toggle('site-header-menu-open', open);
+  toggle.setAttribute('aria-expanded', String(open));
+  const labelKey = open ? 'guide.nav.closeMenu' : 'guide.nav.openMenu';
+  toggle.dataset.i18nAria = labelKey;
+  toggle.setAttribute('aria-label', t(labelKey));
+
+  headerMenu.inert = disclosureMode && !open;
+  if (headerMenu) headerMenu.style.display = open ? 'flex' : '';
+  if (disclosureMode) headerMenu.setAttribute('aria-hidden', String(!open));
+  else headerMenu.removeAttribute('aria-hidden');
+}
+
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
+  const views = [
+    '#hero-view',
+    '#highscores-view',
+    '#patch-notes-view',
+    '#news-view',
+    '#download-view',
+    '#account-view',
+  ];
   const currentViewId = views.find((id) => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
   });
 
-  if (currentViewId === targetId) return;
-
   const navMap: Record<string, string> = {
     '#hero-view': 'nav-btn-play',
     '#highscores-view': 'nav-btn-highscores',
+    '#patch-notes-view': 'nav-btn-patch-notes',
     '#news-view': 'nav-btn-news',
     '#download-view': 'nav-btn-download',
     '#account-view': 'nav-btn-account',
   };
+  setHeaderNavCurrent(navMap[targetId]);
 
-  const activeNavId = navMap[targetId];
-  document.querySelectorAll('.nav-link').forEach((link) => {
-    const isActive = link.id === activeNavId;
-    link.classList.toggle('active', isActive);
-    link.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-  });
+  const resetStartScreenScroll = (): void => {
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen) startScreen.scrollTop = 0;
+  };
+
+  if (currentViewId === targetId) {
+    resetStartScreenScroll();
+    return;
+  }
 
   const fromView = currentViewId ? $(currentViewId) : null;
   const toView = $(targetId);
@@ -3338,11 +3532,29 @@ function switchMainView(targetId: string): void {
         el.setAttribute('aria-hidden', isTarget ? 'false' : 'true');
       }
     });
+    if (targetId === '#news-view') {
+      requestAnimationFrame(() => landingXTimeline?.load());
+    }
+
+    resetStartScreenScroll();
+    requestAnimationFrame(() => resetStartScreenScroll());
+
+    const viewStatus = document.getElementById('main-view-status');
+    const localizedHeading = toView.querySelector<HTMLElement>('h2[data-i18n]');
+    if (viewStatus && localizedHeading) {
+      viewStatus.textContent = '';
+      requestAnimationFrame(() => {
+        viewStatus.textContent = localizedHeading.textContent?.trim() ?? '';
+      });
+    }
 
     // The key-art backdrop is for the Play page only; hide it on other views.
     const onPlayPage = targetId === '#hero-view';
     const backdrop = document.getElementById('start-screen-backdrop');
     if (backdrop) backdrop.classList.toggle('trailer-off', !onPlayPage);
+    const socialTrayRoot = document.getElementById('site-social-tray-root');
+    // Public destination pages keep the same floating social launcher as home.
+    if (socialTrayRoot) socialTrayRoot.hidden = targetId === '#account-view';
 
     if (targetId === '#hero-view') {
       const activePlayPanel = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
@@ -3376,14 +3588,107 @@ function switchMainView(targetId: string): void {
 
     toView.style.opacity = '1';
     toView.style.transform = 'translateY(0)';
+
+    // Do not leave an identity transform inline after the route transition.
+    // Even translateY(0) creates a containing block, which makes fixed key-art
+    // layers size themselves against a very tall SPA view instead of the viewport.
+    const clearRouteTransitionStyles = (): void => {
+      toView.style.removeProperty('opacity');
+      toView.style.removeProperty('transform');
+      fromView.style.removeProperty('opacity');
+      fromView.style.removeProperty('transform');
+    };
+    window.setTimeout(clearRouteTransitionStyles, 240);
   };
 
   window.setTimeout(handleTransitionEnd, 150);
 }
 
+const PUBLIC_LANDING_ROUTE_VIEWS = Object.freeze({
+  '/download': '#download-view',
+  '/highscores': '#highscores-view',
+  '/news': '#news-view',
+  '/patch-notes': '#patch-notes-view',
+} as const);
+
+// These views share the homepage app shell, but each is also a public, crawlable
+// destination. Keep their page-specific search metadata here rather than allowing
+// every route to canonicalise to the homepage.
+const PUBLIC_LANDING_ROUTE_SEO = Object.freeze({
+  '/download': {
+    title: 'Download World of ClaudeCraft | Desktop Launcher',
+    description:
+      'Download the World of ClaudeCraft desktop launcher for a dedicated classic-style MMO experience.',
+  },
+  '/highscores': {
+    title: 'World of ClaudeCraft High Scores | Global Leaderboard',
+    description:
+      'Explore the World of ClaudeCraft global leaderboard and see the adventurers leading the realm.',
+  },
+  '/news': {
+    title: 'World of ClaudeCraft News & Updates',
+    description:
+      'Read the latest World of ClaudeCraft news, community stories, livestream updates, and announcements.',
+  },
+  '/patch-notes': {
+    title: 'World of ClaudeCraft Patch Notes | Latest Updates',
+    description:
+      'Read the latest World of ClaudeCraft patch notes, releases, improvements, and game updates.',
+  },
+} as const);
+
+type PublicLandingRoutePath = keyof typeof PUBLIC_LANDING_ROUTE_SEO;
+
+function publicLandingRoutePath(
+  pathname = window.location.pathname,
+): PublicLandingRoutePath | null {
+  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+  return normalizedPath in PUBLIC_LANDING_ROUTE_SEO
+    ? (normalizedPath as PublicLandingRoutePath)
+    : null;
+}
+
+function openPublicLandingRoute(): void {
+  const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
+  const targetView =
+    PUBLIC_LANDING_ROUTE_VIEWS[normalizedPath as keyof typeof PUBLIC_LANDING_ROUTE_VIEWS];
+  if (!targetView) return;
+
+  switchMainView(targetView);
+  if (targetView === '#highscores-view') void loadHighscores();
+  if (targetView === '#patch-notes-view') void loadPatchNotes();
+}
+
 function show(el: string): void {
-  // Ensure the main view is switched to hero-view so play sub-panels are visible
-  switchMainView('#hero-view');
+  const startScreen = document.getElementById('start-screen');
+  const launcherSlot = document.querySelector<HTMLElement>('.play-module-slot');
+  const preserveLauncherPosition =
+    document.body.dataset.siteHome === 'true' &&
+    (el === '#mode-select' || el === '#login-panel') &&
+    !document.getElementById('hero-view')?.hasAttribute('hidden') &&
+    !!startScreen &&
+    !!launcherSlot;
+  const launcherViewportTop = preserveLauncherPosition
+    ? launcherSlot.getBoundingClientRect().top
+    : 0;
+  const restoreLauncherPosition = (): void => {
+    if (!preserveLauncherPosition || !startScreen || !launcherSlot) return;
+    const delta = launcherSlot.getBoundingClientRect().top - launcherViewportTop;
+    if (Math.abs(delta) <= 0.25) return;
+    const previousScrollBehavior = startScreen.style.scrollBehavior;
+    startScreen.style.scrollBehavior = 'auto';
+    startScreen.scrollTop += delta;
+    startScreen.style.scrollBehavior = previousScrollBehavior;
+  };
+
+  // Ensure the main view is switched to hero-view so play sub-panels are visible.
+  // A launcher front/back flip retains the card's exact viewport anchor instead of
+  // jumping when the homepage sections around it change visibility.
+  const heroView = document.getElementById('hero-view');
+  if (heroView?.hasAttribute('hidden')) {
+    switchMainView('#hero-view');
+    restoreLauncherPosition();
+  }
 
   // Mount the Turnstile widget the first time the login/register form appears.
   if (el === '#login-panel') {
@@ -3433,7 +3738,17 @@ function show(el: string): void {
     '#charcreate-panel',
     '#offline-select',
   ];
-  document.body.dataset.startPanel = el.slice(1);
+  // Settle any previous transition before resolving the active panel. This keeps a
+  // fast double activation from letting stale cleanup hide the new target.
+  if (activeTransitionTimeout !== null) {
+    window.clearTimeout(activeTransitionTimeout);
+    activeTransitionTimeout = null;
+  }
+  if (activeTransitionCleanup) {
+    const cleanup = activeTransitionCleanup;
+    activeTransitionCleanup = null;
+    cleanup();
+  }
 
   // Find currently visible panel. Not every entry carries every panel: play.html omits
   // #discord-choice-panel (the chooser is an index.html-only flow), so resolve each id
@@ -3443,10 +3758,58 @@ function show(el: string): void {
     return panel !== null && !panel.hasAttribute('hidden');
   });
 
+  const isCharacterPanel =
+    el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select';
+  if (isCharacterPanel) setHomepageMenuOpen(false);
+  document.body.dataset.startPanel = el.slice(1);
+  restoreLauncherPosition();
+  if (preserveLauncherPosition) requestAnimationFrame(restoreLauncherPosition);
+
+  const launcherCard = launcherSlot?.querySelector<HTMLElement>('.play-module-card') ?? null;
+  const launcherModePanel = document.getElementById('mode-select');
+  const launcherLoginPanel = document.getElementById('login-panel');
+  const isLauncherTarget = el === '#mode-select' || el === '#login-panel';
+  const setLauncherFaceActive = (panel: HTMLElement, active: boolean): void => {
+    panel.toggleAttribute('hidden', !active);
+    panel.setAttribute('aria-hidden', active ? 'false' : 'true');
+    panel.toggleAttribute('inert', !active);
+  };
+  const focusPanelTarget = (targetId: string): void => {
+    const focusSelector: Record<string, string> = {
+      '#mode-select': '#btn-play',
+      '#login-panel': '#login-user',
+      '#forgot-panel': '#forgot-user',
+      '#reset-panel': '#reset-pass',
+    };
+    const selector = focusSelector[targetId];
+    if (!selector) return;
+    requestAnimationFrame(() => {
+      const panel = document.querySelector<HTMLElement>(targetId);
+      const target = document.querySelector<HTMLElement>(selector);
+      if (
+        document.body.dataset.startPanel !== targetId.slice(1) ||
+        !panel ||
+        panel.hasAttribute('hidden') ||
+        panel.hasAttribute('inert') ||
+        !target
+      ) {
+        return;
+      }
+      target.focus({ preventScroll: true });
+    });
+  };
+
   if (!currentActiveId || currentActiveId === el) {
-    // Show instantly on initial load or same panel
+    // Show instantly on initial load or same panel.
     for (const id of panels) {
       document.querySelector(id)?.toggleAttribute('hidden', id !== el);
+    }
+    if (launcherSlot && launcherModePanel && launcherLoginPanel && isLauncherTarget) {
+      const showLogin = el === '#login-panel';
+      launcherSlot.dataset.face = showLogin ? 'login' : 'mode';
+      launcherSlot.dataset.peekFace = showLogin ? 'login' : 'mode';
+      setLauncherFaceActive(launcherModePanel, !showLogin);
+      setLauncherFaceActive(launcherLoginPanel, showLogin);
     }
     if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
       updatePreviewContainer(el);
@@ -3454,26 +3817,127 @@ function show(el: string): void {
     return;
   }
 
-  // Clear active transition
-  if (activeTransitionTimeout !== null) {
-    window.clearTimeout(activeTransitionTimeout);
-    activeTransitionTimeout = null;
-  }
-  if (activeTransitionCleanup) {
-    activeTransitionCleanup();
-    activeTransitionCleanup = null;
-  }
-
   const fromPanel = $(currentActiveId);
   const toPanel = $(el);
-
   const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const isLauncherFlip =
+    !!launcherSlot &&
+    !!launcherCard &&
+    !!launcherModePanel &&
+    !!launcherLoginPanel &&
+    ((currentActiveId === '#mode-select' && el === '#login-panel') ||
+      (currentActiveId === '#login-panel' && el === '#mode-select'));
+
+  if (isLauncherFlip) {
+    const targetFace = el === '#login-panel' ? 'login' : 'mode';
+    const targetPanel = targetFace === 'login' ? launcherLoginPanel : launcherModePanel;
+    const outgoingPanel = targetFace === 'login' ? launcherModePanel : launcherLoginPanel;
+    let finished = false;
+    let onFlipEnd: ((event: TransitionEvent) => void) | null = null;
+    let cancelLauncherFlip: (() => void) | null = null;
+    let peekSwapTimeout: number | null = null;
+
+    if (outgoingPanel.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement | null)?.blur();
+    }
+    launcherSlot.dataset.face = targetFace === 'login' ? 'mode' : 'login';
+    launcherModePanel.toggleAttribute('hidden', false);
+    launcherLoginPanel.toggleAttribute('hidden', false);
+    launcherModePanel.setAttribute('aria-hidden', 'true');
+    launcherLoginPanel.setAttribute('aria-hidden', 'true');
+    launcherModePanel.setAttribute('inert', '');
+    launcherLoginPanel.setAttribute('inert', '');
+
+    const finishLauncherFlip = (allowFocus: boolean): void => {
+      if (finished) return;
+      finished = true;
+      if (onFlipEnd) launcherCard.removeEventListener('transitionend', onFlipEnd);
+      if (activeTransitionTimeout !== null) {
+        window.clearTimeout(activeTransitionTimeout);
+        activeTransitionTimeout = null;
+      }
+      if (peekSwapTimeout !== null) {
+        window.clearTimeout(peekSwapTimeout);
+        peekSwapTimeout = null;
+      }
+      launcherSlot.dataset.face = targetFace;
+      launcherSlot.classList.remove('is-flipping');
+      launcherSlot.dataset.peekFace = targetFace;
+      setLauncherFaceActive(outgoingPanel, false);
+      launcherSlot.classList.remove('is-swapping-peeks');
+      setLauncherFaceActive(targetPanel, true);
+      if (activeTransitionCleanup === cancelLauncherFlip) activeTransitionCleanup = null;
+      restoreLauncherPosition();
+      if (allowFocus) {
+        requestAnimationFrame(() => {
+          if (
+            document.body.dataset.startPanel !== targetPanel.id ||
+            targetPanel.hasAttribute('hidden') ||
+            targetPanel.hasAttribute('inert')
+          ) {
+            return;
+          }
+          restoreLauncherPosition();
+          focusPanelTarget(el);
+        });
+      }
+    };
+
+    if (isReducedMotion) {
+      launcherSlot.dataset.face = targetFace;
+      finishLauncherFlip(true);
+      launcherSlot.dataset.peekFace = targetFace;
+      return;
+    }
+
+    onFlipEnd = (event: TransitionEvent): void => {
+      if (event.target === launcherCard && event.propertyName === 'transform') {
+        finishLauncherFlip(true);
+      }
+    };
+    launcherCard.addEventListener('transitionend', onFlipEnd);
+    cancelLauncherFlip = () => finishLauncherFlip(false);
+    activeTransitionCleanup = cancelLauncherFlip;
+    activeTransitionTimeout = window.setTimeout(() => finishLauncherFlip(true), 820);
+    launcherSlot.classList.add('is-flipping');
+    void launcherCard.offsetWidth;
+    launcherSlot.classList.add('is-swapping-peeks');
+    peekSwapTimeout = window.setTimeout(() => {
+      launcherSlot.dataset.peekFace = targetFace;
+      peekSwapTimeout = null;
+      requestAnimationFrame(() => launcherSlot.classList.remove('is-swapping-peeks'));
+    }, 300);
+    requestAnimationFrame(() => {
+      launcherSlot.dataset.face = targetFace;
+      restoreLauncherPosition();
+    });
+    return;
+  }
+
+  if (launcherSlot && isLauncherTarget) {
+    const targetFace = el === '#login-panel' ? 'login' : 'mode';
+    launcherSlot.dataset.face = targetFace;
+    launcherSlot.dataset.peekFace = targetFace;
+  }
+
   if (isReducedMotion) {
-    fromPanel.toggleAttribute('hidden', true);
-    toPanel.toggleAttribute('hidden', false);
+    if (fromPanel === launcherModePanel || fromPanel === launcherLoginPanel) {
+      setLauncherFaceActive(fromPanel, false);
+    } else {
+      fromPanel.toggleAttribute('hidden', true);
+    }
+    if (launcherModePanel && launcherLoginPanel && isLauncherTarget) {
+      const showLogin = el === '#login-panel';
+      setLauncherFaceActive(launcherModePanel, !showLogin);
+      setLauncherFaceActive(launcherLoginPanel, showLogin);
+    } else {
+      toPanel.toggleAttribute('hidden', false);
+    }
     if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
       updatePreviewContainer(el);
     }
+    focusPanelTarget(el);
     return;
   }
 
@@ -3481,7 +3945,11 @@ function show(el: string): void {
   fromPanel.classList.add('panel-transition', 'panel-fade-out');
 
   const cleanupFrom = () => {
-    fromPanel.toggleAttribute('hidden', true);
+    if (fromPanel === launcherModePanel || fromPanel === launcherLoginPanel) {
+      setLauncherFaceActive(fromPanel, false);
+    } else {
+      fromPanel.toggleAttribute('hidden', true);
+    }
     fromPanel.classList.remove('panel-transition', 'panel-fade-out');
   };
 
@@ -3492,9 +3960,15 @@ function show(el: string): void {
     activeTransitionCleanup = null;
     activeTransitionTimeout = null;
 
-    // Set initial state for fade-in
+    // Set initial state for fade-in.
     toPanel.classList.add('panel-transition', 'panel-fade-in-start');
-    toPanel.toggleAttribute('hidden', false);
+    if (launcherModePanel && launcherLoginPanel && isLauncherTarget) {
+      const showLogin = el === '#login-panel';
+      setLauncherFaceActive(launcherModePanel, !showLogin);
+      setLauncherFaceActive(launcherLoginPanel, showLogin);
+    } else {
+      toPanel.toggleAttribute('hidden', false);
+    }
     if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
       updatePreviewContainer(el);
     }
@@ -3516,6 +3990,7 @@ function show(el: string): void {
       cleanupTo();
       activeTransitionCleanup = null;
       activeTransitionTimeout = null;
+      focusPanelTarget(el);
     }, 150);
   }, 150);
 }
@@ -3560,7 +4035,7 @@ async function enterRealmFlow(): Promise<void> {
 // The nav swaps Login/Register → Account once a session exists; the portal page
 // is a thin consumer of the pure account_portal.ts model + the REST Api.
 function loginNavItem(): HTMLElement | null {
-  return ($('#nav-btn-login') as HTMLElement).closest('.nav-item') as HTMLElement | null;
+  return document.getElementById('nav-btn-login')?.closest<HTMLElement>('.nav-item') ?? null;
 }
 
 const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];
@@ -4276,11 +4751,16 @@ async function refreshCharacters(): Promise<void> {
   syncCharselectEnterButton();
   setCharselectPreviewName('');
   try {
-    const chars = sortCharacters(await api.characters(), charSortMode);
+    const [characterRows, portraitChip, renderRuntime] = await Promise.all([
+      api.characters(),
+      import('./ui/portrait_chip'),
+      loadRenderRuntime(),
+    ]);
+    const chars = sortCharacters(characterRows, charSortMode);
     // Warm the lazy Combat Mech cosmetic assets so selecting an event-skin
     // character shows the mech body without a class-body flash (setAppearance
     // falls back gracefully if this has not resolved yet).
-    if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
+    if (chars.some((c) => c.skinCatalog === 'mech')) void renderRuntime.preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
     if (chars.length === 0) {
@@ -4305,7 +4785,7 @@ async function refreshCharacters(): Promise<void> {
       const inWorldHint = c.online
         ? `<span class="char-inworld-hint">${escapeHtml(t('character.inWorldHint'))}</span>`
         : '';
-      row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
+      row.innerHTML = `${portraitChip.portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
           <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
@@ -4391,7 +4871,7 @@ async function refreshCharacters(): Promise<void> {
       listEl.appendChild(row);
     }
 
-    hydratePortraits(listEl);
+    portraitChip.hydratePortraits(listEl);
 
     // Select first character by default if present, else show a default showcase.
     const firstRow = listEl.querySelector('.char-row') as HTMLElement | null;
@@ -4727,7 +5207,7 @@ function renderClassDetails(
 
       return `
       <li class="details-spell-item">
-        <img class="details-spell-icon-img" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(abilityName)}" width="32" height="32" />
+        <img class="details-spell-icon-img" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(abilityName)}" width="32" height="32" loading="lazy" decoding="async" />
         <div class="details-spell-text">
           <strong>${escapeHtml(abilityName)}</strong>
           ${escapeHtml(resolvedDesc)}
@@ -4836,65 +5316,110 @@ function readTranslationKey(value: string | null): TranslationKey | null {
   return value ? (value as TranslationKey) : null;
 }
 
+function updateHreflangAlternates(pathname: string): void {
+  document.querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]').forEach((link) => {
+    const previous = new URL(link.href);
+    const alternate = new URL(pathname, SITE_URL);
+    const lang = previous.searchParams.get('lang');
+    if (lang) alternate.searchParams.set('lang', lang);
+    link.href = alternate.toString();
+  });
+}
+
 function updateSeoMetadata(lang: SupportedLanguage): void {
+  const routePath = publicLandingRoutePath();
+  const routeSeo = routePath ? PUBLIC_LANDING_ROUTE_SEO[routePath] : null;
+  const canonicalHref = localizedSiteUrl(lang, routePath ?? '/');
+  const siteHref = localizedSiteUrl(lang);
+  const siteDescription = t('seo.description');
+
+  if (routeSeo) {
+    document.title = routeSeo.title;
+    const setMetaContent = (selector: string, content: string) => {
+      const meta = document.querySelector<HTMLMetaElement>(selector);
+      if (meta) meta.content = content;
+    };
+    setMetaContent('meta[name="description"]', routeSeo.description);
+    setMetaContent('meta[property="og:title"]', routeSeo.title);
+    setMetaContent('meta[property="og:description"]', routeSeo.description);
+    setMetaContent('meta[name="twitter:title"]', routeSeo.title);
+    setMetaContent('meta[name="twitter:description"]', routeSeo.description);
+  }
+
   const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
-  const canonicalHref = localizedSiteUrl(lang);
   if (canonical) canonical.href = canonicalHref;
 
   const ogUrl = document.querySelector<HTMLMetaElement>('meta[property="og:url"]');
   if (ogUrl) ogUrl.content = canonicalHref;
+  updateHreflangAlternates(routePath ?? '/');
 
   const jsonLd = document.getElementById('structured-data') as HTMLScriptElement | null;
   if (jsonLd) {
     const sameAs = [
       'https://github.com/levy-street/world-of-claudecraft',
-      'https://discord.gg/GjhnUsBtw',
+      'https://discord.com/invite/worldofclaudecraft',
       'https://www.youtube.com/@WoClaudeCraft',
       'https://x.com/WoClaudecraft',
+      'https://www.twitch.tv/claudeplaysclaudecraft',
+      'https://www.twitch.tv/directory/category/world-of-claudecraft',
       'https://www.instagram.com/worldofclaudecraft/',
       'https://www.tiktok.com/@worldofclaudecraft',
       'https://www.reddit.com/r/WorldofClaudecraft/',
     ];
-    jsonLd.textContent = JSON.stringify(
+    const graph: Record<string, unknown>[] = [
       {
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'WebSite',
-            '@id': 'https://worldofclaudecraft.com/#website',
-            name: 'World of ClaudeCraft',
-            alternateName: 'World of Claudecraft',
-            url: canonicalHref,
-            inLanguage: languageTag(lang),
-            description: t('seo.description'),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
-          },
-          {
-            '@type': 'Organization',
-            '@id': 'https://worldofclaudecraft.com/#organization',
-            name: 'World of ClaudeCraft',
-            url: 'https://worldofclaudecraft.com/',
-            logo: 'https://worldofclaudecraft.com/woc_logo_square.webp',
-            sameAs,
-          },
-          {
-            '@type': 'VideoGame',
-            '@id': 'https://worldofclaudecraft.com/#game',
-            name: 'World of ClaudeCraft',
-            alternateName: 'World of Claudecraft',
-            genre: t('seo.genre'),
-            playMode: t('seo.playMode'),
-            applicationCategory: t('seo.applicationCategory'),
-            operatingSystem: t('seo.operatingSystem'),
-            url: canonicalHref,
-            image: 'https://worldofclaudecraft.com/woc_logo_square.webp',
-            description: t('seo.description'),
-            inLanguage: languageTag(lang),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
-            sameAs,
-          },
-        ],
+        '@type': 'WebSite',
+        '@id': 'https://worldofclaudecraft.com/#website',
+        name: 'World of ClaudeCraft',
+        alternateName: 'World of Claudecraft',
+        url: siteHref,
+        inLanguage: languageTag(lang),
+        description: siteDescription,
+        publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
       },
+      {
+        '@type': 'Organization',
+        '@id': 'https://worldofclaudecraft.com/#organization',
+        name: 'World of ClaudeCraft',
+        url: 'https://worldofclaudecraft.com/',
+        logo: 'https://worldofclaudecraft.com/woc_logo_square.webp',
+        sameAs,
+      },
+      {
+        '@type': 'VideoGame',
+        '@id': 'https://worldofclaudecraft.com/#game',
+        name: 'World of ClaudeCraft',
+        alternateName: 'World of Claudecraft',
+        genre: t('seo.genre'),
+        playMode: t('seo.playMode'),
+        applicationCategory: t('seo.applicationCategory'),
+        operatingSystem: [t('seo.operatingSystem'), 'iOS', 'Android'],
+        gamePlatform: [t('seo.operatingSystem'), 'iOS', 'Android'],
+        installUrl: [
+          'https://apps.apple.com/app/world-of-claudecraft/id6782569061',
+          'https://play.google.com/store/apps/details?id=com.worldofclaudecraft',
+        ],
+        url: siteHref,
+        image: 'https://worldofclaudecraft.com/woc_logo_square.webp',
+        description: siteDescription,
+        inLanguage: languageTag(lang),
+        publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
+        sameAs,
+      },
+    ];
+    if (routeSeo) {
+      graph.push({
+        '@type': 'WebPage',
+        '@id': `${canonicalHref}#webpage`,
+        url: canonicalHref,
+        name: routeSeo.title,
+        description: routeSeo.description,
+        inLanguage: languageTag(lang),
+        isPartOf: { '@id': 'https://worldofclaudecraft.com/#website' },
+      });
+    }
+    jsonLd.textContent = JSON.stringify(
+      { '@context': 'https://schema.org', '@graph': graph },
       null,
       2,
     );
@@ -5023,9 +5548,11 @@ async function loadProjectStats(): Promise<void> {
   // and inside the Online option, so update every instance by class.
   const accountEls = document.querySelectorAll<HTMLElement>('.js-stat-accounts');
   if (!accountEls.length) return;
-  const setAll = (els: NodeListOf<HTMLElement>, text: string): void => {
+  const setAll = (els: NodeListOf<HTMLElement>, text: string, unavailable = false): void => {
     els.forEach((el) => {
-      el.textContent = text;
+      const serverStatLine = el.closest('.server-stat-line');
+      el.textContent = unavailable && !serverStatLine ? '' : text;
+      serverStatLine?.classList.toggle('is-unavailable', unavailable);
     });
   };
 
@@ -5047,7 +5574,7 @@ async function loadProjectStats(): Promise<void> {
 
   // If cache exists and is fresh (within TTL), use it and skip API request
   if (cached && Date.now() - cached.timestamp < STATS_CACHE_TTL_MS) {
-    setAll(accountEls, String(cached.accounts_created));
+    setAll(accountEls, formatNumber(cached.accounts_created, { maximumFractionDigits: 0 }));
     return;
   }
 
@@ -5055,7 +5582,7 @@ async function loadProjectStats(): Promise<void> {
   try {
     const data = await api.projectStats();
 
-    setAll(accountEls, String(data.accounts_created));
+    setAll(accountEls, formatNumber(data.accounts_created, { maximumFractionDigits: 0 }));
 
     // Save to cache with timestamp
     if (typeof localStorage !== 'undefined') {
@@ -5071,9 +5598,15 @@ async function loadProjectStats(): Promise<void> {
     console.error('Failed to fetch project stats:', err);
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
-      setAll(accountEls, String(cached.accounts_created));
+      setAll(accountEls, formatNumber(cached.accounts_created, { maximumFractionDigits: 0 }));
     } else {
-      setAll(accountEls, '–');
+      // A dash beside "Total players" looks like broken data. Keep the launcher
+      // intentional while the API is unavailable and let CSS hide the stale label.
+      setAll(
+        accountEls,
+        `${t('stats.accountsCreated')}: ${t('abilityUi.tooltip.unavailable')}`,
+        true,
+      );
     }
   }
 }
@@ -5186,25 +5719,33 @@ function renderReleaseBody(md: string): string {
   return out.join('');
 }
 
-// News & Updates: published GitHub releases, proxied + cached by the server.
+// Patch Notes: published GitHub releases, proxied + cached by the server.
 // Re-fetched each time the view is opened (the server caches, so it is cheap).
-let newsLoading = false;
-async function loadNews(): Promise<void> {
-  const host = $('#news-feed');
-  if (!host || newsLoading) return;
-  newsLoading = true;
-  host.innerHTML = `<div class="news-loading">${t('news.loading')}</div>`;
+let patchNotesLoading = false;
+let patchNotesLoadedAt = 0;
+const PATCH_NOTES_CLIENT_CACHE_MS = 5 * 60 * 1000;
+async function loadPatchNotes(): Promise<void> {
+  const host = $('#patch-notes-feed');
+  if (!host || patchNotesLoading) return;
+  if (
+    host.dataset.loaded === 'true' &&
+    Date.now() - patchNotesLoadedAt < PATCH_NOTES_CLIENT_CACHE_MS
+  ) {
+    return;
+  }
+  patchNotesLoading = true;
+  host.innerHTML = `<div class="news-loading">${t('landing.patchNotesLoading')}</div>`;
   let releases: ReleaseEntry[] = [];
   try {
     releases = await api.releases(20);
   } catch {
-    host.innerHTML = `<div class="news-error">${t('news.error')}</div>`;
-    newsLoading = false;
+    host.innerHTML = `<div class="news-error">${t('landing.patchNotesError')}</div>`;
+    patchNotesLoading = false;
     return;
   }
-  newsLoading = false;
+  patchNotesLoading = false;
   if (releases.length === 0) {
-    host.innerHTML = `<div class="news-empty">${t('news.empty')}</div>`;
+    host.innerHTML = `<div class="news-empty">${t('landing.patchNotesEmpty')}</div>`;
     return;
   }
   const esc = (s: string): string =>
@@ -5215,10 +5756,12 @@ async function loadNews(): Promise<void> {
         ? `<span class="news-date">${formatDateTime(new Date(r.publishedAt), { dateStyle: 'medium' })}</span>`
         : '';
       const tag = r.tag ? `<span class="news-tag">${esc(r.tag)}</span>` : '';
-      const badge = r.prerelease ? `<span class="news-badge">${t('news.prerelease')}</span>` : '';
+      const badge = r.prerelease
+        ? `<span class="news-badge">${t('landing.patchNotesPrerelease')}</span>`
+        : '';
       const title = esc(r.name || r.tag || '');
       const link = r.url
-        ? `<div class="news-item-foot"><a class="news-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${t('news.viewOnGithub')}</a></div>`
+        ? `<div class="news-item-foot"><a class="news-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${t('landing.patchNotesViewOnGithub')}</a></div>`
         : '';
       return (
         `<article class="news-item">` +
@@ -5228,6 +5771,8 @@ async function loadNews(): Promise<void> {
       );
     })
     .join('');
+  host.dataset.loaded = 'true';
+  patchNotesLoadedAt = Date.now();
 }
 
 let caCopyResetTimer: number | null = null;
@@ -5246,7 +5791,7 @@ function wireContractAddressCopy(): void {
     caCopyResetTimer = window.setTimeout(() => {
       container.classList.remove('is-copied');
       caCopyResetTimer = null;
-    }, 1800);
+    }, 4200);
   };
 
   const fallbackCopy = (text: string): boolean => {
@@ -5280,53 +5825,6 @@ function wireContractAddressCopy(): void {
     } else if (fallbackCopy(ca)) {
       showCopied();
     }
-  });
-}
-
-function syncHomepageMusicToggle(): void {
-  const btn = document.getElementById('homepage-music-toggle') as HTMLButtonElement | null;
-  if (!btn) return;
-  btn.classList.toggle('is-muted', homepageMusicMuted);
-  btn.setAttribute('aria-pressed', String(!homepageMusicMuted));
-}
-
-function playHomepageMusic(): void {
-  const el = homepageMusic;
-  if (!el || homepageMusicMuted || homepageMusicStarted) return;
-  void el
-    .play()
-    .then(() => {
-      homepageMusicStarted = true;
-      removeHomepageMusicGestureListeners?.();
-      removeHomepageMusicGestureListeners = null;
-    })
-    .catch(() => {
-      // Autoplay still blocked: a later gesture will retry.
-    });
-}
-
-function setHomepageMusicMuted(muted: boolean): void {
-  homepageMusicMuted = muted;
-  saveHomepageMusicMuted(muted);
-  const el = homepageMusic;
-  if (el) {
-    el.muted = muted;
-    if (muted) {
-      el.pause();
-      homepageMusicStarted = false;
-    } else {
-      playHomepageMusic();
-    }
-  }
-  syncHomepageMusicToggle();
-}
-
-function wireHomepageMusicToggle(): void {
-  const btn = document.getElementById('homepage-music-toggle') as HTMLButtonElement | null;
-  if (!btn) return;
-  syncHomepageMusicToggle();
-  btn.addEventListener('click', () => {
-    setHomepageMusicMuted(!homepageMusicMuted);
   });
 }
 
@@ -6839,6 +7337,89 @@ function applyLandingBackdrop(highContrast: boolean): void {
 }
 
 function wireStartScreens(): void {
+  // Keep both launcher faces in one persistent grid slot. The slot retains its
+  // geometry while the front/login panels rotate, preventing a scroll-anchor jump.
+  const homepageStage = document.querySelector<HTMLElement>('.site-hero-stage');
+  const homepageModePanel = document.getElementById('mode-select');
+  const homepageLoginPanel = document.getElementById('login-panel');
+  if (
+    homepageStage &&
+    homepageModePanel &&
+    homepageLoginPanel &&
+    document.body.dataset.siteHome === 'true'
+  ) {
+    // The homepage ships the front-face wrapper in HTML so the launcher can be
+    // painted as the LCP immediately, without waiting for the game bundle. Keep
+    // the fallback for play/app shells and older cached HTML.
+    const existingLauncherSlot = homepageStage.querySelector<HTMLElement>(
+      ':scope > .play-module-slot',
+    );
+    const existingLauncherCard =
+      existingLauncherSlot?.querySelector<HTMLElement>(':scope > .play-module-card') ?? null;
+    let launcherSlot: HTMLElement;
+    let launcherCard: HTMLElement;
+    let launcherPeeks: HTMLElement[];
+
+    if (existingLauncherSlot && existingLauncherCard) {
+      launcherSlot = existingLauncherSlot;
+      launcherCard = existingLauncherCard;
+      launcherPeeks = Array.from(
+        launcherSlot.querySelectorAll<HTMLElement>(':scope > .play-module-peek'),
+      );
+    } else {
+      launcherSlot = document.createElement('div');
+      launcherSlot.className = 'play-module-slot';
+      launcherSlot.dataset.face = 'mode';
+      launcherSlot.dataset.peekFace = 'mode';
+      launcherPeeks = Array.from(
+        homepageModePanel.querySelectorAll<HTMLElement>(':scope > .play-module-peek'),
+      );
+      launcherCard = document.createElement('div');
+      launcherCard.className = 'play-module-card';
+    }
+
+    for (const peek of launcherPeeks) peek.classList.add('play-module-peek--launcher');
+    homepageModePanel.classList.add('play-module-face', 'play-module-face--front');
+    homepageLoginPanel.classList.add(
+      'play-module-login-back',
+      'play-module-face',
+      'play-module-face--back',
+    );
+
+    const loginContent = document.createElement('div');
+    loginContent.className = 'play-module-login-content';
+    const loginFooter = document.createElement('div');
+    loginFooter.className = 'play-module-login-footer';
+    loginFooter.setAttribute('aria-hidden', 'true');
+    const loginMotto = homepageLoginPanel.querySelector('.play-module-login-motto');
+    for (const child of Array.from(homepageLoginPanel.children)) {
+      if (child !== loginMotto) loginContent.append(child);
+    }
+    const loginSeal = document.createElement('img');
+    loginSeal.className = 'play-module-login-seal';
+    loginSeal.src = '/woc-logo-square-320-v1.webp';
+    loginSeal.width = 96;
+    loginSeal.height = 96;
+    loginSeal.alt = '';
+    loginSeal.setAttribute('aria-hidden', 'true');
+    loginFooter.append(loginSeal);
+    if (loginMotto) loginFooter.append(loginMotto);
+    homepageLoginPanel.append(loginContent, loginFooter);
+
+    if (existingLauncherSlot && existingLauncherCard) {
+      launcherCard.append(homepageLoginPanel);
+    } else {
+      homepageModePanel.before(launcherSlot);
+      launcherCard.append(homepageModePanel, homepageLoginPanel);
+      launcherSlot.append(launcherCard);
+      launcherSlot.append(...launcherPeeks);
+    }
+    homepageModePanel.setAttribute('aria-hidden', 'false');
+    homepageModePanel.removeAttribute('inert');
+    homepageLoginPanel.setAttribute('aria-hidden', 'true');
+    homepageLoginPanel.setAttribute('inert', '');
+  }
+
   // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
   // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
   // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
@@ -6869,7 +7450,6 @@ function wireStartScreens(): void {
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
-  wireHomepageMusicToggle();
   wireWallet();
   wireGithubLink();
   wireSteamLink(api);
@@ -7453,7 +8033,6 @@ function wireStartScreens(): void {
       if (forgotStatus) forgotStatus.textContent = '';
       forgotUserInput.value = '';
       show('#forgot-panel');
-      forgotUserInput.focus();
     });
 
     $('#btn-forgot-back').addEventListener('click', (e) => {
@@ -7786,11 +8365,8 @@ function wireStartScreens(): void {
   $('#btn-charselect-back').addEventListener('click', () => show('#login-panel'));
 
   // Main Navigation View Switching
-  const navBtnPlay = $('#nav-btn-play');
-  const navBtnHighscores = $('#nav-btn-highscores');
   const navBtnWiki = $('#nav-btn-wiki');
-  const navBtnNews = $('#nav-btn-news');
-  const navBtnDownload = $('#nav-btn-download');
+  const navBtnCommunityBuilt = $('#nav-btn-community-built');
   const navBtnLogin = $('#nav-btn-login');
 
   const deleteConfirmInput = $('#delete-character-confirm') as HTMLInputElement;
@@ -7838,54 +8414,59 @@ function wireStartScreens(): void {
   const setupNavBtn = (
     btn: HTMLElement | null,
     targetViewId: string,
-    customAction?: () => void,
+    customAction?: (moveFocus?: boolean) => void,
   ) => {
     if (!btn) return;
-    const action = () => {
-      // Close mobile menu if open
-      const header = $('.homepage-header');
-      const toggleBtn = $('#mobile-menu-toggle');
-      if (header && toggleBtn) {
-        header.classList.remove('menu-open');
-        toggleBtn.setAttribute('aria-expanded', 'false');
-        const menu = document.getElementById('header-menu-container') as HTMLElement | null;
-        if (menu) menu.style.display = '';
+    const action = (moveFocus = false) => {
+      setHomepageMenuOpen(false, false);
+      if (btn.id !== 'nav-btn-community-built' && window.location.hash === '#community-built') {
+        window.history.pushState(null, '', `${window.location.pathname}${window.location.search}`);
       }
 
       if (customAction) {
-        customAction();
+        customAction(moveFocus);
       } else {
         switchMainView(targetViewId);
+      }
+
+      const focusDestination =
+        moveFocus &&
+        targetViewId &&
+        !['nav-btn-play', 'nav-btn-login', 'nav-btn-logout', 'nav-btn-community-built'].includes(
+          btn.id,
+        );
+      if (focusDestination) {
+        const focusDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+        window.setTimeout(() => {
+          const destination = document.querySelector<HTMLElement>(targetViewId);
+          const heading = destination?.querySelector<HTMLElement>('h1, h2');
+          if (!heading || destination?.hasAttribute('hidden')) return;
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        }, focusDelay);
       }
     };
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      action();
+      action(false);
     });
     btn.addEventListener('keydown', (e) => {
-      handleKeyboardActivation(e as KeyboardEvent, action);
+      handleKeyboardActivation(e as KeyboardEvent, () => action(true));
     });
   };
 
-  setupNavBtn(navBtnPlay, '#hero-view', enterOnlinePlayFlow);
-
-  setupNavBtn(navBtnHighscores, '#highscores-view', () => {
-    switchMainView('#highscores-view');
-    void loadHighscores();
-  });
   // The wiki is the curated guide SPA at /wiki (its own page), so this nav item
   // navigates there rather than switching an in-page view.
   setupNavBtn(navBtnWiki, '', () => {
     window.location.href = '/wiki';
   });
-  setupNavBtn(navBtnNews, '#news-view', () => {
-    switchMainView('#news-view');
-    void loadNews();
+  setupNavBtn(navBtnCommunityBuilt, '', () => {
+    window.location.href = '/community';
   });
-  setupNavBtn(navBtnDownload, '#download-view');
   initDesktopDownload();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
+    setHeaderNavCurrent('nav-btn-login');
   });
   setupNavBtn($('#nav-btn-account'), '#account-view', () => {
     switchMainView('#account-view');
@@ -8214,16 +8795,64 @@ function wireStartScreens(): void {
   // Mobile menu toggle setup
   const mobileMenuToggle = $('#mobile-menu-toggle');
   const homepageHeader = $('.homepage-header');
-  if (mobileMenuToggle && homepageHeader) {
-    const headerMenu = document.getElementById('header-menu-container') as HTMLElement | null;
-    let lastNativeMenuToggleAt = 0;
-    const setMobileMenuOpen = (open: boolean) => {
-      homepageHeader.classList.toggle('menu-open', open);
-      mobileMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (headerMenu) headerMenu.style.display = open ? 'flex' : '';
+  const headerMenu = document.getElementById('header-menu-container');
+  if (mobileMenuToggle && homepageHeader && headerMenu) {
+    let menuMeasureFrame: number | null = null;
+    const measureHomepageMenuColumns = (): void => {
+      menuMeasureFrame = null;
+      syncHomepageDrawerViewportTop(homepageHeader);
+      // Always measure from the intended two-column/mobile or standard desktop
+      // state. Otherwise a previous density decision can mask that labels fit again.
+      headerMenu.classList.remove('is-single-column');
+      homepageHeader.classList.remove('is-nav-condensed');
+
+      const visibleNavLinks = Array.from(
+        headerMenu.querySelectorAll<HTMLElement>('.nav-link'),
+      ).filter((link) => {
+        const navItem = link.closest<HTMLElement>('.nav-item');
+        return !link.hidden && !navItem?.hidden && window.getComputedStyle(link).display !== 'none';
+      });
+
+      if (!homepageMenuMedia.matches) {
+        const homepageNav = headerMenu.querySelector<HTMLElement>('.homepage-nav');
+        const navList = headerMenu.querySelector<HTMLElement>('.nav-list');
+        const needsCondensed =
+          !!homepageNav &&
+          !!navList &&
+          (navList.scrollWidth > homepageNav.clientWidth ||
+            visibleNavLinks.some((link) => link.scrollWidth > link.clientWidth));
+        homepageHeader.classList.toggle('is-nav-condensed', needsCondensed);
+        return;
+      }
+
+      headerMenu.classList.toggle(
+        'is-single-column',
+        visibleNavLinks.some((link) => link.scrollWidth > link.clientWidth),
+      );
     };
-    const toggleMobileMenu = () =>
-      setMobileMenuOpen(!homepageHeader.classList.contains('menu-open'));
+    const scheduleHomepageMenuMeasurement = (): void => {
+      if (menuMeasureFrame !== null) window.cancelAnimationFrame(menuMeasureFrame);
+      menuMeasureFrame = window.requestAnimationFrame(measureHomepageMenuColumns);
+    };
+    const menuContentObserver = new MutationObserver(scheduleHomepageMenuMeasurement);
+    menuContentObserver.observe(headerMenu, {
+      attributes: true,
+      attributeFilter: ['hidden'],
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+
+    let lastNativeMenuToggleAt = 0;
+    const toggleMobileMenu = () => {
+      const willOpen = !homepageHeader.classList.contains('menu-open');
+      setHomepageMenuOpen(willOpen);
+      if (willOpen && mobileMenuToggle.matches(':focus-visible')) {
+        window.requestAnimationFrame(() => {
+          headerMenu.querySelector<HTMLElement>('.nav-link[aria-current]')?.focus();
+        });
+      }
+    };
     const handleNativeMenuToggle = (e: Event) => {
       const target = e.target instanceof Element ? e.target : null;
       if (!target?.closest('#mobile-menu-toggle')) return;
@@ -8249,6 +8878,31 @@ function wireStartScreens(): void {
       if (Date.now() - lastNativeMenuToggleAt <= 250) return;
       toggleMobileMenu();
     });
+    document.addEventListener('pointerdown', (event) => {
+      if (!homepageHeader.classList.contains('menu-open')) return;
+      if (event.target instanceof Node && !homepageHeader.contains(event.target)) {
+        setHomepageMenuOpen(false, headerMenu.contains(document.activeElement));
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !homepageHeader.classList.contains('menu-open')) return;
+      event.preventDefault();
+      setHomepageMenuOpen(false, true);
+    });
+    homepageHeader.addEventListener('focusout', () => {
+      window.setTimeout(() => {
+        if (!homepageHeader.contains(document.activeElement)) setHomepageMenuOpen(false);
+      }, 0);
+    });
+    window.addEventListener('resize', scheduleHomepageMenuMeasurement, { passive: true });
+    document.addEventListener('woc:languagechange', scheduleHomepageMenuMeasurement);
+    homepageMenuMedia.addEventListener('change', () => {
+      setHomepageMenuOpen(false);
+      scheduleHomepageMenuMeasurement();
+    });
+    setHomepageMenuOpen(false);
+    scheduleHomepageMenuMeasurement();
+    void document.fonts.ready.then(scheduleHomepageMenuMeasurement);
   }
 
   // Dynamically initialize background embers
@@ -8295,6 +8949,14 @@ function wireStartScreens(): void {
   const graphicsSelect = document.getElementById(
     'landing-graphics-select',
   ) as HTMLSelectElement | null;
+  const appGraphicsTrigger = document.getElementById(
+    'app-graphics-trigger',
+  ) as HTMLButtonElement | null;
+  const appGraphicsValue = document.getElementById('app-graphics-value');
+  const appGraphicsMenu = document.getElementById('app-graphics-menu');
+  const appGraphicsOptions = Array.from(
+    appGraphicsMenu?.querySelectorAll<HTMLButtonElement>('[data-graphics-value]') ?? [],
+  );
   const normalizedLandingGraphicsChoice = (raw: string | null): string => {
     if (raw === LANDING_GRAPHICS_AUTO) return raw;
     const preset = Number(raw);
@@ -8321,6 +8983,13 @@ function wireStartScreens(): void {
     graphicsSelect.value = landingSettings.get('graphicsDefaultApplied')
       ? String(landingSettings.get('graphicsPreset'))
       : LANDING_GRAPHICS_AUTO;
+    const selectedLabel =
+      graphicsSelect.selectedOptions[0]?.textContent?.trim() ?? graphicsSelect.value;
+    if (appGraphicsValue) appGraphicsValue.textContent = selectedLabel;
+    for (const option of appGraphicsOptions) {
+      const selected = option.dataset.graphicsValue === graphicsSelect.value;
+      option.setAttribute('aria-selected', String(selected));
+    }
   };
   const syncContrastToggle = (on: boolean): void => {
     if (contrastToggle) contrastToggle.setAttribute('aria-pressed', String(on));
@@ -8360,85 +9029,31 @@ function wireStartScreens(): void {
     applyLandingGraphicsChoice(choice);
     syncLandingGraphicsSelect();
   });
-
-  // Initialize 3D character preview once assets are ready
-  assetsReady().then(() => {
-    // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-    const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
-      const panel = $(id) as HTMLElement | null;
-      return panel !== null && !panel.hasAttribute('hidden');
-    });
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
-    const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-    if (container && canvas) {
-      characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
-        characterPreview.setAppearance(charselectAppearance(charselectSelected));
-      } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
-      }
-    }
-    decorateClassChips();
-  });
-}
-
-// Looping home-page theme. Browsers block audio autoplay until a user gesture,
-// so we try immediately and otherwise start on the first interaction. It keeps
-// playing through the loading screen and fades out once the game is on screen.
-function initHomepageMusic(): void {
-  if (homepageMusic) return;
-  const el = new Audio('/audio/main-theme.mp3');
-  el.loop = true;
-  el.muted = homepageMusicMuted;
-  el.preload = 'auto';
-  el.volume = HOMEPAGE_MUSIC_VOLUME;
-  homepageMusic = el;
-
-  const gestureEvents: Array<keyof WindowEventMap> = ['pointerdown', 'keydown', 'touchstart'];
-  removeHomepageMusicGestureListeners = (): void => {
-    gestureEvents.forEach((ev) => {
-      window.removeEventListener(ev, onGesture);
-    });
+  const setAppGraphicsMenuOpen = (open: boolean): void => {
+    if (!appGraphicsTrigger || !appGraphicsMenu) return;
+    appGraphicsMenu.hidden = !open;
+    appGraphicsTrigger.setAttribute('aria-expanded', String(open));
   };
-  const onGesture = (): void => playHomepageMusic();
-  gestureEvents.forEach((ev) => {
-    window.addEventListener(ev, onGesture, { passive: true });
+  appGraphicsTrigger?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setAppGraphicsMenuOpen(appGraphicsTrigger.getAttribute('aria-expanded') !== 'true');
   });
-  syncHomepageMusicToggle();
-  playHomepageMusic();
-}
-
-function fadeOutHomepageMusic(durationMs = 1600): void {
-  const el = homepageMusic;
-  if (!el) return;
-  homepageMusic = null; // stop further control + block restarts
-  removeHomepageMusicGestureListeners?.();
-  removeHomepageMusicGestureListeners = null;
-  const startVol = el.volume;
-  const steps = 32;
-  let i = 0;
-  const id = window.setInterval(() => {
-    i += 1;
-    el.volume = Math.max(0, startVol * (1 - i / steps));
-    if (i >= steps) {
-      window.clearInterval(id);
-      el.pause();
-      homepageMusicStarted = false;
-    }
-  }, durationMs / steps);
+  for (const option of appGraphicsOptions) {
+    option.addEventListener('click', () => {
+      if (!graphicsSelect) return;
+      graphicsSelect.value = option.dataset.graphicsValue ?? LANDING_GRAPHICS_AUTO;
+      graphicsSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      setAppGraphicsMenuOpen(false);
+      appGraphicsTrigger?.focus();
+    });
+  }
+  appGraphicsMenu?.addEventListener('click', (event) => event.stopPropagation());
+  document.addEventListener('click', () => setAppGraphicsMenuOpen(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || appGraphicsMenu?.hidden) return;
+    setAppGraphicsMenuOpen(false);
+    appGraphicsTrigger?.focus();
+  });
 }
 
 // Apply the persisted UI theme to :root before the home/login/character-select
@@ -8458,8 +9073,15 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // here, boot straight into that offline world and skip the start screen. Any
 // malformed/absent request falls through to the normal home flow.
 const editorPlaytest = takeEditorPlaytestRequest();
-if (editorPlaytest) {
+let sitePresenceStarted = false;
+const startConsentedSitePresence = (): void => {
+  if (sitePresenceStarted || !privacyConsent.allowed('analytics')) return;
+  sitePresenceStarted = true;
   startSitePresence('home');
+};
+privacyConsent.onChange(startConsentedSitePresence);
+void privacyConsent.ready.then(startConsentedSitePresence);
+if (editorPlaytest) {
   void startOffline(
     editorPlaytest.playerClass,
     editorPlaytest.playerName,
@@ -8468,7 +9090,7 @@ if (editorPlaytest) {
     editorPlaytest.seed,
   );
 } else {
-  startSitePresence('home');
   wireStartScreens();
-  initHomepageMusic();
+  initMarketingMusic();
+  openPublicLandingRoute();
 }

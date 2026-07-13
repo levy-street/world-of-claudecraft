@@ -106,7 +106,7 @@ export function buildChrome(
     <header class="guide-header">
       <div class="guide-header-inner">
         <a class="guide-brand" href="${esc(GUIDE_BASE)}">
-          <img class="guide-brand-logo" src="/woc-logo-guide.webp" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
+          <img class="guide-brand-logo" src="/woc-logo-guide.webp" srcset="/woc-logo-guide-144-v1.webp 144w" sizes="66px" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
         </a>
         <button type="button" class="guide-menu-toggle" aria-expanded="false" aria-controls="guide-primary-nav" aria-label="${esc(t('guide.nav.openMenu'))}">
           <span class="guide-menu-bars" aria-hidden="true"></span>
@@ -136,7 +136,7 @@ export function buildChrome(
         <nav class="guide-footer-links" aria-label="${esc(t('guide.footer.linksLabel'))}">
           <a class="guide-cta guide-cta-sm" href="/play">${esc(t('guide.footer.playNow'))}</a>
           <a href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener">${esc(t('guide.footer.github'))}</a>
-          <a href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener">${esc(t('guide.footer.discord'))}</a>
+          <a href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener">${esc(t('guide.footer.discord'))}</a>
         </nav>
         <p class="guide-footer-rights">&copy; ${esc(t('guide.footer.rights'))}</p>
       </div>

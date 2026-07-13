@@ -72,7 +72,7 @@ if (typeof window !== 'undefined') {
   const urls = [...new Set(Object.values(QUEST_OBJECT_URLS))];
   for (const url of urls) {
     registerPreload(
-      loadGltf(url).then((g) => { gltfByUrl.set(url, g); }).catch(() => undefined),
+      () => loadGltf(url).then((g) => { gltfByUrl.set(url, g); }).catch(() => undefined),
     );
   }
 }

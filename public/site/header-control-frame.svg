@@ -1,0 +1,32 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  preserveAspectRatio="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="frame-gold" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.34" stop-color="#d8a343"/>
+      <stop offset="0.72" stop-color="#9a681f"/>
+      <stop offset="1" stop-color="#4d2f0e"/>
+    </linearGradient>
+    <linearGradient id="inner-panel" x1="0" y1="7" x2="0" y2="57" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#151d27"/>
+      <stop offset="0.52" stop-color="#070d15"/>
+      <stop offset="1" stop-color="#02050a"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M11 2H53L62 11V53L53 62H11L2 53V11Z" fill="url(#frame-gold)"/>
+  <path d="M12 5H52L59 12V52L52 59H12L5 52V12Z" fill="#02050a"/>
+  <path
+    d="M13 7H51L57 13V51L51 57H13L7 51V13Z"
+    fill="url(#inner-panel)"
+    stroke="#6f4515"
+    stroke-width="1.25"
+    stroke-linejoin="miter"
+  />
+  <path d="M14 9H50L55 14" fill="none" stroke="#fff0b3" stroke-opacity="0.24" stroke-width="1"/>
+  <path d="M55 50L50 55H14" fill="none" stroke="#9a681f" stroke-opacity="0.42" stroke-width="1"/>
+</svg>

@@ -48,7 +48,7 @@ export interface PropsResult {
 const MERGE_BAND_DEPTH = GFX.standardMaterials ? 180 : 90;
 
 // ---------------------------------------------------------------------------
-// Asset registry — loads kick off at module import; main.ts awaits
+// Asset registry — lazy factories register at module import; main.ts awaits
 // assetsReady() before the Renderer is constructed, so buildProps() can read
 // the resolved GLTFs synchronously.
 // ---------------------------------------------------------------------------
@@ -178,7 +178,7 @@ if (typeof window !== 'undefined') {
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
     if (!preloadKeys.has(key as PropKey)) continue;
     registerPreload(
-      loadGltf(def.url).then((gltf) => {
+      () => loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
       }),
     );

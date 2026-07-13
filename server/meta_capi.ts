@@ -153,7 +153,9 @@ export function trackAccountCreated(
   accountId: number | string,
   userData: CapiUserData,
   sourceUrl?: string,
+  marketingAllowed = false,
 ): Promise<void> {
+  if (!marketingAllowed) return Promise.resolve();
   const id = String(accountId);
   return sendCapiEvent({
     eventName: 'AccountCreated',
@@ -167,7 +169,9 @@ export function trackReachedLevel5(
   characterId: number | string,
   userData: CapiUserData,
   sourceUrl?: string,
+  marketingAllowed = false,
 ): Promise<void> {
+  if (!marketingAllowed) return Promise.resolve();
   const id = String(characterId);
   return sendCapiEvent({
     eventName: 'ReachedLevel5',

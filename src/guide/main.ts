@@ -6,6 +6,7 @@ import './styles.css';
 import { installWebGLContextRelease } from '../render/context_release';
 import { startSitePresence } from '../site_presence';
 import { ensureLocaleLoaded, getLanguage } from '../ui/i18n';
+import { initPrivacyConsent } from '../ui/privacy_consent';
 import { GuideApp } from './app';
 
 async function boot(): Promise<void> {
@@ -19,7 +20,15 @@ async function boot(): Promise<void> {
   new GuideApp(mount).start();
 }
 
-startSitePresence('guide');
+const privacyConsent = initPrivacyConsent();
+let sitePresenceStarted = false;
+const startConsentedSitePresence = (): void => {
+  if (sitePresenceStarted || !privacyConsent.allowed('analytics')) return;
+  sitePresenceStarted = true;
+  startSitePresence('guide');
+};
+privacyConsent.onChange(startConsentedSitePresence);
+void privacyConsent.ready.then(startConsentedSitePresence);
 // Free any live model-viewer WebGL contexts on a real page teardown (reload, navigation),
 // so repeated visits cannot exhaust the browser's per-process context pool.
 installWebGLContextRelease();

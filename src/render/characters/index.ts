@@ -1,5 +1,5 @@
 // Character visual system — rigged glTF replacements for the old procedural
-// rigs. Asset fetches start at module import (see assets.ts) and register
+// rigs. Lazy asset factories register at module import (see assets.ts)
 // with the preload gate, so createCharacterVisual is synchronous by the time
 // the Renderer constructs views.
 import type { Entity, PlayerClass } from '../../sim/types';

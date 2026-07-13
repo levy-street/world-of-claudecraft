@@ -1,0 +1,43 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 48 112"
+  preserveAspectRatio="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1520"/>
+      <stop offset="0.56" stop-color="#050a12"/>
+      <stop offset="1" stop-color="#02050a"/>
+    </linearGradient>
+    <linearGradient id="outer-rail" x1="0" y1="1" x2="0" y2="111" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4dc99"/>
+      <stop offset="1" stop-color="#9a681f"/>
+    </linearGradient>
+    <linearGradient id="inner-rail" x1="0" y1="6.5" x2="0" y2="106.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#d8a343" stop-opacity="0.22"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M0 1H12C27 1.5 39 10 44 23C47.5 33 45.5 44 39 50.5C36.5 53 33.5 54.8 30 56C34 58 37.2 61 39 65C40.5 68.5 39 72 35 75V88C35 101.5 25 111 10 111H0Z"
+    fill="url(#panel)"
+  />
+  <path
+    d="M0 1H12C27 1.5 39 10 44 23C47.5 33 45.5 44 39 50.5C36.5 53 33.5 54.8 30 56C34 58 37.2 61 39 65C40.5 68.5 39 72 35 75V88C35 101.5 25 111 10 111H0"
+    fill="none"
+    stroke="url(#outer-rail)"
+    stroke-width="2"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d="M0 6.5H10C22.5 6.5 32 13.5 37 25C40.5 33.5 38.5 41.5 33 46.5C29.5 50 26 52 22 53.5L17 56L22 58.5C27.5 61.5 31.5 65 32 68.5C32.5 70.5 31.5 72.5 28 75V87C28 98.5 20.5 106.5 8 106.5H0"
+    fill="none"
+    stroke="url(#inner-rail)"
+    stroke-width="1"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+</svg>

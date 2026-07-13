@@ -2,155 +2,217 @@
 
 **World of ClaudeCraft**
 
-Last updated: 21 June 2026
+Last updated: 12 July 2026
 
-This Privacy Policy explains what personal information we collect, why we collect it, how we use and share it, and the choices you have. It applies when you play World of ClaudeCraft (the "Game"), visit worldofclaudecraft.com (the "Site"), or use our mobile application (the "App"). The Game, Site, and App together are the "Service."
+This Privacy Policy explains what personal information we collect, why we collect it, how we use and disclose it, and the choices available to you. It applies when you play World of ClaudeCraft (the "Game"), visit worldofclaudecraft.com (the "Site"), or use our mobile application (the "App"). The Game, Site, and App together are the "Service."
 
-**Who we are.** The Service is operated by Dream Home AI Limited, trading as Levy Street, New Zealand company number 8703066 ("we," "us," "our"), based in Wellington, New Zealand. We are the data controller for personal information processed through the Service.
+**Who we are.** The Service is operated by Dream Home AI Limited, trading as Levy Street, New Zealand company number 8703066 ("we," "us," "our"), based in Wellington, New Zealand. We are the controller of personal information processed through the Service, except where a third-party service acts as a separate controller under its own privacy notice.
 
-By using the Service you agree to this Policy. If you do not agree, do not use the Service.
+This Policy is provided for transparency. It is not a request for you to agree to processing that requires a separate consent choice.
 
 ---
 
 ## 1. The short version
 
-- You can play the offline browser version without an account and without giving us personal information.
-- To play online you create an account with a username and password. Your password is hashed. We do not store it in readable form.
-- We store your characters and progress so the world is there when you return.
-- Chat, character names, trades, and leaderboard scores are visible to other players. Treat anything you type or name as public.
-- We use limited technical data (such as your IP address) to run the servers, stop abuse, and keep the Game secure.
-- You can delete your characters and your account at any time.
-- We are an independent project and are not affiliated with or endorsed by any third-party company or brand. The $WOC token was created by a third party. See Section 14.
+- You can play the offline browser version without creating an account.
+- Online play requires an account. Passwords are stored as salted hashes, not in readable form.
+- We store characters and progress so the shared world is available when you return.
+- Chat, character names, trades, and leaderboard scores may be visible to other players.
+- We use limited technical, security, site-presence, and performance information to operate and improve the Service.
+- Google Analytics, Meta advertising tools, the X timeline, and the Twitch stream are controlled by our regional privacy-choice system. Cloudflare Turnstile is used for account security.
+- Visitors in opt-in regions are asked before optional technologies load. Visitors in opt-out regions may disable them at any time. We honor Global Privacy Control where applicable.
+- You can reopen Privacy Choices from the Site footer and withdraw or change a choice at any time.
+- You can delete characters and your account.
 
-The rest of this Policy gives the detail.
+Our [Cookie Notice](https://worldofclaudecraft.com/cookies) gives a service-by-service list of cookies and similar technologies.
 
 ---
 
 ## 2. Information we collect
 
-**Account information.** When you register to play online we collect a username and a password. Passwords are stored only as a salted scrypt hash, never in plain text. If you provide an email address at registration or for account recovery, we store it to identify your account and to contact you about the Service.
+**Account information.** When you register for online play, we collect a username and password. Passwords are stored only as a salted scrypt hash. If you provide an email address for registration or account recovery, we store it to identify your account and communicate with you about the Service.
 
-**Character and gameplay data.** When you create and play characters we store character names, chosen class, appearance, level, equipment, inventory, quests, position in the world, and in-game currency. This data persists in our database so your progress is saved between sessions.
+**Character and gameplay data.** We store character names, class, appearance, level, equipment, inventory, quests, world position, in-game currency, progression, and related game state.
 
-**Chat and social activity.** The Game includes chat (general, party, and similar channels), trading, duels, and parties. Messages you send and the social actions you take are transmitted to other players and may be stored on our servers for delivery, moderation, safety, and abuse prevention. Character names and leaderboard scores are shown publicly to other players and on high score and ranking screens.
+**Chat and social activity.** Messages and social actions are transmitted to other players and may be stored for delivery, moderation, safety, and abuse prevention. Character names, public player cards, and leaderboard scores may be publicly visible.
 
-**Technical and log data.** When you connect to the Service we automatically receive technical information, including your IP address, device and browser type, operating system, language and display settings, session identifiers, session tokens (which expire after 7 days), connection timestamps, and error and performance logs. We use your IP address to rate-limit sign-in attempts and to detect and prevent abuse.
+**Technical and security data.** We receive IP address, user agent, browser and device information, operating system, language, display settings, session identifiers, connection times, request metadata, and security events. We use this information for authentication, rate limiting, fraud and abuse prevention, debugging, and reliable delivery.
 
-**Optional wallet verification.** If you choose to verify a Solana wallet to display holder flair or a player-card badge, we store the public wallet address you provide. This is optional, is used only for cosmetic in-game display, and does not involve any transaction, signature that moves funds, or transfer of SOL. We do not access your private keys and cannot move your funds.
+**First-party site presence.** The Site may create a pseudonymous visitor identifier in local storage and send a page label at intervals while the page is visible. On our server, the related IP address and user agent are stored as truncated hashes for aggregate presence reporting rather than in readable form.
 
-**Cookies and local storage.** The Site and Game use cookies and browser local storage to keep you signed in (your session token), remember your settings and preferences (such as language, audio, and control options), and operate core features. You can clear or block these through your browser, but the online Game may not work correctly without them.
+**First-party performance telemetry.** The Game may send a per-tab session identifier, release and build version, graphics configuration, coarse browser, operating-system and GPU categories, viewport category, frame rate, frame timing, renderer statistics, memory and long-task information, network timing, and similar diagnostic measurements. Logged-in reports may include the character identifier. We use this information to identify performance problems and improve compatibility.
 
-**Advertising and analytics.** We use third-party advertising and analytics providers on the Site and in the App. These providers may set cookies or use device identifiers to measure usage and to serve and measure advertising. They collect information such as device identifiers, IP address, approximate location derived from IP, and interaction data, subject to their own privacy policies. Where required, we ask for your consent before using non-essential cookies or trackers, and we provide a way to manage your choices.
+**Coarse region and privacy signals.** We use a country or region code supplied by our hosting or content-delivery edge to select an opt-in, opt-out, or notice privacy experience. If that signal is unavailable, we use a privacy-protective fallback. We also read the Global Privacy Control signal exposed by a supported browser. We do not use this process to determine precise location.
 
-**Donations.** If you donate through Ko-fi, Ko-fi facilitates the payment directly through a third-party payment provider such as PayPal or Stripe. We do not process your card details on the Service. Ko-fi and the selected payment provider process donation-related information under their own privacy policies and may share supporter and transaction information with us.
+**Optional wallet verification.** If you choose to verify a Solana wallet for holder flair or a player-card badge, we store the public wallet address. We do not access private keys and cannot move funds.
 
-**Community channels.** Our Discord server and our GitHub repository are operated on third-party platforms. Information you share there is governed by those platforms' privacy policies, not this one.
+**Information from optional third parties.** If enabled under your privacy choices:
 
-We do not knowingly collect sensitive personal information (such as health, religion, or precise geolocation) through the Service.
+- [Google Analytics](https://support.google.com/analytics/answer/11593727?hl=en) may receive interaction events, page and session information, browser and device information, approximate location, and cookie identifiers. Google states that Analytics uses the first-party _ga cookie as a client identifier and does not log or store IP addresses in Analytics.
+- The [Meta Pixel and Meta Conversions API](https://www.facebook.com/business/help/AboutConversionsAPI) may receive page views, account-created and level-five milestone events, event identifiers, page URL, IP address, user agent, Meta cookie identifiers, and a hashed account identifier. If an email is included in an eligible server event, it is normalized and hashed before transmission.
+- An embedded [X timeline](https://help.x.com/en/x-for-websites-ads-info-and-privacy) may disclose the page visited, IP address, browser type, operating system, and cookie information to X.
+- An embedded [Twitch stream](https://www.twitch.tv/p/en/legal/privacy-notice/) may allow Twitch to receive IP address, device and browser information, viewing activity, and cookie or similar identifiers.
+
+**Cloudflare Turnstile.** When an account or other protected action requires an anti-bot check, [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) processes browser and device signals, network information, challenge results, and a short-lived verification token. Cloudflare may receive an IP address and user agent as part of providing and validating the security service.
+
+**Google Fonts.** Pages that request fonts from Google may disclose IP address, user agent, and request metadata to Google. No World of ClaudeCraft account details are intentionally included in those requests.
+
+**Donations and community channels.** Ko-fi facilitates donations through payment providers such as PayPal or Stripe. We do not receive payment-card or bank details. Ko-fi, PayPal, Stripe, GitHub, Discord, and other linked platforms process information under their own notices.
+
+We do not intentionally request sensitive personal information such as health information, religion, or precise geolocation through the Service.
 
 ---
 
-## 3. How we use information
+## 3. Cookies, similar technologies, and your choices
+
+Cookies are small text files stored by a browser. Similar technologies include local storage, session storage, pixels, tags, embedded content, and server-side events connected to browser identifiers.
+
+Our categories are:
+
+- **Necessary:** authentication, security, language, settings, the consent record, and functions you request. These cannot be switched off through the privacy panel because the Service may not work without them.
+- **Analytics:** Google Analytics and first-party site-presence and performance measurement.
+- **Marketing:** Meta Pixel and consent-linked Meta Conversions API events.
+- **X timeline:** the embedded X feed.
+- **Twitch stream:** the embedded Twitch player.
+
+Our preference cookie is named **woc_privacy_consent**. It records the policy version, update time, and on or off choices for Analytics, Marketing, X timeline, and Twitch stream. It lasts for 180 days unless you delete it or replace your choice sooner.
+
+We apply these regional defaults:
+
+- In the EEA, UK, and other opt-in regions, optional categories stay off until you choose to enable them.
+- In the United States and other opt-out regions, optional categories may be enabled unless you opt out. Where applicable law treats advertising disclosure as a sale, sharing, or targeted advertising, disabling Marketing is treated as an opt-out request.
+- In notice regions, we provide notice and make Privacy Choices continuously available.
+- If region detection fails, we use the opt-in experience.
+- If a supported browser sends Global Privacy Control, we disable Analytics and Marketing. Marketing is treated as the applicable opt-out from sale, sharing, or targeted advertising. A later interface choice will not be used to override an active GPC signal where the law requires us to honor it.
+
+You can change or withdraw choices at any time through **Privacy Choices** in the Site footer. Withdrawing consent does not affect processing that occurred before withdrawal. When you disable Analytics or Marketing, we make a best-effort attempt to delete the related Google Analytics and Meta first-party cookies. Cookies placed or controlled by a third party may still require removal through your browser controls.
+
+See the [Cookie Notice](https://worldofclaudecraft.com/cookies) for names, purposes, providers, storage types, and typical durations.
+
+---
+
+## 4. How we use information
 
 We use personal information to:
 
-- Create and maintain your account and authenticate you.
-- Run the Game, save your characters and progress, and deliver multiplayer features such as chat, parties, trading, and duels.
-- Operate, maintain, secure, and improve the Service, including debugging and performance work.
-- Prevent, detect, and respond to cheating, fraud, abuse, harassment, and security incidents.
-- Moderate user content and enforce our Terms.
-- Respond to your support requests and communicate with you about the Service.
-- Display optional cosmetic features you choose to enable, such as wallet-linked badges.
-- Comply with legal obligations and respond to lawful requests.
+- create, authenticate, and maintain accounts;
+- operate online and offline game functions;
+- save characters, progression, and settings;
+- provide chat, parties, trading, rankings, and public player cards;
+- measure service availability, site presence, compatibility, and performance;
+- investigate bugs and improve the Service;
+- detect and prevent cheating, fraud, abuse, harassment, and security incidents;
+- moderate content and enforce our Terms;
+- respond to requests and communicate about the Service;
+- provide optional wallet-linked cosmetics;
+- measure marketing effectiveness when permitted by your choices; and
+- comply with legal obligations and respond to lawful requests.
 
 ---
 
-## 4. Legal bases for processing (EEA and UK users)
+## 5. Legal bases for EEA and UK processing
 
-Where the EU or UK General Data Protection Regulation applies, we rely on these legal bases:
+Where the EU or UK GDPR applies, we rely on:
 
-- **Performance of a contract:** to provide the Game and your account.
-- **Legitimate interests:** to secure the Service, prevent abuse, and improve the Game, balanced against your rights.
-- **Consent:** for non-essential cookies, advertising, and analytics where consent is required. You can withdraw consent at any time.
-- **Legal obligation:** where we must process information to comply with the law.
+- **Contract:** to provide an account, online Game, and requested Service functions.
+- **Legitimate interests:** to secure, operate, debug, and improve the Service, prevent abuse, and understand aggregate service performance, after balancing those interests against your rights.
+- **Consent:** for non-essential device storage, Analytics, Marketing, X timeline, and Twitch stream in opt-in regions.
+- **Legal obligation:** where processing is required by law.
 
----
-
-## 5. How we share information
-
-We do not sell your personal information. We share it only as follows:
-
-- **Other players:** character names, chat, trades, party activity, and leaderboard scores are visible to other users as a normal part of an online multiplayer game.
-- **Service providers:** hosting, database, content delivery, and infrastructure providers that run the Service on our behalf, under contracts that limit their use of the data.
-- **Advertising and analytics partners:** if enabled, as described in Section 2.
-- **Legal and safety:** to comply with the law, enforce our Terms, protect the rights, safety, and property of users, the public, or us, and respond to lawful requests.
-- **Business transfers:** in connection with a merger, acquisition, financing, or sale of assets, in which case we will require the recipient to honour this Policy or notify you of any material change.
+You may withdraw consent at any time. Where we rely on legitimate interests, you may have a right to object.
 
 ---
 
-## 6. Data retention
+## 6. How we disclose information
 
-We keep personal information only as long as needed for the purposes in this Policy.
+We disclose information to:
 
-- **Account and character data:** retained for as long as your account remains active, so your characters and progress are preserved, and until you ask us to delete your account. We may close and delete accounts that have been inactive for a long period, but we are not obliged to.
-- **Chat and moderation records:** retained for as long as needed for safety, security, and abuse prevention, generally up to 24 months, then deleted or anonymised.
-- **Technical and log data:** retained for as long as needed to operate and secure the Service and to investigate incidents, generally up to 24 months.
-- **Backups:** residual copies may persist in encrypted backups for a limited period before they are overwritten.
+- **Other players and the public:** for chat, player names, trades, parties, rankings, and public player-card functions.
+- **Infrastructure and security providers:** to host, deliver, monitor, and secure the Service.
+- **Measurement and advertising providers:** Google and Meta, according to your regional regime and privacy choices.
+- **Embedded-content providers:** X and Twitch when the corresponding category is enabled.
+- **Cloudflare:** when Turnstile or edge security and region functions are used.
+- **Professional advisers, authorities, and safety recipients:** where reasonably necessary to comply with law, establish or defend claims, enforce terms, or protect people and systems.
+- **A business successor:** in a merger, financing, reorganization, acquisition, or asset transfer, subject to applicable law.
 
----
-
-## 7. Your rights and choices
-
-Depending on where you live, you may have some or all of these rights:
-
-- Access the personal information we hold about you.
-- Correct inaccurate information.
-- Delete your information.
-- Object to or restrict certain processing.
-- Receive a copy of your information in a portable format.
-- Withdraw consent where we rely on it.
-
-**New Zealand:** under the Privacy Act 2020 you may request access to and correction of your personal information.
-
-**EEA and UK:** you have the GDPR rights listed above and may lodge a complaint with your local data protection authority.
-
-**California:** under the CCPA and CPRA you may request to know, delete, and correct your personal information, and to opt out of the sale or sharing of personal information. We do not sell personal information. We will not discriminate against you for exercising these rights.
-
-To exercise any right, contact us using Section 13. We may need to verify your identity before we act.
+We do not exchange personal information for money. Some U.S. state privacy laws define "sale," "sharing," or targeted advertising broadly enough that disclosure through advertising technology may fall within those terms. We therefore describe Marketing disclosures as potentially covered and provide an opt-out. We do not knowingly sell or share personal information of people under 16 for cross-context behavioral advertising.
 
 ---
 
-## 8. Deleting your account and data
+## 7. Data retention
 
-You can delete individual characters in the Game using the delete option on the character screen. To delete your entire account and associated personal information, use the account deletion option in the Game or App, or contact us using Section 13. We will action verified deletion requests within a reasonable time, subject to legal retention requirements. Some residual data may remain in backups for a limited period as described in Section 6.
+We retain information only for as long as reasonably needed for the purposes above:
 
----
+- Account and character data is kept while the account is active and until deletion is requested, subject to legal, fraud-prevention, dispute, and backup needs.
+- Authentication tokens expire after 7 days. A browser copy may remain until logout, removal, or replacement.
+- Chat, moderation, technical, security, site-presence, and performance records are generally retained for no more than 24 months unless a longer period is reasonably necessary for an incident, legal obligation, or claim.
+- The woc_privacy_consent cookie lasts 180 days.
+- A first-party presence identifier and saved preferences remain in browser storage until replaced or cleared.
+- A performance session identifier remains for the browser-tab session.
+- Encrypted backup copies may remain until the relevant backup cycle overwrites them.
+- Google, Meta, X, Twitch, Cloudflare, and other third parties apply their own retention periods under their notices and service settings. Typical browser durations are listed in our Cookie Notice.
 
-## 9. Children
-
-The Service is not directed to children under 13, and you must be at least 13 to create an account (or older where your country sets a higher minimum age for online services, such as 16 in some EEA states). We do not knowingly collect personal information from children under the applicable minimum age. If you believe a child has provided us personal information, contact us using Section 13 and we will delete it.
-
----
-
-## 10. International data transfers
-
-We are based in New Zealand and may process your information in New Zealand and in other countries, including where our service providers operate. These countries may have different data protection laws than yours. Where required, we use appropriate safeguards for international transfers, such as standard contractual clauses.
-
----
-
-## 11. How we protect information
-
-We use technical and organisational measures to protect personal information, including salted scrypt password hashing, encrypted connections (TLS and secure WebSockets), per-IP rate limiting on authentication, and session tokens that expire after 7 days. No method of transmission or storage is completely secure, so we cannot guarantee absolute security.
+We may retain aggregated or de-identified information that no longer reasonably identifies an individual.
 
 ---
 
-## 12. Third-party services and links
+## 8. Your rights and privacy controls
 
-The Service links to and integrates third-party services, including GitHub, Ko-fi, PayPal, Stripe, Discord, and the Solana network. These services are controlled by others and have their own privacy policies. We are not responsible for their practices. Review their policies before using them.
+Depending on your location, you may have rights to access, correct, delete, restrict, object to processing, obtain a portable copy, withdraw consent, or appeal a decision. You may also have a right to lodge a complaint with a regulator.
+
+**New Zealand.** You may request access to and correction of your personal information under the Privacy Act 2020.
+
+**EEA and UK.** You may exercise GDPR rights and complain to your local supervisory authority or the UK Information Commissioner's Office.
+
+**United States.** Residents of California and some other states may have rights to know, access, correct, delete, obtain a portable copy, opt out of sale, sharing, or targeted advertising, and avoid discrimination for exercising privacy rights. Applicability and the precise rights depend on the state and statutory thresholds. We honor Global Privacy Control as an opt-out where legally required. The [California Attorney General](https://oag.ca.gov/privacy/ccpa) explains that GPC can communicate an opt-out from sale or sharing.
+
+Use **Privacy Choices** to control optional technologies without creating an account. To exercise other rights, contact us under Section 14. We may ask for information reasonably necessary to verify the request. Authorized agents may submit requests where applicable law permits.
 
 ---
 
-## 13. Contact us
+## 9. Deleting your account and data
+
+You can delete individual characters through the character screen. To delete an account and associated personal information, use the account-deletion function in the Game or App, visit our [Data Deletion page](https://worldofclaudecraft.com/data-deletion), or contact us. We may retain limited information where required for security, legal compliance, dispute resolution, or backup integrity.
+
+---
+
+## 10. Children
+
+The Service is not directed to children under 13. You must be at least 13 to create an account, or older where local law requires a higher minimum age. We do not knowingly collect personal information from a child below the applicable minimum age. Contact us if you believe this has happened.
+
+---
+
+## 11. International transfers
+
+We are based in New Zealand. Providers named in this Policy may process information in New Zealand, the United States, the EEA, the UK, and other countries where they operate. Those countries may provide different legal protections.
+
+Where required, we use or rely on an applicable transfer mechanism, such as an adequacy decision, standard contractual clauses, the UK international data transfer agreement or addendum, or a provider's valid Data Privacy Framework certification. We also consider contractual, technical, and organizational safeguards appropriate to the transfer. You may contact us for more information about applicable safeguards.
+
+---
+
+## 12. Security
+
+We use measures designed to protect personal information, including salted scrypt password hashing, encrypted transport, expiring session tokens, access controls, rate limits, anti-bot checks, logging controls, and abuse detection. No method of transmission or storage is completely secure.
+
+---
+
+## 13. Third-party services and sources
+
+Third parties control their own processing and may change their technologies. Their notices include:
+
+- [Google Privacy Policy](https://policies.google.com/privacy) and [Google Analytics data collection](https://support.google.com/analytics/answer/11593727?hl=en)
+- [Meta Privacy Policy](https://www.facebook.com/privacy/policy/) and [Conversions API information](https://www.facebook.com/business/help/AboutConversionsAPI)
+- [X Privacy Policy](https://x.com/en/privacy) and [X for Websites](https://help.x.com/en/x-for-websites-ads-info-and-privacy)
+- [Twitch Privacy Notice](https://www.twitch.tv/p/en/legal/privacy-notice/)
+- [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/) and [Turnstile documentation](https://developers.cloudflare.com/turnstile/)
+- [GitHub Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+- [Discord Privacy Policy](https://discord.com/privacy)
+
+The Service also links to GitHub, Ko-fi, PayPal, Stripe, Discord, Solana, app stores, and other websites. Following a link takes you to a service we do not control.
+
+---
+
+## 14. Contact us
 
 For privacy questions or to exercise your rights:
 
@@ -158,20 +220,18 @@ Email: tony@levystreet.com
 
 Postal: Dream Home AI Limited, 262 Thorndon Quay, Wellington 6011, New Zealand
 
-New Zealand users may also contact the Office of the Privacy Commissioner at privacy.org.nz.
+New Zealand users may also contact the [Office of the Privacy Commissioner](https://www.privacy.org.nz/). EEA and UK users may contact their local supervisory authority.
 
 ---
 
-## 14. No affiliation and the $WOC token
+## 15. No affiliation and the $WOC token
 
-World of ClaudeCraft is an independent, community project.
+World of ClaudeCraft is an independent community project. It is not affiliated with, endorsed by, sponsored by, or associated with any third-party company, game, product, or brand.
 
-It is not affiliated with, endorsed by, sponsored by, or associated with any third-party company, game, product, or brand. All third-party names and trademarks are the property of their respective owners.
-
-The $WOC token referenced by the community was created and is controlled by a third party. We do not issue, control, endorse, or guarantee it. It is not required to play, has no connection to your account data, and is not an investment offered by us. Wallet verification is cosmetic only. See our Terms and Conditions for more.
+The $WOC token referenced by the community was created and is controlled by a third party. We do not issue, control, endorse, or guarantee it. It is not required to play and is not an investment offered by us. Wallet verification is cosmetic only.
 
 ---
 
-## 15. Changes to this Policy
+## 16. Changes to this Policy
 
-We may update this Policy from time to time. When we make material changes we will update the date above and, where appropriate, provide additional notice. Your continued use of the Service after an update means you accept the revised Policy.
+We may update this Policy when our practices, providers, or legal requirements change. We will update the date above and provide additional notice when appropriate. If a change affects processing based on consent, we will request a new choice where required.

@@ -58,11 +58,11 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Alegreya:ital,wght@0,400;0,500;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/site/fonts-v1.css" />
 
   <style>
+    :root { --page-bg-image: url('/loading-screen-v1.webp'); }
+    @media (max-width: 720px) { :root { --page-bg-image: url('/loading-screen-mobile-v1.webp'); } }
     /* Every colour and reusable constant is a token here; nothing below :root
        hard-codes a colour. RGB triplets (--c-*) exist so the same hue can be
        composited at any alpha via rgba(var(--c-*), a) without repeating literals.
@@ -166,7 +166,7 @@
       background:
         linear-gradient(90deg, rgba(var(--c-deep), 0.86), rgba(var(--c-deep), 0.40) 52%, rgba(var(--c-deep), 0.88)),
         radial-gradient(circle at 50% 30%, rgba(var(--c-gold), 0.14), transparent 42%),
-        var(--bg-photo) url("/loading-screen.jpg") center / cover no-repeat;
+        var(--bg-photo) var(--page-bg-image) center / cover no-repeat;
     }
 
     /* Parallax only where a fine pointer exists; avoids iOS background jank. */
@@ -761,7 +761,7 @@
 
   <main class="console" aria-labelledby="title">
     <header class="crest">
-      <img class="logo" src="/worldofclaudecraft-logo.png" alt="World of ClaudeCraft" data-i18n-alt="logoAlt" />
+      <img class="logo" src="/site/worldofclaudecraft-logo.webp" srcset="/site/worldofclaudecraft-logo-mobile-v3.webp 400w, /site/worldofclaudecraft-logo-720-v1.webp 720w, /site/worldofclaudecraft-logo.webp 860w" sizes="(max-width: 560px) 86vw, 360px" width="860" height="575" decoding="async" fetchpriority="high" alt="World of ClaudeCraft" data-i18n-alt="logoAlt" />
       <p class="eyebrow" data-i18n="eyebrow">Merchandise</p>
       <h1 id="title" data-i18n="heading">The Armory Opens Soon</h1>
       <p class="badge"><span class="badge__dot" aria-hidden="true"></span><span data-i18n="badge">Coming soon</span></p>

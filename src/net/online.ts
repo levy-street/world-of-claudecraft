@@ -668,14 +668,10 @@ export class Api {
   // News & Updates feed for the home page, mirrored from GitHub Releases by the
   // server. Not realm-scoped — always read from the page's own origin.
   async releases(limit = 20): Promise<ReleaseEntry[]> {
-    try {
-      const res = await fetch(apiUrl(`/api/releases?limit=${limit}`));
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.releases ?? [];
-    } catch {
-      return [];
-    }
+    const res = await fetch(apiUrl(`/api/releases?limit=${limit}`));
+    if (!res.ok) throw new Error(`Patch notes request failed (${res.status})`);
+    const data = (await res.json()) as { releases?: ReleaseEntry[] };
+    return Array.isArray(data.releases) ? data.releases : [];
   }
 
   // ── Non-custodial Solana wallet linking ───────────────────────────────────

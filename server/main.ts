@@ -223,6 +223,7 @@ import {
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import { marketingAllowedForRequest, privacyRegionResponse } from './privacy_region';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -315,8 +316,22 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/app', '/app.html'],
+  ['/app/', '/app.html'],
   ['/privacy', '/privacy.html'],
+  ['/highscores', '/highscores.html'],
+  ['/highscores/', '/highscores.html'],
+  ['/patch-notes', '/patch-notes.html'],
+  ['/patch-notes/', '/patch-notes.html'],
+  ['/news', '/news.html'],
+  ['/news/', '/news.html'],
+  ['/download', '/download.html'],
+  ['/download/', '/download.html'],
+  ['/community', '/community.html'],
+  ['/community/', '/community.html'],
   ['/privacy/', '/privacy.html'],
+  ['/cookies', '/cookies.html'],
+  ['/cookies/', '/cookies.html'],
   ['/terms', '/terms.html'],
   ['/terms/', '/terms.html'],
   ['/merch', '/merch.html'],
@@ -1014,6 +1029,9 @@ function publicCors(res: http.ServerResponse): void {
 async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = (req.url ?? '').split('?')[0];
   try {
+    if (req.method === 'GET' && url === '/api/privacy/region') {
+      return privacyRegionResponse(req, res);
+    }
     if (req.method === 'POST' && url === '/api/native-attestation/challenge') {
       const body = await readBody(req);
       const action = typeof body.action === 'string' ? body.action : 'auth';
@@ -1125,14 +1143,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         locale: null,
         marketing_opt_in: false,
       });
-      void trackAccountCreated(
-        account.id,
-        {
-          email: signupEmail,
-          ...metaRequestUserData(req, meta),
-        },
-        metaEventSourceUrl(req),
-      );
+      if (marketingAllowedForRequest(req)) {
+        void trackAccountCreated(
+          account.id,
+          {
+            email: signupEmail,
+            ...metaRequestUserData(req, meta),
+          },
+          metaEventSourceUrl(req),
+          true,
+        );
+      }
       void createSuspiciousRegistrationReport({
         accountId: account.id,
         username: account.username,

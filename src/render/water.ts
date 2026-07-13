@@ -24,13 +24,13 @@ import { shoreDepthAt } from './water_core';
 const VERTEX_SPACING = 2; // yards/segment, matches the old whole-zone density
 const MIN_SEGMENTS = 8;
 
-// Real water normal maps, fetched at module import and gated by the boot
+// Real water normal maps, registered lazily and gated by the boot
 // preload only for the shader tier. Low/mobile uses generated canvas water
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
   registerPreload(
-    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+    () => loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
       tex.anisotropy = 4;
       WATER_TEX[key] = tex;
       return tex;

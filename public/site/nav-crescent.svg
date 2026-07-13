@@ -1,0 +1,38 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 160 18"
+  preserveAspectRatio="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="arc" x1="4" y1="0" x2="156" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b87919" stop-opacity="0.72"/>
+      <stop offset="0.14" stop-color="#dfa024" stop-opacity="0.92"/>
+      <stop offset="0.40" stop-color="#f2bd3a"/>
+      <stop offset="0.50" stop-color="#fff4c0"/>
+      <stop offset="0.60" stop-color="#f2bd3a"/>
+      <stop offset="0.86" stop-color="#dfa024" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#b87919" stop-opacity="0.72"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M4 3.5 C39 13.25 121 13.25 156 3.5"
+    fill="none"
+    stroke="#d99b21"
+    stroke-opacity="0.13"
+    stroke-width="3"
+    stroke-linecap="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d="M4 3.5 C39 13.25 121 13.25 156 3.5"
+    fill="none"
+    stroke="url(#arc)"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <circle cx="80" cy="10.81" r="2" fill="#ffd45b" opacity="0.13"/>
+  <circle cx="80" cy="10.81" r="0.72" fill="#fff7d6"/>
+</svg>

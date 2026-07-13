@@ -1,12 +1,14 @@
 // HTTP caching policy for the static file server. Vite content-hashes
 // everything under /assets/, and the media build step content-hashes files
-// under /media/, so those URLs never change content and can be cached forever.
-// Everything else (legacy model/texture/HDR paths, HTML shells, loading art)
+// under /media/. Marketing artwork with an explicit -vN filename is likewise
+// deployment-stable. Those URLs can be cached forever. Everything else
+// (legacy model/texture/HDR paths, HTML shells, loading art)
 // keeps its URL across deploys, so clients must revalidate — a 304 costs one
 // round-trip of headers instead of re-downloading the bytes.
 import type { Stats } from 'node:fs';
 
 const IMMUTABLE_PREFIXES = ['/assets/', '/media/'];
+const VERSIONED_STATIC_ASSET = /(?:^|\/)[^/]+-v\d+(?:-[^/]*)?\.[a-z0-9]+$/i;
 const VERSIONED_SFX = /^\/audio\/sfx\/[a-z0-9]+(?:_[a-z0-9]+)*\.mp3\?v=([a-f0-9]{12})$/;
 const BLOB_SFX = /^\/audio\/sfx\/blobs\/([a-f0-9]{64})\.mp3$/;
 const RUNTIME_SFX_PACK = '/audio/sfx/runtime-pack.json';
@@ -36,6 +38,7 @@ export function cacheControlFor(urlPath: string, actualSfxHash?: string): string
   if (urlPath.split('?')[0] === RUNTIME_SFX_PACK) return 'no-store';
   const requested = requestedSfxVersion(urlPath);
   return IMMUTABLE_PREFIXES.some((prefix) => urlPath.startsWith(prefix)) ||
+    VERSIONED_STATIC_ASSET.test(urlPath) ||
     (requested !== null && actualSfxHash?.startsWith(requested))
     ? 'public, max-age=31536000, immutable'
     : 'no-cache';

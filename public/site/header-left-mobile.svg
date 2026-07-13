@@ -1,0 +1,76 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 112 72"
+  preserveAspectRatio="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1520"/>
+      <stop offset="0.56" stop-color="#050a12"/>
+      <stop offset="1" stop-color="#02050a"/>
+    </linearGradient>
+    <linearGradient id="outer-rail" x1="0" y1="1" x2="0" y2="71" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4dc99"/>
+      <stop offset="1" stop-color="#9a681f"/>
+    </linearGradient>
+    <linearGradient id="inner-rail" x1="0" y1="4.5" x2="0" y2="67.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#d8a343" stop-opacity="0.22"/>
+    </linearGradient>
+    <radialGradient id="socket-recess" cx="50%" cy="44%" r="62%">
+      <stop offset="0" stop-color="#0a1723"/>
+      <stop offset="0.68" stop-color="#050b12"/>
+      <stop offset="1" stop-color="#010307"/>
+    </radialGradient>
+    <linearGradient id="socket-rim" x1="30" y1="11" x2="80" y2="61" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.34" stop-color="#d9a33e"/>
+      <stop offset="0.68" stop-color="#8f5b18"/>
+      <stop offset="1" stop-color="#e1ae4b"/>
+    </linearGradient>
+    <linearGradient id="divider" x1="0" y1="12" x2="0" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d8a343" stop-opacity="0"/>
+      <stop offset="0.16" stop-color="#d8a343" stop-opacity="0.48"/>
+      <stop offset="0.5" stop-color="#ffe7a1" stop-opacity="0.92"/>
+      <stop offset="0.84" stop-color="#d8a343" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#d8a343" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M112 1H24C13 1.3 5.5 6.1 2.4 15.2.2 21.7 1.6 28.4 6 32.6c1.7 1.65 3.7 2.8 6.2 3.4-2.7 1.35-4.8 3.3-6 5.8-1 2.3.05 4.6 2.8 6.6V56c0 9 6.3 15 15.4 15H112Z"
+    fill="url(#panel)"
+  />
+  <path
+    d="M112 1H24C13 1.3 5.5 6.1 2.4 15.2.2 21.7 1.6 28.4 6 32.6c1.7 1.65 3.7 2.8 6.2 3.4-2.7 1.35-4.8 3.3-6 5.8-1 2.3.05 4.6 2.8 6.6V56c0 9 6.3 15 15.4 15H112"
+    fill="none"
+    stroke="url(#outer-rail)"
+    stroke-width="2"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d="M112 4.5H25.5c-9.2 0-15.8 3.9-18.6 12.1-1.9 5.4-.65 10.1 2.75 13.25 2.15 2 4.55 3.35 7.05 4.2L20.5 36l-3.8 1.95c-3.55 1.85-6 4.15-6.3 6.35-.2 1.4.7 2.75 3 4.45v7.05c0 7.3 4.75 11.7 12.6 11.7h86"
+    fill="none"
+    stroke="url(#inner-rail)"
+    stroke-width="1"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+
+  <path
+    d="M55 5 67 8 77.5 15.5 83.5 25.5 86 36l-2.5 10.5-6 10L67 64l-12 3-12-3-10.5-7.5-6-10L24 36l2.5-10.5 6-10L43 8Z"
+    fill="url(#socket-recess)"
+    stroke="url(#socket-rim)"
+    stroke-width="1.25"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+
+  <path d="M105 12V60" stroke="#010307" stroke-opacity="0.9" stroke-width="1"/>
+  <path d="M104 12V60" stroke="url(#divider)" stroke-width="1"/>
+
+  <!-- The last source pixel is a deliberate, rail-aligned handoff to the live panel. -->
+  <path d="M111 1H112M111 71H112" stroke="url(#outer-rail)" stroke-width="2"/>
+</svg>

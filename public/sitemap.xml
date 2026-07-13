@@ -6,6 +6,26 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/download</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/highscores</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/news</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/patch-notes</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/links</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
@@ -24,6 +44,11 @@
     <loc>https://worldofclaudecraft.com/play</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/community</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://worldofclaudecraft.com/wiki</loc>
@@ -197,6 +222,11 @@
   </url>
   <url>
     <loc>https://worldofclaudecraft.com/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/cookies</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

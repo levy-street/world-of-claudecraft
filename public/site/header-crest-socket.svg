@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112">
+  <defs>
+    <radialGradient id="socket" cx="50%" cy="45%" r="58%">
+      <stop offset="0" stop-color="#142435"/>
+      <stop offset="0.68" stop-color="#07101a"/>
+      <stop offset="1" stop-color="#020509"/>
+    </radialGradient>
+    <linearGradient id="tab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7dfa0"/>
+      <stop offset="0.48" stop-color="#d19a3a"/>
+      <stop offset="1" stop-color="#6f4515"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#tab)" stroke="#03060a" stroke-width="1">
+    <path d="M53 0h6l2 8H51z"/>
+    <path d="M53 112h6l2-8H51z"/>
+    <path d="M0 53v6l8 2V51z"/>
+    <path d="M112 53v6l-8 2V51z"/>
+    <path d="M15.2 11l4.2-4.2 7 4.2-7 7z"/>
+    <path d="M96.8 101l-4.2 4.2-7-4.2 7-7z"/>
+    <path d="M101 15.2l4.2 4.2-4.2 7-7-7z"/>
+    <path d="M11 96.8l-4.2-4.2 4.2-7 7 7z"/>
+  </g>
+  <circle cx="56" cy="56" r="54" fill="url(#socket)" stroke="#d19a3a" stroke-width="2"/>
+  <circle cx="56" cy="56" r="51" fill="none" stroke="#f7dfa0" stroke-width="1"/>
+  <circle cx="56" cy="56" r="48" fill="none" stroke="#03060a" stroke-width="3"/>
+  <circle cx="56" cy="56" r="46" fill="none" stroke="#9c6b24" stroke-width="1"/>
+</svg>

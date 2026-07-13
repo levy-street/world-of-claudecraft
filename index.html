@@ -51,9 +51,6 @@
   })();
 </script>
 
-<!-- Cloudflare Turnstile (bot gate on login/registration). Rendered explicitly
-     by src/main.ts only when VITE_TURNSTILE_SITEKEY is configured. -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://worldofclaudecraft.com/" />
@@ -120,9 +117,11 @@
       "logo": "https://worldofclaudecraft.com/woc_logo_square.webp",
       "sameAs": [
         "https://github.com/levy-street/world-of-claudecraft",
-        "https://discord.gg/GjhnUsBtw",
+        "https://discord.com/invite/worldofclaudecraft",
         "https://www.youtube.com/@WoClaudeCraft",
         "https://x.com/WoClaudecraft",
+        "https://www.twitch.tv/claudeplaysclaudecraft",
+        "https://www.twitch.tv/directory/category/world-of-claudecraft",
         "https://www.instagram.com/worldofclaudecraft/",
         "https://www.tiktok.com/@worldofclaudecraft",
         "https://www.reddit.com/r/WorldofClaudecraft/"
@@ -136,7 +135,12 @@
       "genre": "MMORPG",
       "playMode": "MultiPlayer",
       "applicationCategory": "Game",
-      "operatingSystem": "Web Browser",
+      "operatingSystem": ["Web Browser", "iOS", "Android"],
+      "gamePlatform": ["Web Browser", "iOS", "Android"],
+      "installUrl": [
+        "https://apps.apple.com/app/world-of-claudecraft/id6782569061",
+        "https://play.google.com/store/apps/details?id=com.worldofclaudecraft"
+      ],
       "url": "https://worldofclaudecraft.com/",
       "image": "https://worldofclaudecraft.com/woc_logo_square.webp",
       "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!",
@@ -144,8 +148,10 @@
       "publisher": { "@id": "https://worldofclaudecraft.com/#organization" },
       "sameAs": [
         "https://github.com/levy-street/world-of-claudecraft",
-        "https://discord.gg/GjhnUsBtw",
+        "https://discord.com/invite/worldofclaudecraft",
         "https://www.youtube.com/@WoClaudeCraft",
+        "https://www.twitch.tv/claudeplaysclaudecraft",
+        "https://www.twitch.tv/directory/category/world-of-claudecraft",
         "https://x.com/WoClaudecraft",
         "https://www.instagram.com/worldofclaudecraft/",
         "https://www.tiktok.com/@worldofclaudecraft",
@@ -162,35 +168,22 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="preload" as="image" href="/loading-screen.jpg" />
+
 <link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
 <link rel="preload" as="image" href="./ui/cursors/arrow.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- Google tag (gtag.js) - skipped on localhost so dev sessions don't pollute analytics -->
-<script>
-  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-    const s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BR5Z7GT7C2';
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){ dataLayer.push(arguments); };
-    gtag('js', new Date());
-    gtag('config', 'G-BR5Z7GT7C2');
-  }
-</script>
-<!-- Meta Pixel Code - skipped on localhost so dev sessions don't pollute analytics -->
-<script>
-  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-    !((f,b,e,v,n,t,s)=> {if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1692101265042180');
-    fbq('track', 'PageView');
-  }
-</script>
-<!-- End Meta Pixel Code -->
+<link rel="stylesheet" href="/site/fonts-v1.css" />
+<link rel="preload" as="image" href="/site/launcher-shell-v3.webp" fetchpriority="high" />
+
+
 <link rel="stylesheet" href="/src/styles/index.extra.css" />
+<link rel="stylesheet" href="/src/styles/homepage.css" />
+<link rel="stylesheet" href="/src/styles/download-page.css" />
+<link rel="stylesheet" href="/src/styles/site-news.css" media="print" onload="this.media='all'" />
+<link rel="stylesheet" href="/src/styles/realm-data-pages.css" />
+<link rel="stylesheet" href="/src/styles/community-quest-cards.css" media="print" onload="this.media='all'" />
+<link rel="stylesheet" href="/src/styles/community-forged-ui.css" media="print" onload="this.media='all'" />
+<link rel="stylesheet" href="/src/styles/social-tray.css" />
+<link rel="stylesheet" href="/src/styles/site-header.css" />
 <style>
   /* Game CSS now lives in src/styles/* (the CSS extraction). The shared
      layers (tokens, base, layout, components, hud, shell, hud-mobile) load via the
@@ -200,12 +193,12 @@
      inline block is intentionally empty. */
 </style>
 </head>
-<body data-start-panel="mode-select">
+<body data-site-home="true" data-start-panel="mode-select">
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
   <a class="hud-skip" href="#chatlog" data-i18n="hudChrome.skipLinks.chat">Skip to Chat</a>
-  <noscript><img height="1" width="1" style="display:none" alt="" aria-hidden="true" src="https://www.facebook.com/tr?id=1692101265042180&ev=PageView&noscript=1" /></noscript>
+
   <canvas id="game-canvas"></canvas>
   <div id="nameplates" aria-hidden="true"></div>
   <img
@@ -530,150 +523,147 @@
            is NOT eagerly fetched: no autoplay/preload/source here — main.ts attaches
            the source and plays only on capable devices (see applyLandingBackdrop).
            Phones / Save-Data / reduced-motion / high-contrast keep the poster only. -->
-      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg-v1.webp" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
       <div class="portal-ring-reverse"></div>
       <div class="nebula-overlay"></div>
     </div>
+    <div class="highscores-page-backdrop" aria-hidden="true"></div>
 
-    <header class="homepage-header">
-      <div class="header-logo-container">
-        <button type="button" class="header-logo-btn" id="header-logo-btn" data-i18n-aria="a11y.goHome" data-i18n-title="a11y.goHome" aria-label="Go to homepage" title="Go to homepage">
-          <img class="header-logo" src="/icon-192.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
-        </button>
-      </div>
-      
-      <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" data-i18n-aria="a11y.toggleMenu" aria-label="Toggle menu" aria-expanded="false">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-      </button>
-      
-      <div class="header-menu-container" id="header-menu-container">
-        <nav data-i18n-aria="a11y.mainNavigation" aria-label="Main navigation" class="homepage-nav">
-            <ul class="nav-list">
-              <li class="nav-item">
-                <button type="button" class="nav-link active" id="nav-btn-play" aria-pressed="true" data-i18n="nav.play">Play</button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" id="nav-btn-highscores" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" id="nav-btn-wiki" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" id="nav-btn-news" aria-pressed="false" data-i18n="nav.news">News</button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" id="nav-btn-download" aria-pressed="false" data-i18n="nav.download">Download</button>
-              </li>
-              <li class="nav-item">
-                <button type="button" class="nav-link" id="nav-btn-login" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
-              </li>
-              <li class="nav-item" id="nav-item-account" hidden>
-                <button type="button" class="nav-link" id="nav-btn-account" aria-pressed="false" data-i18n="nav.account">Account</button>
-              </li>
-              <li class="nav-item" id="nav-item-logout" hidden>
-                <button type="button" class="nav-link" id="nav-btn-logout" aria-pressed="false" data-i18n="nav.logout">Logout</button>
-            </li>
-          </ul>
-        </nav>
+    <div data-shared-marketing-header></div>
 
-        <div class="header-actions">
-          <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
-          <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            <span data-i18n="nav.donate">Donate</span>
-          </a>
-        </div>
-      </div>
-    </header>
-
+    <div id="site-social-tray-root" class="site-marketing-only"></div>
     <div id="homepage-views-container">
+      <div id="main-view-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
       <section id="hero-view" class="view-section" aria-hidden="false">
-        <h1 class="visually-hidden">World of ClaudeCraft</h1>
-        
+        <div class="site-hero-stage">
+          <div class="site-hero-copy">
+            <p class="site-eyebrow" data-i18n="landing.heroEyebrow">THE WORLD IS ALREADY RUNNING</p>
         <!-- Main Logo -->
-        <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
-
+        <img class="main-logo" id="title-logo" src="/site/worldofclaudecraft-logo.webp" srcset="/site/worldofclaudecraft-logo-mobile-v2.webp 360w, /site/worldofclaudecraft-logo.webp 860w" sizes="(max-width: 620px) 180px, (max-width: 1279px) 340px, 680px" width="860" height="575" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" fetchpriority="high" />
+            <h1 class="site-hero-heading" data-i18n="landing.heroHeading">A living classic MMO where players and AI adventurers face the same world.</h1>
+            <p class="site-hero-body" data-i18n="landing.heroBody">Play free in your browser, build a hero across nine classes, or train an agent against the real game.</p>
+            <div class="site-hero-contract" id="token-ca">
+              <div class="token-ca-heading">
+                <span class="token-ca-label">$WOC Contract Address</span>
+              </div>
+              <button
+                type="button"
+                class="token-ca-pill"
+                id="btn-copy-ca"
+                data-ca="3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth"
+                aria-label="Copy the WOC contract address"
+              >
+                <span class="token-ca-address-stage">
+                  <code class="token-ca-addr">3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth</code>
+                  <span class="token-ca-copied" aria-hidden="true">Copied</span>
+                </span>
+                <span class="token-ca-copy" aria-hidden="true">
+                  <svg class="icon-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="11" height="11" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>
+                  <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4 4L19 6"></path></svg>
+                </span>
+              </button>
+              <span class="token-ca-feedback" role="status" aria-live="polite">Contract address copied</span>
+              <p class="token-ca-note">WOC is our community token, not a requirement to play. Join Discord to explore its utility and flywheel.</p>
+            </div>
         <section class="official-site-copy" aria-labelledby="official-site-copy-heading">
           <p class="official-site-copy__label" id="official-site-copy-heading" data-i18n="seo.officialLabel">Official World of ClaudeCraft website</p>
           <p class="official-site-copy__body" data-i18n="seo.officialBody">worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.</p>
         </section>
+          </div>
 
-        <div id="mode-select">
-          <div class="play-console">
-            <!-- World selector: a themed dropdown that defaults to Online and can switch to Offline.
-                 It only chooses the destination; the Play button below commits. -->
-            <div class="server-select" id="server-select" data-mode="online">
-              <button type="button" class="server-select-trigger" id="server-select-trigger"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="server-select-menu"
-                data-i18n-aria="mode.serverAria" aria-label="Select world: Online or Offline">
-                <span class="server-dot" data-mode="online" aria-hidden="true"></span>
-                <span class="server-select-text">
-                  <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Online</span>
-                  <span class="server-select-sub" id="server-select-sub">
-                    <span class="server-realm-line" data-mode="online">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+        <div class="play-module-slot" data-face="mode" data-peek-face="mode">
+          <img class="play-module-peek play-module-peek--skeleton play-module-peek--launcher" src="/site/play-skeleton-peek.webp" width="512" height="768" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+          <img class="play-module-peek play-module-peek--skeleton play-module-peek--skeleton-grip play-module-peek--launcher" src="/site/play-skeleton-peek.webp" width="512" height="768" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+          <img class="play-module-peek play-module-peek--warrior play-module-peek--launcher" src="/site/play-warrior-peek.webp" width="512" height="768" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+          <div class="play-module-card">
+            <div id="mode-select" class="play-module-face play-module-face--front">
+              <div class="play-module-frame">
+            <div class="play-module-content">
+              <div class="play-console">
+                <!-- World selector remains a functional online/offline dropdown. -->
+                <div class="server-select" id="server-select" data-mode="online">
+                  <button type="button" class="server-select-trigger" id="server-select-trigger"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="server-select-menu"
+                    aria-labelledby="server-select-value">
+                    <span class="server-dot" data-mode="online" aria-hidden="true"></span>
+                    <span class="server-select-text">
+                      <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Server Online</span>
+                      <span class="server-select-sub" id="server-select-sub">
+                        <span class="server-realm-line" data-mode="online">
+                          <span class="server-stat-line"><b class="stats-value js-stat-accounts">...</b> <span data-i18n="stats.accountsCreated">Total players</span></span>
+                        </span>
+                        <span class="server-sub-offline" data-mode="offline" data-i18n="mode.serverOfflineSub" hidden>Local offline world</span>
+                      </span>
                     </span>
-                    <span class="server-sub-offline" data-mode="offline" data-i18n="mode.serverOfflineSub" hidden>Instant local world</span>
-                  </span>
-                </span>
-                <svg class="server-select-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <div class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select world: Online or Offline" hidden>
-                <div class="server-select-option is-selected" id="server-opt-online" role="option" data-mode="online" tabindex="-1" aria-selected="true">
-                  <span class="server-dot" data-mode="online" aria-hidden="true"></span>
-                  <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOnline">Online</span>
-                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Log in to the world. Your characters live on the server and you share the world with everyone else who's on.</span>
-                    <span class="server-opt-stats">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
-                    </span>
-                  </span>
-                  <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg class="server-select-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select server mode: Server Online or Server Offline" hidden>
+                    <div class="server-select-option is-selected" id="server-opt-online" role="option" data-mode="online" tabindex="-1" aria-selected="true">
+                      <span class="server-dot" data-mode="online" aria-hidden="true"></span>
+                      <span class="server-opt-text">
+                        <span class="server-opt-name" data-i18n="mode.serverOnline">Server Online</span>
+                        <span class="server-opt-desc" data-i18n="mode.onlineDesc">Play on the live server. Your characters are saved online.</span>
+                        <span class="server-opt-stats"><span class="server-stat-line"><b class="stats-value js-stat-accounts">...</b> <span data-i18n="stats.accountsCreated">Total players</span></span></span>
+                      </span>
+                      <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div class="server-select-option" id="server-opt-offline" role="option" data-mode="offline" tabindex="-1" aria-selected="false">
+                      <span class="server-dot" data-mode="offline" aria-hidden="true"></span>
+                      <span class="server-opt-text">
+                        <span class="server-opt-name" data-i18n="mode.serverOffline">Server Offline</span>
+                        <span class="server-opt-desc" data-i18n="mode.offlineDesc">Play a local offline world in your browser. Nothing is saved.</span>
+                      </span>
+                      <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                  </div>
                 </div>
-                <div class="server-select-option" id="server-opt-offline" role="option" data-mode="offline" tabindex="-1" aria-selected="false">
-                  <span class="server-dot" data-mode="offline" aria-hidden="true"></span>
-                  <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOffline">Offline</span>
-                    <span class="server-opt-desc" data-i18n="mode.offlineDesc">Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.</span>
-                  </span>
-                  <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+
+                <div class="play-module-main">
+                  <img class="play-module-logo" src="/woc-logo-square-320-v1.webp" srcset="/woc-logo-square-128-v1.webp 128w, /woc-logo-square-192-v1.webp 192w" sizes="96px" width="96" height="96" alt="" aria-hidden="true" />
+                  <h2 class="play-module-title" data-i18n="landing.playNowTitle">Play Now</h2>
+                  <p class="play-module-subtitle" data-i18n="landing.playNowBody">Play instantly in your browser. No download required.</p>
+                  <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
+                    <span class="btn-play-sheen" aria-hidden="true"></span>
+                    <span class="btn-play-label" data-i18n="landing.playNowButton">Play Now</span>
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
-              <span class="btn-play-sheen" aria-hidden="true"></span>
-              <span class="btn-play-label" data-i18n="mode.play">Play</span>
-            </button>
+              <div class="play-module-or" aria-hidden="true"><span>OR</span></div>
+
+              <section class="play-module-platforms" aria-labelledby="play-module-platforms-title">
+                <h3 id="play-module-platforms-title" data-i18n="landing.playWayTitle">Play Your Way</h3>
+                <p data-i18n="landing.playWayBody">Choose your platform and join the adventure.</p>
+                <div class="play-module-platform-grid">
+                  <a class="play-module-platform" href="https://play.google.com/store/apps/details?id=com.worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.googlePlayAria" aria-label="Get World of ClaudeCraft on Google Play">
+                    <img class="play-module-platform__icon" src="/site/platform-google-play.webp" width="192" height="218" alt="" />
+                    <span class="play-module-platform__copy"><small data-i18n="landing.googlePlayEyebrow">Get it on</small><strong>Google Play</strong></span>
+                  </a>
+                  <a class="play-module-platform" href="https://apps.apple.com/app/world-of-claudecraft/id6782569061" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.appStoreAria" aria-label="Download World of ClaudeCraft on the App Store">
+                    <img class="play-module-platform__icon" src="/site/platform-app-store.webp" width="192" height="233" alt="" />
+                    <span class="play-module-platform__copy"><small data-i18n="landing.appStoreEyebrow">Download on the</small><strong>App Store</strong></span>
+                  </a>
+                  <div class="play-module-platform play-module-platform--disabled" role="img" data-i18n-aria="landing.steamAria" aria-label="World of ClaudeCraft on Steam, coming soon">
+                    <img class="play-module-platform__icon" src="/site/platform-steam.webp" width="192" height="198" alt="" />
+                    <span class="play-module-platform__copy"><small data-i18n="landing.steamEyebrow">Available on</small><strong>Steam</strong></span>
+                    <span class="play-module-platform__soon" data-i18n="landing.comingSoon">Coming Soon</span>
+                  </div>
+                </div>
+              </section>
+
+              <p class="play-module-sync"><img src="/site/stream-icon-shield.webp" width="96" height="96" alt="" aria-hidden="true" /><span data-i18n="landing.syncProgress">Sync progression across all platforms</span></p>
+            </div>
           </div>
 
-          <!-- Hidden, non-focusable compatibility triggers. Stable hooks the automated
-               tours / E2E scripts use to drive the online & offline flows directly. -->
+          <!-- Hidden compatibility triggers used by tours and the direct play flows. -->
           <button type="button" id="btn-online" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
           <button type="button" id="btn-offline" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
-
-          <div id="token-ca">
-            <span class="token-ca-label" data-i18n="mode.caLabel">$WOC Contract Address</span>
-            <button type="button" id="btn-copy-ca" class="token-ca-pill" data-ca="3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth" data-i18n-aria="mode.caCopyAria" aria-label="Copy contract address">
-              <code class="token-ca-addr">3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth</code>
-              <span class="token-ca-copy" aria-hidden="true">
-                <svg class="icon-clipboard" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                <svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </span>
-            </button>
-            <p class="token-ca-note" data-i18n="mode.caNote">WOC is our community token. It is not needed to play. Join Discord to discuss the WOC utility and flywheel.</p>
-          </div>
-
-          <!-- Tip — part of the same play container (divider above). -->
-          <div class="play-tip">
-            <p id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></p>
+            </div>
           </div>
         </div>
-
+        </div>
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
           <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the World</h2>
 
@@ -769,6 +759,7 @@
           <p class="auth-switch">
             <button type="button" class="auth-link" id="btn-forgot-open" data-i18n="hudChrome.auth.forgotPrompt">Forgot password?</button>
           </p>
+          <p class="play-module-login-motto" data-i18n="landing.introEyebrow">One world. One ruleset.</p>
         </form>
 
         <!-- Password reset step 1: request a reset link. Always shows the same
@@ -1090,63 +1081,391 @@
             </div>
           </div>
         </div>
+        <div class="site-story site-marketing-only" id="world-story">
+          <section class="site-section site-stream" id="yuumiii-stream" data-stream-state="idle" aria-labelledby="yuumiii-title">
+            <div class="site-stream-scene site-stream-scene--vale" aria-hidden="true"></div>
+            <div class="site-stream-scene site-stream-scene--crypt" aria-hidden="true"></div>
+            <div class="site-stream-scene site-stream-scene--battlefield" aria-hidden="true"></div>
+            <div class="site-stream-scene site-stream-scene--thornpeak" aria-hidden="true"></div>
+
+            <header class="site-stream-hero-title">
+              <img class="site-stream-title-ornament" src="/site/stream-divider.webp" srcset="/site/stream-divider-mobile-v1.webp 640w, /site/stream-divider.webp 1200w" sizes="(max-width: 620px) 330px, 760px" width="1200" height="93" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+              <p data-i18n="landing.streamNetwork">WOC BROADCAST NETWORK</p>
+              <h2 id="yuumiii-title"><span>Yuumiii</span> <em data-i18n="landing.streamEyebrow">Live 24/7</em></h2>
+              <p data-i18n="landing.streamHeroSubtitle">Your resident AI streamer, playing the world around the clock.</p>
+            </header>
+
+            <div class="site-stream-showcase">
+              <aside class="site-stream-host">
+                <div class="site-stream-host__portrait">
+                  <img src="/site/yuumiii-cutout.webp" srcset="/site/yuumiii-cutout-mobile-v1.webp 512w, /site/yuumiii-cutout.webp 1017w" sizes="(max-width: 620px) 68vw, 420px" width="1017" height="1396" loading="lazy" decoding="async" data-i18n-alt="landing.streamPortraitAlt" alt="Yuumiii, the resident AI streamer of World of ClaudeCraft" />
+                </div>
+                <div class="site-stream-host__copy">
+                  <p data-i18n="landing.streamMeet">Meet your guide</p>
+                  <h3>Yuumiii</h3>
+                  <strong data-i18n="landing.streamHostTitle">Resident AI streamer</strong>
+                  <span data-i18n="landing.streamHostBody">Join Yuumiii as she explores every corner of World of ClaudeCraft, day and night.</span>
+                </div>
+              </aside>
+
+              <div class="site-stream-console">
+                <div class="site-stream-frame">
+                  <div class="site-stream-frame__top">
+                    <span><i aria-hidden="true"></i><b data-i18n="landing.streamEyebrow">LIVE 24/7</b><span data-i18n="landing.streamFeed">YUUMIII // LIVE FEED</span></span>
+                    <span class="site-stream-frame__viewers" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                  </div>
+                  <div class="site-stream-viewport">
+                    <div id="yuumiii-player" class="site-stream-player"></div>
+                    <div class="site-stream-placeholder" aria-hidden="true">
+                      <span class="site-stream-placeholder__ring"><b data-i18n="landing.streamMonogram">Y</b></span>
+                      <small data-i18n="landing.streamLoading">Opening the viewing portal...</small>
+                    </div>
+                    <button type="button" class="site-stream-mobile-portal" aria-controls="yuumiii-player" aria-label="Play Yuumiii live on this page">
+                      <span class="site-stream-mobile-portal__icon" aria-hidden="true">
+                        <img src="/site/stream-play-inline.svg" width="88" height="88" alt="" loading="lazy" decoding="async" />
+                      </span>
+                      <span class="site-stream-mobile-portal__copy">
+                        <small><i aria-hidden="true"></i> YUUMIII IS LIVE</small>
+                        <strong>Watch the adventure</strong>
+                        <em>Tap to play here</em>
+                      </span>
+                    </button>
+                  </div>
+
+                  <div class="site-stream-console__footer">
+                    <div class="site-stream-status" role="status" aria-live="polite">
+                      <span data-stream-copy="idle" data-i18n="landing.streamLoading">Opening the viewing portal...</span>
+                      <span data-stream-copy="loading" data-i18n="landing.streamLoading">Opening the viewing portal...</span>
+                      <span data-stream-copy="ready" data-i18n="landing.streamReady">The viewing portal is ready. Press play to watch Yuumiii.</span>
+                      <span data-stream-copy="online" data-i18n="landing.streamOnline">Yuumiii is live now.</span>
+                      <span data-stream-copy="offline" data-i18n="landing.streamOffline">The viewing portal is reconnecting. Open the Twitch channel to keep watching.</span>
+                      <span data-stream-copy="compact" data-i18n="landing.streamCompact">Open the Twitch channel to watch Yuumiii on this screen.</span>
+                      <span data-stream-copy="unavailable" data-i18n="landing.streamUnavailable">The viewing portal is unavailable. Open the Twitch channel to keep watching.</span>
+                    </div>
+                    <span class="site-stream-signal" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                  </div>
+                </div>
+                <a class="site-stream-mobile-external" href="https://www.twitch.tv/claudeplaysclaudecraft" target="_blank" rel="noopener noreferrer">
+                  <img src="/site/twitch-mark.svg" width="26" height="26" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <span data-i18n="landing.streamWatch">Watch on Twitch</span>
+                </a>
+              </div>
+
+              <aside class="site-stream-features" data-i18n-aria="landing.streamFeed" aria-label="Yuumiii live feed">
+                <article>
+                  <img class="site-stream-feature-icon" src="/site/stream-icon-clock.webp" width="96" height="96" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <div><h3 data-i18n="landing.streamAlwaysTitle">24/7 live</h3><p data-i18n="landing.streamAlwaysBody">Always on. Always adventuring.</p></div>
+                </article>
+                <article>
+                  <img class="site-stream-feature-icon" src="/site/stream-icon-crown.webp" width="96" height="96" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <div><h3 data-i18n="landing.streamAiTitle">AI streamer</h3><p data-i18n="landing.streamAiBody">Powered by AI for real reactions and endless fun.</p></div>
+                </article>
+                <article>
+                  <img class="site-stream-feature-icon" src="/site/stream-icon-swords.webp" width="96" height="96" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <div><h3 data-i18n="landing.streamCommunityTitle">Community</h3><p data-i18n="landing.streamCommunityBody">Chat, quests, and surprises await.</p></div>
+                </article>
+                <article>
+                  <img class="site-stream-feature-icon" src="/site/stream-icon-shield.webp" width="96" height="96" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                  <div><h3 data-i18n="landing.streamWorldTitle">Real world</h3><p data-i18n="landing.streamWorldBody">One persistent world. Infinite stories.</p></div>
+                </article>
+              </aside>
+            </div>
+
+            <div class="site-stream-actions">
+              <a class="site-stream-action site-stream-action--live" href="https://www.twitch.tv/claudeplaysclaudecraft" target="_blank" rel="noopener noreferrer">
+                <img class="site-stream-action__icon" src="/site/twitch-mark.svg" width="36" height="36" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                <span data-i18n="landing.streamWatch">Watch on Twitch</span>
+              </a>
+            </div>
+          </section>
+          <section class="site-section site-world" aria-labelledby="site-world-title">
+            <picture class="site-world__backdrop" aria-hidden="true">
+              <source media="(max-width: 1080px)" srcset="/site/journey/realm-dawn-cartoon-v2-mobile-v1.webp 768w, /site/journey/realm-dawn-cartoon-v2-portrait.webp 1440w" sizes="100vw" width="768" height="1280" />
+              <img src="/site/journey/realm-dawn-cartoon-v2.webp" width="2400" height="1688" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+            </picture>
+            <div class="site-section-heading site-section-heading--wide">
+              <p class="site-eyebrow" data-i18n="landing.worldEyebrow">JOURNEY THROUGH CLAUDEMOON</p>
+              <h2 id="site-world-title" data-i18n="landing.worldHeading">A realm built for long roads and dangerous nights.</h2>
+              <p data-i18n="landing.worldBody">Begin among Eastbrook Vale campfires, descend into haunted crypts, and climb through the storms of Thornpeak. Every road leads deeper into a world that keeps moving.</p>
+            </div>
+            <div class="site-journey">
+              <figure class="site-journey-card site-journey-card--primary">
+                <picture class="site-journey-card__media">
+                  <source media="(max-width: 620px)" srcset="/site/journey/realm-long-road-mobile-v2.webp 768w, /site/journey/realm-long-road-mobile.webp 1120w" sizes="calc(100vw - 32px)" width="768" height="960" />
+                  <img src="/site/journey/realm-long-road.webp" width="2100" height="1500" loading="lazy" decoding="async" data-i18n-alt="landing.eastbrookAlt" alt="A party of adventurers travels the long road from Eastbrook Vale toward Thornpeak" />
+                </picture>
+                <figcaption><span>01</span><div><h3 data-i18n="landing.eastbrookTitle">Eastbrook Vale</h3><p data-i18n="landing.eastbrookBody">A shared frontier of first quests, roaming enemies, and unlikely allies.</p></div></figcaption>
+              </figure>
+              <figure class="site-journey-card site-journey-card--crypt">
+                <picture class="site-journey-card__media">
+                  <source media="(max-width: 620px)" srcset="/site/journey/realm-crypt-night-mobile-v1.webp" width="768" height="549" />
+                  <img src="/site/journey/realm-crypt-night.webp" width="1344" height="960" loading="lazy" decoding="async" data-i18n-alt="landing.hollowAlt" alt="A party confronting enemies inside the Hollow Crypt" />
+                </picture>
+                <figcaption><span>02</span><div><h3 data-i18n="landing.hollowTitle">The Hollow Crypt</h3><p data-i18n="landing.hollowBody">Party combat beneath cold blue torches, where the restless dead gather in force.</p></div></figcaption>
+              </figure>
+              <figure class="site-journey-card site-journey-card--thornpeak">
+                <picture class="site-journey-card__media">
+                  <img src="/site/journey/realm-thornpeak.webp" srcset="/site/journey/realm-thornpeak-mobile-v1.webp 768w, /site/journey/realm-thornpeak.webp 1680w" sizes="(max-width: 620px) calc(100vw - 32px), 840px" width="1680" height="1200" loading="lazy" decoding="async" data-i18n-alt="landing.thornpeakAlt" alt="Snow falling across Thornpeak Heights" />
+                </picture>
+                <figcaption><span>03</span><div><h3 data-i18n="landing.thornpeakTitle">Thornpeak Heights</h3><p data-i18n="landing.thornpeakBody">Snow, ancient ruins, and endgame threats wait above the cloud line.</p></div></figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="site-section site-open-support" id="community-built" aria-labelledby="site-community-title">
+            <picture class="site-open-support__backdrop" aria-hidden="true">
+              <source media="(max-width: 620px)" srcset="/site/community/community-realm-backdrop-cartoon-v6-mobile.webp" width="640" height="1137" />
+              <img src="/site/community/community-realm-backdrop-cartoon-v6.webp" width="1440" height="810" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+            </picture>
+            <div class="site-section-heading site-section-heading--wide site-open-support__intro">
+              <p class="site-eyebrow" data-i18n="landing.communityEyebrow">GATHER AT THE FORGE</p>
+              <h2 id="site-community-title" tabindex="-1" data-i18n="landing.communityHeading">Claudemoon is made together.</h2>
+              <p data-i18n="landing.communityBody">Bring your craft, your curiosity, or simply your company&mdash;the guild has room at its table.</p>
+            </div>
+            <article class="site-project-panel site-project-panel--forge" aria-labelledby="site-open-source-title">
+              <picture class="site-project-panel__art" aria-hidden="true">
+                <source media="(max-width: 620px)" srcset="/site/community/community-world-forge-mobile.webp" width="840" height="1260" />
+                <img src="/site/community/community-world-forge.webp" width="1600" height="854" loading="lazy" decoding="async" alt="" />
+              </picture>
+              <div class="site-project-panel__content">
+                <p class="site-eyebrow" data-i18n="landing.openEyebrow">OPEN WORLD. OPEN CODE.</p>
+                <h2 id="site-open-source-title" data-i18n="landing.openHeading">Host your own world. Bring your friends.</h2>
+                <p data-i18n="landing.openBody">Explore the source, host your own private world, and invite your friends to adventure together on a server you control.</p>
+                <div class="site-action-row">
+                  <a class="site-action" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12Z" /></svg>
+                    <span data-i18n="footer.githubLabel">Open Source Project</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                  <a class="site-action site-action--ghost" href="/wiki">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 3h6a3 3 0 0 1 2 1 3 3 0 0 1 2-1h6v16h-6a3 3 0 0 0-2 1 3 3 0 0 0-2-1H4V3Zm2 2v12h4c.35 0 .68.06 1 .18V6.4A2 2 0 0 0 10 5H6Zm12 0h-4a2 2 0 0 0-1 1.4v10.78A5 5 0 0 1 14 17h4V5Z" /></svg>
+                    <span data-i18n="nav.wiki">Wiki</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article class="site-project-panel site-project-panel--support" aria-labelledby="site-support-title">
+              <picture class="site-project-panel__art" aria-hidden="true">
+                <source media="(max-width: 620px)" srcset="/site/community/community-guild-hall-mobile.webp" width="840" height="1260" />
+                <img src="/site/community/community-guild-hall.webp" width="1800" height="639" loading="lazy" decoding="async" alt="" />
+              </picture>
+              <div class="site-project-panel__content">
+                <p class="site-eyebrow" data-i18n="landing.supportEyebrow">KEEP THE REALM RUNNING</p>
+                <h2 id="site-support-title" data-i18n="landing.supportHeading">Build, play, and support the next chapter.</h2>
+                <p data-i18n="landing.supportBody">World of ClaudeCraft grows in the open. Join the community, follow the living world, or support ongoing development.</p>
+                <div class="site-community-links">
+                  <a class="site-community-link--primary" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z" /></svg>
+                    <span data-i18n="footer.discordLabel">Join the Discord</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                  <a href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                    <span data-i18n="landing.xCta">Follow on X</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                  <a href="https://www.twitch.tv/directory/category/world-of-claudecraft" target="_blank" rel="noopener noreferrer">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 2h18v13l-5 5h-4l-3 3H7v-3H2V5l2-3Zm2 2L4 6v12h5v2l2-2h5l4-4V4H6Zm3 3h2v6H9V7Zm5 0h2v6h-2V7Z" /></svg>
+                    <span data-i18n="landing.twitchCategoryCta">Explore World of ClaudeCraft streams</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                  <a href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer">
+                    <svg class="site-project-link__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A6 6 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z" /></svg>
+                    <span data-i18n="nav.donate">Donate</span>
+                    <span class="site-project-link__cue" aria-hidden="true"></span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section class="site-section site-final-gate" aria-labelledby="site-final-title">
+            <picture class="site-final-gate__backdrop" aria-hidden="true">
+              <source media="(max-width: 760px)" srcset="/site/final-moongate-cartoon-v1-mobile.webp" width="1440" height="2400" />
+              <img src="/site/final-moongate-cartoon-v1.webp" width="2400" height="1350" loading="lazy" decoding="async" fetchpriority="low" alt="" />
+            </picture>
+            <div class="site-ornament" aria-hidden="true"><span></span></div>
+            <div class="site-section-heading">
+              <p class="site-eyebrow" data-i18n="landing.finalEyebrow">YOUR STORY STARTS AT THE GATE</p>
+              <h2 id="site-final-title" data-i18n="landing.finalHeading">Choose your way into Claudemoon.</h2>
+              <p data-i18n="landing.finalBody">Play in your browser now, continue on mobile, or watch for the Steam release.</p>
+            </div>
+            <a class="site-action site-browser-cta" href="#mode-select" data-i18n="landing.browserCta">Play in your browser</a>
+            <div class="site-platform-grid site-platform-grid--final">
+              <a class="site-platform-card site-platform-card--twitch-style site-platform-card--apple" href="https://apps.apple.com/app/world-of-claudecraft/id6782569061" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.appStoreAria" aria-label="Download World of ClaudeCraft on the App Store">
+                <img class="site-platform-card__icon" src="/site/platform-app-store.webp" width="192" height="233" loading="lazy" decoding="async" alt="" />
+                <span class="site-platform-card__copy"><small data-i18n="landing.appStoreEyebrow">Download on the</small><strong>App Store</strong></span>
+              </a>
+              <a class="site-platform-card site-platform-card--twitch-style site-platform-card--google-play" href="https://play.google.com/store/apps/details?id=com.worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.googlePlayAria" aria-label="Get World of ClaudeCraft on Google Play">
+                <img class="site-platform-card__icon" src="/site/platform-google-play.webp" width="192" height="218" loading="lazy" decoding="async" alt="" />
+                <span class="site-platform-card__copy"><small data-i18n="landing.googlePlayEyebrow">Get it on</small><strong>Google Play</strong></span>
+              </a>
+              <div class="site-platform-card site-platform-card--disabled site-platform-card--twitch-style site-platform-card--steam" role="img" data-i18n-aria="landing.steamAria" aria-label="World of ClaudeCraft on Steam, coming soon">
+                <img class="site-platform-card__icon" src="/site/platform-steam.webp" width="192" height="198" loading="lazy" decoding="async" alt="" />
+                <span class="site-platform-card__copy"><small data-i18n="landing.steamEyebrow">Available on</small><strong>Steam</strong></span>
+                <span class="site-coming-soon" data-i18n="landing.comingSoon">Coming Soon</span>
+              </div>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section id="highscores-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel hs-panel">
-          <div class="skeleton-icon-wrapper">
-            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
-              <path fill="currentColor" d="M12 2C11.5 2 6 4 6 4V10C6 14.41 9.59 18 12 18.5C14.41 18 18 14.41 18 10V4C18 4 12.5 2 12 2M12 16.5C10.32 15.5 8 12.78 8 10V5.37L12 3.91L16 5.37V10C16 12.78 13.68 15.5 12 16.5Z"/>
-            </svg>
-          </div>
-          <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
-          <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all worlds</p>
-          <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
-            <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
+        <div class="realm-data-page realm-data-page--highscores">
+          <header class="realm-data-hero">
+            <span class="realm-data-hero__kicker" aria-hidden="true">Hall of Champions</span>
+            <h2 data-i18n="highscores.title">High Scores Leaderboard</h2>
+            <p data-i18n="game.leaderboard.globalSubtitle">Top champions across all worlds</p>
+            <span class="realm-data-hero__rule" aria-hidden="true"></span>
+          </header>
+          <div class="hs-panel realm-data-frame">
+            <span class="realm-data-frame__ornaments" aria-hidden="true"></span>
+            <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
+              <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings...</div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="news-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel news-panel">
-          <div class="skeleton-icon-wrapper">
-            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
-              <path fill="currentColor" d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6m-2 0l-8 5l-8-5h16m0 12H4V8l8 5l8-5v10z"/>
-            </svg>
+      <section id="patch-notes-view" class="view-section" hidden aria-hidden="true">
+        <div class="realm-data-page realm-data-page--patch-notes">
+          <header class="realm-data-hero">
+            <span class="realm-data-hero__kicker" aria-hidden="true">The Living Chronicle</span>
+            <h2 data-i18n="landing.patchNotesTitle">Patch Notes</h2>
+            <p data-i18n="landing.patchNotesDesc">Review the latest gameplay changes, fixes, and release details.</p>
+            <span class="realm-data-hero__rule" aria-hidden="true"></span>
+          </header>
+          <div class="news-panel patch-notes-panel">
+            <div class="patch-notes-panel__rail" aria-hidden="true">
+              <span></span><i></i><span></span>
+            </div>
+            <div id="patch-notes-feed" class="news-feed" aria-live="polite">
+              <div class="news-loading" data-i18n="landing.patchNotesLoading">Loading the latest patch notes...</div>
+            </div>
           </div>
-          <h2 class="skeleton-title" data-i18n="news.title">News & Updates</h2>
-          <p class="skeleton-desc" data-i18n="news.desc">Read the latest patch notes, events, and community updates.</p>
-          <div id="news-feed" class="news-feed" aria-live="polite">
-            <div class="news-loading" data-i18n="news.loading">Loading the latest updates…</div>
+        </div>
+      </section>
+      <section id="news-view" class="view-section" hidden aria-hidden="true">
+        <div class="site-news-hub" aria-labelledby="news-view-title">
+          <header class="site-news-hub__intro">
+            <p class="site-news-eyebrow" data-i18n="landing.newsEyebrow">NEWS FROM THE REALM</p>
+            <h2 id="news-view-title" data-i18n="landing.newsTitle">News from Claudemoon</h2>
+            <p data-i18n="landing.newsBody">Follow the latest from World of ClaudeCraft and discover stories from behind the world.</p>
+          </header>
+
+          <div class="site-news-grid">
+            <section id="news-x-card" class="site-news-card site-news-card--x" data-x-state="consent" aria-labelledby="news-x-title">
+              <header class="site-news-card__head">
+                <p class="site-news-card__eyebrow" data-i18n="landing.newsEyebrow">NEWS FROM THE REALM</p>
+                <h3 id="news-x-title" class="site-news-card__title" data-i18n="landing.newsXTitle">Latest on X</h3>
+              </header>
+              <p data-i18n="landing.newsXIntro">Official posts from @WoClaudecraft</p>
+
+              <div class="news-x-state-shell" aria-live="polite" aria-atomic="true">
+                <div class="news-x-state news-x-state--consent">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXConsentTitle">X feed needs permission</h4>
+                    <p id="news-x-consent-description" data-i18n="landing.newsXConsentBody">This live feed needs permission to connect to X. X may receive information about your visit.</p>
+                    <p id="news-x-consent-note" class="news-x-state__note" data-i18n="landing.newsXConsentNote">Enable X content in Privacy Choices. You can change this anytime.</p>
+                  </div>
+                </div>
+                <div class="news-x-state news-x-state--loading">
+                  <div class="news-x-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <p data-i18n="landing.newsXLoading">Opening the X feed...</p>
+                </div>
+                <div class="news-x-state news-x-state--error">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXUnavailableTitle">We couldn't load the X feed</h4>
+                    <p data-i18n="landing.newsXUnavailableBody">It may be blocked by your browser, an extension, or a temporary issue with X.</p>
+                  </div>
+                </div>
+                <div class="news-x-state news-x-state--loaded">
+                  <p data-i18n="landing.newsXLoaded">X feed loaded.</p>
+                </div>
+                <div class="news-x-state news-x-state--hidden">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXHiddenTitle">Live feed unavailable here</h4>
+                    <p data-i18n="landing.newsXHiddenBody">The embedded X feed isn't available on smaller screens or in the app. Open @WoClaudecraft on X to see the latest posts.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="news-x-mount" class="news-x-mount">
+                <a class="twitter-timeline" data-theme="dark" data-dnt="true" data-height="640" href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer" data-i18n="landing.newsXOpen" data-i18n-aria="landing.newsXOpenAria" aria-label="Open @WoClaudecraft on X in a new tab">Open @WoClaudecraft on X</a>
+              </div>
+
+              <div class="news-x-actions">
+                <button type="button" id="news-x-privacy" class="site-news-button site-news-button--primary" aria-describedby="news-x-consent-description news-x-consent-note" data-i18n="landing.newsXPrivacyChoices">Privacy Choices</button>
+                <button type="button" id="news-x-retry" class="site-news-button" data-i18n="landing.newsXRetry" hidden>Try again</button>
+                <a id="news-x-permanent-fallback" class="site-news-external" href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer" data-i18n="landing.newsXOpen" data-i18n-aria="landing.newsXOpenAria" aria-label="Open @WoClaudecraft on X in a new tab">Open @WoClaudecraft on X</a>
+              </div>
+            </section>
+
+            <section class="site-news-card site-news-card--blog" aria-labelledby="news-blog-title">
+              <header class="site-news-card__head">
+                <p class="site-news-card__eyebrow" data-i18n="landing.newsBlogEyebrow">THE CLAUDEMOON CHRONICLE</p>
+                <h3 id="news-blog-title" class="site-news-card__title" data-i18n="landing.newsBlogTitle">Latest stories</h3>
+              </header>
+              <div class="site-blog-list">
+                <article class="site-press-story">
+                  <a class="site-press-story__media" href="https://www.mmorpg.com/news/the-first-vibe-coded-mmorpg-is-free-open-source-and-surprisingly-complete-2000138347" target="_blank" rel="noopener noreferrer nofollow" data-i18n-aria="landing.newsPressLinkAria" aria-label="Read the MMORPG.com feature in a new tab">
+                    <img src="/site/eastbrook-dusk.webp" width="1440" height="793" data-i18n-alt="landing.newsPressPrimaryAlt" alt="Adventurers explore Eastbrook Vale in World of ClaudeCraft" loading="lazy" decoding="async" />
+                  </a>
+                  <div class="site-press-story__body">
+                    <p class="site-press-story__eyebrow" data-i18n="landing.newsPressEyebrow">PRESS SPOTLIGHT</p>
+                    <h4 data-i18n="landing.newsPressPrimaryTitle">The First Vibe Coded MMORPG Is Free, Open Source, and Surprisingly Complete</h4>
+                    <p data-i18n="landing.newsPressPrimaryBody">MMORPG.com explores the open world, shared adventures, and fast-moving experiment behind World of ClaudeCraft.</p>
+                    <a class="news-link" href="https://www.mmorpg.com/news/the-first-vibe-coded-mmorpg-is-free-open-source-and-surprisingly-complete-2000138347" target="_blank" rel="noopener noreferrer nofollow" data-i18n="landing.newsPressRead" data-i18n-aria="landing.newsPressLinkAria" aria-label="Read the MMORPG.com feature in a new tab">Read the feature</a>
+                  </div>
+                </article>
+              </div>
+            </section>
           </div>
         </div>
       </section>
 
       <section id="download-view" class="view-section" hidden aria-hidden="true">
-        <div class="parchment-panel skeleton-panel">
-          <div class="skeleton-icon-wrapper">
-            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
-              <path fill="currentColor" d="M5 20h14v-2H5v2m14-9h-4V3H9v8H5l7 7l7-7z"/>
-            </svg>
-          </div>
-          <h2 class="skeleton-title" data-i18n="download.title">Download Desktop Launcher</h2>
-          <p class="skeleton-desc" data-i18n="download.desc">Get the standalone launcher for optimized performance and full-screen play.</p>
-          <div class="desktop-download-actions">
-            <a
-              class="btn btn-primary desktop-download-link"
-              data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-mac-universal.dmg"
-              data-i18n="download.macCta"
-            >Download for macOS</a>
-            <a
-              class="btn btn-primary desktop-download-link"
-              data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-linux-x86_64.AppImage"
-              data-i18n="download.linuxCta"
-            >Download for Linux</a>
-          </div>
-          <p class="desktop-download-hint" data-platform-hint="linux" data-i18n="download.linuxHint" hidden>AppImage: make it executable, then run it. No install needed.</p>
-          <div class="desktop-download-status" data-i18n="download.windowsPending">Windows build pending.</div>
+        <div class="download-page-backdrop" aria-hidden="true"></div>
+        <div class="download-page-vignette" aria-hidden="true"></div>
+        <div class="download-page-layout">
+          <article class="download-launcher-panel" aria-labelledby="download-view-title">
+            <div class="download-launcher-content">
+              <div class="download-rune" aria-hidden="true">
+                <svg viewBox="0 0 64 64" focusable="false"><path d="M32 10v29m0 0 12-12M32 39 20 27M15 48h34"/></svg>
+              </div>
+              <h2 id="download-view-title" class="download-title" data-i18n="download.title">Download Desktop Launcher</h2>
+              <p class="download-desc" data-i18n="download.desc">Get the standalone launcher for optimized performance and full-screen play.</p>
+              <div class="download-divider" aria-hidden="true"><span></span></div>
+              <div class="desktop-download-actions">
+                <a class="desktop-download-link" data-platform="mac" href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-mac-universal.dmg">
+                  <span class="download-platform-mark download-platform-mark--mac" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M16.9 12.9c0-2.7 2.2-4 2.3-4.1-1.3-1.9-3.3-2.1-4-2.1-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.7-1-1.9 0-3.7 1.1-4.7 2.8-2 3.5-.5 8.7 1.4 11.5.9 1.4 2.1 2.9 3.6 2.8 1.4-.1 2-1 3.7-1s2.2 1 3.7 1c1.5 0 2.5-1.4 3.4-2.8 1.1-1.6 1.5-3.1 1.5-3.2-.1 0-3-.9-3-4.9ZM14.1 5c.8-1 1.3-2.3 1.2-3.6-1.2.1-2.6.8-3.4 1.7-.7.8-1.3 2.2-1.2 3.4 1.3.1 2.6-.6 3.4-1.5Z"/></svg>
+                  </span>
+                  <span class="download-platform-copy"><small>UNIVERSAL BUILD</small><strong data-i18n="download.macCta">Download for macOS</strong></span>
+                  <span class="download-link-arrow" aria-hidden="true">&#8595;</span>
+                </a>
+                <a class="desktop-download-link" data-platform="linux" href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-linux-x86_64.AppImage">
+                  <span class="download-platform-mark download-platform-mark--linux" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="m6 7 5 5-5 5M13 17h5"/></svg>
+                  </span>
+                  <span class="download-platform-copy"><small>APPIMAGE</small><strong data-i18n="download.linuxCta">Download for Linux</strong></span>
+                  <span class="download-link-arrow" aria-hidden="true">&#8595;</span>
+                </a>
+              </div>
+              <p class="desktop-download-hint" data-platform-hint="linux" data-i18n="download.linuxHint" hidden>AppImage: make it executable, then run it. No install needed.</p>
+              <div class="desktop-download-status"><span class="desktop-download-status-dot" aria-hidden="true"></span><span data-i18n="download.windowsPending">Windows build pending.</span></div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -1342,9 +1661,17 @@
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           <span data-i18n="footer.githubLabel">Open Source Project</span>
         </a>
-        <a class="social-link" href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
+        <a class="social-link" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
           <span data-i18n="footer.discordLabel">Join the Discord</span>
+        </a>
+        <a class="social-link" href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.xCta" aria-label="Follow on X">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z"/></svg>
+          <span data-i18n="landing.xCta">Follow on X</span>
+        </a>
+        <a class="social-link" href="https://www.twitch.tv/directory/category/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="landing.twitchCategoryCta" aria-label="Explore World of ClaudeCraft streams">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M4 2h18v13l-5 5h-4l-3 3H7v-3H2V5l2-3Zm2 2L4 6v12h5v2l2-2h5l4-4V4H6Zm3 3h2v6H9V7Zm5 0h2v6h-2V7Z"/></svg>
+          <span data-i18n="landing.twitchCategoryCta">Explore World of ClaudeCraft streams</span>
         </a>
         <a class="social-link donate" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -1357,6 +1684,7 @@
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
         <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="/cookies" class="footer-link" data-i18n="footer.cookies">Cookie Notice</a>
       </div>
       <div class="footer-lang-row">
         <div class="language-selector">
@@ -1492,7 +1820,7 @@
   </div>
 
   <div id="loading-screen">
-    <img class="ls-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+    <img class="ls-logo" src="/site/worldofclaudecraft-logo.webp" width="860" height="575" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" loading="lazy" decoding="async" />
     <div class="ls-progress">
       <div class="ls-bar"><div id="ls-fill"></div></div>
       <div id="ls-status" data-i18n="loading.enteringWorld">Entering the world...</div>
@@ -1500,6 +1828,7 @@
     </div>
   </div>
 
+  <script type="module" src="/src/ui/landing_social_tray.ts"></script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

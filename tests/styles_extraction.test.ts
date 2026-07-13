@@ -21,6 +21,7 @@ const tokensCode = stripCssComments(tokens);
 const base = read('src/styles/base.css');
 const baseCode = stripCssComments(base);
 const barrel = read('src/styles/index.css');
+const gameStyles = read('src/styles/game.css');
 const mainTs = read('src/main.ts');
 const viteConfig = read('vite.config.ts');
 
@@ -81,60 +82,38 @@ describe('CSS extraction: base.css', () => {
   });
 });
 
-describe('CSS extraction: barrel + seam wiring', () => {
-  it('declares the single @layer order once, with hud-mobile after shell and the per-entry extras last', () => {
-    // Flat (hyphenated) layer names: a DOT would make hud-mobile/index-extra/play-extra
-    // SUBLAYERS, not top-level layers. hud-mobile is ordered AFTER shell so the
-    // in-game mobile overrides of pre-game shell elements win as they did when inline.
-    expect(barrel).toContain(
-      '@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;',
+describe('CSS extraction: initial/deferred style seams', () => {
+  const canonicalOrder =
+    '@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;';
+
+  it('declares the same flat @layer order in both style chunks', () => {
+    expect(barrel).toContain(canonicalOrder);
+    expect(gameStyles).toContain(canonicalOrder);
+  });
+
+  it('keeps only landing-shell modules in the initial style chunk', () => {
+    for (const module of ['tokens.css', 'base.css', 'shell.css', 'hud.mobile.css']) {
+      expect(barrel).toContain(`@import "./${module}";`);
+    }
+    for (const module of ['layout.css', 'hud.css', 'components.css']) {
+      expect(barrel).not.toContain(`@import "./${module}";`);
+    }
+  });
+
+  it('loads every in-world style module once in the deferred chunk', () => {
+    for (const module of ['layout.css', 'hud.css', 'components.css']) {
+      const statement = `@import "./${module}";`;
+      expect(gameStyles).toContain(statement);
+      expect(gameStyles.split(statement).length - 1).toBe(1);
+    }
+    expect(gameStyles.indexOf('@import "./hud.css";')).toBeLessThan(
+      gameStyles.indexOf('@import "./components.css";'),
     );
   });
 
-  it('@imports every shared module exactly once (a dropped @import ships the game unstyled with a green suite)', () => {
-    // Every other CSS guard (css_corpus, client_shell, charselect, mobile_window_transform)
-    // reads the modules off disk directly, so deleting an @import line here leaves the whole
-    // suite green while that layer never loads at runtime. Pin the seam itself.
-    for (const m of [
-      'tokens.css',
-      'base.css',
-      'layout.css',
-      'hud.css',
-      'components.css',
-      'shell.css',
-      'hud.mobile.css',
-    ]) {
-      const imp = `@import "./${m}";`;
-      expect(barrel, `barrel must @import ${m}`).toContain(imp);
-      expect(barrel.split(imp).length - 1, `barrel must @import ${m} exactly once`).toBe(1);
-    }
-  });
-
-  it('@imports in cascade order, with hud.css BEFORE components.css (same @layer components tie-break)', () => {
-    // Import order roughly follows the @layer cascade. The one deliberate exception:
-    // hud.css and components.css both target @layer components, so components.css is
-    // imported LAST of the pair to win equal-specificity ties (the pre-extraction
-    // unlayered precedence). hud-mobile is imported after shell so its in-game overrides
-    // of pre-game shell elements win.
-    const at = (m: string) => barrel.indexOf(`@import "./${m}";`);
-    const order = [
-      'tokens.css',
-      'base.css',
-      'layout.css',
-      'hud.css',
-      'components.css',
-      'shell.css',
-      'hud.mobile.css',
-    ];
-    for (let i = 1; i < order.length; i++) {
-      expect(at(order[i]), `${order[i]} must be imported after ${order[i - 1]}`).toBeGreaterThan(
-        at(order[i - 1]),
-      );
-    }
-  });
-
-  it('imports the barrel once from the shared game bootstrap (covers index.html + play.html)', () => {
+  it('statically imports landing CSS and dynamically imports in-world CSS', () => {
     expect(mainTs).toContain("import './styles/index.css'");
+    expect(mainTs).toContain("import('./styles/game.css')");
   });
 
   it('flips Vite to the Lightning CSS transformer with browserslist-derived targets', () => {

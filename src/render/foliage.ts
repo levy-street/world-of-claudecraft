@@ -29,7 +29,7 @@ import { grassTuftTexture } from './textures';
 //
 // Models come from the Quaternius Stylized Nature MegaKit (CC0), shipped via
 // scripts/assets/specs/foliage.json -> public/models/foliage/*.glb and
-// preloaded at module import (main.ts awaits assetsReady() before the
+// registered lazily at module import (main.ts awaits assetsReady() before the
 // Renderer is constructed, so buildFoliage can read the cache synchronously).
 //
 // - Placement still comes from the deterministic generateDecorations(seed)
@@ -97,12 +97,12 @@ const FOLIAGE_MODEL_URLS_LOW = {
 };
 const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS_HIGH;
 
-// kick off fetches at import; buildFoliage assumes the cache is populated
+// Register lazy boot fetches; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
     registerPreload(
-      loadGltf(url).then((g) => {
+      () => loadGltf(url).then((g) => {
         loadedModels.set(url, g);
       }),
     );

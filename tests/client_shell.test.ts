@@ -55,6 +55,14 @@ const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const appHtml = readFileSync(new URL('../app.html', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const privacyConsentTs = readFileSync(
+  new URL('../src/ui/privacy_consent.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const privacyHtml = readFileSync(
   new URL('../public/privacy.html', import.meta.url),
   'utf8',
@@ -84,6 +92,14 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   '\n',
 );
 const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const marketingMusicTs = readFileSync(
+  new URL('../src/ui/marketing_music.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const onlineTs = readFileSync(new URL('../src/net/online.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
 );
@@ -652,6 +668,67 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('keeps Patch Notes and News as distinct, ordered destinations in BOTH entries', () => {
+    const orderedNavIds = [
+      'nav-btn-play',
+      'nav-btn-highscores',
+      'nav-btn-wiki',
+      'nav-btn-patch-notes',
+      'nav-btn-news',
+      'nav-btn-download',
+      'nav-btn-login',
+    ];
+
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const navPositions = orderedNavIds.map((id) => entry.indexOf(`id="${id}"`));
+      expect(
+        navPositions.every((position) => position >= 0),
+        name,
+      ).toBe(true);
+      expect(navPositions, name).toEqual([...navPositions].sort((a, b) => a - b));
+
+      const patchViewAt = entry.indexOf('id="patch-notes-view"');
+      const newsViewAt = entry.indexOf('id="news-view"');
+      expect(patchViewAt, name).toBeGreaterThan(-1);
+      expect(newsViewAt, name).toBeGreaterThan(patchViewAt);
+      expect(entry, name).toContain(
+        'id="main-view-status" class="visually-hidden" role="status" aria-live="polite"',
+      );
+
+      const primaryNav = entry.match(/<nav[^>]*class="homepage-nav"[\s\S]*?<\/nav>/)?.[0] ?? '';
+      expect(primaryNav, name).not.toContain('aria-selected=');
+      expect(primaryNav, name).not.toContain('aria-pressed=');
+      expect(primaryNav, name).toMatch(/id="nav-btn-play"[^>]*aria-current="page"/);
+    }
+
+    expect(mainTs).toContain("'#patch-notes-view',");
+    for (const [id, href] of [
+      ['nav-btn-highscores', '/highscores'],
+      ['nav-btn-patch-notes', '/patch-notes'],
+      ['nav-btn-news', '/news'],
+      ['nav-btn-download', '/download'],
+    ]) {
+      expect(html).toContain(`id="${id}" href="${href}"`);
+      expect(playHtml).toContain(`id="${id}" href="${href}"`);
+    }
+
+    expect(mainTs).toContain("'#news-view',");
+    expect(mainTs).toContain("'#patch-notes-view': 'nav-btn-patch-notes'");
+    expect(mainTs).toContain("'#news-view': 'nav-btn-news'");
+    expect(mainTs).toContain('const PUBLIC_LANDING_ROUTE_VIEWS = Object.freeze({');
+    expect(mainTs).toContain('void loadPatchNotes();');
+    expect(viteConfig).toContain("env(['VITE_PATCH_NOTES_API_ORIGIN'])");
+    expect(viteConfig).toContain("'/api/releases': { target: patchNotesProxyTarget");
+    expect(onlineTs).toContain('if (!res.ok) throw new Error(`Patch notes request failed');
+    expect(mainTs).toContain('openPublicLandingRoute();');
+    expect(mainTs).not.toContain('loadNews');
+    expect(mainTs).toContain("toView.querySelector<HTMLElement>('h2[data-i18n]')");
+    expect(mainTs).toContain("document.getElementById('main-view-status')");
+  });
+
   it('shows a logged-in Logout nav item next to Account', () => {
     expect(html).toContain('id="nav-btn-account"');
     expect(html).toContain('id="nav-btn-logout"');
@@ -679,7 +756,8 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('const enterOnlinePlayFlow = () => {');
     expect(mainTs).toContain('if (api.token) {');
     expect(mainTs).toContain('goToLoggedInPlay();');
-    expect(mainTs).toContain("setupNavBtn(navBtnPlay, '#hero-view', enterOnlinePlayFlow);");
+    expect(html).toContain('id="nav-btn-play" href="/"');
+    expect(playHtml).toContain('id="nav-btn-play" href="/"');
     expect(mainTs).toContain('const handleOnlineSelect = () => {');
     expect(mainTs).toContain("show('#login-panel');");
   });
@@ -703,6 +781,7 @@ describe('client HTML shell', () => {
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/links</loc>');
     expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/play</loc>');
+    expect(sitemapXml).toContain('<loc>https://worldofclaudecraft.com/community</loc>');
     expect(playHtml).toContain(
       '<link rel="canonical" href="https://worldofclaudecraft.com/play" />',
     );
@@ -731,14 +810,14 @@ describe('client HTML shell', () => {
     );
     expect(dataDeletionHtml).toContain('<h1>Data Deletion</h1>');
     expect(dataDeletionHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(dataDeletionHtml).toContain('href="https://discord.gg/GjhnUsBtw"');
+    expect(dataDeletionHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
     expect(dataDeletionHtml).toContain('href="/support">Support</a>');
     expect(supportHtml).toContain(
       '<link rel="canonical" href="https://worldofclaudecraft.com/support" />',
     );
     expect(supportHtml).toContain('<h1>Support</h1>');
     expect(supportHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(supportHtml).toContain('href="https://discord.gg/GjhnUsBtw"');
+    expect(supportHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
     expect(supportHtml).toContain('href="/data-deletion">Data Deletion page</a>');
     expect(supportHtml).toContain('"@type": "ContactPage"');
     expect(html).toContain(
@@ -761,16 +840,33 @@ describe('client HTML shell', () => {
     expect(serverMain).toContain("['/support', '/support.html']");
   });
 
-  it('loads Meta Pixel outside local development and tracks level 5', () => {
-    expect(html).toContain('https://connect.facebook.net/en_US/fbevents.js');
-    expect(html).toContain("fbq('init', '1692101265042180');");
-    expect(html).toContain("fbq('track', 'PageView');");
-    expect(html).toContain(
-      'https://www.facebook.com/tr?id=1692101265042180&ev=PageView&noscript=1',
+  it('keeps optional scripts off startup and tracks consented Meta milestones', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+      ['app.html', appHtml],
+    ] as const) {
+      expect(entry, name).not.toContain('https://www.googletagmanager.com/gtag/js');
+      expect(entry, name).not.toContain('https://connect.facebook.net/en_US/fbevents.js');
+      expect(entry, name).not.toContain('https://www.facebook.com/tr?');
+      expect(entry, name).not.toContain('https://challenges.cloudflare.com/turnstile/v0/api.js');
+    }
+
+    expect(privacyConsentTs).toContain('const GOOGLE_ANALYTICS_URL =');
+    expect(privacyConsentTs).toContain(
+      "const META_PIXEL_URL = 'https://connect.facebook.net/en_US/fbevents.js';",
     );
-    expect(html).toContain(
-      "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
+    expect(privacyConsentTs).toContain('if (choices.analytics) loadGoogleAnalytics();');
+    expect(privacyConsentTs).toContain('if (choices.marketing) loadMetaPixel();');
+
+    expect(mainTs).toContain(
+      "const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js';",
     );
+    expect(mainTs).toContain('function loadTurnstileApi(): Promise<TurnstileApi | undefined>');
+    expect(mainTs).toContain('script.src = TURNSTILE_SCRIPT_URL;');
+    expect(mainTs).toContain("if (el === '#login-panel') {");
+    expect(mainTs).toContain('ensureTurnstile();');
+    expect(mainTs).not.toContain('window.setTimeout(ensureTurnstile');
     expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
     expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
     expect(hudTs).toContain('if (ev.level === 5) {');
@@ -1398,6 +1494,21 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain("visualViewport?.addEventListener('scroll', syncAppViewport)");
   });
 
+  it('restores Play as the only current nav item from Login for Play and crest actions', () => {
+    const switchStart = mainTs.indexOf('function switchMainView(targetId: string): void');
+    const currentSync = mainTs.indexOf('setHeaderNavCurrent(navMap[targetId]);', switchStart);
+    const sameViewReturn = mainTs.indexOf('if (currentViewId === targetId)', switchStart);
+
+    expect(switchStart).toBeGreaterThan(-1);
+    expect(currentSync).toBeGreaterThan(switchStart);
+    expect(currentSync).toBeLessThan(sameViewReturn);
+    expect(mainTs).toContain("setHeaderNavCurrent('nav-btn-login');");
+    expect(html).toContain('id="nav-btn-play" href="/"');
+    expect(mainTs).toContain("setupNavBtn(headerLogoBtn, '#hero-view', () => {");
+    expect(mainTs).toContain("if (isCurrent) link.setAttribute('aria-current', currentKind);");
+    expect(mainTs).toContain("else link.removeAttribute('aria-current');");
+  });
+
   it('lets HUD windows scroll by touch on iOS (Bag / Market)', () => {
     // The HUD overlay must permit one-finger panning so scroll containers
     // inside it can scroll on iOS, `touch-action: none` here would block them
@@ -1617,18 +1728,51 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('ships a looping cinematic backdrop with a poster fallback, lazy-loaded for perf', () => {
-    expect(html).toContain('id="bg-home"');
-    expect(html).toContain('poster="/home-bg.png"');
-    // The 5.7MB mp4 is NOT eagerly fetched: no <source>/autoplay/preload in the
-    // static markup. main.ts attaches data-trailer-src only on capable devices;
-    // phones / Save-Data / reduced-motion / high-contrast keep the poster only.
-    expect(html).toContain('data-trailer-src="/home-bg.mp4"');
-    expect(html).toContain('preload="none"');
-    expect(html).not.toContain('<source src="/home-bg.mp4"');
+  it('ships deferred cinematic backdrops without preloading the loading screen', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+      ['app.html', appHtml],
+    ] as const) {
+      const trailer = entry.match(/<video id="bg-home"[^>]*><\/video>/)?.[0] ?? '';
+      expect(trailer, name).toContain('poster="/home-bg-v1.webp"');
+      expect(trailer, name).toContain('data-trailer-src="/home-bg.mp4"');
+      expect(trailer, name).toContain('preload="none"');
+      expect(trailer, name).not.toContain('autoplay');
+      expect(entry, name).not.toContain('<source src="/home-bg.mp4"');
+      expect(entry, name).not.toContain(
+        '<link rel="preload" as="image" href="/loading-screen-v1.webp" />',
+      );
+    }
+
     expect(mainTs).toContain('applyLandingBackdrop');
     // View transitions still honour reduced-motion.
     expect(mainTs).toContain('prefers-reduced-motion: reduce');
+  });
+
+  it('creates homepage audio only after a trusted gesture or explicit unmute', () => {
+    const createStart = marketingMusicTs.indexOf(
+      'function createMarketingMusic(): HTMLAudioElement',
+    );
+    const playStart = marketingMusicTs.indexOf('function playMarketingMusic(): void', createStart);
+    const initStart = marketingMusicTs.indexOf('export function initMarketingMusic(): void');
+    const fadeStart = marketingMusicTs.indexOf('export function fadeOutMarketingMusic', initStart);
+    const createMusic = marketingMusicTs.slice(createStart, playStart);
+    const initMusic = marketingMusicTs.slice(initStart, fadeStart);
+
+    expect(createStart).toBeGreaterThan(-1);
+    expect(createMusic).toContain('const el = new Audio();');
+    expect(createMusic).toContain("el.preload = 'none';");
+    expect(createMusic).toContain("el.src = '/audio/main-theme.mp3';");
+    expect(initMusic).not.toContain('new Audio(');
+    expect(initMusic).toContain(
+      "const gestureEvents: Array<keyof WindowEventMap> = ['pointerdown', 'keydown', 'touchstart'];",
+    );
+    expect(initMusic).toContain('const onGesture = (): void => playMarketingMusic();');
+    expect(marketingMusicTs).not.toContain("new Audio('/audio/main-theme.mp3')");
+    expect(marketingMusicTs).not.toContain("el.preload = 'auto';");
+    expect(mainTs).toContain('initMarketingMusic();');
+    expect(mainTs).toContain('fadeOutMarketingMusic();');
   });
 
   it('holds the cinematic trailer hidden until it plays, so the poster never flashes first', () => {

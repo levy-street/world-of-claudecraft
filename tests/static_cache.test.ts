@@ -63,6 +63,15 @@ describe('cacheControlFor', () => {
     expect(sfxBlobIntegrityMatches('/audio/sfx/runtime-pack.json', undefined)).toBe(true);
   });
 
+  it('marks explicitly versioned static artwork as immutable for a year', () => {
+    expect(cacheControlFor('/site/community-landscape-bg-v1.webp')).toBe(
+      'public, max-age=31536000, immutable',
+    );
+    expect(cacheControlFor('/home-bg-v2.webp')).toBe('public, max-age=31536000, immutable');
+    expect(cacheControlFor('/site/fonts/alegreya-v41-normal-400-700-latin.woff2')).toBe(
+      'public, max-age=31536000, immutable',
+    );
+  });
   it('requires revalidation for unhashed assets and html shells', () => {
     expect(cacheControlFor('/models/kaykit/knight.glb')).toBe('no-cache');
     expect(cacheControlFor('/textures/atlas.png')).toBe('no-cache');

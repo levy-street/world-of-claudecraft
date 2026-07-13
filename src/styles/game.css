@@ -1,0 +1,7 @@
+/* Deferred in-world styles. src/main.ts imports this chunk after the loading
+   screen paints, in parallel with game assets and the active locale. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@import "./layout.css";
+@import "./hud.css";
+@import "./components.css";

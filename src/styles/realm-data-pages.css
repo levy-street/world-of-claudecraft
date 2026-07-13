@@ -1,0 +1,1122 @@
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@layer index-extra {
+  body[data-site-home="true"] #highscores-view,
+  body[data-site-home="true"] #patch-notes-view {
+    isolation: isolate;
+    position: relative;
+    min-height: calc(100svh - 110px);
+    padding: clamp(34px, 5vw, 74px) clamp(18px, 4vw, 68px) clamp(58px, 7vw, 104px);
+    overflow: visible;
+    transform: none;
+  }
+
+  body[data-site-home="true"] #patch-notes-view {
+    background-color: #070a10;
+    background-image: url("/site/patch-notes-war-room-bg-v2.webp");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+
+  body[data-site-home="true"] #patch-notes-view::before,
+  body[data-site-home="true"] #patch-notes-view::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+  }
+
+  body[data-site-home="true"] .highscores-page-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        ellipse 58% 54% at 50% 23%,
+        rgba(2, 7, 15, 0.66),
+        rgba(2, 7, 15, 0.38) 58%,
+        rgba(2, 7, 15, 0.06)
+      ),
+      linear-gradient(180deg, rgba(1, 4, 10, 0.08), rgba(1, 4, 10, 0.32)),
+      #06101e url("/site/highscores-boar-battle-paladin-v3.webp") 50% 50% / cover no-repeat;
+  }
+
+  body[data-site-home="true"]:has(#highscores-view:not([hidden])) .highscores-page-backdrop {
+    display: block;
+  }
+
+  body[data-site-home="true"]:has(#highscores-view:not([hidden])) .homepage-footer {
+    background: linear-gradient(180deg, rgba(4, 11, 18, 0.82), rgba(2, 6, 11, 0.94));
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  body[data-site-home="true"] #patch-notes-view::before {
+    z-index: 0;
+    width: auto;
+    min-height: 0;
+    transform: none;
+    background: #070a10 url("/site/patch-notes-war-room-bg-v2.webp") 50% 50% / cover no-repeat;
+  }
+
+  body[data-site-home="true"] #patch-notes-view::after {
+    z-index: 1;
+    background:
+      radial-gradient(ellipse at 50% 32%, rgba(3, 8, 15, 0.16), rgba(2, 5, 10, 0.42) 72%),
+      linear-gradient(180deg, rgba(1, 4, 8, 0.08), rgba(1, 4, 8, 0.42));
+  }
+
+  .realm-data-page {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 1020px);
+    margin: 0 auto;
+    color: #f7f2e8;
+  }
+
+  .realm-data-page--highscores {
+    width: min(100%, 830px);
+    margin-inline: auto;
+  }
+
+  .realm-data-page--highscores .realm-data-hero {
+    margin-bottom: clamp(72px, 10svh, 108px);
+  }
+
+  .realm-data-hero {
+    position: relative;
+    width: min(100%, 760px);
+    margin: 0 auto clamp(28px, 3vw, 44px);
+    text-align: center;
+    text-shadow: 0 3px 12px #000;
+  }
+
+  .realm-data-hero__kicker {
+    display: block;
+    margin-bottom: 9px;
+    color: #f5ce72;
+    font-family: var(--font-heading);
+    font-size: clamp(11px, 0.9vw, 14px);
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .realm-data-hero h2 {
+    margin: 0;
+    color: #fff8e7;
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 4.3vw, 68px);
+    font-weight: 500;
+    letter-spacing: 0.055em;
+    line-height: 1.02;
+    text-transform: uppercase;
+    text-wrap: balance;
+    background: linear-gradient(180deg, #fff9e9 10%, #f9d97f 56%, #b87820 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 3px 0 rgba(31, 15, 2, 0.9)) drop-shadow(0 0 18px rgba(255, 201, 88, 0.16));
+  }
+
+  .realm-data-hero p {
+    margin: 14px auto 0;
+    color: #e8dcc1;
+    font-family: var(--font-body, Georgia, serif);
+    font-size: clamp(16px, 1.35vw, 20px);
+    line-height: 1.55;
+  }
+
+  .realm-data-hero__rule {
+    display: flex;
+    width: min(68%, 430px);
+    height: 1px;
+    margin: 20px auto 0;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, transparent, rgba(235, 187, 76, 0.72), transparent);
+  }
+
+  .realm-data-hero__rule::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border: 1px solid #eec358;
+    background: #07101b;
+    box-shadow: 0 0 12px rgba(244, 199, 88, 0.35);
+    transform: rotate(45deg);
+  }
+
+  .realm-data-frame {
+    isolation: isolate;
+    container-name: highscore-frame;
+    container-type: inline-size;
+    position: relative;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 8px 6px 8px 8px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+    box-shadow: none;
+  }
+
+  .realm-data-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border: 0;
+    background: url("/site/highscores-frame-desktop-v5.webp") 50% 50% / 100% 100% no-repeat;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.58));
+    pointer-events: none;
+  }
+
+  .realm-data-frame::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(45, 97, 151, 0.17), transparent 38%),
+      linear-gradient(180deg, rgba(5, 14, 25, 0.985), rgba(2, 7, 13, 0.995));
+    box-shadow: inset 0 0 72px rgba(0, 0, 0, 0.58);
+    clip-path: polygon(
+      10px 0,
+      calc(100% - 10px) 0,
+      100% 10px,
+      100% calc(100% - 10px),
+      calc(100% - 10px) 100%,
+      10px 100%,
+      0 calc(100% - 10px),
+      0 10px
+    );
+    pointer-events: none;
+  }
+
+  .realm-data-frame__ornaments {
+    display: none;
+  }
+
+  .realm-data-frame__ornaments::before,
+  .realm-data-frame__ornaments::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 7px 9px rgba(0, 0, 0, 0.64));
+  }
+
+  .realm-data-frame__ornaments::before {
+    top: 0;
+    width: clamp(104px, 16cqi, 160px);
+    aspect-ratio: 262 / 185;
+    background-image: url("/site/highscores-frame-crest-top-v2.webp");
+    transform: translate(-50%, -34%);
+  }
+
+  .realm-data-frame__ornaments::after {
+    bottom: 0;
+    width: clamp(82px, 11cqi, 112px);
+    aspect-ratio: 246 / 192;
+    background-image: url("/site/highscores-frame-crest-bottom-v2.webp");
+    transform: translate(-50%, 42%);
+  }
+  #highscores-view .hs-leaderboard {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-height: min(64svh, 760px);
+    margin: 0;
+    padding: 0 4px 8px 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #a77a2c rgba(0, 0, 0, 0.25);
+    scrollbar-width: thin;
+  }
+
+  #highscores-view .hs-leaderboard::-webkit-scrollbar,
+  #patch-notes-view .news-body::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  #highscores-view .hs-leaderboard::-webkit-scrollbar-track,
+  #patch-notes-view .news-body::-webkit-scrollbar-track {
+    border: 1px solid rgba(205, 158, 65, 0.2);
+    background: rgba(0, 0, 0, 0.32);
+  }
+
+  #highscores-view .hs-leaderboard::-webkit-scrollbar-thumb,
+  #patch-notes-view .news-body::-webkit-scrollbar-thumb {
+    border: 2px solid #08111d;
+    background: linear-gradient(180deg, #d2a340, #74501b);
+  }
+
+  #highscores-view .hs-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 58px minmax(150px, 1fr) 120px 62px 72px 128px;
+    min-height: 50px;
+    padding: 9px 14px;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid transparent;
+    border-bottom-color: rgba(119, 151, 178, 0.15);
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(8, 20, 35, 0.72), rgba(4, 11, 20, 0.5));
+    color: #e9edf3;
+    font-size: 14px;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  #highscores-view .hs-row:nth-child(even) {
+    background: linear-gradient(90deg, rgba(13, 31, 51, 0.82), rgba(5, 13, 23, 0.58));
+  }
+
+  #highscores-view .hs-row:not(.hs-head):hover {
+    z-index: 1;
+    border-color: rgba(229, 185, 79, 0.45);
+    background: linear-gradient(90deg, rgba(25, 49, 72, 0.96), rgba(8, 18, 31, 0.84));
+    transform: translateX(2px);
+  }
+
+  #highscores-view .hs-head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    min-height: 42px;
+    border: 1px solid #8b6625;
+    background: linear-gradient(180deg, #172b40, #07111e) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    color: #f4d478;
+    font-size: 11px;
+    letter-spacing: 0.09em;
+  }
+
+  #highscores-view .hs-rank {
+    color: #b9c6d3;
+    font-size: 15px;
+  }
+
+  #highscores-view .hs-name {
+    color: #fff9e9;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+
+  #highscores-view .hs-realm,
+  #highscores-view .hs-lvl,
+  #highscores-view .hs-vlvl {
+    color: #bfcbd6;
+  }
+
+  #highscores-view .hs-xp {
+    color: #f0cd70;
+    font-weight: 700;
+  }
+
+  #highscores-view .hs-row.hs-top {
+    min-height: 59px;
+    margin-bottom: 4px;
+    border-color: rgba(226, 180, 74, 0.5);
+    background:
+      radial-gradient(circle at 7% 50%, rgba(255, 205, 79, 0.16), transparent 20%),
+      linear-gradient(90deg, rgba(43, 36, 24, 0.95), rgba(11, 24, 36, 0.88));
+    box-shadow:
+      inset 0 1px rgba(255, 239, 178, 0.08),
+      0 5px 14px rgba(0, 0, 0, 0.3);
+  }
+
+  #highscores-view .hs-row.hs-top .hs-rank {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    margin: auto;
+    place-items: center;
+    border: 1px solid #e2b84f;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 28%, #fff0a6, #aa6f16 42%, #321c06 76%);
+    color: #160d03;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.35);
+    box-shadow:
+      0 0 0 3px #07111c,
+      0 0 13px rgba(234, 184, 61, 0.28);
+  }
+
+  #highscores-view .hs-row.hs-top:nth-child(3) .hs-rank {
+    border-color: #c3d2df;
+    background: radial-gradient(circle at 35% 28%, #fff, #94a8b9 44%, #34424e 76%);
+  }
+
+  #highscores-view .hs-row.hs-top:nth-child(4) .hs-rank {
+    border-color: #d49a65;
+    background: radial-gradient(circle at 35% 28%, #ffd3a5, #a75b2d 44%, #492111 76%);
+  }
+
+  #highscores-view .hs-loading,
+  #highscores-view .hs-empty,
+  #highscores-view .hs-error {
+    min-height: 260px;
+    padding: 116px 20px 20px;
+    color: #e9dfc8;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .realm-data-page--patch-notes {
+    position: relative;
+    z-index: 2;
+    width: min(100%, 1040px);
+  }
+
+  #patch-notes-view .realm-data-hero {
+    width: min(100%, 780px);
+  }
+
+  .patch-notes-panel {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    text-align: left;
+  }
+
+  .patch-notes-panel::before,
+  .patch-notes-panel::after {
+    content: none;
+  }
+  .patch-notes-panel__rail {
+    display: none;
+    width: min(74%, 560px);
+    height: 18px;
+    margin: -33px auto 16px;
+    grid-template-columns: 1fr 18px 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .patch-notes-panel__rail span {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #d7a946);
+  }
+
+  .patch-notes-panel__rail span:last-child {
+    background: linear-gradient(90deg, #d7a946, transparent);
+  }
+
+  .patch-notes-panel__rail i {
+    width: 11px;
+    height: 11px;
+    margin: auto;
+    border: 1px solid #f0c65d;
+    background: #07111d;
+    box-shadow: 0 0 10px rgba(240, 198, 93, 0.4);
+    transform: rotate(45deg);
+  }
+
+  #patch-notes-view .news-feed {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    gap: clamp(24px, 3vw, 38px);
+    overflow: visible;
+  }
+
+  #patch-notes-view .news-item {
+    position: relative;
+    display: flex;
+    height: clamp(620px, 74svh, 720px);
+    min-width: 0;
+    padding: clamp(78px, 6.8vw, 90px) clamp(66px, 6vw, 80px) clamp(70px, 6.2vw, 84px);
+    flex-direction: column;
+    overflow: hidden;
+    isolation: isolate;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.48);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 680px;
+  }
+
+  #patch-notes-view .news-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border-style: solid;
+    border-color: transparent;
+    border-width: 64px 60px;
+    border-image-source: url("/site/patch-note-frame-v1.webp");
+    border-image-slice: 145 155;
+    border-image-width: 64px 60px;
+    border-image-repeat: stretch;
+    pointer-events: none;
+  }
+
+  #patch-notes-view .news-item::after {
+    content: "";
+    position: absolute;
+    inset: 58px 62px 60px;
+    z-index: 0;
+    border: 1px solid rgba(220, 177, 77, 0.4);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(39, 83, 127, 0.2), transparent 34%),
+      linear-gradient(180deg, rgba(5, 13, 23, 0.985), rgba(2, 7, 13, 0.995));
+    box-shadow:
+      inset 0 0 0 5px rgba(223, 181, 79, 0.08),
+      inset 0 0 80px rgba(0, 0, 0, 0.52),
+      0 0 0 4px rgba(1, 4, 8, 0.78);
+    pointer-events: none;
+  }
+
+  #patch-notes-view .news-item > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  #patch-notes-view .news-item-head {
+    display: flex;
+    flex: 0 0 auto;
+    margin: 0 0 20px;
+    padding: 0 0 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px 18px;
+    border-bottom: 1px solid rgba(216, 170, 71, 0.38);
+  }
+
+  #patch-notes-view .news-item-title {
+    min-width: min(100%, 300px);
+    margin: 0;
+    flex: 1 1 420px;
+    color: #fff4d2;
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 2vw, 29px);
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px #000;
+    overflow-wrap: anywhere;
+  }
+
+  #patch-notes-view .news-item-meta {
+    display: flex;
+    margin: 2px 0 0 auto;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  #patch-notes-view .news-tag,
+  #patch-notes-view .news-date,
+  #patch-notes-view .news-badge {
+    display: inline-flex;
+    min-height: 27px;
+    padding: 4px 10px;
+    align-items: center;
+    border: 1px solid rgba(215, 169, 70, 0.42);
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #d8c79f;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  #patch-notes-view .news-badge {
+    border-color: rgba(219, 92, 77, 0.65);
+    color: #ffb3a8;
+  }
+
+  #patch-notes-view .news-body {
+    min-height: 0;
+    max-height: none;
+    padding: 0 12px 0 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #a77a2c rgba(0, 0, 0, 0.25);
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    color: #e8e0cf;
+    font-family: var(--font-body, Georgia, serif);
+    font-size: clamp(15px, 1.1vw, 17px);
+    line-height: 1.75;
+  }
+
+  #patch-notes-view .news-body h1,
+  #patch-notes-view .news-body h2,
+  #patch-notes-view .news-body h3 {
+    margin: 24px 0 8px;
+    color: #f0cf78;
+    font-family: var(--font-heading);
+    font-size: clamp(16px, 1.35vw, 20px);
+    letter-spacing: 0.025em;
+  }
+
+  #patch-notes-view .news-body li {
+    margin: 6px 0;
+    padding-left: 4px;
+  }
+
+  #patch-notes-view .news-body li::marker {
+    color: #d5a544;
+  }
+
+  #patch-notes-view .news-body code {
+    border: 1px solid rgba(105, 139, 170, 0.28);
+    background: #02070d;
+    color: #dcecff;
+  }
+
+  #patch-notes-view .news-link {
+    display: inline-flex;
+    min-height: 38px;
+    padding: 8px 15px;
+    align-items: center;
+    border: 1px solid #b98b35;
+    background: linear-gradient(180deg, rgba(37, 62, 82, 0.88), rgba(9, 22, 35, 0.96));
+    color: #f1d27c;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    text-decoration: none;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  #patch-notes-view .news-link:hover,
+  #patch-notes-view .news-link:focus-visible {
+    border-color: #f0c760;
+    background: linear-gradient(180deg, rgba(52, 80, 102, 0.94), rgba(13, 29, 45, 0.98));
+    color: #fff1bc;
+    text-decoration: none;
+  }
+
+  #patch-notes-view .news-loading,
+  #patch-notes-view .news-empty,
+  #patch-notes-view .news-error {
+    min-height: 280px;
+    padding: 124px 20px 30px;
+    color: #e9dfc8;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  @container highscore-frame (max-width: 720px) {
+    #highscores-view .hs-leaderboard {
+      display: flex;
+      max-height: 66svh;
+      padding-right: 4px;
+      flex-direction: column;
+      gap: 8px;
+      overflow-x: hidden;
+    }
+
+    #highscores-view .hs-row.hs-head {
+      display: none !important;
+    }
+
+    #highscores-view .hs-row:not(.hs-head) {
+      display: grid;
+      min-height: 0;
+      padding: 13px 14px;
+      grid-template-columns: 44px minmax(0, 1fr);
+      grid-template-areas:
+        "rank name"
+        "rank realm"
+        "rank lvl"
+        "rank vlvl"
+        "rank xp";
+      align-items: start;
+      gap: 5px 12px;
+      border: 1px solid rgba(120, 151, 178, 0.22);
+      background: linear-gradient(145deg, rgba(11, 28, 46, 0.96), rgba(3, 10, 18, 0.98));
+    }
+
+    #highscores-view .hs-rank {
+      grid-area: rank;
+      align-self: center;
+    }
+    #highscores-view .hs-name {
+      grid-area: name;
+      min-width: 0;
+      font-size: 16px;
+    }
+    #highscores-view .hs-realm {
+      grid-area: realm;
+    }
+    #highscores-view .hs-lvl {
+      grid-area: lvl;
+    }
+    #highscores-view .hs-vlvl {
+      grid-area: vlvl;
+    }
+    #highscores-view .hs-xp {
+      grid-area: xp;
+    }
+
+    #highscores-view .hs-realm,
+    #highscores-view .hs-lvl,
+    #highscores-view .hs-vlvl,
+    #highscores-view .hs-xp {
+      display: flex;
+      min-width: 0;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: right;
+    }
+
+    #highscores-view .hs-realm::before,
+    #highscores-view .hs-lvl::before,
+    #highscores-view .hs-vlvl::before,
+    #highscores-view .hs-xp::before {
+      content: attr(data-label);
+      color: #c9a75d;
+      font-family: var(--font-heading);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #highscores-view .hs-row.hs-top {
+      min-height: 0;
+      margin-bottom: 0;
+    }
+    #highscores-view .hs-row.hs-top .hs-rank {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  /* Let the desktop backing plate continue beneath the ornate rail so no page backdrop leaks through. */
+  @media (min-width: 901px) {
+    #patch-notes-view .news-item::after {
+      inset: 42px 46px 44px;
+    }
+  }
+  @media (max-width: 1040px) {
+    body[data-site-home="true"] #highscores-view::before {
+      background-position: 50% 50%;
+    }
+
+    body[data-site-home="true"] #patch-notes-view::before {
+      background-position: 52% 50%;
+    }
+
+    .realm-data-page--highscores {
+      margin-inline: auto;
+    }
+  }
+
+  @media (max-width: 900px) {
+    body[data-site-home="true"] #highscores-view,
+    body[data-site-home="true"] #patch-notes-view {
+      min-height: calc(100svh - 72px);
+      padding: 28px max(10px, env(safe-area-inset-right)) 46px max(10px, env(safe-area-inset-left));
+    }
+
+    body[data-site-home="true"] #highscores-view::before {
+      background-position: 50% 50%;
+    }
+
+    body[data-site-home="true"] #patch-notes-view::before {
+      background-position: 45% 50%;
+    }
+
+    body[data-site-home="true"] #highscores-view::after {
+      background:
+        radial-gradient(
+          ellipse 92% 48% at 50% 18%,
+          rgba(2, 6, 12, 0.68) 0%,
+          rgba(2, 6, 12, 0.42) 58%,
+          rgba(2, 6, 12, 0.08) 100%
+        ),
+        linear-gradient(180deg, rgba(2, 6, 12, 0.1), rgba(2, 6, 12, 0.34));
+    }
+
+    body[data-site-home="true"] #patch-notes-view::after {
+      background: linear-gradient(180deg, rgba(2, 6, 12, 0.42), rgba(2, 6, 12, 0.68));
+    }
+
+    .realm-data-hero {
+      margin-bottom: 24px;
+      padding-inline: 10px;
+    }
+
+    .realm-data-page--highscores .realm-data-hero {
+      margin-bottom: 24px;
+    }
+
+    body[data-site-home="true"]:has(#highscores-view:not([hidden])) .social-tray__launcher {
+      display: none;
+    }
+
+    .realm-data-hero__kicker {
+      font-size: 10px;
+      letter-spacing: 0.21em;
+    }
+
+    .realm-data-hero h2 {
+      font-size: clamp(32px, 10vw, 46px);
+      letter-spacing: 0.035em;
+    }
+
+    .realm-data-hero p {
+      max-width: 34ch;
+      font-size: 15px;
+    }
+
+    .realm-data-frame {
+      width: calc(100% - 56px);
+      margin-inline: auto;
+      padding: 6px;
+    }
+
+    .realm-data-frame::before {
+      inset: 0;
+      background-image: url("/site/highscores-frame-mobile-v5.webp");
+    }
+
+    .realm-data-frame::after {
+      inset: 4px;
+    }
+
+    #highscores-view .hs-leaderboard {
+      display: flex;
+      max-height: 66svh;
+      padding-right: 4px;
+      flex-direction: column;
+      gap: 8px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    #highscores-view .hs-head {
+      display: none;
+    }
+
+    #highscores-view .hs-row,
+    body.mobile-touch #highscores-view .hs-row {
+      display: grid;
+      flex: 0 0 auto;
+      min-height: 0;
+      padding: 13px 14px;
+      grid-template-columns: 44px minmax(0, 1fr);
+      grid-template-areas:
+        "rank name"
+        "rank realm"
+        "rank lvl"
+        "rank vlvl"
+        "rank xp";
+      align-items: start;
+      gap: 5px 12px;
+      border: 1px solid rgba(120, 151, 178, 0.22);
+      background: linear-gradient(145deg, rgba(11, 28, 46, 0.96), rgba(3, 10, 18, 0.98));
+    }
+
+    #highscores-view .hs-row.hs-head {
+      display: none;
+    }
+
+    #highscores-view .hs-rank {
+      grid-area: rank;
+      align-self: center;
+    }
+
+    #highscores-view .hs-name {
+      grid-area: name;
+      min-width: 0;
+      font-size: 16px;
+    }
+
+    #highscores-view .hs-realm {
+      grid-area: realm;
+    }
+
+    #highscores-view .hs-lvl {
+      grid-area: lvl;
+    }
+
+    #highscores-view .hs-vlvl {
+      grid-area: vlvl;
+    }
+
+    #highscores-view .hs-xp {
+      grid-area: xp;
+    }
+
+    #highscores-view .hs-realm,
+    #highscores-view .hs-lvl,
+    #highscores-view .hs-vlvl,
+    #highscores-view .hs-xp {
+      display: flex;
+      min-width: 0;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: right;
+    }
+
+    #highscores-view .hs-realm::before,
+    #highscores-view .hs-lvl::before,
+    #highscores-view .hs-vlvl::before,
+    #highscores-view .hs-xp::before {
+      content: attr(data-label);
+      color: #c9a75d;
+      font-family: var(--font-heading);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #highscores-view .hs-row.hs-top {
+      min-height: 0;
+      margin-bottom: 0;
+    }
+
+    #highscores-view .hs-row.hs-top .hs-rank {
+      width: 34px;
+      height: 34px;
+    }
+
+    .patch-notes-panel {
+      height: auto;
+      padding: 0;
+    }
+
+    .patch-notes-panel__rail {
+      width: 78%;
+      margin-top: -29px;
+      margin-bottom: 10px;
+    }
+
+    #patch-notes-view .news-feed {
+      max-height: none;
+      padding: 0;
+      gap: 28px;
+    }
+
+    #patch-notes-view .news-item {
+      height: clamp(560px, 76svh, 680px);
+      padding: 66px 42px 60px;
+    }
+
+    #patch-notes-view .news-item::before {
+      border-width: 54px 40px;
+      border-image-width: 54px 40px;
+    }
+
+    #patch-notes-view .news-item::after {
+      inset: 44px 34px 46px;
+    }
+
+    #patch-notes-view .news-item-head {
+      flex-direction: column;
+    }
+
+    #patch-notes-view .news-item-title {
+      width: 100%;
+      min-width: 0;
+      flex: 0 1 auto;
+    }
+
+    #patch-notes-view .news-item-meta {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+    }
+
+    #patch-notes-view .news-body {
+      max-height: none;
+      font-size: 15px;
+      line-height: 1.68;
+    }
+  }
+
+  @media (max-width: 900px) and (orientation: portrait) {
+    body[data-site-home="true"] #highscores-view::before {
+      background-image: url("/site/highscores-boar-battle-paladin-mobile-v3.webp");
+      background-position: 50% 100%;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .realm-data-frame {
+      width: calc(100% - 48px);
+    }
+
+    .realm-data-frame::after {
+      inset: 4px;
+    }
+
+    #patch-notes-view .news-feed {
+      padding-inline: 0;
+    }
+
+    #patch-notes-view .news-item {
+      padding-inline: 36px;
+    }
+  }
+
+  /* Phone reading mode: preserve the ornate plate while giving release copy room to breathe. */
+  @media (max-width: 600px) {
+    body[data-site-home="true"] #patch-notes-view {
+      padding-inline: max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-left));
+    }
+
+    .realm-data-page--patch-notes {
+      width: 100%;
+    }
+
+    #patch-notes-view .news-feed {
+      gap: 22px;
+    }
+
+    #patch-notes-view .news-item {
+      height: auto;
+      min-height: 0;
+      padding: 56px clamp(40px, 12vw, 47px) 50px;
+      contain-intrinsic-size: auto 700px;
+    }
+
+    #patch-notes-view .news-item::before {
+      inset: 0;
+      border: 0;
+      background: url("/site/patch-note-frame-mobile-v1.webp") 50% 50% / 100% 100% no-repeat;
+    }
+
+    #patch-notes-view .news-item::after {
+      inset: 42px 26px 44px;
+    }
+
+    #patch-notes-view .news-item-head {
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      gap: 8px;
+    }
+
+    #patch-notes-view .news-item-title {
+      font-size: clamp(19px, 6vw, 21px);
+      line-height: 1.14;
+      letter-spacing: 0.012em;
+    }
+
+    #patch-notes-view .news-item-meta {
+      gap: 6px;
+    }
+
+    #patch-notes-view .news-tag,
+    #patch-notes-view .news-date,
+    #patch-notes-view .news-badge {
+      min-height: 25px;
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+
+    #patch-notes-view .news-body {
+      max-height: min(58svh, 480px);
+      padding-right: 6px;
+      flex: 0 0 auto;
+      overflow-y: auto;
+      scrollbar-gutter: auto;
+      font-size: 15px;
+      line-height: 1.62;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #patch-notes-view .news-body h1,
+    #patch-notes-view .news-body h2,
+    #patch-notes-view .news-body h3 {
+      margin-top: 20px;
+      line-height: 1.25;
+    }
+
+    #patch-notes-view .news-item-foot {
+      display: flex;
+      margin-top: 14px;
+    }
+
+    #patch-notes-view .news-link {
+      width: 100%;
+      min-height: 42px;
+      justify-content: center;
+      padding: 9px 10px;
+      font-size: 11px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 340px) {
+    body[data-site-home="true"] #patch-notes-view {
+      padding-inline: max(2px, env(safe-area-inset-right)) max(2px, env(safe-area-inset-left));
+    }
+
+    #patch-notes-view .news-item::after {
+      right: 22px;
+      left: 22px;
+    }
+
+    #patch-notes-view .news-item-title {
+      font-size: 18px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #highscores-view .hs-row {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    body[data-site-home="true"] #highscores-view::before,
+    body[data-site-home="true"] #patch-notes-view::before,
+    body[data-site-home="true"] #highscores-view::after,
+    body[data-site-home="true"] #patch-notes-view::after,
+    #highscores-view .hs-row,
+    .realm-data-frame,
+    .patch-notes-panel,
+    #patch-notes-view .news-item {
+      background: Canvas;
+      border-color: CanvasText;
+      color: CanvasText;
+    }
+  }
+}

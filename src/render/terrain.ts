@@ -47,7 +47,7 @@ const NORMAL_ANISOTROPY = 4;
 
 function kickTerrainTex(key: string, file: string, srgb: boolean): void {
   registerPreload(
-    loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
+    () => loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
       return tex;

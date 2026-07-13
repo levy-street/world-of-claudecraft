@@ -72,6 +72,13 @@ const desktopApiOrigin = env(['VITE_DESKTOP_API_ORIGIN']);
 const isDesktopDevBuild = env(['VITE_DESKTOP_APP']) === '1';
 const apiProxyTarget =
   isDesktopDevBuild && desktopApiOrigin ? desktopApiOrigin : 'http://127.0.0.1:8787';
+const patchNotesProxyTarget =
+  env(['VITE_PATCH_NOTES_API_ORIGIN']) ?? 'https://worldofclaudecraft.com';
+const leaderboardProxyTarget =
+  env(['VITE_HIGHSCORES_API_ORIGIN', 'VITE_LEADERBOARD_API_ORIGIN']) ??
+  'https://worldofclaudecraft.com';
+const projectStatsProxyTarget =
+  env(['VITE_PROJECT_STATS_API_ORIGIN']) ?? 'https://worldofclaudecraft.com';
 const wsProxyTarget = apiProxyTarget.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
 
 // Pretty-URL aliases for standalone static HTML pages. Mirrors the production
@@ -85,8 +92,22 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/app', '/app.html'],
+  ['/app/', '/app.html'],
   ['/privacy', '/privacy.html'],
+  ['/highscores', '/highscores.html'],
+  ['/highscores/', '/highscores.html'],
+  ['/patch-notes', '/patch-notes.html'],
+  ['/patch-notes/', '/patch-notes.html'],
+  ['/news', '/news.html'],
+  ['/news/', '/news.html'],
+  ['/download', '/download.html'],
+  ['/download/', '/download.html'],
+  ['/community', '/community.html'],
+  ['/community/', '/community.html'],
   ['/privacy/', '/privacy.html'],
+  ['/cookies', '/cookies.html'],
+  ['/cookies/', '/cookies.html'],
   ['/terms', '/terms.html'],
   ['/terms/', '/terms.html'],
   ['/merch', '/merch.html'],
@@ -112,26 +133,131 @@ function isGuideSpaPath(pathOnly: string): boolean {
   return !last.includes('.');
 }
 function staticPageAliasPlugin() {
-  const rewrite = (req: { url?: string }) => {
+  const generatedLandingShells = new Set([
+    '/download.html',
+    '/highscores.html',
+    '/news.html',
+    '/patch-notes.html',
+  ]);
+  const rewrite = (req: { url?: string }, useGeneratedLandingShells: boolean) => {
     const url = req.url ?? '';
     const pathOnly = url.split('?')[0];
-    const target =
+    let target =
       STATIC_PAGE_ALIASES.get(pathOnly) ?? (isGuideSpaPath(pathOnly) ? '/guide.html' : undefined);
+    // Route-specific shells are emitted only by a production build. During `vite`
+    // development, retain the shared source shell; runtime head management supplies
+    // the same route metadata once the app starts.
+    if (!useGeneratedLandingShells && target && generatedLandingShells.has(target)) {
+      target = '/index.html';
+    }
     if (target) req.url = target + url.slice(pathOnly.length);
   };
-  const attach = (server: {
-    middlewares: {
-      use: (fn: (req: { url?: string }, res: unknown, next: () => void) => void) => void;
-    };
-  }) => {
+  const attach = (
+    server: {
+      middlewares: {
+        use: (fn: (req: { url?: string }, res: unknown, next: () => void) => void) => void;
+      };
+    },
+    useGeneratedLandingShells: boolean,
+  ) => {
     server.middlewares.use((req, _res, next) => {
-      rewrite(req);
+      rewrite(req, useGeneratedLandingShells);
       next();
     });
   };
-  return { name: 'woc-static-page-alias', configureServer: attach, configurePreviewServer: attach };
+  return {
+    name: 'woc-static-page-alias',
+    configureServer: (server: Parameters<typeof attach>[0]) => attach(server, false),
+    configurePreviewServer: (server: Parameters<typeof attach>[0]) => attach(server, true),
+  };
 }
 
+// The four public landing views are one app shell, but they are individual search
+// destinations. Build static HTML variants so crawlers and social previews receive
+// their route-specific head tags before JavaScript executes.
+const LANDING_ROUTE_STATIC_SEO = [
+  {
+    path: '/download',
+    file: 'download.html',
+    title: 'Download World of ClaudeCraft | Desktop Launcher',
+    description:
+      'Download the World of ClaudeCraft desktop launcher for a dedicated classic-style MMO experience.',
+  },
+  {
+    path: '/highscores',
+    file: 'highscores.html',
+    title: 'World of ClaudeCraft High Scores | Global Leaderboard',
+    description:
+      'Explore the World of ClaudeCraft global leaderboard and see the adventurers leading the realm.',
+  },
+  {
+    path: '/news',
+    file: 'news.html',
+    title: 'World of ClaudeCraft News & Updates',
+    description:
+      'Read the latest World of ClaudeCraft news, community stories, livestream updates, and announcements.',
+  },
+  {
+    path: '/patch-notes',
+    file: 'patch-notes.html',
+    title: 'World of ClaudeCraft Patch Notes | Latest Updates',
+    description:
+      'Read the latest World of ClaudeCraft patch notes, releases, improvements, and game updates.',
+  },
+] as const;
+
+function routeStaticHtml(html: string, page: (typeof LANDING_ROUTE_STATIC_SEO)[number]): string {
+  const canonical = `https://worldofclaudecraft.com${page.path}`;
+  const meta = (attribute: string, value: string) => `<meta ${attribute} content="${value}" />`;
+  const pageJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${canonical}#webpage`,
+    url: canonical,
+    name: page.title,
+    description: page.description,
+    inLanguage: 'en',
+    isPartOf: { '@id': 'https://worldofclaudecraft.com/#website' },
+  });
+
+  return html
+    .replace(/<title\b[^>]*>[\s\S]*?<\/title>/i, `<title>${page.title}</title>`)
+    .replace(/<meta\b[^>]*name="description"[^>]*>/i, meta('name="description"', page.description))
+    .replace(/<meta\b[^>]*property="og:title"[^>]*>/i, meta('property="og:title"', page.title))
+    .replace(/<meta\b[^>]*property="og:description"[^>]*>/i, meta('property="og:description"', page.description))
+    .replace(/<meta\b[^>]*property="og:url"[^>]*>/i, meta('property="og:url"', canonical))
+    .replace(/<meta\b[^>]*name="twitter:title"[^>]*>/i, meta('name="twitter:title"', page.title))
+    .replace(/<meta\b[^>]*name="twitter:description"[^>]*>/i, meta('name="twitter:description"', page.description))
+    .replace(/<link rel="canonical" href="[^"]*"\s*\/>/i, `<link rel="canonical" href="${canonical}" />`)
+    .replace(
+      /<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\s*\/>/g,
+      (_match, locale: string, href: string) => {
+        const alternate = new URL(href);
+        alternate.pathname = page.path;
+        return `<link rel="alternate" hreflang="${locale}" href="${alternate}" />`;
+      },
+    )
+    .replace('</head>', `  <script id="landing-route-structured-data" type="application/ld+json">${pageJsonLd}</script>\n</head>`);
+}
+
+function landingRouteStaticSeoPlugin() {
+  let outDir = path.resolve(root, 'dist');
+  return {
+    name: 'woc-landing-route-static-seo',
+    apply: 'build' as const,
+    configResolved(cfg: { root: string; build: { outDir: string } }) {
+      outDir = path.isAbsolute(cfg.build.outDir) ? cfg.build.outDir : path.resolve(cfg.root, cfg.build.outDir);
+    },
+    writeBundle() {
+      const indexPath = path.join(outDir, 'index.html');
+      if (!existsSync(indexPath)) return;
+      const indexHtml = readFileSync(indexPath, 'utf8');
+      for (const page of LANDING_ROUTE_STATIC_SEO) {
+        writeFileSync(path.join(outDir, page.file), routeStaticHtml(indexHtml, page));
+      }
+    },
+  };
+}
 // Phase 4 (i18n Lazy Locales): after the production build, resolve each lazy locale
 // chunk's content-hashed URL from Vite's manifest and template a { locale: hashedChunkUrl }
 // lookup into dist/index.html. The inline boot <script> reads it to modulepreload a stored
@@ -150,7 +276,7 @@ function i18nModulepreloadPlugin() {
         ? cfg.build.outDir
         : path.resolve(cfg.root, cfg.build.outDir);
     },
-    closeBundle() {
+    writeBundle() {
       const { map } = templateModulepreload({ root, outDir, base });
       // eslint-disable-next-line no-console
       console.log(
@@ -302,6 +428,7 @@ export default defineConfig({
     ...(process.env.VITEST ? [svelteTesting()] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
+    landingRouteStaticSeoPlugin(),
     musicEditorSavePlugin(),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },
@@ -320,6 +447,19 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
+      // Patch notes are a global public feed, not realm-local game state. Keep
+      // them available when the local game server is not running (including
+      // `vite preview` on :4173), while retaining an env override for backend work.
+      '/api/releases': { target: patchNotesProxyTarget, changeOrigin: true },
+      // The homepage global board is a public read. During website-only work,
+      // route it to the live source instead of a missing local game server.
+      // Production stays same-origin, while backend work can opt back into a
+      // local/staging board through VITE_HIGHSCORES_API_ORIGIN.
+      '/api/leaderboard': { target: leaderboardProxyTarget, changeOrigin: true },
+      // The launcher count is another public, global read used by the homepage,
+      // /play, and /app. Website-only dev/preview should show the same live total
+      // instead of falling through to an absent local game server.
+      '/api/project-stats': { target: projectStatsProxyTarget, changeOrigin: true },
       '/api': { target: apiProxyTarget, changeOrigin: true },
       '/admin/api': { target: apiProxyTarget, changeOrigin: true },
       '/ws': { target: wsProxyTarget, ws: true },
@@ -343,6 +483,8 @@ export default defineConfig({
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
         play: fileURLToPath(new URL('play.html', import.meta.url)),
+        community: fileURLToPath(new URL('community.html', import.meta.url)),
+        app: fileURLToPath(new URL('app.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
       },

@@ -728,7 +728,7 @@
   }
   /* Landing accessibility toggle: cinematic trailer vs static high-contrast
      backdrop. Sits beside the language picker (the page's preferences area).
-     ≥40px tall tap target, aria-pressed reflects state. */
+     Ã¢â€°Â¥40px tall tap target, aria-pressed reflects state. */
   .landing-contrast-toggle {
     min-height: 40px;
     padding: 0 14px;
@@ -1369,7 +1369,7 @@
     letter-spacing: 0.6px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--color-border-default);
-    background: none !important;
+    background: none;
   }
   .hs-rank {
     text-align: center;
@@ -1883,7 +1883,7 @@
     inset: 0;
     z-index: 150;
     display: none;
-    background: #0a0d14 url("/loading-screen.jpg") center / cover no-repeat;
+    background: #0a0d14 url("/loading-screen-v1.webp") center / cover no-repeat;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
@@ -5757,21 +5757,20 @@
     }
   }
 
-  /* ---------- Mobile pre-game chrome compaction (login/charselect/charcreate) ----------
+  /* ---------- Mobile pre-game chrome compaction (deep auth/character panels) ----------
      On a mobile-touch web session (not just the native-app wrapper, which already had this
      treatment landscape-only), the marketing lockup (logo + "official website" tagline) and
      the page footer (language/graphics pickers, legal links) sit above and below every
      auth/character panel regardless of orientation, forcing a scroll past them to reach the
-     login fields, character roster, or Back/New Character buttons. Once a real auth/character
-     panel is the active start panel, shrink the logo, drop the tagline, and hide the footer so
-     the primary action never requires scrolling on a phone screen. The mode-select landing
-     panel keeps the full marketing chrome untouched. */
+     character roster or Back/New Character buttons. Once a deep auth/character panel is the
+     active start panel, shrink the logo, drop the tagline, and hide the footer so the primary
+     action never requires scrolling on a phone screen. The mode and login launcher faces keep
+     the full marketing chrome untouched. */
   /* !important: the hud-mobile layer (hud.mobile.css) is declared AFTER this shell
      layer (see src/styles/index.css's @layer order), so its unconditional
      `body.mobile-touch #title-logo` width rule would otherwise win over this one
      regardless of selector specificity. !important is the one thing that still
      lets an earlier layer beat a later one. */
-  body.mobile-touch[data-start-panel="login-panel"] .official-site-copy,
   body.mobile-touch[data-start-panel="discord-choice-panel"] .official-site-copy,
   body.mobile-touch[data-start-panel="realm-panel"] .official-site-copy,
   body.mobile-touch[data-start-panel="charselect-panel"] .official-site-copy,
@@ -5779,7 +5778,6 @@
   body.mobile-touch[data-start-panel="offline-select"] .official-site-copy {
     display: none !important;
   }
-  body.mobile-touch[data-start-panel="login-panel"] #title-logo,
   body.mobile-touch[data-start-panel="discord-choice-panel"] #title-logo,
   body.mobile-touch[data-start-panel="realm-panel"] #title-logo,
   body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,
@@ -5788,7 +5786,6 @@
     width: min(140px, 26vw) !important;
     margin-bottom: 2px !important;
   }
-  body.mobile-touch[data-start-panel="login-panel"] #hero-view,
   body.mobile-touch[data-start-panel="discord-choice-panel"] #hero-view,
   body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
   body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
@@ -5797,7 +5794,6 @@
     gap: 8px !important;
     justify-content: flex-start !important;
   }
-  body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container,
   body.mobile-touch[data-start-panel="discord-choice-panel"] #homepage-views-container,
   body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
   body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
@@ -5806,7 +5802,6 @@
     padding-top: max(8px, env(safe-area-inset-top)) !important;
     padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
   }
-  body.mobile-touch[data-start-panel="login-panel"] .homepage-footer,
   body.mobile-touch[data-start-panel="discord-choice-panel"] .homepage-footer,
   body.mobile-touch[data-start-panel="realm-panel"] .homepage-footer,
   body.mobile-touch[data-start-panel="charselect-panel"] .homepage-footer,
@@ -5949,6 +5944,27 @@
 
   /* The floating hamburger above reserves zero flow height, so the container and
      #hero-view below get the FULL viewport height, not height-minus-header. */
+
+  /* The roster panels deliberately leave a little breathing room at the viewport
+     edge on phones. That gutter must sit on a quiet canvas, not expose the moving
+     landing trailer as a distracting seam beside the character artwork. */
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop {
+    background: #030407;
+  }
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop .bg-trailer,
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop .bg-trailer-scrim,
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop .portal-ring,
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop .portal-ring-reverse,
+  body.mobile-touch[data-start-panel="charselect-panel"] #start-screen-backdrop .nebula-overlay,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop .bg-trailer,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop .bg-trailer-scrim,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop .portal-ring,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop .portal-ring-reverse,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #start-screen-backdrop .nebula-overlay {
+    display: none;
+  }
+
   @media (orientation: landscape) {
     body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
     body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container {
@@ -7206,7 +7222,7 @@
       0 0 12px var(--tier-color, #fff);
   }
   .se-swatch.sel::after {
-    content: "✓";
+    content: "Ã¢Å“â€œ";
     position: absolute;
     right: 3px;
     bottom: 1px;
@@ -7401,5 +7417,85 @@
   }
   #desktop-update-toast .desktop-update-restart {
     border-color: var(--color-primary);
+  }
+
+  /* Homepage server selector status and lifetime account total from PR #1511. */
+  .server-realm-line,
+  .server-opt-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .server-opt-stats {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .server-select-trigger {
+    gap: 14px;
+    min-height: 66px;
+    padding: 13px 18px;
+  }
+
+  .server-dot {
+    width: 11px;
+    height: 11px;
+  }
+
+  .server-select-text {
+    gap: 3px;
+  }
+
+  .server-select-value {
+    font-size: 18px;
+    line-height: 1.25;
+    word-spacing: 2px;
+  }
+
+  .server-select-sub {
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: 13.5px;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+
+  .server-stat-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .server-stat-line .stats-value {
+    margin-right: 0;
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .server-stat-line > span {
+    font-family: var(--font-ui);
+    line-height: 1;
+  }
+
+  .server-select-option {
+    gap: 13px;
+    min-height: 52px;
+    padding: 13px 14px;
+  }
+
+  .server-opt-name {
+    font-size: 16px;
+    word-spacing: 1.5px;
+  }
+
+  .server-opt-desc {
+    font-size: 12.5px;
   }
 }

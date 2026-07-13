@@ -16,7 +16,7 @@ import {
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
-import { pageFor } from '../src/guide/pages';
+import { loadPage } from '../src/guide/pages';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
@@ -52,7 +52,10 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   /\r\n/g,
   '\n',
 );
-const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
+const guideMain = readFileSync(new URL('../src/guide/main.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
 );
@@ -138,9 +141,9 @@ describe('Guide entry wiring', () => {
   // A route with no registered page silently renders the placeholder; a route or class
   // page missing from the sitemap is invisible to crawlers. These gates fail the build
   // instead, so adding a page (like Delves) means wiring all of route + module + sitemap.
-  it('registers a page module for every route', () => {
+  it('registers a page module for every route', async () => {
     for (const r of GUIDE_ROUTES) {
-      expect(pageFor(r.id), `route "${r.id}" has no registered page module`).toBeTruthy();
+      expect(await loadPage(r.id), `route "${r.id}" has no registered page module`).toBeTruthy();
     }
   });
 
@@ -178,6 +181,9 @@ describe('guide.html shell', () => {
 
   it('loads the guide client module and a noscript fallback', () => {
     expect(guideHtml).toContain('<script type="module" src="/src/guide/main.ts"></script>');
+    expect(guideMain).toContain(
+      "if (sitePresenceStarted || !privacyConsent.allowed('analytics')) return;",
+    );
     expect(guideHtml).toContain('<noscript>');
   });
 });

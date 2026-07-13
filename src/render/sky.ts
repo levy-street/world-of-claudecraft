@@ -125,13 +125,7 @@ type NavigatorWithBackdropHints = Navigator & {
   readonly webkitConnection?: NetworkInformationLike;
 };
 
-/** Typed read of the Save-Data client hint (the user asked to conserve data). */
-export function navigatorSaveData(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  const nav = navigator as NavigatorWithBackdropHints;
-  const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
-  return !!connection?.saveData;
-}
+export { navigatorSaveData } from '../game/network_hints';
 
 function shouldUseLiteBackdrop(): boolean {
   if (typeof location !== 'undefined') {
@@ -178,14 +172,14 @@ const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // preload, so this best-effort device gate keeps mobile out of the worst path.
 if (GFX.standardMaterials) {
   for (const biome of Object.keys(BIOME_HDRI) as BiomeId[]) {
-    registerPreload(
+    registerPreload(() =>
       loadHdr(BIOME_HDRI[biome]).then((tex) => {
         tex.wrapS = THREE.RepeatWrapping; // azimuth rotation needs u to wrap
         hdriStore[biome] = tex;
         return tex;
       }),
     );
-    registerPreload(
+    registerPreload(() =>
       loadTexture(BIOME_BACKDROP[biome], { srgb: true })
         .then((tex) => {
           tex.wrapS = THREE.RepeatWrapping;

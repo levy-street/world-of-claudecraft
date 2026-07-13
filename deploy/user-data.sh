@@ -83,7 +83,7 @@ fi
 cat > /etc/caddy/Caddyfile <<CADDY
 $SITE {
 	reverse_proxy localhost:8787
-	encode gzip
+	encode zstd gzip
 }
 CADDY
 if [ -n "$ADMIN_DOMAIN" ]; then
@@ -91,7 +91,7 @@ if [ -n "$ADMIN_DOMAIN" ]; then
 
 $ADMIN_DOMAIN {
 	reverse_proxy localhost:8787
-	encode gzip
+	encode zstd gzip
 }
 CADDY
 fi

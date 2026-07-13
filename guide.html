@@ -84,7 +84,8 @@
 
 <!-- LCP: the overview hero backdrop. Preload it high-priority since the SPA renders the
      hero after the module parses, so the image is not otherwise parser-discoverable. -->
-<link rel="preload" as="image" href="/loading-screen.jpg" fetchpriority="high" />
+<link rel="preload" as="image" href="/loading-screen-mobile-v1.webp" media="(max-width: 720px)" fetchpriority="high" />
+<link rel="preload" as="image" href="/loading-screen-v1.webp" media="(min-width: 721px)" fetchpriority="high" />
 
 <!-- i18n stored-locale modulepreload (mirrors index.html / play.html). For a returning
      visitor whose stored locale is non-English, preload that locale's content-hashed

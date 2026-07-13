@@ -167,7 +167,7 @@ export function ensureValeCupAssets(): Promise<void> {
 
 // Boot-gate the kit fetches (tier-INDEPENDENT set, the props.ts preload law);
 // headless/test imports never fetch.
-if (typeof window !== 'undefined') registerPreload(ensureValeCupAssets());
+if (typeof window !== 'undefined') registerPreload(() => ensureValeCupAssets());
 
 function kitAsset(name: KitPiece): KitAsset {
   const a = kitAssets.get(name);

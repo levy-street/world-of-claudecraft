@@ -1,0 +1,87 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 240 112"
+  preserveAspectRatio="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1520"/>
+      <stop offset="0.56" stop-color="#050a12"/>
+      <stop offset="1" stop-color="#02050a"/>
+    </linearGradient>
+    <linearGradient id="outer-rail" x1="0" y1="1" x2="0" y2="111" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4dc99"/>
+      <stop offset="1" stop-color="#9a681f"/>
+    </linearGradient>
+    <linearGradient id="inner-rail" x1="0" y1="6.5" x2="0" y2="106.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#d8a343" stop-opacity="0.22"/>
+    </linearGradient>
+    <radialGradient id="socket-recess" cx="50%" cy="44%" r="62%">
+      <stop offset="0" stop-color="#0a1723"/>
+      <stop offset="0.68" stop-color="#050b12"/>
+      <stop offset="1" stop-color="#010307"/>
+    </radialGradient>
+    <linearGradient id="socket-rim" x1="80" y1="18" x2="156" y2="94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b3"/>
+      <stop offset="0.34" stop-color="#d9a33e"/>
+      <stop offset="0.68" stop-color="#8f5b18"/>
+      <stop offset="1" stop-color="#e1ae4b"/>
+    </linearGradient>
+    <linearGradient id="divider" x1="0" y1="22" x2="0" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d8a343" stop-opacity="0"/>
+      <stop offset="0.14" stop-color="#d8a343" stop-opacity="0.52"/>
+      <stop offset="0.5" stop-color="#ffe7a1" stop-opacity="0.94"/>
+      <stop offset="0.86" stop-color="#d8a343" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#d8a343" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M240 1H40C22 1.5 9 9 4 23C0.5 33 2.5 44 9 50.5C11.5 53 14.5 54.8 18 56C14 58 10.8 61 9 65C7.5 68.5 9 72 13 75V88C13 101.5 23 111 38 111H240Z"
+    fill="url(#panel)"
+  />
+
+  <!-- The uninterrupted rails are mounted behind the crest socket. -->
+  <path
+    d="M240 1H40C22 1.5 9 9 4 23C0.5 33 2.5 44 9 50.5C11.5 53 14.5 54.8 18 56C14 58 10.8 61 9 65C7.5 68.5 9 72 13 75V88C13 101.5 23 111 38 111H240"
+    fill="none"
+    stroke="url(#outer-rail)"
+    stroke-width="2"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d="M240 6.5H42C27 6.5 15.5 12.5 11 25C8 33.5 10 41.5 15 46.5C18.5 50 22 52 26 53.5L31 56L26 58.5C20.5 61.5 16.5 65 16 68.5C15.5 70.5 16.5 72.5 20 75V87C20 98.5 27.5 106.5 40 106.5H240"
+    fill="none"
+    stroke="url(#inner-rail)"
+    stroke-width="1"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+
+  <!-- A single faceted recess and one quiet inner accent replace the stacked rings. -->
+  <path
+    d="M118 8L137 12L153 24L163 40L166 56L163 72L153 88L137 100L118 104L99 100L83 88L73 72L70 56L73 40L83 24L99 12Z"
+    fill="url(#socket-recess)"
+    stroke="url(#socket-rim)"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+  <path
+    d="M118 13L135 16.5L149 27L158 42L161 56L158 70L149 85L135 95.5L118 99L101 95.5L87 85L78 70L75 56L78 42L87 27L101 16.5Z"
+    fill="none"
+    stroke="#e3b557"
+    stroke-opacity="0.38"
+    stroke-width="0.75"
+    stroke-linejoin="round"
+    vector-effect="non-scaling-stroke"
+  />
+
+  <!-- Divider is mounted into the panel, with a dark relief edge and end caps. -->
+  <path d="M215 22V90" stroke="#010307" stroke-opacity="0.88" stroke-width="1"/>
+  <path d="M214 22V90" stroke="url(#divider)" stroke-width="1"/>
+  <path d="M211.5 22H216.5M211.5 90H216.5" stroke="#d8a343" stroke-opacity="0.24" stroke-width="0.75"/>
+</svg>

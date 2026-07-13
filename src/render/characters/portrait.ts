@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
-import { assetsReady } from '../assets/preload';
+import { onAssetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
 import { VISUALS } from './manifest';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
@@ -51,16 +51,11 @@ let mount: THREE.Group | null = null;
 const cache = new Map<string, string>();
 const readyListeners = new Set<() => void>();
 let assetsAreReady = false;
-void assetsReady()
-  .then(() => {
-    assetsAreReady = true;
-    for (const cb of readyListeners) cb();
-    readyListeners.clear();
-  })
-  .catch(() => {
-    /* asset failure surfaces through the main loading screen; portraits just
-       keep falling back to the class crest. */
-  });
+onAssetsReady(() => {
+  assetsAreReady = true;
+  for (const cb of readyListeners) cb();
+  readyListeners.clear();
+});
 
 function ensureRig(): void {
   if (renderer) return;

@@ -14,7 +14,7 @@ import {
 import { buildChrome, type GuideChrome } from './chrome';
 import { applyRouteHead } from './head';
 import { breadcrumbHtml, mountToc, sequenceHtml } from './nav_aids';
-import { notFoundHtml, type PageContext, pageFor, placeholderHtml } from './pages';
+import { type GuidePage, loadPage, notFoundHtml, type PageContext, placeholderHtml } from './pages';
 import { GuideRouter } from './router';
 import { type GuideRoute, matchRoute } from './routes';
 
@@ -29,11 +29,12 @@ export class GuideApp {
   private chrome!: GuideChrome;
   private chromeAbort: AbortController | null = null;
   private firstNav = true;
+  private navigationRevision = 0;
   private pageCleanups: (() => void)[] = [];
 
   constructor(mount: HTMLElement) {
     this.mount = mount;
-    this.router = new GuideRouter((pathname) => this.navigate(pathname));
+    this.router = new GuideRouter((pathname) => void this.navigate(pathname));
   }
 
   start(): void {
@@ -43,6 +44,7 @@ export class GuideApp {
   }
 
   private rebuildChrome(): void {
+    delete this.mount.dataset.guideReady;
     this.chromeAbort?.abort();
     this.chromeAbort = new AbortController();
     this.chrome = buildChrome(
@@ -61,19 +63,39 @@ export class GuideApp {
   private async changeLanguage(lang: SupportedLanguage): Promise<void> {
     await ensureLocaleLoaded(lang);
     setLanguage(lang);
-    // The chrome rebuild rides the same transition as the page swap, so the whole
-    // relocalization lands as one cross-fade instead of the chrome popping first.
-    this.withViewTransition(() => {
+    // Load the translated page before swapping, then rebuild the chrome and page in
+    // the same cross-fade. Preserve the fragment so a deep link stays anchored.
+    await this.navigate(window.location.pathname + window.location.hash, () => {
       this.rebuildChrome();
       this.applyDocumentLang();
-      // Preserve the fragment across the relocalize so a language switch on a
-      // deep-linked section re-scrolls to that anchor, not back to the top.
-      this.renderRoute(window.location.pathname + window.location.hash);
     });
   }
 
-  private navigate(pathname: string): void {
-    this.withViewTransition(() => this.renderRoute(pathname));
+  private async navigate(pathname: string, beforeRender?: () => void): Promise<void> {
+    const revision = ++this.navigationRevision;
+    const waitingMainEl = this.chrome.mainEl;
+    const match = matchRoute(pathname);
+    let page: GuidePage | null = null;
+
+    if (match) {
+      waitingMainEl.setAttribute('aria-busy', 'true');
+      try {
+        page = await loadPage(match.route.id);
+      } catch (error) {
+        console.error(`[guide] failed to load page module "${match.route.id}"`, error);
+      }
+      // A slower import from an earlier click must never replace a newer route.
+      if (revision !== this.navigationRevision) {
+        waitingMainEl.removeAttribute('aria-busy');
+        return;
+      }
+    }
+
+    waitingMainEl.removeAttribute('aria-busy');
+    this.withViewTransition(() => {
+      beforeRender?.();
+      this.renderRoute(pathname, match, page);
+    });
   }
 
   // Cross-fade DOM swaps through the View Transitions API where it exists. The initial
@@ -96,17 +118,22 @@ export class GuideApp {
     }
   }
 
-  private renderRoute(pathname: string): void {
-    // Tear down the previous page's listeners before swapping its DOM out.
+  private renderRoute(
+    pathname: string,
+    match: ReturnType<typeof matchRoute>,
+    page: GuidePage | null,
+  ): void {
+    const mainEl = this.chrome.mainEl;
+    // Keep the current page interactive while its successor loads, then tear down its
+    // listeners immediately before replacing the DOM.
     this.runPageCleanup();
-    const match = matchRoute(pathname);
     let titleKey: TranslationKey;
     let dynamicTitle: string | null = null;
     let headRoute: GuideRoute | null = null;
     let headSub = '';
     let detailId: string | null = null;
     if (!match) {
-      this.chrome.mainEl.innerHTML = notFoundHtml();
+      mainEl.innerHTML = notFoundHtml();
       titleKey = 'guide.notFound.title';
       this.chrome.setActive('');
       this.chrome.setSidebarVisible(false);
@@ -114,7 +141,6 @@ export class GuideApp {
     } else {
       const { route, params } = match;
       const ctx: PageContext = { params, sub: route.sub, titleKey: route.navKey };
-      const page = pageFor(route.id);
       const pageHtml = page ? page.render(ctx) : placeholderHtml(ctx);
       titleKey = page?.titleKey ?? route.navKey;
       dynamicTitle = page?.titleFor ? page.titleFor(ctx) : null;
@@ -124,15 +150,14 @@ export class GuideApp {
       // The home landing is a marketing page: no breadcrumb, prev/next, or TOC chrome.
       const isHome = route.id === 'home';
       if (isHome) {
-        this.chrome.mainEl.innerHTML = pageHtml;
+        mainEl.innerHTML = pageHtml;
       } else {
         const isDetail = params.length > 0;
         const leaf = dynamicTitle ?? t(route.navKey);
-        this.chrome.mainEl.innerHTML =
-          breadcrumbHtml(route, isDetail, leaf) + pageHtml + sequenceHtml(route);
+        mainEl.innerHTML = breadcrumbHtml(route, isDetail, leaf) + pageHtml + sequenceHtml(route);
       }
-      if (page?.mount) this.addCleanup(page.mount(this.chrome.mainEl, ctx));
-      if (!isHome) this.addCleanup(mountToc(this.chrome.mainEl));
+      if (page?.mount) this.addCleanup(page.mount(mainEl, ctx));
+      if (!isHome) this.addCleanup(mountToc(mainEl));
       this.chrome.setActive(route.sub);
       this.chrome.setSidebarVisible(!isHome);
       document.body.dataset.guideRoute = route.id;
@@ -144,10 +169,10 @@ export class GuideApp {
     // One seam for all per-route head metadata (title, description, canonical, og/twitter,
     // hreflang alternates, JSON-LD). Runs on every navigation and after a language switch.
     applyRouteHead({ route: headRoute, sub: headSub, title, detailId });
+    this.mount.dataset.guideReady = 'true';
     this.chrome.closeMenu();
     this.focusMain(pathname);
   }
-
   private addCleanup(cleanup: (() => void) | void): void {
     if (cleanup) this.pageCleanups.push(cleanup);
   }

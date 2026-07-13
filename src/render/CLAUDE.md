@@ -84,9 +84,10 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
-- **`preload.ts` is the boot gate.** Subsystems call `registerPreload(promise)` at
-  import time and `startGame` awaits `assetsReady()`, so `build*()` can read resolved
-  assets synchronously. A new module-load fetch MUST `registerPreload`.
+- **`preload.ts` is the boot gate.** Subsystems call `registerPreload(() => promise)` at
+  import time; the factory stays dormant on public landing pages. `startGame` awaits
+  `assetsReady()`, so `build*()` can read resolved assets synchronously. New boot assets
+  MUST register a lazy factory, never an already-started promise at module scope.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not

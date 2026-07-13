@@ -596,6 +596,7 @@ export interface ClientSession {
   fbp: string;
   fbc: string;
   sourceUrl: string;
+  marketingAllowed: boolean;
   isAdmin: boolean;
   // Expanded admin permissions, snapshotted at join like isAdmin (a role change
   // applies at the next login). Gates the in-game moderation commands.
@@ -2286,6 +2287,7 @@ export class GameServer {
         fbp?: string | null;
         fbc?: string | null;
         sourceUrl?: string | null;
+        marketingAllowed?: boolean;
         leaseNonce?: string;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
@@ -2400,6 +2402,7 @@ export class GameServer {
       fbp: meta.fbp ?? '',
       fbc: meta.fbc ?? '',
       sourceUrl: meta.sourceUrl ?? '',
+      marketingAllowed: meta.marketingAllowed ?? false,
       isAdmin: meta.isAdmin ?? false,
       // Permissions come only from the explicit set main.ts computes from the
       // account's roles; no is_admin fallback (fail closed, matching
@@ -2538,6 +2541,10 @@ export class GameServer {
       this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     }
     session.userAgent = meta.userAgent ?? '';
+    session.marketingAllowed = meta.marketingAllowed ?? false;
+    session.fbp = session.marketingAllowed ? (meta.fbp ?? '') : '';
+    session.fbc = session.marketingAllowed ? (meta.fbc ?? '') : '';
+    session.sourceUrl = session.marketingAllowed ? (meta.sourceUrl ?? '') : '';
     session.clientSeed = meta.clientSeed ?? '';
     this.botDetector.setTrackingConnection(session.botTrackingContext, true, meta);
     // per-login account state, freshly loaded by the auth path like any join
@@ -4971,7 +4978,7 @@ export class GameServer {
       }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
-        if (s) {
+        if (s?.marketingAllowed) {
           void trackReachedLevel5(
             s.characterId,
             {
@@ -4981,6 +4988,7 @@ export class GameServer {
               fbc: s.fbc,
             },
             s.sourceUrl,
+            true,
           );
         }
       }

@@ -73,12 +73,8 @@ describe('appearance skin selection', () => {
 
   it('loads alternate skin atlases on low graphics so previews keep distinct colours', () => {
     expect(characterAssetsSource).toContain('These load on every tier so skin');
-    expect(characterAssetsSource).toContain(
-      'for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));',
-    );
-    expect(characterAssetsSource).toContain(
-      'for (const url of SKINS.player_mech ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));',
-    );
+    expect(characterAssetsSource).toContain('for (const url of bootSkinUrls) registerPreload(() => loadSkinTexInto(url, skinTexByUrl));');
+    expect(characterAssetsSource).toContain('for (const url of SKINS.player_mech ?? []) if (url) jobs.push(loadSkinTexInto(url, skinTexByUrl));');
     expect(characterAssetsSource).toContain('if (!GFX.standardMaterials) return skinsReady;');
     expect(characterAssetsSource).not.toContain('Standard tier only — low tier aliases');
     expect(characterAssetsSource).not.toContain(

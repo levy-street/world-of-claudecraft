@@ -3,7 +3,7 @@
 // material variants, and bakes a single static idle-pose geometry per key for
 // the far-LOD / shadow-proxy path.
 //
-// Loading contract: fetches kick off at module import and register with the
+// Loading contract: lazy factories register at module import with the
 // preload registry; main.ts awaits assetsReady() before the Renderer exists,
 // so everything here can assume resolved GLTFs synchronously afterwards.
 import * as THREE from 'three';
@@ -410,7 +410,7 @@ const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
 
 for (const url of preloadUrls) {
   registerPreload(
-    loadGltf(url).then((g) => {
+    () => loadGltf(url).then((g) => {
       gltfByUrl.set(url, g);
     }),
   );
@@ -438,7 +438,7 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+for (const url of bootSkinUrls) registerPreload(() => loadSkinTexInto(url, skinTexByUrl));
 
 /** Resolved skin texture for a visual key + skin index, or null for the model's
  *  embedded default (index 0, unknown key, or an atlas that is not loaded yet). */

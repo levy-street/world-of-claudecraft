@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 76" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1724"/>
+      <stop offset="0.46" stop-color="#06101a"/>
+      <stop offset="1" stop-color="#02060c"/>
+    </linearGradient>
+    <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9a681f"/>
+      <stop offset="0.08" stop-color="#f4dc99"/>
+      <stop offset="0.2" stop-color="#d8a343"/>
+      <stop offset="0.5" stop-color="#9a681f"/>
+      <stop offset="0.8" stop-color="#d8a343"/>
+      <stop offset="0.92" stop-color="#f4dc99"/>
+      <stop offset="1" stop-color="#9a681f"/>
+    </linearGradient>
+    <radialGradient id="bloom" cx="50%" cy="42%" r="70%">
+      <stop offset="0" stop-color="#184d72" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#06101a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <path d="M12 1H1188L1199 12V64L1188 75H12L1 64V12Z" fill="url(#panel)" stroke="url(#rail)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  <path d="M15 5H1185L1195 15V61L1185 71H15L5 61V15Z" fill="url(#bloom)" stroke="#d8a343" stroke-opacity=".34" vector-effect="non-scaling-stroke"/>
+  <path d="M18 8H1182" fill="none" stroke="#fff0b3" stroke-opacity=".16" vector-effect="non-scaling-stroke"/>
+  <path d="M18 68H1182" fill="none" stroke="#6f4515" stroke-opacity=".62" vector-effect="non-scaling-stroke"/>
+  <path d="M12 1 21 10M1188 1 1179 10M12 75 21 66M1188 75 1179 66" fill="none" stroke="#f4dc99" stroke-opacity=".56" vector-effect="non-scaling-stroke"/>
+</svg>

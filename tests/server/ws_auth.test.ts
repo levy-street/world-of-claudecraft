@@ -11,6 +11,10 @@ import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
+import {
+  createPrivacyConsentRecord,
+  serializePrivacyConsentCookie,
+} from '../../src/privacy_consent_core';
 
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
@@ -103,7 +107,7 @@ function setup() {
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
     maxWsPerIpHard: 20,
   };
-  const req = {} as http.IncomingMessage;
+  const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } } as http.IncomingMessage;
   return { ws, game, session, deps, req };
 }
 
@@ -328,6 +332,14 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
 
   it('snapshots the staff roles into isAdmin + expanded adminPermissions, and rides the CAPI attribution', async () => {
     const { ws, game, deps, req } = setup();
+    req.headers.cookie = serializePrivacyConsentCookie(
+      createPrivacyConsentRecord({
+        analytics: false,
+        marketing: true,
+        x: false,
+        twitch: false,
+      }),
+    );
     deps.adminRolesForAccount = vi.fn(async () => ({ username: 'Op', roles: ['moderator'] }));
     deps.permissionsForRoles = vi.fn(() => new Set(['moderation.read', 'moderation.act']));
     deps.metaRequestUserData = vi.fn(() => ({ fbp: 'fb.1.a', fbc: 'fb.1.b' }));
@@ -353,6 +365,31 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         fbp: 'fb.1.a',
         fbc: 'fb.1.b',
         sourceUrl: 'https://example.test/',
+        marketingAllowed: true,
+      }),
+    );
+  });
+
+  it('keeps CAPI attribution out of a strict fallback session without consent', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.metaRequestUserData = vi.fn(() => ({ fbp: 'should-not-collect' }));
+    deps.metaEventSourceUrl = vi.fn(() => 'https://example.test/');
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+
+    expect(deps.metaRequestUserData).not.toHaveBeenCalled();
+    expect(deps.metaEventSourceUrl).not.toHaveBeenCalled();
+    expect(game.join).toHaveBeenCalledWith(
+      ws,
+      1,
+      7,
+      'Aldric',
+      'warrior',
+      null,
+      false,
+      expect.objectContaining({
+        marketingAllowed: false,
+        sourceUrl: undefined,
       }),
     );
   });

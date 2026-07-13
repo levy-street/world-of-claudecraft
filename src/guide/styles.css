@@ -1308,7 +1308,7 @@ body.guide-has-sidebar .guide-layout {
   z-index: -1;
   background:
     linear-gradient(180deg, rgba(8, 8, 13, 0.5) 0%, rgba(8, 8, 13, 0.78) 62%, var(--g-bg) 100%),
-    url("/loading-screen.jpg") center / cover no-repeat;
+    var(--g-guide-hero-image, url("/loading-screen-v1.webp")) center / cover no-repeat;
 }
 /* Portrait phones: the wide art's center crop is empty sky, so pull the framing toward
    the foreground figures and trim the height so the CTAs sit near the art, not below a
@@ -1542,8 +1542,12 @@ body[data-guide-route="home"] .guide-main {
 
 /* ----------------------------------------------------------------- footer */
 .guide-footer {
+  visibility: hidden;
   border-block-start: 1px solid var(--g-border-soft);
   background: var(--g-bg-2);
+}
+#guide-app[data-guide-ready="true"] .guide-footer {
+  visibility: visible;
 }
 .guide-footer-inner {
   max-width: var(--g-maxw);
@@ -3475,4 +3479,10 @@ a.guide-poi:hover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--g-text-muted);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --g-guide-hero-image: url("/loading-screen-mobile-v1.webp");
+  }
 }

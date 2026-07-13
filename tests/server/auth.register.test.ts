@@ -32,6 +32,10 @@ import {
   resetRateLimitClock,
   resetRateLimits,
 } from '../../server/ratelimit';
+import {
+  createPrivacyConsentRecord,
+  serializePrivacyConsentCookie,
+} from '../../src/privacy_consent_core';
 import { type FakeRes, fakeCtx, makeReq } from './helpers';
 
 // ---------------------------------------------------------------------------
@@ -247,16 +251,42 @@ describe('register handler', () => {
 
   it('fires the Meta CAPI AccountCreated event with the signup email (fire-and-forget)', async () => {
     const capiCalls: Array<{ id: unknown; userData: Record<string, unknown> }> = [];
+    const cookie = serializePrivacyConsentCookie(
+      createPrivacyConsentRecord({
+        analytics: false,
+        marketing: true,
+        x: false,
+        twitch: false,
+      }),
+    );
+
     installDb({
       trackAccountCreated: async (id, userData) => {
         capiCalls.push({ id, userData: userData as Record<string, unknown> });
       },
     });
-    const out = await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' });
+    const out = await runHandler(
+      { username: 'newhero', password: 'secret123', email: 'a@b.co' },
+      { headers: { cookie } },
+    );
     expect(out.status).toBe(200);
     expect(capiCalls).toHaveLength(1);
     expect(capiCalls[0].id).toBe(7);
     expect(capiCalls[0].userData.email).toBe('a@b.co');
+  });
+
+  it('does not fire Meta CAPI without marketing permission', async () => {
+    let capiCalls = 0;
+    installDb({
+      trackAccountCreated: async () => {
+        capiCalls++;
+      },
+    });
+
+    const out = await runHandler({ username: 'newhero', password: 'secret123', email: 'a@b.co' });
+
+    expect(out.status).toBe(200);
+    expect(capiCalls).toBe(0);
   });
 
   it('stores the signup email and sends the welcome mail for a valid address', async () => {

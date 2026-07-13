@@ -36,6 +36,7 @@ import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
+import { routes as privacyRegionRoutes } from '../privacy_region';
 import { routes as reportsRoutes } from '../reports';
 import { routes as steamRoutes } from '../steam';
 import { routes as userAssetsRoutes } from '../user_assets_routes';
@@ -129,6 +130,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...userAssetsRoutes,
   ...adminRoutes,
   ...oauthRoutes,
+  ...privacyRegionRoutes,
   ...internalRoutes,
   ...deedsRoutes,
   ...steamRoutes,

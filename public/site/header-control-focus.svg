@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="focus-gold" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff3bd"/>
+      <stop offset="0.48" stop-color="#ffe499"/>
+      <stop offset="1" stop-color="#c98218"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#focus-gold)" fill-rule="evenodd" d="M8 0H56L64 8V56L56 64H8L0 56V8ZM9.5 2H54.5L62 9.5V54.5L54.5 62H9.5L2 54.5V9.5Z"/>
+  <path fill="#02050a" fill-rule="evenodd" d="M9.5 2H54.5L62 9.5V54.5L54.5 62H9.5L2 54.5V9.5ZM11 4H53L60 11V53L53 60H11L4 53V11Z"/>
+</svg>

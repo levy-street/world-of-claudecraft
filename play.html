@@ -47,9 +47,6 @@
   })();
 </script>
 
-<!-- Cloudflare Turnstile (bot gate on login/registration). Rendered explicitly
-     by src/main.ts only when VITE_TURNSTILE_SITEKEY is configured. -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://worldofclaudecraft.com/play" />
@@ -110,7 +107,7 @@
   "inLanguage": "en",
   "sameAs": [
     "https://github.com/levy-street/world-of-claudecraft",
-    "https://discord.gg/GjhnUsBtw"
+    "https://discord.com/invite/worldofclaudecraft"
   ]
 }
 </script>
@@ -121,26 +118,14 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="preload" as="image" href="/loading-screen.jpg" />
+
 <link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
 <link rel="preload" as="image" href="./ui/cursors/arrow.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- Google tag (gtag.js) - skipped on localhost so dev sessions don't pollute analytics -->
-<script>
-  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
-    const s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BR5Z7GT7C2';
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){ dataLayer.push(arguments); };
-    gtag('js', new Date());
-    gtag('config', 'G-BR5Z7GT7C2');
-  }
-</script>
+<link rel="stylesheet" href="/site/fonts-v1.css" />
+
 <link rel="stylesheet" href="/src/styles/play.extra.css" />
+<link rel="stylesheet" href="/src/styles/site-news.css" media="print" onload="this.media='all'" />
+<link rel="stylesheet" href="/src/styles/site-header.css" />
 <style>
   /* Game CSS now lives in src/styles/* (the CSS extraction). This inline block was
      emptied: play.html previously carried a full, stale copy of the CSS that
@@ -152,6 +137,34 @@
 </style>
 </head>
 <body data-start-panel="mode-select">
+<script>
+  // Apply the persisted touch-interface tier before the first layout. main.ts
+  // recomputes the same classes at boot and on every viewport change.
+  (() => {
+    let interfaceMode = 0;
+    try {
+      const stored = JSON.parse(localStorage.getItem("woc_settings") ?? "null");
+      if (typeof stored?.interfaceMode === "number") interfaceMode = stored.interfaceMode;
+    } catch {
+      // Corrupt or unavailable storage falls back to automatic device detection.
+    }
+    const autoTouch = matchMedia(
+      '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)',
+    ).matches;
+    if (interfaceMode >= 1 && interfaceMode < 2) return;
+    if (interfaceMode < 2 && !autoTouch) return;
+    document.body.classList.add("mobile-touch");
+    const width = innerWidth;
+    const height = innerHeight;
+    const tier =
+      height <= 480 || width <= 700
+        ? "hud-mobile-compact"
+        : Math.min(width, height) >= 768 && width >= 1000
+          ? "hud-mobile-tablet"
+          : "hud-mobile-standard";
+    document.body.classList.add(tier);
+  })();
+</script>
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
@@ -477,66 +490,22 @@
            preload, no <source>): main.ts attaches the source and plays only on
            capable devices (see applyLandingBackdrop). Phones, Save-Data, reduced
            motion, and high contrast keep the poster only. -->
-      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg-v1.webp" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
       <div class="portal-ring-reverse"></div>
       <div class="nebula-overlay"></div>
     </div>
 
-    <header class="homepage-header">
-      <div class="header-logo-container">
-        <button type="button" class="header-logo-btn" id="header-logo-btn" data-i18n-aria="a11y.goHome" data-i18n-title="a11y.goHome" aria-label="Go to homepage" title="Go to homepage">
-          <img class="header-logo" src="/icon-192.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
-        </button>
-      </div>
-      
-      <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" data-i18n-aria="a11y.toggleMenu" aria-label="Toggle menu" aria-expanded="false">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-      </button>
-      
-      <div class="header-menu-container" id="header-menu-container">
-        <nav data-i18n-aria="a11y.mainNavigation" aria-label="Main navigation" class="homepage-nav">
-          <ul class="nav-list" role="list">
-            <li class="nav-item">
-              <button type="button" class="nav-link active" id="nav-btn-play" aria-selected="true" aria-pressed="true" data-i18n="nav.play">Play</button>
-            </li>
-            <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-highscores" aria-selected="false" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
-            </li>
-            <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-wiki" aria-selected="false" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
-            </li>
-            <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-news" aria-selected="false" aria-pressed="false" data-i18n="nav.news">News</button>
-            </li>
-            <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-download" aria-selected="false" aria-pressed="false" data-i18n="nav.download">Download</button>
-            </li>
-            <li class="nav-item">
-              <button type="button" class="nav-link" id="nav-btn-login" aria-selected="false" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
-            </li>
-          </ul>
-        </nav>
-
-        <div class="header-actions">
-          <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
-          <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            <span data-i18n="nav.donate">Donate</span>
-          </a>
-        </div>
-      </div>
-    </header>
+    <div data-shared-marketing-header></div>
 
     <div id="homepage-views-container">
+      <div id="main-view-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
       <section id="hero-view" class="view-section" aria-hidden="false">
         <h1 class="visually-hidden">World of ClaudeCraft</h1>
         
         <!-- Main Logo -->
-        <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+        <img class="main-logo" id="title-logo" src="/site/worldofclaudecraft-logo.webp" srcset="/site/worldofclaudecraft-logo-mobile-v2.webp 360w, /site/worldofclaudecraft-logo-mobile-v3.webp 400w, /site/worldofclaudecraft-logo-mobile-v1.webp 430w, /site/worldofclaudecraft-logo.webp 860w" sizes="(max-width: 620px) 220px, (max-width: 1279px) 340px, 680px" width="860" height="575" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" fetchpriority="high" />
 
         <div id="mode-select">
           <div class="play-console play-console-solo">
@@ -566,8 +535,8 @@
 
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
           <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
-          <!-- First-class onboarding: Continue with Discord at the top of the form. -->
-          <button type="button" class="btn" id="btn-login-discord" hidden style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#5865f2,#404ac4);border-color:#2a2f7a;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+
+          <button type="button" class="btn auth-discord-login" id="btn-login-discord" hidden>
             <svg viewBox="0 0 127.14 96.36" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>
             <span data-i18n="hudChrome.discord.loginCta">Continue with Discord</span>
           </button>
@@ -831,17 +800,104 @@
         </div>
       </section>
 
-      <section id="news-view" class="view-section" hidden aria-hidden="true">
+      <section id="patch-notes-view" class="view-section" hidden aria-hidden="true">
         <div class="parchment-panel news-panel">
           <div class="skeleton-icon-wrapper">
             <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
               <path fill="currentColor" d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6m-2 0l-8 5l-8-5h16m0 12H4V8l8 5l8-5v10z"/>
             </svg>
           </div>
-          <h2 class="skeleton-title" data-i18n="news.title">News & Updates</h2>
-          <p class="skeleton-desc" data-i18n="news.desc">Read the latest patch notes, events, and community updates.</p>
-          <div id="news-feed" class="news-feed" aria-live="polite">
-            <div class="news-loading" data-i18n="news.loading">Loading the latest updates…</div>
+          <h2 class="skeleton-title" data-i18n="landing.patchNotesTitle">Patch Notes</h2>
+          <p class="skeleton-desc" data-i18n="landing.patchNotesDesc">Review the latest gameplay changes, fixes, and release details.</p>
+          <div id="patch-notes-feed" class="news-feed" aria-live="polite">
+            <div class="news-loading" data-i18n="landing.patchNotesLoading">Loading the latest patch notes...</div>
+          </div>
+        </div>
+      </section>
+      <section id="news-view" class="view-section" hidden aria-hidden="true">
+        <div class="site-news-hub" aria-labelledby="news-view-title">
+          <header class="site-news-hub__intro">
+            <p class="site-news-eyebrow" data-i18n="landing.newsEyebrow">NEWS FROM THE REALM</p>
+            <h2 id="news-view-title" data-i18n="landing.newsTitle">News from Claudemoon</h2>
+            <p data-i18n="landing.newsBody">Follow the latest from World of ClaudeCraft and discover stories from behind the world.</p>
+          </header>
+
+          <div class="site-news-grid">
+            <section id="news-x-card" class="site-news-card site-news-card--x" data-x-state="consent" aria-labelledby="news-x-title">
+              <header class="site-news-card__head">
+                <p class="site-news-card__eyebrow" data-i18n="landing.newsEyebrow">NEWS FROM THE REALM</p>
+                <h3 id="news-x-title" class="site-news-card__title" data-i18n="landing.newsXTitle">Latest on X</h3>
+              </header>
+              <p data-i18n="landing.newsXIntro">Official posts from @WoClaudecraft</p>
+
+              <div class="news-x-state-shell" aria-live="polite" aria-atomic="true">
+                <div class="news-x-state news-x-state--consent">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXConsentTitle">X feed needs permission</h4>
+                    <p id="news-x-consent-description" data-i18n="landing.newsXConsentBody">This live feed needs permission to connect to X. X may receive information about your visit.</p>
+                    <p id="news-x-consent-note" class="news-x-state__note" data-i18n="landing.newsXConsentNote">Enable X content in Privacy Choices. You can change this anytime.</p>
+                  </div>
+                </div>
+                <div class="news-x-state news-x-state--loading">
+                  <div class="news-x-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <p data-i18n="landing.newsXLoading">Opening the X feed...</p>
+                </div>
+                <div class="news-x-state news-x-state--error">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXUnavailableTitle">We couldn't load the X feed</h4>
+                    <p data-i18n="landing.newsXUnavailableBody">It may be blocked by your browser, an extension, or a temporary issue with X.</p>
+                  </div>
+                </div>
+                <div class="news-x-state news-x-state--loaded">
+                  <p data-i18n="landing.newsXLoaded">X feed loaded.</p>
+                </div>
+                <div class="news-x-state news-x-state--hidden">
+                  <span class="news-x-state__emblem" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M18.24 2H21l-6.04 6.9L22 22h-5.51l-4.32-5.65L7.23 22H4.47l6.42-7.34L4.14 2h5.65l3.91 5.17L18.24 2Zm-.97 17.7h1.53L8.96 4.18H7.32L17.27 19.7Z" /></svg>
+                  </span>
+                  <div class="news-x-state__copy">
+                    <h4 data-i18n="landing.newsXHiddenTitle">Live feed unavailable here</h4>
+                    <p data-i18n="landing.newsXHiddenBody">The embedded X feed isn't available on smaller screens or in the app. Open @WoClaudecraft on X to see the latest posts.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="news-x-mount" class="news-x-mount">
+                <a class="twitter-timeline" data-theme="dark" data-dnt="true" data-height="640" href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer" data-i18n="landing.newsXOpen" data-i18n-aria="landing.newsXOpenAria" aria-label="Open @WoClaudecraft on X in a new tab">Open @WoClaudecraft on X</a>
+              </div>
+
+              <div class="news-x-actions">
+                <button type="button" id="news-x-privacy" class="site-news-button site-news-button--primary" aria-describedby="news-x-consent-description news-x-consent-note" data-i18n="landing.newsXPrivacyChoices">Privacy Choices</button>
+                <button type="button" id="news-x-retry" class="site-news-button" data-i18n="landing.newsXRetry" hidden>Try again</button>
+                <a id="news-x-permanent-fallback" class="site-news-external" href="https://x.com/WoClaudecraft" target="_blank" rel="noopener noreferrer" data-i18n="landing.newsXOpen" data-i18n-aria="landing.newsXOpenAria" aria-label="Open @WoClaudecraft on X in a new tab">Open @WoClaudecraft on X</a>
+              </div>
+            </section>
+
+            <section class="site-news-card site-news-card--blog" aria-labelledby="news-blog-title">
+              <header class="site-news-card__head">
+                <p class="site-news-card__eyebrow" data-i18n="landing.newsBlogEyebrow">THE CLAUDEMOON CHRONICLE</p>
+                <h3 id="news-blog-title" class="site-news-card__title" data-i18n="landing.newsBlogTitle">Latest stories</h3>
+              </header>
+              <div class="site-blog-list">
+                <article class="site-press-story">
+                  <a class="site-press-story__media" href="https://www.mmorpg.com/news/the-first-vibe-coded-mmorpg-is-free-open-source-and-surprisingly-complete-2000138347" target="_blank" rel="noopener noreferrer nofollow" data-i18n-aria="landing.newsPressLinkAria" aria-label="Read the MMORPG.com feature in a new tab">
+                    <img src="/site/eastbrook-dusk.webp" width="1440" height="793" data-i18n-alt="landing.newsPressPrimaryAlt" alt="Adventurers explore Eastbrook Vale in World of ClaudeCraft" loading="lazy" decoding="async" />
+                  </a>
+                  <div class="site-press-story__body">
+                    <p class="site-press-story__eyebrow" data-i18n="landing.newsPressEyebrow">PRESS SPOTLIGHT</p>
+                    <h4 data-i18n="landing.newsPressPrimaryTitle">The First Vibe Coded MMORPG Is Free, Open Source, and Surprisingly Complete</h4>
+                    <p data-i18n="landing.newsPressPrimaryBody">MMORPG.com explores the open world, shared adventures, and fast-moving experiment behind World of ClaudeCraft.</p>
+                    <a class="news-link" href="https://www.mmorpg.com/news/the-first-vibe-coded-mmorpg-is-free-open-source-and-surprisingly-complete-2000138347" target="_blank" rel="noopener noreferrer nofollow" data-i18n="landing.newsPressRead" data-i18n-aria="landing.newsPressLinkAria" aria-label="Read the MMORPG.com feature in a new tab">Read the feature</a>
+                  </div>
+                </article>
+              </div>
+            </section>
           </div>
         </div>
       </section>
@@ -890,7 +946,7 @@
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           <span data-i18n="footer.githubLabel">Open Source Project</span>
         </a>
-        <a class="social-link" href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
+        <a class="social-link" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
           <span data-i18n="footer.discordLabel">Join the Discord</span>
         </a>
@@ -904,6 +960,9 @@
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
         <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
+      </div>
+      <div class="footer-legal-row">
+        <a href="/cookies" class="footer-link" data-i18n="footer.cookies">Cookie Notice</a>
       </div>
       <div class="footer-lang-row">
         <div class="language-selector">
@@ -1027,7 +1086,7 @@
   </div>
 
   <div id="loading-screen">
-    <img class="ls-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+    <img class="ls-logo" src="/site/worldofclaudecraft-logo.webp" width="860" height="575" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" loading="lazy" decoding="async" />
     <div class="ls-progress">
       <div class="ls-bar"><div id="ls-fill"></div></div>
       <div id="ls-status" data-i18n="loading.enteringWorld">Entering the world...</div>

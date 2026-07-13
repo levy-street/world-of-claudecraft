@@ -1,0 +1,478 @@
+@layer index-extra {
+  body[data-site-home="true"] #download-view {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    min-height: calc(100svh - 72px);
+    padding: 0;
+    overflow: hidden;
+    background: #02060c;
+  }
+  body[data-site-home="true"] #download-view[hidden] {
+    display: none;
+  }
+  .download-page-backdrop,
+  .download-page-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .download-page-backdrop {
+    z-index: -3;
+    background: url("/site/download-paladin-bg-v1.webp") 58% center / cover no-repeat;
+    transform: scale(1.015);
+  }
+  .download-page-vignette {
+    z-index: -2;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(1, 5, 12, 0.94),
+        rgba(2, 7, 16, 0.78) 31%,
+        rgba(3, 8, 17, 0.18) 63%,
+        rgba(0, 3, 8, 0.08)
+      ),
+      linear-gradient(
+        180deg,
+        rgba(1, 4, 10, 0.5),
+        transparent 24%,
+        transparent 70%,
+        rgba(0, 3, 8, 0.78)
+      ),
+      radial-gradient(circle at 28% 46%, rgba(29, 72, 115, 0.22), transparent 42%);
+  }
+  .download-page-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 690px) 1fr;
+    align-items: center;
+    width: min(100%, 1560px);
+    min-height: inherit;
+    margin: 0 auto;
+    padding: clamp(38px, 6vh, 76px) clamp(28px, 5vw, 86px);
+  }
+  .download-launcher-panel {
+    position: relative;
+    width: min(100%, 650px);
+    margin: 0;
+    border: 54px solid transparent;
+    border-image: url("/site/download-panel-frame-v1.webp") 112 128 fill / 54px 62px / 0 stretch;
+    filter: drop-shadow(0 24px 44px rgba(0, 0, 0, 0.72))
+      drop-shadow(0 0 26px rgba(42, 114, 175, 0.16));
+  }
+  .download-launcher-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 390px;
+    margin: -20px -24px;
+    padding-top: 24px;
+    text-align: center;
+  }
+  .download-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 9px;
+    color: #d9c28b;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .download-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border: 1px solid #9dd6ff;
+    background: #58b9ff;
+    box-shadow: 0 0 13px rgba(63, 175, 255, 0.9);
+    transform: rotate(45deg);
+  }
+  .download-rune {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    height: 50px;
+    margin: 14px 0 16px;
+    border: 1px solid rgba(105, 187, 244, 0.28);
+    background: radial-gradient(circle, rgba(31, 122, 191, 0.24), rgba(2, 13, 25, 0.46) 68%);
+    box-shadow:
+      inset 0 0 15px rgba(25, 105, 168, 0.28),
+      0 0 20px rgba(31, 124, 196, 0.16);
+    transform: rotate(45deg);
+  }
+  .download-rune svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: #f0c65d;
+    stroke-width: 3.2;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    filter: drop-shadow(0 0 5px rgba(255, 198, 72, 0.42));
+    transform: rotate(-45deg);
+  }
+  .download-title {
+    max-width: 520px;
+    margin: 2px 0 9px;
+    color: #fff3d2;
+    font-family: var(--font-heading);
+    font-size: clamp(27px, 2.2vw, 38px);
+    font-weight: 500;
+    letter-spacing: 0.055em;
+    line-height: 1.08;
+    text-transform: uppercase;
+    text-shadow:
+      0 2px 0 #000,
+      0 0 20px rgba(232, 179, 66, 0.18);
+  }
+  .download-desc {
+    max-width: 470px;
+    margin: 0;
+    color: #c4c9ce;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.55;
+    text-wrap: balance;
+  }
+  .download-divider {
+    display: flex;
+    align-items: center;
+    width: min(100%, 470px);
+    margin: 18px 0 16px;
+  }
+  .download-divider::before,
+  .download-divider::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, transparent, rgba(213, 174, 81, 0.62));
+  }
+  .download-divider::after {
+    transform: scaleX(-1);
+  }
+  .download-divider span {
+    width: 9px;
+    height: 9px;
+    margin: 0 10px;
+    border: 1px solid #d8ad4b;
+    background: #0a1520;
+    box-shadow: 0 0 7px rgba(226, 176, 59, 0.42);
+    transform: rotate(45deg);
+  }
+  #download-view .desktop-download-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 500px);
+    margin: 0;
+  }
+  #download-view .desktop-download-link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 42px 1fr 20px;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 72px;
+    margin: 0;
+    padding: 10px 13px;
+    overflow: hidden;
+    border: 1px solid rgba(229, 187, 84, 0.58);
+    border-radius: 2px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 36%),
+      linear-gradient(180deg, rgba(25, 38, 51, 0.98), rgba(6, 14, 23, 0.98));
+    box-shadow:
+      inset 0 0 0 1px rgba(6, 8, 12, 0.94),
+      inset 0 0 22px rgba(0, 0, 0, 0.45),
+      0 8px 18px rgba(0, 0, 0, 0.28);
+    color: #f6e7bf;
+    text-align: left;
+    text-decoration: none;
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  #download-view .desktop-download-link::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(96, 161, 206, 0.12);
+    pointer-events: none;
+  }
+  #download-view .desktop-download-link:hover,
+  #download-view .desktop-download-link:focus-visible,
+  #download-view .desktop-download-link.is-detected {
+    border-color: #f0ca67;
+    box-shadow:
+      inset 0 0 0 1px rgba(8, 10, 14, 0.92),
+      inset 0 0 24px rgba(22, 92, 139, 0.2),
+      0 0 0 1px rgba(239, 196, 87, 0.28),
+      0 10px 26px rgba(0, 0, 0, 0.4),
+      0 0 22px rgba(50, 141, 206, 0.13);
+    transform: translateY(-2px);
+  }
+  #download-view .desktop-download-link:focus-visible {
+    outline: 2px solid #8ed0ff;
+    outline-offset: 3px;
+  }
+  .download-platform-mark {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(219, 177, 81, 0.48);
+    background: radial-gradient(circle at 35% 30%, rgba(63, 130, 178, 0.22), rgba(2, 9, 17, 0.86));
+    box-shadow:
+      inset 0 0 12px rgba(0, 0, 0, 0.68),
+      0 0 10px rgba(44, 135, 197, 0.1);
+    transform: rotate(45deg);
+  }
+  .download-platform-mark svg {
+    width: 23px;
+    height: 23px;
+    fill: #f5ead0;
+    stroke: #f5ead0;
+    stroke-width: 1.8;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    transform: rotate(-45deg);
+  }
+  .download-platform-mark--mac svg {
+    stroke: none;
+  }
+  .download-platform-mark--linux svg {
+    fill: none;
+  }
+  .download-platform-copy {
+    min-width: 0;
+  }
+  .download-platform-copy small,
+  .download-platform-copy strong {
+    display: block;
+  }
+  .download-platform-copy small {
+    margin-bottom: 3px;
+    color: #83b3d3;
+    font-family: var(--font-sans);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+  }
+  .download-platform-copy strong {
+    display: block;
+    overflow: hidden;
+    color: #f4e8c7;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.035em;
+    line-height: 1.18;
+    text-overflow: ellipsis;
+  }
+  .download-link-arrow {
+    color: #dfb950;
+    font-size: 20px;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 0 0 7px rgba(236, 185, 63, 0.5);
+  }
+  #download-view .desktop-download-hint {
+    margin: 10px auto 0;
+    color: #aab6bf;
+    font-size: 11px;
+  }
+  #download-view .desktop-download-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    margin-top: 13px;
+    padding: 6px 13px;
+    border: 1px solid rgba(211, 171, 77, 0.28);
+    border-radius: 999px;
+    background: rgba(1, 6, 12, 0.64);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+    color: #b9ad91;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .desktop-download-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d8a925;
+    box-shadow: 0 0 8px rgba(227, 178, 35, 0.7);
+  }
+  /* Give the launcher panel more breathing room from the left edge while
+     keeping the paladin and social rail clear on the right. */
+  @media (min-width: 721px) {
+    .download-launcher-panel {
+      transform: translateX(clamp(68px, 9vw, 168px));
+    }
+  }
+  @media (max-width: 980px) {
+    .download-page-backdrop {
+      background-position: 66% center;
+    }
+    .download-page-vignette {
+      background:
+        linear-gradient(
+          90deg,
+          rgba(1, 5, 12, 0.96),
+          rgba(2, 7, 16, 0.83) 48%,
+          rgba(3, 8, 17, 0.25) 82%
+        ),
+        linear-gradient(180deg, rgba(1, 4, 10, 0.6), transparent 28%, rgba(0, 3, 8, 0.78));
+    }
+    .download-page-layout {
+      grid-template-columns: minmax(0, 620px) 1fr;
+      padding-inline: clamp(20px, 4vw, 42px);
+    }
+  }
+  @media (max-width: 720px) {
+    body[data-site-home="true"] #download-view {
+      min-height: calc(100svh - 64px);
+      overflow: visible;
+    }
+    .download-page-backdrop {
+      position: fixed;
+      background-image: url("/site/download-paladin-bg-mobile-v1.webp");
+      background-position: 72% center;
+    }
+    .download-page-vignette {
+      position: fixed;
+      background: linear-gradient(
+        180deg,
+        rgba(2, 6, 13, 0.68),
+        rgba(2, 7, 15, 0.88) 48%,
+        rgba(1, 4, 9, 0.96)
+      );
+    }
+    .download-page-layout {
+      display: block;
+      min-height: inherit;
+      padding: 28px 8px 42px;
+    }
+    .download-launcher-panel {
+      width: min(100%, 540px);
+      margin: 0 auto;
+      border-width: 38px;
+      border-image-width: 38px 42px;
+      filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.68));
+    }
+    .download-launcher-content {
+      min-height: 468px;
+      margin: -10px -17px;
+    }
+    .download-title {
+      max-width: 330px;
+      font-size: clamp(25px, 8vw, 32px);
+    }
+    .download-desc {
+      max-width: 350px;
+      font-size: 13px;
+    }
+    .download-divider {
+      margin-block: 16px 14px;
+    }
+    #download-view .desktop-download-actions {
+      grid-template-columns: 1fr;
+      width: min(100%, 350px);
+    }
+    #download-view .desktop-download-link {
+      min-height: 66px;
+    }
+    .download-platform-copy strong {
+      font-size: 14px;
+    }
+  }
+  @media (max-width: 390px) {
+    .download-launcher-panel {
+      border-width: 30px;
+      border-image-width: 30px 34px;
+    }
+    .download-launcher-content {
+      min-height: 455px;
+      margin-inline: -13px;
+    }
+    .download-rune {
+      width: 48px;
+      height: 48px;
+    }
+
+    #download-view .desktop-download-status {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+  }
+  @media (max-width: 720px) {
+    .download-page-layout {
+      padding: 22px 8px 38px;
+    }
+    .download-launcher-content {
+      padding-top: 32px;
+    }
+
+    .download-title {
+      margin-top: 7px;
+      font-size: clamp(25px, 7.8vw, 30px);
+      line-height: 1.04;
+    }
+    .download-desc {
+      max-width: 310px;
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .download-divider {
+      margin-block: 14px 13px;
+    }
+    #download-view .desktop-download-actions {
+      gap: 10px;
+      width: min(100%, 360px);
+    }
+    #download-view .desktop-download-link {
+      grid-template-columns: 36px minmax(0, 1fr) 16px;
+      gap: 9px;
+      min-height: 64px;
+      padding: 9px 10px;
+    }
+    .download-platform-mark {
+      width: 34px;
+      height: 34px;
+    }
+    .download-platform-mark svg {
+      width: 20px;
+      height: 20px;
+    }
+    .download-platform-copy small {
+      margin-bottom: 2px;
+      font-size: 7px;
+      letter-spacing: 0.14em;
+    }
+    .download-platform-copy strong {
+      font-size: 12px;
+      letter-spacing: 0.015em;
+      white-space: nowrap;
+    }
+    .download-link-arrow {
+      font-size: 17px;
+    }
+    #download-view .desktop-download-status {
+      margin-top: 12px;
+      font-size: 8.5px;
+      letter-spacing: 0.09em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #download-view .desktop-download-link {
+      transition: none;
+    }
+  }
+}

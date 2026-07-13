@@ -14,7 +14,7 @@ import {
   GUIDE_FAMILIES,
   GUIDE_ZONES,
 } from './content.generated';
-import { GLOSSARY_TERMS } from './pages/glossary';
+import { GLOSSARY_TERMS } from './glossary_terms';
 import { GUIDE_ROUTES, hrefFor } from './routes';
 
 export interface SearchEntry {

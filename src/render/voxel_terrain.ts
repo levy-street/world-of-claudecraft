@@ -16,7 +16,7 @@ import { registerPreload } from './assets/preload';
 const VOXEL_TEX: Record<string, THREE.Texture> = {};
 function kickVoxelTex(key: string, file: string): void {
   registerPreload(
-    loadTexture(`/textures/terrain/${file}`, { srgb: true, repeat: true }).then((tex) => {
+    () => loadTexture(`/textures/terrain/${file}`, { srgb: true, repeat: true }).then((tex) => {
       VOXEL_TEX[key] = tex;
       return tex;
     }),

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
 import { propPreloadInternalsForTest } from '../src/render/props';
 
@@ -64,5 +64,36 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
         ).toBe(true);
       }
     }
+  });
+});
+
+describe('lazy render asset preload registry', () => {
+  it('does not start registered factories until world entry and starts them only once', async () => {
+    vi.resetModules();
+    const { assetsReady, onAssetsReady, registerPreload } = await import(
+      '../src/render/assets/preload'
+    );
+    const observedReady = vi.fn();
+    let starts = 0;
+
+    registerPreload(() => {
+      starts += 1;
+      return Promise.resolve();
+    });
+    onAssetsReady(observedReady);
+    onAssetsReady(() => {
+      throw new Error('optional preview failed');
+    });
+
+    expect(starts).toBe(0);
+    expect(observedReady).not.toHaveBeenCalled();
+
+    await assetsReady();
+    expect(starts).toBe(1);
+    expect(observedReady).toHaveBeenCalledTimes(1);
+
+    await assetsReady();
+    expect(starts).toBe(1);
+    expect(observedReady).toHaveBeenCalledTimes(1);
   });
 });

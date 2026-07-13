@@ -23,6 +23,7 @@ import type {
   CharacterRow,
 } from './db';
 import type { GameServer } from './game';
+import { marketingAllowedForRequest } from './privacy_region';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
 // and localizes. Each is part of the wire contract (see the module header).
@@ -204,10 +205,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       return;
     }
     const accountCosmetics = await loadAccountCosmetics(accountId);
+    const marketingAllowed = marketingAllowedForRequest(req);
     const joinMeta = {
       ...meta,
-      ...metaRequestUserData(req, meta),
-      sourceUrl: metaEventSourceUrl(req),
+      ...(marketingAllowed ? metaRequestUserData(req, meta) : {}),
+      sourceUrl: marketingAllowed ? metaEventSourceUrl(req) : undefined,
+      marketingAllowed,
       mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
       reason: chatMute.reason,
       chatStrikes: status.chatStrikes,

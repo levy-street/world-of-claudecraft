@@ -36,14 +36,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/site/fonts-v1.css" />
   <style>
+    :root { --page-bg-image: url('/loading-screen-v1.webp'); }
+    @media (max-width: 720px) { :root { --page-bg-image: url('/loading-screen-mobile-v1.webp'); } }
     :root { color-scheme: dark; --gold: #ffd100; --gold-dim: #c8a838; --gold-soft: #f3dfaa; --ink: #f0ebd8; --muted: #c4b899; --border: #6f5a2a; --line: rgba(215, 181, 109, 0.32); --line-soft: rgba(215, 181, 109, 0.14); --bg: #08080d; --panel-top: rgba(20, 20, 30, 0.94); --panel-bottom: rgba(6, 6, 11, 0.96); --font-display: 'Cinzel', 'Palatino Linotype', Palatino, Georgia, serif; --font-ui: 'Alegreya Sans', 'Segoe UI', system-ui, -apple-system, sans-serif; --font-serif: 'Alegreya', 'Palatino Linotype', Palatino, Georgia, serif; --r-sm: 4px; --r-md: 8px; }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
-    body { min-height: 100vh; min-height: 100dvh; color: var(--ink); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; background: linear-gradient(90deg, rgba(5, 7, 12, 0.90), rgba(5, 7, 12, 0.56) 52%, rgba(5, 7, 12, 0.92)), radial-gradient(circle at 50% 8%, rgba(255, 209, 0, 0.16), transparent 40%), var(--bg) url('/loading-screen.jpg') center / cover fixed no-repeat; padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+    body { min-height: 100vh; min-height: 100dvh; color: var(--ink); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; background: linear-gradient(90deg, rgba(5, 7, 12, 0.90), rgba(5, 7, 12, 0.56) 52%, rgba(5, 7, 12, 0.92)), radial-gradient(circle at 50% 8%, rgba(255, 209, 0, 0.16), transparent 40%), var(--bg) var(--page-bg-image) center / cover fixed no-repeat; padding: max(18px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
     body::before { content: ""; position: fixed; inset: 0; pointer-events: none; background: linear-gradient(rgba(255,255,255,0.018) 50%, rgba(0,0,0,0.035) 50%), radial-gradient(circle at 50% 100%, rgba(0,0,0,0.58), transparent 48%); background-size: 100% 4px, auto; }
     .shell { position: relative; z-index: 1; width: min(1040px, 100%); margin: 0 auto; }
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
@@ -76,8 +76,8 @@
 <body>
   <div class="shell">
     <nav class="topbar" aria-label="Legal page navigation">
-      <a class="brand" href="/" aria-label="World of ClaudeCraft home"><img src="/woc_logo_square.webp" alt="" /> <span>World of ClaudeCraft</span></a>
-      <a class="back-link" href="/">Return to Game</a>
+      <a class="brand" href="/" aria-label="World of ClaudeCraft home"><img src="/woc-logo-square-320-v1.webp" srcset="/woc-logo-square-128-v1.webp 128w, /woc-logo-square-192-v1.webp 192w" sizes="38px" width="96" height="96" alt="" decoding="async" /> <span>World of ClaudeCraft</span></a>
+      <a class="back-link" href="/" data-return-to-game>Return to Game</a>
     </nav>
     <main>
       <header class="hero">
@@ -180,5 +180,6 @@
       <a href="/links">Official Links</a>
     </footer>
   </div>
+  <script src="/return-to-game.js"></script>
 </body>
 </html>

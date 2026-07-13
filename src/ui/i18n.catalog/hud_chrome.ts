@@ -10,6 +10,38 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  privacyConsent: {
+    bannerTitle: 'Your privacy in Claudemoon',
+    bannerOptIn:
+      'Choose whether optional services may load. Necessary services always remain active.',
+    bannerOptOut:
+      'Optional services are active. Use Reject optional to opt out of sale or sharing for targeted advertising, or choose what loads.',
+    bannerGpc:
+      'We honor your browser Global Privacy Control signal. Analytics and marketing stay off.',
+    acceptAll: 'Accept all',
+    rejectAll: 'Reject optional',
+    customize: 'Customize',
+    launcher: 'Privacy choices',
+    dialogTitle: 'Privacy choices',
+    dialogIntro:
+      'Choose which optional services World of ClaudeCraft may use. You can change these choices at any time.',
+    close: 'Close privacy choices',
+    necessaryTitle: 'Necessary',
+    necessaryBody: 'Required for security, saved preferences, authentication, and core game features.',
+    analyticsTitle: 'Analytics',
+    analyticsBody: 'Helps us understand site use and diagnose game performance.',
+    marketingTitle: 'Marketing',
+    marketingBody: 'Measures campaign results through services such as Meta Pixel.',
+    xTitle: 'X feed',
+    xBody: 'Allows the embedded @WoClaudecraft timeline to load on the News page.',
+    twitchTitle: 'Twitch player',
+    twitchBody: 'Allows the embedded Yuumiii livestream player to load.',
+    alwaysOn: 'Always on',
+    save: 'Save choices',
+    cookiePolicy: 'Read our Cookie Policy',
+    twitchBlocked: 'The Twitch player is paused until you allow Twitch in Privacy Choices.',
+    twitchEnable: 'Choose Twitch privacy setting',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },

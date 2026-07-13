@@ -129,7 +129,7 @@ function communityHtml(): string {
       <p class="guide-section-sub">${esc(t('guide.home.community.body'))}</p>
       <div class="guide-community-cta">
         <a class="guide-cta" href="/play">${esc(t('guide.home.community.play'))}</a>
-        <a class="guide-cta guide-cta-ghost" href="https://discord.gg/GjhnUsBtw" target="_blank" rel="noopener">${esc(t('guide.home.community.discord'))}</a>
+        <a class="guide-cta guide-cta-ghost" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener">${esc(t('guide.home.community.discord'))}</a>
         <a class="guide-cta guide-cta-ghost" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener">${esc(t('guide.home.community.github'))}</a>
       </div>
     </section>`;
