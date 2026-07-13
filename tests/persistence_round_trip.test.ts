@@ -52,7 +52,15 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const s2 = sim2.serializeCharacter(pid2)!;
-    expect(s2).toEqual(s1);
+    // The Book of Deeds legitimately enriches a save across a load: joining
+    // seeds the discovery ledger from held items (the hand-stuffed bank rows
+    // above bypassed the addItem hub) and the retro pass back-credits state
+    // predicates at join, while sim1 never ticked to evaluate. Everything
+    // else must round-trip byte-equal; the deed round-trip itself is pinned
+    // in tests/deeds.test.ts.
+    const { deeds: _d1, deedStats: _ds1, renown: _r1, ...rest1 } = s1;
+    const { deeds: _d2, deedStats: _ds2, renown: _r2, ...rest2 } = s2;
+    expect(rest2).toEqual(rest1);
     // spot-check that the rich fields actually survived (not all defaulted to empty).
     expect(s2.arena2v2Rating).toBe(1880);
     expect(s2.delveMarks).toBe(17);

@@ -27,6 +27,7 @@
 
 import { isStunned } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
+import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
 import { applyHeroicMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
 import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
@@ -44,6 +45,7 @@ import {
   INTERACT_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_ROOM_RADIUS,
   normAngle,
   OBJECT_RESPAWN,
   type SimEvent,
@@ -57,8 +59,9 @@ const NYTHRAXIS_RELIC_SUMMONS: Record<string, string> = {
   royal_seal: 'deathstalker_voss',
 };
 const _NYTHRAXIS_CRYPT_QUESTS = new Set(['q_nythraxis_sealed_crypt', 'q_nythraxis_bound_guardian']);
-// NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID live in types.ts (shared with mob/locomotion.ts;
-// the dungeon raid-door seal in instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
+// NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID / NYTHRAXIS_ROOM_RADIUS live in types.ts
+// (shared with mob/locomotion.ts and deeds.ts; the dungeon raid-door seal in
+// instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
 const NYTHRAXIS_ALDRIC_ID = 'brother_aldric_raid';
 const _NYTHRAXIS_FINAL_QUEST_ID = 'q_nythraxis_scourges_end';
 const NYTHRAXIS_WARDSTONE_ITEM_ID = 'bastion_ward_stone';
@@ -109,7 +112,6 @@ const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
 const NYTHRAXIS_TRANSITION_STUN = 21.5;
 const NYTHRAXIS_FINAL_STAND_HP = 0.05;
-const NYTHRAXIS_ROOM_RADIUS = 260;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
 // of the boss spawn: appears 50yd out, walks up to 30yd out (between door + boss).
@@ -487,10 +489,20 @@ export function nythraxisTransitionStunTargets(ctx: SimContext, boss: Entity): E
 }
 
 export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] {
+  // Membership (the lockout roster), so the circle is clipped to the boss
+  // slot's own z band, the same clip the deed task window applies: arena
+  // slots sit 500 apart in z with the spawn skewed high, so the raw circle
+  // reaches into the next slot's band. The in-room combat queries above keep
+  // the raw circle (their cross-slot reach is behind arena walls the movement
+  // resolver enforces, and they never confer credit or a lockout).
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  const origin = inst ? ctx.instanceOriginOf(inst) : null;
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
-    if (p && dist2d(p.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS) out.push(meta);
+    if (!p || dist2d(p.pos, boss.spawnPos) > NYTHRAXIS_ROOM_RADIUS) continue;
+    if (origin !== null && Math.abs(p.pos.z - origin.z) >= 250) continue;
+    out.push(meta);
   }
   out.sort((a, b) => a.entityId - b.entityId);
   return out;
@@ -515,15 +527,18 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   // (walls at roughly +/-230 local x): a raider who left the raid while parked
   // in a side wing sits outside both claim arms yet can still hold the tap and
   // its rewards, so the 260-yd boss room must keep locking them.
-  const metas = new Map<number, PlayerMeta>();
-  for (const meta of nythraxisRoomMetas(ctx, boss)) metas.set(meta.entityId, meta);
+  const roomMetas = nythraxisRoomMetas(ctx, boss);
+  const lockoutMetas = new Map<number, PlayerMeta>();
+  for (const meta of roomMetas) lockoutMetas.set(meta.entityId, meta);
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   if (inst) {
-    for (const meta of instanceLockoutMetas(ctx, inst)) metas.set(meta.entityId, meta);
+    for (const meta of instanceLockoutMetas(ctx, inst)) lockoutMetas.set(meta.entityId, meta);
   }
-  for (const meta of metas.values()) {
+  for (const meta of lockoutMetas.values()) {
     meta.raidLockouts.set(lockId, until);
   }
+  // Raid deed credit stays scoped to the boss room roster.
+  deedsMod.onNythraxisKillForDeeds(ctx, boss, roomMetas);
 }
 
 // ----- phase-one mechanics --------------------------------------------------------
@@ -556,10 +571,13 @@ export function updateNythraxisGravebreaker(
     if (d > NYTHRAXIS_GRAVEBREAKER_RANGE) continue;
     const delta = Math.abs(normAngle(angleTo(boss.pos, p.pos) - boss.facing));
     if (delta > NYTHRAXIS_GRAVEBREAKER_HALF_ARC) continue;
-    const mult = p.id === boss.aggroTargetId ? 1 : 1.5;
+    const offTarget = p.id !== boss.aggroTargetId;
+    const mult = offTarget ? 1.5 : 1;
     const mitigated = rawDmg * mult * (1 - armorReduction(ctx.effectiveArmor(p), boss.level));
     const dmg = Math.max(1, Math.round(mitigated));
     ctx.dealDamage(boss, p, dmg, false, 'physical', 'Gravebreaker', 'hit', true);
+    // An arc hit on anyone but the current target taints the positioning task.
+    if (offTarget) deedsMod.onBossSplashHitForDeeds(ctx, boss);
   }
 }
 
@@ -926,6 +944,8 @@ export function updateNythraxisDeathlessRage(
   const ragePct = isHeroicNythraxis(ctx, boss)
     ? NYTHRAXIS_DEATHLESS_PCT_HEROIC
     : NYTHRAXIS_DEATHLESS_PCT;
+  // The cast resolved uninterrupted: the wardens task fails for this attempt.
+  deedsMod.onDeathlessRageResolvedForDeeds(ctx, boss);
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     ctx.dealDamage(
       boss,

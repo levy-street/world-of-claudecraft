@@ -212,6 +212,8 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     dungeonId === 'nythraxis_crypt' && corpseRunClaim !== undefined;
   if (p.ghost && !passingThroughNythraxisCrypt) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
+  // Stepping through the moongate is a Chronicle task.
+  if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
 }
 
 function canEnterNythraxisRaid(meta: PlayerMeta): boolean {
@@ -344,6 +346,8 @@ function claimInstance(
   inst.partyKey = key;
   inst.difficulty = difficulty;
   inst.emptyFor = 0;
+  // The Sanctum speed deed measures from the claim.
+  inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   const origin = instanceOriginOf(inst);
   for (const spawn of dungeon.spawns) {
@@ -416,6 +420,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.objectIds = [];
   inst.exitId = null;
   inst.emptyFor = 0;
+  inst.claimedAt = undefined;
   inst.clearedBy = new Set();
 }
 
@@ -480,10 +485,11 @@ export function grantHeroicKillLockout(ctx: SimContext, mob: Entity): void {
 // Heroic Marks for every eligible participant (marksPerParticipant on the
 // tuning record: 1 for the five-mans, 3 for the Nythraxis raid). `recipients`
 // is the same downed-members-included snapshot handleDeath uses for XP and
-// loot rights. Each mark is its own personalFor slot (the loot pickup arm
-// grants one item per personal slot, so a single loot click takes them all)
-// and nobody can take another player's. Draws no rng, so the corpse loot
-// draw order is untouched. The daily LOCKOUT is not granted here: it covers
+// loot rights. The marks ride ONE shared-personal slot (personalFor lists
+// every earner, count is the per-participant payout): whoever loots the
+// corpse hands every earner their marks at once, and nobody can take another
+// player's. Draws no rng, so the corpse loot draw order is untouched. The
+// daily LOCKOUT is not granted here: it covers
 // the whole owning group, credit or no credit (grantHeroicKillLockout above).
 //
 // Daily income gate: each dungeon pays a given character at most once per host
@@ -518,6 +524,8 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
     if (meta.heroicDaily.marked.has(inst.dungeonId)) continue;
     meta.heroicDaily.marked.add(inst.dungeonId);
     earners.push(meta.entityId);
+    // The heroic-mark circuit flag re-checks.
+    ctx.markDeedsDirty(meta.entityId);
   }
   if (earners.length === 0) return;
   // One shared-personal slot for the whole party: whoever loots the corpse hands

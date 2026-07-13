@@ -1459,6 +1459,12 @@ describe('client HTML shell', () => {
     );
     expect(html).toContain('id="mobile-more-close"');
     expect(html).toContain('<div id="mobile-extra-grid">');
+    // Daily Rewards and the Book of Deeds ride the More grid in BOTH entries
+    // (play.html historically lags index.html; these pins keep them in step).
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="mobile-daily-rewards"');
+      expect(entry).toContain('id="mobile-deeds"');
+    }
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
     );
@@ -1539,6 +1545,33 @@ describe('client HTML shell', () => {
     expect(bindButton.indexOf("button.closest('#mobile-extra-controls')")).toBeGreaterThan(-1);
     expect(bindButton.indexOf('this.closeMoreModal();')).toBeLessThan(bindButton.indexOf('cb();'));
     expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
+  });
+
+  it('keeps the More tray out of the managed-window close path', () => {
+    // The closed tray stays display:flex (opacity/visibility carry the
+    // transition), so the managed-window visibility probe must key on the
+    // body class: otherwise closeAll() treats the closed tray as the topmost
+    // window and stamps an inline display:none that the class toggles can
+    // never clear, leaving the tray unopenable until reload.
+    const isWindowVisible = hudTs.slice(
+      hudTs.indexOf('private isWindowVisible('),
+      hudTs.indexOf('private syncWindowOpenState('),
+    );
+    expect(isWindowVisible).toContain("if (el.id === 'mobile-extra-controls')");
+    expect(isWindowVisible).toContain(
+      "return document.body.classList.contains('mobile-more-open');",
+    );
+    // Closing through the window manager must ride the same class mechanism
+    // as the tray's own X button, never the default inline display:none arm.
+    const closeManaged = hudTs.slice(
+      hudTs.indexOf('private closeManagedWindow('),
+      hudTs.indexOf('private initChatTabs('),
+    );
+    expect(closeManaged).toContain("case 'mobile-extra-controls':");
+    expect(closeManaged).toContain("document.body.classList.remove('mobile-more-open');");
+    expect(closeManaged).toContain(
+      "document.getElementById('mobile-more')?.classList.remove('active');",
+    );
   });
 
   it('replaces the dual mode cards with one Play CTA and a realm selector', () => {

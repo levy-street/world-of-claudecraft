@@ -9,6 +9,9 @@ export interface FriendInfo {
   cls: string;
   level: number;
   realm: string;
+  // The selected Book of Deeds title: a deed id (never display text; the
+  // client localizes through deed_i18n.ts deedTitleText), null when untitled.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;

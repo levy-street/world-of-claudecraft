@@ -38,6 +38,7 @@ import {
   talentPointsAtLevel,
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
+import * as deedsMod from '../deeds';
 import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { Rng } from '../rng';
@@ -357,6 +358,13 @@ export function fiestaTakedown(
   f.lastKill.set(killerPid, now);
   const ks = (f.streak.get(killerPid) ?? 0) + 1;
   f.streak.set(killerPid, ks);
+  // Deed moments read the sim-side tallies, independent of the word-cue
+  // else-if chain below (which reports only the loudest cue).
+  deedsMod.onFiestaTakedownForDeeds(ctx, match, killerPid, {
+    rapid,
+    victimStreak,
+    killerKills: f.kills.get(killerPid) ?? 0,
+  });
   if (!f.firstBlood) {
     f.firstBlood = true;
     ctx.emit({ type: 'fiestaWord', flavor: 'firstblood', pid: killerPid });
@@ -573,7 +581,7 @@ export function fiestaSpawnPowerup(match: ArenaMatch): void {
 
 export function fiestaGrabPowerup(
   ctx: SimContext,
-  _match: ArenaMatch,
+  match: ArenaMatch,
   e: Entity,
   p: FiestaPowerup,
 ): void {
@@ -602,4 +610,5 @@ export function fiestaGrabPowerup(
     glow: def.glow,
     duration: def.duration,
   });
+  deedsMod.onFiestaPowerupForDeeds(ctx, match, e.id, def.id);
 }

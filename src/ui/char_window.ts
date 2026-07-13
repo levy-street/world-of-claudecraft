@@ -128,6 +128,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderSkinPicker(): void;
   openPlayerCard(): void;
   openPrestige(): void;
+  /** Open the Book of Deeds (the active-title line's button). */
+  openDeeds(): void;
 }
 
 // Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
@@ -209,6 +211,10 @@ export class CharWindow {
     el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
       this.deps.openPrestige(),
     );
+    el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openDeeds();
+    });
     el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openPlayerCard();

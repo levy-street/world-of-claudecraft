@@ -1,15 +1,27 @@
 ---
+name: qa
 description: Run the full end-of-contribution QA review over the current change (the qa-checklist gate plus a coverage fan-out and the domain reviewers it names).
-argument-hint: "[optional: feature name, phase, or files to scope the review]"
-allowed-tools: Read, Grep, Glob, Bash, Agent, Task
+user-invocable: true
 ---
 
 You are running the project's end-of-contribution QA gate. Do this now, before the change is
 called done.
 
-1. Scope the review from the diff (`git diff --name-only`, else
-   `git diff --name-only "$(git merge-base HEAD main)"..HEAD`). If the user passed an argument
-   ($ARGUMENTS), use it to focus the scope.
+1. Scope the review from the diff: `git diff --name-only` for uncommitted work. For committed
+   work, merge-base against the branch's own base, never `main` (work is based off the latest
+   release branch and `main` trails it, so a merge-base against `main` sweeps the whole release
+   into scope). Fallback chain: the upstream, else the newest `origin/release/*` branch, else
+   `origin/main`:
+
+   ```sh
+   base=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null) ||
+     base=$(git for-each-ref --sort=-creatordate --format='%(refname:short)' \
+       'refs/remotes/origin/release/*' | head -1)
+   git diff --name-only "$(git merge-base HEAD "${base:-origin/main}")"..HEAD
+   ```
+
+   If the user passed an argument (a feature name, phase, or file list), use it to focus the
+   scope.
 
 2. Dispatch the `qa-checklist` agent over that scope. It is the read-only gate: it scales its
    own depth to the size of the change, checks every repo invariant in play, and ends with an
@@ -35,4 +47,6 @@ called done.
 
 End with a one-line verdict: READY or NOT READY, and the list of any VERIFY items the maintainer
 still has to run by hand (for example `npm run perf:tour`, `npm run test:browser`, or the mobile
-E2E scripts).
+E2E scripts). READY is advisory judgment; `npm run gate` is the deterministic pre-merge contract
+(release tier on `release/**`), so if it has not run green this session, list it as the first
+VERIFY item.

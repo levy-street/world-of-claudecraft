@@ -432,5 +432,16 @@ export function resolveCraft(ctx: SimContext, pid: number, recipeId: string): Cr
 export function craftItem(ctx: SimContext, recipeId: string, pid?: number): CraftResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, recipeId, reason: 'unknown_recipe' };
-  return resolveCraft(ctx, r.meta.entityId, recipeId);
+  const result = resolveCraft(ctx, r.meta.entityId, recipeId);
+  if (result.ok) {
+    ctx.bumpDeedStat(r.meta, 'craftsPerformed', 1);
+    // A station-bound success already proved hub position and level in the
+    // resolve's hub gate, so the recipe flag alone identifies a hub craft.
+    if (recipeById(recipeId)?.requiresHubStation) {
+      ctx.bumpDeedStat(r.meta, 'hubCraftsPerformed', 1);
+    }
+    // The dirty mark also covers the craft-skill gain the resolve applied.
+    ctx.markDeedsDirty(r.meta.entityId);
+  }
+  return result;
 }

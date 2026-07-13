@@ -3180,3 +3180,109 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(run.completed).toBe(true);
   });
 });
+
+// Delve run slots are a fixed pool recycled for the process lifetime: enterDelve
+// reclaims the first free slot, so a slot that hosted a duo must not carry its
+// whole-run roster watermark (run.deedMaxParty) into the next claimed run. The
+// dlv_solo_heroic deed reads that watermark at completion, so a stale 2 would
+// silently deny a genuine solo Heroic clear its restriction deed.
+describe('delve slot recycle resets the roster watermark (dlv_solo_heroic)', () => {
+  // Enter the Collapsed Reliquary on Heroic as an arbitrary player id (the
+  // module-level enterReliquary only drives the primary player).
+  function enterHeroicAs(sim: Sim, pid: number) {
+    const heroic = DELVES.collapsed_reliquary.tiers.find((t) => t.id === 'heroic');
+    const level = heroic?.minPlayerLevel ?? DELVES.collapsed_reliquary.minLevel;
+    sim.setPlayerLevel(level, pid);
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const e = sim.entities.get(pid)!;
+    e.pos.x = door.x;
+    e.pos.z = door.z;
+    e.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    sim.enterDelve('collapsed_reliquary', 'heroic', pid);
+  }
+
+  // Collapse a claimed run down to the finale as its only module and respawn it.
+  function toFinale(sim: Sim, run: any) {
+    run.bountiful = false;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+  }
+
+  function killVarric(sim: Sim, attackerPid: number) {
+    const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric')!;
+    const attacker = sim.entities.get(attackerPid)!;
+    (sim as any).dealDamage(attacker, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+  }
+
+  // Flawlessly solve the reward-chest lock as a given player, granting the clear.
+  function pickFlawlessAs(sim: Sim, run: any, pickerPid: number, ante: 1 | 2 | 3 = 3) {
+    const chestEnt = sim.entities.get(run.rewardChestId!)!;
+    const picker = sim.entities.get(pickerPid)!;
+    picker.pos = { ...chestEnt.pos };
+    picker.prevPos = { ...chestEnt.pos };
+    sim.lockpickEngage(run.rewardChestId!, ante, pickerPid);
+    let guard = 0;
+    while (run.lockpick && run.lockpick.state === 'IN_PROGRESS' && guard++ < 12) {
+      const actions = solveLockActions(run.lockpick.pages[run.lockpick.pageIndex])!;
+      for (const a of actions) sim.lockpickAction(a, pickerPid);
+    }
+  }
+
+  it('a solo Heroic clear on a slot a duo just freed earns dlv_solo_heroic (watermark reset at claim)', () => {
+    const sim = makeSim();
+    // A duo claims the first Collapsed Reliquary slot on Heroic; the whole-run
+    // roster watermark climbs to 2. Then the run is freed back to the pool.
+    const a = sim.addPlayer('warrior', 'DuoA');
+    const b = sim.addPlayer('warrior', 'DuoB');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    enterHeroicAs(sim, a);
+    enterHeroicAs(sim, b);
+    const slot = sim.delveRunForPlayer(a)!;
+    expect(slot.deedMaxParty).toBe(2);
+    (sim as any).freeDelveRun(slot);
+
+    // The primary (solo, never partied) enters Heroic and reclaims the SAME freed
+    // slot object. Its watermark must read 1, not the stale 2 the duo left behind.
+    enterReliquary(sim, 'heroic');
+    const soloRun = sim.delveRunForPlayer(sim.playerId)!;
+    expect(soloRun).toBe(slot); // same recycled DelveRun slot object
+    expect(soloRun.deedMaxParty).toBe(1); // claim-time reset, not the leaked 2
+
+    // Clearing the finale solo grants the Heroic solo-restriction deed.
+    toFinale(sim, soloRun);
+    killVarric(sim, sim.playerId);
+    pickFlawlessAs(sim, soloRun, sim.playerId);
+    expect(sim.players.get(sim.playerId)!.deedsEarned.has('dlv_solo_heroic')).toBe(true);
+  });
+
+  it('a duo Heroic clear on a recycled slot still withholds dlv_solo_heroic (in-run watermark climbs to 2)', () => {
+    const sim = makeSim();
+    // Dirty the first slot with a prior solo Heroic run (watermark 1), then free it.
+    enterReliquary(sim, 'heroic');
+    const slot = sim.delveRunForPlayer(sim.playerId)!;
+    expect(slot.deedMaxParty).toBe(1);
+    (sim as any).freeDelveRun(slot);
+
+    // A genuine duo reclaims that same recycled slot; the watermark climbs back to 2.
+    const a = sim.addPlayer('warrior', 'DuoA');
+    const b = sim.addPlayer('warrior', 'DuoB');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    enterHeroicAs(sim, a);
+    enterHeroicAs(sim, b);
+    const duoRun = sim.delveRunForPlayer(a)!;
+    expect(duoRun).toBe(slot); // same recycled slot object
+    expect(duoRun.deedMaxParty).toBe(2); // reset to 0 at claim, then climbed to 2
+
+    // Clearing it grants no solo-restriction deed to either member.
+    toFinale(sim, duoRun);
+    killVarric(sim, a);
+    pickFlawlessAs(sim, duoRun, a);
+    expect(sim.players.get(a)!.deedsEarned.has('dlv_solo_heroic')).toBe(false);
+    expect(sim.players.get(b)!.deedsEarned.has('dlv_solo_heroic')).toBe(false);
+  });
+});

@@ -70,6 +70,7 @@ export interface InputCallbacks {
       | 'leaderboard'
       | 'calendar'
       | 'discord'
+      | 'deeds'
       | 'crafting',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -862,6 +863,9 @@ export class Input {
         return;
       case 'discord':
         this.cb.onUiKey('discord');
+        return;
+      case 'deeds':
+        this.cb.onUiKey('deeds');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

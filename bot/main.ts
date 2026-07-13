@@ -1,9 +1,9 @@
 // World of ClaudeCraft Discord bot.
 //
 // Two-way bridge between the game and the official Discord server:
-//  - IN DISCORD: /flex shows your top character + rank, /whoami your link status,
-//    /link the connect instructions; status-tier roles are synced from in-game
-//    reward points; new members get a welcome.
+//  - IN DISCORD: /whoami shows your link status, /link the connect instructions;
+//    status-tier roles are synced from in-game reward points (missing roles are
+//    auto-provisioned); member joins are recorded without a welcome message.
 //  - INTO THE GAME: who is online + in the featured voice room is pushed to the
 //    server, which surfaces it in the HUD Discord widget.
 //

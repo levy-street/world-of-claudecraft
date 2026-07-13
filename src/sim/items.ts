@@ -128,6 +128,8 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
+  // The all-slots deed reads equipment, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
@@ -149,6 +151,8 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
   if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+  // The all-slots deed reads equipment, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless. An
@@ -247,13 +251,16 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // uncommon potion, exactly as before this issue.
     const [drunkInstance] = ctx.removeItem(itemId, 1, meta.entityId);
     if (drunkInstance) {
-      battlefieldExperienceTrickle(meta.craftSkills, {
+      const granted = battlefieldExperienceTrickle(meta.craftSkills, {
         itemId,
         instance: drunkInstance,
         observerName: meta.name,
         observerActiveArchetype: meta.archetype.activeArchetype,
         observerPairedMajor: meta.archetype.pairedMajor,
       });
+      // A nonzero trickle changed a craft skill (returns 0 on every
+      // short-circuit), so the craft-skill deeds re-check this player.
+      if (granted > 0) ctx.markDeedsDirty(meta.entityId);
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
@@ -474,6 +481,9 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
   addItemSilent(itemId, 1, meta);
+  // The silent add bypasses the inventory hub, so credit the discovery
+  // ledger here (an acquisition like any other; the mark is idempotent).
+  ctx.markItemDiscovered(meta, itemId);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({

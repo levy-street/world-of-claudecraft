@@ -237,6 +237,10 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the on-screen Book of Deeds watchlist
+  // tracker is collapsed to just its header. Toggled by clicking the tracker
+  // header (the quest-tracker convention); kept here so the choice persists.
+  deedTrackerCollapsed: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
