@@ -28,6 +28,8 @@ provided as a courtesy.
 | Modular Dungeon Kit (corridor and room tiles, stairs, gates) | Kenney | https://kenney.nl/assets/modular-dungeon-kit | CC0 1.0 |
 | Mini Dungeon (trap, wood structure, supports, column, banner) | Kenney | https://kenney.nl/assets/mini-dungeon | CC0 1.0 |
 | Medieval Hexagon Pack (hex buildings, hex tiles, walls, bridge) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Medieval-Hexagon-Pack-1.0 | CC0 1.0 |
+| RPG Tools Bits, free tier (grindstone, metal bucket, standing lantern, open journal, rolled map, pickaxe, rope bundle) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/rpg-tools-bits | CC0 1.0 |
+| Furniture Bits (long table, wood stool, book set) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Furniture-Bits-1.0 | CC0 1.0 |
 | Canyon Terrain Asset (cacti, desert tree, canyon rock formations, boulders, mesas) | loafbrr | https://loafbrr.itch.io/canyon-terrain-asset | CC0 1.0 |
 | Mines and Cave Modular Set (mine carts, rails, ladder, cave rocks, entrances, supports, platforms) | loafbrr | https://loafbrr.itch.io/mines-and-cave-set | CC0 1.0 |
 | Terrain PBR textures (Grass001, Ground048, Rock051, Ground071, Ground080, PavingStones046, Snow010A) | ambientCG | https://ambientcg.com | CC0 1.0 |

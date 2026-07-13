@@ -1,0 +1,47 @@
+{
+  "note": "KayKit RPG Tools Bits 1.0 free tier (CC0). Profession and town dressing: smithy grindstone/bucket, market journals/maps, mine pickaxe, dock rope, standing lantern. Already low-poly, no simplify (static items must never simplify).",
+  "items": [
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/grindstone.gltf",
+      "out": "models/props/grindstone.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/bucket_metal.gltf",
+      "out": "models/props/bucket_metal.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/lantern.gltf",
+      "out": "models/props/lantern_standing.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/journal_open.gltf",
+      "out": "models/props/journal_open.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/map_rolled.gltf",
+      "out": "models/props/map_rolled.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/pickaxe.gltf",
+      "out": "models/props/pickaxe.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_rpg_tools/KayKit_RPGToolsBits_1.0_FREE/Assets/gltf/rope_bundle_A.gltf",
+      "out": "models/props/rope_bundle.glb",
+      "type": "static",
+      "maxTex": 256
+    }
+  ]
+}
