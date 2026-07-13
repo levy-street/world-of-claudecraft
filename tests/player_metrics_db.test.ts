@@ -19,6 +19,8 @@ describe('player metric lifecycle facts', () => {
     expect(PLAYER_METRICS_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS player_activity_daily');
     expect(PLAYER_METRICS_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS player_business_daily');
     expect(PLAYER_METRICS_SCHEMA).toContain('PRIMARY KEY (realm, day, account_id)');
+    expect(PLAYER_METRICS_SCHEMA).toContain('ON player_account_facts(first_session_id, realm)');
+    expect(PLAYER_METRICS_SCHEMA).toContain('ON play_sessions(account_id, started_at, id)');
     expect(PLAYER_METRICS_SCHEMA).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
   });
 
@@ -51,6 +53,7 @@ describe('player metric lifecycle facts', () => {
     expect(sql).toContain('INSERT INTO player_account_facts');
     expect(sql).toContain('INSERT INTO player_activity_daily');
     expect(sql).toContain('COALESCE(player_account_facts.first_play_at');
+    expect(sql).toContain('SELECT count(*) FROM account_fact');
     expect(params).toEqual([7, 42, 'Alice', 'eastbrook', 3, '203.0.113.6', 'Mozilla/5.0']);
   });
 
@@ -63,6 +66,10 @@ describe('player metric lifecycle facts', () => {
     expect(sql).toContain("date_trunc('day', closed.started_at, 'UTC')");
     expect(sql).toContain('first_session_seconds');
     expect(sql).toContain('first_session_max_level');
+    expect(sql.indexOf('UPDATE player_account_facts')).toBeLessThan(
+      sql.indexOf('INSERT INTO player_activity_daily'),
+    );
+    expect(sql).toContain('SELECT count(*) FROM account_fact');
     expect(params).toEqual([99, 'eastbrook', 5]);
   });
 
@@ -147,7 +154,16 @@ describe('player business snapshot safety', () => {
     expect(result.days[0]).toMatchObject({
       period: 'today',
       accountsCreated: 2,
+      charactersCreated: 3,
+      firstCharacterAccounts: 2,
+      firstWorldEntryRate: 0.5,
+      activeNew: 1,
+      activeReturning: 4,
+      avgPlaytimeSecondsAll: 100,
       avgPlaytimeSecondsNew: null,
+      avgPlaytimeSecondsLevel20: 200,
+      firstSessionMedianSeconds: 60,
+      firstSessionLevel2Rate: 0.75,
       firstSessionLevel5Rate: null,
     });
     expect(result.retention).toEqual([

@@ -17,15 +17,20 @@ CREATE TABLE IF NOT EXISTS player_account_facts (
   first_session_ended_at TIMESTAMPTZ,
   first_session_seconds INT,
   first_session_max_level INT NOT NULL DEFAULT 1,
-  PRIMARY KEY (realm, account_id),
-  UNIQUE (realm, first_session_id)
+  PRIMARY KEY (realm, account_id)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS player_account_facts_first_session_realm
+  ON player_account_facts(first_session_id, realm);
+ALTER TABLE player_account_facts
+  DROP CONSTRAINT IF EXISTS player_account_facts_realm_first_session_id_key;
 CREATE INDEX IF NOT EXISTS player_account_facts_first_character
   ON player_account_facts(realm, first_character_at)
   WHERE first_character_at IS NOT NULL;
 CREATE INDEX IF NOT EXISTS player_account_facts_first_play
   ON player_account_facts(realm, first_play_at)
   WHERE first_play_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS play_sessions_account_started_id
+  ON play_sessions(account_id, started_at, id);
 
 CREATE TABLE IF NOT EXISTS player_activity_daily (
   realm TEXT NOT NULL,
@@ -244,18 +249,26 @@ export async function openPlayerSession(
              THEN EXCLUDED.first_session_max_level
            ELSE player_account_facts.first_session_max_level
          END
+       RETURNING 1
      ), activity AS (
+       -- A reconnect can race the prior session's grace-expiry close. Reading
+       -- account_fact here enforces facts-before-activity lock order in both
+       -- statements instead of relying on textual CTE order.
        INSERT INTO player_activity_daily (
          realm, day, account_id, sessions, playtime_seconds, max_level
        )
        SELECT $4, (opened.started_at AT TIME ZONE 'UTC')::date,
               opened.account_id, 1, 0, $5
          FROM opened
+        CROSS JOIN (SELECT count(*) FROM account_fact) AS account_fact_done
        ON CONFLICT (realm, day, account_id) DO UPDATE SET
          sessions = player_activity_daily.sessions + 1,
          max_level = GREATEST(player_activity_daily.max_level, EXCLUDED.max_level)
+       RETURNING 1
      )
-     SELECT id FROM opened`,
+     SELECT opened.id
+       FROM opened
+      CROSS JOIN (SELECT count(*) FROM activity) AS activity_done`,
     [
       input.accountId,
       input.characterId,
@@ -298,18 +311,8 @@ export async function closePlayerSession(
            date_trunc('day', closed.ended_at, 'UTC'),
            interval '1 day'
          ) AS boundary
-     ), activity AS (
-       INSERT INTO player_activity_daily (
-         realm, day, account_id, sessions, playtime_seconds, max_level
-       )
-       SELECT $2, day, account_id, 0, GREATEST(playtime_seconds, 0), $3
-         FROM segments
-       ON CONFLICT (realm, day, account_id) DO UPDATE SET
-         playtime_seconds = player_activity_daily.playtime_seconds
-           + EXCLUDED.playtime_seconds,
-         max_level = GREATEST(player_activity_daily.max_level, EXCLUDED.max_level)
-     )
-     UPDATE player_account_facts facts
+    ), account_fact AS (
+       UPDATE player_account_facts facts
         SET first_session_ended_at = closed.ended_at,
             first_session_seconds = GREATEST(
               0,
@@ -319,7 +322,19 @@ export async function closePlayerSession(
        FROM closed
       WHERE facts.realm = $2
         AND facts.account_id = closed.account_id
-        AND facts.first_session_id = closed.id`,
+        AND facts.first_session_id = closed.id
+       RETURNING 1
+     )
+     INSERT INTO player_activity_daily (
+       realm, day, account_id, sessions, playtime_seconds, max_level
+     )
+     SELECT $2, day, account_id, 0, GREATEST(playtime_seconds, 0), $3
+       FROM segments
+      CROSS JOIN (SELECT count(*) FROM account_fact) AS account_fact_done
+     ON CONFLICT (realm, day, account_id) DO UPDATE SET
+       playtime_seconds = player_activity_daily.playtime_seconds
+         + EXCLUDED.playtime_seconds,
+       max_level = GREATEST(player_activity_daily.max_level, EXCLUDED.max_level)`,
     [sessionId, realm, maxLevel],
   );
 }

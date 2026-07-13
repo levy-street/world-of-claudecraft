@@ -2313,30 +2313,6 @@ export async function guildNameForCharacter(characterId: number): Promise<string
   return res.rows[0]?.name ?? null;
 }
 
-export async function createCharacter(
-  accountId: number,
-  name: string,
-  cls: PlayerClass,
-  state: CharacterState | null = null,
-): Promise<CharacterRow> {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const res = await client.query(
-      'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
-      [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
-    );
-    await recordCharacterCreation(client, accountId, REALM);
-    await client.query('COMMIT');
-    return res.rows[0];
-  } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw err;
-  } finally {
-    client.release();
-  }
-}
-
 export async function createCharacterCapped(
   accountId: number,
   name: string,
