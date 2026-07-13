@@ -147,10 +147,53 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     expect(today?.avgPlaytimeSecondsAll).toBeGreaterThanOrEqual(3599);
     expect(today?.firstSessionMedianSeconds).toBeGreaterThanOrEqual(3599);
     expect(snapshot.retention).toEqual([
-      { day: 1, rate: null },
-      { day: 7, rate: null },
-      { day: 30, rate: null },
+      { period: 'today', day: 1, rate: null },
+      { period: 'today', day: 7, rate: null },
+      { period: 'today', day: 30, rate: null },
+      { period: 'yesterday', day: 1, rate: null },
+      { period: 'yesterday', day: 7, rate: null },
+      { period: 'yesterday', day: 30, rate: null },
     ]);
+  });
+
+  it('keeps live and completed retention cohorts separate', async () => {
+    const db = await scopedClient();
+    try {
+      const accounts = await db.query(
+        `INSERT INTO accounts (created_at)
+         VALUES (now()), (now()), (now()), (now())
+         RETURNING id`,
+      );
+      const ids = accounts.rows.map((row) => Number(row.id));
+      await db.query(
+        `INSERT INTO player_account_facts (
+           realm, account_id, account_created_at, first_play_at
+         ) VALUES
+           ('eastbrook', $1, current_date - 1, current_date - 1),
+           ('eastbrook', $2, current_date - 1, current_date - 1),
+           ('eastbrook', $3, current_date - 2, current_date - 2),
+           ('eastbrook', $4, current_date - 2, current_date - 2)`,
+        ids,
+      );
+      await db.query(
+        `INSERT INTO player_activity_daily (realm, day, account_id)
+         VALUES
+           ('eastbrook', current_date, $1),
+           ('eastbrook', current_date - 1, $2),
+           ('eastbrook', current_date - 1, $3)`,
+        [ids[0], ids[2], ids[3]],
+      );
+    } finally {
+      db.release();
+    }
+
+    const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
+    expect(snapshot.retention.find((item) => item.period === 'today' && item.day === 1)?.rate).toBe(
+      0.5,
+    );
+    expect(
+      snapshot.retention.find((item) => item.period === 'yesterday' && item.day === 1)?.rate,
+    ).toBe(1);
   });
 
   it('seeds a veteran from their indexed earliest session instead of classifying them as new', async () => {

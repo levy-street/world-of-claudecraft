@@ -62,6 +62,7 @@ export interface PlayerBusinessDay {
 }
 
 export interface PlayerRetentionMetric {
+  period: 'today' | 'yesterday';
   day: 1 | 7 | 30;
   rate: number | null;
 }
@@ -73,6 +74,57 @@ export interface PlayerBusinessSnapshot {
 
 interface Queryable {
   query(text: string, values?: unknown[]): Promise<{ rows: Record<string, unknown>[] }>;
+}
+
+/** Whole-refresh deadline, including waiting for a pooled client. */
+export const PLAYER_BUSINESS_SNAPSHOT_TIMEOUT_MS = 3_000;
+
+function snapshotTimeoutError(): Error {
+  return new Error('player business snapshot timed out');
+}
+
+/**
+ * Wait for a pooled client until the snapshot deadline. If the pool hands the
+ * client out after the deadline, destroy it immediately instead of leaking a
+ * checked-out connection into shutdown.
+ */
+function acquireSnapshotClient(pool: Pool, signal: AbortSignal): Promise<PoolClient> {
+  if (signal.aborted) {
+    return Promise.reject(signal.reason instanceof Error ? signal.reason : snapshotTimeoutError());
+  }
+
+  const pending = pool.connect();
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const removeAbortListener = () => signal.removeEventListener('abort', onAbort);
+    const onAbort = () => {
+      if (settled) return;
+      settled = true;
+      removeAbortListener();
+      reject(signal.reason instanceof Error ? signal.reason : snapshotTimeoutError());
+    };
+
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) onAbort();
+
+    void pending.then(
+      (client) => {
+        if (settled) {
+          client.release(true);
+          return;
+        }
+        settled = true;
+        removeAbortListener();
+        resolve(client);
+      },
+      (err) => {
+        if (settled) return;
+        settled = true;
+        removeAbortListener();
+        reject(err);
+      },
+    );
+  });
 }
 
 function numberOrNull(value: unknown): number | null {
@@ -367,19 +419,21 @@ WITH days(period, day) AS (
 ), retention_offsets(retention_day) AS (
   VALUES (1), (7), (30)
 ), retention AS (
-  SELECT retention_offsets.retention_day,
+  SELECT days.period,
+         retention_offsets.retention_day,
          count(activity.account_id)::double precision / NULLIF(count(facts.account_id), 0)
            AS retention_rate
-    FROM retention_offsets
+    FROM days
+    CROSS JOIN retention_offsets
     LEFT JOIN player_account_facts facts
       ON facts.realm = $1
-     AND facts.first_play_at >= current_date - retention_offsets.retention_day
-     AND facts.first_play_at < current_date - retention_offsets.retention_day + 1
+     AND facts.first_play_at >= days.day - retention_offsets.retention_day
+     AND facts.first_play_at < days.day - retention_offsets.retention_day + 1
     LEFT JOIN player_activity_daily activity
       ON activity.realm = facts.realm
      AND activity.account_id = facts.account_id
-     AND activity.day = current_date
-   GROUP BY retention_offsets.retention_day
+     AND activity.day = days.day
+   GROUP BY days.period, days.day, retention_offsets.retention_day
 )
 SELECT daily.period,
        daily.accounts_created,
@@ -395,7 +449,9 @@ SELECT daily.period,
        first_sessions.median_seconds,
        first_sessions.level_2_rate,
        first_sessions.level_5_rate,
-       (SELECT jsonb_object_agg(retention_day, retention_rate) FROM retention) AS retention
+       (SELECT jsonb_object_agg(retention_day, retention_rate)
+          FROM retention
+         WHERE retention.period = daily.period) AS retention
   FROM daily
   JOIN activity USING (period)
   JOIN first_sessions USING (period)
@@ -420,18 +476,42 @@ function mapBusinessDay(row: Record<string, unknown>): PlayerBusinessDay {
   };
 }
 
-function mapRetention(value: unknown): PlayerRetentionMetric[] {
+function mapRetention(
+  period: PlayerRetentionMetric['period'],
+  value: unknown,
+): PlayerRetentionMetric[] {
   const rows = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return ([1, 7, 30] as const).map((day) => ({ day, rate: numberOrNull(rows[String(day)]) }));
+  return ([1, 7, 30] as const).map((day) => ({
+    period,
+    day,
+    rate: numberOrNull(rows[String(day)]),
+  }));
 }
 
 /** Run the bounded snapshot under fail-fast database safety limits. */
 export async function playerBusinessSnapshot(
   pool: Pool,
   realm: string,
+  timeoutMs: number = PLAYER_BUSINESS_SNAPSHOT_TIMEOUT_MS,
 ): Promise<PlayerBusinessSnapshot> {
-  const client: PoolClient = await pool.connect();
+  const deadline = new AbortController();
+  const timer = setTimeout(() => deadline.abort(snapshotTimeoutError()), Math.max(1, timeoutMs));
+  timer.unref();
+
+  let client: PoolClient | null = null;
+  let released = false;
+  const releaseClient = (destroy = false) => {
+    if (!client || released) return;
+    released = true;
+    client.release(destroy);
+  };
+  const abortActiveClient = () => releaseClient(true);
+
   try {
+    client = await acquireSnapshotClient(pool, deadline.signal);
+    deadline.signal.addEventListener('abort', abortActiveClient, { once: true });
+    if (deadline.signal.aborted) abortActiveClient();
+
     await client.query('BEGIN READ ONLY');
     await client.query("SET LOCAL lock_timeout = '250ms'");
     await client.query("SET LOCAL statement_timeout = '2000ms'");
@@ -440,12 +520,19 @@ export async function playerBusinessSnapshot(
     await client.query('COMMIT');
     return {
       days: res.rows.map((row) => mapBusinessDay(row as Record<string, unknown>)),
-      retention: mapRetention(res.rows[0]?.retention),
+      retention: res.rows.flatMap((row) =>
+        mapRetention(row.period === 'yesterday' ? 'yesterday' : 'today', row.retention),
+      ),
     };
   } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
+    if (client && !released) await client.query('ROLLBACK').catch(() => {});
+    if (deadline.signal.aborted && deadline.signal.reason instanceof Error) {
+      throw deadline.signal.reason;
+    }
     throw err;
   } finally {
-    client.release();
+    clearTimeout(timer);
+    deadline.signal.removeEventListener('abort', abortActiveClient);
+    releaseClient();
   }
 }

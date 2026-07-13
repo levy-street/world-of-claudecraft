@@ -82,6 +82,8 @@ describe('player business snapshot safety', () => {
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain("('today'::text, current_date)");
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain("('yesterday'::text, current_date - 1)");
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('VALUES (1), (7), (30)');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('activity.day = days.day');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('retention.period = daily.period');
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).not.toContain('play_sessions');
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).not.toMatch(/FROM characters\b/);
   });
@@ -106,6 +108,22 @@ describe('player business snapshot safety', () => {
               level_2_rate: 0.75,
               level_5_rate: null,
               retention: { 1: 0.4, 7: null, 30: null },
+            },
+            {
+              period: 'yesterday',
+              accounts_created: 1,
+              characters_created: 1,
+              first_character_accounts: 1,
+              first_world_entry_rate: 1,
+              active_new: 1,
+              active_returning: 0,
+              avg_playtime_all: 80,
+              avg_playtime_new: 80,
+              avg_playtime_level_20: null,
+              median_seconds: 40,
+              level_2_rate: 0.5,
+              level_5_rate: 0,
+              retention: { 1: 0.6, 7: 0.3, 30: null },
             },
           ],
         };
@@ -133,9 +151,12 @@ describe('player business snapshot safety', () => {
       firstSessionLevel5Rate: null,
     });
     expect(result.retention).toEqual([
-      { day: 1, rate: 0.4 },
-      { day: 7, rate: null },
-      { day: 30, rate: null },
+      { period: 'today', day: 1, rate: 0.4 },
+      { period: 'today', day: 7, rate: null },
+      { period: 'today', day: 30, rate: null },
+      { period: 'yesterday', day: 1, rate: 0.6 },
+      { period: 'yesterday', day: 7, rate: 0.3 },
+      { period: 'yesterday', day: 30, rate: null },
     ]);
     expect(release).toHaveBeenCalledOnce();
   });
@@ -153,5 +174,45 @@ describe('player business snapshot safety', () => {
     );
     expect(query).toHaveBeenCalledWith('ROLLBACK');
     expect(release).toHaveBeenCalledOnce();
+  });
+
+  it('times out pool acquisition and destroys a client handed out after the deadline', async () => {
+    let resolveConnect!: (client: { release: ReturnType<typeof vi.fn> }) => void;
+    const release = vi.fn();
+    const pool = {
+      connect: vi.fn(
+        () =>
+          new Promise<{ release: ReturnType<typeof vi.fn> }>((resolve) => {
+            resolveConnect = resolve;
+          }),
+      ),
+    };
+
+    await expect(playerBusinessSnapshot(pool as never, 'eastbrook', 10)).rejects.toThrow(
+      'player business snapshot timed out',
+    );
+
+    resolveConnect({ release });
+    await vi.waitFor(() => expect(release).toHaveBeenCalledWith(true));
+    expect(release).toHaveBeenCalledOnce();
+  });
+
+  it('destroys an active snapshot client when the whole-refresh deadline expires', async () => {
+    let rejectQuery!: (err: Error) => void;
+    const query = vi.fn(
+      () =>
+        new Promise<never>((_resolve, reject) => {
+          rejectQuery = reject;
+        }),
+    );
+    const release = vi.fn((destroy?: boolean) => {
+      if (destroy) rejectQuery(new Error('connection destroyed'));
+    });
+    const pool = { connect: vi.fn(async () => ({ query, release })) };
+
+    await expect(playerBusinessSnapshot(pool as never, 'eastbrook', 10)).rejects.toThrow(
+      'player business snapshot timed out',
+    );
+    expect(release).toHaveBeenCalledWith(true);
   });
 });

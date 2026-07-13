@@ -50,9 +50,12 @@ function snapshot(): PlayerBusinessSnapshot {
       },
     ],
     retention: [
-      { day: 1, rate: 0.4 },
-      { day: 7, rate: 0.2 },
-      { day: 30, rate: null },
+      { period: 'today', day: 1, rate: 0.4 },
+      { period: 'today', day: 7, rate: 0.2 },
+      { period: 'today', day: 30, rate: null },
+      { period: 'yesterday', day: 1, rate: 0.35 },
+      { period: 'yesterday', day: 7, rate: 0.15 },
+      { period: 'yesterday', day: 30, rate: 0.05 },
     ],
   };
 }
@@ -100,8 +103,9 @@ describe('registerBusinessMetrics', () => {
     expect(sample(text, WOC_PLAYER_FIRST_SESSION_LEVEL_RATE, 'period="today",level="5"')).toBe(
       '0.25',
     );
-    expect(sample(text, WOC_PLAYER_RETENTION_RATE, 'day="7"')).toBe('0.2');
-    expect(text).not.toContain('woc_player_retention_rate{day="30"}');
+    expect(sample(text, WOC_PLAYER_RETENTION_RATE, 'period="today",day="7"')).toBe('0.2');
+    expect(sample(text, WOC_PLAYER_RETENTION_RATE, 'period="yesterday",day="30"')).toBe('0.05');
+    expect(text).not.toContain('woc_player_retention_rate{period="today",day="30"}');
   });
 
   it('never queries on scrape and bounds every label value', async () => {
@@ -119,7 +123,7 @@ describe('registerBusinessMetrics', () => {
     expect(labelValues('period')).toEqual(new Set(['today', 'yesterday']));
     expect(labelValues('segment')).toEqual(new Set(['new', 'returning', 'all', 'level_20']));
     expect(labelValues('level')).toEqual(new Set(['2', '5']));
-    expect(labelValues('day')).toEqual(new Set(['1', '7']));
+    expect(labelValues('day')).toEqual(new Set(['1', '7', '30']));
     for (const forbidden of ['account_id', 'character_id', 'player', 'name', 'ip']) {
       expect(labelValues(forbidden).size).toBe(0);
     }

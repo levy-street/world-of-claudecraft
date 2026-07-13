@@ -199,15 +199,19 @@ export function registerBusinessMetrics(
   new Gauge({
     name: WOC_PLAYER_RETENTION_RATE,
     help: 'Share of a first-play cohort active again after a fixed number of UTC days.',
-    labelNames: ['day'],
+    labelNames: ['period', 'day'],
     registers: [registry],
     collect() {
       this.reset();
       const snapshot = collector.current();
       if (!snapshot) return;
-      for (const day of RETENTION_DAYS) {
-        const retention = snapshot.retention.find((item) => item.day === day);
-        if (retention) setIfPresent(this, { day: String(day) }, retention.rate);
+      for (const period of PERIODS) {
+        for (const day of RETENTION_DAYS) {
+          const retention = snapshot.retention.find(
+            (item) => item.period === period && item.day === day,
+          );
+          if (retention) setIfPresent(this, { period, day: String(day) }, retention.rate);
+        }
       }
     },
   });
