@@ -213,6 +213,14 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
+  // Enhancement shaman tank kit. `earth_shield`: a charge-limited damage-taken
+  // reduction (value = fraction less, `charges` = remaining attacks, spent in
+  // src/sim/combat/earth_shield.ts). `earthbound_weapon`: a weapon-enchant buff
+  // that multiplies all threat the wearer generates (see threat.ts); it swaps
+  // with the damage imbues (one weapon enchant at a time) but adds no swing
+  // damage of its own.
+  | 'earth_shield'
+  | 'earthbound_weapon'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.
@@ -1539,6 +1547,12 @@ export type AbilityEffect =
   | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
   | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
+  // Enhancement shaman tank kit. `earthbindWeapon`: apply the Anchorbound Weapon
+  // threat-imbue (swaps out any other weapon enchant; +100% threat while up).
+  // `unleashWeapon`: discharge the active weapon enchant for `min..max` damage
+  // plus an enchant-keyed rider (see src/sim/combat/unleash_weapon.ts).
+  | { type: 'earthbindWeapon'; duration: number }
+  | { type: 'unleashWeapon'; min: number; max: number }
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
   | { type: 'summonPet'; templateId: string } // warlock demon summon: creates/replaces a controlled pet

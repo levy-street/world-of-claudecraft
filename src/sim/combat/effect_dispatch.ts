@@ -37,8 +37,22 @@ import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { runUnleashWeapon } from './unleash_weapon';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
+
+// Remove every active weapon enchant (damage imbues and the Anchorbound threat
+// imbue) except the one about to be applied, so a shaman always carries exactly
+// one weapon enchant. Emits the loss for each dropped aura.
+function clearWeaponEnchants(ctx: SimContext, caster: Entity, keepId: string): void {
+  for (let i = caster.auras.length - 1; i >= 0; i--) {
+    const a = caster.auras[i];
+    if ((a.kind === 'imbue' || a.kind === 'earthbound_weapon') && a.id !== keepId) {
+      caster.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: caster.id, name: a.name, gained: false });
+    }
+  }
+}
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -359,13 +373,7 @@ export function runEffects(
         break;
       }
       case 'imbue': {
-        for (let i = p.auras.length - 1; i >= 0; i--) {
-          const a = p.auras[i];
-          if (a.kind === 'imbue' && a.id !== ability.id) {
-            p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
-          }
-        }
+        clearWeaponEnchants(ctx, p, ability.id);
         ctx.applyAura(p, {
           id: ability.id,
           name: ability.name,
@@ -378,6 +386,28 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        break;
+      }
+      case 'earthbindWeapon': {
+        // Anchorbound Weapon: a threat imbue. It occupies the weapon-enchant slot
+        // (swaps out any damage imbue) and adds no swing damage; its whole effect
+        // is the +100% threat multiplier read in threat.ts.
+        clearWeaponEnchants(ctx, p, ability.id);
+        ctx.applyAura(p, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'earthbound_weapon',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: 0,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
+      case 'unleashWeapon': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        runUnleashWeapon(ctx, p, target, ability, eff.min, eff.max);
         break;
       }
       case 'judgement': {

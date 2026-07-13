@@ -49,6 +49,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { applyEarthShield } from './earth_shield';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -117,6 +118,14 @@ export function dealDamage(
     target.auras.some((a) => a.kind === 'defensive_stance')
   ) {
     amount = Math.round(amount * 0.9);
+  }
+
+  // Earth Shield (Stone Aegis): a charge-limited damage-taken reduction on the
+  // shaman. Only a real incoming attack (a DIRECT hit from another entity) spends
+  // a charge; DoT ticks and reflects (direct=false) and self-damage leave it be,
+  // matching the "next N attacks" fantasy.
+  if (direct && source && source.id !== target.id && amount > 0) {
+    amount = applyEarthShield(ctx, target, amount);
   }
 
   // Expose: a cracked-guard debuff amplifies the physical damage the victim

@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "es_ES": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "fr_FR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "fr_CA": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "de_DE": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "nl_NL": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "pl_PL": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "id_ID": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "tr_TR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "sv_SE": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "vi_VN": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ],
+  "da_DK": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.earthbound_weapon.description",
+    "entities.abilities.earthbound_weapon.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name"
+  ]
 };
