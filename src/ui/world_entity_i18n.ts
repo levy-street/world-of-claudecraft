@@ -1,4 +1,5 @@
 import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
+import { DAWNHAVEN_ZONE } from '../sim/content/tutorial';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -103,6 +104,9 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Dawnhaven Isle (the starter tutorial's offline map)
+  'dawnhaven_dummy',
+  'dawnhaven_strandwolf',
 ] as const;
 
 const NPC_IDS = [
@@ -139,6 +143,7 @@ const NPC_IDS = [
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
+  'dawnhaven_warden', // Dawnhaven Isle keeper (starter tutorial; dynamic, offline map only)
 ] as const;
 
 const QUEST_IDS = [
@@ -219,9 +224,15 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_dawnhaven_wolves', // Dawnhaven Isle (starter tutorial; offline map only)
 ] as const;
 
-const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
+const ZONE_IDS = [
+  'eastbrook_vale',
+  'mirefen_marsh',
+  'thornpeak_heights',
+  'dawnhaven_isle', // starter tutorial's offline map
+] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',
   'sunken_bastion',
@@ -339,7 +350,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   });
 
   const zones = {} as ZoneTranslations;
-  ZONES.forEach((zone) => {
+  // The isle is not one of the built-in `ZONES` (it ships as its own WorldContent
+  // bundle and never spawns in the live world), so it is appended explicitly here:
+  // its name and POI labels still have to localize when the tutorial runs.
+  [...ZONES, DAWNHAVEN_ZONE].forEach((zone) => {
     const poiRecord = {} as Record<number, { label: string }>;
     zone.pois.forEach((poi, index) => {
       poiRecord[index] = { label: poi.label };

@@ -1875,6 +1875,81 @@ export const ko_KR: EnTranslations = {
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
       "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
       "titledName": "{name} [{title}]"
+    },
+    "starterTutorial": {
+      "stepLabel": "Step {current} of {total}",
+      "skip": "섬 떠나기",
+      "leave": "본토로 출항하기",
+      "doneTitle": "감시관이 만족했다",
+      "doneBody": "가만히 선 채로 가르칠 수 있는 건 여기까지다. 나머지는 먼저 서투르게 겪어 봐야 배우는 법이다. 가라, 본토가 기다린다. 그곳은 나만큼 다정하지 않을 거다.",
+      "objectiveDone": "{label}: 완료",
+      "objectiveCount": "{label}: {current} of {total}",
+      "scenes": {
+        "wardenReveal": "한 여인이 제단 돌 위의 빛 속에서 걸어 나와, 아침 내내 당신을 기다렸다는 듯 외투에 묻은 소금기를 털어낸다.",
+        "yardReveal": "연습장이다. 짚 허수아비 셋이 성인처럼 참을성 있게, 딱 그만큼 위험하지 않게 서 있다.",
+        "wolfReveal": "덤불이 흔들린다. 저것이 바로 몹, 당신을 아주 기꺼이 죽이려 드는 살아 있는 것이다. 저것에게도 생명력 바가 있다. 당신 것이 비기 전에 저것부터 비워라."
+      },
+      "steps": {
+        "land": "조수가 또 한 명 데려왔군. 모래밭을 따라 오르는 길이 있고, 그 위 언덕에 제단이 있다. 걸어 올라와라. 나는 누구를 향해서도 소리치지 않는다.",
+        "enlist": "나에게는 일이 있고, 네 손은 비어 있다. 가까이 서서 나에게 말을 걸어 그 일을 받아라.",
+        "target": "이 섬에서 너를 위해 가만히 있어 주는 건 내 허수아비뿐이다. 연습장은 동쪽이다. 하나 골라서 대상으로 지정해라.",
+        "strike": "이제 때려라. 바짝 붙어서 휘두르기 시작해라. 자동 공격은 한번 시작되면 알아서 계속되니, 서서 구경만 하고 있지 마라.",
+        "hunt": "해변늑대 세 마리가 조수를 타고 들어와 내 염소들을 노리고 있다. 서쪽, 골짜기로 내려가라. 어서 가 봐라.",
+        "spoils": "뒤져 보지도 않은 사냥감을 그냥 두고 오는 법은 없다. 늑대를 약탈해서 송곳니를 꺼내 와라.",
+        "report": "나에게 돌아와라. 일은 죽이기를 멈췄다고 끝나는 게 아니라, 보고해야 끝나는 거다."
+      },
+      "objective": {
+        "land": "감시관에게 도착하기",
+        "enlist": "임무 수락하기",
+        "target": "{mob} 대상 지정",
+        "strike": "적중한 자동 공격",
+        "hunt": "해변늑대 처치",
+        "spoils": "Take a {item}",
+        "report": "감시관에게 보고하기",
+        "abilityHit": "{ability} 적중",
+        "auraUp": "{ability} 활성화",
+        "healSelf": "자신을 치유하기",
+        "rangedHit": "원거리에서 적중한 자동 사격",
+        "petSummoned": "악마 소환"
+      },
+      "class": {
+        "warrior": {
+          "signature": "휘두르면 분노가 쌓이고, 분노는 쓰라고 있는 것이다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.",
+          "mastery": "전사는 일부러 시끄러운 법이다. {ability}을(를) 끌어올려 섬 전체가 듣게 해라."
+        },
+        "paladin": {
+          "signature": "네 힘은 빌린 것이고, 빌린 힘은 청해야 얻는 것이다. {ability}(으)로 네 무기를 축성해라.",
+          "mastery": "빛은 무엇을 태우기 전에 제 사람부터 낫게 한다. 자신을 한 번 치유하고, 성기사를 버티게 하는 것이 무엇인지 느껴 봐라."
+        },
+        "hunter": {
+          "signature": "사냥꾼도 궁지에 몰릴 때가 있고, 궁지에 몰린 사냥꾼은 칼이 무엇에 쓰는 물건인지는 알아야 한다. 허수아비에게 {ability}을(를) 두 번 꽂아 넣어라.",
+          "mastery": "이제 제대로 해 봐라. 저것의 손이 닿지 않는 곳까지 물러나서 쏴라. 거기서 자동 사격 세 번이다."
+        },
+        "rogue": {
+          "signature": "베고, 계속 베어라. {ability}을(를) 세 번 적중시키고 연계 점수가 쌓이는 것을 지켜봐라.",
+          "mastery": "점수는 쌓아 두기만 하면 쓸모가 없다. 써라. {ability}(으)로 허수아비를 끝내 버려라."
+        },
+        "priest": {
+          "signature": "이빨이 달린 믿음이다. {ability}(으)로 허수아비를 두 번 쳐라.",
+          "mastery": "그리고 낫게 하는 믿음도 있다. 자신을 한 번 치유해라. 그 습관이 곧 필요해질 거다."
+        },
+        "mage": {
+          "signature": "불부터 지르고, 질문은 하지 않는다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.",
+          "mastery": "천은 빨리 탄다. 그러니 천보다 나은 것을 걸쳐라. {ability}을(를) 걸어 둬라."
+        },
+        "warlock": {
+          "signature": "어둠 속으로 손을 뻗어 한 줌 움켜쥐고, 무언가를 향해 던져라. 허수아비에게 {ability}을(를) 두 번 적중시켜라.",
+          "mastery": "남들이 뭐라 하든, 혼자 걷는 흑마법사는 없다. 네 악마를 소환해라."
+        },
+        "druid": {
+          "signature": "야생은 정중하게 청할 때 답한다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.",
+          "mastery": "이제 네 자신을 위해서도 청해 봐라. 자신에게 {ability}을(를) 걸어라."
+        },
+        "shaman": {
+          "signature": "오늘은 폭풍이 네 편이다. 허수아비에게 {ability}을(를) 두 번 적중시켜라.",
+          "mastery": "폭풍보다 바위가 먼저다. {ability}(으)로 네 무기를 강화해라."
+        }
+      }
     }
   },
   "apiError": {
@@ -4571,6 +4646,13 @@ export const ko_KR: EnTranslations = {
     "sortName": "이름",
     "sortRecent": "최근 플레이",
     "sortPlaytime": "플레이 시간"
+  },
+  "starterTutorial": {
+    "title": "잠시 돌아가시겠습니까?",
+    "body": "{className}(으)로는 처음이시군요. 새 모험가를 위한 훈련의 섬이 있고, 그곳의 감시관이 당신의 직업이 실제로 무엇을 하는지 하나씩 알려 줍니다. 몇 분이면 끝나며, 전적으로 선택 사항입니다.",
+    "note": "캐릭터는 만드신 그대로 유지됩니다. 섬에서 얻은 것은 아무것도 따라오지 않습니다.",
+    "accept": "던헤이븐으로 출항",
+    "decline": "건너뛰기, 길은 압니다"
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",
@@ -8048,6 +8130,12 @@ export const ko_KR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
+      "dawnhaven_dummy": {
+        "name": "연습용 허수아비"
+      },
+      "dawnhaven_strandwolf": {
+        "name": "해변늑대"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -8322,6 +8410,11 @@ export const ko_KR: EnTranslations = {
         "name": "연대기 기록관 젠지",
         "title": "쏜피크 고지 연대기",
         "greeting": "산은 아무것도 잊지 않네, {playerName}. 나도 마찬가지지. 자네가 이룬 일을 보여 주게."
+      },
+      "dawnhaven_warden": {
+        "name": "감시관 펜나 로크",
+        "title": "던헤이븐의 수호자",
+        "greeting": "{className}, 일어나서 숨은 쉬고 있군? 좋다. 섬은 참을성이 있지만, 늑대들은 그렇지 않다."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -9142,6 +9235,16 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_dawnhaven_wolves": {
+        "title": "감시관의 시험",
+        "text": "해변늑대 세 마리가 조수를 타고 들어와 그때부터 내 염소들을 노리고 있다. {playerName}, 서쪽 길을 따라 골짜기로 내려가서 연습장에서 배운 것을 나에게 보여 봐라.",
+        "completion": "깔끔하군. 이제 내 섬보다 큰 섬으로 갈 준비가 됐다.",
+        "objectives": {
+          "0": {
+            "label": "해변늑대 처치"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -9309,6 +9412,24 @@ export const ko_KR: EnTranslations = {
           },
           "9": {
             "label": "무덤고룡 성소"
+          }
+        }
+      },
+      "dawnhaven_isle": {
+        "name": "던헤이븐 섬",
+        "welcome": "길을 따라 올라가면 감시관 로크가 기다리고 있습니다.",
+        "pois": {
+          "0": {
+            "label": "상륙지"
+          },
+          "1": {
+            "label": "감시관의 쉼터"
+          },
+          "2": {
+            "label": "연습장"
+          },
+          "3": {
+            "label": "늑대 골짜기"
           }
         }
       }

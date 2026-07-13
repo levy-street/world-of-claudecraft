@@ -1,6 +1,6 @@
 // Screenshots of the Sowfield (Vale Cup stadium, src/render/vale_cup_stadium.ts)
 // in the southern vale. Boots the offline world, then drives the renderer's
-// editor free-cam seam (editorCam bypasses the chase camera, so framing is
+// editor free-cam seam (freeCam bypasses the chase camera, so framing is
 // exact) through the gate approach, the pitch from the stands, a goal mouth,
 // the boarball during a practice match, and a wide vale shot.
 // Needs `npm run dev` running; pass GAME_URL if vite picked a non-default port.
@@ -94,7 +94,7 @@ async function shot(name, cam, target, settleMs = 1600) {
       p.pos.z = c.z - (dz / dl) * 3;
       p.prevPos.x = p.pos.x;
       p.prevPos.z = p.pos.z;
-      g.renderer.editorCam = {
+      g.renderer.freeCam = {
         pos: { x: c.x, y: gy + c.h, z: c.z },
         target: { x: t.x, y: gy + t.h, z: t.z },
       };
@@ -156,7 +156,7 @@ if (practice) {
     p.prevPos.x = p.pos.x;
     p.prevPos.z = p.pos.z;
     const gy = e.pos.y;
-    g.renderer.editorCam = {
+    g.renderer.freeCam = {
       pos: { x: -10.2, y: gy + 1.15, z: -100.9 },
       target: { x: -11, y: gy + 0.6, z: -104 },
     };
@@ -173,7 +173,7 @@ if (practice) {
   // timing; a real goal lands whenever the bots feel like it)
   await page.evaluate(() => {
     const g = window.__game;
-    g.renderer.editorCam = {
+    g.renderer.freeCam = {
       pos: { x: -6, y: g.sim.player.pos.y + 2.4, z: -119 },
       target: { x: 11, y: g.sim.player.pos.y + 9, z: -112 },
     };

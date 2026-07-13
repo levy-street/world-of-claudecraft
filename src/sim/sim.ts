@@ -381,6 +381,7 @@ import {
   threatModifier,
   topThreatValue,
 } from './threat';
+import * as tutorialStageMod from './tutorial_stage';
 import {
   type AbilityDef,
   type AbilityEffect,
@@ -6836,6 +6837,18 @@ export class Sim {
 
   updateFiestaBots(): void {
     fiestaBotsMod.updateFiestaBots(this);
+  }
+
+  // Starter tutorial: place one entity at an exact spot, on cue, for a scripted
+  // reveal. Draws no rng and runs in no tick phase (see tutorial_stage.ts); the
+  // only caller is the client host that owns an OFFLINE tutorial Sim, and no wire
+  // command reaches either method.
+  spawnStagedMob(templateId: string, x: number, z: number, facing = 0): number | null {
+    return tutorialStageMod.spawnStagedMob(this.ctx, templateId, x, z, facing);
+  }
+
+  spawnStagedNpc(npcId: string, x: number, z: number, facing?: number): number | null {
+    return tutorialStageMod.spawnStagedNpc(this.ctx, npcId, x, z, facing);
   }
 
   // -------------------------------------------------------------------------

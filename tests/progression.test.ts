@@ -84,9 +84,18 @@ describe('content referential integrity', () => {
     expect(problems).toEqual([]);
   });
 
-  it('QUEST_ORDER covers every quest exactly once', () => {
-    expect([...QUEST_ORDER].sort()).toEqual(Object.keys(QUESTS).sort());
+  it('QUEST_ORDER covers every LIVE-WORLD quest exactly once', () => {
+    // QUEST_ORDER is the live world's progression spine. The starter tutorial's
+    // quest is merged into QUESTS (talkToNpc and questState resolve every quest
+    // through that table by id) but is deliberately NOT in the spine: its only
+    // giver is the Dawnhaven Warden, who exists only on the offline tutorial isle,
+    // so it is unreachable in the live world and must not sit in its ordering.
+    const TUTORIAL_QUESTS = ['q_dawnhaven_wolves'];
+    const liveQuests = Object.keys(QUESTS).filter((id) => !TUTORIAL_QUESTS.includes(id));
+    expect([...QUEST_ORDER].sort()).toEqual(liveQuests.sort());
     expect(new Set(QUEST_ORDER).size).toBe(QUEST_ORDER.length);
+    // ...and it really is defined, so this carve-out can never quietly hide a typo.
+    for (const id of TUTORIAL_QUESTS) expect(QUESTS[id]).toBeDefined();
   });
 
   it('all loot tables, vendor stock, camps and dungeon spawns resolve', () => {

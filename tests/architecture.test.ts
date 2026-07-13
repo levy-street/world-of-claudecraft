@@ -121,6 +121,8 @@ const simFiles = walk(simRoot);
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
   'src/ui/chat_ignore_core.ts',
+  'src/ui/starter_tutorial_core.ts',
+  'src/ui/objective_arrow_core.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',

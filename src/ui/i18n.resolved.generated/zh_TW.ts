@@ -1875,6 +1875,81 @@ export const zh_TW: EnTranslations = {
       "lbEmpty": "尚無上榜的編年史家。",
       "broadcastsLabel": "與公會和好友分享功績達成",
       "titledName": "{name}【{title}】"
+    },
+    "starterTutorial": {
+      "stepLabel": "Step {current} of {total}",
+      "skip": "離開此島",
+      "leave": "啟航前往大陸",
+      "doneTitle": "守望者滿意了",
+      "doneBody": "站著不動能教的，我都教完了。剩下的，你得先做砸幾次才學得會。去吧，大陸正等著你，而它不會像我這麼客氣。",
+      "objectiveDone": "{label}：完成",
+      "objectiveCount": "{label}: {current} of {total}",
+      "scenes": {
+        "wardenReveal": "一名女子自神龕石的光芒中走出，拍掉外套上的鹽粒，彷彿她整個早上都在等你。",
+        "yardReveal": "練習場到了。三具稻草人偶，像聖人一樣有耐性，危險程度也跟聖人差不多。",
+        "wolfReveal": "灌木叢動了。那就是怪物：一個活生生、而且非常想殺死你的東西。牠有一條生命條。在牠清空你的之前，先清空牠的。"
+      },
+      "steps": {
+        "land": "潮水又替我送來一個。沙灘上有條小徑往上走，上頭的小丘有座神龕。自己走上來，我不會對任何人喊話。",
+        "enlist": "我這裡有活，而你兩手正空著。靠過來跟我說話，把任務接下。",
+        "target": "這座島上除了我的人偶，沒有東西會乖乖站著等你。練習場在東邊。挑一具出來，把牠設為你的目標。",
+        "strike": "現在打它。靠近，開始揮武器。自動攻擊一旦啟動就會自己持續下去，所以別站在那裡欣賞。",
+        "hunt": "三隻灘岸狼隨潮水上了岸，一直盯著我的山羊看。往西，下到窪地去。走吧。",
+        "spoils": "沒搜過的屍體，絕不能就這樣走開。拾取一隻狼，把牠的獠牙取下來。",
+        "report": "回來找我。任務不是殺完就結束，是回報了才算結束。"
+      },
+      "objective": {
+        "land": "抵達守望者身邊",
+        "enlist": "接下任務",
+        "target": "將{mob}設為目標",
+        "strike": "命中的自動攻擊次數",
+        "hunt": "已擊殺灘岸狼",
+        "spoils": "Take a {item}",
+        "report": "向守望者回報",
+        "abilityHit": "{ability}命中",
+        "auraUp": "{ability}生效中",
+        "healSelf": "治療自己",
+        "rangedHit": "遠距離命中的自動射擊",
+        "petSummoned": "已召喚惡魔"
+      },
+      "class": {
+        "warrior": {
+          "signature": "揮擊會累積怒氣，而怒氣就是拿來花的。對人偶命中兩次{ability}。",
+          "mastery": "戰士的吵鬧是故意的。開啟{ability}，讓整座島都聽見。"
+        },
+        "paladin": {
+          "signature": "你的力量是借來的，而借來的力量得先開口求。用{ability}為你的武器烙上印記。",
+          "mastery": "聖光在灼燒他物之前，會先修補自己人。治療自己一次，感受一下是什麼撐著聖騎士站直。"
+        },
+        "hunter": {
+          "signature": "就連獵人也會被逼到角落，而被逼到角落的獵人，最好清楚刀刃是拿來做什麼的。對人偶使出兩次{ability}。",
+          "mastery": "現在用正確的方式再來一次。退到牠碰不到你的地方再射：從那裡打出三次自動射擊。"
+        },
+        "rogue": {
+          "signature": "砍，然後繼續砍。命中三次{ability}，看著連擊點在牠身上疊起來。",
+          "mastery": "連擊點囤著一文不值。花掉它們：用{ability}了結那具人偶。"
+        },
+        "priest": {
+          "signature": "長了牙的信仰。用{ability}擊中人偶兩次。",
+          "mastery": "也要有能修補的信仰。治療自己一次。這個習慣，你以後用得上。"
+        },
+        "mage": {
+          "signature": "先放火，問題永遠不必問。對人偶命中兩次{ability}。",
+          "mastery": "布甲燒得很快，所以穿點比布更好的東西。把{ability}掛上。"
+        },
+        "warlock": {
+          "signature": "把手伸進黑暗，抓一把出來，往東西上扔。對人偶命中兩次{ability}。",
+          "mastery": "不管他們怎麼跟你說，沒有術士是獨自行走的。召喚你的惡魔。"
+        },
+        "druid": {
+          "signature": "只要問得客氣，荒野就會回應。對人偶命中兩次{ability}。",
+          "mastery": "現在，替你自己開口要點東西。對自己施放{ability}。"
+        },
+        "shaman": {
+          "signature": "今天風暴站在你這邊。對人偶命中兩次{ability}。",
+          "mastery": "先有磐石，才有風暴。用{ability}為你的武器附魔。"
+        }
+      }
     }
   },
   "apiError": {
@@ -4571,6 +4646,13 @@ export const zh_TW: EnTranslations = {
     "sortName": "名稱",
     "sortRecent": "最近遊玩",
     "sortPlaytime": "遊戲時間"
+  },
+  "starterTutorial": {
+    "title": "要繞個小路嗎？",
+    "body": "這是你的第一位{className}。有一座專為新冒險者準備的訓練島，島上的守望者會親自帶你摸清你的職業究竟能做什麼。只需要幾分鐘，而且完全可以略過。",
+    "note": "你的角色會維持你創建時的模樣。你在島上獲得的一切，都不會跟著你回來。",
+    "accept": "啟航前往黎明港",
+    "decline": "略過，我認得路"
   },
   "deleteCharacter": {
     "title": "刪除角色",
@@ -8048,6 +8130,12 @@ export const zh_TW: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
       },
+      "dawnhaven_dummy": {
+        "name": "練習人偶"
+      },
+      "dawnhaven_strandwolf": {
+        "name": "灘岸狼"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -8322,6 +8410,11 @@ export const zh_TW: EnTranslations = {
         "name": "編年史者贊西",
         "title": "荊峰高地編年史",
         "greeting": "高山什麼都不會忘記，{playerName}，我也一樣。讓我看看你都做過什麼吧。"
+      },
+      "dawnhaven_warden": {
+        "name": "守望者芬娜·洛克",
+        "title": "黎明港守護者",
+        "greeting": "站起來了，還喘著氣，{className}？很好。這座島很有耐性，狼可沒有。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -9142,6 +9235,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_dawnhaven_wolves": {
+        "title": "守望者的試煉",
+        "text": "三隻灘岸狼隨潮水上了岸，從那時起就一直盯著我的山羊。走西邊的小徑下到窪地去，{playerName}，讓我看看你在練習場學到了什麼。",
+        "completion": "做得乾淨俐落。你已經可以去比我這裡更大的島了。",
+        "objectives": {
+          "0": {
+            "label": "擊殺灘岸狼"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱詩班",
         "text": "那些涉者並非單獨行動。在牠們之間行走的，是溺亡信徒——隨神殿一同沉沒的邪教徒，仍披著腐朽的法衣，仍從岸岩之間唱著那篇禱文。讓其中八人歸於沉寂，並為我帶回他們所攜的六件供品。我想知道他們要獻給女神的究竟是什麼。",
@@ -9309,6 +9412,24 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "墓龍聖所"
+          }
+        }
+      },
+      "dawnhaven_isle": {
+        "name": "黎明港島",
+        "welcome": "守望者洛克正在小徑上頭等你。",
+        "pois": {
+          "0": {
+            "label": "登岸處"
+          },
+          "1": {
+            "label": "守望者憩所"
+          },
+          "2": {
+            "label": "練習場"
+          },
+          "3": {
+            "label": "狼窪地"
           }
         }
       }

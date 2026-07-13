@@ -6868,4 +6868,98 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有幾個日常指令值得記住：/w 名稱 可發送密語，/r 則回覆你最近收到的一則，/invite 邀請某人加入你的隊伍，/follow 跟隨在朋友身後，/roll 為隊伍擲骰讓大家看見，/who 顯示誰在線上，而 /afk 則標示你暫時離開。在遊戲中輸入 /help 可查看完整清單。',
   'guide.social.slashHeading': '實用的斜線指令',
+  'hudChrome.starterTutorial.skip': '離開此島',
+  'hudChrome.starterTutorial.leave': '啟航前往大陸',
+  'hudChrome.starterTutorial.doneTitle': '守望者滿意了',
+  'hudChrome.starterTutorial.doneBody':
+    '站著不動能教的，我都教完了。剩下的，你得先做砸幾次才學得會。去吧，大陸正等著你，而它不會像我這麼客氣。',
+  'hudChrome.starterTutorial.objectiveDone': '{label}：完成',
+  'hudChrome.starterTutorial.scenes.wardenReveal':
+    '一名女子自神龕石的光芒中走出，拍掉外套上的鹽粒，彷彿她整個早上都在等你。',
+  'hudChrome.starterTutorial.scenes.yardReveal':
+    '練習場到了。三具稻草人偶，像聖人一樣有耐性，危險程度也跟聖人差不多。',
+  'hudChrome.starterTutorial.scenes.wolfReveal':
+    '灌木叢動了。那就是怪物：一個活生生、而且非常想殺死你的東西。牠有一條生命條。在牠清空你的之前，先清空牠的。',
+  'hudChrome.starterTutorial.steps.land':
+    '潮水又替我送來一個。沙灘上有條小徑往上走，上頭的小丘有座神龕。自己走上來，我不會對任何人喊話。',
+  'hudChrome.starterTutorial.steps.enlist':
+    '我這裡有活，而你兩手正空著。靠過來跟我說話，把任務接下。',
+  'hudChrome.starterTutorial.steps.target':
+    '這座島上除了我的人偶，沒有東西會乖乖站著等你。練習場在東邊。挑一具出來，把牠設為你的目標。',
+  'hudChrome.starterTutorial.steps.strike':
+    '現在打它。靠近，開始揮武器。自動攻擊一旦啟動就會自己持續下去，所以別站在那裡欣賞。',
+  'hudChrome.starterTutorial.steps.hunt':
+    '三隻灘岸狼隨潮水上了岸，一直盯著我的山羊看。往西，下到窪地去。走吧。',
+  'hudChrome.starterTutorial.steps.spoils':
+    '沒搜過的屍體，絕不能就這樣走開。拾取一隻狼，把牠的獠牙取下來。',
+  'hudChrome.starterTutorial.steps.report': '回來找我。任務不是殺完就結束，是回報了才算結束。',
+  'hudChrome.starterTutorial.objective.land': '抵達守望者身邊',
+  'hudChrome.starterTutorial.objective.enlist': '接下任務',
+  'hudChrome.starterTutorial.objective.target': '將{mob}設為目標',
+  'hudChrome.starterTutorial.objective.strike': '命中的自動攻擊次數',
+  'hudChrome.starterTutorial.objective.hunt': '已擊殺灘岸狼',
+  'hudChrome.starterTutorial.objective.report': '向守望者回報',
+  'hudChrome.starterTutorial.objective.abilityHit': '{ability}命中',
+  'hudChrome.starterTutorial.objective.auraUp': '{ability}生效中',
+  'hudChrome.starterTutorial.objective.healSelf': '治療自己',
+  'hudChrome.starterTutorial.objective.rangedHit': '遠距離命中的自動射擊',
+  'hudChrome.starterTutorial.objective.petSummoned': '已召喚惡魔',
+  'hudChrome.starterTutorial.class.warrior.signature':
+    '揮擊會累積怒氣，而怒氣就是拿來花的。對人偶命中兩次{ability}。',
+  'hudChrome.starterTutorial.class.warrior.mastery':
+    '戰士的吵鬧是故意的。開啟{ability}，讓整座島都聽見。',
+  'hudChrome.starterTutorial.class.paladin.signature':
+    '你的力量是借來的，而借來的力量得先開口求。用{ability}為你的武器烙上印記。',
+  'hudChrome.starterTutorial.class.paladin.mastery':
+    '聖光在灼燒他物之前，會先修補自己人。治療自己一次，感受一下是什麼撐著聖騎士站直。',
+  'hudChrome.starterTutorial.class.hunter.signature':
+    '就連獵人也會被逼到角落，而被逼到角落的獵人，最好清楚刀刃是拿來做什麼的。對人偶使出兩次{ability}。',
+  'hudChrome.starterTutorial.class.hunter.mastery':
+    '現在用正確的方式再來一次。退到牠碰不到你的地方再射：從那裡打出三次自動射擊。',
+  'hudChrome.starterTutorial.class.rogue.signature':
+    '砍，然後繼續砍。命中三次{ability}，看著連擊點在牠身上疊起來。',
+  'hudChrome.starterTutorial.class.rogue.mastery':
+    '連擊點囤著一文不值。花掉它們：用{ability}了結那具人偶。',
+  'hudChrome.starterTutorial.class.priest.signature': '長了牙的信仰。用{ability}擊中人偶兩次。',
+  'hudChrome.starterTutorial.class.priest.mastery':
+    '也要有能修補的信仰。治療自己一次。這個習慣，你以後用得上。',
+  'hudChrome.starterTutorial.class.mage.signature':
+    '先放火，問題永遠不必問。對人偶命中兩次{ability}。',
+  'hudChrome.starterTutorial.class.mage.mastery':
+    '布甲燒得很快，所以穿點比布更好的東西。把{ability}掛上。',
+  'hudChrome.starterTutorial.class.warlock.signature':
+    '把手伸進黑暗，抓一把出來，往東西上扔。對人偶命中兩次{ability}。',
+  'hudChrome.starterTutorial.class.warlock.mastery':
+    '不管他們怎麼跟你說，沒有術士是獨自行走的。召喚你的惡魔。',
+  'hudChrome.starterTutorial.class.druid.signature':
+    '只要問得客氣，荒野就會回應。對人偶命中兩次{ability}。',
+  'hudChrome.starterTutorial.class.druid.mastery':
+    '現在，替你自己開口要點東西。對自己施放{ability}。',
+  'hudChrome.starterTutorial.class.shaman.signature':
+    '今天風暴站在你這邊。對人偶命中兩次{ability}。',
+  'hudChrome.starterTutorial.class.shaman.mastery':
+    '先有磐石，才有風暴。用{ability}為你的武器附魔。',
+  'starterTutorial.title': '要繞個小路嗎？',
+  'starterTutorial.body':
+    '這是你的第一位{className}。有一座專為新冒險者準備的訓練島，島上的守望者會親自帶你摸清你的職業究竟能做什麼。只需要幾分鐘，而且完全可以略過。',
+  'starterTutorial.note': '你的角色會維持你創建時的模樣。你在島上獲得的一切，都不會跟著你回來。',
+  'starterTutorial.accept': '啟航前往黎明港',
+  'starterTutorial.decline': '略過，我認得路',
+  'entities.mobs.dawnhaven_dummy.name': '練習人偶',
+  'entities.mobs.dawnhaven_strandwolf.name': '灘岸狼',
+  'entities.npcs.dawnhaven_warden.name': '守望者芬娜·洛克',
+  'entities.npcs.dawnhaven_warden.title': '黎明港守護者',
+  'entities.npcs.dawnhaven_warden.greeting':
+    '站起來了，還喘著氣，{className}？很好。這座島很有耐性，狼可沒有。',
+  'entities.quests.q_dawnhaven_wolves.title': '守望者的試煉',
+  'entities.quests.q_dawnhaven_wolves.text':
+    '三隻灘岸狼隨潮水上了岸，從那時起就一直盯著我的山羊。走西邊的小徑下到窪地去，{playerName}，讓我看看你在練習場學到了什麼。',
+  'entities.quests.q_dawnhaven_wolves.completion': '做得乾淨俐落。你已經可以去比我這裡更大的島了。',
+  'entities.quests.q_dawnhaven_wolves.objectives.0.label': '擊殺灘岸狼',
+  'entities.zones.dawnhaven_isle.name': '黎明港島',
+  'entities.zones.dawnhaven_isle.welcome': '守望者洛克正在小徑上頭等你。',
+  'entities.zones.dawnhaven_isle.pois.0.label': '登岸處',
+  'entities.zones.dawnhaven_isle.pois.1.label': '守望者憩所',
+  'entities.zones.dawnhaven_isle.pois.2.label': '練習場',
+  'entities.zones.dawnhaven_isle.pois.3.label': '狼窪地',
 };

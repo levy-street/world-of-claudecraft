@@ -61,6 +61,7 @@ import {
   TEMPLE_QUEST_ORDER,
   TEMPLE_QUESTS,
 } from './content/temple';
+import { DAWNHAVEN_MOBS, DAWNHAVEN_NPC_REGISTRY, DAWNHAVEN_QUESTS } from './content/tutorial/isle';
 import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from './content/vale_cup';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import { YUMI_MOBS } from './content/yumi';
@@ -185,6 +186,10 @@ export const MOBS: Record<string, MobTemplate> = {
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
+  // Dawnhaven Isle (the starter tutorial's offline map). Lookup-table only: the
+  // isle's camps live in its OWN WorldContent bundle, never in CAMPS below, so
+  // merging these templates places nothing in the live world and shifts no rng.
+  ...DAWNHAVEN_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -204,6 +209,11 @@ export const NPCS: Record<string, NpcDef> = {
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
+  // Dawnhaven Isle's Warden. Same `dynamic: true` device as the Spirit Healer
+  // above: registered here so entity-name resolution and the quest lookups find
+  // her by id, but skipped by the ctor's surface-placement loop, so she can never
+  // spawn in the live world. The isle's own WorldContent carries the PLACED copy.
+  ...DAWNHAVEN_NPC_REGISTRY,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -215,6 +225,11 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  // Dawnhaven's one quest. Only its Warden offers it and she only exists on the
+  // isle, so it is unreachable in the live world; it is merged here because
+  // talkToNpc/questState resolve every quest through this table by id. It is
+  // deliberately absent from QUEST_ORDER (that drives live-world progression).
+  ...DAWNHAVEN_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -374,11 +389,18 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 }
 
 // Zone containing a world position (overworld only; clamps to the strip ends).
+//
+// Reads the ACTIVE world's zones, not the built-in `ZONES` array, so a custom map
+// (the editor play-test, the starter tutorial's isle) reports its own zone name,
+// level range and biome instead of Eastbrook's. With no custom world loaded the
+// active content IS `BUILTIN_WORLD`, whose `zones` is this very array, so every
+// built-in lookup stays byte-identical.
 export function zoneAt(z: number): ZoneDef {
-  for (const zone of ZONES) {
+  const zones = getActiveWorldContent().zones;
+  for (const zone of zones) {
     if (z < zone.zMax) return zone;
   }
-  return ZONES[ZONES.length - 1];
+  return zones[zones.length - 1];
 }
 
 export function zoneWelcomeText(

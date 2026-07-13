@@ -72,6 +72,12 @@ import {
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
+import {
+  localTutorialAnswerStore,
+  rememberTutorialAnswer,
+  shouldOfferTutorial,
+} from './game/tutorial_offer';
+import { TutorialScenePlayer } from './game/tutorial_scenes';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -125,12 +131,14 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { DAWNHAVEN_SEED, DAWNHAVEN_WORLD } from './sim/content/tutorial';
 import { ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
+  ALL_CLASSES,
   DT,
   dist2d,
   INTERACT_RANGE,
@@ -139,7 +147,7 @@ import {
   RUN_SPEED,
   type WorldContent,
 } from './sim/types';
-import { zoneBiomeAt } from './sim/world';
+import { groundHeight, zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -214,6 +222,7 @@ import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overl
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
+import { markTutorialClassSeen } from './ui/tutorial';
 import {
   classifyAuthCode,
   formatRecoveryCodesFile,
@@ -855,7 +864,11 @@ async function startGame(
   online: ClientWorld | null,
   keybindScope: string,
   playIntro = false,
+  // Set only when this session IS the starter tutorial (an offline Sim booted
+  // against Dawnhaven Isle); null in every other session.
+  tutorialClass: PlayerClass | null = null,
 ): Promise<void> {
+  let tutorialScenes: TutorialScenePlayer | null = null;
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
   // The loading screen covers the gap - not a silent black screen.
@@ -983,6 +996,65 @@ async function startGame(
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
   if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
+
+  // Dawnhaven Isle. The tutorial's step machine lives in the HUD (it reads IWorld
+  // like any other overlay), but its staged reveals have to move the camera and put
+  // entities in the world, which only this module may do. So the scene player is
+  // built HERE, over the concrete offline Sim + renderer + input, and handed to the
+  // HUD as an opaque hook bag: the same seam the fiesta-practice hook uses.
+  if (tutorialClass && offlineSim) {
+    const scenes = new TutorialScenePlayer({
+      playerPos: () => offlineSim.player.pos,
+      cameraOrbit: () => ({ yaw: input.camYaw, pitch: input.camPitch, dist: input.camDist }),
+      setFreeCam: (pose) => renderer.setFreeCamPose(pose),
+      suspendInput: (suspended) => input.setSuspendMovement(suspended),
+      spawnMob: (templateId, x, z, facing) => offlineSim.spawnStagedMob(templateId, x, z, facing),
+      spawnNpc: (npcId, x, z, facing) => offlineSim.spawnStagedNpc(npcId, x, z, facing),
+      burst: (entityId, school) =>
+        renderer.handleEvent({
+          type: 'spellfx',
+          sourceId: entityId,
+          targetId: entityId,
+          school,
+          fx: 'nova',
+        }),
+      // The same EFFECTIVE reduce-motion flag the spawn cinematic honors: the OS
+      // query OR the in-game switch. A reduce-motion player still gets every staged
+      // entity, just none of the camera glide (see TutorialScenePlayer.play).
+      reduceMotion: () =>
+        settings.get('reduceMotion') ||
+        (typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches),
+      groundY: (x, z) => groundHeight(x, z, offlineSim.cfg.seed),
+    });
+    tutorialScenes = scenes;
+    hud.startStarterTutorial(tutorialClass, {
+      play: (id, nowSec) => scenes.play(id, nowSec),
+      active: () => scenes.active,
+      forceCue: (id) => scenes.forceCue(id),
+      // Finishing or leaving the isle drops the offline session and returns the
+      // player to the roster. A reload is the honest way back: the tutorial Sim,
+      // its custom WorldContent and the renderer's scene all have to go, and the
+      // auth token in storage puts them straight back on character select.
+      leave: () => {
+        markTutorialClassSeen(tutorialClass);
+        location.reload();
+      },
+    });
+    // Escape cuts a reveal short (the spawn cinematic's contract), and every cue it
+    // had not reached yet fires immediately, so skipping can never strand the run.
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.key === 'Escape' && scenes.active !== null) {
+          e.preventDefault();
+          e.stopPropagation();
+          scenes.skip();
+        }
+      },
+      true,
+    );
+  }
   // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
@@ -2669,6 +2741,10 @@ async function startGame(
         },
       );
       introCameraTick(now);
+      // Applied after the follow camera and before the renderer reads it, so a
+      // running reveal's free-cam pose wins over the chase pose (same slot, and
+      // for the same reason, as the intro cinematic above).
+      tutorialScenes?.tick(now / 1000);
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
@@ -2992,6 +3068,10 @@ async function startGame(
           renderer,
           input,
           hud,
+          // Starter tutorial only (null otherwise): lets the screenshot/E2E driver
+          // fire a staged reveal on demand instead of having to play the whole
+          // tutorial up to the step that triggers it.
+          tutorialScenes,
           online,
           controller,
           perf,
@@ -3026,12 +3106,21 @@ function sanitizeOfflineName(raw: string): string {
   return /^[A-Za-z][A-Za-z' -]{1,15}$/.test(stripped) ? stripped : 'Adventurer';
 }
 
+/** Boot the starter tutorial: an offline Sim on Dawnhaven Isle, with the HUD's
+ *  tutorial director driving it. Nothing here touches the online character: the
+ *  isle is a sandbox, so the character the player just made is still sitting
+ *  untouched on the roster when they come back. */
+async function startTutorial(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
+  await startOffline(playerClass, name, skin, DAWNHAVEN_WORLD, DAWNHAVEN_SEED, playerClass);
+}
+
 async function startOffline(
   playerClass: PlayerClass,
   name: string,
   skin = 0,
   world?: WorldContent,
   seedOverride?: number,
+  tutorialClass: PlayerClass | null = null,
 ): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
@@ -3086,7 +3175,7 @@ async function startOffline(
   }
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
-  void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
+  void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true, tutorialClass);
 }
 
 // ---------------------------------------------------------------------------
@@ -6414,6 +6503,37 @@ function wireDiscordKeepModal(): void {
 const EMAIL_SHAPE_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 let recoveryEmailResolve: (() => void) | null = null;
 
+/**
+ * The once-per-class starter-tutorial offer, shown right after a character of a
+ * never-played class is created. Resolves true if the player wants the isle.
+ * A missing modal (a shell that does not ship it) resolves false, so a broken
+ * lookup can never block character creation.
+ */
+function askStarterTutorial(cls: PlayerClass): Promise<boolean> {
+  const modal = document.getElementById('starter-tutorial-modal');
+  const accept = document.getElementById('btn-accept-tutorial');
+  const decline = document.getElementById('btn-decline-tutorial');
+  const body = document.getElementById('starter-tutorial-body');
+  if (!modal || !accept || !decline) return Promise.resolve(false);
+
+  if (body) body.textContent = t('starterTutorial.body', { className: classDisplayName(cls) });
+  modal.hidden = false;
+  (accept as HTMLButtonElement).focus();
+
+  return new Promise<boolean>((resolve) => {
+    const close = (answer: boolean): void => {
+      modal.hidden = true;
+      accept.removeEventListener('click', onAccept);
+      decline.removeEventListener('click', onDecline);
+      resolve(answer);
+    };
+    const onAccept = (): void => close(true);
+    const onDecline = (): void => close(false);
+    accept.addEventListener('click', onAccept);
+    decline.addEventListener('click', onDecline);
+  });
+}
+
 function openRecoveryEmailModal(): Promise<void> {
   const modal = document.getElementById('recovery-email-modal');
   if (!modal) return Promise.resolve();
@@ -7768,12 +7888,15 @@ function wireStartScreens(): void {
     newCharNameInput.classList.remove('user-invalid-fallback');
     newCharNameInput.removeAttribute('aria-invalid');
 
+    const cls = clsEl.dataset.class as PlayerClass;
+    const skin = selectedSkin('#online-skin-row', onlineSkin);
+    // The roster as it stands BEFORE this character exists: that is what decides
+    // whether this class has ever been played (see game/tutorial_offer.ts). Read it
+    // now, because after the create call it always contains the new character.
+    const rosterBefore = await api.characters().catch(() => []);
+
     try {
-      await api.createCharacter(
-        name,
-        clsEl.dataset.class as PlayerClass,
-        selectedSkin('#online-skin-row', onlineSkin),
-      );
+      await api.createCharacter(name, cls, skin);
       newCharNameInput.value = '';
       charselectError.textContent = '';
       // Return to the roster and show the freshly-created character.
@@ -7781,6 +7904,15 @@ function wireStartScreens(): void {
       await refreshCharacters();
     } catch (err) {
       charselectError.textContent = userFacingApiError(err);
+      return;
+    }
+
+    // First ever character of this class: offer the isle. Declining is remembered,
+    // so a player is never asked twice about the same class.
+    const store = localTutorialAnswerStore();
+    if (shouldOfferTutorial(cls, rosterBefore, store.read())) {
+      rememberTutorialAnswer(store, cls);
+      if (await askStarterTutorial(cls)) void startTutorial(cls, name, skin);
     }
   });
   $('#btn-charselect-back').addEventListener('click', () => show('#login-panel'));
@@ -8457,8 +8589,19 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 // Editor play-test handoff: if the map editor stored a custom world and sent us
 // here, boot straight into that offline world and skip the start screen. Any
 // malformed/absent request falls through to the normal home flow.
+// Dev convenience: ?tutorial=<class> drops straight onto Dawnhaven Isle, so the
+// starter tutorial can be iterated on and screenshotted without creating an online
+// character of a never-played class first. DEV builds only (mirrors ?mech above);
+// inert in production, where the isle is reached only through the offer.
+const devTutorialClass = import.meta.env.DEV
+  ? (new URLSearchParams(location.search).get('tutorial') as PlayerClass | null)
+  : null;
+
 const editorPlaytest = takeEditorPlaytestRequest();
-if (editorPlaytest) {
+if (devTutorialClass && ALL_CLASSES.includes(devTutorialClass)) {
+  startSitePresence('home');
+  void startTutorial(devTutorialClass, 'Recruit');
+} else if (editorPlaytest) {
   startSitePresence('home');
   void startOffline(
     editorPlaytest.playerClass,

@@ -370,6 +370,26 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
+  /* Dawnhaven Isle (the starter tutorial). Reuses the coachmark shell above and
+     adds the two things the isle card has and the in-world one does not: the
+     Warden's speech reads as speech (a quoted, indented voice), and the live
+     objective sits under it in its own rule-off row. */
+  .stut-card .tut-body {
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px;
+    font-style: italic;
+  }
+  .stut-objective {
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff14;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-dim);
+  }
+  .stut-objective:empty {
+    display: none;
+  }
   .tut-next-tips {
     margin: 0;
     padding: 0;

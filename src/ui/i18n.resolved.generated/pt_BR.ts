@@ -1875,6 +1875,81 @@ export const pt_BR: EnTranslations = {
       "lbEmpty": "Ainda não há cronistas na classificação.",
       "broadcastsLabel": "Compartilhar feitos desbloqueados com a guilda e os amigos",
       "titledName": "{name} [{title}]"
+    },
+    "starterTutorial": {
+      "stepLabel": "Step {current} of {total}",
+      "skip": "Leave the Isle",
+      "leave": "Sail for the Mainland",
+      "doneTitle": "The Warden is Satisfied",
+      "doneBody": "That is everything I know how to teach standing still. The rest you learn by doing it badly first. Go on, the mainland is waiting, and it will not be as gentle as I was.",
+      "objectiveDone": "{label}: done",
+      "objectiveCount": "{label}: {current} of {total}",
+      "scenes": {
+        "wardenReveal": "A woman steps out of the light on the shrine stone, brushing salt off her coat like she has been expecting you all morning.",
+        "yardReveal": "The practice yard. Three straw dummies, patient as saints, and about as dangerous.",
+        "wolfReveal": "The brush moves. THAT is a mob: a living thing that would very much like to kill you. It has a health bar. Empty it before it empties yours."
+      },
+      "steps": {
+        "land": "The tide brought me another one. There is a path up the sand and a shrine on the knoll above it. Walk up. I do not shout for anyone.",
+        "enlist": "I have work, and you have empty hands. Stand close and speak with me to take the task.",
+        "target": "Nothing on this isle holds still for you except my dummies. The yard is east. Pick one out and make it your target.",
+        "strike": "Now hit it. Get in close and start swinging. Once your auto attack is going it keeps going on its own, so do not stand there admiring it.",
+        "hunt": "Three strand wolves came in with the tide and they have been eyeing my goats. West, into the hollow. Off you go.",
+        "spoils": "Never walk away from a kill you have not picked over. Loot a wolf and take the fang out of it.",
+        "report": "Back to me. A task is not finished when the killing stops, it is finished when it is reported."
+      },
+      "objective": {
+        "land": "Reach the Warden",
+        "enlist": "Accept the task",
+        "target": "Target a {mob}",
+        "strike": "Auto attack swings landed",
+        "hunt": "Strand Wolves slain",
+        "spoils": "Take a {item}",
+        "report": "Report to the Warden",
+        "abilityHit": "{ability} landed",
+        "auraUp": "{ability} active",
+        "healSelf": "Heal yourself",
+        "rangedHit": "Auto Shots landed at range",
+        "petSummoned": "Demon summoned"
+      },
+      "class": {
+        "warrior": {
+          "signature": "Swinging builds Rage, and Rage is there to be spent. Land {ability} on the dummy twice.",
+          "mastery": "A warrior is loud on purpose. Raise {ability} and let the whole isle hear it."
+        },
+        "paladin": {
+          "signature": "Your strength is borrowed, and borrowed strength must be asked for. Brand your weapon with {ability}.",
+          "mastery": "The Light mends its own before it burns anything else. Heal yourself once, and feel what keeps a paladin upright."
+        },
+        "hunter": {
+          "signature": "Even a hunter gets cornered, and a cornered hunter had better know what a blade is for. Put {ability} into the dummy twice.",
+          "mastery": "Now do it properly. Back away until it cannot reach you and shoot: three Auto Shots, from out there."
+        },
+        "rogue": {
+          "signature": "Cut, and keep cutting. Land {ability} three times and watch the combo points stack up on it.",
+          "mastery": "Points are worthless hoarded. Spend them: finish the dummy with {ability}."
+        },
+        "priest": {
+          "signature": "Faith with teeth in it. Strike the dummy twice with {ability}.",
+          "mastery": "And faith that mends. Heal yourself once. You will need the habit."
+        },
+        "mage": {
+          "signature": "Fire first, questions never. Land {ability} on the dummy twice.",
+          "mastery": "Cloth burns fast, so wear something better than cloth. Put {ability} up."
+        },
+        "warlock": {
+          "signature": "Reach into the dark, take a handful, throw it at something. Land {ability} on the dummy twice.",
+          "mastery": "No warlock walks alone, whatever they tell you. Summon your demon."
+        },
+        "druid": {
+          "signature": "The wild answers when it is asked politely. Land {ability} on the dummy twice.",
+          "mastery": "Now ask it for something on your own behalf. Put {ability} on yourself."
+        },
+        "shaman": {
+          "signature": "The storm is on your side today. Land {ability} on the dummy twice.",
+          "mastery": "Stone before storm. Imbue your weapon with {ability}."
+        }
+      }
     }
   },
   "apiError": {
@@ -4571,6 +4646,13 @@ export const pt_BR: EnTranslations = {
     "sortName": "Nome",
     "sortRecent": "Jogados recentemente",
     "sortPlaytime": "Tempo de jogo"
+  },
+  "starterTutorial": {
+    "title": "A Short Detour?",
+    "body": "This is your first {className}. There is a training isle for new adventurers, and a Warden on it who will walk you through what your class actually does. It takes a few minutes and it is entirely optional.",
+    "note": "Your character stays exactly as you made it. Nothing you earn on the isle follows you back.",
+    "accept": "Sail to Dawnhaven",
+    "decline": "Skip, I know the way"
   },
   "deleteCharacter": {
     "title": "Excluir personagem",
@@ -8048,6 +8130,12 @@ export const pt_BR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elemental de tormenta desperto"
       },
+      "dawnhaven_dummy": {
+        "name": "Practice Dummy"
+      },
+      "dawnhaven_strandwolf": {
+        "name": "Strand Wolf"
+      },
       "ironvein_foreman": {
         "name": "Capataz Veio de Ferro"
       },
@@ -8322,6 +8410,11 @@ export const pt_BR: EnTranslations = {
         "name": "Cronista Zenzie",
         "title": "A Crônica das Alturas",
         "greeting": "A montanha não esquece nada, {playerName}, e eu também não. Vejamos o que você andou fazendo."
+      },
+      "dawnhaven_warden": {
+        "name": "Warden Fenna Locke",
+        "title": "Keeper of Dawnhaven",
+        "greeting": "Up and breathing, {className}? Good. The isle is patient, but the wolves are not."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -9142,6 +9235,16 @@ export const pt_BR: EnTranslations = {
           }
         }
       },
+      "q_dawnhaven_wolves": {
+        "title": "The Warden's Test",
+        "text": "Three strand wolves came in with the tide and they have been eyeing my goats ever since. Take the west path down into the hollow, {playerName}, and show me what you learned in the yard.",
+        "completion": "Cleanly done. You are ready for a bigger island than mine.",
+        "objectives": {
+          "0": {
+            "label": "Strand Wolf slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "O Coro Afogado",
         "text": "Os vadeadores não agem sozinhos. Entre eles caminham os Devotos Afogados — o culto que afundou com o templo, ainda em suas vestes apodrecidas, ainda cantando a prece desde as rochas da costa. Silencie oito deles e traga-me seis das oferendas que carregam. Eu gostaria de saber o que pretendem dar à sua deusa.",
@@ -9309,6 +9412,24 @@ export const pt_BR: EnTranslations = {
           },
           "9": {
             "label": "Santuário do Gravewyrm"
+          }
+        }
+      },
+      "dawnhaven_isle": {
+        "name": "Dawnhaven Isle",
+        "welcome": "Warden Locke is waiting up the path.",
+        "pois": {
+          "0": {
+            "label": "The Landing"
+          },
+          "1": {
+            "label": "Warden's Rest"
+          },
+          "2": {
+            "label": "The Practice Yard"
+          },
+          "3": {
+            "label": "Wolf Hollow"
           }
         }
       }

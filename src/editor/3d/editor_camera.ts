@@ -1,6 +1,6 @@
 // Free/orbit editor camera for the 3D map editor. Terrain-agnostic: it owns yaw/
 // pitch/dist around a free-floating `target`; the viewport only soft-floors the
-// target above the terrain and writes the derived pose to Renderer.editorCam.
+// target above the terrain and writes the derived pose to Renderer.freeCam.
 // Hand-rolled (not OrbitControls) so it never fights the Renderer's own camera
 // writes.
 
@@ -26,7 +26,7 @@ export class EditorCamera {
   // allocations. The renderer copies the vectors immediately (sync()).
   private readonly poseOut = { pos: new THREE.Vector3(), target: new THREE.Vector3() };
 
-  // The camera pose to hand to Renderer.editorCam. Orbit math mirrors the game's
+  // The camera pose to hand to Renderer.freeCam. Orbit math mirrors the game's
   // chase camera so the feel matches play-test.
   pose(): { pos: THREE.Vector3; target: THREE.Vector3 } {
     const cp = Math.cos(this.pitch);

@@ -170,6 +170,17 @@ export const shellStrings = {
       sortRecent: 'Recently Played',
       sortPlaytime: 'Playtime',
     },
+    // The once-per-class offer, shown right after a character of a class the
+    // account has never played is created. Wording is load-bearing: players must
+    // understand up front that the isle is a sandbox and that nothing they do out
+    // there follows the character back, or they will think they wasted a run.
+    starterTutorial: {
+      title: 'A Short Detour?',
+      body: 'This is your first {className}. There is a training isle for new adventurers, and a Warden on it who will walk you through what your class actually does. It takes a few minutes and it is entirely optional.',
+      note: 'Your character stays exactly as you made it. Nothing you earn on the isle follows you back.',
+      accept: 'Sail to Dawnhaven',
+      decline: 'Skip, I know the way',
+    },
     deleteCharacter: {
       title: 'Delete Character',
       body: 'This permanently deletes {name}. This cannot be undone.',

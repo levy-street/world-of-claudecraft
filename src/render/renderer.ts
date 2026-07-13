@@ -32,7 +32,7 @@ import {
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
-import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { ALL_CLASSES, type Entity, type SimEvent, type Vec3 } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
@@ -809,10 +809,24 @@ export class Renderer {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
-  // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
-  // chasing the player (updateCamera honors it and returns early). Editor-only;
-  // always null in the shipped game.
-  editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
+  // Free-camera override: when set, the camera uses this eye/target pose instead
+  // of chasing the player (updateCamera honors it and returns early). Two
+  // consumers, both of which restore null when they are done: the map editor's 3D
+  // viewport, and the starter tutorial's cinematic scenes (the reveals on
+  // Dawnhaven Isle). Null in ordinary play.
+  freeCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
+
+  /** Set (or clear, with null) the free camera from a plain eye/target pair. The
+   *  Three types stay in here: callers outside `src/render/` (main.ts driving the
+   *  tutorial's cinematic scenes) hand over numbers and never import Three. */
+  setFreeCamPose(pose: { eye: Vec3; target: Vec3 } | null): void {
+    this.freeCam = pose
+      ? {
+          pos: new THREE.Vector3(pose.eye.x, pose.eye.y, pose.eye.z),
+          target: new THREE.Vector3(pose.target.x, pose.target.y, pose.target.z),
+        }
+      : null;
+  }
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
   private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
   showNameplates = true;
@@ -5434,9 +5448,9 @@ export class Renderer {
     // Map-editor free camera: use the editor pose verbatim and skip the entire
     // player-chase + occlusion path. Every camera-relative cull in sync() then
     // runs off this free camera with no other change.
-    if (this.editorCam) {
-      this.camera.position.copy(this.editorCam.pos);
-      this.cameraLookAt.copy(this.editorCam.target);
+    if (this.freeCam) {
+      this.camera.position.copy(this.freeCam.pos);
+      this.cameraLookAt.copy(this.freeCam.target);
       if (Math.abs(this.camera.fov - CAMERA_BASE_FOV) > 0.01) {
         this.camera.fov = CAMERA_BASE_FOV;
         this.camera.updateProjectionMatrix();

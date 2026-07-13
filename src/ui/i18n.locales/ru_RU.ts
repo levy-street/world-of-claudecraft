@@ -7354,4 +7354,104 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
+
+  // Starter tutorial: Остров Рассветной Гавани (Страж Фенна Локк).
+  'hudChrome.starterTutorial.skip': 'Покинуть остров',
+  'hudChrome.starterTutorial.leave': 'Отплыть на материк',
+  'hudChrome.starterTutorial.doneTitle': 'Страж одобряет',
+  'hudChrome.starterTutorial.doneBody':
+    'Это всё, чему я могу научить, стоя на месте. Остальному вы выучитесь, сперва сделав это скверно. Ступайте, материк ждёт, и он не будет так же мягок, как я.',
+  'hudChrome.starterTutorial.objectiveDone': '{label}: выполнено',
+  'hudChrome.starterTutorial.scenes.wardenReveal':
+    'Из света над камнем святилища выходит женщина и стряхивает соль с плаща так, будто ждала вас всё утро.',
+  'hudChrome.starterTutorial.scenes.yardReveal':
+    'Учебный двор. Три соломенных манекена, терпеливые, как святые, и примерно столь же опасные.',
+  'hudChrome.starterTutorial.scenes.wolfReveal':
+    'Кусты зашевелились. Вот ЭТО и есть моб: живая тварь, которой очень хочется вас убить. У него есть полоска здоровья. Опустошите её раньше, чем он опустошит вашу.',
+  'hudChrome.starterTutorial.steps.land':
+    'Прилив принёс мне ещё одного. По песку наверх идёт тропа, а над ней, на пригорке, стоит святилище. Поднимайтесь. Я ни для кого не кричу.',
+  'hudChrome.starterTutorial.steps.enlist':
+    'У меня есть работа, а у вас пустые руки. Подойдите ближе и заговорите со мной, чтобы взять задание.',
+  'hudChrome.starterTutorial.steps.target':
+    'На этом острове ради вас никто смирно не стоит, кроме моих манекенов. Двор к востоку. Выберите один и возьмите его в цель.',
+  'hudChrome.starterTutorial.steps.strike':
+    'А теперь бейте. Подойдите вплотную и начинайте махать оружием. Автоатака, если уж пошла, идёт сама, так что не стойте и не любуйтесь ею.',
+  'hudChrome.starterTutorial.steps.hunt':
+    'С приливом пришли три прибрежных волка, и они уже поглядывают на моих коз. На запад, вниз, в лощину. Ступайте.',
+  'hudChrome.starterTutorial.steps.spoils':
+    'Никогда не уходите от убитого, которого не обыскали. Обыщите волка и заберите у него клык.',
+  'hudChrome.starterTutorial.steps.report':
+    'Возвращайтесь ко мне. Задание кончается не тогда, когда кончается драка, а тогда, когда о нём доложили.',
+  'hudChrome.starterTutorial.objective.land': 'Дойти до стража',
+  'hudChrome.starterTutorial.objective.enlist': 'Принять задание',
+  'hudChrome.starterTutorial.objective.target': 'Выбрать целью «{mob}»',
+  'hudChrome.starterTutorial.objective.strike': 'Удары автоатакой',
+  'hudChrome.starterTutorial.objective.hunt': 'Убитые прибрежные волки',
+  'hudChrome.starterTutorial.objective.report': 'Доложить стражу',
+  'hudChrome.starterTutorial.objective.abilityHit': 'Удары способностью «{ability}»',
+  'hudChrome.starterTutorial.objective.auraUp': 'Способность «{ability}» активна',
+  'hudChrome.starterTutorial.objective.healSelf': 'Исцелить себя',
+  'hudChrome.starterTutorial.objective.rangedHit': 'Автовыстрелы с дистанции',
+  'hudChrome.starterTutorial.objective.petSummoned': 'Призвать демона',
+  'hudChrome.starterTutorial.class.warrior.signature':
+    'Удары копят ярость, а ярость на то и нужна, чтобы её тратить. Дважды попадите по манекену способностью «{ability}».',
+  'hudChrome.starterTutorial.class.warrior.mastery':
+    'Воин шумит нарочно. Поднимите «{ability}» и пусть услышит весь остров.',
+  'hudChrome.starterTutorial.class.paladin.signature':
+    'Ваша сила взята взаймы, а о такой силе положено просить. Заклеймите своё оружие способностью «{ability}».',
+  'hudChrome.starterTutorial.class.paladin.mastery':
+    'Свет сперва врачует своих и только потом жжёт всё остальное. Исцелите себя один раз и почувствуйте, на чём держится паладин.',
+  'hudChrome.starterTutorial.class.hunter.signature':
+    'Даже охотника загоняют в угол, и загнанному охотнику лучше бы знать, зачем нужен клинок. Дважды всадите в манекен «{ability}».',
+  'hudChrome.starterTutorial.class.hunter.mastery':
+    'А теперь сделайте это как надо. Отойдите так, чтобы до вас не дотянулись, и стреляйте: три автовыстрела, вот оттуда.',
+  'hudChrome.starterTutorial.class.rogue.signature':
+    'Режьте и не останавливайтесь. Трижды попадите способностью «{ability}» и смотрите, как на цели копятся очки серии.',
+  'hudChrome.starterTutorial.class.rogue.mastery':
+    'Копить очки бессмысленно. Тратьте их: добейте манекен способностью «{ability}».',
+  'hudChrome.starterTutorial.class.priest.signature':
+    'Вера, у которой есть зубы. Дважды ударьте манекен способностью «{ability}».',
+  'hudChrome.starterTutorial.class.priest.mastery':
+    'И вера, которая врачует. Исцелите себя один раз. Эта привычка вам ещё пригодится.',
+  'hudChrome.starterTutorial.class.mage.signature':
+    'Сначала огонь, а вопросов не будет вовсе. Дважды попадите по манекену способностью «{ability}».',
+  'hudChrome.starterTutorial.class.mage.mastery':
+    'Ткань горит быстро, так что носите на себе кое-что получше ткани. Поставьте «{ability}».',
+  'hudChrome.starterTutorial.class.warlock.signature':
+    'Запустите руку во тьму, зачерпните горсть, швырните в кого-нибудь. Дважды попадите по манекену способностью «{ability}».',
+  'hudChrome.starterTutorial.class.warlock.mastery':
+    'Ни один чернокнижник не ходит один, что бы вам ни говорили. Призовите своего демона.',
+  'hudChrome.starterTutorial.class.druid.signature':
+    'Дикая природа отвечает тем, кто просит вежливо. Дважды попадите по манекену способностью «{ability}».',
+  'hudChrome.starterTutorial.class.druid.mastery':
+    'А теперь попросите её кое о чём для себя. Наложите «{ability}» на себя.',
+  'hudChrome.starterTutorial.class.shaman.signature':
+    'Сегодня буря на вашей стороне. Дважды попадите по манекену способностью «{ability}».',
+  'hudChrome.starterTutorial.class.shaman.mastery':
+    'Сперва камень, потом буря. Наделите своё оружие силой «{ability}».',
+  'starterTutorial.title': 'Небольшой крюк?',
+  'starterTutorial.body':
+    'Это ваш первый персонаж класса {className}. Для новых искателей приключений есть учебный остров, а на нём страж, которая покажет, что на деле умеет ваш класс. Это займёт несколько минут и совершенно не обязательно.',
+  'starterTutorial.note':
+    'Ваш персонаж останется ровно таким, каким вы его создали. Ничто из добытого на острове не последует за вами обратно.',
+  'starterTutorial.accept': 'Отплыть в Рассветную Гавань',
+  'starterTutorial.decline': 'Пропустить, я знаю дорогу',
+  'entities.mobs.dawnhaven_dummy.name': 'Учебный манекен',
+  'entities.mobs.dawnhaven_strandwolf.name': 'Прибрежный волк',
+  'entities.npcs.dawnhaven_warden.name': 'Страж Фенна Локк',
+  'entities.npcs.dawnhaven_warden.title': 'Хранительница Рассветной Гавани',
+  'entities.npcs.dawnhaven_warden.greeting':
+    'На ногах и дышите, {className}? Хорошо. Остров терпелив, а волки нет.',
+  'entities.quests.q_dawnhaven_wolves.title': 'Испытание стража',
+  'entities.quests.q_dawnhaven_wolves.text':
+    'С приливом пришли три прибрежных волка, и с тех пор они поглядывают на моих коз. Спуститесь по западной тропе в лощину, {playerName}, и покажите мне, чему вы научились во дворе.',
+  'entities.quests.q_dawnhaven_wolves.completion':
+    'Чисто сработано. Вы готовы к острову побольше моего.',
+  'entities.quests.q_dawnhaven_wolves.objectives.0.label': 'Прибрежный волк: убито',
+  'entities.zones.dawnhaven_isle.name': 'Остров Рассветной Гавани',
+  'entities.zones.dawnhaven_isle.welcome': 'Страж Локк ждёт выше по тропе.',
+  'entities.zones.dawnhaven_isle.pois.0.label': 'Пристань',
+  'entities.zones.dawnhaven_isle.pois.1.label': 'Приют стража',
+  'entities.zones.dawnhaven_isle.pois.2.label': 'Учебный двор',
+  'entities.zones.dawnhaven_isle.pois.3.label': 'Волчья лощина',
 };

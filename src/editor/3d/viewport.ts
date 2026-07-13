@@ -607,7 +607,7 @@ export class Editor3DViewport {
     this.raf = 0;
     if (this.renderer) {
       try {
-        this.renderer.editorCam = null;
+        this.renderer.freeCam = null;
         this.renderer.webgl.setAnimationLoop(null);
         this.renderer.webgl.dispose();
         this.renderer.webgl.forceContextLoss();
@@ -648,7 +648,7 @@ export class Editor3DViewport {
       player.pos.z = this.cam.target.z;
       player.pos.y = ground;
     }
-    this.renderer.editorCam = this.cam.pose();
+    this.renderer.freeCam = this.cam.pose();
     this.renderer.sync(1, DT, null);
     // The player is an LOD anchor, not editable content: keep its model out of
     // the scene (its view is built lazily by sync, so re-hide every frame).
