@@ -201,6 +201,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   impactCueForDamage,
+  type MobVoiceAction,
   mobVoiceCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
@@ -873,10 +874,7 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
   return span;
 }
 
-function availableMobVoiceCue(
-  templateId: string,
-  action: 'aggro' | 'attack' | 'death',
-): string | null {
+function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
   return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
 }
 
@@ -8644,7 +8642,7 @@ export class Hud {
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 0.55, { cooldown: 0.3 });
         } else if (ev.crit && tgt.kind === 'mob' && shouldPlayCritSfxForTarget(tgt)) {
-          const voice = availableMobVoiceCue(tgt.templateId, 'attack');
+          const voice = availableMobVoiceCue(tgt.templateId, 'hurt');
           if (voice && shouldPlayMobVoiceSfxForEntity(tgt))
             this.combat(voice, tp.x, tp.y, tp.z, 0.6, { rate: 1.25, cooldown: 0.1 });
         }

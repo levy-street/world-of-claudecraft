@@ -217,6 +217,35 @@ describe('combat SFX policy', () => {
     expect(mobVoiceCue('deepfen_spearjaw', 'aggro')).toBe('mob_reptile_aggro');
     expect(mobVoiceCue('deepfen_spearjaw', 'attack')).toBe('mob_reptile_attack');
     expect(mobVoiceCue('deepfen_spearjaw', 'death')).toBe('mob_reptile_death');
+    expect(mobVoiceCue('deepfen_spearjaw', 'hurt')).toBe('mob_reptile_hurt');
+  });
+
+  // Table-driven over every one of the 13 real mob families (not a sample),
+  // so a cue mapped to the wrong family's key (still a valid SfxId, so tsc
+  // and a spot check would both miss it) fails here.
+  it('resolves a real, correctly-mapped hurt cue for every mob family', () => {
+    const familyByTemplateId: Record<string, string> = {
+      forest_wolf: 'beast',
+      wild_boar: 'boar',
+      mire_widow: 'spider',
+      mudfin_murloc: 'mudfin',
+      tunnel_rat: 'burrower',
+      mogger: 'humanoid',
+      crypt_shambler: 'undead',
+      fen_troll: 'troll',
+      korgath_the_bound: 'ogre',
+      stormcrag_elemental: 'elemental',
+      sanctum_drakonid: 'dragonkin',
+      emberkin: 'demon',
+      deepfen_spearjaw: 'reptile',
+    };
+    expect(Object.keys(familyByTemplateId)).toHaveLength(13);
+    for (const [templateId, family] of Object.entries(familyByTemplateId)) {
+      expect(mobVoiceFamily(templateId), templateId).toBe(family);
+      const expected = `mob_${family}_hurt`;
+      expect(mobVoiceCue(templateId, 'hurt'), templateId).toBe(expected);
+      expect(expected in SFX_CLIPS, expected).toBe(true);
+    }
   });
 
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {

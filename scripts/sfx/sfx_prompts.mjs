@@ -17,23 +17,35 @@ const FOOT = (key, surface) => ({
   prompt: `A single isolated footstep ${surface}. One step only, close and dry, no music, no voice.`,
 });
 
-const mob = (family, who, aggro, attack, death) => [
-  {
-    key: `mob_${family}_aggro`,
-    duration: 1.2,
-    prompt: `${who} ${aggro}. A single short creature vocalization, no music, no human speech.`,
-  },
-  {
-    key: `mob_${family}_attack`,
-    duration: 0.9,
-    prompt: `${who} ${attack}. A single short aggressive vocalization, no music, no human speech.`,
-  },
-  {
-    key: `mob_${family}_death`,
-    duration: 1.4,
-    prompt: `${who} ${death}. A single dying vocalization fading out, no music, no human speech.`,
-  },
-];
+const mob = (family, who, aggro, attack, death, hurt) => {
+  for (const [name, value] of Object.entries({ family, who, aggro, attack, death, hurt })) {
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new Error(`mob('${family}', ...): missing or invalid '${name}' argument`);
+    }
+  }
+  return [
+    {
+      key: `mob_${family}_aggro`,
+      duration: 1.2,
+      prompt: `${who} ${aggro}. A single short creature vocalization, no music, no human speech.`,
+    },
+    {
+      key: `mob_${family}_attack`,
+      duration: 0.9,
+      prompt: `${who} ${attack}. A single short aggressive vocalization, no music, no human speech.`,
+    },
+    {
+      key: `mob_${family}_death`,
+      duration: 1.4,
+      prompt: `${who} ${death}. A single dying vocalization fading out, no music, no human speech.`,
+    },
+    {
+      key: `mob_${family}_hurt`,
+      duration: 0.6,
+      prompt: `${who} ${hurt}. A single short pained reaction vocalization, no music, no human speech.`,
+    },
+  ];
+};
 
 export const SFX = [
   // --- Movement & footsteps -------------------------------------------------
@@ -310,6 +322,7 @@ export const SFX = [
     'snarling with an alert growl',
     'lunging with a vicious biting snarl',
     'yelping and whimpering as it dies',
+    'yelping sharply in sudden pain',
   ),
   ...mob(
     'boar',
@@ -317,6 +330,7 @@ export const SFX = [
     'snorting angrily and squealing',
     'charging with a furious grunt',
     'squealing as it dies',
+    'squealing sharply in sudden pain',
   ),
   ...mob(
     'spider',
@@ -324,6 +338,7 @@ export const SFX = [
     'hissing and chittering in alarm',
     'lunging with a sharp hiss',
     'hissing weakly as it shrivels and dies',
+    'chittering sharply in sudden pain',
   ),
   ...mob(
     'mudfin',
@@ -331,6 +346,7 @@ export const SFX = [
     'warbling a startled gurgling cry',
     'croaking and gurgling as it strikes',
     'gurgling a wet death rattle',
+    'croaking sharply in sudden pain',
   ),
   ...mob(
     'burrower',
@@ -338,6 +354,7 @@ export const SFX = [
     'yipping a startled bark',
     'snarling and biting',
     'squealing as it dies',
+    'yelping sharply in sudden pain',
   ),
   ...mob(
     'humanoid',
@@ -345,6 +362,7 @@ export const SFX = [
     'shouting an angry war cry',
     'grunting with effort as he strikes',
     'crying out in pain as he dies',
+    'grunting sharply in sudden pain',
   ),
   ...mob(
     'undead',
@@ -352,6 +370,7 @@ export const SFX = [
     'rattling its bones with a hollow groan',
     'moaning hollowly as it strikes',
     'clattering apart into a pile of bones',
+    'rattling sharply in sudden impact',
   ),
   ...mob(
     'troll',
@@ -359,6 +378,7 @@ export const SFX = [
     'roaring a guttural alert',
     'grunting savagely as it strikes',
     'groaning heavily as it dies',
+    'grunting sharply in sudden pain',
   ),
   ...mob(
     'ogre',
@@ -366,6 +386,7 @@ export const SFX = [
     'bellowing a deep alert roar',
     'grunting heavily as it smashes down',
     'groaning a ground-shaking death',
+    'bellowing sharply in sudden pain',
   ),
   ...mob(
     'elemental',
@@ -373,6 +394,7 @@ export const SFX = [
     'crackling with a humming alert surge',
     'bursting with surging energy as it strikes',
     'dissipating in a fading crackle',
+    'crackling sharply in sudden disruption',
   ),
   ...mob(
     'dragonkin',
@@ -380,6 +402,7 @@ export const SFX = [
     'roaring fiercely with a flap of wings',
     'snapping a biting roar as it strikes',
     'roaring as it collapses dying',
+    'roaring sharply in sudden pain',
   ),
   ...mob(
     'demon',
@@ -387,6 +410,7 @@ export const SFX = [
     'snarling with a sinister hiss',
     'shrieking a demonic strike',
     'wailing in agonized demonic death',
+    'shrieking sharply in sudden pain',
   ),
   ...mob(
     'reptile',
@@ -394,6 +418,7 @@ export const SFX = [
     'hissing with a low guttural rasp',
     'shrieking with a sharp reptilian snap',
     'hissing weakly as it goes still',
+    'hissing sharply in sudden pain',
   ),
 
   // --- Ambient loops --------------------------------------------------------

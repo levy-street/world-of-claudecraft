@@ -7,7 +7,7 @@ type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 type SpellFxEvent = Extract<SimEvent, { type: 'spellfx' }>;
 type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
 type MagicSchool = 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
-export type MobVoiceAction = 'aggro' | 'attack' | 'death';
+export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt';
 
 const SCHOOL_CUES = {
   fire: { cast: 'cast_fire', projectile: 'proj_fire', impact: 'impact_fire' },
@@ -19,40 +19,85 @@ const SCHOOL_CUES = {
 } as const satisfies Record<MagicSchool, { cast: SfxId; projectile: SfxId; impact: SfxId }>;
 
 const MOB_VOICE_CUES = {
-  beast: { aggro: 'mob_beast_aggro', attack: 'mob_beast_attack', death: 'mob_beast_death' },
-  boar: { aggro: 'mob_boar_aggro', attack: 'mob_boar_attack', death: 'mob_boar_death' },
-  spider: { aggro: 'mob_spider_aggro', attack: 'mob_spider_attack', death: 'mob_spider_death' },
-  mudfin: { aggro: 'mob_mudfin_aggro', attack: 'mob_mudfin_attack', death: 'mob_mudfin_death' },
+  beast: {
+    aggro: 'mob_beast_aggro',
+    attack: 'mob_beast_attack',
+    death: 'mob_beast_death',
+    hurt: 'mob_beast_hurt',
+  },
+  boar: {
+    aggro: 'mob_boar_aggro',
+    attack: 'mob_boar_attack',
+    death: 'mob_boar_death',
+    hurt: 'mob_boar_hurt',
+  },
+  spider: {
+    aggro: 'mob_spider_aggro',
+    attack: 'mob_spider_attack',
+    death: 'mob_spider_death',
+    hurt: 'mob_spider_hurt',
+  },
+  mudfin: {
+    aggro: 'mob_mudfin_aggro',
+    attack: 'mob_mudfin_attack',
+    death: 'mob_mudfin_death',
+    hurt: 'mob_mudfin_hurt',
+  },
   burrower: {
     aggro: 'mob_burrower_aggro',
     attack: 'mob_burrower_attack',
     death: 'mob_burrower_death',
+    hurt: 'mob_burrower_hurt',
   },
   humanoid: {
     aggro: 'mob_humanoid_aggro',
     attack: 'mob_humanoid_attack',
     death: 'mob_humanoid_death',
+    hurt: 'mob_humanoid_hurt',
   },
-  undead: { aggro: 'mob_undead_aggro', attack: 'mob_undead_attack', death: 'mob_undead_death' },
-  troll: { aggro: 'mob_troll_aggro', attack: 'mob_troll_attack', death: 'mob_troll_death' },
-  ogre: { aggro: 'mob_ogre_aggro', attack: 'mob_ogre_attack', death: 'mob_ogre_death' },
+  undead: {
+    aggro: 'mob_undead_aggro',
+    attack: 'mob_undead_attack',
+    death: 'mob_undead_death',
+    hurt: 'mob_undead_hurt',
+  },
+  troll: {
+    aggro: 'mob_troll_aggro',
+    attack: 'mob_troll_attack',
+    death: 'mob_troll_death',
+    hurt: 'mob_troll_hurt',
+  },
+  ogre: {
+    aggro: 'mob_ogre_aggro',
+    attack: 'mob_ogre_attack',
+    death: 'mob_ogre_death',
+    hurt: 'mob_ogre_hurt',
+  },
   elemental: {
     aggro: 'mob_elemental_aggro',
     attack: 'mob_elemental_attack',
     death: 'mob_elemental_death',
+    hurt: 'mob_elemental_hurt',
   },
   dragonkin: {
     aggro: 'mob_dragonkin_aggro',
     attack: 'mob_dragonkin_attack',
     death: 'mob_dragonkin_death',
+    hurt: 'mob_dragonkin_hurt',
   },
-  demon: { aggro: 'mob_demon_aggro', attack: 'mob_demon_attack', death: 'mob_demon_death' },
+  demon: {
+    aggro: 'mob_demon_aggro',
+    attack: 'mob_demon_attack',
+    death: 'mob_demon_death',
+    hurt: 'mob_demon_hurt',
+  },
   // deepfen_spearjaw (The Drowned Litany delve) is the family's first mob:
   // a velociraptor model, retagged from its former 'beast' mistag.
   reptile: {
     aggro: 'mob_reptile_aggro',
     attack: 'mob_reptile_attack',
     death: 'mob_reptile_death',
+    hurt: 'mob_reptile_hurt',
   },
 } as const satisfies Record<string, Record<MobVoiceAction, SfxId>>;
 

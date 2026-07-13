@@ -143,15 +143,18 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 26 UI cues in one 141-key inventory', () => {
+  it('keeps the release catalog and all 26 UI cues in one 154-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(141);
+    expect(keys.size).toBe(154);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
       'mob_burrower_attack',
       'mob_reptile_attack',
+      'mob_beast_hurt',
+      'mob_dragonkin_hurt',
+      'mob_reptile_hurt',
       'quest_ready',
       'lockpick_success',
     ]) {
@@ -159,7 +162,14 @@ describe('buildManifest', () => {
     }
     expect(keys.has('mob_murloc_attack')).toBe(false);
     expect(keys.has('mob_kobold_attack')).toBe(false);
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(141);
+    // Every mob family (13, including reptile) now generates 4 actions
+    // (aggro/attack/death/hurt), not just 3, pin the count so a future
+    // family addition can't silently drop hurt coverage again. Subfamily
+    // keys (mob_beast_wolf_*, etc.) never appear in the static catalog,
+    // they are purely filesystem-discovered.
+    const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
+    expect(mobFamilyKeys).toHaveLength(52); // 13 families x 4 actions
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(154);
   });
 });
 
