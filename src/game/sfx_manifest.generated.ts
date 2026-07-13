@@ -19,9 +19,9 @@ export interface SfxEntry {
   hash: string;
   variants: readonly SfxVariant[];
 }
-export const SFX_CATALOG_HASH = 'b30ce54cb7d99765d45cb05f60ad394a6b2f081af6853fc9e191edc75b270baa';
-export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","heal_impact","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_undead_aggro","mob_undead_attack","mob_undead_death","move_jump","move_land","move_splash","move_swim","player_death","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","quest_accept","quest_complete","quest_ready","spell_nova","ui_bag_close","ui_bag_open","ui_click","ui_coin","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_level_up","ui_loot_item","ui_quest_accept","ui_quest_done","ui_sheep","ui_whisper"] as const;
-export const SFX_MOB_EXTENSION_FAMILIES = ["beast","boar","burrower","demon","dragonkin","elemental","humanoid","mudfin","ogre","spider","troll","undead"] as const;
+export const SFX_CATALOG_HASH = '1936141d1892288ac71266faf7c966645c7a4b1d07cee9735def821a590f1efd';
+export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","heal_impact","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_undead_aggro","mob_undead_attack","mob_undead_death","move_jump","move_land","move_splash","move_swim","player_death","player_hurt","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","quest_accept","quest_complete","quest_ready","spell_nova","ui_bag_close","ui_bag_open","ui_click","ui_coin","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_level_up","ui_loot_item","ui_quest_accept","ui_quest_done","ui_sheep","ui_whisper"] as const;
+export const SFX_MOB_EXTENSION_FAMILIES = ["beast","boar","burrower","demon","dragonkin","elemental","humanoid","mudfin","ogre","reptile","spider","troll","undead"] as const;
 export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$";
 export const SFX_RUNTIME_PACK_URL = '/audio/sfx/runtime-pack.json';
 export const SFX_MAX_TRACKS_PER_KEY = 8;
@@ -1680,6 +1680,87 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mob_ogre_death.mp3?v=9f81f8a19f03",
         "bytes": 34524,
         "sha256": "9f81f8a19f03d3bf9bf6138d4bb2dd8a06d54715cacce6f414170c638be2a39e"
+      }
+    ]
+  },
+  "mob_reptile_aggro": {
+    "url": "/audio/sfx/mob_reptile_aggro_1.mp3?v=bd53d2051e87",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 21359,
+    "hash": "bd53d2051e87",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_reptile_aggro_1.mp3?v=bd53d2051e87",
+        "bytes": 21359,
+        "sha256": "bd53d2051e870caf7537e025229fcb30133c5134df027832a1bb02729c12e41c"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_reptile_aggro_2.mp3?v=1504fc5cabe7",
+        "bytes": 22568,
+        "sha256": "1504fc5cabe78502fa625faebdb9347f3820dbbea582ea1ddad98cb483bf3d69"
+      }
+    ]
+  },
+  "mob_reptile_attack": {
+    "url": "/audio/sfx/mob_reptile_attack_1.mp3?v=5e3d8f6dbf00",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 15672,
+    "hash": "5e3d8f6dbf00",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_reptile_attack_1.mp3?v=5e3d8f6dbf00",
+        "bytes": 15672,
+        "sha256": "5e3d8f6dbf0035635834b4f7f9a971861cc4fbc0e3b363a29700cc02165b2bdc"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_reptile_attack_2.mp3?v=2d1167c3dae7",
+        "bytes": 14462,
+        "sha256": "2d1167c3dae7b33111ecaccae7c4481570ee8234a0d42c97c073b9e00ca93ffd"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mob_reptile_attack_3.mp3?v=2899eafa9b40",
+        "bytes": 17597,
+        "sha256": "2899eafa9b40d7effe0ec2eabff7e081ea8d0a209b7f701e114e755718009ffc"
+      }
+    ]
+  },
+  "mob_reptile_death": {
+    "url": "/audio/sfx/mob_reptile_death_1.mp3?v=73d4db55c8dc",
+    "loop": false,
+    "category": "voices",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 28882,
+    "hash": "73d4db55c8dc",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mob_reptile_death_1.mp3?v=73d4db55c8dc",
+        "bytes": 28882,
+        "sha256": "73d4db55c8dc29446b6f7f69acb2a5f048f29df5b18e60017bbd79ce823ba03e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mob_reptile_death_2.mp3?v=b5c13fa6c936",
+        "bytes": 25120,
+        "sha256": "b5c13fa6c936f59a021b89da5aec6e1f2d2496769d6b1b26ee6b3afe03ef22ce"
       }
     ]
   },

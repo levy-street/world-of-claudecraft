@@ -143,14 +143,15 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 26 UI cues in one 138-key inventory', () => {
+  it('keeps the release catalog and all 26 UI cues in one 141-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(138);
+    expect(keys.size).toBe(141);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
       'mob_burrower_attack',
+      'mob_reptile_attack',
       'quest_ready',
       'lockpick_success',
     ]) {
@@ -158,7 +159,7 @@ describe('buildManifest', () => {
     }
     expect(keys.has('mob_murloc_attack')).toBe(false);
     expect(keys.has('mob_kobold_attack')).toBe(false);
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(138);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(141);
   });
 });
 

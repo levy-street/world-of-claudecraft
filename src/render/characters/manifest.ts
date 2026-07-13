@@ -1126,6 +1126,10 @@ const FAMILY_KEYS: Record<string, string> = {
   elemental: 'mob_elemental',
   dragonkin: 'mob_dragonkin',
   demon: 'mob_demonalt',
+  // No mob is data-tagged 'reptile' yet (deepfen_spearjaw is still 'beast'
+  // pending its own retag PR); reuse its model as the family default so the
+  // fallback is sane the moment that retag lands.
+  reptile: 'mob_spearjaw',
 };
 
 const NPC_KEYS: Record<string, string> = {

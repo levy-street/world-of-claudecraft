@@ -388,6 +388,13 @@ export const SFX = [
     'shrieking a demonic strike',
     'wailing in agonized demonic death',
   ),
+  ...mob(
+    'reptile',
+    'A large reptilian predator',
+    'hissing with a low guttural rasp',
+    'shrieking with a sharp reptilian snap',
+    'hissing weakly as it goes still',
+  ),
 
   // --- Ambient loops --------------------------------------------------------
   {
@@ -503,4 +510,5 @@ export const MOB_VOICE_FAMILIES = [
   'elemental',
   'dragonkin',
   'demon',
+  'reptile',
 ];

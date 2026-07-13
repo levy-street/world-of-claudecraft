@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "4d2d27171ea70ab9f954c958c2022e3a9eb46c84431270b31f331d1832a859a6",
-  "catalogHash": "b30ce54cb7d99765d45cb05f60ad394a6b2f081af6853fc9e191edc75b270baa",
+  "bundleId": "dce14bdbebcbf9dccf165f17934c19703022e9b9b7981ede9a99c88909759e87",
+  "catalogHash": "1936141d1892288ac71266faf7c966645c7a4b1d07cee9735def821a590f1efd",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1043,6 +1043,66 @@
           "url": "/audio/sfx/mob_ogre_death.mp3?v=9f81f8a19f03",
           "bytes": 34524,
           "sha256": "9f81f8a19f03d3bf9bf6138d4bb2dd8a06d54715cacce6f414170c638be2a39e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_reptile_aggro": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_reptile_aggro_1.mp3?v=bd53d2051e87",
+          "bytes": 21359,
+          "sha256": "bd53d2051e870caf7537e025229fcb30133c5134df027832a1bb02729c12e41c"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_reptile_aggro_2.mp3?v=1504fc5cabe7",
+          "bytes": 22568,
+          "sha256": "1504fc5cabe78502fa625faebdb9347f3820dbbea582ea1ddad98cb483bf3d69"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_reptile_attack": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_reptile_attack_1.mp3?v=5e3d8f6dbf00",
+          "bytes": 15672,
+          "sha256": "5e3d8f6dbf0035635834b4f7f9a971861cc4fbc0e3b363a29700cc02165b2bdc"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_reptile_attack_2.mp3?v=2d1167c3dae7",
+          "bytes": 14462,
+          "sha256": "2d1167c3dae7b33111ecaccae7c4481570ee8234a0d42c97c073b9e00ca93ffd"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/mob_reptile_attack_3.mp3?v=2899eafa9b40",
+          "bytes": 17597,
+          "sha256": "2899eafa9b40d7effe0ec2eabff7e081ea8d0a209b7f701e114e755718009ffc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_reptile_death": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_reptile_death_1.mp3?v=73d4db55c8dc",
+          "bytes": 28882,
+          "sha256": "73d4db55c8dc29446b6f7f69acb2a5f048f29df5b18e60017bbd79ce823ba03e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_reptile_death_2.mp3?v=b5c13fa6c936",
+          "bytes": 25120,
+          "sha256": "b5c13fa6c936f59a021b89da5aec6e1f2d2496769d6b1b26ee6b3afe03ef22ce"
         }
       ],
       "gain": 1,
