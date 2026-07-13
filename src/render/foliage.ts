@@ -669,7 +669,8 @@ function farTrunkGeo(barkGeo: THREE.BufferGeometry): THREE.BufferGeometry {
   const cached = farTrunkCache.get(barkGeo);
   if (cached) return cached;
   barkGeo.computeBoundingBox();
-  const h = barkGeo.boundingBox!.max.y * 0.8;
+  // computeBoundingBox always sets boundingBox; the fallback only quiets lint
+  const h = (barkGeo.boundingBox?.max.y ?? 0) * 0.8;
   const geo = new THREE.CylinderGeometry(0.2, 0.42, h, 5, 1, true);
   geo.translate(0, h / 2, 0);
   // the bark material has vertexColors:true (source GLBs ship COLOR_0); a
