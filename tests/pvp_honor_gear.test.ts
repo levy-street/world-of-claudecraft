@@ -12,6 +12,7 @@ import { weaponDpsBudget } from '../src/sim/item_budget';
 import {
   expectedStatBudget,
   itemLevel,
+  itemScore,
   itemSourceLevel,
   primaryStatSum,
 } from '../src/sim/item_level';
@@ -177,10 +178,11 @@ describe('FURY WARFARE stock', () => {
 });
 
 describe('FURY WARFARE item budgets', () => {
-  it('makes every offer an exact-budget, soulbound, honor-priced item-level-28 epic', () => {
+  it('makes every offer a soulbound, honor-priced item-level-28 epic with full WARFARE', () => {
     for (const id of FURY_STOCK) {
       const item = ITEMS[id];
       const budget = expectedStatBudget(item);
+      const isJewelry = item.slot === 'ring' || item.slot === 'neck';
       expect(item.quality, id).toBe('epic');
       expect(item.requiredLevel, id).toBe(20);
       expect(item.soulbound, id).toBe(true);
@@ -188,10 +190,36 @@ describe('FURY WARFARE item budgets', () => {
       expect(item.buyValue, id).toBeUndefined();
       expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
       expect(itemLevel(item), id).toBe(28);
-      expect(primaryStatSum(item), id).toBe(budget);
+      if (isJewelry) {
+        // Jewelry spends its budget on WARFARE: reduced primary stats (see the
+        // badge-comparison guard below), full WARFARE ratings.
+        expect(primaryStatSum(item), id).toBeLessThan(budget);
+      } else {
+        expect(primaryStatSum(item), id).toBe(budget);
+      }
+      // Every piece's WARFARE ratings mirror its slot budget (drives the 16.8% set).
       expect(item.pvpOffenseRating, id).toBe(budget);
       expect(item.pvpDefenseRating, id).toBe(budget);
       expect(item.priceHonor, id).toBe(SLOT_PRICES[item.slot ?? '']);
+    }
+  });
+
+  it('never lets PvP jewelry out-stat the PvE badge (heroic marks) jewelry in PvE', async () => {
+    // Jewelry itemScore excludes WARFARE (and combat ratings), so it measures the
+    // PvE-relevant power. Every PvP ring/amulet must score strictly BELOW the
+    // weakest PvE badge piece of the same slot: a PvP jewelry piece is never a PvE
+    // upgrade over the badge vendor's gear.
+    const { HEROIC_VENDOR_ITEMS } = await import('../src/sim/content/heroic_vendor');
+    for (const slot of ['ring', 'neck'] as const) {
+      const pvp = FURY_STOCK.map((id) => ITEMS[id]).filter((i) => i.slot === slot);
+      const badge = Object.values(HEROIC_VENDOR_ITEMS).filter((i) => i.slot === slot);
+      expect(pvp.length, slot).toBeGreaterThan(0);
+      expect(badge.length, slot).toBeGreaterThan(0);
+      const bestPvp = Math.max(...pvp.map(itemScore));
+      const worstBadge = Math.min(...badge.map(itemScore));
+      expect(bestPvp, `${slot}: best PvP ${bestPvp} vs worst badge ${worstBadge}`).toBeLessThan(
+        worstBadge,
+      );
     }
   });
 
