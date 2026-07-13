@@ -7088,15 +7088,6 @@ export const es: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
       },
-      "deathless_warguard_legmail": {
-        "name": "Malla de piernas del Guardián Imperecedero"
-      },
-      "soulrend_diadem": {
-        "name": "Diadema Desgarralmas"
-      },
-      "scourgehide_carapace": {
-        "name": "Caparazón de piel de Azote"
-      },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
       },
@@ -7135,9 +7126,6 @@ export const es: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
-      },
-      "soulforged_warplate": {
-        "name": "Coraza de guerra forjada en almas"
       },
       "stormcallers_focus": {
         "name": "Foco del Invocador de Tormentas"
@@ -7452,6 +7440,15 @@ export const es: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardián Imperecedero"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imperecedero"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Cuchillo Imperecedero"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"

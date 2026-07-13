@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
@@ -924,8 +925,13 @@ function delay(ms: number): Promise<void> {
 // context needed to read it: when it was taken, how long the window was, and the
 // crowd it was taken under. The admin dashboard renders this.
 export interface PerfCaptureResult {
+  captureId: string; // server-generated correlation id returned when the window starts
   capturedAt: number; // epoch ms the window closed
   durationMs: number; // the (clamped) capture window length
+  loopCallbacks: number; // setInterval callbacks observed during the window
+  simTicks: number; // authoritative sim ticks run across those callbacks
+  catchUpCallbacks: number; // callbacks that ran more than one sim tick
+  maxTicksPerCallback: number;
   online: number; // live sessions at capture close
   simEntities: number; // sim entity count at capture close
   profile: ReturnType<TickProfiler['profile']>;
@@ -934,6 +940,7 @@ export interface PerfCaptureResult {
 // The /admin/api/perf/tick status envelope: whether a capture is currently running
 // (with when it ends, so the UI can show a countdown), plus the last frozen result.
 export interface PerfCaptureStatus {
+  captureId: string | null; // id of the in-flight capture, or null while idle
   capturing: boolean;
   endsAt: number | null; // epoch ms the in-flight capture closes, or null
   last: PerfCaptureResult | null;
@@ -1014,12 +1021,18 @@ export class GameServer {
   // The host-side mark the injected sim perfLap probe diffs against; refreshed just
   // before each sim.tick() call while a detailed capture is active.
   private simLapMark = 0n;
-  // On-demand capture state (admin-triggered). While `perfCaptureEndsAtTick` is set,
-  // the loop is accumulating a fresh detailed window; when the loop reaches that tick
-  // it freezes `lastPerfCapture`. Only the single latest result is kept, in memory.
-  private perfCaptureEndsAtTick: number | null = null;
+  // On-demand capture state (admin-triggered). The deadline is wall-clock based:
+  // a saturated sim may commit far fewer or many more ticks than nominal, but a
+  // requested 30-second incident capture must still finish after about 30 seconds.
+  // Only the single latest result is kept, in memory.
+  private perfCaptureDeadlineNs: bigint | null = null;
   private perfCaptureEndsAtMs = 0;
+  private perfCaptureId: string | null = null;
   private perfCaptureDurationMs = 0;
+  private perfCaptureLoopCallbacks = 0;
+  private perfCaptureSimTicks = 0;
+  private perfCaptureCatchUpCallbacks = 0;
+  private perfCaptureMaxTicksPerCallback = 0;
   private lastPerfCapture: PerfCaptureResult | null = null;
   private bcastGridNs = 0n;
   private bcastSelfNs = 0n;
@@ -1523,6 +1536,7 @@ export class GameServer {
             ticksRun++;
             acc -= DT;
           }
+          this.recordPerfCaptureCallback(ticksRun);
           this.expireLinkdeadSessions();
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
@@ -2699,46 +2713,66 @@ export class GameServer {
 
   // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
   // window is clean, flips the detailed sub-phase timing on, and schedules the close
-  // `durationMs` (clamped) out in sim ticks. A second call while one is running just
+  // `durationMs` (clamped) out in wall time. A second call while one is running just
   // restarts the window. Returns the resulting status for the caller to echo back.
   startPerfCapture(durationMs = PERF_CAPTURE_DEFAULT_MS): PerfCaptureStatus {
     const clamped = Math.round(
       Math.min(PERF_CAPTURE_MAX_MS, Math.max(PERF_CAPTURE_MIN_MS, durationMs)),
     );
-    const ticks = Math.max(1, Math.round(clamped / (DT * 1000)));
     this.tickProfiler.reset();
     this.perfDetailActive = true;
     this.perfCaptureDurationMs = clamped;
-    this.perfCaptureEndsAtTick = this.sim.tickCount + ticks;
+    this.perfCaptureId = randomUUID();
+    this.perfCaptureLoopCallbacks = 0;
+    this.perfCaptureSimTicks = 0;
+    this.perfCaptureCatchUpCallbacks = 0;
+    this.perfCaptureMaxTicksPerCallback = 0;
     this.perfCaptureEndsAtMs = Date.now() + clamped;
+    this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
   }
 
   // The current capture status: whether one is in flight (with its close time for a UI
   // countdown) and the last frozen result. Read by GET /admin/api/perf/tick.
   perfCaptureStatus(): PerfCaptureStatus {
-    const capturing = this.perfCaptureEndsAtTick !== null;
+    const capturing = this.perfCaptureDeadlineNs !== null;
     return {
+      captureId: capturing ? this.perfCaptureId : null,
       capturing,
       endsAt: capturing ? this.perfCaptureEndsAtMs : null,
       last: this.lastPerfCapture,
     };
   }
 
-  // Close an in-flight capture once the loop reaches its end tick: freeze the profile
+  private recordPerfCaptureCallback(ticksRun: number): void {
+    if (this.perfCaptureDeadlineNs === null) return;
+    this.perfCaptureLoopCallbacks++;
+    this.perfCaptureSimTicks += ticksRun;
+    if (ticksRun > 1) this.perfCaptureCatchUpCallbacks++;
+    this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
+  }
+
+  // Close an in-flight capture once its monotonic deadline passes: freeze the profile
   // and revert the detailed-timing switch to its baseline (env, so PERF_TICK_LOG keeps
   // working). Called once per loop body, right after commit.
   private finalizePerfCaptureIfDue(): void {
-    if (this.perfCaptureEndsAtTick === null) return;
-    if (this.sim.tickCount < this.perfCaptureEndsAtTick) return;
+    if (this.perfCaptureDeadlineNs === null) return;
+    if (process.hrtime.bigint() < this.perfCaptureDeadlineNs) return;
+    if (this.perfCaptureId === null) return;
     this.lastPerfCapture = {
+      captureId: this.perfCaptureId,
       capturedAt: Date.now(),
       durationMs: this.perfCaptureDurationMs,
+      loopCallbacks: this.perfCaptureLoopCallbacks,
+      simTicks: this.perfCaptureSimTicks,
+      catchUpCallbacks: this.perfCaptureCatchUpCallbacks,
+      maxTicksPerCallback: this.perfCaptureMaxTicksPerCallback,
       online: this.clients.size,
       simEntities: this.sim.entities.size,
       profile: this.tickProfiler.profile(),
     };
-    this.perfCaptureEndsAtTick = null;
+    this.perfCaptureDeadlineNs = null;
+    this.perfCaptureId = null;
     this.perfDetailActive = process.env.PERF_TICK_LOG === '1';
   }
 

@@ -78,7 +78,7 @@ export function dealDamage(
   direct = true,
 ): void {
   if (target.dead) return;
-  if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
+  if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
@@ -86,6 +86,12 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
+  // through raid bosses to inspect drops without one-shotting them past their phase
+  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // marks real, non-fighting game masters). Draws no rng.
+  if (source?.devGod && source.kind === 'player' && ctx.devCommands)
+    amount = Math.round(amount * 100);
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (

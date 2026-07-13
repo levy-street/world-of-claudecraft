@@ -2480,8 +2480,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). Palettes step up with
-  // the quality tier so the bag reads richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
+  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
+  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
+  // richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -3603,8 +3605,11 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags
+  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  'gravewoven_bag',
   'linen_pouch',
+  'mistcallers_duffel',
+  'travelers_knapsack',
   'wolfhide_satchel',
   // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)
   'copper_mining_pick',
@@ -3634,9 +3639,16 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'unknown_alien_weaponry',
 ]);
 
-/** Static URL of an item's image icon, or null if it uses a recipe. */
+// UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
+// records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
+// looted, equipped, or unequipped, so it has no item def. Kept apart from ITEM_IMAGE_IDS so
+// the item guard (tests/item_icons.test.ts) keeps asserting that every wired ITEM id is a
+// real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
+export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
+
+/** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
-  return ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
+  return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
 
 // Book of Deeds crest ids are shaped `deed_<deedId>` (deeds_view.ts deedCrestId). Those whose

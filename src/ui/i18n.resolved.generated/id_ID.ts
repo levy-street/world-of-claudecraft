@@ -7088,15 +7088,6 @@ export const id_ID: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Tongkat Kebesaran Istana Nirmaut"
       },
-      "deathless_warguard_legmail": {
-        "name": "Zirah Kaki Garda Perang Nirmaut"
-      },
-      "soulrend_diadem": {
-        "name": "Diadem Pengoyak Jiwa"
-      },
-      "scourgehide_carapace": {
-        "name": "Karapas Kulit Sampar"
-      },
       "cryptplate_helm": {
         "name": "Helm Lempeng Kripta"
       },
@@ -7135,9 +7126,6 @@ export const id_ID: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Bilah Agung Nirmaut"
-      },
-      "soulforged_warplate": {
-        "name": "Zirah Perang Tempaan Jiwa"
       },
       "stormcallers_focus": {
         "name": "Fokus Pemanggil Badai"
@@ -7452,6 +7440,15 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garda Perang Nirmaut"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofan Nirmaut"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Belati Nirmaut"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"

@@ -196,6 +196,7 @@ const baseEnTable = {
   'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
   'log.mobChannels': '{name} channels {mechanic}.',
+  'log.channelInterrupted': '{mechanic} is interrupted!',
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
@@ -5921,6 +5922,11 @@ const RULES: Rule[] = [
   {
     re: /^(.+) channels (.+)\.$/,
     build: (m) => tSim('log.mobChannels', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
+  },
+  // "{mechanic} is interrupted!" (a channeled mob heal broken by a stun/silence).
+  {
+    re: /^(.+) is interrupted!$/,
+    build: (m) => tSim('log.channelInterrupted', { mechanic: locBossMechanic(m[1]) }),
   },
   {
     re: /^(.+) unleashes (.+)!$/,

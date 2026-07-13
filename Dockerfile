@@ -30,6 +30,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/media-build ./media-build
 COPY --from=build /app/dist-server ./dist-server
 COPY --from=build /app/dist-bot ./dist-bot
+COPY --from=build /app/scripts/prod_cpu_game_helper.mjs /app/ops/
+COPY --from=build /app/scripts/prod_cpu_profile_client.mjs /app/ops/
 RUN mkdir -p /app/dist/media && chown -R node:node /app/dist/media
 EXPOSE 8787
 USER node

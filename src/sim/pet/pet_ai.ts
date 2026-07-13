@@ -52,7 +52,8 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const PET_LEASH = 40; // yards from the owner before a pet gives up its target
 const PET_FOLLOW_DISTANCE = 3.5;
 const PET_PATH_RECALC = 0.5; // seconds between heel-path A* recomputes per pet (throttle)
-const PET_PATH_SPAN = 96; // A* search half-window in cells; covers the teleport distance + slack
+const PET_PATH_SPAN = 96; // maximum A* search cells per axis; covers teleport distance + slack
+const PET_FORCE_RECOVERY_DISTANCE = 96; // beyond this separation, snap after a fresh bounded path fails
 const PET_PATH_STALE_DISTANCE = 4; // path end this far from the (now-moved) owner: recompute the heel route
 const PET_WAYPOINT_REACHED = 1; // pet within this of the next waypoint: pop it and home on the next leg
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
@@ -155,8 +156,8 @@ function pullNearbyMobs(ctx: SimContext, pet: Entity): void {
 // letting greedy slide-steering wedge on a wall and then snapping the pet to
 // the owner. Mirrors the warrior-charge path cache (`petPath`): A* is recomputed
 // at most every PET_PATH_RECALC and otherwise the cached waypoints are followed.
-// The 60yd teleport is kept only as a true last resort, for when no route to the
-// owner exists at all (e.g. owner stranded across un-navigable terrain).
+// The teleport is kept as a recovery path when no route exists or the pet-owner
+// separation is implausibly large (for example, after an instance transition).
 export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   pet.petPathCooldown = Math.max(0, pet.petPathCooldown - DT);
   const d = dist2d(pet.pos, owner.pos);
@@ -183,14 +184,20 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   while (pet.petPath.length > 1 && dist2d(pet.pos, pet.petPath[0]) < PET_WAYPOINT_REACHED)
     pet.petPath.shift();
 
-  // Last-resort teleport: only when the owner is far AND genuinely unreachable.
+  // Last-resort teleport: only when the owner is far and either genuinely
+  // unreachable or beyond the forced recovery boundary.
   // We confirm with a FRESH path (ignoring the throttle) so a stale single-point
   // cache from a moment ago can never trigger a spurious snap while a real route
   // exists — e.g. right after a combat→heel transition.
   if (
     pet.petPath.length <= 1 &&
     d > PET_TELEPORT_DISTANCE &&
-    !lineOfSightClear(ctx.cfg.seed, pet.pos, owner.pos, BODY_RADIUS)
+    // lineOfSightClear samples every 0.5yd. Do not trace an arbitrarily long
+    // world-space segment for a pet stranded across a teleport or instance
+    // transition. Below the explicit recovery boundary, preserve the clear-line
+    // run-home behavior.
+    (d > PET_FORCE_RECOVERY_DISTANCE ||
+      !lineOfSightClear(ctx.cfg.seed, pet.pos, owner.pos, BODY_RADIUS))
   ) {
     recompute();
     if (pet.petPath.length <= 1) {

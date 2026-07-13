@@ -7088,15 +7088,6 @@ export const en_XA: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "[Šçéþţéŕ óƒ ţĥé Ðéáţĥļéšš Çóúŕţ]"
       },
-      "deathless_warguard_legmail": {
-        "name": "[Ðéáţĥļéšš Ŵáŕĝúáŕð Ļéĝɱáíļ]"
-      },
-      "soulrend_diadem": {
-        "name": "[Šóúļŕéñð Ðíáðéɱ]"
-      },
-      "scourgehide_carapace": {
-        "name": "[Šçóúŕĝéĥíðé Çáŕáþáçé]"
-      },
       "cryptplate_helm": {
         "name": "[Çŕýþţþļáţé Ĥéļɱ]"
       },
@@ -7135,9 +7126,6 @@ export const en_XA: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "[Ðéáţĥļéšš Ĝŕéáţƀļáðé]"
-      },
-      "soulforged_warplate": {
-        "name": "[Šóúļƒóŕĝéð Ŵáŕþļáţé]"
       },
       "stormcallers_focus": {
         "name": "[Šţóŕɱçáļļéŕ'š Ƒóçúš]"
@@ -7452,6 +7440,15 @@ export const en_XA: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "[Šþíŕíţ óƒ Áļðŕéñ]"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "[Šþíŕíţ óƒ Ɱáļŕíç]"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "[Šþíŕíţ óƒ Ʋóšš]"
       },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"

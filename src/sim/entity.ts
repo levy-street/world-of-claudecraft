@@ -110,6 +110,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     detonateTimer: Infinity,
     mendTimer: 0,
     wardTimer: 0,
+    channelTimer: 0,
+    channelRamp: 0,
     rallyTimer: 0,
     warcryTimer: 0,
     firedSummons: 0,
@@ -547,6 +549,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.mendAlly) e.mendTimer = template.mendAlly.every;
   // Telegraph the first Ward the same way: one full interval after engage.
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
+  // Telegraph the first channeled heal tick: one full interval after engage.
+  if (template.channelHeal) e.channelTimer = template.channelHeal.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
