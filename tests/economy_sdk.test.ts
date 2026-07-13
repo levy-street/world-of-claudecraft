@@ -102,6 +102,88 @@ describe('EconomyClient store snapshot', () => {
   });
 });
 
+describe('EconomyClient pack snapshot', () => {
+  it('marks the snapshot available when balance, packs, and native rails all load', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith('/api/claudium/balance')) {
+          return new Response(JSON.stringify({ available: true, balance: 250 }), { status: 200 });
+        }
+        if (url.endsWith('/api/claudium/skus')) {
+          return new Response(
+            JSON.stringify({
+              available: true,
+              skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.endsWith('/api/claudium/native/rails')) {
+          return new Response(
+            JSON.stringify({ available: true, rails: { sol: true, woc: true } }),
+            { status: 200 },
+          );
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    const snapshot = await new EconomyClient({
+      token: () => 'token',
+      base: 'https://game.example',
+    }).packSnapshot();
+
+    expect(snapshot).toEqual({
+      available: true,
+      balance: 250,
+      skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+      nativeRails: { sol: true, woc: true },
+    });
+  });
+
+  it('marks a partial pack refresh unavailable instead of presenting fallbacks as fresh data', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith('/api/claudium/balance')) {
+          return new Response(JSON.stringify({ available: true, balance: 250 }), { status: 200 });
+        }
+        if (url.endsWith('/api/claudium/skus')) {
+          return new Response(
+            JSON.stringify({
+              available: true,
+              skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.endsWith('/api/claudium/native/rails')) {
+          return new Response(
+            JSON.stringify({ available: false, rails: { sol: false, woc: false } }),
+            { status: 200 },
+          );
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    const snapshot = await new EconomyClient({
+      token: () => 'token',
+      base: 'https://game.example',
+    }).packSnapshot();
+
+    expect(snapshot).toEqual({
+      available: false,
+      balance: 250,
+      skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+      nativeRails: { sol: false, woc: false },
+    });
+  });
+});
+
 describe('confirmNativeSettlement', () => {
   it('retries while a native payment is not finalized yet', async () => {
     const results: ClaudiumNativeConfirm[] = [

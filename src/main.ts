@@ -1848,11 +1848,16 @@ async function startGame(
         };
       },
       snapshot: async () => {
-        const [balance, skus, nativeRails] = await Promise.all([
-          economy.balance(),
-          economy.skus(),
-          economy.nativeRails(),
-        ]);
+        const pack = await economy.packSnapshot();
+        if (!pack.available) {
+          return {
+            available: false,
+            balance: pack.balance,
+            skus: pack.skus,
+            nativeRails: pack.nativeRails,
+          };
+        }
+        const { balance, skus, nativeRails } = pack;
         const wallet = await loadWallet();
         const walletAddress = wallet.currentWallet().address;
         const [solBalance, wocBalance] = walletAddress
@@ -1864,8 +1869,8 @@ async function startGame(
         const nativePrices = await Promise.all(
           skus.map(async (row) => {
             const [sol, woc] = await Promise.all([
-              nativeRails.rails.sol ? economy.nativePrice('sol', row.sku) : null,
-              nativeRails.rails.woc ? economy.nativePrice('woc', row.sku) : null,
+              nativeRails.sol ? economy.nativePrice('sol', row.sku) : null,
+              nativeRails.woc ? economy.nativePrice('woc', row.sku) : null,
             ]);
             return {
               sku: row.sku,
@@ -1875,9 +1880,10 @@ async function startGame(
           }),
         );
         return {
-          balance: balance.balance,
+          available: true,
+          balance,
           skus,
-          nativeRails: nativeRails.rails,
+          nativeRails,
           walletBalances: {
             solLamports: solBalance.lamports,
             wocBaseUnits: wocBalanceBaseUnits(wocBalance),

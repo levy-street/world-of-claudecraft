@@ -14,6 +14,7 @@ export type ClaudiumPriceRail = 'stripe' | 'woc';
 export type ClaudiumNativeRail = 'sol' | 'woc';
 
 export interface ClaudiumBalance {
+  available?: boolean;
   balance: number | null;
 }
 
@@ -44,6 +45,13 @@ export interface ClaudiumStoreSnapshot {
   items: ClaudiumStoreItem[];
 }
 
+export interface ClaudiumPackSnapshot {
+  available: boolean;
+  balance: number | null;
+  skus: ClaudiumSku[];
+  nativeRails: Record<ClaudiumNativeRail, boolean>;
+}
+
 export interface ClaudiumStripeIntent {
   clientSecret: string;
   publishableKey: string;
@@ -69,6 +77,7 @@ export interface ClaudiumPurchase {
 }
 
 export interface ClaudiumNativeRails {
+  available?: boolean;
   rails: Record<ClaudiumNativeRail, boolean>;
 }
 
@@ -117,7 +126,7 @@ export interface EconomyClientConfig {
   base?: string;
 }
 
-const OFF_BALANCE: ClaudiumBalance = { balance: null };
+const OFF_BALANCE: ClaudiumBalance = { available: false, balance: null };
 const OFF_PRICE = (rail: string): ClaudiumPrice => ({
   rail,
   usdPerClaudium: null,
@@ -125,7 +134,10 @@ const OFF_PRICE = (rail: string): ClaudiumPrice => ({
 });
 const OFF_SKUS: ClaudiumSku[] = [];
 const OFF_STORE: ClaudiumStoreItem[] = [];
-const OFF_NATIVE_RAILS: ClaudiumNativeRails = { rails: { sol: false, woc: false } };
+const OFF_NATIVE_RAILS: ClaudiumNativeRails = {
+  available: false,
+  rails: { sol: false, woc: false },
+};
 const OFF_PURCHASE: ClaudiumPurchase = {
   ok: false,
   purchaseId: null,
@@ -240,9 +252,36 @@ export class EconomyClient {
       }),
     ]);
     return {
-      available: balance.ok && store.ok && store.value.available !== false,
+      available:
+        balance.ok &&
+        balance.value.available !== false &&
+        store.ok &&
+        store.value.available !== false,
       balance: balance.value.balance,
       items: store.value.items ?? OFF_STORE,
+    };
+  }
+
+  async packSnapshot(): Promise<ClaudiumPackSnapshot> {
+    const [balance, skus, nativeRails] = await Promise.all([
+      this.getResult('/api/claudium/balance', OFF_BALANCE),
+      this.getResult<{ available?: boolean; skus: ClaudiumSku[] }>('/api/claudium/skus', {
+        available: false,
+        skus: OFF_SKUS,
+      }),
+      this.getResult('/api/claudium/native/rails', OFF_NATIVE_RAILS),
+    ]);
+    return {
+      available:
+        balance.ok &&
+        balance.value.available === true &&
+        skus.ok &&
+        skus.value.available === true &&
+        nativeRails.ok &&
+        nativeRails.value.available === true,
+      balance: balance.value.balance,
+      skus: skus.value.skus ?? OFF_SKUS,
+      nativeRails: nativeRails.value.rails,
     };
   }
 

@@ -413,6 +413,79 @@ describe('Claudium spend entitlement mirroring', () => {
 });
 
 describe('Claudium economy-service transport contract', () => {
+  it('marks typed HTTP 200 read fallbacks unavailable when the economy service is off', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', '');
+    vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', '');
+    const cases = [
+      {
+        url: '/api/claudium/balance',
+        expected: { available: false, balance: null },
+      },
+      {
+        url: '/api/claudium/skus',
+        expected: { available: false, skus: [] },
+      },
+      {
+        url: '/api/claudium/native/rails',
+        expected: { available: false, rails: { sol: false, woc: false } },
+      },
+    ];
+
+    for (const { url, expected } of cases) {
+      const res = new FakeRes();
+      await handleClaudiumApi(makeReq({ method: 'GET', url }), res as never, 7);
+      expect(responseJson(res)).toEqual(expected);
+    }
+  });
+
+  it('marks typed read responses available only after authoritative service data loads', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL | Request) => {
+        const url = String(input);
+        if (url.endsWith('/balance/7')) {
+          return new Response(JSON.stringify({ balance: 250 }), { status: 200 });
+        }
+        if (url.endsWith('/skus')) {
+          return new Response(JSON.stringify([{ sku: 'claudium_500', usd: 4.99, claudium: 500 }]), {
+            status: 200,
+          });
+        }
+        if (url.endsWith('/native/rails')) {
+          return new Response(JSON.stringify({ rails: { sol: true, woc: true } }), {
+            status: 200,
+          });
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+    const cases = [
+      {
+        url: '/api/claudium/balance',
+        expected: { available: true, balance: 250 },
+      },
+      {
+        url: '/api/claudium/skus',
+        expected: {
+          available: true,
+          skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+        },
+      },
+      {
+        url: '/api/claudium/native/rails',
+        expected: { available: true, rails: { sol: true, woc: true } },
+      },
+    ];
+
+    for (const { url, expected } of cases) {
+      const res = new FakeRes();
+      await handleClaudiumApi(makeReq({ method: 'GET', url }), res as never, 7);
+      expect(responseJson(res)).toEqual(expected);
+    }
+  });
+
   it('forwards Stripe webhook bytes and signature without reserializing them', async () => {
     vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');

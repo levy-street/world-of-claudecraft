@@ -2750,6 +2750,14 @@
       linear-gradient(155deg, #07121b, #050a0f 72%);
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
+  /* Both store surfaces already paint opaque backgrounds. Keeping them in the
+     backdrop blur compositor adds no visual benefit and can drop the front
+     window's root layer for a frame when the two windows overlap. */
+  body.frosted-panels #daily-rewards-window,
+  body.frosted-panels #claudium-window {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
   .cl-body {
     max-height: calc(100vh - 96px);
     padding: 14px 18px 18px;
@@ -2764,6 +2772,34 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  .cl-refresh-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: auto;
+    visibility: hidden;
+  }
+  .cl-refresh-status.active {
+    visibility: visible;
+  }
+  .cl-refresh-status.failed {
+    visibility: visible;
+    color: #ffb07a;
+  }
+  .cl-refresh-error {
+    display: none;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .cl-refresh-status.failed .cl-spinner {
+    display: none;
+  }
+  .cl-refresh-status.failed .cl-refresh-error {
+    display: block;
+  }
   .cl-spinner {
     width: 18px;
     height: 18px;
@@ -2775,6 +2811,11 @@
   @keyframes cl-spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cl-spinner {
+      animation: none;
     }
   }
   .cl-balance {
@@ -2922,24 +2963,6 @@
     color: var(--color-text-muted);
     font-size: 11px;
   }
-  .cl-pending {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 6px 0;
-    padding: 7px 9px;
-    border: 1px solid #735d2b;
-    border-radius: 4px;
-    background: #221a0e;
-    color: #f3e6c4;
-    font-size: 12px;
-    line-height: 1.35;
-  }
-  .cl-pending .cl-spinner {
-    width: 14px;
-    height: 14px;
-    flex: 0 0 auto;
-  }
   .cl-purchase-error {
     margin: 6px 0;
     padding: 7px 9px;
@@ -2982,6 +3005,12 @@
   .cl-sku:disabled {
     opacity: 0.58;
     cursor: default;
+  }
+  /* A background price refresh disables purchases without changing the mounted
+     cards' appearance. The header spinner is the refresh indicator, so dimming
+     the full grid here would make the game appear to flash through the panel. */
+  .cl-body[aria-busy="true"] .cl-sku:disabled {
+    opacity: 1;
   }
   .cl-sku:disabled .cl-sku-buy {
     color: #b2a47d;
@@ -3029,6 +3058,10 @@
     text-align: center;
   }
   .cl-sku-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     justify-self: stretch;
     min-height: 36px;
     padding: 8px 10px;
@@ -3039,6 +3072,11 @@
     font-weight: 700;
     text-align: center;
     text-transform: uppercase;
+  }
+  .cl-sku-buy-spinner {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
   }
   .cl-item {
     display: grid;

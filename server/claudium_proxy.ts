@@ -20,6 +20,7 @@ const NATIVE_CONFIRM_TIMEOUT_MS = 60_000;
 
 /** Integer Claudium balance for an account, or null when the service is off. */
 export interface ClaudiumBalanceResult {
+  available: boolean;
   balance: number | null;
 }
 
@@ -56,6 +57,7 @@ export interface ClaudiumSku {
 
 /** The SKU ladder, empty when the service is off. */
 export interface ClaudiumSkusResult {
+  available: boolean;
   skus: ClaudiumSku[];
 }
 
@@ -93,6 +95,7 @@ export interface ClaudiumPurchaseResult {
 }
 
 export interface ClaudiumNativeRailsResult {
+  available: boolean;
   rails: Record<ClaudiumNativeRail, boolean>;
 }
 
@@ -250,7 +253,8 @@ export async function claudiumBalance(accountId: number): Promise<ClaudiumBalanc
     method: 'GET',
     path: `balance/${encodeURIComponent(String(accountId))}`,
   });
-  return { balance: typeof data?.balance === 'number' ? data.balance : null };
+  const available = typeof data?.balance === 'number';
+  return { available, balance: typeof data?.balance === 'number' ? data.balance : null };
 }
 
 /** GET price/:rail. Prices null when the service is off (buy disabled). */
@@ -314,13 +318,17 @@ export async function claudiumNativeRails(): Promise<ClaudiumNativeRailsResult> 
     method: 'GET',
     path: 'native/rails',
   });
-  return { rails: { sol: data?.rails?.sol === true, woc: data?.rails?.woc === true } };
+  const available = data !== null && typeof data.rails === 'object' && data.rails !== null;
+  return {
+    available,
+    rails: { sol: data?.rails?.sol === true, woc: data?.rails?.woc === true },
+  };
 }
 
 /** GET skus. Empty ladder when the service is off (stripe rail disabled). */
 export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
   const data = await callService<ClaudiumSku[]>({ method: 'GET', path: 'skus' });
-  if (!Array.isArray(data)) return { skus: [] };
+  if (!Array.isArray(data)) return { available: false, skus: [] };
   const skus = data
     .filter(
       (s): s is ClaudiumSku =>
@@ -335,7 +343,7 @@ export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
           ? (s as { stripeConfigured: boolean }).stripeConfigured
           : undefined,
     }));
-  return { skus };
+  return { available: true, skus };
 }
 
 /** POST purchase. Returns ok:false with a reason when the service is off. */

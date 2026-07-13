@@ -12,6 +12,10 @@ const claudiumWindow = readFileSync(
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const inspect = readFileSync(new URL('../src/ui/armory_inspect.ts', import.meta.url), 'utf8');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+);
 
 describe('WOC Store window contract', () => {
   it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
@@ -73,6 +77,53 @@ describe('WOC Store window contract', () => {
     expect(claudiumWindow).toContain('/claudium/icons/stack_');
   });
 
+  it('keeps Claudium packs mounted while their snapshot refreshes', () => {
+    const render = claudiumWindow.slice(
+      claudiumWindow.indexOf('async render('),
+      claudiumWindow.indexOf('private ensureShell'),
+    );
+    expect(render).toContain('this.syncRefreshing(true);');
+    expect(render).toContain('if (!this.hasRenderedSnapshot) this.paintLoading();');
+    expect(render).toContain('snapshot.available === false) && this.currentView');
+    expect(render).toContain("this.announce(t('hudChrome.claudium.unavailable'))");
+    expect(claudiumWindow).toContain('data-refresh-status');
+    expect(claudiumWindow).toContain('data-cl-live-status');
+    expect(claudiumWindow).toContain("querySelector<HTMLElement>('.cl-body')");
+    expect(claudiumWindow).toContain("setAttribute('aria-busy', refreshing ? 'true' : 'false')");
+    expect(claudiumWindow).toContain("querySelectorAll<HTMLButtonElement>('[data-sku]')");
+    const refreshSync = claudiumWindow.slice(
+      claudiumWindow.indexOf('private syncRefreshing('),
+      claudiumWindow.indexOf('private announce('),
+    );
+    expect(refreshSync).not.toContain('[data-rail]');
+    expect(claudiumWindow).toContain('cl-sku-buy-spinner');
+    expect(claudiumWindow).toContain('this.syncPendingPurchase(body, rail, sku);');
+    expect(claudiumWindow).toContain(
+      'const refreshFocus = restoreTarget ?? this.captureBodyFocus();',
+    );
+    expect(claudiumWindow).toContain(
+      "const purchaseFocus = this.captureBodyFocus() ?? { kind: 'sku', value: sku };",
+    );
+    expect(claudiumWindow).toContain('void this.render(null, purchaseFocus);');
+    expect(claudiumWindow).toContain('this.restoreBodyFocus(focused);');
+    expect(claudiumWindow).toContain('this.paint(this.currentView ?? view);');
+  });
+
+  it('keeps refresh-disabled Claudium packs visually stable', () => {
+    expect(componentsCss).toContain(
+      '.cl-body[aria-busy="true"] .cl-sku:disabled {\n    opacity: 1;',
+    );
+  });
+
+  it('keeps stacked opaque store windows out of the backdrop blur compositor', () => {
+    const rule = componentsCss.match(
+      /body\.frosted-panels #daily-rewards-window,\s*body\.frosted-panels #claudium-window \{([^}]*)\}/,
+    );
+    expect(rule).not.toBeNull();
+    expect(rule?.[1]).toMatch(/(?:^|\n)\s+-webkit-backdrop-filter: none;/);
+    expect(rule?.[1]).toMatch(/(?:^|\n)\s+backdrop-filter: none;/);
+  });
+
   it('keeps storefront content mounted while a background refresh is loading', () => {
     expect(storeWindow).toContain('data-woc-store-loading');
     expect(storeWindow).toContain(
@@ -117,5 +168,14 @@ describe('WOC Store window contract', () => {
     expect(storeSnapshot).not.toContain('economy.skus()');
     expect(storeSnapshot).not.toContain("economy.price('woc')");
     expect(storeSnapshot).not.toContain('economy.nativePrice(');
+  });
+
+  it('distinguishes a complete Claudium pack refresh from typed economy fallbacks', () => {
+    const hook = main.slice(main.indexOf('snapshot: async () =>'));
+    const snapshot = hook.slice(0, hook.indexOf('buy: async'));
+    expect(snapshot).toContain('economy.packSnapshot()');
+    expect(snapshot).toContain('if (!pack.available)');
+    expect(snapshot).toContain('available: false');
+    expect(snapshot).toContain('available: true');
   });
 });
