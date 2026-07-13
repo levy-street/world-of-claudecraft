@@ -26,6 +26,10 @@ import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 export const SET_HASTE_3PC = 0.15;
 export const SET_HASTE_3PC_RATING = 150; // -> 15% haste at 10 rating = 1%
 export const SET_CRIT_3PC_RATING = 20; // -> +2% crit at 10 rating = 1%
+// The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
+// (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
+// the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
+export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -131,10 +135,12 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 4,
     effect: {
+      hitRating: SET_HIT_4PC_RATING,
       // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
       // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
       // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
-      // sustained damage while rewarding crit stacking.
+      // sustained damage while rewarding crit stacking. The added Hit rating is
+      // what makes the set worth completing for Heroic content.
       proc: {
         id: 'set_bonesplinter',
         name: 'Bonesplinter',
@@ -149,7 +155,7 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
         school: 'physical',
       },
     },
-    text: 'Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
@@ -162,9 +168,11 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 4,
     effect: {
+      hitRating: SET_HIT_4PC_RATING,
       // Leather crits land more often (the 3-piece adds crit AND haste), so
       // its bleed ticks lighter than the plate one: more applications, same
-      // sustained value, peaking at 18 damage per 2s at 3 stacks.
+      // sustained value, peaking at 18 damage per 2s at 3 stacks. The added Hit
+      // rating is what makes the set worth completing for Heroic content.
       proc: {
         id: 'set_ragged_gash',
         name: 'Ragged Gash',
@@ -179,7 +187,7 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
         school: 'physical',
       },
     },
-    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [
@@ -279,6 +287,7 @@ export interface AggregatedSetEffect {
   critRating: number;
   haste: number;
   hasteRating: number;
+  hitRating: number;
   castPushbackReduction: number;
   knockbackResistance: number;
   procs: SetProc[];
@@ -297,6 +306,7 @@ function zeroEffect(): AggregatedSetEffect {
     critRating: 0,
     haste: 0,
     hasteRating: 0,
+    hitRating: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     procs: [],
@@ -326,6 +336,7 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.critRating += e.critRating ?? 0;
       out.haste += e.haste ?? 0;
       out.hasteRating += e.hasteRating ?? 0;
+      out.hitRating += e.hitRating ?? 0;
       if (e.castPushbackReduction != null) {
         out.castPushbackReduction = Math.max(out.castPushbackReduction, e.castPushbackReduction);
       }

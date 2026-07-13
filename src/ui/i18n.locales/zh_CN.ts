@@ -550,6 +550,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.critRating': '暴击等级',
   'hudChrome.statInfo.names.hasteRating': '急速等级',
+  'hudChrome.statInfo.names.hitRating': '命中等级',
+  'hudChrome.statInfo.desc.hitRating':
+    '来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。',
   'hudChrome.statInfo.names.warfare': '战争',
   'hudChrome.statInfo.warfareValue': '造成伤害 +{increase}% / 承受伤害 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':

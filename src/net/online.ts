@@ -972,6 +972,8 @@ function blankEntity(id: number): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,

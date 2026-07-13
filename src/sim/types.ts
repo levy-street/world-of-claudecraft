@@ -40,11 +40,18 @@ export const GCD = 1.5; // seconds
 // Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
 export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
 export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export const HIT_RATING_PER_PCT = 10; // 10 hit rating = +1% hit (less miss/resist)
 export function hasteFractionFromRating(rating: number): number {
   return rating / (HASTE_RATING_PER_PCT * 100);
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+// Hit rating converts to a hit fraction that reduces both physical miss and spell
+// resist by the same amount (both share the above-level penalty table). One unified
+// stat: a warrior and a mage both want hit. Applied in recalcPlayerStats.
+export function hitFractionFromRating(rating: number): number {
+  return rating / (HIT_RATING_PER_PCT * 100);
 }
 
 export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
@@ -434,9 +441,13 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
-  // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
+  // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // Hit rating: reduces melee/ranged miss AND spell resist by the same percent.
+  // The endgame differentiator (jewelry + ilvl 31+/heroic gear); off the primary
+  // stat budget like spellPower.
+  hitRating?: number;
   // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
   // combat clamps them again at the PvP caps before applying damage.
   pvpOffenseRating?: number;
@@ -535,6 +546,7 @@ export interface SetBonusEffect {
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
   hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
+  hitRating?: number; // hit rating (converted to % in recalcPlayerStats): less miss/resist
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
   proc?: SetProc;
@@ -1900,6 +1912,8 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  hitRating: number; // accumulated hit rating from gear + set bonuses
+  hitBonus: number; // hit fraction (hitRating converted): reduces miss/resist, 0..1
   // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
   // so a mastery only strengthens the crits it is meant to. Added to the matching base
   // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
@@ -3229,7 +3243,11 @@ export function swingMissChance(attacker: Entity, target: Entity): number {
   const miss = meleeMissChance(attacker.level, target.level);
   const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
   const playerSide = target.kind === 'player' || target.ownerId !== null;
-  return mobAttacker && playerSide ? Math.min(miss, MOB_VS_PLAYER_MAX_MISS) : miss;
+  if (mobAttacker && playerSide) return Math.min(miss, MOB_VS_PLAYER_MAX_MISS);
+  // Player/pet -> mob keeps the full above-level scaling, minus gear Hit rating
+  // (attacker.hitBonus, 0 for anything without hit gear so parity is unchanged),
+  // floored at 0 so a hit-capped attacker can reach 0% miss.
+  return Math.max(0, miss - attacker.hitBonus);
 }
 
 export function armorReduction(armor: number, attackerLevel: number): number {

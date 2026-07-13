@@ -572,6 +572,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
+  'hudChrome.statInfo.names.hitRating': '命中レーティング',
+  'hudChrome.statInfo.desc.hitRating':
+    '装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。',
   'hudChrome.statInfo.names.warfare': 'ウォーフェア',
   'hudChrome.statInfo.warfareValue': '与ダメージ +{increase}% / 被ダメージ -{reduction}%',
   'hudChrome.statInfo.desc.critRating':

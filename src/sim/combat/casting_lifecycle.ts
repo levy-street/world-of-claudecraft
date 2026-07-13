@@ -844,7 +844,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // semantics), so a spell's on-impact roll uses isSpellResisted and emits a 'resist'.
     // A physical shot has no resist roll; its hit/crit resolve inside runEffects.
     scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level)) {
+      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
         ctx.emit({
           type: 'damage',
           sourceId: src.id,

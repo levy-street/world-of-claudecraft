@@ -977,6 +977,7 @@ export const da_DK: EnTranslations = {
         "spellPower": "Besværgelseskraft",
         "critRating": "Kritvurdering",
         "hasteRating": "Hastevurdering",
+        "hitRating": "Hit Rating",
         "warfare": "Krigsførelse"
       },
       "warfareValue": "+{increase}% givet / -{reduction}% modtaget",
@@ -994,6 +995,7 @@ export const da_DK: EnTranslations = {
         "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade.",
         "critRating": "Kritvurdering fra dit udstyr og sætbonusser, der hæver din chance for kritisk slag. Cirka 10 vurdering giver 1% krit.",
         "hasteRating": "Hastevurdering fra dit udstyr og sætbonusser, der fremskynder dine angreb og besværgelser. Cirka 10 vurdering giver 1% hast.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Øger skade givet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%."
       },
       "effects": {

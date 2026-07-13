@@ -977,6 +977,7 @@ export const sv_SE: EnTranslations = {
         "spellPower": "Besvärjelsekraft",
         "critRating": "Kritvärde",
         "hasteRating": "Snabbhetsvärde",
+        "hitRating": "Hit Rating",
         "warfare": "Krigföring"
       },
       "warfareValue": "+{increase}% tillfogad / -{reduction}% mottagen",
@@ -994,6 +995,7 @@ export const sv_SE: EnTranslations = {
         "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada.",
         "critRating": "Kritvärde från din utrustning och setbonusar, som höjer din chans till kritisk träff. Ungefär 10 i värde ger 1% krit.",
         "hasteRating": "Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%."
       },
       "effects": {

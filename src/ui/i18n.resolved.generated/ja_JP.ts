@@ -977,6 +977,7 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
+        "hitRating": "命中レーティング",
         "warfare": "ウォーフェア"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
@@ -994,6 +995,7 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {

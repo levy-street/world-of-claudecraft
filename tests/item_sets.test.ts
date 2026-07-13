@@ -45,6 +45,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       critRating: 0,
       haste: 0,
       hasteRating: 0,
+      hitRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
       procs: [],

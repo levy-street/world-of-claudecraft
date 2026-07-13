@@ -977,6 +977,7 @@ export const pl_PL: EnTranslations = {
         "spellPower": "Moc zaklęć",
         "critRating": "Ocena krytyczna",
         "hasteRating": "Ocena pośpiechu",
+        "hitRating": "Hit Rating",
         "warfare": "Działania wojenne"
       },
       "warfareValue": "+{increase}% zadawane / -{reduction}% otrzymywane",
@@ -994,6 +995,7 @@ export const pl_PL: EnTranslations = {
         "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń.",
         "critRating": "Ocena krytyczna z twojego ekwipunku i bonusów zestawów, zwiększająca szansę na trafienie krytyczne. Około 10 oceny daje 1% trafienia krytycznego.",
         "hasteRating": "Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymywane od graczy o {reduction}%."
       },
       "effects": {

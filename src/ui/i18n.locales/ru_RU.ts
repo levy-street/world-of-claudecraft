@@ -571,6 +571,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
+  'hudChrome.statInfo.names.hitRating': 'Рейтинг меткости',
+  'hudChrome.statInfo.desc.hitRating':
+    'Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.',
   'hudChrome.statInfo.names.warfare': 'Боевая мощь',
   'hudChrome.statInfo.warfareValue': '+{increase}% к урону / -{reduction}% получаемого',
   'hudChrome.statInfo.desc.critRating':

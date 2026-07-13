@@ -23,7 +23,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "es_ES": [
     "guide.family.reptile.desc",
@@ -39,7 +41,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "fr_FR": [
     "guide.family.reptile.desc",
@@ -55,7 +59,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "fr_CA": [
     "guide.family.reptile.desc",
@@ -71,7 +77,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "en_CA": [],
   "it_IT": [
@@ -88,7 +96,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "de_DE": [
     "guide.family.reptile.desc",
@@ -104,7 +114,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -124,7 +136,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -141,7 +155,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "nl_NL": [
     "guide.family.reptile.desc",
@@ -157,7 +173,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "pl_PL": [
     "guide.family.reptile.desc",
@@ -173,7 +191,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "id_ID": [
     "guide.family.reptile.desc",
@@ -189,7 +209,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "tr_TR": [
     "guide.family.reptile.desc",
@@ -205,7 +227,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "sv_SE": [
     "guide.family.reptile.desc",
@@ -221,7 +245,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "vi_VN": [
     "guide.family.reptile.desc",
@@ -237,7 +263,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ],
   "da_DK": [
     "guide.family.reptile.desc",
@@ -253,6 +281,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.link.joinServer",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.statInfo.desc.hitRating",
+    "hudChrome.statInfo.names.hitRating"
   ]
 };

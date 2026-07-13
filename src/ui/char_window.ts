@@ -94,6 +94,7 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'hitRating',
   'warfare',
 ];
 

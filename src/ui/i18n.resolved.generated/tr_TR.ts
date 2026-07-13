@@ -977,6 +977,7 @@ export const tr_TR: EnTranslations = {
         "spellPower": "Büyü Gücü",
         "critRating": "Kritik Puanı",
         "hasteRating": "Hız Puanı",
+        "hitRating": "Hit Rating",
         "warfare": "Harp"
       },
       "warfareValue": "+{increase}% verilen / -{reduction}% alınan",
@@ -994,6 +995,7 @@ export const tr_TR: EnTranslations = {
         "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
         "critRating": "Teçhizatından ve set bonuslarından gelen kritik puanı, kritik vuruş şansını artırır. Yaklaşık 10 puan %1 kritik sağlar.",
         "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır."
       },
       "effects": {

@@ -977,6 +977,7 @@ export const id_ID: EnTranslations = {
         "spellPower": "Kekuatan Mantra",
         "critRating": "Rating Kritis",
         "hasteRating": "Rating Kecepatan",
+        "hitRating": "Hit Rating",
         "warfare": "Perang"
       },
       "warfareValue": "+{increase}% dibagikan / -{reduction}% diambil",
@@ -994,6 +995,7 @@ export const id_ID: EnTranslations = {
         "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan.",
         "critRating": "Rating kritis dari perlengkapan dan bonus set Anda, menaikkan peluang serangan kritis Anda. Sekitar 10 rating memberi 1% kritis.",
         "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%."
       },
       "effects": {

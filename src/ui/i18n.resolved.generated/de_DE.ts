@@ -977,6 +977,7 @@ export const de_DE: EnTranslations = {
         "spellPower": "Zaubermacht",
         "critRating": "Kritische Trefferwertung",
         "hasteRating": "Tempowertung",
+        "hitRating": "Hit Rating",
         "warfare": "Kriegsführung"
       },
       "warfareValue": "+{increase}% verursacht / -{reduction}% erlitten",
@@ -994,6 +995,7 @@ export const de_DE: EnTranslations = {
         "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden.",
         "critRating": "Kritische Trefferwertung aus deiner Ausrüstung und deinen Setboni, die deine kritische Trefferchance erhöht. Etwa 10 Wertung gewähren 1% kritische Trefferchance.",
         "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%."
       },
       "effects": {

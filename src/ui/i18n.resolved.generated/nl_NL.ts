@@ -977,6 +977,7 @@ export const nl_NL: EnTranslations = {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
         "hasteRating": "Snelheidswaardering",
+        "hitRating": "Hit Rating",
         "warfare": "Oorlogvoering"
       },
       "warfareValue": "+{increase}% toegebracht / -{reduction}% opgelopen",
@@ -994,6 +995,7 @@ export const nl_NL: EnTranslations = {
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
         "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%."
       },
       "effects": {

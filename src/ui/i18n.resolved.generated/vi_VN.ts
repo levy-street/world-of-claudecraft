@@ -977,6 +977,7 @@ export const vi_VN: EnTranslations = {
         "spellPower": "Sức Mạnh Phép Thuật",
         "critRating": "Chỉ Số Chí Mạng",
         "hasteRating": "Chỉ Số Thần Tốc",
+        "hitRating": "Hit Rating",
         "warfare": "Chiến Tranh"
       },
       "warfareValue": "+{increase}% gây ra / -{reduction}% nhận vào",
@@ -994,6 +995,7 @@ export const vi_VN: EnTranslations = {
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
         "critRating": "Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.",
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
       },
       "effects": {

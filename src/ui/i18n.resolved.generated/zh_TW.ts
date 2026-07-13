@@ -977,6 +977,7 @@ export const zh_TW: EnTranslations = {
         "spellPower": "法術強度",
         "critRating": "暴擊等級",
         "hasteRating": "急速等級",
+        "hitRating": "命中等級",
         "warfare": "戰爭"
       },
       "warfareValue": "造成傷害 +{increase}% / 承受傷害 -{reduction}%",
@@ -994,6 +995,7 @@ export const zh_TW: EnTranslations = {
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
         "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
+        "hitRating": "來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。",
         "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。"
       },
       "effects": {

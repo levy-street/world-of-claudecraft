@@ -4695,6 +4695,19 @@ export class Hud {
         }),
       )}</div>`;
     }
+    // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
+    // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
+    // miss/resist penalty; crit and haste add throughput.
+    for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
+      const value = item[ratingStat] ?? 0;
+      if (value <= 0) continue;
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(value),
+          stat: t(statNameKey(ratingStat) as TranslationKey),
+        }),
+      )}</div>`;
+    }
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -4888,6 +4901,7 @@ export class Hud {
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
+      hitRating: p.hitRating,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,

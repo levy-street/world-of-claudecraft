@@ -29,6 +29,38 @@ export function heroicVariantId(baseId: string): string {
   return `heroic_${baseId}`;
 }
 
+// Combat ratings on the Heroic RAID variants (item level 33/37): the dual-rating
+// tier. Unlike the five-man heroic variants (which inherit their base's ratings
+// unchanged, so ilvl-26 dungeon bases with no rating stay rating-free at ilvl 28),
+// a raid variant SCALES its base's primary rating up to the raid allowance AND adds
+// a complementary secondary rating. Two ratings per piece is the raid tier's
+// identity, a step nothing below ilvl 33 has. See docs/prd/combat-ratings-and-jewelry.md.
+const RAID_RATING_KEYS = ['hitRating', 'critRating', 'hasteRating'] as const;
+type RatingKey = (typeof RAID_RATING_KEYS)[number];
+const RAID_PRIMARY_ARMOR = 55; // 5.5%
+const RAID_PRIMARY_WEAPON = 65; // 6.5%
+const RAID_PRIMARY_LEGENDARY = 70; // 7.0%
+const RAID_SECONDARY = 20; // 2.0%
+const RAID_SECONDARY_LEGENDARY = 30; // 3.0%
+
+// Apply the raid-tier dual rating to a variant, in place. The primary keeps the
+// base's rating TYPE (defaulting to hit when the base carried none, e.g. a
+// legendary), scaled to the tier allowance; the secondary is complementary (hit
+// pairs with crit, and any non-hit primary pairs with hit so every raid piece
+// carries some Hit for the +3 above-level content it drops in).
+function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
+  const isLegendary = (base.quality ?? 'common') === 'legendary';
+  const primaryKey: RatingKey = RAID_RATING_KEYS.find((k) => (base[k] ?? 0) > 0) ?? 'hitRating';
+  const secondaryKey: RatingKey = primaryKey === 'hitRating' ? 'critRating' : 'hitRating';
+  const primaryVal = isLegendary
+    ? RAID_PRIMARY_LEGENDARY
+    : base.weapon
+      ? RAID_PRIMARY_WEAPON
+      : RAID_PRIMARY_ARMOR;
+  variant[primaryKey] = primaryVal;
+  variant[secondaryKey] = isLegendary ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
+}
+
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
   const quality = base.quality ?? 'common';
   const targetLevel = sourceLevel + (QUALITY_ILVL_BONUS[quality] ?? 0);
@@ -61,6 +93,9 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
       ...scaleWeaponDamage(base.weapon, Math.max(weaponDpsBudget(targetLevel), baseDps)),
     };
   }
+  // Heroic RAID variants (source level 27 -> item level 33/37) get the dual rating;
+  // five-man heroic variants inherit their base's ratings unchanged via the spread.
+  if (sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL) applyRaidVariantRatings(variant, base);
   // The spread widens ItemDef's discriminated union; the transform preserves the
   // base item's kind/slot shape, so this is a valid ItemDef of the same variant.
   return variant as ItemDef;

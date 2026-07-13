@@ -977,6 +977,7 @@ export const pt_BR: EnTranslations = {
         "spellPower": "Poder Mágico",
         "critRating": "Índice de crítico",
         "hasteRating": "Índice de aceleração",
+        "hitRating": "Hit Rating",
         "warfare": "Guerra"
       },
       "warfareValue": "+{increase}% causado / -{reduction}% recebido",
@@ -994,6 +995,7 @@ export const pt_BR: EnTranslations = {
         "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
         "critRating": "Índice de crítico dos seus equipamentos e benefícios de conjunto, elevando sua chance de acerto crítico. Cerca de 10 de índice concede 1% de crítico.",
         "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%."
       },
       "effects": {

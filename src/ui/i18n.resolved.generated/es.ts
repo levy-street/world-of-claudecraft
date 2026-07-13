@@ -977,6 +977,7 @@ export const es: EnTranslations = {
         "spellPower": "Poder con hechizos",
         "critRating": "Índice de golpe crítico",
         "hasteRating": "Índice de celeridad",
+        "hitRating": "Hit Rating",
         "warfare": "Pericia bélica"
       },
       "warfareValue": "+{increase}% infligido / -{reduction}% recibido",
@@ -994,6 +995,7 @@ export const es: EnTranslations = {
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
         "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores."
       },
       "effects": {

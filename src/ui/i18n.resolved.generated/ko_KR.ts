@@ -977,6 +977,7 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
+        "hitRating": "명중 등급",
         "warfare": "워페어"
       },
       "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
@@ -994,6 +995,7 @@ export const ko_KR: EnTranslations = {
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
         "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {

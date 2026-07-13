@@ -977,6 +977,7 @@ export const fr_CA: EnTranslations = {
         "spellPower": "Puissance des sorts",
         "critRating": "Score de critique",
         "hasteRating": "Score de hâte",
+        "hitRating": "Hit Rating",
         "warfare": "Art de la guerre"
       },
       "warfareValue": "+{increase} % infligés / -{reduction} % subis",
@@ -994,6 +995,7 @@ export const fr_CA: EnTranslations = {
         "dodge": "Vos chances d'éviter complètement une attaque de mêlée, sans subir aucun dégât.",
         "critRating": "Score de critique de votre équipement et de vos bonus de panoplie, augmentant vos chances de coup critique. Environ 10 points de score confèrent 1% de critique.",
         "hasteRating": "Score de hâte de votre équipement et de vos bonus de panoplie, accélérant vos attaques et vos incantations. Environ 10 points de score confèrent 1% de hâte.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Augmente de {increase} % les dégâts infligés aux joueurs et réduit de {reduction} % les dégâts que les joueurs vous infligent."
       },
       "effects": {

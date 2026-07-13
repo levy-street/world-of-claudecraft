@@ -550,6 +550,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
+  'hudChrome.statInfo.names.hitRating': '命中等級',
+  'hudChrome.statInfo.desc.hitRating':
+    '來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。',
   'hudChrome.statInfo.names.warfare': '戰爭',
   'hudChrome.statInfo.warfareValue': '造成傷害 +{increase}% / 承受傷害 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
