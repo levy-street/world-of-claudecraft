@@ -578,26 +578,14 @@ export const DAWNHAVEN_PLACEMENTS: PlacedAsset[] = [
   // --- Trees and rocks scattered around the isle's rim, tying the stations into
   // one landmass and hiding the shoreline blockers behind something to look at.
   ...ring(
-    [
-      'foliage/oak_5',
-      'foliage/pine_4',
-      'foliage/oak_1',
-      'foliage/pine_5',
-    ],
+    ['foliage/oak_5', 'foliage/pine_4', 'foliage/oak_1', 'foliage/pine_5'],
     35,
     10,
     1.15,
     8.0,
     0.8,
   ),
-  ...ring(
-    ['foliage/rock_3', 'foliage/rock_1', 'foliage/rock_2'],
-    39,
-    9,
-    0.55,
-    1.8,
-    1.3,
-  ),
+  ...ring(['foliage/rock_3', 'foliage/rock_1', 'foliage/rock_2'], 39, 9, 0.55, 1.8, 1.3),
 ];
 
 // ---------------------------------------------------------------------------
