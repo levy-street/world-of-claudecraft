@@ -1,12 +1,13 @@
 # Spell & ability balance framework
 
 A repeatable, sim-driven way to answer "is this spell pulling its weight?" and to
-keep the kit balanced as Spell Power, haste, and content change. Two layers:
+keep the kit balanced as Spell Power, haste, and content change. Three layers:
 
 | Layer | Tool | What it gives you |
 |---|---|---|
 | Analytical | `scripts/balance_report.mjs` | Fast per-spell metrics (spamDPS, dps/mana, effCast) for every caster spell, with class-median outlier flags. No sim needed. |
 | Empirical | `scripts/dummy_sim.mjs` | The REAL `Sim` driven against an immortal, pinned, passive **target dummy** (300s, infinite mana). Measures actual DPS per nuke (spam) and per class (priority rotation). Validates the analytical model. |
+| Adversarial | `scripts/balance_sim.ts` (`npm run sim:balance`) | Monte Carlo PvP duel round robin plus solo PvE kill benchmarks across all specs and talent builds, with Wilson confidence intervals and per-talent knockout attribution. Finds which specs and talents WIN, not just which deal damage. See `combat-balance-simulator.md`. |
 
 Run them:
 

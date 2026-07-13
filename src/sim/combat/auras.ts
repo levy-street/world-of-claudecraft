@@ -144,6 +144,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   let statsDirty = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
+    // A tick side effect below (a DoT tick's dealDamage firing the duel 1 hp
+    // guard, whose endDuel bulk-clears the opponent's auras) can shrink this
+    // array mid-iteration, leaving the walked index past the end. A bystander
+    // aura shifted below the cursor by such a bulk removal can be visited a
+    // second time that tick (one extra DT of decay): accepted, deterministic
+    // and host-consistent, to keep this hot loop allocation-free.
+    if (!a) continue;
     a.remaining -= DT;
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
@@ -223,7 +230,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       }
     }
     if (a.remaining <= CAST_COMPLETE_EPS) {
-      e.auras.splice(i, 1);
+      // The same reentrant removal can shift this aura's index or remove it
+      // outright; splice by identity, and skip the teardown when the remover
+      // already ran it (a stale second teardown would double-revert stat auras).
+      const idx = e.auras[i] === a ? i : e.auras.indexOf(a);
+      if (idx < 0) continue;
+      e.auras.splice(idx, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
