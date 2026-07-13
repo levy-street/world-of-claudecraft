@@ -18,7 +18,11 @@ const SCHOOL_CUES = {
   nature: { cast: 'cast_nature', projectile: 'proj_nature', impact: 'impact_nature' },
 } as const satisfies Record<MagicSchool, { cast: SfxId; projectile: SfxId; impact: SfxId }>;
 
-const MOB_VOICE_CUES = {
+// Exported (read-only, `as const`) purely so a test can pin its key set
+// against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
+// the other currently resolves at runtime to a key with no clip, which plays
+// nothing and throws nowhere.
+export const MOB_VOICE_CUES = {
   beast: {
     aggro: 'mob_beast_aggro',
     attack: 'mob_beast_attack',
@@ -195,6 +199,16 @@ export function mobVoiceCue(
 
 export function shouldPlayCritSfxForTarget(target: Entity): boolean {
   return target.kind !== 'mob' || !MOBS[target.templateId]?.boss;
+}
+
+/** The mob-voice action a damage event's target should react with, or null
+ *  for anything that isn't a crit against a non-boss mob (a miss, an
+ *  ordinary hit, a player target, a boss immune to crit stingers). Callers
+ *  still gate the actual play through shouldPlayMobVoiceSfxForEntity (the
+ *  Nythraxis mute list) before using the resolved cue. */
+export function mobVoiceActionForDamage(event: DamageEvent, target: Entity): MobVoiceAction | null {
+  if (!event.crit || target.kind !== 'mob' || !shouldPlayCritSfxForTarget(target)) return null;
+  return 'hurt';
 }
 
 function isNythraxisBoss(entity: Entity): boolean {

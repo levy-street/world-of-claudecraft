@@ -341,6 +341,23 @@ class Sfx {
     );
   }
 
+  /** True when a key's first variant is already decoded and resident, so a
+   *  caller expecting playback THIS event (not a lazy-loaded 0.12s race) can
+   *  check before playing, e.g. a rare crit-only cue that a warm-but-similar
+   *  cue can fall back to on a cold cache. */
+  isBuffered(key: string): boolean {
+    return this.buffers.has(assetCacheKey(key, 0));
+  }
+
+  /** Fire-and-forget warm of a key's first variant. Safe to call repeatedly;
+   *  loadBuffer is idempotent once cached, in flight, or failed. Lets a
+   *  frequently-triggered cue (e.g. a mob's attack bark) also warm a rare
+   *  sibling cue (its hurt reaction) that would otherwise race a cold fetch
+   *  the first time it is actually needed. */
+  preload(key: string): void {
+    void this.loadBuffer(key, 0);
+  }
+
   /** Squared distance from the listener. Callers can pre-cull, but playAt also
    *  guards internally so a far event is a cheap no-op. */
   private tooFar(x: number, z: number): boolean {

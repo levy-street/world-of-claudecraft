@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "dce14bdbebcbf9dccf165f17934c19703022e9b9b7981ede9a99c88909759e87",
-  "catalogHash": "1936141d1892288ac71266faf7c966645c7a4b1d07cee9735def821a590f1efd",
+  "bundleId": "b8746cc609464ce83cbecbb371ffbdef876cc0a4959671b060bad06a896ff62a",
+  "catalogHash": "254e9eaf1ab3c6c8c113ee046ced2b9013c6b9527e5f707b95e661b10e66c34b",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -760,6 +760,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_beast_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_beast_hurt.mp3?v=ae1835b9670d",
+          "bytes": 11328,
+          "sha256": "ae1835b9670d2895abdc03dccf9da91e7d471c22d9b88c79c7a169e1076816c9"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_boar_aggro": {
       "variants": [
         {
@@ -791,6 +803,18 @@
           "url": "/audio/sfx/mob_boar_death.mp3?v=1386f3e1ef60",
           "bytes": 34524,
           "sha256": "1386f3e1ef60b3e11cab3a45c41b3ee4c024c0234dccb19fa74271dc8781d842"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_boar_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_boar_hurt.mp3?v=97ef9bb27134",
+          "bytes": 20732,
+          "sha256": "97ef9bb271348067fc96098b80a627aae9bbeffb12285fc38cf4ba796a7b8e64"
         }
       ],
       "gain": 1,
@@ -832,6 +856,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_burrower_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_burrower_hurt.mp3?v=469991947e72",
+          "bytes": 11328,
+          "sha256": "469991947e7217f6c9b2f3163676fdf04000959df84298935cbf7bb538cbf85b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_demon_aggro": {
       "variants": [
         {
@@ -863,6 +899,18 @@
           "url": "/audio/sfx/mob_demon_death.mp3?v=c9fda68e270a",
           "bytes": 34524,
           "sha256": "c9fda68e270aaf9e18117855e8d4cdadb5035e82d8288d2f656e9a8ccd3bcd04"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_demon_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_demon_hurt.mp3?v=9e8aea3c7a8b",
+          "bytes": 25120,
+          "sha256": "9e8aea3c7a8b5070fbef72b85aee3e450e51809a062f335691823ad2cc6f984f"
         }
       ],
       "gain": 1,
@@ -904,6 +952,24 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_dragonkin_hurt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_dragonkin_hurt_1.mp3?v=48db3128cc1d",
+          "bytes": 25747,
+          "sha256": "48db3128cc1d3f9c0f91412e4bbfee21854fced526dd0b79377f163d961b1ed7"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_dragonkin_hurt_2.mp3?v=949ac1ea8f07",
+          "bytes": 27001,
+          "sha256": "949ac1ea8f0799839b5e6c8ec30069a7077a89604cbdd749b7c5b42aa88100d3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_elemental_aggro": {
       "variants": [
         {
@@ -935,6 +1001,18 @@
           "url": "/audio/sfx/mob_elemental_death.mp3?v=d96cee692597",
           "bytes": 34524,
           "sha256": "d96cee692597ad7dfaa58e3d7810b7d3eb5f58b4d40609d58115654d21d0b32f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_elemental_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_elemental_hurt.mp3?v=220ddabf8ba1",
+          "bytes": 25747,
+          "sha256": "220ddabf8ba11dbd54662be83977fccf7571a89d08c4462a38ffab5a0411a867"
         }
       ],
       "gain": 1,
@@ -976,6 +1054,24 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_humanoid_hurt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_humanoid_hurt_1.mp3?v=861837f9d7ba",
+          "bytes": 8193,
+          "sha256": "861837f9d7ba7b768b78bbba159bfb2d13a848568fdad45f09187aec55a7e6ee"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_humanoid_hurt_2.mp3?v=b45ec788da25",
+          "bytes": 25120,
+          "sha256": "b45ec788da258c9058463e3efe4933ee0121bdede8b24cbc5940227683191009"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_mudfin_aggro": {
       "variants": [
         {
@@ -1012,6 +1108,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_mudfin_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_mudfin_hurt.mp3?v=6f70528c1204",
+          "bytes": 11954,
+          "sha256": "6f70528c1204e94c62cd6779552d1145aa1c4c73c1977ad8cbda373eedca60d8"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_ogre_aggro": {
       "variants": [
         {
@@ -1043,6 +1151,18 @@
           "url": "/audio/sfx/mob_ogre_death.mp3?v=9f81f8a19f03",
           "bytes": 34524,
           "sha256": "9f81f8a19f03d3bf9bf6138d4bb2dd8a06d54715cacce6f414170c638be2a39e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_ogre_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_ogre_hurt.mp3?v=280e286bb54f",
+          "bytes": 12581,
+          "sha256": "280e286bb54fed169456d866d0c2cb266acd3046904d22b2dc2e5b7c0588fbbd"
         }
       ],
       "gain": 1,
@@ -1108,6 +1228,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_reptile_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_reptile_hurt.mp3?v=c928f69207e1",
+          "bytes": 15089,
+          "sha256": "c928f69207e10688d06be28e90892e3575ee878347c71ae09ba3435e94170500"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_spider_aggro": {
       "variants": [
         {
@@ -1139,6 +1271,24 @@
           "url": "/audio/sfx/mob_spider_death.mp3?v=f18cc4c8b231",
           "bytes": 34524,
           "sha256": "f18cc4c8b231ae1ea0b9801923802de11a9e5389677fabd63d0e487d9bdef744"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_spider_hurt": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/mob_spider_hurt_1.mp3?v=9975dca7124f",
+          "bytes": 26374,
+          "sha256": "9975dca7124f4635170d2e0d69f692160e8577a96757e9909147268b930e79bb"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/mob_spider_hurt_2.mp3?v=577b7b497681",
+          "bytes": 12581,
+          "sha256": "577b7b497681369535f0f01b802be84eb8f0f7bedb8aa5a270e9d6c370995f74"
         }
       ],
       "gain": 1,
@@ -1180,6 +1330,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mob_troll_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_troll_hurt.mp3?v=c5218cdfa7b7",
+          "bytes": 25120,
+          "sha256": "c5218cdfa7b74c5578ea7c561c19612e57d01642cdcafa07f70f05729c740fb5"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mob_undead_aggro": {
       "variants": [
         {
@@ -1211,6 +1373,18 @@
           "url": "/audio/sfx/mob_undead_death.mp3?v=c12d4b0040ca",
           "bytes": 34524,
           "sha256": "c12d4b0040ca46815baae48b4a5bddee699ebfb11367f8cc879898861fa4e8bc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_undead_hurt": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_undead_hurt.mp3?v=cbf985f15b74",
+          "bytes": 15089,
+          "sha256": "cbf985f15b74fac21f267cae0c8a9c4b6f2c836cfafa211fa2a74c943267d3fb"
         }
       ],
       "gain": 1,

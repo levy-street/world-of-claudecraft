@@ -202,6 +202,7 @@ import {
   castCueForAbility,
   impactCueForDamage,
   type MobVoiceAction,
+  mobVoiceActionForDamage,
   mobVoiceCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
@@ -8641,10 +8642,20 @@ export class Hud {
         // pain vocalization only on a crit — never on ordinary hits.
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 0.55, { cooldown: 0.3 });
-        } else if (ev.crit && tgt.kind === 'mob' && shouldPlayCritSfxForTarget(tgt)) {
-          const voice = availableMobVoiceCue(tgt.templateId, 'hurt');
-          if (voice && shouldPlayMobVoiceSfxForEntity(tgt))
-            this.combat(voice, tp.x, tp.y, tp.z, 0.6, { rate: 1.25, cooldown: 0.1 });
+        } else {
+          const mobAction = mobVoiceActionForDamage(ev, tgt);
+          if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
+            // hurt has exactly one trigger (this one), so on a cold cache it
+            // can lose the race to fetch+decode within playAt's 0.12s replay
+            // window. attack is always warm (it plays on every ordinary
+            // hit), so fall back to it rather than risk silence.
+            const hurtVoice = availableMobVoiceCue(tgt.templateId, mobAction);
+            const voice =
+              hurtVoice && sfx.isBuffered(hurtVoice)
+                ? hurtVoice
+                : availableMobVoiceCue(tgt.templateId, 'attack');
+            if (voice) this.combat(voice, tp.x, tp.y, tp.z, 0.6, { cooldown: 0.1 });
+          }
         }
         return;
       }
@@ -8732,6 +8743,10 @@ export class Hud {
       const voice = availableMobVoiceCue(src.templateId, 'attack');
       if (voice && shouldPlayMobVoiceSfxForEntity(src))
         this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
+      // Warm the crit-only hurt cue alongside the frequently-played attack
+      // bark, so it is resident well before a crit could ever need it.
+      const hurtVoice = availableMobVoiceCue(src.templateId, 'hurt');
+      if (hurtVoice) sfx.preload(hurtVoice);
     }
   }
 

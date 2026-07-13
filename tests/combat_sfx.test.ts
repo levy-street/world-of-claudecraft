@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
+// @ts-expect-error scripts use the repository's untyped Node ESM convention
+import { SFX_MOB_EXTENSION_FAMILIES } from '../scripts/sfx/manifest.mjs';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
   castCueForAbility,
   impactCueForDamage,
+  MOB_VOICE_CUES,
+  mobVoiceActionForDamage,
   mobVoiceCue,
   mobVoiceFamily,
   playerSwingCueForDamage,
@@ -246,6 +250,22 @@ describe('combat SFX policy', () => {
       expect(mobVoiceCue(templateId, 'hurt'), templateId).toBe(expected);
       expect(expected in SFX_CLIPS, expected).toBe(true);
     }
+  });
+
+  it('keeps MOB_VOICE_CUES in lockstep with the real family list', () => {
+    // A family added to one and forgotten in the other resolves at runtime
+    // to a key with no clip: no error, it just plays nothing.
+    expect(Object.keys(MOB_VOICE_CUES).sort()).toEqual([...SFX_MOB_EXTENSION_FAMILIES].sort());
+  });
+
+  it('requests a hurt reaction only for a crit against a non-boss mob', () => {
+    const mob = target('mob', 'crypt_shambler');
+    const boss = target('mob', 'nythraxis_scourge_of_thornpeak');
+    const player = target('player', 'warrior');
+    expect(mobVoiceActionForDamage(damage({ crit: true }), mob)).toBe('hurt');
+    expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
+    expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
+    expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
   });
 
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {
