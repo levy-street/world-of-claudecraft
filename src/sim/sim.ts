@@ -6397,6 +6397,8 @@ export class Sim {
   friendRemove(_name: string): void {}
   blockAdd(_name: string): void {}
   blockRemove(_name: string): void {}
+  ignoreAdd(_name: string): void {}
+  ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
   guildAccept(): void {}
@@ -6411,6 +6413,15 @@ export class Sim {
   guildEventRemove(_eventId: number): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
+  }
+  characterProfile(_name: string): Promise<import('../world_api').CharacterProfile | null> {
+    return Promise.resolve(null);
+  }
+  // Account flair is operator-set on an ACCOUNT, and offline play has none, so the
+  // offline world never has any to report. The sim must never read this for
+  // gameplay either way: it is cosmetic, server-set, and confers no effect.
+  accountFlair(_name: string): import('./account_flair').PlayerFlair | null {
+    return null;
   }
 
   private updateDuels(): void {

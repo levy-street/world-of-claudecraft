@@ -976,6 +976,19 @@ export const vi_VN: EnTranslations = {
       "promoteLeader": "Thăng Làm Đội Trưởng",
       "inviteUsage": "Mời ai? Cách dùng: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Thông tin người chơi",
+      "block": "Chặn",
+      "unblock": "Bỏ chặn",
+      "openFor": "Mở menu người chơi {name}",
+      "profileUnavailable": "Không tìm thấy hồ sơ của {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Tài khoản do AI điều khiển",
+      "watchTwitch": "Xem trên Twitch",
+      "watchX": "Xem trên X",
+      "watchKick": "Xem trên Kick",
+      "watchYouTube": "Xem trên YouTube"
+    },
     "lootSettings": {
       "title": "Cài Đặt Chiến Lợi Phẩm",
       "close": "Đóng cài đặt chiến lợi phẩm",
@@ -1495,7 +1508,15 @@ export const vi_VN: EnTranslations = {
     },
     "social": {
       "lastSeen": "Lần cuối trực tuyến: {when}",
-      "lastSeenNever": "chưa bao giờ"
+      "lastSeenNever": "chưa bao giờ",
+      "ignoredTab": "Đã bỏ qua",
+      "blockedTab": "Đã chặn",
+      "ignoredEmpty": "Bạn không bỏ qua ai.",
+      "blockedEmpty": "Bạn chưa chặn ai.",
+      "blockSearchPlaceholder": "Tên người chơi",
+      "blockAction": "Chặn",
+      "nowBlocking": "Đã chặn {name}.",
+      "stopBlockingTitle": "Bỏ chặn {name}"
     },
     "gathering": {
       "title": "Thu thập",

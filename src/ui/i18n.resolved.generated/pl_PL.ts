@@ -976,6 +976,19 @@ export const pl_PL: EnTranslations = {
       "promoteLeader": "Mianuj przywódcą",
       "inviteUsage": "Kogo zaprosić? Użycie: /invite <imię>."
     },
+    "playerMenu": {
+      "info": "Informacje o graczu",
+      "block": "Zablokuj",
+      "unblock": "Odblokuj",
+      "openFor": "Otwórz menu gracza {name}",
+      "profileUnavailable": "Nie znaleziono profilu gracza {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Konto prowadzone przez SI",
+      "watchTwitch": "Oglądaj na Twitchu",
+      "watchX": "Zobacz na X",
+      "watchKick": "Oglądaj na Kicku",
+      "watchYouTube": "Oglądaj na YouTube"
+    },
     "lootSettings": {
       "title": "Ustawienia łupów",
       "close": "Zamknij ustawienia łupów",
@@ -1495,7 +1508,15 @@ export const pl_PL: EnTranslations = {
     },
     "social": {
       "lastSeen": "Ostatnio widziano: {when}",
-      "lastSeenNever": "nigdy"
+      "lastSeenNever": "nigdy",
+      "ignoredTab": "Ignorowani",
+      "blockedTab": "Zablokowani",
+      "ignoredEmpty": "Nikogo nie ignorujesz.",
+      "blockedEmpty": "Nikogo nie zablokowałeś.",
+      "blockSearchPlaceholder": "Nazwa gracza",
+      "blockAction": "Zablokuj",
+      "nowBlocking": "{name} zablokowany.",
+      "stopBlockingTitle": "Odblokuj gracza {name}"
     },
     "gathering": {
       "title": "Zbieractwo",

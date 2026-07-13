@@ -976,6 +976,19 @@ export const cs_CZ: EnTranslations = {
       "promoteLeader": "Povýšit na vůdce",
       "inviteUsage": "Koho pozvat? Použití: /invite <jméno>."
     },
+    "playerMenu": {
+      "info": "Informace o hráči",
+      "block": "Zablokovat",
+      "unblock": "Odblokovat",
+      "openFor": "Otevřít nabídku hráče {name}",
+      "profileUnavailable": "Profil hráče {name} nebyl nalezen.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Účet ovládaný AI",
+      "watchTwitch": "Sledovat na Twitchi",
+      "watchX": "Zobrazit na X",
+      "watchKick": "Sledovat na Kicku",
+      "watchYouTube": "Sledovat na YouTube"
+    },
     "lootSettings": {
       "title": "Nastavení kořisti",
       "close": "Zavřít nastavení kořisti",
@@ -1495,7 +1508,15 @@ export const cs_CZ: EnTranslations = {
     },
     "social": {
       "lastSeen": "Naposledy viděn(a): {when}",
-      "lastSeenNever": "nikdy"
+      "lastSeenNever": "nikdy",
+      "ignoredTab": "Ignorovaní",
+      "blockedTab": "Zablokovaní",
+      "ignoredEmpty": "Nikoho neignoruješ.",
+      "blockedEmpty": "Nikoho jsi nezablokoval.",
+      "blockSearchPlaceholder": "Jméno hráče",
+      "blockAction": "Zablokovat",
+      "nowBlocking": "{name} zablokován.",
+      "stopBlockingTitle": "Odblokovat hráče {name}"
     },
     "gathering": {
       "title": "Sběr",

@@ -976,6 +976,19 @@ export const ru_RU: EnTranslations = {
       "promoteLeader": "Назначить лидером",
       "inviteUsage": "Кого пригласить? Использование: /invite <имя>."
     },
+    "playerMenu": {
+      "info": "Об игроке",
+      "block": "Заблокировать",
+      "unblock": "Разблокировать",
+      "openFor": "Открыть меню игрока {name}",
+      "profileUnavailable": "Профиль игрока {name} не найден.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Аккаунт под управлением ИИ",
+      "watchTwitch": "Смотреть на Twitch",
+      "watchX": "Открыть в X",
+      "watchKick": "Смотреть на Kick",
+      "watchYouTube": "Смотреть на YouTube"
+    },
     "lootSettings": {
       "title": "Настройки добычи",
       "close": "Закрыть настройки добычи",
@@ -1495,7 +1508,15 @@ export const ru_RU: EnTranslations = {
     },
     "social": {
       "lastSeen": "Последний вход: {when}",
-      "lastSeenNever": "никогда"
+      "lastSeenNever": "никогда",
+      "ignoredTab": "Игнорируемые",
+      "blockedTab": "Заблокированные",
+      "ignoredEmpty": "Вы никого не игнорируете.",
+      "blockedEmpty": "Вы никого не заблокировали.",
+      "blockSearchPlaceholder": "Имя персонажа",
+      "blockAction": "Заблокировать",
+      "nowBlocking": "{name} заблокирован.",
+      "stopBlockingTitle": "Разблокировать {name}"
     },
     "gathering": {
       "title": "Собирательство",

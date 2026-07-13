@@ -976,6 +976,19 @@ export const tr_TR: EnTranslations = {
       "promoteLeader": "Lider Yap",
       "inviteUsage": "Kimi davet edeyim? Kullanım: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Oyuncu bilgisi",
+      "block": "Engelle",
+      "unblock": "Engeli kaldır",
+      "openFor": "{name} için oyuncu menüsünü aç",
+      "profileUnavailable": "{name} için profil bulunamadı.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Yapay zeka ile yönetilen hesap",
+      "watchTwitch": "Twitch'te izle",
+      "watchX": "X'te görüntüle",
+      "watchKick": "Kick'te izle",
+      "watchYouTube": "YouTube'da izle"
+    },
     "lootSettings": {
       "title": "Ganimet Ayarları",
       "close": "Ganimet ayarlarını kapat",
@@ -1495,7 +1508,15 @@ export const tr_TR: EnTranslations = {
     },
     "social": {
       "lastSeen": "Son görülme: {when}",
-      "lastSeenNever": "hiç"
+      "lastSeenNever": "hiç",
+      "ignoredTab": "Yok sayılanlar",
+      "blockedTab": "Engellenenler",
+      "ignoredEmpty": "Kimseyi yok saymıyorsun.",
+      "blockedEmpty": "Kimseyi engellemedin.",
+      "blockSearchPlaceholder": "Oyuncu adı",
+      "blockAction": "Engelle",
+      "nowBlocking": "{name} engellendi.",
+      "stopBlockingTitle": "{name} engelini kaldır"
     },
     "gathering": {
       "title": "Toplama",

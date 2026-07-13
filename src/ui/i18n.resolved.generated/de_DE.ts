@@ -976,6 +976,19 @@ export const de_DE: EnTranslations = {
       "promoteLeader": "Zum Anführer befördern",
       "inviteUsage": "Wen einladen? Verwendung: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Spielerinfo",
+      "block": "Blockieren",
+      "unblock": "Blockierung aufheben",
+      "openFor": "Spielermenü für {name} öffnen",
+      "profileUnavailable": "Kein Profil für {name} gefunden.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "KI-gesteuertes Konto",
+      "watchTwitch": "Auf Twitch ansehen",
+      "watchX": "Auf X ansehen",
+      "watchKick": "Auf Kick ansehen",
+      "watchYouTube": "Auf YouTube ansehen"
+    },
     "lootSettings": {
       "title": "Beute-Einstellungen",
       "close": "Beute-Einstellungen schließen",
@@ -1495,7 +1508,15 @@ export const de_DE: EnTranslations = {
     },
     "social": {
       "lastSeen": "Zuletzt gesehen: {when}",
-      "lastSeenNever": "nie"
+      "lastSeenNever": "nie",
+      "ignoredTab": "Ignoriert",
+      "blockedTab": "Blockiert",
+      "ignoredEmpty": "Du ignorierst niemanden.",
+      "blockedEmpty": "Du hast niemanden blockiert.",
+      "blockSearchPlaceholder": "Spielername",
+      "blockAction": "Blockieren",
+      "nowBlocking": "{name} blockiert.",
+      "stopBlockingTitle": "{name} nicht mehr blockieren"
     },
     "gathering": {
       "title": "Sammeln",

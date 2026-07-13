@@ -976,6 +976,19 @@ export const fr_CA: EnTranslations = {
       "promoteLeader": "Promouvoir chef",
       "inviteUsage": "Inviter qui ? Utilisation : /invite <nom>."
     },
+    "playerMenu": {
+      "info": "Infos joueur",
+      "block": "Bloquer",
+      "unblock": "Débloquer",
+      "openFor": "Ouvrir le menu du joueur {name}",
+      "profileUnavailable": "Aucun profil trouvé pour {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Compte géré par une IA",
+      "watchTwitch": "Regarder sur Twitch",
+      "watchX": "Voir sur X",
+      "watchKick": "Regarder sur Kick",
+      "watchYouTube": "Regarder sur YouTube"
+    },
     "lootSettings": {
       "title": "Réglages de butin",
       "close": "Fermer les réglages de butin",
@@ -1495,7 +1508,15 @@ export const fr_CA: EnTranslations = {
     },
     "social": {
       "lastSeen": "Vu pour la dernière fois : {when}",
-      "lastSeenNever": "jamais"
+      "lastSeenNever": "jamais",
+      "ignoredTab": "Ignorés",
+      "blockedTab": "Bloqués",
+      "ignoredEmpty": "Vous n'ignorez personne.",
+      "blockedEmpty": "Vous n'avez bloqué personne.",
+      "blockSearchPlaceholder": "Nom du joueur",
+      "blockAction": "Bloquer",
+      "nowBlocking": "{name} bloqué.",
+      "stopBlockingTitle": "Débloquer {name}"
     },
     "gathering": {
       "title": "Récolte",

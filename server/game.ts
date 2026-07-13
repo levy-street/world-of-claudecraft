@@ -1,6 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
+import {
+  type AccountFlair,
+  type ChatSenderFlair,
+  EMPTY_ACCOUNT_FLAIR,
+  hasStreamerLink,
+  wireStreamerLinks,
+} from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { DEEDS } from '../src/sim/content/deeds';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
@@ -67,6 +74,11 @@ import {
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
 import { ChatFilter } from './chat_filter';
+import {
+  isChatFilterWrite,
+  isIgnorableChannel,
+  parseChatFilterCommand,
+} from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
 import { dailyRewardService } from './daily_rewards';
@@ -76,6 +88,7 @@ import {
   grantAccountMechChroma,
   heartbeatCharacterLeases,
   insertChatLogs,
+  loadAccountFlair,
   loadMailState,
   loadMarketState,
   markAccountQuestComplete,
@@ -178,6 +191,13 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
+// because the S3 localization guard scans sendChatNotice literals, and
+// src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
+// account silence and lives in moderation_commands.ts, not here.)
+const IGNORE_USAGE = 'Usage: /ignore <name>, /unignore <name>, /ignorelist.';
+const BLOCK_USAGE = 'Usage: /block <name>, /unblock <name>, /blocklist.';
+
 const CHAT_RATE_BURST = 5;
 const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
@@ -480,6 +500,18 @@ export interface ClientSession {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
+  // Operator-set account flair (AI mark + streamer links), loaded at join and kept
+  // current by applyAccountFlairLive. Held on the SESSION, not just the entity,
+  // because chat fan-out has to read the SENDER's flair for recipients who are
+  // nowhere near them (general/world/guild chat crosses the interest scope, where
+  // no entity record exists for the sender).
+  accountFlair: AccountFlair;
+  // The wire-ready ChatSenderFlair derived from accountFlair, or undefined for the
+  // ordinary player with no flair. Cached here (recomputed only in stampAccountFlair,
+  // i.e. at join and when an operator edits) because deriving it re-parses every
+  // stored link through `new URL()`, and the chat path would otherwise pay that on
+  // EVERY line a streamer sends, to every channel.
+  chatFlair: ChatSenderFlair | undefined;
   characterId: number;
   pid: number; // player entity id in the sim
   name: string;
@@ -515,6 +547,12 @@ export interface ClientSession {
   // delivery. Loaded from the DB on join, kept in sync by social commands.
   blockedIds: Set<number>;
   blockListLoaded: boolean;
+  // character ids this player has IGNORED. An ignore is the chat-only sibling of
+  // a block: their PUBLIC chat is dropped before delivery, but their whispers,
+  // rolls, invites and mail still arrive. Loaded on join, kept in sync by the
+  // ignore commands. Distinct from `chatMutedUntil`, which is the ADMIN silence
+  // applied TO this player by staff.
+  ignoredIds: Set<number>;
   // name of the last player to whisper this session, for the /r reply
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
@@ -736,12 +774,32 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
   if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
+  if (e.aiAccount) out.ai = 1; // operator-set AI-operated mark (name prefix)
+  // Official streamer's platform links (player menu). Already gated by
+  // wireStreamerLinks at the point they were set on the entity, so an account whose
+  // streamer flag is off has none here, whatever is stored against it.
+  if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   if (e.guild) out.gd = e.guild;
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
+  return out;
+}
+
+/**
+ * The flair a chat line carries for its SENDER, or undefined when the account has
+ * none, so an ordinary player's chat event is byte-unchanged on the wire. The links
+ * run through the same wireStreamerLinks gate the entity encoding uses: an account
+ * whose streamer flag is off ships no links here either, whatever is stored.
+ */
+function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
+  const links = wireStreamerLinks(flair);
+  if (!flair.ai && !links) return undefined;
+  const out: ChatSenderFlair = {};
+  if (flair.ai) out.ai = true;
+  if (links) out.links = links;
   return out;
 }
 
@@ -1429,10 +1487,19 @@ export class GameServer {
         const meta = s ? this.sim.meta(s.pid) : null;
         if (meta) this.sim.ctx.bumpDeedStat(meta, 'guildsFounded', 1);
       },
-      isIgnoring: (recipientId, senderCharacterId) => {
+      isBlocking: (recipientId, senderCharacterId) => {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
       },
+      onIgnoresChanged: (id, ids) => {
+        const s = this.sessionByCharacterId(id);
+        if (s) s.ignoredIds = new Set(ids);
+      },
+      isIgnoringChat: (recipientId, senderCharacterId) => {
+        const s = this.sessionByCharacterId(recipientId);
+        return s ? s.ignoredIds.has(senderCharacterId) : false;
+      },
+      chatFlairFor: (senderCharacterId) => this.sessionByCharacterId(senderCharacterId)?.chatFlair,
     };
   }
 
@@ -1744,6 +1811,50 @@ export class GameServer {
       e.discordJoined = joined;
       e.discordRole = role;
     }
+  }
+
+  // Load one player's operator-set account flair (AI mark + streamer links) and
+  // stamp it on their entity + session. Best-effort and guarded against the player
+  // leaving mid-fetch, exactly like the Discord/holder/dev flair refreshes above.
+  private async refreshAccountFlair(session: ClientSession): Promise<void> {
+    const flair = await loadAccountFlair(session.accountId);
+    if (this.clients.get(session.pid) !== session) return;
+    this.stampAccountFlair(session, flair);
+  }
+
+  /**
+   * Apply an account's flair to one live session: the entity fields the wire encodes
+   * (the identity diff re-broadcasts them to nearby players on the next snapshot) and
+   * the session copy the chat fan-out reads. `streamerLinks` is set through
+   * wireStreamerLinks, so the entity never carries links for an account whose
+   * streamer flag is off.
+   */
+  private stampAccountFlair(session: ClientSession, flair: AccountFlair): void {
+    session.accountFlair = flair;
+    // Derived once, here, and read straight off the session by every chat fan-out.
+    session.chatFlair = chatSenderFlair(flair);
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return;
+    e.aiAccount = flair.ai ? true : undefined;
+    e.streamerLinks = wireStreamerLinks(flair);
+  }
+
+  /**
+   * Push an operator's account-flair edit onto every live session of that account, so
+   * the AI mark and the streamer links change with no reconnect. Injected into the
+   * admin routes via configureAdminRuntime (server/admin.ts); a no-op when the
+   * account is offline (the next join loads the new row anyway).
+   */
+  applyAccountFlairLive(accountId: number, flair: AccountFlair): void {
+    for (const live of this.clients.values()) {
+      if (live.accountId !== accountId) continue;
+      this.stampAccountFlair(live, flair);
+    }
+  }
+
+  /** The chat flair of the session at `pid`, read from the SESSION, never an entity. */
+  private chatFlairForPid(pid: number): ChatSenderFlair | undefined {
+    return this.clients.get(pid)?.chatFlair;
   }
 
   // Intercept a leading "!" community command in chat (lfg/wts/...): broadcast it
@@ -2131,6 +2242,10 @@ export class GameServer {
       ws,
       accountId,
       accountCosmetics,
+      // Loaded right below by refreshAccountFlair; an account with no flair (every
+      // ordinary player) keeps these empty values and never touches the wire.
+      accountFlair: EMPTY_ACCOUNT_FLAIR,
+      chatFlair: undefined,
       characterId,
       pid,
       name,
@@ -2153,6 +2268,7 @@ export class GameServer {
       chatStrikes: meta.chatStrikes ?? 0,
       blockedIds: new Set(),
       blockListLoaded: false,
+      ignoredIds: new Set(),
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
@@ -2275,6 +2391,11 @@ export class GameServer {
     void this.refreshDevBadge(session).catch((err) =>
       console.error('dev badge refresh failed:', err),
     );
+    // Stamp the operator-set account flair (AI mark + streamer links), same
+    // best-effort contract: a flair read must never affect joining the world.
+    void this.refreshAccountFlair(session).catch((err) =>
+      console.error('account flair refresh failed:', err),
+    );
     return session;
   }
 
@@ -2390,6 +2511,11 @@ export class GameServer {
       session.blockListLoaded = true;
     } catch (err) {
       console.error('failed to load block list:', err);
+    }
+    try {
+      session.ignoredIds = new Set(await this.socialDb.ignoredIds(session.characterId));
+    } catch (err) {
+      console.error('failed to load ignore list:', err);
     }
     await this.sendSocialSnapshot(session.characterId, firstJoin);
     await this.social
@@ -3474,6 +3600,13 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text)
         )
           break;
+        // The player's own ignore/block commands. Deliberately BEFORE isChatMuted
+        // and the rate limiter: a GM-silenced player must still be able to manage
+        // their own lists, and a list readout must not burn a chat token toward
+        // the rate-limit cooldown. Deliberately AFTER the moderation router, so
+        // the ADMIN "/mute" is always claimed as the account silence and can
+        // never be shadowed by a player command.
+        if (this.handleChatFilterCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
@@ -3683,6 +3816,14 @@ export class GameServer {
       case 'block_remove':
         if (typeof msg.name === 'string')
           void this.social.blockRemove(this.actorFor(session), msg.name).catch(logSocialErr);
+        break;
+      case 'ignore_add':
+        if (typeof msg.name === 'string')
+          void this.social.ignoreAdd(this.actorFor(session), msg.name).catch(logSocialErr);
+        break;
+      case 'ignore_remove':
+        if (typeof msg.name === 'string')
+          void this.social.ignoreRemove(this.actorFor(session), msg.name).catch(logSocialErr);
         break;
       case 'social_refresh':
         void this.sendSocialSnapshot(session.characterId);
@@ -4907,6 +5048,16 @@ export class GameServer {
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
+    // Account flair of each chat line's SENDER, resolved once per event (not once
+    // per recipient) and read from the sender's SESSION rather than an entity:
+    // general/world/lfg chat reaches players far outside the sender's interest
+    // scope, where the recipient has no entity record for them. Sparse by design:
+    // an ordinary player's chat event is untouched.
+    for (const ev of events) {
+      if (ev.type !== 'chat') continue;
+      const flair = this.chatFlairForPid(ev.fromPid);
+      if (flair) ev.flair = flair;
+    }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
@@ -4937,6 +5088,16 @@ export class GameServer {
             ev.type === 'chat' &&
             session.blockedIds.size > 0 &&
             this.isBlockedSender(session, ev.fromPid)
+          )
+            continue;
+          // ignore list: drop PUBLIC chat from an ignored character. Unlike a
+          // block this is chat-only, so their whispers and rolls still come through.
+          if (
+            !session.spectating &&
+            ev.type === 'chat' &&
+            session.ignoredIds.size > 0 &&
+            isIgnorableChannel(ev.channel) &&
+            this.isIgnoredSender(session, ev.fromPid)
           )
             continue;
           if (ev.pid !== undefined) {
@@ -5005,6 +5166,57 @@ export class GameServer {
     if (fromPid === recipient.pid) return false;
     const sender = this.clients.get(fromPid);
     return sender ? recipient.blockedIds.has(sender.characterId) : false;
+  }
+
+  // Same pid-to-character-id hop as isBlockedSender, against the ignore set.
+  private isIgnoredSender(recipient: ClientSession, fromPid: number): boolean {
+    if (fromPid === recipient.pid) return false;
+    const sender = this.clients.get(fromPid);
+    return sender ? recipient.ignoredIds.has(sender.characterId) : false;
+  }
+
+  // The player's two chat-filter tiers: ignore (/ignore, /unignore, /ignorelist)
+  // and block (/block, /unblock, /blocklist). Returns true when the text was one
+  // of them and has been handled, so the caller stops before the chat pipeline
+  // treats it as something to broadcast. The ADMIN /mute is a different command
+  // entirely and is claimed earlier, by the moderation router.
+  private handleChatFilterCommand(session: ClientSession, text: string): boolean {
+    const parsed = parseChatFilterCommand(text);
+    if (!parsed) return false;
+    const actor = this.actorFor(session);
+
+    // The two list commands are reads and stay free: they must work even for a
+    // GM-silenced player, and echoing your own list back must never burn a token
+    // toward the chat cooldown. The four WRITE commands each cost a chat token:
+    // they INSERT/DELETE and then push a full social snapshot, so they are the
+    // most expensive thing on the chat path and must not be the one thing on it
+    // that is unmetered.
+    if (isChatFilterWrite(parsed) && !this.consumeChatToken(session)) return true;
+
+    // An if-chain, NOT a switch: tests/command_schema.test.ts scrapes `case '<x>':`
+    // labels out of this region of game.ts to derive the dispatched wire
+    // vocabulary, so switching on these kinds would register 'ignore'/'block'/...
+    // as phantom wire commands and fail the gate.
+    const logErr = (err: unknown) => console.error('ignore/block command failed:', err);
+    const kind = parsed.kind;
+    if (kind === 'ignoreList') {
+      void this.social.ignoreList(actor).catch(logErr);
+    } else if (kind === 'blockList') {
+      void this.social.blockList(actor).catch(logErr);
+    } else if (kind === 'ignore') {
+      if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
+      else void this.social.ignoreAdd(actor, parsed.name).catch(logErr);
+    } else if (kind === 'unignore') {
+      if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
+      else void this.social.ignoreRemove(actor, parsed.name).catch(logErr);
+    } else if (kind === 'block') {
+      if (!parsed.name) this.sendChatNotice(session, BLOCK_USAGE);
+      else void this.social.blockAdd(actor, parsed.name).catch(logErr);
+    } else {
+      if (!parsed.name) this.sendChatNotice(session, BLOCK_USAGE);
+      else void this.social.blockRemove(actor, parsed.name).catch(logErr);
+    }
+    return true;
   }
 
   // ignore list: a party invite, trade request, or duel challenge from a
@@ -5335,7 +5547,7 @@ export class GameServer {
       this.send(session, {
         t: 'events',
         list: [
-          { type: 'error', text: 'Your ignore list is still loading. Try /who again in a moment.' },
+          { type: 'error', text: 'Your block list is still loading. Try /who again in a moment.' },
         ],
       });
       return;

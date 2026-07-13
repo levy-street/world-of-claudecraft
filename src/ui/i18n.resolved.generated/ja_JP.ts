@@ -976,6 +976,19 @@ export const ja_JP: EnTranslations = {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
     },
+    "playerMenu": {
+      "info": "プレイヤー情報",
+      "block": "ブロック",
+      "unblock": "ブロック解除",
+      "openFor": "{name} のプレイヤーメニューを開く",
+      "profileUnavailable": "{name} のプロフィールが見つかりません。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI操作アカウント",
+      "watchTwitch": "Twitch で視聴",
+      "watchX": "X で見る",
+      "watchKick": "Kick で視聴",
+      "watchYouTube": "YouTube で視聴"
+    },
     "lootSettings": {
       "title": "分配設定",
       "close": "分配設定を閉じる",
@@ -1495,7 +1508,15 @@ export const ja_JP: EnTranslations = {
     },
     "social": {
       "lastSeen": "最終ログイン: {when}",
-      "lastSeenNever": "なし"
+      "lastSeenNever": "なし",
+      "ignoredTab": "無視中",
+      "blockedTab": "ブロック",
+      "ignoredEmpty": "誰も無視していません。",
+      "blockedEmpty": "誰もブロックしていません。",
+      "blockSearchPlaceholder": "プレイヤー名",
+      "blockAction": "ブロック",
+      "nowBlocking": "{name} をブロックしました。",
+      "stopBlockingTitle": "{name} のブロックを解除"
     },
     "gathering": {
       "title": "採集",

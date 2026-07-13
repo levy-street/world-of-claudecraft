@@ -43,6 +43,15 @@ provided as a courtesy.
 | Book of Deeds achievement icons (`public/ui/deeds/*.webp`, one per earnable deed, downscaled from the maintainer's 512px source set to 128px WebP via `scripts/convert_deed_icons_webp.mjs`) | World of ClaudeCraft | Maintainer-commissioned bespoke art, owned by the project | Project asset |
 | Guide webfonts (`public/fonts/*.woff2`: Cinzel by Natanael Gama; Alegreya and Alegreya Sans by Juan Pablo del Peral, Huerta Tipografica; woff2 subsets latin/latin-ext/cyrillic/vietnamese as served by Google Fonts, self-hosted for the /wiki guide) | Natanael Gama; Huerta Tipografica | https://fonts.google.com/specimen/Cinzel , https://fonts.google.com/specimen/Alegreya , https://fonts.google.com/specimen/Alegreya+Sans | SIL OFL 1.1 |
 
+## Brand marks
+
+The four streamer-platform marks inlined as SVG paths in `src/ui/ui_icons.ts`
+(Twitch, X, Kick, YouTube) are the trademarks of their respective platforms,
+reproduced monochrome and unmodified in shape solely to identify a link that
+points at that platform. They are not project assets, and no endorsement or
+affiliation is implied. The Discord (Clyde) mark in the same file is used the
+same way.
+
 ## Audio
 
 | Assets | Author | Source | License |

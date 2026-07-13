@@ -976,6 +976,19 @@ export const zh_TW: EnTranslations = {
       "promoteLeader": "提升為隊長",
       "inviteUsage": "邀請誰？用法：/invite <名稱>。"
     },
+    "playerMenu": {
+      "info": "玩家資訊",
+      "block": "封鎖",
+      "unblock": "取消封鎖",
+      "openFor": "開啟 {name} 的玩家選單",
+      "profileUnavailable": "找不到 {name} 的資料。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 操作的帳號",
+      "watchTwitch": "在 Twitch 觀看",
+      "watchX": "在 X 檢視",
+      "watchKick": "在 Kick 觀看",
+      "watchYouTube": "在 YouTube 觀看"
+    },
     "lootSettings": {
       "title": "拾取設定",
       "close": "關閉拾取設定",
@@ -1495,7 +1508,15 @@ export const zh_TW: EnTranslations = {
     },
     "social": {
       "lastSeen": "最後上線: {when}",
-      "lastSeenNever": "從未"
+      "lastSeenNever": "從未",
+      "ignoredTab": "已忽略",
+      "blockedTab": "封鎖",
+      "ignoredEmpty": "你沒有忽略任何人。",
+      "blockedEmpty": "你沒有封鎖任何人。",
+      "blockSearchPlaceholder": "玩家名稱",
+      "blockAction": "封鎖",
+      "nowBlocking": "已封鎖 {name}。",
+      "stopBlockingTitle": "取消對 {name} 的封鎖"
     },
     "gathering": {
       "title": "採集",

@@ -976,6 +976,19 @@ export const sv_SE: EnTranslations = {
       "promoteLeader": "Befordra till ledare",
       "inviteUsage": "Bjud in vem? Användning: /invite <namn>."
     },
+    "playerMenu": {
+      "info": "Spelarinfo",
+      "block": "Blockera",
+      "unblock": "Avblockera",
+      "openFor": "Öppna spelarmenyn för {name}",
+      "profileUnavailable": "Ingen profil hittades för {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI-styrt konto",
+      "watchTwitch": "Titta på Twitch",
+      "watchX": "Visa på X",
+      "watchKick": "Titta på Kick",
+      "watchYouTube": "Titta på YouTube"
+    },
     "lootSettings": {
       "title": "Byteinställningar",
       "close": "Stäng byteinställningar",
@@ -1495,7 +1508,15 @@ export const sv_SE: EnTranslations = {
     },
     "social": {
       "lastSeen": "Senast sedd: {when}",
-      "lastSeenNever": "aldrig"
+      "lastSeenNever": "aldrig",
+      "ignoredTab": "Ignorerade",
+      "blockedTab": "Blockerade",
+      "ignoredEmpty": "Du ignorerar ingen.",
+      "blockedEmpty": "Du har inte blockerat någon.",
+      "blockSearchPlaceholder": "Spelarnamn",
+      "blockAction": "Blockera",
+      "nowBlocking": "{name} blockerad.",
+      "stopBlockingTitle": "Avblockera {name}"
     },
     "gathering": {
       "title": "Insamling",

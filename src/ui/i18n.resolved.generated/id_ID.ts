@@ -976,6 +976,19 @@ export const id_ID: EnTranslations = {
       "promoteLeader": "Angkat jadi Pemimpin",
       "inviteUsage": "Mengundang siapa? Penggunaan: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Info pemain",
+      "block": "Blokir",
+      "unblock": "Buka blokir",
+      "openFor": "Buka menu pemain {name}",
+      "profileUnavailable": "Profil {name} tidak ditemukan.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Akun yang dijalankan AI",
+      "watchTwitch": "Tonton di Twitch",
+      "watchX": "Lihat di X",
+      "watchKick": "Tonton di Kick",
+      "watchYouTube": "Tonton di YouTube"
+    },
     "lootSettings": {
       "title": "Pengaturan Jarahan",
       "close": "Tutup pengaturan jarahan",
@@ -1495,7 +1508,15 @@ export const id_ID: EnTranslations = {
     },
     "social": {
       "lastSeen": "Terakhir terlihat: {when}",
-      "lastSeenNever": "tidak pernah"
+      "lastSeenNever": "tidak pernah",
+      "ignoredTab": "Diabaikan",
+      "blockedTab": "Diblokir",
+      "ignoredEmpty": "Kamu tidak mengabaikan siapa pun.",
+      "blockedEmpty": "Kamu belum memblokir siapa pun.",
+      "blockSearchPlaceholder": "Nama pemain",
+      "blockAction": "Blokir",
+      "nowBlocking": "{name} diblokir.",
+      "stopBlockingTitle": "Buka blokir {name}"
     },
     "gathering": {
       "title": "Pengumpulan",

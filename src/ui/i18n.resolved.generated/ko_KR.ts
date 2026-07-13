@@ -976,6 +976,19 @@ export const ko_KR: EnTranslations = {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
     },
+    "playerMenu": {
+      "info": "플레이어 정보",
+      "block": "차단",
+      "unblock": "차단 해제",
+      "openFor": "{name} 님의 플레이어 메뉴 열기",
+      "profileUnavailable": "{name} 님의 프로필을 찾을 수 없습니다.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 운영 계정",
+      "watchTwitch": "Twitch에서 시청",
+      "watchX": "X에서 보기",
+      "watchKick": "Kick에서 시청",
+      "watchYouTube": "YouTube에서 시청"
+    },
     "lootSettings": {
       "title": "전리품 설정",
       "close": "전리품 설정 닫기",
@@ -1495,7 +1508,15 @@ export const ko_KR: EnTranslations = {
     },
     "social": {
       "lastSeen": "마지막 접속: {when}",
-      "lastSeenNever": "없음"
+      "lastSeenNever": "없음",
+      "ignoredTab": "무시됨",
+      "blockedTab": "차단",
+      "ignoredEmpty": "아무도 무시하고 있지 않습니다.",
+      "blockedEmpty": "아무도 차단하지 않았습니다.",
+      "blockSearchPlaceholder": "플레이어 이름",
+      "blockAction": "차단",
+      "nowBlocking": "{name} 님을 차단했습니다.",
+      "stopBlockingTitle": "{name} 님 차단 해제"
     },
     "gathering": {
       "title": "채집",

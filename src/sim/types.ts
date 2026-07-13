@@ -1,5 +1,6 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 
@@ -2050,6 +2051,13 @@ export interface Entity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Account flair (cosmetic, operator-set from the admin dashboard; the sim
+  // never reads either): the AI-operated mark that prefixes the name with [AI],
+  // and an official streamer's platform links for the player menu. `streamerLinks`
+  // is present only when the account's streamer flag is actually on (the server
+  // gates it in wireStreamerLinks), so on the client "has links" IS "is a streamer".
+  aiAccount?: boolean;
+  streamerLinks?: StreamerLinks;
 }
 
 export interface NythraxisWardChannel {
@@ -2252,6 +2260,13 @@ export type SimEvent = { pid?: number } & (
         | 'roll';
       entityId?: number;
       to?: string;
+      // Account flair of the SENDER, attached by the server at fan-out (the sim
+      // never sets it). Sparse: absent for a normal player, so an ordinary chat
+      // line is unchanged on the wire. It rides the event rather than being read
+      // off the sender's entity because general/world/lfg/guild chat reaches you
+      // from players far outside your ~120yd interest scope, where no entity
+      // record exists locally.
+      flair?: ChatSenderFlair;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a

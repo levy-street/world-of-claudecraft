@@ -1,3 +1,4 @@
+import type { StreamerLinks } from './account_flair';
 import type { AccountStatus } from './account_status';
 
 // Shapes returned by the /admin/api endpoints (mirrors server/admin_db.ts
@@ -202,6 +203,8 @@ export interface AccountRow {
   createdAt: string;
   lastLogin: string | null;
   isAdmin: boolean;
+  isAi: boolean;
+  isStreamer: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
   characterCount: number;
@@ -272,6 +275,9 @@ export interface AccountDetail {
   createdAt: string;
   lastLogin: string | null;
   isAdmin: boolean;
+  isAi: boolean;
+  isStreamer: boolean;
+  streamerLinks: StreamerLinks;
   online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;

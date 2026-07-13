@@ -976,6 +976,19 @@ export const it_IT: EnTranslations = {
       "promoteLeader": "Promuovi a Capo",
       "inviteUsage": "Invitare chi? Uso: /invite <nome>."
     },
+    "playerMenu": {
+      "info": "Info giocatore",
+      "block": "Blocca",
+      "unblock": "Sblocca",
+      "openFor": "Apri il menu giocatore di {name}",
+      "profileUnavailable": "Nessun profilo trovato per {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Account gestito da IA",
+      "watchTwitch": "Guarda su Twitch",
+      "watchX": "Vedi su X",
+      "watchKick": "Guarda su Kick",
+      "watchYouTube": "Guarda su YouTube"
+    },
     "lootSettings": {
       "title": "Impostazioni Bottino",
       "close": "Chiudi impostazioni bottino",
@@ -1495,7 +1508,15 @@ export const it_IT: EnTranslations = {
     },
     "social": {
       "lastSeen": "Ultimo accesso: {when}",
-      "lastSeenNever": "mai"
+      "lastSeenNever": "mai",
+      "ignoredTab": "Ignorati",
+      "blockedTab": "Bloccati",
+      "ignoredEmpty": "Non stai ignorando nessuno.",
+      "blockedEmpty": "Non hai bloccato nessuno.",
+      "blockSearchPlaceholder": "Nome del giocatore",
+      "blockAction": "Blocca",
+      "nowBlocking": "{name} bloccato.",
+      "stopBlockingTitle": "Sblocca {name}"
     },
     "gathering": {
       "title": "Raccolta",

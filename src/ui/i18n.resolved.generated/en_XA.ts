@@ -976,6 +976,19 @@ export const en_XA: EnTranslations = {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",
       "inviteUsage": "[Íñʋíţé ŵĥóɱ? Úšáĝé: /íñʋíţé <ñáɱé>.]"
     },
+    "playerMenu": {
+      "info": "[Þļáýéŕ Íñƒó]",
+      "block": "[Ɓļóçķ]",
+      "unblock": "[Úñƀļóçķ]",
+      "openFor": "[Óþéñ þļáýéŕ ɱéñú ƒóŕ {name}]",
+      "profileUnavailable": "[Ñó þŕóƒíļé ƒóúñð ƒóŕ {name}.]",
+      "aiTag": "[[ÁÍ]]",
+      "aiTagTitle": "[ÁÍ-óþéŕáţéð áççóúñţ]",
+      "watchTwitch": "[Ŵáţçĥ óñ Ţŵíţçĥ]",
+      "watchX": "[Ʋíéŵ óñ Ẋ]",
+      "watchKick": "[Ŵáţçĥ óñ Ķíçķ]",
+      "watchYouTube": "[Ŵáţçĥ óñ ÝóúŢúƀé]"
+    },
     "lootSettings": {
       "title": "[Ļóóţ Šéţţíñĝš]",
       "close": "[Çļóšé ļóóţ šéţţíñĝš]",
@@ -1495,7 +1508,15 @@ export const en_XA: EnTranslations = {
     },
     "social": {
       "lastSeen": "[Ļášţ šééñ: {when}]",
-      "lastSeenNever": "[ñéʋéŕ]"
+      "lastSeenNever": "[ñéʋéŕ]",
+      "ignoredTab": "[Íĝñóŕéð]",
+      "blockedTab": "[Ɓļóçķéð]",
+      "ignoredEmpty": "[Ýóú áŕé ñóţ íĝñóŕíñĝ áñýóñé.]",
+      "blockedEmpty": "[Ýóú ĥáʋé ñóţ ƀļóçķéð áñýóñé.]",
+      "blockSearchPlaceholder": "[Þļáýéŕ ñáɱé]",
+      "blockAction": "[Ɓļóçķ]",
+      "nowBlocking": "[Ɓļóçķéð {name}.]",
+      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]"
     },
     "gathering": {
       "title": "[Ĝáţĥéŕíñĝ]",

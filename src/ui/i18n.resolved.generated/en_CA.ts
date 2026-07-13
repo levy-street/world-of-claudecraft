@@ -976,6 +976,19 @@ export const en_CA: EnTranslations = {
       "promoteLeader": "Promote to Leader",
       "inviteUsage": "Invite whom? Usage: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Player Info",
+      "block": "Block",
+      "unblock": "Unblock",
+      "openFor": "Open player menu for {name}",
+      "profileUnavailable": "No profile found for {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI-operated account",
+      "watchTwitch": "Watch on Twitch",
+      "watchX": "View on X",
+      "watchKick": "Watch on Kick",
+      "watchYouTube": "Watch on YouTube"
+    },
     "lootSettings": {
       "title": "Loot Settings",
       "close": "Close loot settings",
@@ -1495,7 +1508,15 @@ export const en_CA: EnTranslations = {
     },
     "social": {
       "lastSeen": "Last seen: {when}",
-      "lastSeenNever": "never"
+      "lastSeenNever": "never",
+      "ignoredTab": "Ignored",
+      "blockedTab": "Blocked",
+      "ignoredEmpty": "You are not ignoring anyone.",
+      "blockedEmpty": "You have not blocked anyone.",
+      "blockSearchPlaceholder": "Player name",
+      "blockAction": "Block",
+      "nowBlocking": "Blocked {name}.",
+      "stopBlockingTitle": "Stop blocking {name}"
     },
     "gathering": {
       "title": "Gathering",
