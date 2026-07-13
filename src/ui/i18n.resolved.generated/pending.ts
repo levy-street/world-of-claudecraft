@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "es_ES": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "fr_FR": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "fr_CA": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "de_DE": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "nl_NL": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "pl_PL": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "id_ID": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "tr_TR": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "sv_SE": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "vi_VN": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ],
   "da_DK": [
     "hudChrome.bags.dragDestroyHint",
-    "hudChrome.bags.dragEquipHint"
+    "hudChrome.bags.dragEquipHint",
+    "hudChrome.bags.reorderNeedsRecent"
   ]
 };

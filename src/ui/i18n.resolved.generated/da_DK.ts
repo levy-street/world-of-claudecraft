@@ -1266,6 +1266,7 @@ export const da_DK: EnTranslations = {
       "rightClickDestroy": "Højreklik for at ødelægge",
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Switch the sort to Recent to rearrange your bags",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",

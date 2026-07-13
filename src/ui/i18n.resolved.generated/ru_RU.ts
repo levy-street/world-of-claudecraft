@@ -1266,6 +1266,7 @@ export const ru_RU: EnTranslations = {
       "rightClickDestroy": "Правый клик, чтобы уничтожить",
       "dragEquipHint": "Перетащите на персонажа, чтобы надеть",
       "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
+      "reorderNeedsRecent": "Переключите сортировку на «Недавние», чтобы менять порядок в сумках",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",

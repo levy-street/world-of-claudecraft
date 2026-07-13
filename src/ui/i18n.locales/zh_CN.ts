@@ -4047,6 +4047,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.rightClickDestroy': '右键单击以销毁',
   'hudChrome.bags.dragEquipHint': '拖到角色身上以装备',
   'hudChrome.bags.dragDestroyHint': '拖出到世界中以销毁',
+  'hudChrome.bags.reorderNeedsRecent': '将排序切换为“最近”以整理背包',
   'hudChrome.bags.filterGroupAria': '按类别筛选背包',
   'hudChrome.bags.filterAll': '全部',
   'hudChrome.bags.filterWeapon': '武器',

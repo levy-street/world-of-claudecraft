@@ -4209,6 +4209,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.rightClickDestroy': '마우스 오른쪽 버튼으로 파괴',
   'hudChrome.bags.dragEquipHint': '캐릭터로 끌어다 놓아 장착',
   'hudChrome.bags.dragDestroyHint': '세계로 끌어내어 파괴',
+  'hudChrome.bags.reorderNeedsRecent': '가방을 정리하려면 정렬을 최근으로 바꾸세요',
   'hudChrome.bags.filterGroupAria': '가방을 분류별로 필터링',
   'hudChrome.bags.filterAll': '전체',
   'hudChrome.bags.filterWeapon': '무기',

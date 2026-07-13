@@ -1266,6 +1266,7 @@ export const sv_SE: EnTranslations = {
       "rightClickDestroy": "Högerklicka för att förstöra",
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Switch the sort to Recent to rearrange your bags",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",

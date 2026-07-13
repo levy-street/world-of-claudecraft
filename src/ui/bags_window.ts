@@ -457,8 +457,11 @@ export class BagsWindow {
       grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
-    // Manual order: only the raw-array view (no sort, no filter) can name a cell's
-    // inventory index, so only there do the cells become reorder drop targets.
+    // A cell can only name an inventory index while the view PRESERVES the array order
+    // (a category chip or a search only hides stacks; a quality/name sort reorders the
+    // view, so a cell there names nothing). Every stack cell is still stamped and still
+    // a drop target under a sort: the drop is REFUSED with a toast rather than silently
+    // doing nothing, which is indistinguishable from a broken drag.
     const manual = bagOrderIsManual(this.filter);
     for (const s of model.visible) {
       const item = ITEMS[s.itemId];
@@ -468,7 +471,7 @@ export class BagsWindow {
       row.className = `bag-item q-${bagQualityKey(item)}`;
       // The stack's live inventory index, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId), which is exactly what the move command sends.
-      const index = manual ? bagStackIndex(world.inventory, s) : -1;
+      const index = bagStackIndex(world.inventory, s);
       if (index >= 0) {
         row.dataset.bagIndex = String(index);
         this.bindBagCellDrop(row, index);
@@ -640,7 +643,9 @@ export class BagsWindow {
       if (!drag || drag.index === null || drag.index === index) return;
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-      cell.classList.add('drop-target');
+      // Under a quality/name sort the drop will be refused, so do not promise it with
+      // the accepting highlight; the drop still fires and explains why.
+      if (bagOrderIsManual(this.filter)) cell.classList.add('drop-target');
     });
     cell.addEventListener('dragleave', () => cell.classList.remove('drop-target'));
     cell.addEventListener('drop', (e) => {
@@ -660,6 +665,12 @@ export class BagsWindow {
   // repaint, or a hand-crafted pair, is simply refused there), so this only dispatches.
   private dropOnBagCell(from: number | null, to: number): void {
     if (from === null || from === to) return;
+    if (!bagOrderIsManual(this.filter)) {
+      // A quality/name sort reorders the VIEW: a cell names no array position there, and
+      // the sort would put both stacks straight back. Say so instead of doing nothing.
+      this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
+      return;
+    }
     this.deps.world().moveInventoryItem(from, to);
     audio.click();
     this.deps.hideTooltip();

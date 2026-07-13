@@ -1352,6 +1352,11 @@ export const hudChromeStrings = {
     // stack out onto the world to throw it away (which opens the destroy prompt).
     dragEquipHint: 'Drag onto your character to equip',
     dragDestroyHint: 'Drag out into the world to destroy',
+    // Refusal when a stack is dropped on another cell while the grid is showing a
+    // quality/name SORT: that view reorders the bag for display, so a cell names no
+    // real position and the sort would put both stacks straight back. Say so instead
+    // of letting the drop do nothing.
+    reorderNeedsRecent: 'Switch the sort to Recent to rearrange your bags',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

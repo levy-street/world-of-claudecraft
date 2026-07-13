@@ -4264,6 +4264,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.rightClickDestroy': 'Правый клик, чтобы уничтожить',
   'hudChrome.bags.dragEquipHint': 'Перетащите на персонажа, чтобы надеть',
   'hudChrome.bags.dragDestroyHint': 'Перетащите в мир, чтобы уничтожить',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Переключите сортировку на «Недавние», чтобы менять порядок в сумках',
   'hudChrome.bags.filterGroupAria': 'Фильтровать сумки по категории',
   'hudChrome.bags.filterAll': 'Все',
   'hudChrome.bags.filterWeapon': 'Оружие',

@@ -1266,6 +1266,7 @@ export const ko_KR: EnTranslations = {
       "rightClickDestroy": "마우스 오른쪽 버튼으로 파괴",
       "dragEquipHint": "캐릭터로 끌어다 놓아 장착",
       "dragDestroyHint": "세계로 끌어내어 파괴",
+      "reorderNeedsRecent": "가방을 정리하려면 정렬을 최근으로 바꾸세요",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",

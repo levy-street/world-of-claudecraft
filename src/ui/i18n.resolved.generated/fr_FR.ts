@@ -1266,6 +1266,7 @@ export const fr_FR: EnTranslations = {
       "rightClickDestroy": "Clic droit pour détruire",
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Switch the sort to Recent to rearrange your bags",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",

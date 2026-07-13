@@ -1266,6 +1266,7 @@ export const cs_CZ: EnTranslations = {
       "rightClickDestroy": "Zničíš pravým kliknutím",
       "dragEquipHint": "Drag onto your character to equip",
       "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Switch the sort to Recent to rearrange your bags",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
