@@ -181,8 +181,8 @@ describe('FURY WARFARE item budgets', () => {
   it('makes every offer a soulbound, honor-priced item-level-28 epic with full WARFARE', () => {
     for (const id of FURY_STOCK) {
       const item = ITEMS[id];
-      const budget = expectedStatBudget(item);
-      const isJewelry = item.slot === 'ring' || item.slot === 'neck';
+      const budget = expectedStatBudget(item) ?? 0;
+      expect(budget, id).toBeGreaterThan(0);
       expect(item.quality, id).toBe('epic');
       expect(item.requiredLevel, id).toBe(20);
       expect(item.soulbound, id).toBe(true);
@@ -190,14 +190,12 @@ describe('FURY WARFARE item budgets', () => {
       expect(item.buyValue, id).toBeUndefined();
       expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
       expect(itemLevel(item), id).toBe(28);
-      if (isJewelry) {
-        // Jewelry spends its budget on WARFARE: reduced primary stats (see the
-        // badge-comparison guard below), full WARFARE ratings.
-        expect(primaryStatSum(item), id).toBeLessThan(budget);
-      } else {
-        expect(primaryStatSum(item), id).toBe(budget);
-      }
-      // Every piece's WARFARE ratings mirror its slot budget (drives the 16.8% set).
+      // WARFARE gear weights its stat budget toward warfare: primary stats are 60%
+      // of the slot budget (the rest is expressed as the full WARFARE rating), so a
+      // PvP piece is a PvP-first, stat-light kit that never out-stats same-tier PvE
+      // gear. Armor mitigation and weapon DPS (the slot's inherent baseline) are kept.
+      expect(primaryStatSum(item), id).toBe(Math.round(budget * 0.6));
+      // Every piece's WARFARE ratings still mirror its FULL slot budget (drives 16.8%).
       expect(item.pvpOffenseRating, id).toBe(budget);
       expect(item.pvpDefenseRating, id).toBe(budget);
       expect(item.priceHonor, id).toBe(SLOT_PRICES[item.slot ?? '']);
