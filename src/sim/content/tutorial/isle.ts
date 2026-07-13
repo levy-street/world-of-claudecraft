@@ -285,12 +285,20 @@ export const DAWNHAVEN_QUESTS: Record<string, QuestDef> = {
 // the reveal is playing (pinned by tests/starter_tutorial_isle.test.ts).
 export const DAWNHAVEN_AMBUSH = { x: -14, z: 9 };
 
+// The three posts of the practice yard. Like the Warden and the ambush wolf, the
+// dummies are NOT spawned at world init: the `yardReveal` scene stages them here,
+// the moment the player takes the Warden's task. The camera turns east onto an
+// empty yard and they land in it, one after another.
+//
+// The yard reads as empty until that beat, which is the whole point: a reveal of
+// something that was already standing there is just a camera move.
+export const DAWNHAVEN_DUMMY_POSTS = [
+  { x: 22, z: 2 },
+  { x: 26, z: 6 },
+  { x: 30, z: 10 },
+] as const;
+
 export const DAWNHAVEN_CAMPS: CampDef[] = [
-  // The practice yard: three dummies in a row. Zero rng (see `dummy` above), so
-  // their positions are exact and the class challenges always find a target.
-  { mobId: 'dawnhaven_dummy', center: { x: 22, z: 2 }, radius: 0, count: 1 },
-  { mobId: 'dawnhaven_dummy', center: { x: 26, z: 6 }, radius: 0, count: 1 },
-  { mobId: 'dawnhaven_dummy', center: { x: 30, z: 10 }, radius: 0, count: 1 },
   // The wolf pack, set DEEP in the hollow (well past the ambush spot and past
   // their own 9yd aggro radius) so nothing wanders out and mugs the player during
   // the reveal cinematic. Four of them, so the 3-kill objective never dead-ends on

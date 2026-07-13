@@ -108,17 +108,33 @@ for (const [label, viewport] of [
     await sleep(12000);
     await shot('01-landing');
 
-    // Up the path. Crossing into 22yd of the knoll fires the Warden reveal.
-    await walkTo(page, 0, -14);
+    // Up the path. Crossing into 22yd of the knoll fires the Warden reveal, and we
+    // stop INSIDE her reach radius (WARDEN_REACH_YARDS = 6, and she stands at z=-21):
+    // the `land` step does not complete until the player actually gets to her, and
+    // until it does, taking the task cannot advance the script to the yard.
+    await walkTo(page, 0, -16);
     await sleep(1200);
     await shot('02-warden-reveal');
     await sleep(4200);
     await shot('03-warden');
 
-    // The practice yard (the reveal fires once the tutorial sends them there).
-    await walkTo(page, 22, 4);
-    await sleep(2500);
+    // Take her task. THAT is what fires the yard reveal: the camera sweeps east off
+    // the player's shoulder onto an empty practice yard and the three dummies land
+    // in it. Done through the sim's own talkToNpc, which is exactly what the Interact
+    // key calls.
+    await page.evaluate(() => {
+      const g = window.__game;
+      const warden = [...g.sim.entities.values()].find((e) => e.templateId === 'dawnhaven_warden');
+      if (warden) g.sim.talkToNpc(warden.id);
+    });
+    await sleep(3400);
     await shot('04-practice-yard');
+    await sleep(3000);
+    await shot('04b-dummies-landed');
+
+    // Walk over to them.
+    await walkTo(page, 22, 4);
+    await sleep(2000);
 
     // West to the ambush brush, then fire the wolf reveal. The reveal normally
     // triggers on the `hunt` step, which a screenshot run has not played up to, so
@@ -145,6 +161,8 @@ for (const [label, viewport] of [
     });
     console.log(`  entities: ${JSON.stringify(state)}`);
     if (state.warden !== 1) errors.push(`[${label}] warden not staged in (${state.warden})`);
+    // The dummies exist ONLY because the yard reveal staged them (nothing spawns them
+    // at world init), so this doubles as proof the reveal fired.
     if (state.dummies !== 3) errors.push(`[${label}] expected 3 dummies, got ${state.dummies}`);
     // 4 from the pack camp + the 1 the reveal staged.
     if (state.wolves < 5) errors.push(`[${label}] ambush wolf never spawned (${state.wolves})`);

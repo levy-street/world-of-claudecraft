@@ -261,6 +261,7 @@ const TOLLING_BELL: ClipMap = {
 const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
+const TUTORIAL = 'models/tutorial';
 const WEAPONS = 'models/weapons';
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
@@ -1039,6 +1040,28 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Idle',
     },
   },
+  // Practice Dummy (Dawnhaven Isle, the starter tutorial): the straw post the class
+  // challenges are fought against. Same rig-less device as the egg-sac above (no
+  // clips in the GLB; the animation pipeline no-ops on a clip name it cannot find),
+  // which is exactly right for a post: it never moves and it can never be felled.
+  // Without this it falls through to FAMILY_KEYS.humanoid and the player is asked to
+  // spend the tutorial beating up what looks like a villager.
+  //
+  // `lazyPreload`: the isle is the ONLY place it appears, so it stays out of the boot
+  // sweep and a live-world player never downloads it. src/main.ts preloads it (via
+  // preloadTutorialAssets) before the tutorial world is built.
+  mob_training_post: {
+    url: `${TUTORIAL}/training_post.glb`,
+    height: 1.9,
+    lazyPreload: true,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      death: 'Idle',
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -1062,6 +1085,8 @@ const MOB_KEYS: Record<string, string> = {
   // Old Greyjaw: the named rare wolf gets his own custom model (the pack
   // wolves keep the light mob_wolf)
   old_greyjaw: 'greyjaw',
+  // Starter tutorial: the practice dummy is a straw post, not a person.
+  dawnhaven_dummy: 'mob_training_post',
   // The Drowned Litany (Mirefen Marsh): give marsh enemies the right silhouette
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',

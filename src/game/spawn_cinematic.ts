@@ -43,6 +43,54 @@ export function spawnCinematicPose(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Does the arrival cinematic play at all?
+//
+// Two different products share this camera. In the LIVE world it is a one-time
+// welcome: a brand-new character's first entry, remembered per character so it
+// never replays. On Dawnhaven Isle (the starter tutorial) it is a SET PIECE: you
+// wash ashore and the camera sweeps in off the sea, and that is the opening beat
+// of the tutorial, not a convenience. Those two want opposite answers to "have you
+// seen this before", which is why the decision is one pure function rather than a
+// condition spelled out at the call site.
+// ---------------------------------------------------------------------------
+
+export interface SpawnIntroGate {
+  /** The caller asked for an intro at all (a world entry, not a reconnect). */
+  requested: boolean;
+  /** The persisted "already seen it" marker for this character. */
+  seen: boolean;
+  playerLevel: number;
+  /** The EFFECTIVE flag: the OS query OR the in-game switch. */
+  reduceMotion: boolean;
+  /** This session IS the starter tutorial. */
+  tutorial: boolean;
+}
+
+export function shouldPlaySpawnIntro(g: SpawnIntroGate): boolean {
+  if (!g.requested) return false;
+  // A sweeping camera glide is exactly what the reduce-motion contract exists for,
+  // and it outranks everything below, the tutorial included.
+  if (g.reduceMotion) return false;
+  if (g.playerLevel > 1) return false;
+  // The isle's arrival replays every time you land on it (a second class, a replay),
+  // so the seen marker is deliberately not consulted.
+  if (g.tutorial) return true;
+  return !g.seen;
+}
+
+/**
+ * ...and for a tutorial session the marker is not WRITTEN either.
+ *
+ * Two reasons. It would retire the isle's own arrival after one visit, and the
+ * offline keybind scope is `offline:<class>:<name>`, which the tutorial borrows, so
+ * writing it would ALSO silently retire the first-spawn intro for an ordinary
+ * offline character that happened to share that class and name.
+ */
+export function shouldPersistIntroSeen(tutorial: boolean): boolean {
+  return !tutorial;
+}
+
 // Skipping: desktop presses Escape; touch players have no Escape key, so a
 // rapid burst of taps skips instead (a lone stray tap must not).
 export const SKIP_TAP_COUNT = 4;

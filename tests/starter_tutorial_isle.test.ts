@@ -14,6 +14,7 @@ import {
   DAWNHAVEN_ASSET_SIZES,
   DAWNHAVEN_BLOCKERS,
   DAWNHAVEN_CAMPS,
+  DAWNHAVEN_DUMMY_POSTS,
   DAWNHAVEN_LANDING,
   DAWNHAVEN_MOBS,
   DAWNHAVEN_PLACEMENTS,
@@ -107,7 +108,11 @@ describe('Dawnhaven Isle content', () => {
 
   it('the practice dummies draw no rng and sit at level 1', () => {
     const dummy = DAWNHAVEN_MOBS.dawnhaven_dummy;
-    // `dummy: true` is what makes the ctor spawn them without a single rng draw.
+    // They are staged, not camped, so no camp should reference them at all.
+    expect(DAWNHAVEN_CAMPS.some((c) => c.mobId === 'dawnhaven_dummy')).toBe(false);
+    expect(DAWNHAVEN_DUMMY_POSTS.length).toBe(3);
+    // `dummy: true` keeps them out of the rng anyway (the ctor's zero-draw arm), and
+    // `spawnStagedMob` draws none either.
     expect(dummy.dummy).toBe(true);
     // A level 20 dummy would give a fresh level 1 player a brutal miss rate on the
     // very step that is teaching them to attack.
@@ -193,9 +198,22 @@ describe('Dawnhaven Isle content', () => {
       expect(warden.kind).toBe('npc');
       expect(warden.questIds).toContain('q_dawnhaven_wolves');
 
-      // The dummies and the wolf pack DID spawn from the camps.
-      const dummies = [...sim.entities.values()].filter((e) => e.templateId === 'dawnhaven_dummy');
-      expect(dummies).toHaveLength(3);
+      // The practice dummies are staged too: the yard is EMPTY until the player takes
+      // her task and the `yardReveal` scene lands them in it. A dummy standing there
+      // from world init would make that reveal a plain camera move.
+      const dummiesAtInit = [...sim.entities.values()].filter(
+        (e) => e.templateId === 'dawnhaven_dummy',
+      );
+      expect(dummiesAtInit).toHaveLength(0);
+      for (const post of DAWNHAVEN_DUMMY_POSTS) {
+        expect(sim.spawnStagedMob('dawnhaven_dummy', post.x, post.z)).not.toBeNull();
+      }
+      expect(
+        [...sim.entities.values()].filter((e) => e.templateId === 'dawnhaven_dummy'),
+      ).toHaveLength(DAWNHAVEN_DUMMY_POSTS.length);
+
+      // The wolf PACK does come from a camp: it is what respawns, and what the player
+      // works through after the staged ambusher.
       const wolves = [...sim.entities.values()].filter(
         (e) => e.templateId === 'dawnhaven_strandwolf',
       );

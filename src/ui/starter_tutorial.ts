@@ -63,7 +63,6 @@ export const AUTO_SHOT_ABILITY_LABEL = 'Auto Shot';
 // the step's own completion radius, so the scene always plays BEFORE the step it
 // belongs to can complete.
 const WARDEN_SCENE_RANGE = 22;
-const YARD_SCENE_RANGE = 18;
 const AMBUSH_SCENE_RANGE = 15;
 
 /** How long the closing card lingers before the tutorial hands the player back. */
@@ -238,13 +237,22 @@ export class StarterTutorial {
       hooks.forceCue('wardenReveal');
     }
 
+    // The yard reveal fires ON TAKING THE TASK, from wherever the player is standing
+    // (in front of the Warden), NOT on walking up to the yard. That ordering is the
+    // whole beat: the camera sweeps east onto an EMPTY yard and the dummies land in
+    // it, which both answers "where am I going" and makes the reveal a reveal. A
+    // proximity trigger would have shown them the dummies they were already looking
+    // at. The dummies are staged by this scene, so it is also what puts them in the
+    // world at all.
+    if (stepId !== null && YARD_STEPS.has(stepId)) hooks.play('yardReveal', nowSec);
+    // Safety net, same shape as the Warden's: past the step that needs a dummy and
+    // still no dummy in the world means the scene never ran. Stage them anyway.
     if (
       stepId !== null &&
       YARD_STEPS.has(stepId) &&
-      dist2d(p.pos, { x: TUTORIAL_POINTS.yard.x, y: p.pos.y, z: TUTORIAL_POINTS.yard.z }) <=
-        YARD_SCENE_RANGE
+      this.nearestMob(world, TUTORIAL_DUMMY_ID) === null
     ) {
-      hooks.play('yardReveal', nowSec);
+      hooks.forceCue('yardReveal');
     }
 
     if (
@@ -412,8 +420,10 @@ export class StarterTutorial {
   }
 }
 
-/** The steps whose objective lives in the practice yard, so the yard reveal fires
- *  as the player walks over to it. */
+/** The steps whose objective lives in the practice yard. The FIRST of them
+ *  ('target') begins the moment the Warden's task is accepted, which is what fires
+ *  the yard reveal; the rest are here so the safety net below still recognizes a
+ *  player who is mid-yard with no dummies (a scene that somehow never ran). */
 const YARD_STEPS: ReadonlySet<string> = new Set(['target', 'strike', 'signature', 'mastery']);
 
 /** The two steps whose content depends on the class (see objectiveLabel). */

@@ -495,6 +495,23 @@ export function preloadMechAssets(): Promise<void> {
   return mechAssetsPromise;
 }
 
+// Lazy fetch for the starter tutorial's practice-dummy post. Kept out of the boot
+// sweep for the same reason as the Mech: it is only ever seen on Dawnhaven Isle, so
+// a live-world player should never pay for it. main.ts awaits this before building
+// the tutorial world, so the visual is resolved by the time a dummy is staged in.
+let tutorialAssetsPromise: Promise<void> | null = null;
+export function preloadTutorialAssets(): Promise<void> {
+  if (tutorialAssetsPromise) return tutorialAssetsPromise;
+  const def = VISUALS.mob_training_post;
+  if (!def) return Promise.resolve();
+  tutorialAssetsPromise = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(def.url, g);
+    })
+    .then(() => undefined);
+  return tutorialAssetsPromise;
+}
+
 export function mechAssetsReady(): boolean {
   const def = VISUALS.player_mech;
   if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;

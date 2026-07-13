@@ -4,6 +4,9 @@ import {
   recordSkipTap,
   SKIP_TAP_COUNT,
   SKIP_TAP_WINDOW_SEC,
+  type SpawnIntroGate,
+  shouldPersistIntroSeen,
+  shouldPlaySpawnIntro,
   spawnCinematicFor,
   spawnCinematicPose,
 } from '../src/game/spawn_cinematic';
@@ -86,5 +89,50 @@ describe('skip tap burst', () => {
     for (let i = 0; i < SKIP_TAP_COUNT - 1; i++) recordSkipTap(taps, i * 0.1);
     // The next tap lands past the window: everything before it is pruned.
     expect(recordSkipTap(taps, SKIP_TAP_WINDOW_SEC + 1)).toBe(false);
+  });
+});
+
+describe('does the arrival cinematic play', () => {
+  const gate = (over: Partial<SpawnIntroGate> = {}): SpawnIntroGate => ({
+    requested: true,
+    seen: false,
+    playerLevel: 1,
+    reduceMotion: false,
+    tutorial: false,
+    ...over,
+  });
+
+  it('plays once for a fresh live character, then never again', () => {
+    expect(shouldPlaySpawnIntro(gate())).toBe(true);
+    expect(shouldPlaySpawnIntro(gate({ seen: true }))).toBe(false);
+  });
+
+  it('REPLAYS every time on the tutorial isle, seen marker or not', () => {
+    // The regression this exists for: the isle's arrival is a set piece (you wash
+    // ashore and the camera sweeps in off the sea), not a one-time welcome. It was
+    // being suppressed on the second visit by the live world's seen marker, so a
+    // player only ever saw the opening of the tutorial once, on their first class.
+    expect(shouldPlaySpawnIntro(gate({ tutorial: true, seen: true }))).toBe(true);
+    expect(shouldPlaySpawnIntro(gate({ tutorial: true, seen: false }))).toBe(true);
+  });
+
+  it('never persists the seen marker for a tutorial session', () => {
+    // Persisting it would retire the isle's own arrival, AND (because the tutorial
+    // borrows the offline keybind scope, class + name) silently retire the
+    // first-spawn intro for an ordinary offline character of the same class + name.
+    expect(shouldPersistIntroSeen(true)).toBe(false);
+    expect(shouldPersistIntroSeen(false)).toBe(true);
+  });
+
+  it('reduce motion outranks everything, the tutorial included', () => {
+    expect(shouldPlaySpawnIntro(gate({ reduceMotion: true }))).toBe(false);
+    expect(shouldPlaySpawnIntro(gate({ reduceMotion: true, tutorial: true }))).toBe(false);
+  });
+
+  it('never plays for a character past level 1, or when not asked for', () => {
+    expect(shouldPlaySpawnIntro(gate({ playerLevel: 2 }))).toBe(false);
+    expect(shouldPlaySpawnIntro(gate({ playerLevel: 2, tutorial: true }))).toBe(false);
+    expect(shouldPlaySpawnIntro(gate({ requested: false }))).toBe(false);
+    expect(shouldPlaySpawnIntro(gate({ requested: false, tutorial: true }))).toBe(false);
   });
 });

@@ -12,18 +12,29 @@
 // and glides back. Four of them:
 //
 //   wardenReveal - the empty shrine on the knoll; the Warden materializes on it.
-//   yardReveal   - a slow pan across the practice dummies.
+//   yardReveal   - fires the instant the player takes her task, so the camera
+//                  TRAVELS: it sweeps east off their shoulder onto an empty
+//                  practice yard, and the three dummies land in it.
 //   wolfReveal   - the brush at the lip of the hollow; the first strand wolf
 //                  explodes out of it. This is the player's first real enemy, and
 //                  the beat the Warden narrates ("that is a mob").
 //   finale       - a slow orbit as the Warden hands over the reward.
+//
+// Every reveal stages something that WAS NOT THERE. That is deliberate and it is
+// the difference between a reveal and a camera move: nothing on this isle stands
+// around waiting to be panned across.
 //
 // Accessibility: `reduceMotion` is honored the way the spawn cinematic honors it.
 // A reduce-motion player gets NO camera movement at all, but every cue still fires
 // immediately, so the Warden and the wolf still appear and the tutorial can never
 // dead-end on a scene that was skipped.
 
-import { DAWNHAVEN_AMBUSH, DAWNHAVEN_WARDEN_POS, DAWNHAVEN_YARD } from '../sim/content/tutorial';
+import {
+  DAWNHAVEN_AMBUSH,
+  DAWNHAVEN_DUMMY_POSTS,
+  DAWNHAVEN_WARDEN_POS,
+  DAWNHAVEN_YARD,
+} from '../sim/content/tutorial';
 import {
   chasePose,
   cuesBetween,
@@ -60,9 +71,11 @@ export interface TutorialSceneDeps {
 
 const WARDEN_NPC_ID = 'dawnhaven_warden';
 const WOLF_MOB_ID = 'dawnhaven_strandwolf';
+const DUMMY_MOB_ID = 'dawnhaven_dummy';
 
 // Cue names. A cue fires exactly once, when its shot begins.
 const CUE_SPAWN_WARDEN = 'spawnWarden';
+const CUE_SPAWN_DUMMIES = 'spawnDummies';
 const CUE_SPAWN_WOLF = 'spawnWolf';
 
 export class TutorialScenePlayer {
@@ -159,6 +172,17 @@ export class TutorialScenePlayer {
       if (id !== null) this.deps.burst(id, 'holy');
       return;
     }
+    if (cue === CUE_SPAWN_DUMMIES) {
+      // All three land together, each with its own pop. They face back down the row
+      // toward the player, who is standing at the Warden's knoll watching this.
+      const p = this.deps.playerPos();
+      for (const post of DAWNHAVEN_DUMMY_POSTS) {
+        const facing = Math.atan2(p.x - post.x, p.z - post.z);
+        const id = this.deps.spawnMob(DUMMY_MOB_ID, post.x, post.z, facing);
+        if (id !== null) this.deps.burst(id, 'arcane');
+      }
+      return;
+    }
     if (cue === CUE_SPAWN_WOLF) {
       // Faces the player it is about to charge.
       const p = this.deps.playerPos();
@@ -203,9 +227,21 @@ export class TutorialScenePlayer {
       return {
         open,
         shots: [
-          { to: frameSubject(yard, 2.4, 14, 4.5), durationSec: 1.5 },
-          // A slow drift down the dummy row.
-          { to: frameSubject(yard, 3.3, 9, 2.4), durationSec: 1.6 },
+          // The long one. This fires the instant the player takes the task, from
+          // wherever they are standing (the Warden's knoll), so the camera actually
+          // TRAVELS: it lifts off their shoulder and sweeps east across the meadow
+          // onto the yard. That journey is what tells them where they are being sent.
+          { to: frameSubject(yard, 2.4, 16, 5.0), durationSec: 2.0 },
+          // Drop onto the empty row, and hold on it being empty for a beat.
+          { to: frameSubject(yard, 3.0, 10, 2.6), durationSec: 1.2 },
+          // The beat: the three of them land in it.
+          {
+            to: frameSubject(yard, 3.0, 10, 2.6),
+            durationSec: 0.5,
+            hold: true,
+            cue: CUE_SPAWN_DUMMIES,
+          },
+          { to: frameSubject(yard, 3.0, 10, 2.6), durationSec: 1.1, hold: true },
           land,
         ],
       };

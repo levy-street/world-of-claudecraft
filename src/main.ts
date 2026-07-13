@@ -69,6 +69,8 @@ import { sfx } from './game/sfx';
 import {
   recordSkipTap,
   type SpawnCinematic,
+  shouldPersistIntroSeen,
+  shouldPlaySpawnIntro,
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
@@ -119,7 +121,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { preloadMechAssets } from './render/characters/assets';
+import { preloadMechAssets, preloadTutorialAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
@@ -2938,6 +2940,11 @@ async function startGame(
   // has no Escape key) skips straight to the end; other input is swallowed
   // while it runs. Seen-state persists per character so it plays exactly once;
   // reduce-motion players go straight to gameplay.
+  //
+  // The starter tutorial is the exception, and shouldPlaySpawnIntro owns that rule:
+  // washing ashore on Dawnhaven IS the opening beat of the tutorial, so it replays
+  // on every visit and never touches the seen marker.
+  const isTutorialSession = tutorialClass !== null;
   const INTRO_SEEN_KEY = `woc_spawn_intro_seen:${keybindScope}`;
   let introSeen = true;
   try {
@@ -2975,10 +2982,12 @@ async function startGame(
     setIntroUiHidden(false);
     window.removeEventListener('keydown', skipIntro, true);
     window.removeEventListener('pointerdown', skipIntro, true);
-    try {
-      localStorage.setItem(INTRO_SEEN_KEY, '1');
-    } catch {
-      // storage unavailable: worst case the intro replays next session
+    if (shouldPersistIntroSeen(isTutorialSession)) {
+      try {
+        localStorage.setItem(INTRO_SEEN_KEY, '1');
+      } catch {
+        // storage unavailable: worst case the intro replays next session
+      }
     }
   };
   const introTaps: number[] = [];
@@ -3014,11 +3023,13 @@ async function startGame(
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (
-    playIntro &&
-    !introSeen &&
-    world.player.level <= 1 &&
-    !settings.get('reduceMotion') &&
-    !osReducedMotion
+    shouldPlaySpawnIntro({
+      requested: playIntro,
+      seen: introSeen,
+      playerLevel: world.player.level,
+      reduceMotion: settings.get('reduceMotion') || osReducedMotion,
+      tutorial: isTutorialSession,
+    })
   ) {
     intro = {
       cinematic: spawnCinematicFor({
@@ -3111,6 +3122,11 @@ function sanitizeOfflineName(raw: string): string {
  *  isle is a sandbox, so the character the player just made is still sitting
  *  untouched on the roster when they come back. */
 async function startTutorial(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
+  // The practice-dummy post is kept out of the boot preload sweep (it is only ever
+  // seen here, so a live-world player never pays for it), which means it has to be
+  // resolved BEFORE the world is built: the renderer reads visual GLBs synchronously
+  // when it creates an entity's view, and the reveal stages three dummies on cue.
+  await preloadTutorialAssets();
   await startOffline(playerClass, name, skin, DAWNHAVEN_WORLD, DAWNHAVEN_SEED, playerClass);
 }
 
