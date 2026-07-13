@@ -19,6 +19,7 @@ import { ALL_CLASSES, dist2d, INTERACT_RANGE, type PlayerClass } from '../sim/ty
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n';
 import { formatNumber, t } from './i18n';
+import { createObjectiveArrow, hideObjectiveArrow, paintObjectiveArrow } from './objective_arrow';
 import {
   TUTORIAL_NEXT_TIPS,
   type TutorialParam,
@@ -286,12 +287,7 @@ export class TutorialOverlay {
     ui.appendChild(root);
     this.root = root;
 
-    const arrow = document.createElement('div');
-    arrow.className = 'tut-arrow';
-    arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '➤'; // ➤
-    ui.appendChild(arrow);
-    this.arrow = arrow;
+    this.arrow = createObjectiveArrow(ui);
   }
 
   private renderPanel(world: IWorld, keybinds: Keybinds): void {
@@ -389,32 +385,11 @@ export class TutorialOverlay {
       return;
     }
 
-    const v = renderer.worldToScreen(target.x, target.y + 2.2, target.z);
-    const margin = 56;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    let sx = v.x;
-    let sy = v.y;
-    // Behind the camera projects inverted; mirror through screen centre so the
-    // marker still points the right way.
-    if (v.behind) {
-      sx = w - v.x;
-      sy = h - v.y;
-    }
-    const cx = w / 2;
-    const cy = h / 2;
-    const angle = Math.atan2(sy - cy, sx - cx);
-    sx = Math.max(margin, Math.min(w - margin, sx));
-    sy = Math.max(margin, Math.min(h - margin, sy));
-
-    this.arrow.style.display = 'block';
-    this.arrow.style.left = `${sx}px`;
-    this.arrow.style.top = `${sy}px`;
-    this.arrow.style.transform = `translate(-50%, -50%) rotate(${angle}rad)`;
+    paintObjectiveArrow(this.arrow, renderer.worldToScreen(target.x, target.y + 2.2, target.z));
   }
 
   private hideArrow(): void {
-    if (this.arrow) this.arrow.style.display = 'none';
+    hideObjectiveArrow(this.arrow);
   }
 
   private finish(): void {
