@@ -422,9 +422,6 @@
     border-color: var(--gold);
     color: #fff;
   }
-  body.mobile-touch #mobile-extra-controls .mobile-btn:not(.is-on) {
-    opacity: 0.55;
-  }
   body.mobile-touch .mobile-btn .mobile-label {
     display: block;
     margin-top: 1px;
@@ -957,14 +954,16 @@
     --window-pad: 10px;
     pointer-events: none;
     z-index: 100;
-    border: 1px solid var(--mobile-glass-border);
-    border-radius: 10px;
-    background: var(--mobile-glass-bg);
-    -webkit-backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
-    backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     box-shadow:
-      0 8px 28px #000d,
-      inset 0 1px 0 #ffffff12;
+      0 0 0 1px #000,
+      inset 0 0 0 1px var(--gold-dim),
+      inset 0 1px 0 #ffffff1f,
+      0 8px 28px #000d;
     /* Centre-screen modal (the More button lives in the top-left trio now, so
        the menu opens under the middle of the screen instead of stacking on the
        trigger): cap to the safe viewport so short landscape phones can
@@ -1003,23 +1002,37 @@
     }
   }
   body.mobile-touch #mobile-extra-controls .panel-title {
-    /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
+    /* 48px, not the old 32px: the close button is a 48x48 absolute-pinned touch
        target now (it no longer props the header height from the flex flow), so
        the header itself must be at least as tall as the target. */
     min-height: 48px;
     margin-bottom: 8px;
     padding-bottom: 6px;
+    font-family: var(--title-font);
+    font-size: 17px;
+    letter-spacing: 0.8px;
+    color: var(--gold);
+    background: linear-gradient(180deg, #201a12, var(--panel-base));
+    border-bottom-color: var(--border);
+    box-shadow: inset 0 -1px 0 #000b;
     cursor: move;
     touch-action: none;
   }
   body.mobile-touch #mobile-extra-controls .panel-title .x-btn {
-    /* Meet the 40x40 mobile touch floor (was 32x28), matching the general
-       body.mobile-touch .x-btn rule. */
-    min-width: 40px;
-    min-height: 40px;
+    /* The More tray is a modal navigation surface, so its close action uses the
+       same 48px primary touch floor as every menu item. */
+    min-width: 48px;
+    min-height: 48px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    color: #d8c89a;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: linear-gradient(#302116, #17100b);
+    box-shadow:
+      inset 0 1px 0 #ffffff1f,
+      0 1px 3px #000a;
   }
   /* Issue 1577 round 2 (4): 4 columns instead of 3 so each More-tray button is a
      bit narrower (the tray holds a long list of verbs, and the wide 3-up pills
@@ -1027,46 +1040,69 @@
   body.mobile-touch #mobile-extra-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    /* No chrome-scale here: the More tray is a TRANSIENT modal, not persistent
-       chrome, so shrinking it frees no world view. Keep its pills at the 40px
-       touch floor regardless of the persistent-HUD chrome scale. */
-    grid-auto-rows: 40px;
+    /* No chrome-scale here: the More tray is a transient modal, not persistent
+       chrome, so shrinking it frees no world view. Keep every menu action at the
+       48px primary touch floor regardless of the persistent HUD chrome scale. */
+    grid-auto-rows: 48px;
     gap: 6px;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
-    height: 40px;
+    height: 48px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 6px;
     padding: 0 8px;
+    font-family: var(--title-font);
     font-size: 14px;
-    /* The base .mobile-btn's border-radius: 50% is meant for the near-square
-       combat/hotbar buttons; on this wide row it computes a squashed oval
-       (elliptical corner radii bigger than the box is tall). A pill needs the
-       radius capped at half the height so the ends are true semicircles and
-       the sides stay straight. */
-    border-radius: 20px;
+    letter-spacing: 0.25px;
+    color: #ffd9a0;
+    background: linear-gradient(#8a3326, #5a1d12 55%, #471409);
+    border: 1px solid #a86;
+    outline: 1px solid #000;
+    border-radius: 4px;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    text-shadow: 1px 1px 1px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff2a,
+      0 2px 4px #0008;
+    opacity: 1;
+    transition:
+      filter var(--transition-speed),
+      box-shadow var(--transition-speed),
+      border-color var(--transition-speed);
   }
   body.mobile-touch #mobile-extra-controls .mobile-label {
     display: inline;
     margin: 0;
-    font-size: 9px;
-    color: #e6d8ae;
+    font-size: 10px;
+    color: inherit;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
     flex: 0 0 18px;
+    color: #f3dfaa;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn:hover,
+  body.mobile-touch #mobile-extra-controls .mobile-btn:focus-visible {
+    filter: brightness(1.2);
+    border-color: var(--gold-dim);
+    box-shadow:
+      inset 0 1px 0 #ffffff2a,
+      0 2px 4px #0008,
+      0 0 8px var(--color-primary-glow);
   }
   /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
-  body.mobile-touch #mobile-extra-controls .mobile-btn.is-on {
+  body.mobile-touch #mobile-extra-controls .mobile-btn:is(.is-on, .active) {
+    background: linear-gradient(#6b5314, #3a2d10 60%, #241a08);
     border-color: var(--gold);
     box-shadow:
       0 0 8px #ffd10066,
       inset 0 0 6px #ffd10033;
   }
-  body.mobile-touch #mobile-extra-controls .mobile-btn.is-on .mobile-label {
+  body.mobile-touch #mobile-extra-controls .mobile-btn:is(.is-on, .active) .mobile-label {
     color: var(--gold);
   }
   body.mobile-touch #bottom-bar {
@@ -1841,29 +1877,45 @@
   body.mobile-touch #minimap-clock {
     position: static;
     order: 4;
+    left: auto;
+    bottom: auto;
+    width: max-content;
+    max-width: 100%;
+    min-width: 52px;
+    min-height: 20px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transform: none;
     margin: 5px auto 0;
+    line-height: 16px;
+    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
+    border: 2px solid var(--border);
+    border-radius: 8px;
   }
   /* The minimap wrapper is scaled down on touch, so counter-scale the disc
-     controls and place them in a row below the aura strip, left of the map. */
+     controls. Their row sits below coords, compass, and clock instead of
+     covering the compass strip. */
   body.mobile-touch #raid-lockout {
-    left: auto;
-    right: calc(100% + 10px);
-    top: 156px;
+    left: 22px;
+    right: auto;
+    top: 258px;
     bottom: auto;
     width: 44px;
     height: 44px;
     border-width: 2px;
     transform: scale(1.25);
-    transform-origin: right top;
+    transform-origin: left top;
   }
   body.mobile-touch #raid-lockout svg {
     width: 24px;
     height: 24px;
   }
   body.mobile-touch #mail-indicator {
-    right: calc(100% + 74px);
-    top: 156px;
+    left: 85px;
+    right: auto;
+    top: 258px;
     bottom: auto;
     width: 44px;
     height: 44px;
@@ -1874,7 +1926,7 @@
     border-radius: 999px;
     border-width: 2px;
     transform: scale(1.25);
-    transform-origin: right top;
+    transform-origin: left top;
   }
   body.mobile-touch #mail-indicator .ui-icon {
     width: 22px;
@@ -4122,13 +4174,12 @@
       bottom: auto !important;
       transform: var(--mobile-more-closed-transform) !important;
       --window-pad: 8px;
-      /* No --ui-scale division: body-level window outside the zoomed #ui.
-         120px clears the bottom control row (movement/action clusters +
-         labels), which sits outside normal layout flow so nothing else
-         reserves space for it. */
+      /* No --ui-scale division: body-level window outside the zoomed #ui. The
+         modal owns input while open, so it can use the viewport above the
+         safe-area/footer band even if gameplay controls remain painted behind it. */
       max-height: calc(
         var(--app-vh) -
-        120px -
+        64px -
         env(safe-area-inset-top) -
         env(safe-area-inset-bottom)
       );
@@ -4138,11 +4189,11 @@
     }
     body.mobile-touch #mobile-extra-grid {
       /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
-         tier so each More-tray pill stays narrow on a wide landscape phone.
+         tier so each More-tray action stays compact on a wide landscape phone.
          No chrome-scale on the rows (see the base-tier rule): transient modal,
-         always held at the 40px floor. */
+         always held at the 48px primary touch floor. */
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-auto-rows: 40px;
+      grid-auto-rows: 48px;
       gap: 5px;
     }
     /* The base square map can dip into the fixed Jump/Interact/combat row on a
@@ -4193,13 +4244,13 @@
     }
     body.mobile-touch #mobile-extra-controls .mobile-btn {
       width: 100%;
-      height: 40px;
+      height: 48px;
       font-size: 13px;
       padding: 0 7px;
-      border-radius: 20px;
+      border-radius: 4px;
     }
     body.mobile-touch #mobile-extra-controls .mobile-label {
-      font-size: 9px;
+      font-size: 10px;
     }
     body.mobile-touch #bottom-bar {
       left: calc(max(20px, env(safe-area-inset-left)) + 164px);
@@ -4357,7 +4408,7 @@
     }
     body.mobile-touch #raid-lockout,
     body.mobile-touch #mail-indicator {
-      top: 94px;
+      top: 258px;
       transform: scale(1.27);
     }
     body.mobile-touch #quest-tracker {
@@ -5315,8 +5366,8 @@
     position: static;
     order: 4;
     margin: 5px auto 0;
-    min-height: 0;
-    display: block;
+    min-height: 20px;
+    display: inline-flex;
     translate: none;
     transform: none;
     z-index: auto;
@@ -5330,8 +5381,8 @@
     transform-origin: left top;
   }
   body.mobile-touch.mobile-hud-custom-active #raid-lockout {
-    left: 0;
-    top: 156px;
+    left: 22px;
+    top: 270px;
     bottom: auto;
   }
   body.mobile-touch.mobile-hud-custom-active :is(#zone-label, #minimap-coords, #compass),
@@ -5339,8 +5390,8 @@
     pointer-events: none;
   }
   body.mobile-touch.mobile-hud-custom-active #mail-indicator {
-    left: 74px;
-    top: 156px;
+    left: 85px;
+    top: 270px;
     bottom: auto;
   }
   body.mobile-touch.mobile-hud-custom-active #player-frame {

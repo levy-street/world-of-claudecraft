@@ -1063,18 +1063,21 @@ describe('MobileHudEditor validation UI', () => {
     expect(mainSource).not.toContain(['window.confirm(`', '$', '{copy.title}'].join(''));
   });
 
-  it('keeps the custom minimap clock and rim buttons on the production mobile geometry', () => {
+  it('keeps the minimap clock compact and seats its buttons below the compass and clock', () => {
     expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.mobile-hud-custom-active #minimap-clock\s*\{[^}]*position:\s*static;[^}]*order:\s*4;[^}]*transform:\s*none;/,
+      /body\.mobile-touch #minimap-clock\s*\{[^}]*position:\s*static;[^}]*order:\s*4;[^}]*left:\s*auto;[^}]*bottom:\s*auto;[^}]*width:\s*max-content;[^}]*display:\s*inline-flex;[^}]*background:\s*radial-gradient/,
     );
     expect(mobileHudCss).toMatch(
       /body\.mobile-touch\.mobile-hud-custom-active #minimap-disc,\s*body\.mobile-touch\.mobile-hud-custom-active #minimap\s*\{[^}]*width:\s*162px;[^}]*height:\s*162px;/,
     );
     expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.mobile-hud-custom-active #raid-lockout\s*\{[^}]*left:\s*0;[^}]*top:\s*156px;/,
+      /body\.mobile-touch\.mobile-hud-custom-active #raid-lockout\s*\{[^}]*left:\s*22px;[^}]*top:\s*270px;/,
     );
     expect(mobileHudCss).toMatch(
-      /body\.mobile-touch\.mobile-hud-custom-active #mail-indicator\s*\{[^}]*left:\s*74px;[^}]*top:\s*156px;/,
+      /body\.mobile-touch\.mobile-hud-custom-active #mail-indicator\s*\{[^}]*left:\s*85px;[^}]*top:\s*270px;/,
+    );
+    expect(mobileHudCss).not.toMatch(
+      /body\.mobile-touch #raid-lockout,\s*body\.mobile-touch #mail-indicator\s*\{[^}]*top:\s*94px;/,
     );
   });
 

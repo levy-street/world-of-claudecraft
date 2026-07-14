@@ -1826,7 +1826,7 @@ describe('client HTML shell', () => {
       'display: flex;\n    flex-direction: column;\n    opacity: 0;\n    visibility: hidden;',
     );
     expect(hudMobileCss).toContain('z-index: 100;');
-    expect(hudMobileCss).toContain('border-radius: 10px;');
+    expect(hudMobileCss).toContain('border-radius: 6px;');
     expect(hudMobileCss).toContain(
       'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
     );
@@ -2571,12 +2571,42 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('uses the classic game window and button chrome for the mobile More tray', () => {
+    const panelStart = hudMobileCss.indexOf('body.mobile-touch #mobile-extra-controls {');
+    const panelBody = hudMobileCss.slice(panelStart, hudMobileCss.indexOf('}', panelStart));
+    expect(panelBody).toContain('border: 2px solid var(--border);');
+    expect(panelBody).toContain('border-radius: 6px;');
+    expect(panelBody).toContain('background: var(--panel-bg);');
+    expect(panelBody).toContain('-webkit-backdrop-filter: none;');
+    expect(panelBody).toContain('backdrop-filter: none;');
+
+    const titleStart = hudMobileCss.indexOf(
+      'body.mobile-touch #mobile-extra-controls .panel-title {',
+    );
+    const titleBody = hudMobileCss.slice(titleStart, hudMobileCss.indexOf('}', titleStart));
+    expect(titleBody).toContain('font-family: var(--title-font);');
+    expect(titleBody).toContain('color: var(--gold);');
+
+    const buttonStart = hudMobileCss.indexOf(
+      'body.mobile-touch #mobile-extra-controls .mobile-btn {',
+    );
+    const buttonBody = hudMobileCss.slice(buttonStart, hudMobileCss.indexOf('}', buttonStart));
+    expect(buttonBody).toContain('background: linear-gradient(#8a3326, #5a1d12 55%, #471409);');
+    expect(buttonBody).toContain('border: 1px solid #a86;');
+    expect(buttonBody).toContain('border-radius: 4px;');
+    expect(buttonBody).toContain('font-family: var(--title-font);');
+    expect(buttonBody).toContain('color: #ffd9a0;');
+    expect(hudMobileCss).not.toContain(
+      'body.mobile-touch #mobile-extra-controls .mobile-btn:not(.is-on)',
+    );
+  });
+
   it('keeps the expanded mobile More tray inside the viewport', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(\n        var(--app-vh) -\n        120px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
+      'max-height: calc(\n        var(--app-vh) -\n        64px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
     );
   });
 

@@ -300,17 +300,17 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       coordinateHost: 'ui-author',
       visibleIn: ALL_CONTEXTS,
       validateIn: ALL_CONTEXTS,
-      // Includes the clock and the two rim controls, not only the map disc.
-      // At the 0.6 default scale this matches the compact production footprint.
-      defaultSize: { width: 162, height: 220 },
+      // Includes the clock and the two controls below it, not only the map disc.
+      // At the 0.6 default scale this matches the complete compact footprint.
+      defaultSize: { width: 162, height: 340 },
       edgeMargin: 4,
       comfortPadding: 2,
       scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
-      // The clock and raid/mail satellites receive input too. Keeping the full
-      // normalized cluster blocking prevents an apparently decorative edge from
-      // covering another control after the player moves the minimap.
+      // The clock and raid/mail satellites receive input too. Keep them in the
+      // normalized editor footprint so selection and scaling match the complete
+      // cluster; player-authored overlap remains allowed.
       binding: {
         ...uiBinding('minimap.cluster', '#minimap-wrap', [
           '#zone-label',

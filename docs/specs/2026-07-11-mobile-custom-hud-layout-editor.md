@@ -759,7 +759,8 @@ catalog and rendered through `t()`.
 - Target's interactive aura viewport, the Deeds header, and Delve's mixed click-through
   text plus interactive affix pocket.
 - One Minimap cluster containing its dependent label, indicators, clock, compass, coordinates, and
-  controls.
+  controls. On compact touch layouts, mail and raid lockout stay attached to that cluster in a row
+  below the clock so they do not cover the compass; the clock keeps its compact game-styled box.
 - World, Arena, Vale Cup, and Delve scene previews with supported Arena and Vale Cup substates.
 - Movable compact context status surfaces and hidden protected runtime footprints for fixed overlays.
 - Automatic red diagnostics for malformed placements, unsupported capabilities, invalid scale,
@@ -841,9 +842,10 @@ not change persisted layout semantics.
       swaps a tooltip, tapping elsewhere dismisses it, and only a slop-guarded hold on the player's
       own helpful buff cancels that aura.
 - [ ] The Minimap cluster moves and scales its zone label, map, clock, coordinates, compass, raid
-      lockout, mail indicator, and controls together. Target auras stay with Target; XP, cast, and
-      swing stay with Player. Target reserves 236 by 68 when empty and a 236 by 121 maximum envelope
-      for its interactive aura viewport.
+      lockout, mail indicator, and controls together. Mail and raid lockout render below the clock,
+      outside the compass strip. Target auras stay with Target; XP, cast, and swing stay with Player.
+      Target reserves 236 by 68 when empty and a 236 by 121 maximum envelope for its interactive aura
+      viewport.
 - [ ] Party / Raid shrinks to sparse runtime content without leaving a raid-sized pointer deadzone,
       while Edit Mode shows its maximum 372 by 40 horizontal or 68 by 260 vertical raid-capacity
       scroll viewport. Save validates scale and target size, not exclusive space.

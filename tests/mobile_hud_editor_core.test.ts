@@ -245,7 +245,7 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
       'world.base',
     );
 
-    expect(resolved.canonicalRect).toEqual({ x: 162, y: 57, width: 162, height: 220 });
+    expect(resolved.canonicalRect).toEqual({ x: 162, y: 57, width: 162, height: 340 });
     expect(resolved.interactiveRect).toEqual(resolved.canonicalRect);
   });
 

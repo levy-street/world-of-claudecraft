@@ -256,10 +256,7 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     expectAtLeastFloor(leave, '#party-leave', LEGACY_TOUCH_FLOOR);
   });
 
-  // WIP snapshot carry-over: the 48px floor campaign has not resized the
-  // drawer close button yet (it still ships 40px). Un-skip in the change that
-  // lands the resized close button on the mobile-layout-adjustments branch.
-  it.skip('the mobile More-tray close button', () => {
+  it('the mobile More-tray close button', () => {
     document.body.className = 'mobile-touch game-active mobile-more-open';
     const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
     const title = el('div', { class: 'panel-title' });
