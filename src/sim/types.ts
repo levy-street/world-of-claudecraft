@@ -221,19 +221,11 @@ export type AuraKind =
   // damage of its own.
   | 'earth_shield'
   | 'earthbound_weapon'
-  // Shield Wall-style tank cooldown: a big, short, all-school damage-taken
-  // reduction (value = fraction less, e.g. 0.4 = 40% less) applied in damage.ts.
-  // The warrior tank cooldown (Ironhold).
-  | 'shield_wall'
   // Tidal Ward (shaman tank cooldown): raises the healing the wearer RECEIVES
   // (value = fraction more, e.g. 0.4 = +40%), read by healingTakenMult so it lifts
   // both the ward's own HoT and any incoming ally heal. The positive mirror of
   // mortal_wound.
   | 'heal_taken_up'
-  // Sacred Bulwark (paladin tank cooldown): a divine cheat-death ward. While it
-  // holds, a lethal blow is denied in damage.ts (the wearer survives, restored to
-  // 35% max health) and the ward is consumed.
-  | 'guardian_ward'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.

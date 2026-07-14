@@ -2442,12 +2442,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Стихийный разряд',
   'entities.abilities.unleash_weapon.description':
     'Высвобождает энергию активного усиления оружия по цели, нанося {damage} ед. урона и добавляя эффект в зависимости от усиления: всплеск угрозы (земная привязь), огненный ожог (пламя) или замедление (лед).',
-  'entities.abilities.ironhold.name': 'Железная стена',
-  'entities.abilities.ironhold.description':
-    'Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек.',
-  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
-  'entities.abilities.sacred_bulwark.description':
-    'Защищает вас верой на 1 мин. Смертельный удар не убьет вас, а восстановит здоровье до 35% от максимума.',
   'entities.abilities.tidal_ward.name': 'Приливный оберег',
   'entities.abilities.tidal_ward.description':
     'Нарастающий прилив омывает вас, исцеляя каждые 2 сек и повышая все получаемое вами исцеление на 40% на 8 сек.',

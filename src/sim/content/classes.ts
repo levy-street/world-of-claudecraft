@@ -82,7 +82,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sunder_armor',
       'taunt',
       'pummel',
-      'ironhold',
     ],
     color: 0xc79c6e,
   },
@@ -188,7 +187,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'righteous_fury',
       'retribution_aura',
       'rebuke',
-      'sacred_bulwark',
     ],
     color: 0xf58cba,
   },
@@ -690,24 +688,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
     description:
       'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
-  },
-  // Warrior defensive cooldown: a flat mitigation wall (the `shield_wall` aura,
-  // read in damage.ts). One of three distinct tank cooldowns, see also the paladin
-  // Sacred Bulwark (cheat-death) and shaman Tidal Ward (heal-through).
-  ironhold: {
-    id: 'ironhold',
-    name: 'Ironhold',
-    class: 'warrior',
-    learnLevel: 20,
-    cost: 10,
-    castTime: 0,
-    cooldown: 60,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.4, duration: 8 }],
-    description: 'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
   },
   sunder_armor: {
     id: 'sunder_armor',
@@ -1670,25 +1650,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] },
     ],
     description: 'A holy shield absorbs $d damage for 10 sec.',
-  },
-  // Paladin defensive cooldown: a divine cheat-death (the `guardian_ward` aura,
-  // consumed by a lethal blow in damage.ts). Kept up (its 1 min duration matches
-  // its cooldown), so when a killing blow lands the Light restores you instead.
-  sacred_bulwark: {
-    id: 'sacred_bulwark',
-    name: 'Sacred Bulwark',
-    class: 'paladin',
-    learnLevel: 20,
-    cost: 15,
-    castTime: 0,
-    cooldown: 60,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'guardian_ward', value: 0, duration: 60 }],
-    description:
-      'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
   },
   hammer_of_justice: {
     id: 'hammer_of_justice',

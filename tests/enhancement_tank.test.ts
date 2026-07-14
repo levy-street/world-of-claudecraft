@@ -10,7 +10,13 @@ import { Sim } from '../src/sim/sim';
 import { threatModifier } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
 
-const TANK_KIT = ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon'];
+const TANK_KIT = [
+  'earth_shield',
+  'earthbound_weapon',
+  'elemental_demand',
+  'unleash_weapon',
+  'tidal_ward',
+];
 
 function makeEnh(seed = 7) {
   const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: true });
@@ -46,7 +52,7 @@ function cast(sim: Sim, id: string, pid: number, aim?: { x: number; z: number })
 }
 
 describe('Enhancement tank kit: spec grant', () => {
-  it('grants all four tank abilities to Enhancement only', () => {
+  it('grants the whole tank kit to Enhancement only', () => {
     for (const specId of ['enhancement', 'elemental', 'restoration']) {
       const sim = new Sim({ seed: 1, playerClass: 'shaman', autoEquip: true });
       sim.setPlayerLevel(20);
@@ -128,72 +134,10 @@ describe('Anchorbound Weapon (Earthbound Weapon)', () => {
   });
 });
 
-describe('Tank defensive cooldowns (one distinct mechanic per class)', () => {
-  const CD: Record<string, string> = {
-    warrior: 'ironhold',
-    paladin: 'sacred_bulwark',
-    shaman: 'tidal_ward',
-  };
-
-  // Level-20 player of any class, learn events flushed.
-  function make(cls: string, spec?: string) {
-    const sim = new Sim({ seed: 4, playerClass: cls as any, autoEquip: true });
-    sim.setPlayerLevel(20);
-    if (spec) sim.setSpec(spec);
-    const pid = sim.playerId;
-    const p = sim.entities.get(pid) as Entity & Record<string, unknown>;
-    for (let i = 0; i < 5; i++) sim.tick();
-    (p as any).resource = (p as any).maxResource;
-    return { sim, p, pid };
-  }
-
-  it('all three tank classes know their defensive cooldown at 20', () => {
-    for (const [cls, id] of Object.entries(CD)) {
-      const { sim } = make(cls, cls === 'shaman' ? 'enhancement' : undefined);
-      expect(!!sim.resolvedAbility(id), `${cls} knows ${id}`).toBe(true);
-    }
-  });
-
-  it('Ironhold (warrior): flat 40% mitigation on any damage, DoT ticks included', () => {
-    const { sim, p, pid } = make('warrior');
-    cast(sim, 'ironhold', pid);
-    expect(p.auras.some((a) => a.kind === 'shield_wall')).toBe(true);
-    const mob = spawnMob(sim, p, 3, false);
-    (p as any).maxHp = p.hp = 1_000_000;
-    for (const school of ['physical', 'fire', 'shadow']) {
-      const before = p.hp;
-      (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
-      expect(before - p.hp).toBe(60); // 40% reduced
-    }
-    // non-direct (DoT tick) is reduced too
-    const beforeDot = p.hp;
-    (sim as any).dealDamage(mob, p, 100, false, 'shadow', null, 'hit', false, undefined, false);
-    expect(beforeDot - p.hp).toBe(60);
-  });
-
-  it('Sacred Bulwark (paladin): a lethal blow is denied, restoring 35% health', () => {
-    const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
-    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
-    const mob = spawnMob(sim, p, 3, false);
-    p.hp = p.maxHp;
-    (sim as any).dealDamage(mob, p, p.maxHp * 5, false, 'physical', null, 'hit'); // lethal
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(Math.round(p.maxHp * 0.35));
-    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(false); // consumed
-  });
-
-  it('Sacred Bulwark: a non-lethal blow leaves the ward intact', () => {
-    const { sim, p, pid } = make('paladin');
-    cast(sim, 'sacred_bulwark', pid);
-    const mob = spawnMob(sim, p, 3, false);
-    p.hp = p.maxHp;
-    (sim as any).dealDamage(mob, p, 10, false, 'physical', null, 'hit');
-    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
-  });
-
-  it('Tidal Ward (shaman): heals over time and boosts healing received', () => {
-    const { sim, p, pid } = make('shaman', 'enhancement');
+describe('Tidal Ward (shaman defensive cooldown, heal-through)', () => {
+  it('is granted to Enhancement and heals over time while boosting healing received', () => {
+    const { sim, p, pid } = makeEnh();
+    expect(!!sim.resolvedAbility('tidal_ward')).toBe(true);
     (p as any).maxHp = 100_000;
     cast(sim, 'tidal_ward', pid);
     expect(p.auras.some((a) => a.kind === 'hot')).toBe(true);

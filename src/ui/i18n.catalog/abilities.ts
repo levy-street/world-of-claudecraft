@@ -1045,17 +1045,7 @@ const classAbilityNamesEn = {
         'Elemental Discharge',
         'Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
       ],
-      // Tank defensive cooldowns, one per class, each a different mechanic.
-      [
-        'ironhold',
-        'Ironhold',
-        'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
-      ],
-      [
-        'sacred_bulwark',
-        'Sacred Bulwark',
-        'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
-      ],
+      // Shaman defensive cooldown (heal-through), part of the Enhancement tank kit.
       [
         'tidal_ward',
         'Tidal Ward',

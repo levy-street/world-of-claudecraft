@@ -6072,14 +6072,6 @@ export const zh_CN: EnTranslations = {
         "name": "元素释放",
         "description": "释放当前武器附魔的能量攻击目标，造成 {damage} 点伤害，并根据附魔产生额外效果：威胁值爆发（大地之锚）、火焰灼烧（烈焰）或减速（寒冰）。"
       },
-      "ironhold": {
-        "name": "铁壁",
-        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
-      },
-      "sacred_bulwark": {
-        "name": "神圣壁垒",
-        "description": "以信仰守护自身，持续 1 分钟。下一次致命打击将被抵消，转而将你恢复至 35% 生命值。"
-      },
       "tidal_ward": {
         "name": "潮汐守护",
         "description": "涌动的潮水冲刷全身，每 2 秒治疗你一次，并使你受到的所有治疗提高 40%，持续 8 秒。"

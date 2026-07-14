@@ -6072,14 +6072,6 @@ export const nl_NL: EnTranslations = {
         "name": "Elemental Discharge",
         "description": "Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound)."
       },
-      "ironhold": {
-        "name": "Ironhold",
-        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
-      },
-      "sacred_bulwark": {
-        "name": "Sacred Bulwark",
-        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
-      },
       "tidal_ward": {
         "name": "Tidal Ward",
         "description": "A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec."
