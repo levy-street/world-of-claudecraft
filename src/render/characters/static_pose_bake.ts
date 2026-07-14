@@ -15,6 +15,22 @@ export function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boo
   return true;
 }
 
+// The parts of one model do not agree on uv array types: rig_merge dequantizes
+// the primitives it merges to float32 while unmerged parts and non-skinned
+// attachments keep their meshopt/KHR_mesh_quantization normalized-integer uvs,
+// and mergeGeometries refuses mixed array types (returns null, proxy lost).
+// Bake every uv to plain float32; the getters denormalize quantized sources.
+function toFloatUv(
+  attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+): THREE.BufferAttribute {
+  const size = attr.itemSize;
+  const out = new Float32Array(attr.count * size);
+  for (let i = 0; i < attr.count; i++) {
+    for (let c = 0; c < size; c++) out[i * size + c] = attr.getComponent(i, c);
+  }
+  return new THREE.BufferAttribute(out, size);
+}
+
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
  *  (skinned verts via applyBoneTransform), normalized into world units. */
 export function bakeStaticPose(
@@ -52,7 +68,7 @@ export function bakeStaticPose(
     }
     out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
     const uv = srcGeo.getAttribute('uv');
-    if (uv) out.setAttribute('uv', uv.clone());
+    if (uv) out.setAttribute('uv', toFloatUv(uv));
     if (srcGeo.index) out.setIndex(srcGeo.index.clone());
     out.computeVertexNormals();
     geos.push(out);
