@@ -316,7 +316,7 @@ describe.sequential('SFX Studio server security', () => {
       }),
     });
     const body = Buffer.from(await allowed.arrayBuffer());
-    expect(allowed.status).toBe(200);
+    expect(allowed.status, body.toString('utf8')).toBe(200);
     expect(allowed.headers.get('content-type')).toBe('application/zip');
     expect(allowed.headers.get('content-disposition')).toMatch(
       /^attachment; filename="world-of-claudecraft-sfx-[a-f0-9]{16}\.zip"$/,

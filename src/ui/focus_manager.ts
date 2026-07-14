@@ -124,7 +124,7 @@ export class FocusManager {
           return;
         }
       }
-      const focusables = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+      const focusables = this.focusablesIn(root);
       // Skip the close (X) button on open so focus lands on a meaningful control, not the
       // dismiss affordance; fall back to it only when it is the sole focusable element.
       const target = focusables.find((el) => !el.matches('[data-close]')) ?? focusables[0];
@@ -204,8 +204,25 @@ export class FocusManager {
   };
 
   private focusablesIn(root: HTMLElement): HTMLElement[] {
-    return [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)].filter(
+    const visible = [...root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)].filter(
       (el) => el.getClientRects().length > 0,
     );
+    // Native Tab order exposes a named radio group as one stop: the checked
+    // radio, or the first member when none is checked. The manager drives Tab
+    // manually, so reproduce that derivation instead of stopping on every
+    // unchecked radio in the group.
+    const radioStopByName = new Map<string, HTMLElement>();
+    for (const el of visible) {
+      if (el.tagName.toLowerCase() !== 'input') continue;
+      const input = el as HTMLInputElement;
+      if (input.type !== 'radio' || input.name.length === 0) continue;
+      if (!radioStopByName.has(input.name) || input.checked) radioStopByName.set(input.name, el);
+    }
+    return visible.filter((el) => {
+      if (el.tagName.toLowerCase() !== 'input') return true;
+      const input = el as HTMLInputElement;
+      if (input.type !== 'radio' || input.name.length === 0) return true;
+      return radioStopByName.get(input.name) === el;
+    });
   }
 }

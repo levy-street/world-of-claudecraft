@@ -135,6 +135,7 @@ const legacyLadder = SURFACE_INVENTORY.filter(
 const LEGACY_SOURCE_URLS = [
   new URL('../../../server/main.ts', import.meta.url),
   new URL('../../../server/daily_rewards.ts', import.meta.url),
+  new URL('../../../server/claudium.ts', import.meta.url),
 ] as const;
 
 // Every `=== '<path>'` (or "<path>") comparison whose path begins with /api/. The
@@ -309,6 +310,23 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // v0.20.0: the paginated daily leaderboard read (the ops-side sibling is
     // asserted with the internal family below).
     { method: 'GET', path: '/api/daily-rewards/leaderboard' },
+    // Claudium (server-authoritative soft currency) proxy family
+    // (server/claudium.ts). A brand-new /api/claudium/* prefix with NO legacy
+    // ladder twin: registry-only, so every arm is asserted here. price/:rail is a
+    // public enum param (publicRead), not an account-owned resource.
+    { method: 'POST', path: '/api/claudium/stripe/webhook' },
+    { method: 'GET', path: '/api/claudium/balance' },
+    { method: 'GET', path: '/api/claudium/price/:rail' },
+    { method: 'GET', path: '/api/claudium/skus' },
+    { method: 'GET', path: '/api/claudium/native/rails' },
+    { method: 'GET', path: '/api/claudium/native/price/:rail' },
+    { method: 'GET', path: '/api/claudium/native/balance/sol/:owner' },
+    { method: 'GET', path: '/api/claudium/store' },
+    { method: 'GET', path: '/api/claudium/history' },
+    { method: 'POST', path: '/api/claudium/purchase' },
+    { method: 'POST', path: '/api/claudium/native/quote' },
+    { method: 'POST', path: '/api/claudium/native/confirm' },
+    { method: 'POST', path: '/api/claudium/spend' },
     // v0.20.0 third slice: the map editor surface, migrated in-merge. The custom
     // map family (server/maps_routes.ts) and the uploaded-GLB family
     // (server/user_assets_routes.ts). GET /api/assets/:file is the

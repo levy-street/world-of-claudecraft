@@ -155,136 +155,136 @@ export const ko_KR: EnTranslations = {
       "banner": "{name} 관전 중"
     },
     "mobileHudEditor": {
-      "launcher": "모바일 레이아웃 사용자 정의",
-      "title": "모바일 레이아웃 편집기",
-      "dialogLabel": "모바일 컨트롤 사용자 정의",
-      "locked": "잠김",
-      "unlocked": "잠금 해제됨",
-      "lock": "잠금 레이아웃",
-      "unlock": "레이아웃 잠금 해제",
-      "sceneLabel": "미리보기 장면",
-      "contextLabel": "미리보기 상태",
-      "profileLabel": "장치 프로필",
-      "profilePhone": "핸드폰",
-      "profileTablet": "태블릿",
-      "save": "저장",
-      "cancel": "취소",
-      "showFailingLayout": "실패한 레이아웃 표시",
-      "previousFailure": "이전 실패",
-      "nextFailure": "다음 실패",
-      "runtimeFallback": "{profile} 레이아웃은 이 표시 영역에 맞지 않습니다. 내장된 기본값은 일시적으로 활성화됩니다.",
-      "storageError": "모바일 레이아웃을 저장할 수 없습니다. 초안이 아직 열려 있습니다.",
-      "invalidSave": "저장하기 전에 모든 레이아웃 오류를 수정하세요.",
+      "launcher": "Customize Mobile Layout",
+      "title": "Mobile Layout Editor",
+      "dialogLabel": "Customize mobile controls",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "lock": "Lock layout",
+      "unlock": "Unlock layout",
+      "sceneLabel": "Preview scene",
+      "contextLabel": "Preview state",
+      "profileLabel": "Device profile",
+      "profilePhone": "Phone",
+      "profileTablet": "Tablet",
+      "save": "Save",
+      "cancel": "Cancel",
+      "showFailingLayout": "Show Failing Layout",
+      "previousFailure": "Previous failure",
+      "nextFailure": "Next failure",
+      "runtimeFallback": "The {profile} layout does not fit this viewport. Built-in defaults are active temporarily.",
+      "storageError": "Could not save the mobile layout. Your draft is still open.",
+      "invalidSave": "Fix every layout error before saving.",
       "failureWithContext": "{message} ({context})",
       "failureWithFixture": "{message} ({context}; {profile}; {viewport})",
       "scene": {
-        "world": "세계",
-        "arenaStandard": "아레나 스탠다드",
-        "arenaFiesta": "아레나 피에스타",
-        "arenaYumi": "아레나 유미",
-        "valeCupBriefing": "베일 컵 브리핑",
-        "valeCupMatch": "베일컵 경기",
-        "valeCupSpectator": "베일 컵 관중",
-        "delve": "탐굴"
+        "world": "World",
+        "arenaStandard": "Arena Standard",
+        "arenaFiesta": "Arena Fiesta",
+        "arenaYumi": "Arena Yumi",
+        "valeCupBriefing": "Vale Cup Briefing",
+        "valeCupMatch": "Vale Cup Match",
+        "valeCupSpectator": "Vale Cup Spectator",
+        "delve": "Delve"
       },
       "context": {
-        "worldBase": "세계",
-        "worldValeCupIndicator": "Vale Cup 표시가 있는 세계",
-        "arenaStandard": "아레나 스탠다드",
-        "arenaFiestaBase": "피에스타 경기",
-        "arenaFiestaPending": "피에스타 보류중",
-        "arenaFiestaRespawn": "피에스타 부활",
-        "arenaFiestaOffer": "Fiesta 강화 제안",
-        "arenaFiestaRespawnOffer": "Fiesta 부활 및 강화 제안",
-        "arenaYumiBase": "유미매치",
-        "arenaYumiRespawn": "유미 부활",
-        "arenaYumiReturning": "돌아오는 유미",
-        "valeCupBriefing": "베일 컵 브리핑",
-        "valeCupMatch": "베일 컵 경기",
-        "valeCupMatchCharge": "베일컵 차지샷",
-        "valeCupSpectatorBetting": "Vale Cup 관중 베팅",
-        "instanceDelve": "탐굴"
+        "worldBase": "World",
+        "worldValeCupIndicator": "World with Vale Cup indicator",
+        "arenaStandard": "Arena Standard",
+        "arenaFiestaBase": "Fiesta match",
+        "arenaFiestaPending": "Fiesta pending",
+        "arenaFiestaRespawn": "Fiesta respawn",
+        "arenaFiestaOffer": "Fiesta augment offer",
+        "arenaFiestaRespawnOffer": "Fiesta respawn and augment offer",
+        "arenaYumiBase": "Yumi match",
+        "arenaYumiRespawn": "Yumi respawn",
+        "arenaYumiReturning": "Yumi returning",
+        "valeCupBriefing": "Vale Cup briefing",
+        "valeCupMatch": "Vale Cup match",
+        "valeCupMatchCharge": "Vale Cup charged shot",
+        "valeCupSpectatorBetting": "Vale Cup spectator betting",
+        "instanceDelve": "Delve"
       },
       "surface": {
-        "actionA1": "액션 A1",
-        "actionA2": "액션 A2",
-        "actionA3": "액션 A3",
-        "actionA4": "액션 A4",
-        "actionA5": "액션 A5",
-        "actionAttack": "공격",
-        "actionTarget": "목표",
-        "actionJumpUse": "점프 또는 사용",
-        "actionPage": "작업 페이지 스위치",
-        "controlMovement": "움직임",
-        "controlView": "시점",
-        "utilityConsumables": "소모품",
-        "petCommands": "애완동물 명령",
-        "party": "파티",
-        "menuTop": "톱 메뉴",
-        "minimapCluster": "미니맵",
-        "frameTarget": "대상 프레임",
-        "framePlayer": "플레이어 프레임",
-        "playerBuffs": "플레이어 버프",
-        "playerDebuffs": "플레이어 디버프",
-        "statusArenaGeneric": "투기장 현황",
-        "statusFiestaScore": "피에스타 점수",
-        "statusFiestaPending": "Fiesta 보류 상태",
-        "protectedFiestaRespawn": "Fiesta 부활 프롬프트",
-        "protectedFiestaOffer": "Fiesta 강화 제안",
-        "statusYumi": "유미상태",
-        "protectedYumiRespawn": "유미 부활 프롬프트",
-        "statusValeCupIndicator": "베일 컵 표시기",
-        "protectedValeCupBriefing": "베일 컵 브리핑",
-        "statusValeCupMatch": "베일 컵 경기 상황",
-        "statusValeCupCharge": "베일컵 슛 차지",
-        "protectedValeCupBetting": "Vale Cup 베팅 패널",
-        "trackerDelve": "탐굴 추적기",
-        "protectedCenterMessage": "센터 메시지"
+        "actionA1": "Action A1",
+        "actionA2": "Action A2",
+        "actionA3": "Action A3",
+        "actionA4": "Action A4",
+        "actionA5": "Action A5",
+        "actionAttack": "Attack",
+        "actionTarget": "Target",
+        "actionJumpUse": "Jump or Use",
+        "actionPage": "Action page switch",
+        "controlMovement": "Movement",
+        "controlView": "View",
+        "utilityConsumables": "Consumables",
+        "petCommands": "Pet commands",
+        "party": "Party / Raid",
+        "menuTop": "Top menu",
+        "minimapCluster": "Minimap",
+        "frameTarget": "Target frame",
+        "framePlayer": "Player frame",
+        "playerBuffs": "Player buffs",
+        "playerDebuffs": "Player debuffs",
+        "statusArenaGeneric": "Arena status",
+        "statusFiestaScore": "Fiesta score",
+        "statusFiestaPending": "Fiesta pending status",
+        "protectedFiestaRespawn": "Fiesta respawn prompt",
+        "protectedFiestaOffer": "Fiesta augment offer",
+        "statusYumi": "Yumi status",
+        "protectedYumiRespawn": "Yumi respawn prompt",
+        "statusValeCupIndicator": "Vale Cup indicator",
+        "protectedValeCupBriefing": "Vale Cup Briefing",
+        "statusValeCupMatch": "Vale Cup match status",
+        "statusValeCupCharge": "Vale Cup shot charge",
+        "protectedValeCupBetting": "Vale Cup betting panel",
+        "trackerDelve": "Delve tracker",
+        "protectedCenterMessage": "Center message"
       },
       "control": {
-        "nudgeUp": "위로 이동",
-        "nudgeDown": "아래로 이동",
-        "nudgeLeft": "왼쪽으로 이동",
-        "nudgeRight": "오른쪽으로 이동",
-        "decreaseScale": "크기 줄이기",
-        "increaseScale": "크기 늘리기",
-        "orientation": "정위",
-        "horizontal": "수평의",
-        "vertical": "수직의",
-        "order": "순서",
-        "normalOrder": "기본 순서",
-        "reverseOrder": "역순",
-        "openingDirection": "열리는 방향",
-        "openLeft": "왼쪽으로 펼치기",
-        "openRight": "오른쪽으로 펼치기",
-        "openUp": "위로 펼치기",
-        "openDown": "아래로 펼치기",
-        "resetSelected": "선택 재설정",
-        "resetAll": "모두 재설정"
+        "nudgeUp": "Move up",
+        "nudgeDown": "Move down",
+        "nudgeLeft": "Move left",
+        "nudgeRight": "Move right",
+        "decreaseScale": "Decrease size",
+        "increaseScale": "Increase size",
+        "orientation": "Orientation",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "order": "Order",
+        "normalOrder": "Normal",
+        "reverseOrder": "Reversed",
+        "openingDirection": "Opening direction",
+        "openLeft": "Open left",
+        "openRight": "Open right",
+        "openUp": "Open up",
+        "openDown": "Open down",
+        "resetSelected": "Reset Selected",
+        "resetAll": "Reset All"
       },
       "status": {
-        "noSelection": "편집하려면 컨트롤을 선택하세요.",
-        "selected": "선택됨: {surface}",
-        "scale": "크기: {scale}",
-        "valid": "레이아웃을 저장할 준비가 되었습니다.",
-        "invalid": "레이아웃에 {count}개의 차단 오류가 있습니다.",
-        "failurePosition": "{count}개 중 실패 {index}개"
+        "noSelection": "Select a control to edit it.",
+        "selected": "Selected: {surface}",
+        "scale": "Size: {scale}",
+        "valid": "Layout ready to save.",
+        "invalid": "Layout has {count} blocking errors.",
+        "failurePosition": "Failure {index} of {count}"
       },
       "failure": {
-        "invalidPlacement": "{surface}에 잘못된 게재위치가 있습니다.",
-        "unsupportedCapability": "{surface}는 지원되지 않는 레이아웃 옵션을 사용합니다.",
-        "scaleOutOfRange": "{surface} 크기가 허용 범위를 벗어났습니다.",
-        "targetTooSmall": "{surface}은(는) 너무 작아서 안전하게 사용할 수 없습니다.",
-        "outOfBounds": "{surface}은(는) 안전 영역 밖에 있습니다.",
-        "overlap": "{surface}이(가) {other}과(와) 겹칩니다.",
-        "viewIntrusion": "{surface}는 뷰 영역과 겹칩니다.",
-        "protectedOverlap": "{surface}가 {other}와 겹칩니다."
+        "invalidPlacement": "{surface} has an invalid placement.",
+        "unsupportedCapability": "{surface} uses an unsupported layout option.",
+        "scaleOutOfRange": "{surface} size is outside its allowed range.",
+        "targetTooSmall": "{surface} is too small to use safely.",
+        "outOfBounds": "{surface} is outside the safe area.",
+        "overlap": "{surface} overlaps {other}.",
+        "viewIntrusion": "{surface} overlaps the View area.",
+        "protectedOverlap": "{surface} overlaps {other}."
       },
       "discard": {
-        "title": "레이아웃 변경사항을 삭제하시겠습니까?",
-        "body": "저장되지 않은 모바일 레이아웃 변경사항은 손실됩니다.",
-        "confirm": "변경사항 취소",
-        "continueEditing": "계속 편집"
+        "title": "Discard layout changes?",
+        "body": "Your unsaved mobile layout changes will be lost.",
+        "confirm": "Discard Changes",
+        "continueEditing": "Continue Editing"
       }
     },
     "readyCheck": {
@@ -377,6 +377,263 @@ export const ko_KR: EnTranslations = {
         "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC 상점",
+      "close": "WOC 상점 닫기",
+      "tabsLabel": "WOC 상점 구역",
+      "storeTab": "상점",
+      "rewardsTab": "일일 보상",
+      "loading": "WOC 상점 불러오는 중…",
+      "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+      "balance": "Claudium 잔액",
+      "buyClaudium": "Claudium 구매",
+      "owned": "보유 중",
+      "needMoreTitle": "Claudium이 더 필요합니다",
+      "needMoreBody": "{item} 구매에 Claudium {shortfall}개가 더 필요합니다.",
+      "cancel": "취소",
+      "confirmTitle": "꾸미기 상품 구매 확인",
+      "confirmBody": "{item}을(를) {cost} Claudium으로 구매할까요?",
+      "confirmPurchase": "구매",
+      "priceChanged": "구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.",
+      "armoryEyebrow": "시즌 1",
+      "armoryTitle": "무기고",
+      "armoryBody": "시즌 1 무기고의 한정 무기 스킨입니다. 계정 전체에 적용되는 순수 장식이며 주변 모든 플레이어에게 보입니다.",
+      "collectionLine": "{collection} 컬렉션",
+      "collections": {
+        "guildmark": "길드마크",
+        "emberwrought": "엠버로트",
+        "hoarfrost": "백상",
+        "fallen_star": "추락한 별"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "길드마크 무장검",
+          "look": "푸르게 처리한 강철 칼날, 청동 물고기 꼬리형 십자 가드, 청록색으로 염색한 가죽 손잡이, 작게 찍힌 길드 문장.",
+          "lore": "단조된 칼날이 이름 없는 물건이라면, 이 검에는 서명이 있습니다. 갑옷 장인은 월드 마켓의 상인이 자신의 강철을 보증해 준 뒤에야 검신 뿌리에 표식을 새길 자격을 얻으며, 대장장이 할드렌의 표식은 정식 보증을 받았습니다. 베일의 습기를 견디도록 푸르게 처리했고, 머리카락 한 올만큼 정밀하게 균형을 맞췄습니다. 검값만큼이나 표식에 값을 치르지만, 그만한 가치가 있습니다."
+        },
+        "brasscap_axe": {
+          "name": "브라스캡 손도끼",
+          "look": "광택 낸 강철 날, 옻칠한 물푸레나무 자루의 황동 덮개와 랑게트, 단정한 감개, 제작자의 표식.",
+          "lore": "표식이 찍힌 도끼는 손에 쥘 수 있는 자랑거리입니다. 황동 덮개와 랑게트는 절반은 갑옷이고 절반은 서명입니다. 자루가 쪼개지는 것을 막고 선술집 불빛을 받아 반짝여, 모두에게 이것이 민병대에서 물려받은 물건이 아니라 갑옷 장인 호드의 작품임을 알립니다. 하이워치 대장장이는 “베기만 한다면 팔지”라고 말합니다. 이 도끼는 벱니다."
+        },
+        "tempered_flanged_mace": {
+          "name": "담금질 플랜지 철퇴",
+          "look": "여섯 갈래의 담금질한 청강철 머리, 황동 칼라와 폼멜, 와인색 가죽 손잡이.",
+          "lore": "푸르게 담금질한 강철 플랜지 여섯 개를 투구를 가를 수 있도록 하나하나 갈아내고, 황동으로 마감한 뒤 와인색 가죽을 감았습니다. 이 왕국의 갑옷 장인들은 일이 잔혹할 때조차 흉한 무기를 만들지 않습니다. 이 철퇴는 진열대에서 집어 든 것이 아니라 월드 마켓을 통해 주문 제작되었습니다. 어딘가의 장부에는 자랑스러운 구매자의 이름과 그가 호드에게 치른 금액이 적혀 있을 것입니다."
+        },
+        "guildmark_dirk": {
+          "name": "길드마크 더크",
+          "look": "가느다란 담금질 강철 더크, 청동 가드와 폼멜 너트, 짙은 녹색 끈 손잡이, 찍힌 문장.",
+          "lore": "검을 집에 두고 나온 명사가 차는 무기입니다. 가늘고 단단하며, 온전한 칼날과 같은 품질을 보증하는 표식이 찍혀 있습니다. 날이 선 인장처럼 허리띠에 차며, 갑옷 장인의 증표를 알아보는 사람에게만 그 의미가 드러납니다. 병참장교 브리는 성벽의 존경을 얻은 장교들을 위해 하이워치의 서랍 하나를 이 더크로 가득 채워 둡니다."
+        },
+        "brasscrown_staff": {
+          "name": "브라스크라운 여행 지팡이",
+          "look": "깎아 만든 황동 왕관 장식이 얹힌 견목 지팡이, 황동 페룰, 염색한 가죽 띠.",
+          "lore": "잘 말린 견목을 깎아 만들고, 이스트브룩 대장장이들이 수백 개씩 주조하면서도 하나하나 완벽하게 다듬은 황동 장식을 왕관처럼 얹었습니다. 펜브리지의 관문과 하이워치의 성벽 어디서든 진지하게 대우받고 싶은 여행자에게 어울립니다. 실제로는 걸을 필요가 전혀 없었던 듯한 여행 지팡이이며, 염색한 띠와 어울리는 외투의 가격도 짐작할 만합니다."
+        },
+        "lacquered_wand": {
+          "name": "옻칠 마법봉",
+          "look": "가느다란 진홍색 옻칠 마법봉, 광택 낸 황동 띠 두 개, 작고 둥근 황동 끝.",
+          "lore": "인내심을 들여 진홍색 옻칠을 일곱 겹 올리고 광택 낸 황동 띠 두 개를 둘렀습니다. 진짜 주화를 받기 시작한 떠돌이 마법사가 월드 마켓에서 사서 그럴듯하게 보이고 싶을 때 고르는 마법봉입니다. 빛을 다루는 능력은 자작나무 막대보다 나을 것이 없습니다. 하지만 상인의 계산대 너머에서 눈부시게 빛나며, 하찮은 마법의 절반은 언제나 믿음을 사는 일이었습니다."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "화살장인 길드 활",
+          "look": "옻칠한 호두나무 리커브 활, 황동 활대 끝, 밀랍 먹인 아마실 시위, 손잡이에 찍힌 길드 표식.",
+          "lore": "이 왕국에서 길드에 가장 가까운 것은 활 손잡이에 찍힌 화살장인의 표식입니다. 포도주 장인이 술통을 봉인하듯, 그 안에 무엇이 들었는지 보증하는 약속입니다. 옻칠한 호두나무, 활대 끝의 황동, 미어펜의 비에도 해지지 않는 밀랍 먹인 아마실 시위. 모든 이음새가 그 가격을 정당화합니다. 위도우 시켓을 지나 단 한 번 당겨 보면 그 주장이 옳았음을 알게 됩니다."
+        },
+        "cinderbrand_sword": {
+          "name": "신더브랜드",
+          "look": "어두운 단조 강철 칼날, 불씨 주황빛 룬으로 채운 홈, 열기로 갈라진 균열, 가드에서 타오르는 보석.",
+          "lore": "물 대신 스톰크래그에서 긁어 모은 축복받은 불씨에 담금질한 최초의 칼날입니다. 하이워치 대장장이들은 그 숯이 “산이 옛 맹세를 기억하기 때문에 푸르고 맑게 탄다”고 맹세합니다. 칼날의 홈에 가둔 불은 불씨 같은 주황빛으로 타오르며 꺼지지 않습니다. 성벽의 가장 추운 밤에도 룬은 맨손에 따뜻합니다. 신더브랜드는 불을 붙일 필요가 없습니다. 그저 꺼지기를 거부할 뿐입니다."
+        },
+        "emberbite_axe": {
+          "name": "엠버바이트",
+          "look": "날의 균열 사이로 불씨 주황빛이 새어 나오는 검게 그을린 쇠도끼, 잔불 같은 보석, 아른거리는 열기.",
+          "lore": "갑옷 장인 호드는 살아 있는 산불의 숯을 도끼날 중심에 박아 넣어, 타격 사이에도 날이 완전히 식지 않게 했습니다. 휘두를 때 균열이 주황빛으로 숨 쉬며, 마치 첫 단조가 쇠 속에 잠재운 무언가를 타격이 깨우는 듯합니다. 스톰크래그 정령이 이 불씨를 내주었다고 합니다. 하이워치에 바람이 거세지면 별별 이야기가 다 나옵니다."
+        },
+        "smoulderfall_mace": {
+          "name": "스몰더폴",
+          "look": "안쪽 균열을 따라 불씨 주황빛으로 타오르는 어두운 철제 플랜지, 머리에 박힌 용융 핵 보석.",
+          "lore": "자신만의 화로를 품은 철퇴입니다. “산불로 빚었다”는 생텀 봉인에서 떼어 낸 용융 핵 돌을 머리에 박아 빛나게 했습니다. 플랜지는 손에 닿을 때 따뜻하고, 적중한 곳에서는 더욱 뜨겁습니다. 한 하이워치 부사관은 이 철퇴에 맞은 멍이 아침까지 희미하게 빛난다고 맹세합니다. 마침내 산의 불이 봉인이 아니라 파괴를 위해 쓰이게 되었습니다."
+        },
+        "ashspark_dagger": {
+          "name": "애시스파크 칼",
+          "look": "불씨 주황빛 맥이 흐르는 짧고 검게 그을린 칼날, 폼멜의 작은 잔불 보석, 재와 불꽃.",
+          "lore": "산의 불을 폼멜 돌에 몰래 숨긴 뒷골목 칼날로, 소매치기조차 최초 단조의 불씨를 지닐 수 있다는 갑옷 장인의 은밀한 농담입니다. 검게 그을리고 주황빛 맥이 흐르며, 칼집 속에서도 늘 조금 지나치게 따뜻합니다. 하이워치 아래 어둠 속에서 뽑으면, 그 빛이 손을 겨우 밝혀 상대의 방어 틈을 찾게 해 줍니다."
+        },
+        "forgeheart_staff": {
+          "name": "포지하트 장봉",
+          "look": "철로 덧댄 지팡이, 우리에 갇힌 빛나는 불씨 핵, 자루를 타고 오르는 불씨 룬, 피어오르는 아지랑이.",
+          "lore": "살아 있는 산불의 숯을 꼭대기의 철창에 가두었습니다. 기록학자 캐디스는 이것이 최초 단조의 불이 봉인뿐 아니라 복종하도록 묶일 수 있다는 증거라 말합니다. 얇고 끝없는 열 아지랑이가 피어오르므로, 이것을 든 마법사는 대장간의 불이나 야간 경계의 모닥불이 아쉬울 일이 없습니다. 사람들은 이 불씨가 보스카르 엠버윙의 숨결에서 뽑혔으며 그 뒤로 한 번도 식지 않았다고 속삭입니다."
+        },
+        "emberwrought_wand": {
+          "name": "엠버로트 마법봉",
+          "look": "쇠 발톱이 빛나는 불씨를 움켜쥔 검게 그을린 금속 마법봉, 실금 같은 열 균열, 따뜻한 내부 광채.",
+          "lore": "이 등급에 이름을 붙인 마법봉입니다. 하이워치 갑옷 장인이 처음으로 산불의 숯을 쇠 발톱에 끼워 인간의 손에 응답하게 만들었을 때, 빛의 사제들조차 이를 이단이라 부르기를 멈추고 쓸모 있다고 부르기 시작했습니다. 따뜻하고 끈기 있으며 조용히 위험합니다. 끝의 불씨는 주인이 태어나기 전부터 한 번도 끊이지 않고 타올랐습니다."
+        },
+        "cinderlatch_crossbow": {
+          "name": "신더래치",
+          "look": "검게 그을린 강철 석궁, 활대 균열에서 새어 나오는 불씨 주황빛, 대목 속에서 타오르는 숯.",
+          "lore": "불씨로 단조한 무기 중 가장 기묘한 작품으로, 산의 불을 기계에 부었습니다. 활대의 균열에서 주황빛이 새어 나오며, 대목 속에서 타오르는 숯은 손피크의 추위나 미어펜의 습기에도 시위가 뻣뻣해지지 않게 합니다. 화살은 이미 따뜻한 채 홈을 떠나 더 뜨거운 상태로 꽂힙니다. 추위를 느끼지 않는 적이 서 있는 성벽에 대한 사냥꾼의 해답입니다."
+        },
+        "ice_fang_sword": {
+          "name": "얼음 송곳니",
+          "look": "옅은 빙하 얼음의 곡선 칼날, 칼등을 따라 돋은 들쭉날쭉한 서리 결정, 홈 속에서 청록빛을 내는 얼어붙은 핵, 고드름 십자 가드.",
+          "lore": "얼어붙은 등급의 대표작이자 모든 수집가가 가장 먼저 손을 뻗는 작품입니다. 얼음 송곳니는 단조하지 않고, 하이워치 위 손피크를 덮은 빙하의 송곳니를 깎아 만들었습니다. 청록색 핵은 글리머미어에 반사된 빛처럼 차갑게 타오릅니다. 베어 가르는 공기마저 서리로 덮습니다. 성벽 수비대는 폭설이 웜컬트를 막아 세운 밤에 한 병사가 이것을 들고 “성벽에 겨울 하나를 사 주었다”고 맹세합니다."
+        },
+        "glaciersplit_axe": {
+          "name": "글레이셔스플릿",
+          "look": "반투명한 푸른 빙하 얼음 도끼머리, 청록빛으로 빛나는 내부 균열, 솟아난 서리 결정, 한기를 흘리는 자루.",
+          "lore": "두 세기 동안 쌓인 얼음이 스스로 빛날 때까지 추위를 짓눌러 온 손피크 빙하의 푸른 심장에서 잘라 냈습니다. 가만히 있어도 냉기를 흘리며, 내리찍는 소리는 스토커 리지 아래에서 크레바스가 벌어지는 듯합니다. 하이워치는 전사자를 그 위의 얼음에 맡깁니다. 그러니 이 무기는 해빙과, 해빙이 깨울 모든 것을 막아 내기 위한 것입니다."
+        },
+        "rimecrusher_mace": {
+          "name": "라임크러셔",
+          "look": "빛나는 청록색 핵 주위로 뻗은 들쭉날쭉한 얼음 결정 무리, 은빛 자루를 타고 내려오는 백상.",
+          "lore": "깎아 낸 것이 아니라 길러 낸 무기입니다. 손피크의 얼음을 차가운 청록색 핵 주위로 유도해 호드가 만든 최고의 강철만큼 단단하게 굳혔습니다. 백상이 은빛 자루를 따라 손 쪽으로 기어 내려오지만 끝내 닿지는 않습니다. 내려친 곳에서는 물이 얼고, 내려놓은 곳에서는 땅이 하얗게 변합니다. 봉우리를 내려오는 망자의 차가움을 성벽을 기어오르는 것들에게 휘두를 수 있을 만큼 작게 만들었습니다."
+        },
+        "frostbite_dagger": {
+          "name": "서리 바늘",
+          "look": "맑고 푸른 얼음으로 만든 사악하리만치 가느다란 단검, 중앙을 흐르는 청록빛 맥, 바늘 같은 서리 결정, 백상으로 덮인 손잡이.",
+          "lore": "참은 숨결처럼 가늘고 그보다 두 배는 차갑습니다. 손피크 빙하의 파편을 하나의 빛나는 맥이 되도록 갈아, 피가 흐를 생각을 떠올리기도 전에 상처가 얼어붙을 만큼 날카롭게 만들었습니다. 그 이름은 망자들이 봉우리에서 가져오는 무덤의 한기에서 빌렸습니다. 날을 갈 필요는 없습니다. 기록학자 캐디스가 무심하게 지적하듯, 얼음은 무뎌지지 않고 그저 기다릴 뿐입니다."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "백상의 감시",
+          "look": "천천히 회전하며 떠 있는 청록빛 얼음 파편을 왕관처럼 얹은 은빛 지팡이, 퍼져 나가는 결정과 차가운 안개.",
+          "lore": "하이워치 성벽에서 결코 잠들지 않는 경계병의 지팡이입니다. 꼭대기의 청록색 산정호수 얼음 파편은 은에서 떨어져 천천히 저절로 회전합니다. 수비대는 그것이 언제나 봉우리 아래에 모이는 추위를 향한다고 맹세합니다. 이 감시를 든다는 것은 단 하룻밤에 이백 년의 경계를 서고, 시선을 돌리지 않겠다고 약속하는 일입니다."
+        },
+        "everwinter_wand": {
+          "name": "영원한 겨울의 파편",
+          "look": "청록빛으로 빛나는 단 하나의 빙하 얼음 가시, 은 칼라에서 피어나는 백상, 희미한 냉기 안개.",
+          "lore": "산의 추위가 이빨을 드러내는 생텀 아래 깊은 산정호수에서 부러뜨렸다고 전해지는 빛나는 빙하 얼음 가시입니다. 은 칼라에서 백상이 끝없이 피어나며, 불에도 여름에도 녹지 않습니다. 마법사들은 자신의 술법에 한기를 더하려고 가까이 두지만, 니스락시스의 지하 묘지를 향해 기울며 귀 기울이는 듯한 밤에는 멀리 둡니다."
+        },
+        "winterbite": {
+          "name": "윈터바이트",
+          "look": "은빛 강철과 푸른 얼음으로 만든 활, 손잡이에서 빛나는 청록색 얼어붙은 핵, 시위에 걸린 단단한 얼음 화살, 차가운 안개.",
+          "lore": "은빛 강철과 손피크 얼음으로 만든 활로, 손잡이의 차가운 청록색 핵이 화살을 시위에 얼려 붙입니다. 당길 때마다 다시 만들어지는 단단한 빙하 얼음 화살을 메기 때문에, 성벽의 궁수는 화살통 대신 추위만 지닙니다. 하이워치는 이와 같은 활 하나로 포위전 내내 스토커 리지를 지켰습니다. 궁수 한 명과 이미 언제나 그곳에 있던 한겨울 분량의 화살만으로 해냈다고 합니다."
+        },
+        "solheim_sword": {
+          "name": "솔하임, 새벽의 마지막 빛",
+          "look": "추락한 별로 벼린 대검, 칼날을 가르는 용융 금빛 핵, 별빛으로 날을 세운 우주처럼 검은 강철, 가드를 도는 황금 파편, 오로라의 띠.",
+          "lore": "별이 서쪽 하늘에서 떨어져 위도우 시켓 너머에서 “대장간처럼 폭발했을” 때, 알드릭 수사는 미어펜 분화구에서 아직 타오르는 심장을 꺼내 왕국의 대장장이들에게 “이 세계에 속하지 않은 것”을 벼려 달라고 간청했습니다. 그들은 그것으로 단 한 자루의 대검, 솔하임을 만들었습니다. 용융 금빛 핵은 새벽이 밤하늘을 가르듯 우주처럼 검은 칼날을 쪼개고, 별 금속 파편은 누구의 손도 정하지 않은 궤도로 가드를 돕니다. 오직 하나만 만들어졌습니다. 두 번째는 없을 것입니다."
+        },
+        "skyrender_axe": {
+          "name": "스카이렌더, 창공의 상처",
+          "look": "찢어진 밤하늘 같은 도끼머리, 용융 금빛 균열과 별자리 각인, 떠 있는 별빛 파편, 날을 따라 흐르는 오로라 광채.",
+          "lore": "추락한 별이 미어펜에서 하늘의 모습마저 찢어내고 아직도 김이 오르는 상처를 남긴 분화구 가장자리에서 두드려 만들었습니다. 도끼머리는 찢어진 밤 조각처럼 보입니다. 용융 금빛 균열, 하이워치의 어떤 학자도 이름 붙이지 못한 별자리, 휘두를 때마다 날에서 흘러나오는 오로라가 있습니다. 알드릭 수사는 축복을 내렸지만 손대려 하지는 않았습니다. 이것을 들어 올리는 것은 하늘이 남긴 구멍을 손에 쥐는 일입니다."
+        },
+        "starfall_mace": {
+          "name": "스타폴, 하늘의 심판",
+          "look": "궤도를 도는 파편에 둘러싸인 포획된 용융 금빛 별의 핵, 별빛 맥이 흐르는 우주처럼 검은 플랜지, 틈에서 쏟아지는 오로라.",
+          "lore": "죽기 직전의 별의 핵을 붙잡고, 함께 추락한 잔해를 둘러 소멸에서 불과 한 치 떨어진 곳에 얼려 두었습니다. 우주처럼 검은 플랜지에는 갇힌 별빛이 흐르고, 들어 올리면 틈새에서 오로라가 쏟아집니다. 옛 빛의 사제들은 추락하는 별을 심판이라 불렀습니다. 어떤 방패도 막아서는 안 되는 위에서 내려진 판결이라 여겼으며, 미어펜에 떨어진 별을 따라 이 무기의 이름을 지었습니다."
+        },
+        "astravyr_dagger": {
+          "name": "아스트라비르, 추락한 별의 송곳니",
+          "look": "추락한 별의 조각, 우주처럼 검은 금속 위의 용융 금빛 날, 폼멜을 도는 밝은 별 티끌, 가느다란 오로라 궤적.",
+          "lore": "알드릭이 분화구에서 가져온 별의 가장 작은 조각이지만, 어떤 셈법으로는 가장 위험한 조각입니다. 이 세계에 속하지 않은 심장의 한 파편으로, 우주처럼 검은 금속 위에 용융 금빛 날이 서 있고, 세계를 잃은 달처럼 별 티끌 하나가 폼멜 주위를 돕니다. 무게는 거의 없지만 거의 무엇이든 가릅니다. 숨길 만큼 작고, 스스로 내는 빛으로 어둠 속에서 찾아낼 만큼 밝습니다."
+        },
+        "cosmarch_staff": {
+          "name": "코스마치, 끝없는 공허의 첨탑",
+          "look": "용융 금빛 핵 주위를 도는 황금 별 파편 무리, 별자리가 새겨진 우주처럼 검은 자루, 위로 감겨 오르는 오로라 띠.",
+          "lore": "별 금속 자루 위에 용융 금빛 핵을 얹고, 황금 파편의 고리가 느리고 끝없는 궤도로 그 주위를 행진합니다. 손피크의 어떤 하늘과도 맞지 않는 별자리가 새겨진 작은 우주입니다. 오로라는 위로 오르는 법을 잊은 연기처럼 길이를 따라 감깁니다. 이것을 지녔던 이들은 이솔레이의 호수가 “달빛을 마시는” 방식처럼, 끈기 있고 차가우며 이쪽을 바라보는 공허의 회전을 느낄 수 있었다고 주장했습니다."
+        },
+        "emberwish_wand": {
+          "name": "엠버위시, 죽어 가는 태양의 티끌",
+          "look": "궤도를 도는 불꽃에 싸인 포획된 용융 금빛 죽은 별의 티끌, 빛나는 별자리가 새겨진 우주처럼 검은 자루.",
+          "lore": "추락한 별 자체가 아니라 죽어 가는 별의 마지막 티끌입니다. 이미 꺼진 태양의 용융 금빛 불씨 하나를 마지막 빛이었던 불꽃이 감쌉니다. 우주처럼 검은 자루에는 그 죽음을 지켜본 별자리들이 새겨져 있습니다. 미어펜의 소작농들은 진정한 황혼에 이것을 든 자에게 소원 하나를 들어준다고 말합니다. 또한 이것을 든 모든 영혼은 더 많은 시간을 빌었지만, 드라운드 문은 그 누구의 소원도 들어주지 않았다고 말합니다."
+        },
+        "encore_bow": {
+          "name": "앙코르, 두 번째 추락한 별",
+          "look": "우스꽝스러울 만큼 거대한 별 대포, 빛나는 황금 별자리가 새겨진 우주처럼 검은 포신, 용융 금빛 혜성탄이 장전된 나팔 모양 포구, 황동 부품, 나무 견착대.",
+          "lore": "추락한 별을 다룬 대장장이들은 그것으로 유물 여섯 개를 만들고도 포신 하나 분량의 별 금속이 남았습니다. 그때쯤 도제들에게도 의견이 생겼습니다. 모루에서 나온 것은 왕국 최초의 총이거나 가장 작은 공성 병기입니다. 이 견착 대포는 탄환을 쏜다기보다 두 번째 별이 목표를 향해 떨어져 달라고 요청합니다. 알드릭 수사는 이토록 시끄러운 물건은 이미 하늘의 눈에 띄었을 것이라며 축복을 거절했습니다. 사냥꾼들은 열광합니다. 사선 끝에 선 것은 무엇도 그러지 못했습니다."
+        },
+        "meteorlatch_crossbow": {
+          "name": "미티어래치, 하늘의 마지막 심판",
+          "look": "운석의 별 금속, 대목을 따라 흐르는 용융 금빛 핵, 별자리가 새겨진 우주처럼 검은 활대, 시위에 걸린 순수한 별불 화살.",
+          "lore": "미어펜 분화구가 아직 빛날 때 “손댈 수 없을 만큼 뜨거웠던” 잔해인 순수한 운석 별 금속을 벼려 만들었습니다. 망치로 두드려 별자리가 새겨진 우주처럼 검은 활대를 만들고, 대목을 따라 용융 금빛 핵을 가두었습니다. 화살을 메는 대신 별불의 화살을 불러냅니다. 판결처럼 날아가 이야기 하나의 끝처럼 꽂힙니다. 하이워치가 니스락시스의 죽지 않는 왕관조차 봉우리 아래 최악의 것이 아닐 수 있다고 두려워했을 때, 성벽 위에 두고 싶어 했던 무기입니다. 조준을 신중히 하십시오."
+        }
+      },
+      "seasonOne": "시즌 1",
+      "rarity": {
+        "uncommon": "고급",
+        "rare": "희귀",
+        "epic": "영웅",
+        "legendary": "전설"
+      },
+      "wtype": {
+        "sword": "검",
+        "axe": "도끼",
+        "mace": "둔기",
+        "dagger": "단검",
+        "staff": "지팡이",
+        "wand": "마법봉",
+        "bow": "활",
+        "crossbow": "석궁"
+      },
+      "badge": {
+        "flagship": "플래그십",
+        "hero": "영웅"
+      },
+      "inspectAria": "{item} 살펴보기",
+      "viewModeLabel": "미리보기 모드",
+      "tryOn": "착용해 보기",
+      "weaponOnly": "무기만 보기",
+      "sceneLabel": "장면 조명",
+      "scene": {
+        "day": "낮",
+        "dusk": "황혼",
+        "night": "밤"
+      },
+      "lore": "전승",
+      "buySkin": "스킨 구매",
+      "unavailable": "이용 불가",
+      "applied": "적용됨",
+      "apply": "스킨 적용",
+      "detach": "스킨 해제",
+      "equipHint": "이 스킨을 적용하려면 {type}을(를) 장착하세요."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Claudium 열기",
+      "close": "Claudium 닫기",
+      "loading": "Claudium 불러오는 중…",
+      "balanceLabel": "잔액",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "현재 Claudium 상점을 이용할 수 없습니다. 잔액과 구매 내역에는 영향이 없으니 잠시 후 다시 확인해 주세요.",
+      "disclosure": "Claudium은 단방향 게임 화폐입니다. 현금으로 구매해 꾸미기 상품에 사용할 수 있으며 환전, 양도 또는 현금화할 수 없습니다.",
+      "buyTitle": "Claudium 구매",
+      "railLabel": "결제 수단",
+      "railStripe": "카드",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20% 할인",
+      "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
+      "railNativeUnavailable": "SOL/WOC 사용 불가",
+      "amountLabel": "수량",
+      "showAmounts": "모든 Claudium 수량 표시",
+      "hideAmounts": "추가 Claudium 수량 숨기기",
+      "skuRow": "{usd}에 {claudium} Claudium",
+      "buyButton": "구매",
+      "buyUnavailable": "현재 구매할 수 없습니다.",
+      "storeTitle": "꾸미기 상점",
+      "storeEmpty": "현재 이용 가능한 꾸미기 상품이 없습니다.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "교환",
+      "kindCosmetic": "꾸미기 상품",
+      "kindSkin": "스킨",
+      "kindItem": "아이템",
+      "checkoutTitle": "구매 완료",
+      "checkoutClose": "결제 닫기",
+      "checkoutLoading": "결제 불러오는 중…",
+      "checkoutPending": "거래가 진행 중입니다. 지갑에서 확인하고 이 패널을 열어 두세요.",
+      "checkoutPendingButton": "처리 중",
+      "checkoutFailed": "결제를 불러오지 못했습니다. 다시 시도해 주세요.",
+      "checkoutUnavailable": "해당 Claudium 구매는 현재 이용할 수 없습니다.",
+      "checkoutWalletRequired": "암호화폐로 Claudium을 구매하기 전에 Solana 지갑을 연결하세요.",
+      "checkoutWalletUnsupported": "이 지갑은 Solana 거래에 서명하거나 전송할 수 없습니다.",
+      "checkoutNotSettled": "거래는 전송됐지만 Claudium이 아직 지급되지 않았습니다. 잠시 후 다시 시도해 주세요."
+    },
     "theme": {
       "preset": "UI 테마",
       "customColors": "사용자 지정 색상",
@@ -450,16 +707,16 @@ export const ko_KR: EnTranslations = {
     "mobile": {
       "jump": "점프",
       "leaderboard": "순위",
-      "dailyRewards": "보상",
+      "dailyRewards": "상점",
       "deeds": "업적",
       "nameplates": "이름표",
-      "nameplatesOff": "이름 끄기",
-      "musicOff": "음악 끄기",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
       "toggleHaptics": "진동 전환",
-      "showMenuButtons": "메뉴 버튼 표시",
-      "hideMenuButtons": "메뉴 버튼 숨기기",
+      "showMenuButtons": "Show menu buttons",
+      "hideMenuButtons": "Hide menu buttons",
       "hotbarPage": "스킬",
       "hotbarPageAria": "다음 스킬 세트 표시",
       "actionRing": "전투 행동",
@@ -496,6 +753,15 @@ export const ko_KR: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft 버전 {version}을(를) 사용할 수 있습니다. 지금 업데이트하여 최신 수정 사항과 개선 사항을 받으세요.",
       "notNow": "나중에",
       "update": "업데이트"
+    },
+    "cameraPrompt": {
+      "title": "카메라 선택",
+      "intro": "카메라가 캐릭터를 따라가는 방식을 선택하세요.",
+      "mouseDesc": "버튼을 누르지 않고 마우스를 움직여 시점을 돌립니다.",
+      "classicTitle": "클래식 카메라",
+      "classicDesc": "우클릭을 누른 채 마우스를 움직여 시점을 돌립니다.",
+      "changeLater": "이 설정은 나중에 Esc 메뉴의 키 설정에서 변경할 수 있습니다.",
+      "confirm": "확인"
     },
     "castBar": {
       "playerAria": "내 시전 막대",
@@ -542,7 +808,12 @@ export const ko_KR: EnTranslations = {
       "perSecond": "{value}/초",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}분 {s}초",
-      "seconds": "{s}초"
+      "seconds": "{s}초",
+      "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다."
+    },
+    "petFeed": {
+      "disabledFullHp": "펫의 체력이 가득 찼습니다",
+      "disabledNoFood": "가방에 펫을 치유할 음식이 없습니다"
     },
     "keybinds": {
       "emoteWheel": "감정 표현 휠",
@@ -550,6 +821,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -708,10 +980,10 @@ export const ko_KR: EnTranslations = {
       "interfaceModeDesktop": "데스크톱",
       "interfaceModeTouch": "터치",
       "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
-      "mobileActionPages": "최소 행동 페이지 수",
-      "mobileActionPagesTwo": "2페이지",
-      "mobileActionPagesThree": "3페이지",
-      "mobileActionPagesFour": "4페이지",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "발소리",
       "clickFeedback": "클릭 표시",
       "lockCursorOnRotate": "회전 중 커서 고정",
@@ -827,13 +1099,29 @@ export const ko_KR: EnTranslations = {
       "highContrast": "고대비",
       "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
     },
+    "warfare": {
+      "honorAmount": "명예 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "명예: {amount}",
+      "honorFloat": "명예 +{amount}",
+      "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "notEnoughHonor": "명예가 부족합니다.",
+      "reasons": {
+        "arenaWin": "투기장 승리",
+        "fiestaKill": "피에스타 처치",
+        "fiestaComplete": "피에스타 완료",
+        "fiestaWin": "피에스타 승리"
+      }
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
-        "hasteRating": "가속 등급"
+        "hasteRating": "가속 등급",
+        "warfare": "워페어"
       },
+      "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
         "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
@@ -847,7 +1135,8 @@ export const ko_KR: EnTranslations = {
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
-        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속."
+        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -920,6 +1209,12 @@ export const ko_KR: EnTranslations = {
         "few": "당신은 {rank}, {count}명 회원",
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
+      },
+      "finderPartySize": {
+        "one": "{count}인",
+        "few": "{count}인",
+        "many": "{count}인",
+        "other": "{count}인"
       },
       "characterCount": {
         "one": "캐릭터 {count}개",
@@ -1100,6 +1395,19 @@ export const ko_KR: EnTranslations = {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
     },
+    "playerMenu": {
+      "info": "플레이어 정보",
+      "block": "차단",
+      "unblock": "차단 해제",
+      "openFor": "{name} 님의 플레이어 메뉴 열기",
+      "profileUnavailable": "{name} 님의 프로필을 찾을 수 없습니다.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 운영 계정",
+      "watchTwitch": "Twitch에서 시청",
+      "watchX": "X에서 보기",
+      "watchKick": "Kick에서 시청",
+      "watchYouTube": "YouTube에서 시청"
+    },
     "lootSettings": {
       "title": "전리품 설정",
       "close": "전리품 설정 닫기",
@@ -1117,7 +1425,7 @@ export const ko_KR: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "이 아이템은 파괴할 수 없습니다.",
-      "rightClickDestroy": "마우스 오른쪽 버튼으로 파괴",
+      "rightClickDestroy": "Shift + 마우스 오른쪽 버튼으로 파괴",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1138,25 +1446,25 @@ export const ko_KR: EnTranslations = {
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "빈 가방 칸",
       "unequipHint": "클릭하여 이 가방을 해제",
-      "itemActionsTitle": "{item} 동작",
-      "itemActionEquip": "장착",
-      "itemActionEquipBag": "가방 장착",
-      "itemActionUse": "사용",
-      "itemActionConsume": "소비",
-      "itemActionLinkToChat": "채팅에 링크",
-      "itemActionDestroy": "파괴",
-      "itemActionDetails": "아이템 상세",
-      "itemActionAssignTitle": "소모품에 지정",
-      "itemActionAssignSlot": "{slot}번 슬롯에 지정",
-      "itemActionRemoveSlot": "{slot}번 슬롯에서 제거",
-      "itemActionSlotCurrent": "{slot}번 슬롯: {item}",
-      "itemActionSlotEmpty": "{slot}번 슬롯: 비어 있음",
-      "itemActionResetAutomatic": "자동 배치로 재설정",
-      "itemActionClose": "아이템 동작 닫기",
-      "itemActionAssigned": "{item}을(를) {slot}번 슬롯에 지정했습니다.",
-      "itemActionRemoved": "{item}을(를) {slot}번 슬롯에서 제거했습니다.",
-      "itemActionInvalid": "이 아이템은 지정할 수 없습니다.",
-      "itemActionFailed": "동작을 완료할 수 없습니다."
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -1278,17 +1586,17 @@ export const ko_KR: EnTranslations = {
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
       "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
-      "add": "추가",
-      "remove": "제거",
+      "add": "Add",
+      "remove": "Remove",
       "mobileChip": "{page} - A{position}",
-      "desktopChip": "데스크톱",
-      "moveAssignmentAria": "{name}을(를) {slot}에서 이동",
-      "pickerPages": "행동 페이지",
-      "pickerDestinations": "행동 슬롯",
-      "destinationAria": "{page}페이지, A{position}, {state}",
-      "empty": "비어 있음",
-      "closePicker": "슬롯 닫기",
-      "assignedStatus": "{name}을(를) {page}페이지 A{position}에 배치했습니다"
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1313,7 +1621,7 @@ export const ko_KR: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
-      "duration": "지속 시간: {duration}"
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1348,7 +1656,8 @@ export const ko_KR: EnTranslations = {
         "connecting": "Discord 여는 중...",
         "benefits": "플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.",
         "error": "Discord를 연결할 수 없습니다. 다시 시도해 주세요.",
-        "success": "Discord가 연결되었습니다."
+        "success": "Discord가 연결되었습니다.",
+        "joinServer": "연동 없이 서버 참여하기"
       },
       "choice": {
         "title": "Discord로 계속하기",
@@ -1396,8 +1705,13 @@ export const ko_KR: EnTranslations = {
         "admin": "관리자",
         "coredevs": "핵심 개발자",
         "devs": "개발자",
+        "seniormods": "선임 운영자",
         "mods": "운영자",
-        "artists": "아티스트"
+        "juniormods": "수습 운영자",
+        "artists": "아티스트",
+        "contentcreator": "콘텐츠 크리에이터",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
@@ -1650,7 +1964,15 @@ export const ko_KR: EnTranslations = {
     },
     "social": {
       "lastSeen": "마지막 접속: {when}",
-      "lastSeenNever": "없음"
+      "lastSeenNever": "없음",
+      "ignoredTab": "무시됨",
+      "blockedTab": "차단",
+      "ignoredEmpty": "아무도 무시하고 있지 않습니다.",
+      "blockedEmpty": "아무도 차단하지 않았습니다.",
+      "blockSearchPlaceholder": "플레이어 이름",
+      "blockAction": "차단",
+      "nowBlocking": "{name} 님을 차단했습니다.",
+      "stopBlockingTitle": "{name} 님 차단 해제"
     },
     "gathering": {
       "title": "채집",
@@ -1688,6 +2010,107 @@ export const ko_KR: EnTranslations = {
       "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
       "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
+    },
+    "finder": {
+      "title": "던전 찾기",
+      "close": "닫기",
+      "back": "뒤로",
+      "syncing": "서버 응답을 기다리는 중...",
+      "tabCatalogue": "목록",
+      "tabQueue": "빠른 매칭",
+      "tabBoard": "사전 모집",
+      "normal": "일반",
+      "heroic": "영웅",
+      "kindDungeon": "던전",
+      "kindRaid": "공격대",
+      "kindSolo": "솔로 모험",
+      "levels": "레벨 {min} ~ {max}",
+      "levelOne": "레벨 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role} {count}",
+      "roleTank": "방어 전담",
+      "roleHealer": "치유 전담",
+      "roleDps": "공격 전담",
+      "freeRoles": "역할 제한 없음",
+      "lockoutDaily": "최종 우두머리 일일 귀속",
+      "lockoutNone": "귀속 없음",
+      "lockedFor": "약 {minutes}분 동안 귀속됨",
+      "attunement": "선행 퀘스트 필요: {quest}",
+      "heroicMarks": "영웅의 징표: 1인당 {count}개",
+      "entrance": "입구: {zone}",
+      "showOnMap": "지도에 표시",
+      "encounters": "우두머리 전투",
+      "finalBoss": "최종 우두머리",
+      "summoned": "소환되는 수호자",
+      "lootGuaranteed": "다음 중 하나가 반드시 드롭:",
+      "lootMaybe": "다음 중 최대 하나가 드롭:",
+      "lootChance": "추가 확률 드롭:",
+      "lootHeroic": "영웅 보상, 다음 중 하나가 반드시 드롭:",
+      "pct": "{pct}%",
+      "blockedLevel": "레벨 {min} ~ {max} 전용",
+      "blockedSpec": "전문화 선택 필요",
+      "yourRoles": "내 역할",
+      "needsSpec": "던전 찾기를 사용하려면 전문화를 선택하세요.",
+      "leaderNote": "파티장만 파티를 대기열에 등록할 수 있습니다.",
+      "chooseActivities": "콘텐츠 선택",
+      "joinQueue": "대기열 참가",
+      "leaveQueue": "대기열 나가기",
+      "waited": "대기 시간: {time}",
+      "cooldownNote": "{seconds}초 후에 다시 대기열에 참가할 수 있습니다.",
+      "travelNote": "파티는 그 자리에서 결성됩니다. 함께 입구까지 이동하세요. 순간이동은 없습니다.",
+      "proposalTitle": "파티 결성: {name}",
+      "proposalRole": "내 역할: {role}",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 플레이어를 기다리는 중...",
+      "slotState": "{role}: {total}명 중 {accepted}명 준비 완료",
+      "openListings": "공개 모집",
+      "boardEmpty": "지금은 모집이 없습니다. 직접 올려 보세요!",
+      "boardLeaderGate": "파티장만 모집 글을 올릴 수 있습니다.",
+      "publishListing": "모집 등록",
+      "activity": "콘텐츠",
+      "publish": "등록",
+      "yourListing": "내 모집",
+      "closeListing": "모집 마감",
+      "applicants": "신청자",
+      "noApplicants": "아직 신청자가 없습니다.",
+      "acceptApplicantAria": "{name} 수락",
+      "declineApplicantAria": "{name} 거절",
+      "levelClass": "Lv {level} {className}",
+      "leader": "파티장: {name}",
+      "needs": "필요: {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "신청",
+      "withdraw": "신청 취소",
+      "tagFirstRun": "첫 공략",
+      "tagQuestRun": "퀘스트 진행",
+      "tagFullClear": "완전 공략",
+      "tagLearning": "초보 환영",
+      "tagFastRun": "빠른 공략",
+      "mech": {
+        "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
+        "reaping_arc": "수확의 호(전방 휩쓸기)",
+        "mist_surge": "안개 쇄도(주기적 광역 피해)",
+        "summons_adds": "증원 소환",
+        "lunar_tide": "달의 파도(주기적 광역 피해)",
+        "enrage": "체력이 낮으면 격노",
+        "shuddering_stomp": "전율의 발구르기(광역 기절)",
+        "necrotic_shockwave": "괴사의 충격파(높은 광역 피해)",
+        "grave_cleaver": "무덤 절단(전방 휩쓸기)",
+        "shadow_nova": "어둠의 회오리(광역 폭발)",
+        "profane_mending": "모독의 치유(아군 치유)",
+        "mana_burn": "시든 축복(마나 연소)",
+        "deathstalker_cleave": "죽음추적자의 절단(전방 휩쓸기)",
+        "mortal_wound": "잊힌 상처(받는 치유 감소)",
+        "sealbreak_shockwave": "봉인 파괴 충격파(광역 폭발)",
+        "gravebreaker": "무덤파괴자(전방 부채꼴, 공격대 반대편으로)",
+        "raise_fallen": "망자 소생(주기적 증원)",
+        "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
+        "deathless_rage": "불사의 격노(수호석에서 저지)",
+        "wardstones": "수호석 정신집중(단계 전환)"
+      }
     },
     "deeds": {
       "title": "업적의 서",
@@ -2428,6 +2851,10 @@ export const ko_KR: EnTranslations = {
       "dragonkin": {
         "name": "용족",
         "desc": "비늘로 뒤덮인 뱀 같은 옛 심연의 존재들. 보기 드물고 오만하며, 겉보기보다 훨씬 강합니다."
+      },
+      "reptile": {
+        "name": "파충류",
+        "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
       }
     },
     "worldPage": {
@@ -4529,7 +4956,7 @@ export const ko_KR: EnTranslations = {
     "androidStandaloneDetail": "전체 화면 앱 모드입니다. 기기를 가로로 유지하세요.",
     "androidInstallDetail": "Android에서 전체 화면을 사용하려면 이 페이지를 설치하거나 홈 화면에 추가하세요.",
     "androidInstallStep": "Chrome에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.",
-    "androidSamsungInstallStep": "Samsung Internet에서 메뉴를 누른 뒤 앱 설치 또는 홈 화면에 추가를 선택하세요.",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "새 아이콘에서 World of ClaudeCraft를 여세요.",
     "otherStandaloneDetail": "기기를 가로 전체 화면으로 유지하세요.",
     "otherInstallDetail": "최상의 모바일 전체 화면 경험을 위해 이 페이지를 설치하거나 홈 화면에 추가하세요."
@@ -5755,6 +6182,10 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 의식",
         "description": "막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분."
       },
+      "holy_taunt": {
+        "name": "신성한 부추김",
+        "description": "대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다."
+      },
       "flash_of_light": {
         "name": "빛의 치유",
         "description": "빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
@@ -6079,6 +6510,98 @@ export const ko_KR: EnTranslations = {
         "name": "들끓는 격노",
         "description": "들끓는 격노에 들어가 분노 20을 생성합니다. (전사 특성)"
       },
+      "crusader_strike": {
+        "name": "성전사의 일격",
+        "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
+      },
+      "chain_heal": {
+        "name": "연쇄 치유",
+        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
+      },
+      "metamorphosis": {
+        "name": "악마 변신",
+        "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"
+      },
+      "holy_shock": {
+        "name": "신성 충격",
+        "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"
+      },
+      "holy_shield": {
+        "name": "신성한 방패",
+        "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+      },
+      "bestial_wrath": {
+        "name": "야수의 격노",
+        "description": "야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)"
+      },
+      "trueshot_aura": {
+        "name": "정조준 오라",
+        "description": "주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)"
+      },
+      "wyvern_sting": {
+        "name": "비룡 쐐기",
+        "description": "원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)"
+      },
+      "arcane_power": {
+        "name": "신비의 마법 강화",
+        "description": "10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)"
+      },
+      "combustion": {
+        "name": "발화",
+        "description": "15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)"
+      },
+      "icy_veins": {
+        "name": "얼음 핏줄",
+        "description": "10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)"
+      },
+      "cold_blood": {
+        "name": "냉혈",
+        "description": "살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)"
+      },
+      "blade_flurry": {
+        "name": "폭풍의 칼날",
+        "description": "칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)"
+      },
+      "hemorrhage": {
+        "name": "과다출혈",
+        "description": "적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)"
+      },
+      "power_infusion": {
+        "name": "마력 주입",
+        "description": "아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)"
+      },
+      "holy_nova": {
+        "name": "신성한 폭발",
+        "description": "신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)"
+      },
+      "shadowform": {
+        "name": "어둠의 형상",
+        "description": "어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)"
+      },
+      "elemental_mastery": {
+        "name": "정기의 깨달음",
+        "description": "정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)"
+      },
+      "siphon_life": {
+        "name": "생명력 착취",
+        "description": "적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)"
+      },
+      "conflagrate": {
+        "name": "점화",
+        "description": "적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)"
+      },
+      "moonkin_form": {
+        "name": "달빛야수 변신",
+        "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
+      },
+      "feral_charge": {
+        "name": "야성의 돌진",
+        "description": "적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)"
+      },
+      "swiftmend": {
+        "name": "신속한 치유",
+        "description": "아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)"
+      },
       "summon_imp": {
         "name": "불씨족 소환",
         "description": "흑마법사의 명령을 따르는 불씨족을 소환합니다. 불씨족은 멀리서 적에게 잿불 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
@@ -6106,6 +6629,34 @@ export const ko_KR: EnTranslations = {
       "summon_doomguard": {
         "name": "망령태생 소환",
         "description": "망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+      },
+      "pummel": {
+        "name": "턱 강타",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "kick": {
+        "name": "발차기",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "counterspell": {
+        "name": "주문 분쇄",
+        "description": "대상의 주문을 무효화하고 6초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "counter_shot": {
+        "name": "침묵의 사격",
+        "description": "빠른 사격으로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
+      },
+      "rebuke": {
+        "name": "질책",
+        "description": "대상의 주문 시전을 중단시키고 4초 동안 해당 계열의 주문을 봉쇄합니다."
+      },
+      "skull_bash": {
+        "name": "박치기",
+        "description": "돌진 박치기로 대상의 시전을 중단시키고 4초 동안 해당 계열을 봉쇄합니다."
+      },
+      "spell_lock": {
+        "name": "재갈 물리기",
+        "description": "시전 중인 대상을 침묵시키고 5초 동안 해당 계열의 주문을 봉쇄합니다."
       },
       "bear_charge": {
         "name": "큰곰 돌진",
@@ -6749,6 +7300,126 @@ export const ko_KR: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "태양꽃잎 약초"
+      },
+      "furyforged_warhelm": {
+        "name": "분노벼림 전투투구"
+      },
+      "furyforged_warspaulders": {
+        "name": "분노벼림 전투어깨갑옷"
+      },
+      "furyforged_warplate": {
+        "name": "분노벼림 전투흉갑"
+      },
+      "furyforged_girdle": {
+        "name": "분노벼림 요대"
+      },
+      "furyforged_legguards": {
+        "name": "분노벼림 다리보호대"
+      },
+      "furyforged_gauntlets": {
+        "name": "분노벼림 건틀릿"
+      },
+      "furyforged_sabatons": {
+        "name": "분노벼림 전투장화"
+      },
+      "stormbound_crown": {
+        "name": "폭풍결속 왕관"
+      },
+      "stormbound_spaulders": {
+        "name": "폭풍결속 어깨갑옷"
+      },
+      "stormbound_hauberk": {
+        "name": "폭풍결속 사슬갑옷"
+      },
+      "stormbound_waistguard": {
+        "name": "폭풍결속 허리보호대"
+      },
+      "stormbound_legmail": {
+        "name": "폭풍결속 다리사슬갑옷"
+      },
+      "stormbound_handguards": {
+        "name": "폭풍결속 손보호대"
+      },
+      "stormbound_greaves": {
+        "name": "폭풍결속 경갑"
+      },
+      "ashstalker_cowl": {
+        "name": "잿빛추적자 두건"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "잿빛추적자 어깨보호대"
+      },
+      "ashstalker_harness": {
+        "name": "잿빛추적자 멜빵갑옷"
+      },
+      "ashstalker_waistband": {
+        "name": "잿빛추적자 허리띠"
+      },
+      "ashstalker_legguards": {
+        "name": "잿빛추적자 다리보호대"
+      },
+      "ashstalker_grips": {
+        "name": "잿빛추적자 장갑"
+      },
+      "ashstalker_treads": {
+        "name": "잿빛추적자 발덮개"
+      },
+      "cinderweave_cowl": {
+        "name": "불씨매듭 두건"
+      },
+      "cinderweave_mantle": {
+        "name": "불씨매듭 어깨망토"
+      },
+      "cinderweave_raiment": {
+        "name": "불씨매듭 예복"
+      },
+      "cinderweave_cord": {
+        "name": "불씨매듭 장식끈"
+      },
+      "cinderweave_legwraps": {
+        "name": "불씨매듭 다리싸개"
+      },
+      "cinderweave_handwraps": {
+        "name": "불씨매듭 손싸개"
+      },
+      "cinderweave_slippers": {
+        "name": "불씨매듭 덧신"
+      },
+      "final_oath_medallion": {
+        "name": "최후의 맹세 메달"
+      },
+      "razorwind_torque": {
+        "name": "칼바람 목가리개"
+      },
+      "cinder_sigil_pendant": {
+        "name": "불씨 인장 목걸이"
+      },
+      "iron_vow_band": {
+        "name": "강철 맹세의 반지"
+      },
+      "unbroken_circle": {
+        "name": "깨지지 않는 고리"
+      },
+      "fleetblood_band": {
+        "name": "쾌혈의 반지"
+      },
+      "last_step_signet": {
+        "name": "마지막 걸음의 인장"
+      },
+      "ashen_focus_ring": {
+        "name": "잿빛 집중의 반지"
+      },
+      "spellbreakers_seal": {
+        "name": "주문파괴자의 인장"
+      },
+      "final_argument_greatblade": {
+        "name": "최후 논박의 대검"
+      },
+      "first_blood_razor": {
+        "name": "첫 피의 면도날"
+      },
+      "emberglass_warstaff": {
+        "name": "불씨유리 전투지팡이"
       },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
@@ -7622,6 +8293,15 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "죽지 않는 전쟁수호병 알드렌"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "죽지 않는 대사제 말릭"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "죽지 않는 칼날 보스"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -7890,6 +8570,11 @@ export const ko_KR: EnTranslations = {
         "title": "영웅 병참장교",
         "greeting": "영웅 던전의 증표는 하이워치 최고의 반지와 펜던트로 바꿀 수 있소. 징표를 보여 주시오."
       },
+      "fury": {
+        "name": "퓨리",
+        "title": "명예 병참장교",
+        "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
       "loremaster_caddis": {
         "name": "현자 캐디스",
         "title": "현자",
@@ -7965,7 +8650,7 @@ export const ko_KR: EnTranslations = {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
         "text": "이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.",
-        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 그 안에 정직한 거래가 기다리고 있다네.",
+        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.",
         "objectives": {
           "0": {
             "label": "광석 조각"

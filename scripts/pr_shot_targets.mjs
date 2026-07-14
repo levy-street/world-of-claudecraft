@@ -138,6 +138,65 @@ export const TARGETS = [
       return open ? { clip: '#char-window' } : {};
     },
   },
+  {
+    key: 'chat-general-tab',
+    label: 'Chat window: General/Chat tab',
+    when: ['log_event_route'],
+    // Synthesize one entityId-anchored mob combat-flavor 'log' event (routes to the
+    // Combat Log tab on this branch, General/Chat before the fix) and one anchorless
+    // system 'log' event (always stays in General/Chat) through the real dispatch
+    // (hud.handleEvents), then show the General/Chat tab so the routing is visible
+    // without needing a live mob fight.
+    async capture(page) {
+      // Under CPU contention the #ui template clone (and window.__game) can land
+      // well after enterOfflineGame's fixed settleMs; wait for it explicitly so
+      // this target does not race a slow machine into an empty full-frame shot.
+      await pollForSize(page, '#chatlog-wrap', 60, 500);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        hud.handleEvents([
+          {
+            type: 'log',
+            text: 'The Greyjaw Ravager flies into a frenzy!',
+            color: '#ff7a6a',
+            entityId: 999999,
+          },
+          {
+            type: 'log',
+            text: 'Talents updated.',
+            color: '#ffd100',
+            pid: window.__game?.sim?.player?.id,
+          },
+        ]);
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="all"]')
+          ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'chat-combat-tab',
+    label: 'Chat window: Combat Log tab',
+    when: ['log_event_route'],
+    // Runs on the same page right after chat-general-tab (targets share one browser
+    // session in pr_screenshots.mjs), so the two synthetic lines from that capture
+    // are still in the log; this just switches to the Combat Log tab to show them.
+    async capture(page) {
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="combat"]')
+          ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

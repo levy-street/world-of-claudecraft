@@ -147,6 +147,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     expect(c.socialInfo).toEqual({
       friends,
       blocks: [{ id: 9, name: 'Foe' }],
+      ignores: [],
       guild: {
         id: 1,
         name: 'Guild',
@@ -173,7 +174,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
   it('the `social` frame applies the `?? []` / `?? null` defaults when fields are absent', () => {
     const c = bareClient(7);
     feed(c, { t: 'social' }); // no friends/blocks/guild
-    expect(c.socialInfo).toEqual({ friends: [], blocks: [], guild: null });
+    expect(c.socialInfo).toEqual({ friends: [], blocks: [], ignores: [], guild: null });
   });
 
   it('the `social` frame carries each guild member last_login through unchanged', () => {
@@ -247,6 +248,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
         },
       ],
       blocks: [],
+      ignores: [],
       guild: {
         id: 1,
         name: 'Guild',
@@ -320,7 +322,7 @@ describe('W9 socialInfo is NOT snapshot-driven', () => {
     expect(snap.self).not.toHaveProperty('social');
 
     const c = bareClient(session.pid);
-    const sentinel: SocialInfo = { friends: [], blocks: [], guild: null };
+    const sentinel: SocialInfo = { friends: [], blocks: [], ignores: [], guild: null };
     c.socialInfo = sentinel;
     (c as any).applySnapshot(snap);
     // reference identity preserved => applySnapshot did not write socialInfo

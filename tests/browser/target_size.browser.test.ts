@@ -239,8 +239,10 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     // The mobile party UI collapses behind the disclosure chip; member rows are
     // interactive only in the expanded state, so measure them there.
     const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
+    const rows = el('div', { class: 'party-rows' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
-    frames.appendChild(row);
+    rows.appendChild(row);
+    frames.appendChild(rows);
     document.body.appendChild(frames);
     expectAtLeastFloor(row, 'party-frame', LEGACY_TOUCH_FLOOR);
   });
@@ -280,6 +282,18 @@ describe('mobile target-size: primary in-game touch controls are >=48x48 in land
     hud.appendChild(menu);
     document.body.appendChild(hud);
     expect(measure(toggle)).toEqual({ w: 0, h: 0 });
+  });
+
+  it('the always-present Donate button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const donate = el('button', { id: 'mobile-donate', class: 'mobile-btn' });
+    donate.textContent = 'Donate';
+    grid.appendChild(donate);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(donate, '#mobile-donate');
   });
 
   it('the movement / camera joystick', () => {

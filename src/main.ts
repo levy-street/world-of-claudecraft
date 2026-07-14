@@ -91,6 +91,7 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
+import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 import {
   isAppleAuthorizationCancellation,
   isNativeIos,
@@ -114,6 +115,7 @@ import {
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
+import { openStripeCheckout } from './net/stripe_checkout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -164,6 +166,11 @@ import {
   validateForm,
 } from './ui/auth_utils';
 import { assembleBugReportMeta } from './ui/bug_report';
+import {
+  cameraPromptOpen,
+  dismissCameraPrompt,
+  maybeShowFirstRunCameraPrompt,
+} from './ui/camera_prompt';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
@@ -186,7 +193,7 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { Hud } from './ui/hud';
+import { type ClaudiumHooks, Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
   formatDateTime,
@@ -232,8 +239,10 @@ import {
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
+import { wireSkinPicker } from './ui/skin_picker';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
+import { shouldShowStorePromo } from './ui/store_promo_card';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -998,7 +1007,10 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds, keybindScope);
+    hud = new Hud(world, renderer, keybinds, {
+      dailyRewardsEnabled: !NATIVE_APP,
+      consumablePreferenceScope: keybindScope,
+    });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -1022,20 +1034,31 @@ async function startGame(
   // edge, the extra height extends upward, away from the chat log beneath it.
   const CHAT_INPUT_MIN_H = 36;
   const CHAT_INPUT_MAX_H = 110;
-  const autosizeChatInput = (): void => {
-    // Empty: pin to one line. (A long placeholder otherwise inflates a textarea's
-    // scrollHeight in Chromium, making the bar tall when empty and snapping to one
-    // line on the first keystroke.)
-    if (chatInput.value === '') {
-      chatInput.style.height = `${CHAT_INPUT_MIN_H}px`;
-      chatInput.style.overflowY = 'hidden';
-      return;
-    }
+  // Collapse to 'auto' and read the textarea's natural content height.
+  const measureChatInputScrollH = (): number => {
     chatInput.style.height = 'auto';
-    const size = chatInputSize(chatInput.scrollHeight, {
-      minHeight: CHAT_INPUT_MIN_H,
-      maxHeight: CHAT_INPUT_MAX_H,
-    });
+    return chatInput.scrollHeight;
+  };
+  const autosizeChatInput = (): void => {
+    const cs = getComputedStyle(chatInput);
+    const borderY =
+      (Number.parseFloat(cs.borderTopWidth) || 0) + (Number.parseFloat(cs.borderBottomWidth) || 0);
+    // A textarea's scrollHeight ignores the placeholder, so an empty box would measure
+    // as zero content and clip a placeholder that wraps to more than one line. When the
+    // field is empty, momentarily mirror the placeholder into the value to measure the
+    // height it needs. This is synchronous (no paint or input event in between), so the
+    // caret and text never flicker and no listener re-fires.
+    let placeholderHeight = 0;
+    if (chatInput.value === '' && chatInput.placeholder) {
+      chatInput.value = chatInput.placeholder;
+      placeholderHeight = measureChatInputScrollH();
+      chatInput.value = '';
+    }
+    const contentHeight = measureChatInputScrollH();
+    const size = chatInputSize(
+      { contentHeight, placeholderHeight, borderY },
+      { minHeight: CHAT_INPUT_MIN_H, maxHeight: CHAT_INPUT_MAX_H },
+    );
     chatInput.style.height = `${size.height}px`;
     chatInput.style.overflowY = size.overflowY;
   };
@@ -1077,9 +1100,10 @@ async function startGame(
     wrap.insertBefore(chatInput, wrap.firstChild);
   };
   function openChat(): void {
-    // reflect the active chat-channel tab in the placeholder (e.g. "Message World")
+    // reflect the active/sticky send channel in the placeholder (e.g. "Message World")
+    // and tint the input text to that channel's color
     ensureMobileComposerInPanel();
-    chatInput.placeholder = hud.activeChatPlaceholder();
+    hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
     anchorChatInput();
     autosizeChatInput();
@@ -1097,7 +1121,7 @@ async function startGame(
   // the keyboard (native + the focus handler). Same as openChat minus the focus.
   function openChatRead(): void {
     ensureMobileComposerInPanel();
-    chatInput.placeholder = hud.activeChatPlaceholder();
+    hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
     document.body.classList.remove('mobile-chat-reply');
     autosizeChatInput();
@@ -1148,7 +1172,12 @@ async function startGame(
       // "/share" links the selected quest into party chat; skip the normal send path.
       if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
-        if (text) world.chat(text);
+        if (text) {
+          world.chat(text);
+          // Remember the channel this line reached so the next open (on the All
+          // tab) defaults there and tints the input to its color.
+          hud.noteSentChannel(text);
+        }
       }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,
       // mirroring the "+" menu (without hijacking the active send channel)
@@ -1172,6 +1201,15 @@ async function startGame(
   // WITHOUT closing chat.
   const chatDismiss = document.getElementById('chat-dismiss');
   chatDismiss?.addEventListener('click', () => chatInput.blur());
+
+  // One keyboard/gamepad action gate for every blocking client surface. The
+  // camera prompt lives outside Hud, so it reports its open state explicitly.
+  const gameplayInputBlocked = () =>
+    mobileHudEditor.isOpen ||
+    hud.isModalOpen() ||
+    hud.promptModalOpen() ||
+    cameraPromptOpen() ||
+    chatInput.style.display === 'block';
 
   const input = new Input(
     canvas,
@@ -1231,6 +1269,9 @@ async function startGame(
           case 'arena':
             hud.toggleArena();
             break;
+          case 'dungeonFinder':
+            hud.toggleDungeonFinder();
+            break;
           case 'valecup':
             hud.toggleValeCup();
             break;
@@ -1246,6 +1287,17 @@ async function startGame(
           case 'deeds':
             hud.toggleDeeds();
             break;
+          case 'sheathe': {
+            // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
+            // combat auto-unsheathe); play the cue only when the state moved.
+            const wasStowed = world.player.weaponStowed;
+            world.toggleWeaponStow();
+            if (world.player.weaponStowed !== wasStowed) {
+              if (world.player.weaponStowed) audio.weaponSheathe();
+              else audio.weaponUnsheathe();
+            }
+            break;
+          }
           case 'chat':
             openChat();
             break;
@@ -1259,23 +1311,15 @@ async function startGame(
       onEmoteWheel: (open) => hud.setEmoteWheelOpen(open),
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
-      canUseGameKeys: () =>
-        !mobileHudEditor.isOpen &&
-        !hud.isModalOpen() &&
-        !hud.promptModalOpen() &&
-        chatInput.style.display !== 'block',
+      canUseGameKeys: () => !gameplayInputBlocked(),
     },
     keybinds,
   );
   input.camYaw = world.player.facing;
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
-    canUseGameKeys:
-      !mobileHudEditor.isOpen &&
-      !hud.isModalOpen() &&
-      !hud.promptModalOpen() &&
-      chatInput.style.display !== 'block',
-    modalOpen: hud.isModalOpen(),
+    canUseGameKeys: !gameplayInputBlocked(),
+    modalOpen: hud.isModalOpen() || cameraPromptOpen(),
     chatOpen: chatInput.style.display === 'block',
     gameInputReady,
   }));
@@ -1302,6 +1346,7 @@ async function startGame(
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
+    onDungeonFinder: () => hud.toggleDungeonFinder(),
     onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => hud.toggleChar(),
@@ -1340,13 +1385,10 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
-  const canUseGameKeysNow = () =>
-    !mobileHudEditor.isOpen &&
-    !hud.isModalOpen() &&
-    !hud.promptModalOpen() &&
-    chatInput.style.display !== 'block';
+  const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
+      if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
@@ -1423,7 +1465,7 @@ async function startGame(
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
-    isPointerMode: () => hud.isWindowOpen(),
+    isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
     isInputBlocked: () => mobileHudEditor.isOpen,
@@ -1938,6 +1980,7 @@ async function startGame(
         document.documentElement.style.setProperty('--ui-scale', String(v));
         refreshMobileHudMeasurement();
         applyMobileHudCustomLayout();
+        hud.reapplySavedGeometry();
         break;
       case 'playerFrameScale':
         document.documentElement.style.setProperty('--player-frame-scale', String(v));
@@ -2070,6 +2113,166 @@ async function startGame(
           meta: payload.meta,
         }),
     });
+    // Native iOS and Android expose neither Daily Rewards nor the WOC Store.
+    // Every Claudium purchase surface stays absent until native billing is implemented.
+    // Claudium store, online only. The client SDK hits the game server's
+    // same-origin /api/claudium/* routes, which proxy to the economy service and
+    // fail closed; the SDK itself returns typed unavailable states, never throws.
+    // The game therefore boots and plays with the service OFF: snapshot() resolves
+    // to the disabled state and the window renders its empty notice.
+    const economy = new EconomyClient({ token: () => api.token, base: api.base });
+    const wocBalanceBaseUnits = (balance: number | null): string | null => {
+      if (balance === null || !Number.isFinite(balance) || balance < 0) return null;
+      return String(Math.floor(balance * 1_000_000));
+    };
+    const nativePriceCache = new Map<string, { amountBase: string; atMs: number }>();
+    const nativePriceCacheTtlMs = 60_000;
+    const nativeAmountBase = (
+      rail: 'sol' | 'woc',
+      sku: string,
+      amountBase: string | null | undefined,
+    ): string | null => {
+      const key = `${rail}:${sku}`;
+      if (amountBase) {
+        nativePriceCache.set(key, { amountBase, atMs: Date.now() });
+        return amountBase;
+      }
+      const cached = nativePriceCache.get(key);
+      if (!cached || Date.now() - cached.atMs > nativePriceCacheTtlMs) return null;
+      return cached.amountBase;
+    };
+    const claudiumHooks: ClaudiumHooks = {
+      balance: async () => (await economy.balance()).balance,
+      storeSnapshot: async () => {
+        const snapshot = await economy.storeSnapshot();
+        return {
+          available: snapshot.available,
+          balance: snapshot.balance,
+          storeItems: snapshot.items,
+        };
+      },
+      snapshot: async () => {
+        const pack = await economy.packSnapshot();
+        if (!pack.available) {
+          return {
+            available: false,
+            balance: pack.balance,
+            skus: pack.skus,
+            nativeRails: pack.nativeRails,
+          };
+        }
+        const { balance, skus, nativeRails } = pack;
+        const wallet = await loadWallet();
+        const walletAddress = wallet.currentWallet().address;
+        const [solBalance, wocBalance] = walletAddress
+          ? await Promise.all([
+              economy.solBalance(walletAddress),
+              wallet.fetchWocBalance(walletAddress, true),
+            ])
+          : [{ lamports: null }, null];
+        const nativePrices = await Promise.all(
+          skus.map(async (row) => {
+            const [sol, woc] = await Promise.all([
+              nativeRails.sol ? economy.nativePrice('sol', row.sku) : null,
+              nativeRails.woc ? economy.nativePrice('woc', row.sku) : null,
+            ]);
+            return {
+              sku: row.sku,
+              solAmountBase: nativeAmountBase('sol', row.sku, sol?.amountBase),
+              wocAmountBase: nativeAmountBase('woc', row.sku, woc?.amountBase),
+            };
+          }),
+        );
+        return {
+          available: true,
+          balance,
+          skus,
+          nativeRails,
+          walletBalances: {
+            solLamports: solBalance.lamports,
+            wocBaseUnits: wocBalanceBaseUnits(wocBalance),
+          },
+          nativePrices,
+        };
+      },
+      buy: async (rail, sku) => {
+        await (async () => {
+          const refreshClaudiumLater = () => {
+            void hud.refreshClaudium();
+          };
+          const result = await startClaudiumPurchase(economy, rail, sku, {
+            stripe: (intent) =>
+              openStripeCheckout(
+                intent,
+                {
+                  title: t('hudChrome.claudium.checkoutTitle'),
+                  close: t('hudChrome.claudium.checkoutClose'),
+                  loading: t('hudChrome.claudium.checkoutLoading'),
+                  failed: t('hudChrome.claudium.checkoutFailed'),
+                },
+                {
+                  onComplete: () => {
+                    refreshClaudiumLater();
+                    window.setTimeout(refreshClaudiumLater, 1500);
+                    window.setTimeout(refreshClaudiumLater, 4000);
+                    window.setTimeout(refreshClaudiumLater, 8000);
+                  },
+                },
+              ),
+            nativeSignAndSend: async (transactionBase64) => {
+              const wallet = await loadWallet();
+              return wallet.signAndSendTransactionBase64(transactionBase64);
+            },
+          });
+          if ('ok' in result && !result.ok) {
+            throw new Error(t('hudChrome.claudium.checkoutUnavailable'));
+          }
+          if ('settled' in result && result.settled) {
+            await hud.refreshClaudium();
+            window.setTimeout(refreshClaudiumLater, 1500);
+            return;
+          }
+          if ('settled' in result && !result.settled) {
+            throw new Error(t('hudChrome.claudium.checkoutNotSettled'));
+          }
+        })().catch((err) => {
+          const message = err instanceof Error ? err.message : '';
+          if (/connect a wallet first/i.test(message)) {
+            throw new Error(t('hudChrome.claudium.checkoutWalletRequired'));
+          }
+          if (/wallet cannot sign and send transactions/i.test(message)) {
+            throw new Error(t('hudChrome.claudium.checkoutWalletUnsupported'));
+          }
+          throw new Error(message || t('hudChrome.claudium.checkoutFailed'));
+        });
+      },
+      spend: async (itemId, kind, expectedCostClaudium) => {
+        const result = await economy.spend({
+          itemId,
+          kind,
+          expectedCostClaudium,
+          idempotencyKey: newIdempotencyKey(),
+        });
+        return {
+          granted: result.granted,
+          balance: result.balance,
+          costClaudium: result.costClaudium,
+          reason: result.reason,
+        };
+      },
+    };
+    if (!NATIVE_APP) {
+      hud.attachClaudium(claudiumHooks);
+      if (
+        shouldShowStorePromo({
+          nativeApp: NATIVE_APP,
+          desktopApp: DESKTOP_APP,
+          mobileTouch: document.body.classList.contains('mobile-touch'),
+        })
+      ) {
+        hud.attachStorePromoCard();
+      }
+    }
   }
   function interactNearby(showError: boolean): boolean {
     return stopAutorunForInteraction(
@@ -2639,7 +2842,11 @@ async function startGame(
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
     input.setSuspendMovement(
-      !gameInputReady || mobileHudEditor.isOpen || hud.isModalOpen() || intro !== null,
+      !gameInputReady ||
+        mobileHudEditor.isOpen ||
+        hud.isModalOpen() ||
+        cameraPromptOpen() ||
+        intro !== null,
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
@@ -3049,6 +3256,13 @@ async function startGame(
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
         prewarmIconCache(defaultIconPrewarmEntries());
+        // First-run camera-mode prompt (issue #1727): show once per browser on a
+        // mouse-driven interface, after any spawn cinematic has finished. Applies
+        // the choice through the same applySetting path as the Key Bindings toggle.
+        maybeShowFirstRunCameraPrompt({
+          applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
+          isBlocked: () => intro !== null,
+        });
         (window as any).__game = {
           sim: world,
           world,
@@ -3216,6 +3430,7 @@ function renderSkinPicker(
   }
   if (picker) picker.style.display = '';
   row.style.setProperty('--class-color', `#${CLASSES[cls].color.toString(16).padStart(6, '0')}`);
+  const swatches: HTMLElement[] = [];
   for (let i = 0; i < count; i++) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -3233,21 +3448,19 @@ function renderSkinPicker(
     } else {
       b.textContent = String(i + 1);
     }
-    b.addEventListener('click', () => {
-      row.querySelectorAll('.skin-swatch').forEach((x) => {
-        x.classList.remove('sel');
-      });
-      b.classList.add('sel');
-      onPick(i);
-    });
-    // Live-preview the chroma on the right avatar while hovering; revert on leave.
-    b.addEventListener('mouseenter', () => characterPreview?.setSkin(i));
-    b.addEventListener('mouseleave', () => {
-      const sel = row.querySelector('.skin-swatch.sel') as HTMLElement | null;
-      characterPreview?.setSkin(sel ? Number(sel.dataset.skin ?? 0) || 0 : current);
-    });
+    swatches.push(b);
     row.appendChild(b);
   }
+  // Live-preview the chroma on the avatar while hovering, commit on click, and
+  // revert to the committed selection when the pointer leaves the whole row.
+  // The revert is row-level, not per swatch, so hovering the swatch next to the
+  // selected one previews instead of being clobbered (issue 1464); see
+  // wireSkinPicker.
+  wireSkinPicker(row, swatches, current, {
+    onPreview: (i) => characterPreview?.setSkin(i),
+    onRevert: (i) => characterPreview?.setSkin(i),
+    onPick,
+  });
 }
 
 /** Give each class button a small portrait preview of that class (run once
@@ -4919,7 +5132,7 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
   if (jsonLd) {
     const sameAs = [
       'https://github.com/levy-street/world-of-claudecraft',
-      'https://discord.gg/GjhnUsBtw',
+      'https://discord.com/invite/worldofclaudecraft',
       'https://www.youtube.com/@WoClaudeCraft',
       'https://x.com/WoClaudecraft',
       'https://www.instagram.com/worldofclaudecraft/',
@@ -5947,8 +6160,8 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // Community links for the mobile More tray. The invite mirrors the hardcoded
 // invite on the shells' community links and is the fallback when the server-fed
 // discordInviteUrl() is not known yet (logged out, offline).
-const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';
-const DONATE_URL = 'https://github.com/sponsors/levy-street';
+const DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';
+const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 

@@ -155,136 +155,136 @@ export const ja_JP: EnTranslations = {
       "banner": "{name}を観戦中"
     },
     "mobileHudEditor": {
-      "launcher": "モバイルレイアウトのカスタマイズ",
-      "title": "モバイルレイアウトエディター",
-      "dialogLabel": "モバイルコントロールをカスタマイズする",
-      "locked": "ロックされています",
-      "unlocked": "ロック解除済み",
-      "lock": "ロックのレイアウト",
-      "unlock": "レイアウトのロックを解除する",
-      "sceneLabel": "プレビューシーン",
-      "contextLabel": "プレビュー状態",
-      "profileLabel": "デバイスプロファイル",
-      "profilePhone": "スマートフォン",
-      "profileTablet": "タブレット",
-      "save": "保存",
-      "cancel": "キャンセル",
-      "showFailingLayout": "失敗したレイアウトを表示",
-      "previousFailure": "前回の失敗",
-      "nextFailure": "次の失敗",
-      "runtimeFallback": "{profile} レイアウトはこのビューポートに適合しません。組み込みのデフォルトは一時的にアクティブになります。",
-      "storageError": "モバイルレイアウトを保存できませんでした。下書きは開いたままです。",
-      "invalidSave": "保存する前にレイアウト エラーをすべて修正してください。",
-      "failureWithContext": "{message}（{context}）",
-      "failureWithFixture": "{message}（{context}、{profile}、{viewport}）",
+      "launcher": "Customize Mobile Layout",
+      "title": "Mobile Layout Editor",
+      "dialogLabel": "Customize mobile controls",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "lock": "Lock layout",
+      "unlock": "Unlock layout",
+      "sceneLabel": "Preview scene",
+      "contextLabel": "Preview state",
+      "profileLabel": "Device profile",
+      "profilePhone": "Phone",
+      "profileTablet": "Tablet",
+      "save": "Save",
+      "cancel": "Cancel",
+      "showFailingLayout": "Show Failing Layout",
+      "previousFailure": "Previous failure",
+      "nextFailure": "Next failure",
+      "runtimeFallback": "The {profile} layout does not fit this viewport. Built-in defaults are active temporarily.",
+      "storageError": "Could not save the mobile layout. Your draft is still open.",
+      "invalidSave": "Fix every layout error before saving.",
+      "failureWithContext": "{message} ({context})",
+      "failureWithFixture": "{message} ({context}; {profile}; {viewport})",
       "scene": {
-        "world": "世界",
-        "arenaStandard": "アリーナスタンダード",
-        "arenaFiesta": "アリーナフェスタ",
-        "arenaYumi": "アリーナユミ",
-        "valeCupBriefing": "ヴェイルカップ説明会",
-        "valeCupMatch": "ヴェイルカップ戦",
-        "valeCupSpectator": "ヴェイルカップ観戦者",
-        "delve": "デルヴ"
+        "world": "World",
+        "arenaStandard": "Arena Standard",
+        "arenaFiesta": "Arena Fiesta",
+        "arenaYumi": "Arena Yumi",
+        "valeCupBriefing": "Vale Cup Briefing",
+        "valeCupMatch": "Vale Cup Match",
+        "valeCupSpectator": "Vale Cup Spectator",
+        "delve": "Delve"
       },
       "context": {
-        "worldBase": "世界",
-        "worldValeCupIndicator": "ヴェイルカップ表示のあるワールド",
-        "arenaStandard": "アリーナスタンダード",
-        "arenaFiestaBase": "フィエスタマッチ",
-        "arenaFiestaPending": "フィエスタは保留中",
-        "arenaFiestaRespawn": "フィエスタリスポーン",
-        "arenaFiestaOffer": "フィエスタ拡張オファー",
-        "arenaFiestaRespawnOffer": "フィエスタの復活とオファーの強化",
-        "arenaYumiBase": "ユミマッチ",
-        "arenaYumiRespawn": "ユミが復活する",
-        "arenaYumiReturning": "ユミが帰ってくる",
-        "valeCupBriefing": "ヴェイルカップ説明会",
-        "valeCupMatch": "ヴェイルカップの試合",
-        "valeCupMatchCharge": "ヴェイルカップチャージショット",
-        "valeCupSpectatorBetting": "ヴェイルカップの観客の賭け",
-        "instanceDelve": "デルヴ"
+        "worldBase": "World",
+        "worldValeCupIndicator": "World with Vale Cup indicator",
+        "arenaStandard": "Arena Standard",
+        "arenaFiestaBase": "Fiesta match",
+        "arenaFiestaPending": "Fiesta pending",
+        "arenaFiestaRespawn": "Fiesta respawn",
+        "arenaFiestaOffer": "Fiesta augment offer",
+        "arenaFiestaRespawnOffer": "Fiesta respawn and augment offer",
+        "arenaYumiBase": "Yumi match",
+        "arenaYumiRespawn": "Yumi respawn",
+        "arenaYumiReturning": "Yumi returning",
+        "valeCupBriefing": "Vale Cup briefing",
+        "valeCupMatch": "Vale Cup match",
+        "valeCupMatchCharge": "Vale Cup charged shot",
+        "valeCupSpectatorBetting": "Vale Cup spectator betting",
+        "instanceDelve": "Delve"
       },
       "surface": {
-        "actionA1": "アクションA1",
-        "actionA2": "アクションA2",
-        "actionA3": "アクションA3",
-        "actionA4": "アクションA4",
-        "actionA5": "アクションA5",
-        "actionAttack": "攻撃",
-        "actionTarget": "ターゲット",
-        "actionJumpUse": "ジャンプまたは使用",
-        "actionPage": "アクションページの切り替え",
-        "controlMovement": "移動",
-        "controlView": "視点",
-        "utilityConsumables": "消耗品",
-        "petCommands": "ペットコマンド",
-        "party": "パーティー",
-        "menuTop": "トップメニュー",
-        "minimapCluster": "ミニマップ",
-        "frameTarget": "ターゲットフレーム",
-        "framePlayer": "プレイヤーフレーム",
-        "playerBuffs": "プレイヤーバフ",
-        "playerDebuffs": "プレイヤーのデバフ",
-        "statusArenaGeneric": "アリーナのステータス",
-        "statusFiestaScore": "フィエスタスコア",
-        "statusFiestaPending": "フィエスタ保留ステータス",
-        "protectedFiestaRespawn": "フィエスタのリスポーンプロンプト",
-        "protectedFiestaOffer": "フィエスタ拡張オファー",
-        "statusYumi": "ユミのステータス",
-        "protectedYumiRespawn": "ユミのリスポーンプロンプト",
-        "statusValeCupIndicator": "ヴェイルカップ表示",
-        "protectedValeCupBriefing": "ヴェイルカップ説明会",
-        "statusValeCupMatch": "ヴェイルカップの試合状況",
-        "statusValeCupCharge": "ヴェイルカップショットチャージ",
-        "protectedValeCupBetting": "ヴェイルカップベッティングパネル",
-        "trackerDelve": "デルヴトラッカー",
-        "protectedCenterMessage": "センターメッセージ"
+        "actionA1": "Action A1",
+        "actionA2": "Action A2",
+        "actionA3": "Action A3",
+        "actionA4": "Action A4",
+        "actionA5": "Action A5",
+        "actionAttack": "Attack",
+        "actionTarget": "Target",
+        "actionJumpUse": "Jump or Use",
+        "actionPage": "Action page switch",
+        "controlMovement": "Movement",
+        "controlView": "View",
+        "utilityConsumables": "Consumables",
+        "petCommands": "Pet commands",
+        "party": "Party / Raid",
+        "menuTop": "Top menu",
+        "minimapCluster": "Minimap",
+        "frameTarget": "Target frame",
+        "framePlayer": "Player frame",
+        "playerBuffs": "Player buffs",
+        "playerDebuffs": "Player debuffs",
+        "statusArenaGeneric": "Arena status",
+        "statusFiestaScore": "Fiesta score",
+        "statusFiestaPending": "Fiesta pending status",
+        "protectedFiestaRespawn": "Fiesta respawn prompt",
+        "protectedFiestaOffer": "Fiesta augment offer",
+        "statusYumi": "Yumi status",
+        "protectedYumiRespawn": "Yumi respawn prompt",
+        "statusValeCupIndicator": "Vale Cup indicator",
+        "protectedValeCupBriefing": "Vale Cup Briefing",
+        "statusValeCupMatch": "Vale Cup match status",
+        "statusValeCupCharge": "Vale Cup shot charge",
+        "protectedValeCupBetting": "Vale Cup betting panel",
+        "trackerDelve": "Delve tracker",
+        "protectedCenterMessage": "Center message"
       },
       "control": {
-        "nudgeUp": "上に移動",
-        "nudgeDown": "下に移動",
-        "nudgeLeft": "左に移動",
-        "nudgeRight": "右に移動",
-        "decreaseScale": "サイズを小さくする",
-        "increaseScale": "サイズを大きくする",
-        "orientation": "向き",
-        "horizontal": "水平",
-        "vertical": "垂直",
-        "order": "並び順",
-        "normalOrder": "通常",
-        "reverseOrder": "逆順",
-        "openingDirection": "開き方向",
-        "openLeft": "左開き",
-        "openRight": "右開き",
-        "openUp": "上に開く",
-        "openDown": "下に開く",
-        "resetSelected": "選択をリセット",
-        "resetAll": "すべてリセット"
+        "nudgeUp": "Move up",
+        "nudgeDown": "Move down",
+        "nudgeLeft": "Move left",
+        "nudgeRight": "Move right",
+        "decreaseScale": "Decrease size",
+        "increaseScale": "Increase size",
+        "orientation": "Orientation",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "order": "Order",
+        "normalOrder": "Normal",
+        "reverseOrder": "Reversed",
+        "openingDirection": "Opening direction",
+        "openLeft": "Open left",
+        "openRight": "Open right",
+        "openUp": "Open up",
+        "openDown": "Open down",
+        "resetSelected": "Reset Selected",
+        "resetAll": "Reset All"
       },
       "status": {
-        "noSelection": "コントロールを選択して編集します。",
-        "selected": "選択済み: {surface}",
-        "scale": "サイズ: {scale}",
-        "valid": "レイアウトを保存する準備ができました。",
-        "invalid": "レイアウトに {count} 個のブロック エラーがあります。",
-        "failurePosition": "{count} 件中 {index} 件の失敗"
+        "noSelection": "Select a control to edit it.",
+        "selected": "Selected: {surface}",
+        "scale": "Size: {scale}",
+        "valid": "Layout ready to save.",
+        "invalid": "Layout has {count} blocking errors.",
+        "failurePosition": "Failure {index} of {count}"
       },
       "failure": {
-        "invalidPlacement": "{surface} には無効な配置があります。",
-        "unsupportedCapability": "{surface} はサポートされていないレイアウト オプションを使用しています。",
-        "scaleOutOfRange": "{surface} サイズは許容範囲外です。",
-        "targetTooSmall": "{surface} は小さすぎて安全に使用できません。",
-        "outOfBounds": "{surface} は安全領域の外にあります。",
-        "overlap": "{surface} は {other} と重なっています。",
-        "viewIntrusion": "{surface} はビュー領域と重なっています。",
-        "protectedOverlap": "{surface} は {other} と重なっています。"
+        "invalidPlacement": "{surface} has an invalid placement.",
+        "unsupportedCapability": "{surface} uses an unsupported layout option.",
+        "scaleOutOfRange": "{surface} size is outside its allowed range.",
+        "targetTooSmall": "{surface} is too small to use safely.",
+        "outOfBounds": "{surface} is outside the safe area.",
+        "overlap": "{surface} overlaps {other}.",
+        "viewIntrusion": "{surface} overlaps the View area.",
+        "protectedOverlap": "{surface} overlaps {other}."
       },
       "discard": {
-        "title": "レイアウトの変更を破棄しますか?",
-        "body": "保存されていないモバイル レイアウトの変更は失われます。",
-        "confirm": "変更の破棄",
-        "continueEditing": "編集を続ける"
+        "title": "Discard layout changes?",
+        "body": "Your unsaved mobile layout changes will be lost.",
+        "confirm": "Discard Changes",
+        "continueEditing": "Continue Editing"
       }
     },
     "readyCheck": {
@@ -377,6 +377,263 @@ export const ja_JP: EnTranslations = {
         "banned": "デイリー報酬への参加が禁止されています。理由: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOCストア",
+      "close": "WOCストアを閉じる",
+      "tabsLabel": "WOCストアのセクション",
+      "storeTab": "ストア",
+      "rewardsTab": "デイリー報酬",
+      "loading": "WOCストアを読み込み中…",
+      "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
+      "balance": "Claudium残高",
+      "buyClaudium": "Claudiumを購入",
+      "owned": "所有済み",
+      "needMoreTitle": "Claudiumが不足しています",
+      "needMoreBody": "{item}の購入にはあと{shortfall} Claudium必要です。",
+      "cancel": "キャンセル",
+      "confirmTitle": "外見の購入を確認",
+      "confirmBody": "{item}を{cost} Claudiumで購入しますか？",
+      "confirmPurchase": "購入",
+      "priceChanged": "購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。",
+      "armoryEyebrow": "シーズン1",
+      "armoryTitle": "武器庫",
+      "armoryBody": "シーズン1武器庫の限定武器スキン。アカウント共有の純粋な装飾で、周囲のプレイヤー全員に表示されます。",
+      "collectionLine": "{collection}コレクション",
+      "collections": {
+        "guildmark": "ギルドマーク",
+        "emberwrought": "残り火鍛造",
+        "hoarfrost": "白霜",
+        "fallen_star": "墜星"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "ギルドマーク・アーミングソード",
+          "look": "青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。",
+          "lore": "名もなき鍛造刀とは違い、この剣には署名がある。刀匠がリカッソに自らの印を打つ権利を得るのは、World MarketのMerchantがその鋼を保証してからだ。そしてSmith Haldrenの印には、その保証がある。Valeの湿気に耐える青焼き仕上げ、髪一本ほどの狂いもない均衡。剣と同じほど刻印にも金を払うが、それだけの価値はある。"
+        },
+        "brasscap_axe": {
+          "name": "ブラスキャップ・ハチェット",
+          "look": "磨き鋼の刃、漆塗りのトネリコ柄を守る真鍮の頭金とランゲット、整った柄巻き、職人の刻印。",
+          "lore": "刻印入りの斧は、手に取れる自慢そのものだ。真鍮の頭金とランゲットは半ば防具、半ば署名。柄が割れるのを防ぎ、酒場の灯を受けて輝くから、民兵のお下がりではなくArmorer Hodeの仕事を買ったのだと誰にでも分かる。「斬れるなら売る」とHighwatchの鍛冶師は言う。この斧は、斬れる。"
+        },
+        "tempered_flanged_mace": {
+          "name": "焼入れフランジドメイス",
+          "look": "六枚のフランジを備えた焼入れ青鋼の頭部、真鍮の口金と柄頭、葡萄酒色の革巻き。",
+          "lore": "青く焼き入れた鋼の六枚刃は、どれも兜を割り開くために研がれ、真鍮をかぶせて葡萄酒色の革で巻かれている。仕事が残酷でも、この王国の刀匠は醜い武器を作らない。棚から取った品ではなく、World Marketを通じて注文された一本。どこかの帳簿には、誇らしげな買い手の名と、Hodeに支払った額が記されている。"
+        },
+        "guildmark_dirk": {
+          "name": "ギルドマーク・ダーク",
+          "look": "細身の焼入れ鋼のダーク、青銅の鍔と柄頭ナット、深緑の組紐巻き、刻印された紋章。",
+          "lore": "剣を家に置く日に一人前の男が帯びるもの。細身で鍛えられ、長剣と同じ品質を証す印を打ち、刃のある印章のように腰に下げる。刀匠の証を読める者以外には慎ましく映る。Quartermaster Breeは、城壁の敬意を勝ち取った士官のため、Highwatchの引き出し一段をこれで満たしている。"
+        },
+        "brasscrown_staff": {
+          "name": "ブラスクラウン・ウォーキングスタッフ",
+          "look": "堅木の杖に旋盤仕上げの真鍮製冠形石突、真鍮の先金、染め革の帯。",
+          "lore": "乾燥させた堅木を削り出し、Eastbrookの鍛冶師たちが百個単位で鋳ながら、一つずつ完璧に仕上げる真鍮の冠を載せた杖。Fenbridgeの門でもHighwatchの城壁でも、一目置かれたい旅人にふさわしい。歩く必要など本当は一度もなかったような杖で、染め革の帯は値段を想像できる上着とよく似合う。"
+        },
+        "lacquered_wand": {
+          "name": "漆塗りのロッド",
+          "look": "深紅の漆を施した細身のワンド、二本の磨き真鍮帯、小さく丸い真鍮の先端。",
+          "lore": "根気よく七層重ねた深紅の漆に、磨いた真鍮を二筋。野辺の魔術師が本物の金貨を取るようになり、見栄えも整えたくなった頃にWorld Marketで買う類のワンドだ。Lightを導く力は白樺の枝と変わらない。それでもMerchantのカウンター越しには見事に輝く。ささやかな魔法の半分は、昔から信じてもらうことなのだから。"
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Fletcherギルドの弓",
+          "look": "漆塗りのウォールナット製リカーブボウ、真鍮のリム先、蝋引き亜麻弦、ライザーのギルド刻印。",
+          "lore": "この王国でギルドに最も近いものは、ライザーにあるFletcherの刻印だ。酒造家が樽に封をするように、中身を保証する約束である。漆塗りのウォールナット、リム先の真鍮、Mirefenの雨でもほつれない蝋引き亜麻弦。すべての継ぎ目がその値段を主張する。Widow Thicketを越えて一度引けば、その主張が正しいと分かる。"
+        },
+        "cinderbrand_sword": {
+          "name": "シンダーブランド",
+          "look": "黒い鍛鋼の刀身、樋を満たす燃える橙色のルーンと熱亀裂、鍔で燻る宝石。",
+          "lore": "水ではなくStormcragから掻き集めたBlessed Embersで初めて焼き入れされた刀身。Highwatchの鍛冶師は、その炭が「山が古き誓いを覚えているから、青く清らかに燃える」と誓う。樋に封じた火は橙色に燻り、決して消えない。城壁の最も寒い夜でも、ルーンは素手に温かい。Cinderbrandに火を点ける必要はない。ただ、消えることを拒むのだ。"
+        },
+        "emberbite_axe": {
+          "name": "エンバーバイト",
+          "look": "黒鉄の斧、刃から透けて燃える橙色の亀裂、熾火を宿す宝石、立ちのぼる熱気。",
+          "lore": "Armorer Hodeは山火の生きた炭を刃の芯に埋め込み、一撃と次の一撃の間にも刃が冷えきらぬようにした。振り下ろすたび亀裂が橙色に息づき、最初の鍛造が鉄の中に眠らせた何かを打撃が起こすようだ。Stormcragの精霊がこの残り火を手放したのだという。風の強いHighwatchでは、ほかにも実に多くの話が語られる。"
+        },
+        "smoulderfall_mace": {
+          "name": "スモルダーフォール",
+          "look": "内側の亀裂が燃える橙色に輝く黒鉄のフランジ、頭部に据えた溶融核の宝石。",
+          "lore": "自ら炉を携えるメイス。「山火で鍛えられた」Sanctumの封印から欠き取った溶融核の石が、頭部で輝く。フランジは触れて温かく、命中した場所ではさらに熱い。Highwatchの軍曹は、これで殴られた痣は朝までかすかに光ると断言する。かつて封じるための山の火が、ついに壊すためのものとなった。"
+        },
+        "ashspark_dagger": {
+          "name": "Ashsparkシヴ",
+          "look": "燃える橙色の筋が走る短い黒刃、柄頭で燻る小さな宝石、舞う灰と火花。",
+          "lore": "柄頭石に山火を忍ばせた裏路地の刃。最初の鍛造の残り火くらいは追い剥ぎでも携えられる、という刀匠の静かな冗談だ。黒く、橙色の筋が走り、鞘の中でも常に少し熱すぎる。Highwatchの下の闇で抜けば、その光が男の構えの隙を見つけるのに十分なだけ手元を照らす。"
+        },
+        "forgeheart_staff": {
+          "name": "Forgeheartステイヴ",
+          "look": "鉄の石突を備え、檻に収めた輝く残り火を冠する杖。軸を昇る火のルーンと熱の揺らめき。",
+          "lore": "冠の鉄檻に閉じ込めた、山火の生きた炭。Loremaster Caddisは、最初の鍛造の火が封印だけでなく奉仕のためにも縛れる証だという。熱の揺らめきが細く果てない帯となって立ちのぼり、これを持つ魔術師は鍛冶炉にも番火にも困らない。残り火はVoskar the Emberwing自身の吐息から抜き取られ、それ以来冷めていないと囁かれる。"
+        },
+        "emberwrought_wand": {
+          "name": "Emberwroughtワンド",
+          "look": "鉄の爪に輝く熾火を挟んだ黒金属のワンド、髪筋ほどの熱亀裂、内側からの温かな光。",
+          "lore": "この等級に名を与えたワンド。Highwatchの刀匠が初めて山火の炭を鉄の爪に据え、人の手に応えさせたとき、LightのPriestたちさえ異端と呼ぶのをやめ、役に立つと呼び始めた。温かく、辛抱強く、静かに危険。その先端の残り火は、持ち主が生まれる前から途切れず燃え続けている。"
+        },
+        "cinderlatch_crossbow": {
+          "name": "シンダーラッチ",
+          "look": "黒鋼のクロスボウ、弓部の亀裂から滲む燃える橙色の光、台木で燻る炭。",
+          "lore": "残り火鍛造の中でも最も奇妙なもの。山火を機械へ流し込んだ。弓部の亀裂から橙色が滲み、台木で燻る炭がThornpeakの寒さでもMirefenの湿気でも弦を硬くさせない。ボルトは溝を出るときすでに温かく、着弾時にはさらに熱い。敵もまた寒さを感じない城壁に対する、狩人の答えである。"
+        },
+        "ice_fang_sword": {
+          "name": "Ice Fang",
+          "look": "淡い氷河氷の湾曲刀、峰に並ぶ鋸歯状の霧氷結晶、樋で輝く青緑の凍結核、氷柱の鍔。",
+          "lore": "凍結等級の象徴であり、収集家がまず手を伸ばす逸品。Ice Fangは鍛えられたのではなく、Highwatchの上にそびえるThornpeakの氷河の牙から削り出された。青緑の核はGlimmermereの反射光のように冷たく燃え、斬った空気そのものを霧氷で覆う。大雪がWyrmcultを退けた夜、兵士がこれを携え「城壁に一冬を買った」と衛兵たちは誓う。"
+        },
+        "glaciersplit_axe": {
+          "name": "グレイシャースプリット",
+          "look": "半透明の青い氷河氷の斧頭、青緑に輝くひび割れた内部、逆立つ霜の結晶、冷気を引く柄。",
+          "lore": "二世紀の氷が冷気を自ら輝くまで圧し固めた、Thornpeak氷河の青い心臓部から切り出された。静止していても霧を引き、命中する音はStalker Ridgeの下で裂け目が開くようだ。Highwatchは死者をあの氷へ委ねる。ゆえにこれは、雪解けと、雪解けが目覚めさせるものを寄せつけないための武器である。"
+        },
+        "rimecrusher_mace": {
+          "name": "ライムクラッシャー",
+          "look": "輝く青緑の核を囲む鋭い氷晶の房、銀色の柄を這い下りる白霜。",
+          "lore": "削ったのではなく育てたもの。Thornpeakの氷を冷たい青緑の核の周りに導き、Hode自慢の鋼ほど硬く結晶させた。白霜は銀色の柄を手元へ這うが、決して届ききらない。打てば水が凍り、置けば地が白む。峰の墓場の冷気を、城壁を登るものへ振るえるほど小さくした武器だ。"
+        },
+        "frostbite_dagger": {
+          "name": "ライムニードル",
+          "look": "透明な青氷の凶悪なまでに細い短剣、中央を走る輝く青緑の脈、針状の霜結晶、白霜の柄。",
+          "lore": "息を止めた瞬間ほど薄く、その倍も冷たい。Thornpeak氷河の欠片を一本の輝く脈まで研ぎ澄まし、血が流れることを思い出す前に傷口を凍らせるほど鋭い。その名は死者が峰から運び下ろす墓の冷気にちなむ。研ぐ必要はない。氷は鈍らない、ただ待つだけだとLoremaster Caddisは素っ気なく記している。"
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "ホアフロスト・ヴィジル",
+          "look": "銀色の杖の上に浮かび、ゆっくり回る輝く青緑の氷片。放射状の結晶と冷たい霧。",
+          "lore": "Highwatchの城壁で眠らぬ見張りの杖。冠には青緑の山湖氷の欠片が銀から離れて浮かび、ひとりでにゆっくり回る。衛兵によれば、常に峰の下へ集う寒気を指すという。Vigilを携えることは、一夜で二百年の見張りに立ち、決して目を逸らさぬと誓うことだ。"
+        },
+        "everwinter_wand": {
+          "name": "エヴァーウィンターの欠片",
+          "look": "輝く青緑の氷河氷の一本角、銀の口金から咲く白霜、かすかな冷たい霧。",
+          "lore": "山の寒さが牙を持つSanctumの下の深い山湖から折り取られたという、輝く氷河氷の角。銀の口金から白霜が絶えず咲き、火にも夏にも溶けない。魔術師は術に貸す冷気ゆえ近くに置き、Nythraxisの地下墓所へ傾いて耳を澄ますような夜には、遠ざけておく。"
+        },
+        "winterbite": {
+          "name": "ウィンターバイト",
+          "look": "銀鋼と青氷の弓、ライザーで輝く青緑の凍結核、つがえられた固い氷の矢、冷たい霧。",
+          "lore": "銀鋼とThornpeakの氷で作られた弓。ライザーの冷たい青緑の核が矢を弦へ凍りつかせる。引くたびに氷河氷の矢が再び形づくられるため、城壁の射手が携えるのは矢筒ではなく寒気だけ。Highwatchは同じ弓でStalker Ridgeの包囲を耐え抜いたという。射手は一人、そして初めからそこにあった一冬分の矢。"
+        },
+        "solheim_sword": {
+          "name": "Solheim、暁の最後の光",
+          "look": "墜星から鍛えた大剣、刀身を裂く溶融金の核、星明かりの刃を持つ宇宙黒の鋼、鍔を巡る金の破片、極光の帯。",
+          "lore": "星が西の空から落ち、Widow Thicketの彼方で「炉のように爆ぜた」とき、Brother AldricはMirefenのクレーターからまだ燻る心臓を引き出し、王国の鍛冶師に「この世のものではない物」を鍛えてくれと懇願した。生まれた大剣はただ一振り、Solheim。溶融金の核が夜空を割る暁のように宇宙黒の刀身を裂き、星鉄の破片は誰の手も定めぬ軌道で鍔を巡る。二振り目が作られることはない。"
+        },
+        "skyrender_axe": {
+          "name": "Skyrender、天空の傷",
+          "look": "引き裂かれた夜空のような斧頭、溶融金の亀裂と星座の刻印、浮かぶ星光の破片、刃を引く極光。",
+          "lore": "墜星がMirefenから空そのものの映り込みを引き裂き、今も蒸気を上げる傷を残したクレーターの縁から打ち出された。斧頭は破れた夜の一片に見える。溶融金の亀裂、Highwatchの学者にも名づけられぬ星座、振るたび刃から流血のようにこぼれる極光。Brother Aldricは祝福したが、触れようとはしなかった。掲げる者は、天が残した穴を手にする。"
+        },
+        "starfall_mace": {
+          "name": "Starfall、天の裁き",
+          "look": "周回する破片に囲まれた溶融金の星核、星明かりの脈が走る宇宙黒のフランジ、継ぎ目から溢れる極光。",
+          "lore": "死の直前に捉えられた星核。ともに落ちた残骸に囲まれ、消滅まであと一寸のところで凍りついている。宇宙黒のフランジには閉じ込めた星明かりが走り、掲げれば継ぎ目から極光が溢れる。古いLightのPriestたちは流星を裁き、いかなる盾も止めるべきでない天上からの宣告と呼び、Mirefenへ下った一星にちなんでこれを名づけた。"
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr、墜星の牙",
+          "look": "墜星の薄片、宇宙黒の金属に輝く溶融金の刃、柄頭を巡る明るい星粒、細い極光の尾。",
+          "lore": "Aldricがクレーターから運び出した星の最小の欠片であり、見方によっては最も危険なもの。異世界の心臓の薄片ひとつ、宇宙黒の金属に沿う溶融金の刃、世界を失った月のように柄頭を巡る孤独な星粒。重さはほとんどなく、ほとんど何でも切り分ける。隠せるほど小さく、自らの光で闇の中から見つけられるほど明るい。"
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch、果てなき虚空の尖塔",
+          "look": "溶融金の核を巡る金色の星片、星座を刻んだ宇宙黒の軸、上へ巻きつく極光の帯。",
+          "lore": "星鉄の軸に溶融金の核を冠し、金の破片がゆっくり果てなく巡る小宇宙。そこに刻まれた星座はThornpeakのどの空にも一致しない。立ち昇ることを忘れた煙のように、極光が全長へ巻きつく。これを担った者は、Ysoleiの湖が「月明かりを飲む」ように、虚空が杖の中で回るのを感じたという。辛抱強く、冷たく、こちらを見返しながら。"
+        },
+        "emberwish_wand": {
+          "name": "Emberwish、死にゆく太陽の火種",
+          "look": "周回する火花に包まれた、捕らわれの溶融金の死に星。輝く星座を刻んだ宇宙黒の軸。",
+          "lore": "墜星そのものではなく、死にゆく星の最後の一粒。すでに消えた太陽の溶融金の残り火を、最後の光だった火花が包む。宇宙黒の軸には、その死を見届けた星座が刻まれている。Mirefenの小作人は、真の黄昏にこれを持つ者の願いを一つ叶えるという。同時に、手にした魂は誰もが「もっと時間を」と願い、Drowned Moonは誰にも与えなかったとも語る。"
+        },
+        "encore_bow": {
+          "name": "Encore、二つ目の墜星",
+          "look": "滑稽なほど巨大な星砲。輝く金の星座を刻んだ宇宙黒の砲身、溶融金の彗星弾を収めた朝顔形の砲口、真鍮金具、木製の銃床。",
+          "lore": "墜星を加工した鍛冶師は六つの遺物を作ってなお、樽一本分の星鉄を余らせた。その頃には徒弟たちにも意見があった。金床から生まれたのは王国初の銃か、最小の攻城兵器か。射撃というより、狙いをつけた二つ目の星を呼び寄せる肩撃ち砲だ。これほど轟くものはすでに天に気づかれているとしてBrother Aldricは祝福を断った。狩人たちは愛用する。射線の先にいるものは、決してそうではない。"
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlatch、空の最後の裁き",
+          "look": "隕鉄、台木に沿う溶融金の核、星座を刻んだ宇宙黒の弓部、つがえられた純粋な星火のボルト。",
+          "lore": "Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。"
+        }
+      },
+      "seasonOne": "シーズン1",
+      "rarity": {
+        "uncommon": "アンコモン",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー"
+      },
+      "wtype": {
+        "sword": "剣",
+        "axe": "斧",
+        "mace": "メイス",
+        "dagger": "短剣",
+        "staff": "杖",
+        "wand": "ワンド",
+        "bow": "弓",
+        "crossbow": "クロスボウ"
+      },
+      "badge": {
+        "flagship": "フラッグシップ",
+        "hero": "ヒーロー"
+      },
+      "inspectAria": "{item}を詳しく見る",
+      "viewModeLabel": "プレビューモード",
+      "tryOn": "試着する",
+      "weaponOnly": "武器のみ",
+      "sceneLabel": "シーンライティング",
+      "scene": {
+        "day": "昼",
+        "dusk": "夕暮れ",
+        "night": "夜"
+      },
+      "lore": "伝承",
+      "buySkin": "スキンを購入",
+      "unavailable": "利用不可",
+      "applied": "適用中",
+      "apply": "スキンを適用",
+      "detach": "スキンを解除",
+      "equipHint": "このスキンを適用するには{type}を装備してください。"
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Claudiumを開く",
+      "close": "Claudiumを閉じる",
+      "loading": "Claudiumを読み込み中…",
+      "balanceLabel": "残高",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL：{amount}",
+      "wocBalance": "WOC：{amount}",
+      "unavailable": "Claudiumストアは現在利用できません。残高と購入内容に影響はありません。しばらくしてからお試しください。",
+      "disclosure": "Claudiumは一方向のゲーム内通貨です。現金で購入して外見アイテムに使用でき、換金、譲渡、払い戻しはできません。",
+      "buyTitle": "Claudiumを購入",
+      "railLabel": "支払い方法",
+      "railStripe": "カード",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20%オフ",
+      "railWocUnavailable": "WOC価格は現在利用できません。",
+      "railNativeUnavailable": "SOL/WOCは利用不可",
+      "amountLabel": "数量",
+      "showAmounts": "すべてのClaudium数量を表示",
+      "hideAmounts": "追加のClaudium数量を隠す",
+      "skuRow": "{usd}で{claudium} Claudium",
+      "buyButton": "購入",
+      "buyUnavailable": "現在購入できません。",
+      "storeTitle": "外見アイテムストア",
+      "storeEmpty": "現在利用できる外見アイテムはありません。",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "交換",
+      "kindCosmetic": "外見アイテム",
+      "kindSkin": "スキン",
+      "kindItem": "アイテム",
+      "checkoutTitle": "購入を完了",
+      "checkoutClose": "決済を閉じる",
+      "checkoutLoading": "決済を読み込み中…",
+      "checkoutPending": "取引を処理中です。ウォレットで確認し、このパネルを開いたままにしてください。",
+      "checkoutPendingButton": "処理中",
+      "checkoutFailed": "決済を読み込めませんでした。もう一度お試しください。",
+      "checkoutUnavailable": "そのClaudium購入は現在利用できません。",
+      "checkoutWalletRequired": "暗号資産でClaudiumを購入する前にSolanaウォレットを接続してください。",
+      "checkoutWalletUnsupported": "このウォレットではSolana取引の署名と送信ができません。",
+      "checkoutNotSettled": "取引は送信されましたが、Claudiumはまだ反映されていません。しばらくしてからお試しください。"
+    },
     "theme": {
       "preset": "UIテーマ",
       "customColors": "カスタムカラー",
@@ -450,16 +707,16 @@ export const ja_JP: EnTranslations = {
     "mobile": {
       "jump": "ジャンプ",
       "leaderboard": "ランキング",
-      "dailyRewards": "報酬",
+      "dailyRewards": "ストア",
       "deeds": "功績",
       "nameplates": "ネームプレート",
-      "nameplatesOff": "名前オフ",
-      "musicOff": "音楽オフ",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
-      "showMenuButtons": "メニューボタンを表示",
-      "hideMenuButtons": "メニューボタンを非表示",
+      "showMenuButtons": "Show menu buttons",
+      "hideMenuButtons": "Hide menu buttons",
       "hotbarPage": "スキル",
       "hotbarPageAria": "次のスキルセットを表示",
       "actionRing": "戦闘アクション",
@@ -496,6 +753,15 @@ export const ja_JP: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft のバージョン {version} が利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。",
       "notNow": "後で",
       "update": "更新"
+    },
+    "cameraPrompt": {
+      "title": "カメラを選択",
+      "intro": "カメラがキャラクターを追う方法を選びましょう。",
+      "mouseDesc": "ボタンを押さずにマウスを動かして視点を回します。",
+      "classicTitle": "クラシックカメラ",
+      "classicDesc": "右クリックを押しながらマウスを動かして視点を回します。",
+      "changeLater": "この設定は後で Esc の「キー割り当て」から変更できます。",
+      "confirm": "決定"
     },
     "castBar": {
       "playerAria": "あなたの詠唱バー",
@@ -542,7 +808,12 @@ export const ja_JP: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。"
+    },
+    "petFeed": {
+      "disabledFullHp": "ペットは満タンの体力です",
+      "disabledNoFood": "バッグの中にペットを回復できる食べ物がありません"
     },
     "keybinds": {
       "emoteWheel": "エモートホイール",
@@ -550,6 +821,7 @@ export const ja_JP: EnTranslations = {
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
+      "sheathe": "武器を納刀/抜刀",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -708,10 +980,10 @@ export const ja_JP: EnTranslations = {
       "interfaceModeDesktop": "デスクトップ",
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
-      "mobileActionPages": "最小アクションページ数",
-      "mobileActionPagesTwo": "2ページ",
-      "mobileActionPagesThree": "3ページ",
-      "mobileActionPagesFour": "4ページ",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "足音",
       "clickFeedback": "クリックマーカー",
       "lockCursorOnRotate": "回転中はカーソルを固定",
@@ -827,13 +1099,29 @@ export const ja_JP: EnTranslations = {
       "highContrast": "高コントラスト",
       "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
     },
+    "warfare": {
+      "honorAmount": "名誉 {amount}",
+      "dualPrice": "{money} + {honor}",
+      "balance": "名誉: {amount}",
+      "honorFloat": "名誉 +{amount}",
+      "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "notEnoughHonor": "名誉が足りません。",
+      "reasons": {
+        "arenaWin": "アリーナ勝利",
+        "fiestaKill": "フィエスタ撃破",
+        "fiestaComplete": "フィエスタ完遂",
+        "fiestaWin": "フィエスタ勝利"
+      }
+    },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
-        "hasteRating": "ヘイストレーティング"
+        "hasteRating": "ヘイストレーティング",
+        "warfare": "ウォーフェア"
       },
+      "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
         "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
@@ -847,7 +1135,8 @@ export const ja_JP: EnTranslations = {
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
-        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。"
+        "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -920,6 +1209,12 @@ export const ja_JP: EnTranslations = {
         "few": "あなたは{rank}、{count}人のメンバー",
         "many": "あなたは{rank}、{count}人のメンバー",
         "other": "あなたは{rank}、{count}人のメンバー"
+      },
+      "finderPartySize": {
+        "one": "{count} 人",
+        "few": "{count} 人",
+        "many": "{count} 人",
+        "other": "{count} 人"
       },
       "characterCount": {
         "one": "{count}キャラクター",
@@ -1100,6 +1395,19 @@ export const ja_JP: EnTranslations = {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
     },
+    "playerMenu": {
+      "info": "プレイヤー情報",
+      "block": "ブロック",
+      "unblock": "ブロック解除",
+      "openFor": "{name} のプレイヤーメニューを開く",
+      "profileUnavailable": "{name} のプロフィールが見つかりません。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI操作アカウント",
+      "watchTwitch": "Twitch で視聴",
+      "watchX": "X で見る",
+      "watchKick": "Kick で視聴",
+      "watchYouTube": "YouTube で視聴"
+    },
     "lootSettings": {
       "title": "分配設定",
       "close": "分配設定を閉じる",
@@ -1117,7 +1425,7 @@ export const ja_JP: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
-      "rightClickDestroy": "右クリックで破壊",
+      "rightClickDestroy": "Shift+右クリックで破壊",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1138,25 +1446,25 @@ export const ja_JP: EnTranslations = {
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "空のバッグスロット",
       "unequipHint": "クリックしてこのバッグを外す",
-      "itemActionsTitle": "{item}の操作",
-      "itemActionEquip": "装備",
-      "itemActionEquipBag": "バッグを装備",
-      "itemActionUse": "使用",
-      "itemActionConsume": "消費",
-      "itemActionLinkToChat": "チャットにリンク",
-      "itemActionDestroy": "破棄",
-      "itemActionDetails": "アイテム詳細",
-      "itemActionAssignTitle": "消耗品に登録",
-      "itemActionAssignSlot": "スロット{slot}に登録",
-      "itemActionRemoveSlot": "スロット{slot}から解除",
-      "itemActionSlotCurrent": "スロット{slot}: {item}",
-      "itemActionSlotEmpty": "スロット{slot}: 空き",
-      "itemActionResetAutomatic": "自動配置に戻す",
-      "itemActionClose": "アイテム操作を閉じる",
-      "itemActionAssigned": "{item}をスロット{slot}に登録しました。",
-      "itemActionRemoved": "{item}をスロット{slot}から解除しました。",
-      "itemActionInvalid": "このアイテムは登録できません。",
-      "itemActionFailed": "操作を完了できませんでした。"
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -1278,17 +1586,17 @@ export const ja_JP: EnTranslations = {
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
       "removeFromBarAria": "{name}をアクションバーから削除",
-      "add": "追加",
-      "remove": "解除",
+      "add": "Add",
+      "remove": "Remove",
       "mobileChip": "{page} - A{position}",
-      "desktopChip": "デスクトップ",
-      "moveAssignmentAria": "{name}を{slot}から移動",
-      "pickerPages": "アクションページ",
-      "pickerDestinations": "アクションスロット",
-      "destinationAria": "{page}ページ、A{position}、{state}",
-      "empty": "空き",
-      "closePicker": "スロットを閉じる",
-      "assignedStatus": "{name}を{page}ページのA{position}に割り当てました"
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1313,7 +1621,7 @@ export const ja_JP: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
-      "duration": "持続時間: {duration}"
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1348,7 +1656,8 @@ export const ja_JP: EnTranslations = {
         "connecting": "Discordを開いています...",
         "benefits": "Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。",
         "error": "Discordを連携できませんでした。もう一度お試しください。",
-        "success": "Discordを連携しました。"
+        "success": "Discordを連携しました。",
+        "joinServer": "アカウント連携なしでサーバーに参加"
       },
       "choice": {
         "title": "Discordで続ける",
@@ -1396,8 +1705,13 @@ export const ja_JP: EnTranslations = {
         "admin": "管理者",
         "coredevs": "コア開発者",
         "devs": "開発者",
+        "seniormods": "シニアモデレーター",
         "mods": "モデレーター",
-        "artists": "アーティスト"
+        "juniormods": "ジュニアモデレーター",
+        "artists": "アーティスト",
+        "contentcreator": "コンテンツクリエイター",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -1650,7 +1964,15 @@ export const ja_JP: EnTranslations = {
     },
     "social": {
       "lastSeen": "最終ログイン: {when}",
-      "lastSeenNever": "なし"
+      "lastSeenNever": "なし",
+      "ignoredTab": "無視中",
+      "blockedTab": "ブロック",
+      "ignoredEmpty": "誰も無視していません。",
+      "blockedEmpty": "誰もブロックしていません。",
+      "blockSearchPlaceholder": "プレイヤー名",
+      "blockAction": "ブロック",
+      "nowBlocking": "{name} をブロックしました。",
+      "stopBlockingTitle": "{name} のブロックを解除"
     },
     "gathering": {
       "title": "採集",
@@ -1688,6 +2010,107 @@ export const ja_JP: EnTranslations = {
       "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
       "recipeNotLearned": "そのレシピはまだ習得していません。"
+    },
+    "finder": {
+      "title": "ダンジョンファインダー",
+      "close": "閉じる",
+      "back": "戻る",
+      "syncing": "レルムに接続中...",
+      "tabCatalogue": "カタログ",
+      "tabQueue": "クイックマッチ",
+      "tabBoard": "募集掲示板",
+      "normal": "ノーマル",
+      "heroic": "ヒロイック",
+      "kindDungeon": "ダンジョン",
+      "kindRaid": "レイド",
+      "kindSolo": "ソロ攻略",
+      "levels": "レベル {min} ～ {max}",
+      "levelOne": "レベル {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "タンク",
+      "roleHealer": "ヒーラー",
+      "roleDps": "ダメージ",
+      "freeRoles": "ロール自由",
+      "lockoutDaily": "最終ボスにデイリーロックアウト",
+      "lockoutNone": "ロックアウトなし",
+      "lockedFor": "約 {minutes} 分ロック中",
+      "attunement": "前提クエストが必要：{quest}",
+      "heroicMarks": "ヒロイックの証：1 人 {count} 個",
+      "entrance": "入口：{zone}",
+      "showOnMap": "マップに表示",
+      "encounters": "ボス戦",
+      "finalBoss": "最終ボス",
+      "summoned": "召喚される守護者",
+      "lootGuaranteed": "以下のいずれかが必ずドロップ：",
+      "lootMaybe": "以下のうち最大 1 つがドロップ：",
+      "lootChance": "追加の低確率ドロップ：",
+      "lootHeroic": "ヒロイック報酬、以下のいずれかが必ずドロップ：",
+      "pct": "{pct}%",
+      "blockedLevel": "レベル {min} ～ {max} 限定",
+      "blockedSpec": "特性の選択が必要",
+      "yourRoles": "あなたのロール",
+      "needsSpec": "ダンジョンファインダーを使うには特性を選択してください。",
+      "leaderNote": "キューに入れられるのはパーティリーダーだけです。",
+      "chooseActivities": "コンテンツを選択",
+      "joinQueue": "キューに参加",
+      "leaveQueue": "キューを離脱",
+      "waited": "待機時間：{time}",
+      "cooldownNote": "あと {seconds} 秒で再びキューに入れます。",
+      "travelNote": "パーティはその場で結成されます。全員で入口まで移動してください。テレポートはしません。",
+      "proposalTitle": "グループ成立：{name}",
+      "proposalRole": "あなたのロール：{role}",
+      "accepted": "{accepted}/{size} 人が承認",
+      "remaining": "残り {seconds} 秒",
+      "accept": "承認",
+      "decline": "辞退",
+      "acceptedWait": "他のメンバーを待っています...",
+      "slotState": "{role}：{total} 人中 {accepted} 人が準備完了",
+      "openListings": "公開中の募集",
+      "boardEmpty": "現在募集はありません。作成してみましょう！",
+      "boardLeaderGate": "募集を出せるのはパーティリーダーだけです。",
+      "publishListing": "募集を作成",
+      "activity": "コンテンツ",
+      "publish": "掲載",
+      "yourListing": "あなたの募集",
+      "closeListing": "募集を終了",
+      "applicants": "応募者",
+      "noApplicants": "まだ応募者はいません。",
+      "acceptApplicantAria": "{name} を承認",
+      "declineApplicantAria": "{name} を辞退",
+      "levelClass": "Lv {level} {className}",
+      "leader": "リーダー：{name}",
+      "needs": "募集中：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "応募",
+      "withdraw": "応募を取り下げる",
+      "tagFirstRun": "初見",
+      "tagQuestRun": "クエスト消化",
+      "tagFullClear": "フルクリア",
+      "tagLearning": "初心者歓迎",
+      "tagFastRun": "高速周回",
+      "mech": {
+        "shadow_pulse": "シャドウパルス（周期的な範囲ダメージ）",
+        "reaping_arc": "リーピングアーク（前方クリーブ）",
+        "mist_surge": "ミストサージ（周期的な範囲ダメージ）",
+        "summons_adds": "増援を召喚",
+        "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
+        "enrage": "低体力で激怒",
+        "shuddering_stomp": "身震いの踏みつけ（範囲スタン）",
+        "necrotic_shockwave": "ネクロティック衝撃波（大範囲ダメージ）",
+        "grave_cleaver": "グレイブクリーバー（前方クリーブ）",
+        "shadow_nova": "シャドウノヴァ（範囲バースト）",
+        "profane_mending": "冒涜の治癒（味方を回復）",
+        "mana_burn": "枯れた祝福（マナバーン）",
+        "deathstalker_cleave": "デスストーカークリーブ（前方クリーブ）",
+        "mortal_wound": "忘れられた傷（被回復量低下）",
+        "sealbreak_shockwave": "封印破りの衝撃波（範囲バースト）",
+        "gravebreaker": "グレイブブレイカー（前方扇形、レイドに向けない）",
+        "raise_fallen": "死者蘇生（周期的な増援ウェーブ）",
+        "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
+        "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
+        "wardstones": "ウォードストーンの詠唱（フェーズ移行）"
+      }
     },
     "deeds": {
       "title": "功績の書",
@@ -2428,6 +2851,10 @@ export const ja_JP: EnTranslations = {
       "dragonkin": {
         "name": "ドラゴンキン",
         "desc": "古き深淵に棲む、鱗に覆われた蛇のような存在。希少で誇り高く、見た目よりもはるかに強大です。"
+      },
+      "reptile": {
+        "name": "爬虫類",
+        "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
       }
     },
     "worldPage": {
@@ -4529,7 +4956,7 @@ export const ja_JP: EnTranslations = {
     "androidStandaloneDetail": "全画面アプリモードです。端末を横向きに保ってください。",
     "androidInstallDetail": "Androidで全画面にするには、このページをインストールするかホーム画面に追加してください。",
     "androidInstallStep": "Chromeでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。",
-    "androidSamsungInstallStep": "Samsung Internetでメニューを開き、アプリをインストールまたはホーム画面に追加を選びます。",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "新しいアイコンからWorld of ClaudeCraftを開きます。",
     "otherStandaloneDetail": "端末を横向き全画面に保ってください。",
     "otherInstallDetail": "最高のモバイル全画面体験のため、このページをインストールするかホーム画面に追加してください。"
@@ -5755,6 +6182,10 @@ export const ja_JP: EnTranslations = {
         "name": "最後の秘跡",
         "description": "大きな癒やしの波で体力を{damage}回復します。クールダウン10分。"
       },
+      "holy_taunt": {
+        "name": "聖なる挑発",
+        "description": "対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。"
+      },
       "flash_of_light": {
         "name": "光の癒し",
         "description": "素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。"
@@ -6079,6 +6510,98 @@ export const ja_JP: EnTranslations = {
         "name": "滾る怒り",
         "description": "滾る怒りに身を任せ、怒りを20生成します。（戦士タレント）"
       },
+      "crusader_strike": {
+        "name": "クルセイダー ストライク",
+        "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
+      },
+      "chain_heal": {
+        "name": "チェインヒール",
+        "description": "味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）"
+      },
+      "metamorphosis": {
+        "name": "悪魔変身",
+        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
+      },
+      "holy_shock": {
+        "name": "ホーリーショック",
+        "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"
+      },
+      "holy_shield": {
+        "name": "ホーリーシールド",
+        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+      },
+      "bestial_wrath": {
+        "name": "野獣の怒り",
+        "description": "野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）"
+      },
+      "trueshot_aura": {
+        "name": "トゥルーショットオーラ",
+        "description": "近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）"
+      },
+      "wyvern_sting": {
+        "name": "ワイバーンスティング",
+        "description": "遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）"
+      },
+      "arcane_power": {
+        "name": "アーケインパワー",
+        "description": "10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）"
+      },
+      "combustion": {
+        "name": "コンバッション",
+        "description": "15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）"
+      },
+      "icy_veins": {
+        "name": "アイシーヴェインズ",
+        "description": "10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）"
+      },
+      "cold_blood": {
+        "name": "コールドブラッド",
+        "description": "殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）"
+      },
+      "blade_flurry": {
+        "name": "ブレードフラリー",
+        "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
+      },
+      "hemorrhage": {
+        "name": "ヘモリッジ",
+        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
+      },
+      "power_infusion": {
+        "name": "パワーインフュージョン",
+        "description": "味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）"
+      },
+      "holy_nova": {
+        "name": "ホーリーノヴァ",
+        "description": "聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）"
+      },
+      "shadowform": {
+        "name": "シャドウフォーム",
+        "description": "シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）"
+      },
+      "elemental_mastery": {
+        "name": "エレメンタルマスタリー",
+        "description": "元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）"
+      },
+      "siphon_life": {
+        "name": "サイフォンライフ",
+        "description": "敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）"
+      },
+      "conflagrate": {
+        "name": "コンフラグレート",
+        "description": "敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）"
+      },
+      "moonkin_form": {
+        "name": "ムーンキンフォーム",
+        "description": "ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）"
+      },
+      "feral_charge": {
+        "name": "フェラルチャージ",
+        "description": "敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）"
+      },
+      "swiftmend": {
+        "name": "スウィフトメンド",
+        "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）"
+      },
       "summon_imp": {
         "name": "エンバーキンの召喚",
         "description": "ウォーロックの命令に従うエンバーキンを召喚します。エンバーキンは遠くから敵にアッシュボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
@@ -6106,6 +6629,34 @@ export const ja_JP: EnTranslations = {
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
         "description": "レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+      },
+      "pummel": {
+        "name": "顎砕き",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "kick": {
+        "name": "ブーツ",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "counterspell": {
+        "name": "スペルブレイク",
+        "description": "対象の呪文を打ち消し、6秒間その系統の呪文を封じる。"
+      },
+      "counter_shot": {
+        "name": "沈黙の一射",
+        "description": "素早い一射で対象の詠唱を中断し、4秒間その系統を封じる。"
+      },
+      "rebuke": {
+        "name": "叱咤",
+        "description": "対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。"
+      },
+      "skull_bash": {
+        "name": "頭突き",
+        "description": "突進する頭突きで対象の詠唱を中断し、4秒間その系統を封じる。"
+      },
+      "spell_lock": {
+        "name": "猿轡",
+        "description": "詠唱中の対象を沈黙させ、5秒間その系統の呪文を封じる。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -6749,6 +7300,126 @@ export const ja_JP: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "サンペタル草"
+      },
+      "furyforged_warhelm": {
+        "name": "憤怒鋳りの戦兜"
+      },
+      "furyforged_warspaulders": {
+        "name": "憤怒鋳りの戦肩当て"
+      },
+      "furyforged_warplate": {
+        "name": "憤怒鋳りの戦鎧"
+      },
+      "furyforged_girdle": {
+        "name": "憤怒鋳りの腰帯"
+      },
+      "furyforged_legguards": {
+        "name": "憤怒鋳りの脚当て"
+      },
+      "furyforged_gauntlets": {
+        "name": "憤怒鋳りの篭手"
+      },
+      "furyforged_sabatons": {
+        "name": "憤怒鋳りの戦靴"
+      },
+      "stormbound_crown": {
+        "name": "嵐縛りの王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "嵐縛りの肩当て"
+      },
+      "stormbound_hauberk": {
+        "name": "嵐縛りの鎖帷子"
+      },
+      "stormbound_waistguard": {
+        "name": "嵐縛りの腰守り"
+      },
+      "stormbound_legmail": {
+        "name": "嵐縛りの脚鎖"
+      },
+      "stormbound_handguards": {
+        "name": "嵐縛りの手甲"
+      },
+      "stormbound_greaves": {
+        "name": "嵐縛りの脛当て"
+      },
+      "ashstalker_cowl": {
+        "name": "灰追いの頭巾"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "灰追いの肩守り"
+      },
+      "ashstalker_harness": {
+        "name": "灰追いの胴具"
+      },
+      "ashstalker_waistband": {
+        "name": "灰追いの腰帯"
+      },
+      "ashstalker_legguards": {
+        "name": "灰追いの脚当て"
+      },
+      "ashstalker_grips": {
+        "name": "灰追いの手甲"
+      },
+      "ashstalker_treads": {
+        "name": "灰追いの足袋"
+      },
+      "cinderweave_cowl": {
+        "name": "熾火織りの頭巾"
+      },
+      "cinderweave_mantle": {
+        "name": "熾火織りの肩衣"
+      },
+      "cinderweave_raiment": {
+        "name": "熾火織りの法衣"
+      },
+      "cinderweave_cord": {
+        "name": "熾火織りの腰紐"
+      },
+      "cinderweave_legwraps": {
+        "name": "熾火織りの脚巻き"
+      },
+      "cinderweave_handwraps": {
+        "name": "熾火織りの手巻き"
+      },
+      "cinderweave_slippers": {
+        "name": "熾火織りの上履き"
+      },
+      "final_oath_medallion": {
+        "name": "最後の誓いのメダリオン"
+      },
+      "razorwind_torque": {
+        "name": "刃風の首輪"
+      },
+      "cinder_sigil_pendant": {
+        "name": "熾火印のペンダント"
+      },
+      "iron_vow_band": {
+        "name": "鉄の誓いの指輪"
+      },
+      "unbroken_circle": {
+        "name": "不壊の円環"
+      },
+      "fleetblood_band": {
+        "name": "疾血の指輪"
+      },
+      "last_step_signet": {
+        "name": "最後の一歩の印章"
+      },
+      "ashen_focus_ring": {
+        "name": "灰燼の集中指輪"
+      },
+      "spellbreakers_seal": {
+        "name": "呪文砕きの印章"
+      },
+      "final_argument_greatblade": {
+        "name": "最後の論駁の大剣"
+      },
+      "first_blood_razor": {
+        "name": "初血の剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "熾火硝子の戦杖"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
@@ -7622,6 +8293,15 @@ export const ja_JP: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
@@ -7889,6 +8569,11 @@ export const ja_JP: EnTranslations = {
         "name": "補給係ヴェックス",
         "title": "英雄補給係",
         "greeting": "英雄の深部の証があれば、ハイウォッチ一の指輪とペンダントが手に入る。あなたの証を見せてくれ。"
+      },
+      "fury": {
+        "name": "フューリー",
+        "title": "名誉補給官",
+        "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",

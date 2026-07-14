@@ -7,6 +7,8 @@
 // Assembled into `en` by ./index.ts under the `hudChrome` namespace. Kept as its
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
+import { armoryCollectionStrings, armorySkinStrings } from './armory';
+
 export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
@@ -245,6 +247,122 @@ export const hudChromeStrings = {
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
     },
   },
+  wocStore: {
+    title: 'WOC Store',
+    close: 'Close WOC Store',
+    tabsLabel: 'WOC Store sections',
+    storeTab: 'Store',
+    rewardsTab: 'Daily Rewards',
+    loading: 'Loading WOC Store...',
+    error: 'The WOC Store is unavailable right now. Please try again shortly.',
+    balance: 'Claudium Balance',
+    buyClaudium: 'Purchase Claudium',
+    owned: 'Owned',
+    needMoreTitle: 'More Claudium Required',
+    needMoreBody: 'You need {shortfall} more Claudium to purchase {item}.',
+    cancel: 'Cancel',
+    confirmTitle: 'Confirm Cosmetic Purchase',
+    confirmBody: 'Purchase {item} for {cost} Claudium?',
+    confirmPurchase: 'Purchase',
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Season 1 Armory (weapon skins). English copy comes from the dedicated
+    // Armory i18n catalog; the sim registry remains mechanical and locale-free.
+    armoryEyebrow: 'Season 1',
+    armoryTitle: 'The Armory',
+    armoryBody:
+      'Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.',
+    collectionLine: '{collection} Collection',
+    collections: armoryCollectionStrings,
+    skins: armorySkinStrings,
+    seasonOne: 'Season 1',
+    rarity: {
+      uncommon: 'Uncommon',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary',
+    },
+    wtype: {
+      sword: 'Sword',
+      axe: 'Axe',
+      mace: 'Mace',
+      dagger: 'Dagger',
+      staff: 'Staff',
+      wand: 'Wand',
+      bow: 'Bow',
+      crossbow: 'Crossbow',
+    },
+    badge: {
+      flagship: 'Flagship',
+      hero: 'Hero',
+    },
+    inspectAria: 'Inspect {item}',
+    viewModeLabel: 'Preview mode',
+    tryOn: 'Try it on',
+    weaponOnly: 'Weapon only',
+    sceneLabel: 'Scene lighting',
+    scene: {
+      day: 'Day',
+      dusk: 'Dusk',
+      night: 'Night',
+    },
+    lore: 'Lore',
+    buySkin: 'Purchase Skin',
+    unavailable: 'Unavailable',
+    applied: 'Applied',
+    apply: 'Apply Skin',
+    detach: 'Detach Skin',
+    equipHint: 'Equip a {type} to apply this skin.',
+  },
+  // CLAUDIUM: a server-authoritative soft currency. The game renders only what the
+  // economy service returns (balance, SKU credits, prices, store costs); it
+  // computes nothing. One-way: buy with money, spend on cosmetics, never cashes out.
+  claudium: {
+    title: 'Claudium',
+    open: 'Open Claudium',
+    close: 'Close Claudium',
+    loading: 'Loading Claudium...',
+    balanceLabel: 'Balance',
+    balanceUnit: '{amount} Claudium',
+    solBalance: 'SOL: {amount}',
+    wocBalance: 'WOC: {amount}',
+    unavailable:
+      'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
+    disclosure:
+      'Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.',
+    buyTitle: 'Buy Claudium',
+    railLabel: 'Payment method',
+    railStripe: 'Card',
+    railSol: 'SOL',
+    railWoc: 'WOC',
+    railWocDiscount: '20% off',
+    railWocUnavailable: 'WOC pricing is unavailable right now.',
+    railNativeUnavailable: 'SOL/WOC off.',
+    amountLabel: 'Amount',
+    showAmounts: 'Show all Claudium amounts',
+    hideAmounts: 'Hide extra Claudium amounts',
+    skuRow: '{usd} for {claudium} Claudium',
+    buyButton: 'Buy',
+    buyUnavailable: 'Purchasing is unavailable right now.',
+    storeTitle: 'Cosmetic Store',
+    storeEmpty: 'No cosmetics are available right now.',
+    storeCost: '{amount} Claudium',
+    spendButton: 'Redeem',
+    kindCosmetic: 'Cosmetic',
+    kindSkin: 'Skin',
+    kindItem: 'Item',
+    checkoutTitle: 'Complete purchase',
+    checkoutClose: 'Close checkout',
+    checkoutLoading: 'Loading checkout...',
+    checkoutPending: 'Transaction in progress. Confirm in your wallet and keep this panel open.',
+    checkoutPendingButton: 'Processing',
+    checkoutFailed: 'Checkout could not be loaded. Please try again.',
+    checkoutUnavailable: 'That Claudium purchase is not available right now.',
+    checkoutWalletRequired: 'Connect a Solana wallet before buying Claudium with crypto.',
+    checkoutWalletUnsupported: 'This wallet cannot sign and send Solana transactions.',
+    checkoutNotSettled:
+      'The transaction was sent but Claudium was not credited yet. Please try again shortly.',
+  },
   theme: {
     preset: 'UI Theme',
     customColors: 'Custom Colors',
@@ -378,7 +496,7 @@ export const hudChromeStrings = {
   mobile: {
     jump: 'Jump',
     leaderboard: 'Ranks',
-    dailyRewards: 'Rewards',
+    dailyRewards: 'Store',
     deeds: 'Deeds',
     nameplates: 'Names',
     nameplatesOff: 'Names Off',
@@ -496,6 +614,19 @@ export const hudChromeStrings = {
     notNow: 'Not now',
     update: 'Update',
   },
+  // First-run camera-mode prompt (issue #1727): a one-shot modal on the first world
+  // entry in a browser, offering Classic vs Mouse Camera. The mouse option title
+  // reuses hud.options.mouseCamera; these are the surrounding strings. The setting
+  // stays changeable later under Esc, Key Bindings.
+  cameraPrompt: {
+    title: 'Choose Your Camera',
+    intro: 'Pick how the camera follows your character.',
+    mouseDesc: 'Move the mouse to turn the camera without holding a button.',
+    classicTitle: 'Classic Camera',
+    classicDesc: 'Hold right-click and move the mouse to turn the camera.',
+    changeLater: 'You can change this later under Esc, Key Bindings.',
+    confirm: 'Confirm',
+  },
   // Cast-bar progressbar accessible names (the visible spell name + seconds-left
   // text are the live status; these name which bar is which). One for the player's
   // own cast (#castbar) and one for the target/boss cast (#tf-castbar).
@@ -567,6 +698,18 @@ export const hudChromeStrings = {
     perSecondRow: '{total} ({rate})',
     minutesSeconds: '{m}m {s}s',
     seconds: '{s}s',
+    // Shown alongside the empty state so a first-time viewer understands the
+    // panel is not broken: rows populate once party combat starts, and the
+    // segment closes itself a few seconds after the fight ends.
+    autoShowHint:
+      'Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.',
+  },
+  // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
+  // visible (never hidden) while it cannot currently be used, so a hunter
+  // sees WHY instead of a button that looks broken.
+  petFeed: {
+    disabledFullHp: 'Pet is at full health',
+    disabledNoFood: 'No food in your bags will heal your pet',
   },
   // Key Bindings panel action labels that the in-file BIND_ACTION_LABEL_KEYS map
   // (hud.ts) routes through t(). Kept here (not the constrained `hud` catalog
@@ -578,6 +721,7 @@ export const hudChromeStrings = {
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
+    sheathe: 'Sheathe/Unsheathe Weapon',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -944,6 +1088,20 @@ export const hudChromeStrings = {
     highContrastAria:
       'Toggle high-contrast background: disables the moving trailer so start-screen text stays legible',
   },
+  warfare: {
+    honorAmount: '{amount} Honor',
+    dualPrice: '{money} + {honor}',
+    balance: 'Honor: {amount}',
+    honorFloat: '+{amount} Honor',
+    honorGain: 'You gain {amount} Honor ({reason}).',
+    notEnoughHonor: 'Not enough Honor.',
+    reasons: {
+      arenaWin: 'Arena victory',
+      fiestaKill: 'Fiesta takedown',
+      fiestaComplete: 'Fiesta completed',
+      fiestaWin: 'Fiesta victory',
+    },
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -960,7 +1118,9 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      warfare: 'Warfare',
     },
+    warfareValue: '+{increase}% dealt / -{reduction}% taken',
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
@@ -979,6 +1139,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      warfare:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -1081,6 +1243,12 @@ export const hudChromeStrings = {
       few: 'you are {rank}, {count} members',
       many: 'you are {rank}, {count} members',
       other: 'you are {rank}, {count} members',
+    },
+    finderPartySize: {
+      one: '{count} player',
+      few: '{count} players',
+      many: '{count} players',
+      other: '{count} players',
     },
     characterCount: {
       one: '{count} character',
@@ -1305,6 +1473,29 @@ export const hudChromeStrings = {
     // without a name (the invite itself has no proximity gate).
     inviteUsage: 'Invite whom? Usage: /invite <name>.',
   },
+  // The player context menu (click a name in chat, or right-click a unit frame).
+  // Ignore is the chat-only tier: it hides their public chat from you (its
+  // Ignore/Unignore labels are the existing hud.chat.context.* keys). Block is the
+  // heavy tier: it also drops invites, whispers, mail and /who visibility.
+  // Neither is the ADMIN "mute", which is a staff silence, not a player action.
+  playerMenu: {
+    info: 'Player Info',
+    block: 'Block',
+    unblock: 'Unblock',
+    // Accessible name on a clickable chat sender name.
+    openFor: 'Open player menu for {name}',
+    // Shown when a profile lookup for an out-of-range player finds nothing.
+    profileUnavailable: 'No profile found for {name}.',
+    // Operator-set account flair. The tag itself is the bracketed literal every
+    // classic client shows beside a name; the title is its hover explanation.
+    aiTag: '[AI]',
+    aiTagTitle: 'AI-operated account',
+    // Player-menu rows linking out to an official streamer's own channel.
+    watchTwitch: 'Watch on Twitch',
+    watchX: 'View on X',
+    watchKick: 'Watch on Kick',
+    watchYouTube: 'Watch on YouTube',
+  },
   lootSettings: {
     title: 'Loot Settings',
     close: 'Close loot settings',
@@ -1330,9 +1521,10 @@ export const hudChromeStrings = {
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
-    // Tooltip sub-line advertising the right-click destroy affordance, shown only
-    // for a destroyable item so junk is removable without hunting for a menu.
-    rightClickDestroy: 'Right-click to destroy',
+    // Tooltip sub-line advertising the shift+right-click destroy affordance, shown
+    // only for a destroyable item so junk is removable without hunting for a menu. A
+    // plain right-click equips/uses the item instead (issue 1852).
+    rightClickDestroy: 'Shift+right-click to destroy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1629,6 +1821,12 @@ export const hudChromeStrings = {
         'Link your Discord to earn points from play and community activity, and climb the status tiers.',
       error: 'Could not link Discord. Please try again.',
       success: 'Discord linked.',
+      // Secondary action next to the link CTA: open the plain community invite
+      // without linking an account. This is the single Discord entry point in
+      // the game HUD (the corner community tray's separate invite link was
+      // removed as a duplicate), so an unlinked player still needs one click
+      // to just join the server.
+      joinServer: 'Just join the Discord server',
     },
     // First-time Discord login chooser (create a new account vs link an existing one).
     choice: {
@@ -1680,8 +1878,13 @@ export const hudChromeStrings = {
       admin: 'Admin',
       coredevs: 'Core Dev',
       devs: 'Dev',
+      seniormods: 'Senior Mod',
       mods: 'Mod',
+      juniormods: 'Junior Mod',
       artists: 'Artist',
+      contentcreator: 'Content Creator',
+      legend: 'LEGEND',
+      shill: 'SHILL',
     },
     guildMember: 'Verified member',
     notMember: 'Not in the server yet',
@@ -1957,6 +2160,16 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+    // The two PLAYER chat-filter tiers get a tab each. Ignored is chat-only;
+    // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
+    ignoredTab: 'Ignored',
+    blockedTab: 'Blocked',
+    ignoredEmpty: 'You are not ignoring anyone.',
+    blockedEmpty: 'You have not blocked anyone.',
+    blockSearchPlaceholder: 'Player name',
+    blockAction: 'Block',
+    nowBlocking: 'Blocked {name}.',
+    stopBlockingTitle: 'Stop blocking {name}',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
@@ -2012,6 +2225,117 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+  },
+  // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
+  // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
+  // never through these keys.
+  finder: {
+    title: 'Dungeon Finder',
+    close: 'Close',
+    back: 'Back',
+    syncing: 'Waiting for the realm...',
+    tabCatalogue: 'Catalogue',
+    tabQueue: 'Quick Match',
+    tabBoard: 'Premade Groups',
+    normal: 'Normal',
+    heroic: 'Heroic',
+    kindDungeon: 'Dungeon',
+    kindRaid: 'Raid',
+    kindSolo: 'Solo adventure',
+    levels: 'Levels {min} to {max}',
+    levelOne: 'Level {level}',
+    // Group size renders through tPlural(hudChrome.plurals.finderPartySize).
+    // The mm:ss clock separator is a token pattern, like every other HUD clock.
+    clock: '{minutes}:{seconds}',
+    // Count-plus-role composition ({count} tanks): a token pattern so a locale
+    // owns the ORDER, never a `${n} ${label}` concat at the call site.
+    roleCount: '{count} {role}',
+    roleTank: 'Tank',
+    roleHealer: 'Healer',
+    roleDps: 'Damage',
+    freeRoles: 'Any roles welcome',
+    lockoutDaily: 'Daily lockout on the final boss',
+    lockoutNone: 'No lockout',
+    lockedFor: 'Locked for about {minutes} min',
+    attunement: 'Requires attunement: {quest}',
+    heroicMarks: 'Heroic Marks: {count} per player',
+    entrance: 'Entrance: {zone}',
+    showOnMap: 'Show on Map',
+    encounters: 'Encounters',
+    finalBoss: 'Final boss',
+    summoned: 'Summoned guardian',
+    lootGuaranteed: 'One of these always drops:',
+    lootMaybe: 'At most one of these may drop:',
+    lootChance: 'Additional chance drops:',
+    lootHeroic: 'Heroic bonus, one of these always drops:',
+    pct: '{pct}%',
+    blockedLevel: 'Levels {min} to {max} only',
+    blockedSpec: 'Requires a specialization',
+    yourRoles: 'Your roles',
+    needsSpec: 'Choose a specialization to use the Dungeon Finder.',
+    leaderNote: 'Only your party leader can queue the group.',
+    chooseActivities: 'Choose activities',
+    joinQueue: 'Join queue',
+    leaveQueue: 'Leave queue',
+    waited: 'Time in queue: {time}',
+    cooldownNote: 'You may queue again in {seconds}s.',
+    travelNote:
+      'The group forms where everyone stands. Travel to the entrance together; nobody is teleported.',
+    proposalTitle: 'Group found: {name}',
+    proposalRole: 'Your role: {role}',
+    accepted: '{accepted} of {size} confirmed',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+    slotState: '{role}: {accepted} of {total} ready',
+    openListings: 'Open listings',
+    boardEmpty: 'No listings right now. Publish one!',
+    boardLeaderGate: 'Only your party leader can publish a listing.',
+    publishListing: 'Publish a listing',
+    activity: 'Activity',
+    publish: 'Publish',
+    yourListing: 'Your listing',
+    closeListing: 'Close listing',
+    applicants: 'Applicants',
+    noApplicants: 'No applicants yet.',
+    acceptApplicantAria: 'Accept {name}',
+    declineApplicantAria: 'Decline {name}',
+    levelClass: 'Lv {level} {className}',
+    leader: 'Leader: {name}',
+    needs: 'Needs {roles}',
+    slots: '{size}/{capacity}',
+    apply: 'Apply',
+    withdraw: 'Withdraw application',
+    tagFirstRun: 'First run',
+    tagQuestRun: 'Quest run',
+    tagFullClear: 'Full clear',
+    tagLearning: 'Learning welcome',
+    tagFastRun: 'Fast run',
+    // Notable encounter mechanics (stable keys authored in
+    // src/sim/content/dungeon_finder.ts encounter records).
+    mech: {
+      shadow_pulse: 'Shadow Pulse (pulsing area damage)',
+      reaping_arc: 'Reaping Arc (frontal cleave)',
+      mist_surge: 'Mist Surge (pulsing area damage)',
+      summons_adds: 'Summons reinforcements',
+      lunar_tide: 'Lunar Tide (pulsing area damage)',
+      enrage: 'Enrages at low health',
+      shuddering_stomp: 'Shuddering Stomp (area stun)',
+      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_cleaver: 'Grave-Cleaver (frontal cleave)',
+      shadow_nova: 'Shadow Nova (area burst)',
+      profane_mending: 'Profane Mending (heals its allies)',
+      mana_burn: 'Withered Benediction (burns mana)',
+      deathstalker_cleave: 'Deathstalker Cleave (frontal cleave)',
+      mortal_wound: 'Forgotten Wound (reduces healing taken)',
+      sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
+      gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
+      raise_fallen: 'Raise Fallen (periodic waves of adds)',
+      soul_rend: 'Soul Rend (marked players must spread and be healed)',
+      deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
+      wardstones: 'Wardstone channels (phase transition)',
+    },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

@@ -377,6 +377,263 @@ export const es: EnTranslations = {
         "banned": "Tienes prohibido participar en las Recompensas diarias. Motivo: {reason}"
       }
     },
+    "wocStore": {
+      "title": "Tienda WOC",
+      "close": "Cerrar la tienda WOC",
+      "tabsLabel": "Secciones de la tienda WOC",
+      "storeTab": "Tienda",
+      "rewardsTab": "Recompensas diarias",
+      "loading": "Cargando la tienda WOC...",
+      "error": "La tienda WOC no está disponible en este momento. Vuelve a intentarlo dentro de poco.",
+      "balance": "Saldo de Claudium",
+      "buyClaudium": "Comprar Claudium",
+      "owned": "Adquirido",
+      "needMoreTitle": "Necesitas más Claudium",
+      "needMoreBody": "Te faltan {shortfall} Claudium para comprar {item}.",
+      "cancel": "Cancelar",
+      "confirmTitle": "Confirmar compra de cosmético",
+      "confirmBody": "¿Comprar {item} por {cost} Claudium?",
+      "confirmPurchase": "Comprar",
+      "priceChanged": "El precio cambió antes de completarse la compra. Revisa el precio actualizado y vuelve a confirmar.",
+      "armoryEyebrow": "Temporada 1",
+      "armoryTitle": "La Armería",
+      "armoryBody": "Apariencias de armas de edición limitada de la Armería de la temporada 1. Válidas para toda la cuenta, puramente cosméticas y visibles para todos los que te rodean.",
+      "collectionLine": "Colección {collection}",
+      "collections": {
+        "guildmark": "Sello gremial",
+        "emberwrought": "Forja de ascuas",
+        "hoarfrost": "Escarcha",
+        "fallen_star": "Estrella caída"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Espada de Armar con Sello Gremial",
+          "look": "Hoja de acero azulado, cruz de bronce en cola de pez, empuñadura de cuero teñido de verde azulado y pequeño sello gremial estampado.",
+          "lore": "Mientras la hoja común es anónima, esta está firmada. Un armero se gana el derecho a estampar su marca en el recazo solo cuando el Mercader del Mercado Mundial responde por su acero, y la marca del Herrero Haldren tiene su aval. Azulada contra la humedad del Valle y equilibrada con precisión. Pagas tanto por el sello como por la espada, y lo vale."
+        },
+        "brasscap_axe": {
+          "name": "Hachuela Coronada de Latón",
+          "look": "Hoja de acero pulido, casquillo y refuerzos de latón sobre un mango de fresno lacado, envoltura pulcra y sello del artesano.",
+          "lore": "Un hacha sellada es una fanfarronada que puedes sostener. El casquillo y los refuerzos de latón son mitad armadura, mitad firma: evitan que el mango se raje y atrapan la luz de la taberna para que todos sepan que compraste una obra del Armero Hode, no un descarte de la milicia. «Si corta, lo vendo», dice el herrero de Highwatch. Esta corta."
+        },
+        "tempered_flanged_mace": {
+          "name": "Maza Aletada Templada",
+          "look": "Cabeza de acero azulado templado con seis aletas, collar y pomo de latón y empuñadura de cuero rojo vino.",
+          "lore": "Seis aletas de acero azulado y templado, cada una afilada para abrir un yelmo, rematadas en latón y envueltas en cuero rojo vino. Los armeros del reino no fabrican armas feas ni siquiera cuando el trabajo es brutal. Esta fue encargada a través del Mercado Mundial, no tomada de un estante; en algún lugar hay un libro de cuentas con el nombre de un comprador orgulloso y la suma que pagó a Hode por ella."
+        },
+        "guildmark_dirk": {
+          "name": "Daga con Sello Gremial",
+          "look": "Daga larga y delgada de acero templado, guarda y pomo de bronce, empuñadura de cordón verde oscuro y sello estampado.",
+          "lore": "La hoja que lleva alguien de posición cuando la espada se queda en casa: esbelta, templada, marcada con el mismo sello que certifica una hoja completa y prendida al cinturón como un anillo de sello con filo. Discreta para todos salvo quienes saben leer la garantía de un armero. La Intendente Bree guarda un cajón lleno en Highwatch para los oficiales que se han ganado el respeto del muro."
+        },
+        "brasscrown_staff": {
+          "name": "Bastón de Paseo con Corona de Latón",
+          "look": "Bastón de madera noble rematado por una corona torneada de latón, contera de latón y banda de cuero teñido.",
+          "lore": "Torneado en madera noble curada y coronado con un remate de latón que los herreros de Eastbrook funden por centenares, pero perfeccionan de uno en uno. Pertenece al tipo de viajero que quiere que lo tomen en serio tanto en la puerta de Fenbridge como en el muro de Highwatch. Un bastón que nunca ha necesitado realmente ayudar a caminar; la banda teñida combina con un abrigo cuyo precio se adivina."
+        },
+        "lacquered_wand": {
+          "name": "Vara Lacada",
+          "look": "Varita esbelta lacada en rojo oscuro, con dos bandas de latón pulido y una pequeña punta redondeada de latón.",
+          "lore": "Laca de color rojo oscuro aplicada con paciencia en siete capas y ceñida dos veces con latón pulido: la clase de varita que un mago rural compra en el Mercado Mundial cuando empieza a cobrar monedas de verdad y quiere que se note. No canaliza la Luz mejor que una rama de abedul. Pero reluce de maravilla sobre el mostrador del Mercader, y la mitad de la magia menor siempre ha consistido en que crean en quien la practica."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Arco del Gremio de Flecheros",
+          "look": "Arco recurvo de nogal lacado, puntas de las palas de latón, cuerda de lino encerado y sello del gremio en la empuñadura.",
+          "lore": "Lo más parecido que tiene el reino a un gremio es el sello de un flechero en la empuñadura, una promesa sobre lo que hay dentro, como la marca con que un vinatero sella un barril. Nogal lacado, latón en las puntas de las palas y una cuerda de lino encerado que no se deshilacha bajo la lluvia de Mirefen. Cada unión justifica el precio. Ténsalo una vez más allá de la Espesura de la Viuda y el argumento queda ganado."
+        },
+        "cinderbrand_sword": {
+          "name": "Marca de Ascua",
+          "look": "Hoja oscura de acero forjado, canal central lleno de runas de ascua naranja brillante, grietas de calor y una gema humeante en la guarda.",
+          "lore": "La primera hoja templada no en agua, sino en Brasas Benditas recogidas de Stormcrag, los carbones que los herreros de Highwatch juran que «arden azules y limpios, porque la montaña recuerda su antiguo juramento». Guardado en el canal central, aquel fuego arde en naranja y no se extingue; las runas permanecen cálidas para una mano desnuda incluso en la noche más fría del muro. Marca de Ascua nunca necesita encenderse. Sencillamente se niega a apagarse."
+        },
+        "emberbite_axe": {
+          "name": "Mordisco de Ascua",
+          "look": "Hacha de hierro ennegrecido con grietas de ascua naranja que brillan a través de la hoja, una gema de carbón contenido y volutas de calor.",
+          "lore": "El Armero Hode incrustó un carbón vivo de fuego de montaña en el corazón de la hoja, de modo que el filo nunca llega a enfriarse entre golpes. Las grietas respiran naranja en el descenso, como si el impacto despertara algo que la primera forja dejó dormido en el hierro. Dicen que un elemental de Stormcrag entregó el ascua para crearla; dicen muchas cosas en Highwatch cuando sopla el viento."
+        },
+        "smoulderfall_mace": {
+          "name": "Ocaso Humeante",
+          "look": "Aletas de hierro oscuro que brillan en naranja de ascua por sus grietas interiores y una gema de núcleo fundido en la cabeza.",
+          "lore": "Una maza que porta su propio hogar: una piedra de núcleo fundido, desprendida del sello del Santuario que fue «forjado con fuego de montaña», engastada y brillante en la cabeza. Las aletas permanecen cálidas al tacto y más calientes donde golpean; un sargento de Highwatch jura que uno de sus golpes deja un moratón que brilla débilmente hasta el amanecer. El fuego de la montaña, creado por fin para romper en lugar de sellar."
+        },
+        "ashspark_dagger": {
+          "name": "Puñal Chispa de Ceniza",
+          "look": "Hoja corta ennegrecida recorrida por vetas de ascua naranja brillante, una diminuta gema humeante en el pomo, ceniza y chispas.",
+          "lore": "Una hoja de callejón con el fuego de la montaña oculto en la piedra del pomo, la broma discreta de un armero: hasta un ratero puede llevar una ascua de la primera forja. Ennegrecida, veteada de naranja, siempre un poco demasiado caliente dentro de la vaina. Desenváinala en la oscuridad bajo Highwatch y el resplandor te iluminará la mano lo justo para encontrar un hueco en la guardia de un hombre."
+        },
+        "forgeheart_staff": {
+          "name": "Bastón Corazón de Forja",
+          "look": "Bastón con regatón de hierro, coronado por un núcleo de ascua brillante enjaulado, con runas de ascua por la vara y reverberación de calor ascendente.",
+          "lore": "Un carbón vivo de fuego de montaña enjaulado en hierro en su corona. El Maestro de saber Caddis lo considera la prueba de que el fuego de la primera forja puede obligarse a servir, no solo a sellar. Una fina cinta de reverberación térmica se eleva de él sin cesar; el mago que lleva uno nunca necesita una forja ni una hoguera de guardia. Según susurran, el ascua fue extraída del propio aliento de Voskar Aladebrasa y no se ha enfriado desde entonces."
+        },
+        "emberwrought_wand": {
+          "name": "Varita Forjada en Ascuas",
+          "look": "Varita de metal ennegrecido rematada por un carbón de ascua brillante entre garras de hierro, con finas grietas de calor y una cálida luz interior.",
+          "lore": "La varita que dio nombre a la serie. Cuando un armero de Highwatch engastó por primera vez un carbón de fuego de montaña en garras de hierro y lo hizo responder a una mano mortal, hasta los Sacerdotes de la Luz dejaron de llamarlo herejía y empezaron a llamarlo útil. Cálida, paciente y discretamente peligrosa: el ascua de la punta ha ardido sin interrupción desde antes de que su dueño respirara por primera vez."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Cerrojo de Ascua",
+          "look": "Ballesta de acero ennegrecido, con un resplandor naranja de ascua que se filtra por las grietas del arco y un carbón humeante en la cureña.",
+          "lore": "La más extraña de las armas forjadas en ascuas: el fuego de la montaña vertido en una máquina. El naranja se filtra por las grietas del arco, y un carbón humeante en la cureña impide que la cuerda se ponga rígida con el frío de Thornpeak o la humedad de Mirefen. Sus virotes ya salen calientes del canal y llegan aún más calientes. La respuesta de un cazador para un muro donde el enemigo tampoco siente el frío."
+        },
+        "ice_fang_sword": {
+          "name": "Colmillo de Hielo",
+          "look": "Hoja curva de hielo glacial pálido, cristales de escarcha dentados a lo largo del lomo, un núcleo congelado cian brillante en el canal central y una cruceta de carámbanos.",
+          "lore": "La pieza insignia de la serie helada y la primera que busca cualquier coleccionista. La espada Colmillo de Hielo no fue forjada, sino tallada en un colmillo del glaciar que corona Thornpeak sobre Highwatch, con un núcleo cian que arde tan frío como la luz reflejada en el Glimmermere. Cubre de escarcha hasta el aire que corta. La guardia del muro jura que un soldado la empuñó la noche en que las nieves altas contuvieron al Wyrmcult y «le compró un invierno al muro»."
+        },
+        "glaciersplit_axe": {
+          "name": "Quebraglaciares",
+          "look": "Cabeza de hielo glaciar azul translúcido, con un interior agrietado que brilla en cian, erizada de cristales de escarcha y un mango que deja una estela de vapor frío.",
+          "lore": "Tallada en el corazón azul del glaciar de Thornpeak, donde dos siglos de hielo han comprimido el frío hasta que brilla por sí solo. Deja una estela de vapor incluso en reposo, y su impacto suena como una grieta que se abre bajo la Cresta del Acechador. Highwatch entrega sus caídos al hielo de allí arriba; esta es, pues, un arma destinada a mantener a raya el deshielo y cuanto este pudiera despertar."
+        },
+        "rimecrusher_mace": {
+          "name": "Rompeescarcha",
+          "look": "Cúmulo de cristales de hielo dentados alrededor de un núcleo cian brillante, con escarcha que repta por un mango plateado.",
+          "lore": "No fue tallada, sino cultivada: hielo de Thornpeak inducido a crecer alrededor de un núcleo cian frío hasta endurecerse tanto como el mejor acero de Hode. La escarcha baja por el mango plateado hacia la mano, pero nunca termina de alcanzarla. Donde golpea, el agua se congela; donde reposa, el suelo blanquea. El frío sepulcral de las cumbres, reducido a un tamaño que permite blandirlo contra las cosas que escalan el muro."
+        },
+        "frostbite_dagger": {
+          "name": "Aguja de Escarcha",
+          "look": "Daga de hielo azul transparente, siniestramente fina, con una veta cian brillante en el centro, cristales de escarcha como agujas y empuñadura cubierta de escarcha.",
+          "lore": "Fina como un aliento contenido y el doble de fría: una esquirla del glaciar de Thornpeak afilada hasta dejar una sola veta luminosa, tan cortante que la herida se congela antes de que la sangre recuerde correr. Su nombre procede del frío sepulcral que los muertos traen de las cumbres. Nunca necesita afilarse; el hielo no pierde el filo, observa secamente el Maestro de saber Caddis, solo espera."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Vigilia de Escarcha",
+          "look": "Bastón plateado coronado por un fragmento flotante de hielo cian brillante que gira lentamente y emite cristales y vapor frío.",
+          "lore": "El bastón de la guardia que nunca duerme en el muro de Highwatch. Su corona es un fragmento de hielo cian del lago que flota separado de la plata y gira lentamente por voluntad propia: siempre, juran los guardias, hacia el frío que se acumula bajo las cumbres. Llevar la Vigilia es hacer doscientos años de guardia en una sola noche y prometer no apartar la mirada."
+        },
+        "everwinter_wand": {
+          "name": "Fragmento del Invierno Eterno",
+          "look": "Una sola punta de hielo glaciar cian brillante, con escarcha que brota de un collar de plata y una tenue neblina fría.",
+          "lore": "Una punta de hielo glaciar brillante que, según dicen, se quebró del lago profundo bajo el Santuario, donde el frío de la montaña tiene dientes. La escarcha brota sin cesar de su collar de plata y nunca se derrite, ni con fuego ni en verano. Los magos la mantienen cerca por el frío que aporta a su obra, y la apartan en las noches en que parece inclinarse hacia la cripta de Nythraxis y escuchar."
+        },
+        "winterbite": {
+          "name": "Mordisco Invernal",
+          "look": "Arco de acero plateado y hielo azul, con un núcleo congelado cian brillante en la empuñadura, una flecha de hielo macizo lista para disparar y vapor frío.",
+          "lore": "Un arco de acero plateado y hielo de Thornpeak, con la empuñadura iluminada por un núcleo cian frío que congela la flecha a la cuerda. Carga un astil de hielo glaciar macizo que vuelve a formarse con cada tensado; el arquero no lleva carcaj en el muro, solo el frío. Highwatch resistió un asedio en la Cresta del Acechador con uno como este: un solo arquero, según cuentan, y flechas para un invierno entero que parecían estar allí desde siempre."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Última Luz del Alba",
+          "look": "Mandoble forjado con una estrella caída, con un núcleo de oro fundido que divide la hoja de acero negro cósmico ribeteada de luz estelar, fragmentos dorados que orbitan la guarda y una cinta de aurora.",
+          "lore": "Cuando la estrella cayó del cielo occidental y «estalló como una forja» más allá de la Espesura de la Viuda, el Hermano Aldric sacó su corazón aún humeante del cráter de Mirefen y rogó a los herreros del reino que trabajaran «algo que no pertenece a este mundo». Hicieron con él un único mandoble: Solheim. Su núcleo de oro fundido divide la hoja negra cósmica como el alba abre el cielo nocturno, y fragmentos de metal estelar orbitan la guarda por trayectorias que ninguna mano trazó. Solo se forjó uno. No habrá otro."
+        },
+        "skyrender_axe": {
+          "name": "Desgarracielos, Herida del Firmamento",
+          "look": "Cabeza semejante a un fragmento arrancado del cielo nocturno, con grietas de oro fundido y constelaciones grabadas, esquirlas de luz estelar suspendidas y un fulgor de aurora tras el filo.",
+          "lore": "Batida a partir del borde del cráter, donde la estrella caída arrancó del Mirefen el reflejo del propio cielo y dejó una herida que aún humea. La cabeza parece un fragmento de noche desgarrada: grietas de oro fundido, constelaciones que ningún erudito de Highwatch puede nombrar y una aurora que sangra del filo con cada golpe. El Hermano Aldric la bendijo sin tocarla. Al levantarla, sostienes el hueco que dejaron los cielos."
+        },
+        "starfall_mace": {
+          "name": "Caída Estelar, Juicio de los Cielos",
+          "look": "Núcleo estelar cautivo de oro fundido, rodeado de fragmentos orbitales, con aletas negras cósmicas recorridas por vetas de luz estelar y una aurora que se derrama por las junturas.",
+          "lore": "Un núcleo estelar atrapado en el instante anterior a morir, rodeado por los restos que cayeron con él y congelado a un dedo del olvido. Sus aletas negras cósmicas están recorridas por luz estelar cautiva, y la aurora se derrama por las junturas cuando se alza. Los antiguos Sacerdotes de la Luz llamaban juicio a una estrella fugaz, un veredicto dictado desde lo alto que ningún escudo debía detener, y bautizaron esta por la que cayó sobre Mirefen."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Colmillo de la Estrella Caída",
+          "look": "Una esquirla de estrella caída, con filo de oro fundido brillante sobre metal negro cósmico, una mota estelar luminosa que orbita el pomo y una fina estela de aurora.",
+          "lore": "La pieza más pequeña de la estrella que Aldric sacó del cráter y, según algunos, la más peligrosa. Una sola esquirla de aquel corazón de otro mundo, con su filo de oro fundido sobre metal negro cósmico y una mota estelar solitaria que rodea el pomo como una luna que perdió su mundo. Casi no pesa y corta casi cualquier cosa. Lo bastante pequeña para ocultarla y lo bastante brillante para encontrarla en la oscuridad por su propia luz."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Aguja del Vacío Infinito",
+          "look": "Cúmulo orbital de fragmentos estelares dorados alrededor de un núcleo de oro fundido, vara negra cósmica grabada con constelaciones y cintas de aurora que ascienden en espiral.",
+          "lore": "Una vara de metal estelar coronada por un núcleo de oro fundido y un anillo de fragmentos dorados que marchan a su alrededor en una órbita lenta e interminable: un pequeño cosmos grabado con constelaciones que no corresponden a ningún cielo sobre Thornpeak. La aurora trepa por su longitud como humo que olvidó elevarse. Quienes la llevaron afirmaban sentir el vacío girando a través de ella, como el lago de Ysolei «bebe la luz de la luna»: paciente, frío y devolviendo la mirada."
+        },
+        "emberwish_wand": {
+          "name": "Deseo de Ascua, Mota del Sol Agonizante",
+          "look": "Mota cautiva de una estrella agonizante, de oro fundido y envuelta en chispas orbitales, sobre una vara negra cósmica grabada con constelaciones brillantes.",
+          "lore": "No es la estrella caída, sino la última mota de una moribunda: una sola ascua de oro fundido de un sol ya extinguido, envuelta en las chispas que fueron su última luz. Su vara negra cósmica lleva grabadas las constelaciones que lo vieron morir. Los campesinos de Mirefen dicen que concede un deseo a quien la sostenga en el crepúsculo verdadero; también dicen que cada alma que la sostuvo pidió más tiempo y que la Luna Ahogada no se lo concedió a ninguna."
+        },
+        "encore_bow": {
+          "name": "Encore, la Segunda Estrella Caída",
+          "look": "Cañón estelar cómicamente enorme: un tubo negro cósmico grabado con constelaciones doradas brillantes, boca acampanada con un proyectil cometario de oro fundido en su interior, herrajes de latón y culata de madera.",
+          "lore": "Los herreros que trabajaron la estrella caída fabricaron seis reliquias y aún les sobró un tubo entero de metal estelar; para entonces, los aprendices ya tenían sus propias ideas. Lo que salió del yunque es el primer fusil del reino o su máquina de asedio más pequeña: un cañón de hombro que no dispara tanto como solicita una segunda estrella, pero apuntada. El Hermano Aldric se negó a bendecirlo, pues razonó que cualquier cosa tan ruidosa ya ha llamado la atención del cielo. A los cazadores les encanta. A nada situado en su trayectoria le ha gustado jamás."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Cerrojo Meteórico, Último Juicio del Cielo",
+          "look": "Metal estelar meteórico, núcleo de oro fundido a lo largo de la cureña, palas negras cósmicas grabadas con constelaciones y un virote de fuego estelar puro listo para disparar.",
+          "lore": "Forjada con metal estelar meteórico en bruto mientras el cráter de Mirefen aún brillaba, restos «demasiado calientes para tocarlos» martillados hasta formar palas negras como el cosmos, grabadas con constelaciones, y un núcleo de oro fundido contenido a lo largo de la cureña. No carga ningún virote, sino que conjura uno: un astil de fuego estelar que sale como un veredicto y cae como el final de una sentencia. Cuando Highwatch temió que incluso la corona inmortal de Nythraxis no fuese lo peor oculto bajo las cumbres, esta era el arma que querían en el muro. Apunta bien."
+        }
+      },
+      "seasonOne": "Temporada 1",
+      "rarity": {
+        "uncommon": "Poco común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
+      },
+      "wtype": {
+        "sword": "Espada",
+        "axe": "Hacha",
+        "mace": "Maza",
+        "dagger": "Daga",
+        "staff": "Bastón",
+        "wand": "Varita",
+        "bow": "Arco",
+        "crossbow": "Ballesta"
+      },
+      "badge": {
+        "flagship": "Emblemático",
+        "hero": "Héroe"
+      },
+      "inspectAria": "Examinar {item}",
+      "viewModeLabel": "Modo de vista previa",
+      "tryOn": "Probar",
+      "weaponOnly": "Solo arma",
+      "sceneLabel": "Iluminación de la escena",
+      "scene": {
+        "day": "Día",
+        "dusk": "Crepúsculo",
+        "night": "Noche"
+      },
+      "lore": "Trasfondo",
+      "buySkin": "Comprar apariencia",
+      "unavailable": "No disponible",
+      "applied": "Aplicado",
+      "apply": "Aplicar apariencia",
+      "detach": "Quitar apariencia",
+      "equipHint": "Equipa un arma del tipo {type} para aplicar esta apariencia."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Abrir Claudium",
+      "close": "Cerrar Claudium",
+      "loading": "Cargando Claudium...",
+      "balanceLabel": "Saldo",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "La tienda de Claudium no está disponible en este momento. Tu saldo y tus compras no se verán afectados; vuelve a intentarlo dentro de poco.",
+      "disclosure": "Claudium es una moneda virtual unidireccional: se compra con dinero y se gasta en cosméticos. No se puede canjear, transferir ni convertir en dinero.",
+      "buyTitle": "Comprar Claudium",
+      "railLabel": "Forma de pago",
+      "railStripe": "Tarjeta",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20 % de descuento",
+      "railWocUnavailable": "Los precios en WOC no están disponibles en este momento.",
+      "railNativeUnavailable": "SOL/WOC no disponible.",
+      "amountLabel": "Cantidad",
+      "showAmounts": "Mostrar todas las cantidades de Claudium",
+      "hideAmounts": "Ocultar cantidades adicionales de Claudium",
+      "skuRow": "{claudium} Claudium por {usd}",
+      "buyButton": "Comprar",
+      "buyUnavailable": "Las compras no están disponibles en este momento.",
+      "storeTitle": "Tienda de cosméticos",
+      "storeEmpty": "No hay cosméticos disponibles en este momento.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Canjear",
+      "kindCosmetic": "Cosmético",
+      "kindSkin": "Apariencia",
+      "kindItem": "Objeto",
+      "checkoutTitle": "Completar compra",
+      "checkoutClose": "Cerrar el pago",
+      "checkoutLoading": "Cargando el pago...",
+      "checkoutPending": "Transacción en curso. Confírmala en tu cartera y mantén abierto este panel.",
+      "checkoutPendingButton": "Procesando",
+      "checkoutFailed": "No se pudo cargar el pago. Inténtalo de nuevo.",
+      "checkoutUnavailable": "Esa compra de Claudium no está disponible en este momento.",
+      "checkoutWalletRequired": "Conecta una cartera de Solana antes de comprar Claudium con criptomonedas.",
+      "checkoutWalletUnsupported": "Esta cartera no puede firmar ni enviar transacciones de Solana.",
+      "checkoutNotSettled": "La transacción se envió, pero el Claudium aún no se ha abonado. Vuelve a intentarlo dentro de poco."
+    },
     "theme": {
       "preset": "Tema de la interfaz",
       "customColors": "Colores personalizados",
@@ -450,7 +707,7 @@ export const es: EnTranslations = {
     "mobile": {
       "jump": "Saltar",
       "leaderboard": "Clasificación",
-      "dailyRewards": "Recompensas",
+      "dailyRewards": "Tienda",
       "deeds": "Gestas",
       "nameplates": "Nombres",
       "nameplatesOff": "Names Off",
@@ -476,12 +733,12 @@ export const es: EnTranslations = {
       "talkBodyTouch": "Acércate al mariscal Redbrook y toca el botón Usar para hablar; luego acepta su tarea.",
       "returnBodyTouch": "Tu tarea está hecha. Vuelve con el mariscal Redbrook y toca el botón Usar para entregarla.",
       "doneBodyTouch": "Ya dominas lo básico, {name}. El Valle es tuyo para explorar: toca Más y luego Diario de misiones para revisar tu diario de misiones en cualquier momento. ¡Buena caza!",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "¿Eres nuevo en el combate? Pulsa {targetKey} o haz clic en un lobo para seleccionarlo y luego usa una habilidad de la barra de acción para atacarlo.",
+      "slayTargetHintTouch": "¿Eres nuevo en el combate? Toca un lobo para seleccionarlo y luego toca una habilidad de la barra de acción para atacarlo.",
+      "nextTipsTitle": "Adónde ir ahora",
+      "nextTipQuestLog": "Abre tu Diario de misiones ({key}) para encontrar la siguiente tarea cercana.",
+      "nextTipMap": "Consulta el mapa del mundo ({key}) para ver dónde te esperan misiones.",
+      "nextTipSocial": "Abre el panel Social ({key}) para buscar un grupo para los combates más difíciles."
     },
     "widgets": {
       "clockTitle": "Hora local: haz clic para alternar 12/24 horas",
@@ -496,6 +753,15 @@ export const es: EnTranslations = {
       "bodyWithVersion": "La versión {version} de World of ClaudeCraft ya está disponible. Actualiza ahora para obtener las últimas correcciones y mejoras.",
       "notNow": "Ahora no",
       "update": "Actualizar"
+    },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
     },
     "castBar": {
       "playerAria": "Tu barra de lanzamiento",
@@ -542,7 +808,12 @@ export const es: EnTranslations = {
       "perSecond": "{value}/s",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
-      "seconds": "{s} s"
+      "seconds": "{s} s",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Rueda de gestos",
@@ -550,6 +821,7 @@ export const es: EnTranslations = {
       "targetFriendlyNext": "Objetivo amistoso siguiente",
       "discord": "Discord",
       "valecup": "Copa del Valle",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Mascota",
       "petAttack": "Mascota: atacar",
       "petStop": "Mascota: detenerse",
@@ -827,13 +1099,29 @@ export const es: EnTranslations = {
       "highContrast": "Alto contraste",
       "highContrastAria": "Alternar el fondo de alto contraste: desactiva el tráiler en movimiento para que el texto de la pantalla de inicio siga siendo legible"
     },
+    "warfare": {
+      "honorAmount": "{amount} de Honor",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Honor: {amount}",
+      "honorFloat": "+{amount} de Honor",
+      "honorGain": "Obtienes {amount} de Honor ({reason}).",
+      "notEnoughHonor": "No tienes suficiente Honor.",
+      "reasons": {
+        "arenaWin": "Victoria en la arena",
+        "fiestaKill": "Derribo en Fiesta",
+        "fiestaComplete": "Fiesta completada",
+        "fiestaWin": "Victoria en Fiesta"
+      }
+    },
     "statInfo": {
       "fromYour": "De tu {value} de {stat}:",
       "names": {
         "spellPower": "Poder con hechizos",
         "critRating": "Índice de golpe crítico",
-        "hasteRating": "Índice de celeridad"
+        "hasteRating": "Índice de celeridad",
+        "warfare": "Pericia bélica"
       },
+      "warfareValue": "+{increase}% infligido / -{reduction}% recibido",
       "desc": {
         "str": "Aumenta tu poder de ataque, así que tus golpes con el arma impactan con más fuerza.",
         "agi": "Agudiza tus reflejos y tu puntería, mejorando varias de tus estadísticas de combate.",
@@ -847,7 +1135,8 @@ export const es: EnTranslations = {
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
-        "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad."
+        "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
+        "warfare": "Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores."
       },
       "effects": {
         "attackPower": "+{value} de poder de ataque",
@@ -920,6 +1209,12 @@ export const es: EnTranslations = {
         "few": "eres {rank}, {count} miembros",
         "many": "eres {rank}, {count} miembros",
         "other": "eres {rank}, {count} miembros"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} personaje",
@@ -1072,7 +1367,7 @@ export const es: EnTranslations = {
     "corpseHarvest": {
       "title": "Recolectar",
       "harvestButton": "Recolectar",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Recolectar: obtén materiales de artesanía de este cadáver (piel, colmillos, seda y componentes similares), por separado del botín. Cualquiera puede recolectarlo, pero solo un jugador puede recolectar cada cadáver.",
       "concentrateHint": "Cuantos menos componentes elijas, mayor será la calidad de cada uno.",
       "alreadyHarvested": "Este cadáver ya ha sido recolectado.",
       "componentAria": "Recolectar {component}",
@@ -1100,6 +1395,19 @@ export const es: EnTranslations = {
       "promoteLeader": "Promover a líder",
       "inviteUsage": "¿Invitar a quién? Uso: /invite <nombre>."
     },
+    "playerMenu": {
+      "info": "Info del jugador",
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "openFor": "Abrir el menú de jugador de {name}",
+      "profileUnavailable": "No se encontró el perfil de {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Cuenta operada por IA",
+      "watchTwitch": "Ver en Twitch",
+      "watchX": "Ver en X",
+      "watchKick": "Ver en Kick",
+      "watchYouTube": "Ver en YouTube"
+    },
     "lootSettings": {
       "title": "Ajustes de botín",
       "close": "Cerrar ajustes de botín",
@@ -1117,7 +1425,7 @@ export const es: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Este elemento no se puede destruir.",
-      "rightClickDestroy": "Clic derecho para destruir",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -1273,7 +1581,7 @@ export const es: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Cofre",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Recoger todos: recoge todas las monedas y objetos de esta ventana de botín."
     },
     "spellbook": {
       "addToBarAria": "Añadir {name} a la barra de acción",
@@ -1348,7 +1656,8 @@ export const es: EnTranslations = {
         "connecting": "Abriendo Discord...",
         "benefits": "Vincula tu Discord para ganar puntos jugando y participando en la comunidad, y escalar los niveles de estatus.",
         "error": "No se pudo vincular Discord. Inténtalo de nuevo.",
-        "success": "Discord vinculado."
+        "success": "Discord vinculado.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continuar con Discord",
@@ -1396,8 +1705,13 @@ export const es: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Desarrollador principal",
         "devs": "Dev",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "artists": "Artista"
+        "juniormods": "Junior Mod",
+        "artists": "Artista",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Miembro verificado",
       "notMember": "Aún no estás en el servidor",
@@ -1650,7 +1964,15 @@ export const es: EnTranslations = {
     },
     "social": {
       "lastSeen": "Última conexión: {when}",
-      "lastSeenNever": "nunca"
+      "lastSeenNever": "nunca",
+      "ignoredTab": "Ignorados",
+      "blockedTab": "Bloqueados",
+      "ignoredEmpty": "No estás ignorando a nadie.",
+      "blockedEmpty": "No has bloqueado a nadie.",
+      "blockSearchPlaceholder": "Nombre del jugador",
+      "blockAction": "Bloquear",
+      "nowBlocking": "{name} bloqueado.",
+      "stopBlockingTitle": "Dejar de bloquear a {name}"
     },
     "gathering": {
       "title": "Recolección",
@@ -1688,6 +2010,107 @@ export const es: EnTranslations = {
       "notAtHub": "Debes estar en el centro de elaboración, con el nivel requerido, para elaborar eso.",
       "throttled": "Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.",
       "recipeNotLearned": "Aún no has aprendido esa receta."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Libro de Gestas",
@@ -1741,7 +2164,7 @@ export const es: EnTranslations = {
       "trackerLabel": "Gestas",
       "collapseHint": "Contraer rastreador de gestas",
       "expandHint": "Expandir rastreador de gestas",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Abrir el Libro de Gestas",
       "charTitleLabel": "Título",
       "charTitleNone": "Sin título elegido",
       "charOpenBook": "Libro de Gestas",
@@ -2428,6 +2851,10 @@ export const es: EnTranslations = {
       "dragonkin": {
         "name": "Dracónidos",
         "desc": "Criaturas escamosas y serpentinas de las viejas profundidades. Raras, orgullosas y mucho más fuertes de lo que aparentan."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {
@@ -5755,6 +6182,10 @@ export const es: EnTranslations = {
         "name": "Último Rito",
         "description": "Una enorme oleada de sanación: restaura {damage} de salud. Tiempo de reutilización de 10 min."
       },
+      "holy_taunt": {
+        "name": "Provocación sagrada",
+        "description": "Provoca al objetivo: tu amenaza aumenta hasta igualar la de su enemigo más odiado y lo obliga a atacarte durante 3 s."
+      },
       "flash_of_light": {
         "name": "Reparación de Luz",
         "description": "Un estallido de Luz rápido y eficiente que sana a un objetivo amistoso por {damage}."
@@ -6079,6 +6510,98 @@ export const es: EnTranslations = {
         "name": "Furia Hirviente",
         "description": "Entras en un frenesí hirviente y generas 20 de furia. (talento de guerrero)"
       },
+      "crusader_strike": {
+        "name": "Golpe de cruzado",
+        "description": "Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)"
+      },
+      "chain_heal": {
+        "name": "Sanación en cadena",
+        "description": "Sana una gran cantidad a un objetivo amistoso y luego salta a un máximo de 2 aliados cercanos adicionales, sanando un 50 % menos con cada salto. (habilidad distintiva de Restauración)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfosis",
+        "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
+      },
+      "holy_shock": {
+        "name": "Choque Sagrado",
+        "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"
+      },
+      "holy_shield": {
+        "name": "Escudo Sagrado",
+        "description": "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)"
+      },
+      "bestial_wrath": {
+        "name": "Cólera de las bestias",
+        "description": "Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)"
+      },
+      "trueshot_aura": {
+        "name": "Aura de disparo certero",
+        "description": "Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)"
+      },
+      "wyvern_sting": {
+        "name": "Picadura de dracoleón",
+        "description": "Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)"
+      },
+      "arcane_power": {
+        "name": "Poder Arcano",
+        "description": "Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)"
+      },
+      "combustion": {
+        "name": "Combustión",
+        "description": "Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)"
+      },
+      "icy_veins": {
+        "name": "Venas heladas",
+        "description": "Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)"
+      },
+      "cold_blood": {
+        "name": "Sangre fría",
+        "description": "Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)"
+      },
+      "blade_flurry": {
+        "name": "Aluvión de acero",
+        "description": "Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)"
+      },
+      "hemorrhage": {
+        "name": "Hemorragia",
+        "description": "Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)"
+      },
+      "power_infusion": {
+        "name": "Infusión de poder",
+        "description": "Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)"
+      },
+      "holy_nova": {
+        "name": "Nova Sagrada",
+        "description": "Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)"
+      },
+      "shadowform": {
+        "name": "Forma de las Sombras",
+        "description": "Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)"
+      },
+      "elemental_mastery": {
+        "name": "Maestría elemental",
+        "description": "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)"
+      },
+      "siphon_life": {
+        "name": "Succionar vida",
+        "description": "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)"
+      },
+      "conflagrate": {
+        "name": "Conflagrar",
+        "description": "Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)"
+      },
+      "moonkin_form": {
+        "name": "Forma de lechúcico lunar",
+        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
+      },
+      "feral_charge": {
+        "name": "Carga feral",
+        "description": "Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)"
+      },
+      "swiftmend": {
+        "name": "Alivio presto",
+        "description": "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)"
+      },
       "summon_imp": {
         "name": "Invocar Emberkin",
         "description": "Invoca a un Emberkin bajo el mando del brujo. El Emberkin lanza Descargas de Ceniza a tus enemigos desde la distancia. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
@@ -6106,6 +6629,34 @@ export const es: EnTranslations = {
       "summon_doomguard": {
         "name": "Invocar Wraithborn",
         "description": "Somete a un Wraithborn a tu voluntad: un demonio de élite que descarga un fuerte daño de las Sombras desde lejos. Un largo tiempo de reutilización refrena su poder devastador. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
+      },
+      "pummel": {
+        "name": "Rompequijadas",
+        "description": "Interrumpe el lanzamiento de hechizos del objetivo e impide lanzar hechizos de esa escuela durante 4 s."
+      },
+      "kick": {
+        "name": "Patada",
+        "description": "Interrumpe el lanzamiento de hechizos del objetivo e impide lanzar hechizos de esa escuela durante 4 s."
+      },
+      "counterspell": {
+        "name": "Ruptura de hechizos",
+        "description": "Contrarresta el lanzamiento de hechizos del objetivo e impide lanzar hechizos de esa escuela durante 6 s."
+      },
+      "counter_shot": {
+        "name": "Disparo silenciador",
+        "description": "Un disparo rápido que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s."
+      },
+      "rebuke": {
+        "name": "Reproche",
+        "description": "Interrumpe el lanzamiento de hechizos del objetivo e impide lanzar hechizos de esa escuela durante 4 s."
+      },
+      "skull_bash": {
+        "name": "Cabezazo",
+        "description": "Un cabezazo en embestida que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s."
+      },
+      "spell_lock": {
+        "name": "Orden de silencio",
+        "description": "Silencia al objetivo en pleno lanzamiento e impide lanzar hechizos de esa escuela durante 5 s."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
@@ -6749,6 +7300,126 @@ export const es: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Hierba Pétalo de Sol"
+      },
+      "furyforged_warhelm": {
+        "name": "Yelmo de guerra forjafuria"
+      },
+      "furyforged_warspaulders": {
+        "name": "Hombreras de guerra forjafuria"
+      },
+      "furyforged_warplate": {
+        "name": "Coraza de guerra forjafuria"
+      },
+      "furyforged_girdle": {
+        "name": "Cinturón forjafuria"
+      },
+      "furyforged_legguards": {
+        "name": "Guardapiernas forjafuria"
+      },
+      "furyforged_gauntlets": {
+        "name": "Guanteletes forjafuria"
+      },
+      "furyforged_sabatons": {
+        "name": "Escarpes forjafuria"
+      },
+      "stormbound_crown": {
+        "name": "Corona ligada a la tormenta"
+      },
+      "stormbound_spaulders": {
+        "name": "Hombreras ligadas a la tormenta"
+      },
+      "stormbound_hauberk": {
+        "name": "Cota ligada a la tormenta"
+      },
+      "stormbound_waistguard": {
+        "name": "Guardacintura ligado a la tormenta"
+      },
+      "stormbound_legmail": {
+        "name": "Malla de piernas ligada a la tormenta"
+      },
+      "stormbound_handguards": {
+        "name": "Guardamanos ligados a la tormenta"
+      },
+      "stormbound_greaves": {
+        "name": "Grebas ligadas a la tormenta"
+      },
+      "ashstalker_cowl": {
+        "name": "Caperuza del acechador de ceniza"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Guardahombros del acechador de ceniza"
+      },
+      "ashstalker_harness": {
+        "name": "Arnés del acechador de ceniza"
+      },
+      "ashstalker_waistband": {
+        "name": "Faja del acechador de ceniza"
+      },
+      "ashstalker_legguards": {
+        "name": "Guardapiernas del acechador de ceniza"
+      },
+      "ashstalker_grips": {
+        "name": "Guantes del acechador de ceniza"
+      },
+      "ashstalker_treads": {
+        "name": "Botines del acechador de ceniza"
+      },
+      "cinderweave_cowl": {
+        "name": "Caperuza de tejido de ascuas"
+      },
+      "cinderweave_mantle": {
+        "name": "Manto de tejido de ascuas"
+      },
+      "cinderweave_raiment": {
+        "name": "Vestidura de tejido de ascuas"
+      },
+      "cinderweave_cord": {
+        "name": "Cordón de tejido de ascuas"
+      },
+      "cinderweave_legwraps": {
+        "name": "Vendas de piernas de tejido de ascuas"
+      },
+      "cinderweave_handwraps": {
+        "name": "Vendas de manos de tejido de ascuas"
+      },
+      "cinderweave_slippers": {
+        "name": "Zapatillas de tejido de ascuas"
+      },
+      "final_oath_medallion": {
+        "name": "Medallón del juramento final"
+      },
+      "razorwind_torque": {
+        "name": "Gargantilla del viento cortante"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Colgante del sigilo de ascua"
+      },
+      "iron_vow_band": {
+        "name": "Sortija del voto de hierro"
+      },
+      "unbroken_circle": {
+        "name": "El círculo inquebrantable"
+      },
+      "fleetblood_band": {
+        "name": "Sortija de sangre veloz"
+      },
+      "last_step_signet": {
+        "name": "Sello del último paso"
+      },
+      "ashen_focus_ring": {
+        "name": "Anillo de enfoque cinéreo"
+      },
+      "spellbreakers_seal": {
+        "name": "Sello del rompehechizos"
+      },
+      "final_argument_greatblade": {
+        "name": "Mandoble del argumento final"
+      },
+      "first_blood_razor": {
+        "name": "Navaja de primera sangre"
+      },
+      "emberglass_warstaff": {
+        "name": "Bastón de guerra de cristal de ascuas"
       },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"
@@ -7622,6 +8293,15 @@ export const es: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardián Imperecedero"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofante Imperecedero"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Cuchillo Imperecedero"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"
       },
@@ -7889,6 +8569,11 @@ export const es: EnTranslations = {
         "name": "Intendente Vex",
         "title": "Intendente Heroico",
         "greeting": "La prueba de las profundidades heroicas compra los mejores anillos y colgantes de Highwatch. Muéstrame tus marcas."
+      },
+      "fury": {
+        "name": "FURIA",
+        "title": "Intendente de Honor",
+        "greeting": "Las arenas recuerdan cada victoria. Gasta tu Honor con sabiduría."
       },
       "loremaster_caddis": {
         "name": "Maestro de saber Caddis",

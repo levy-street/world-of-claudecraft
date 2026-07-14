@@ -377,6 +377,263 @@ export const nl_NL: EnTranslations = {
         "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC-winkel",
+      "close": "WOC-winkel sluiten",
+      "tabsLabel": "Onderdelen van de WOC-winkel",
+      "storeTab": "Winkel",
+      "rewardsTab": "Dagelijkse beloningen",
+      "loading": "WOC-winkel laden...",
+      "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
+      "balance": "Claudium-saldo",
+      "buyClaudium": "Claudium kopen",
+      "owned": "In bezit",
+      "needMoreTitle": "Meer Claudium vereist",
+      "needMoreBody": "Je hebt {shortfall} meer Claudium nodig om {item} te kopen.",
+      "cancel": "Annuleren",
+      "confirmTitle": "Cosmetische aankoop bevestigen",
+      "confirmBody": "{item} voor {cost} Claudium kopen?",
+      "confirmPurchase": "Kopen",
+      "priceChanged": "De prijs veranderde voordat de aankoop voltooid was. Bekijk de vernieuwde prijs en bevestig opnieuw.",
+      "armoryEyebrow": "Seizoen 1",
+      "armoryTitle": "Het Arsenaal",
+      "armoryBody": "Gelimiteerde wapenskins uit de Wapenkamer van seizoen 1. Ze gelden voor je hele account, zijn puur cosmetisch en zijn zichtbaar voor iedereen om je heen.",
+      "collectionLine": "{collection}-collectie",
+      "collections": {
+        "guildmark": "Gildemerk",
+        "emberwrought": "Sintelgesmeed",
+        "hoarfrost": "Rijp",
+        "fallen_star": "Gevallen ster"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Gildemerk-Wapenzwaard",
+          "look": "Geblauwd stalen lemmet, bronzen vissenstaart pareerstang, groenblauw geverfde leren handgreep, klein gestempeld gildeteken.",
+          "lore": "Waar het gesmeed mes anoniem is, is deze gesigneerd. Een wapensmid krijgt pas het recht om zijn stempel in de ricasso te slaan als de koopman van de Wereldmarkt voor zijn staal instaat, en voor het merk van Smith Haldren. Blauwgeblakerd tegen het vocht van de Vale, tot op een haartje uitgebalanceerd. Je betaalt evenveel voor de postzegel als voor het zwaard, en het is het waard."
+        },
+        "brasscap_axe": {
+          "name": "Messingkapbijl",
+          "look": "Bit van gepolijst staal, messing dop en langets op een gelakte essenhouten heft, netjes omwikkeld, een stempel van de maker.",
+          "lore": "Een gestempelde bijl is een opschepperij die je kunt koesteren. De koperen dop en langets zijn half pantser, half signatuur: ze zorgen ervoor dat het heft niet splijt en vangen het licht van de herberg op, zodat iedereen weet dat je het werk van Armorer Hode hebt gekocht, en niet het werk van een militie. 'Als het bezuinigt, verkoop ik het', zegt de Highwatch-smid. Deze snijdt."
+        },
+        "tempered_flanged_mace": {
+          "name": "Geharde flensknots",
+          "look": "Kop van gehard blauw staal met zes flenzen, messing kraag en pommel, wijnrood leren handvat.",
+          "lore": "Zes flenzen van geblauwd, gehard staal, elk geslepen om een helm open te breken, afgewerkt met messing en omwikkeld met wijnrood leer. De pantsersmeden van het rijk maken geen lelijke wapens, zelfs niet wanneer het werk bruut is. Deze werd via de Wereldmarkt besteld en niet zomaar uit een rek gepakt. Ergens ligt een grootboek met de naam van een trotse koper en het bedrag dat hij Hode ervoor betaalde."
+        },
+        "guildmark_dirk": {
+          "name": "Gildemerk-Dirk",
+          "look": "Slanke dirk van gehard staal, bronzen beschermkap en pommelmoer, donkergroene koordgreep, gestempeld sigil.",
+          "lore": "Wat een gevestigd heer draagt wanneer het zwaard thuisblijft: slank, gehard en gestempeld met hetzelfde merk dat een volledige kling waarmerkt, aan de riem gedragen als een zegelring met een snede. Onopvallend voor iedereen behalve wie het bewijs van een pantsersmid kan lezen. Kwartiermeester Bree bewaart er in Hoogwacht een lade vol van voor officieren die het respect van de muur hebben verdiend."
+        },
+        "brasscrown_staff": {
+          "name": "Messingkroon-Wandelstaf",
+          "look": "Hardhouten staf met daarop een gedraaide koperen kroonknop, koperen ring en geverfde leren band.",
+          "lore": "Gemaakt van doorgewinterd hardhout en bekroond met een koperen kruisbloem die door de Eastbrook-smeden per honderd is gegoten, maar perfect door één. Het behoort tot het soort reiziger dat zowel bij de poort van Fenbridge als bij de muur van Highwatch serieus genomen wil worden. Een wandelstok die nooit echt heeft hoeven lopen; de geverfde band past bij een jas waarvan je de prijs wel kunt raden."
+        },
+        "lacquered_wand": {
+          "name": "Gelakte Staf",
+          "look": "Slanke, dieprood gelakte toverstaf, twee gepolijste koperen banden, kleine ronde koperen punt.",
+          "lore": "Dieprode lak in zeven geduldige jassen, tweemaal omwikkeld met gepolijst koper: het soort toverstok dat een heggenmagiër op de Wereldmarkt koopt zodra ze echte munten zijn gaan opladen en ernaar willen kijken. Het kanaliseert het licht niet beter dan een berkenstok. Maar het glanst prachtig over de toonbank van de Koopman, en de helft van de kleine magie is altijd geloofd."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Boog van het Pijlenmakersgilde",
+          "look": "Gelakte notenhouten recurvestrijkstok, messing uiteinden van de ledematen, gewaxte linnen snaar, een gildestempel op de stijgbuis.",
+          "lore": "Wat het rijk het dichtst bij een gilde brengt, is een stempel van een fletcher op de stijgleiding, een belofte over wat erin zit, zoals een wijnboer een vat verzegelt. Gelakt walnoothout, messing aan de uiteinden van de ledematen, een gewaxt linnen koord dat niet rafelt door een Mirefen-regen. Elke joint pleit voor de prijs. Trek het één keer voorbij het Widow Struikgewas en het argument wint."
+        },
+        "cinderbrand_sword": {
+          "name": "Sintelbrand",
+          "look": "Mes van donker gesmeed staal, voller gevuld met gloeiende sinteloranje runen, hittescheuren en een smeulend juweel in de beschermer.",
+          "lore": "Het eerste mes werd niet in water geblust, maar in gezegende sintels, geharkt uit Stormcrag, de kolen waarvan de Highwatch-smeden zweren dat ze 'blauw en schoon branden, omdat de berg zich zijn oude eed herinnert.' In de volle laag smeult dat vuur sinteloranje en zal niet doven; de runen blijven warm tot aan de blote hand tijdens de koudste nacht van de muur. Cinderbrand heeft nooit verlichting nodig. Het weigert eenvoudigweg om naar buiten te gaan."
+        },
+        "emberbite_axe": {
+          "name": "Sintelbeet",
+          "look": "Een bijl van zwart ijzer met oranje-oranje scheuren die door het bit heen gloeien, een steenkoolsteen, sliertjes hitte.",
+          "lore": "Armorer Hode werkte een steenkool van bergvuur in het hart van het bit, zodat de rand tussen de slagen nooit echt afkoelt. De scheuren ademen oranje tijdens de neerwaartse beweging, alsof de slag iets wakker maakt dat door het eerste smeden in het ijzer is blijven slapen. Ze zeggen dat een Stormcrag-elementaal de kolen ervoor heeft opgegeven; ze zeggen heel veel dingen bij Highwatch als de wind op is."
+        },
+        "smoulderfall_mace": {
+          "name": "Smeulval",
+          "look": "Donkere ijzeren flenzen gloeien sinteloranje langs de binnenste scheuren, een edelsteen met gesmolten kern in de kop.",
+          "lore": "Een strijdknots die zijn eigen haard draagt: een steen met gesmolten kern, afgebroken van het Sanctum-zegel en 'gesmeed met bergvuur', gloeiend in het hoofd. De flenzen blijven warm aanvoelen en warmer waar ze landen; een Highwatch-sergeant zweert dat een klap ervan een blauwe plek achterlaat die tot de ochtend zwak gloeit. Het vuur van de berg, eindelijk gemaakt om te breken in plaats van te verzegelen."
+        },
+        "ashspark_dagger": {
+          "name": "Asvonkmes",
+          "look": "Kort, zwartgeblakerd lemmet dooraderd met gloeiend sinteloranje, een klein smeulend juweeltje in de pommel, as en vonk.",
+          "lore": "Een mes uit een steegje met het vuur van de berg in de pommelsteen gesmokkeld, de stille grap van een wapensmid: zelfs een handtas zou een sintel van het eerste smeedstuk kunnen bevatten. Zwartgeblakerd, oranje geaderd, altijd een tintje te warm in de schede. Teken het in het donker onder Highwatch en de gloed verlicht je hand net genoeg om het gat in de bewaker van een man te vinden."
+        },
+        "forgeheart_staff": {
+          "name": "Smeedhartstaf",
+          "look": "Met ijzer beslagen staf bekroond met een gekooide gloeiende sintelkern, sintelrunen omhoog in de schacht, opstijgende hitte-glinstering.",
+          "lore": "Een levende steenkool van bergvuur, aan de kruin in ijzer gekooid. Loremaster Caddis noemt het het bewijs dat het vuur van het eerste smeden kan dienen om te dienen, en niet alleen om te verzegelen. Warmte-glinstering stijgt eruit op in een dun, eindeloos lint; een magiër die iemand draagt, heeft nooit behoefte aan een smederij of een wachtvuur. De sintel, zo fluisteren ze, werd uit de adem van Voskar de Sintelvleugel gehaald, en is sindsdien niet meer afgekoeld."
+        },
+        "emberwrought_wand": {
+          "name": "Sintelgesmede Toverstaf",
+          "look": "Zwartgeblakerde metalen toverstok met een gloeiende kolenkool in ijzeren klauwen, haarscheurtjes in de hitte, warm innerlijk licht.",
+          "lore": "De toverstaf die het cijfer noemde. Toen een Highwatch-wapenmaker voor het eerst een steenkool van bergvuur in ijzeren klauwen stak en deze een sterfelijke hand liet beantwoorden, noemden zelfs de Priester's van het Licht het niet langer ketterij en begonnen het nuttig te noemen. Warm, geduldig en stilletjes gevaarlijk: het kooltje aan de punt brandt al onafgebroken voordat de eigenaar ademhaalde."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Sintelslot",
+          "look": "Een kruisboog van zwart staal, een sinteloranje gloed die uit de scheuren in de prikstok sijpelde, een smeulende kool in de helmstok.",
+          "lore": "Het vreemdste van de gesmeed sintels: het vuur van de berg stroomde in een machine. Sinaasappel sijpelt uit de scheuren in de prikstok, en een smeulende kool in de helmstok zorgt ervoor dat de snaar nooit verstijft in de kou van Thornpeak of de vochtigheid van Mirefen. De bouten verlaten de groef al warm en het land warmer. Het antwoord van een jager op een muur waar de vijand de kou ook niet voelt."
+        },
+        "ice_fang_sword": {
+          "name": "IJstand",
+          "look": "Gebogen blad van bleek gletsjerijs, gekartelde rijpkristallen langs de ruggengraat, een gloeiende cyaan bevroren kern in de vollere, ijspegelpareerstang.",
+          "lore": "Het vlaggenschip van de diepvriesklasse, en het stuk waar elke verzamelaar als eerste naar reikt. Ice Fang was gesneden, niet gesmeed, uit een hoektand van de gletsjer die Thornpeak boven Highwatch afdekt, waarvan de cyaan kern koud brandde als het licht van de Glimmermere. Het rijpt de lucht die het snijdt. De muurwachter zweert dat één soldaat hem heeft gedragen op de avond dat de hoge sneeuw de Wyrmcult tegenhield, en 'de muur voor een winter heeft gekocht'."
+        },
+        "glaciersplit_axe": {
+          "name": "Gletsjersplijter",
+          "look": "Een kop van doorschijnend blauw gletsjerijs, een gebarsten binnenkant van gloeiend cyaan, borstelige ijskristallen en een handvat dat koude damp achterlaat.",
+          "lore": "Gehouwen uit het blauwe hart van de Thornpeak-gletsjer, waar twee eeuwen ijs de kou hebben onderdrukt totdat deze uit zichzelf gloeit. Zelfs in rust laat hij damp achter, en de scheur waarin hij landt is een gletsjerspleet onder de Besluipener Ridge. Highwatch geeft zijn gevallenen daarboven aan het ijs; dit is dus een wapen dat bedoeld is om de dooi, en wat de dooi ook zou veroorzaken, op afstand te houden."
+        },
+        "rimecrusher_mace": {
+          "name": "Rijpverbrijzelaar",
+          "look": "Een cluster van grillige ijskristallen rond een gloeiende cyaankern, terwijl rijp langs een verzilverde steel naar beneden kruipt.",
+          "lore": "Niet uitgesneden maar gegroeid: Thornpeak-ijs lokte rond een koude cyaankern totdat het zo hard werd als Hode's beste staal. Rijm kruipt langs het verzilverde handvat naar de hand en komt nooit helemaal aan. Waar het toeslaat, bevriest het water; waar het rust, wordt de grond wit. De ernstige kou van de toppen, klein genoeg gemaakt om te slingeren naar de dingen die tegen de muur klimmen."
+        },
+        "frostbite_dagger": {
+          "name": "Rijpnaald",
+          "look": "Een griezelig dunne dolk van helderblauw ijs, een gloeiende cyaanader in het midden, naaldvorstkristallen en een rijp gevest.",
+          "lore": "Dun als een ingehouden adem en twee keer zo koud: een splinter van de Thornpeak-gletsjer aangescherpt tot een enkele gloeiende ader, zo scherp dat de wond dichtgevroren is voordat het bloed eraan denkt te stromen. De naam is ontleend aan de ernstige kou die de doden van de bergtoppen meedragen. Het hoeft nooit te worden verscherpt; ijs wordt niet dof, merkt Loremaster Caddis droogjes op, het wacht alleen maar."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Rijpwake",
+          "look": "Verzilverde staf bekroond met een zwevende, langzaam roterende scherf van gloeiend cyaanijs, waaruit kristallen en koude damp voortkomen.",
+          "lore": "De staf van de wacht die nooit aan de muur van Highwatch slaapt. De kroon is een scherf cyaan-tarn-ijs dat vrij van het zilver drijft en langzaam uit zichzelf draait: altijd, zo zweert de bewaker, in de richting van de kou die zich onder de toppen verzamelt. Het dragen van de wake betekent tweehonderd jaar wacht houden in één nacht, en beloven niet weg te kijken."
+        },
+        "everwinter_wand": {
+          "name": "Scherf van de Eeuwige Winter",
+          "look": "Een enkele piek van gloeiend cyaan gletsjerijs, rijp die uit een zilveren kraag bloeit, zwakke koude mist.",
+          "lore": "Een piek van gloeiend gletsjerijs, naar verluidt gebroken uit het diepe bergmeer onder het Sanctum, waar de kou van de berg tanden heeft. Rijp bloeit eindeloos uit zijn zilveren kraag en smelt nooit, niet door vuur, noch door de zomer. Magiër's houden het dichtbij vanwege de kou die het hun werk leent, en houden het ver weg op de avonden dat het naar de crypte van Nythraxis lijkt te leunen en te luisteren."
+        },
+        "winterbite": {
+          "name": "Winterbeet",
+          "look": "Boog van verzilverd staal en blauw ijs, een gloeiende cyaan bevroren kern in de stijgbuis, een nokvormige pijl van massief ijs, koude damp.",
+          "lore": "Een boog van verzilverd staal en ijs uit Doorntop, met in het middenstuk een koude cyaankern die de pijl aan de pees vastvriest. De boog legt een schacht van massief gletsjerijs aan die zich bij elke trek opnieuw vormt. De schutter draagt op de muur geen pijlkoker, alleen de kou. Met zo'n boog hield Hoogwacht de Belagerrug tijdens een belegering: één schutter, zo wordt verteld, en een wintervoorraad pijlen die er altijd al waren."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Laatste licht van de dageraad",
+          "look": "Een grootzwaard gesmeed uit een gevallen ster, een kern van gesmolten goud die het lemmet splijt, kosmoszwart staal met een rand in sterrenlicht, gouden scherven die rond de bewaker cirkelen, een aurora-lint.",
+          "lore": "Toen de ster uit de westelijke hemel viel en 'als een smidse' voorbij het weduwenstruikgewas barstte, trok broeder Aldric zijn nog smeulende hart uit de Mirefen-krater en smeekte de smeden van het rijk om 'iets te maken dat niet tot deze wereld behoort'. Ze hebben er één grootzwaard van gemaakt: Solheim. De gesmolten gouden kern splijt het kosmoszwarte blad als de dageraad die een nachtelijke hemel kraakt, en scherven van stermetaal cirkelen rond de bewaker op paden waar geen hand voor is ingesteld. Er is er maar één ooit vervalst. Er zal geen ander zijn."
+        },
+        "skyrender_axe": {
+          "name": "Hemelsplijter, De Wond van het Firmament",
+          "look": "Hoofd als een gescheurd stuk nachtelijke hemel, scheuren van gesmolten goud en etsen van sterrenbeelden, zwevende scherven van sterrenlicht, een aurora-glans langs de rand.",
+          "lore": "Geslagen vanaf de rand van de krater, waar de gevallen ster het spiegelbeeld van de hemel uit Mirefen scheurde en een wond achterliet die nog steeds stoomt. Het hoofd ziet eruit als een stuk verscheurde nacht: scheuren van gesmolten goud, sterrenbeelden die geen wetenschapper bij Highwatch kan noemen, een aurora die bij elke beweging van de rand bloedt. Broeder Aldric zegende het en wilde het niet aanraken. Het optillen betekent het gat vasthouden dat de hemel achterliet."
+        },
+        "starfall_mace": {
+          "name": "Sterrenval, Oordeel van de Hemel",
+          "look": "Gevangen gesmolten gouden sterkern omringd door rondcirkelende fragmenten, kosmoszwarte flenzen dooraderd met sterrenlicht, aurora die uit de naden spat.",
+          "lore": "Een sterkern werd gevangen vlak voordat hij stierf, omringd door het puin dat ermee viel, bevroren op een paar centimeter afstand van de vergetelheid. De kosmoszwarte flenzen lopen door van opgesloten sterrenlicht, en aurora komt uit de naden wanneer het omhoog wordt gebracht. De oude Priester's van het Licht noemden een vallende ster een oordeel, een oordeel van bovenaf dat geen enkel schild mocht tegenhouden, en noemden dit naar degene die op Mirefen neerkwam."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Hoektand van de Gevallen Ster",
+          "look": "Een stukje van een gevallen ster, een gloeiende rand van gesmolten goud op kosmoszwart metaal, een heldere sterdeeltjes die rond de pommel cirkelen, een dun auroraspoor.",
+          "lore": "Het kleinste stukje van de ster dat Aldric uit de krater haalde, en volgens sommigen het gevaarlijkste. Eén enkel stukje van dat buitenaardse hart, met de gesmolten gouden rand op kosmoszwart metaal, een eenzame sterstof die rond de pommel cirkelt als een maan die zijn wereld heeft verloren. Hij weegt bijna niets en deelt bijna alles. Klein genoeg om te verbergen, helder genoeg om in het donker door zijn eigen licht te vinden."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Spits van de Eindeloze Leegte",
+          "look": "Ronddraaiende cluster van gouden sterrenscherven rond een kern van gesmolten goud, een door sterrenbeelden geëtste kosmoszwarte schacht, aurora-linten die naar boven kronkelen.",
+          "lore": "Een schacht van stermetaal bekroond met een kern van gesmolten goud en een ring van gouden scherven die er in een langzame, eindeloze baan omheen marcheren: een kleine kosmos, geëtst met sterrenbeelden die bij geen enkele hemel boven Thornpeak passen. Aurora slingert zich omhoog als rook die vergat op te stijgen. Degenen die het droegen, beweerden dat ze de leegte er doorheen konden voelen stromen, zoals Ysolei louter 'het maanlicht drinkt': geduldig en koud, en terugkijkend."
+        },
+        "emberwish_wand": {
+          "name": "Sintelwens, Vonk van de Stervende Zon",
+          "look": "Gevangen gesmolten gouden stervende sterrenstof omhuld door rondcirkelende vonken, kosmoszwarte schacht geëtst met gloeiende sterrenbeelden.",
+          "lore": "Niet de gevallen ster zelf, maar het laatste splintertje van een stervende: een enkele gesmolten gouden gloed van een zon die al is uitgedoofd, omhuld door de vonken die het laatste licht vormden. De kosmoszwarte schacht is geëtst met de sterrenbeelden die hem zagen sterven. De Mirefen-boeren zeggen dat het één wens vervult voor degene die het in de echte schemering vasthoudt; ze zeggen ook dat elke ziel die het vasthield meer tijd wenste, en dat de Verdronken Maan niemand van hen dat gunde."
+        },
+        "encore_bow": {
+          "name": "Encore, de tweede vallende ster",
+          "look": "Komisch extra groot sterrenkanon: een kosmoszwarte loop geëtst met gloeiende gouden sterrenbeelden, een uitlopende klokkenmond met daarin een gesmolten gouden komeetschelp, koperen fittingen, een houten schouderkolf.",
+          "lore": "De smeden die de gevallen ster bewerkten, maakten er zes relikwieën van en hadden nog een vat stermetaal over, en tegen die tijd hadden de leerlingen er een mening over. Wat uit het aambeeld kwam, is het eerste kanon van het rijk, of de kleinste belegeringsmachine: een schouderkanon dat niet zozeer een schot loslaat als wel een tweede ster vraagt, gericht. Broeder Aldric weigerde het te zegenen, omdat hij redeneerde dat alles wat zo luid is al door de hemel is opgemerkt. Jager's zijn er dol op. Er is niets downrange ooit gebeurd."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteoorslot, Het Laatste Oordeel van de Hemel",
+          "look": "Meteorisch stermetaal, gesmolten gouden kern langs de helmstok, kosmoszwarte ledematen geëtst met sterrenbeelden, een nokvormige straal van puur sterrenvuur.",
+          "lore": "Gesmeed uit ruw meteorisch stermetaal terwijl de Mirefen-krater nog gloeide, puin 'te heet om te hanteren', in kosmoszwarte ledematen gehamerd met sterrenbeelden, en een gesmolten gouden kern langs de helmstok. Het slaat geen grendel, maar roept er een op: een straal van sterrenvuur, losgelaten als een vonnis en neerkomend als het einde van een. Toen Highwatch vreesde dat zelfs de onsterfelijke kroon van Nythraxis misschien niet het ergste onder de toppen zou zijn, was dit het wapen dat ze aan de muur wilden hebben. Richt het goed."
+        }
+      },
+      "seasonOne": "Seizoen 1",
+      "rarity": {
+        "uncommon": "Ongewoon",
+        "rare": "Zeldzaam",
+        "epic": "Episch",
+        "legendary": "Legendarisch"
+      },
+      "wtype": {
+        "sword": "Zwaard",
+        "axe": "Bijl",
+        "mace": "Foelie",
+        "dagger": "Dolk",
+        "staff": "Staf",
+        "wand": "Toverstaf",
+        "bow": "Boog",
+        "crossbow": "Kruisboog"
+      },
+      "badge": {
+        "flagship": "Vlaggenschip",
+        "hero": "Held"
+      },
+      "inspectAria": "Inspecteer {item}",
+      "viewModeLabel": "Voorbeeldmodus",
+      "tryOn": "Uitproberen",
+      "weaponOnly": "Alleen wapen",
+      "sceneLabel": "Voorbeeldbelichting",
+      "scene": {
+        "day": "Dag",
+        "dusk": "Schemering",
+        "night": "Nacht"
+      },
+      "lore": "Achtergrondverhaal",
+      "buySkin": "Skin kopen",
+      "unavailable": "Niet beschikbaar",
+      "applied": "In gebruik",
+      "apply": "Skin toepassen",
+      "detach": "Skin verwijderen",
+      "equipHint": "Rust een {type} uit om deze skin aan te brengen."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Claudium openen",
+      "close": "Claudium sluiten",
+      "loading": "Claudium laden...",
+      "balanceLabel": "Saldo",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "De Claudium-winkel is momenteel niet beschikbaar. Je saldo en aankopen zijn niet aangetast. Probeer het binnenkort opnieuw.",
+      "disclosure": "Claudium is een virtuele valuta die maar één kant op gaat: koop het met geld en besteed het aan cosmetica. Het kan niet worden ingewisseld, overgedragen of uitbetaald.",
+      "buyTitle": "Claudium kopen",
+      "railLabel": "Betaalmethode",
+      "railStripe": "Kaart",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20% korting",
+      "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
+      "railNativeUnavailable": "SOL/WOC staat uit.",
+      "amountLabel": "Hoeveelheid",
+      "showAmounts": "Toon alle Claudium-bedragen",
+      "hideAmounts": "Verberg extra Claudium-bedragen",
+      "skuRow": "{usd} voor {claudium} Claudium",
+      "buyButton": "Kopen",
+      "buyUnavailable": "Aankoop is momenteel niet mogelijk.",
+      "storeTitle": "Cosmetische winkel",
+      "storeEmpty": "Er zijn momenteel geen cosmetica beschikbaar.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Besteden",
+      "kindCosmetic": "Cosmetica",
+      "kindSkin": "Skin",
+      "kindItem": "Item",
+      "checkoutTitle": "Aankoop voltooien",
+      "checkoutClose": "Betaalvenster sluiten",
+      "checkoutLoading": "Afrekenen laden...",
+      "checkoutPending": "Transactie in behandeling. Bevestig deze in je wallet en houd dit paneel open.",
+      "checkoutPendingButton": "Bezig",
+      "checkoutFailed": "Afrekenen kon niet worden geladen. Probeer het opnieuw.",
+      "checkoutUnavailable": "Die aankoop van Claudium is momenteel niet beschikbaar.",
+      "checkoutWalletRequired": "Koppel een Solana-wallet voordat je Claudium met cryptovaluta koopt.",
+      "checkoutWalletUnsupported": "Deze wallet kan geen Solana-transacties ondertekenen en verzenden.",
+      "checkoutNotSettled": "De transactie is verzonden, maar Claudium is nog niet gecrediteerd. Probeer het binnenkort opnieuw."
+    },
     "theme": {
       "preset": "UI-thema",
       "customColors": "Aangepaste kleuren",
@@ -450,7 +707,7 @@ export const nl_NL: EnTranslations = {
     "mobile": {
       "jump": "Springen",
       "leaderboard": "Ranglijst",
-      "dailyRewards": "Beloningen",
+      "dailyRewards": "Winkel",
       "deeds": "Daden",
       "nameplates": "Namen",
       "nameplatesOff": "Names Off",
@@ -476,12 +733,12 @@ export const nl_NL: EnTranslations = {
       "talkBodyTouch": "Ga dicht bij Marshal Redbrook staan en tik op de Gebruik-knop om te spreken, neem dan zijn taak aan.",
       "returnBodyTouch": "Je taak is volbracht. Keer terug naar Marshal Redbrook en tik op de Gebruik-knop om hem in te leveren.",
       "doneBodyTouch": "Je kent de basis, {name}. Het Dal ligt voor je om te verkennen. Tik op Meer, dan op Queesten, om je queestelogboek op elk moment na te kijken. Goede jacht.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Nog niet vertrouwd met gevechten? Druk op {targetKey} of klik op een wolf om die als doelwit te kiezen. Gebruik daarna een vaardigheid op je actiebalk om aan te vallen.",
+      "slayTargetHintTouch": "Nog niet vertrouwd met gevechten? Tik op een wolf om die als doelwit te kiezen en tik daarna op een vaardigheid op je actiebalk om aan te vallen.",
+      "nextTipsTitle": "Waar nu heen?",
+      "nextTipQuestLog": "Open je questlogboek ({key}) om je volgende taak in de buurt te vinden.",
+      "nextTipMap": "Bekijk de wereldkaart ({key}) om te zien waar speurtochten wachten.",
+      "nextTipSocial": "Open Sociaal ({key}) om een groep te vinden voor zwaardere gevechten."
     },
     "widgets": {
       "clockTitle": "Lokale tijd - klik om te wisselen tussen 12/24-uurs",
@@ -496,6 +753,15 @@ export const nl_NL: EnTranslations = {
       "bodyWithVersion": "Versie {version} van World of ClaudeCraft is beschikbaar. Werk nu bij voor de nieuwste oplossingen en verbeteringen.",
       "notNow": "Niet nu",
       "update": "Bijwerken"
+    },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
     },
     "castBar": {
       "playerAria": "Jouw Spreukbalk",
@@ -542,7 +808,12 @@ export const nl_NL: EnTranslations = {
       "perSecond": "{value}/s",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "seconds": "{s}s",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Emotewiel",
@@ -550,6 +821,7 @@ export const nl_NL: EnTranslations = {
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "discord": "Discord",
       "valecup": "Dalbeker",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
       "petStop": "Huisdier: Stoppen",
@@ -827,13 +1099,29 @@ export const nl_NL: EnTranslations = {
       "highContrast": "Hoog contrast",
       "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft"
     },
+    "warfare": {
+      "honorAmount": "{amount} Eer",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Eer: {amount}",
+      "honorFloat": "+{amount} Eer",
+      "honorGain": "Je krijgt {amount} eer ({reason}).",
+      "notEnoughHonor": "Niet genoeg eer.",
+      "reasons": {
+        "arenaWin": "Arena-overwinning",
+        "fiestaKill": "Fiesta-uitschakeling",
+        "fiestaComplete": "Fiesta voltooid",
+        "fiestaWin": "Fiesta-overwinning"
+      }
+    },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
       "names": {
         "spellPower": "Spreukkracht",
         "critRating": "Crit-waardering",
-        "hasteRating": "Snelheidswaardering"
+        "hasteRating": "Snelheidswaardering",
+        "warfare": "Oorlogvoering"
       },
+      "warfareValue": "+{increase}% toegebracht / -{reduction}% opgelopen",
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
         "agi": "Scherpt je reflexen en mikken, wat meerdere van je gevechtsstatistieken verbetert.",
@@ -847,7 +1135,8 @@ export const nl_NL: EnTranslations = {
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
         "critRating": "Crit-waardering van je uitrusting en setbonussen, die je kans op een kritieke treffer verhoogt. Ongeveer 10 waardering verleent 1% crit.",
-        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid."
+        "hasteRating": "Snelheidswaardering van je uitrusting en setbonussen, die je aanvallen en spreukbezwering versnelt. Ongeveer 10 waardering verleent 1% snelheid.",
+        "warfare": "Verhoogt de schade die aan spelers wordt toegebracht met {increase}% en vermindert de schade die aan spelers wordt toegebracht met {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
@@ -920,6 +1209,12 @@ export const nl_NL: EnTranslations = {
         "few": "je bent {rank}, {count} leden",
         "many": "je bent {rank}, {count} leden",
         "other": "je bent {rank}, {count} leden"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} personage",
@@ -1072,7 +1367,7 @@ export const nl_NL: EnTranslations = {
     "corpseHarvest": {
       "title": "Oogsten",
       "harvestButton": "Oogsten",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Oogsten: verzamel ambachtsmaterialen van dit lijk (vel, hoektand, zijde en vergelijkbare onderdelen), los van de buit. Iedereen kan oogsten, maar elk lijk kan maar door één speler worden geoogst.",
       "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
@@ -1100,6 +1395,19 @@ export const nl_NL: EnTranslations = {
       "promoteLeader": "Bevorderen tot leider",
       "inviteUsage": "Wie wil je uitnodigen? Gebruik: /invite <naam>."
     },
+    "playerMenu": {
+      "info": "Spelerinfo",
+      "block": "Blokkeren",
+      "unblock": "Deblokkeren",
+      "openFor": "Spelersmenu voor {name} openen",
+      "profileUnavailable": "Geen profiel gevonden voor {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "Door AI bestuurd account",
+      "watchTwitch": "Bekijken op Twitch",
+      "watchX": "Bekijken op X",
+      "watchKick": "Bekijken op Kick",
+      "watchYouTube": "Bekijken op YouTube"
+    },
     "lootSettings": {
       "title": "Buitinstellingen",
       "close": "Buitinstellingen sluiten",
@@ -1117,7 +1425,7 @@ export const nl_NL: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Dit voorwerp kan niet worden vernietigd.",
-      "rightClickDestroy": "Rechtsklik om te vernietigen",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -1273,7 +1581,7 @@ export const nl_NL: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Kist",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Alles nemen: verzamel alle munten en voorwerpen in dit buitvenster."
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
@@ -1348,7 +1656,8 @@ export const nl_NL: EnTranslations = {
         "connecting": "Discord openen...",
         "benefits": "Koppel je Discord om punten te verdienen door spelen en gemeenschapsactiviteit, en klim door de statusrangen.",
         "error": "Kon Discord niet koppelen. Probeer het opnieuw.",
-        "success": "Discord gekoppeld."
+        "success": "Discord gekoppeld.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Doorgaan met Discord",
@@ -1396,8 +1705,13 @@ export const nl_NL: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kernontwikkelaar",
         "devs": "Dev",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "artists": "Artiest"
+        "juniormods": "Junior Mod",
+        "artists": "Artiest",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Geverifieerd lid",
       "notMember": "Nog niet in de server",
@@ -1650,7 +1964,15 @@ export const nl_NL: EnTranslations = {
     },
     "social": {
       "lastSeen": "Laatst gezien: {when}",
-      "lastSeenNever": "nooit"
+      "lastSeenNever": "nooit",
+      "ignoredTab": "Genegeerd",
+      "blockedTab": "Geblokkeerd",
+      "ignoredEmpty": "Je negeert niemand.",
+      "blockedEmpty": "Je hebt niemand geblokkeerd.",
+      "blockSearchPlaceholder": "Spelersnaam",
+      "blockAction": "Blokkeren",
+      "nowBlocking": "{name} geblokkeerd.",
+      "stopBlockingTitle": "{name} deblokkeren"
     },
     "gathering": {
       "title": "Verzamelen",
@@ -1688,6 +2010,107 @@ export const nl_NL: EnTranslations = {
       "notAtHub": "Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.",
       "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Boek der Daden",
@@ -1741,7 +2164,7 @@ export const nl_NL: EnTranslations = {
       "trackerLabel": "Daden",
       "collapseHint": "Klap de dadenvolglijst in",
       "expandHint": "Klap de dadenvolglijst uit",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Open het Boek der Daden",
       "charTitleLabel": "Titel",
       "charTitleNone": "Geen titel gekozen",
       "charOpenBook": "Boek der Daden",
@@ -2428,6 +2851,10 @@ export const nl_NL: EnTranslations = {
       "dragonkin": {
         "name": "Drakenvolk",
         "desc": "Geschubde, slangachtige wezens uit de oude diepten. Zeldzaam, trots en veel sterker dan ze eruitzien."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {
@@ -5755,6 +6182,10 @@ export const nl_NL: EnTranslations = {
         "name": "Laatste Rite",
         "description": "Een enorme golf van genezing: herstelt {damage} levenskracht. 10 min hersteltijd."
       },
+      "holy_taunt": {
+        "name": "Heilige Aansporing",
+        "description": "Tart het doelwit: je dreiging stijgt tot die van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen."
+      },
       "flash_of_light": {
         "name": "Lichtheling",
         "description": "Een snelle, doeltreffende uitbarsting van Licht die een bevriend doelwit voor {damage} geneest."
@@ -6079,6 +6510,98 @@ export const nl_NL: EnTranslations = {
         "name": "Kolkende Woede",
         "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
+      "crusader_strike": {
+        "name": "Kruisvaardersslag",
+        "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
+      },
+      "chain_heal": {
+        "name": "Kettinggenezing",
+        "description": "Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 andere bondgenoten in de buurt. Elke sprong geneest 50% minder. (Herstelkenmerk)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfose",
+        "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
+      },
+      "holy_shock": {
+        "name": "Heilige schok",
+        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+      },
+      "holy_shield": {
+        "name": "Heilig schild",
+        "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+      },
+      "bestial_wrath": {
+        "name": "Beestachtige woede",
+        "description": "Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)"
+      },
+      "trueshot_aura": {
+        "name": "Zuiver schot-aura",
+        "description": "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsteek",
+        "description": "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)"
+      },
+      "arcane_power": {
+        "name": "Arcanekracht",
+        "description": "Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)"
+      },
+      "combustion": {
+        "name": "Verbranding",
+        "description": "Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)"
+      },
+      "icy_veins": {
+        "name": "IJzige Aders",
+        "description": "Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)"
+      },
+      "cold_blood": {
+        "name": "Koud bloed",
+        "description": "Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenvlaag",
+        "description": "Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)"
+      },
+      "hemorrhage": {
+        "name": "Bloeding",
+        "description": "Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)"
+      },
+      "power_infusion": {
+        "name": "Krachtinfusie",
+        "description": "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)"
+      },
+      "holy_nova": {
+        "name": "Heilige nova",
+        "description": "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)"
+      },
+      "shadowform": {
+        "name": "Schaduwvorm",
+        "description": "Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementaire meesterschap",
+        "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
+      },
+      "siphon_life": {
+        "name": "Levenshevel",
+        "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "conflagrate": {
+        "name": "Ontvlamming",
+        "description": "Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)"
+      },
+      "moonkin_form": {
+        "name": "Maanuilvorm",
+        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
+      },
+      "feral_charge": {
+        "name": "Wilde stormloop",
+        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+      },
+      "swiftmend": {
+        "name": "Snelle genezing",
+        "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
       "summon_imp": {
         "name": "Emberkin Oproepen",
         "description": "Roept een Emberkin op onder bevel van de Heksenmeester. De Emberkin slingert van veraf Ashbolts naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
@@ -6106,6 +6629,34 @@ export const nl_NL: EnTranslations = {
       "summon_doomguard": {
         "name": "Wraithborn Oproepen",
         "description": "Bindt een Wraithborn aan je wil, een elite-demon die van veraf zware Schaduwschade laat regenen. Een lange afkoeltijd beteugelt zijn verwoestende kracht. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
+      },
+      "pummel": {
+        "name": "Kaakbreker",
+        "description": "Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken."
+      },
+      "kick": {
+        "name": "Schop",
+        "description": "Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken."
+      },
+      "counterspell": {
+        "name": "Spreukbreuk",
+        "description": "Onderbreekt de spreuk van het doelwit en verhindert het 6 sec lang spreuken uit die magieschool uit te spreken."
+      },
+      "counter_shot": {
+        "name": "Dempingsschot",
+        "description": "Een snel schot dat de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt."
+      },
+      "rebuke": {
+        "name": "Berisping",
+        "description": "Onderbreekt de spreuk van het doelwit en verhindert het 4 sec lang spreuken uit die magieschool uit te spreken."
+      },
+      "skull_bash": {
+        "name": "Kopstoot",
+        "description": "Een uitvallende kopstoot die de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt."
+      },
+      "spell_lock": {
+        "name": "Spreukverbod",
+        "description": "Legt het doelwit tijdens een spreuk het zwijgen op en verhindert het 5 sec lang spreuken uit die magieschool uit te spreken."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -6749,6 +7300,126 @@ export const nl_NL: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Zonnepetaalkruid"
+      },
+      "furyforged_warhelm": {
+        "name": "Woedegesmede Oorlogshelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Woedegesmede Oorlogsschouderplaten"
+      },
+      "furyforged_warplate": {
+        "name": "Woedegesmede Oorlogsplaat"
+      },
+      "furyforged_girdle": {
+        "name": "Woedegesmede Gordel"
+      },
+      "furyforged_legguards": {
+        "name": "Woedegesmede Beenbeschermers"
+      },
+      "furyforged_gauntlets": {
+        "name": "Woedegesmede Strijdhandschoenen"
+      },
+      "furyforged_sabatons": {
+        "name": "Woedegesmede Plaatlaarzen"
+      },
+      "stormbound_crown": {
+        "name": "Stormgebonden Kroon"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormgebonden Schouderplaten"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormgebonden Maliënkolder"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormgebonden Taillebeschermer"
+      },
+      "stormbound_legmail": {
+        "name": "Stormgebonden Beenmaliën"
+      },
+      "stormbound_handguards": {
+        "name": "Stormgebonden Handbeschermers"
+      },
+      "stormbound_greaves": {
+        "name": "Stormgebonden Scheenplaten"
+      },
+      "ashstalker_cowl": {
+        "name": "Kap van de Asjager"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Schouderbeschermers van de Asjager"
+      },
+      "ashstalker_harness": {
+        "name": "Harnas van de Asjager"
+      },
+      "ashstalker_waistband": {
+        "name": "Tailleband van de Asjager"
+      },
+      "ashstalker_legguards": {
+        "name": "Beenbeschermers van de Asjager"
+      },
+      "ashstalker_grips": {
+        "name": "Handgrepen van de Asjager"
+      },
+      "ashstalker_treads": {
+        "name": "Laarzen van de Asjager"
+      },
+      "cinderweave_cowl": {
+        "name": "Sintelgeweven Kap"
+      },
+      "cinderweave_mantle": {
+        "name": "Sintelgeweven Schoudermantel"
+      },
+      "cinderweave_raiment": {
+        "name": "Sintelgeweven Gewaad"
+      },
+      "cinderweave_cord": {
+        "name": "Sintelgeweven Koord"
+      },
+      "cinderweave_legwraps": {
+        "name": "Sintelgeweven Beenwikkels"
+      },
+      "cinderweave_handwraps": {
+        "name": "Sintelgeweven Handwikkels"
+      },
+      "cinderweave_slippers": {
+        "name": "Sintelgeweven Schoenen"
+      },
+      "final_oath_medallion": {
+        "name": "Medaillon van de Laatste Eed"
+      },
+      "razorwind_torque": {
+        "name": "Halsring van de Snijwind"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Hanger van het Sintelzegel"
+      },
+      "iron_vow_band": {
+        "name": "Ring van de IJzeren Eed"
+      },
+      "unbroken_circle": {
+        "name": "De Ongebroken Cirkel"
+      },
+      "fleetblood_band": {
+        "name": "Snelbloedring"
+      },
+      "last_step_signet": {
+        "name": "Zegelring van de Laatste Stap"
+      },
+      "ashen_focus_ring": {
+        "name": "Asgrauwe Focusring"
+      },
+      "spellbreakers_seal": {
+        "name": "Zegel van de Spreukbreker"
+      },
+      "final_argument_greatblade": {
+        "name": "Grootkling van het Slotargument"
+      },
+      "first_blood_razor": {
+        "name": "Eerstebloedmes"
+      },
+      "emberglass_warstaff": {
+        "name": "Sintelglazen Oorlogsstaf"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
@@ -7622,6 +8293,15 @@ export const nl_NL: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Doodloze Krijgswacht"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Doodloze Hiërofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Doodloos Mes"
+      },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
       },
@@ -7889,6 +8569,11 @@ export const nl_NL: EnTranslations = {
         "name": "Kwartiermeester Vex",
         "title": "Heroïsche Kwartiermeester",
         "greeting": "Bewijs van de heroïsche diepten koopt de fijnste ringen en hangers in Hoogwacht. Laat me je merken zien."
+      },
+      "fury": {
+        "name": "WOEDE",
+        "title": "Erekwartiermeester",
+        "greeting": "Het zand herinnert zich elke overwinning. Besteed je eer goed."
       },
       "loremaster_caddis": {
         "name": "Verhalenmeester Caddis",

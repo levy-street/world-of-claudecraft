@@ -95,6 +95,7 @@ describe('characterSheet: owner variant', () => {
     expect(sheet.gold).toEqual({ gold: 12, silver: 34, copper: 56 });
     expect(sheet.pos).toEqual({ x: 5, z: 0 });
     expect(sheet.stats).toBeDefined();
+    expect(sheet.stats).toMatchObject({ pvpOffense: 0, pvpDefense: 0 });
     expect(sheet.vitals).toBeDefined();
     expect(sheet.vitals!.hp).toBe(500);
   });

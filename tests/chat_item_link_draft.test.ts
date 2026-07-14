@@ -33,11 +33,15 @@ describe('item links in a chat draft', () => {
     const draftHud = hud as unknown as {
       pendingChatLinks: Map<string, string>;
       activeChatTab: string;
+      stickyChannel: string;
       activeChatPlaceholder: () => string;
       onOpenChatComposer: () => void;
     };
     draftHud.pendingChatLinks = new Map();
     draftHud.activeChatTab = 'all';
+    // The All tab falls back to the sticky send channel; say is the neutral default
+    // (a bare Object.create instance skips the field initializer, so set it here).
+    draftHud.stickyChannel = 'say';
     draftHud.activeChatPlaceholder = () => 'Chat';
     draftHud.onOpenChatComposer = vi.fn();
 
@@ -51,6 +55,6 @@ describe('item links in a chat draft', () => {
 
     expect(input.value).toBe('[Moonwrack Robe] [Moonwrack Robe]');
     expect(draftHud.onOpenChatComposer).toHaveBeenCalledTimes(2);
-    expect(hud.composeChatSend(input.value)).toBe(`[[i:${baseId}]] [[i:${heroicId}]]`);
+    expect(hud.composeChatSend(input.value)).toBe(`/say [[i:${baseId}]] [[i:${heroicId}]]`);
   }, 15_000);
 });

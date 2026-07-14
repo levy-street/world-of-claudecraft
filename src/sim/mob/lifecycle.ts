@@ -88,6 +88,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
+  mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;
+  mob.channelRamp = 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
@@ -186,6 +188,7 @@ export function armDeathThroes(ctx: SimContext, dead: Entity): void {
     text: `${dead.name} begins to swell — get clear!`,
     color: '#9acd32',
     entityId: dead.id,
+    telegraph: true,
   });
 }
 

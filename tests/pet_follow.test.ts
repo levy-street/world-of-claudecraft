@@ -120,4 +120,30 @@ describe('pet heel pathfinding', () => {
     sim.tick();
     expect(dist(pet.pos, owner.pos)).toBeLessThan(1);
   });
+
+  it('bounds far-pet recovery instead of tracing line of sight across the world', () => {
+    // Production regression (#1833): a pet stranded extremely far from its owner
+    // took the last-resort branch every tick. The pathfinder returned its bounded
+    // straight-line fallback, then lineOfSightClear sampled the ENTIRE separation
+    // every 0.5yd. Clear off-map ground keeps this reproducer independent of props:
+    // the old behavior scans 1,000 points and advances one ordinary movement step.
+    // A separation beyond the bounded recovery window must snap the pet home.
+    const { sim, pet, owner } = setup(
+      { x: -10_000, y: 0, z: -10_000 },
+      { x: -10_000, y: 0, z: -9_500 },
+    );
+    expect(dist(pet.pos, owner.pos)).toBe(500);
+    sim.tick();
+    expect(dist(pet.pos, owner.pos)).toBeLessThan(1);
+  });
+
+  it('keeps ordinary follow below the forced recovery boundary', () => {
+    const below = setup({ x: -10_000, y: 0, z: -10_000 }, { x: -10_000, y: 0, z: -9_904 });
+    below.sim.tick();
+    expect(dist(below.pet.pos, below.owner.pos)).toBeGreaterThan(95);
+
+    const above = setup({ x: -10_000, y: 0, z: -10_000 }, { x: -10_000, y: 0, z: -9_903 });
+    above.sim.tick();
+    expect(dist(above.pet.pos, above.owner.pos)).toBeLessThan(1);
+  });
 });

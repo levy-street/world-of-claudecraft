@@ -117,8 +117,8 @@ describe('i18n status registry: enHash re-derivation (independent)', () => {
 describe('i18n status registry: states', () => {
   // RELEASE-TIER ONLY. A `pending` key must never reach a cut release;
   // the release gate asserts the set is empty. At the PR tier a pending key is
-  // LEGAL (English-only PRs), so this is skipped there. Today the set is empty at
-  // both tiers because the overlays are still dense - this gate guards the future.
+  // LEGAL (English-only PRs), so this is skipped there. Release preparation must
+  // resolve every pending row before this check can pass.
   it.runIf(RELEASE_TIER)(
     'the pending set is empty (release tier: no untranslated key may ship)',
     () => {

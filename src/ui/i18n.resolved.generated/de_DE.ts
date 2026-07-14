@@ -377,6 +377,263 @@ export const de_DE: EnTranslations = {
         "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC-Shop",
+      "close": "WOC-Shop schließen",
+      "tabsLabel": "Bereiche des WOC-Shops",
+      "storeTab": "Shop",
+      "rewardsTab": "Tägliche Belohnungen",
+      "loading": "WOC-Shop wird geladen...",
+      "error": "Der WOC-Shop ist derzeit nicht verfügbar. Bitte versuche es gleich noch einmal.",
+      "balance": "Claudium-Guthaben",
+      "buyClaudium": "Claudium kaufen",
+      "owned": "Im Besitz",
+      "needMoreTitle": "Mehr Claudium benötigt",
+      "needMoreBody": "Dir fehlen {shortfall} Claudium, um {item} zu kaufen.",
+      "cancel": "Abbrechen",
+      "confirmTitle": "Kosmetikkauf bestätigen",
+      "confirmBody": "{item} für {cost} Claudium kaufen?",
+      "confirmPurchase": "Kaufen",
+      "priceChanged": "Der Preis hat sich vor Abschluss des Kaufs geändert. Prüfe den aktualisierten Preis und bestätige den Kauf erneut.",
+      "armoryEyebrow": "Saison 1",
+      "armoryTitle": "Die Waffenkammer",
+      "armoryBody": "Limitierte Waffenskins aus der Waffenkammer von Saison 1. Accountweit, rein kosmetisch und für alle in deiner Umgebung sichtbar.",
+      "collectionLine": "Kollektion: {collection}",
+      "collections": {
+        "guildmark": "Gildenzeichen",
+        "emberwrought": "Glutgeschmiedet",
+        "hoarfrost": "Raureif",
+        "fallen_star": "Gefallener Stern"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Gildenzeichen-Ritterschwert",
+          "look": "Klinge aus gebläutem Stahl, bronzene Parierstange in Fischschwanzform, Griff aus blaugrün gefärbtem Leder und ein kleines eingeprägtes Gildensiegel.",
+          "lore": "Wo eine gewöhnliche geschmiedete Klinge namenlos bleibt, ist diese signiert. Ein Waffenschmied verdient das Recht, sein Zeichen in die Fehlschärfe zu schlagen, erst wenn der Händler des Weltmarkts für seinen Stahl bürgt, und für Schmied Haldrens Zeichen wird gebürgt. Gegen die Feuchtigkeit des Tals gebläut und bis aufs Haar ausbalanciert. Für den Stempel zahlt man ebenso viel wie für das Schwert, und er ist es wert."
+        },
+        "brasscap_axe": {
+          "name": "Messingkappen-Beil",
+          "look": "Poliertes stählernes Axtblatt, Messingkappe und Schaftfedern an einem lackierten Eschenholzstiel, sauber gewickelter Griff und Schmiedemarke.",
+          "lore": "Eine gemarkte Axt ist eine Prahlerei, die man in der Hand halten kann. Messingkappe und Schaftfedern sind halb Rüstung, halb Signatur: Sie bewahren den Stiel vor dem Splittern und fangen das Licht der Taverne ein, damit jeder erkennt, dass du Rüstungsschmied Hodes Arbeit gekauft hast und kein ausgemustertes Milizstück. „Was schneidet, verkaufe ich“, sagt der Schmied aus Highwatch. Diese hier schneidet."
+        },
+        "tempered_flanged_mace": {
+          "name": "Gehärteter Flanschstreitkolben",
+          "look": "Sechsflanschiger Kopf aus gehärtetem Blaustahl, Kragen und Knauf aus Messing und ein Griff aus weinrotem Leder.",
+          "lore": "Sechs Flansche aus gebläutem, gehärtetem Stahl, jeder geschliffen, um einen Helm aufzubrechen, mit Messing eingefasst und in weinrotes Leder gewickelt. Die Waffenschmiede des Reiches fertigen keine hässlichen Waffen, selbst wenn deren Arbeit brutal ist. Dieses Stück wurde über den Weltmarkt in Auftrag gegeben und nicht vom Regal genommen. Irgendwo liegt ein Hauptbuch mit dem Namen eines stolzen Käufers und der Summe, die er Hode dafür zahlte."
+        },
+        "guildmark_dirk": {
+          "name": "Gildenzeichen-Dolch",
+          "look": "Schlanker Dolch aus gehärtetem Stahl, Handschutz und Knaufmutter aus Bronze, dunkelgrüner Kordelgriff und eingeprägtes Siegel.",
+          "lore": "Was ein Mann von Rang trägt, wenn das Schwert zu Hause bleibt: schlank, gehärtet und mit demselben Zeichen versehen, das eine volle Klinge auszeichnet, am Gürtel getragen wie ein Siegelring mit Schneide. Unauffällig für alle, die den Nachweis eines Waffenschmieds nicht zu lesen wissen. Quartiermeisterin Bree bewahrt in Highwatch eine Schublade davon für Offiziere auf, die sich den Respekt der Mauer verdient haben."
+        },
+        "brasscrown_staff": {
+          "name": "Messingkronen-Wanderstab",
+          "look": "Hartholzstab mit gedrechseltem Messingkronenknauf, Messingzwinge und gefärbtem Lederband.",
+          "lore": "Aus abgelagertem Hartholz gedrechselt und mit einem Messingknauf gekrönt, wie ihn die Schmiede von Eastbrook zu Hunderten gießen, aber einzeln vollenden. Er gehört Reisenden, die am Tor von Fenbridge und an der Mauer von Highwatch gleichermaßen ernst genommen werden wollen. Ein Wanderstab, der nie wirklich zum Wandern gebraucht wurde. Das gefärbte Band passt zu einem Mantel, dessen Preis man ihm ansieht."
+        },
+        "lacquered_wand": {
+          "name": "Lackierter Zauberstab",
+          "look": "Schlanker, tiefrot lackierter Zauberstab, zwei polierte Messingringe und eine kleine abgerundete Messingspitze.",
+          "lore": "Tiefroter Lack in sieben sorgfältigen Schichten, zweimal mit poliertem Messing eingefasst: die Art Zauberstab, die ein Heckenmagier auf dem Weltmarkt kauft, sobald er echte Münzen verlangt und sich damit sehen lassen will. Er leitet das Licht nicht besser als ein Birkenzweig. Doch auf der Ladentheke des Händlers glänzt er prächtig, und bei kleiner Magie war der Glaube daran schon immer die halbe Wirkung."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Gildenbogen des Pfeilmachers",
+          "look": "Lackierter Recurvebogen aus Walnussholz, Wurfarmenden aus Messing, gewachste Leinensehne und Gildenstempel auf dem Mittelstück.",
+          "lore": "Was im Reich einer Gilde am nächsten kommt, ist der Stempel eines Pfeilmachers auf dem Mittelstück, ein Versprechen über das Werk, wie das Siegel eines Winzers auf einem Fass. Lackiertes Walnussholz, Messing an den Wurfarmenden und eine gewachste Leinensehne, die selbst im Regen von Mirefen nicht ausfranst. Jede Verbindung rechtfertigt den Preis. Zieh ihn einmal jenseits des Witwendickichts, und jedes Gegenargument verstummt."
+        },
+        "cinderbrand_sword": {
+          "name": "Glutbrand",
+          "look": "Dunkle Klinge aus geschmiedetem Stahl, Hohlkehle mit glühend glutorangenen Runen, Hitzerisse und ein schwelender Edelstein in der Parierstange.",
+          "lore": "Die erste Klinge, die nicht in Wasser, sondern in Gesegneter Glut aus Stormcrag abgeschreckt wurde. Die Schmiede von Highwatch schwören, diese Kohlen „brennen blau und rein, weil der Berg sich an seinen alten Eid erinnert“. In die Hohlkehle gebettet, glimmt dieses Feuer glutorange und erlischt nicht. Selbst in der kältesten Nacht an der Mauer bleiben die Runen unter der bloßen Hand warm. Glutbrand muss nie entzündet werden. Die Klinge weigert sich schlicht, auszugehen."
+        },
+        "emberbite_axe": {
+          "name": "Glutbiss",
+          "look": "Axt aus geschwärztem Eisen, durch deren Blatt glutorangefarbene Risse schimmern, ein Edelstein wie eine gehütete Kohle und Hitzeschleier.",
+          "lore": "Rüstungsschmied Hode arbeitete eine lebende Kohle aus Bergfeuer in das Herz des Axtblatts ein, sodass die Schneide zwischen den Schlägen nie ganz abkühlt. Beim Abschwung atmen die Risse orangefarbenes Licht, als wecke der Schlag etwas, das die erste Schmiede schlafend im Eisen zurückließ. Man sagt, ein Stormcrag-Elementar habe die Glut dafür hergegeben. Wenn der Wind aufkommt, erzählt man sich in Highwatch vieles."
+        },
+        "smoulderfall_mace": {
+          "name": "Schwelsturz",
+          "look": "Dunkle Eisenflansche, die entlang ihrer inneren Risse glutorange leuchten, und ein Edelstein mit flüssigem Kern im Kopf.",
+          "lore": "Ein Streitkolben mit eigener Feuerstelle: Ein Stein mit flüssigem Kern, vom Siegel des Heiligtums abgesplittert und „mit Bergfeuer geschmiedet“, glüht in seinem Kopf. Die Flansche fühlen sich warm an und werden dort, wo sie treffen, noch heißer. Ein Sergeant aus Highwatch schwört, ein Schlag hinterlasse einen blauen Fleck, der bis zum Morgen schwach leuchtet. Das Feuer des Berges, endlich zum Brechen bestimmt statt zum Versiegeln."
+        },
+        "ashspark_dagger": {
+          "name": "Aschenfunken-Messer",
+          "look": "Kurze, geschwärzte Klinge mit glühend glutorangenen Adern, einem winzigen schwelenden Edelstein im Knauf, Asche und Funken.",
+          "lore": "Eine Gassenklinge, in deren Knaufstein das Feuer des Berges geschmuggelt wurde, ein stiller Scherz eines Waffenschmieds: Selbst ein Beutelschneider könnte eine Glut der ersten Schmiede tragen. Geschwärzt, von orangefarbenen Adern durchzogen und in der Scheide stets eine Spur zu warm. Ziehst du sie im Dunkel unter Highwatch, erhellt ihr Glühen deine Hand gerade genug, um die Lücke in der Deckung eines Mannes zu finden."
+        },
+        "forgeheart_staff": {
+          "name": "Schmiedeherz-Stab",
+          "look": "Eisenbeschlagener Stab, gekrönt von einem leuchtenden Glutkern im Käfig, Glutrunen entlang des Schafts und aufsteigendes Hitzeflimmern.",
+          "lore": "Eine lebende Kohle aus Bergfeuer, an der Krone in einen Eisenkäfig gesperrt. Lehrmeister Caddis nennt sie den Beweis, dass sich das Feuer der ersten Schmiede zum Dienen binden lässt und nicht nur zum Versiegeln. Hitzeflimmern steigt in einem dünnen, endlosen Band davon auf. Ein Magier mit diesem Stab braucht weder Schmiede noch Wachfeuer. Die Glut, so flüstert man, wurde aus Voskar Glutschwinges eigenem Atem geschöpft und ist seither nicht erkaltet."
+        },
+        "emberwrought_wand": {
+          "name": "Glutgeschmiedeter Zauberstab",
+          "look": "Zauberstab aus geschwärztem Metall mit einer glühenden Kohle in eisernen Klauen, haarfeinen Hitzerissen und warmem Licht aus seinem Inneren.",
+          "lore": "Der Zauberstab, der seiner Güteklasse den Namen gab. Als ein Waffenschmied aus Highwatch erstmals eine Kohle aus Bergfeuer in eiserne Klauen setzte und sie einer sterblichen Hand gehorchen ließ, nannten selbst die Priester des Lichts das Werk nicht länger Ketzerei, sondern nützlich. Warm, geduldig und still gefährlich: Die Glut an seiner Spitze brennt ununterbrochen, seit einer Zeit, bevor sein Besitzer den ersten Atemzug tat."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Glutspanner",
+          "look": "Armbrust aus geschwärztem Stahl, glutorangefarbenes Leuchten aus Rissen in den Wurfarmen und eine glimmende Kohle im Schaft.",
+          "lore": "Die seltsamste der glutgeschmiedeten Waffen: Das Feuer des Berges wurde in eine Maschine gegossen. Orangefarbenes Licht sickert aus Rissen in den Wurfarmen, und eine glimmende Kohle im Schaft verhindert, dass die Sehne in Thornpeaks Kälte oder Mirefens Nässe je steif wird. Ihre Bolzen verlassen die Rinne bereits warm und treffen noch heißer. Die Antwort eines Jägers auf eine Mauer, an der auch der Feind die Kälte nicht spürt."
+        },
+        "ice_fang_sword": {
+          "name": "Eiszahn",
+          "look": "Gebogene Klinge aus blassem Gletschereis, gezackte Raureifkristalle entlang des Rückens, ein leuchtender cyanfarbener Frostkern in der Hohlkehle und eine Parierstange aus Eiszapfen.",
+          "lore": "Das Aushängeschild der gefrorenen Güteklasse und die Waffe, nach der jeder Sammler zuerst greift. Eiszahn wurde aus einem Fangzahn des Gletschers geschnitzt, der Thornpeak über Highwatch krönt, nicht geschmiedet. Sein cyanfarbener Kern brennt so kalt wie das Licht auf dem Glimmermere. Er bereift selbst die Luft, die er durchschneidet. Die Mauerwächter schwören, ein Soldat habe ihn in jener Nacht getragen, als der hohe Schnee den Wyrmkult zurückhielt, und damit „der Mauer einen Winter erkauft“."
+        },
+        "glaciersplit_axe": {
+          "name": "Gletscherspalter",
+          "look": "Axtkopf aus durchscheinendem blauem Gletschereis, ein rissiges, cyanfarben leuchtendes Inneres, starrende Frostkristalle und ein Stiel mit einer Spur aus kaltem Dunst.",
+          "lore": "Aus dem blauen Herzen des Thornpeak-Gletschers gehauen, wo zwei Jahrhunderte Eis die Kälte pressten, bis sie von selbst zu leuchten begann. Selbst in Ruhe zieht die Axt Dunst hinter sich her, und das Krachen ihres Aufpralls klingt wie eine Gletscherspalte, die sich unter dem Pirscherkamm öffnet. Highwatch überlässt seine Gefallenen dort oben dem Eis. Diese Waffe soll das Tauwetter und alles, was es erwecken würde, in Schach halten."
+        },
+        "rimecrusher_mace": {
+          "name": "Reifbrecher",
+          "look": "Gezackte Eiskristalle um einen leuchtenden cyanfarbenen Kern, Raureif, der an einem versilberten Stiel hinabkriecht.",
+          "lore": "Nicht geschnitzt, sondern gewachsen: Eis aus Thornpeak wurde um einen kalten cyanfarbenen Kern gezogen, bis es so hart war wie Hodes bester Stahl. Raureif kriecht am versilberten Stiel zur Hand hinab und erreicht sie doch nie ganz. Wo die Waffe trifft, gefriert Wasser. Wo sie ruht, wird der Boden weiß. Die Grabeskälte der Gipfel, klein genug gemacht, um sie gegen jene Dinge zu schwingen, die die Mauer erklimmen."
+        },
+        "frostbite_dagger": {
+          "name": "Reifnadel",
+          "look": "Unheilvoll dünner Dolch aus klarem blauem Eis, eine leuchtende cyanfarbene Ader in der Mitte, nadelfeine Frostkristalle und ein Griff aus Raureif.",
+          "lore": "Dünn wie ein angehaltener Atem und doppelt so kalt: ein Splitter des Thornpeak-Gletschers, entlang einer einzigen leuchtenden Ader geschliffen, so scharf, dass die Wunde zufriert, bevor das Blut ans Fließen denkt. Sein Name stammt von der Grabeskälte, welche die Toten von den Gipfeln herabtragen. Er muss nie geschärft werden. Eis wird nicht stumpf, bemerkt Lehrmeister Caddis trocken, es wartet nur."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Raureifwacht",
+          "look": "Versilberter Stab, gekrönt von einem schwebenden, langsam kreisenden Splitter aus leuchtendem cyanfarbenem Eis, der Kristalle und kalten Dunst ausstrahlt.",
+          "lore": "Der Stab jener Wache, die an der Mauer von Highwatch niemals schläft. Seine Krone ist ein Splitter cyanfarbenen Bergseeeises, der frei über dem Silber schwebt und sich langsam aus eigener Kraft dreht: immer, so schwören die Wächter, zu der Kälte hin, die sich unter den Gipfeln sammelt. Die Wacht zu tragen bedeutet, in einer einzigen Nacht zweihundert Jahre Wache zu halten und zu versprechen, niemals wegzusehen."
+        },
+        "everwinter_wand": {
+          "name": "Splitter von Everwinter",
+          "look": "Eine einzelne Spitze aus leuchtendem cyanfarbenem Gletschereis, Raureif, der aus einem silbernen Kragen blüht, und schwacher kalter Nebel.",
+          "lore": "Eine Spitze aus leuchtendem Gletschereis, die angeblich aus dem tiefen Bergsee unterhalb des Heiligtums gebrochen wurde, wo die Kälte des Berges Zähne hat. Raureif blüht endlos aus ihrem silbernen Kragen und schmilzt weder im Feuer noch im Sommer. Magier halten sie wegen der Kälte nah, die sie ihrer Arbeit verleiht, und in jenen Nächten fern, in denen sie sich zur Krypta von Nythraxis zu neigen und zu lauschen scheint."
+        },
+        "winterbite": {
+          "name": "Winterbiss",
+          "look": "Bogen aus versilbertem Stahl und blauem Eis, ein leuchtender cyanfarbener Frostkern im Mittelstück, ein eingelegter Pfeil aus massivem Eis und kalter Dunst.",
+          "lore": "Ein Bogen aus versilbertem Stahl und Eis aus Thornpeak. In seinem Mittelstück leuchtet ein kalter cyanfarbener Kern, der den Pfeil an der Sehne festfriert. Bei jedem Spannen bildet sich ein neuer Pfeil aus massivem Gletschereis. Der Bogenschütze auf der Mauer trägt keinen Köcher, nur die Kälte. Mit einem solchen Bogen hielt Highwatch den Pirscherkamm während einer Belagerung: ein einziger Schütze, so sagt man, und ein Winter voller Pfeile, die schon immer dort gewesen waren."
+        },
+        "solheim_sword": {
+          "name": "Solheim, letztes Licht der Morgenröte",
+          "look": "Großschwert aus einem gefallenen Stern, ein flüssiggoldener Kern, der die kosmosschwarze, von Sternenlicht gesäumte Klinge teilt, goldene Splitter um die Parierstange und ein Polarlichtband.",
+          "lore": "Als der Stern vom westlichen Himmel fiel und jenseits des Witwendickichts „wie eine Schmiede“ zerbarst, barg Bruder Aldric sein noch schwelendes Herz aus dem Krater von Mirefen und flehte die Schmiede des Reiches an, „etwas zu bearbeiten, das nicht in diese Welt gehört“. Sie schufen daraus ein einziges Großschwert: Solheim. Sein flüssiggoldener Kern teilt die kosmosschwarze Klinge wie die Morgendämmerung den Nachthimmel, und Splitter aus Sternenmetall umkreisen die Parierstange auf Bahnen, die keine Hand bestimmte. Nur eines wurde je geschmiedet. Ein zweites wird es nicht geben."
+        },
+        "skyrender_axe": {
+          "name": "Himmelsreißer, Wunde des Firmaments",
+          "look": "Axtkopf wie ein zerrissenes Stück Nachthimmel, flüssiggoldene Risse und eingeätzte Sternbilder, schwebende Sternenlichtsplitter und Polarlichtschimmer entlang der Schneide.",
+          "lore": "Vom Kraterrand geschlagen, wo der gefallene Stern das Spiegelbild des Himmels aus Mirefen riss und eine Wunde hinterließ, die noch immer dampft. Der Axtkopf gleicht einem Stück zerrissener Nacht: flüssiggoldene Risse, Sternbilder, die kein Gelehrter in Highwatch benennen kann, und Polarlicht, das bei jedem Schwung von der Schneide blutet. Bruder Aldric segnete die Axt und weigerte sich, sie zu berühren. Wer sie hebt, hält das Loch in Händen, das der Himmel hinterließ."
+        },
+        "starfall_mace": {
+          "name": "Sternenfall, Urteil des Himmels",
+          "look": "Ein gefangener flüssiggoldener Sternenkern, umringt von kreisenden Splittern, kosmosschwarze Flansche mit Adern aus Sternenlicht und aus den Nähten strömendes Polarlicht.",
+          "lore": "Ein Sternenkern, im Augenblick vor seinem Tod eingefangen, umringt von den Trümmern, die mit ihm fielen, und einen Fingerbreit vor dem Vergessen erstarrt. In seinen kosmosschwarzen Flanschen fließt gefangenes Sternenlicht, und beim Heben strömt Polarlicht aus den Nähten. Die alten Priester des Lichts nannten einen fallenden Stern ein Urteil, einen von oben verhängten Spruch, den kein Schild aufhalten sollte, und benannten diese Waffe nach jenem Stern, der auf Mirefen niederging."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Fangzahn des gefallenen Sterns",
+          "look": "Ein Splitter eines gefallenen Sterns: eine flüssiggolden glühende Schneide auf kosmosschwarzem Metall, ein heller Sternenpartikel, der den Knauf umkreist, und eine feine Polarlichtspur.",
+          "lore": "Das kleinste Stück des Sterns, das Aldric aus dem Krater barg, und nach mancher Einschätzung das gefährlichste. Ein einzelner Splitter jenes fremdartigen Herzens, dessen flüssiggoldene Schneide auf kosmosschwarzem Metall ruht, während ein einsamer Sternenpartikel den Knauf umkreist wie ein Mond, der seine Welt verloren hat. Er wiegt fast nichts und durchtrennt fast alles. Klein genug, um ihn zu verbergen, und hell genug, um ihn im Dunkeln an seinem eigenen Licht zu finden."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Turm der endlosen Leere",
+          "look": "Goldene Sternensplitter, die einen flüssiggoldenen Kern umkreisen, ein kosmosschwarzer Schaft mit eingeätzten Sternbildern und aufwärts windende Polarlichtbänder.",
+          "lore": "Ein Schaft aus Sternenmetall, gekrönt von einem flüssiggoldenen Kern und einem Ring goldener Splitter, die ihn langsam und endlos umkreisen: ein kleiner Kosmos, gezeichnet mit Sternbildern, die keinem Himmel über Thornpeak gleichen. Polarlicht windet sich daran empor wie Rauch, der vergessen hat aufzusteigen. Seine Träger behaupteten, sie könnten die Leere darin kreisen spüren, so wie Ysoleis See „das Mondlicht trinkt“: geduldig, kalt und zurückblickend."
+        },
+        "emberwish_wand": {
+          "name": "Glutwunsch, Funke der sterbenden Sonne",
+          "look": "Ein gefangener, flüssiggoldener Partikel eines sterbenden Sterns, umhüllt von kreisenden Funken, auf einem kosmosschwarzen Schaft mit leuchtenden Sternbildern.",
+          "lore": "Nicht der gefallene Stern selbst, sondern der letzte Partikel eines sterbenden Sterns: eine einzelne flüssiggoldene Glut einer längst erloschenen Sonne, umhüllt von den Funken ihres letzten Lichts. In den kosmosschwarzen Schaft sind die Sternbilder geätzt, die ihren Tod beobachteten. Die Bauern von Mirefen sagen, er erfülle jedem einen Wunsch, der ihn in der tiefsten Abenddämmerung hält. Sie sagen auch, jede Seele, die ihn trug, habe sich mehr Zeit gewünscht, und der Ertränkte Mond habe keinem diesen Wunsch gewährt."
+        },
+        "encore_bow": {
+          "name": "Encore, der zweite gefallene Stern",
+          "look": "Absurd überdimensionierte Sternenkanone: ein kosmosschwarzer Lauf mit leuchtend goldenen Sternbildern, eine trichterförmige Mündung mit einem flüssiggoldenen Kometengeschoss, Messingbeschläge und eine hölzerne Schulterstütze.",
+          "lore": "Die Schmiede, die den gefallenen Stern bearbeiteten, schufen sechs Relikte daraus und hatten noch immer ein ganzes Fass Sternenmetall übrig. Zu diesem Zeitpunkt hatten die Lehrlinge bereits eigene Vorstellungen. Was vom Amboss kam, ist entweder die erste Feuerwaffe des Reiches oder seine kleinste Belagerungsmaschine: eine Schulterkanone, die weniger einen Schuss abgibt, als einen zweiten, diesmal gezielten Stern anzufordern. Bruder Aldric weigerte sich, sie zu segnen. Etwas derart Lautes, so meinte er, sei dem Himmel längst aufgefallen. Jäger lieben sie. Nichts in ihrem Schussfeld tat das je."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlatch, das jüngste Gericht des Himmels",
+          "look": "Meteorisches Sternenmetall, ein flüssiggoldener Kern entlang des Schafts, kosmosschwarze Wurfarme mit eingeätzten Sternbildern und ein eingelegter Bolzen aus reinem Sternenfeuer.",
+          "lore": "Aus rohem meteorischem Sternenmetall geschmiedet, während der Krater von Mirefen noch glühte. Trümmer, die „zu heiß zum Anfassen“ waren, wurden zu kosmosschwarzen Wurfarmen mit eingeätzten Sternbildern gehämmert, ein flüssiggoldener Kern in den Schaft gebettet. Die Armbrust legt keinen Bolzen ein, sondern beschwört einen: einen Schaft aus Sternenfeuer, abgeschossen wie ein Urteil und einschlagend wie dessen Vollstreckung. Als Highwatch fürchtete, selbst die todlose Krone von Nythraxis sei nicht das Schlimmste unter den Gipfeln, wollte man diese Waffe auf der Mauer. Ziele mit Bedacht."
+        }
+      },
+      "seasonOne": "Saison 1",
+      "rarity": {
+        "uncommon": "Ungewöhnlich",
+        "rare": "Selten",
+        "epic": "Episch",
+        "legendary": "Legendär"
+      },
+      "wtype": {
+        "sword": "Schwert",
+        "axe": "Axt",
+        "mace": "Streitkolben",
+        "dagger": "Dolch",
+        "staff": "Stab",
+        "wand": "Zauberstab",
+        "bow": "Bogen",
+        "crossbow": "Armbrust"
+      },
+      "badge": {
+        "flagship": "Flaggschiff",
+        "hero": "Held"
+      },
+      "inspectAria": "{item} ansehen",
+      "viewModeLabel": "Vorschaumodus",
+      "tryOn": "Ausprobieren",
+      "weaponOnly": "Nur Waffe",
+      "sceneLabel": "Szenenbeleuchtung",
+      "scene": {
+        "day": "Tag",
+        "dusk": "Dämmerung",
+        "night": "Nacht"
+      },
+      "lore": "Hintergrund",
+      "buySkin": "Skin kaufen",
+      "unavailable": "Nicht verfügbar",
+      "applied": "Angewendet",
+      "apply": "Skin anwenden",
+      "detach": "Skin entfernen",
+      "equipHint": "Rüste eine Waffe des Typs {type} aus, um diesen Skin anzuwenden."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Claudium-Fenster öffnen",
+      "close": "Claudium-Fenster schließen",
+      "loading": "Claudium wird geladen...",
+      "balanceLabel": "Guthaben",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "Der Claudium-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.",
+      "disclosure": "Claudium ist eine nicht rücktauschbare Spielwährung: Du kaufst es mit echtem Geld und gibst es für kosmetische Inhalte aus. Es kann weder eingelöst noch übertragen oder ausgezahlt werden.",
+      "buyTitle": "Claudium kaufen",
+      "railLabel": "Zahlungsart",
+      "railStripe": "Karte",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20% Rabatt",
+      "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
+      "railNativeUnavailable": "SOL/WOC deaktiviert.",
+      "amountLabel": "Menge",
+      "showAmounts": "Alle Claudium-Mengen anzeigen",
+      "hideAmounts": "Zusätzliche Claudium-Mengen ausblenden",
+      "skuRow": "{claudium} Claudium für {usd}",
+      "buyButton": "Kaufen",
+      "buyUnavailable": "Käufe sind derzeit nicht verfügbar.",
+      "storeTitle": "Kosmetikshop",
+      "storeEmpty": "Derzeit sind keine kosmetischen Inhalte verfügbar.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Einlösen",
+      "kindCosmetic": "Kosmetik",
+      "kindSkin": "Skin",
+      "kindItem": "Gegenstand",
+      "checkoutTitle": "Kauf abschließen",
+      "checkoutClose": "Bezahlvorgang schließen",
+      "checkoutLoading": "Bezahlvorgang wird geladen...",
+      "checkoutPending": "Die Transaktion wird verarbeitet. Bestätige sie in deiner Wallet und lass dieses Fenster geöffnet.",
+      "checkoutPendingButton": "Wird verarbeitet",
+      "checkoutFailed": "Der Bezahlvorgang konnte nicht geladen werden. Bitte versuche es erneut.",
+      "checkoutUnavailable": "Dieser Claudium-Kauf ist derzeit nicht verfügbar.",
+      "checkoutWalletRequired": "Verbinde eine Solana-Wallet, bevor du Claudium mit Kryptowährung kaufst.",
+      "checkoutWalletUnsupported": "Diese Wallet kann Solana-Transaktionen weder signieren noch senden.",
+      "checkoutNotSettled": "Die Transaktion wurde gesendet, aber das Claudium wurde noch nicht gutgeschrieben. Bitte versuche es gleich noch einmal."
+    },
     "theme": {
       "preset": "Oberflächendesign",
       "customColors": "Eigene Farben",
@@ -450,7 +707,7 @@ export const de_DE: EnTranslations = {
     "mobile": {
       "jump": "Springen",
       "leaderboard": "Rangliste",
-      "dailyRewards": "Belohnungen",
+      "dailyRewards": "Shop",
       "deeds": "Taten",
       "nameplates": "Namen",
       "nameplatesOff": "Names Off",
@@ -476,12 +733,12 @@ export const de_DE: EnTranslations = {
       "talkBodyTouch": "Stell dich nah an Marschall Redbrook und tippe auf die Schaltfläche Benutzen, um mit ihm zu sprechen, und nimm dann seine Aufgabe an.",
       "returnBodyTouch": "Deine Aufgabe ist erledigt. Kehre zu Marschall Redbrook zurück und tippe auf die Schaltfläche Benutzen, um sie abzugeben.",
       "doneBodyTouch": "Du beherrschst die Grundlagen, {name}. Das Eastbrook-Tal liegt bereit, von dir erkundet zu werden. Tippe auf Mehr und dann auf Questlog, um jederzeit dein Questlog einzusehen. Gute Jagd.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Neu im Kampf? Drücke {targetKey} oder klicke auf einen Wolf, um ihn anzuvisieren. Nutze dann eine Fähigkeit in deiner Aktionsleiste, um ihn anzugreifen.",
+      "slayTargetHintTouch": "Neu im Kampf? Tippe auf einen Wolf, um ihn anzuvisieren. Tippe dann auf eine Fähigkeit in deiner Aktionsleiste, um ihn anzugreifen.",
+      "nextTipsTitle": "Wie geht es weiter?",
+      "nextTipQuestLog": "Öffne dein Questlog ({key}), um deine nächste Aufgabe in der Nähe zu finden.",
+      "nextTipMap": "Sieh auf der Weltkarte ({key}) nach, wo Quests auf dich warten.",
+      "nextTipSocial": "Öffne Soziales ({key}), um eine Gruppe für schwierigere Kämpfe zu finden."
     },
     "widgets": {
       "clockTitle": "Ortszeit - klicken, um zwischen 12-/24-Stunden zu wechseln",
@@ -496,6 +753,15 @@ export const de_DE: EnTranslations = {
       "bodyWithVersion": "Version {version} von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.",
       "notNow": "Jetzt nicht",
       "update": "Aktualisieren"
+    },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
     },
     "castBar": {
       "playerAria": "Eure Zauberleiste",
@@ -542,7 +808,12 @@ export const de_DE: EnTranslations = {
       "perSecond": "{value}/s",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
-      "seconds": "{s} Sek."
+      "seconds": "{s} Sek.",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Emote-Rad",
@@ -550,6 +821,7 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "discord": "Discord",
       "valecup": "Talpokal",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Begleiter",
       "petAttack": "Begleiter: Angreifen",
       "petStop": "Begleiter: Stopp",
@@ -827,13 +1099,29 @@ export const de_DE: EnTranslations = {
       "highContrast": "Hoher Kontrast",
       "highContrastAria": "Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt"
     },
+    "warfare": {
+      "honorAmount": "{amount} Ehre",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Ehre: {amount}",
+      "honorFloat": "+{amount} Ehre",
+      "honorGain": "Du erhältst {amount} Ehre ({reason}).",
+      "notEnoughHonor": "Nicht genug Ehre.",
+      "reasons": {
+        "arenaWin": "Arenasieg",
+        "fiestaKill": "Fiesta-Ausschaltung",
+        "fiestaComplete": "Fiesta abgeschlossen",
+        "fiestaWin": "Fiesta-Sieg"
+      }
+    },
     "statInfo": {
       "fromYour": "Von deinen {value} Punkten {stat}:",
       "names": {
         "spellPower": "Zaubermacht",
         "critRating": "Kritische Trefferwertung",
-        "hasteRating": "Tempowertung"
+        "hasteRating": "Tempowertung",
+        "warfare": "Kriegsführung"
       },
+      "warfareValue": "+{increase}% verursacht / -{reduction}% erlitten",
       "desc": {
         "str": "Erhöht deine Angriffskraft, sodass deine Waffenschläge härter treffen.",
         "agi": "Schärft Reflexe und Zielsicherheit und verbessert mehrere deiner Kampfwerte.",
@@ -847,7 +1135,8 @@ export const de_DE: EnTranslations = {
         "critChance": "Deine Chance, dass ein Angriff kritisch trifft und doppelten Schaden verursacht.",
         "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden.",
         "critRating": "Kritische Trefferwertung aus deiner Ausrüstung und deinen Setboni, die deine kritische Trefferchance erhöht. Etwa 10 Wertung gewähren 1% kritische Trefferchance.",
-        "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo."
+        "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",
+        "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Angriffskraft",
@@ -920,6 +1209,12 @@ export const de_DE: EnTranslations = {
         "few": "Ihr seid {rank}, {count} Mitglieder",
         "many": "Ihr seid {rank}, {count} Mitglieder",
         "other": "Ihr seid {rank}, {count} Mitglieder"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} Charakter",
@@ -1072,7 +1367,7 @@ export const de_DE: EnTranslations = {
     "corpseHarvest": {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Verwerten: Sammle Handwerksmaterialien aus diesem Kadaver (Haut, Fangzahn, Seide und ähnliche Komponenten), unabhängig von der Beute. Jeder kann Kadaver verwerten, aber einen bestimmten Kadaver darf nur ein Spieler verwerten.",
       "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
@@ -1100,6 +1395,19 @@ export const de_DE: EnTranslations = {
       "promoteLeader": "Zum Anführer befördern",
       "inviteUsage": "Wen einladen? Verwendung: /invite <name>."
     },
+    "playerMenu": {
+      "info": "Spielerinfo",
+      "block": "Blockieren",
+      "unblock": "Blockierung aufheben",
+      "openFor": "Spielermenü für {name} öffnen",
+      "profileUnavailable": "Kein Profil für {name} gefunden.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "KI-gesteuertes Konto",
+      "watchTwitch": "Auf Twitch ansehen",
+      "watchX": "Auf X ansehen",
+      "watchKick": "Auf Kick ansehen",
+      "watchYouTube": "Auf YouTube ansehen"
+    },
     "lootSettings": {
       "title": "Beute-Einstellungen",
       "close": "Beute-Einstellungen schließen",
@@ -1117,7 +1425,7 @@ export const de_DE: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Dieser Gegenstand kann nicht zerstört werden.",
-      "rightClickDestroy": "Rechtsklick zum Zerstören",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
@@ -1273,7 +1581,7 @@ export const de_DE: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Truhe",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Alles nehmen: Sammle alle Münzen und Gegenstände in diesem Beutefenster."
     },
     "spellbook": {
       "addToBarAria": "{name} zur Aktionsleiste hinzufügen",
@@ -1348,7 +1656,8 @@ export const de_DE: EnTranslations = {
         "connecting": "Discord wird geöffnet...",
         "benefits": "Verknüpfe deinen Discord, um durch Spiel und Gemeinschaftsaktivität Punkte zu verdienen und die Statusstufen zu erklimmen.",
         "error": "Discord konnte nicht verknüpft werden. Bitte versuche es erneut.",
-        "success": "Discord verknüpft."
+        "success": "Discord verknüpft.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Mit Discord fortfahren",
@@ -1396,8 +1705,13 @@ export const de_DE: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kernentwickler",
         "devs": "Entwickler",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "artists": "Künstler"
+        "juniormods": "Junior Mod",
+        "artists": "Künstler",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Verifiziertes Mitglied",
       "notMember": "Noch nicht auf dem Server",
@@ -1650,7 +1964,15 @@ export const de_DE: EnTranslations = {
     },
     "social": {
       "lastSeen": "Zuletzt gesehen: {when}",
-      "lastSeenNever": "nie"
+      "lastSeenNever": "nie",
+      "ignoredTab": "Ignoriert",
+      "blockedTab": "Blockiert",
+      "ignoredEmpty": "Du ignorierst niemanden.",
+      "blockedEmpty": "Du hast niemanden blockiert.",
+      "blockSearchPlaceholder": "Spielername",
+      "blockAction": "Blockieren",
+      "nowBlocking": "{name} blockiert.",
+      "stopBlockingTitle": "{name} nicht mehr blockieren"
     },
     "gathering": {
       "title": "Sammeln",
@@ -1688,6 +2010,107 @@ export const de_DE: EnTranslations = {
       "notAtHub": "Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.",
       "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.",
       "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Buch der Taten",
@@ -1741,7 +2164,7 @@ export const de_DE: EnTranslations = {
       "trackerLabel": "Taten",
       "collapseHint": "Tatenverfolgung einklappen",
       "expandHint": "Tatenverfolgung ausklappen",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Buch der Taten öffnen",
       "charTitleLabel": "Titel",
       "charTitleNone": "Kein Titel gewählt",
       "charOpenBook": "Buch der Taten",
@@ -2428,6 +2851,10 @@ export const de_DE: EnTranslations = {
       "dragonkin": {
         "name": "Drachkin",
         "desc": "Schuppige, schlangenhafte Wesen aus den alten Tiefen. Selten, stolz und weit stärker, als sie aussehen."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {
@@ -5755,6 +6182,10 @@ export const de_DE: EnTranslations = {
         "name": "Letzte Ölung",
         "description": "Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Verspottet das Ziel: Eure Bedrohung steigt auf den Wert seines meistgehassten Feindes, und es wird 3 Sek. lang gezwungen, Euch anzugreifen."
+      },
       "flash_of_light": {
         "name": "Lightmend",
         "description": "Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt."
@@ -6079,6 +6510,98 @@ export const de_DE: EnTranslations = {
         "name": "Brodelnde Raserei",
         "description": "Ihr verfallt in brodelnde Raserei und erzeugt 20 Wut. (Krieger-Talent)"
       },
+      "crusader_strike": {
+        "name": "Kreuzfahrerstoß",
+        "description": "Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)"
+      },
+      "metamorphosis": {
+        "name": "Metamorphose",
+        "description": "Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)"
+      },
+      "holy_shock": {
+        "name": "Heiliger Schock",
+        "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"
+      },
+      "holy_shield": {
+        "name": "Heiliger Schild",
+        "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
+      },
+      "bestial_wrath": {
+        "name": "Zorn des Wildtiers",
+        "description": "Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)"
+      },
+      "trueshot_aura": {
+        "name": "Aura des Volltreffers",
+        "description": "Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)"
+      },
+      "wyvern_sting": {
+        "name": "Stich des Flügeldrachen",
+        "description": "Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)"
+      },
+      "arcane_power": {
+        "name": "Arkane Macht",
+        "description": "Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)"
+      },
+      "combustion": {
+        "name": "Verbrennung",
+        "description": "Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)"
+      },
+      "icy_veins": {
+        "name": "Eisige Adern",
+        "description": "Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)"
+      },
+      "cold_blood": {
+        "name": "Kaltblütigkeit",
+        "description": "Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenwirbel",
+        "description": "Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)"
+      },
+      "hemorrhage": {
+        "name": "Blutsturz",
+        "description": "Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)"
+      },
+      "power_infusion": {
+        "name": "Machtinfusion",
+        "description": "Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)"
+      },
+      "holy_nova": {
+        "name": "Heilige Nova",
+        "description": "Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)"
+      },
+      "shadowform": {
+        "name": "Schattenform",
+        "description": "Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementarbeherrschung",
+        "description": "Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)"
+      },
+      "siphon_life": {
+        "name": "Lebensentzug",
+        "description": "Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)"
+      },
+      "conflagrate": {
+        "name": "Feuersbrunst",
+        "description": "Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)"
+      },
+      "moonkin_form": {
+        "name": "Mondkingestalt",
+        "description": "Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)"
+      },
+      "feral_charge": {
+        "name": "Wilde Attacke",
+        "description": "Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)"
+      },
+      "swiftmend": {
+        "name": "Rasche Heilung",
+        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)"
+      },
       "summon_imp": {
         "name": "Emberkin beschwören",
         "description": "Beschwört einen Emberkin unter dem Befehl des Hexenmeisters. Der Emberkin schleudert aus der Ferne Ashbolts auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
@@ -6106,6 +6629,34 @@ export const de_DE: EnTranslations = {
       "summon_doomguard": {
         "name": "Wraithborn beschwören",
         "description": "Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
+      },
+      "pummel": {
+        "name": "Jawcrack",
+        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "kick": {
+        "name": "Boot",
+        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "counter_shot": {
+        "name": "Hushing Shot",
+        "description": "Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
+      },
+      "rebuke": {
+        "name": "Reproach",
+        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "skull_bash": {
+        "name": "Headbutt",
+        "description": "Ein vorstoßender Kopfstoß, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
+      },
+      "spell_lock": {
+        "name": "Gag Order",
+        "description": "Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken."
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",
@@ -6749,6 +7300,126 @@ export const de_DE: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Sonnenblütenkraut"
+      },
+      "furyforged_warhelm": {
+        "name": "Zorngeschmiedeter Kriegshelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Zorngeschmiedete Kriegsschulterstücke"
+      },
+      "furyforged_warplate": {
+        "name": "Zorngeschmiedete Kriegsplatte"
+      },
+      "furyforged_girdle": {
+        "name": "Zorngeschmiedeter Gürtel"
+      },
+      "furyforged_legguards": {
+        "name": "Zorngeschmiedete Beinschützer"
+      },
+      "furyforged_gauntlets": {
+        "name": "Zorngeschmiedete Stulpen"
+      },
+      "furyforged_sabatons": {
+        "name": "Zorngeschmiedete Plattenstiefel"
+      },
+      "stormbound_crown": {
+        "name": "Sturmgebundene Krone"
+      },
+      "stormbound_spaulders": {
+        "name": "Sturmgebundene Schulterstücke"
+      },
+      "stormbound_hauberk": {
+        "name": "Sturmgebundene Halsberge"
+      },
+      "stormbound_waistguard": {
+        "name": "Sturmgebundener Hüftschutz"
+      },
+      "stormbound_legmail": {
+        "name": "Sturmgebundene Kettenbeinlinge"
+      },
+      "stormbound_handguards": {
+        "name": "Sturmgebundene Handschützer"
+      },
+      "stormbound_greaves": {
+        "name": "Sturmgebundene Beinschienen"
+      },
+      "ashstalker_cowl": {
+        "name": "Aschenpirscher-Kapuze"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Aschenpirscher-Schulterschützer"
+      },
+      "ashstalker_harness": {
+        "name": "Aschenpirscher-Harnisch"
+      },
+      "ashstalker_waistband": {
+        "name": "Aschenpirscher-Hüftgurt"
+      },
+      "ashstalker_legguards": {
+        "name": "Aschenpirscher-Beinschützer"
+      },
+      "ashstalker_grips": {
+        "name": "Aschenpirscher-Handschützer"
+      },
+      "ashstalker_treads": {
+        "name": "Aschenpirscher-Stiefel"
+      },
+      "cinderweave_cowl": {
+        "name": "Kapuze aus Glutgewebe"
+      },
+      "cinderweave_mantle": {
+        "name": "Mantel aus Glutgewebe"
+      },
+      "cinderweave_raiment": {
+        "name": "Gewand aus Glutgewebe"
+      },
+      "cinderweave_cord": {
+        "name": "Kordel aus Glutgewebe"
+      },
+      "cinderweave_legwraps": {
+        "name": "Beinwickel aus Glutgewebe"
+      },
+      "cinderweave_handwraps": {
+        "name": "Handwickel aus Glutgewebe"
+      },
+      "cinderweave_slippers": {
+        "name": "Schuhe aus Glutgewebe"
+      },
+      "final_oath_medallion": {
+        "name": "Medaillon des letzten Eides"
+      },
+      "razorwind_torque": {
+        "name": "Halsreif des Klingenwinds"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Anhänger des Glutsiegels"
+      },
+      "iron_vow_band": {
+        "name": "Reif des eisernen Eids"
+      },
+      "unbroken_circle": {
+        "name": "Der ungebrochene Kreis"
+      },
+      "fleetblood_band": {
+        "name": "Flinkblut-Reif"
+      },
+      "last_step_signet": {
+        "name": "Siegelring des letzten Schritts"
+      },
+      "ashen_focus_ring": {
+        "name": "Aschener Fokusring"
+      },
+      "spellbreakers_seal": {
+        "name": "Siegel des Zauberbrechers"
+      },
+      "final_argument_greatblade": {
+        "name": "Großklinge des letzten Arguments"
+      },
+      "first_blood_razor": {
+        "name": "Klinge des ersten Blutes"
+      },
+      "emberglass_warstaff": {
+        "name": "Glutglas-Kriegsstab"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hammer"
@@ -7622,6 +8293,15 @@ export const de_DE: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Todlose Kriegswache"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Todloser Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Todlose Klinge"
+      },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"
       },
@@ -7889,6 +8569,11 @@ export const de_DE: EnTranslations = {
         "name": "Quartiermeister Vex",
         "title": "Heroischer Quartiermeister",
         "greeting": "Ein Beweis aus den heroischen Tiefen kauft die feinsten Ringe und Anhänger in Highwatch. Zeig mir deine Marken."
+      },
+      "fury": {
+        "name": "WUT",
+        "title": "Ehrenquartiermeister",
+        "greeting": "Der Sand erinnert sich an jeden Sieg. Gib deine Ehre mit Bedacht aus."
       },
       "loremaster_caddis": {
         "name": "Lehrmeister Caddis",

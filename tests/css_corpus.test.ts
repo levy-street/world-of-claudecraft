@@ -123,6 +123,7 @@ const INDEX_SECTIONS = [
   'bags',
   'social',
   'map',
+  'Dungeon Finder',
   'Ashen Coliseum (arena)',
   "The World Market (the Merchant's auction house)",
   'options / game menu (Esc)',
@@ -144,6 +145,9 @@ const INDEX_SECTIONS = [
   'chat',
   'party frames',
   'context menu',
+  // the operator-set AI-account tag: one shared animated-gradient class serving the
+  // chat line, the nameplate .np-ai span, and the target frame's flair line.
+  'ai account tag',
   'prompts (invite/trade/duel)',
   'trade window',
   'elite target frame',
@@ -179,12 +183,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 71 index + 69 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(71);
-    expect(PLAY_SECTIONS.length).toBe(69);
-    expect(MANIFEST.length).toBe(71);
-    expect(new Set(INDEX_SECTIONS).size).toBe(71);
-    expect(new Set(PLAY_SECTIONS).size).toBe(69);
+  it('pins a non-vacuous manifest: 73 index + 71 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(73);
+    expect(PLAY_SECTIONS.length).toBe(71);
+    expect(MANIFEST.length).toBe(73);
+    expect(new Set(INDEX_SECTIONS).size).toBe(73);
+    expect(new Set(PLAY_SECTIONS).size).toBe(71);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

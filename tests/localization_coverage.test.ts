@@ -56,6 +56,7 @@ import {
   pl_PL,
   pt_BR,
   ru_RU,
+  type SupportedLanguage,
   setLanguage,
   supportedLanguages,
   sv_SE,
@@ -1085,6 +1086,64 @@ describe('i18n Localization Key Coverage', () => {
     );
     expect(entityTranslationFallbackLog()).toHaveLength(0);
 
+    setLanguage('en');
+  });
+
+  it('keeps generated talent effect labels out of English fallback in translated locales', () => {
+    const englishEffectFragments = [
+      'damage-over-time damage',
+      'heal-over-time healing',
+      'melee haste',
+      'pet damage',
+      'damage redirected to pet',
+    ];
+    const descriptions = talentTranslationManifest().filter(
+      (entry) => entry.field === 'description',
+    );
+
+    for (const lang of supportedLanguages) {
+      if (lang === 'en' || lang === 'en_CA') continue;
+      setLanguage(lang);
+      const rendered = descriptions.map(renderTalentManifestEntry).join('\n').toLowerCase();
+      for (const fragment of englishEffectFragments) {
+        expect(rendered, `${lang}: copied English talent effect label ${fragment}`).not.toContain(
+          fragment,
+        );
+      }
+    }
+
+    setLanguage('en');
+  });
+
+  it('renders the mobile Store label in every locale', () => {
+    const expected: Record<SupportedLanguage, string> = {
+      en: 'Store',
+      en_CA: 'Store',
+      es: 'Tienda',
+      es_ES: 'Tienda',
+      fr_FR: 'Boutique',
+      fr_CA: 'Boutique',
+      it_IT: 'Negozio',
+      de_DE: 'Shop',
+      zh_CN: '商店',
+      zh_TW: '商店',
+      ko_KR: '상점',
+      ja_JP: 'ストア',
+      pt_BR: 'Loja',
+      ru_RU: 'Магазин',
+      cs_CZ: 'Obchod',
+      nl_NL: 'Winkel',
+      pl_PL: 'Sklep',
+      id_ID: 'Toko',
+      tr_TR: 'Mağaza',
+      sv_SE: 'Butik',
+      vi_VN: 'Cửa hàng',
+      da_DK: 'Butik',
+    };
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      expect(t('hudChrome.mobile.dailyRewards'), lang).toBe(expected[lang]);
+    }
     setLanguage('en');
   });
 

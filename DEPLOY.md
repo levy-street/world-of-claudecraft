@@ -185,9 +185,16 @@ For off-box safety, sync the directory to S3 occasionally:
   route answers `steam.disabled`, the mirror is inert, and no client renders
   link UI. To enable, set `STEAM_ENABLED=1` plus the Steamworks `STEAM_APP_ID`
   and a publisher Web API key in `STEAM_WEB_API_KEY` (partner.steam-api.com)
-  in the server runtime env. The key is a secret: it must never appear in
-  logs or client code. Linking is a cosmetic mirror for deed achievements
-  only; login with Steam does not exist.
+  in the server runtime env. Docker Compose passes these three variables from
+  the host `.env` into the game container. The key is a secret: it must never
+  appear in logs or client code. Linking is a cosmetic mirror for deed
+  achievements only; login with Steam does not exist.
+- **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
+  game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
+  run directly on the host. For the Compose game container with a host-run
+  economy service, use `http://host.docker.internal:8798/v1/claudium/`.
+  A separately deployed economy service should use its internal or remote DNS
+  URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
@@ -267,6 +274,83 @@ artifact with a different compiled catalog hash, a missing fixed key, or an
 unsupported extra key is rejected by the client and needs a normal game
 deployment instead. Compatible constrained mob-subfamily keys may be added by
 an artifact.
+
+## Automatic production CPU incident capture
+
+`npm run ops:cpu-monitor` watches Docker CPU and attaches to the game only after a
+confirmed trigger. By default it polls every 30 seconds, confirms that two of three
+samples exceed 90%, and then records a 20-second V8 CPU profile at a 4 ms sampling
+interval. The profile is temporary and event-triggered, so the profiler has no
+steady-state game-loop cost.
+
+Run the monitor as a supervised service on an always-on private operations host,
+not in the game container. The Levy Street deployment should manage that service
+in the private Ansible repo, where SSH aliases and credentials already live. A
+representative direct invocation from that host is:
+
+```bash
+npm run ops:cpu-monitor -- \
+  --direct \
+  --host world-of-claudecraft-prod \
+  --container eastbrook-game \
+  --out-dir /var/lib/woc-prod-cpu-monitor
+```
+
+The service unit should use `Restart=always`, `RestartSec=10`, `UMask=0077`, an
+unprivileged local user, and the repository checkout as its working directory. With
+systemd, use `StateDirectory=woc-prod-cpu-monitor` and
+`StateDirectoryMode=0700`; the monitor safely initializes an empty, private,
+service-owned directory on first use. The remote SSH principal needs narrowly
+controlled access to the Docker operations used by the script and to `flock` for
+capture serialization. General `sudo docker` access is effectively root access.
+Use a dedicated principal plus a root-owned forced-command or validation wrapper
+that admits only the exact expected commands for the named container; do not grant
+a wildcard Docker sudo rule to an ordinary account. The PID and profiler clients
+are immutable, root-owned helpers copied into `/app/ops` by the production image,
+and their `docker exec` calls do not consume client-supplied stdin. The wrapper must
+validate the complete `SSH_ORIGINAL_COMMAND`, reject unexpected stdin, and allow
+only those fixed helper paths. Checking only a `docker exec` command prefix still
+permits arbitrary code execution in the production container and is not sufficient.
+
+The monitor verifies private file ownership and permissions, uses local and remote
+exclusive locks, and retains at most 24 validated captures or 30 days of captures.
+Captures and process logs can contain sensitive operational data, so the artifact
+directory must stay private and must not be served over HTTP.
+
+Each incident directory includes `cpu.cpuprofile`, game and perf logs,
+container/process snapshots, Docker stats before/during/after, metadata, and SHA-256
+checksums. Open `cpu.cpuprofile` with the Load profile action in the Chrome DevTools
+Performance panel. Review `metadata.json` first: `complete` should be true and
+`profileStartDelayMs` records the delay until the profiler acknowledged it had
+started. A fully complete directory also contains a `COMPLETE` marker written after
+the metadata and checksum manifest. A valid CPU profile is retained even if
+supporting context is degraded. The `errors` array explains any missing auxiliary
+artifact without triggering a second profile every two minutes.
+
+Detailed tick-profiler JSON is optional. It requires an existing staff bearer that
+can access the `ops.perf` admin routes, supplied through a service-owned mode-0600
+file with `--ops-token-file`. The current role model does not provide a dedicated
+machine-only bearer, so do not copy a broad personal admin session into the service.
+Provision a narrowly scoped service credential in the server before enabling this
+option. When enabled, `tickCapture` in `metadata.json` must be `complete`.
+The tick result also records loop callback count, sim tick count, catch-up callback
+count, and maximum ticks per callback so callback aggregation is visible during a
+saturation event.
+
+Before enabling the service, verify its SSH user has only the required passwordless
+Docker commands and run one controlled check:
+
+```bash
+npm run ops:cpu-monitor -- --once --dry-run --direct \
+  --host world-of-claudecraft-prod \
+  --container eastbrook-game \
+  --out-dir /var/lib/woc-prod-cpu-monitor
+```
+
+Once automatic tick capture is working, remove `PERF_TICK_LOG=1` from production.
+The admin-triggered profiler enables detailed sim sub-phase timing only during its
+wall-clock capture window; leaving the environment flag enabled would keep that
+extra instrumentation active on every tick.
 
 ## Admin dashboard
 

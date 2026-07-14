@@ -34,6 +34,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
@@ -227,9 +228,9 @@ export interface SimContextCallbacks {
   // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
   // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
   // slash command and instances/dungeons reach them through the seam.
-  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it after
-  // rollLoot so a heroic final-boss corpse gains one personal Heroic Mark slot per
-  // eligible participant (no rng draws).
+  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it
+  // once per death to settle a heroic final boss's direct participant rewards
+  // and whole-claim realm-reset lockout together (no rng draws).
   lockoutNowMs(): number;
   // The next raid-reset instant (epoch ms) for a given lockout "now". The host owns
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
@@ -237,17 +238,12 @@ export interface SimContextCallbacks {
   raidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
+  instanceClaimIdAt(pos: Vec3): number | null;
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
-  // grantHeroicKillLockout is awardHeroicMarks' sibling on the death path, owned by
-  // instances/dungeons: the C1 death hub calls it for EVERY mob death (credit or no
-  // credit). A heroic claim's final-boss kill locks the whole owning group (plus
-  // anyone inside the instance) to the :heroic key until the daily reset, so the
-  // lockout cannot be dodged by camping the door or releasing before the kill.
-  grantHeroicKillLockout(mob: Entity): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -263,6 +259,9 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    attackAnimationStarted?: boolean,
+    // Amount is already fully source-modified (redirect shares); skip source-output mods.
+    alreadyFinal?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -319,9 +318,15 @@ export interface SimContextCallbacks {
     school: string,
     ability: string | null,
     kind: 'hit' | 'miss' | 'dodge',
+    attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
-  rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
+  rollLoot(
+    mob: Entity,
+    meta: PlayerMeta,
+    eligible?: PlayerMeta[],
+    contributors?: PlayerMeta[],
+  ): void;
   // World-boss personal loot: an independent roll of the boss's loot table per
   // contributor (gated once-per-day per boss). Owned by world_boss.ts.
   rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;
@@ -392,6 +397,12 @@ export interface SimContextCallbacks {
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
+  // Dungeon Finder formation seam (owned by social/party.ts): merge solo
+  // players and whole partial parties into ONE party/raid without synthesizing
+  // invite prompts or accept events. Returns the formed party, or null (and
+  // mutates nothing) when a source roster no longer matches live party state.
+  // Consumed by social/dungeon_finder.ts.
+  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
@@ -467,9 +478,12 @@ export interface SimContextCallbacks {
   grantNythraxisLockout(boss: Entity): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
-  // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts)
-  // both consume refreshKnownAbilities: the talent path always passes announce=false
-  // (a silent re-resolve, no learnAbility spam); the level-up path passes announce=true.
+  // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts) both
+  // consume refreshKnownAbilities with announce=true, so a spec pick / talent apply that
+  // grants a new ability (e.g. a spec signature) surfaces it: emits learnAbility (the HUD
+  // places it on the bar + spellbook) and a "You have learned" log. Character LOAD uses its
+  // OWN announce=false call (addPlayer/restore) so it never spams on login; the before/after
+  // diff in refreshKnownAbilities means only genuinely new abilities are announced.
   // G1a's talent module also consumes the core `error` sink (declared above). The talent
   // PUBLIC API (applyTalents/spendTalent/setSpec/respec/saveLoadout/switchLoadout/
   // deleteLoadout/talentPoints) is NOT on this seam: Sim keeps thin wrapper methods that
@@ -612,7 +626,13 @@ export interface SimContextCallbacks {
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
-  runEffects(p: Entity, meta: PlayerMeta, target: Entity | null, res: ResolvedAbility): void;
+  runEffects(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity | null,
+    res: ResolvedAbility,
+    attackAnimationStarted?: boolean,
+  ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
   // reach back for these. All STAY on Sim. `syncPetAspect` is pet-management (the P1b
@@ -640,6 +660,12 @@ export interface SimContextCallbacks {
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
   spawnDevBot(name: string): number;
+  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (social/chat.ts,
+  // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
+  seedDungeonFinderDev(
+    mode: 'queue' | 'raid' | 'board',
+    pid?: number,
+  ): { spawned: number; note: 'ok' | 'needRoles' | 'noneEligible' };
 
   // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
@@ -918,12 +944,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
+    instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,
-    grantHeroicKillLockout: host.grantHeroicKillLockout,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,
@@ -984,6 +1010,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     readyCheckStart: host.readyCheckStart,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
+    formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
@@ -1093,6 +1120,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
+    seedDungeonFinderDev: host.seedDungeonFinderDev,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,

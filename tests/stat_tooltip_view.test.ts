@@ -5,6 +5,7 @@ import {
   statBreakdownHeader,
   statCellHtml,
   statEffectText,
+  statNameKey,
   statNoteTexts,
   statSourceText,
   statTooltipAria,
@@ -98,6 +99,12 @@ describe('statBreakdownHeader', () => {
     expect(statBreakdownHeader(model({ stat: 'int', isPrimary: true, effects: [] }), deps)).toBe(
       '',
     );
+  });
+});
+
+describe('statNameKey', () => {
+  it('routes the Warfare label through the HUD-chrome catalog', () => {
+    expect(statNameKey('warfare')).toBe('hudChrome.statInfo.names.warfare');
   });
 });
 
@@ -305,9 +312,20 @@ describe('statTooltipAria', () => {
 });
 
 describe('statValueText', () => {
-  it('shows a one-decimal percent for crit and dodge', () => {
+  it('shows one-decimal percents for crit and dodge and both Warfare effects', () => {
     expect(statValueText(model({ stat: 'critChance', statValue: 5.5 }), deps)).toBe('5.5%');
     expect(statValueText(model({ stat: 'dodge', statValue: 5 }), deps)).toBe('5.0%');
+    expect(
+      statValueText(
+        model({
+          stat: 'warfare',
+          statValue: 20,
+          warfareDamageIncrease: 20,
+          warfareDamageReduction: 13.7,
+        }),
+        deps,
+      ),
+    ).toBe('hudChrome.statInfo.warfareValue(increase=20.0,reduction=13.7)');
   });
   it('shows a one-decimal number for the dps estimate and a whole number otherwise', () => {
     expect(statValueText(model({ stat: 'dps', statValue: 12.34 }), deps)).toBe('12.3');
@@ -334,5 +352,22 @@ describe('statCellHtml', () => {
     const html = statCellHtml(model({ stat: 'str', statValue: 7 }), xss);
     expect(html).toContain('A&amp;B: <b>7</b>');
     expect(html).not.toContain('A&B:');
+  });
+
+  it('uses one Warfare name and describes both live PvP effects in accessible output', () => {
+    const m = model({
+      stat: 'warfare',
+      isPrimary: false,
+      statValue: 20,
+      warfareDamageIncrease: 20,
+      warfareDamageReduction: 13.7,
+    });
+    const html = statCellHtml(m, deps);
+    expect(html).toContain(
+      'hudChrome.statInfo.names.warfare: <b>hudChrome.statInfo.warfareValue(increase=20.0,reduction=13.7)</b>',
+    );
+    expect(statTooltipAria(m, deps)).toBe(
+      'hudChrome.statInfo.desc.warfare(increase=20.0,reduction=13.7)',
+    );
   });
 });

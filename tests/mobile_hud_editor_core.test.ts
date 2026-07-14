@@ -377,7 +377,9 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     expect(invalidStep.scaleValid).toBe(false);
     expect(invalidStep.targetSizeValid).toBe(true);
     expect(belowFloor.scaleValid).toBe(false);
-    expect(belowFloor.targetSizeValid).toBe(false);
+    // Action seats compensate their touch rect below 1x, so an out-of-range
+    // visual scale remains independently invalid without shrinking the hitbox.
+    expect(belowFloor.targetSizeValid).toBe(true);
     expect(undersizedViewHitbox.scaleValid).toBe(true);
     expect(undersizedViewHitbox.targetSizeValid).toBe(false);
   });
@@ -502,7 +504,6 @@ describe('one canonical mobile HUD context validator', () => {
     const outside = validate(['action.a1'], { 'action.a1': at(-45, 100) });
     expect(scaled.map((failure) => failure.reason)).toEqual([
       'scale-out-of-range',
-      'target-too-small',
     ]);
     expect(outside).toEqual([]);
   });

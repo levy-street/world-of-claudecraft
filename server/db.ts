@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
+import {
+  type AccountFlair,
+  EMPTY_ACCOUNT_FLAIR,
+  normalizeAccountFlair,
+} from '../src/sim/account_flair';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
@@ -158,6 +163,46 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
+-- Paid weapon ownership and loadouts live outside accounts.cosmetics. Older game
+-- binaries replace that JSON document wholesale, so keeping paid state there would
+-- let a rolling deploy or rollback erase entitlements. The one-time backfill reads
+-- the legacy keys for accounts that received them before this table existed; once a
+-- row exists here it is authoritative and old binaries cannot mutate it.
+CREATE TABLE IF NOT EXISTS account_weapon_cosmetics (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  skin_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  loadout JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT account_weapon_cosmetics_skin_ids_array
+    CHECK (jsonb_typeof(skin_ids) = 'array'),
+  CONSTRAINT account_weapon_cosmetics_loadout_object
+    CHECK (jsonb_typeof(loadout) = 'object')
+);
+INSERT INTO account_weapon_cosmetics AS awc (account_id, skin_ids, loadout)
+SELECT
+  id,
+  CASE WHEN jsonb_typeof(cosmetics -> 'weaponSkinIds') = 'array'
+    THEN cosmetics -> 'weaponSkinIds' ELSE '[]'::jsonb END,
+  CASE WHEN jsonb_typeof(cosmetics -> 'weaponSkinLoadout') = 'object'
+    THEN cosmetics -> 'weaponSkinLoadout' ELSE '{}'::jsonb END
+FROM accounts
+WHERE cosmetics ? 'weaponSkinIds' OR cosmetics ? 'weaponSkinLoadout'
+-- This is deliberately insert-only. Re-merging the legacy document on every
+-- startup would let a rolled-back binary resurrect a stale, previously-cleared
+-- loadout. Once the dedicated row exists it is the sole authority.
+ON CONFLICT (account_id) DO NOTHING;
+-- Operator-set account flair (cosmetic, no gameplay effect): the "AI-operated
+-- account" mark that prefixes the character name with [AI], and an official
+-- streamer's platform links. Both are written ONLY from the admin dashboard
+-- (moderation.act) and audited in account_moderation_actions. streamer_links is
+-- a JSONB bag keyed by platform; it is UNTRUSTED at read time and always run back
+-- through normalizeAccountFlair (src/sim/account_flair.ts), which is also the one
+-- gate the write path uses, so a link that somehow reached the column cannot
+-- reach a client. is_streamer is kept separate from the links so an operator can
+-- switch the flair off without losing the URLs they typed.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_ai BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_streamer BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS streamer_links JSONB NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMPTZ;
 -- Whether the account has a password the OWNER set (and therefore can log in with
@@ -894,6 +939,11 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Season 1 Armory weapon skins: owned skin ids (granted on Claudium spend,
+  // reconciled from the economy service) and the applied-skin-per-weapon-type
+  // loadout. Account-wide by design; characters never carry either.
+  weaponSkinIds: string[];
+  weaponSkinLoadout: Record<string, string>;
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -908,59 +958,205 @@ function uniqueStrings(value: unknown): string[] {
   return out;
 }
 
+function stringRecord(value: unknown): Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const out: Record<string, string> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof entry === 'string' && entry.length > 0) out[key] = entry;
+  }
+  return out;
+}
+
 export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
   return {
     completedQuestIds: uniqueStrings(src.completedQuestIds),
     mechChromaIds: uniqueStrings(src.mechChromaIds),
+    weaponSkinIds: uniqueStrings(src.weaponSkinIds),
+    weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
+  };
+}
+
+interface AccountCosmeticsRow {
+  cosmetics?: unknown;
+  weapon_skin_ids?: unknown;
+  weapon_skin_loadout?: unknown;
+}
+
+function normalizeAccountCosmeticsRow(row: AccountCosmeticsRow | undefined): AccountCosmetics {
+  const base = normalizeAccountCosmetics(row?.cosmetics);
+  return {
+    ...base,
+    weaponSkinIds:
+      row?.weapon_skin_ids === null || row?.weapon_skin_ids === undefined
+        ? base.weaponSkinIds
+        : uniqueStrings(row.weapon_skin_ids),
+    weaponSkinLoadout:
+      row?.weapon_skin_loadout === null || row?.weapon_skin_loadout === undefined
+        ? base.weaponSkinLoadout
+        : stringRecord(row.weapon_skin_loadout),
   };
 }
 
 export async function loadAccountCosmetics(accountId: number): Promise<AccountCosmetics> {
-  const res = await pool.query('SELECT cosmetics FROM accounts WHERE id = $1', [accountId]);
-  return normalizeAccountCosmetics(res.rows[0]?.cosmetics);
+  const res = await pool.query(
+    `SELECT a.cosmetics,
+            awc.skin_ids AS weapon_skin_ids,
+            awc.loadout AS weapon_skin_loadout
+       FROM accounts a
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = a.id
+      WHERE a.id = $1`,
+    [accountId],
+  );
+  return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
-async function saveAccountCosmetics(
+/**
+ * The account's operator-set flair (AI mark + streamer links). The stored JSONB is
+ * treated as untrusted: the row always goes back through normalizeAccountFlair, so
+ * a link that is not a plain https URL on the platform's own host is dropped here
+ * rather than shipped to a client. An unknown account reads as no flair.
+ */
+export async function loadAccountFlair(accountId: number): Promise<AccountFlair> {
+  const res = await pool.query(
+    'SELECT is_ai, is_streamer, streamer_links FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  const row = res.rows[0];
+  if (!row) return EMPTY_ACCOUNT_FLAIR;
+  return normalizeAccountFlair({
+    ai: row.is_ai,
+    streamer: row.is_streamer,
+    links: row.streamer_links,
+  });
+}
+
+async function addAccountCosmeticId(
   accountId: number,
-  cosmetics: AccountCosmetics,
+  key: 'completedQuestIds' | 'mechChromaIds',
+  value: string,
 ): Promise<AccountCosmetics> {
   const res = await pool.query(
-    'UPDATE accounts SET cosmetics = $2 WHERE id = $1 RETURNING cosmetics',
-    [accountId, cosmetics],
+    `WITH updated AS (
+       UPDATE accounts
+          SET cosmetics = jsonb_set(
+            COALESCE(cosmetics, '{}'::jsonb), ARRAY[$2::text],
+            (SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY v), '[]'::jsonb)
+               FROM (
+                 SELECT DISTINCT v FROM (
+                   SELECT jsonb_array_elements_text(
+                     CASE WHEN jsonb_typeof(cosmetics -> $2) = 'array'
+                       THEN cosmetics -> $2 ELSE '[]'::jsonb END) AS v
+                   UNION ALL SELECT $3::text
+                 ) merged
+               ) uniq))
+        WHERE id = $1
+        RETURNING id, cosmetics
+     )
+     SELECT updated.cosmetics,
+            awc.skin_ids AS weapon_skin_ids,
+            awc.loadout AS weapon_skin_loadout
+       FROM updated
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id`,
+    [accountId, key, value],
   );
-  return normalizeAccountCosmetics(res.rows[0]?.cosmetics ?? cosmetics);
+  return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
 export async function markAccountQuestComplete(
   accountId: number,
   questId: string,
 ): Promise<AccountCosmetics> {
-  const cosmetics = await loadAccountCosmetics(accountId);
-  const completedQuestIds = cosmetics.completedQuestIds.includes(questId)
-    ? cosmetics.completedQuestIds
-    : [...cosmetics.completedQuestIds, questId];
-  return saveAccountCosmetics(accountId, { ...cosmetics, completedQuestIds });
+  return addAccountCosmeticId(accountId, 'completedQuestIds', questId);
 }
 
 export async function grantAccountMechChroma(
   accountId: number,
   chromaId: string,
 ): Promise<AccountCosmetics> {
-  const cosmetics = await loadAccountCosmetics(accountId);
-  const mechChromaIds = cosmetics.mechChromaIds.includes(chromaId)
-    ? cosmetics.mechChromaIds
-    : [...cosmetics.mechChromaIds, chromaId];
-  return saveAccountCosmetics(accountId, { ...cosmetics, mechChromaIds });
+  return addAccountCosmeticId(accountId, 'mechChromaIds', chromaId);
 }
 
 export async function revokeAccountMechChroma(
   accountId: number,
   chromaId: string,
 ): Promise<AccountCosmetics> {
-  const cosmetics = await loadAccountCosmetics(accountId);
-  const mechChromaIds = cosmetics.mechChromaIds.filter((id) => id !== chromaId);
-  return saveAccountCosmetics(accountId, { ...cosmetics, mechChromaIds });
+  const res = await pool.query(
+    `WITH updated AS (
+       UPDATE accounts
+          SET cosmetics = jsonb_set(
+            COALESCE(cosmetics, '{}'::jsonb), '{mechChromaIds}',
+            (SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY ord), '[]'::jsonb)
+               FROM jsonb_array_elements_text(
+                 CASE WHEN jsonb_typeof(cosmetics -> 'mechChromaIds') = 'array'
+                   THEN cosmetics -> 'mechChromaIds' ELSE '[]'::jsonb END)
+                 WITH ORDINALITY AS entries(v, ord)
+              WHERE v <> $2))
+        WHERE id = $1
+        RETURNING id, cosmetics
+     )
+     SELECT updated.cosmetics,
+            awc.skin_ids AS weapon_skin_ids,
+            awc.loadout AS weapon_skin_loadout
+       FROM updated
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id`,
+    [accountId, chromaId],
+  );
+  return normalizeAccountCosmeticsRow(res.rows[0]);
+}
+
+/** Additive union in the rollback-safe paid-entitlement row. */
+export async function grantAccountWeaponSkins(
+  accountId: number,
+  skinIds: string[],
+): Promise<AccountCosmetics> {
+  const res = await pool.query(
+    `WITH upserted AS (
+       INSERT INTO account_weapon_cosmetics AS awc (account_id, skin_ids)
+       VALUES ($1, to_jsonb($2::text[]))
+       ON CONFLICT (account_id) DO UPDATE SET
+         skin_ids = (
+           SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY v), '[]'::jsonb)
+             FROM (
+               SELECT DISTINCT value AS v
+                 FROM jsonb_array_elements_text(awc.skin_ids || EXCLUDED.skin_ids)
+             ) merged),
+         updated_at = now()
+       RETURNING account_id, skin_ids, loadout
+     )
+     SELECT a.cosmetics,
+            upserted.skin_ids AS weapon_skin_ids,
+            upserted.loadout AS weapon_skin_loadout
+       FROM upserted
+       JOIN accounts a ON a.id = upserted.account_id`,
+    [accountId, skinIds.filter((id) => id)],
+  );
+  return normalizeAccountCosmeticsRow(res.rows[0]);
+}
+
+/** Replace the applied-skin-per-weapon-type loadout in the paid-state row. */
+export async function setAccountWeaponSkinLoadout(
+  accountId: number,
+  loadout: Record<string, string>,
+): Promise<AccountCosmetics> {
+  const cleanLoadout = stringRecord(loadout);
+  const res = await pool.query(
+    `WITH upserted AS (
+       INSERT INTO account_weapon_cosmetics AS awc (account_id, loadout)
+       VALUES ($1, $2::jsonb)
+       ON CONFLICT (account_id) DO UPDATE SET
+         loadout = EXCLUDED.loadout,
+         updated_at = now()
+       RETURNING account_id, skin_ids, loadout
+     )
+     SELECT a.cosmetics,
+            upserted.skin_ids AS weapon_skin_ids,
+            upserted.loadout AS weapon_skin_loadout
+       FROM upserted
+       JOIN accounts a ON a.id = upserted.account_id`,
+    [accountId, JSON.stringify(cleanLoadout)],
+  );
+  return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
 function cleanMetadataText(value: string | null | undefined, max: number): string | null {

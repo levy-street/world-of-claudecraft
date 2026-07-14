@@ -72,17 +72,28 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
 // Crit and dodge are shown as percents (one decimal); every other stat's source
 // values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
-  model.stat === 'critChance' || model.stat === 'dodge';
+  model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'warfare';
 
 /** The catalog key for a stat's display name. Most reuse the shared
  *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
  *  lives in the English-only HUD-chrome domain instead. */
 export function statNameKey(stat: StatTooltipModel['stat']): string {
-  // Character-sheet-only stats (no item carries a labeled line for them) keep their
-  // label in the English-only HUD-chrome domain instead of the item-stats catalog.
-  return stat === 'spellPower' || stat === 'critRating' || stat === 'hasteRating'
+  // Character-sheet rating labels live in the HUD-chrome domain instead of the
+  // core item-stats catalog (WARFARE items author ratings, not final percentages).
+  return stat === 'spellPower' ||
+    stat === 'critRating' ||
+    stat === 'hasteRating' ||
+    stat === 'warfare'
     ? `hudChrome.statInfo.names.${stat}`
     : `itemUi.stats.${stat}`;
+}
+
+function statDescriptionText(model: StatTooltipModel, deps: StatTooltipI18n): string {
+  if (model.stat !== 'warfare') return deps.t(`hudChrome.statInfo.desc.${model.stat}`);
+  return deps.t('hudChrome.statInfo.desc.warfare', {
+    increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
+    reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
+  });
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:
@@ -153,7 +164,7 @@ export function statSourcesHeader(model: StatTooltipModel, deps: StatTooltipI18n
  *  talents), then any note lines. */
 export function statTooltipHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
   let html = `<div class="tt-title">${esc(deps.t(statNameKey(model.stat)))}</div>`;
-  html += `<div class="tt-body">${esc(deps.t(`hudChrome.statInfo.desc.${model.stat}`))}</div>`;
+  html += `<div class="tt-body">${esc(statDescriptionText(model, deps))}</div>`;
   const header = statBreakdownHeader(model, deps);
   if (header) html += `<div class="tt-bd-head">${esc(header)}</div>`;
   for (const e of model.effects) {
@@ -175,7 +186,7 @@ export function statTooltipHtml(model: StatTooltipModel, deps: StatTooltipI18n):
  *  sighted-only tooltip. The stat name is omitted here because the cell's own
  *  visible text already names it. */
 export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  const parts = [deps.t(`hudChrome.statInfo.desc.${model.stat}`)];
+  const parts = [statDescriptionText(model, deps)];
   const header = statBreakdownHeader(model, deps);
   if (header) parts.push(header);
   for (const e of model.effects) parts.push(statEffectText(e, deps));
@@ -190,6 +201,12 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
  *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
  *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
+  if (model.stat === 'warfare') {
+    return deps.t('hudChrome.statInfo.warfareValue', {
+      increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
+      reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
+    });
+  }
   if (model.stat === 'critChance' || model.stat === 'dodge')
     return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);

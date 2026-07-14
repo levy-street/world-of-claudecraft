@@ -725,8 +725,8 @@ const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
       ] as const
     ).every((slot) => !!m.equipment[slot]),
   nonDefaultSkin: (m) => m.skinCatalog === 'mech' || m.skin > 0,
-  // The marked set resets whenever the date advances, so containment of all
-  // four ids already means "for one heroicDaily.date".
+  // The marked set resets whenever the authoritative reward window advances,
+  // so containment of all four ids already means one complete circuit.
   heroicMarkCircuit: (m) => MARK_CIRCUIT_DUNGEONS.every((d) => m.heroicDaily.marked.has(d)),
   companionsBothMax: (m) =>
     (m.companionUpgrades.companion_tessa ?? 0) >= 3 &&

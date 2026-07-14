@@ -673,7 +673,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
   },
   // Heroic-dungeon participation token: the final boss of a heroic instance
-  // drops one personal mark per eligible participant (awardHeroicMarks in
+  // directly awards marks to every eligible participant (awardHeroicMarks in
   // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   heroic_mark: {
     id: 'heroic_mark',
@@ -685,8 +685,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     // Bound to the earner: marks can only be spent at the Heroic Quartermaster,
-    // never traded, mailed, listed, or destroyed. See the soulbound flag in types.ts.
+    // never traded, mailed, listed, or destroyed.
     soulbound: true,
+    noDiscard: true,
   },
   raw_mirror_trout: {
     id: 'raw_mirror_trout',

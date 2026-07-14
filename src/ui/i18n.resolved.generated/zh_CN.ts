@@ -155,136 +155,136 @@ export const zh_CN: EnTranslations = {
       "banner": "正在观察 {name}"
     },
     "mobileHudEditor": {
-      "launcher": "自定义移动布局",
-      "title": "移动布局编辑器",
-      "dialogLabel": "自定义移动控件",
-      "locked": "锁定",
-      "unlocked": "解锁",
-      "lock": "锁布局",
-      "unlock": "解锁布局",
-      "sceneLabel": "预览场景",
-      "contextLabel": "预览状态",
-      "profileLabel": "设备简介",
-      "profilePhone": "手机",
-      "profileTablet": "平板电脑",
-      "save": "保存",
-      "cancel": "取消",
-      "showFailingLayout": "显示失败的布局",
-      "previousFailure": "以前的失败",
-      "nextFailure": "下一次失败",
-      "runtimeFallback": "{profile} 布局不适合此视口。内置默认值暂时处于活动状态。",
-      "storageError": "无法保存移动布局。您的草稿仍处于开放状态。",
-      "invalidSave": "保存之前修复每个布局错误。",
-      "failureWithContext": "{message}（{context}）",
-      "failureWithFixture": "{message}（{context}；{profile}；{viewport}）",
+      "launcher": "Customize Mobile Layout",
+      "title": "Mobile Layout Editor",
+      "dialogLabel": "Customize mobile controls",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "lock": "Lock layout",
+      "unlock": "Unlock layout",
+      "sceneLabel": "Preview scene",
+      "contextLabel": "Preview state",
+      "profileLabel": "Device profile",
+      "profilePhone": "Phone",
+      "profileTablet": "Tablet",
+      "save": "Save",
+      "cancel": "Cancel",
+      "showFailingLayout": "Show Failing Layout",
+      "previousFailure": "Previous failure",
+      "nextFailure": "Next failure",
+      "runtimeFallback": "The {profile} layout does not fit this viewport. Built-in defaults are active temporarily.",
+      "storageError": "Could not save the mobile layout. Your draft is still open.",
+      "invalidSave": "Fix every layout error before saving.",
+      "failureWithContext": "{message} ({context})",
+      "failureWithFixture": "{message} ({context}; {profile}; {viewport})",
       "scene": {
-        "world": "世界",
-        "arenaStandard": "竞技场标准",
-        "arenaFiesta": "竞技场嘉年华",
-        "arenaYumi": "竞技场由美",
-        "valeCupBriefing": "溪谷杯简报",
-        "valeCupMatch": "溪谷杯比赛",
-        "valeCupSpectator": "溪谷杯观战",
-        "delve": "探秘"
+        "world": "World",
+        "arenaStandard": "Arena Standard",
+        "arenaFiesta": "Arena Fiesta",
+        "arenaYumi": "Arena Yumi",
+        "valeCupBriefing": "Vale Cup Briefing",
+        "valeCupMatch": "Vale Cup Match",
+        "valeCupSpectator": "Vale Cup Spectator",
+        "delve": "Delve"
       },
       "context": {
-        "worldBase": "世界",
-        "worldValeCupIndicator": "显示溪谷杯提示的世界",
-        "arenaStandard": "竞技场标准",
-        "arenaFiestaBase": "嘉年华比赛",
-        "arenaFiestaPending": "嘉年华待定",
-        "arenaFiestaRespawn": "嘉年华重生",
-        "arenaFiestaOffer": "嘉年华增加优惠",
-        "arenaFiestaRespawnOffer": "嘉年华重生并增强优惠",
-        "arenaYumiBase": "由美比赛",
-        "arenaYumiRespawn": "由美重生",
-        "arenaYumiReturning": "由美归来",
-        "valeCupBriefing": "溪谷杯简报",
-        "valeCupMatch": "溪谷杯比赛",
-        "valeCupMatchCharge": "溪谷杯蓄力射击",
-        "valeCupSpectatorBetting": "溪谷杯观战投注",
-        "instanceDelve": "探秘"
+        "worldBase": "World",
+        "worldValeCupIndicator": "World with Vale Cup indicator",
+        "arenaStandard": "Arena Standard",
+        "arenaFiestaBase": "Fiesta match",
+        "arenaFiestaPending": "Fiesta pending",
+        "arenaFiestaRespawn": "Fiesta respawn",
+        "arenaFiestaOffer": "Fiesta augment offer",
+        "arenaFiestaRespawnOffer": "Fiesta respawn and augment offer",
+        "arenaYumiBase": "Yumi match",
+        "arenaYumiRespawn": "Yumi respawn",
+        "arenaYumiReturning": "Yumi returning",
+        "valeCupBriefing": "Vale Cup briefing",
+        "valeCupMatch": "Vale Cup match",
+        "valeCupMatchCharge": "Vale Cup charged shot",
+        "valeCupSpectatorBetting": "Vale Cup spectator betting",
+        "instanceDelve": "Delve"
       },
       "surface": {
-        "actionA1": "动作A1",
-        "actionA2": "动作A2",
-        "actionA3": "动作A3",
-        "actionA4": "行动A4",
-        "actionA5": "行动A5",
-        "actionAttack": "攻击",
-        "actionTarget": "目标",
-        "actionJumpUse": "跳跃或使用",
-        "actionPage": "动作页面切换",
-        "controlMovement": "移动",
-        "controlView": "视角",
-        "utilityConsumables": "消耗品",
-        "petCommands": "宠物命令",
-        "party": "队伍",
-        "menuTop": "顶部菜单",
-        "minimapCluster": "小地图",
-        "frameTarget": "目标框",
-        "framePlayer": "玩家框",
-        "playerBuffs": "玩家增益",
-        "playerDebuffs": "玩家减益效果",
-        "statusArenaGeneric": "竞技场状态",
-        "statusFiestaScore": "嘉年华分数",
-        "statusFiestaPending": "嘉年华待定状态",
-        "protectedFiestaRespawn": "嘉年华重生提示",
-        "protectedFiestaOffer": "嘉年华增加优惠",
-        "statusYumi": "由美状态",
-        "protectedYumiRespawn": "Yumi重生提示",
-        "statusValeCupIndicator": "溪谷杯提示",
-        "protectedValeCupBriefing": "溪谷杯简报",
-        "statusValeCupMatch": "溪谷杯比赛状态",
-        "statusValeCupCharge": "溪谷杯射击蓄力",
-        "protectedValeCupBetting": "溪谷杯投注面板",
-        "trackerDelve": "探秘追踪器",
-        "protectedCenterMessage": "中央提示"
+        "actionA1": "Action A1",
+        "actionA2": "Action A2",
+        "actionA3": "Action A3",
+        "actionA4": "Action A4",
+        "actionA5": "Action A5",
+        "actionAttack": "Attack",
+        "actionTarget": "Target",
+        "actionJumpUse": "Jump or Use",
+        "actionPage": "Action page switch",
+        "controlMovement": "Movement",
+        "controlView": "View",
+        "utilityConsumables": "Consumables",
+        "petCommands": "Pet commands",
+        "party": "Party / Raid",
+        "menuTop": "Top menu",
+        "minimapCluster": "Minimap",
+        "frameTarget": "Target frame",
+        "framePlayer": "Player frame",
+        "playerBuffs": "Player buffs",
+        "playerDebuffs": "Player debuffs",
+        "statusArenaGeneric": "Arena status",
+        "statusFiestaScore": "Fiesta score",
+        "statusFiestaPending": "Fiesta pending status",
+        "protectedFiestaRespawn": "Fiesta respawn prompt",
+        "protectedFiestaOffer": "Fiesta augment offer",
+        "statusYumi": "Yumi status",
+        "protectedYumiRespawn": "Yumi respawn prompt",
+        "statusValeCupIndicator": "Vale Cup indicator",
+        "protectedValeCupBriefing": "Vale Cup Briefing",
+        "statusValeCupMatch": "Vale Cup match status",
+        "statusValeCupCharge": "Vale Cup shot charge",
+        "protectedValeCupBetting": "Vale Cup betting panel",
+        "trackerDelve": "Delve tracker",
+        "protectedCenterMessage": "Center message"
       },
       "control": {
-        "nudgeUp": "向上移动",
-        "nudgeDown": "下移",
-        "nudgeLeft": "向左移动",
-        "nudgeRight": "向右移动",
-        "decreaseScale": "减小尺寸",
-        "increaseScale": "增加尺寸",
-        "orientation": "方向",
-        "horizontal": "水平的",
-        "vertical": "垂直的",
-        "order": "顺序",
-        "normalOrder": "正常顺序",
-        "reverseOrder": "反向顺序",
-        "openingDirection": "展开方向",
-        "openLeft": "向左展开",
-        "openRight": "向右展开",
-        "openUp": "向上展开",
-        "openDown": "向下展开",
-        "resetSelected": "重置所选内容",
-        "resetAll": "全部重置"
+        "nudgeUp": "Move up",
+        "nudgeDown": "Move down",
+        "nudgeLeft": "Move left",
+        "nudgeRight": "Move right",
+        "decreaseScale": "Decrease size",
+        "increaseScale": "Increase size",
+        "orientation": "Orientation",
+        "horizontal": "Horizontal",
+        "vertical": "Vertical",
+        "order": "Order",
+        "normalOrder": "Normal",
+        "reverseOrder": "Reversed",
+        "openingDirection": "Opening direction",
+        "openLeft": "Open left",
+        "openRight": "Open right",
+        "openUp": "Open up",
+        "openDown": "Open down",
+        "resetSelected": "Reset Selected",
+        "resetAll": "Reset All"
       },
       "status": {
-        "noSelection": "选择一个控件进行编辑。",
-        "selected": "已选择：{surface}",
-        "scale": "尺寸：{scale}",
-        "valid": "布局准备保存。",
-        "invalid": "布局有 {count} 个阻塞错误。",
-        "failurePosition": "失败 {index}，共 {count} 个"
+        "noSelection": "Select a control to edit it.",
+        "selected": "Selected: {surface}",
+        "scale": "Size: {scale}",
+        "valid": "Layout ready to save.",
+        "invalid": "Layout has {count} blocking errors.",
+        "failurePosition": "Failure {index} of {count}"
       },
       "failure": {
-        "invalidPlacement": "{surface} 的展示位置无效。",
-        "unsupportedCapability": "{surface} 使用不受支持的布局选项。",
-        "scaleOutOfRange": "{surface} 尺寸超出其允许范围。",
-        "targetTooSmall": "{surface} 太小，无法安全使用。",
-        "outOfBounds": "{surface} 位于安全区域之外。",
-        "overlap": "{surface} 与 {other} 重叠。",
-        "viewIntrusion": "{surface} 与视图区域重叠。",
-        "protectedOverlap": "{surface} 与 {other} 重叠。"
+        "invalidPlacement": "{surface} has an invalid placement.",
+        "unsupportedCapability": "{surface} uses an unsupported layout option.",
+        "scaleOutOfRange": "{surface} size is outside its allowed range.",
+        "targetTooSmall": "{surface} is too small to use safely.",
+        "outOfBounds": "{surface} is outside the safe area.",
+        "overlap": "{surface} overlaps {other}.",
+        "viewIntrusion": "{surface} overlaps the View area.",
+        "protectedOverlap": "{surface} overlaps {other}."
       },
       "discard": {
-        "title": "放弃布局更改？",
-        "body": "您未保存的移动布局更改将会丢失。",
-        "confirm": "放弃更改",
-        "continueEditing": "继续编辑"
+        "title": "Discard layout changes?",
+        "body": "Your unsaved mobile layout changes will be lost.",
+        "confirm": "Discard Changes",
+        "continueEditing": "Continue Editing"
       }
     },
     "readyCheck": {
@@ -377,6 +377,263 @@ export const zh_CN: EnTranslations = {
         "banned": "您已被禁止参加每日奖励。原因：{reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC 商店",
+      "close": "关闭 WOC 商店",
+      "tabsLabel": "WOC 商店分区",
+      "storeTab": "商店",
+      "rewardsTab": "每日奖励",
+      "loading": "正在加载 WOC 商店…",
+      "error": "WOC 商店暂时不可用，请稍后再试。",
+      "balance": "Claudium 余额",
+      "buyClaudium": "购买 Claudium",
+      "owned": "已拥有",
+      "needMoreTitle": "需要更多 Claudium",
+      "needMoreBody": "还需要 {shortfall} Claudium 才能购买 {item}。",
+      "cancel": "取消",
+      "confirmTitle": "确认购买外观",
+      "confirmBody": "要用 {cost} Claudium 购买 {item} 吗？",
+      "confirmPurchase": "购买",
+      "priceChanged": "购买完成前价格已发生变化。请查看刷新后的价格并再次确认。",
+      "armoryEyebrow": "第一赛季",
+      "armoryTitle": "兵器库",
+      "armoryBody": "第一赛季兵器库限定武器外观。全账号通用，纯装饰性，周围所有玩家都能看到。",
+      "collectionLine": "{collection}系列",
+      "collections": {
+        "guildmark": "公会印记",
+        "emberwrought": "余烬锻造",
+        "hoarfrost": "白霜",
+        "fallen_star": "陨星"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "公会印记武装剑",
+          "look": "发蓝钢剑刃、青铜鱼尾形十字护手、青绿色染皮握柄，以及一枚小巧的公会钢印。",
+          "lore": "一般成品剑无名无姓，这一把却有署名。只有当 World Market 的 Merchant 愿为其钢材作保，铠甲匠才有权在剑根刻下自己的印记；Smith Haldren 的印记正有这份担保。剑身经发蓝处理，足以抵御 the Vale 的湿气，平衡精准至毫厘。你付的钱有一半买的是钢印，但它物有所值。"
+        },
+        "brasscap_axe": {
+          "name": "黄铜帽手斧",
+          "look": "抛光钢斧刃，漆制白蜡木柄上装有黄铜顶帽与护木铁，缠带整洁，并刻有匠人钢印。",
+          "lore": "带钢印的斧头是握在手里的炫耀。黄铜顶帽和护木铁一半是护甲，一半是签名：既防斧柄劈裂，也映着酒馆灯火，让人人都知道你买的是 Armorer Hode 的作品，不是民兵传下来的旧货。“能砍，我就卖。”Highwatch 的铁匠如此说。这一把确实能砍。"
+        },
+        "tempered_flanged_mace": {
+          "name": "淬火凸缘锤",
+          "look": "六棱淬火蓝钢锤头、黄铜颈环与柄首，以及酒红色皮革握柄。",
+          "lore": "六道发蓝淬火钢棱，每一道都磨得足以劈开头盔，再配黄铜端饰与酒红皮革。哪怕用途再残酷，王国的铠甲匠也不肯造丑陋的武器。这一把经 World Market 专门委制，并非货架上的现成货；某处账簿里还写着那位自豪买家的名字，以及他付给 Hode 的价钱。"
+        },
+        "guildmark_dirk": {
+          "name": "公会印记短剑",
+          "look": "纤细的淬火钢短剑、青铜护手与柄尾螺帽、深绿色绳缠握柄，以及压印徽记。",
+          "lore": "这是有身份者把长剑留在家中时佩戴的武器：纤细、淬火，盖着与整柄长剑同样的认证钢印，挂在腰间，如同一枚带刃的印戒。除非懂得铠甲匠的凭证，否则只会觉得它低调。Quartermaster Bree 在 Highwatch 留着整整一抽屉，专供赢得城墙敬意的军官。"
+        },
+        "brasscrown_staff": {
+          "name": "黄铜冠手杖",
+          "look": "硬木杖顶装有车制黄铜冠饰，配黄铜杖脚与染色皮带。",
+          "lore": "杖身取自风干硬木，顶上是 Eastbrook 铁匠成百铸造却件件精修的黄铜冠饰。它属于那种无论走到 Fenbridge 城门还是 Highwatch 城墙，都希望被认真对待的旅人。这根手杖从未真正需要支撑步伐；染色皮带与那件一眼便知价值不菲的外套恰好相配。"
+        },
+        "lacquered_wand": {
+          "name": "漆木短杖",
+          "look": "纤细的深红漆杖，饰有两道抛光黄铜环和小巧圆润的黄铜杖头。",
+          "lore": "深红漆面耐心涂了七层，再以两道抛光黄铜束起。这正是乡野法师开始收取真金白银后，会从 World Market 买来装点门面的法杖。它引导 Light 的能力并不比白桦枝更强，却能在 Merchant 的柜台上耀眼夺目；小法术向来有一半靠别人相信。"
+        },
+        "fletcher_s_guild_bow": {
+          "name": "制弓师公会弓",
+          "look": "漆制胡桃木反曲弓、黄铜弓梢、上蜡亚麻弦，弓把上刻有公会钢印。",
+          "lore": "弓把上的制弓师钢印，是王国最接近公会凭证的东西；它承诺着弓身内在的品质，就像酿酒师为木桶封印。漆制胡桃木、黄铜弓梢，还有经上蜡、不会在 Mirefen 雨中磨损的亚麻弦，每一处接合都在为价格辩护。越过 Widow Thicket 后拉一次弓，这场辩论便有了答案。"
+        },
+        "cinderbrand_sword": {
+          "name": "烬痕",
+          "look": "深色锻钢剑刃，血槽中嵌着橙红发光符文与热裂纹，护手内有一枚阴燃宝石。",
+          "lore": "这是第一把不用水淬火，而以从 Stormcrag 耙出的 Blessed Embers 淬炼的剑。Highwatch 的铁匠发誓，那些煤火“燃得湛蓝而纯净，因为山仍记得古老的誓言”。火焰被封进血槽后只余橙红暗燃，却永不熄灭；即便在城墙最寒冷的夜晚，符文也能温暖裸手。Cinderbrand 从不需要点燃，它只是拒绝熄灭。"
+        },
+        "emberbite_axe": {
+          "name": "余烬之噬",
+          "look": "熏黑铁斧，斧刃间透出橙红裂光，嵌有一枚封存炭火的宝石，周围热气缭绕。",
+          "lore": "Armorer Hode 把一块山火活炭锻进斧刃核心，使刃口在两次挥砍之间也从未真正冷却。下劈时裂纹吐出橙光，仿佛撞击唤醒了初次锻造时沉睡在铁里的东西。有人说一只 Stormcrag 元素为此交出了余烬；Highwatch 起风时，人们总会说出许多故事。"
+        },
+        "smoulderfall_mace": {
+          "name": "闷燃坠击",
+          "look": "黑铁锤棱的内侧裂缝泛着橙红光芒，锤头中嵌有熔核宝石。",
+          "lore": "这柄战锤自带炉火：从那道“以山火铸成”的 Sanctum 封印上凿下一块熔核石，嵌在锤头中发光。锤棱触手温热，落下时更烫；一名 Highwatch 中士发誓，被它击中的瘀伤会微微发亮直到清晨。山中之火终于不再用于封印，而用于破坏。"
+        },
+        "ashspark_dagger": {
+          "name": "灰火匕",
+          "look": "短小的熏黑刀刃遍布橙红发光纹路，柄首嵌着微小的阴燃宝石，灰烬与火星相随。",
+          "lore": "一把将山火偷藏进柄首宝石的巷战短刀，也是铠甲匠无声的玩笑：就连扒手也能带着初次锻造的一点余烬。刀身熏黑、橙纹密布，在鞘中总比应有的温度更暖。于 Highwatch 下方的黑暗中拔出它，微光恰好能照亮你的手，也足以找到对手守势中的缝隙。"
+        },
+        "forgeheart_staff": {
+          "name": "炉心法杖",
+          "look": "铁箍法杖顶端囚着发光余烬核心，火焰符文沿杖身攀升，热浪在上方摇曳。",
+          "lore": "一块山火活炭被囚在杖冠的铁笼中。Loremaster Caddis 称它证明了初次锻造之火不仅能用于封印，也能被束缚来服务。热浪化作纤细而无尽的丝带升起；携带它的法师永远不缺锻炉或守夜火。传言这块余烬取自 Voskar the Emberwing 的吐息，自此从未冷却。"
+        },
+        "emberwrought_wand": {
+          "name": "余烬锻造魔杖",
+          "look": "熏黑金属魔杖，铁爪扣住发光炭火，细微热裂纹间透出温暖内光。",
+          "lore": "正是这根魔杖为整个品级命名。Highwatch 的铠甲匠第一次以铁爪扣住山火余炭，并让它听命于凡人之手时，就连 Light 的祭司也不再称其为异端，转而说它很实用。温暖、耐心，又悄然危险：杖尖的余烬从主人出生前便持续燃烧，从未中断。"
+        },
+        "cinderlatch_crossbow": {
+          "name": "烬锁",
+          "look": "熏黑钢弩，弩臂裂缝渗出橙红光芒，弩身中封着一块阴燃煤炭。",
+          "lore": "这是余烬锻造中最奇异的一件：把山火灌进一台机械。橙光从弩臂裂缝渗出，弩身内的阴燃煤炭令弓弦在 Thornpeak 的严寒或 Mirefen 的湿气中都不会僵硬。弩矢离槽时已有温度，命中时更为灼热。对于城墙外那些同样不畏严寒的敌人，这是猎人的回答。"
+        },
+        "ice_fang_sword": {
+          "name": "冰牙",
+          "look": "苍白冰川弯刃，刃背生着锯齿状霜晶，血槽内有发光的青蓝冰核，护手如冰柱。",
+          "lore": "这是冰封品级的旗舰，也是每位收藏家最先伸手的一件。Ice Fang 并非锻造，而是从覆盖 Highwatch 上方 Thornpeak 的冰川尖牙中雕成；青蓝核心寒冷燃烧，如 Glimmermere 水面的冷光。它劈过之处连空气都会结霜。城墙守卫发誓，大雪挡住 Wyrmcult 的那一夜，一名士兵带着它，“为城墙买下了一个冬天”。"
+        },
+        "glaciersplit_axe": {
+          "name": "裂冰",
+          "look": "半透明蓝色冰川斧头，裂开的内部泛着青蓝光，霜晶密布，斧柄拖曳寒雾。",
+          "lore": "它凿自 Thornpeak 冰川的蓝色核心，两个世纪的重压把寒意压到自行发光。即使静止也拖着白雾，落下时的巨响如同 Stalker Ridge 下方裂开一道冰隙。Highwatch 将阵亡者交给那里的冰雪；因此这件武器生来便要阻挡融雪，以及融雪可能唤醒的一切。"
+        },
+        "rimecrusher_mace": {
+          "name": "霜碎",
+          "look": "锯齿状冰晶簇拥着发光的青蓝核心，白霜沿镀银锤柄向下蔓延。",
+          "lore": "它不是雕刻出来，而是生长而成：匠人诱导 Thornpeak 寒冰包裹青蓝冷核，直到坚硬得不逊于 Hode 最好的钢。白霜沿镀银锤柄爬向手掌，却始终差一点触及。它击中之处水会冻结，停放之处地面会泛白。山峰的墓穴寒意，被缩小到足以挥向那些攀爬城墙之物。"
+        },
+        "frostbite_dagger": {
+          "name": "霜针",
+          "look": "透明蓝冰制成的极细匕首，中央贯穿青蓝发光脉络，针状霜晶与白霜覆盖刀柄。",
+          "lore": "薄如屏息，却比呼吸冷上两倍：一片 Thornpeak 冰川碎屑被磨成单一发光脉络，锋利到伤口会在血液想起流动前先被冻结。它的名字借自死者从群峰带下的墓穴寒意。它从不需要磨刃；Loremaster Caddis 冷冷地说，冰不会变钝，它只会等待。"
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "白霜守望",
+          "look": "镀银法杖顶端漂浮着缓慢旋转的青蓝冰片，放射霜晶与寒雾。",
+          "lore": "这是 Highwatch 城墙上永不沉睡的守望之杖。杖冠是一片青蓝湖冰，脱离银托悬浮，并自行缓缓转动；守卫发誓，它总是指向群峰下正在聚集的寒意。携带这份守望，便是在一夜间站完两百年的岗，并承诺绝不移开目光。"
+        },
+        "everwinter_wand": {
+          "name": "永冬碎片",
+          "look": "一根发光的青蓝冰川尖刺，白霜从银环绽开，周围浮着淡淡寒雾。",
+          "lore": "一根发光的冰川尖刺，据说折自 Sanctum 下方的深潭，那里的山寒长着利齿。白霜不断从银环绽放，无论烈火还是盛夏都不能使它融化。法师将它贴身携带，借寒意辅助施法；但在它似乎倾向 Nythraxis 墓室并静静聆听的夜晚，又会把它放得远远的。"
+        },
+        "winterbite": {
+          "name": "寒冬之噬",
+          "look": "镀银钢与蓝冰制成的弓，弓把内有青蓝冰核，弦上搭着实冰箭矢，寒雾缭绕。",
+          "lore": "这把弓由镀银钢与 Thornpeak 寒冰制成，弓把内的青蓝冷核将箭冻结在弦上。每次拉弓都会重新凝成一支冰川实冰箭；城墙上的弓手不带箭袋，只携寒意。Highwatch 曾靠一把这样的弓守住遭围攻的 Stalker Ridge：据说只有一名弓手，以及一整个冬天取之不尽的箭。"
+        },
+        "solheim_sword": {
+          "name": "Solheim，黎明最后之光",
+          "look": "以陨星锻成的巨剑，熔金核心贯裂剑刃，宇宙黑钢边缘闪着星光，金色碎片环绕护手，极光如带。",
+          "lore": "那颗星从西方天空坠落，在 Widow Thicket 之外“如锻炉般爆裂”时，Brother Aldric 从 Mirefen 陨坑取出仍在阴燃的星核，恳求王国铁匠加工“并不属于这个世界的东西”。他们将其锻成唯一一柄巨剑：Solheim。熔金核心如黎明撕开夜空般劈开宇宙黑刃，星金碎片沿无人设定的轨道绕护手运行。世上只锻成这一把，也绝不会有第二把。"
+        },
+        "skyrender_axe": {
+          "name": "裂天者，苍穹之伤",
+          "look": "斧头像一块撕裂的夜空，遍布熔金裂缝与星座刻纹，星光碎片悬浮，刃后拖着极光。",
+          "lore": "它锻自陨坑边缘，那里坠星从 Mirefen 水面撕走了天空的倒影，留下至今仍冒蒸汽的伤口。斧头像一片被扯下的夜：熔金裂缝、Highwatch 学者也叫不出名字的星座，以及每次挥动都从刃缘流出的极光。Brother Aldric 为它赐福，却拒绝碰触。举起它，就像握住苍穹留下的缺口。"
+        },
+        "starfall_mace": {
+          "name": "星陨，诸天裁决",
+          "look": "被囚的熔金星核由轨道碎片环绕，宇宙黑锤棱中流淌星光，极光从接缝溢出。",
+          "lore": "一颗星核在死亡前一瞬被捕获，随它坠落的残片环绕四周，永远停在湮灭前最后一寸。宇宙黑锤棱中流淌着被困的星光，举起时极光便从接缝溢出。古老的 Light 祭司称流星为裁决，是从天而降、任何盾牌都无意阻挡的判决；此锤便以坠落 Mirefen 的那颗星命名。"
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr，陨星之牙",
+          "look": "一片陨星碎屑，宇宙黑金属上燃着熔金刃光，明亮星尘绕柄首运行，并拖出细薄极光。",
+          "lore": "这是 Aldric 从陨坑带回的星体中最小的一片，也有人认为它最危险。异界星核的一缕碎片，熔金刃缘贴着宇宙黑金属，一颗孤独星尘如失去世界的月亮般绕柄首运行。它几乎没有重量，却几乎能切开一切。小到足以藏匿，也亮到能凭自身光芒在黑暗中寻回。"
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch，无尽虚空尖塔",
+          "look": "金色星片环绕熔金核心运行，宇宙黑杖身刻满星座，极光丝带向上盘绕。",
+          "lore": "星金杖身顶着熔金核心，金色碎片沿缓慢而无尽的轨道环行，宛如一座微型宇宙；其星座不属于 Thornpeak 上空的任何天幕。极光如忘记升起的烟，沿杖身向上缠绕。曾持有它的人说能感到虚空在杖中转动，就像 Ysolei 的湖水“饮下月光”：耐心、寒冷，并回望着你。"
+        },
+        "emberwish_wand": {
+          "name": "余烬之愿，垂死太阳之火种",
+          "look": "被囚的熔金垂死星火由火星环绕，宇宙黑杖身刻着发光星座。",
+          "lore": "这并非陨星本身，而是一颗垂死恒星最后的微光：一轮早已熄灭的太阳留下的熔金余烬，周围盘旋着它最后的火花。宇宙黑杖身刻有见证其死亡的星座。Mirefen 佃农说，真黄昏时持有它便可许下一个愿望；他们也说，每个持有过它的灵魂都只愿获得更多时间，而 Drowned Moon 从未答应任何人。"
+        },
+        "encore_bow": {
+          "name": "Encore，第二颗坠星",
+          "look": "夸张巨大的星炮：宇宙黑炮管刻着金色发光星座，喇叭形炮口内装有熔金彗星弹，配黄铜构件与木质肩托。",
+          "lore": "加工陨星的铁匠造出六件遗物后，还剩下整整一炮管星金；到了那时，学徒们也有了自己的主意。铁砧上诞生的东西，要么是王国第一支火枪，要么是最小的攻城器：一门肩扛星炮，与其说它发射弹丸，不如说它瞄准后请求第二颗星落下。Brother Aldric 拒绝赐福，理由是如此响亮的东西早已被天堂注意。猎人深爱它，射线前方的一切则从未如此。"
+        },
+        "meteorlatch_crossbow": {
+          "name": "星陨锁扣，苍穹最后的裁决",
+          "look": "陨星金属弩身，熔金核心贯穿弩托，宇宙黑弩臂刻满星座，弦上搭着纯粹星火之矢。",
+          "lore": "它在 Mirefen 陨坑仍发着光时，以“烫得无法触碰”的原始陨星金属锻成；碎片被敲成刻满星座的宇宙黑弩臂，熔金核心沿弩托封存。它不搭弩矢，而是召来一束星火：发射如宣判，落地如判决的终结。当 Highwatch 担心 Nythraxis 的不死王冠或许还不是群峰下最可怕的东西时，他们希望城墙上摆着的正是这件武器。务必瞄准。"
+        }
+      },
+      "seasonOne": "第一赛季",
+      "rarity": {
+        "uncommon": "优秀",
+        "rare": "精良",
+        "epic": "史诗",
+        "legendary": "传说"
+      },
+      "wtype": {
+        "sword": "剑",
+        "axe": "斧",
+        "mace": "锤",
+        "dagger": "匕首",
+        "staff": "法杖",
+        "wand": "魔杖",
+        "bow": "弓",
+        "crossbow": "弩"
+      },
+      "badge": {
+        "flagship": "旗舰",
+        "hero": "英雄"
+      },
+      "inspectAria": "查看{item}",
+      "viewModeLabel": "预览模式",
+      "tryOn": "试穿",
+      "weaponOnly": "仅武器",
+      "sceneLabel": "场景光照",
+      "scene": {
+        "day": "白天",
+        "dusk": "黄昏",
+        "night": "夜晚"
+      },
+      "lore": "背景故事",
+      "buySkin": "购买外观",
+      "unavailable": "暂不可用",
+      "applied": "已装备",
+      "apply": "装备外观",
+      "detach": "卸下外观",
+      "equipHint": "装备{type}后才能使用此外观。"
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "打开 Claudium",
+      "close": "关闭 Claudium",
+      "loading": "正在加载 Claudium…",
+      "balanceLabel": "余额",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL：{amount}",
+      "wocBalance": "WOC：{amount}",
+      "unavailable": "Claudium 商店暂时不可用。您的余额和购买不会受到影响，请稍后再试。",
+      "disclosure": "Claudium 是单向软货币：可用真钱购买并用于兑换外观物品，不能赎回、转让或兑现。",
+      "buyTitle": "购买 Claudium",
+      "railLabel": "付款方式",
+      "railStripe": "银行卡",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "优惠 20%",
+      "railWocUnavailable": "WOC 定价暂时不可用。",
+      "railNativeUnavailable": "SOL/WOC 不可用",
+      "amountLabel": "数量",
+      "showAmounts": "显示所有 Claudium 数量",
+      "hideAmounts": "隐藏其他 Claudium 数量",
+      "skuRow": "{usd} 可购买 {claudium} Claudium",
+      "buyButton": "购买",
+      "buyUnavailable": "暂时无法购买。",
+      "storeTitle": "外观商店",
+      "storeEmpty": "目前没有可用的外观物品。",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "兑换",
+      "kindCosmetic": "外观物品",
+      "kindSkin": "外观",
+      "kindItem": "物品",
+      "checkoutTitle": "完成购买",
+      "checkoutClose": "关闭结账",
+      "checkoutLoading": "正在加载结账页面…",
+      "checkoutPending": "交易正在进行。请在钱包中确认，并保持此面板打开。",
+      "checkoutPendingButton": "处理中",
+      "checkoutFailed": "无法加载结账页面，请重试。",
+      "checkoutUnavailable": "该 Claudium 购买项目暂时不可用。",
+      "checkoutWalletRequired": "使用加密货币购买 Claudium 前，请先连接 Solana 钱包。",
+      "checkoutWalletUnsupported": "此钱包无法签署和发送 Solana 交易。",
+      "checkoutNotSettled": "交易已发送，但 Claudium 尚未到账，请稍后重试。"
+    },
     "theme": {
       "preset": "界面主题",
       "customColors": "自定义颜色",
@@ -450,16 +707,16 @@ export const zh_CN: EnTranslations = {
     "mobile": {
       "jump": "跳跃",
       "leaderboard": "排行榜",
-      "dailyRewards": "奖励",
+      "dailyRewards": "商店",
       "deeds": "功绩",
       "nameplates": "姓名板",
-      "nameplatesOff": "名称关闭",
-      "musicOff": "音乐关闭",
+      "nameplatesOff": "Names Off",
+      "musicOff": "Music Off",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈",
-      "showMenuButtons": "显示菜单按钮",
-      "hideMenuButtons": "隐藏菜单按钮",
+      "showMenuButtons": "Show menu buttons",
+      "hideMenuButtons": "Hide menu buttons",
       "hotbarPage": "技能",
       "hotbarPageAria": "显示下一组技能",
       "actionRing": "战斗动作",
@@ -496,6 +753,15 @@ export const zh_CN: EnTranslations = {
       "bodyWithVersion": "World of ClaudeCraft {version} 版本已可用。立即更新以获取最新修复和改进。",
       "notNow": "暂不",
       "update": "更新"
+    },
+    "cameraPrompt": {
+      "title": "选择你的镜头",
+      "intro": "选择镜头跟随角色的方式。",
+      "mouseDesc": "无需按住鼠标按键，移动鼠标即可转动镜头。",
+      "classicTitle": "经典镜头",
+      "classicDesc": "按住鼠标右键并移动鼠标来转动镜头。",
+      "changeLater": "稍后可在 Esc 菜单的“按键绑定”中更改。",
+      "confirm": "确认"
     },
     "castBar": {
       "playerAria": "你的施法条",
@@ -542,7 +808,12 @@ export const zh_CN: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。"
+    },
+    "petFeed": {
+      "disabledFullHp": "宠物生命值已满",
+      "disabledNoFood": "你的背包中没有可以治疗宠物的食物"
     },
     "keybinds": {
       "emoteWheel": "表情轮盘",
@@ -550,6 +821,7 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "discord": "Discord",
       "valecup": "溪谷杯",
+      "sheathe": "收起/拔出武器",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
@@ -708,10 +980,10 @@ export const zh_CN: EnTranslations = {
       "interfaceModeDesktop": "桌面",
       "interfaceModeTouch": "触控",
       "interfaceModeNote": "自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。",
-      "mobileActionPages": "最少动作页数",
-      "mobileActionPagesTwo": "2 页",
-      "mobileActionPagesThree": "3 页",
-      "mobileActionPagesFour": "4 页",
+      "mobileActionPages": "Minimum Action Pages",
+      "mobileActionPagesTwo": "2 pages",
+      "mobileActionPagesThree": "3 pages",
+      "mobileActionPagesFour": "4 pages",
       "footstepSounds": "脚步声",
       "clickFeedback": "点击标记",
       "lockCursorOnRotate": "旋转时锁定光标",
@@ -827,13 +1099,29 @@ export const zh_CN: EnTranslations = {
       "highContrast": "高对比度",
       "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰"
     },
+    "warfare": {
+      "honorAmount": "{amount} 点荣誉",
+      "dualPrice": "{money} + {honor}",
+      "balance": "荣誉：{amount}",
+      "honorFloat": "+{amount} 荣誉",
+      "honorGain": "你获得了 {amount} 点荣誉（{reason}）。",
+      "notEnoughHonor": "荣誉不足。",
+      "reasons": {
+        "arenaWin": "竞技场胜利",
+        "fiestaKill": "嘉年华击倒",
+        "fiestaComplete": "完成嘉年华",
+        "fiestaWin": "嘉年华胜利"
+      }
+    },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
-        "hasteRating": "急速等级"
+        "hasteRating": "急速等级",
+        "warfare": "战争"
       },
+      "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
         "agi": "提高你的反应和准度，强化你的多项战斗属性。",
@@ -847,7 +1135,8 @@ export const zh_CN: EnTranslations = {
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
-        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。"
+        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
+        "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -920,6 +1209,12 @@ export const zh_CN: EnTranslations = {
         "few": "你是{rank}，{count}名成员",
         "many": "你是{rank}，{count}名成员",
         "other": "你是{rank}，{count}名成员"
+      },
+      "finderPartySize": {
+        "one": "{count} 名玩家",
+        "few": "{count} 名玩家",
+        "many": "{count} 名玩家",
+        "other": "{count} 名玩家"
       },
       "characterCount": {
         "one": "{count} 个角色",
@@ -1100,6 +1395,19 @@ export const zh_CN: EnTranslations = {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"
     },
+    "playerMenu": {
+      "info": "玩家信息",
+      "block": "屏蔽",
+      "unblock": "取消屏蔽",
+      "openFor": "打开 {name} 的玩家菜单",
+      "profileUnavailable": "未找到 {name} 的资料。",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI 操作的账号",
+      "watchTwitch": "在 Twitch 观看",
+      "watchX": "在 X 查看",
+      "watchKick": "在 Kick 观看",
+      "watchYouTube": "在 YouTube 观看"
+    },
     "lootSettings": {
       "title": "拾取设置",
       "close": "关闭拾取设置",
@@ -1117,7 +1425,7 @@ export const zh_CN: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "该物品无法销毁。",
-      "rightClickDestroy": "右键单击以销毁",
+      "rightClickDestroy": "Shift+右键单击以销毁",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1138,25 +1446,25 @@ export const zh_CN: EnTranslations = {
       "bagSocketAria": "{name}：{slots}",
       "socketEmpty": "空背包栏位",
       "unequipHint": "点击移除此背包",
-      "itemActionsTitle": "{item}操作",
-      "itemActionEquip": "装备",
-      "itemActionEquipBag": "装备背包",
-      "itemActionUse": "使用",
-      "itemActionConsume": "食用",
-      "itemActionLinkToChat": "链接到聊天",
-      "itemActionDestroy": "摧毁",
-      "itemActionDetails": "物品详情",
-      "itemActionAssignTitle": "分配到消耗品栏",
-      "itemActionAssignSlot": "分配到栏位{slot}",
-      "itemActionRemoveSlot": "从栏位{slot}移除",
-      "itemActionSlotCurrent": "栏位{slot}：{item}",
-      "itemActionSlotEmpty": "栏位{slot}：空",
-      "itemActionResetAutomatic": "恢复自动排列",
-      "itemActionClose": "关闭物品操作",
-      "itemActionAssigned": "已将{item}分配到栏位{slot}。",
-      "itemActionRemoved": "已将{item}从栏位{slot}移除。",
-      "itemActionInvalid": "该物品无法分配。",
-      "itemActionFailed": "无法完成该操作。"
+      "itemActionsTitle": "{item} actions",
+      "itemActionEquip": "Equip",
+      "itemActionEquipBag": "Equip Bag",
+      "itemActionUse": "Use",
+      "itemActionConsume": "Consume",
+      "itemActionLinkToChat": "Link to Chat",
+      "itemActionDestroy": "Destroy",
+      "itemActionDetails": "Item Details",
+      "itemActionAssignTitle": "Assign to Consumables",
+      "itemActionAssignSlot": "Assign to slot {slot}",
+      "itemActionRemoveSlot": "Remove from slot {slot}",
+      "itemActionSlotCurrent": "Slot {slot}: {item}",
+      "itemActionSlotEmpty": "Slot {slot}: Empty",
+      "itemActionResetAutomatic": "Reset to Automatic",
+      "itemActionClose": "Close item actions",
+      "itemActionAssigned": "Assigned {item} to slot {slot}.",
+      "itemActionRemoved": "Removed {item} from slot {slot}.",
+      "itemActionInvalid": "That item cannot be assigned.",
+      "itemActionFailed": "That action could not be completed."
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -1278,17 +1586,17 @@ export const zh_CN: EnTranslations = {
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
       "removeFromBarAria": "从动作条移除{name}",
-      "add": "添加",
-      "remove": "移除",
+      "add": "Add",
+      "remove": "Remove",
       "mobileChip": "{page} - A{position}",
-      "desktopChip": "桌面端",
-      "moveAssignmentAria": "将 {name} 从 {slot} 移动",
-      "pickerPages": "动作页",
-      "pickerDestinations": "动作栏位",
-      "destinationAria": "第{page}页，A{position}，{state}",
-      "empty": "空",
-      "closePicker": "关闭栏位",
-      "assignedStatus": "{name} 已分配到第{page}页 A{position}"
+      "desktopChip": "Desktop",
+      "moveAssignmentAria": "Move {name} from {slot}",
+      "pickerPages": "Action pages",
+      "pickerDestinations": "Action slots",
+      "destinationAria": "Page {page}, A{position}, {state}",
+      "empty": "Empty",
+      "closePicker": "Close slots",
+      "assignedStatus": "{name} assigned to page {page}, A{position}"
     },
     "nameplate": {
       "mob": "[{level}] {name}",
@@ -1313,7 +1621,7 @@ export const zh_CN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
-      "duration": "持续时间：{duration}"
+      "duration": "Duration: {duration}"
     },
     "discord": {
       "title": "Discord",
@@ -1348,7 +1656,8 @@ export const zh_CN: EnTranslations = {
         "connecting": "正在打开 Discord...",
         "benefits": "关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。",
         "error": "无法关联 Discord，请重试。",
-        "success": "Discord 已关联。"
+        "success": "Discord 已关联。",
+        "joinServer": "直接加入 Discord 服务器"
       },
       "choice": {
         "title": "使用 Discord 继续",
@@ -1396,8 +1705,13 @@ export const zh_CN: EnTranslations = {
         "admin": "管理员",
         "coredevs": "核心开发者",
         "devs": "开发者",
+        "seniormods": "高级管理员",
         "mods": "管理员",
-        "artists": "画师"
+        "juniormods": "初级管理员",
+        "artists": "画师",
+        "contentcreator": "内容创作者",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "已验证成员",
       "notMember": "尚未加入服务器",
@@ -1650,7 +1964,15 @@ export const zh_CN: EnTranslations = {
     },
     "social": {
       "lastSeen": "最后在线: {when}",
-      "lastSeenNever": "从未"
+      "lastSeenNever": "从未",
+      "ignoredTab": "已忽略",
+      "blockedTab": "屏蔽",
+      "ignoredEmpty": "你没有忽略任何人。",
+      "blockedEmpty": "你没有屏蔽任何人。",
+      "blockSearchPlaceholder": "玩家名称",
+      "blockAction": "屏蔽",
+      "nowBlocking": "已屏蔽 {name}。",
+      "stopBlockingTitle": "取消对 {name} 的屏蔽"
     },
     "gathering": {
       "title": "采集",
@@ -1688,6 +2010,107 @@ export const zh_CN: EnTranslations = {
       "notAtHub": "必须达到所需等级并位于制作站，才能制作该物品。",
       "throttled": "你制作得太快了，请稍等片刻后再试。",
       "recipeNotLearned": "你还没有学会这个配方。"
+    },
+    "finder": {
+      "title": "地下城查找器",
+      "close": "关闭",
+      "back": "返回",
+      "syncing": "正在等待服务器...",
+      "tabCatalogue": "目录",
+      "tabQueue": "快速匹配",
+      "tabBoard": "预组队伍",
+      "normal": "普通",
+      "heroic": "英雄",
+      "kindDungeon": "地下城",
+      "kindRaid": "团队副本",
+      "kindSolo": "单人冒险",
+      "levels": "等级 {min} 至 {max}",
+      "levelOne": "等级 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "坦克",
+      "roleHealer": "治疗",
+      "roleDps": "输出",
+      "freeRoles": "不限职责",
+      "lockoutDaily": "最终首领每日锁定",
+      "lockoutNone": "无锁定",
+      "lockedFor": "锁定约 {minutes} 分钟",
+      "attunement": "需要完成前置任务：{quest}",
+      "heroicMarks": "英雄徽记：每人 {count} 枚",
+      "entrance": "入口：{zone}",
+      "showOnMap": "在地图上显示",
+      "encounters": "首领战",
+      "finalBoss": "最终首领",
+      "summoned": "召唤的守卫",
+      "lootGuaranteed": "以下物品必掉其一：",
+      "lootMaybe": "以下物品至多掉落其一：",
+      "lootChance": "额外概率掉落：",
+      "lootHeroic": "英雄奖励，以下物品必掉其一：",
+      "pct": "{pct}%",
+      "blockedLevel": "仅限等级 {min} 至 {max}",
+      "blockedSpec": "需要选择专精",
+      "yourRoles": "你的职责",
+      "needsSpec": "选择一个专精才能使用地下城查找器。",
+      "leaderNote": "只有队长才能为队伍排队。",
+      "chooseActivities": "选择活动",
+      "joinQueue": "加入队列",
+      "leaveQueue": "离开队列",
+      "waited": "排队时间：{time}",
+      "cooldownNote": "你可以在 {seconds} 秒后再次排队。",
+      "travelNote": "队伍在原地组成。请一起前往入口；不会传送任何人。",
+      "proposalTitle": "找到队伍：{name}",
+      "proposalRole": "你的职责：{role}",
+      "accepted": "{accepted}/{size} 已确认",
+      "remaining": "剩余 {seconds} 秒确认",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptedWait": "正在等待其他人...",
+      "slotState": "{role}：{accepted}/{total} 已就绪",
+      "openListings": "公开招募",
+      "boardEmpty": "目前没有招募。发布一个吧！",
+      "boardLeaderGate": "只有队长才能发布招募。",
+      "publishListing": "发布招募",
+      "activity": "活动",
+      "publish": "发布",
+      "yourListing": "你的招募",
+      "closeListing": "关闭招募",
+      "applicants": "申请者",
+      "noApplicants": "还没有申请者。",
+      "acceptApplicantAria": "接受 {name}",
+      "declineApplicantAria": "拒绝 {name}",
+      "levelClass": "{level} 级 {className}",
+      "leader": "队长：{name}",
+      "needs": "需要：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "申请",
+      "withdraw": "撤回申请",
+      "tagFirstRun": "初次挑战",
+      "tagQuestRun": "任务车",
+      "tagFullClear": "全通",
+      "tagLearning": "欢迎新手",
+      "tagFastRun": "速通",
+      "mech": {
+        "shadow_pulse": "暗影脉冲（周期性范围伤害）",
+        "reaping_arc": "收割之弧（正面顺劈）",
+        "mist_surge": "迷雾涌动（周期性范围伤害）",
+        "summons_adds": "召唤增援",
+        "lunar_tide": "月潮（周期性范围伤害）",
+        "enrage": "低血量时狂怒",
+        "shuddering_stomp": "震颤践踏（范围眩晕）",
+        "necrotic_shockwave": "死灵冲击波（高额范围伤害）",
+        "grave_cleaver": "掘墓劈砍（正面顺劈）",
+        "shadow_nova": "暗影新星（范围爆发）",
+        "profane_mending": "亵渎治疗（治疗其盟友）",
+        "mana_burn": "枯萎祝福（燃烧法力）",
+        "deathstalker_cleave": "死亡潜行者劈砍（正面顺劈）",
+        "mortal_wound": "遗忘之伤（降低受到的治疗）",
+        "sealbreak_shockwave": "破印冲击波（范围爆发）",
+        "gravebreaker": "碎墓打击（正面扇形，背对团队）",
+        "raise_fallen": "亡者复生（周期性召唤小怪）",
+        "soul_rend": "灵魂撕裂（被标记者需分散并接受治疗）",
+        "deathless_rage": "不死之怒（需在护符石处打断）",
+        "wardstones": "护符石引导（阶段转换）"
+      }
     },
     "deeds": {
       "title": "功绩之书",
@@ -2428,6 +2851,10 @@ export const zh_CN: EnTranslations = {
       "dragonkin": {
         "name": "龙类",
         "desc": "源自远古深渊、披着鳞甲、形似巨蛇的造物。它们罕见、骄傲，远比看上去更强大。"
+      },
+      "reptile": {
+        "name": "爬行类",
+        "desc": "冷血的猎手，带着独有的嘶声与撕咬，与温血的野兽截然不同。"
       }
     },
     "worldPage": {
@@ -4529,7 +4956,7 @@ export const zh_CN: EnTranslations = {
     "androidStandaloneDetail": "你正在全屏应用模式中。请保持横屏。",
     "androidInstallDetail": "若要在 Android 上全屏，请先安装此页面或将其添加到主屏幕。",
     "androidInstallStep": "在 Chrome 中点击菜单，然后选择安装应用或添加到主屏幕。",
-    "androidSamsungInstallStep": "在 Samsung Internet 中点击菜单，然后选择安装应用或添加到主屏幕。",
+    "androidSamsungInstallStep": "In Samsung Internet, tap the menu, then Install app or Add to Home screen.",
     "androidOpenStep": "从新图标打开 World of ClaudeCraft。",
     "otherStandaloneDetail": "请保持设备处于横屏全屏。",
     "otherInstallDetail": "安装此页面或将其添加到主屏幕，以获得最佳移动端全屏体验。"
@@ -5755,6 +6182,10 @@ export const zh_CN: EnTranslations = {
         "name": "临终圣礼",
         "description": "巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。"
       },
+      "holy_taunt": {
+        "name": "神圣挑衅",
+        "description": "嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。"
+      },
       "flash_of_light": {
         "name": "圣光愈合",
         "description": "一道快速而高效的圣光爆发，为一个友方目标恢复 {damage} 点生命值。"
@@ -6079,6 +6510,98 @@ export const zh_CN: EnTranslations = {
         "name": "沸腾之怒",
         "description": "进入沸腾之怒，产生 20 点怒气。（战士天赋）"
       },
+      "crusader_strike": {
+        "name": "十字军打击",
+        "description": "打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）"
+      },
+      "chain_heal": {
+        "name": "治疗链",
+        "description": "大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）"
+      },
+      "metamorphosis": {
+        "name": "恶魔变形",
+        "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
+      },
+      "holy_shock": {
+        "name": "神圣震击",
+        "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
+      },
+      "holy_shield": {
+        "name": "神圣之盾",
+        "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+      },
+      "bestial_wrath": {
+        "name": "狂野怒火",
+        "description": "使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）"
+      },
+      "trueshot_aura": {
+        "name": "强击光环",
+        "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
+      },
+      "wyvern_sting": {
+        "name": "翼龙钉刺",
+        "description": "从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）"
+      },
+      "arcane_power": {
+        "name": "奥术强化",
+        "description": "法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）"
+      },
+      "combustion": {
+        "name": "燃烧",
+        "description": "法术暴击几率提高50%，持续15秒。（火焰专精招牌）"
+      },
+      "icy_veins": {
+        "name": "冰冷血脉",
+        "description": "法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）"
+      },
+      "cold_blood": {
+        "name": "冷血",
+        "description": "集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）"
+      },
+      "blade_flurry": {
+        "name": "剑刃乱舞",
+        "description": "释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）"
+      },
+      "hemorrhage": {
+        "name": "出血",
+        "description": "攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）"
+      },
+      "power_infusion": {
+        "name": "能量灌注",
+        "description": "向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）"
+      },
+      "holy_nova": {
+        "name": "神圣新星",
+        "description": "引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）"
+      },
+      "shadowform": {
+        "name": "暗影形态",
+        "description": "进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）"
+      },
+      "elemental_mastery": {
+        "name": "元素掌握",
+        "description": "呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）"
+      },
+      "siphon_life": {
+        "name": "生命虹吸",
+        "description": "虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）"
+      },
+      "conflagrate": {
+        "name": "燃尽",
+        "description": "吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）"
+      },
+      "moonkin_form": {
+        "name": "枭兽形态",
+        "description": "进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）"
+      },
+      "feral_charge": {
+        "name": "野性冲锋",
+        "description": "冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）"
+      },
+      "swiftmend": {
+        "name": "迅捷治愈",
+        "description": "吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）"
+      },
       "summon_imp": {
         "name": "召唤烬裔",
         "description": "召唤一只听从术士命令的烬裔。烬裔会从远处向你的敌人投掷灰烬箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
@@ -6106,6 +6629,34 @@ export const zh_CN: EnTranslations = {
       "summon_doomguard": {
         "name": "召唤亡魂裔",
         "description": "将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+      },
+      "pummel": {
+        "name": "碎颚击",
+        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+      },
+      "kick": {
+        "name": "飞踢",
+        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+      },
+      "counterspell": {
+        "name": "破法",
+        "description": "反制目标的施法，并在6秒内封锁该法术学派。"
+      },
+      "counter_shot": {
+        "name": "静默射击",
+        "description": "一记快射，打断目标的施法，并在4秒内封锁该学派。"
+      },
+      "rebuke": {
+        "name": "谴喝",
+        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+      },
+      "skull_bash": {
+        "name": "头槌",
+        "description": "猛然头槌，打断目标的施法，并在4秒内封锁该学派。"
+      },
+      "spell_lock": {
+        "name": "封口令",
+        "description": "在施法中沉默目标，并在5秒内封锁该法术学派。"
       },
       "bear_charge": {
         "name": "巨熊冲锋",
@@ -6749,6 +7300,126 @@ export const zh_CN: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "阳瓣草"
+      },
+      "furyforged_warhelm": {
+        "name": "怒铸战盔"
+      },
+      "furyforged_warspaulders": {
+        "name": "怒铸战肩"
+      },
+      "furyforged_warplate": {
+        "name": "怒铸战甲"
+      },
+      "furyforged_girdle": {
+        "name": "怒铸腰带"
+      },
+      "furyforged_legguards": {
+        "name": "怒铸护腿"
+      },
+      "furyforged_gauntlets": {
+        "name": "怒铸护手"
+      },
+      "furyforged_sabatons": {
+        "name": "怒铸战靴"
+      },
+      "stormbound_crown": {
+        "name": "缚雷王冠"
+      },
+      "stormbound_spaulders": {
+        "name": "缚雷肩甲"
+      },
+      "stormbound_hauberk": {
+        "name": "缚雷锁甲"
+      },
+      "stormbound_waistguard": {
+        "name": "缚雷护腰"
+      },
+      "stormbound_legmail": {
+        "name": "缚雷腿甲"
+      },
+      "stormbound_handguards": {
+        "name": "缚雷护手"
+      },
+      "stormbound_greaves": {
+        "name": "缚雷胫甲"
+      },
+      "ashstalker_cowl": {
+        "name": "猎烬兜帽"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "猎烬护肩"
+      },
+      "ashstalker_harness": {
+        "name": "猎烬胸甲"
+      },
+      "ashstalker_waistband": {
+        "name": "猎烬腰带"
+      },
+      "ashstalker_legguards": {
+        "name": "猎烬护腿"
+      },
+      "ashstalker_grips": {
+        "name": "猎烬护手"
+      },
+      "ashstalker_treads": {
+        "name": "猎烬软靴"
+      },
+      "cinderweave_cowl": {
+        "name": "织烬兜帽"
+      },
+      "cinderweave_mantle": {
+        "name": "织烬披肩"
+      },
+      "cinderweave_raiment": {
+        "name": "织烬法衣"
+      },
+      "cinderweave_cord": {
+        "name": "织烬腰绳"
+      },
+      "cinderweave_legwraps": {
+        "name": "织烬裹腿"
+      },
+      "cinderweave_handwraps": {
+        "name": "织烬裹手"
+      },
+      "cinderweave_slippers": {
+        "name": "织烬便鞋"
+      },
+      "final_oath_medallion": {
+        "name": "最终誓约勋章"
+      },
+      "razorwind_torque": {
+        "name": "剃风颈环"
+      },
+      "cinder_sigil_pendant": {
+        "name": "烬印坠饰"
+      },
+      "iron_vow_band": {
+        "name": "铁誓指环"
+      },
+      "unbroken_circle": {
+        "name": "不破之环"
+      },
+      "fleetblood_band": {
+        "name": "疾血指环"
+      },
+      "last_step_signet": {
+        "name": "末步徽戒"
+      },
+      "ashen_focus_ring": {
+        "name": "灰烬专注戒指"
+      },
+      "spellbreakers_seal": {
+        "name": "破法者之印"
+      },
+      "final_argument_greatblade": {
+        "name": "最终论断巨刃"
+      },
+      "first_blood_razor": {
+        "name": "初血剃刀"
+      },
+      "emberglass_warstaff": {
+        "name": "烬晶战杖"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
@@ -7622,6 +8293,15 @@ export const zh_CN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奥德伦，亡魂战卫"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "马尔里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },
@@ -7890,6 +8570,11 @@ export const zh_CN: EnTranslations = {
         "title": "英雄军需官",
         "greeting": "英雄深渊的凭证能换来高崖望最上等的戒指和吊坠。把你的徽记拿给我看。"
       },
+      "fury": {
+        "name": "怒焰",
+        "title": "荣誉军需官",
+        "greeting": "战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。"
+      },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
         "title": "博学者",
@@ -7965,7 +8650,7 @@ export const zh_CN: EnTranslations = {
       "q_prof_intro": {
         "title": "人人都有一技之长",
         "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
-        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，这里面都有正经买卖等着你。",
+        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，靠这些都能正经谋生。",
         "objectives": {
           "0": {
             "label": "矿石块"

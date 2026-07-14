@@ -4,7 +4,7 @@
 // scrolls away with the content; the grip visual is a background layer on
 // `.window.window-resizable`, see src/styles/layout.css).
 //
-// Event-driven chrome like the hud.ts window drag (not a per-frame painter):
+// Event-driven chrome like window_drag.ts (not a per-frame painter):
 // document-level pointer delegation, pointer capture on the window, and the
 // same visual-vs-author space correction (see src/ui/ui_scale.ts). Owned state
 // is one pending/active session; everything else is injected via deps (never Hud).

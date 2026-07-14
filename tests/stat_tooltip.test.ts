@@ -422,4 +422,24 @@ describe('rating stat cells', () => {
     expect(crit.sources).toEqual([]);
     expect(haste.sources).toEqual([]);
   });
+
+  it('summarizes both capped PvP effects in one Warfare stat', () => {
+    const p = freshPlayer('warrior', 20);
+    const input = inputFor('warrior', p);
+    input.stats = {
+      ...input.stats,
+      pvpOffense: 0.2,
+      pvpDefense: 0.137,
+    };
+
+    const warfare = buildStatTooltip('warfare', input);
+    expect(warfare.statValue).toBe(20);
+    expect(warfare.warfareDamageIncrease).toBe(20);
+    expect(warfare.warfareDamageReduction).toBeCloseTo(13.7, 6);
+    expect(warfare.isPrimary).toBe(false);
+    expect(warfare.effects).toEqual([]);
+    // Warfare fractions are already derived from all equipped ratings and capped
+    // by recalcPlayerStats, so inventing a second source breakdown here would lie.
+    expect(warfare.sources).toEqual([]);
+  });
 });

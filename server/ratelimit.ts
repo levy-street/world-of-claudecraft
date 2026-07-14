@@ -609,6 +609,76 @@ export function resetCharacterMutationRateLimits(): void {
   characterMutationAccountAttempts.clear();
 }
 
+// Claudium writes can create payment sessions, persist on-chain quotes, poll a
+// settlement verifier, or debit the account ledger. Each action receives its own
+// pre-auth IP bucket plus the existing post-auth fused IP AND account bucket, so
+// invalid-token floods stop before a DB lookup while authenticated account abuse
+// remains capped. Confirm is deliberately the roomiest because the client retries
+// pending chain settlement; purchase remains strict because every accepted call
+// can create a new provider-side payment object.
+export const CLAUDIUM_PURCHASE_MAX_PER_MINUTE = 10;
+export const CLAUDIUM_QUOTE_MAX_PER_MINUTE = 20;
+export const CLAUDIUM_CONFIRM_MAX_PER_MINUTE = 60;
+export const CLAUDIUM_SPEND_MAX_PER_MINUTE = 30;
+
+export type ClaudiumMutationAction = 'purchase' | 'quote' | 'confirm' | 'spend';
+
+const claudiumMutationIpAttempts = new Map<string, number[]>();
+const claudiumMutationAccountAttempts = new Map<string, number[]>();
+const claudiumPreAuthIpAttempts = new Map<string, number[]>();
+
+export function claudiumMutationLimit(action: ClaudiumMutationAction): number {
+  switch (action) {
+    case 'purchase':
+      return CLAUDIUM_PURCHASE_MAX_PER_MINUTE;
+    case 'quote':
+      return CLAUDIUM_QUOTE_MAX_PER_MINUTE;
+    case 'confirm':
+      return CLAUDIUM_CONFIRM_MAX_PER_MINUTE;
+    case 'spend':
+      return CLAUDIUM_SPEND_MAX_PER_MINUTE;
+  }
+}
+
+/** Per-IP monetary throttle that runs before bearer-token database resolution. */
+export function claudiumPreAuthRateLimited(
+  req: http.IncomingMessage,
+  action: ClaudiumMutationAction,
+): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    claudiumPreAuthIpAttempts,
+    `${action}:${requestIp(req)}`,
+    claudiumMutationLimit(action),
+  );
+}
+
+/** Fused per-IP and per-account throttle for one monetary mutation action. */
+export function claudiumMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+  action: ClaudiumMutationAction,
+): RateLimitOutcome {
+  const limit = claudiumMutationLimit(action);
+  const ip = recordSlidingWindowAttempt(
+    claudiumMutationIpAttempts,
+    `${action}:${requestIp(req)}`,
+    limit,
+  );
+  const account = recordSlidingWindowAttempt(
+    claudiumMutationAccountAttempts,
+    `${action}:${accountId}`,
+    limit,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Claudium mutation throttles. Test-only. */
+export function resetClaudiumMutationRateLimits(): void {
+  claudiumMutationIpAttempts.clear();
+  claudiumMutationAccountAttempts.clear();
+  claudiumPreAuthIpAttempts.clear();
+}
+
 // Player-report creation had no dedicated limiter (it was gated only by the full
 // session plus the per-target 12h duplicate-report window in moderation_db). This
 // adds a coarse per-account create limiter so a single account cannot flood the

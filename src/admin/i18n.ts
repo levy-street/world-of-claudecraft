@@ -196,6 +196,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'moderation reason is required': 'error.moderationReasonRequired',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
+  'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
   'word is empty after normalization': 'error.wordEmptyAfterNormalization',

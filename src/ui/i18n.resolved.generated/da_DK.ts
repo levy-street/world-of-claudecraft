@@ -377,6 +377,263 @@ export const da_DK: EnTranslations = {
         "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
       }
     },
+    "wocStore": {
+      "title": "WOC-butik",
+      "close": "Luk WOC-butikken",
+      "tabsLabel": "Sektioner i WOC-butikken",
+      "storeTab": "Butik",
+      "rewardsTab": "Daglige belønninger",
+      "loading": "Indlæser WOC-butikken...",
+      "error": "WOC-butikken er ikke tilgængelig lige nu. Prøv igen om lidt.",
+      "balance": "Claudium-saldo",
+      "buyClaudium": "Køb Claudium",
+      "owned": "Du ejer dette",
+      "needMoreTitle": "Mere Claudium påkrævet",
+      "needMoreBody": "Du skal bruge {shortfall} mere Claudium for at købe {item}.",
+      "cancel": "Annuller",
+      "confirmTitle": "Bekræft køb af kosmetik",
+      "confirmBody": "Køb {item} til {cost} Claudium?",
+      "confirmPurchase": "Køb",
+      "priceChanged": "Prisen ændrede sig før købet blev gennemført. Gennemgå den opdaterede pris, og bekræft igen.",
+      "armoryEyebrow": "Sæson 1",
+      "armoryTitle": "Våbenhuset",
+      "armoryBody": "Begrænsede våbenskins fra sæson 1-våbenhuset. De gælder for hele kontoen, er rent kosmetiske og vises for alle omkring dig.",
+      "collectionLine": "{collection}-samlingen",
+      "collections": {
+        "guildmark": "Laugsmærke",
+        "emberwrought": "Glødesmedet",
+        "hoarfrost": "Rimfrost",
+        "fallen_star": "Falden Stjerne"
+      },
+      "skins": {
+        "guildmark_arming_sword": {
+          "name": "Laugsmærket Væbnersværd",
+          "look": "Blåneret stålklinge, fiskehaleformet korsgreb i bronze, blågrønt lædergreb og et lille stemplet laugssigil.",
+          "lore": "Hvor den smedede klinge er anonym, er denne signeret. En pansermester tjener kun retten til at synke sit mærke i ricassoen, når verdensmarkedets købmand vil stå inde for hans stål, og Smith Haldrens mærke står inde for. Blåt mod dalens fugt, balanceret til et hår. Du betaler for frimærket lige så meget som sværdet, og det er det værd."
+        },
+        "brasscap_axe": {
+          "name": "Messinghætte-Økse",
+          "look": "Poleret stålblad, messinghætte og skaftskinner på et lakeret asketræsskaft, sirlig omvikling og smedens stempel.",
+          "lore": "En stemplet økse er en pral, du kan holde. Messinghætten og langets er halvt rustning, halvt signatur: de forhindrer, at skaftet flækker, og de fanger værtshusets lys, så alle ved, at du har købt Armorer Hodes værk, ikke en milits, der er hånd-me-down. \"Hvis det skærer, sælger jeg det,\" siger Highwatch-smeden. Denne skærer."
+        },
+        "tempered_flanged_mace": {
+          "name": "Hærdet Flangekølle",
+          "look": "Sekskantet køllehoved af hærdet, blåneret stål, messingkrave og endeknop samt vinrødt lædergreb.",
+          "lore": "Seks flanger af blågjort, hærdet stål, hver slebet for at åbne et hjelm, dækket af messing og viklet i vinrødt læder. Rigets pansermænd laver ikke grimme våben, selv når arbejdet er brutalt. Denne blev bestilt gennem verdensmarkedet, ikke trukket fra et stativ; et eller andet sted er der en hovedbog med en stolt købers navn og den sum, han betalte Hode for det."
+        },
+        "guildmark_dirk": {
+          "name": "Laugsmærket Dirk",
+          "look": "Slank dirk i hærdet stål, bronzebeskytter og møtrik, mørkegrønt snoregreb, stemplet sigil.",
+          "lore": "Hvad en lavet mand bærer, når sværdet bliver hjemme: slank, hærdet, stemplet med det samme mærke, der attesterer en fuld klinge, båret på bæltet som et signet med en kant. Underspillet for alle undtagen dem, der kan læse en rustningsmands bevis. Kvartermester Bree opbevarer en skuffe af dem på Highwatch for officerer, der har fortjent murens respekt."
+        },
+        "brasscrown_staff": {
+          "name": "Messingkrone-Vandrestav",
+          "look": "Hårdttræsstav med en drejet messingkrone, messingdop og farvet læderbånd.",
+          "lore": "Drevet af krydret hårdttræ og kronet med en messingfinal, Eastbrook-smedene støbt i hundrede, men perfekt af den ene. Det tilhører den slags rejsende, der ønsker at blive taget seriøst ved både Fenbridges gate og Highwatchs mur. En vandrestav, der aldrig rigtig har behøvet at gå; det farvede bånd matcher en frakke du kan gætte prisen på."
+        },
+        "lacquered_wand": {
+          "name": "Lakeret Stav",
+          "look": "Slank dybrød lakeret tryllestav, to polerede messingbånd, lille afrundet messingspids.",
+          "lore": "Dybrød lak i syv omhyggelige lag, omkranset to gange af poleret messing: den slags tryllestav en landsbymagiker køber på Verdensmarkedet, når betalingen begynder at komme i rigtige mønter, og udseendet skal følge med. Den leder ikke Lyset bedre end en birkekæp. Men den stråler over Købmandens disk, og halvdelen af den mindre magi har altid været at blive troet."
+        },
+        "fletcher_s_guild_bow": {
+          "name": "Buemagerlaugets Bue",
+          "look": "Recurvebue af lakeret valnød, messingbeslåede bueender, vokset hørstreng og et laugsstempel på grebet.",
+          "lore": "Det tætteste, riget har på et laug, er et fletchers stempel på stigrøret, et løfte om, hvad der er indeni, den måde en vinbonde forsegler et fad på. Lakeret valnød, messing ved benspidserne, en vokset hørsnor, der ikke vil flosse gennem en Mirefen-regn. Hver led argumenterer for prisen. Træk den én gang forbi enkekransen, og argumentet vinder."
+        },
+        "cinderbrand_sword": {
+          "name": "Glødebrand",
+          "look": "Mørk klinge af smedet stål, blodrille fyldt med glødende glødeorange runer, varmerevner og en ulmende ædelsten i korsgrebet.",
+          "lore": "Den første klinge slukkede ikke i vand, men i Blessed Embers rivet fra Stormcrag, kullene, som Highwatch-smedene sværger 'brænder blåt og rent, fordi bjerget husker sin gamle ed'. Ilden ulmer orange og vil ikke dø; runerne holder sig varme til en bar hånd på murens koldeste nat. Cinderbrand har aldrig brug for belysning. Den nægter simpelthen at gå ud."
+        },
+        "emberbite_axe": {
+          "name": "Glødebid",
+          "look": "Økse af sortsværtet jern med glødeorange revner gennem bladet, en indkapslet glødeperle og flimrende varmedis.",
+          "lore": "Pansermester Hode arbejdede et levende kul af bjergild ind i hjertet af biten, så kanten afkøles aldrig rigtigt mellem slagene. Revnerne ånder orange på nedsvinget, som om strejken vækker noget, det første smedje efterlod sovende i jernet. De siger, at et Stormcrag-element opgav gløden for det; de siger rigtig mange ting på Highwatch, når vinden blæser."
+        },
+        "smoulderfall_mace": {
+          "name": "Ulmefald",
+          "look": "Mørke jernflanger gløder orange langs deres indre revner, en smeltet kerne i hovedet.",
+          "lore": "En mace, der bærer sit eget ildsted: en sten med smeltet kerne, der er skåret af Sanctum-sælen, der var 'smedet med bjergild', som glødede i hovedet. Flangerne forbliver varme at røre ved og varmere, hvor de lander; en Highwatch-sergent sværger, at et slag fra det efterlader et blåt mærke, der lyser svagt til morgenen. Bjergets ild gjorde endelig til at bryde frem for at forsegle."
+        },
+        "ashspark_dagger": {
+          "name": "Askegnist-Stikkniv",
+          "look": "Kort, sortsværtet klinge med glødende, glødeorange årer, en lille ulmende ædelsten i knappen, aske og gnister.",
+          "lore": "En baggydeklinge med bjergets ild smuglet ind i dens sten, en pansermesters stille vittighed: selv en pung kan bære en glød af den første smedning. Sortfarvet, året med orange, altid en nuance for varm i skeden. Tegn den i mørket under Highwatch, og gløden tænder din hånd lige nok til at finde hullet i en mands vagt."
+        },
+        "forgeheart_staff": {
+          "name": "Smedehjerte-Stav",
+          "look": "Jernskoet stav kronet med en buret glødende glødekerne, gløderuner op ad skaftet, stigende varmeglimmer.",
+          "lore": "Et levende kul af bjergbål buret i jern ved sin krone. Loremaster Caddis kalder det et bevis på, at ilden fra den første smedning kan bindes til at tjene, ikke kun til at forsegle. Varmeglimmer stiger op af den i et tyndt, endeløst bånd; en magiker, der bærer en, vil aldrig have en smedje eller et vagtbål. Gløden, hvisker de, blev trukket fra Glødende Voskars eget åndedræt, og den er ikke kølet af siden."
+        },
+        "emberwrought_wand": {
+          "name": "Glødesmedet Tryllestav",
+          "look": "Sortsværtet metaltryllestav med et glødende kul i jernklør, fine varmerevner og varmt indre lys.",
+          "lore": "Tryllestaven, der gav samlingen navn. Da en rustningssmed i Højvagten første gang satte et kul af bjergild i jernklør og fik det til at adlyde en dødelig hånd, holdt selv Lysets Præster op med at kalde det kætteri og begyndte at kalde det nyttigt. Varm, tålmodig og stille farlig: gløden i spidsen har brændt uden ophør, siden før dens ejer trak vejret."
+        },
+        "cinderlatch_crossbow": {
+          "name": "Glødelås",
+          "look": "Armbrøst af sortsværtet stål, glødeorange skær fra revner i buearmen og et ulmende kul i skæftet.",
+          "lore": "Det mærkeligste af det glødesmedede: bjergets ild strømmede ind i en maskine. Orange siver fra revner i stangen, og et ulmende kul i rorpinden forhindrer, at snoren nogensinde stivner i Thornpeaks kulde eller Mirefens fugt. Dens bolte efterlader rillen allerede varm og lander varmere. En jægers svar på en mur, hvor fjenden heller ikke mærker kulden."
+        },
+        "ice_fang_sword": {
+          "name": "Istænd",
+          "look": "Buet klinge af bleg gletsjeris, takkede rimkrystaller langs ryggen, en glødende cyan kerne i blodrillen og et korsgreb af istapper.",
+          "lore": "Flagskibet for den frosne kvalitet, og det stykke, hver samler rækker efter først. Ice Fang blev skåret, ikke smedet, fra en hugtænd på gletsjeren, der dækker Thornpeak over Highwatch, og dens cyan kerne brænder kold som lyset fra Glimmermere. Den rimer selve luften, den skærer. Vægvagten sværger, at en soldat bar den den nat, hvor høje snevejr holdt Wyrmcult tilbage, og 'købte muren en vinter'."
+        },
+        "glaciersplit_axe": {
+          "name": "Gletsjerspalter",
+          "look": "Øksehoved af gennemsigtig blå gletsjeris med cyan glød i revnerne, strittende frostkrystaller og et skaft, der efterlader kold damp.",
+          "lore": "Udhugget af Tornetop-gletsjerens blå hjerte, hvor to århundreders is har presset kulden sammen, til den lyser af sig selv. Øksen efterlader damp selv i hvile, og når den rammer, lyder det som en gletsjerspalte, der åbner sig under Snigerkammen. Højvagten overgiver sine faldne til isen deroppe. Derfor er dette et våben skabt til at holde tøbruddet, og alt det kunne vække, på afstand."
+        },
+        "rimecrusher_mace": {
+          "name": "Rimknuser",
+          "look": "Klynge af takkede iskrystaller omkring en glødende cyan kerne, rimfrost kryber ned ad en forsølvet skaft.",
+          "lore": "Ikke udskåret, men vokset: Thornpeak-is lokket rundt om en kold cyan kerne, indtil den satte sig lige så hårdt som Hodes bedste stål. Rimfrost kryber ned af den forsølvede skaft mod hånden og når aldrig helt frem. Hvor det rammer, fryser vand; hvor den hviler, bleger jorden. Toppenes gravkulde, lavet små nok til at svinge mod de ting, der klatrer op ad væggen."
+        },
+        "frostbite_dagger": {
+          "name": "Rimnål",
+          "look": "Uhyggeligt tynd dolk af klar blå is, en glødende cyan åre nede i midten, nålefrostkrystaller, rimfrostgreb.",
+          "lore": "Tynd som en tilbageholdt åndedræt og dobbelt så kold: en splint af Thornpeak-gletsjeren finpudset til en enkelt glødende vene, så ivrig efter at såret fryses til, før blodet husker at løbe. Dens navn er lånt fra den gravkulde, de døde bærer ned fra toppene. Den behøver aldrig skærpes; is bliver ikke sløv, konstaterer Loremaster Caddis tørt, den venter kun."
+        },
+        "hoarfrost_vigil_staff": {
+          "name": "Rimfrostvagt",
+          "look": "Forsølvet stav kronet med et flydende, langsomt roterende skår af glødende cyan is, udstrålende krystaller og kold damp.",
+          "lore": "Personalet på uret, der aldrig sover på Highwatchs væg. Dens krone er et skår af cyan-tjærneis, der flyder fri af sølvet og drejer sig, langsomt, af sig selv: altid, sværger vagten, mod kulden, der samler sig under toppene. At bære Vigilen er at stå to hundrede års vagt på en enkelt nat og love ikke at se væk."
+        },
+        "everwinter_wand": {
+          "name": "Evigvinters Skår",
+          "look": "En enkelt spids af glødende cyan gletsjer-is, rimfrost blomstrer fra en sølvkrave, svag kold tåge.",
+          "lore": "En spids af glødende gletsjer-is, som siges at være brudt fra den dybe tjerne under Sanctum, hvor bjergets kulde har tænder. Rimfrost blomstrer uendeligt fra sin sølvkrave og smelter aldrig, hverken ved ild eller om sommeren. Magikers holder det tæt på for kulden, det giver deres arbejde, og holder det langt om nætterne, det ser ud til at læne sig mod Nythraxis' krypt, og lytte."
+        },
+        "winterbite": {
+          "name": "Vinterbid",
+          "look": "Bue af forsølvet stål og blå is, en glødende cyan kerne i grebet, en pil af massiv is og kold damp.",
+          "lore": "En bue af forsølvet stål og Thornpeak-is, dens stigrør oplyst af en kold cyan kerne, der fryser pilen til strengen. Det knækker en skaft af fast gletsjer-is, der reformerer hvert træk; bueskytten bærer ingen kogger på væggen, kun kulden. Highwatch holdt Sniger Ridge gennem en belejring med en lignende: en enkelt buemand, siger de, og en vinters værdi af pile, der altid allerede var der."
+        },
+        "solheim_sword": {
+          "name": "Solheim, Daggryets sidste lys",
+          "look": "Storsværd smedet af en falden stjerne, smeltet guldkerne, der splitter bladet, kosmosort stål kantet i stjernelys, gyldne skår, der kredser om vagten, nordlysbånd.",
+          "lore": "Da stjernen faldt ud af den vestlige himmel og 'brød som en smedje' ud over Enkekratten, trak broder Aldric sit stadig ulmende hjerte fra Mirefen-krateret og tryglede rigets smede om at arbejde 'en ting, der ikke tilhører denne verden'. De lavede ét stort sværd af det: Solheim. Dens smeltede gyldne kerne spalter det kosmossorte blad som daggry, der slår en nattehimmel, og skår af stjernemetal kredser om vagten på stier uden håndsæt. Kun én blev nogensinde smedet. Der vil ikke være en anden."
+        },
+        "skyrender_axe": {
+          "name": "Himmelriver, Firmamentets Sår",
+          "look": "Hovedet som et revet stykke nattehimmel, smeltede guldrevner og konstellationsætsninger, stjernelysskår svævende, et nordlysglimt bagerst i kanten.",
+          "lore": "Slået fra kraterets rand, hvor den faldne stjerne rev himlens egen refleksion ud af Mirefen og efterlod et sår, der stadig damper. Hovedet ligner et stykke revet nat: smeltede guldrevner, stjernebilleder, som ingen forsker på Highwatch kan nævne, et nordlys, der bløder ud over kanten med hvert sving. Bror Aldric velsignede det og ville ikke røre det. At løfte det er at holde hullet himlen tilbage."
+        },
+        "starfall_mace": {
+          "name": "Stjernefald, Himlens Dom",
+          "look": "Fangenskab smeltet guld stjerne-kerne omkranset af kredsende fragmenter, kosmos-sorte flanger årede med stjernelys, aurora vælter ud fra sømmene.",
+          "lore": "En stjernekerne fangede det øjeblik, før den døde, omkranset med affaldet, der faldt med den, frosset en tomme fra glemslen. Dens kosmossorte flanger løber med indespærret stjernelys, og nordlys vælter ud af sømmene, når den hæves. Lysets gamle Præst'ere kaldte en faldende stjerne for en dom, en dom afsagt fra oven om, at intet skjold var beregnet til at stoppe, og opkaldte dette efter det, der kom ned på Mirefen."
+        },
+        "astravyr_dagger": {
+          "name": "Astravyr, Den Faldne Stjernes Hugtand",
+          "look": "En splint af en faldet stjerne, en glødende kant af smeltet guld på kosmossort metal, en lysende stjernegnist i kredsløb om knappen og et tyndt nordlysspor.",
+          "lore": "Det mindste stykke af stjernen Aldric blev trukket fra krateret, og efter nogle beregninger det farligste. En enkelt splint af det andet-verdslige hjerte, dets smeltede guldkant, der kører på kosmosort metal, en ensom stjerneskive, der cirkulerer rundt om stangen som en måne, der mistede sin verden. Den vejer næsten ingenting og deler næsten alt. Lille nok til at gemme sig, lys nok til at finde i mørket ved sit eget lys."
+        },
+        "cosmarch_staff": {
+          "name": "Cosmarch, Det Endeløse Tomrums Spir",
+          "look": "Kredsende klynge af gyldne stjerneskår omkring en smeltet guldkerne, stjernebillede-ætset kosmos-sort skaft, nordlysbånd, der snor sig opad.",
+          "lore": "Et skaft af stjernemetal kronet med en smeltet guldkerne og en ring af gyldne skår, der marcherer rundt om den i langsom, endeløs kredsløb: et lille kosmos, ætset med stjernebilleder, der ikke matcher nogen himmel over Thornpeak. Aurora snor sig op ad sin længde som røg, der glemte at stige. De, der bar det, hævdede, at de kunne mærke tomrummet vende sig igennem det, sådan som Ysoleis blotte 'drikker måneskin': tålmodig og kold og ser tilbage."
+        },
+        "emberwish_wand": {
+          "name": "Glødeønske, Den Døende Sols Gnist",
+          "look": "En indfanget, smeltet gylden gnist fra en døende stjerne omgivet af kredsende smågnister, på et kosmossort skaft ætset med glødende stjernebilleder.",
+          "lore": "Ikke den faldne stjerne selv, men den sidste gnist fra en døende stjerne: en enkelt glød af smeltet guld fra en sol, der allerede er slukket, omgivet af gnisterne fra dens sidste lys. Det kosmossorte skaft er ætset med de stjernebilleder, der så den dø. Mosekærs bønder siger, at den opfylder ét ønske for den, der holder den i den sande skumring. De siger også, at alle, der har holdt den, ønskede sig mere tid, og at Den Druknede Måne ikke gav nogen af dem det."
+        },
+        "encore_bow": {
+          "name": "Encore, Den Anden Faldende Stjerne",
+          "look": "Komisk overdimensioneret stjernekanon: et kosmossort løb ætset med glødende gyldne stjernebilleder, trompetformet munding med et kometprojektil af smeltet guld, messingbeslag og en trækolbe.",
+          "lore": "Smedene, der bearbejdede den faldne stjerne, lavede seks relikvier af den og havde stadig en tønde stjernemetal tilbage, og da havde lærlingene meninger. Det, der kom af ambolten, er enten rigets første pistol eller dens mindste belejringsmotor: en skulderkanon, der ikke så meget taber et skud som anmoder om en anden stjerne, sigtet. Bror Aldric nægtede at velsigne det, idet han ræsonnerede, at alt så højt allerede er blevet bemærket af himlen. Jægers elsker det. Intet downrange nogensinde har."
+        },
+        "meteorlatch_crossbow": {
+          "name": "Meteorlås, Himlens Sidste Dom",
+          "look": "Meteoritisk stjernemetal, en kerne af smeltet guld langs skæftet, kosmossorte buearme ætset med stjernebilleder og en armbrøstpil af ren stjerneild.",
+          "lore": "Smedet af råt, meteoritisk stjernemetal, mens Mosekær-krateret endnu glødede. Vragdele, der var 'for varme at håndtere', blev hamret til kosmossorte buearme ætset med stjernebilleder, med en kerne af smeltet guld langs skæftet. Den lægger ingen armbrøstpil an, men fremmaner en: et skaft af stjerneild, affyret som en dom og med nedslag som dommens fuldbyrdelse. Da Højvagten frygtede, at selv Nythraxis' udødelige krone måske ikke var det værste under tinderne, var dette våbnet, de ønskede på muren. Sigt omhyggeligt."
+        }
+      },
+      "seasonOne": "Sæson 1",
+      "rarity": {
+        "uncommon": "Ualmindelig",
+        "rare": "Sjælden",
+        "epic": "Episk",
+        "legendary": "Legendarisk"
+      },
+      "wtype": {
+        "sword": "Sværd",
+        "axe": "Økse",
+        "mace": "Kølle",
+        "dagger": "Dolk",
+        "staff": "Stav",
+        "wand": "Tryllestav",
+        "bow": "Bue",
+        "crossbow": "Armbrøst"
+      },
+      "badge": {
+        "flagship": "Flagskib",
+        "hero": "Helt"
+      },
+      "inspectAria": "Undersøg {item}",
+      "viewModeLabel": "Forhåndsvisningstilstand",
+      "tryOn": "Prøv på",
+      "weaponOnly": "Kun våben",
+      "sceneLabel": "Forhåndsvisningens belysning",
+      "scene": {
+        "day": "Dag",
+        "dusk": "Skumring",
+        "night": "Nat"
+      },
+      "lore": "Baggrundshistorie",
+      "buySkin": "Køb skin",
+      "unavailable": "Ikke tilgængelig",
+      "applied": "I brug",
+      "apply": "Anvend skin",
+      "detach": "Fjern skin",
+      "equipHint": "Udstyr et våben af typen {type} for at anvende dette skin."
+    },
+    "claudium": {
+      "title": "Claudium",
+      "open": "Åbn Claudium",
+      "close": "Luk Claudium",
+      "loading": "Indlæser Claudium...",
+      "balanceLabel": "Saldo",
+      "balanceUnit": "{amount} Claudium",
+      "solBalance": "SOL: {amount}",
+      "wocBalance": "WOC: {amount}",
+      "unavailable": "Claudium-butikken er ikke tilgængelig lige nu. Din saldo og dine køb er ikke påvirket. Prøv igen om lidt.",
+      "disclosure": "Claudium er en virtuel valuta, der kun går én vej: Køb den for penge, og brug den på kosmetik. Den kan ikke indløses, overføres eller udbetales.",
+      "buyTitle": "Køb Claudium",
+      "railLabel": "Betalingsmetode",
+      "railStripe": "Kort",
+      "railSol": "SOL",
+      "railWoc": "WOC",
+      "railWocDiscount": "20% rabat",
+      "railWocUnavailable": "WOC-priser er ikke tilgængelige lige nu.",
+      "railNativeUnavailable": "SOL/WOC er slået fra.",
+      "amountLabel": "Beløb",
+      "showAmounts": "Vis alle Claudium-beløb",
+      "hideAmounts": "Skjul ekstra Claudium-beløb",
+      "skuRow": "{usd} til {claudium} Claudium",
+      "buyButton": "Køb",
+      "buyUnavailable": "Det er ikke muligt at foretage køb lige nu.",
+      "storeTitle": "Kosmetisk butik",
+      "storeEmpty": "Ingen kosmetik er tilgængelig lige nu.",
+      "storeCost": "{amount} Claudium",
+      "spendButton": "Brug",
+      "kindCosmetic": "Kosmetisk",
+      "kindSkin": "Skin",
+      "kindItem": "Genstand",
+      "checkoutTitle": "Gennemfør køb",
+      "checkoutClose": "Luk betalingsvinduet",
+      "checkoutLoading": "Indlæser betalingsvinduet...",
+      "checkoutPending": "Transaktion i gang. Bekræft i din tegnebog, og hold dette panel åbent.",
+      "checkoutPendingButton": "Behandler",
+      "checkoutFailed": "Betalingsvinduet kunne ikke indlæses. Prøv igen.",
+      "checkoutUnavailable": "Dette Claudium-køb er ikke tilgængeligt lige nu.",
+      "checkoutWalletRequired": "Tilslut en Solana-tegnebog, før du køber Claudium med kryptovaluta.",
+      "checkoutWalletUnsupported": "Denne tegnebog kan ikke underskrive og sende Solana-transaktioner.",
+      "checkoutNotSettled": "Transaktionen blev sendt, men Claudium er endnu ikke blevet tilføjet. Prøv igen om lidt."
+    },
     "theme": {
       "preset": "UI-tema",
       "customColors": "Tilpassede farver",
@@ -450,7 +707,7 @@ export const da_DK: EnTranslations = {
     "mobile": {
       "jump": "Hop",
       "leaderboard": "Rangliste",
-      "dailyRewards": "Belønninger",
+      "dailyRewards": "Butik",
       "deeds": "Bedrifter",
       "nameplates": "Navne",
       "nameplatesOff": "Names Off",
@@ -476,12 +733,12 @@ export const da_DK: EnTranslations = {
       "talkBodyTouch": "Stil dig tæt på Marskal Redbrook og tryk på Brug-knappen for at tale, og accepter derefter hans opgave.",
       "returnBodyTouch": "Din opgave er fuldført. Vend tilbage til Marskal Redbrook og tryk på Brug-knappen for at aflevere den.",
       "doneBodyTouch": "Du har styr på det grundlæggende, {name}. Dalen er din at udforske. Tryk på Mere, derefter Opgaver, for at gennemse din opgavelog når som helst. God jagt.",
-      "slayTargetHint": "New to combat? Press {targetKey} or click a wolf to target it, then use an action bar ability to attack it.",
-      "slayTargetHintTouch": "New to combat? Tap a wolf to target it, then tap an action bar ability to attack it.",
-      "nextTipsTitle": "Where to next",
-      "nextTipQuestLog": "Open your Quest Log ({key}) to find your next task nearby.",
-      "nextTipMap": "Check the World Map ({key}) to see where quests are waiting.",
-      "nextTipSocial": "Open Social ({key}) to find a group for tougher fights."
+      "slayTargetHint": "Er kamp nyt for dig? Tryk på {targetKey}, eller klik på en ulv for at vælge den som mål. Brug derefter en evne på handlingsbjælken til at angribe den.",
+      "slayTargetHintTouch": "Er kamp nyt for dig? Tryk på en ulv for at vælge den som mål, og tryk derefter på en evne på handlingsbjælken for at angribe den.",
+      "nextTipsTitle": "Hvad nu?",
+      "nextTipQuestLog": "Åbn din questlog ({key}) for at finde den næste opgave i nærheden.",
+      "nextTipMap": "Tjek verdenskortet ({key}) for at se, hvor quests venter.",
+      "nextTipSocial": "Åbn panelet Socialt ({key}) for at finde en gruppe til sværere kampe."
     },
     "widgets": {
       "clockTitle": "Lokal tid - klik for at skifte mellem 12/24-timers",
@@ -496,6 +753,15 @@ export const da_DK: EnTranslations = {
       "bodyWithVersion": "Version {version} af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.",
       "notNow": "Ikke nu",
       "update": "Opdater"
+    },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
     },
     "castBar": {
       "playerAria": "Din castbjælke",
@@ -542,7 +808,12 @@ export const da_DK: EnTranslations = {
       "perSecond": "{value}/s",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "seconds": "{s}s",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Følelseshjul",
@@ -550,6 +821,7 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
       "valecup": "Dalpokalen",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
       "petStop": "Kæledyr: Stop",
@@ -827,13 +1099,29 @@ export const da_DK: EnTranslations = {
       "highContrast": "Høj kontrast",
       "highContrastAria": "Slå baggrund med høj kontrast til/fra: deaktiverer den bevægende trailer, så teksten på startskærmen forbliver læselig"
     },
+    "warfare": {
+      "honorAmount": "{amount} Ære",
+      "dualPrice": "{money} + {honor}",
+      "balance": "Ære: {amount}",
+      "honorFloat": "+{amount} Ære",
+      "honorGain": "Du opnår {amount} Ære ({reason}).",
+      "notEnoughHonor": "Ikke nok Ære.",
+      "reasons": {
+        "arenaWin": "Arenasejr",
+        "fiestaKill": "Fiesta-nedlæggelse",
+        "fiestaComplete": "Fiesta gennemført",
+        "fiestaWin": "Fiesta-sejr"
+      }
+    },
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
       "names": {
         "spellPower": "Besværgelseskraft",
         "critRating": "Kritvurdering",
-        "hasteRating": "Hastevurdering"
+        "hasteRating": "Hastevurdering",
+        "warfare": "Krigsførelse"
       },
+      "warfareValue": "+{increase}% givet / -{reduction}% modtaget",
       "desc": {
         "str": "Øger din angrebsstyrke, så dine våbenslag rammer hårdere.",
         "agi": "Skærper dine reflekser og dit sigte og forbedrer flere af dine kampegenskaber.",
@@ -847,7 +1135,8 @@ export const da_DK: EnTranslations = {
         "critChance": "Din chance for at et angreb rammer kritisk og gør dobbelt skade.",
         "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade.",
         "critRating": "Kritvurdering fra dit udstyr og sætbonusser, der hæver din chance for kritisk slag. Cirka 10 vurdering giver 1% krit.",
-        "hasteRating": "Hastevurdering fra dit udstyr og sætbonusser, der fremskynder dine angreb og besværgelser. Cirka 10 vurdering giver 1% hast."
+        "hasteRating": "Hastevurdering fra dit udstyr og sætbonusser, der fremskynder dine angreb og besværgelser. Cirka 10 vurdering giver 1% hast.",
+        "warfare": "Øger skade givet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%."
       },
       "effects": {
         "attackPower": "+{value} Angrebsstyrke",
@@ -920,6 +1209,12 @@ export const da_DK: EnTranslations = {
         "few": "du er {rank}, {count} medlemmer",
         "many": "du er {rank}, {count} medlemmer",
         "other": "du er {rank}, {count} medlemmer"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1072,7 +1367,7 @@ export const da_DK: EnTranslations = {
     "corpseHarvest": {
       "title": "Høst",
       "harvestButton": "Høst",
-      "harvestButtonTooltip": "Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.",
+      "harvestButtonTooltip": "Høst: Saml håndværksmaterialer fra dette lig (skind, hugtænder, silke og lignende dele), uafhængigt af dets bytte. Alle kan høste, men hvert lig kan kun høstes af én spiller.",
       "concentrateHint": "Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.",
       "alreadyHarvested": "Dette kadaver er allerede blevet høstet.",
       "componentAria": "Høst {component}",
@@ -1100,6 +1395,19 @@ export const da_DK: EnTranslations = {
       "promoteLeader": "Forfrem til leder",
       "inviteUsage": "Invitér hvem? Brug: /invite <navn>."
     },
+    "playerMenu": {
+      "info": "Spilleroplysninger",
+      "block": "Blokér",
+      "unblock": "Fjern blokering",
+      "openFor": "Åbn spillermenuen for {name}",
+      "profileUnavailable": "Ingen profil fundet for {name}.",
+      "aiTag": "[AI]",
+      "aiTagTitle": "AI-styret konto",
+      "watchTwitch": "Se på Twitch",
+      "watchX": "Vis på X",
+      "watchKick": "Se på Kick",
+      "watchYouTube": "Se på YouTube"
+    },
     "lootSettings": {
       "title": "Bytteindstillinger",
       "close": "Luk byttindstillinger",
@@ -1117,7 +1425,7 @@ export const da_DK: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
-      "rightClickDestroy": "Højreklik for at ødelægge",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1273,7 +1581,7 @@ export const da_DK: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Kiste",
-      "takeAllTooltip": "Take All: collect every coin and item in this loot window."
+      "takeAllTooltip": "Tag alt: Saml alle mønter og genstande i dette byttevindue."
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
@@ -1348,7 +1656,8 @@ export const da_DK: EnTranslations = {
         "connecting": "Åbner Discord...",
         "benefits": "Forbind din Discord for at optjene point fra spil og fællesskabsaktivitet og stige i statusrangene.",
         "error": "Kunne ikke forbinde Discord. Prøv igen.",
-        "success": "Discord forbundet."
+        "success": "Discord forbundet.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Fortsæt med Discord",
@@ -1396,8 +1705,13 @@ export const da_DK: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kerneudvikler",
         "devs": "Udvikler",
+        "seniormods": "Senior Mod",
         "mods": "Moderator",
-        "artists": "Kunstner"
+        "juniormods": "Junior Mod",
+        "artists": "Kunstner",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Verificeret medlem",
       "notMember": "Ikke på serveren endnu",
@@ -1650,7 +1964,15 @@ export const da_DK: EnTranslations = {
     },
     "social": {
       "lastSeen": "Sidst set: {when}",
-      "lastSeenNever": "aldrig"
+      "lastSeenNever": "aldrig",
+      "ignoredTab": "Ignorerede",
+      "blockedTab": "Blokerede",
+      "ignoredEmpty": "Du ignorerer ingen.",
+      "blockedEmpty": "Du har ikke blokeret nogen.",
+      "blockSearchPlaceholder": "Spillernavn",
+      "blockAction": "Blokér",
+      "nowBlocking": "{name} blokeret.",
+      "stopBlockingTitle": "Fjern blokering af {name}"
     },
     "gathering": {
       "title": "Indsamling",
@@ -1688,6 +2010,107 @@ export const da_DK: EnTranslations = {
       "notAtHub": "Du skal være ved håndværksstationen og på det krævede niveau for at lave det.",
       "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Bedrifternes Bog",
@@ -1741,7 +2164,7 @@ export const da_DK: EnTranslations = {
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fold bedriftssporing sammen",
       "expandHint": "Fold bedriftssporing ud",
-      "openBookHint": "Open the Book of Deeds",
+      "openBookHint": "Åbn Bedrifternes Bog",
       "charTitleLabel": "Titel",
       "charTitleNone": "Ingen titel valgt",
       "charOpenBook": "Bedrifternes Bog",
@@ -2428,6 +2851,10 @@ export const da_DK: EnTranslations = {
       "dragonkin": {
         "name": "Drageæt",
         "desc": "Skældækkede, slangeagtige væsner fra de gamle dyb. Sjældne, stolte og langt stærkere, end de ser ud."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {
@@ -5755,6 +6182,10 @@ export const da_DK: EnTranslations = {
         "name": "Sidste Rite",
         "description": "En massiv bølge af helbredelse: genopretter {damage} helbred. 10 min afkøling."
       },
+      "holy_taunt": {
+        "name": "Hellig Æggelse",
+        "description": "Håner målet: din trussel stiger til samme niveau som dets mest hadede fjendes, og målet tvinges til at angribe dig i 3 sek."
+      },
       "flash_of_light": {
         "name": "Lyslægning",
         "description": "Et hurtigt, effektivt udbrud af Lys, der helbreder et venligt mål for {damage}."
@@ -6079,6 +6510,98 @@ export const da_DK: EnTranslations = {
         "name": "Sydende Raseri",
         "description": "Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)"
       },
+      "crusader_strike": {
+        "name": "Korsfarerslag",
+        "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
+      },
+      "chain_heal": {
+        "name": "Kædeheling",
+        "description": "Helbreder et venligt mål for en stor mængde og springer derefter til op til 2 yderligere allierede i nærheden. Helbredelsen mindskes med 50% for hvert spring. (Genoprettelsessignatur)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfose",
+        "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"
+      },
+      "holy_shock": {
+        "name": "Hellig chok",
+        "description": "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)"
+      },
+      "holy_shield": {
+        "name": "Hellig skjold",
+        "description": "Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)"
+      },
+      "bestial_wrath": {
+        "name": "Bestialsk vrede",
+        "description": "Sender dig i bestialsk raseri, så angrebskraft øges med 55 i 15 sek. (Bæstmestersignatur)"
+      },
+      "trueshot_aura": {
+        "name": "Træfsikkerhedsaura",
+        "description": "Inspirerer nærliggende allierede og øger angrebskraft med 35 i 5 min. (Skytte signatur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernstik",
+        "description": "Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)"
+      },
+      "arcane_power": {
+        "name": "Arkan kraft",
+        "description": "Øger besværgelsesskade med 20% og besværgelseshast med 10% i 10 sek. (Arcane-signatur)"
+      },
+      "combustion": {
+        "name": "Forbrænding",
+        "description": "Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)"
+      },
+      "icy_veins": {
+        "name": "Iskolde Årer",
+        "description": "Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)"
+      },
+      "cold_blood": {
+        "name": "Koldt blod",
+        "description": "Fokuserer din dræbervilje, så dit næste angreb bliver et kritisk træf. (Snigmordersignatur)"
+      },
+      "blade_flurry": {
+        "name": "Klingevirvel",
+        "description": "Udløser en byge af klinger og øger angrebshastighed med 20% i 12 sek. (Kampsignatur)"
+      },
+      "hemorrhage": {
+        "name": "Blødning",
+        "description": "Ramler fjenden for våbenskade plus {damage} og påfører blødningsskade over 12 sek. Giver 1 combopoint. (Underfundighedssignatur)"
+      },
+      "power_infusion": {
+        "name": "Kraftinfusion",
+        "description": "Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)"
+      },
+      "holy_nova": {
+        "name": "Hellig nova",
+        "description": "Udløser en eksplosion af helligt lys, helbreder nærliggende allierede for {damage} og skader nærliggende fjender. (Hellig signatur)"
+      },
+      "shadowform": {
+        "name": "Skyggeform",
+        "description": "Antag skyggeform, som styrker skyggemagi, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Skyggesignatur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementær beherskelse",
+        "description": "Påkalder elementær beherskelse og gør din næste besværgelse øjeblikkelig. (Elementær signatur)"
+      },
+      "siphon_life": {
+        "name": "Sug liv",
+        "description": "Suger liv fra fjenden, påfører {damage} skyggeskade over 30 sek og helbreder dig for den skade, der bliver gjort. (Lidelsessignatur)"
+      },
+      "conflagrate": {
+        "name": "Antændelse",
+        "description": "Forbruger din Opbrænding på fjenden for at antænde den for {damage} ildskade. (Ødelæggelsessignatur)"
+      },
+      "moonkin_form": {
+        "name": "Månekinform",
+        "description": "Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)"
+      },
+      "feral_charge": {
+        "name": "Vild ladning",
+        "description": "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)"
+      },
+      "swiftmend": {
+        "name": "Hurtig heling",
+        "description": "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)"
+      },
       "summon_imp": {
         "name": "Tilkald Emberkin",
         "description": "Tilkalder en Emberkin under Heksemesterens kommando. Emberkinen slynger Askelyn mod dine fjender fra det fjerne. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
@@ -6106,6 +6629,34 @@ export const da_DK: EnTranslations = {
       "summon_doomguard": {
         "name": "Tilkald Wraithborn",
         "description": "Binder en Wraithborn til din vilje, en elitedæmon der regner tung Skygge skade ned på afstand. En lang nedkøling holder dens ødelæggende kraft i skak. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
+      },
+      "pummel": {
+        "name": "Kæbeknuser",
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+      },
+      "kick": {
+        "name": "Spark",
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+      },
+      "counterspell": {
+        "name": "Besværgelsesbrud",
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
+      },
+      "counter_shot": {
+        "name": "Dæmpende Skud",
+        "description": "Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
+      },
+      "rebuke": {
+        "name": "Irettesættelse",
+        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+      },
+      "skull_bash": {
+        "name": "Skalle",
+        "description": "En fremadstormende skalle, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
+      },
+      "spell_lock": {
+        "name": "Mundkurv",
+        "description": "Gør målet tavst midt i en besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 5 sek."
       },
       "bear_charge": {
         "name": "Bruin-storm",
@@ -6749,6 +7300,126 @@ export const da_DK: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Solkroneurt"
+      },
+      "furyforged_warhelm": {
+        "name": "Raserismedet Krigshjelm"
+      },
+      "furyforged_warspaulders": {
+        "name": "Raserismedede Krigsskuldre"
+      },
+      "furyforged_warplate": {
+        "name": "Raserismedet Krigsplade"
+      },
+      "furyforged_girdle": {
+        "name": "Raserismedet Bælte"
+      },
+      "furyforged_legguards": {
+        "name": "Raserismedede Benbeskyttere"
+      },
+      "furyforged_gauntlets": {
+        "name": "Raserismedede Stridshandsker"
+      },
+      "furyforged_sabatons": {
+        "name": "Raserismedede Pladestøvler"
+      },
+      "stormbound_crown": {
+        "name": "Stormbundet Krone"
+      },
+      "stormbound_spaulders": {
+        "name": "Stormbundne Skulderplader"
+      },
+      "stormbound_hauberk": {
+        "name": "Stormbundet Brynjeskjorte"
+      },
+      "stormbound_waistguard": {
+        "name": "Stormbundet Livbeskytter"
+      },
+      "stormbound_legmail": {
+        "name": "Stormbundne Benbrynjer"
+      },
+      "stormbound_handguards": {
+        "name": "Stormbundne Håndbeskyttere"
+      },
+      "stormbound_greaves": {
+        "name": "Stormbundne Benskinner"
+      },
+      "ashstalker_cowl": {
+        "name": "Askeluskerens Hætte"
+      },
+      "ashstalker_shoulderguards": {
+        "name": "Askeluskerens Skulderbeskyttere"
+      },
+      "ashstalker_harness": {
+        "name": "Askeluskerens Sele"
+      },
+      "ashstalker_waistband": {
+        "name": "Askeluskerens Livrem"
+      },
+      "ashstalker_legguards": {
+        "name": "Askeluskerens Benbeskyttere"
+      },
+      "ashstalker_grips": {
+        "name": "Askeluskerens Gribehandsker"
+      },
+      "ashstalker_treads": {
+        "name": "Askeluskerens Støvler"
+      },
+      "cinderweave_cowl": {
+        "name": "Glødevævet Hætte"
+      },
+      "cinderweave_mantle": {
+        "name": "Glødevævet Skulderslag"
+      },
+      "cinderweave_raiment": {
+        "name": "Glødevævet Klædning"
+      },
+      "cinderweave_cord": {
+        "name": "Glødevævet Snor"
+      },
+      "cinderweave_legwraps": {
+        "name": "Glødevævede Benbind"
+      },
+      "cinderweave_handwraps": {
+        "name": "Glødevævede Håndbind"
+      },
+      "cinderweave_slippers": {
+        "name": "Glødevævede Sko"
+      },
+      "final_oath_medallion": {
+        "name": "Den Sidste Eds Medaljon"
+      },
+      "razorwind_torque": {
+        "name": "Klingevinds Halsring"
+      },
+      "cinder_sigil_pendant": {
+        "name": "Glødeseglets Vedhæng"
+      },
+      "iron_vow_band": {
+        "name": "Jernedens Ring"
+      },
+      "unbroken_circle": {
+        "name": "Den Ubrudte Cirkel"
+      },
+      "fleetblood_band": {
+        "name": "Hurtigblodsring"
+      },
+      "last_step_signet": {
+        "name": "Sidste Skridts Signet"
+      },
+      "ashen_focus_ring": {
+        "name": "Askegrå Fokusring"
+      },
+      "spellbreakers_seal": {
+        "name": "Besværgelsesbryderens Segl"
+      },
+      "final_argument_greatblade": {
+        "name": "Slutargumentets Storklinge"
+      },
+      "first_blood_razor": {
+        "name": "Førsteblodskniv"
+      },
+      "emberglass_warstaff": {
+        "name": "Glødeglas-Krigsstav"
       },
       "bristleback_maul": {
         "name": "Gallowglass-Hammer"
@@ -7622,6 +8293,15 @@ export const da_DK: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"
       },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Den Udødelige Krigsvagt"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Den Udødelige Hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Den Udødelige Kniv"
+      },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"
       },
@@ -7889,6 +8569,11 @@ export const da_DK: EnTranslations = {
         "name": "Kvartermester Vex",
         "title": "Heroisk Kvartermester",
         "greeting": "Bevis på de heroiske dyb køber de fineste ringe og vedhæng i Højvagt. Vis mig dine mærker."
+      },
+      "fury": {
+        "name": "RASERI",
+        "title": "Æreskvartermester",
+        "greeting": "Sandet husker hver sejr. Brug din ære godt."
       },
       "loremaster_caddis": {
         "name": "Lærdomsmester Caddis",

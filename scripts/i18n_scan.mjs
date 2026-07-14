@@ -135,6 +135,8 @@ function cognateReason(scope, locale, key) {
     return "'Status' is the accepted term in this locale and is identical to English (matches detail.status).";
   if (key === 'chatFilter.escalationTitle')
     return "'Escalation' is a borrowed term already used across this locale's admin strings.";
+  if (key === 'accounts.badgeStreamer' || key === 'detail.streamerLabel')
+    return "'Streamer' is the borrowed term this locale actually uses for the role; the native calque is not what an operator would say.";
   return 'Accepted cognate or borrowed term that is legitimately identical to English.';
 }
 

@@ -277,7 +277,7 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   (`scripts/convert_skill_icons_webp.mjs`): it encodes each non-webp image to WebP (the tuned
   encoder settings live in the script) and deletes the original. Then list its id in
   `ABILITY_IMAGE_IDS`. Nothing converts at BUILD time (the script is a pre-commit step, not
-  wired into `npm run build`); only `ui/skills/` is auto-converted and gated:
+  wired into `npm run build`); each art tree has its own converter and its own gate:
   `tests/skill_icons.test.ts` fails if a wired id lacks its webp or any non-webp image is
   committed there (the existing weapon JPGs and cursor/emote PNGs are grandfathered). Prefer
   WebP for any new ability/skill art.
@@ -287,6 +287,18 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
   composites its procedural recipe). Convert with `npm run assets:deeds`
   (`scripts/convert_deed_icons_webp.mjs`); `tests/deed_icons.test.ts` gates the id list
   against the committed webp files in both directions.
+- **The same exception for ITEMS:** `ITEM_IMAGE_IDS` ships painted art for items, and
+  `itemImageUrl(id)` returns `/ui/items/<id>.webp`, served for `kind:'item'` (bags, tooltips,
+  loot, vendor, the `/wiki` guide). Weapons are the one carve-out: they keep their rendered-model
+  thumbnails under `WEAPON_ICON_DIR`. Add art the same way: drop it into `public/ui/items/` named
+  after the item id, run `npm run assets:items` (`scripts/convert_item_icons_webp.mjs`, the
+  sibling of the skills converter, which ALSO downscales to the served 128px square and deletes
+  the original), then list the id in `ITEM_IMAGE_IDS` and record its provenance/license in
+  `public/ui/items/mapping.json`. An icon id with NO `ITEMS` record (today: the implicit
+  `backpack` the bag bar shows) goes in `UI_ITEM_IMAGE_IDS` instead, which keeps the guard's
+  "every wired ITEM id is a real, non-weapon item" assertion intact. `tests/item_icons.test.ts`
+  is the gate: WebP-only tree, art and wiring in bijection, every icon the declared square, every
+  bag image-backed.
 
 ## Small modules (pure-core + thin-consumer exemplars)
 Logic lifted out of `hud.ts`: a host-agnostic core a Vitest imports directly, plus a thin
@@ -302,12 +314,14 @@ header carries its own contract.
   label key, value coercion) painted with the shared `settings_controls.ts` builders; a
   settings refresh re-runs the painter's `render()` view dispatcher, never a direct sub-panel
   repaint.
-- **window_resize.ts** (pure `window_resize_core.ts`) + **movable_frame.ts** (pure
+- **window_drag.ts** (pure `window_drag_core.ts`) + **window_stack_state_core.ts** +
+  **window_resize.ts** (pure
+  `window_resize_core.ts`) + **movable_frame.ts** (pure
   `target_frame_pos.ts`; `frame_pos_reset.ts`): the shared SE-corner resize grip on every
   `.window.panel` and the movable/lockable unit-frame controller, both instance-parameterized.
-  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag stays in `hud.ts`
-  (`isWindowDragHandle`); bump `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position
-  reset.
+  Fixed-size popups opt out via `NON_RESIZABLE_WINDOW_IDS`; titlebar drag is frame-batched
+  and compositor-only until it commits through Hud's shared position clamp. Bump
+  `LAYOUT_RESET_EPOCH` only for a forced one-time frame-position reset.
 - **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
   **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
   **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds
