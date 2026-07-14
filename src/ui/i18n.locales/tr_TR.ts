@@ -374,7 +374,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Kahramanca Nişanlar: {count}',
   'heroicShop.buyAria': '{item} ürününü {marks} Kahramanca Nişan karşılığında satın al',
   'hudChrome.bags.cannotDestroy': 'Bu eşya yok edilemez.',
-  'hudChrome.bags.rightClickDestroy': 'Yok etmek için sağ tıkla',
   'hudChrome.crafting.comboRequirementUnmet':
     'O tarif için gereken iki zanaata da gereken kademede sahip değilsin.',
   'hudChrome.discord.roleTag.coredevs': 'Çekirdek Geliştirici',

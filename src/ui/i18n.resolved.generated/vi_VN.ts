@@ -1263,7 +1263,7 @@ export const vi_VN: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Không thể phá hủy vật phẩm này.",
-      "rightClickDestroy": "Nhấp phải để phá hủy",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",

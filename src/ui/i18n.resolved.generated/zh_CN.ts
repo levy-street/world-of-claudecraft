@@ -1263,7 +1263,7 @@ export const zh_CN: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "该物品无法销毁。",
-      "rightClickDestroy": "右键单击以销毁",
+      "rightClickDestroy": "Shift+右键单击以销毁",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",

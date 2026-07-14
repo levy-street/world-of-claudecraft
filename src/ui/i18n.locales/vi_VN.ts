@@ -374,7 +374,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Dấu Ấn Anh Hùng: {count}',
   'heroicShop.buyAria': 'Mua {item} với giá {marks} Dấu Ấn Anh Hùng',
   'hudChrome.bags.cannotDestroy': 'Không thể phá hủy vật phẩm này.',
-  'hudChrome.bags.rightClickDestroy': 'Nhấp phải để phá hủy',
   'hudChrome.crafting.comboRequirementUnmet':
     'Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.',
   'hudChrome.discord.roleTag.coredevs': 'Nhà Phát Triển Chính',

@@ -1263,7 +1263,7 @@ export const en_XA: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "[Ţĥíš íţéɱ çáññóţ ƀé ðéšţŕóýéð.]",
-      "rightClickDestroy": "[Ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
+      "rightClickDestroy": "[Šĥíƒţ+ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",

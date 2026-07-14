@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
 
@@ -16,7 +16,10 @@ function installStorage(): void {
   };
 }
 
-function makeInput() {
+function makeInput(userAgent?: string) {
+  vi.stubGlobal('navigator', {
+    userAgent: userAgent ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0',
+  });
   const canvasListeners = new Map<string, (event: any) => void>();
   const windowListeners = new Map<string, (event: any) => void>();
   const documentListeners = new Map<string, (event: any) => void>();
@@ -86,6 +89,10 @@ function makeInput() {
 beforeEach(() => {
   installStorage();
   vi.restoreAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('Input camera zoom', () => {
@@ -384,6 +391,166 @@ describe('Input pointer lock', () => {
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, requests pointer lock synchronously from mousedown for the camera-look button (#1834)', () => {
+    // Firefox denies requestPointerLock() when it is deferred to a later
+    // mousemove once the drag threshold is crossed, so on Firefox the request
+    // must happen inside the mousedown handler itself, before any movement.
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, does not request pointer lock on mousedown for the click-to-move button', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setClickMoveMouseButton(0);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('on Firefox in classic camera mode, requests pointer lock synchronously for a LEFT drag too (blocking regression #1840)', () => {
+    // Classic mode still lets either button start a camera drag (leftDown ||
+    // rightDown in onMouseMove); the synchronous Firefox request must cover
+    // left, not only the mode's nominal look button (right, in classic mode).
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox in Mouse Camera mode, requests pointer lock synchronously for button 0', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setMouseCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox in Mouse Camera mode, requests pointer lock synchronously for a RIGHT drag too (blocking regression #1840)', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setMouseCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, does not request pointer lock on mousedown when "Lock Cursor While Rotating" is off', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setLockCursorOnRotate(false);
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('on Chrome, does not request pointer lock synchronously on mousedown (deferred path keeps #116 fixed)', () => {
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('exits pointer lock if the async grant lands after mouseup already released (should-fix regression #1840)', () => {
+    // A fast click can beat requestPointerLock()'s async resolution: mouseup
+    // runs first (nothing to release yet, since pointerLockElement is still
+    // null), then the grant lands late via pointerlockchange with no button
+    // held. Without the pointerlockchange guard the canvas would stay locked
+    // with no drag active until the next press/release cycle.
+    const { canvas, documentListeners, canvasListeners, windowListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: canvas });
+    expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
+
+    (globalThis as any).document.pointerLockElement = canvas;
+    documentListeners.get('pointerlockchange')!({});
+
+    expect((globalThis as any).document.exitPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the lock when the grant lands while the button is still held', () => {
+    const { canvas, documentListeners, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    (globalThis as any).document.pointerLockElement = canvas;
+    documentListeners.get('pointerlockchange')!({});
+
+    expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
   });
 
   it('does not rotate the camera before the drag threshold, so short sloppy clicks stay stable', () => {

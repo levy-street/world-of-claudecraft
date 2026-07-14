@@ -1341,9 +1341,10 @@ export const hudChromeStrings = {
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
-    // Tooltip sub-line advertising the right-click destroy affordance, shown only
-    // for a destroyable item so junk is removable without hunting for a menu.
-    rightClickDestroy: 'Right-click to destroy',
+    // Tooltip sub-line advertising the shift+right-click destroy affordance, shown
+    // only for a destroyable item so junk is removable without hunting for a menu. A
+    // plain right-click equips/uses the item instead (issue 1852).
+    rightClickDestroy: 'Shift+right-click to destroy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
