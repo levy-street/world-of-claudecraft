@@ -90,9 +90,9 @@ describe('registry', () => {
     expect(valecup?.category).toBe('Interface');
     expect(valecup?.kind).toBe('edge');
     expect(valecup?.defaults).toEqual(['KeyY']);
-    // The Book of Deeds is a rebindable Interface toggle. Damage Meters claimed
-    // the last free ergonomic letter (KeyZ), so deeds parks on the shifted
-    // layer of the same key, like the Shift+digit secondary bar.
+    // The Book of Deeds is a rebindable Interface toggle. Every bare letter is
+    // claimed by another default, so deeds parks on the shifted layer of KeyZ,
+    // like Damage Meters does on H and the Shift+digit secondary bar.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
     expect(deeds?.category).toBe('Interface');
     expect(deeds?.kind).toBe('edge');
@@ -411,6 +411,73 @@ describe('per-character scope', () => {
     // A corrupt scoped value behaves like an absent one: still seed from legacy,
     // do not drop to bare defaults.
     expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+  });
+
+  it('repairs the Q/E strafe overhaul signature on a scoped profile', () => {
+    // The reverted interface overhaul (1d2678f58, reverted by #1788) saved a
+    // scoped profile with slot10/slot11 holding Q/E and Strafe Left/Right
+    // unbound. Loading it must restore the current defaults (Q/E strafe,
+    // Minus/Equal on the two slots), not keep pressing Q/E driving the slots.
+    localStorage.setItem(
+      'woc_keybinds:char:alice',
+      JSON.stringify({
+        strafeLeft: [null, null],
+        strafeRight: [null, null],
+        slot10: ['KeyQ', 'Minus'],
+        slot11: ['KeyE', 'Equal'],
+      }),
+    );
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('strafeLeft', 0)).toBe('KeyQ');
+    expect(fresh.codeAt('strafeRight', 0)).toBe('KeyE');
+    expect(fresh.codeAt('slot10', 0)).toBe('Minus');
+    expect(fresh.codeAt('slot11', 0)).toBe('Equal');
+    expect(fresh.actionForCode('KeyQ')).toBe('strafeLeft');
+    expect(fresh.actionForCode('KeyE')).toBe('strafeRight');
+  });
+
+  it('re-seeds an evicted meters binding to Shift+KeyH on a scoped profile', () => {
+    // A profile saved while targetFriendly and meters both defaulted to KeyH
+    // persisted meters as [null, null] (the sweep gave KeyH to targetFriendly).
+    // meters now defaults to Shift+KeyH; the stored null must not keep it
+    // unbound for the players the collision already emptied.
+    localStorage.setItem(
+      'woc_keybinds:char:alice',
+      JSON.stringify({ meters: [null, null], targetFriendly: ['KeyH', null] }),
+    );
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('targetFriendly', 0)).toBe('KeyH');
+    expect(fresh.codeAt('meters', 0)).toBe('Shift+KeyH');
+  });
+
+  it('does not revert a deliberate slot0/slot1 swap on load', () => {
+    // A deliberate remap that merely looks unusual carries no version marker;
+    // the loader must keep it verbatim rather than treating it as corruption.
+    localStorage.setItem(
+      'woc_keybinds:char:alice',
+      JSON.stringify({ slot0: ['Digit2', null], slot1: ['Digit1', null] }),
+    );
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('slot0', 0)).toBe('Digit2');
+    expect(fresh.codeAt('slot1', 0)).toBe('Digit1');
+    expect(fresh.actionForCode('Digit2')).toBe('slot0');
+    expect(fresh.actionForCode('Digit1')).toBe('slot1');
+  });
+
+  it('still imports a genuine legacy customization that does not collide with a current default', () => {
+    // A real remap (interact moved off F onto an otherwise-unused function
+    // key) must still come through on first seed.
+    localStorage.setItem('woc_keybinds', JSON.stringify({ interact: ['F1', null] }));
+    const fresh = new Keybinds('char:alice');
+    expect(fresh.codeAt('interact', 0)).toBe('F1');
+  });
+
+  it('gives targetFriendly and meters distinct default keys instead of colliding on KeyH', () => {
+    const kb = new Keybinds();
+    expect(kb.codeAt('targetFriendly', 0)).toBe('KeyH');
+    expect(kb.codeAt('meters', 0)).toBe('Shift+KeyH');
+    expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
+    expect(kb.edgeActionForCombo('Shift+KeyH')).toBe('meters');
   });
 
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {

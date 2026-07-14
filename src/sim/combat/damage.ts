@@ -459,7 +459,14 @@ export function dealDamage(
     addThreat(target, source.id, threat);
   }
 
-  // tap rights: the first player (or their pet) to damage a mob owns it
+  // Tap rights: the first player (or their pet) to damage a mob owns it. Classic-era
+  // behavior for every mob, including rares: pet damage taps. A camper who
+  // monopolizes a rare's tap through their pet alone does not deny anyone the kill
+  // reward, because rares also track PERSONAL loot contribution (below, mirroring
+  // world bosses): every player who lands a hit gets their own credit toward a
+  // guaranteed quest drop regardless of who holds the tap, so tap rights only gate
+  // who owns the corpse/party-loot roll, never who is credited for a personal
+  // quest item.
   if (
     source &&
     target.kind === 'mob' &&
@@ -472,12 +479,25 @@ export function dealDamage(
     if (sourceMeta && !sourceMeta.leaving) target.tappedById = sourcePid;
   }
 
-  // World-boss loot roster: every player (or pet owner) who lands a hit on a world
-  // boss becomes a permanent loot contributor. Unlike the hate table above, this set
-  // is NEVER pruned when they die, release their spirit, or drop off threat, so a
-  // raider who died to the boss still gets their personal drop. Read at death by
-  // worldBossLootContributors. Only world-boss templates ever populate it.
-  if (source && amount > 0 && MOBS[target.templateId]?.worldBoss) {
+  // Personal-drop contributor roster: every player (or pet owner) who lands a hit on
+  // a world boss OR a rare becomes a permanent loot contributor. Unlike the hate
+  // table above, this set is NEVER pruned when they die, release their spirit, or
+  // drop off threat, so a contributor who died still gets credit. Read at death by
+  // worldBossLootContributors. Rares reuse this contributor tracking (not the
+  // world-boss PERSONAL LOOT TABLE roll, just the roster) so a guaranteed personal
+  // quest drop (a rare's `chance: 1` quest item, e.g. greyjaw_fang) can be credited
+  // to every quest-needing contributor, not just whoever holds the tap. A rare has a
+  // single camp spawn shared by the whole zone: without this, a camper's aggressive
+  // pet re-tapping it the instant it respawns (petPickTarget's anti-AFK window,
+  // pet/pet_ai.ts) would monopolize the guaranteed drop forever, and a passerby who
+  // lands one hit to steal the tap back would also steal it from the player who
+  // actually farmed the kill. Tracking contribution, not tap, closes both holes
+  // without changing the classic pet-tap rule itself.
+  if (
+    source &&
+    amount > 0 &&
+    (MOBS[target.templateId]?.worldBoss || MOBS[target.templateId]?.rare)
+  ) {
     const contributorId = source.kind === 'player' ? source.id : source.ownerId;
     if (contributorId !== null) target.bossDamagers.add(contributorId);
   }
@@ -749,6 +769,12 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // whole window, and a slain add's in-place respawn timer would revive it
     // mid-window (only fires for worldBoss templates, so no parity rng change).
     const worldBossContribs = template?.worldBoss ? worldBossLootContributors(ctx, e) : null;
+    // Rares: same contributor roster as a world boss, but used only to widen who is
+    // eligible for a guaranteed personal quest drop (rollLoot's questId branch below),
+    // never to run the world-boss PERSONAL LOOT TABLE roll. Snapshot BEFORE
+    // clearThreat below, exactly like worldBossContribs.
+    const rareContribs =
+      !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -846,8 +872,11 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         ctx.onMobKilledForQuests(e, member);
       }
       // World bosses use PERSONAL loot for every contributor (rolled below from the
-      // hate-table snapshot), not the tapper/party shared-corpse roll.
-      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
+      // hate-table snapshot), not the tapper/party shared-corpse roll. Rares pass
+      // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
+      // personal quest-item entries (questId, chance:1) can credit every contributing
+      // quest-needer, not just the tap-credited party.
+      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
       deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);

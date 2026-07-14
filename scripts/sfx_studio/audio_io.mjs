@@ -441,12 +441,12 @@ export async function analyzeLoopContinuity(path, channels) {
 }
 
 function publicPath(key, repoRoot = REPO_ROOT) {
-  const source = CATALOG.get(assertSfxKey(key));
+  assertSfxKey(key);
   const repo = realpathSync(repoRoot);
   const publicRoot = existingPlainDirectory(join(repo, 'public'), repo);
   const audioRoot = existingPlainDirectory(join(publicRoot, 'audio'), publicRoot);
   const sfxRoot = existingPlainDirectory(join(audioRoot, 'sfx'), audioRoot);
-  const discovered = discoverSfxTracks([source], sfxRoot);
+  const discovered = discoverSfxTracks([...CATALOG.values()], sfxRoot);
   if (discovered.errors.length) {
     throw new Error(`invalid published SFX inventory for ${key}: ${discovered.errors.join('; ')}`);
   }

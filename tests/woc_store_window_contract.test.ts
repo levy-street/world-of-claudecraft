@@ -16,6 +16,7 @@ const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
 );
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 
 describe('WOC Store window contract', () => {
   it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
@@ -55,6 +56,22 @@ describe('WOC Store window contract', () => {
     expect(storeWindow).not.toContain('woc-store-grid');
     expect(storeWindow).not.toContain('storeCardHtml');
     expect(storeWindow).not.toContain('buildWocStoreRows');
+  });
+
+  it('uses a denser cosmetic grid on wide desktop layouts only', () => {
+    const baseGrid = componentsCss.match(/\.armory-grid \{([^}]*)\}/);
+    const desktopGrid = componentsCss.match(
+      /@media \(min-width: 900px\) \{\s*body:not\(\.mobile-touch\) \.armory-grid \{([^}]*)\}/,
+    );
+    const mobileGrid = mobileCss.match(/body\.mobile-touch \.armory-grid \{([^}]*)\}/);
+    const mobileLandscape = mobileCss.slice(mobileCss.indexOf('@media (orientation: landscape)'));
+    expect(baseGrid?.[1]).toContain('grid-template-columns: repeat(4, minmax(0, 1fr));');
+    expect(desktopGrid).not.toBeNull();
+    expect(desktopGrid?.[1]).toContain('grid-template-columns: repeat(5, minmax(0, 1fr));');
+    expect(mobileGrid?.[1]).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));');
+    expect(mobileLandscape).toContain(
+      'grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));',
+    );
   });
 
   it('implements roving keyboard tabs with explicit tabpanel ownership', () => {
@@ -186,7 +203,19 @@ describe('WOC Store window contract', () => {
     expect(main).toContain(
       'hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });',
     );
-    expect(main).toContain('if (!NATIVE_APP) hud.attachClaudium(claudiumHooks);');
+    const economyWiring = main.slice(
+      main.indexOf('if (!NATIVE_APP) {', main.indexOf('const claudiumHooks')),
+      main.indexOf('function interactKey'),
+    );
+    expect(economyWiring).toContain('hud.attachClaudium(claudiumHooks);');
+    expect(economyWiring).toContain('shouldShowStorePromo({');
+    expect(economyWiring).toContain('nativeApp: NATIVE_APP');
+    expect(economyWiring).toContain('desktopApp: DESKTOP_APP');
+    expect(economyWiring).toContain(
+      "mobileTouch: document.body.classList.contains('mobile-touch')",
+    );
+    expect(economyWiring).toContain('hud.attachStorePromoCard();');
+    expect(hud).toContain("returnFocusTo: () => document.getElementById('daily-rewards-button')");
     expect(hud).toContain('storeEnabled: () => this.claudiumHooks !== null');
     expect(hud).toContain(
       'private dailyRewardsEnabled(): boolean {\n    return this.features.dailyRewardsEnabled;',

@@ -321,7 +321,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroiska märken: {count}',
   'heroicShop.buyAria': 'Köp {item} för {marks} heroiska märken',
   'hudChrome.bags.cannotDestroy': 'Det här föremålet kan inte förstöras.',
-  'hudChrome.bags.rightClickDestroy': 'Högerklicka för att förstöra',
   'hudChrome.crafting.comboRequirementUnmet':
     'Du har inte båda de hantverk som krävs på den nivå receptet kräver.',
   'hudChrome.discord.roleTag.coredevs': 'Kärnutvecklare',

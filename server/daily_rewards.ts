@@ -893,8 +893,9 @@ export class DailyRewardService {
 
   // Vale Cup daily task: wins only. Rated wins use the full task value; bot-filled
   // and practice wins use a much smaller base so they can contribute without competing
-  // with real ranked match rewards. The match id keys the dedupe row, so one match
-  // yields at most one grant per account.
+  // with real ranked match rewards. The GameServer supplies one UUID and completion time
+  // per live match object, so every winner and retry shares an identity while a restarted
+  // server gets a fresh identity even when the sim reuses its in-memory numeric match id.
   async recordValeCupResult(
     accountId: number,
     result: {
@@ -904,12 +905,15 @@ export class DailyRewardService {
       rated?: boolean;
       hasBots?: boolean;
       practice?: boolean;
-      completedAt?: Date;
+      completionId?: string;
+      completedAt: Date;
     },
   ): Promise<number> {
     if (!result.won) return 0;
     if (result.rated === false && result.hasBots !== true && result.practice !== true) return 0;
-    const completedAt = result.completedAt ?? new Date();
+    const completedAt = result.completedAt;
+    const completedAtIso = completedAt.toISOString();
+    const completionId = result.completionId?.trim() || null;
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
@@ -940,12 +944,14 @@ export class DailyRewardService {
         accountId,
         'task',
         points,
-        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}`,
+        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}:${completionId ?? completedAtIso}`,
         {
           taskId: task.taskId,
           taskType: task.type,
           bracket: result.bracket,
           matchId: result.matchId,
+          completionId,
+          completedAt: completedAtIso,
           won: true,
           matchType: result.practice === true ? 'practice' : reducedMatch ? 'bot' : 'ranked',
           rated: result.rated !== false,

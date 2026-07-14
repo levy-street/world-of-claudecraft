@@ -1259,6 +1259,23 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('bindTouchTap(moreClose, () => {');
   });
 
+  it('binds the death-screen respawn buttons via touch-tap, not bare click', () => {
+    // On a phone the browser only synthesizes 'click' for the primary pointer,
+    // so a bare click binding goes dead while another finger is down (a held
+    // movement joystick when the player dies mid-run), stranding them on the
+    // death overlay (issue 1484). All three buttons must use bindTouchTap.
+    expect(hudTs).toContain('bindTouchTap(this.releaseSpiritBtnEl, () => {');
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
+    );
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+    );
+    expect(hudTs).not.toMatch(
+      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
+    );
+  });
+
   it('keeps desktop community links open after HUD clicks', () => {
     expect(mainTs).toContain('communityMenu.open = !(NATIVE_APP || useTouchInterface());');
     expect(hudTs).toMatch(
@@ -1820,6 +1837,22 @@ describe('client HTML shell', () => {
   it('omits Meters from the mobile More tray while keeping the desktop window', () => {
     expect(html).toContain('id="meters-window"');
     expect(html).not.toContain('id="mobile-meters"');
+  });
+
+  it('ships the meters hint hook in every game entry', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+      ['app.html', appHtml],
+    ] as const) {
+      expect(entry.match(/class="mt-hint"/g), name).toHaveLength(1);
+      expect(entry.indexOf('<div class="mt-sub"></div>'), name).toBeLessThan(
+        entry.indexOf('<div class="mt-hint"></div>'),
+      );
+      expect(entry.indexOf('<div class="mt-hint"></div>'), name).toBeLessThan(
+        entry.indexOf('<div class="mt-rows"></div>'),
+      );
+    }
   });
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {

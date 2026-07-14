@@ -22,6 +22,7 @@ import {
   DT,
   dist2d,
   type Entity,
+  emptyMoveInput,
   MELEE_RANGE,
   PET_TELEPORT_DISTANCE,
   steadyAngleTo,
@@ -69,6 +70,11 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
       // re-entering mid-run cannot recharge the boon.
       run.companionReviveUsed = true;
       fallen.dead = false;
+      // Clear any movement intent held at death so the revived ally does not walk
+      // off on its own with no key held (issue 1651, companion-revive path). fallen
+      // is always a player (owner or a partyMembersForKey ally), so it has a meta.
+      const fallenMeta = ctx.players.get(fallen.id);
+      if (fallenMeta) Object.assign(fallenMeta.moveInput, emptyMoveInput());
       fallen.hp = Math.max(1, Math.round(fallen.maxHp * 0.5));
       if (fallen.resourceType === 'mana')
         fallen.resource = Math.max(fallen.resource, Math.round(fallen.maxResource * 0.5));

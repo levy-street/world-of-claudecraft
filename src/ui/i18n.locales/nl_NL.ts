@@ -330,7 +330,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroïsche Merken: {count}',
   'heroicShop.buyAria': 'Koop {item} voor {marks} Heroïsche Merken',
   'hudChrome.bags.cannotDestroy': 'Dit voorwerp kan niet worden vernietigd.',
-  'hudChrome.bags.rightClickDestroy': 'Rechtsklik om te vernietigen',
   'hudChrome.crafting.comboRequirementUnmet':
     'Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.',
   'hudChrome.discord.roleTag.coredevs': 'Kernontwikkelaar',

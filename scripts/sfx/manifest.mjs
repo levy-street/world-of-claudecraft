@@ -15,14 +15,18 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   categoryForSfx,
   readSfxPlaybackProfile,
   resolveSfxPlaybackProfile,
 } from './playback_profile.mjs';
-import { discoverSfxTracks } from './sfx_manifest_builder.mjs';
+import {
+  SFX_MOB_EXTENSION_KEY_PATTERN as CANONICAL_MOB_EXTENSION_KEY_PATTERN,
+  discoverSfxTracks,
+  isSfxMobExtensionKey as isCanonicalMobExtensionKey,
+} from './sfx_manifest_builder.mjs';
 import { MOB_VOICE_FAMILIES, SFX } from './sfx_prompts.mjs';
 
 export { categoryForSfx } from './playback_profile.mjs';
@@ -42,16 +46,13 @@ export const SFX_MAX_RUNTIME_PACK_BYTES = 512 * 1024;
 
 export const SFX_FIXED_CATALOG_KEYS = Object.freeze(SFX.map((source) => source.key).sort());
 export const SFX_MOB_EXTENSION_FAMILIES = Object.freeze([...MOB_VOICE_FAMILIES].sort());
-export const SFX_MOB_EXTENSION_KEY_PATTERN =
-  /^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$/;
+export const SFX_MOB_EXTENSION_KEY_PATTERN = CANONICAL_MOB_EXTENSION_KEY_PATTERN;
 
 const CATALOG_KEYS = new Set(SFX_FIXED_CATALOG_KEYS);
-const MOB_EXTENSION_FAMILIES = new Set(SFX_MOB_EXTENSION_FAMILIES);
 
 export function isSfxMobExtensionKey(key) {
   if (typeof key !== 'string' || CATALOG_KEYS.has(key)) return false;
-  const match = key.match(SFX_MOB_EXTENSION_KEY_PATTERN);
-  return !!match && MOB_EXTENSION_FAMILIES.has(match[1]);
+  return isCanonicalMobExtensionKey(key);
 }
 
 export function preloadForSfx(key) {
@@ -69,7 +70,7 @@ export function preloadForSfx(key) {
 
 export function spatialForSfx(key) {
   if (key.startsWith('ui_')) return false;
-  return !key.startsWith('amb_') || ['amb_water', 'amb_campfire', 'amb_forge'].includes(key);
+  return !key.startsWith('amb_') || key === 'amb_campfire' || key === 'amb_forge';
 }
 
 export function readSfxMix(repoRoot = DEFAULT_REPO_ROOT) {
@@ -221,6 +222,11 @@ export function buildSfxManifestData(
   for (const [key, source] of Object.entries(discovered.entries)) {
     if (!source.catalog && !isSfxMobExtensionKey(key)) {
       throw new Error(`invalid sampled SFX inventory: unsupported mob extension key ${key}`);
+    }
+    for (const track of source.tracks) {
+      if (extname(track.filename) !== '.mp3') {
+        throw new Error(`runtime sampled SFX must be MP3: ${track.filename}`);
+      }
     }
   }
   if (requireComplete) {

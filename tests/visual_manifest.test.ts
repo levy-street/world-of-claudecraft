@@ -153,4 +153,12 @@ describe('character visual manifest', () => {
       'models/weapons/dagger.glb',
     ]);
   });
+
+  it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
+    // Prose-only claim otherwise (FAMILY_KEYS.reptile comment): the explicit MOB_KEYS
+    // override this pins is what actually keeps the model, and nothing else does.
+    expect(visualKeyFor({ kind: 'mob', templateId: 'deepfen_spearjaw' } as never)).toBe(
+      'mob_spearjaw',
+    );
+  });
 });

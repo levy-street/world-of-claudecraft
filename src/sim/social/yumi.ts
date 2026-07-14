@@ -26,7 +26,7 @@ import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
 import { createMob } from '../entity';
 import { Rng } from '../rng';
-import type { ArenaMatch, ArenaQueueUnit } from '../sim';
+import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity, TICK_RATE } from '../types';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../yumi_maze_layout';
@@ -187,9 +187,11 @@ export function startYumiMatch(
   }
   ctx.yumiBusySlots.add(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
+  const preMatchPools = new Map<number, ArenaReturnPools>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i]!;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    preMatchPools.set(allPids[i], arenaMod.snapshotArenaReturnPools(e));
   }
   const matchId = ctx.nextArenaMatchId++;
   const layout = yumiMazeLayout();
@@ -229,6 +231,7 @@ export function startYumiMatch(
     state: 'countdown',
     timer: YUMI_COUNTDOWN,
     returns,
+    preMatchPools,
     ratingA: arenaMod.arenaTeamRating(ctx, teamA, '2v2'),
     ratingB: arenaMod.arenaTeamRating(ctx, teamB, '2v2'),
     defeated: new Set(),

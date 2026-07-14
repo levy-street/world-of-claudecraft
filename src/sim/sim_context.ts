@@ -320,7 +320,12 @@ export interface SimContextCallbacks {
     attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
-  rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
+  rollLoot(
+    mob: Entity,
+    meta: PlayerMeta,
+    eligible?: PlayerMeta[],
+    contributors?: PlayerMeta[],
+  ): void;
   // World-boss personal loot: an independent roll of the boss's loot table per
   // contributor (gated once-per-day per boss). Owned by world_boss.ts.
   rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;

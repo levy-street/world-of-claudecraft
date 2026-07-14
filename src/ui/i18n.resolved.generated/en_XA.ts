@@ -645,6 +645,15 @@ export const en_XA: EnTranslations = {
       "notNow": "[Ñóţ ñóŵ]",
       "update": "[Úþðáţé]"
     },
+    "cameraPrompt": {
+      "title": "[Çĥóóšé Ýóúŕ Çáɱéŕá]",
+      "intro": "[Þíçķ ĥóŵ ţĥé çáɱéŕá ƒóļļóŵš ýóúŕ çĥáŕáçţéŕ.]",
+      "mouseDesc": "[Ɱóʋé ţĥé ɱóúšé ţó ţúŕñ ţĥé çáɱéŕá ŵíţĥóúţ ĥóļðíñĝ á ƀúţţóñ.]",
+      "classicTitle": "[Çļáššíç Çáɱéŕá]",
+      "classicDesc": "[Ĥóļð ŕíĝĥţ-çļíçķ áñð ɱóʋé ţĥé ɱóúšé ţó ţúŕñ ţĥé çáɱéŕá.]",
+      "changeLater": "[Ýóú çáñ çĥáñĝé ţĥíš ļáţéŕ úñðéŕ Éšç, Ķéý Ɓíñðíñĝš.]",
+      "confirm": "[Çóñƒíŕɱ]"
+    },
     "castBar": {
       "playerAria": "[Ýóúŕ Çášţ Ɓáŕ]",
       "targetAria": "[Úñíţ Çášţ Ɓáŕ]"
@@ -690,7 +699,12 @@ export const en_XA: EnTranslations = {
       "perSecond": "[{value}/š]",
       "perSecondRow": "[{total} ({rate})]",
       "minutesSeconds": "[{m}ɱ {s}š]",
-      "seconds": "[{s}š]"
+      "seconds": "[{s}š]",
+      "autoShowHint": "[Ŕóŵš áþþéáŕ áúţóɱáţíçáļļý óñçé ýóúŕ þáŕţý ðéáļš ðáɱáĝé óŕ ĥéáļíñĝ, áñð ţĥíš šéĝɱéñţ çļóšéš á ƒéŵ šéçóñðš áƒţéŕ çóɱƀáţ éñðš.]"
+    },
+    "petFeed": {
+      "disabledFullHp": "[Þéţ íš áţ ƒúļļ ĥéáļţĥ]",
+      "disabledNoFood": "[Ñó ƒóóð íñ ýóúŕ ƀáĝš ŵíļļ ĥéáļ ýóúŕ þéţ]"
     },
     "keybinds": {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
@@ -1291,7 +1305,7 @@ export const en_XA: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "[Ţĥíš íţéɱ çáññóţ ƀé ðéšţŕóýéð.]",
-      "rightClickDestroy": "[Ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
+      "rightClickDestroy": "[Šĥíƒţ+ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",
@@ -2580,6 +2594,10 @@ export const en_XA: EnTranslations = {
       "dragonkin": {
         "name": "[Ðŕáĝóñķíñ]",
         "desc": "[Šçáļéð, šéŕþéñţíñé ţĥíñĝš óƒ ţĥé óļð ðéþţĥš. Ŕáŕé, þŕóúð, áñð ƒáŕ šţŕóñĝéŕ ţĥáñ ţĥéý ļóóķ.]"
+      },
+      "reptile": {
+        "name": "[Ŕéþţíļéš]",
+        "desc": "[Çóļð-ƀļóóðéð ĥúñţéŕš ŵíţĥ á ĥíšš áñð á šñáþ áļļ ţĥéíŕ óŵñ, ðíšţíñçţ ƒŕóɱ ţĥé ŵáŕɱ-ƀļóóðéð ƀéášţš.]"
       }
     },
     "worldPage": {
