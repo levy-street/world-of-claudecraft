@@ -968,7 +968,10 @@ export const zh_TW: EnTranslations = {
         "arenaWin": "競技場勝利",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
-        "fiestaWin": "嘉年華勝利"
+        "fiestaWin": "嘉年華勝利",
+        "frontierKill": "Frontier kill",
+        "frontierRare": "Frostreach rare",
+        "frontierDaily": "Frontier daily"
       }
     },
     "statInfo": {

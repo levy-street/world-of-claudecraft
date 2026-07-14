@@ -28,7 +28,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "es_ES": [
     "guide.family.reptile.desc",
@@ -49,7 +52,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "fr_FR": [
     "guide.family.reptile.desc",
@@ -70,7 +76,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "fr_CA": [
     "guide.family.reptile.desc",
@@ -91,7 +100,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "en_CA": [],
   "it_IT": [
@@ -113,7 +125,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "de_DE": [
     "guide.family.reptile.desc",
@@ -134,23 +149,38 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "zh_CN": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill"
+    "hudChrome.discord.roleTag.shill",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "zh_TW": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill"
+    "hudChrome.discord.roleTag.shill",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "ko_KR": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill"
+    "hudChrome.discord.roleTag.shill",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "ja_JP": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill"
+    "hudChrome.discord.roleTag.shill",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "pt_BR": [
     "guide.family.reptile.desc",
@@ -171,11 +201,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "ru_RU": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill"
+    "hudChrome.discord.roleTag.shill",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "cs_CZ": [
     "guide.family.reptile.desc",
@@ -196,7 +232,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "nl_NL": [
     "guide.family.reptile.desc",
@@ -217,7 +256,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "pl_PL": [
     "guide.family.reptile.desc",
@@ -238,7 +280,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "id_ID": [
     "guide.family.reptile.desc",
@@ -259,7 +304,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "tr_TR": [
     "guide.family.reptile.desc",
@@ -280,7 +328,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "sv_SE": [
     "guide.family.reptile.desc",
@@ -301,7 +352,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "vi_VN": [
     "guide.family.reptile.desc",
@@ -322,7 +376,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ],
   "da_DK": [
     "guide.family.reptile.desc",
@@ -343,6 +400,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.shill",
     "hudChrome.meters.autoShowHint",
     "hudChrome.petFeed.disabledFullHp",
-    "hudChrome.petFeed.disabledNoFood"
+    "hudChrome.petFeed.disabledNoFood",
+    "hudChrome.warfare.reasons.frontierDaily",
+    "hudChrome.warfare.reasons.frontierKill",
+    "hudChrome.warfare.reasons.frontierRare"
   ]
 };

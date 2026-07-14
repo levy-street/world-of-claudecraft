@@ -891,6 +891,10 @@ export interface PlayerMeta {
   // Soulbound PvP currency. honor is spendable; lifetimeHonor is monotonic.
   honor: number;
   lifetimeHonor: number;
+  // Season 1 Frontier PvP currency (hero points). heroPoints is spendable at the
+  // Frostreach hub vendor; lifetimeHeroPoints is a monotonic earned total.
+  heroPoints: number;
+  lifetimeHeroPoints: number;
   // Persisted per-day, per-opponent ranked-win accounting for honor DR.
   honorArenaDaily?: HonorArenaDailyState;
   prestigeRank: number;
@@ -1092,6 +1096,9 @@ export interface CharacterState {
   // Soulbound PvP progression. Optional so pre-honor saves load at zero.
   honor?: number;
   lifetimeHonor?: number;
+  // Season 1 Frontier hero points. Optional so pre-Frontier saves load at zero.
+  heroPoints?: number;
+  lifetimeHeroPoints?: number;
   honorArenaDaily?: HonorArenaDailyState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
@@ -1868,6 +1875,8 @@ export class Sim {
       lifetimeXp: 0,
       honor: 0,
       lifetimeHonor: 0,
+      heroPoints: 0,
+      lifetimeHeroPoints: 0,
       prestigeRank: 0,
       unlockedMilestones: new Set(),
       restedXp: 0,
@@ -1958,6 +1967,11 @@ export class Sim {
         honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
       );
       meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
+      meta.heroPoints = honorMod.normalizeHeroPoints(s.heroPoints);
+      meta.lifetimeHeroPoints = Math.max(
+        meta.heroPoints,
+        honorMod.normalizeHeroPoints(s.lifetimeHeroPoints ?? meta.heroPoints),
+      );
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -2343,6 +2357,9 @@ export class Sim {
       lifetimeXp: meta.lifetimeXp,
       ...(meta.honor || meta.lifetimeHonor
         ? { honor: meta.honor, lifetimeHonor: meta.lifetimeHonor }
+        : {}),
+      ...(meta.heroPoints || meta.lifetimeHeroPoints
+        ? { heroPoints: meta.heroPoints, lifetimeHeroPoints: meta.lifetimeHeroPoints }
         : {}),
       ...(meta.honorArenaDaily
         ? {
@@ -6440,6 +6457,18 @@ export class Sim {
         match.state === 'active' &&
         !match.defeated.has(attackerPlayer.id) &&
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
+      ) {
+        return true;
+      }
+      // The Frostreach Frontier: factionless open-world PvP. Both players inside
+      // the band are hostile, no team, no color (the Wilderness "flagged the
+      // instant you are in here" rule). The one safe hub is exempted so nobody
+      // is attackable at the vendor/graveyard. isFriendlyTo mirrors this.
+      if (
+        honorMod.isFrontierPos(attackerPlayer.pos.x) &&
+        honorMod.isFrontierPos(target.pos.x) &&
+        !honorMod.inFrontierHub(attackerPlayer.pos.x, attackerPlayer.pos.z) &&
+        !honorMod.inFrontierHub(target.pos.x, target.pos.z)
       ) {
         return true;
       }

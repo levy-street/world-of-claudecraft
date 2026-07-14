@@ -951,6 +951,9 @@ export const hudChromeStrings = {
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
+      frontierKill: 'Frontier kill',
+      frontierRare: 'Frostreach rare',
+      frontierDaily: 'Frontier daily',
     },
   },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES

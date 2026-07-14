@@ -968,7 +968,10 @@ export const en_XA: EnTranslations = {
         "arenaWin": "[Áŕéñá ʋíçţóŕý]",
         "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
         "fiestaComplete": "[Ƒíéšţá çóɱþļéţéð]",
-        "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]"
+        "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",
+        "frontierKill": "[Ƒŕóñţíéŕ ķíļļ]",
+        "frontierRare": "[Ƒŕóšţŕéáçĥ ŕáŕé]",
+        "frontierDaily": "[Ƒŕóñţíéŕ ðáíļý]"
       }
     },
     "statInfo": {
