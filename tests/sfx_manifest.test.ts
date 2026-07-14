@@ -257,6 +257,42 @@ describe('mob subfamily scanning', () => {
     expect(Object.keys(data)).toEqual(['mob_beast_attack']);
   });
 
+  // Decisive regression pin: a mob_*.mp3 file that matches neither a real
+  // catalog entry nor a valid numbered subfamily pattern used to be silently
+  // ignored (a `continue` with no error), the same silent-omission class as
+  // the cast_lightning_bolt bug. It must now fail loudly instead.
+  it('reports an error for a bare subfamily file missing its numbered suffix', () => {
+    // mob_beast_wolf_hurt.mp3 has no _<N> suffix and no matching catalog
+    // entry, so it is neither a valid subfamily file nor a catalog match.
+    writeFileSync(path.join(sfxDir, 'mob_beast_wolf_hurt.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(count).toBe(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('mob_beast_wolf_hurt.mp3');
+    expect(errors[0]).toContain('unrecognized mob sfx file');
+  });
+
+  it('reports an error for a family-level mob file with no matching catalog entry', () => {
+    // No catalog entry for 'mob_reptile_aggro' exists, so this bare file
+    // matches nothing: not the catalog loop, not the subfamily scanner.
+    writeFileSync(path.join(sfxDir, 'mob_reptile_aggro.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(count).toBe(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('mob_reptile_aggro.mp3');
+    expect(errors[0]).toContain('unrecognized mob sfx file');
+  });
+
+  it('does not flag a family-level file that legitimately matches a catalog entry', () => {
+    // Same shape as the two error cases above, but this time a catalog entry
+    // exists, so it must be consumed silently and cleanly, no error.
+    writeFileSync(path.join(sfxDir, 'mob_ogre_hurt.mp3'), '');
+    const catalog = [{ key: 'mob_ogre_hurt' }];
+    const { count, errors } = buildManifest(catalog, sfxDir, manifestPath);
+    expect(count).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
   it('MOB_ACTIONS covers the four expected vocalization types', () => {
     expect(MOB_ACTIONS.has('aggro')).toBe(true);
     expect(MOB_ACTIONS.has('attack')).toBe(true);

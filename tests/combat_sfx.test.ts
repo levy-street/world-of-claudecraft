@@ -210,9 +210,29 @@ describe('combat SFX policy', () => {
     expect(mobVoiceFamily('tunnel_rat')).toBe('burrower');
     expect(mobVoiceCue('tunnel_rat', 'death')).toBe('mob_burrower_death');
 
-    const specific = 'mob_beast_forest_wolf_attack';
-    expect(mobVoiceCue('forest_wolf', 'attack', (key) => key === specific)).toBe(specific);
-    expect(mobVoiceCue('forest_wolf', 'attack', () => false)).toBe('mob_beast_attack');
+    // bog_bloat has no subfamily alias, so it still keys off its own raw
+    // templateId (unlike the wolf-shaped beasts covered below).
+    const specific = 'mob_beast_bog_bloat_attack';
+    expect(mobVoiceCue('bog_bloat', 'attack', (key) => key === specific)).toBe(specific);
+    expect(mobVoiceCue('bog_bloat', 'attack', () => false)).toBe('mob_beast_attack');
+  });
+
+  it('shares one recorded wolf subfamily voice across every wolf-shaped beast', () => {
+    const wolfCue = 'mob_beast_wolf_attack';
+    const hasWolfCue = (key: string) => key === wolfCue;
+    for (const wolfLike of ['forest_wolf', 'ridge_stalker', 'mire_prowler', 'old_greyjaw']) {
+      expect(mobVoiceCue(wolfLike, 'attack', hasWolfCue), wolfLike).toBe(wolfCue);
+    }
+    // A non-aliased templateId is unaffected: it keys off its own id, not 'wolf'.
+    expect(mobVoiceCue('crypt_shambler', 'attack', hasWolfCue)).toBe('mob_undead_attack');
+    // With no recorded wolf take at all, every aliased template falls back to
+    // the plain family-level sound, same as an unaliased one would.
+    for (const wolfLike of ['forest_wolf', 'ridge_stalker', 'mire_prowler', 'old_greyjaw']) {
+      expect(
+        mobVoiceCue(wolfLike, 'attack', () => false),
+        wolfLike,
+      ).toBe('mob_beast_attack');
+    }
   });
 
   it('resolves the reptile family for its first real mob', () => {

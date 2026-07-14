@@ -1463,7 +1463,8 @@ export const ja_JP: EnTranslations = {
         "connecting": "Discordを開いています...",
         "benefits": "Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。",
         "error": "Discordを連携できませんでした。もう一度お試しください。",
-        "success": "Discordを連携しました。"
+        "success": "Discordを連携しました。",
+        "joinServer": "アカウント連携なしでサーバーに参加"
       },
       "choice": {
         "title": "Discordで続ける",

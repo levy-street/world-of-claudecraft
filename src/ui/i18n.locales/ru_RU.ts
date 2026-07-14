@@ -5939,6 +5939,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.',
   'hudChrome.discord.link.error': 'Не удалось привязать Discord. Пожалуйста, попробуйте снова.',
   'hudChrome.discord.link.success': 'Discord привязан.',
+  'hudChrome.discord.link.joinServer': 'Просто присоединиться к серверу Discord',
   'hudChrome.discord.linkedAs': 'Привязан как {name}',
   'hudChrome.discord.linkedTitle': 'Discord: {name}',
   'hudChrome.discord.viewProfile': 'Открыть публичный профиль этого персонажа',

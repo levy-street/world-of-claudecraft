@@ -5566,6 +5566,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。',
   'hudChrome.discord.link.error': '无法关联 Discord，请重试。',
   'hudChrome.discord.link.success': 'Discord 已关联。',
+  'hudChrome.discord.link.joinServer': '直接加入 Discord 服务器',
   'hudChrome.discord.linkedAs': '已关联为 {name}',
   'hudChrome.discord.linkedTitle': 'Discord：{name}',
   'hudChrome.discord.viewProfile': '打开该角色的公开资料',
