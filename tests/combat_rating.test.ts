@@ -91,6 +91,14 @@ describe('combat ratings', () => {
     expect(effectiveSpellHit(20, 23, 0)).toBe(spellHitChance(20, 23));
   });
 
+  it('effective spell hit is clamped at 1 (over-capping Hit cannot exceed certainty)', () => {
+    // spellHitChance(20, 23) is ~0.75; a huge hitBonus would push it past 1 without
+    // the Math.min clamp. Equal-level (0.96) also clamps.
+    expect(effectiveSpellHit(20, 23, 0.9)).toBe(1);
+    expect(effectiveSpellHit(20, 20, 0.5)).toBe(1);
+    expect(spellResistChance(20, 23, 0.9)).toBe(0); // and resist floors at 0
+  });
+
   it('hit does not help a mob attacking a player (attacker-side only, capped)', () => {
     // A mob has no hit gear; the player-side target hit never reduces the mob's swing.
     const mob = ent({ kind: 'mob', hostile: true, level: 23 });
@@ -160,6 +168,18 @@ describe('combat-rating tier ladder', () => {
         raidVariant.hasteRating ?? 0,
       );
       expect(primary).toBeGreaterThan(20);
+    }
+  });
+
+  it('a spell-facing raid legendary (Heartwood staff) takes throughput ratings, never Hit', () => {
+    // A rating-less caster/healer base must not default to the game's largest Hit
+    // allowance: heals are not resisted by level, matching the healer-facing rule.
+    const staff = ITEMS['heroic_deathless_heartwood'];
+    expect(staff, 'heroic Heartwood variant should be generated').toBeTruthy();
+    if (staff) {
+      expect(staff.hitRating ?? 0).toBe(0);
+      expect(ratingCount(staff)).toBe(2); // haste primary + crit secondary
+      expect((staff.hasteRating ?? 0) > 0 && (staff.critRating ?? 0) > 0).toBe(true);
     }
   });
 });

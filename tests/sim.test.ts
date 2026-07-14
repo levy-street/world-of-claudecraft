@@ -165,12 +165,14 @@ describe('classic formulas', () => {
 
   it('spell resist rises with the level gap but is capped (~25% max)', () => {
     expect(spellHitChance(5, 5)).toBeCloseTo(0.96); // equal level -> 4% resist
+    expect(spellHitChance(4, 5)).toBeCloseTo(0.89); // +1 -> ~11% resist (retuned entry)
     expect(spellHitChance(3, 5)).toBeCloseTo(0.82); // +2 -> ~18% resist
     expect(spellHitChance(3, 7)).toBeCloseTo(0.75); // +4 -> capped ~25% resist
   });
 
   it('melee/ranged miss rises with the level gap but is capped (~26% max)', () => {
     expect(meleeMissChance(5, 5)).toBeCloseTo(0.05); // equal level -> 5% base
+    expect(meleeMissChance(4, 5)).toBeCloseTo(0.12); // +1 (L4 vs L5) -> ~12% (retuned entry)
     expect(meleeMissChance(3, 5)).toBeCloseTo(0.19); // +2 (L3 vs L5) -> ~19%
     expect(meleeMissChance(3, 7)).toBeCloseTo(0.26); // +4 -> capped ~26%
     expect(meleeMissChance(3, 9)).toBeCloseTo(0.26); // +6 -> still capped ~26%

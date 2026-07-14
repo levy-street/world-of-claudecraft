@@ -163,11 +163,13 @@ describe('self stat wire round-trip', () => {
         rtype: 'mana',
         crat: 20,
         hrat: 150,
+        hirat: 30,
       },
     });
     // Without the wire fields these read the blankEntity default 0 (the bug this guards).
     expect(client.player.critRating).toBe(20);
     expect(client.player.hasteRating).toBe(150);
+    expect(client.player.hitRating).toBe(30);
   });
 
   it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {

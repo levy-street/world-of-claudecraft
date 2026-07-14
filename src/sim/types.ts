@@ -3217,7 +3217,7 @@ function aboveLevelMissPct(diff: number): number {
 
 // Spell hit by level difference (target - caster): 96% at equal level, a gentle
 // +1%/level bonus below you, and the capped above-level penalty above (resist tops
-// out at ~14%). cap 99%, floor 5%.
+// out at ~25%). cap 99%, floor 5%.
 export function spellHitChance(casterLevel: number, targetLevel: number): number {
   const diff = targetLevel - casterLevel;
   const hit = diff <= 0 ? 96 + -diff * 1 : 96 - aboveLevelMissPct(diff);
@@ -3225,7 +3225,7 @@ export function spellHitChance(casterLevel: number, targetLevel: number): number
 }
 
 // Melee miss vs target by level difference: 5% base, a gentle -0.2%/level below you,
-// and the capped above-level penalty above (miss tops out at ~15%). cap 95%, floor 0.5%.
+// and the capped above-level penalty above (miss tops out at ~26%). cap 95%, floor 0.5%.
 export function meleeMissChance(attackerLevel: number, targetLevel: number): number {
   const diff = targetLevel - attackerLevel;
   const miss = diff > 0 ? 5 + aboveLevelMissPct(diff) : 5 + diff * 0.2;

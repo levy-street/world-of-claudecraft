@@ -102,8 +102,15 @@ differentiates the ilvl tiers.
 4. **Buff the weak 4-set bonuses** by adding hit rating to the two bleed 4pc, so a
    marginal bonus becomes Heroic-relevant (Section 7).
 
-Non-goals: changing the miss/resist or crit-suppression curves; changing normal
-difficulty; on-use trinkets; per-level rating scaling (the cap is fixed).
+Enabling change (shipped in this PR): the above-level miss/resist curve is retuned to
+a capped `[0, 7, 14, 21]` penalty table, so melee miss tops out at ~26% and spell
+resist at ~25% (was ~44%/~43%). This is what makes Hit a meaningful-but-not-mandatory
+lever: a hit-stacked kit closes that final ~26% toward 0 rather than being forced to
+paper over a coin-flip. The physical miss floor is 0 (a hit-capped attacker can reach
+0% miss on a +3 target).
+
+Non-goals: changing the crit-suppression curve; changing normal difficulty; on-use
+trinkets; per-level rating scaling (the cap is fixed).
 
 ## 4. The hit-rating primitive
 
@@ -124,8 +131,8 @@ Plumbing mirrors the crit/haste rating that already ships:
   e.hitBonus = hitFractionFromRating(e.hitRating);`.
 - Subtract `hitBonus` at the roll sites (leave the pure level-only helpers unchanged
   so their tests hold):
-  - Physical: in `swingMissChance` (`types.ts:2817`, already receives `attacker`):
-    `max(0.005, baseMiss - attacker.hitBonus)`. Covers melee AND ranged.
+  - Physical: in `swingMissChance` (already receives `attacker`):
+    `max(0, baseMiss - attacker.hitBonus)`. Covers melee AND ranged.
   - Spell: pass the caster's `hitBonus` into `spell_resist.ts`:
     `max(0, (1 - spellHitChance(...)) - hitBonus)`.
 - Hit does NOT reduce mob dodge (a separate roll), keeping the change contained.
@@ -166,10 +173,12 @@ What this produces:
 - **31 -> 33 is qualitatively new.** ilvl-33 raid pieces carry TWO ratings (a 5.5-6.5%
   primary plus a 2% secondary). No ilvl-31 or lower piece does. A raider immediately
   reads "dual-stat" as a tier above.
-- **Total power stays sane.** A full ilvl-31 set (~11 slots) with ~40% hit pieces
-  (~5 pieces at ~4-5%) yields ~22% hit, taking Heroic melee miss 44% -> ~22% and
-  resist 43% -> ~21%. Strong and earned, but Heroic stays harder than +0. The other
-  ~60% of the set is crit/haste throughput.
+- **Total power stays sane.** With the retuned curve, Heroic (+3) melee miss starts at
+  ~26% and spell resist at ~25% (not the old ~44%/~43%). A full ilvl-31 set (~11 slots)
+  with ~40% hit pieces (~5 pieces at ~4-5%) yields ~22% hit, enough to close most of
+  that gap: a hit-stacked kit drives Heroic melee miss toward 0 (the floor). Hit is
+  therefore a strong, earned lever rather than a mandatory tax. The other ~60% of the
+  set is crit/haste throughput.
 
 Because the ilvl-28 heroic dungeon variants and ilvl-26 dungeon epics carry zero
 rating, and the ilvl-33/37 raid variants inherit their base piece's rating and the
@@ -279,9 +288,12 @@ and the two legendaries. Extend the variant builder so a heroic raid variant:
 1. Scales the base piece's primary rating (6.3) up to the 33/37 allowance
    (55/70 armor, 65/70 weapon).
 2. ADDS a secondary rating of a DIFFERENT type (20 at ilvl 33, 30 at ilvl 37),
-   picked complementary to the primary: a hit piece gets +crit, a crit piece gets
-   +hit, a haste piece gets +crit. This gives the raid tier its unique dual-stat
-   identity.
+   picked complementary to the primary: a hit piece gets +crit, and a non-hit primary
+   gets +hit, EXCEPT a spell-facing piece (caster/healer stats, no strength/agility),
+   which never takes Hit (heals are not resisted by level) and instead pairs its two
+   throughput ratings (haste+crit). A rating-less spell-facing base (e.g. the Heartwood
+   staff) therefore defaults to +haste primary, +crit secondary, never the Hit default.
+   This gives the raid tier its unique dual-stat identity.
 
 Legendaries (`deathless_heartwood`, `kingsbane_last_oath`) keep their weapon procs
 and gain the dual rating at the ilvl-37 allowance (e.g. Kingsbane: +hit primary,
