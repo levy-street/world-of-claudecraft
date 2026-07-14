@@ -1,8 +1,17 @@
 // Authoritative sound-effect catalog — consumed by scripts/gen_sfx.mjs.
 // Each entry: { key, prompt, duration (seconds 0.5 to 30), loop?, generator?,
-// custom? }. Additional takes are discovered from <key>_1.mp3, <key>_2.mp3,
-// and so on. The runtime cycles those files in numeric order.
+// custom?, stereo? }. Additional takes are discovered from <key>_1.mp3,
+// <key>_2.mp3, and so on. The runtime cycles those files in numeric order.
 // Human-readable design + spatial behaviour: docs/design/sound_effects.md.
+//
+// stereo: true keeps the published asset two-channel. It is set only on global
+// ambience beds whose L/R width is audible and which never pass through a
+// positional panner. Point ambience (campfire/forge) and every other cue are
+// mono (positional playAt downmixes to
+// mono, personal playUi sums to the mono master), so the conform step in
+// gen_sfx.mjs encodes it single-channel. This is the channel half of the asset
+// standard checked by scripts/sfx_conform.mjs and documented in
+// docs/design/sound_effects.md.
 //
 // Keys map to public/audio/sfx/<key>.mp3 and to src/game/sfx_manifest.generated.ts.
 // Prompts are written for the ElevenLabs Sound Effects model: concise, concrete,
@@ -401,6 +410,7 @@ export const SFX = [
     key: 'amb_wind_vale',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt:
       'A gentle pleasant breeze through a green forest valley, soft wind and distant rustling leaves. Seamless loop, no music.',
   },
@@ -408,6 +418,7 @@ export const SFX = [
     key: 'amb_wind_marsh',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt:
       'An eerie damp marshland: a low mournful breeze with distant frogs and insects. Seamless loop, no music.',
   },
@@ -415,6 +426,7 @@ export const SFX = [
     key: 'amb_wind_peaks',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt:
       'A cold howling mountain wind across bleak high rocky peaks, gusty. Seamless loop, no music.',
   },
@@ -422,12 +434,14 @@ export const SFX = [
     key: 'amb_birds',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt: 'Calm daytime forest ambience with gentle distant birdsong. Seamless loop, no music.',
   },
   {
     key: 'amb_water',
     duration: 6,
     loop: true,
+    stereo: true,
     prompt:
       'Gentle lake water lapping at the shore with soft flowing ripples. Seamless loop, no music.',
   },
@@ -448,6 +462,7 @@ export const SFX = [
     key: 'amb_dungeon',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt:
       'A dark stone dungeon interior: echoing water drips and a low ominous drone. Seamless loop, no music.',
   },
@@ -455,6 +470,7 @@ export const SFX = [
     key: 'amb_rain',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt:
       'Steady rainfall pattering on the ground with occasional distant thunder. Seamless loop, no music.',
   },
@@ -462,6 +478,7 @@ export const SFX = [
     key: 'amb_snow',
     duration: 8,
     loop: true,
+    stereo: true,
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 

@@ -617,6 +617,15 @@ export const ko_KR: EnTranslations = {
       "notNow": "나중에",
       "update": "업데이트"
     },
+    "cameraPrompt": {
+      "title": "카메라 선택",
+      "intro": "카메라가 캐릭터를 따라가는 방식을 선택하세요.",
+      "mouseDesc": "버튼을 누르지 않고 마우스를 움직여 시점을 돌립니다.",
+      "classicTitle": "클래식 카메라",
+      "classicDesc": "우클릭을 누른 채 마우스를 움직여 시점을 돌립니다.",
+      "changeLater": "이 설정은 나중에 Esc 메뉴의 키 설정에서 변경할 수 있습니다.",
+      "confirm": "확인"
+    },
     "castBar": {
       "playerAria": "내 시전 막대",
       "targetAria": "대상 시전 막대"

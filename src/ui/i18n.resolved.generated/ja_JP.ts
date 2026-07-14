@@ -617,6 +617,15 @@ export const ja_JP: EnTranslations = {
       "notNow": "後で",
       "update": "更新"
     },
+    "cameraPrompt": {
+      "title": "カメラを選択",
+      "intro": "カメラがキャラクターを追う方法を選びましょう。",
+      "mouseDesc": "ボタンを押さずにマウスを動かして視点を回します。",
+      "classicTitle": "クラシックカメラ",
+      "classicDesc": "右クリックを押しながらマウスを動かして視点を回します。",
+      "changeLater": "この設定は後で Esc の「キー割り当て」から変更できます。",
+      "confirm": "決定"
+    },
     "castBar": {
       "playerAria": "あなたの詠唱バー",
       "targetAria": "ターゲットの詠唱バー"

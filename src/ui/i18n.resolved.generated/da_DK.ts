@@ -617,6 +617,15 @@ export const da_DK: EnTranslations = {
       "notNow": "Ikke nu",
       "update": "Opdater"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Din castbjælke",
       "targetAria": "Enhedens castbjælke"

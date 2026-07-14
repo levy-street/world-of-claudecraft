@@ -97,6 +97,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     // dungeon mobs stay dead until the instance resets
     const isInstanceMob = mob.spawnPos.x > DUNGEON_X_THRESHOLD;
+    // Corpse-decay window (classic-faithful, issue #1539): an in-place respawn
+    // reuses this entity id and respawnMob wipes the loot, so while the corpse is
+    // still lootable the respawn is DEFERRED until its corpse timer elapses. The
+    // tapping player thus gets the full bounded window (corpseTimer, default
+    // CORPSE_DURATION, capped by any fixed respawnSeconds) to loot; un-looted
+    // drops then decay with the corpse and are never lost before the window ends.
     if (!isInstanceMob && mob.respawnTimer <= 0 && (mob.corpseTimer <= 0 || !mob.lootable)) {
       ctx.respawnMob(mob);
     }

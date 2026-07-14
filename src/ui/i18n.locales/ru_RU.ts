@@ -6050,6 +6050,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Доступна версия {version} World of ClaudeCraft. Обновите сейчас, чтобы получить последние исправления и улучшения.',
   'hudChrome.nativeUpdate.notNow': 'Не сейчас',
   'hudChrome.nativeUpdate.update': 'Обновить',
+  'hudChrome.cameraPrompt.title': 'Выберите камеру',
+  'hudChrome.cameraPrompt.intro': 'Выберите, как камера следует за персонажем.',
+  'hudChrome.cameraPrompt.mouseDesc':
+    'Двигайте мышью, чтобы поворачивать камеру, не удерживая кнопку.',
+  'hudChrome.cameraPrompt.classicTitle': 'Классическая камера',
+  'hudChrome.cameraPrompt.classicDesc':
+    'Удерживайте правую кнопку мыши и двигайте мышью, чтобы поворачивать камеру.',
+  'hudChrome.cameraPrompt.changeLater': 'Это можно изменить позже в меню Esc, раздел «Клавиши».',
+  'hudChrome.cameraPrompt.confirm': 'Подтвердить',
   'desktop.update.downloading': 'Загрузка обновления {version}...',
   'desktop.update.ready':
     'Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.',

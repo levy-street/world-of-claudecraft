@@ -1,35 +1,15 @@
 // Pure world-to-audio routing. Static prop data determines footstep surfaces
 // and positional ambience anchors without adding presentation-only sim events.
 
-import { DUNGEON_X_THRESHOLD, PROPS } from '../sim/data';
+import { DUNGEON_X_THRESHOLD, getActiveWorldContent, PROPS } from '../sim/data';
+import { dockSectionAt } from '../sim/dock_layout';
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { AmbientPointSource, Surface } from './audio_sink';
 
-// buildProps places three dock sections at local z -1.05, -3.18, and -5.31.
-// Their scaled deck union is about 1.95 units wide and 6.40 units deep.
-const DOCK_HALF_WIDTH = 0.98;
-const DOCK_MIN_Z = -6.38;
-const DOCK_MAX_Z = 0.02;
-
-const DOCK_SURFACES = PROPS.docks.map((dock) => ({
-  x: dock.x,
-  z: dock.z,
-  cos: Math.cos(dock.rot),
-  sin: Math.sin(dock.rot),
-}));
-
 export function isOnDockDeck(x: number, z: number): boolean {
-  for (let i = 0; i < DOCK_SURFACES.length; i++) {
-    const dock = DOCK_SURFACES[i];
-    const dx = x - dock.x;
-    const dz = z - dock.z;
-    const localX = dx * dock.cos - dz * dock.sin;
-    const localZ = dx * dock.sin + dz * dock.cos;
-    if (Math.abs(localX) <= DOCK_HALF_WIDTH && localZ >= DOCK_MIN_Z && localZ <= DOCK_MAX_Z) {
-      return true;
-    }
-  }
+  for (const dock of getActiveWorldContent().props.docks)
+    if (dockSectionAt(dock, x, z) >= 0) return true;
   return false;
 }
 
