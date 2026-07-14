@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import {
+  MATERIAL_RARITY_MAX_PROFICIENCY,
+  NODE_HARVEST_TABLE,
+} from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -312,5 +315,89 @@ describe('gather node harvest (#1121)', () => {
     p.dead = true;
     sim.harvestNode(NODE_ID, pid); // denied: dead, the first guard in the chain
     expect(draws).toBe(0);
+  });
+});
+
+describe('gather-completion event for audio (#1729)', () => {
+  it('a granted harvest emits a personal gatherResult carrying node/profession/item/rarity', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Harvester');
+    teleportOntoNode(sim, pid, NODE_ID);
+    const node = mustNode(NODE_ID);
+    const entry = NODE_HARVEST_TABLE[node.type];
+
+    sim.drainEvents();
+    sim.harvestNode(NODE_ID, pid);
+    const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
+    if (gather?.type !== 'gatherResult') throw new Error('expected a gatherResult event');
+    // Personal: carries the acting player's pid so the server routes it only to
+    // the harvester (delivered-to-acting-player acceptance criterion).
+    expect(gather.pid).toBe(pid);
+    expect(gather.nodeId).toBe(node.id);
+    expect(gather.nodeType).toBe(node.type);
+    expect(gather.professionId).toBe(entry.professionId);
+    expect(gather.itemId).toBe(entry.itemId);
+    // A proficiency-0 harvest always rolls common (the rarity ladder puts all
+    // weight on common at proficiency 0), so this exact value is seed-independent.
+    expect(gather.rarity).toBe('common');
+  });
+
+  it('the emitted rarity reflects the actual roll: a max-proficiency harvest never reports common', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Proficient');
+    teleportOntoNode(sim, pid, NODE_ID);
+    const node = mustNode(NODE_ID);
+    const entry = NODE_HARVEST_TABLE[node.type];
+    const meta = mustMeta(sim, pid);
+    // At max proficiency the rarity ladder puts ZERO weight on common, so the
+    // emitted rarity must be one of the four higher tiers. This proves the event
+    // carries the value actually rolled, not a hard-coded 'common'.
+    meta.gatheringProficiency[entry.professionId] = MATERIAL_RARITY_MAX_PROFICIENCY;
+
+    sim.drainEvents();
+    sim.harvestNode(NODE_ID, pid);
+    const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
+    if (gather?.type !== 'gatherResult') throw new Error('expected a gatherResult event');
+    expect(gather.rarity).not.toBe('common');
+    expect(['uncommon', 'rare', 'epic', 'legendary']).toContain(gather.rarity);
+  });
+
+  it('no gatherResult is emitted on any denial path (too far, dead, unknown node)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Denied');
+    const p = mustEntity(sim, pid);
+    // Too far from any node.
+    p.pos.x = -9999;
+    p.pos.z = -9999;
+    p.pos.y = terrainHeight(p.pos.x, p.pos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    sim.drainEvents();
+    sim.harvestNode(NODE_ID, pid);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherResult')).toBe(false);
+
+    // Dead player standing on the node.
+    teleportOntoNode(sim, pid, NODE_ID);
+    p.dead = true;
+    sim.drainEvents();
+    sim.harvestNode(NODE_ID, pid);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherResult')).toBe(false);
+
+    // Unknown node id.
+    p.dead = false;
+    sim.drainEvents();
+    sim.harvestNode('not_a_real_node', pid);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherResult')).toBe(false);
+  });
+
+  it('the gatherResult event is deterministic across runs (same seed, same harvest)', () => {
+    const run = () => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Det');
+      teleportOntoNode(sim, pid, NODE_ID);
+      sim.drainEvents();
+      sim.harvestNode(NODE_ID, pid);
+      return sim.drainEvents().find((e) => e.type === 'gatherResult');
+    };
+    expect(run()).toEqual(run());
   });
 });

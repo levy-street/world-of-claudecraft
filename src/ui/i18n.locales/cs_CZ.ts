@@ -327,7 +327,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Hrdinské značky: {count}',
   'heroicShop.buyAria': 'Koupit {item} za {marks} hrdinských značek',
   'hudChrome.bags.cannotDestroy': 'Tento předmět nelze zničit.',
-  'hudChrome.bags.rightClickDestroy': 'Zničíš pravým kliknutím',
   'hudChrome.crafting.comboRequirementUnmet':
     'Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.',
   'hudChrome.discord.roleTag.coredevs': 'Hlavní dev',

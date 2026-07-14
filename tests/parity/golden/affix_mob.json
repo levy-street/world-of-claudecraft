@@ -132,7 +132,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "a972c53d",
+      "state": "71a0d282",
       "events": "da981db4",
       "rng": {
         "draws": 14,
@@ -143,7 +143,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "42c7f28a",
+      "state": "63f9309d",
       "events": "bd4b9aed",
       "rng": {
         "draws": 28,
@@ -154,7 +154,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 411,
-      "state": "fc4f8258",
+      "state": "c1b307b5",
       "events": "334f8acb",
       "rng": {
         "draws": 57,
@@ -325,6 +325,9 @@
               "value": 1.3
             }
           ],
+          "bossDamagers": [
+            408
+          ],
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -431,7 +434,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 411,
-      "state": "8e99ddcf",
+      "state": "f550b890",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -602,6 +605,9 @@
               "sourceId": 409,
               "value": 1.3
             }
+          ],
+          "bossDamagers": [
+            408
           ],
           "combatTimer": 0.2,
           "comboUntil": -1,

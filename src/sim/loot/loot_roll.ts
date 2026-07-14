@@ -150,6 +150,12 @@ export function rollLoot(
   mob: Entity,
   meta: PlayerMeta,
   eligible: PlayerMeta[] = [meta],
+  // Extra players (currently: a rare's damage-contributor roster, see handleDeath in
+  // combat/damage.ts) who are ALSO eligible for a guaranteed personal quest-item
+  // drop (the questId branch below), even when they are outside the tap-credited
+  // party. Never widens XP/party-loot eligibility: `eligible` (the tap/party set)
+  // stays the source of truth for everything else this function does.
+  contributors?: PlayerMeta[],
 ): void {
   const template = MOBS[mob.templateId];
   if (!template) return;
@@ -192,7 +198,22 @@ export function rollLoot(
       continue;
     }
     if (entry.questId) {
-      const questRecipients = eligible.filter((m) => needsQuestDrop(ctx, entry, m));
+      // Union eligible (the tap/party set) with the rare's damage-contributor
+      // roster, deduped by entityId, so a guaranteed personal quest item credits
+      // every contributing quest-needer, not just whoever holds the tap. Sorted by
+      // entityId for a fixed, deterministic iteration order (contributors arrives
+      // pre-sorted from worldBossLootContributors, but eligible does not, so sort
+      // the union explicitly).
+      const pool =
+        contributors && contributors.length > 0 ? [...eligible, ...contributors] : eligible;
+      const seen = new Set<number>();
+      const candidates = pool.filter((m) => {
+        if (seen.has(m.entityId)) return false;
+        seen.add(m.entityId);
+        return true;
+      });
+      candidates.sort((a, b) => a.entityId - b.entityId);
+      const questRecipients = candidates.filter((m) => needsQuestDrop(ctx, entry, m));
       if (questRecipients.length === 0) continue;
       if (!ctx.rng.chance(entry.chance)) continue;
       if (!entry.itemId) continue;

@@ -35,6 +35,13 @@ describe('bot-detector stub (open-source no-op)', () => {
       { some: 'meta-value', another: 'meta' },
     );
 
+    // Connection-state transitions the server drives on linkdead drop and
+    // same-session resume. Guards the stub-versus-private drift class where the
+    // server called setTrackingConnection but the bundled detector lacked it: a
+    // missing method here is a compile error, and this call would throw at runtime.
+    detector.setTrackingConnection(ctx, false);
+    detector.setTrackingConnection(ctx, true, { some: 'resume-meta' });
+
     // A full observation cycle is inert and never escalates.
     detector.observeCommand(ctx, 'attack', Date.now());
     detector.observeCommand(ctx, 'attack', Date.now(), { some: 'payload' });

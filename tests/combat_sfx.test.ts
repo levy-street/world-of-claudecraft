@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
+import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
   castCueForAbility,
   impactCueForDamage,
+  MOB_VOICE_CUES,
+  mobVoiceActionForDamage,
   mobVoiceCue,
+  mobVoiceCueWithFallback,
   mobVoiceFamily,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
@@ -207,9 +210,95 @@ describe('combat SFX policy', () => {
     expect(mobVoiceFamily('tunnel_rat')).toBe('burrower');
     expect(mobVoiceCue('tunnel_rat', 'death')).toBe('mob_burrower_death');
 
-    const specific = 'mob_beast_forest_wolf_attack';
-    expect(mobVoiceCue('forest_wolf', 'attack', (key) => key === specific)).toBe(specific);
-    expect(mobVoiceCue('forest_wolf', 'attack', () => false)).toBe('mob_beast_attack');
+    // bog_bloat has no subfamily alias, so it still keys off its own raw
+    // templateId (unlike the wolf-shaped beasts covered below).
+    const specific = 'mob_beast_bog_bloat_attack';
+    expect(mobVoiceCue('bog_bloat', 'attack', (key) => key === specific)).toBe(specific);
+    expect(mobVoiceCue('bog_bloat', 'attack', () => false)).toBe('mob_beast_attack');
+  });
+
+  it('shares one recorded wolf subfamily voice across every wolf-shaped beast', () => {
+    const wolfCue = 'mob_beast_wolf_attack';
+    const hasWolfCue = (key: string) => key === wolfCue;
+    for (const wolfLike of ['forest_wolf', 'ridge_stalker', 'mire_prowler', 'old_greyjaw']) {
+      expect(mobVoiceCue(wolfLike, 'attack', hasWolfCue), wolfLike).toBe(wolfCue);
+    }
+    // A non-aliased templateId is unaffected: it keys off its own id, not 'wolf'.
+    expect(mobVoiceCue('crypt_shambler', 'attack', hasWolfCue)).toBe('mob_undead_attack');
+    // With no recorded wolf take at all, every aliased template falls back to
+    // the plain family-level sound, same as an unaliased one would.
+    for (const wolfLike of ['forest_wolf', 'ridge_stalker', 'mire_prowler', 'old_greyjaw']) {
+      expect(
+        mobVoiceCue(wolfLike, 'attack', () => false),
+        wolfLike,
+      ).toBe('mob_beast_attack');
+    }
+  });
+
+  it('resolves the reptile family for its first real mob', () => {
+    expect(mobVoiceFamily('deepfen_spearjaw')).toBe('reptile');
+    expect(mobVoiceCue('deepfen_spearjaw', 'aggro')).toBe('mob_reptile_aggro');
+    expect(mobVoiceCue('deepfen_spearjaw', 'attack')).toBe('mob_reptile_attack');
+    expect(mobVoiceCue('deepfen_spearjaw', 'death')).toBe('mob_reptile_death');
+    expect(mobVoiceCue('deepfen_spearjaw', 'hurt')).toBe('mob_reptile_hurt');
+  });
+
+  // Table-driven over every one of the 13 real mob families (not a sample),
+  // so a cue mapped to the wrong family's key (still a valid SfxId, so tsc
+  // and a spot check would both miss it) fails here.
+  it('resolves a real, correctly-mapped hurt cue for every mob family', () => {
+    const familyByTemplateId: Record<string, string> = {
+      forest_wolf: 'beast',
+      wild_boar: 'boar',
+      mire_widow: 'spider',
+      mudfin_murloc: 'mudfin',
+      tunnel_rat: 'burrower',
+      mogger: 'humanoid',
+      crypt_shambler: 'undead',
+      fen_troll: 'troll',
+      korgath_the_bound: 'ogre',
+      stormcrag_elemental: 'elemental',
+      sanctum_drakonid: 'dragonkin',
+      emberkin: 'demon',
+      deepfen_spearjaw: 'reptile',
+    };
+    expect(Object.keys(familyByTemplateId)).toHaveLength(13);
+    for (const [templateId, family] of Object.entries(familyByTemplateId)) {
+      expect(mobVoiceFamily(templateId), templateId).toBe(family);
+      const expected = `mob_${family}_hurt`;
+      expect(mobVoiceCue(templateId, 'hurt'), templateId).toBe(expected);
+      expect(expected in SFX_CLIPS, expected).toBe(true);
+    }
+  });
+
+  it('keeps MOB_VOICE_CUES in lockstep with the real family list', () => {
+    // A family added to one and forgotten in the other resolves at runtime
+    // to a key with no clip: no error, it just plays nothing.
+    expect(Object.keys(MOB_VOICE_CUES).sort()).toEqual([...SFX_MOB_EXTENSION_FAMILIES].sort());
+  });
+
+  it('requests a hurt reaction only for a crit against a non-boss mob', () => {
+    const mob = target('mob', 'crypt_shambler');
+    const boss = target('mob', 'nythraxis_scourge_of_thornpeak');
+    const player = target('player', 'warrior');
+    expect(mobVoiceActionForDamage(damage({ crit: true }), mob)).toBe('hurt');
+    expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
+    expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
+    expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
+  });
+
+  it('falls back to the attack cue only when the resolved cue is not yet buffered', () => {
+    const hasCue = () => false;
+    const warm = () => true;
+    const cold = () => false;
+    // warm arm: the resolved hurt cue is already buffered, use it as is.
+    expect(mobVoiceCueWithFallback('crypt_shambler', 'hurt', hasCue, warm)).toBe('mob_undead_hurt');
+    // cold arm: the resolved hurt cue is not buffered yet, fall back to attack.
+    expect(mobVoiceCueWithFallback('crypt_shambler', 'hurt', hasCue, cold)).toBe(
+      'mob_undead_attack',
+    );
+    // no-cue arm: an unmapped templateId resolves neither cue nor a fallback.
+    expect(mobVoiceCueWithFallback('not_a_real_mob', 'hurt', hasCue, warm)).toBeNull();
   });
 
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {

@@ -617,6 +617,15 @@ export const ru_RU: EnTranslations = {
       "notNow": "Не сейчас",
       "update": "Обновить"
     },
+    "cameraPrompt": {
+      "title": "Выберите камеру",
+      "intro": "Выберите, как камера следует за персонажем.",
+      "mouseDesc": "Двигайте мышью, чтобы поворачивать камеру, не удерживая кнопку.",
+      "classicTitle": "Классическая камера",
+      "classicDesc": "Удерживайте правую кнопку мыши и двигайте мышью, чтобы поворачивать камеру.",
+      "changeLater": "Это можно изменить позже в меню Esc, раздел «Клавиши».",
+      "confirm": "Подтвердить"
+    },
     "castBar": {
       "playerAria": "Ваша полоса применения",
       "targetAria": "Полоса применения цели"
@@ -662,7 +671,12 @@ export const ru_RU: EnTranslations = {
       "perSecond": "{value}/с",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} мин {s} сек.",
-      "seconds": "{s} сек."
+      "seconds": "{s} сек.",
+      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя."
+    },
+    "petFeed": {
+      "disabledFullHp": "Питомец полностью здоров",
+      "disabledNoFood": "В ваших сумках нет еды, которая могла бы вылечить питомца"
     },
     "keybinds": {
       "emoteWheel": "Колесо эмоций",
@@ -1263,7 +1277,7 @@ export const ru_RU: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Этот предмет нельзя уничтожить.",
-      "rightClickDestroy": "Правый клик, чтобы уничтожить",
+      "rightClickDestroy": "Shift+правый клик, чтобы уничтожить",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -1463,7 +1477,8 @@ export const ru_RU: EnTranslations = {
         "connecting": "Открываем Discord...",
         "benefits": "Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.",
         "error": "Не удалось привязать Discord. Пожалуйста, попробуйте снова.",
-        "success": "Discord привязан."
+        "success": "Discord привязан.",
+        "joinServer": "Просто присоединиться к серверу Discord"
       },
       "choice": {
         "title": "Продолжить через Discord",
@@ -2551,6 +2566,10 @@ export const ru_RU: EnTranslations = {
       "dragonkin": {
         "name": "Дракониды",
         "desc": "Чешуйчатые, змееподобные твари древних глубин. Редкие, гордые и куда сильнее, чем кажутся."
+      },
+      "reptile": {
+        "name": "Рептилии",
+        "desc": "Хладнокровные охотники со своим особым шипением и хваткой, непохожие на теплокровных зверей."
       }
     },
     "worldPage": {

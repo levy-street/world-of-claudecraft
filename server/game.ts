@@ -22,6 +22,7 @@ import {
   delveAt,
   dungeonAt,
   isDelvePos,
+  ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
@@ -40,6 +41,7 @@ import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import type { VcMatch } from '../src/sim/social/vale_cup';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
   type Aura,
@@ -271,6 +273,34 @@ export const SIM_LAP_PHASES = [
   'deeds',
   'gridRefresh',
 ].map((n) => `sim.${n}`);
+
+// Per-zone attribution buckets for the mob.update phase. The mob loop
+// tags each mob.update lap with its entity; the host splits that slice of the phase
+// time by the mob's zone/group so a stall localizes to "which zone froze" instead of
+// only the phase total. These are HOST-DERIVED (the sim never emits them), so they are
+// registered in the profiler but deliberately kept OUT of SIM_LAP_PHASES (which pins
+// the sim's own emissions). Overworld mobs bucket by zone id; instance/delve mobs
+// (x beyond DUNGEON_X_THRESHOLD) share one 'instance' bucket; 'other' is a safety net.
+const MOB_ZONE_PHASE_PREFIX = 'sim.mob.z:';
+const MOB_ZONE_PHASE_INSTANCE = `${MOB_ZONE_PHASE_PREFIX}instance`;
+const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
+// Pre-interned zone-id -> phase-name map so the per-mob probe allocates no strings.
+const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
+  ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
+);
+export const SIM_MOB_ZONE_PHASES = [
+  ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
+  MOB_ZONE_PHASE_INSTANCE,
+  MOB_ZONE_PHASE_OTHER,
+];
+
+// The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
+// (a cheap zoneAt band scan plus a Map lookup of an interned string).
+export function mobZonePhase(mob: Entity): string {
+  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
+  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
+}
+
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
@@ -1033,6 +1063,10 @@ export class GameServer {
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
+  private readonly valeCupRewardCompletions = new WeakMap<
+    VcMatch,
+    { completionId: string; completedAtIso: string }
+  >();
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
@@ -1079,6 +1113,8 @@ export class GameServer {
     // Populated only while the detailed capture is active (an on-demand admin
     // capture or PERF_TICK_LOG=1); zero otherwise.
     ...SIM_LAP_PHASES,
+    // Per-zone breakdown of the mob.update phase, with the same capture gating.
+    ...SIM_MOB_ZONE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
   // (bcastGrid/bcastSelf/visits) AND the sim.tick() perfLap sub-phases are measured;
@@ -1134,10 +1170,16 @@ export class GameServer {
       // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
       // probe is always passed but early-returns unless a detailed capture is active,
       // so the steady-state loop pays only a branch per phase.
-      perfLap: (phase) => {
+      perfLap: (phase, entity) => {
         if (!this.perfDetailActive) return;
         const t = process.hrtime.bigint();
-        this.tickProfiler.add(`sim.${phase}`, Number(t - this.simLapMark) / 1e6);
+        const dt = Number(t - this.simLapMark) / 1e6;
+        this.tickProfiler.add(`sim.${phase}`, dt);
+        // The mob loop tags each mob.update lap with its entity, so the SAME measured
+        // slice also lands in that mob's per-zone bucket. One clock read,
+        // no extra wall-clock, no sim-side work: a mob.update blowup now localizes to a
+        // zone in the same [perf.sim] report instead of only the phase total.
+        if (entity !== undefined) this.tickProfiler.add(mobZonePhase(entity), dt);
         this.simLapMark = t;
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
@@ -3053,6 +3095,17 @@ export class GameServer {
       const fmtMean = (n: string) => `${n.slice(4)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
       console.log(`[perf.sim] mean/p95/max ${simPhases.slice(0, 14).map(fmtMean).join(' ')}`);
     }
+    // Per-zone split of mob.update, mean-sorted so the zone eating the
+    // phase leads. Only prints when the mob.update cost is actually attributed to a
+    // zone, so a normal tick stays quiet.
+    const zonePhases = SIM_MOB_ZONE_PHASES.filter((n) => p[n] && p[n].mean > 0).sort(
+      (a, b) => p[b].mean - p[a].mean,
+    );
+    if (zonePhases.length > 0) {
+      const fmtZone = (n: string) =>
+        `${n.slice(MOB_ZONE_PHASE_PREFIX.length)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
+      console.log(`[perf.sim.mob] zone mean/p95/max ${zonePhases.map(fmtZone).join(' ')}`);
+    }
   }
 
   suspiciousPlayers(): SuspiciousPlayer[] {
@@ -4941,6 +4994,20 @@ export class GameServer {
     return REALM_PUBLIC_ORIGIN ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(name)}` : null;
   }
 
+  private valeCupRewardCompletion(match: VcMatch): {
+    completionId: string;
+    completedAtIso: string;
+  } {
+    const existing = this.valeCupRewardCompletions.get(match);
+    if (existing) return existing;
+    const completion = {
+      completionId: randomUUID(),
+      completedAtIso: new Date().toISOString(),
+    };
+    this.valeCupRewardCompletions.set(match, completion);
+    return completion;
+  }
+
   // Scan a tick's events for "significant activity" (max-level ding, rare drop,
   // duel result, arena win) and enqueue a card for the Discord bot to post. The
   // drain endpoint resolves which players are linked and tags them; the queue
@@ -5110,6 +5177,7 @@ export class GameServer {
           practice || [...match.rosterA, ...match.rosterB].some((player) => player.bot);
         if (!match.rated && !matchHasBots) continue;
         if (!ev.won) continue;
+        const completion = this.valeCupRewardCompletion(match);
         void dailyRewardService
           .recordValeCupResult(s.accountId, {
             won: true,
@@ -5118,6 +5186,8 @@ export class GameServer {
             rated: match.rated,
             hasBots: matchHasBots,
             practice,
+            completionId: completion.completionId,
+            completedAt: new Date(completion.completedAtIso),
           })
           .then((points) => {
             if (points > 0) this.sendDailyRewardPointsGained(s, points);

@@ -696,6 +696,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.emoteWheel': '감정 표현 휠',
   'hudChrome.keybinds.targetFriendly': '가장 가까운 아군 대상 지정',
   'hudChrome.keybinds.targetFriendlyNext': '아군 대상 순환',
+  'hudChrome.petFeed.disabledFullHp': '펫의 체력이 가득 찼습니다',
+  'hudChrome.petFeed.disabledNoFood': '가방에 펫을 치유할 음식이 없습니다',
   'hudChrome.options.clickMoveLeft': '왼쪽 클릭',
   'hudChrome.options.clickMoveRight': '오른쪽 클릭',
   'hudChrome.options.browserEffects': '브라우저 효과',
@@ -3999,6 +4001,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/초',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}초',
+  'hudChrome.meters.autoShowHint':
+    '파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.',
   'hudChrome.mobile.actionPageToggle': '행동 페이지 전환',
   'hudChrome.mobile.actionRing': '전투 행동',
   'hudChrome.mobile.haptics': '진동',
@@ -4227,7 +4231,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': '퀘스트 추적기 접기',
   'hudChrome.questTracker.expandHint': '퀘스트 추적기 펼치기',
   'hudChrome.bags.cannotDestroy': '이 아이템은 파괴할 수 없습니다.',
-  'hudChrome.bags.rightClickDestroy': '마우스 오른쪽 버튼으로 파괴',
+  'hudChrome.bags.rightClickDestroy': 'Shift + 마우스 오른쪽 버튼으로 파괴',
   'hudChrome.bags.filterGroupAria': '가방을 분류별로 필터링',
   'hudChrome.bags.filterAll': '전체',
   'hudChrome.bags.filterWeapon': '무기',
@@ -4720,6 +4724,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.family.dragonkin.name': '용족',
   'guide.family.elemental.desc':
     '원소가 강하게 흐르는 야생의 장소에 매여 있는, 살아 있는 폭풍과 돌.',
+  'guide.family.reptile.name': '파충류',
+  'guide.family.reptile.desc':
+    '쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다.',
   'guide.worldPage.heading': '세계',
   'guide.worldPage.intro':
     'World of ClaudeCraft는 두 발로 가로지르는 하나로 이어진 대지이며, 남에서 북으로 펼쳐진 세 개의 지역으로 이루어져 있습니다. 빠른 이동이 없으니, 여정 자체가 모험의 일부입니다.',
@@ -5847,6 +5854,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.',
   'hudChrome.discord.link.error': 'Discord를 연결할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.discord.link.success': 'Discord가 연결되었습니다.',
+  'hudChrome.discord.link.joinServer': '연동 없이 서버 참여하기',
   'hudChrome.discord.linkedAs': '{name}(으)로 연결됨',
   'hudChrome.discord.linkedTitle': 'Discord: {name}',
   'hudChrome.discord.viewProfile': '이 캐릭터의 공개 프로필 열기',
@@ -5958,6 +5966,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft 버전 {version}을(를) 사용할 수 있습니다. 지금 업데이트하여 최신 수정 사항과 개선 사항을 받으세요.',
   'hudChrome.nativeUpdate.notNow': '나중에',
   'hudChrome.nativeUpdate.update': '업데이트',
+  'hudChrome.cameraPrompt.title': '카메라 선택',
+  'hudChrome.cameraPrompt.intro': '카메라가 캐릭터를 따라가는 방식을 선택하세요.',
+  'hudChrome.cameraPrompt.mouseDesc': '버튼을 누르지 않고 마우스를 움직여 시점을 돌립니다.',
+  'hudChrome.cameraPrompt.classicTitle': '클래식 카메라',
+  'hudChrome.cameraPrompt.classicDesc': '우클릭을 누른 채 마우스를 움직여 시점을 돌립니다.',
+  'hudChrome.cameraPrompt.changeLater':
+    '이 설정은 나중에 Esc 메뉴의 키 설정에서 변경할 수 있습니다.',
+  'hudChrome.cameraPrompt.confirm': '확인',
   'desktop.update.downloading': '업데이트 {version} 다운로드 중...',
   'desktop.update.ready':
     '업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.',

@@ -1703,6 +1703,11 @@
     border-top: 1px solid rgb(255 255 255 / 0.06);
     background: #0a1119;
   }
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) .armory-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
   .armory-card {
     position: relative;
     border: 1px solid var(--rarity);
@@ -3693,6 +3698,71 @@
     min-height: 48px;
     word-break: break-all;
   }
+  /* Shared themed native <select>: dark panel, gold accent, custom caret, so a
+     native dropdown stops rendering as OS chrome inside the HUD. Keeps real
+     <select> keyboard/type-ahead semantics (unlike the fully custom .ui-dd
+     widget). Other HUD selects (report reason, etc.) can adopt this class. */
+  .hud-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 26px 6px 8px;
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    /* Caret drawn from two gradients tinted by the theme-aware --gold accent (a
+       data-URI fill cannot read a CSS var), so it stays readable on the dark
+       presets AND on the light Parchment panel where --gold darkens to a
+       contrasting accent. */
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+      linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+    background-position:
+      right 13px center,
+      right 8px center;
+    background-size:
+      5px 5px,
+      5px 5px;
+    background-repeat: no-repeat, no-repeat;
+  }
+  /* Keep the tappable control at the mobile 40px floor (base.css only bumps the
+     select font to 16px; appearance:none leaves height to padding + line box). */
+  @media (pointer: coarse) {
+    .hud-select {
+      min-height: 40px;
+    }
+  }
+  .hud-select:hover {
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:disabled {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+  .hud-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  /* High-contrast: appearance:none + a background-image caret both vanish under
+     forced-colors, so restore the native control + a system border there. */
+  @media (forced-colors: active) {
+    .hud-select {
+      appearance: auto;
+      -webkit-appearance: auto;
+      background-image: none;
+      border: 1px solid ButtonBorder;
+    }
+  }
   /* shared in-app dropdown (replaces native <select>, loadouts, report reason) */
   .ui-dd {
     position: relative;
@@ -3937,6 +4007,111 @@
   .native-update-cta {
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
     color: #ffe6a8;
+  }
+
+  /* ---------- first-run camera mode prompt ---------- */
+  .camera-prompt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+  }
+  .camera-prompt-dialog {
+    width: min(440px, calc(100vw - 32px));
+    max-width: 100%;
+    padding: 18px;
+    box-sizing: border-box;
+    animation: camera-prompt-in 160ms ease-out;
+  }
+  @keyframes camera-prompt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .camera-prompt-title {
+    font-family: var(--title-font);
+    font-size: 19px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .camera-prompt-desc {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .camera-prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .camera-prompt-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .camera-prompt-option:focus-within {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .camera-prompt-radio {
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+  }
+  .camera-prompt-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .camera-prompt-option-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .camera-prompt-option-desc {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .camera-prompt-note {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 14px;
+  }
+  .camera-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .camera-prompt-confirm {
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    min-width: 120px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .camera-prompt-dialog {
+      animation: none;
+    }
   }
 
   /* player card: char-window entry button + share modal */

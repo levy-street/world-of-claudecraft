@@ -1936,7 +1936,11 @@
     width: min(220px, calc(50vw - 144px));
     min-width: 142px;
     max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
-    overflow: hidden;
+    /* Scroll vertically instead of clipping: the empty-state discoverability
+       hint can wrap to several lines in this narrow column, and a clipped hint
+       with no scroll affordance would silently hide it. */
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 25;
   }
   /* Left-handed mirror: swap the move joystick (and the utility cluster and

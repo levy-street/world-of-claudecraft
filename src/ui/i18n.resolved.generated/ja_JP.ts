@@ -617,6 +617,15 @@ export const ja_JP: EnTranslations = {
       "notNow": "後で",
       "update": "更新"
     },
+    "cameraPrompt": {
+      "title": "カメラを選択",
+      "intro": "カメラがキャラクターを追う方法を選びましょう。",
+      "mouseDesc": "ボタンを押さずにマウスを動かして視点を回します。",
+      "classicTitle": "クラシックカメラ",
+      "classicDesc": "右クリックを押しながらマウスを動かして視点を回します。",
+      "changeLater": "この設定は後で Esc の「キー割り当て」から変更できます。",
+      "confirm": "決定"
+    },
     "castBar": {
       "playerAria": "あなたの詠唱バー",
       "targetAria": "ターゲットの詠唱バー"
@@ -662,7 +671,12 @@ export const ja_JP: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。"
+    },
+    "petFeed": {
+      "disabledFullHp": "ペットは満タンの体力です",
+      "disabledNoFood": "バッグの中にペットを回復できる食べ物がありません"
     },
     "keybinds": {
       "emoteWheel": "エモートホイール",
@@ -1263,7 +1277,7 @@ export const ja_JP: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
-      "rightClickDestroy": "右クリックで破壊",
+      "rightClickDestroy": "Shift+右クリックで破壊",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1463,7 +1477,8 @@ export const ja_JP: EnTranslations = {
         "connecting": "Discordを開いています...",
         "benefits": "Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。",
         "error": "Discordを連携できませんでした。もう一度お試しください。",
-        "success": "Discordを連携しました。"
+        "success": "Discordを連携しました。",
+        "joinServer": "アカウント連携なしでサーバーに参加"
       },
       "choice": {
         "title": "Discordで続ける",
@@ -2551,6 +2566,10 @@ export const ja_JP: EnTranslations = {
       "dragonkin": {
         "name": "ドラゴンキン",
         "desc": "古き深淵に棲む、鱗に覆われた蛇のような存在。希少で誇り高く、見た目よりもはるかに強大です。"
+      },
+      "reptile": {
+        "name": "爬虫類",
+        "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
       }
     },
     "worldPage": {

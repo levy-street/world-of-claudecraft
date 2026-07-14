@@ -20,6 +20,7 @@ import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
 import {
   dist2d,
@@ -43,7 +44,16 @@ const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
-  return party ? `party:${party.id}` : `solo:${pid}`;
+  if (party) return `party:${party.id}`;
+  // Solo instances key on the DURABLE character id when the server supplies one,
+  // so a logout, relog, or character-select "Take Over" (each of which mints a
+  // new entity id) rejoins the SAME live instance instead of claiming a fresh one
+  // with the boss respawned (issue #1600). This is the shared foundation that
+  // also lets a disconnected solo runner resume their cleared instance (#1351).
+  // Offline / sim-only callers have no characterId and fall back to the entity id,
+  // preserving the exact pre-existing key (and the parity golden trace).
+  const durable = ctx.players.get(pid)?.characterId;
+  return durable !== undefined ? `solo:char:${durable}` : `solo:${pid}`;
 }
 
 export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
@@ -240,6 +250,10 @@ export function enterDungeon(
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;
+  // Stepping inside removes you from any arena queue: a match must never form for
+  // a player standing in an instance and teleport them back inside fully restored
+  // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
+  arenaQueueLeave(ctx, r.meta.entityId);
   // A ghost that ran its spirit back and re-entered resurrects at the entrance,
   // penalty-free: the re-entry IS the corpse run under the instance death model (no
   // Spirit Healer inside an instance).

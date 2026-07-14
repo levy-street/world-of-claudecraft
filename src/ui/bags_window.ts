@@ -33,6 +33,7 @@ import {
   serializeBagFilter,
 } from './bag_filter';
 import {
+  type BagAction,
   type BagMode,
   bagDestroyAction,
   bagItemAction,
@@ -463,80 +464,7 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        const action = bagItemAction(item, this.bagMode());
-        switch (action) {
-          case 'transferBlockedSoulbound':
-            this.deps.showError(t('hudChrome.itemSoulbound'));
-            return;
-          case 'trade':
-            this.deps.addItemToTrade(s.itemId);
-            break;
-          case 'mailAttachBlocked':
-            this.deps.showError(t('hudChrome.mailbox.cannotMail'));
-            return;
-          case 'mailAttach':
-            this.deps.stageMailParcel(s.itemId);
-            break;
-          case 'marketSellBlockedQuest':
-            this.deps.showError(t('itemUi.errors.noQuestItems'));
-            return;
-          case 'marketSellBlockedNoMarket':
-            this.deps.showError(t('itemUi.tooltip.cannotMarket'));
-            return;
-          case 'marketSell':
-            this.deps.stageMarketSell(s.itemId);
-            break;
-          case 'vendorSell':
-            this.sellBagItem(s, ev);
-            break;
-          case 'bankDeposit': {
-            // The command is inventory-index-based, so resolve the exact clicked stack
-            // by reference (duplicate stacks / distinct instanced copies share an
-            // itemId); a stale click whose stack already left the bags is a no-op.
-            const index = bagStackIndex(this.deps.world().inventory, s);
-            if (index < 0) break;
-            if (ev.shiftKey && bankDepositOpensPrompt(s)) {
-              this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
-            } else {
-              // Whole-stack deposit (omitted count); an instanced slot always moves whole.
-              this.deps.world().bankDeposit(index);
-              this.deps.hideTooltip();
-              // Bank ops emit no client repaint event and the bags grid has no per-frame
-              // refresh (only the bank grid does), so repaint here like the use / equip
-              // local-action cases, not a bespoke path.
-              this.render();
-            }
-            break;
-          }
-          case 'bankDepositBlockedQuest':
-            // The sim would refuse this ('You cannot store quest items in the bank.');
-            // pre-empt with the same deny wording via its established sim key (rendered
-            // through the shared showError pipe), and send nothing.
-            this.deps.showError(tSim('error.bankQuestItem'));
-            return;
-          case 'petFeedBlocked':
-            this.deps.showError(t('hud.pet.petEatsFoodOnly'));
-            return;
-          case 'petFeed':
-            this.deps.world().feedPet(s.itemId);
-            this.deps.setPendingPetFeed(false);
-            this.deps.resetPetBarSig();
-            this.render();
-            break;
-          case 'discardQuest':
-            this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
-            break;
-          case 'equipBag':
-            this.deps.world().equipBag(s.itemId);
-            this.deps.hideTooltip();
-            this.render();
-            break;
-          case 'use':
-            this.deps.world().useItem(s.itemId);
-            this.render();
-            this.deps.renderCharIfOpen();
-            break;
-        }
+        this.runBagItemAction(s, bagItemAction(item, this.bagMode()), ev);
       });
       row.addEventListener('contextmenu', (ev) => {
         // A touch long-press belongs to the tooltip peek (the TouchPeekGuard
@@ -561,8 +489,17 @@ export class BagsWindow {
           this.sellBagItem(s, ev);
           return;
         }
-        // Otherwise right-click destroys the item, reusing the quest-item destroy
-        // prompt (confirm + quantity). noDiscard items stay protected (issue 1501).
+        // Shift+right-click destroys the item, reusing the quest-item destroy prompt
+        // (confirm + quantity); noDiscard items stay protected (issue 1501). A plain
+        // right-click (no shift) is NOT a destroy shortcut: it runs the same primary
+        // action a left-click would (equip/use/etc), matching the classic-MMO
+        // expectation that right-click on an inventory item uses or equips it rather
+        // than silently opening a delete prompt (issue 1852).
+        if (!ev.shiftKey) {
+          ev.preventDefault();
+          this.runBagItemAction(s, bagItemAction(item, this.bagMode()), ev);
+          return;
+        }
         const destroy = bagDestroyAction(item, this.bagMode());
         if (destroy === 'none') return;
         ev.preventDefault();
@@ -629,6 +566,88 @@ export class BagsWindow {
     grid.innerHTML = '';
     this.fillGrid(grid);
     grid.scrollTop = prevScrollTop;
+  }
+
+  // Runs the mode-dependent bag action decided by bagItemAction (trade / mail /
+  // market-sell / vendor-sell / bank-deposit / pet-feed / quest-discard / equip / use).
+  // Shared by the left-click handler and the plain (non-shift) right-click handler, so
+  // right-click on a bag item performs the same primary action a left-click would
+  // (equip/use/etc) rather than the surprise destroy-item shortcut it used to be
+  // (issue 1852).
+  private runBagItemAction(s: InvSlot, action: BagAction, ev: MouseEvent): void {
+    switch (action) {
+      case 'transferBlockedSoulbound':
+        this.deps.showError(t('hudChrome.itemSoulbound'));
+        return;
+      case 'trade':
+        this.deps.addItemToTrade(s.itemId);
+        break;
+      case 'mailAttachBlocked':
+        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        return;
+      case 'mailAttach':
+        this.deps.stageMailParcel(s.itemId);
+        break;
+      case 'marketSellBlockedQuest':
+        this.deps.showError(t('itemUi.errors.noQuestItems'));
+        return;
+      case 'marketSellBlockedNoMarket':
+        this.deps.showError(t('itemUi.tooltip.cannotMarket'));
+        return;
+      case 'marketSell':
+        this.deps.stageMarketSell(s.itemId);
+        break;
+      case 'vendorSell':
+        this.sellBagItem(s, ev);
+        break;
+      case 'bankDeposit': {
+        // The command is inventory-index-based, so resolve the exact clicked stack
+        // by reference (duplicate stacks / distinct instanced copies share an
+        // itemId); a stale click whose stack already left the bags is a no-op.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+        } else {
+          // Whole-stack deposit (omitted count); an instanced slot always moves whole.
+          this.deps.world().bankDeposit(index);
+          this.deps.hideTooltip();
+          // Bank ops emit no client repaint event and the bags grid has no per-frame
+          // refresh (only the bank grid does), so repaint here like the use / equip
+          // local-action cases, not a bespoke path.
+          this.render();
+        }
+        break;
+      }
+      case 'bankDepositBlockedQuest':
+        // The sim would refuse this ('You cannot store quest items in the bank.');
+        // pre-empt with the same deny wording via its established sim key (rendered
+        // through the shared showError pipe), and send nothing.
+        this.deps.showError(tSim('error.bankQuestItem'));
+        return;
+      case 'petFeedBlocked':
+        this.deps.showError(t('hud.pet.petEatsFoodOnly'));
+        return;
+      case 'petFeed':
+        this.deps.world().feedPet(s.itemId);
+        this.deps.setPendingPetFeed(false);
+        this.deps.resetPetBarSig();
+        this.render();
+        break;
+      case 'discardQuest':
+        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
+        break;
+      case 'equipBag':
+        this.deps.world().equipBag(s.itemId);
+        this.deps.hideTooltip();
+        this.render();
+        break;
+      case 'use':
+        this.deps.world().useItem(s.itemId);
+        this.render();
+        this.deps.renderCharIfOpen();
+        break;
+    }
   }
 
   // The current open-window modes that change what a bag click does. Cross-window

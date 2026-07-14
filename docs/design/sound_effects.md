@@ -32,6 +32,54 @@ ElevenLabs remains the optional generator for natural world and character audio.
 
 ---
 
+## Asset standard
+
+Every file in `public/audio/sfx` conforms to one standard, applied by the
+generation and Studio conform paths and enforced by `scripts/sfx_conform.mjs`
+(`npm run sfx:check`). `scripts/gen_sfx.mjs` post-processes each generated clip
+through it before writing, so a regenerated clip already meets the standard.
+
+- **Container and codec:** MP3 (LAME) only. WebKit `decodeAudioData` (every iOS
+  browser is WebKit, plus desktop Safari) has no Ogg Vorbis support, so OGG is
+  ruled out; AAC in m4a is a possible future efficiency option and is out of
+  scope. Lossless masters (`.wav`/`.flac`/`.aiff`) are accepted as sources and
+  transcoded on conform.
+- **Sample rate:** 44.1 kHz.
+- **Bitrate:** 192 kbps for MP3 masters. A lossy source below 112 kbps is
+  rejected (re-encoding cannot restore it); a hand-authored MP3 above the
+  192 kbps ceiling is re-encoded down to it.
+- **Loudness:** clips under 1 s normalize to a -6 dBFS true peak; clips at or
+  above 1 s normalize to -14 LUFS integrated. Normalization is a consistency
+  measure, not a clipping fix: the engine caps per-play gain at 1.0 under a 0.85
+  master, so clipping is not otherwise possible.
+- **Channels (mono/stereo policy per playback path):** mono, except global
+  ambience beds. `playAt` positions a clip through an equalpower `PannerNode` that
+  downmixes to mono before panning, and `playUi` sums to the mono master, so for
+  a positional or personal cue a second channel is decoded into the shared
+  `AudioBuffer` and then discarded; on the iOS Capacitor build (WKWebView) that
+  decoded buffer memory is the binding constraint. Global ambience beds flagged
+  `stereo: true` in `scripts/sfx/sfx_prompts.mjs` keep both channels because their
+  L/R width is audible and they never pass through a panner. Water is one such
+  global bed. Campfire and forge loops are positioned point sources, so they are
+  mono. Sustained spell casts (`cast_*`) are positional and therefore mono. The policy is
+  data-driven from that per-entry flag, never a hardcoded key list.
+- **Naming:** snake_case `category_subject_variant`, and the filename equals the
+  manifest key at `public/audio/sfx/<key>.mp3`. Ordered takes use `<key>_<n>.mp3`
+  (contiguous from `_1`); dynamic creature variants use
+  `mob_<family>_<subfamily>_<action>_<n>.mp3`. The category prefixes in use are
+  `foot_`, `move_`, `melee_`, `impact_`, `combat_`, `player_`, `cast_`, `proj_`,
+  `spell_`, `heal_`, `buff_`/`debuff_`, `mob_`, `amb_`, `lockpick_`, `quest_`, and
+  `ui_`.
+
+`npm run sfx:check` reports the loudness, format, and bitrate rules as hard
+failures. The channel and naming rules are advisory by default (they print but do
+not change the exit code), so the shipped world clips, which predate the mono
+policy, do not break the gate before the one-time re-process. Pass
+`npm run sfx:check -- --strict` to promote them to failures, and
+`npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+
+---
+
 ## Architecture
 
 ### `src/game/sfx.ts` — `Sfx` (singleton `sfx`)
@@ -216,7 +264,7 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `amb_wind_marsh` | ✓ | global | eerie damp marshland wind, low mournful breeze with distant frogs and insects |
 | `amb_wind_peaks` | ✓ | global | cold howling mountain wind across high rocky peaks, bleak and gusty |
 | `amb_birds` | ✓ | global | calm daytime forest ambience with gentle birdsong |
-| `amb_water` | ✓ | point | gentle lake water lapping at the shore, soft flowing ripples |
+| `amb_water` | yes | global | gentle lake water lapping at the shore, soft flowing ripples |
 | `amb_campfire` | ✓ | point | a crackling campfire, popping embers and flames |
 | `amb_forge` | ✓ | point | a blacksmith forge, roaring furnace with rhythmic hammer strikes on an anvil |
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
@@ -247,8 +295,10 @@ editing, mastering, caching, and playback limits as the world catalog.
 `ELEVENLABS_API_KEY=... node scripts/gen_sfx.mjs [--force]` reads
 `scripts/sfx/sfx_prompts.mjs`, calls `POST /v1/sound-generation` per clip
 (`duration_seconds`, `prompt_influence` 0.4, `loop` per entry,
-`output_format=mp3_44100_128`), writes `public/audio/sfx/<key>.mp3`, and emits
-the sampled files. `node scripts/build_sfx_manifest.mjs` independently emits
+`output_format=mp3_44100_128`), passes each response through the shared conform
+step (44.1 kHz, 192 kbps, downmixed to mono unless the entry is `stereo: true`;
+see Asset standard), writes `public/audio/sfx/<key>.mp3`, and emits the sampled
+files. `node scripts/build_sfx_manifest.mjs` independently emits
 `src/game/sfx_manifest.generated.ts` with URLs of the form
 `/audio/sfx/<key>.mp3?v=<content-hash>`. Generation is idempotent
 (skips existing; `--force` to regenerate). Offline-only; the key is never read at
@@ -331,8 +381,11 @@ the live HUD. The Studio inventories published masters without silently changing
 them. Existing cues keep their current balance until an author listens and
 applies a reviewed playback-map change; audio mastering remains a separate
 publish. Every new Studio exact render and publish ends in the shared 44.1 kHz,
-192 kbps production conform pass. Spatial stereo files are folded to one retained
-channel after runtime decode to reduce positional buffer memory.
+192 kbps production conform pass. Positional and one-shot masters are encoded mono
+at the source under the Asset standard, so the runtime stereo-to-mono fold after
+decode is a no-op for them; that fold still protects any stereo asset (a
+not-yet-re-processed clip, or a bespoke upload) from wasting positional buffer
+memory.
 
 ## Efficiency budget
 - One decoded `AudioBuffer` per loaded clip, shared across all sources. Only the

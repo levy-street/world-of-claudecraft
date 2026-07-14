@@ -617,6 +617,15 @@ export const en_CA: EnTranslations = {
       "notNow": "Not now",
       "update": "Update"
     },
+    "cameraPrompt": {
+      "title": "Choose Your Camera",
+      "intro": "Pick how the camera follows your character.",
+      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
+      "classicTitle": "Classic Camera",
+      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
+      "changeLater": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm"
+    },
     "castBar": {
       "playerAria": "Your Cast Bar",
       "targetAria": "Unit Cast Bar"
@@ -662,7 +671,12 @@ export const en_CA: EnTranslations = {
       "perSecond": "{value}/s",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
-      "seconds": "{s}s"
+      "seconds": "{s}s",
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+    },
+    "petFeed": {
+      "disabledFullHp": "Pet is at full health",
+      "disabledNoFood": "No food in your bags will heal your pet"
     },
     "keybinds": {
       "emoteWheel": "Emote Wheel",
@@ -1263,7 +1277,7 @@ export const en_CA: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "This item cannot be destroyed.",
-      "rightClickDestroy": "Right-click to destroy",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -1463,7 +1477,8 @@ export const en_CA: EnTranslations = {
         "connecting": "Opening Discord...",
         "benefits": "Link your Discord to earn points from play and community activity, and climb the status tiers.",
         "error": "Could not link Discord. Please try again.",
-        "success": "Discord linked."
+        "success": "Discord linked.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continue with Discord",
@@ -2551,6 +2566,10 @@ export const en_CA: EnTranslations = {
       "dragonkin": {
         "name": "Dragonkin",
         "desc": "Scaled, serpentine things of the old depths. Rare, proud, and far stronger than they look."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

@@ -303,13 +303,16 @@ describe('vale cup: online integration (GameServer)', () => {
 
     // daily-reward arm: exactly one grant, for the human winner of the rated bout
     expect(rewardSpy).toHaveBeenCalledTimes(1);
-    expect(rewardSpy).toHaveBeenCalledWith(sb.accountId, {
+    expect(rewardSpy.mock.calls[0][0]).toBe(sb.accountId);
+    expect(rewardSpy.mock.calls[0][1]).toMatchObject({
       won: true,
       bracket: 1,
       matchId: match.id,
       rated: true,
       hasBots: false,
       practice: false,
+      completionId: expect.any(String),
+      completedAt: expect.any(Date),
     });
 
     // one Discord card for the decided match, tagging the winning side
@@ -418,5 +421,51 @@ describe('vale cup: online integration (GameServer)', () => {
     expect(drainActivity().filter((c) => c.kind === 'vale_cup')).toHaveLength(1);
     (server.sim as any).vcup.match = null;
     rewardSpy.mockRestore();
+  });
+
+  it('reuses stable completion data when a Vale Cup result is detected twice', () => {
+    vi.useFakeTimers();
+    const rewardSpy = vi.spyOn(dailyRewardService, 'recordValeCupResult').mockResolvedValue(0);
+    try {
+      const fc = fakeWs();
+      const session = joinServer(server, fc, 30, 'RetryWinner');
+      const match: any = {
+        id: 77,
+        bracket: 1,
+        rated: true,
+        practice: null,
+        teamA: [session.pid],
+        teamB: [9999],
+        rosterA: [{ pid: session.pid, bot: false }],
+        rosterB: [{ pid: 9999, bot: false }],
+        scoreA: 1,
+        scoreB: 0,
+        nationA: 'vale',
+        nationB: 'moon',
+      };
+      (server.sim as any).vcup.match = match;
+      const result = { type: 'vcupResult', won: true, draw: false, pid: session.pid };
+
+      vi.setSystemTime(new Date('2026-06-30T20:59:00.000Z'));
+      (server as any).detectActivity([result]);
+      vi.setSystemTime(new Date('2026-06-30T21:01:00.000Z'));
+      (server as any).detectActivity([result]);
+
+      expect(rewardSpy).toHaveBeenCalledTimes(2);
+      const first = rewardSpy.mock.calls[0][1];
+      const replay = rewardSpy.mock.calls[1][1];
+      const firstCompletedAt = first.completedAt;
+      const replayCompletedAt = replay.completedAt;
+      expect(firstCompletedAt).toBeInstanceOf(Date);
+      expect(replayCompletedAt).toBeInstanceOf(Date);
+      expect(first.completionId).toMatch(/^[0-9a-f-]{36}$/);
+      expect(firstCompletedAt.toISOString()).toBe('2026-06-30T20:59:00.000Z');
+      expect(replay.completionId).toBe(first.completionId);
+      expect(replayCompletedAt.toISOString()).toBe(firstCompletedAt.toISOString());
+    } finally {
+      (server.sim as any).vcup.match = null;
+      rewardSpy.mockRestore();
+      vi.useRealTimers();
+    }
   });
 });

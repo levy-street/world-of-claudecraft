@@ -617,6 +617,15 @@ export const zh_TW: EnTranslations = {
       "notNow": "暫不",
       "update": "更新"
     },
+    "cameraPrompt": {
+      "title": "選擇你的鏡頭",
+      "intro": "選擇鏡頭跟隨角色的方式。",
+      "mouseDesc": "無需按住滑鼠按鍵，移動滑鼠即可轉動鏡頭。",
+      "classicTitle": "經典鏡頭",
+      "classicDesc": "按住滑鼠右鍵並移動滑鼠來轉動鏡頭。",
+      "changeLater": "稍後可在 Esc 選單的「按鍵綁定」中變更。",
+      "confirm": "確認"
+    },
     "castBar": {
       "playerAria": "你的施法條",
       "targetAria": "目標施法條"
@@ -662,7 +671,12 @@ export const zh_TW: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。"
+    },
+    "petFeed": {
+      "disabledFullHp": "寵物生命值已滿",
+      "disabledNoFood": "你的背包中沒有可以治療寵物的食物"
     },
     "keybinds": {
       "emoteWheel": "表情輪盤",
@@ -1263,7 +1277,7 @@ export const zh_TW: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "此物品無法銷毀。",
-      "rightClickDestroy": "右鍵單擊以銷毀",
+      "rightClickDestroy": "Shift+右鍵單擊以銷毀",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1463,7 +1477,8 @@ export const zh_TW: EnTranslations = {
         "connecting": "正在開啟 Discord...",
         "benefits": "連結你的 Discord，從遊玩與社群活動中賺取點數，並攀升階級。",
         "error": "無法連結 Discord。請再試一次。",
-        "success": "Discord 已連結。"
+        "success": "Discord 已連結。",
+        "joinServer": "直接加入 Discord 伺服器"
       },
       "choice": {
         "title": "使用 Discord 繼續",
@@ -2551,6 +2566,10 @@ export const zh_TW: EnTranslations = {
       "dragonkin": {
         "name": "龍類",
         "desc": "來自遠古深淵、覆鱗如蛇的生物。稀少、高傲，且遠比外表看來更為強大。"
+      },
+      "reptile": {
+        "name": "爬行類",
+        "desc": "冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。"
       }
     },
     "worldPage": {

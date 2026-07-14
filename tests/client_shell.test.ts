@@ -1018,6 +1018,14 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('<a class="community-link github"');
+      expect(entry).toContain('<a class="community-link donate"');
+      expect(entry).not.toContain('<a class="community-link discord"');
+    }
+  });
+
   it('keeps the game menu free of duplicate and dev-only entries', () => {
     const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
     expect(interfaceEntries).toHaveLength(1);
@@ -1104,9 +1112,12 @@ describe('client HTML shell', () => {
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
     expect(html).toContain('<div class="community-tray">');
-    expect(html).toContain('<a class="community-link discord"');
     expect(html).toContain('<a class="community-link github"');
     expect(html).toContain('<a class="community-link donate"');
+    // No separate Discord invite link here: it duplicated the Discord (U)
+    // icon-rail button (#mm-discord), the game HUD's single Discord entry
+    // point (see the fix/inspect-camera-talent-overlap-discord-dup PR).
+    expect(html).not.toContain('<a class="community-link discord"');
     expect(hudMobileCss).toContain('body.mobile-touch.game-active #ui {\n    z-index: 80;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #community-hud {\n    display: none;\n  }');
     // No stray mobile-touch styling survives for the hidden rail (the old
@@ -1138,6 +1149,23 @@ describe('client HTML shell', () => {
     // only synthesizes for the primary pointer), so it works mid-steer.
     expect(hudTs).toContain("const moreClose = document.getElementById('mobile-more-close');");
     expect(hudTs).toContain('bindTouchTap(moreClose, () => {');
+  });
+
+  it('binds the death-screen respawn buttons via touch-tap, not bare click', () => {
+    // On a phone the browser only synthesizes 'click' for the primary pointer,
+    // so a bare click binding goes dead while another finger is down (a held
+    // movement joystick when the player dies mid-run), stranding them on the
+    // death overlay (issue 1484). All three buttons must use bindTouchTap.
+    expect(hudTs).toContain('bindTouchTap(this.releaseSpiritBtnEl, () => {');
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
+    );
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+    );
+    expect(hudTs).not.toMatch(
+      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
+    );
   });
 
   it('keeps desktop community links open after HUD clicks', () => {

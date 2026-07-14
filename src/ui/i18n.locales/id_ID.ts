@@ -380,7 +380,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Tanda Heroik: {count}',
   'heroicShop.buyAria': 'Beli {item} seharga {marks} Tanda Heroik',
   'hudChrome.bags.cannotDestroy': 'Item ini tidak dapat dihancurkan.',
-  'hudChrome.bags.rightClickDestroy': 'Klik kanan untuk menghancurkan',
   'hudChrome.crafting.comboRequirementUnmet':
     'Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.',
   'hudChrome.discord.roleTag.coredevs': 'Dev Inti',
