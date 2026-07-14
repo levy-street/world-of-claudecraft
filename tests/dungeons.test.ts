@@ -1543,6 +1543,51 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(p.pos.x).toBe(DUNGEONS.nythraxis_boss_arena.doorPos.x);
     expect(p.pos.z).toBe(DUNGEONS.nythraxis_boss_arena.doorPos.z - 4);
   });
+
+  it('cancels the eject when a misclick-kicked raider is re-invited during the grace', () => {
+    const { sim, tank, raiders } = raidSetup('normal');
+    const kicked = raiders[1];
+    sim.players.get(kicked)!.questsDone.add('q_nythraxis_bound_guardian');
+    sim.enterDungeon('nythraxis_boss_arena', kicked);
+    const p = sim.entities.get(kicked) as AnyEntity;
+
+    sim.partyKick(kicked, tank);
+    const meta = sim.players.get(kicked)!;
+    expect(meta.raidKickEjectRemaining).toBe(60);
+    sim.drainEvents();
+
+    // The leader re-invites the misclicked raider back before the timer fires.
+    sim.partyInvite(kicked, tank);
+    sim.partyAccept(kicked);
+    expect(sim.partyOf(kicked)).not.toBeNull();
+
+    // The eject sweep runs on the once-per-second gate and cancels as soon as the
+    // player belongs to the instance's party again, well within the 60s grace.
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+
+    // Back in the owning raid party: eject canceled, still inside the arena.
+    expect(meta.raidKickEjectRemaining).toBe(0);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
+  });
+
+  it('clears the eject early when the kicked raider leaves the raid on their own', () => {
+    const { sim, tank, raiders } = raidSetup('normal');
+    const kicked = raiders[1];
+    sim.players.get(kicked)!.questsDone.add('q_nythraxis_bound_guardian');
+    sim.enterDungeon('nythraxis_boss_arena', kicked);
+    const p = sim.entities.get(kicked) as AnyEntity;
+
+    sim.partyKick(kicked, tank);
+    const meta = sim.players.get(kicked)!;
+    expect(meta.raidKickEjectRemaining).toBe(60);
+
+    // Walking out of the raid during the grace zeroes the pending eject (the eject
+    // sweep runs on the once-per-second instance-update gate, so tick past it).
+    sim.leaveDungeon(kicked);
+    expect(sim.instanceSlotAt(p.pos)).toBeNull();
+    for (let i = 0; i < 20 * 2; i++) sim.tick();
+    expect(meta.raidKickEjectRemaining).toBe(0);
+  });
 });
 
 describe('dungeons: ghost corpse-run re-entry', () => {

@@ -401,6 +401,14 @@ function updateRaidKickEjects(ctx: SimContext): void {
       meta.raidKickEjectRemaining = 0;
       continue;
     }
+    // A misclick kick that is re-invited during the grace cancels the eject: once
+    // the player is back in the party that owns the raid instance they are standing
+    // in, their instance key matches its partyKey again and they belong here.
+    const inst = ctx.instances.find((i) => instanceContains(instanceOriginOf(i), p.pos));
+    if (inst && inst.partyKey === instanceKeyFor(ctx, meta.entityId)) {
+      meta.raidKickEjectRemaining = 0;
+      continue;
+    }
     meta.raidKickEjectRemaining -= 1;
     if (meta.raidKickEjectRemaining > 0) continue;
     const info = instanceInfoAt(ctx, p.pos);
