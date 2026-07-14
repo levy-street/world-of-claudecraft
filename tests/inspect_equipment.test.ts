@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The inspect-another-player feature mirrors a player's full worn set onto the
@@ -14,8 +15,14 @@ vi.mock('../server/db', () => ({
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
-  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  markAccountQuestComplete: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
+  grantAccountMechChroma: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+  })),
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
@@ -51,6 +58,20 @@ describe('inspect: sim mirrors the worn set onto the entity', () => {
   });
 });
 
+// The inspect popup is the SECOND consumer of the shared buildPaperdollView pure
+// core (the character sheet in char_window.ts is the first). buildPaperdollView
+// takes equipment + items only; bags are managed by the owning player's Bags
+// panel and are not part of another player's paperdoll. The inspect painter
+// folds the shared top-center helmet back into its traditional left rail.
+describe('inspect: hud paperdoll uses the equipment-only core', () => {
+  const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+  it('calls buildPaperdollView(e.equippedItems, ITEMS) and paints the top slot', () => {
+    expect(hudSrc).toMatch(/buildPaperdollView\(\s*e\.equippedItems\s*,\s*ITEMS\s*\)/);
+    expect(hudSrc).toContain('buildInspectSlotRow(view.top)');
+  });
+});
+
 interface FakeClient {
   sent: any[];
   ws: any;
@@ -58,7 +79,13 @@ interface FakeClient {
 
 function fakeWs(): FakeClient {
   const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
+  return {
+    sent,
+    ws: {
+      readyState: 1,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    },
+  };
 }
 
 function lastSnap(sent: any[]): any {
@@ -167,7 +194,10 @@ describe('inspect: equipment identity-wire round-trip', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
 
     const decoded = client.entities.get(42)!;
-    expect(decoded.equippedItems).toEqual({ helmet: 'iron_helm', mainhand: 'iron_sword' });
+    expect(decoded.equippedItems).toEqual({
+      helmet: 'iron_helm',
+      mainhand: 'iron_sword',
+    });
   });
 
   it('defaults equippedItems to {} when a record omits `eq`', () => {

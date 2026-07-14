@@ -21,8 +21,19 @@ export async function enterOfflineGame(page, opts = {}) {
   const card = `#offline-select .mini-class[data-class="${charClass}"]`;
   await page.waitForSelector('#btn-offline', { timeout: 30000 });
   // Hidden legacy hook: fire its handler in-page rather than page.click (no clickable point).
-  await page.evaluate(() => document.querySelector('#btn-offline')?.click());
-  await page.waitForSelector(card, { visible: true, timeout: 15000 });
+  // The element ships in the initial HTML before main has necessarily attached
+  // its listener, so retry the harmless activation until the class rail is
+  // visibly ready instead of racing that listener on fast static servers.
+  await page.waitForFunction(
+    (sel) => {
+      const classCard = document.querySelector(sel);
+      if (classCard?.getClientRects().length) return true;
+      document.querySelector('#btn-offline')?.click();
+      return false;
+    },
+    { timeout: 15000, polling: 100 },
+    card,
+  );
   // Drive name / class / Enter World in-page too: on small touch viewports these can fail
   // puppeteer's clickable-point check, the same reason #btn-offline does.
   await page.evaluate((name) => {

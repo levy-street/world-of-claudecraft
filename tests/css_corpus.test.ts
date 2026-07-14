@@ -90,6 +90,9 @@ const CORPUS_SECTIONS = new Set(sectionNames(CORPUS));
 // and dropdown, vendor, bags, social, map) so one window's body can no longer be
 // dropped without this guard going red. As the extraction migrates sections out of the inline
 // <style> they reappear in src/styles modules, so the union corpus stays complete.
+// "character window" was later renamed "char equipment tab" (docs/char-equipment/
+// Phase 2, the tabbed paperdoll redesign); the manifest entry below tracks the
+// live banner text, not the extraction-era name.
 // play.html is a near-clone that ships 57 of these (it omits the two in PLAY_OMITS;
 // tooltip is shared via hud.css and the windows via components.css / layout.css, all of
 // which play loads). play's set is a subset of index's, so this is the union.
@@ -113,7 +116,9 @@ const INDEX_SECTIONS = [
   'community HUD',
   'windows',
   'window shell',
-  'character window',
+  'char equipment tab',
+  'char equipment radial orbit stage',
+  'char window ornate frame chrome',
   'spellbook',
   'quest log',
   'leaderboard',
@@ -180,12 +185,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 69 index + 67 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(69);
-    expect(PLAY_SECTIONS.length).toBe(67);
-    expect(MANIFEST.length).toBe(69);
-    expect(new Set(INDEX_SECTIONS).size).toBe(69);
-    expect(new Set(PLAY_SECTIONS).size).toBe(67);
+  it('pins a non-vacuous manifest: 71 index + 69 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(71);
+    expect(PLAY_SECTIONS.length).toBe(69);
+    expect(MANIFEST.length).toBe(71);
+    expect(new Set(INDEX_SECTIONS).size).toBe(71);
+    expect(new Set(PLAY_SECTIONS).size).toBe(69);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

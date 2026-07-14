@@ -18,13 +18,19 @@ import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
-import { t } from '../../src/ui/i18n';
+import { formatNumber, type TranslationKey, t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
 import { QuestLogWindow } from '../../src/ui/questlog_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
+import type { StatId, StatTooltipModel } from '../../src/ui/stat_tooltip';
+import {
+  statCellHtml as realStatCellHtml,
+  statTooltipHtml as realStatTooltipHtml,
+  type StatTooltipI18n,
+} from '../../src/ui/stat_tooltip_view';
 import { TalentsWindow } from '../../src/ui/talents_window';
 import type {
   LeaderboardEntry,
@@ -478,7 +484,25 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll sheet is clean (dialog role + role=img preview host)', async () => {
+  // A minimal-but-real stat model so the stat panels render the REAL cell markup
+  // (aria-describedby + a hidden breakdown span), exercising that the per-panel id
+  // namespacing (Bug 2) keeps every id unique under axe's duplicate-id rule.
+  const statModel = (stat: StatId): StatTooltipModel => ({
+    stat,
+    isPrimary: false,
+    statValue: 10,
+    effects: [],
+    minorForClass: false,
+    baseChanceNote: false,
+    dpsApproxNote: false,
+    sources: [],
+  });
+  const statI18n: StatTooltipI18n = {
+    t: (key, params) => t(key as TranslationKey, params),
+    fmt: (value, opts) => formatNumber(value, opts),
+  };
+
+  it('paperdoll sheet + stat panels are clean (dialog role, role=img preview host, unique cell ids)', async () => {
     const root = host('char-window');
     root.style.display = 'none';
     const win = new CharWindow(
@@ -489,19 +513,30 @@ describe('axe: character window', () => {
             cfg: { playerClass: 'warrior' },
             player: { name: 'Aurelia', level: 60, skin: 0 },
             equipment: {},
+            bags: [],
+            inventory: [],
+            copper: 0,
             professionsState: { skills: [] },
+            // Phase 3 stat panels read these off the world (progression + spec).
+            lifetimeXp: 5000,
+            xp: 300,
+            prestigeRank: 0,
+            talentSpec: null,
           }) as never,
-        statCellHtml: () => '',
-        statTooltipHtml: () => '',
-        talentSummaryHtml: () => '',
-        progressionHtml: () => '',
+        // Exercise the REAL cell markup, threading the per-panel id namespace, so
+        // the shared-stat cells (armor/dodge/attackPower/dps/critChance) get unique
+        // aria-describedby target ids instead of colliding (Bug 2 regression guard).
+        statCellHtml: (stat: StatId, idNamespace?: string) =>
+          realStatCellHtml(statModel(stat), statI18n, idNamespace),
+        statTooltipHtml: (stat: StatId) => realStatTooltipHtml(statModel(stat), statI18n),
+        moneyHtml: () => '<span class="money-inline">0</span>',
         slotName: (s: string) => s,
         // The 3D turntable + skin picker are HUD-owned (rendered by callback). The skin
-        // row is a role=list, so populate one listitem (as the real picker does) to keep
-        // the list valid; the 3D preview HOST keeps its role=img with the pixels OUT.
+        // row is a labelled group of toggle buttons; the 3D preview HOST keeps its
+        // role=img with the pixels OUT.
         renderSkinPicker: () => {
           const row = root.querySelector('#char-skin-row');
-          if (row) row.innerHTML = '<button type="button" role="listitem">1</button>';
+          if (row) row.innerHTML = '<button type="button" aria-pressed="true">1</button>';
         },
         captureFocus: () => null,
       }),
@@ -511,12 +546,14 @@ describe('axe: character window', () => {
     expect(root.getAttribute('aria-labelledby')).toBe('char-title');
     expect(root.querySelector('#char-title')).toBeTruthy();
     expect(root.querySelector('#char-model-preview')?.getAttribute('role')).toBe('img');
-    // The role=img preview HOST carries its OWN name, not a duplicate of the
-    // title's level/class subtitle.
+    // The role=img preview HOST carries its OWN name (the level/class subtitle now
+    // lives in the frame titlebar, not a body #char-title node).
     const previewName = root.querySelector('#char-model-preview')?.getAttribute('aria-label');
-    const titleSubtitle = root.querySelector('#char-title .panel-subtitle')?.textContent ?? '';
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
-    expect(previewName).not.toBe(titleSubtitle);
+    // The shared-stat cells produced unique ids (axe would flag duplicates otherwise):
+    // armor appears in Attributes AND Defense, so both namespaced ids must be present.
+    expect(root.querySelector('#statdesc-attributes-armor')).toBeTruthy();
+    expect(root.querySelector('#statdesc-defense-armor')).toBeTruthy();
     await expectClean(root);
   });
 });

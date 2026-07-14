@@ -565,7 +565,35 @@ export const ru_RU: EnTranslations = {
       "durationUnitDays": "д"
     },
     "character": {
-      "modelPreview": "Предпросмотр модели персонажа"
+      "modelPreview": "Предпросмотр модели персонажа",
+      "tabs": {
+        "equipment": "Экипировка",
+        "overview": "Обзор"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Клаудиум"
+      },
+      "bagSocket": "Слот сумки: {name}",
+      "sections": {
+        "attributes": "Характеристики",
+        "combat": "Бой",
+        "defense": "Защита"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Выбрать",
+        "change": "Изменить"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Открыть окно сумок",
+        "container": "Сумка {n}",
+        "emptySpaces": "Пустые ячейки",
+        "emptySummary": "+{count} пустых"
+      }
     },
     "skipLinks": {
       "mainHud": "Перейти к основному интерфейсу",

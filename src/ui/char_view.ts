@@ -2,8 +2,8 @@
 //
 // The pure-core half of the pure-core + thin-painter split (root CLAUDE.md
 // Conventions; reference vendor_view.ts). Scope is deliberately narrow: the
-// deterministic paperdoll data ONLY, i.e. which equipment slots flank the model
-// in which column and what item (if any) fills each. Everything else the char
+// deterministic paperdoll data ONLY, i.e. which equipment slot crowns the model,
+// which slots flank it in each column, and what item (if any) fills each. Everything else the char
 // window draws stays on the painter: the shared Three.js turntable preview (it
 // emits no Three types into this core), the cosmetic skin picker, the stat panel
 // (already its own stat_tooltip_view core), and the talent / progression blocks.
@@ -22,45 +22,52 @@ export interface PaperdollSlot {
   item: ItemDef | null;
 }
 
-/** The two equipment columns that flank the character model. */
+/** The top-center helmet plus two balanced equipment columns flanking the model. */
 export interface PaperdollView {
+  top: PaperdollSlot;
   left: PaperdollSlot[];
   right: PaperdollSlot[];
 }
 
-// Two columns flanking the model, like the classic character sheet: the left
-// column holds head/neck/shoulder/chest plus the weapon; the right column holds
-// the hands/waist/legs/feet quartet with the two ring slots at the bottom.
+// The helmet owns the paperdoll's top-center crown. The remaining ten real
+// slots form two balanced five-cell rails, with one ring at the bottom of each
+// side. Bags are inventory containers and are deliberately absent here; the
+// Bags panel is their single management surface. No off hand or trinket exists
+// in the sim, so neither is invented for visual symmetry.
+export const PAPERDOLL_TOP_SLOT: EquipSlot = 'helmet';
 export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
-  'helmet',
   'neck',
   'shoulder',
   'chest',
-  'mainhand',
+  'gloves',
+  'ring1',
 ];
 export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
-  'gloves',
+  'mainhand',
   'waist',
   'legs',
   'feet',
-  'ring1',
   'ring2',
 ];
 
 /**
- * Build the paperdoll view from the player's equipment and the item table. A
- * slot resolves to its item only when the id is present AND the item still
- * exists in the table; otherwise the cell is empty.
+ * Build the paperdoll view from the player's equipment and item table. A slot
+ * resolves to its item only when the id is present AND the item still exists in
+ * the table; otherwise the cell is empty.
  */
 export function buildPaperdollView(
   equipment: Partial<Record<EquipSlot, string>>,
   items: Record<string, ItemDef>,
 ): PaperdollView {
-  const column = (slots: readonly EquipSlot[]): PaperdollSlot[] =>
-    slots.map((slot) => {
-      const itemId = equipment[slot];
-      const item = itemId ? (items[itemId] ?? null) : null;
-      return { slot, item };
-    });
-  return { left: column(PAPERDOLL_LEFT_SLOTS), right: column(PAPERDOLL_RIGHT_SLOTS) };
+  const resolve = (slot: EquipSlot): PaperdollSlot => {
+    const itemId = equipment[slot];
+    const item = itemId ? (items[itemId] ?? null) : null;
+    return { slot, item };
+  };
+  const column = (slots: readonly EquipSlot[]): PaperdollSlot[] => slots.map(resolve);
+  return {
+    top: resolve(PAPERDOLL_TOP_SLOT),
+    left: column(PAPERDOLL_LEFT_SLOTS),
+    right: column(PAPERDOLL_RIGHT_SLOTS),
+  };
 }

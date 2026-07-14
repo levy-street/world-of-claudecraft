@@ -565,7 +565,35 @@ export const zh_TW: EnTranslations = {
       "durationUnitDays": "天"
     },
     "character": {
-      "modelPreview": "角色模型預覽"
+      "modelPreview": "角色模型預覽",
+      "tabs": {
+        "equipment": "裝備",
+        "overview": "總覽"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "克勞迪姆"
+      },
+      "bagSocket": "背包欄位：{name}",
+      "sections": {
+        "attributes": "屬性",
+        "combat": "戰鬥",
+        "defense": "防禦"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "選擇",
+        "change": "更改"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "開啟背包視窗",
+        "container": "背包 {n}",
+        "emptySpaces": "空位",
+        "emptySummary": "+{count} 個空位"
+      }
     },
     "skipLinks": {
       "mainHud": "跳至主介面",

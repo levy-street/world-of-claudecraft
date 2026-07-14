@@ -565,7 +565,35 @@ export const en_XA: EnTranslations = {
       "durationUnitDays": "[ð]"
     },
     "character": {
-      "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
+      "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]",
+      "tabs": {
+        "equipment": "[Éɋúíþɱéñţ]",
+        "overview": "[Óʋéŕʋíéŵ]"
+      },
+      "balances": {
+        "woc": "[$ŴÓÇ]",
+        "claudium": "[Çļáúðíúɱ]"
+      },
+      "bagSocket": "[Ɓáĝ Šóçķéţ: {name}]",
+      "sections": {
+        "attributes": "[Áţţŕíƀúţéš]",
+        "combat": "[Çóɱƀáţ]",
+        "defense": "[Ðéƒéñšé]"
+      },
+      "progression": {
+        "xpLabel": "[{current} / {max}]"
+      },
+      "spec": {
+        "choose": "[Çĥóóšé]",
+        "change": "[Çĥáñĝé]"
+      },
+      "bags": {
+        "counter": "[{used} / {total}]",
+        "openFull": "[Óþéñ ƀáĝš ŵíñðóŵ]",
+        "container": "[Ɓáĝ {n}]",
+        "emptySpaces": "[Éɱþţý šþáçéš]",
+        "emptySummary": "[+{count} éɱþţý]"
+      }
     },
     "skipLinks": {
       "mainHud": "[Šķíþ ţó Ɱáíñ ĤÚÐ]",

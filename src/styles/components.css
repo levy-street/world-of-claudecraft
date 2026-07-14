@@ -1036,53 +1036,444 @@
     box-shadow: 0 0 6px #ff800066;
   }
 
-  /* ---------- character window ---------- */
-  /* character window */
+  /* ---------- char equipment tab ---------- */
+  /* Character window (docs/char-equipment/, Phase 2, then the full-screen
+     radial-orbit redesign): the tabbed frame's EQUIPMENT tab. `.paperdoll`
+     (aka `.char-equip-stage`, the new hook the orbit section below targets)
+     hosts bag sockets above the model panel (locked decision 2, top-center),
+     6 equip slots anchored left of the niche, 5 anchored right (honest data:
+     no Off Hand, so the right side has one fewer real anchor than the
+     mockup's; see the "char equipment radial orbit stage" section for the
+     anchor map). Slot cells and bag sockets reuse the shared AAA .item-cell
+     family (frame grammar above) for their rarity border via data-quality;
+     the slot name is an OUTSIDE label (the mockup), achieved purely by DOM
+     order (char_window.ts appends label-then-cell on the left, cell-then-
+     label on the right), never a flex-direction trick. #char-panels /
+     #char-bags / #char-overview are empty Phase 3/4/5 mount points: the
+     shared :empty rule below draws a dashed placeholder banner that
+     disappears on its own once a later phase paints real content, so no
+     future cleanup is needed here. */
+  /* Full-screen container (the radial-orbit redesign): a large resizeable
+     desktop interface instead of a small centered card, usable 1280-1920px
+     with no wasted side margins. The floor (1200px) is load-bearing: the
+     grid floors below (620px/480px + 16px gap + the frame's own ~36px of
+     border/padding chrome) need >=~1152px of window width to avoid the same
+     overflow bug the original 560/300 floors were written to prevent, so the
+     floor sits a small margin above that. The preferred term targets ~80% of
+     the viewport via the same --app-vw/--window-scale
+     idiom the shared `.window` max-width clamp already uses (never a bare
+     `vw`, which would render at the wrong physical size once a player's UI
+     Scale setting departs from 1, since #char-window lives inside the zoomed
+     #ui). The 90% safe envelope leaves enough world and browser-edge context
+     to read as a window rather than a second viewport; the 2400x1350 ceilings
+     still let a 1440p desktop use that envelope while stopping 4K and
+     ultra-wide displays from inflating every item and stat panel. Mobile
+     keeps its inset-driven full-screen override in
+     hud.mobile.css. These custom properties are also used by the framed-shell
+     height rule below so width and height cannot drift apart again. */
   #char-window {
-    width: 600px;
+    /* Character-local aliases for the small shell vocabulary this screen
+       consumes. Keep them scoped here so the shared frame token system removed
+       on release/v0.26.0 is not restored for unrelated windows. */
+    --panel-l1-bg: var(--panel-bg);
+    --window-border: var(--color-border-default);
+    --window-title-color: var(--color-gold);
+    --window-ornament-size: 20px;
+    --focus-ring-color: var(--color-border-focus);
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+    --dur-fast: 120ms;
+    --touch-min: 40px;
+    --touch-cell: 56px;
+    --control-h: 36px;
+    --text-xs: 12px;
+    --text-sm: 13px;
+    --text-md: 15px;
+    --text-lg: 18px;
+    --color-quality-poor: #9d9d9d;
+    --color-quality-common: #ffffff;
+    --color-quality-uncommon: #1eff00;
+    --color-quality-rare: #0070dd;
+    --color-quality-epic: #a335ee;
+    --color-quality-legendary: #ff8000;
+    --char-window-safe-width: min(calc(var(--app-vw, 100vw) * 0.9 / var(--window-scale)), 2400px);
+    --char-window-safe-height: min(calc(var(--app-vh, 100vh) * 0.9 / var(--window-scale)), 1350px);
+    width: var(--char-window-safe-width);
+    min-width: min(720px, var(--char-window-safe-width));
+    max-width: var(--char-window-safe-width);
+    container: char-window / inline-size;
   }
-  .paperdoll {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
+  /* Two-column mockup layout (ornate redesign Round 1; widened for the
+     full-screen radial-orbit redesign): the left column (the equipment
+     stage over bags) is wider than the right (the six stacked stat panels),
+     per the redesign spec's roughly 58/42 split. The floors (620px/480px,
+     widened from the original 560px/300px alongside the container above) are
+     load-bearing, not decorative: nothing here clips overflow, so a track
+     compressed below its content's real minimum would bleed into its
+     neighbor rather than actually shrinking (the exact bug the original
+     floors were written to prevent). The floors guarantee each track always
+     has enough room; the fr weights only govern any width ABOVE the combined
+     floor. Narrow/mobile widths collapse to one column instead (below +
+     hud.mobile.css). */
+  .char-equip-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 59fr) minmax(360px, 41fr);
+    align-items: start;
+    gap: var(--spacing-md);
   }
-  .equip-col {
+  .char-equip-col-left {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    width: 150px;
-    flex-shrink: 0;
+    gap: var(--spacing-md);
+    min-width: 0;
   }
-  .equip-col-right .equip-slot {
-    flex-direction: row-reverse;
-    text-align: right;
+  .char-equip-col-right {
+    min-width: 0;
+  }
+  /* Desktop fallback for a narrow viewport (a resized-down window or a small
+     browser window, not just touch): a middle tier shrinks the floors/slot
+     size/labels rather than squeezing the full-size grid illegibly thin, and
+     a lower tier stacks to one column outright. Thresholds account for the
+     `.window` viewport clamp (layout.css: max-width shrinks the window itself
+     below its clamp()'d declared width once the viewport minus its own
+     margin is narrower), so each must clear the window's floor-driven width
+     PLUS that margin, not just the floor itself, or a clamped-but-still-two-
+     column window would reproduce the same overflow the floors guard
+     against. body.mobile-touch gets its own unconditional stack
+     (hud.mobile.css), since that host is always full-screen regardless of
+     viewport width, so neither tier here ever fires for it. */
+  @container char-window (max-width: 1180px) {
+    #char-window .char-equip-grid {
+      /* Favor the stats column a little more once space is tight (the
+         redesign spec's "stats panel slightly wider" direction). */
+      grid-template-columns: minmax(0, 50fr) minmax(340px, 50fr);
+    }
+    body:not(.mobile-touch) #char-window .equip-item-cell {
+      width: clamp(40px, 6.25cqi, 48px);
+      height: clamp(40px, 6.25cqi, 48px);
+    }
+    body:not(.mobile-touch) #char-window .slot-label {
+      display: none;
+    }
+    #char-window .char-bags-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+  @container char-window (max-width: 930px) {
+    #char-window .char-equip-grid {
+      grid-template-columns: 1fr;
+    }
+    body:not(.mobile-touch) #char-window .char-equip-col-left,
+    body:not(.mobile-touch) #char-window .char-equip-col-right {
+      min-height: auto;
+    }
+  }
+  @media (max-height: 800px) {
+    body:not(.mobile-touch) #char-window .paperdoll {
+      min-height: 340px;
+    }
+    body:not(.mobile-touch) #char-window .equip-item-cell {
+      width: clamp(40px, min(6.25cqi, 6.5cqb), 46px);
+      height: clamp(40px, min(6.25cqi, 6.5cqb), 46px);
+    }
+    body:not(.mobile-touch) #char-window .char-model-panel {
+      height: 76%;
+    }
+    body:not(.mobile-touch) #char-window .char-bags {
+      min-height: 132px;
+    }
+  }
+  .paperdoll {
+    /* Equipment art sizes from the stage it actually surrounds. This remains
+       an inline-size container in the desktop orbit layout; the compact and
+       touch landscape layouts upgrade it to a size container below. */
+    container: char-paperdoll / inline-size;
+    display: grid;
+    grid-template-columns: 150px 1fr 150px;
+    grid-template-rows: auto 1fr;
+    gap: var(--spacing-sm);
+    align-items: start;
+    /* Harmless on mobile-touch (still `display: grid` there, so this sits
+       unused): the desktop-only orbit stage below needs this element to be a
+       positioning context for its absolutely anchored slot cells. */
+    position: relative;
+  }
+  /* The rail wrapper generates NO box:
+     its children (the top slot + both equip columns) stay direct
+     participants of whichever `.paperdoll` layout is active (the base grid
+     here, the desktop absolute-anchor stage whose percentage anchors resolve
+     against the positioned `.paperdoll`, the mobile-portrait grid areas), so
+     every layout can position its three children without DOM reordering. */
+  .char-equip-rail {
+    display: contents;
+  }
+  .equip-top-center {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .equip-col {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .equip-col-right {
+    grid-column: 3;
   }
   .equip-slot {
     display: flex;
-    gap: 7px;
     align-items: center;
+    gap: var(--spacing-sm);
     width: 100%;
   }
-  .equip-slot > div {
+  .equip-col-right .equip-slot {
+    flex-direction: row-reverse;
+  }
+  .slot-label {
     min-width: 0;
+    flex: 1 1 auto;
+    font-size: var(--text-xs);
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    overflow-wrap: break-word;
   }
-  .equip-slot .slot-name {
-    font-size: 10px;
-    color: var(--color-text-muted);
+  .equip-col-right .slot-label {
+    text-align: right;
   }
-  .equip-slot .slot-item {
-    font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* The square rarity-bordered icon: position: relative hosts the corner-x
+     overlay (paperdoll unequip + bags drop-target section) identically
+     whether the outside label sits to its left or its right. */
+  .equip-item-cell {
+    position: relative;
+    flex: none;
   }
+  /* Paperdoll rework (docs/char-equipment/, "badly shaped equipment" fix): a
+     generous, uniform cell size for every equip slot and bag socket, plus a
+     subtle radial highlight on the dark well so an empty cell reads as a
+     rounded recess rather than a flat rectangle. #char-window is required to
+     out-specificity the character-local `.char-window-frame .item-cell`
+     baseline below. Border-color is deliberately NOT touched here, so the
+     local per-data-quality rarity border still wins on that property. */
+  /* Visual-restraint pass (docs/char-equipment/): equip slots grow a touch
+     (the reference's slots read larger), reusing the shared --slot-cell
+     density token rather than a bespoke pixel value. */
+  #char-window .equip-item-cell {
+    --char-equip-frame: clamp(4px, min(0.8cqi, 1.6cqb), 7px);
+    --char-equip-rivet: clamp(6px, min(1.1cqi, 2.2cqb), 10px);
+    width: clamp(40px, 6.25cqi, 68px);
+    height: clamp(40px, 6.25cqi, 68px);
+    border-radius: var(--radius-md);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--color-text-light) 10%, var(--color-bg-dark)) 0%,
+      var(--color-bg-dark) 70%
+    );
+  }
+  .equip-item-cell .item-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+  /* Empty-slot silhouette glyph: the per-slot-type ui_icons.ts glyph
+     char_window.ts paints into an empty cell (helmet/neck/shoulder/... ; the
+     bag glyph for an empty bag socket). Paperdoll rework: enlarged from the
+     original 56% (read as tiny/washed-out) so it centers as a clear, legible
+     silhouette, and colored a warm gold/tan (the recolored
+     --color-slot-empty-text token, tokens.css) instead of plain grey so an
+     empty cell still reads as part of the ornate gold-brown frame family. */
+  .equip-item-cell .slot-glyph {
+    width: 64%;
+    height: 64%;
+    color: var(--color-slot-empty-text);
+  }
+  /* Ornate BEVELED METAL FRAME (paperdoll rework, replacing the thin
+     bright-yellow L-corner brackets the user flagged as "badly shaped"): ONE
+     ::before pseudo-element forms a cast-metal picture-frame RING around every
+     slot/bag-socket cell, plus four corner rivet studs, all as background
+     layers on a single generated box (the same "many background layers, one
+     pseudo" technique the old brackets used, just drawing a full ring instead
+     of four L-marks).
+     - RING: the pseudo is inset -6px (6px bigger than the cell on every edge).
+       FOUR separate `linear-gradient(color, color)` layers, one per edge, each
+       explicitly SIZED to just the 6px ring thickness along its own axis
+       (`100% 6px` for top/bottom, `6px 100%` for left/right) and positioned at
+       that edge: because each layer's own size confines it to a thin strip,
+       none of them ever reach the interior, so no separate "hole" layer is
+       needed (a single diagonal gradient sized to fill the whole box, by
+       contrast, cannot be confined to a ring by `background-clip` alone: clip
+       only bounds where a layer is ALLOWED to paint, not how large an
+       already-full-size image renders, so that approach painted solid color
+       straight across the interior, a bug caught via a throwaway static-HTML
+       render before this landed here). The brief's literal "lighter warm gold
+       top/left, darker brown bottom/right" becomes top+left = the light frame
+       token, bottom+right = the dark one, reading as an embossed bevel.
+     - RIVETS: four small radial-gradient studs layered on TOP of the ring
+       (earlier in the background-image list paints later/on top), positioned
+       at the ring's own corners.
+     - RECESS: an inset box-shadow on the pseudo itself (not the real cell)
+       darkens just inside the ring's inner edge, reading as a shadow cast onto
+       the recessed well below, for BOTH empty and filled cells (a filled
+       slot's 100%-filling `<img>` covers only the real cell's own box, never
+       the pseudo's outward ring, so neither the ring, the rivets, nor this
+       recess shadow are ever occluded by the icon).
+     Stays lit at every fx tier (core cell structure, per the Round 2 direction
+     already established for the arch/slot brackets this replaces), not a
+     flourish. */
+  .equip-item-cell::before {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--char-equip-frame));
+    border-radius: calc(var(--radius-md) + var(--char-equip-frame));
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle,
+        var(--color-slot-rivet-light) 0%,
+        var(--color-slot-rivet-dark) 70%,
+        transparent 74%
+      )
+      top 1px left 1px / var(--char-equip-rivet) var(--char-equip-rivet) no-repeat border-box,
+      radial-gradient(
+        circle,
+        var(--color-slot-rivet-light) 0%,
+        var(--color-slot-rivet-dark) 70%,
+        transparent 74%
+      )
+      top 1px right 1px / var(--char-equip-rivet) var(--char-equip-rivet) no-repeat border-box,
+      radial-gradient(
+        circle,
+        var(--color-slot-rivet-light) 0%,
+        var(--color-slot-rivet-dark) 70%,
+        transparent 74%
+      )
+      bottom 1px left 1px / var(--char-equip-rivet) var(--char-equip-rivet) no-repeat border-box,
+      radial-gradient(
+        circle,
+        var(--color-slot-rivet-light) 0%,
+        var(--color-slot-rivet-dark) 70%,
+        transparent 74%
+      )
+      bottom 1px right 1px / var(--char-equip-rivet) var(--char-equip-rivet) no-repeat border-box,
+      linear-gradient(var(--color-slot-frame-light), var(--color-slot-frame-light)) top / 100%
+      var(--char-equip-frame) no-repeat border-box,
+      linear-gradient(var(--color-slot-frame-light), var(--color-slot-frame-light)) left /
+      var(--char-equip-frame) 100% no-repeat border-box,
+      linear-gradient(var(--color-slot-frame-dark), var(--color-slot-frame-dark)) bottom / 100%
+      var(--char-equip-frame) no-repeat border-box,
+      linear-gradient(var(--color-slot-frame-dark), var(--color-slot-frame-dark)) right /
+      var(--char-equip-frame) 100% no-repeat border-box;
+    box-shadow: inset 0 0 6px 2px rgba(0, 0, 0, 0.65);
+  }
+  /* Visual-restraint pass (docs/char-equipment/): a filled slot no longer
+     glows gold by default (the "too much gold/glow" diff item). Rarity now
+     reads ONLY through the thin inner border the character-local
+     `.item-cell[data-quality]` rule paints; this frame's own ring stays the
+     calm dark-iron bevel above for
+     every cell, filled or empty. The warm gold border + soft glow is reserved
+     for direct interaction (hover / keyboard focus / an active drag target),
+     the ONE place glow is allowed, mirroring the reference. `:focus-within`
+     covers the equip-slot row (its cell is not itself focusable; the corner-x
+     unequip button and the draggable row are), while the bag-socket cell is
+     focusable directly when filled. */
+  .equip-item-cell:hover::before,
+  .equip-item-cell:focus-visible::before,
+  .equip-slot:focus-within .equip-item-cell::before {
+    box-shadow:
+      inset 0 0 6px 2px rgba(0, 0, 0, 0.65),
+      0 0 0 2px var(--gold),
+      0 0 12px 2px var(--color-primary-glow-heavy);
+  }
+  /* Model panel: a carved STONE ARCHWAY niche around the character (paperdoll
+     rework, docs/char-equipment/: the mockup's dungeon alcove, replacing the
+     thin gold-outline arch Round 1/2 shipped). The overall SHAPE stays the
+     tall rounded-top rectangle Round 1 established as the gothic-arch stand-in
+     (no new asset); this pass re-skins the border itself as weathered grey
+     stone block segments instead of a gold line, and swaps the interior's
+     warm gold base-glow for a cool BLUE atmospheric glow behind the character.
+     The border is a thick `solid transparent` ring textured entirely through
+     the background shorthand: a single box keyword on a layer sets BOTH
+     background-origin and background-clip to that box, so the three interior
+     gradient/base layers (clipped `padding-box`) never bleed under the border,
+     while four `repeating-linear-gradient` edge strips (clipped `border-box`,
+     one per side so each tiles blocks along its own axis) paint ONLY in the
+     transparent border ring, each strip alternating a mid-tone block, a dark
+     mortar line, a lighter block, and another mortar line for a weathered,
+     uneven-value masonry read. A solid stone fallback (also `border-box`)
+     sits last/bottom in case of any sub-pixel gaps between the four strips.
+     #char-model-preview (the 3D canvas, a flex child below) fills the
+     interior on top of this background; the border ring is outside that
+     child's box, so it never covers the model or blocks drag-rotate. Stays
+     lit at every fx tier (core sheet structure, the Round 2 direction already
+     established for this niche), not a flourish. */
+  /* Visual-restraint pass (docs/char-equipment/): a WIDER, ROUNDER opening
+     (the top corner radius grew, was a tall-and-narrow 110px ladder) and
+     softer, wider mortar segmentation (blocks widened from 26px/mortar-3px to
+     34px/mortar-2px, and the stone tokens above are now a desaturated
+     grey-blue rather than tan) so the archway blends into the navy atmosphere
+     instead of popping. */
   .char-model-panel {
-    flex: 1;
+    position: relative;
+    grid-column: 2;
+    grid-row: 2;
     min-width: 0;
-    min-height: 172px;
-    border: 1px solid #463a1c;
-    border-radius: 5px;
-    background: rgba(0, 0, 0, 0.28);
+    min-height: 240px;
+    border: 10px solid transparent;
+    border-radius: 150px 150px var(--radius-md) var(--radius-md);
+    background:
+      radial-gradient(
+        ellipse 85% 55% at 50% 32%,
+        color-mix(in srgb, var(--color-char-arch-glow) 40%, transparent) 0%,
+        transparent 72%
+      )
+      padding-box,
+      radial-gradient(
+        ellipse 70% 40% at 50% 92%,
+        color-mix(in srgb, var(--color-char-navy) 55%, transparent) 0%,
+        transparent 70%
+      )
+      padding-box,
+      var(--panel-l1-bg) padding-box,
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-char-stone-mid) 74%, var(--color-char-navy-deep)) 0 34px,
+        var(--color-char-stone-mortar) 34px 36px,
+        color-mix(in srgb, var(--color-char-stone-light) 72%, var(--color-char-navy-deep)) 36px 68px,
+        var(--color-char-stone-mortar) 68px 70px
+      )
+      top / 100% 10px no-repeat border-box,
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-char-stone-mid) 74%, var(--color-char-navy-deep)) 0 34px,
+        var(--color-char-stone-mortar) 34px 36px,
+        color-mix(in srgb, var(--color-char-stone-light) 72%, var(--color-char-navy-deep)) 36px 68px,
+        var(--color-char-stone-mortar) 68px 70px
+      )
+      bottom / 100% 10px no-repeat border-box,
+      repeating-linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-char-stone-mid) 74%, var(--color-char-navy-deep)) 0 34px,
+        var(--color-char-stone-mortar) 34px 36px,
+        color-mix(in srgb, var(--color-char-stone-light) 72%, var(--color-char-navy-deep)) 36px 68px,
+        var(--color-char-stone-mortar) 68px 70px
+      )
+      left / 10px 100% no-repeat border-box,
+      repeating-linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-char-stone-mid) 74%, var(--color-char-navy-deep)) 0 34px,
+        var(--color-char-stone-mortar) 34px 36px,
+        color-mix(in srgb, var(--color-char-stone-light) 72%, var(--color-char-navy-deep)) 36px 68px,
+        var(--color-char-stone-mortar) 68px 70px
+      )
+      right / 10px 100% no-repeat border-box,
+      linear-gradient(var(--color-char-stone-dark), var(--color-char-stone-dark)) border-box;
+    box-shadow:
+      inset 0 0 0 1px var(--panel-edge),
+      inset 0 0 0 3px color-mix(in srgb, var(--color-char-stone-dark) 70%, transparent);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1104,9 +1495,23 @@
     padding: 6px 0 8px;
     flex-shrink: 0;
   }
+  /* The two Equipment-tab mount points (Phase 3 stat panels, Phase 4 embedded
+     bags): a dashed "content incoming" treatment while empty, no player-
+     visible copy (root CLAUDE.md i18n invariant: an aria-label here would
+     itself need a t() key for content that does not exist yet). The Overview
+     mount (#char-overview) shares the same class but is never empty as of
+     Phase 5, so this rule no longer applies to it. */
+  .char-phase-mount:empty {
+    border: 1px dashed var(--color-border-default);
+    border-radius: var(--radius-md);
+    min-height: 96px;
+  }
   .char-stats {
     font-size: 12px;
-    line-height: 1.65;
+    /* Full-screen redesign compactness pass: a touch tighter than the
+       original 1.65 so a multi-row panel (Attributes/Combat) contributes a
+       little less to the six-panel column's total height. */
+    line-height: 1.5;
     color: var(--color-text-muted);
     margin-top: 10px;
     border-top: 1px solid #463a1c;
@@ -1126,6 +1531,10 @@
      transform) per the motion-sickness rule; keyboard focus gets the same pill as
      hover so the affordance is identical for mouse and keyboard. */
   .char-stats .stat-cell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--spacing-sm);
     cursor: help;
     border-radius: 4px;
     padding: 1px 5px;
@@ -1149,6 +1558,2159 @@
     .char-stats .stat-cell {
       transition: none;
     }
+  }
+
+  /* ---------- char equipment radial orbit stage ---------- */
+  /* The full-screen orbiting redesign (docs/char-equipment/): DESKTOP-ONLY
+     overrides that turn `.paperdoll` (aka `.char-equip-stage`, both classes
+     land on the same element, see char_window.ts) from the fixed 3-column
+     flanking grid into a free-form stage the character niche centers in,
+     with every equip slot placed at a fixed percentage anchor orbiting it.
+     Every rule here is scoped `body:not(.mobile-touch)`: mobile-touch keeps
+     the EXACT existing `.paperdoll` grid / `.equip-col` flex-column / plain
+     in-flow `.equip-slot` layout (hud.mobile.css's own overrides target
+     those same classes and rely on them staying a grid there), so nothing in
+     this section can ever apply on that host - the two layouts coexist on
+     one DOM tree, selected purely by which CSS rule wins for a given
+     viewport/host, never by branching the markup itself. char_window.ts
+     builds the SAME markup for both hosts; only the anchor inline styles
+     (`left`/`right`/`top` percentages on each `.equip-slot`) are ignored by
+     a `position: static` element, which is exactly what mobile-touch's
+     `.equip-slot` stays, so those inline styles are inert there too.
+
+     Layout model: the grid row stretches to the full window-body height
+     (`grid-template-rows: 1fr` + `align-items: stretch`, overriding the
+     shared `align-items: start` above only for this host) so both columns
+     share the window's real available height, matching the redesign's "MAIN
+     GRID: full remaining width and height" ask; within the left column, the
+     stage grows to fill whatever the bags panel below does not need
+     (`flex: 1 1 auto`), and the bags panel keeps its own natural height
+     (`flex: 0 0 auto`). Inside the stage: the character niche (arch + model
+     + pedestal) is centered via `left/top: 50%` + `translate(-50%, -50%)` at
+     ~44% x 72% of the stage (the redesign spec's numbers); the top-center helmet
+     anchors above it; each side equip slot anchors via the inline
+     percentage char_window.ts sets (the DATA-DRIVEN anchor map, LEFT_ANCHORS/
+     RIGHT_ANCHORS), centered on that point by a side-aware transform (a
+     left-anchored cell centers via translate(-50%,-50%), a right-anchored
+     one via translate(50%,-50%), mirroring how `left`/`right` measure from
+     opposite edges). The honest ten side slots form two balanced five-cell
+     rails; no fake Off Hand or Trinket is introduced. */
+  /* Padding + cohesion pass (arc refinement round): more breathing room
+     around the whole two-column composition, scaling gently with the
+     window's own width (the same vw-driven clamp() idiom `.paperdoll`'s
+     min-height below already uses) so it stays comfortable across the
+     1280-1920px supported range without the fixed 16px `.window-body` the
+     rest of the HUD's windows share reading as cramped at this window's much
+     larger size. Desktop-only (body:not(.mobile-touch)): mobile-touch keeps
+     the shared 16px window-body padding and its own deliberately tight
+     mobile spacing untouched. */
+  /* Visual-restraint pass (docs/char-equipment/): a deep NAVY gradient
+     atmosphere behind the whole window body (was the flat --panel-bg
+     charcoal), so the muted dark arch/slots sit IN atmosphere rather than
+     against flat black. */
+  body:not(.mobile-touch) #char-window .window-body {
+    padding: clamp(12px, 1.2cqw, 20px);
+    background: linear-gradient(
+      170deg,
+      var(--color-char-navy) 0%,
+      var(--color-char-navy-deep) 100%
+    );
+  }
+  body:not(.mobile-touch) #char-window .char-equip-grid {
+    grid-template-rows: 1fr;
+    align-items: stretch;
+    height: 100%;
+    min-height: 100%;
+    gap: clamp(14px, 1.3cqw, 24px);
+  }
+  body:not(.mobile-touch) #char-window .char-equip-col-left {
+    min-height: 0;
+    height: 100%;
+    gap: clamp(12px, 1.1cqw, 20px);
+  }
+  body:not(.mobile-touch) #char-window .char-equip-col-right {
+    display: flex;
+    min-height: 0;
+  }
+  body:not(.mobile-touch) #char-window .paperdoll {
+    display: block;
+    flex: 1 1 auto;
+    min-height: clamp(340px, 46vh, 600px);
+    border-radius: 0;
+    background: radial-gradient(
+      ellipse 90% 70% at 50% 40%,
+      color-mix(in srgb, var(--color-char-navy) 88%, transparent) 0%,
+      var(--color-char-navy-deep) 100%
+    );
+  }
+  body:not(.mobile-touch) #char-window .char-bags {
+    flex: 0 0 42%;
+    min-height: 260px;
+    overflow: hidden;
+  }
+  @media (min-height: 801px) {
+    body:not(.mobile-touch) #char-window .char-bags {
+      flex-basis: 42%;
+    }
+    body:not(.mobile-touch) #char-window .char-model-panel {
+      overflow: visible;
+    }
+    body:not(.mobile-touch) #char-window .char-model-preview {
+      overflow: hidden;
+      border-radius: 140px 140px var(--radius-sm) var(--radius-sm);
+    }
+  }
+  @media (max-height: 800px) {
+    body:not(.mobile-touch) #char-window .paperdoll {
+      min-height: 320px;
+    }
+  }
+  /* The character niche: centered, ~42% x 72% of the stage (narrowed a
+     touch from the spec's 44% on the orchestrator's arch-clearance review,
+     paired with the deeper ORBIT_BOW_DEPTH in char_window.ts, so the middle
+     orbit rows keep visible breathing room off the stone ring at the
+     tightest supported width, 1280). Overrides only `position` (relative ->
+     absolute) plus adds the centering geometry; the arch/pedestal/navy-glow
+     background from the "char equipment tab" section above is untouched, so
+     the niche itself is unchanged, only its PLACEMENT is. */
+  body:not(.mobile-touch) #char-window .char-model-panel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 48%;
+    height: 84%;
+    z-index: 1;
+  }
+  @media (max-height: 800px) {
+    body:not(.mobile-touch) #char-window .char-model-panel {
+      height: 84%;
+    }
+  }
+  /* The helmet crowns the model where the redundant bag strip used to sit. */
+  body:not(.mobile-touch) #char-window .equip-top-center {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+  body:not(.mobile-touch) #char-window .equip-top-center .equip-slot {
+    width: auto;
+    flex-direction: column;
+    gap: 3px;
+  }
+  body:not(.mobile-touch) #char-window .equip-top-center .slot-label {
+    display: block;
+    width: max-content;
+    flex: none;
+    padding: 2px 6px 1px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-char-navy-deep) 88%, transparent);
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 1px 2px var(--color-bg-dark);
+  }
+  body:not(.mobile-touch) #char-window .char-skin-row {
+    position: absolute;
+    top: auto;
+    bottom: 10px;
+    left: 50%;
+    width: max-content;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+  /* Every side slot is pulled out of the desktop flex-column flow and anchored
+     by the CENTER OF ITS ICON. Labels are absolutely positioned outside that
+     cell and therefore never contribute to the anchor box. This keeps long
+     labels such as Main Hand from pushing their icon off the shared half-sine
+     curve; both rails remain mathematically mirrored regardless of copy. */
+  body:not(.mobile-touch) #char-window #equip-col-left .equip-slot,
+  body:not(.mobile-touch) #char-window #equip-col-right .equip-slot {
+    position: absolute;
+    top: var(--orbit-y);
+    display: block;
+    width: max-content;
+    z-index: 3;
+  }
+  body:not(.mobile-touch) #char-window #equip-col-left .equip-slot {
+    left: var(--orbit-x);
+    transform: translate(-50%, -50%);
+  }
+  body:not(.mobile-touch) #char-window #equip-col-right .equip-slot {
+    right: var(--orbit-x);
+    transform: translate(50%, -50%);
+  }
+  body:not(.mobile-touch) #char-window #equip-col-left .equip-slot > .slot-label,
+  body:not(.mobile-touch) #char-window #equip-col-right .equip-slot > .slot-label {
+    position: absolute;
+    top: 50%;
+    width: max-content;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+  body:not(.mobile-touch) #char-window #equip-col-left .equip-slot > .slot-label {
+    right: calc(100% + 8px);
+    text-align: right;
+  }
+  body:not(.mobile-touch) #char-window #equip-col-right .equip-slot > .slot-label {
+    left: calc(100% + 8px);
+    text-align: left;
+  }
+  /* Keep mobile's established columns untouched, but cross the two desktop
+     arch positions: Shoulder becomes the high right-side slot and Main Hand
+     becomes the mirrored high left-side slot. */
+  body:not(.mobile-touch) #char-window #equip-col-left #equip-slot-shoulder {
+    right: var(--orbit-x);
+    left: auto;
+    transform: translate(50%, -50%);
+  }
+  body:not(.mobile-touch) #char-window #equip-col-right #equip-slot-mainhand {
+    right: auto;
+    left: var(--orbit-x);
+    transform: translate(-50%, -50%);
+  }
+  body:not(.mobile-touch) #char-window #equip-col-left #equip-slot-shoulder > .slot-label {
+    right: auto;
+    left: calc(100% + 8px);
+    text-align: left;
+  }
+  body:not(.mobile-touch) #char-window #equip-col-right #equip-slot-mainhand > .slot-label {
+    right: calc(100% + 8px);
+    left: auto;
+    text-align: right;
+  }
+  /* Short, uppercase-only label (the redesign spec's "icon-primary, minimal
+     labels"): a little tighter than the flanking-column label so it never
+     dominates the compact anchored unit; the item-name text was already
+     never shown here (full name lives in the hover tooltip), so this is a
+     sizing tweak only, not a new hide. */
+  body:not(.mobile-touch) #char-window .slot-label {
+    font-size: clamp(10px, 0.82cqw, 14px);
+    color: var(--char-ornament-hi);
+    white-space: nowrap;
+  }
+
+  /* ---------- char stat panels ---------- */
+  /* Character window (docs/char-equipment/, Phase 3): the Equipment tab's right
+     column, #char-panels, filled with six fixed-order panels (Attributes,
+     Combat, Defense, Progression, Specialization, Gathering). Each panel is a
+     bordered card (mirrors .char-model-panel's edge treatment) with an icon +
+     gold display-font header and a body. The stat-cell grid/hover/focus rules
+     stay the Phase-2 .char-stats block above (reused here, not duplicated):
+     the only addition is one override that drops its standalone top divider
+     once nested inside a panel body, plus a column layout for the two-column
+     stat grid (each column is a .char-stat-col child of .char-stats, so the
+     existing grid-template-columns: 1fr 1fr still lays them out side by side).
+     The panels column has no independent scrollbar: it grows and scrolls with
+     .window-body, same as the paperdoll above it.
+     Full-screen redesign compactness pass: the gap and the header/body
+     vertical padding shrink a little so all six panels clear the visible body
+     height at 1440x900+ without the player needing to scroll to reach
+     Gathering (the redesign spec's compactness ask; measured via a live DOM
+     probe: lastPanelBottom vs the window-body's own bottom edge). */
+  .char-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: 100%;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    border: 1px solid var(--window-border);
+    border-radius: var(--radius-md);
+    background: var(--panel-l1-bg);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    overflow-y: auto;
+  }
+  .char-panel {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .char-panel + .char-panel {
+    border-top: 1px solid var(--panel-edge);
+  }
+  .char-panel-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: clamp(7px, 0.65cqw, 12px) clamp(12px, 1cqw, 18px) 5px;
+    border-bottom: 0;
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: clamp(var(--text-xs), 0.9cqw, var(--text-md));
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .char-panel-header .ui-icon {
+    width: clamp(16px, 1.35cqw, 22px);
+    height: clamp(16px, 1.35cqw, 22px);
+  }
+  .char-panel-body {
+    padding: 4px clamp(12px, 1cqw, 18px) clamp(8px, 0.7cqw, 12px);
+  }
+  /* Nested inside a panel body, .char-stats drops its standalone top divider
+     (that divider separated it from the identity strip above it pre-Phase-2;
+     the panel's own header + border now provide that separation). */
+  .char-panel-body .char-stats {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+  .char-stats .char-stat-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  .cp-spec-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .cp-spec-name {
+    color: var(--color-text-light);
+    font-size: var(--text-sm);
+  }
+  /* The character-local bar baseline below establishes position: relative;
+     this only adds the panel-local spacing above it. */
+  .char-panel-body .bar.cp-bar {
+    margin-top: 4px;
+  }
+  .cp-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-light);
+    pointer-events: none;
+  }
+
+  /* ---------- char bags section ---------- */
+  /* Character window (docs/char-equipment/, Phase 4): the Equipment tab's
+     #char-bags mount, filled with a header (bags icon + title + used/total
+     counter + the "+" open-full-window control), a container selector row
+     (backpack + each equipped bag socket), and the selected container's slot
+     grid. The grid reuses the shared AAA .item-cell family (frame grammar
+     above) for its rarity border/count corner via data-quality, sized to
+     --slot-cell like the standalone bags window's own grid; only the
+     auto-fill track and the drop-target glow are new here. Tokens only, no
+     raw hex/px color. */
+  /* Ornate framed sub-panel (mockup, ornate redesign Round 1): the same
+     bordered-card visual language char-panel already uses (frame grammar
+     reuse, not a parallel system), so the embedded bags block reads as one
+     of the sheet's ornate panels rather than a bare grid. */
+  .char-bags {
+    border: 1px solid var(--window-border);
+    border-radius: var(--radius-md);
+    background: var(--panel-l1-bg);
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  .char-bags-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  .char-bags-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: var(--text-xs);
+    letter-spacing: 0.4px;
+  }
+  .char-bags-title .ui-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .char-bags-counter {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .char-bags-open {
+    flex: none;
+  }
+  /* Owned-bag shelf: the real backpack and equipped bags sit above the slot
+     grid as compact icon cards. The selector scrolls independently when all
+     five containers cannot share the row; the Empty spaces control remains
+     pinned and readable instead of being pushed outside the panel. */
+  .char-bags-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    margin-bottom: var(--spacing-sm);
+  }
+  .char-bags-selector {
+    display: flex;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    gap: var(--spacing-xs);
+    padding: 2px;
+    overscroll-behavior-x: contain;
+    scrollbar-color: var(--char-ornament) transparent;
+    scrollbar-width: thin;
+    touch-action: pan-x;
+  }
+  .char-bags-tab-wrap {
+    display: grid;
+    grid-template-columns: auto 28px;
+    min-width: 0;
+    flex: 0 0 auto;
+    align-items: stretch;
+    gap: 0;
+  }
+  .char-bags-tab-wrap:first-child {
+    grid-template-columns: auto;
+  }
+  .char-bags-tab-wrap:not(:first-child) .char-bags-tab {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+  .char-bags-tab {
+    display: grid;
+    grid-template-columns: var(--char-owned-bag-cell, 40px) minmax(0, 1fr);
+    align-items: center;
+    min-width: clamp(116px, 18cqi, 176px);
+    min-height: calc(var(--char-owned-bag-cell, 40px) + 8px);
+    flex: 0 0 auto;
+    gap: 7px;
+    padding: 3px 8px 3px 3px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--char-ornament) 8%, transparent),
+      color-mix(in srgb, var(--panel-base) 92%, transparent)
+    );
+    color: var(--color-text-muted);
+    text-align: left;
+    cursor: var(--cursor-point);
+    transition:
+      border-color var(--dur-fast) var(--transition-ease),
+      color var(--dur-fast) var(--transition-ease),
+      background-color var(--dur-fast) var(--transition-ease),
+      box-shadow var(--dur-fast) var(--transition-ease);
+  }
+  .char-bags-tab-remove {
+    display: grid;
+    min-width: 28px;
+    min-height: 48px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 62%, transparent);
+    border-left: 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: color-mix(in srgb, var(--char-ornament) 7%, var(--panel-base));
+    color: var(--gold-dim);
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 1;
+    cursor: var(--cursor-point);
+  }
+  .char-bags-tab-remove:hover {
+    border-color: var(--color-border-focus);
+    color: var(--gold);
+    background: color-mix(in srgb, var(--char-ornament) 14%, var(--panel-base));
+  }
+  .char-bags-tab-remove:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  .char-bags-tab-icon {
+    position: relative;
+    display: grid;
+    width: var(--char-owned-bag-cell, 40px);
+    height: var(--char-owned-bag-cell, 40px);
+    overflow: hidden;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 62%, transparent);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--char-ornament-hi) 8%, transparent);
+  }
+  .char-bags-tab-icon .item-icon,
+  .char-bags-tab-icon .ui-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .char-bags-tab-ordinal {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    display: grid;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    border: 1px solid var(--char-ornament-hi);
+    border-radius: 50%;
+    background: var(--panel-base);
+    color: var(--gold);
+    font-family: var(--font-display);
+    font-size: 9px;
+    line-height: 1;
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--panel-base) 80%, transparent);
+  }
+  .char-bags-tab-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .char-bags-tab-name,
+  .char-bags-tab-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .char-bags-tab-name {
+    color: var(--color-text-light);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+  }
+  .char-bags-tab-meta {
+    color: var(--color-text-muted);
+    font-size: 9px;
+  }
+  .char-bags-tab:hover {
+    border-color: var(--color-border-focus);
+    background: color-mix(in srgb, var(--char-ornament) 12%, var(--panel-base));
+  }
+  .char-bags-tab.is-active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: color-mix(in srgb, var(--char-ornament) 15%, var(--panel-base));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--char-ornament-hi) 22%, transparent),
+      0 0 9px color-mix(in srgb, var(--color-primary-glow) 58%, transparent);
+  }
+  .char-bags-tab.is-active .char-bags-tab-name {
+    color: var(--gold);
+  }
+  /* Steady tokenized focus ring (Phase 6 a11y sweep): .char-bags-tab is a
+     bespoke class outside the character shell's control families, so it
+     needs its own rule rather than inheriting one for free. */
+  .char-bags-tab:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-bags-tab {
+      transition: none;
+    }
+  }
+  .char-bags-empty-toggle {
+    position: relative;
+    display: inline-flex;
+    min-height: var(--touch-min);
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    padding: 0 10px;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 62%, transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--char-ornament) 7%, var(--panel-base));
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+  }
+  .char-bags-empty-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+  }
+  .char-bags-empty-mark {
+    display: grid;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid var(--color-border-default);
+    border-radius: 3px;
+    background: var(--color-bg-dark);
+    color: var(--panel-base);
+  }
+  .char-bags-empty-mark::after {
+    width: 8px;
+    height: 4px;
+    border-bottom: 2px solid currentColor;
+    border-left: 2px solid currentColor;
+    content: "";
+    opacity: 0;
+    transform: translateY(-1px) rotate(-45deg);
+  }
+  .char-bags-empty-input:checked + .char-bags-empty-mark {
+    border-color: var(--char-ornament-hi);
+    background: var(--gold);
+  }
+  .char-bags-empty-input:checked + .char-bags-empty-mark::after {
+    opacity: 1;
+  }
+  .char-bags-empty-toggle:hover {
+    border-color: var(--color-border-focus);
+    color: var(--color-text-light);
+  }
+  .char-bags-empty-toggle:focus-within {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  /* forced-colors: active state is conveyed only by border/text color above,
+     both of which the forced palette can flatten toward indistinguishable;
+     add a system-colour outline so the selected container stays visually
+     distinct (mirrors the existing .opt-seg-btn.is-selected / bag-socket
+     precedent, "char window ornate frame chrome" section further below). */
+  @media (forced-colors: active) {
+    .char-bags-tab.is-active {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .char-bags-empty-input:checked + .char-bags-empty-mark {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+  /* The slot grid uses fluid squares while the local character shell supplies
+     the shared cell anatomy and quality border below. */
+  #char-window .char-bags-grid .item-cell {
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+    min-height: var(--touch-min);
+  }
+  /* Full-screen redesign: a bigger min-size than the shared --slot-cell
+     (56px, used by the standalone bags/bank windows) so the auto-fill track
+     lands near 8 columns at this panel's typical full-left-column width and
+     6 once the window narrows, per the redesign spec, rather than the much
+     denser ~11-12 columns --slot-cell would pack at this width. */
+  .char-bags-grid {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    gap: 4px;
+  }
+  #char-window .char-bags-grid .item-cell {
+    background: var(--color-bg-dark);
+  }
+  #char-window .char-bags-grid .item-icon {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
+  .char-bags-grid .item-cell.is-empty {
+    cursor: default;
+    opacity: 0.5;
+  }
+  .char-bags-empty-summary {
+    display: grid;
+    min-height: var(--touch-min);
+    grid-column: span 2;
+    place-items: center;
+    padding: 4px 8px;
+    border: 1px dashed color-mix(in srgb, var(--color-border-default) 72%, transparent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-text-muted) 6%, var(--color-bg-dark));
+    color: var(--color-text-muted);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    letter-spacing: 0.2px;
+    opacity: 0.72;
+  }
+  .char-bags-grid.is-empty-collapsed {
+    align-content: start;
+  }
+  .char-bags-grid .item-cell:not(.is-empty):hover {
+    filter: brightness(1.2);
+  }
+  /* Lights up as a SECOND drag-to-unequip drop target, alongside the
+     standalone #bags window (components.css ~7911's #bags.drop-target,
+     extended not replaced). */
+  .char-bags-grid.drop-target {
+    outline: 2px dashed var(--color-border-focus);
+    outline-offset: -4px;
+    box-shadow: 0 0 14px var(--color-primary-glow-heavy);
+  }
+
+  /* ---------- char window ornate frame chrome ---------- */
+  /* Character window (docs/char-equipment/, mockup ornate redesign Round 1):
+     a character-local frame shell over the release branch's existing window
+     root. Every rule is scoped to #char-window, so no shared frame architecture
+     or unrelated window chrome is restored.
+     - The outer border/corner ornaments read gold and gain a second pair of
+       ornaments at the bottom corners.
+     - The titlebar TITLE + SUBTITLE move
+       out of flow into a centered, gold-edged nameplate banner: the
+       remaining titlebar children (accessory, close) collapse to the right
+       edge via justify-content, matching the mockup's coin display + close
+       square sitting top-right of a centered name.
+     - The tab rail gains its glyphs (appended by char_window.ts, positioned
+       here via flex `order` so the DOM keeps the label text as the tab
+       button's leading text node, the same contract the talents pip
+       relies on) plus a diamond ornament under the active tab and a second,
+       centered one on the divider between the tabs and the body.
+     - The money accessory (char_window.ts's own charMoneyHtml, always all
+       three real gold/silver/copper denominations, see that file) and the
+       close control get an ornate gold chip treatment.
+     Diamond/corner-filigree flourishes stay pure decoration, dropped at the
+     low fx tier like the shared grammar's own corner ornaments. Round 2
+     direction: the outer border/glow, the navy body tint, the arch niche, and
+     the slot-cell corner brackets are core sheet structure, not tiny
+     flourishes, so those stay lit at every fx tier; only the small diamond
+     marks and the bottom-corner filigree keep the low-tier drop.
+     `#char-skin-row`'s numbered swatches (`.skin-swatch`) ARE now styled
+     (Round 2), but not from this section: `.skin-swatch` is declared in
+     shell.css's `@layer shell`, which is imported AFTER (and so always
+     outranks) this file's `@layer components` regardless of selector
+     specificity (src/styles/CLAUDE.md), so no rule here could ever win
+     against it. The override instead lives in shell.css itself, scoped under
+     `#char-window .skin-swatch` (the "Skin picker" section) so every other
+     `.skin-swatch` consumer (char-select, char-create, the cosmetic
+     skin-event overlay) keeps its exact current look. */
+  /* The release-compatible character shell owns the full-height frame anatomy
+     locally. The shared .window root keeps resize/viewport behavior, while the
+     direct child owns its header, tabs, and scrolling body. */
+  #char-window:has(> .char-window-frame) {
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  body:not(.mobile-touch) #char-window:has(> .char-window-frame) {
+    top: 50%;
+    height: var(--char-window-safe-height);
+    max-height: var(--char-window-safe-height);
+    transform: translate(-50%, -50%);
+  }
+  #char-window > .char-window-frame {
+    --window-ornament-size: 20px;
+    --char-ornament: color-mix(in srgb, var(--gold-dim) 52%, var(--color-char-navy-deep));
+    --char-ornament-hi: color-mix(in srgb, var(--gold) 72%, var(--color-char-navy));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background-color: var(--panel-base);
+    background-image: var(--panel-l1-bg);
+    border: 2px solid var(--char-ornament);
+    border-radius: var(--radius-md);
+    color: var(--color-text-light);
+    box-shadow:
+      inset 0 0 0 1px var(--panel-edge),
+      inset 0 0 0 2px color-mix(in srgb, var(--char-ornament) 24%, transparent),
+      0 0 12px var(--color-primary-glow);
+  }
+  :root[data-fx-level="low"] #char-window > .char-window-frame {
+    box-shadow: inset 0 0 0 1px var(--panel-edge);
+  }
+  #char-window > .char-window-frame::before,
+  #char-window > .char-window-frame::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: var(--window-ornament-size);
+    height: var(--window-ornament-size);
+    pointer-events: none;
+    border-top: 1px solid var(--char-ornament);
+    border-color: var(--char-ornament);
+  }
+  #char-window > .char-window-frame::before {
+    left: 0;
+    border-left: 1px solid var(--char-ornament);
+    border-top-left-radius: var(--radius-md);
+  }
+  #char-window > .char-window-frame::after {
+    right: 0;
+    border-right: 1px solid var(--char-ornament);
+    border-top-right-radius: var(--radius-md);
+  }
+  /* A second ornament pair at the bottom corners, drawn as background layers
+     (no extra pseudo-elements: ::before/::after are already spent on the
+     shared top-corner rule above) inset to match the mockup's small corner
+     brackets. The panel gradient stays the LAST (bottom) layer so it keeps
+     painting the whole frame exactly as the shared rule's own
+     background-image does; only the four corner strokes are added on top.
+     Round 2 (item 7): the BOTTOM-RIGHT mark alone sits further from the
+     corner (20px/20px, not 10px/10px) than the bottom-left one, because only
+     that corner also hosts the resizable window's own diagonal grip
+     (layout.css `.window-resizable::after`, right:3px/bottom:3px/12x12px): at
+     the old shared 10px/10px inset the two ornaments' paint areas overlapped
+     by a few pixels. The bottom-left mark has no grip to clear, so it keeps
+     the tighter, closer-to-corner 10px original. */
+  #char-window > .char-window-frame {
+    background-image:
+      linear-gradient(var(--char-ornament), var(--char-ornament)),
+      linear-gradient(var(--char-ornament), var(--char-ornament)),
+      linear-gradient(var(--char-ornament), var(--char-ornament)),
+      linear-gradient(var(--char-ornament), var(--char-ornament)), var(--panel-l1-bg);
+    background-position:
+      bottom 10px left 10px,
+      bottom 10px left 10px,
+      bottom 20px right 20px,
+      bottom 20px right 20px,
+      left top;
+    background-size:
+      18px 2px,
+      2px 18px,
+      18px 2px,
+      2px 18px,
+      auto;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  }
+  :root[data-fx-level="low"] #char-window > .char-window-frame {
+    background-image: var(--panel-l1-bg);
+  }
+  #char-window .window-titlebar {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+  #char-window .window-title-col {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+  }
+  #char-window .window-title {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--window-title-color);
+    font-family: var(--font-display);
+    letter-spacing: 0.4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #char-window .window-accessory {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+  #char-window .window-close,
+  #char-window .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding: var(--spacing-sm);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  #char-window .window-body {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+  }
+  #char-window .tab-rail {
+    display: flex;
+    align-items: stretch;
+    gap: var(--spacing-xs);
+    flex: none;
+    padding: 0 var(--spacing-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  #char-window .tab-rail::-webkit-scrollbar {
+    height: 0;
+  }
+  #char-window .tab {
+    flex: 0 0 auto;
+    height: var(--control-h);
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font-family: var(--font-display);
+    white-space: nowrap;
+    cursor: var(--cursor-point);
+    transition:
+      color var(--dur-fast) var(--transition-ease),
+      border-color var(--dur-fast) var(--transition-ease);
+  }
+  #char-window .tab:hover {
+    color: var(--color-text-light);
+  }
+  .char-window-frame .item-cell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-quality-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+    cursor: var(--cursor-point);
+  }
+  .char-window-frame .item-cell[data-quality="poor"] {
+    border-color: var(--color-quality-poor);
+  }
+  .char-window-frame .item-cell[data-quality="common"] {
+    border-color: var(--color-quality-common);
+  }
+  .char-window-frame .item-cell[data-quality="uncommon"] {
+    border-color: var(--color-quality-uncommon);
+  }
+  .char-window-frame .item-cell[data-quality="rare"] {
+    border-color: var(--color-quality-rare);
+  }
+  .char-window-frame .item-cell[data-quality="epic"] {
+    border-color: var(--color-quality-epic);
+  }
+  .char-window-frame .item-cell[data-quality="legendary"] {
+    border-color: var(--color-quality-legendary);
+  }
+  .char-window-frame .item-cell-count {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    padding: 0 2px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-bg-dark) 78%, transparent);
+    color: var(--color-text-light);
+    font-size: var(--text-xs);
+  }
+  .char-window-frame .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    height: var(--control-h);
+    min-height: var(--control-h);
+    padding: 0 var(--spacing-md);
+    margin: 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: color-mix(in srgb, var(--color-text-light) 6%, transparent);
+    color: var(--color-text-light);
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    text-shadow: none;
+    box-shadow: none;
+    filter: none;
+    cursor: var(--cursor-point);
+  }
+  .char-window-frame .btn:hover:not(:disabled) {
+    border-color: var(--color-border-focus);
+    filter: none;
+  }
+  .char-window-frame .btn.is-primary {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-bg-dark);
+    font-family: var(--font-display);
+  }
+  .char-window-frame .bar {
+    position: relative;
+    height: 14px;
+    margin-top: 0;
+    overflow: hidden;
+    border: 1px solid var(--panel-edge);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-dark);
+  }
+  .char-window-frame .bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+  }
+  .char-window-frame .btn:focus-visible,
+  #char-window .icon-btn:focus-visible,
+  #char-window .window-close:focus-visible,
+  .char-window-frame .item-cell:focus-visible,
+  #char-window .tab:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #char-window .window-close,
+    #char-window .icon-btn,
+    #char-window .tab {
+      transition: none;
+    }
+  }
+  /* Equipment-column nameplate: align identity over the character side of the
+     59/41 composition instead of the mathematical window center. That creates
+     a deliberate right-side utility lane for token balances, purse, Share,
+     and Close without making the nameplate feel wedged between controls. */
+  #char-window .window-titlebar {
+    position: relative;
+    /* The full-screen redesign's ~72-80px header ask (the low end, so the
+       compact stat-panel column below keeps a little more of the body's
+       available height). */
+    min-height: clamp(72px, 6.8vh, 86px);
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding-inline: clamp(12px, 1.2cqw, 20px);
+    border-bottom: 1px solid var(--char-ornament);
+  }
+  #char-window .window-title-col {
+    position: absolute;
+    left: 30.5%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    align-items: center;
+    text-align: center;
+    width: clamp(280px, 35cqw, 560px);
+    max-width: 52%;
+    padding: 6px 44px 8px;
+    border: 1px solid var(--char-ornament);
+    border-radius: 0;
+    clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--gold) 16%, var(--panel-base)) 0%,
+      var(--panel-base) 100%
+    );
+  }
+  #char-window .window-title {
+    color: var(--color-text-light);
+    font-size: clamp(var(--text-lg), 1.8cqw, 30px);
+    line-height: 1.05;
+    text-transform: none;
+    font-variant: normal;
+  }
+  /* Mobile landscape header (mobile-landscape-brief.md): a small portrait
+     chip beside the name/level-class column, LEFT-aligned instead of the
+     desktop equipment-column nameplate banner. Rendered unconditionally by
+     char_window.ts (cheap, one small HTML string) and hidden here by
+     default; hud.mobile.css (a later @layer, always wins regardless of
+     specificity) turns it back on and re-lays-out `.window-title-col` as a
+     chip + stacked name/subtitle grid, body.mobile-touch only. */
+  #char-window .char-header-chip {
+    display: none;
+  }
+  #char-window .window-subtitle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: var(--gold);
+    font-size: clamp(var(--text-xs), 0.9cqw, var(--text-md));
+  }
+  #char-window .char-earned-title {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--gold-dim);
+    font-size: 0.82em;
+    font-style: italic;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #char-window .window-title-col::before,
+  #char-window .window-title-col::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    background: var(--char-ornament-hi);
+    transform: translateY(-50%) rotate(45deg);
+    pointer-events: none;
+  }
+  #char-window .window-title-col::before {
+    left: 10px;
+  }
+  #char-window .window-title-col::after {
+    right: 10px;
+  }
+  :root[data-fx-level="low"] #char-window .window-title-col::before,
+  :root[data-fx-level="low"] #char-window .window-title-col::after {
+    display: none;
+  }
+  /* Tab glyphs: char_window.ts appends the icon AFTER the label text (the
+     talents-pip contract), so it visually reorders first via flex `order`
+     rather than DOM position. The local shell establishes the base `.tab`
+     anatomy, then this scoped rule supplies the character treatment. */
+  #char-window .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    min-height: 44px;
+    padding-inline: clamp(12px, 1.4cqw, 24px);
+    font-size: clamp(var(--text-xs), 1cqw, var(--text-md));
+  }
+  #char-window .tab .tab-icon {
+    order: -1;
+    width: clamp(16px, 1.25cqw, 21px);
+    height: clamp(16px, 1.25cqw, 21px);
+  }
+  #char-window .tab[aria-selected="true"] {
+    position: relative;
+    color: var(--gold);
+  }
+  #char-window .tab[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--char-ornament-hi);
+    transform: translateX(-50%) rotate(45deg);
+    pointer-events: none;
+  }
+  :root[data-fx-level="low"] #char-window .tab[aria-selected="true"]::after {
+    display: none;
+  }
+  /* Full-width gold divider with a centered diamond ornament, between the
+     chrome (titlebar + tabs) and the scrollable body. */
+  #char-window .tab-rail {
+    position: relative;
+    border-bottom: 0;
+  }
+  #char-window .tab-rail::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--char-ornament-hi);
+    transform: translateX(-50%) rotate(45deg);
+    pointer-events: none;
+  }
+  :root[data-fx-level="low"] #char-window .tab-rail::after {
+    display: none;
+  }
+  /* Header economy rail: two account/token balances, the ordinary three-coin
+     purse, and one compact Share action. Token chips share a restrained dark
+     plate so they read as a system; distinct coin marks keep them scannable. */
+  #char-window .window-accessory {
+    gap: clamp(6px, 0.7cqw, 10px);
+    min-width: 0;
+  }
+  #char-window .char-header-balances,
+  #char-window .char-header-money {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: none;
+  }
+  #char-window .char-balance-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 4px 8px;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 62%, transparent);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-char-navy) 42%, var(--panel-base)) 0%,
+      color-mix(in srgb, var(--color-char-navy-deep) 58%, var(--panel-base)) 100%
+    );
+    color: var(--color-text-muted);
+    font-size: clamp(9px, 0.72cqw, 12px);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  #char-window .char-balance-chip b {
+    min-width: 0;
+    color: var(--color-text-light);
+    font-family: var(--title-font);
+    font-size: 1.08em;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+  /* Header-density tier follows the resizable character window itself, not
+     merely the viewport. Marks + values remain visible, while their names
+     stay accessible through the chip title and clipped label. This also
+     protects unusually large account balances from widening the utility
+     rail into the identity/tabs area. */
+  @container char-window (max-width: 860px) {
+    #char-window .char-balance-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    #char-window .char-balance-chip b {
+      max-width: 7ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  #char-window .char-balance-chip.is-unavailable {
+    opacity: 0.66;
+  }
+  #char-window .char-balance-chip.is-verified {
+    border-color: color-mix(in srgb, var(--color-text-success) 52%, var(--char-ornament));
+  }
+  #char-window .char-balance-icon {
+    position: relative;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+  }
+  #char-window .char-balance-woc .char-balance-icon {
+    border: 1px solid color-mix(in srgb, #d7b4ff 70%, transparent);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d9b9ff 0%, #8450bd 48%, #3b205e 100%);
+    box-shadow: 0 0 6px color-mix(in srgb, #a766ec 42%, transparent);
+  }
+  #char-window .char-balance-claudium .char-balance-icon {
+    width: 10px;
+    height: 10px;
+    margin-inline: 1px;
+    border: 1px solid color-mix(in srgb, #d9f7ff 70%, transparent);
+    background: linear-gradient(135deg, #d7f7ff 0%, #62a9c6 48%, #244766 100%);
+    box-shadow: 0 0 6px color-mix(in srgb, #7fd8ff 38%, transparent);
+    transform: rotate(45deg);
+  }
+  #char-window .char-header-share {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 5px 8px;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 72%, transparent);
+    background: color-mix(in srgb, var(--gold) 7%, transparent);
+    color: var(--gold-dim);
+    font-family: var(--title-font);
+    font-size: clamp(9px, 0.68cqw, 11px);
+    cursor: var(--cursor-point);
+  }
+  #char-window .char-header-share:hover,
+  #char-window .char-header-share:focus-visible {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+    color: var(--gold);
+  }
+  #char-window .char-header-share .pc-share-ico {
+    width: 14px;
+    height: 14px;
+  }
+  #char-window .window-accessory .coin-part {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    font-size: clamp(var(--text-sm), 1cqw, var(--text-md));
+  }
+  #char-window .window-accessory .coin {
+    order: -1;
+    width: clamp(12px, 1cqw, 16px);
+    height: clamp(12px, 1cqw, 16px);
+  }
+  #char-window .window-close {
+    width: clamp(44px, 3.7cqw, 58px);
+    height: clamp(44px, 3.7cqw, 58px);
+    border-color: var(--char-ornament);
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+  }
+  #char-window .window-close .ui-icon {
+    width: clamp(22px, 2.1cqw, 30px);
+    height: clamp(22px, 2.1cqw, 30px);
+  }
+  #char-window .window-close:hover {
+    border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 18%, transparent);
+  }
+  /* Ornate gold accent on the bags header's "+" open-full control, matching
+     the mockup (locked decision 8: same action, deps.openBags()). */
+  #char-window .char-bags-open {
+    border-color: var(--char-ornament);
+    color: var(--gold);
+  }
+  #char-window .char-bags-open:hover:not(:disabled) {
+    border-color: var(--gold);
+  }
+  /* Deep navy panel tint + a radial vignette (Round 2, item 4): the mockup's
+     signature background, replacing the generic neutral --panel-base read.
+     Painted on the scrollable body (a child of .char-window-frame, so it layers
+     over that element's own background-image without needing to merge into
+     the bracket-ornament layer list above) so it shows behind the whole
+     two-column grid; the panel cards get their own lighter mix so they read
+     as members of the same navy family rather than clashing charcoal. Not
+     dropped at the low fx tier: a plain gradient costs nothing extra to
+     composite (no blur/filter), so unlike a glow this is simply the sheet's
+     base look, not a flourish a cheaper tier needs to shed. */
+  #char-window .window-body {
+    background-image:
+      radial-gradient(
+        ellipse 120% 60% at 50% 0%,
+        color-mix(in srgb, var(--color-char-navy) 45%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 140% 130% at 50% 55%,
+        transparent 55%,
+        color-mix(in srgb, var(--color-char-navy-deep) 55%, transparent) 100%
+      );
+    background-repeat: no-repeat;
+  }
+  #char-window .char-panels,
+  #char-window .char-bags {
+    border-color: var(--char-ornament);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-char-navy) 20%, var(--panel-base)) 0%,
+      var(--panel-base) 100%
+    );
+  }
+  #char-window .char-panel {
+    background: transparent;
+  }
+  #char-window .char-panel + .char-panel {
+    border-top-color: var(--char-ornament);
+  }
+  body:not(.mobile-touch) #char-window .char-panel-header,
+  body:not(.mobile-touch) #char-window .char-bags-title {
+    color: var(--char-ornament-hi);
+    font-size: clamp(14px, 1.12cqw, 18px);
+  }
+  body:not(.mobile-touch) #char-window .char-bags-title .ui-icon {
+    width: clamp(20px, 1.5cqw, 24px);
+    height: clamp(20px, 1.5cqw, 24px);
+  }
+  body:not(.mobile-touch) #char-window .char-panel .stat-cell {
+    font-size: clamp(11px, 0.86cqw, 14px);
+    line-height: 1.2;
+  }
+  /* Each half of a stat panel shares an intrinsic label track. Values therefore
+     align immediately after the widest label in their own column instead of
+     drifting to the far edge and visually attaching to the next column. */
+  #char-window .char-stats .char-stat-col {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-auto-rows: minmax(0, auto);
+    align-content: space-evenly;
+    justify-content: start;
+    gap: 2px clamp(7px, 0.55cqw, 10px);
+  }
+  #char-window .char-stat-col .stat-cell {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    column-gap: inherit;
+  }
+  /* Desktop density pass: the sim exposes fewer rows than the visual target,
+     so distribute the real rows through deliberate section proportions rather
+     than leaving arbitrary dead bands. No fictional stats are introduced. */
+  body:not(.mobile-touch) #char-window .char-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(210px, 2fr);
+    grid-template-rows: repeat(5, auto);
+    align-content: stretch;
+    justify-content: stretch;
+    overflow: visible;
+  }
+  body:not(.mobile-touch) #char-window .char-panel {
+    display: flex;
+    min-height: 0;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    overflow: visible;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(4) {
+    grid-row: 4;
+    grid-column: 1;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(5) {
+    grid-row: 4;
+    grid-column: 2;
+    border-left: 1px solid var(--panel-edge);
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(6) {
+    grid-row: 5;
+  }
+  body:not(.mobile-touch) #char-window .char-panel-body {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible;
+  }
+  body:not(.mobile-touch) #char-window .char-panel-body .char-stats {
+    width: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    align-items: stretch;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-milestones-inline .char-progression {
+    margin-top: 6px;
+    padding-top: 5px;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-milestones-inline .cp-title {
+    margin-bottom: 2px;
+    font-size: var(--text-xs);
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary .char-progression {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary .cp-title {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(4) .char-panel-body {
+    justify-content: flex-start;
+  }
+  body:not(.mobile-touch) #char-window .char-progression-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px var(--spacing-sm);
+  }
+  body:not(.mobile-touch) #char-window .char-progression-metric {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    min-width: 0;
+    padding: 4px 8px;
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 58%, transparent);
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--char-ornament) 8%, transparent),
+      transparent
+    );
+    color: var(--color-text-muted);
+    font-size: clamp(10px, 0.76cqw, 12px);
+  }
+  body:not(.mobile-touch) #char-window .char-progression-metric b {
+    color: var(--color-text-light);
+    font-size: 1.08em;
+    font-weight: 500;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(4) .bar.cp-bar {
+    flex: 0 0 auto;
+    margin-top: 6px;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .char-panel-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-sm);
+    overflow: visible;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary {
+    min-width: 0;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary .cp-stats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1px;
+    font-size: clamp(10px, 0.74cqw, 12px);
+    line-height: 1.25;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary .cp-milestones {
+    margin-top: 2px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  body:not(.mobile-touch) #char-window .char-equipment-spec-summary .cp-none {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .cp-spec-row {
+    justify-content: flex-end;
+    margin-top: 0;
+  }
+  body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .cp-spec-name {
+    display: none;
+  }
+  @media (max-height: 800px) {
+    body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .char-panel-header {
+      padding-top: 4px;
+      padding-bottom: 2px;
+    }
+    body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .char-panel-body {
+      padding-top: 0;
+      padding-bottom: 4px;
+    }
+    body:not(.mobile-touch) #char-window .char-panel:nth-child(5) .cp-spec-row .btn {
+      height: 28px;
+      min-height: 28px;
+      padding: 0 12px;
+    }
+  }
+  #char-window .char-gathering-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(5px, 0.55cqw, 9px);
+    width: 100%;
+  }
+  #char-window .char-gathering-row {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: clamp(5px, 0.5cqw, 8px);
+    padding: clamp(4px, 0.4cqw, 7px);
+    border: 1px solid color-mix(in srgb, var(--char-ornament) 58%, transparent);
+    border-radius: 3px;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--char-ornament) 10%, transparent),
+      color-mix(in srgb, var(--panel-base) 86%, transparent)
+    );
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--char-ornament-hi) 5%, transparent);
+  }
+  #char-window .char-gathering-mark {
+    display: grid;
+    width: clamp(28px, 2.2cqw, 36px);
+    height: clamp(28px, 2.2cqw, 36px);
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--char-ornament-hi) 48%, transparent);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--char-ornament) 18%, transparent),
+      transparent 72%
+    );
+    color: var(--char-ornament-hi);
+  }
+  #char-window .char-gathering-mark .ui-icon {
+    width: 64%;
+    height: 64%;
+    filter: drop-shadow(0 1px 2px color-mix(in srgb, var(--panel-base) 78%, transparent));
+  }
+  #char-window .char-gathering-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    color: var(--color-text-muted);
+    font-size: clamp(9px, 0.72cqw, 12px);
+    line-height: 1.15;
+  }
+  #char-window .char-gathering-copy > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #char-window .char-gathering-copy b {
+    color: var(--color-text-light);
+    font-family: var(--title-font);
+    font-size: 1.2em;
+    font-weight: 500;
+  }
+  body.mobile-touch #char-window .char-equipment-milestones-inline,
+  body.mobile-touch #char-window .char-equipment-spec-summary {
+    display: none;
+  }
+  /* A desktop has exactly 16 honest backpack cells. Give Bags its own sizing
+     context so the inventory responds to the panel it actually occupies, not
+     the viewport or the full character window. The bounded height keeps the
+     two-row inventory intentional instead of leaving a giant empty lower half
+     on tall displays. */
+  body:not(.mobile-touch) #char-window .char-bags {
+    --char-bag-cell: clamp(44px, 10cqi, 92px);
+    --char-bag-gap: clamp(5px, 0.8cqi, 10px);
+    --char-owned-bag-cell: clamp(40px, 6.5cqi, 64px);
+    container: char-bags / inline-size;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    flex: 0 0 clamp(275px, 32vh, 360px);
+    min-height: 275px;
+  }
+  body:not(.mobile-touch) #char-window .char-bags-header {
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--char-ornament);
+  }
+  body:not(.mobile-touch) #char-window .char-bags-controls {
+    grid-template-columns: minmax(0, max-content) max-content;
+    justify-content: center;
+    gap: clamp(12px, 1.6cqw, 22px);
+  }
+  body:not(.mobile-touch) #char-window .char-bags-selector {
+    width: max-content;
+    max-width: 100%;
+    justify-self: end;
+  }
+  body:not(.mobile-touch) #char-window .char-bags-empty-toggle {
+    justify-self: start;
+  }
+  body:not(.mobile-touch) #char-window .char-bags-grid {
+    min-height: 0;
+    grid-template-columns: repeat(8, var(--char-bag-cell));
+    grid-auto-rows: var(--char-bag-cell);
+    gap: var(--char-bag-gap);
+    align-content: start;
+    justify-content: center;
+  }
+  @container char-bags (max-width: 620px) {
+    body:not(.mobile-touch) #char-window .char-bags-grid {
+      grid-template-columns: repeat(6, var(--char-bag-cell));
+    }
+  }
+  @container char-bags (max-width: 360px) {
+    body:not(.mobile-touch) #char-window .char-bags-grid {
+      grid-template-columns: repeat(4, var(--char-bag-cell));
+    }
+    body:not(.mobile-touch) #char-window .char-bags-controls {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+    }
+  }
+  body:not(.mobile-touch) #char-window .tab-rail {
+    position: absolute;
+    z-index: 7;
+    top: 0;
+    left: clamp(10px, 1cqw, 18px);
+    height: clamp(72px, 6.8vh, 86px);
+    width: min(34%, 480px);
+    align-items: center;
+    padding: 0;
+  }
+  /* The desktop selection reads as a restrained underline. Keyboard focus
+     uses a thicker version of the same line rather than boxing the whole tab,
+     preserving a clear focus indicator without the heavy yellow rectangle. */
+  body:not(.mobile-touch) #char-window .tab[aria-selected="true"] {
+    border: 0;
+    border-bottom: 2px solid var(--gold);
+    box-shadow: none;
+  }
+  body:not(.mobile-touch) #char-window .tab[aria-selected="true"]::after {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window .tab:focus-visible {
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    border-bottom-color: var(--focus-ring-color);
+    box-shadow: inset 0 -4px 0 var(--focus-ring-color) !important;
+  }
+  body:not(.mobile-touch) #char-window .tab-rail::after {
+    bottom: -4px;
+  }
+
+  /* ---------- char window compact landscape ---------- */
+  /* A fine-pointer desktop can still be resized into a phone-like landscape
+     box. CharWindow stamps this LOCAL class from the root's real client box;
+     body.mobile-touch remains an input-semantic signal for the rest of the HUD.
+     The result reuses the mobile landscape's stage | bags | stats grammar while
+     retaining mouse-sized controls and a single, non-overlapping composition. */
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-titlebar {
+    min-height: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-title-col {
+    position: relative;
+    inset: auto;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    width: clamp(164px, 18cqw, 204px);
+    min-width: 0;
+    max-width: 204px;
+    flex: 0 1 204px;
+    margin-right: auto;
+    align-items: center;
+    gap: 0 6px;
+    padding: 0 4px;
+    border: 0;
+    clip-path: none;
+    background: none;
+    text-align: left;
+    transform: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-title-col::before,
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-title-col::after {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-header-chip {
+    display: inline-flex;
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-header-chip .portrait-chip {
+    width: 36px;
+    height: 36px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-title,
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-subtitle {
+    grid-column: 2;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-title {
+    grid-row: 1;
+    font-size: var(--text-md);
+    line-height: 1.1;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-subtitle {
+    grid-row: 2;
+    font-size: var(--text-xs);
+    line-height: 1.1;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-earned-title {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-accessory {
+    gap: 3px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-header-balances {
+    gap: 3px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-balance-chip {
+    min-height: 26px;
+    padding: 2px 5px;
+    font-size: 8px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-balance-icon {
+    width: 9px;
+    height: 9px;
+    flex-basis: 9px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-header-share {
+    width: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 4px;
+  }
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .char-header-share
+    .char-header-share-label {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-accessory .coin-part {
+    padding-inline: 2px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-accessory .coin {
+    width: clamp(9px, 0.9cqw, 12px);
+    height: clamp(9px, 0.9cqw, 12px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-close {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .tab-rail {
+    position: absolute;
+    z-index: 8;
+    top: 4px;
+    left: clamp(220px, 22cqw, 278px);
+    width: 84px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    align-items: stretch;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .tab-rail .tab {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    place-items: center;
+    gap: 0;
+    padding: 0;
+    font-size: 0;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .tab-rail .tab-icon {
+    display: block;
+    width: clamp(15px, 1.4cqw, 18px);
+    height: clamp(15px, 1.4cqw, 18px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .tab-rail::after,
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .tab-rail
+    .tab[aria-selected="true"]::after {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .window-body {
+    min-height: 0;
+    overflow: hidden;
+    padding: 6px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equip-grid {
+    grid-template-columns: minmax(0, 31fr) minmax(0, 31fr) minmax(0, 38fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    height: 100%;
+    min-height: 0;
+    gap: 6px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equip-col-left {
+    display: contents;
+  }
+
+  /* Paperdoll: size containment lets every gear frame respond to the actual
+     stage width AND height. Desktop compact mode may dip below the touch floor,
+     but never below 28px; real touch layouts retain their separate 40px floor. */
+  body:not(.mobile-touch) #char-window.is-compact-landscape .paperdoll {
+    grid-column: 1;
+    container: char-compact-paperdoll / size;
+    display: grid;
+    grid-template-columns: minmax(32px, 12%) minmax(0, 1fr) minmax(32px, 12%);
+    grid-template-rows: minmax(34px, 12%) minmax(0, 1fr) auto;
+    grid-template-areas:
+      "left helmet right"
+      "left model right"
+      "skins skins skins";
+    width: auto;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: none;
+    align-items: stretch;
+    gap: 0 5px;
+    padding: 0;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equip-rail {
+    display: contents;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .equip-top-center {
+    position: static;
+    grid-area: helmet;
+    display: grid;
+    min-width: 0;
+    place-items: center;
+    transform: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .equip-top-center .equip-slot {
+    width: auto;
+    flex-direction: column;
+    gap: 0;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-left {
+    grid-area: left;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-right {
+    grid-area: right;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-left,
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-right {
+    display: grid;
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    min-width: 0;
+    min-height: 0;
+    place-items: center;
+    gap: 0;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-left .equip-slot,
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-right .equip-slot {
+    position: static;
+    inset: auto;
+    display: flex;
+    width: auto;
+    flex: none;
+    justify-content: center;
+    transform: none;
+  }
+  /* Beat the higher-specificity desktop arch swap when the sheet collapses to
+     the landscape composition. In compact mode both rails are honest 5-slot
+     grids, so neither crossed slot should retain its orbital translation. */
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-left #equip-slot-shoulder,
+  body:not(.mobile-touch) #char-window.is-compact-landscape #equip-col-right #equip-slot-mainhand {
+    inset: auto;
+    transform: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .paperdoll .slot-label {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .paperdoll .equip-item-cell {
+    width: clamp(28px, min(12cqi, 12cqb), 40px);
+    height: clamp(28px, min(12cqi, 12cqb), 40px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-model-panel {
+    position: relative;
+    inset: auto;
+    grid-area: model;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    transform: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-model-preview {
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 130px 130px var(--radius-sm) var(--radius-sm);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-skin-row {
+    position: static;
+    grid-area: skins;
+    width: 100%;
+    max-width: 100%;
+    align-self: end;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    transform: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-skin-row .skin-swatch {
+    width: clamp(28px, min(10cqi, 11cqb), 36px);
+    height: clamp(28px, min(10cqi, 11cqb), 36px);
+    min-width: 28px;
+    min-height: 28px;
+    flex: 0 0 auto;
+  }
+
+  /* Inventory is the primary compact-landscape work area: one concise header,
+     owned-bag shelf, then a centered 6/4-column grid whose art scales with the
+     panel. Only this pane scrolls if an exceptionally short manual resize can no
+     longer display all honest cells. */
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags {
+    --char-bag-cell: clamp(36px, 14cqi, 56px);
+    --char-bag-gap: clamp(4px, 1.2cqi, 7px);
+    --char-owned-bag-cell: clamp(34px, 12cqi, 44px);
+    grid-column: 2;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    width: auto;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: none;
+    padding: 6px;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-header {
+    min-height: 34px;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-title {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-title .ui-icon {
+    width: clamp(14px, 1.4cqw, 18px);
+    height: clamp(14px, 1.4cqw, 18px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-counter {
+    margin-left: auto;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-empty-toggle.is-compact {
+    min-width: 0;
+    min-height: 30px;
+    gap: 4px;
+    padding: 0 5px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 9px;
+  }
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .char-bags-empty-toggle.is-compact
+    .char-bags-empty-mark {
+    width: 16px;
+    height: 16px;
+    border-radius: 0;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-controls {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-selector {
+    width: max-content;
+    max-width: 100%;
+    justify-self: center;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab {
+    grid-template-columns: var(--char-owned-bag-cell);
+    min-width: calc(var(--char-owned-bag-cell) + 4px);
+    min-height: calc(var(--char-owned-bag-cell) + 4px);
+    gap: 0;
+    padding: 2px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab-wrap {
+    grid-template-columns: calc(var(--char-owned-bag-cell) + 4px) 32px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab-wrap:first-child {
+    grid-template-columns: calc(var(--char-owned-bag-cell) + 4px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab-icon {
+    width: var(--char-owned-bag-cell);
+    height: var(--char-owned-bag-cell);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab-copy {
+    display: none;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-tab-remove {
+    min-width: 32px;
+    min-height: 40px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-grid {
+    min-height: 0;
+    align-content: start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: var(--gold-dim) transparent;
+    scrollbar-width: thin;
+  }
+  @container char-bags (max-width: 360px) {
+    body:not(.mobile-touch) #char-window.is-compact-landscape .char-bags-grid {
+      /* Four columns should use the available inventory width instead of
+         inheriting the intentionally denser six-column cell scale. */
+      --char-bag-cell: clamp(42px, 20cqi, 56px);
+    }
+  }
+
+  /* Compact stats use explicit proportional rows and reduced chrome instead of
+     the desktop panel minimums that caused the screenshot's overlap. Nothing is
+     invented: low-priority Overview echoes are hidden just as on mobile. */
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equip-col-right {
+    grid-column: 3;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(140px, 2fr);
+    grid-template-rows:
+      minmax(0, 1.35fr) minmax(0, 1.1fr) minmax(0, 0.75fr) minmax(0, 0.8fr)
+      minmax(0, 0.65fr);
+    height: 100%;
+    min-height: 0;
+    align-content: stretch;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel {
+    min-height: 0;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel-header {
+    gap: 5px;
+    padding: 3px 7px 1px;
+    font-size: clamp(10px, 0.86cqw, 12px);
+    line-height: 1;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel-header .ui-icon {
+    width: clamp(13px, 1.25cqw, 16px);
+    height: clamp(13px, 1.25cqw, 16px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel-body {
+    min-height: 0;
+    justify-content: center;
+    padding: 2px 7px 4px;
+    overflow: hidden;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-stats {
+    min-height: 0;
+    gap: 0 8px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-stats .char-stat-col {
+    grid-template-columns: max-content max-content;
+    gap: 0 6px;
+    align-content: space-evenly;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel .stat-cell {
+    min-height: 0;
+    padding-block: 1px;
+    font-size: clamp(9px, 0.82cqw, 10px);
+    line-height: 1.05;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equipment-milestones-inline,
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-equipment-spec-summary {
+    display: none;
+  }
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .char-panel:nth-child(4)
+    .char-panel-body,
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .char-panel:nth-child(5)
+    .char-panel-body {
+    justify-content: center;
+    padding-block: 2px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-progression-metrics {
+    gap: 2px 5px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-progression-metric {
+    gap: 4px;
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-panel-body .bar.cp-bar {
+    height: 8px;
+    margin-top: 2px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .cp-bar-label {
+    font-size: 8px;
+  }
+  body:not(.mobile-touch)
+    #char-window.is-compact-landscape
+    .char-panel:nth-child(5)
+    .cp-spec-row
+    .btn {
+    height: 26px;
+    min-height: 26px;
+    padding: 0 10px;
+    font-size: 9px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-gathering-stats {
+    gap: 4px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-gathering-row {
+    gap: 4px;
+    padding: 2px 4px;
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-gathering-mark {
+    width: clamp(20px, min(2.2cqw, 6cqh), 24px);
+    height: clamp(20px, min(2.2cqw, 6cqh), 24px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .char-gathering-copy {
+    font-size: 8px;
   }
 
   /* ---------- spellbook ---------- */
@@ -3673,6 +6235,22 @@
     }
   }
 
+  /* Character overview identity strip: keep this character-only part of the
+     feature without restoring the shared frame architecture removed on the
+     release branch. */
+  #char-window .char-overview > .char-identity {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  #char-window .char-overview > .char-identity > .char-title-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #char-window .char-overview > .char-identity > .portrait-chip {
+    flex: 0 0 auto;
+  }
   /* ---------- modals and dropdown ---------- */
   /* in-app input modal field (Save / Import / Export, replaces window.prompt) */
   .cd-field {
@@ -4115,16 +6693,6 @@
   }
 
   /* player card: char-window entry button + share modal */
-  .pc-share-row {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-  }
-  .pc-share-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-  }
   .pc-share-ico {
     flex: none;
   }
@@ -8851,22 +11419,31 @@
      homed here beside the other window bodies under @layer components. */
   /* Per-slot Unequip affordance in the character window (paperdoll): a corner ×
      glyph revealed on hover/focus (always shown on touch). Also right-click the
-     slot, or drag the piece onto the bags window. */
-  .equip-slot .equip-unequip-btn {
-    margin-inline-start: auto;
-    flex: none;
+     slot, or drag the piece onto the bags window. Overlaid on the square
+     .equip-item-cell (position: relative, char-equipment-tab section below)
+     so its corner placement is identical whether the outside label sits to
+     its left or its right; a flex-sibling margin-auto trick (the pre-Phase-2
+     shape) would drift the button to the far edge of the OUTSIDE label
+     instead of hugging the icon on the label-outward side. */
+  .equip-item-cell .equip-unequip-btn {
+    position: absolute;
+    z-index: 3;
+    top: -17px;
+    right: -17px;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid rgba(202, 164, 114, 0.42);
-    background: rgba(60, 38, 28, 0.42);
+    border: 0;
+    background: transparent;
+    isolation: isolate;
     color: var(--color-text-secondary, #d6c1a0);
-    font-size: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
     line-height: 1;
-    font-weight: 600;
+    font-weight: 700;
     cursor: var(--cursor-point);
     opacity: 0;
     transition:
@@ -8875,19 +11452,61 @@
       color 0.12s,
       opacity 0.12s;
   }
+  /* Empty slots never own an unequip action. The renderer already omits the
+     button for a null item; this defensive state guard also prevents any
+     stale/reused control from painting over an empty-slot glyph. */
+  #char-window .equip-item-cell:not([data-quality]) > .equip-unequip-btn {
+    display: none;
+  }
+  .equip-item-cell .equip-unequip-btn::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 12px;
+    border: 1px solid color-mix(in srgb, var(--color-char-stone-light) 42%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-char-leather-dark) 72%, transparent);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      background-color 0.12s;
+  }
+  body:not(.mobile-touch) #char-window .equip-slot .equip-unequip-btn {
+    top: -9px;
+    right: -9px;
+    width: 24px;
+    height: 24px;
+    opacity: 0.72;
+  }
+  body:not(.mobile-touch) #char-window .equip-slot .equip-unequip-btn::before {
+    inset: 4px;
+  }
+  body:not(.mobile-touch) #char-window .equip-slot .equip-unequip-btn:hover,
+  body:not(.mobile-touch) #char-window .equip-slot .equip-unequip-btn:focus-visible {
+    outline-offset: -4px;
+  }
   .equip-slot:hover .equip-unequip-btn,
   .equip-slot:focus-within .equip-unequip-btn,
   body.mobile-touch .equip-slot .equip-unequip-btn {
     opacity: 1;
   }
-  .equip-slot .equip-unequip-btn:hover,
-  .equip-slot .equip-unequip-btn:focus-visible {
-    border-color: rgba(255, 218, 160, 0.8);
+  .equip-item-cell .equip-unequip-btn:hover,
+  .equip-item-cell .equip-unequip-btn:focus-visible {
     color: #fff;
-    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: -12px;
+  }
+  .equip-item-cell .equip-unequip-btn:hover::before,
+  .equip-item-cell .equip-unequip-btn:focus-visible::before {
+    border-color: color-mix(in srgb, var(--gold) 82%, transparent);
+    background: color-mix(in srgb, var(--color-char-leather-dark) 88%, transparent);
+    box-shadow: 0 0 7px color-mix(in srgb, var(--char-ornament-hi) 40%, transparent);
   }
   @media (prefers-reduced-motion: reduce) {
-    .equip-slot .equip-unequip-btn {
+    .equip-item-cell .equip-unequip-btn {
+      transition: none;
+    }
+    .equip-item-cell .equip-unequip-btn::before {
       transition: none;
     }
   }

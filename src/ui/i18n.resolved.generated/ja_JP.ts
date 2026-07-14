@@ -565,7 +565,35 @@ export const ja_JP: EnTranslations = {
       "durationUnitDays": "日"
     },
     "character": {
-      "modelPreview": "キャラクターモデルプレビュー"
+      "modelPreview": "キャラクターモデルプレビュー",
+      "tabs": {
+        "equipment": "装備",
+        "overview": "概要"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "クラウディウム"
+      },
+      "bagSocket": "バッグスロット: {name}",
+      "sections": {
+        "attributes": "属性",
+        "combat": "戦闘",
+        "defense": "防御"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "選択",
+        "change": "変更"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "バッグウィンドウを開く",
+        "container": "バッグ {n}",
+        "emptySpaces": "空きスペース",
+        "emptySummary": "+{count} 空き"
+      }
     },
     "skipLinks": {
       "mainHud": "メインHUDへスキップ",

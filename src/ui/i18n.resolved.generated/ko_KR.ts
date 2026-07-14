@@ -565,7 +565,35 @@ export const ko_KR: EnTranslations = {
       "durationUnitDays": "일"
     },
     "character": {
-      "modelPreview": "캐릭터 모델 미리보기"
+      "modelPreview": "캐릭터 모델 미리보기",
+      "tabs": {
+        "equipment": "장비",
+        "overview": "개요"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "클라우디움"
+      },
+      "bagSocket": "가방 슬롯: {name}",
+      "sections": {
+        "attributes": "능력치",
+        "combat": "전투",
+        "defense": "방어"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "선택",
+        "change": "변경"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "가방 창 열기",
+        "container": "가방 {n}",
+        "emptySpaces": "빈 공간",
+        "emptySummary": "+{count}개 빈 공간"
+      }
     },
     "skipLinks": {
       "mainHud": "메인 HUD로 건너뛰기",

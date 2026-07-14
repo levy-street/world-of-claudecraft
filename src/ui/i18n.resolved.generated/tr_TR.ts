@@ -565,7 +565,35 @@ export const tr_TR: EnTranslations = {
       "durationUnitDays": "g"
     },
     "character": {
-      "modelPreview": "Karakter Modeli Önizlemesi"
+      "modelPreview": "Karakter Modeli Önizlemesi",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Boş alanlar",
+        "emptySummary": "+{count} boş"
+      }
     },
     "skipLinks": {
       "mainHud": "Ana Arayüze Atla",

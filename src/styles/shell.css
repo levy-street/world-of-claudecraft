@@ -3336,6 +3336,50 @@
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #69ccf0);
   }
+  /* Character window ornate redesign (Round 2, docs/char-equipment/): the
+     "1 2 3 4" skin/set row (#char-skin-row) restyled as square, gold-edged
+     numbered buttons, matching the mockup's ornate look rather than the
+     rounded translucent swatch above. This lives HERE, not in components.css,
+     because @layer shell (this file) is declared AFTER @layer components in
+     the barrel's cascade order (src/styles/CLAUDE.md): a layer declared later
+     wins over ANY rule in an earlier layer regardless of selector specificity,
+     so no components.css override could ever beat the base `.skin-swatch`
+     rule above. Scoping every selector under #char-window keeps every OTHER
+     `.skin-swatch` consumer (char-select, char-create, the cosmetic
+     skin-event overlay) at its exact current look; within this shared layer,
+     the extra #char-window ID gives these rules the higher specificity they
+     need to win over the base rules above regardless of source order. */
+  /* Visual-restraint pass (docs/char-equipment/, "loadout row too bright"):
+     the default frame is now a dark, muted border (was a bright gold-dim
+     border on every swatch); only hover/focus/the active selection below
+     earn the gold treatment, matching the "only the ACTIVE one gets gold
+     emphasis" ask. */
+  #char-window .skin-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--color-border-default);
+    background: var(--color-bg-dark);
+    color: var(--color-text-muted);
+  }
+  body:not(.mobile-touch) #char-window .skin-swatch {
+    width: clamp(32px, min(5.2cqi, 11cqb), 52px);
+    height: clamp(32px, min(5.2cqi, 11cqb), 52px);
+  }
+  body:not(.mobile-touch) #char-window.is-compact-landscape .skin-swatch {
+    width: clamp(28px, min(10cqi, 11cqb), 36px);
+    height: clamp(28px, min(10cqi, 11cqb), 36px);
+  }
+  #char-window .skin-swatch:hover,
+  #char-window .skin-swatch:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  #char-window .skin-swatch.sel {
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 9px var(--color-primary-glow-heavy);
+  }
   .skin-unequip-btn {
     min-height: 34px;
     min-width: 40px;

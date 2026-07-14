@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
-import type { PlayerClass } from '../../sim/types';
+import type { EquipSlot, PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
+import { buildPedestal, disposePedestal } from './pedestal';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -36,6 +37,11 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  // Procedural stone dais (pedestal.ts), default off; only Hud.mountCharPreview's
+  // char-window mount enables it (setPedestal). Built lazily on first enable so
+  // every other consumer (skin-event overlay, char-select/create) pays nothing.
+  private pedestal: THREE.Group | null = null;
+  private pedestalVisible = false;
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
   private appearanceSig: string | null = null;
@@ -138,6 +144,36 @@ export class CharacterPreview {
     }
     const v = previewAppearanceVisual(a);
     this.setVisualKey(v.visualKey, v.weaponItemId, v.weaponOverride);
+    if (a.equippedItems) this.setEquipment(a.equippedItems);
+  }
+
+  /** Push the full equipped-item map to the current visual (equipment-visual
+   *  base seam): stores it and, today, delegates only the mainhand weapon
+   *  (CharacterVisual.setEquipment). No-op if no visual is mounted yet. */
+  setEquipment(equipped: Partial<Record<EquipSlot, string>>): void {
+    if (this.destroyed) return;
+    this.currentVisual?.setEquipment(equipped);
+  }
+
+  /** Toggle the procedural stone dais under the model's feet (buildPedestal(),
+   *  pedestal.ts). Default off; lazily built on first enable. Never touches
+   *  the camera, so enabling it does not change how large the character
+   *  renders; it only adds/removes a Group from the scene below the model's
+   *  feet (the model may extend slightly out of frame at the bottom, same as
+   *  the design mockup). Only Hud.mountCharPreview's char-window mount calls
+   *  this with `true`; every other consumer stays default-off. */
+  setPedestal(visible: boolean): void {
+    if (this.destroyed || visible === this.pedestalVisible) return;
+    this.pedestalVisible = visible;
+    if (visible) {
+      if (!this.pedestal) {
+        this.pedestal = buildPedestal();
+        this.pedestal.position.set(LIVE_PREVIEW_X, 0, 0);
+      }
+      this.scene.add(this.pedestal);
+    } else if (this.pedestal) {
+      this.scene.remove(this.pedestal);
+    }
   }
 
   /** Set the active model by raw visual key (e.g. `player_mech` for the cosmetic
@@ -325,6 +361,13 @@ export class CharacterPreview {
     const prevPos = this.camera.position.clone();
     const prevRotY = this.characterGroup.rotation.y;
 
+    // The char-window mount is the only consumer that enables the pedestal, but
+    // it also owns the single preview instance openPlayerCard() borrows for this
+    // capture: pull it out of frame for the headshot, then put it back with the
+    // rest of the restored state below (pedestalVisible itself never changes).
+    const hadPedestal = this.pedestalVisible && !!this.pedestal;
+    if (hadPedestal && this.pedestal) this.scene.remove(this.pedestal);
+
     // Optionally lock a deliberate pose for the shot (e.g. a hero/cast/cheer
     // stance) instead of whatever idle frame is up. Restored via clearPose below.
     const posed =
@@ -350,6 +393,7 @@ export class CharacterPreview {
 
     // Restore the live preview exactly as it was (camera + idle animation).
     if (posed) this.currentVisual?.clearPose();
+    if (hadPedestal && this.pedestal) this.scene.add(this.pedestal);
     this.renderer.setPixelRatio(prevPixelRatio);
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
@@ -379,6 +423,11 @@ export class CharacterPreview {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();
       this.currentVisual = null;
+    }
+    if (this.pedestal) {
+      this.scene.remove(this.pedestal);
+      disposePedestal(this.pedestal);
+      this.pedestal = null;
     }
 
     this.unregisterContext?.();
