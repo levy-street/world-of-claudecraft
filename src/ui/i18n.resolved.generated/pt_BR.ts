@@ -6160,6 +6160,18 @@ export const pt_BR: EnTranslations = {
         "name": "Pele de Carvalho",
         "description": "Sua pele endurece como casca, aumentando a armadura em 150 por 15 s."
       },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
+      },
       "starfire": {
         "name": "Queda Celeste",
         "description": "Invoca um raio de fogo estelar, causando {damage} de dano Arcano."

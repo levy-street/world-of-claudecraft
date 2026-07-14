@@ -2482,6 +2482,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
+  'entities.abilities.ironhold.name': '鉄壁',
+  'entities.abilities.ironhold.description':
+    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。',
+  'entities.abilities.sacred_bulwark.name': '聖なる防壁',
+  'entities.abilities.sacred_bulwark.description':
+    '信仰の加護で1分間自身を守ります。致命的な一撃を受けても死なず、体力が最大値の35%まで回復します。',
+  'entities.abilities.primal_reflexes.name': '原始の反射',
+  'entities.abilities.primal_reflexes.description':
+    '本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。',
   'entities.abilities.starfire.name': '天墜',
   'entities.abilities.starfire.description':
     '星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。',

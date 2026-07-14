@@ -2505,6 +2505,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
+  'entities.abilities.ironhold.name': 'Железная стена',
+  'entities.abilities.ironhold.description':
+    'Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек.',
+  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
+  'entities.abilities.sacred_bulwark.description':
+    'Защищает вас верой на 1 мин. Смертельный удар не убьет вас, а восстановит здоровье до 35% от максимума.',
+  'entities.abilities.primal_reflexes.name': 'Первобытные рефлексы',
+  'entities.abilities.primal_reflexes.description':
+    'Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек.',
   'entities.abilities.starfire.name': 'Падение небес',
   'entities.abilities.starfire.description':
     'Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.',

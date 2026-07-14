@@ -119,6 +119,14 @@ export function dealDamage(
     amount = Math.round(amount * 0.9);
   }
 
+  // Ironhold (Shield Wall): a big defensive cooldown, fraction less damage from any
+  // source, any school, DoT ticks included. Non-stacking: the strongest ward wins.
+  if (source && source.id !== target.id && amount > 0) {
+    let ward = 0;
+    for (const a of target.auras) if (a.kind === 'shield_wall') ward = Math.max(ward, a.value);
+    if (ward > 0) amount = Math.round(amount * (1 - ward));
+  }
+
   // Expose: a cracked-guard debuff amplifies the physical damage the victim
   // takes (from any attacker) until it expires. Armor is already applied at the
   // swing site, so this rides on top of the post-mitigation amount.
@@ -400,6 +408,34 @@ export function dealDamage(
         kind,
         attackAnimationStarted,
       );
+      return;
+    }
+  }
+
+  // Sacred Bulwark (Guardian Ward): a divine cheat-death. If this blow would drop a
+  // warded player, the Light denies it: the hit lands (recorded) but instead of dying
+  // they are restored to 35% of max health, and the ward is spent.
+  if (amount > 0 && target.kind === 'player' && target.hp - amount <= 0) {
+    const wardIdx = target.auras.findIndex((a) => a.kind === 'guardian_ward');
+    if (wardIdx >= 0) {
+      const ward = target.auras[wardIdx];
+      target.auras.splice(wardIdx, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: ward.name, gained: false });
+      const restored = Math.round(target.maxHp * 0.35);
+      target.hp = restored;
+      ctx.emit({
+        type: 'damage',
+        sourceId: source?.id ?? -1,
+        targetId: target.id,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        ...attackAnimation,
+      });
+      ctx.emit({ type: 'heal', targetId: target.id, amount: restored });
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       return;
     }
   }

@@ -2461,6 +2461,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
+  'entities.abilities.ironhold.name': '철벽',
+  'entities.abilities.ironhold.description':
+    '굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다.',
+  'entities.abilities.sacred_bulwark.name': '신성한 방벽',
+  'entities.abilities.sacred_bulwark.description':
+    '1분 동안 신앙으로 자신을 보호합니다. 목숨을 앗아갈 일격을 무효화하고 생명력을 최대치의 35%까지 회복시킵니다.',
+  'entities.abilities.primal_reflexes.name': '원시의 반사',
+  'entities.abilities.primal_reflexes.description':
+    '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
     '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',

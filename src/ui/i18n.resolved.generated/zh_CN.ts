@@ -6160,6 +6160,18 @@ export const zh_CN: EnTranslations = {
         "name": "橡树皮",
         "description": "你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。"
       },
+      "ironhold": {
+        "name": "铁壁",
+        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神圣壁垒",
+        "description": "以信仰守护自身，持续 1 分钟。下一次致命打击将被抵消，转而将你恢复至 35% 生命值。"
+      },
+      "primal_reflexes": {
+        "name": "野性反射",
+        "description": "你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。"
+      },
       "starfire": {
         "name": "天陨",
         "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。"

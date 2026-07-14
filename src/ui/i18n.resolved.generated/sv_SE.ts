@@ -6160,6 +6160,18 @@ export const sv_SE: EnTranslations = {
         "name": "Ekhud",
         "description": "Din hud hårdnar som bark och ökar rustning med 150 i 15 sek."
       },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
+      },
       "starfire": {
         "name": "Himlafall",
         "description": "Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada."

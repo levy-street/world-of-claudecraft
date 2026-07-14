@@ -2370,6 +2370,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。',
   'entities.abilities.barkskin.name': '橡樹皮術',
   'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。',
+  'entities.abilities.ironhold.name': '鐵壁',
+  'entities.abilities.ironhold.description':
+    '以堅固的防禦自守，使受到的所有傷害降低 40%，持續 8 秒。',
+  'entities.abilities.sacred_bulwark.name': '神聖壁壘',
+  'entities.abilities.sacred_bulwark.description':
+    '以信仰守護自身，持續 1 分鐘。下一次致命打擊將被抵消，轉而將你恢復至 35% 生命值。',
+  'entities.abilities.primal_reflexes.name': '野性反射',
+  'entities.abilities.primal_reflexes.description':
+    '你的本能變得敏銳，使閃避機率提高 50%，持續 6 秒。',
   'entities.abilities.starfire.name': '隕天術',
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 點秘法傷害。',
   'entities.abilities.travel_form.name': '迅捷形態',

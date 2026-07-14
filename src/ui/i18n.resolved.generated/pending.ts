@@ -10,6 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -26,6 +32,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "es_ES": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -42,6 +54,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "fr_FR": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -58,6 +76,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "fr_CA": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -75,6 +99,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -91,6 +121,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "de_DE": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -111,6 +147,12 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -128,6 +170,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -144,6 +192,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "nl_NL": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -160,6 +214,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "pl_PL": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -176,6 +236,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "id_ID": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -192,6 +258,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "tr_TR": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -208,6 +280,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "sv_SE": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -224,6 +302,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "vi_VN": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -240,6 +324,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "da_DK": [
+    "entities.abilities.ironhold.description",
+    "entities.abilities.ironhold.name",
+    "entities.abilities.primal_reflexes.description",
+    "entities.abilities.primal_reflexes.name",
+    "entities.abilities.sacred_bulwark.description",
+    "entities.abilities.sacred_bulwark.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",

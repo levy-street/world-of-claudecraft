@@ -213,6 +213,13 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
+  // Warrior Ironhold: a big, short, all-school damage-taken reduction (value =
+  // fraction less, e.g. 0.4 = 40% less), applied in damage.ts.
+  | 'shield_wall'
+  // Paladin Sacred Bulwark: a divine cheat-death ward. While it holds, a lethal
+  // blow is denied in damage.ts (the wearer survives, restored to 35% max health)
+  // and the ward is consumed.
+  | 'guardian_ward'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.

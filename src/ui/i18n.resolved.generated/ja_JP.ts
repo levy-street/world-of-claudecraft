@@ -6160,6 +6160,18 @@ export const ja_JP: EnTranslations = {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
       },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "信仰の加護で1分間自身を守ります。致命的な一撃を受けても死なず、体力が最大値の35%まで回復します。"
+      },
+      "primal_reflexes": {
+        "name": "原始の反射",
+        "description": "本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。"
+      },
       "starfire": {
         "name": "天墜",
         "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。"

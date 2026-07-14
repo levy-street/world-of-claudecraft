@@ -6160,6 +6160,18 @@ export const zh_TW: EnTranslations = {
         "name": "橡樹皮術",
         "description": "你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。"
       },
+      "ironhold": {
+        "name": "鐵壁",
+        "description": "以堅固的防禦自守，使受到的所有傷害降低 40%，持續 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神聖壁壘",
+        "description": "以信仰守護自身，持續 1 分鐘。下一次致命打擊將被抵消，轉而將你恢復至 35% 生命值。"
+      },
+      "primal_reflexes": {
+        "name": "野性反射",
+        "description": "你的本能變得敏銳，使閃避機率提高 50%，持續 6 秒。"
+      },
       "starfire": {
         "name": "隕天術",
         "description": "召下一道星辰之火，造成 {damage} 點秘法傷害。"

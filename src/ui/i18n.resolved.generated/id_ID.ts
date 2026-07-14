@@ -6160,6 +6160,18 @@ export const id_ID: EnTranslations = {
         "name": "Kulit Ek",
         "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik."
       },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
+      },
       "starfire": {
         "name": "Skyfall",
         "description": "Memanggil turun panah api bintang, menyebabkan {damage} kerusakan Arkana."
