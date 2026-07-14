@@ -50,6 +50,7 @@ const steps = [
   ],
   ['malware scan', 'npm', ['run', 'security:gate']],
   ['biome (changed files)', 'npm', ['run', 'ci:changed']],
+  ['sfx check', 'npm', ['run', 'sfx:check']],
   ['vitest (full suite)', 'npm', ['test', '--', `--maxWorkers=${workers}`]],
   ['browser regressions', 'npm', ['run', 'test:browser']],
   ['typecheck', 'npm', ['run', 'check:types']],

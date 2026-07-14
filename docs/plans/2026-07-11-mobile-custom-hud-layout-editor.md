@@ -2,13 +2,13 @@
 
 | | |
 |---|---|
-| Status | In progress |
+| Status | Implemented, v0.26 integration QA in progress |
 | Date | 2026-07-11 |
-| Branch | `dev-td-mobile-custom-layout` |
+| Branch | `mobile-layout-adjustments` |
 | Base | `release/v0.24.0` at `31182684b4043c92e0df18242bdd731bec02819e` |
-| Current integration base | `upstream/release/v0.25.0` at `f81518ec9`, merged into the local integration branch at `c19d44ca8` |
+| Current integration base | `upstream/release/v0.26.0` at `d8a871763`, merged at `0a4715062`; existing PR history joined at `247a7e0e8` |
 | Product spec | [Mobile Custom HUD Layout Editor](../specs/2026-07-11-mobile-custom-hud-layout-editor.md) |
-| Estimated tasks | 88 |
+| Estimated tasks | 90 |
 
 ## Progress
 
@@ -101,6 +101,7 @@
 - [x] T87: Disable player-layout overlap, View, protected-surface, safe-area, and viewport-boundary enforcement after device testing showed false conflicts, editor/runtime geometry drift, and unexpected fallback. Preserve the attempted strict design in this historical plan, keep safe-area measurement only for notch-aware anchoring and editor chrome, and retain blocking validation only for malformed data, unsupported capabilities, invalid scale, and undersized targets (2026-07-14)
 - [x] T88: Make every painted movable context frame, not only its smaller runtime primary footprint, selectable and draggable in Edit Mode, keep context-status proxies above shared controls, hide fixed protected proxies, and restore modal stacking for discard confirmation and More over Consumables (2026-07-15)
 - [x] T89: Preserve 48px combat, menu, and Consumables targets plus 40px compact composite targets while visual art scales to 0.5; elevate the selected proxy and cycle downward on repeated overlap taps; close the game-skinned context dropdown on outside tap (2026-07-15, focused unit and Chromium regressions green)
+- [ ] T90: Complete the v0.26 release merge audit, preserve release-owned QA, versioning, admin localization, Dungeon Finder, camera prompt, and documentation behavior, then run final mobile landscape QA and refresh the local Docker test image (2026-07-15, focused mobile and release suites green; final browser and Docker verification pending)
 
 ## Outcome
 
@@ -110,6 +111,21 @@ gameplay-context matrix, derives left-handed layouts from canonical right-handed
 intentional overlap and off-safe-area placement, and persists structurally valid local layouts. The editor must
 own all touch input while open and must leave desktop, portrait, gameplay, simulation, wire, and
 server behavior unchanged.
+
+## v0.26 integration decision
+
+The current branch contains both the latest `upstream/release/v0.26.0` history and the existing
+`origin/mobile-layout-adjustments` PR history. Release-only files remain authoritative from v0.26.
+In particular, a mobile merge must not remove release-version badge handling, the SFX gate step,
+admin locale coverage, credits, Dungeon Finder content, camera prompt behavior, or release
+reference assets merely because an older mobile snapshot predates them.
+
+Files shared by the release and mobile work are resolved behavior by behavior. The final HUD keeps
+the v0.26 Dungeon Finder, store, camera, loadout, and window-controller behavior together with the
+mobile editor, touch sheets, action assignment, Consumables, and free-overlap policy. Generated
+localization artifacts are rebuilt from the combined source catalogs after conflicts are resolved.
+The release merge audit includes focused release regressions in addition to mobile editor tests so
+a compilable but semantically incomplete conflict resolution cannot be accepted.
 
 ## File structure
 
