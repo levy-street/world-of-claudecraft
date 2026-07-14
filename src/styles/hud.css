@@ -1428,6 +1428,15 @@
   .action-btn:hover {
     outline-color: var(--gold);
   }
+  /* The decorative bezel above rides `outline` in @layer components, which
+     would silently beat the base-layer keyboard focus ring (a later layer
+     wins the cascade regardless of specificity), so the accent ring is
+     re-declared here for both bezel-on-outline controls. */
+  .action-btn:focus-visible,
+  .micro-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .action-btn:active {
     transform: translateY(1px);
   }
@@ -1578,15 +1587,27 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* Reduced motion: the caption still fades, but never translates. */
+  @media (prefers-reduced-motion: reduce) {
+    .micro-btn::before {
+      transform: none;
+      transition: opacity 0.14s ease;
+    }
+  }
   .micro-btn:hover {
     outline-color: var(--gold);
     color: #fff;
   }
   /* talent button glows while unspent talent points are available */
+  /* Only the micro-btn's bezel rides `outline`; the mobile-btn keeps border,
+     so the outline tint stays off the shared rule (see the focus-ring guard,
+     tests/hud_focus_ring_layers.test.ts). */
+  .micro-btn.has-points {
+    outline-color: var(--gold);
+  }
   .micro-btn.has-points,
   .mobile-btn.has-points {
     border-color: var(--gold);
-    outline-color: var(--gold);
     color: #fff;
     animation: tal-pulse 1.6s ease-in-out infinite;
     /* Ambient: paused + duration-calmed by the effect-tier tokens. */
