@@ -1528,8 +1528,13 @@ export const id_ID: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Dev Inti",
         "devs": "Pengembang",
+        "seniormods": "Senior Mod",
         "mods": "Moderator",
-        "artists": "Seniman"
+        "juniormods": "Junior Mod",
+        "artists": "Seniman",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Anggota terverifikasi",
       "notMember": "Belum berada di server",

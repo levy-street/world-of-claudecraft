@@ -1528,8 +1528,13 @@ export const cs_CZ: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Hlavní dev",
         "devs": "Dev",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "artists": "Umělec"
+        "juniormods": "Junior Mod",
+        "artists": "Umělec",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Ověřený člen",
       "notMember": "Zatím nejsi na serveru",

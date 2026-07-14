@@ -1528,8 +1528,13 @@ export const it_IT: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Sviluppatore Principale",
         "devs": "Dev",
+        "seniormods": "Senior Mod",
         "mods": "Mod",
-        "artists": "Artista"
+        "juniormods": "Junior Mod",
+        "artists": "Artista",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Membro verificato",
       "notMember": "Non ancora nel server",

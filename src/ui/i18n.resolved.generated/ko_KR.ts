@@ -1528,8 +1528,13 @@ export const ko_KR: EnTranslations = {
         "admin": "관리자",
         "coredevs": "핵심 개발자",
         "devs": "개발자",
+        "seniormods": "선임 운영자",
         "mods": "운영자",
-        "artists": "아티스트"
+        "juniormods": "수습 운영자",
+        "artists": "아티스트",
+        "contentcreator": "콘텐츠 크리에이터",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",

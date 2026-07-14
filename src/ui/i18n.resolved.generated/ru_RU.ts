@@ -1528,8 +1528,13 @@ export const ru_RU: EnTranslations = {
         "admin": "Администратор",
         "coredevs": "Ведущий разработчик",
         "devs": "Разработчик",
+        "seniormods": "Старший модератор",
         "mods": "Модератор",
-        "artists": "Художник"
+        "juniormods": "Младший модератор",
+        "artists": "Художник",
+        "contentcreator": "Контент-мейкер",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Подтвержденный участник",
       "notMember": "Еще не на сервере",

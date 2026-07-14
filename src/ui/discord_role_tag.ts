@@ -14,8 +14,13 @@ const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
   admin: 'hudChrome.discord.roleTag.admin',
   coredevs: 'hudChrome.discord.roleTag.coredevs',
   devs: 'hudChrome.discord.roleTag.devs',
+  seniormods: 'hudChrome.discord.roleTag.seniormods',
   mods: 'hudChrome.discord.roleTag.mods',
+  juniormods: 'hudChrome.discord.roleTag.juniormods',
   artists: 'hudChrome.discord.roleTag.artists',
+  contentcreator: 'hudChrome.discord.roleTag.contentcreator',
+  legend: 'hudChrome.discord.roleTag.legend',
+  shill: 'hudChrome.discord.roleTag.shill',
 };
 
 /** The i18n label key for a special role key, or undefined when it is not one. */

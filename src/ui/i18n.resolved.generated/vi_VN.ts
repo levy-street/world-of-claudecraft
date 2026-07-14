@@ -1528,8 +1528,13 @@ export const vi_VN: EnTranslations = {
         "admin": "Quản Trị Viên",
         "coredevs": "Nhà Phát Triển Chính",
         "devs": "Lập Trình Viên",
+        "seniormods": "Senior Mod",
         "mods": "Điều Hành Viên",
-        "artists": "Họa Sĩ"
+        "juniormods": "Junior Mod",
+        "artists": "Họa Sĩ",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Thành viên đã xác minh",
       "notMember": "Chưa tham gia máy chủ",

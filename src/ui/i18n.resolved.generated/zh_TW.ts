@@ -1528,8 +1528,13 @@ export const zh_TW: EnTranslations = {
         "admin": "管理員",
         "coredevs": "核心開發者",
         "devs": "開發者",
+        "seniormods": "資深管理員",
         "mods": "管理員",
-        "artists": "美術"
+        "juniormods": "初級管理員",
+        "artists": "美術",
+        "contentcreator": "內容創作者",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "已驗證成員",
       "notMember": "尚未加入伺服器",

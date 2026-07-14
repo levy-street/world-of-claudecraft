@@ -1528,8 +1528,13 @@ export const sv_SE: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kärnutvecklare",
         "devs": "Utvecklare",
+        "seniormods": "Senior Mod",
         "mods": "Moderator",
-        "artists": "Konstnär"
+        "juniormods": "Junior Mod",
+        "artists": "Konstnär",
+        "contentcreator": "Content Creator",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Verifierad medlem",
       "notMember": "Inte med på servern ännu",

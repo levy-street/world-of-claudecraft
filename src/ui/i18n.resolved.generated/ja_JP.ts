@@ -1528,8 +1528,13 @@ export const ja_JP: EnTranslations = {
         "admin": "管理者",
         "coredevs": "コア開発者",
         "devs": "開発者",
+        "seniormods": "シニアモデレーター",
         "mods": "モデレーター",
-        "artists": "アーティスト"
+        "juniormods": "ジュニアモデレーター",
+        "artists": "アーティスト",
+        "contentcreator": "コンテンツクリエイター",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
