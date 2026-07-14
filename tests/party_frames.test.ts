@@ -20,7 +20,7 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
 });
 
 describe('party frame member selection', () => {
-  it('shows every raid member across raid groups', () => {
+  it('shows every other raid member across raid groups', () => {
     const info: PartyInfo = {
       leader: 1,
       raid: true,
@@ -41,7 +41,7 @@ describe('party frame member selection', () => {
 
     const frames = selectPartyFrameMembers(info, 1, { x: 0, z: 0 });
 
-    expect(frames.map((m) => m.pid)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(frames.map((m) => m.pid)).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(frames.filter((m) => m.group === 2)).toHaveLength(5);
   });
 
@@ -55,7 +55,7 @@ describe('party frame member selection', () => {
 
     const frames = selectPartyFrameMembers(info, 1, { x: 0, z: 0 });
 
-    expect(frames.map((m) => m.pid)).toEqual([1, 2, 3, 4, 6, 7]);
+    expect(frames.map((m) => m.pid)).toEqual([2, 3, 4, 6, 7]);
   });
 
   it('marks live out-of-range members without hiding them', () => {
@@ -66,15 +66,13 @@ describe('party frame member selection', () => {
       members: [member(1, 1), member(2, 2, 150, 0)],
     };
 
-    expect(selectPartyFrameMembers(info, 1, { x: 0, z: 0 }).find((m) => m.pid === 2)).toMatchObject(
-      {
-        pid: 2,
-        oor: true,
-      },
-    );
+    expect(selectPartyFrameMembers(info, 1, { x: 0, z: 0 })[0]).toMatchObject({
+      pid: 2,
+      oor: true,
+    });
   });
 
-  it('marks the current target without filtering the selected member', () => {
+  it('marks the currently targeted member as selected (the row highlight cue)', () => {
     const info: PartyInfo = {
       leader: 1,
       raid: false,
@@ -82,10 +80,10 @@ describe('party frame member selection', () => {
       members: [member(1, 1), member(2, 1), member(3, 1)],
     };
 
+    // Local player (1) is filtered; targeting member 2 flags only its row selected.
     const frames = selectPartyFrameMembers(info, 1, { x: 0, z: 0 }, 2);
 
     expect(frames.map((m) => [m.pid, m.selected])).toEqual([
-      [1, false],
       [2, true],
       [3, false],
     ]);
@@ -106,10 +104,10 @@ describe('party frame signature (the per-frame short-circuit)', () => {
     expect(partyFrameSignature(info(), 1, pos)).toBe(partyFrameSignature(info(), 1, pos));
   });
 
-  it('encodes the local player plus every party member + leader / raid / group', () => {
+  it('skips the local player but encodes every other member + leader / raid / group', () => {
     const sig = partyFrameSignature(info(), 1, { x: 0, z: 0 });
-    // pid 1 is the local player and is still encoded as a party frame member.
-    expect(sig).toContain('1:1:');
+    // pid 1 is the local player (skipped); 2 and 3 are encoded.
+    expect(sig).not.toContain('1:1:');
     expect(sig).toContain('2:1:');
     expect(sig).toContain('3:1:');
     expect(sig).toContain('L1:R0:G1');
@@ -215,8 +213,8 @@ describe('ClientWorld-vs-Sim out-of-range parity', () => {
         master: { enabled: false, looter: 0, threshold: 'uncommon' },
         members: [member(1, 1), member(2, 1, round2(dist), 0)],
       };
-      expect(selectPartyFrameMembers(mirror, 1, playerPos).find((m) => m.pid === 2)?.oor).toBe(
-        selectPartyFrameMembers(sim, 1, playerPos).find((m) => m.pid === 2)?.oor,
+      expect(selectPartyFrameMembers(mirror, 1, playerPos)[0].oor).toBe(
+        selectPartyFrameMembers(sim, 1, playerPos)[0].oor,
       );
       // If the oor shape matches, the whole signature matches (round2 touches only x/z,
       // which feed only the oor boolean).

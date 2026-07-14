@@ -1663,7 +1663,7 @@
     flex-direction: column;
     align-items: flex-start;
     width: auto;
-    z-index: 7;
+    z-index: 5;
   }
   /* The member-rows wrapper carries the adaptive double-stack the container used to: a
      CSS grid with grid-auto-flow: column and 2 explicit rows does the adaptive part with
