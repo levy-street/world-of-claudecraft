@@ -4704,6 +4704,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '古き深淵に棲む、鱗に覆われた蛇のような存在。希少で誇り高く、見た目よりもはるかに強大です。',
   'guide.family.dragonkin.name': 'ドラゴンキン',
   'guide.family.elemental.desc': '嵐や岩が命を得た存在。元素の力が強く渦巻く荒野に縛られています。',
+  'guide.family.reptile.name': '爬虫類',
+  'guide.family.reptile.desc':
+    '独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。',
   'guide.worldPage.heading': '世界',
   'guide.worldPage.intro':
     'World of ClaudeCraftは、自らの足で歩いて渡る一続きの大地です。南から北へと3つのゾーンが連なっています。ファストトラベルはなく、その旅路こそが冒険の一部です。',

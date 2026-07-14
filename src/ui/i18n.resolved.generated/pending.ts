@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "es_ES": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "fr_FR": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "fr_CA": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "de_DE": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "nl_NL": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "pl_PL": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "id_ID": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "tr_TR": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "sv_SE": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "vi_VN": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ],
+  "da_DK": [
+    "guide.family.reptile.desc",
+    "guide.family.reptile.name"
+  ]
 };

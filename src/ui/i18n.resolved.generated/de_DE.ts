@@ -2551,6 +2551,10 @@ export const de_DE: EnTranslations = {
       "dragonkin": {
         "name": "Drachkin",
         "desc": "Schuppige, schlangenhafte Wesen aus den alten Tiefen. Selten, stolz und weit stärker, als sie aussehen."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

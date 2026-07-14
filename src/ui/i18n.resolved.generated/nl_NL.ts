@@ -2551,6 +2551,10 @@ export const nl_NL: EnTranslations = {
       "dragonkin": {
         "name": "Drakenvolk",
         "desc": "Geschubde, slangachtige wezens uit de oude diepten. Zeldzaam, trots en veel sterker dan ze eruitzien."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

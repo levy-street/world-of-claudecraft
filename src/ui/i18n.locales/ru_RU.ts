@@ -4760,6 +4760,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.family.dragonkin.name': 'Дракониды',
   'guide.family.elemental.desc':
     'Живая буря и камень, привязанные к диким местам, где стихии особенно сильны.',
+  'guide.family.reptile.name': 'Рептилии',
+  'guide.family.reptile.desc':
+    'Хладнокровные охотники со своим особым шипением и хваткой, непохожие на теплокровных зверей.',
   'guide.worldPage.heading': 'Мир',
   'guide.worldPage.intro':
     'World of ClaudeCraft - это единый цельный край, который вы пересекаете пешком, три зоны, протянувшиеся с юга на север. Здесь нет быстрых перемещений, так что дорога - это часть приключения.',

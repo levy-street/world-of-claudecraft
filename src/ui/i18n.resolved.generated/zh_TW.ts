@@ -2551,6 +2551,10 @@ export const zh_TW: EnTranslations = {
       "dragonkin": {
         "name": "龍類",
         "desc": "來自遠古深淵、覆鱗如蛇的生物。稀少、高傲，且遠比外表看來更為強大。"
+      },
+      "reptile": {
+        "name": "爬行類",
+        "desc": "冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。"
       }
     },
     "worldPage": {

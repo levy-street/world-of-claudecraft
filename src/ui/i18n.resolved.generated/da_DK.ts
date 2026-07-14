@@ -2551,6 +2551,10 @@ export const da_DK: EnTranslations = {
       "dragonkin": {
         "name": "Drageæt",
         "desc": "Skældækkede, slangeagtige væsner fra de gamle dyb. Sjældne, stolte og langt stærkere, end de ser ud."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

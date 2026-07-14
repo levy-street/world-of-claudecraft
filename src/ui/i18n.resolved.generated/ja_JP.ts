@@ -2551,6 +2551,10 @@ export const ja_JP: EnTranslations = {
       "dragonkin": {
         "name": "ドラゴンキン",
         "desc": "古き深淵に棲む、鱗に覆われた蛇のような存在。希少で誇り高く、見た目よりもはるかに強大です。"
+      },
+      "reptile": {
+        "name": "爬虫類",
+        "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
       }
     },
     "worldPage": {

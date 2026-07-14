@@ -2551,6 +2551,10 @@ export const sv_SE: EnTranslations = {
       "dragonkin": {
         "name": "Drakätt",
         "desc": "Fjälliga, ormlika ting från de gamla djupen. Sällsynta, stolta och långt starkare än de ser ut."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

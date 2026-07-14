@@ -2551,6 +2551,10 @@ export const pt_BR: EnTranslations = {
       "dragonkin": {
         "name": "Dracônicos",
         "desc": "Criaturas escamosas e serpentinas das antigas profundezas. Raras, orgulhosas e muito mais fortes do que aparentam."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

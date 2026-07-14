@@ -2551,6 +2551,10 @@ export const cs_CZ: EnTranslations = {
       "dragonkin": {
         "name": "Dračí plémě",
         "desc": "Šupinaté, hadovité věci ze starých hlubin. Vzácné, hrdé a mnohem silnější, než vypadají."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

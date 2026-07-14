@@ -2551,6 +2551,10 @@ export const pl_PL: EnTranslations = {
       "dragonkin": {
         "name": "Smoczy ród",
         "desc": "Łuskowate, wężowate istoty ze starych głębin. Rzadkie, dumne i znacznie silniejsze, niż na to wyglądają."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

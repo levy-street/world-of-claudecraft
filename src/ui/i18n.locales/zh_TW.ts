@@ -4500,6 +4500,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '來自遠古深淵、覆鱗如蛇的生物。稀少、高傲，且遠比外表看來更為強大。',
   'guide.family.dragonkin.name': '龍類',
   'guide.family.elemental.desc': '活生生的風暴與岩石，束縛於元素之力強盛的荒野之地。',
+  'guide.family.reptile.name': '爬行類',
+  'guide.family.reptile.desc': '冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。',
   'guide.worldPage.heading': '世界',
   'guide.worldPage.intro':
     'World of ClaudeCraft 是一片你需徒步橫越的連綿大地，三大區域由南向北排列。沒有快速旅行，所以旅程本身就是冒險的一部分。',

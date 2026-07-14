@@ -2551,6 +2551,10 @@ export const fr_CA: EnTranslations = {
       "dragonkin": {
         "name": "Draconiens",
         "desc": "Des créatures écailleuses et serpentines des anciennes profondeurs. Rares, fières et bien plus fortes qu'elles n'en ont l'air."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

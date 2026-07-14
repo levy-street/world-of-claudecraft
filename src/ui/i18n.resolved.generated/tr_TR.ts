@@ -2551,6 +2551,10 @@ export const tr_TR: EnTranslations = {
       "dragonkin": {
         "name": "Ejder Soyu",
         "desc": "Eski derinliklerin pullu, yılansı yaratıkları. Nadir, mağrur ve göründüklerinden çok daha güçlü."
+      },
+      "reptile": {
+        "name": "Reptiles",
+        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       }
     },
     "worldPage": {

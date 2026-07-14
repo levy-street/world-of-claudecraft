@@ -2551,6 +2551,10 @@ export const ko_KR: EnTranslations = {
       "dragonkin": {
         "name": "용족",
         "desc": "비늘로 뒤덮인 뱀 같은 옛 심연의 존재들. 보기 드물고 오만하며, 겉보기보다 훨씬 강합니다."
+      },
+      "reptile": {
+        "name": "파충류",
+        "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
       }
     },
     "worldPage": {
