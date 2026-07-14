@@ -915,3 +915,69 @@ describe('/dev lfg seeding', () => {
     expect([...prod.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
   });
 });
+
+// The finder forms and dissolves groups through its OWN seam (formDungeonFinderGroup),
+// so every party-side rule the invite path grows has to be mirrored here or it silently
+// diverges. These three regressions all came in with the release/v0.26.0 merge.
+describe('parity with the invite path (party-side rules)', () => {
+  it('credits partiesJoined for every member of a finder-formed group', () => {
+    const sim = makeSim();
+    const { pids } = queueFive(sim);
+    for (const pid of pids) {
+      expect(sim.players.get(pid)?.deedStats.counters.partiesJoined).toBe(0);
+    }
+    acceptAll(sim, pids);
+    expect(sim.partyOf(pids[0])).not.toBeNull();
+    // The leader (a fresh party is created for them) and each joining member.
+    for (const pid of pids) {
+      expect(sim.players.get(pid)?.deedStats.counters.partiesJoined, `pid ${pid}`).toBe(1);
+    }
+  });
+
+  it('clears a premade ready check when the finder dissolves its source party', () => {
+    const sim = makeSim();
+    const pids = addPlayers(sim, [
+      { cls: 'warrior', roles: ['tank'], level: 8, name: 'Lead' },
+      { cls: 'priest', roles: ['healer'], level: 8, name: 'Mate' },
+      { cls: 'mage', roles: ['dps'], level: 8 },
+      { cls: 'rogue', roles: ['dps'], level: 8 },
+      { cls: 'hunter', roles: ['dps'], level: 8 },
+    ]);
+    for (const pid of pids.slice(2)) sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
+    tickAll(sim, 1);
+    sim.partyInvite(pids[1], pids[0]);
+    sim.partyAccept(pids[1]);
+    const premadeId = sim.partyOf(pids[0])?.id;
+    // The premade runs a ready check, THEN gets matched: its party id is about to die.
+    sim.chat('/ready', pids[0]);
+    tickAll(sim, 1);
+    expect((sim as any).readyChecks.has(premadeId)).toBe(true);
+    sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pids[0]);
+    tickAll(sim, 1);
+    acceptAll(sim, pids);
+    const formed = sim.partyOf(pids[0]);
+    expect(formed).not.toBeNull();
+    // The source party is gone; no ready check may outlive it (its members now resolve
+    // to the formed party, so they could never answer it).
+    const stale = [...(sim as any).readyChecks.keys()].filter((id: number) => id !== formed?.id);
+    expect(stale).toEqual([]);
+  });
+
+  it('never matches a player who is already leaving (the disconnect flag)', () => {
+    const sim = makeSim();
+    const { pids } = queueFive(sim);
+    for (const pid of pids) expect(sim.dungeonFinderInfoFor(pid)?.proposal).not.toBeNull();
+    // A proposal is live; one member disconnects. preparePlayerLeave runs BEFORE the
+    // persistence await (and before removePlayer), so the finder must drop them here.
+    sim.preparePlayerLeave(pids[4]);
+    tickAll(sim, 1);
+    for (const pid of pids) expect(sim.dungeonFinderInfoFor(pid)?.proposal).toBeNull();
+    expect(sim.dungeonFinderInfoFor(pids[4])?.queue).toBeNull();
+    // And a leaver still in players/entities can never be re-matched.
+    for (const pid of pids.slice(0, 4)) sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
+    sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pids[4]);
+    tickAll(sim, 2);
+    expect(sim.dungeonFinderInfoFor(pids[0])?.proposal).toBeNull();
+    expect(sim.partyOf(pids[0])).toBeNull();
+  });
+});

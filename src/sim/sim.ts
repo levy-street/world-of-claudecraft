@@ -2217,10 +2217,6 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
-    // Dungeon Finder teardown FIRST, while the leaver's party/roster still
-    // resolves (drops their queue unit, fails their proposal, closes their
-    // listing, withdraws their application).
-    this.dungeonFinder.onPlayerRemoved(pid);
     this.preparePlayerLeave(pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
@@ -2284,6 +2280,13 @@ export class Sim {
     const meta = this.players.get(pid);
     if (!meta) return;
     meta.leaving = true;
+    // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
+    // (drops their queue unit, fails their proposal, closes their listing, withdraws
+    // their application). It runs HERE, not in removePlayer, because the server calls
+    // preparePlayerLeave before the persistence await and only removes the player
+    // after it: without this a disconnecting player could still be matched, or burn a
+    // whole 30-second proposal for four other players. onPlayerRemoved is idempotent.
+    this.dungeonFinder.onPlayerRemoved(pid);
     // Trades are not escrowed. Cancel before the leave snapshot so the other
     // party cannot confirm during the persistence await and receive an item
     // that the departing character's already-captured save still contains.

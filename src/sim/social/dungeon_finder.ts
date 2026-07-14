@@ -254,7 +254,11 @@ export class DungeonFinderMachine {
   // and the same roster; a solo unit while the player stays party-free.
   private unitIntact(unit: FinderQueueUnit): boolean {
     for (const pid of unit.members) {
-      if (!this.ctx.players.has(pid) || !this.ctx.entities.has(pid)) return false;
+      // `leaving` is the disconnect flag every other reward/eligibility system honours:
+      // the player is still in players/entities during the persistence await, but their
+      // removal is already committed, so they must not be matched into a group.
+      const meta = this.ctx.players.get(pid);
+      if (!meta || meta.leaving || !this.ctx.entities.has(pid)) return false;
     }
     if (unit.partyId === null) {
       return unit.members.length === 1 && this.ctx.partyOf(unit.leaderPid) === null;

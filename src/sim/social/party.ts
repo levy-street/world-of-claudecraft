@@ -409,7 +409,11 @@ export class PartyMachine {
     for (const unit of units) {
       for (const pid of unit.members) {
         if (seen.has(pid)) return null;
-        if (!this.ctx.players.has(pid) || !this.ctx.entities.has(pid)) return null;
+        // A disconnecting player (meta.leaving) is still in players/entities during the
+        // persistence await, but removePlayer will rip the group apart right after, so
+        // the formation must reject them, like every other reward/eligibility system.
+        const meta = this.ctx.players.get(pid);
+        if (!meta || meta.leaving || !this.ctx.entities.has(pid)) return null;
         seen.add(pid);
       }
       total += unit.members.length;
@@ -444,6 +448,9 @@ export class PartyMachine {
       };
       this.parties.set(party.id, party);
       this.partyByPid.set(baseUnit.leaderPid, party.id);
+      // Same deed credit the invite path grants (acceptInvite): a finder group is a
+      // party the player joined, so it counts toward partiesJoined.
+      this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
     }
     const convertedToRaid = opts.raid && !party.raid;
     if (convertedToRaid) {
@@ -459,6 +466,10 @@ export class PartyMachine {
         if (old) {
           this.parties.delete(old.id);
           this.ctx.dropPartyMarkers(old.id);
+          // A ready check left on the dissolved party id would outlive its party: its
+          // members now resolve to the NEW party, so they could never answer it and it
+          // would run the full timeout and report on a group that no longer exists.
+          this.ctx.readyChecks.delete(old.id);
         }
       }
       for (const pid of unit.members) {
@@ -466,6 +477,8 @@ export class PartyMachine {
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
         this.partyByPid.set(pid, party.id);
+        const meta = this.ctx.players.get(pid);
+        if (meta) this.ctx.bumpDeedStat(meta, 'partiesJoined', 1);
       }
     }
     if (convertedToRaid) {
