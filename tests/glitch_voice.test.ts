@@ -156,6 +156,19 @@ describe('Glitch voice API', () => {
     );
   });
 
+  it('accepts the canonical voice_room field returned by the join endpoint', async () => {
+    const { fetchImpl } = mockFetch([
+      response(200, { data: [room] }),
+      response(200, { voice_room: room, participant, voice_token: 'voice-token' }),
+    ]);
+
+    await expect(joinGlitchVoice(session(), 'Aster', fetchImpl)).resolves.toEqual({
+      room,
+      participant,
+      voiceToken: 'voice-token',
+    });
+  });
+
   it('creates a room and then joins it before persisting the rotated participant token', async () => {
     const { calls, fetchImpl } = mockFetch([
       response(200, { data: [] }),

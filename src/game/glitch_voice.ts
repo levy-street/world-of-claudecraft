@@ -160,15 +160,17 @@ export async function joinGlitchVoice(
     fetchImpl,
   );
   const result = data as {
-    room: GlitchVoiceRoom;
+    voice_room?: GlitchVoiceRoom;
+    room?: GlitchVoiceRoom;
     participant: GlitchVoiceParticipant;
     voice_token: string;
   };
-  if (!result.room?.id || !result.participant?.id || !result.voice_token) {
+  const joinedRoom = result.voice_room ?? result.room;
+  if (!joinedRoom?.id || !result.participant?.id || !result.voice_token) {
     throw new GlitchApiError('Glitch voice join returned an invalid response.', 500, data);
   }
   return {
-    room: result.room,
+    room: joinedRoom,
     participant: result.participant,
     voiceToken: result.voice_token,
   };
