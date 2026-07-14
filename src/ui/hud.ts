@@ -71,7 +71,7 @@ import {
 } from '../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../sim/deeds';
 import { specialRoleColor } from '../sim/discord_roles';
-import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import { canEquipItem } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -170,16 +170,20 @@ import { ChatAnnouncer } from './chat_announcer';
 import {
   CHANNEL_LABEL_KEYS,
   CHAT_TAB_CHANNELS,
+  type ChatInputTintTarget,
   type ChatOpenTab,
   type ChatTabChannel,
   type ChatTabId,
   channelNeedsJoin,
+  chatChannelColor,
+  chatInputTint,
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
+  sentLineChannel,
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
@@ -193,7 +197,13 @@ import {
 } from './chat_ignore_core';
 import { appendChatLineParts, CHAT_MESSAGE_TOKEN, CHAT_NAME_TOKEN, chatAiTagEl } from './chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
-import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
+import {
+  CHAT_BOX_LIMITS,
+  type ChatBoxGeometry,
+  parseChatBox,
+  placeChatBox,
+  serializeChatBox,
+} from './chat_window';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
@@ -202,7 +212,10 @@ import {
   auraApplyCue,
   castCueForAbility,
   impactCueForDamage,
+  type MobVoiceAction,
+  mobVoiceActionForDamage,
   mobVoiceCue,
+  mobVoiceCueWithFallback,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -239,6 +252,8 @@ import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
+import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
+import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
 import {
   classDisplayName,
@@ -278,6 +293,7 @@ import {
   holderTierForBalance,
 } from './holder_tier';
 import {
+  applyLoadoutBar as applyLoadoutBarActions,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
@@ -306,6 +322,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { itemArmorTypeLabelKey } from './item_armor_type';
+import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
 import { ItemDragState } from './item_drag_state';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
@@ -313,6 +330,7 @@ import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
 import { LockpickWindow } from './lockpick_window';
+import { isCombatFlavorLog } from './log_event_route';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
 import {
   computeLootRollStatusRows,
@@ -363,7 +381,7 @@ import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
-import { PET_ACTION_ICONS } from './pet_action_icons';
+import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
 import {
   CARD_POSES,
   cardCanvasToBlob,
@@ -387,6 +405,7 @@ import {
   streamerActionPlatform,
   streamerMenuActions,
 } from './player_context_menu';
+import { playerStealthed } from './player_stealthed';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
@@ -415,12 +434,18 @@ import {
   statNameKey,
   statTooltipHtml,
 } from './stat_tooltip_view';
+import {
+  mountStorePromoCard,
+  type StorePromoCardController,
+  storePromoReservedHeight,
+} from './store_promo_card';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
+import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
@@ -876,10 +901,7 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
   return span;
 }
 
-function availableMobVoiceCue(
-  templateId: string,
-  action: 'aggro' | 'attack' | 'death',
-): string | null {
+function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
   return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
 }
 
@@ -1038,6 +1060,11 @@ export class Hud {
   // shown, and drives both the log filter and the send channel.
   private chatTabs: ChatOpenTab[] = [];
   private activeChatTab: ChatTabId = 'all';
+  // The last standing channel the player actually sent to (classic sticky-channel
+  // behavior). On the All/combat views a plain typed line goes here and the input
+  // is tinted with its color; a channel-bound tab always overrides it. `say` is
+  // the neutral default (no tint, generic placeholder). Whisper never sets it.
+  private stickyChannel: ChatTabChannel = 'say';
   // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
   // rebuilds the strip's children but the bar element itself persists).
   private chatTabsWheelBound = false;
@@ -1053,6 +1080,11 @@ export class Hud {
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
+  // Which element last painted the shared #tooltip box, so a hovered slot can
+  // detect that the visible content belongs to a different element (after a
+  // drag-drop, or Firefox's spurious post-drag re-enter on the drag source) and
+  // re-resolve its own tooltip instead of trailing the stale one (#1626).
+  private readonly tooltipOwner = new SharedTooltipOwner<HTMLElement>();
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
   // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
@@ -1321,6 +1353,10 @@ export class Hud {
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  // Dungeon Finder "Show on Map": a highlighted entrance + the zone band to
+  // display instead of the player's committed zone. Cleared on map open/close.
+  private mapPing: { x: number; z: number } | null = null;
+  private mapZoneOverride: string | null = null;
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1366,6 +1402,7 @@ export class Hud {
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
+  private storePromoCard: StorePromoCardController | null = null;
   // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
@@ -1492,12 +1529,17 @@ export class Hud {
     });
     this.initCompass();
     this.initMinimapZoom(mm);
-    this.releaseSpiritBtnEl.addEventListener('click', () => {
+    // bindTouchTap, not 'click': the browser only synthesizes click for the
+    // PRIMARY pointer, so on a phone these death-screen buttons went dead the
+    // moment another finger was down (a held movement joystick when the player
+    // died mid-run), stranding them on the death overlay (issue 1484). Matches
+    // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
+    bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
       this.sim.releaseSpirit();
     });
-    this.resurrectCorpseBtnEl.addEventListener('click', () => this.sim.resurrectAtCorpse());
-    this.resurrectHealerBtnEl.addEventListener('click', () => this.sim.resurrectAtSpiritHealer());
+    bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
+    bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -1873,6 +1915,7 @@ export class Hud {
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
@@ -2317,6 +2360,10 @@ export class Hud {
         // consistent with the toggle / X close path.
         this.arenaWindow.close();
         break;
+      case 'dungeon-finder-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.dungeonFinderWindow.close();
+        break;
       case 'valecup-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.valeCupWindow.close();
@@ -2657,24 +2704,38 @@ export class Hud {
     const frame = document.getElementById('chatlog-frame');
     if (!wrap || !tabs || !frame) return;
     const chromeH = tabs.getBoundingClientRect().height || 22;
-    const clamped = clampChatBox(
+    // this.chatBox, the rect, and the viewport are all in visual (post-zoom) space.
+    // The wrap + frame live inside #ui (`zoom: var(--ui-scale)`), so their style
+    // writes divide by the live UI scale into author space (placeChatBox); the
+    // clamped VISUAL geometry is what we keep + persist, so a saved box renders at
+    // the same visual place at any UI Scale.
+    const z = getUiScale();
+    const placement = placeChatBox(
       this.chatBox,
       { w: window.innerWidth, h: window.innerHeight },
       chromeH,
+      z,
+      CHAT_BOX_LIMITS,
+      this.storePromoCard ? (width) => storePromoReservedHeight(width, z) : 0,
     );
-    this.chatBox = clamped;
-    wrap.style.left = `${clamped.left}px`;
-    wrap.style.top = `${clamped.top}px`;
+    this.chatBox = placement.geo;
+    const { css } = placement;
+    wrap.style.left = `${css.left}px`;
+    wrap.style.top = `${css.top}px`;
     wrap.style.right = 'auto';
     wrap.style.bottom = 'auto';
-    wrap.style.width = `${clamped.width}px`;
-    frame.style.height = `${clamped.height}px`;
+    wrap.style.width = `${css.width}px`;
+    frame.style.height = `${css.height}px`;
     // Keep the (separately positioned) chat input bar aligned above the box.
+    // #chat-input is a SIBLING of #ui (a direct child of #game-ui-template, see
+    // index.html), so it is OUTSIDE the zoom: its writes stay in the visual space
+    // of the clamped geometry, undivided, to line up with the re-multiplied box.
     const input = document.getElementById('chat-input');
     if (input) {
-      input.style.left = `${clamped.left}px`;
-      input.style.width = `${clamped.width}px`;
-      input.style.bottom = `${Math.max(0, window.innerHeight - clamped.top + 4)}px`;
+      const { geo } = placement;
+      input.style.left = `${geo.left}px`;
+      input.style.width = `${geo.width}px`;
+      input.style.bottom = `${Math.max(0, window.innerHeight - geo.top + 4)}px`;
     }
   }
 
@@ -2763,6 +2824,13 @@ export class Hud {
   resetUnitFrames(): void {
     this.targetFrameMover?.reset();
     this.playerFrameMover?.reset();
+  }
+
+  /** Repaint persisted visual-space geometry after a live UI Scale change. */
+  reapplySavedGeometry(): void {
+    this.applyChatBoxGeometry();
+    this.targetFrameMover?.reapplyPosition();
+    this.playerFrameMover?.reapplyPosition();
   }
 
   // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
@@ -2903,7 +2971,7 @@ export class Hud {
     if (!showCombat) this.applyChatFilter();
     this.updateActiveTabStyles();
     if (persist) this.persistChatTabs();
-    this.syncChatPlaceholder();
+    this.applyChatInputPresentation();
   }
 
   // Add a channel tab if not already present. Does NOT switch the active send
@@ -2996,6 +3064,22 @@ export class Hud {
     return tab !== null && isChatTabChannel(tab) ? tab : null;
   }
 
+  // The standing channel a plain typed line actually reaches, honoring both the
+  // active tab and the sticky "last used" channel: a channel-bound tab wins (its
+  // bound channel), otherwise the All/combat views fall back to the sticky
+  // channel (`say` by default). The whisper tab is handled separately in
+  // composeChatSend (it has no standing channel), so this is only reached off it.
+  private effectiveSendChannel(): ChatTabChannel {
+    return this.chatSendChannel() ?? this.stickyChannel;
+  }
+
+  // The channel the chat input's tint should signal: the whisper collector when
+  // on its tab (plain text replies as a whisper), else the effective send
+  // channel. chatInputTint maps `say` to no tint (the default input color).
+  private chatInputTintTarget(): ChatInputTintTarget {
+    return this.activeChatTab === WHISPER_TAB ? WHISPER_TAB : this.effectiveSendChannel();
+  }
+
   private applyChatFilter(): void {
     const filter = this.chatFilterTab();
     for (const child of Array.from(this.chatLogEl.children)) {
@@ -3010,20 +3094,39 @@ export class Hud {
     if (filter !== null && chan !== filter) div.classList.add('chat-hidden');
   }
 
-  private syncChatPlaceholder(): void {
+  // Reflect the effective send channel on the chat input: its placeholder text
+  // and its text tint (a non-say channel tints the typed text to that channel's
+  // color so the player can see where plain text will go; say/default clears the
+  // tint). Called on every open path and whenever the active tab changes.
+  applyChatInputPresentation(): void {
     const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
-    if (input) input.placeholder = this.activeChatPlaceholder();
+    if (input) this.presentChatInput(input);
   }
 
-  // The line actually sent for what the player typed, honoring the active tab.
-  // main.ts calls this on Enter so a channel tab works without retyping the slash
-  // command; an explicit "/..." the player typed still wins. On the whisper tab,
-  // plain text replies to the last whisperer (/r) instead of binding a channel.
+  // Set the placeholder + tint on an already-resolved chat-input element (the
+  // shared body of applyChatInputPresentation and insertChatLink).
+  private presentChatInput(input: HTMLTextAreaElement | HTMLInputElement): void {
+    input.placeholder = this.activeChatPlaceholder();
+    input.style.color = chatInputTint(this.chatInputTintTarget()) ?? '';
+  }
+
+  // Remember the standing channel a just-sent line reached as the sticky default
+  // for the next chat open on the All tab. Whisper/reply, emotes, rolls, channel
+  // membership, and unknown commands leave the sticky channel unchanged.
+  noteSentChannel(sentLine: string): void {
+    const ch = sentLineChannel(sentLine);
+    if (ch) this.stickyChannel = ch;
+  }
+
+  // The line actually sent for what the player typed, honoring the active tab and
+  // the sticky "last used" channel. main.ts calls this on Enter so a channel tab
+  // (or the sticky channel) works without retyping the slash command; an explicit
+  // "/..." the player typed still wins. On the whisper tab, plain text replies to
+  // the last whisperer (/r) instead of binding a channel.
   composeChatSend(typed: string): string {
     const withLinks = this.applyPendingChatLinks(typed);
     if (this.activeChatTab === WHISPER_TAB) return composeWhisperReply(withLinks);
-    const ch = this.chatSendChannel();
-    return ch ? composeChatLine(ch, withLinks) : withLinks.trim();
+    return composeChatLine(this.effectiveSendChannel(), withLinks);
   }
 
   // Shift-click a quest-log entry: open the chat input and insert a readable
@@ -3045,7 +3148,7 @@ export class Hud {
   private insertChatLink(display: string, token: string): void {
     const input = $('#chat-input') as unknown as HTMLInputElement;
     this.pendingChatLinks = [...this.pendingChatLinks, { display, token }];
-    input.placeholder = this.activeChatPlaceholder();
+    this.presentChatInput(input);
     input.style.display = 'block';
     input.value =
       input.value && !input.value.endsWith(' ')
@@ -3084,15 +3187,21 @@ export class Hud {
     return true;
   }
 
-  // Placeholder for the chat input reflecting the active tab.
+  // Placeholder for the chat input reflecting the active tab and sticky channel.
   activeChatPlaceholder(): string {
     if (this.activeChatTab === WHISPER_TAB)
       return t('hud.core.chatChannels.sendingTo', { channel: t(WHISPER_TAB_LABEL_KEY) });
-    const ch = this.chatSendChannel();
-    if (ch) return t('hud.core.chatChannels.sendingTo', { channel: t(CHANNEL_LABEL_KEYS[ch]) });
-    // The compact touch composer has no room for the desktop slash-command legend
-    // (/s, /w, /r, ...), so use a short prompt on the mobile HUD. The channel-aware
-    // "Message {channel}" variants above are already short and stay as-is.
+    // A channel-bound tab keeps its "Message {channel}" prompt (unchanged, incl. a
+    // Say tab). On the All/combat views a non-say sticky channel surfaces the same
+    // "Message {channel}" prompt so the player sees where plain text will go.
+    const bound = this.chatSendChannel();
+    const ch = bound ?? this.stickyChannel;
+    if (bound !== null || ch !== 'say')
+      return t('hud.core.chatChannels.sendingTo', { channel: t(CHANNEL_LABEL_KEYS[ch]) });
+    // Default (All tab, sticky say): the compact touch composer has no room for the
+    // desktop slash-command legend (/s, /w, /r, ...), so use a short prompt on the
+    // mobile HUD. The channel-aware "Message {channel}" variants above are already
+    // short and stay as-is.
     return this.isMobileLayout()
       ? t('hudChrome.mobile.chatPlaceholder')
       : t('hud.core.chatPlaceholder');
@@ -3847,6 +3956,27 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
   });
+
+  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
+  // shared presentation bag for loot icons/tooltips and a narrow map hook for
+  // the non-teleporting "Show on Map" action.
+  private readonly dungeonFinderWindow = new DungeonFinderWindow({
+    ...this.presentationBag,
+    root: () => $('#dungeon-finder-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
+    hideTooltip: () => this.hideTooltip(),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    ...this.windowFocus('#dungeon-finder-window'),
+  });
+
+  // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
+  // self-closing when the proposal resolves. Lives OUTSIDE the finder window
+  // so an answer never requires opening it.
+  private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
+    root: () => $('#dfinder-proposal-popup'),
+    world: () => this.sim,
+  });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
   // painter, the ArenaWindow shape). It owns the bracket / nation / role
   // selections, the render-skip signature, and focus-return; Hud forwards the
@@ -4276,6 +4406,9 @@ export class Hud {
       // cache the measured box for the mousemove clamp below (no forced reflow)
       ttW = size.w;
       ttH = size.h;
+      // This element now owns the shared box, so its own mousemove keeps the
+      // cheap reposition-only path and a hover onto any other element re-resolves.
+      this.tooltipOwner.claim(el);
     };
     const showNearElement = () => {
       const rect = el.getBoundingClientRect();
@@ -4304,6 +4437,16 @@ export class Hud {
     });
     el.addEventListener('mousemove', (e) => {
       if (mobile()) return;
+      // The shared box may be showing another element's content: a drag-drop
+      // that ended inside a slot fires no mouseenter, and Firefox re-enters the
+      // drag SOURCE after a native drag, so the visible tooltip can belong to a
+      // different (or no) element while the cursor sits over this one (#1626).
+      // Repaint this element's own tooltip in that case; the common in-slot move
+      // stays on the cheap reposition-only path below.
+      if (this.tooltipOwner.needsReshow(el)) {
+        showAt(e.clientX, e.clientY, 'mouse');
+        return;
+      }
       const z = getUiScale();
       // reuse the box size measured in showAt: same content, no forced reflow
       const tw = ttW,
@@ -4314,10 +4457,13 @@ export class Hud {
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
       this.tooltipEl.style.display = 'none';
+      // Box hidden: no element owns it, so the next move over any slot re-resolves.
+      this.tooltipOwner.release();
     });
     el.addEventListener('focusout', () => {
       clearTouchTimer();
       this.tooltipEl.style.display = 'none';
+      this.tooltipOwner.release();
     });
     el.addEventListener('pointerdown', (e) => {
       if (!mobile() || e.pointerType === 'mouse') return;
@@ -4404,6 +4550,10 @@ export class Hud {
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
+    // Box hidden (drag start, window close, slot mutate): drop ownership so a
+    // later move over any slot re-resolves its live tooltip instead of keeping
+    // the now-stale content (#1626).
+    this.tooltipOwner.release();
   }
 
   private showRaidLockoutTooltip(): void {
@@ -4621,8 +4771,9 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
+    const requiredClasses = requiredClassesForTooltip(item);
+    if (requiredClasses) {
+      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
     // Classic "Requires Level N" line for equippable gear gated above level 1.
     // Red when the viewer is below the requirement (cannot equip yet), otherwise
@@ -4838,6 +4989,13 @@ export class Hud {
 
   private refreshLocalizedDynamicUi(): void {
     this.syncDailyRewardsSurfaceLabels();
+    this.storePromoCard?.relocalize({
+      open: t('hudChrome.wocStore.title'),
+      close: t('hudChrome.wocStore.close'),
+      season: t('hudChrome.wocStore.seasonOne'),
+      title: t('hudChrome.wocStore.armoryTitle'),
+      cta: t('hudChrome.wocStore.title'),
+    });
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -4866,6 +5024,8 @@ export class Hud {
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
+    this.dungeonFinderWindow.relocalize();
+    this.dungeonFinderProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -6377,6 +6537,7 @@ export class Hud {
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
       ['#mm-arena', 'arena', 'hud.core.mobileArena'],
+      ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
       ['#mm-valecup', 'valecup', 'hudChrome.keybinds.valecup'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
@@ -6432,7 +6593,13 @@ export class Hud {
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
     const autoTaunt = pet.petAutoTaunt === true;
     const ownerClass = this.sim.cfg.playerClass;
-    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
+    // Feed-button reason (full HP / no food) folds in so the pet bar redraws
+    // when either flips, even while the pet stays otherwise unchanged.
+    const feedSig =
+      ownerClass === 'warlock'
+        ? ''
+        : (petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood()).reasonKey ?? 'ok');
+    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
@@ -6457,6 +6624,12 @@ export class Hud {
         cooldownText?: string;
         onContextMenu?: () => void;
         onTouchHold?: () => void;
+        // Kept visible (never hidden) but greyed and inert while set. The
+        // accessible name (`title`, which also feeds aria-label) STAYS the
+        // action name; the WHY is carried by the rich hover tooltip
+        // (`tooltip`), so a screen reader still announces the action, not the
+        // disabled reason.
+        disabled?: boolean;
       } = {},
     ) => {
       const btn = document.createElement('button');
@@ -6464,8 +6637,10 @@ export class Hud {
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
+      if (opts.disabled) btn.classList.add('disabled');
       btn.title = title;
       btn.setAttribute('aria-label', title);
+      if (opts.disabled) btn.setAttribute('aria-disabled', 'true');
       if (opts.active || opts.autocast) btn.setAttribute('aria-pressed', 'true');
       const icon = document.createElement('span');
       icon.className = 'icon-label';
@@ -6489,7 +6664,7 @@ export class Hud {
         touchHoldTimer = undefined;
       };
       const runClickAction = () => {
-        if (opts.cooldownText) return;
+        if (opts.cooldownText || opts.disabled) return;
         audio.click();
         onClick();
       };
@@ -6512,6 +6687,7 @@ export class Hud {
         btn.addEventListener('contextmenu', (event) => {
           event.preventDefault();
           if (document.body.classList.contains('mobile-touch')) return;
+          if (opts.disabled) return; // an inert button fires no secondary action
           audio.click();
           opts.onContextMenu?.();
         });
@@ -6521,6 +6697,7 @@ export class Hud {
           if (!document.body.classList.contains('mobile-touch') || event.pointerType !== 'touch') {
             return;
           }
+          if (opts.disabled) return; // an inert button fires no long-press action
           event.preventDefault();
           clearTouchHoldTimer();
           suppressNextClick = false;
@@ -6621,20 +6798,25 @@ export class Hud {
         },
       );
     } else {
+      const feedState = petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood());
       addButton(
         commands,
         PET_ACTION_ICONS.feed,
+        // Accessible name stays "Heal Pet" even when disabled; the disabled
+        // reason lives in the rich tooltip below, never in the aria-label.
         t('hud.pet.healPet'),
-        petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
+        feedState.reasonKey
+          ? petTooltip(t('hud.pet.healPet'), t(feedState.reasonKey))
+          : petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
         () => {
           // Toggle: a second click cancels the pending feed instead of trapping
-          // the player in food-selection mode.
+          // the player in food-selection mode. Reaching this handler at all
+          // means feedState.disabled was false (the button no-ops while
+          // disabled), so the food check below is now just a defensive guard.
           if (this.pendingPetFeed) {
             this.cancelPetFeed();
             return;
           }
-          // With no edible food there is nothing to select, so entering feed mode
-          // would strand the player on the bag screen — surface an error instead.
           if (!this.hasPetFood()) {
             this.showError(t('hud.pet.noPetFood'));
             return;
@@ -6644,7 +6826,10 @@ export class Hud {
           $('#bags').style.display = 'flex';
           this.renderBags();
         },
-        { active: this.pendingPetFeed },
+        // A pending feed stays clickable so the toggle can CANCEL it, even once
+        // the pet has regenerated back to full HP (which would otherwise flip
+        // feedState.disabled true and trap the player in food-selection mode).
+        { active: this.pendingPetFeed, disabled: feedState.disabled && !this.pendingPetFeed },
       );
     }
     const modes: { mode: PetMode; labelKey: TranslationKey; descKey: TranslationKey }[] = [
@@ -7104,10 +7289,22 @@ export class Hud {
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write
     // routes through the elided writer facet; the aria-label keeps its per-frame t()
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
+    // Derive `stealthed` from the mirrored auras rather than trust the raw entity
+    // field: offline it is the live sim Entity's cache (kept current by
+    // Sim.updateAuras), but online it is the ClientWorld mirror's server-local
+    // interest-filtering cache, never encoded on the wire and never updated on the
+    // client (see src/net/online.ts, server/game.ts). The auras ARE mirrored, so
+    // this stays correct on both hosts. Shared by every action-bar-family view
+    // below (desktop bar, mobile ring, consumables quick bar).
+    const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
     this.renderPetBar();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     this.actionBarPainter.paint(
-      this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
+      this.actionBarView.tick({
+        player: abPlayer,
+        target: target ?? null,
+        inventory: sim.inventory,
+      }),
     );
 
     // mobile action ring: the paged touch combat cluster, gated on the touch-mode
@@ -7117,7 +7314,7 @@ export class Hud {
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
-          player: p,
+          player: abPlayer,
           target: target ?? null,
           inventory: sim.inventory,
         }),
@@ -7141,7 +7338,7 @@ export class Hud {
     ) {
       this.consumableBarPainter.paint(
         this.consumableBarView.tick({
-          player: p,
+          player: abPlayer,
           target: target ?? null,
           inventory: sim.inventory,
         }),
@@ -7340,6 +7537,8 @@ export class Hud {
       this.updateShootCharge();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
+      if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
+      if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
@@ -8411,6 +8610,10 @@ export class Hud {
     this.arenaWindow.toggle();
   }
 
+  toggleDungeonFinder(): void {
+    this.dungeonFinderWindow.toggle();
+  }
+
   toggleValeCup(): void {
     this.valeCupWindow.toggle();
   }
@@ -8474,15 +8677,32 @@ export class Hud {
     if (el.style.display === 'block') {
       el.style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.mapPing = null;
+      this.mapZoneOverride = null;
       this.syncAnyWindowOpenState();
       return;
     }
     this.closeOtherWindows('#map-window');
     this.mapZoom = 1; // always open at the full-zone view, following the player
     this.mapCenter = null;
+    this.mapPing = null;
+    this.mapZoneOverride = null;
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
+  }
+
+  // Dungeon Finder "Show on Map": open the world map on the entrance's zone
+  // band, pan to the authored door position, and ring it. Never teleports; the
+  // highlight clears when the map closes or is reopened normally.
+  showFinderOnMap(x: number, z: number): void {
+    const el = $('#map-window');
+    if (el.style.display !== 'block') this.toggleMap();
+    this.mapZoneOverride = zoneAt(z).id;
+    this.mapPing = { x, z };
+    this.mapZoom = Math.max(this.mapZoom, 2);
+    this.mapCenter = { x, z };
+    this.updateMapWindow();
   }
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
@@ -8526,15 +8746,18 @@ export class Hud {
     // the instance x-band layout); outdoors, follow the committed zone so
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+    const zone: ZoneDef = this.mapZoneOverride
+      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.z))
+      : dungeon
+        ? zoneAt(dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
+      ping: this.mapPing,
     });
     this.mapView = result.view;
     this.mapQuestAreas = result.questAreas;
@@ -8669,10 +8892,17 @@ export class Hud {
         // pain vocalization only on a crit — never on ordinary hits.
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 0.55, { cooldown: 0.3 });
-        } else if (ev.crit && tgt.kind === 'mob' && shouldPlayCritSfxForTarget(tgt)) {
-          const voice = availableMobVoiceCue(tgt.templateId, 'attack');
-          if (voice && shouldPlayMobVoiceSfxForEntity(tgt))
-            this.combat(voice, tp.x, tp.y, tp.z, 0.6, { rate: 1.25, cooldown: 0.1 });
+        } else {
+          const mobAction = mobVoiceActionForDamage(ev, tgt);
+          if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
+            const voice = mobVoiceCueWithFallback(
+              tgt.templateId,
+              mobAction,
+              (key) => sfx.hasVariants(key),
+              (key) => sfx.isBuffered(key),
+            );
+            if (voice) this.combat(voice, tp.x, tp.y, tp.z, 0.6, { cooldown: 0.1 });
+          }
         }
         return;
       }
@@ -8758,8 +8988,15 @@ export class Hud {
     if (src.kind === 'mob') {
       if (this.ensureMobEngaged(src)) return; // just fired the aggro alert
       const voice = availableMobVoiceCue(src.templateId, 'attack');
-      if (voice && shouldPlayMobVoiceSfxForEntity(src))
+      if (voice && shouldPlayMobVoiceSfxForEntity(src)) {
         this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
+        // Warm the crit-only hurt cue alongside the frequently-played attack
+        // bark, so it is resident well before a crit could ever need it. Gated
+        // the same as the play above (a muted Nythraxis mob never plays it)
+        // and short-circuited once warm so this doesn't re-scan every hit.
+        const hurtVoice = availableMobVoiceCue(src.templateId, 'hurt');
+        if (hurtVoice && !sfx.isBuffered(hurtVoice)) sfx.preload(hurtVoice);
+      }
     }
   }
 
@@ -9215,7 +9452,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#7fd4ff',
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
                 ev.fromPid,
@@ -9227,7 +9463,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff5040',
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -9242,7 +9477,6 @@ export class Hud {
                 this.chatLogFrom(
                   ev.to,
                   ev.text,
-                  '#ff80ff',
                   CHAT_TEMPLATE_KEYS.toWhisper,
                   'whisper',
                   ev.fromPid,
@@ -9252,7 +9486,6 @@ export class Hud {
                 this.chatLogFrom(
                   ev.from,
                   ev.text,
-                  '#ff80ff',
                   CHAT_TEMPLATE_KEYS.whisper,
                   'whisper',
                   ev.fromPid,
@@ -9266,7 +9499,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ffc864',
                 CHAT_TEMPLATE_KEYS.general,
                 'general',
                 ev.fromPid,
@@ -9278,7 +9510,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff9d5c',
                 CHAT_TEMPLATE_KEYS.world,
                 'world',
                 ev.fromPid,
@@ -9290,7 +9521,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#5cd6a0',
                 CHAT_TEMPLATE_KEYS.lfg,
                 'lfg',
                 ev.fromPid,
@@ -9302,7 +9532,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#40d264',
                 CHAT_TEMPLATE_KEYS.guild,
                 'guild',
                 ev.fromPid,
@@ -9314,7 +9543,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#4ce0c0',
                 CHAT_TEMPLATE_KEYS.officer,
                 'officer',
                 ev.fromPid,
@@ -9326,7 +9554,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff8040',
                 CHAT_TEMPLATE_KEYS.emote,
                 'emote',
                 ev.fromPid,
@@ -9338,7 +9565,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ffd100',
                 CHAT_TEMPLATE_KEYS.roll,
                 'roll',
                 ev.fromPid,
@@ -9350,7 +9576,6 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#f0ead8',
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
@@ -9506,6 +9731,11 @@ export class Hud {
           break;
         case 'arenaUnqueued':
           this.log(t('hud.system.arenaUnqueued'), '#ffa040');
+          break;
+        case 'dfProposal':
+          // A 30s availability window: the WoW-style prompt pops at the top of
+          // the screen (with its cue) without opening the finder window.
+          this.dungeonFinderProposalPopup.show();
           break;
         case 'arenaFound': {
           const name =
@@ -9926,7 +10156,15 @@ export class Hud {
         }
         case 'log': {
           const text = this.localizeSystemText(ev.text);
-          this.log(text, ev.color ?? '#ccc');
+          // Route mob/boss combat-flavor chatter to the Combat Log tab instead of
+          // General/Chat (see log_event_route.ts): pid-scoped personal narrative and
+          // entityId-anchored actionable mechanic telegraphs both stay in General/Chat,
+          // so new players standing near a busy fight aren't drowned out by ambient
+          // mob barks while a mechanic's only cue is never buried. A narrative line
+          // still gets its floating world chat bubble below.
+          if (isCombatFlavorLog(ev.entityId, ev.pid, ev.telegraph))
+            this.combatLog(text, ev.color ?? '#ccc');
+          else this.log(text, ev.color ?? '#ccc');
           const isNythraxisVisionLine = [
             'My king was a good man.',
             'I swore my blade to him.',
@@ -10049,7 +10287,6 @@ export class Hud {
   private chatLogFrom(
     name: string,
     text: string,
-    color: string,
     templateKey: TranslationKey,
     chan: string,
     fromPid?: number,
@@ -10059,7 +10296,9 @@ export class Hud {
     const wasNearBottom =
       this.chatLogEl.scrollHeight - this.chatLogEl.scrollTop - this.chatLogEl.clientHeight < 24;
     const div = document.createElement('div');
-    div.style.color = color;
+    // The line color is a pure function of its channel (the single source of truth
+    // shared with the chat input tint), so it is derived here rather than passed in.
+    div.style.color = chatChannelColor(chan);
     div.dataset.chan = chan;
     this.hideIfFiltered(div, chan);
     this.prependTimestamp(div);
@@ -13689,6 +13928,12 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
+  openWocStore(): void {
+    if (!this.dailyRewardsEnabled()) return;
+    this.dailyRewardsWindow.openStore();
+    this.refreshDailyRewardsLauncher(true);
+  }
+
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
@@ -13698,6 +13943,29 @@ export class Hud {
     this.claudiumLauncherBalanceSeq++;
     this.claudiumLauncherBalancePending = false;
     this.refreshClaudiumLauncherBalance(true);
+  }
+
+  attachStorePromoCard(): void {
+    if (this.storePromoCard || !this.claudiumHooks) return;
+    const host = document.getElementById('chatlog-wrap');
+    if (!host) return;
+    this.storePromoCard = mountStorePromoCard(host, {
+      labels: {
+        open: t('hudChrome.wocStore.title'),
+        close: t('hudChrome.wocStore.close'),
+        season: t('hudChrome.wocStore.seasonOne'),
+        title: t('hudChrome.wocStore.armoryTitle'),
+        cta: t('hudChrome.wocStore.title'),
+      },
+      returnFocusTo: () => document.getElementById('daily-rewards-button'),
+      onOpenStore: () => this.openWocStore(),
+      onDismiss: () => {
+        this.storePromoCard = null;
+      },
+    });
+    const tabs = document.getElementById('chatlog-tabs');
+    if (tabs) this.ensureChatBoxGeometry(host, tabs);
+    this.applyChatBoxGeometry();
   }
 
   /**
@@ -13746,11 +14014,19 @@ export class Hud {
 
   // Restore a saved loadout's action bar into the per-class slot map (reuses the
   // existing hotbar persistence; only places ids that resolve to real abilities).
+  // A SavedLoadout's bar is ability ids only (currentBar strips item shortcuts
+  // before saving, see the talentsWindow deps below), so this must not replace
+  // the WHOLE bar wholesale: that would also silently clear any potion/food/drink
+  // shortcut the player had placed, since the loadout never recorded it either
+  // way (#1889). applyLoadoutBarActions keeps an existing item slot wherever the
+  // loadout leaves that slot blank.
   private applyLoadoutBar(bar: (string | null)[]): void {
-    this.hotbarActions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, (_, i) => {
-      const v = bar[i];
-      return typeof v === 'string' && ABILITIES[v] ? { type: 'ability' as const, id: v } : null;
-    });
+    this.hotbarActions = applyLoadoutBarActions(
+      this.hotbarActions,
+      bar,
+      Hud.BAR_ABILITY_SLOTS,
+      (id) => !!ABILITIES[id],
+    );
     this.saveSlotMap();
   }
 
@@ -14272,7 +14548,7 @@ export class Hud {
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
       `<div class="inspect-card">` +
-      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
+      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg', framing: 'body' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
       // The active Book of Deeds title (the entity `title` wire field, a deed
       // id): a subtitle line under the name, exactly the nameplate surface.

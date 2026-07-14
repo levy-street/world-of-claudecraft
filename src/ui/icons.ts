@@ -2782,6 +2782,7 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_ogre: r('fury', 'earthBrown', ['fist']),
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
+  family_reptile: r('earth', 'leafGreen', ['fang']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -3696,6 +3697,13 @@ export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
   const deedId = crestId.slice(DEED_CREST_PREFIX.length);
   return DEED_IMAGE_IDS.has(deedId) ? `${DEED_ICON_DIR}/${deedId}.webp` : null;
+}
+
+/** True when `id` has a real crest recipe, as opposed to falling through to the
+ *  generic fallback + dev-only console.warn. Lets a test walk every family a
+ *  MobFamily-shaped id can produce and assert none of them silently fall back. */
+export function hasCrestRecipe(id: string): boolean {
+  return id in CREST_RECIPES;
 }
 
 const urlCache = new Map<string, string>();

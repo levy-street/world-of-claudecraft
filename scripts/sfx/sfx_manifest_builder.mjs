@@ -4,16 +4,94 @@
 
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { MOB_VOICE_FAMILIES } from './sfx_prompts.mjs';
 
 // A bare custom recording may remain lossless until the conform step converts
 // it. Numbered takes are production MP3s and always use the release `_N` naming.
-export const PROBE_EXTENSIONS = Object.freeze(['.mp3', '.wav', '.flac', '.ogg']);
+export const PROBE_EXTENSIONS = Object.freeze([
+  '.mp3',
+  '.wav',
+  '.flac',
+  '.aiff',
+  '.aif',
+  '.ogg',
+  '.opus',
+  '.m4a',
+]);
 
 // Valid mob vocalization actions, used as the right-hand anchor when parsing
 // mob_<family>_<subfamily>_<action>_<N>.mp3.
-export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt']);
+export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt', 'idle']);
 
 const KEY_PATTERN = /^[a-z0-9][a-z0-9_]*$/;
+const MOB_EXTENSION_FAMILIES = new Set(MOB_VOICE_FAMILIES);
+export const SFX_MOB_EXTENSION_KEY_PATTERN =
+  /^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$/;
+
+/** Return the canonical positive variant number, or null for zero, leading-zero,
+ * unsafe, or otherwise invalid ids. Manifest discovery and source conformance
+ * must use this one validator so a source cannot conform into an unloadable MP3. */
+export function sfxVariantNumber(value) {
+  if (!/^[1-9]\d*$/.test(value)) return null;
+  const number = Number(value);
+  return Number.isSafeInteger(number) && String(number) === value ? number : null;
+}
+
+export function isSfxMobExtensionKey(key) {
+  if (typeof key !== 'string') return false;
+  const match = key.match(SFX_MOB_EXTENSION_KEY_PATTERN);
+  return !!match && MOB_EXTENSION_FAMILIES.has(match[1]);
+}
+
+/** Parse a catalog take stem such as `foot_grass_2`. Exact/bare catalog stems
+ * are handled by the caller; this parser owns only the canonical `_N` grammar. */
+export function parseCatalogSfxVariantStem(value, catalogKeys) {
+  const match = value.match(/^(.*)_(\d+)$/);
+  if (!match || !catalogKeys.has(match[1])) return null;
+  const variantNumber = sfxVariantNumber(match[2]);
+  if (variantNumber === null) return null;
+  return { key: match[1], variantId: match[2], variantNumber };
+}
+
+/** Parse a dynamic mob take stem and retain a reason when a mob-looking name is
+ * invalid. The runtime key validator and filesystem discovery share this result. */
+export function parseMobSfxVariantStem(value) {
+  const parts = value.split('_');
+  if (parts.length < 5 || parts[0] !== 'mob' || !/^\d+$/.test(parts.at(-1) ?? '')) {
+    return { kind: 'ignore' };
+  }
+
+  const variantId = parts.at(-1) ?? '';
+  const variantNumber = sfxVariantNumber(variantId);
+  if (variantNumber === null) return { kind: 'invalid', reason: 'variant' };
+
+  const body = parts.slice(2, -1);
+  let actionIndex = -1;
+  for (let index = body.length - 1; index >= 0; index--) {
+    if (MOB_ACTIONS.has(body[index])) {
+      actionIndex = index;
+      break;
+    }
+  }
+  if (actionIndex === -1) return { kind: 'invalid', reason: 'action-missing' };
+  if (actionIndex !== body.length - 1) {
+    return { kind: 'invalid', reason: 'action-position' };
+  }
+
+  const subfamilyParts = body.slice(0, actionIndex);
+  if (subfamilyParts.length === 0) return { kind: 'ignore' };
+  const family = parts[1];
+  const action = body[actionIndex];
+  const subfamily = subfamilyParts.join('_');
+  const key = `mob_${family}_${subfamily}_${action}`;
+  if (!KEY_PATTERN.test(key) || !key.match(SFX_MOB_EXTENSION_KEY_PATTERN)) {
+    return { kind: 'invalid', reason: 'key' };
+  }
+  if (!MOB_EXTENSION_FAMILIES.has(family)) {
+    return { kind: 'invalid', reason: 'family' };
+  }
+  return { kind: 'valid', key, family, subfamily, action, variantId, variantNumber };
+}
 
 function track(id, filename) {
   return { id, filename, url: `/audio/sfx/${filename}` };
@@ -52,6 +130,10 @@ export function discoverSfxTracks(catalog, sfxDir) {
   const entries = {};
   const errors = [];
   const catalogKeys = new Set();
+  // Filenames already accounted for by a catalog entry (bare or numbered), so
+  // the mob-extension pass below can tell "this belongs to the catalog loop"
+  // apart from "this looks like a mob sfx file but matches nothing."
+  const consumedFilenames = new Set();
   const sfxFiles = existsSync(sfxDir) ? readdirSync(sfxDir).sort() : [];
 
   for (const source of catalog) {
@@ -71,12 +153,8 @@ export function discoverSfxTracks(catalog, sfxDir) {
       .map((filename) => ({ filename, id: filename.match(numberedPattern)?.[1] ?? null }))
       .filter((candidate) => candidate.id !== null);
     for (const candidate of numbered) {
-      const numericId = Number(candidate.id);
-      if (
-        !/^[1-9]\d*$/.test(candidate.id) ||
-        !Number.isSafeInteger(numericId) ||
-        String(numericId) !== candidate.id
-      ) {
+      consumedFilenames.add(candidate.filename);
+      if (sfxVariantNumber(candidate.id) === null) {
         errors.push(`invalid SFX variant id for ${source.key}: ${candidate.filename}`);
         continue;
       }
@@ -97,6 +175,7 @@ export function discoverSfxTracks(catalog, sfxDir) {
         const filename = `${source.key}${extension}`;
         if (!existsSync(path.join(sfxDir, filename))) continue;
         tracks.push(track('main', filename));
+        consumedFilenames.add(filename);
         break;
       }
     }
@@ -115,48 +194,34 @@ export function discoverSfxTracks(catalog, sfxDir) {
     (filename) => filename.startsWith('mob_') && filename.endsWith('.mp3'),
   );
   for (const filename of mobFiles) {
+    if (consumedFilenames.has(filename)) continue;
     const stem = filename.slice(0, -4);
-    const parts = stem.split('_');
-    if (parts.length < 5 || !/^\d+$/.test(parts.at(-1) ?? '')) continue;
-
-    const variantId = parts.at(-1) ?? '';
-    const variantNumber = Number(variantId);
-    if (
-      !/^[1-9]\d*$/.test(variantId) ||
-      !Number.isSafeInteger(variantNumber) ||
-      String(variantNumber) !== variantId
-    ) {
-      errors.push(`invalid mob sfx variant id: ${filename}`);
+    const parsed = parseMobSfxVariantStem(stem);
+    if (parsed.kind === 'ignore') {
+      // Not a fixed catalog file (already handled above) and not a valid
+      // mob_<family>_<subfamily>_<action>_<N>.mp3 subfamily file either.
+      // A file shaped like this was never meant to be silently ignored: flag
+      // it instead of letting it vanish from every rebuild with no signal.
+      errors.push(
+        `unrecognized mob sfx file (not a catalog entry, not a valid numbered subfamily file): ${filename}`,
+      );
       continue;
     }
-
-    const family = parts[1];
-    const body = parts.slice(2, -1);
-    let actionIndex = -1;
-    for (let index = body.length - 1; index >= 0; index--) {
-      if (MOB_ACTIONS.has(body[index])) {
-        actionIndex = index;
-        break;
-      }
-    }
-    if (actionIndex === -1) {
-      errors.push(`invalid mob sfx filename (no recognized action): ${filename}`);
+    if (parsed.kind === 'invalid') {
+      const detail =
+        parsed.reason === 'variant'
+          ? 'invalid mob sfx variant id'
+          : parsed.reason === 'action-missing'
+            ? 'invalid mob sfx filename (no recognized action)'
+            : parsed.reason === 'action-position'
+              ? 'invalid mob sfx filename (action must precede variant)'
+              : parsed.reason === 'family'
+                ? 'invalid mob sfx filename (unsupported mob family)'
+                : 'invalid mob sfx key derived from filename';
+      errors.push(`${detail}: ${filename}`);
       continue;
     }
-    if (actionIndex !== body.length - 1) {
-      errors.push(`invalid mob sfx filename (action must precede variant): ${filename}`);
-      continue;
-    }
-
-    const subfamilyParts = body.slice(0, actionIndex);
-    if (subfamilyParts.length === 0) continue;
-    const action = body[actionIndex];
-    const subfamily = subfamilyParts.join('_');
-    const key = `mob_${family}_${subfamily}_${action}`;
-    if (!KEY_PATTERN.test(key)) {
-      errors.push(`invalid mob sfx key derived from filename: ${filename}`);
-      continue;
-    }
+    const { key, variantId } = parsed;
     if (!entries[key]) entries[key] = { key, loop: false, catalog: false, tracks: [] };
     const entry = entries[key];
     if (entry.tracks.some((value) => value.filename === filename)) continue;

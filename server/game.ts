@@ -10,6 +10,7 @@ import {
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { DEEDS } from '../src/sim/content/deeds';
+import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -22,6 +23,7 @@ import {
   delveAt,
   dungeonAt,
   isDelvePos,
+  ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
@@ -40,6 +42,7 @@ import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import type { VcMatch } from '../src/sim/social/vale_cup';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
   type Aura,
@@ -265,12 +268,41 @@ export const SIM_LAP_PHASES = [
   'instances',
   'delves',
   'valecup',
+  'dfinder',
   'market',
   'postOffice',
   'delayedEv',
   'deeds',
   'gridRefresh',
 ].map((n) => `sim.${n}`);
+
+// Per-zone attribution buckets for the mob.update phase. The mob loop
+// tags each mob.update lap with its entity; the host splits that slice of the phase
+// time by the mob's zone/group so a stall localizes to "which zone froze" instead of
+// only the phase total. These are HOST-DERIVED (the sim never emits them), so they are
+// registered in the profiler but deliberately kept OUT of SIM_LAP_PHASES (which pins
+// the sim's own emissions). Overworld mobs bucket by zone id; instance/delve mobs
+// (x beyond DUNGEON_X_THRESHOLD) share one 'instance' bucket; 'other' is a safety net.
+const MOB_ZONE_PHASE_PREFIX = 'sim.mob.z:';
+const MOB_ZONE_PHASE_INSTANCE = `${MOB_ZONE_PHASE_PREFIX}instance`;
+const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
+// Pre-interned zone-id -> phase-name map so the per-mob probe allocates no strings.
+const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
+  ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
+);
+export const SIM_MOB_ZONE_PHASES = [
+  ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
+  MOB_ZONE_PHASE_INSTANCE,
+  MOB_ZONE_PHASE_OTHER,
+];
+
+// The zone/group bucket a mob's update cost is attributed to. Pure and allocation-free
+// (a cheap zoneAt band scan plus a Map lookup of an interned string).
+export function mobZonePhase(mob: Entity): string {
+  if (mob.pos.x > DUNGEON_X_THRESHOLD) return MOB_ZONE_PHASE_INSTANCE;
+  return MOB_ZONE_PHASE_BY_ID.get(zoneAt(mob.pos.z).id) ?? MOB_ZONE_PHASE_OTHER;
+}
+
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
@@ -278,12 +310,22 @@ const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
 const VC_WIRE_HZ = 2;
 const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
+// Dungeon Finder personal readout cadence: the `df` payload carries
+// whole-second clocks (queue wait, proposal countdown), so 2 Hz keeps the
+// window live without re-serializing it at 20 Hz. The shared `dfb` board rides
+// the same cadence and only re-sends when a listing actually changes.
+const DF_WIRE_HZ = 2;
+const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
+  accept?: boolean;
   action?: string;
+  activities?: unknown;
+  activity?: string;
   alloc?: unknown;
   ante?: number;
+  applicant?: number;
   augment?: string;
   bar?: unknown;
   bracket?: number;
@@ -308,6 +350,7 @@ type ClientMessage = Record<string, unknown> & {
   item?: string;
   itemId?: string;
   level?: number;
+  listing?: number;
   marker?: number;
   mi?: unknown;
   mode?: string;
@@ -322,6 +365,7 @@ type ClientMessage = Record<string, unknown> & {
   quest?: string;
   r?: string;
   role?: string;
+  roles?: unknown;
   rollId?: number;
   seq?: number;
   sid?: string;
@@ -330,6 +374,7 @@ type ClientMessage = Record<string, unknown> & {
   slot?: number | string;
   spec?: string;
   t?: string;
+  tags?: unknown;
   text?: string;
   tierId?: string;
   x?: number;
@@ -574,6 +619,8 @@ export interface ClientSession {
   lastArenaWireTick: number;
   // Vale Cup readout, same idea at its own cadence (VC_WIRE_HZ)
   lastVcupWireTick: number;
+  // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
+  lastDfWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -882,6 +929,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
@@ -1034,6 +1082,10 @@ export class GameServer {
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
+  private readonly valeCupRewardCompletions = new WeakMap<
+    VcMatch,
+    { completionId: string; completedAtIso: string }
+  >();
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
@@ -1080,6 +1132,8 @@ export class GameServer {
     // Populated only while the detailed capture is active (an on-demand admin
     // capture or PERF_TICK_LOG=1); zero otherwise.
     ...SIM_LAP_PHASES,
+    // Per-zone breakdown of the mob.update phase, with the same capture gating.
+    ...SIM_MOB_ZONE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
   // (bcastGrid/bcastSelf/visits) AND the sim.tick() perfLap sub-phases are measured;
@@ -1135,10 +1189,16 @@ export class GameServer {
       // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
       // probe is always passed but early-returns unless a detailed capture is active,
       // so the steady-state loop pays only a branch per phase.
-      perfLap: (phase) => {
+      perfLap: (phase, entity) => {
         if (!this.perfDetailActive) return;
         const t = process.hrtime.bigint();
-        this.tickProfiler.add(`sim.${phase}`, Number(t - this.simLapMark) / 1e6);
+        const dt = Number(t - this.simLapMark) / 1e6;
+        this.tickProfiler.add(`sim.${phase}`, dt);
+        // The mob loop tags each mob.update lap with its entity, so the SAME measured
+        // slice also lands in that mob's per-zone bucket. One clock read,
+        // no extra wall-clock, no sim-side work: a mob.update blowup now localizes to a
+        // zone in the same [perf.sim] report instead of only the phase total.
+        if (entity !== undefined) this.tickProfiler.add(mobZonePhase(entity), dt);
         this.simLapMark = t;
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
@@ -1260,6 +1320,7 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -1284,6 +1345,7 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
@@ -2393,6 +2455,7 @@ export class GameServer {
       lastSent: {},
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastVcupWireTick: -VC_WIRE_INTERVAL_TICKS,
+      lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -3053,6 +3116,17 @@ export class GameServer {
     if (simPhases.length > 0) {
       const fmtMean = (n: string) => `${n.slice(4)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
       console.log(`[perf.sim] mean/p95/max ${simPhases.slice(0, 14).map(fmtMean).join(' ')}`);
+    }
+    // Per-zone split of mob.update, mean-sorted so the zone eating the
+    // phase leads. Only prints when the mob.update cost is actually attributed to a
+    // zone, so a normal tick stays quiet.
+    const zonePhases = SIM_MOB_ZONE_PHASES.filter((n) => p[n] && p[n].mean > 0).sort(
+      (a, b) => p[b].mean - p[a].mean,
+    );
+    if (zonePhases.length > 0) {
+      const fmtZone = (n: string) =>
+        `${n.slice(MOB_ZONE_PHASE_PREFIX.length)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
+      console.log(`[perf.sim.mob] zone mean/p95/max ${zonePhases.map(fmtZone).join(' ')}`);
     }
   }
 
@@ -3721,6 +3795,11 @@ export class GameServer {
         if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
+      // and the combat auto-unsheathe rule.
+      case 'stow_weapon':
+        sim.toggleWeaponStow(pid);
+        break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -4107,6 +4186,62 @@ export class GameServer {
         ) {
           sim.vcupBet(msg.side, Math.floor(msg.amount), pid);
         }
+        break;
+
+      // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
+      // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
+      // group formation bumps the party key through the normal snapshot path.
+      // Every field is validated here; the Sim re-validates eligibility, roles,
+      // capacity, and party state authoritatively.
+      case 'df_roles': {
+        if (Array.isArray(msg.roles) && msg.roles.length <= 3) {
+          const roles = msg.roles.filter(isFinderRole);
+          if (roles.length === msg.roles.length) sim.dungeonFinderSetRoles(roles, pid);
+        }
+        break;
+      }
+      case 'df_queue': {
+        if (Array.isArray(msg.activities) && msg.activities.length <= 16) {
+          const activities = msg.activities.filter(
+            (a): a is string => typeof a === 'string' && a.length <= 64,
+          );
+          if (activities.length === msg.activities.length)
+            sim.dungeonFinderQueueJoin(activities, pid);
+        }
+        break;
+      }
+      case 'df_queue_leave':
+        sim.dungeonFinderQueueLeave(pid);
+        break;
+      case 'df_proposal':
+        sim.dungeonFinderRespond(msg.accept === true, pid);
+        break;
+      case 'df_list_create': {
+        if (
+          typeof msg.activity === 'string' &&
+          msg.activity.length <= 64 &&
+          Array.isArray(msg.tags) &&
+          msg.tags.length <= 8
+        ) {
+          const tags = msg.tags.filter(isFinderListingTag);
+          if (tags.length === msg.tags.length)
+            sim.dungeonFinderListingCreate(msg.activity, tags, pid);
+        }
+        break;
+      }
+      case 'df_list_close':
+        sim.dungeonFinderListingClose(pid);
+        break;
+      case 'df_apply':
+        if (typeof msg.listing === 'number' && Number.isFinite(msg.listing))
+          sim.dungeonFinderApply(msg.listing, pid);
+        break;
+      case 'df_apply_cancel':
+        sim.dungeonFinderApplyCancel(pid);
+        break;
+      case 'df_app_respond':
+        if (typeof msg.applicant === 'number' && Number.isFinite(msg.applicant))
+          sim.dungeonFinderApplicationRespond(msg.applicant, msg.accept === true, pid);
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
@@ -4783,6 +4918,16 @@ export class GameServer {
       session.lastVcupWireTick = this.sim.tickCount;
       maybe('vcup', this.sim.cupInfoFor(anchorSession.pid));
     }
+    // Dungeon Finder at its own UI cadence (DF_WIRE_HZ): the personal `df`
+    // blob carries whole-second clocks (queue wait, proposal countdown), so
+    // re-evaluating every tick would re-serialize it 20 times per visible
+    // change. The shared `dfb` board is a separate key so a live countdown
+    // never re-sends the listings.
+    if (this.sim.tickCount - session.lastDfWireTick >= DF_WIRE_INTERVAL_TICKS) {
+      session.lastDfWireTick = this.sim.tickCount;
+      maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
+      maybe('dfb', this.sim.dungeonFinderBoardView());
+    }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
@@ -4960,6 +5105,20 @@ export class GameServer {
     return REALM_PUBLIC_ORIGIN ? `${REALM_PUBLIC_ORIGIN}/c/${encodeURIComponent(name)}` : null;
   }
 
+  private valeCupRewardCompletion(match: VcMatch): {
+    completionId: string;
+    completedAtIso: string;
+  } {
+    const existing = this.valeCupRewardCompletions.get(match);
+    if (existing) return existing;
+    const completion = {
+      completionId: randomUUID(),
+      completedAtIso: new Date().toISOString(),
+    };
+    this.valeCupRewardCompletions.set(match, completion);
+    return completion;
+  }
+
   // Scan a tick's events for "significant activity" (max-level ding, rare drop,
   // duel result, arena win) and enqueue a card for the Discord bot to post. The
   // drain endpoint resolves which players are linked and tags them; the queue
@@ -5129,6 +5288,7 @@ export class GameServer {
           practice || [...match.rosterA, ...match.rosterB].some((player) => player.bot);
         if (!match.rated && !matchHasBots) continue;
         if (!ev.won) continue;
+        const completion = this.valeCupRewardCompletion(match);
         void dailyRewardService
           .recordValeCupResult(s.accountId, {
             won: true,
@@ -5137,6 +5297,8 @@ export class GameServer {
             rated: match.rated,
             hasBots: matchHasBots,
             practice,
+            completionId: completion.completionId,
+            completedAt: new Date(completion.completedAtIso),
           })
           .then((points) => {
             if (points > 0) this.sendDailyRewardPointsGained(s, points);

@@ -617,6 +617,15 @@ export const zh_TW: EnTranslations = {
       "notNow": "暫不",
       "update": "更新"
     },
+    "cameraPrompt": {
+      "title": "選擇你的鏡頭",
+      "intro": "選擇鏡頭跟隨角色的方式。",
+      "mouseDesc": "無需按住滑鼠按鍵，移動滑鼠即可轉動鏡頭。",
+      "classicTitle": "經典鏡頭",
+      "classicDesc": "按住滑鼠右鍵並移動滑鼠來轉動鏡頭。",
+      "changeLater": "稍後可在 Esc 選單的「按鍵綁定」中變更。",
+      "confirm": "確認"
+    },
     "castBar": {
       "playerAria": "你的施法條",
       "targetAria": "目標施法條"
@@ -662,7 +671,12 @@ export const zh_TW: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。"
+    },
+    "petFeed": {
+      "disabledFullHp": "寵物生命值已滿",
+      "disabledNoFood": "你的背包中沒有可以治療寵物的食物"
     },
     "keybinds": {
       "emoteWheel": "表情輪盤",
@@ -670,6 +684,7 @@ export const zh_TW: EnTranslations = {
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
+      "sheathe": "收起/拔出武器",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
       "petStop": "寵物：停止",
@@ -1053,6 +1068,12 @@ export const zh_TW: EnTranslations = {
         "few": "你是{rank}，{count}名成員",
         "many": "你是{rank}，{count}名成員",
         "other": "你是{rank}，{count}名成員"
+      },
+      "finderPartySize": {
+        "one": "{count} 名玩家",
+        "few": "{count} 名玩家",
+        "many": "{count} 名玩家",
+        "other": "{count} 名玩家"
       },
       "characterCount": {
         "one": "{count} 個角色",
@@ -1466,7 +1487,8 @@ export const zh_TW: EnTranslations = {
         "connecting": "正在開啟 Discord...",
         "benefits": "連結你的 Discord，從遊玩與社群活動中賺取點數，並攀升階級。",
         "error": "無法連結 Discord。請再試一次。",
-        "success": "Discord 已連結。"
+        "success": "Discord 已連結。",
+        "joinServer": "直接加入 Discord 伺服器"
       },
       "choice": {
         "title": "使用 Discord 繼續",
@@ -1514,8 +1536,13 @@ export const zh_TW: EnTranslations = {
         "admin": "管理員",
         "coredevs": "核心開發者",
         "devs": "開發者",
+        "seniormods": "資深管理員",
         "mods": "管理員",
-        "artists": "美術"
+        "juniormods": "初級管理員",
+        "artists": "美術",
+        "contentcreator": "內容創作者",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "已驗證成員",
       "notMember": "尚未加入伺服器",
@@ -1814,6 +1841,107 @@ export const zh_TW: EnTranslations = {
       "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。"
+    },
+    "finder": {
+      "title": "地城搜尋器",
+      "close": "關閉",
+      "back": "返回",
+      "syncing": "正在等待伺服器...",
+      "tabCatalogue": "目錄",
+      "tabQueue": "快速配對",
+      "tabBoard": "預組隊伍",
+      "normal": "普通",
+      "heroic": "英雄",
+      "kindDungeon": "地城",
+      "kindRaid": "團隊副本",
+      "kindSolo": "單人冒險",
+      "levels": "等級 {min} 至 {max}",
+      "levelOne": "等級 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "坦克",
+      "roleHealer": "補師",
+      "roleDps": "輸出",
+      "freeRoles": "不限職責",
+      "lockoutDaily": "最終首領每日鎖定",
+      "lockoutNone": "無鎖定",
+      "lockedFor": "鎖定約 {minutes} 分鐘",
+      "attunement": "需要完成前置任務：{quest}",
+      "heroicMarks": "英雄徽記：每人 {count} 枚",
+      "entrance": "入口：{zone}",
+      "showOnMap": "在地圖上顯示",
+      "encounters": "首領戰",
+      "finalBoss": "最終首領",
+      "summoned": "召喚的守衛",
+      "lootGuaranteed": "以下物品必掉其一：",
+      "lootMaybe": "以下物品至多掉落其一：",
+      "lootChance": "額外機率掉落：",
+      "lootHeroic": "英雄獎勵，以下物品必掉其一：",
+      "pct": "{pct}%",
+      "blockedLevel": "僅限等級 {min} 至 {max}",
+      "blockedSpec": "需要選擇專精",
+      "yourRoles": "你的職責",
+      "needsSpec": "選擇一個專精才能使用地城搜尋器。",
+      "leaderNote": "只有隊長才能為隊伍排隊。",
+      "chooseActivities": "選擇活動",
+      "joinQueue": "加入佇列",
+      "leaveQueue": "離開佇列",
+      "waited": "排隊時間：{time}",
+      "cooldownNote": "你可以在 {seconds} 秒後再次排隊。",
+      "travelNote": "隊伍在原地組成。請一起前往入口；不會傳送任何人。",
+      "proposalTitle": "找到隊伍：{name}",
+      "proposalRole": "你的職責：{role}",
+      "accepted": "{accepted}/{size} 已確認",
+      "remaining": "剩餘 {seconds} 秒確認",
+      "accept": "接受",
+      "decline": "拒絕",
+      "acceptedWait": "正在等待其他人...",
+      "slotState": "{role}：{accepted}/{total} 已就緒",
+      "openListings": "公開招募",
+      "boardEmpty": "目前沒有招募。發佈一個吧！",
+      "boardLeaderGate": "只有隊長才能發佈招募。",
+      "publishListing": "發佈招募",
+      "activity": "活動",
+      "publish": "發佈",
+      "yourListing": "你的招募",
+      "closeListing": "關閉招募",
+      "applicants": "申請者",
+      "noApplicants": "還沒有申請者。",
+      "acceptApplicantAria": "接受 {name}",
+      "declineApplicantAria": "拒絕 {name}",
+      "levelClass": "{level} 級 {className}",
+      "leader": "隊長：{name}",
+      "needs": "需要：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "申請",
+      "withdraw": "撤回申請",
+      "tagFirstRun": "初次挑戰",
+      "tagQuestRun": "任務團",
+      "tagFullClear": "全通",
+      "tagLearning": "歡迎新手",
+      "tagFastRun": "速通",
+      "mech": {
+        "shadow_pulse": "暗影脈衝（週期性範圍傷害）",
+        "reaping_arc": "收割之弧（正面順劈）",
+        "mist_surge": "迷霧湧動（週期性範圍傷害）",
+        "summons_adds": "召喚增援",
+        "lunar_tide": "月潮（週期性範圍傷害）",
+        "enrage": "低血量時狂怒",
+        "shuddering_stomp": "震顫踐踏（範圍暈眩）",
+        "necrotic_shockwave": "死靈衝擊波（高額範圍傷害）",
+        "grave_cleaver": "掘墓劈砍（正面順劈）",
+        "shadow_nova": "暗影新星（範圍爆發）",
+        "profane_mending": "褻瀆治療（治療其盟友）",
+        "mana_burn": "枯萎祝福（燃燒法力）",
+        "deathstalker_cleave": "死亡潛行者劈砍（正面順劈）",
+        "mortal_wound": "遺忘之傷（降低受到的治療）",
+        "sealbreak_shockwave": "破印衝擊波（範圍爆發）",
+        "gravebreaker": "碎墓打擊（正面扇形，背對團隊）",
+        "raise_fallen": "亡者復生（週期性召喚小怪）",
+        "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
+        "deathless_rage": "不死之怒（需在護符石處打斷）",
+        "wardstones": "護符石引導（階段轉換）"
+      }
     },
     "deeds": {
       "title": "功績之書",
@@ -2554,6 +2682,10 @@ export const zh_TW: EnTranslations = {
       "dragonkin": {
         "name": "龍類",
         "desc": "來自遠古深淵、覆鱗如蛇的生物。稀少、高傲，且遠比外表看來更為強大。"
+      },
+      "reptile": {
+        "name": "爬行類",
+        "desc": "冷血的獵手，帶著獨有的嘶聲與撕咬，與溫血的野獸截然不同。"
       }
     },
     "worldPage": {
@@ -7626,6 +7758,15 @@ export const zh_TW: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死王庭權杖"
       },
+      "deathless_warguard_legmail": {
+        "name": "不死戰衛腿甲"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "scourgehide_carapace": {
+        "name": "災禍之皮甲殼"
+      },
       "cryptplate_helm": {
         "name": "墓板頭盔"
       },
@@ -7664,6 +7805,9 @@ export const zh_TW: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死巨刃"
+      },
+      "soulforged_warplate": {
+        "name": "鑄魂戰甲"
       },
       "stormcallers_focus": {
         "name": "喚雷之核"

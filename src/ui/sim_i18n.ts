@@ -273,6 +273,46 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  // Dungeon Finder (src/sim/social/dungeon_finder.ts emits; docs/prd/dungeon-finder.md).
+  'dfinder.needSpec': 'Choose a specialization to use the Dungeon Finder.',
+  'dfinder.badRole': 'You cannot fill that role.',
+  'dfinder.alreadyQueued': 'You are already in the Dungeon Finder queue.',
+  'dfinder.leaderOnly': 'Only the party leader may use the Dungeon Finder.',
+  'dfinder.noActivities': 'Select at least one activity to queue for.',
+  'dfinder.groupTooLarge': 'Your group is too large for that activity.',
+  'dfinder.levelRange': 'You do not meet the level range for that activity.',
+  'dfinder.memberLevel': '{name} does not meet the level range for that activity.',
+  'dfinder.selectRole': 'Select a Dungeon Finder role first.',
+  'dfinder.memberRoles': '{name} has not selected a Dungeon Finder role.',
+  'dfinder.cooldown': 'You cannot join the queue again yet.',
+  'dfinder.memberCooldown': '{name} cannot join the queue again yet.',
+  'dfinder.notQueued': 'You are not in the Dungeon Finder queue.',
+  'dfinder.noProposal': 'There is no group proposal to answer.',
+  'dfinder.listingGone': 'That listing is no longer available.',
+  'dfinder.alreadyListing': 'You already lead a group listing.',
+  'dfinder.noListing': 'You do not lead a group listing.',
+  'dfinder.alreadyApplied': 'You already have a pending application.',
+  'dfinder.applyInParty': 'Leave your party before applying to a listing.',
+  'dfinder.noRoom': 'That listing has no room for your roles.',
+  'dfinder.noApplication': 'You have no pending application.',
+  'dfinder.playerUnavailable': 'That player is no longer available.',
+  'dfinder.queueJoined': 'You join the Dungeon Finder queue.',
+  'dfinder.queueLeft': 'You leave the Dungeon Finder queue.',
+  'dfinder.youLeftQueue': 'You left the Dungeon Finder queue.',
+  'dfinder.groupLeftQueue': 'Your group left the Dungeon Finder queue.',
+  'dfinder.notAssembled': 'The group did not assemble. You keep your place in the queue.',
+  'dfinder.assembled': 'Your Dungeon Finder group has assembled. Travel to the entrance together.',
+  'dfinder.listingPublished': 'Your group listing is published.',
+  'dfinder.appliedListingClosed': 'The group listing you applied to has closed.',
+  'dfinder.listingClosed': 'Your group listing is now closed.',
+  'dfinder.applied': 'You apply to a group listing.',
+  'dfinder.applicantApplies': '{name} applies to your group listing.',
+  'dfinder.applicationWithdrawn': 'You withdraw your application.',
+  'dfinder.applicationDeclined': 'Your application was declined.',
+  'dfinder.applicationAccepted': 'Your application was accepted.',
+  'dfinder.proposalReady': 'A dungeon group is ready. Confirm your slot now.',
+  'dfinder.groupChanged': 'Your group changed and left the Dungeon Finder queue.',
+  'dfinder.listingFull': 'Your group listing is now full.',
 } as const;
 
 const petEnTable = {
@@ -5964,6 +6004,23 @@ const RULES: Rule[] = [
   {
     re: /^(.+) channels (.+)\.$/,
     build: (m) => tSim('log.mobChannels', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
+  },
+  // Dungeon Finder member-specific templates (player names splice verbatim).
+  {
+    re: /^(.+) does not meet the level range for that activity\.$/,
+    build: (m) => tSim('dfinder.memberLevel', { name: m[1] }),
+  },
+  {
+    re: /^(.+) has not selected a Dungeon Finder role\.$/,
+    build: (m) => tSim('dfinder.memberRoles', { name: m[1] }),
+  },
+  {
+    re: /^(.+) cannot join the queue again yet\.$/,
+    build: (m) => tSim('dfinder.memberCooldown', { name: m[1] }),
+  },
+  {
+    re: /^(.+) applies to your group listing\.$/,
+    build: (m) => tSim('dfinder.applicantApplies', { name: m[1] }),
   },
   // "{mechanic} is interrupted!" (a channeled mob heal broken by a stun/silence).
   {

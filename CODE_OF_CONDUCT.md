@@ -58,7 +58,7 @@ community in public spaces.
 If you experience or witness unacceptable behavior, please report it privately to
 the maintainers. The simplest way is to send a direct message to a member of the
 **Levy St**, **Admin**, or **Devs** group on the
-[community Discord](https://discord.gg/GjhnUsBtw) and ask for a private channel to
+[community Discord](https://discord.com/invite/worldofclaudecraft) and ask for a private channel to
 share the details.
 
 All reports will be reviewed and investigated promptly and fairly. Maintainers are

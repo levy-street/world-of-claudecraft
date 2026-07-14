@@ -1355,9 +1355,21 @@
       0 0 10px #ffe77a66,
       0 0 18px #ffd10033;
   }
-  .pet-btn.cooldown {
+  .pet-btn.cooldown,
+  .pet-btn.disabled {
     filter: grayscale(0.8) brightness(0.65);
     cursor: default;
+  }
+  /* A disabled button must not read as actively clickable: drop the active/hover
+     gold border and glow so it stays visibly inert. (A pending feed is not
+     disabled, so the cancel-toggle case keeps its active gilding.) */
+  .pet-btn.disabled,
+  .pet-btn.disabled:hover,
+  .pet-btn.disabled.active {
+    border-color: #4a3d1d;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
   }
   .pet-btn.cooldown.autocast {
     filter: grayscale(0.45) brightness(0.78);
@@ -1731,6 +1743,126 @@
   body.mobile-touch #chatlog-tabs {
     cursor: default;
   }
+
+  /* ---------- store promo card ---------- */
+  .store-promo-card {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 10px);
+    width: 100%;
+    aspect-ratio: 1000 / 590;
+    border: 2px solid #4a3d1d;
+    border-radius: 5px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    transition:
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .store-promo-card:hover,
+  .store-promo-card:focus-within {
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 1px 0 #ffffff24,
+      0 3px 8px #000b;
+  }
+  .store-promo-card-open {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: var(--cursor-point);
+  }
+  .store-promo-card-open img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: filter 0.12s ease;
+  }
+  .store-promo-card-copy {
+    position: absolute;
+    top: 7%;
+    left: 4%;
+    z-index: 1;
+    max-width: 58%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #fff;
+    text-align: left;
+    line-height: 0.98;
+    pointer-events: none;
+    text-shadow:
+      0 2px 2px #000,
+      0 0 12px #000;
+  }
+  .store-promo-card-season {
+    font-size: 5.2cqw;
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .store-promo-card-title {
+    margin-top: 2%;
+    font-size: 8.7cqw;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .store-promo-card-cta {
+    position: absolute;
+    right: 4%;
+    bottom: 6%;
+    z-index: 1;
+    min-width: 32%;
+    max-width: 47%;
+    padding: 2.4% 4%;
+    border: 2px solid #d4ae5f;
+    background: #3a2712e8;
+    color: #fff7df;
+    font-size: 4.2cqw;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px #000;
+    pointer-events: none;
+  }
+  .store-promo-card-open:hover img,
+  .store-promo-card-open:focus-visible img {
+    filter: brightness(1.07);
+  }
+  .store-promo-card-open:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -4px;
+  }
+  .store-promo-card-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 1;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    line-height: 1;
+    box-shadow: 0 1px 3px #000c;
+  }
+  body.mobile-touch .store-promo-card,
+  body.native-app .store-promo-card,
+  body.desktop-app .store-promo-card {
+    display: none;
+  }
+
   .chat-pane {
     display: none;
     height: 100%;
@@ -2188,6 +2320,15 @@
     font-size: 10px;
     color: #9c8f6e;
     margin: 1px 0 6px;
+  }
+  /* Empty-state discoverability hint, shown only on the live current segment of
+     the damage/healing tabs (meters.ts gates it). Its own element so it is one
+     t() string, never concatenated onto .mt-sub. */
+  .mt-hint {
+    font-size: 10px;
+    line-height: 1.35;
+    color: #8a7d5e;
+    margin: 0 0 6px;
   }
   .mt-row {
     position: relative;
@@ -2900,8 +3041,8 @@
      el.style.color onto a class the pooled fct_painter toggles (no hex
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
-     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#b974ff); rested
-     xp (#4a9eff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
+     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#d9a3ff); rested
+     xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
      .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
@@ -2922,10 +3063,39 @@
     color: #3ce63c;
   }
   .fct-xp {
-    color: #b974ff;
+    color: #d9a3ff;
+    font-size: calc(20px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop;
+    animation-duration: 1.6s;
   }
   .fct-rested-xp {
-    color: #4a9eff;
+    color: #6db8ff;
+    font-size: calc(20px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop;
+    animation-duration: 1.6s;
+  }
+  /* A slightly bigger scale-in pop than the plain rise (but lighter than the crit pop),
+     so the XP reward reads as pronounced without competing with a real critical hit. */
+  @keyframes fct-xp-pop {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.25;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 76px);
+      scale: 1;
+    }
+  }
+  /* Same low-tier motion shedding precedent as .fct.crit: keep the bigger XP size and
+     color, drop only the scale/pop (the heaviest part of the effect). Never refused. */
+  :root[data-fx-level="low"] .fct-xp,
+  :root[data-fx-level="low"] .fct-rested-xp {
+    animation-name: fct-rise;
   }
   .fct-honor {
     color: #ffd100;

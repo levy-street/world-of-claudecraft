@@ -780,7 +780,8 @@ export type MobFamily =
   | 'ogre'
   | 'elemental'
   | 'dragonkin'
-  | 'demon';
+  | 'demon'
+  | 'reptile';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
@@ -1975,6 +1976,9 @@ export interface Entity {
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;
+  // Z-key cosmetic toggle: held weapons render sheathed on the back. Cleared by
+  // any deliberate combat action (auto-attack engage, ability cast), WoW-style.
+  weaponStowed: boolean;
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
@@ -2379,6 +2383,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
   | { type: 'duelEnd'; winnerName: string; loserName: string }
+  // Dungeon Finder: a 30s availability proposal opened for this player (the
+  // client pops the finder window; state rides the `df` self snapshot).
+  | { type: 'dfProposal' }
   // Ashen Coliseum arena: queue state, match lifecycle, and rating result
   | { type: 'arenaQueued'; position: number; format: ArenaFormat }
   | { type: 'arenaUnqueued' }
@@ -2534,7 +2541,11 @@ export type SimEvent = { pid?: number } & (
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
-  | { type: 'log'; text: string; color?: string; entityId?: number }
+  // `telegraph` marks an entityId-anchored line as an actionable mechanic cue
+  // (a channel, a burst warning, a targeted debuff callout) rather than ambient
+  // flavor chatter: it must reach General/Chat even though it is anchored, since
+  // it may be a player's only cue. See src/ui/log_event_route.ts.
+  | { type: 'log'; text: string; color?: string; entityId?: number; telegraph?: boolean }
   | { type: 'delveEntered'; delveId: string; tierId: string }
   | { type: 'delveObjectiveComplete'; delveId: string; tierId: string }
   | { type: 'delveComplete'; delveId: string; tierId: string }
@@ -2627,6 +2638,22 @@ export type SimEvent = { pid?: number } & (
         | 'recipe_not_learned'
         | 'throttled'
         | 'not_at_hub';
+    }
+  // Gather-node harvest outcome (#1729): a successful resource harvest emits
+  // this so the client can play a gathering audio cue for the acting player.
+  // Personal (carries pid), delivered only to the harvester. Emitted only on a
+  // granted harvest (never on a denial), so every field is always present.
+  // Text-free on purpose (like craftResult/skinEvent above): the client selects
+  // its own audio and localized copy off the structured fields, so no sim/server
+  // i18n matcher rule is needed. `rarity` mirrors craftResult.quality so a
+  // rare-material harvest is distinguishable for a special cue.
+  | {
+      type: 'gatherResult';
+      nodeId: string;
+      nodeType: GatherNodeType;
+      professionId: GatheringProfessionId;
+      itemId: string;
+      rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
     }
 );
 
@@ -2753,7 +2780,12 @@ export interface SimConfig {
   // `phase` (keeps wall-clock reads out of the sim, per the determinism guard). The
   // server injects it to feed its tick profiler during an on-demand capture; undefined
   // offline/headless, so the sim draws no wall clock in a deterministic scenario.
-  perfLap?: (phase: string) => void;
+  // The optional `entity` is a SUB-phase tag: the mob loop passes the mob it just
+  // updated so the host can split the mob.update cost per zone/group
+  // without a second clock read or any per-mob work inside the sim. Every other lap
+  // omits it. Passing a reference allocates nothing and stays behavior-inert (the
+  // host reads it, the sim never does), so the parity/determinism gates are untouched.
+  perfLap?: (phase: string, entity?: Entity) => void;
   // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
   // of no queue activity, so a walk-up spectator always has a game to watch (and
   // bet on). Server + offline game enable it; tests/goldens leave it off so the

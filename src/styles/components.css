@@ -1703,6 +1703,11 @@
     border-top: 1px solid rgb(255 255 255 / 0.06);
     background: #0a1119;
   }
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) .armory-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
   .armory-card {
     position: relative;
     border: 1px solid var(--rarity);
@@ -3693,6 +3698,71 @@
     min-height: 48px;
     word-break: break-all;
   }
+  /* Shared themed native <select>: dark panel, gold accent, custom caret, so a
+     native dropdown stops rendering as OS chrome inside the HUD. Keeps real
+     <select> keyboard/type-ahead semantics (unlike the fully custom .ui-dd
+     widget). Other HUD selects (report reason, etc.) can adopt this class. */
+  .hud-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 26px 6px 8px;
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    /* Caret drawn from two gradients tinted by the theme-aware --gold accent (a
+       data-URI fill cannot read a CSS var), so it stays readable on the dark
+       presets AND on the light Parchment panel where --gold darkens to a
+       contrasting accent. */
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+      linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+    background-position:
+      right 13px center,
+      right 8px center;
+    background-size:
+      5px 5px,
+      5px 5px;
+    background-repeat: no-repeat, no-repeat;
+  }
+  /* Keep the tappable control at the mobile 40px floor (base.css only bumps the
+     select font to 16px; appearance:none leaves height to padding + line box). */
+  @media (pointer: coarse) {
+    .hud-select {
+      min-height: 40px;
+    }
+  }
+  .hud-select:hover {
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:disabled {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+  .hud-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  /* High-contrast: appearance:none + a background-image caret both vanish under
+     forced-colors, so restore the native control + a system border there. */
+  @media (forced-colors: active) {
+    .hud-select {
+      appearance: auto;
+      -webkit-appearance: auto;
+      background-image: none;
+      border: 1px solid ButtonBorder;
+    }
+  }
   /* shared in-app dropdown (replaces native <select>, loadouts, report reason) */
   .ui-dd {
     position: relative;
@@ -3937,6 +4007,111 @@
   .native-update-cta {
     background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
     color: #ffe6a8;
+  }
+
+  /* ---------- first-run camera mode prompt ---------- */
+  .camera-prompt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+  }
+  .camera-prompt-dialog {
+    width: min(440px, calc(100vw - 32px));
+    max-width: 100%;
+    padding: 18px;
+    box-sizing: border-box;
+    animation: camera-prompt-in 160ms ease-out;
+  }
+  @keyframes camera-prompt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .camera-prompt-title {
+    font-family: var(--title-font);
+    font-size: 19px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .camera-prompt-desc {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .camera-prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .camera-prompt-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .camera-prompt-option:focus-within {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .camera-prompt-radio {
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+  }
+  .camera-prompt-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .camera-prompt-option-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .camera-prompt-option-desc {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .camera-prompt-note {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 14px;
+  }
+  .camera-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .camera-prompt-confirm {
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    min-width: 120px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .camera-prompt-dialog {
+      animation: none;
+    }
   }
 
   /* player card: char-window entry button + share modal */
@@ -5645,6 +5820,515 @@
     right: 8px;
     top: 8px;
     z-index: 2;
+  }
+
+  /* ---------- Dungeon Finder ---------- */
+  /* Closed by default: this @layer components rule outranks `.window { display: none }`
+     in @layer layout, so the closed state has to be declared HERE or the empty panel
+     sits on screen from boot (same reason #market-window declares it). The painter
+     opens with inline `flex`, which is what the flex-column bounds below assume. */
+  #dungeon-finder-window {
+    width: 640px;
+    max-width: 96%;
+    --window-pad: 14px;
+    display: none;
+    flex-direction: column;
+    max-height: min(700px, 80vh);
+  }
+  .df-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 6px 0 10px;
+  }
+  .df-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 0;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .df-tab.active {
+    color: #ffb24a;
+    border-color: #8a6a28;
+    background: linear-gradient(180deg, #3a2c14, #241a0c);
+  }
+  .df-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  /* Catalogue: the two panes own the scrolling, the body clips. */
+  .df-body-catalogue {
+    display: flex;
+    overflow: hidden;
+  }
+  .df-cols {
+    display: grid;
+    grid-template-columns: 236px 1fr;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .df-rail,
+  .df-detail {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .df-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    padding: 7px 8px;
+    margin: 0 0 4px;
+    background: #1c150c;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .df-row.active {
+    border-color: #8a6a28;
+    color: #ffd9a0;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .df-row.ineligible {
+    opacity: 0.55;
+  }
+  .df-row-icon {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    object-fit: cover;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: #12100a;
+  }
+  .df-row-text {
+    flex: 1;
+    min-width: 0;
+    display: block;
+  }
+  .df-row-name {
+    display: block;
+    font-family: var(--title-font);
+    font-size: 13px;
+  }
+  .df-row-meta,
+  .df-lock,
+  .df-blocked {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-lock {
+    color: #d98181;
+  }
+  .df-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    margin-left: 4px;
+    font-size: 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    vertical-align: 1px;
+  }
+  .df-badge.heroic {
+    color: #d9964d;
+    border-color: #8a5a28;
+  }
+  .df-kind {
+    margin-left: 6px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .df-detail-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    object-fit: cover;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: #12100a;
+  }
+  .df-detail-name {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .df-back {
+    display: none;
+  }
+  .df-meta {
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .df-meta-row {
+    font-size: 12px;
+    margin: 2px 0;
+    color: var(--color-text-muted);
+  }
+  .df-entrance .df-map-btn {
+    margin-left: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .df-sub {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 12px;
+    margin: 8px 0 4px;
+  }
+  .df-encounter {
+    display: flex;
+    gap: 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .df-portrait {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    object-fit: cover;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: #12100a;
+    position: sticky;
+    top: 8px;
+    align-self: flex-start;
+  }
+  .df-encounter-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .df-encounter-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #ffd9a0;
+  }
+  .df-flag {
+    margin-left: 6px;
+    font-size: 10px;
+    color: #d9964d;
+    border: 1px solid #8a5a28;
+    border-radius: 3px;
+    padding: 0 4px;
+  }
+  .df-mechanics {
+    margin: 4px 0;
+  }
+  .df-chip {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 1px 8px;
+    margin: 0 4px 4px 0;
+    background: #171208;
+  }
+  .df-loot-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 6px 0 2px;
+  }
+  .df-loot-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 2px;
+    border-radius: 3px;
+  }
+  .df-loot-row:focus-visible {
+    outline: 2px solid var(--gold);
+  }
+  .df-loot-row img {
+    width: 22px;
+    height: 22px;
+  }
+  .df-loot-name {
+    flex: 1;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .df-loot-chance {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-loot-money {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+  /* The "group found" popup: fixed top-center, outside the finder window. */
+  #dfinder-proposal-popup {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Above every in-game surface (windows are z 20, banners/drawers top out
+       at 340): the 30s prompt must never hide behind another panel. Only the
+       app-update backdrop (700) and the system gates (100000) outrank it. */
+    z-index: 500;
+    width: 320px;
+    max-width: 94%;
+    padding: 12px 14px;
+    border: 1px solid #8a6a28;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #2c2110, #1a1207);
+    box-shadow: 0 6px 24px #000c;
+    text-align: center;
+  }
+  .dfp-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+    margin-bottom: 8px;
+  }
+  .dfp-head .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .dfp-slots {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 6px 0 4px;
+  }
+  .dfp-slot {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    background: #171208;
+  }
+  .dfp-slot .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .dfp-slot.mine {
+    border-color: #8a6a28;
+    color: #ffd9a0;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .dfp-slot.full {
+    color: #9fdc8f;
+  }
+  .dfp-count {
+    font-size: 12px;
+  }
+  .dfp-remaining {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 8px;
+  }
+  .dfp-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .dfp-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .dfp-actions .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .dfp-waiting {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .df-proposal {
+    border: 1px solid #8a6a28;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #35270f, #201607);
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  .df-proposal-title {
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+  }
+  .df-proposal-meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 6px;
+  }
+  .df-proposal-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .df-proposal-actions .btn {
+    flex: 1;
+    text-align: center;
+  }
+  .df-roles,
+  .df-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .df-role-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-right: 8px;
+  }
+  #dungeon-finder-window .df-tab .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  #dungeon-finder-window .df-role-count .ui-icon,
+  #dungeon-finder-window .df-role .ui-icon,
+  #dungeon-finder-window .df-member .ui-icon,
+  #dungeon-finder-window .df-app-meta .ui-icon,
+  #dungeon-finder-window .df-needed .ui-icon,
+  #dungeon-finder-window .df-proposal-meta .ui-icon {
+    width: 13px;
+    height: 13px;
+    vertical-align: -2px;
+    margin-right: 3px;
+  }
+  .df-role,
+  .df-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: #1c150c;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .df-role.active,
+  .df-opt.active,
+  .df-tag.active {
+    color: #ffd9a0;
+    border-color: #8a6a28;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .df-role[disabled],
+  .df-opt[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .df-footer .btn {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 4px 0;
+  }
+  .df-queue-status {
+    font-size: 12px;
+    color: #ffd9a0;
+    margin: 4px 0;
+  }
+  .df-note {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 6px 0;
+  }
+  .df-warn {
+    color: #d98181;
+  }
+  .df-create,
+  .df-mine,
+  .df-listing {
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .df-create-tags {
+    margin-bottom: 6px;
+  }
+  .df-tag {
+    cursor: var(--cursor-point);
+  }
+  .df-listing-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .df-listing-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #ffd9a0;
+  }
+  .df-listing-size,
+  .df-listing-meta,
+  .df-needed {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-member {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-right: 8px;
+  }
+  .df-listing-action {
+    margin-top: 6px;
+  }
+  .df-applicant {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--panel-border);
+    padding: 6px 0;
+  }
+  .df-app-name {
+    font-size: 12px;
+    color: #ffd9a0;
+  }
+  .df-app-meta {
+    flex: 1;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-app-actions {
+    display: flex;
+    gap: 6px;
   }
 
   /* ---------- Ashen Coliseum (arena) ---------- */

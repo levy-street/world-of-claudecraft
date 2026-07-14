@@ -102,6 +102,16 @@ export class DailyRewardsWindow {
     return this.deps.root().style.display === 'block';
   }
 
+  openStore(): void {
+    if (!this.storeEnabled()) return;
+    this.tab = 'store';
+    if (!this.isOpen) {
+      this.toggle();
+      return;
+    }
+    void this.renderCurrent('open');
+  }
+
   toggle(): void {
     if (this.isOpen) {
       this.close();

@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.ru_RU.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · **Русский** · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[Играть сейчас](https://worldofclaudecraft.com/) · [Разверните свой мир](#host-your-own-world-one-command) · [Обучите агента](#train-an-agent-headless-rl) · [Web3](#web3) · [Участие в разработке](CONTRIBUTING.ru_RU.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Играть сейчас](https://worldofclaudecraft.com/) · [Разверните свой мир](#host-your-own-world-one-command) · [Обучите агента](#train-an-agent-headless-rl) · [Web3](#web3) · [Участие в разработке](CONTRIBUTING.ru_RU.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![Титульный экран World of ClaudeCraft](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 ## Участие в разработке
 
-Приветствуется вклад любого рода: код, переводы, баг-репорты и документация. Начните с [CONTRIBUTING.ru_RU.md](CONTRIBUTING.ru_RU.md) для настройки, прочитайте [Кодекс поведения](../../CODE_OF_CONDUCT.md) и проверьте [SECURITY.md](../../SECURITY.md) перед сообщением об уязвимости. Впервые здесь? Ищите issue с меткой [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), откройте [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) или поздоровайтесь в [Discord](https://discord.gg/GjhnUsBtw).
+Приветствуется вклад любого рода: код, переводы, баг-репорты и документация. Начните с [CONTRIBUTING.ru_RU.md](CONTRIBUTING.ru_RU.md) для настройки, прочитайте [Кодекс поведения](../../CODE_OF_CONDUCT.md) и проверьте [SECURITY.md](../../SECURITY.md) перед сообщением об уязвимости. Впервые здесь? Ищите issue с меткой [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), откройте [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) или поздоровайтесь в [Discord](https://discord.com/invite/worldofclaudecraft).
 
 <div align="center">
 

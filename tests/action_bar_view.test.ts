@@ -91,6 +91,7 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  stealthed?: boolean;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -105,6 +106,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
+      stealthed: opts.stealthed ?? false,
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -198,6 +200,27 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const near = view.tick(world({ resource: 60, targetPos: { x: 1, y: 1, z: 1 } })).slots[0];
     expect(near.usable).toBe(true);
     expect(near.outOfRange).toBe(false);
+  });
+
+  it('a requiresStealth ability is usable only while the player is stealthed (issue #1890)', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('cheap_shot', { cost: 60, requiresStealth: true }) })),
+      fakeDeps(),
+    );
+    const outOfStealth = view.tick(world({ stealthed: false })).slots[0];
+    expect(outOfStealth.usable).toBe(false);
+
+    const inStealth = view.tick(world({ stealthed: true })).slots[0];
+    expect(inStealth.usable).toBe(true);
+  });
+
+  it('an ability with no stealth requirement ignores the stealthed flag', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('sinister_strike', { cost: 45 }) })),
+      fakeDeps(),
+    );
+    expect(view.tick(world({ stealthed: false })).slots[0].usable).toBe(true);
+    expect(view.tick(world({ stealthed: true })).slots[0].usable).toBe(true);
   });
 
   it('respects both range boundaries for an ability with a minimum range', () => {

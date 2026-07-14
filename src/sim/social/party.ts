@@ -28,6 +28,15 @@ const RAID_MIN = 5;
 const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
 
+// One indivisible Dungeon Finder unit as the formation seam receives it: a
+// whole existing party (partyId set, roster snapshot included) or one solo
+// player. Validated against live party state before anything mutates.
+export interface FinderFormationUnit {
+  partyId: number | null;
+  leaderPid: number;
+  members: number[];
+}
+
 export class PartyMachine {
   // The party machine's private state (moved off Sim). Public so Sim's teardown and
   // the dead-party-loot white-box test can reach them as they did on Sim.
@@ -378,6 +387,119 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+  }
+
+  // Dungeon Finder formation seam (docs/prd/dungeon-finder.md): merge solo
+  // players and whole partial parties into ONE party or raid without
+  // synthesizing invite prompts or accept events. Rules:
+  //  - every source roster must still match live party state (else null, and
+  //    NOTHING mutates);
+  //  - the oldest premade unit keeps its party object, its leader, and its
+  //    loot settings; an all-solo group gets a fresh party led by the
+  //    longest-waiting solo (units arrive FIFO-ordered);
+  //  - `raid: true` converts before anyone joins, so a ten-player group never
+  //    trips the five-player party cap;
+  //  - no teleport, no difficulty change, no loot-strategy change. Per-join
+  //    chat lines are deliberately skipped (the finder sends its own single
+  //    formation notice); the group still gets the loot summary, and a raid
+  //    conversion announces itself like the manual path.
+  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null {
+    const seen = new Set<number>();
+    let total = 0;
+    for (const unit of units) {
+      for (const pid of unit.members) {
+        if (seen.has(pid)) return null;
+        // A disconnecting player (meta.leaving) is still in players/entities during the
+        // persistence await, but removePlayer will rip the group apart right after, so
+        // the formation must reject them, like every other reward/eligibility system.
+        const meta = this.ctx.players.get(pid);
+        if (!meta || meta.leaving || !this.ctx.entities.has(pid)) return null;
+        seen.add(pid);
+      }
+      total += unit.members.length;
+      if (unit.partyId === null) {
+        if (unit.members.length !== 1 || unit.members[0] !== unit.leaderPid) return null;
+        if (this.partyOf(unit.leaderPid)) return null;
+      } else {
+        const party = this.parties.get(unit.partyId);
+        if (!party || party.leader !== unit.leaderPid) return null;
+        if (party.members.length !== unit.members.length) return null;
+        for (const pid of unit.members) if (!party.members.includes(pid)) return null;
+      }
+    }
+    if (total < 2 || total > (opts.raid ? RAID_MAX : PARTY_MAX)) return null;
+
+    const baseUnit = units.find((u) => u.partyId !== null) ?? units[0];
+    let party: Party | null =
+      baseUnit.partyId !== null ? (this.parties.get(baseUnit.partyId) ?? null) : null;
+    if (!party) {
+      const leaderMeta = this.ctx.players.get(baseUnit.leaderPid);
+      if (!leaderMeta) return null;
+      const dungeonDifficulty = leaderMeta.dungeonDifficulty;
+      party = {
+        id: this.nextPartyId++,
+        leader: baseUnit.leaderPid,
+        members: [baseUnit.leaderPid],
+        raid: false,
+        raidGroups: new Map([[baseUnit.leaderPid, 1 as const]]),
+        lootStrategies: { ...DEFAULT_PARTY_LOOT_STRATEGIES },
+        lootTurn: 0,
+        ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
+      };
+      this.parties.set(party.id, party);
+      this.partyByPid.set(baseUnit.leaderPid, party.id);
+      // Same deed credit the invite path grants (acceptInvite): a finder group is a
+      // party the player joined, so it counts toward partiesJoined.
+      this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
+    }
+    const convertedToRaid = opts.raid && !party.raid;
+    if (convertedToRaid) {
+      party.raid = true;
+      this.normalizeRaidGroups(party);
+    }
+    for (const unit of units) {
+      if (unit === baseUnit) continue;
+      if (unit.partyId !== null) {
+        // The whole source party moves over: dissolve it without disband
+        // chatter (its members are joining, not losing, a group).
+        const old = this.parties.get(unit.partyId);
+        if (old) {
+          this.parties.delete(old.id);
+          this.ctx.dropPartyMarkers(old.id);
+          // A ready check left on the dissolved party id would outlive its party: its
+          // members now resolve to the NEW party, so they could never answer it and it
+          // would run the full timeout and report on a group that no longer exists.
+          this.ctx.readyChecks.delete(old.id);
+        }
+      }
+      for (const pid of unit.members) {
+        const raidGroup = this.nextRaidGroupFor(party);
+        party.members.push(pid);
+        party.raidGroups.set(pid, raidGroup);
+        this.partyByPid.set(pid, party.id);
+        const meta = this.ctx.players.get(pid);
+        if (meta) this.ctx.bumpDeedStat(meta, 'partiesJoined', 1);
+      }
+    }
+    if (convertedToRaid) {
+      for (const mPid of party.members) {
+        this.ctx.emit({
+          type: 'log',
+          text: 'Your party has converted to a raid group.',
+          color: '#aaf',
+          pid: mPid,
+        });
+      }
+    }
+    for (const mPid of party.members) {
+      this.ctx.emit({
+        type: 'log',
+        text: this.lootSettingsSummary(party),
+        color: '#aaf',
+        pid: mPid,
+      });
+    }
+    return party;
   }
 
   private nextRaidGroupFor(party: Party): 1 | 2 {

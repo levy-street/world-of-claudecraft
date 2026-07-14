@@ -39,7 +39,13 @@ class FakeDailyRewardDb implements DailyRewardDb {
   score = 0;
   spin: { outcomeKey: string; points: number; createdAt: string } | null = null;
   tasks: DailyRewardTaskSeed[] = [];
-  events: { kind: string; points: number; key: string; meta: Record<string, unknown> }[] = [];
+  events: {
+    accountId: number;
+    kind: string;
+    points: number;
+    key: string;
+    meta: Record<string, unknown>;
+  }[] = [];
 
   async ensureDay(): Promise<void> {}
   async banForAccount(): Promise<{ reason: string } | null> {
@@ -48,7 +54,7 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async seedTasks(_day: string, tasks: DailyRewardTaskSeed[]): Promise<void> {
     this.tasks = tasks;
   }
-  async tasksForAccount(): Promise<DailyRewardTaskRow[]> {
+  async tasksForAccount(_day: string, accountId: number): Promise<DailyRewardTaskRow[]> {
     return this.tasks.map((task) => ({
       taskId: task.id,
       type: task.type,
@@ -57,7 +63,9 @@ class FakeDailyRewardDb implements DailyRewardDb {
       points: task.points,
       basePoints: task.basePoints ?? task.points,
       config: task.config ?? {},
-      completed: this.events.some((event) => event.meta.taskId === task.id),
+      completed: this.events.some(
+        (event) => event.accountId === accountId && event.meta.taskId === task.id,
+      ),
     }));
   }
   async scoreForAccount(): Promise<number> {
@@ -77,18 +85,22 @@ class FakeDailyRewardDb implements DailyRewardDb {
         completed: false,
       }));
   }
-  async onlineMinutesForAccount(): Promise<number> {
-    return this.events.filter((event) => event.kind === 'online').length;
+  async onlineMinutesForAccount(_day: string, accountId: number): Promise<number> {
+    return this.events.filter((event) => event.accountId === accountId && event.kind === 'online')
+      .length;
   }
   async questTaskCompletionCount(
     _day: string,
-    _accountId: number,
+    accountId: number,
     taskId: string,
     questId: string,
   ): Promise<number> {
     return this.events.filter(
       (event) =>
-        event.kind === 'task' && event.meta.taskId === taskId && event.meta.questId === questId,
+        event.accountId === accountId &&
+        event.kind === 'task' &&
+        event.meta.taskId === taskId &&
+        event.meta.questId === questId,
     ).length;
   }
   async rankForAccount(): Promise<number | null> {
@@ -134,14 +146,15 @@ class FakeDailyRewardDb implements DailyRewardDb {
   }
   async addPoints(
     _day: string,
-    _accountId: number,
+    accountId: number,
     kind: string,
     points: number,
     idempotencyKey: string,
     meta: Record<string, unknown> = {},
   ): Promise<boolean> {
-    if (this.events.some((event) => event.key === idempotencyKey)) return false;
-    this.events.push({ kind, points, key: idempotencyKey, meta });
+    if (this.events.some((event) => event.accountId === accountId && event.key === idempotencyKey))
+      return false;
+    this.events.push({ accountId, kind, points, key: idempotencyKey, meta });
     this.score += points;
     return true;
   }
@@ -281,7 +294,7 @@ describe('daily rewards', () => {
     expect(result.awardedPoints).toBe(20);
     expect(result.score).toBe(20);
     expect(db.events).toEqual([
-      { kind: 'spin', points: 20, key: 'spin', meta: { outcome: 's20' } },
+      { accountId: 1, kind: 'spin', points: 20, key: 'spin', meta: { outcome: 's20' } },
     ]);
     const second = await service.spin(1);
     expect(second).toMatchObject({ status: 409 });
@@ -578,12 +591,14 @@ describe('daily rewards', () => {
     expect(taskEvents).toHaveLength(1);
     expect(taskEvents[0]).toMatchObject({
       points: 75,
-      key: 'task:vale_cup_ranked_wins:vale_cup:42:win',
+      key: 'task:vale_cup_ranked_wins:vale_cup:42:win:2026-06-30T13:01:00.000Z',
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
         bracket: 1,
         matchId: 42,
+        completionId: null,
+        completedAt: '2026-06-30T13:01:00.000Z',
         won: true,
         matchType: 'ranked',
         rated: true,
@@ -607,12 +622,14 @@ describe('daily rewards', () => {
     const botEvent = db.events.filter((event) => event.kind === 'task')[1];
     expect(botEvent).toMatchObject({
       points: 15,
-      key: 'task:vale_cup_ranked_wins:vale_cup:43:bot_win',
+      key: 'task:vale_cup_ranked_wins:vale_cup:43:bot_win:2026-06-30T13:02:00.000Z',
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
         bracket: 1,
         matchId: 43,
+        completionId: null,
+        completedAt: '2026-06-30T13:02:00.000Z',
         won: true,
         matchType: 'bot',
         rated: false,
@@ -638,12 +655,14 @@ describe('daily rewards', () => {
     const practiceEvent = db.events.filter((event) => event.kind === 'task')[2];
     expect(practiceEvent).toMatchObject({
       points: 15,
-      key: 'task:vale_cup_ranked_wins:vale_cup:44:practice_win',
+      key: 'task:vale_cup_ranked_wins:vale_cup:44:practice_win:2026-06-30T13:03:00.000Z',
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
         bracket: 1,
         matchId: 44,
+        completionId: null,
+        completedAt: '2026-06-30T13:03:00.000Z',
         won: true,
         matchType: 'practice',
         rated: false,
@@ -655,6 +674,175 @@ describe('daily rewards', () => {
       },
     });
     expect(db.score).toBe(105);
+  });
+
+  it('credits Vale Cup wins after a server restart resets the match id counter', async () => {
+    // Regression for issue 1831: Vale Cup match ids come from in-memory sim state
+    // (VcState.nextMatchId) that createVcState resets to 1 on every server boot. Keying
+    // the daily-reward dedupe row on the raw match id let a mid-day restart collide with
+    // an id the account was already credited for that day, so the ON CONFLICT DO NOTHING
+    // silently swallowed the win. GameServer now gives each live match object a UUID
+    // and stable completion time, preserving both restart safety and replay rejection.
+    vi.useFakeTimers();
+    try {
+      const db = new FakeDailyRewardDb();
+      resetDailyRewardPriceCacheForTests();
+      stubRewardConfig({
+        tasks: [
+          {
+            id: 'vale_cup_ranked_wins',
+            type: 'vale_cup_result',
+            title: 'Win Vale Cup matches',
+            description:
+              'Win Vale Cup football matches today. Bot-filled and practice wins award fewer points.',
+            points: 25,
+            basePoints: 25,
+            sortOrder: 1,
+            active: true,
+            config: {
+              winBasePoints: 25,
+              botWinBasePoints: 5,
+              minMultiplier: 1,
+              maxMultiplier: 3,
+              minutesPerMultiplier: 30,
+            },
+          },
+        ],
+      });
+      const completedAt = new Date('2026-06-30T20:59:00.000Z');
+      const beforeRestartResult = {
+        won: true,
+        bracket: 1,
+        matchId: 7,
+        completionId: 'before-restart-match-7',
+        completedAt,
+      };
+      const afterRestartResult = {
+        won: true,
+        bracket: 1,
+        matchId: 7,
+        completionId: 'after-restart-match-7',
+        completedAt,
+      };
+
+      // Keep the clock identical across the synthetic restart. A fresh process identity,
+      // rather than timestamp luck, must distinguish the reused in-memory match id.
+      vi.setSystemTime(new Date('2026-06-30T20:59:00.000Z'));
+      const beforeRestartService = new DailyRewardService(db);
+      const beforeRestart = await beforeRestartService.recordValeCupResult(1, beforeRestartResult);
+      expect(beforeRestart).toBe(25);
+
+      const afterRestartService = new DailyRewardService(db);
+      const afterRestart = await afterRestartService.recordValeCupResult(1, afterRestartResult);
+      expect(afterRestart).toBe(25);
+      expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(2);
+      expect(db.score).toBe(50);
+
+      // A delayed replay arrives after the 21:00 UTC reward-day boundary. The match's
+      // first completion time must remain stable, keeping the replay on the original day.
+      vi.setSystemTime(new Date('2026-06-30T21:01:00.000Z'));
+      const replay = await afterRestartService.recordValeCupResult(1, afterRestartResult);
+      expect(replay).toBe(0);
+      expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(2);
+      expect(db.score).toBe(50);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('preserves explicit Vale Cup completion times as a compatibility fallback', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'vale_cup_ranked_wins',
+          type: 'vale_cup_result',
+          title: 'Win Vale Cup matches',
+          description: 'Win Vale Cup football matches today.',
+          points: 25,
+          basePoints: 25,
+          sortOrder: 1,
+          active: true,
+          config: { winBasePoints: 25 },
+        },
+      ],
+    });
+    const result = { won: true, bracket: 1, matchId: 7 };
+    const firstCompletedAt = new Date('2026-06-30T13:20:00.000Z');
+    const secondCompletedAt = new Date('2026-06-30T13:21:00.000Z');
+
+    const first = await service.recordValeCupResult(1, {
+      ...result,
+      completedAt: firstCompletedAt,
+    });
+    const second = await service.recordValeCupResult(1, {
+      ...result,
+      completedAt: secondCompletedAt,
+    });
+    const secondReplay = await service.recordValeCupResult(1, {
+      ...result,
+      completedAt: secondCompletedAt,
+    });
+
+    expect(first).toBe(25);
+    expect(second).toBe(25);
+    expect(secondReplay).toBe(0);
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(2);
+    expect(db.score).toBe(50);
+  });
+
+  it('shares one Vale Cup completion identity across every winning account', async () => {
+    vi.useFakeTimers();
+    try {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      resetDailyRewardPriceCacheForTests();
+      stubRewardConfig({
+        tasks: [
+          {
+            id: 'vale_cup_ranked_wins',
+            type: 'vale_cup_result',
+            title: 'Win Vale Cup matches',
+            description: 'Win Vale Cup football matches today.',
+            points: 25,
+            basePoints: 25,
+            sortOrder: 1,
+            active: true,
+            config: { winBasePoints: 25 },
+          },
+        ],
+      });
+      const result = {
+        won: true,
+        bracket: 2,
+        matchId: 12,
+        rated: true,
+        hasBots: false,
+        practice: false,
+        completionId: 'shared-match-12',
+        completedAt: new Date('2026-06-30T13:20:00.000Z'),
+      };
+
+      vi.setSystemTime(new Date('2026-06-30T13:20:00.000Z'));
+      const firstWinner = await service.recordValeCupResult(1, result);
+      vi.setSystemTime(new Date('2026-06-30T13:20:30.000Z'));
+      const secondWinner = await service.recordValeCupResult(2, result);
+      const firstWinnerReplay = await service.recordValeCupResult(1, result);
+
+      expect(firstWinner).toBe(25);
+      expect(secondWinner).toBe(25);
+      expect(firstWinnerReplay).toBe(0);
+      const taskEvents = db.events.filter((event) => event.kind === 'task');
+      expect(taskEvents).toHaveLength(2);
+      expect(taskEvents.map((event) => event.accountId)).toEqual([1, 2]);
+      expect(taskEvents[1].key).toBe(taskEvents[0].key);
+      expect(taskEvents[1].meta.completionId).toBe(taskEvents[0].meta.completionId);
+      expect(taskEvents[1].meta.completedAt).toBe('2026-06-30T13:20:00.000Z');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('awards delve clear task points with level, tier, and online-time scaling', async () => {

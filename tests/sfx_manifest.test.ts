@@ -3,7 +3,7 @@
 // when the manifest is regenerated. Uses real temp directories (existsSync is
 // the tested behaviour; mocking fs defeats the purpose).
 
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,12 +12,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import * as manifestModule from '../scripts/sfx/manifest.mjs';
 
 const {
+  buildSfxManifestData,
   catalogHashForEntries,
   isSfxMobExtensionKey,
   SFX_FIXED_CATALOG_KEYS,
   SFX_MOB_EXTENSION_FAMILIES,
   SFX_MOB_EXTENSION_KEY_PATTERN,
   serializeSfxManifest,
+  spatialForSfx,
 } = manifestModule;
 
 import {
@@ -49,6 +51,23 @@ describe('buildManifest', () => {
     expect(count).toBe(1);
     const manifest = readFileSync(manifestPath, 'utf8');
     expect(manifest).toContain('cast_lightning_bolt.wav');
+  });
+
+  it('includes a key whose only file is an AIFF lossless master', () => {
+    writeFileSync(path.join(sfxDir, 'cast_lightning_bolt.aiff'), '');
+    const { count } = buildManifest([{ key: 'cast_lightning_bolt' }], sfxDir, manifestPath);
+    expect(count).toBe(1);
+    expect(readFileSync(manifestPath, 'utf8')).toContain('cast_lightning_bolt.aiff');
+  });
+
+  it('never promotes a source master into the rich runtime manifest', () => {
+    const runtimeSfxDirectory = path.join(sfxDir, 'public/audio/sfx');
+    mkdirSync(runtimeSfxDirectory, { recursive: true });
+    writeFileSync(path.join(runtimeSfxDirectory, 'amb_water.m4a'), 'source master');
+
+    expect(() => buildSfxManifestData(sfxDir, { requireComplete: false })).toThrow(
+      /runtime sampled SFX must be MP3.*amb_water\.m4a/,
+    );
   });
 
   it('includes a key whose only file is a .mp3', () => {
@@ -143,14 +162,18 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 26 UI cues in one 138-key inventory', () => {
+  it('keeps the release catalog and all 26 UI cues in one 155-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(138);
+    expect(keys.size).toBe(155);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
       'mob_burrower_attack',
+      'mob_reptile_attack',
+      'mob_beast_hurt',
+      'mob_dragonkin_hurt',
+      'mob_reptile_hurt',
       'quest_ready',
       'lockpick_success',
     ]) {
@@ -158,7 +181,16 @@ describe('buildManifest', () => {
     }
     expect(keys.has('mob_murloc_attack')).toBe(false);
     expect(keys.has('mob_kobold_attack')).toBe(false);
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(138);
+    // Every mob family (13, including reptile) now generates 4 actions
+    // (aggro/attack/death/hurt), not just 3, pin the count so a future
+    // family addition can't silently drop hurt coverage again. reptile is
+    // also the first family with a 5th, idle, action; idle stays optional
+    // per family (mob() only emits it when called with an idle prompt), so
+    // this is +1, not +13. Subfamily keys (mob_beast_wolf_*, etc.) never
+    // appear in the static catalog, they are purely filesystem-discovered.
+    const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
+    expect(mobFamilyKeys).toHaveLength(53); // 13 families x 4 actions, + 1 reptile idle
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(155);
   });
 });
 
@@ -177,6 +209,25 @@ describe('mob subfamily scanning', () => {
     );
     expect(data.mob_beast_wolf_attack).toBeDefined();
     expect(data.mob_beast_wolf_attack.urls).toEqual(['/audio/sfx/mob_beast_wolf_attack_1.mp3']);
+  });
+
+  // Regression: MOB_ACTIONS gained 'idle' (#1887) but SFX_MOB_EXTENSION_KEY_PATTERN
+  // was never updated to match, so a subfamily-level idle recording (e.g. a
+  // dedicated wolf idle take distinct from the beast family default) could never
+  // be added: the action-token scan finds 'idle' fine, but the stricter grammar
+  // check right after it rejects the resulting key, forever.
+  it('adds a subfamily key from mob_<family>_<sub>_idle_N.mp3', () => {
+    writeFileSync(path.join(sfxDir, 'mob_beast_wolf_idle_1.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(errors).toEqual([]);
+    expect(count).toBe(1);
+    const data = JSON.parse(
+      readFileSync(manifestPath, 'utf8')
+        .split('=\n')[1]
+        .replace(/ as const;/, ''),
+    );
+    expect(data.mob_beast_wolf_idle).toBeDefined();
+    expect(data.mob_beast_wolf_idle.urls).toEqual(['/audio/sfx/mob_beast_wolf_idle_1.mp3']);
   });
 
   it('groups multiple numbered variants under the same subfamily key (sorted)', () => {
@@ -231,6 +282,13 @@ describe('mob subfamily scanning', () => {
     expect(errors[0]).toContain('mob_beast_wolf_bogus_1.mp3');
   });
 
+  it('rejects a syntactically valid extension for an unsupported mob family', () => {
+    writeFileSync(path.join(sfxDir, 'mob_unknown_wolf_attack_1.mp3'), '');
+    const discovered = discoverSfxTracks([], sfxDir);
+    expect(discovered.entries).toEqual({});
+    expect(discovered.errors).toEqual([expect.stringContaining('unsupported mob family')]);
+  });
+
   it('skips family-level mob files (fewer than 5 parts), covered by catalog loop', () => {
     // mob_beast_attack_1.mp3 has only 4 parts: mob + beast + attack + 1
     writeFileSync(path.join(sfxDir, 'mob_beast_attack_1.mp3'), '');
@@ -246,20 +304,58 @@ describe('mob subfamily scanning', () => {
     expect(Object.keys(data)).toEqual(['mob_beast_attack']);
   });
 
-  it('MOB_ACTIONS covers the four expected vocalization types', () => {
+  // Decisive regression pin: a mob_*.mp3 file that matches neither a real
+  // catalog entry nor a valid numbered subfamily pattern used to be silently
+  // ignored (a `continue` with no error), the same silent-omission class as
+  // the cast_lightning_bolt bug. It must now fail loudly instead.
+  it('reports an error for a bare subfamily file missing its numbered suffix', () => {
+    // mob_beast_wolf_hurt.mp3 has no _<N> suffix and no matching catalog
+    // entry, so it is neither a valid subfamily file nor a catalog match.
+    writeFileSync(path.join(sfxDir, 'mob_beast_wolf_hurt.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(count).toBe(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('mob_beast_wolf_hurt.mp3');
+    expect(errors[0]).toContain('unrecognized mob sfx file');
+  });
+
+  it('reports an error for a family-level mob file with no matching catalog entry', () => {
+    // No catalog entry for 'mob_reptile_aggro' exists, so this bare file
+    // matches nothing: not the catalog loop, not the subfamily scanner.
+    writeFileSync(path.join(sfxDir, 'mob_reptile_aggro.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(count).toBe(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('mob_reptile_aggro.mp3');
+    expect(errors[0]).toContain('unrecognized mob sfx file');
+  });
+
+  it('does not flag a family-level file that legitimately matches a catalog entry', () => {
+    // Same shape as the two error cases above, but this time a catalog entry
+    // exists, so it must be consumed silently and cleanly, no error.
+    writeFileSync(path.join(sfxDir, 'mob_ogre_hurt.mp3'), '');
+    const catalog = [{ key: 'mob_ogre_hurt' }];
+    const { count, errors } = buildManifest(catalog, sfxDir, manifestPath);
+    expect(count).toBe(1);
+    expect(errors).toEqual([]);
+  });
+
+  it('MOB_ACTIONS covers the five expected vocalization types', () => {
     expect(MOB_ACTIONS.has('aggro')).toBe(true);
     expect(MOB_ACTIONS.has('attack')).toBe(true);
     expect(MOB_ACTIONS.has('death')).toBe(true);
     expect(MOB_ACTIONS.has('hurt')).toBe(true);
-    expect(MOB_ACTIONS.size).toBe(4);
+    expect(MOB_ACTIONS.has('idle')).toBe(true);
+    expect(MOB_ACTIONS.size).toBe(5);
   });
 
   it('exports one constrained grammar for runtime mob extension keys', () => {
     expect(SFX_MOB_EXTENSION_FAMILIES).toContain('beast');
     expect(SFX_MOB_EXTENSION_KEY_PATTERN.source).toBe(
-      '^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$',
+      '^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$',
     );
     expect(isSfxMobExtensionKey('mob_beast_dire_wolf_hurt')).toBe(true);
+    expect(isSfxMobExtensionKey('mob_beast_dire_wolf_idle')).toBe(true);
     expect(isSfxMobExtensionKey('mob_unknown_dire_wolf_hurt')).toBe(false);
     expect(isSfxMobExtensionKey('mob_beast_attack')).toBe(false);
     expect(isSfxMobExtensionKey('mob_beast_dire_wolf_bogus')).toBe(false);
@@ -283,5 +379,11 @@ describe('mob subfamily scanning', () => {
     expect(serialized).toContain('export const SFX_FIXED_CATALOG_KEYS =');
     expect(serialized).toContain('export const SFX_MOB_EXTENSION_FAMILIES =');
     expect(serialized).toContain('export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)');
+  });
+
+  it('marks point ambience spatial but keeps the global water bed non-spatial', () => {
+    expect(spatialForSfx('amb_campfire')).toBe(true);
+    expect(spatialForSfx('amb_forge')).toBe(true);
+    expect(spatialForSfx('amb_water')).toBe(false);
   });
 });

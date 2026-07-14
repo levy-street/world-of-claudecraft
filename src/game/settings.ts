@@ -207,11 +207,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
-  // off by default (the classic self-view keeps no plate over your head): when
-  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
-  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
-  // can see how your character presents. Purely a local display preference.
-  showOwnNameplate: { def: false },
+  // on by default: render your OWN overhead nameplate (name, level, guild, hp,
+  // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
+  // it, so Discord linking and other flair changes have immediate visual feedback.
+  // Purely a local display preference; players can turn it off for the classic view.
+  showOwnNameplate: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
