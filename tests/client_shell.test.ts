@@ -1151,6 +1151,23 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('bindTouchTap(moreClose, () => {');
   });
 
+  it('binds the death-screen respawn buttons via touch-tap, not bare click', () => {
+    // On a phone the browser only synthesizes 'click' for the primary pointer,
+    // so a bare click binding goes dead while another finger is down (a held
+    // movement joystick when the player dies mid-run), stranding them on the
+    // death overlay (issue 1484). All three buttons must use bindTouchTap.
+    expect(hudTs).toContain('bindTouchTap(this.releaseSpiritBtnEl, () => {');
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
+    );
+    expect(hudTs).toContain(
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+    );
+    expect(hudTs).not.toMatch(
+      /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
+    );
+  });
+
   it('keeps desktop community links open after HUD clicks', () => {
     expect(mainTs).toContain('communityMenu.open = !(NATIVE_APP || useTouchInterface());');
     expect(hudTs).toMatch(

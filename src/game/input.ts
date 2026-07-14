@@ -6,6 +6,7 @@
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
+import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import {
@@ -14,6 +15,7 @@ import {
   shouldEngagePointerLockOnMouseDown,
   shouldReleasePointerLock,
 } from './pointer_lock';
+import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 
 function detectPointerLockNeedsSyncGesture(): boolean {
@@ -190,6 +192,14 @@ export class Input {
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
+  // Gecko (Firefox) reports movementX/movementY in CSS pixels, not the physical
+  // pixels Chromium reports and the sensitivity is tuned against, so on a HiDPI
+  // display or under page zoom its mouselook runs at the wrong speed (#1834).
+  // Detected once (the engine never changes mid-session) and used to normalize
+  // each delta in onMouseMove; every other engine stays a pass-through.
+  private readonly isGeckoEngine =
+    typeof navigator !== 'undefined' &&
+    detectBrowserEngine(navigator.userAgent || '').engine === 'gecko';
   private touchMove: TouchMoveInput = {
     forward: false,
     back: false,
@@ -990,8 +1000,15 @@ export class Input {
       this.hoverY = e.clientY;
     }
     if (!this.leftDown && !this.rightDown) return;
-    const mx = e.movementX ?? 0,
-      my = e.movementY ?? 0;
+    // Normalize the raw movement delta to Chromium's physical-pixel unit so
+    // mouselook keeps the same speed and drag-start feel on Firefox, where the
+    // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
+    const { dx: mx, dy: my } = normalizePointerLookDelta({
+      movementX: e.movementX ?? 0,
+      movementY: e.movementY ?? 0,
+      isGecko: this.isGeckoEngine,
+      devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
+    });
     if (mx === 0 && my === 0) return;
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)

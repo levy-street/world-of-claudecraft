@@ -49,7 +49,11 @@ export function clampChatBox(
   limits: ChatBoxLimits = CHAT_BOX_LIMITS,
 ): ChatBoxGeometry {
   const { margin } = limits;
-  const width = clamp(geo.width, limits.minWidth, Math.min(limits.maxWidth, viewport.w - margin * 2));
+  const width = clamp(
+    geo.width,
+    limits.minWidth,
+    Math.min(limits.maxWidth, viewport.w - margin * 2),
+  );
   const height = clamp(
     geo.height,
     limits.minHeight,
@@ -63,6 +67,48 @@ export function clampChatBox(
     top: clamp(geo.top, margin, maxTop),
     width,
     height,
+  };
+}
+
+// A positive, finite divisor for the UI-scale compensation below. A bad read
+// (0, negative, NaN, Infinity) falls back to 1 so a drag never blanks the box.
+function safeScale(scale: number): number {
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+}
+
+export interface ChatBoxPlacement {
+  /** Clamped geometry in VISUAL (screen / pointer) space: persist THIS so a box
+   *  saved at one UI Scale renders at the same visual place at another. */
+  geo: ChatBoxGeometry;
+  /** Author-space (visual / scale) values for the #chatlog-wrap / #chatlog-frame
+   *  style writes: those elements live inside #ui (`zoom: var(--ui-scale)`), which
+   *  re-multiplies the author lengths back to `geo` on screen. (#chat-input is a
+   *  sibling of #ui, outside the zoom, so its caller writes `geo` directly.) */
+  css: ChatBoxGeometry;
+}
+
+// Clamp a desired VISUAL geometry to the viewport / limits, then derive the
+// AUTHOR-space css writes the #ui zoom re-multiplies back. Mirrors hud.ts
+// setWindowPixelPosition: getBoundingClientRect() and pointer clientX/clientY are
+// post-zoom, but style left/top/width/height are author lengths, so the writes
+// divide by the live UI scale. `scale` of 1 (the default) is a no-op.
+export function placeChatBox(
+  geo: ChatBoxGeometry,
+  viewport: { w: number; h: number },
+  chromeH: number,
+  scale: number,
+  limits: ChatBoxLimits = CHAT_BOX_LIMITS,
+): ChatBoxPlacement {
+  const clamped = clampChatBox(geo, viewport, chromeH, limits);
+  const z = safeScale(scale);
+  return {
+    geo: clamped,
+    css: {
+      left: clamped.left / z,
+      top: clamped.top / z,
+      width: clamped.width / z,
+      height: clamped.height / z,
+    },
   };
 }
 

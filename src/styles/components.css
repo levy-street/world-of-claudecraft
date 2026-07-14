@@ -3939,6 +3939,111 @@
     color: #ffe6a8;
   }
 
+  /* ---------- first-run camera mode prompt ---------- */
+  .camera-prompt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+  }
+  .camera-prompt-dialog {
+    width: min(440px, calc(100vw - 32px));
+    max-width: 100%;
+    padding: 18px;
+    box-sizing: border-box;
+    animation: camera-prompt-in 160ms ease-out;
+  }
+  @keyframes camera-prompt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .camera-prompt-title {
+    font-family: var(--title-font);
+    font-size: 19px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .camera-prompt-desc {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .camera-prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .camera-prompt-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .camera-prompt-option:focus-within {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .camera-prompt-radio {
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+  }
+  .camera-prompt-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .camera-prompt-option-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .camera-prompt-option-desc {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .camera-prompt-note {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+    margin-top: 14px;
+  }
+  .camera-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .camera-prompt-confirm {
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    min-width: 120px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .camera-prompt-dialog {
+      animation: none;
+    }
+  }
+
   /* player card: char-window entry button + share modal */
   .pc-share-row {
     margin-top: 10px;

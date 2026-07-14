@@ -588,16 +588,18 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // keydown then bubbles to the window handler, and without this gate the chat
     // bind fires and steals the focus return. promptModalOpen() matches ONLY the
     // installPromptDialog family (party/trade/duel prompts carry no aria-modal and
-    // must stay non-blocking), and every canUseGameKeys predicate consults it.
+    // must stay non-blocking), and the shared gameplay gate consults it before
+    // every keyboard/gamepad action predicate.
     expect(hud).toContain('promptModalOpen(): boolean {');
     expect(hud).toContain(
       `$('#prompt-stack').querySelector('.prompt[aria-modal="true"]') !== null`,
     );
-    const gateSites = mainSrc.match(/!hud\.promptModalOpen\(\)/g) ?? [];
-    expect(gateSites.length).toBeGreaterThanOrEqual(3);
-    expect(mainSrc).toMatch(
-      /canUseGameKeys: \(\) =>\s*!hud\.isModalOpen\(\) && !hud\.promptModalOpen\(\) && chatInput\.style\.display !== 'block'/,
-    );
+    const gateStart = mainSrc.indexOf('const gameplayInputBlocked = () =>');
+    const gate = mainSrc.slice(gateStart, mainSrc.indexOf(';', gateStart));
+    expect(gateStart).toBeGreaterThan(0);
+    expect(gate).toContain('hud.promptModalOpen()');
+    expect(mainSrc.match(/gameplayInputBlocked\(\)/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(mainSrc).toMatch(/canUseGameKeys: \(\) => !gameplayInputBlocked\(\)/);
   });
 
   it('the prompt itself stops Enter/Space propagation (the submit-dismiss race)', () => {
