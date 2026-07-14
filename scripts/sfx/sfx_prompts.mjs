@@ -17,13 +17,20 @@ const FOOT = (key, surface) => ({
   prompt: `A single isolated footstep ${surface}. One step only, close and dry, no music, no voice.`,
 });
 
-const mob = (family, who, aggro, attack, death, hurt) => {
+// idle is optional: a family only gets a mob_<family>_idle catalog entry once
+// its idle recording is actually ready. Not calling mob() with an idle prompt
+// leaves that family out of the catalog entirely, so an unready family is
+// never flagged as a missing or unrecognized sfx file.
+const mob = (family, who, aggro, attack, death, hurt, idle) => {
   for (const [name, value] of Object.entries({ family, who, aggro, attack, death, hurt })) {
     if (typeof value !== 'string' || value.length === 0) {
       throw new Error(`mob('${family}', ...): missing or invalid '${name}' argument`);
     }
   }
-  return [
+  if (idle !== undefined && (typeof idle !== 'string' || idle.length === 0)) {
+    throw new Error(`mob('${family}', ...): invalid 'idle' argument`);
+  }
+  const entries = [
     {
       key: `mob_${family}_aggro`,
       duration: 1.2,
@@ -45,6 +52,14 @@ const mob = (family, who, aggro, attack, death, hurt) => {
       prompt: `${who} ${hurt}. A single short pained reaction vocalization, no music, no human speech.`,
     },
   ];
+  if (idle !== undefined) {
+    entries.push({
+      key: `mob_${family}_idle`,
+      duration: 1.6,
+      prompt: `${who} ${idle}. A single relaxed ambient vocalization, no aggression, no music, no human speech.`,
+    });
+  }
+  return entries;
 };
 
 export const SFX = [
@@ -419,6 +434,7 @@ export const SFX = [
     'shrieking with a sharp reptilian snap',
     'hissing weakly as it goes still',
     'hissing sharply in sudden pain',
+    'breathing in a low idle rasp',
   ),
 
   // --- Ambient loops --------------------------------------------------------
