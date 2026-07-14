@@ -150,7 +150,9 @@ describe.sequential('SFX Studio server security', () => {
     try {
       rmSync(sourceLink, { force: true });
       rmSync(executableSource, { force: true });
-      rmSync(escapedSourceDir, { force: true });
+      // The server may replace the hostile symlink with a real quarantine
+      // directory while rejecting it, so cleanup must accept either shape.
+      rmSync(escapedSourceDir, { recursive: true, force: true });
       rmSync(externalSourceDir, { recursive: true, force: true });
       rmSync(externalExportDir, { recursive: true, force: true });
       rmSync(versionAudio, { force: true });
