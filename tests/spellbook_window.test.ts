@@ -306,10 +306,12 @@ describe('spellbook_window: inline mobile slot picker', () => {
   it('protects inset-pinned touch sheets while allowing the centered spellbook to resize', () => {
     // The drag/resize seed writes inline left/top with bottom:auto, which
     // unpins a top+bottom sheet and leaves it content-tall (offscreen and
-    // unscrollable). Dragging still bails on body.mobile-touch, and resizing
-    // bails for every window except the centered, viewport-capped Spellbook.
-    expect(hud).toContain('// draggable on touch, the same hazard placeNewWindow already guards.');
-    expect(hud).toContain("if (document.body.classList.contains('mobile-touch')) return;");
+    // unscrollable). The shared drag controller therefore rejects touch drag
+    // handles, while resizing still permits the centered, capped Spellbook.
+    expect(hud).toContain('// Touch windows are viewport-pinned sheets.');
+    expect(hud).toContain(
+      "!document.body.classList.contains('mobile-touch') && this.isWindowDragHandle(target, el)",
+    );
     const windowResize = readFileSync(
       new URL('../src/ui/window_resize.ts', import.meta.url),
       'utf8',

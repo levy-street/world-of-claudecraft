@@ -61,6 +61,7 @@ function makeHarness(
     known: knownAbilityIds.map((id) => ({ def: { id } })),
     cupInfo: null,
   };
+  hud.spellbookWindow = { closePicker: vi.fn(() => false) };
   hud.activeHotbarForm = 'normal';
   hud.hotbarActions = initialBar;
   hud.loadedSlotMapFromStorage = false;
@@ -68,7 +69,6 @@ function makeHarness(
   hud.dragAction = null;
   hud.mobileActionPage = 0;
   hud.mobileHotbarDrag = null;
-  hud.spellbookWindow = { closePicker: () => false };
   return hud;
 }
 
@@ -355,6 +355,7 @@ describe('stealth action-bar persistence', () => {
     hud.syncActiveHotbarForm();
 
     expect(hud.mobileHotbarDrag).toBeNull();
+    expect(hud.spellbookWindow.closePicker).toHaveBeenCalledOnce();
     expect(window.clearTimeout).toHaveBeenCalledWith(99);
   });
 });

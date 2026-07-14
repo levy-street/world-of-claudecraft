@@ -121,6 +121,10 @@ describe('production CPU monitor configuration', () => {
     const dockerfile = await readFile(new URL('../Dockerfile', import.meta.url), 'utf8');
     expect(dockerfile).toContain('/app/scripts/prod_cpu_game_helper.mjs /app/ops/');
     expect(dockerfile).toContain('/app/scripts/prod_cpu_profile_client.mjs /app/ops/');
+
+    const dockerignore = await readFile(new URL('../.dockerignore', import.meta.url), 'utf8');
+    expect(dockerignore).toContain('!scripts/prod_cpu_game_helper.mjs');
+    expect(dockerignore).toContain('!scripts/prod_cpu_profile_client.mjs');
   });
 
   it('pins the inspector client to the discovered game PID and requests shutdown', () => {
