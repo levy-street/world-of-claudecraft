@@ -738,6 +738,25 @@ function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; h
 // ---------------------------------------------------------------------------
 type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
 
+/** Existing delve props remain visible independently of the generic loot flag.
+ * The sim removes props that should disappear; stateful variants such as a
+ * pulled bell rope stay in the entity set and must keep their rebuilt mesh. */
+export function delveInteractableVisible(templateId: string | null, lootable: boolean): boolean {
+  return lootable || templateId?.startsWith('delve_') === true;
+}
+
+/** Apply the object-view visibility policy after a delve prop mesh is rebuilt. */
+export function syncDelveInteractableVisibility(
+  group: THREE.Object3D,
+  templateId: string | null,
+  lootable: boolean,
+  withinPortalRange = true,
+): boolean {
+  const visible = delveInteractableVisible(templateId, lootable) && withinPortalRange;
+  group.visible = visible;
+  return visible;
+}
+
 const RITE_SHRINE_ACCENT: Record<RiteShrineKind, number> = {
   bell: 0xc9a24b,
   candle: 0xff8030,
