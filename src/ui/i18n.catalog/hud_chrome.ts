@@ -11,7 +11,7 @@ import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
   spectate: {
-    banner: 'Spectating {name}',
+    banner: 'Spectating {name} now',
   },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
