@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Espacios vacíos',
+  'hudChrome.character.bags.emptySummary': '+{count} vacíos',
   'entities.abilities.sport_boot.description':
     'Un patadón largo y elevado hacia el punto de mira. El público lo adora.',
   'entities.abilities.sport_boot.name': 'Patadón',

@@ -341,7 +341,9 @@ describe('statCellHtml', () => {
     expect(html).toContain(
       'class="stat-cell" data-stat="agi" tabindex="0" aria-describedby="statdesc-agi"',
     );
-    expect(html).toContain('itemUi.stats.agi: <b>22</b>');
+    expect(html).toContain(
+      '<span class="stat-label">itemUi.stats.agi</span><b class="stat-value">22</b>',
+    );
     expect(html).toContain('<span id="statdesc-agi" class="visually-hidden">');
     // The hidden node carries exactly the aria breakdown string.
     expect(html).toContain(statTooltipAria(m, deps));
@@ -350,8 +352,33 @@ describe('statCellHtml', () => {
   it('escapes the stat name and aria text but leaves the formatted value bare', () => {
     const xss: StatTooltipI18n = { t: () => `A&B`, fmt: fakeFmt };
     const html = statCellHtml(model({ stat: 'str', statValue: 7 }), xss);
-    expect(html).toContain('A&amp;B: <b>7</b>');
-    expect(html).not.toContain('A&B:');
+    expect(html).toContain('<span class="stat-label">A&amp;B</span><b class="stat-value">7</b>');
+    expect(html).not.toContain('>A&B<');
+  });
+
+  it('omitting the id namespace reproduces the legacy statdesc-<stat> id (additive back-compat)', () => {
+    const html = statCellHtml(model({ stat: 'armor', statValue: 100 }), deps);
+    expect(html).toContain('aria-describedby="statdesc-armor"');
+    expect(html).toContain('<span id="statdesc-armor" class="visually-hidden">');
+    // No namespaced form leaks in when the caller passes nothing.
+    expect(html).not.toContain('statdesc-attributes-armor');
+  });
+
+  it('namespaces the aria-describedby target id so the SAME StatId in two panels does not collide', () => {
+    const m = model({ stat: 'armor', statValue: 100 });
+    const attr = statCellHtml(m, deps, 'attributes');
+    const def = statCellHtml(m, deps, 'defense');
+    // Each cell's aria-describedby and hidden-span id are namespaced and DISTINCT.
+    expect(attr).toContain('aria-describedby="statdesc-attributes-armor"');
+    expect(attr).toContain('<span id="statdesc-attributes-armor" class="visually-hidden">');
+    expect(def).toContain('aria-describedby="statdesc-defense-armor"');
+    expect(def).toContain('<span id="statdesc-defense-armor" class="visually-hidden">');
+    // The two ids for the same stat genuinely differ (the collision this fixes).
+    expect(attr).not.toContain('statdesc-defense-armor');
+    expect(def).not.toContain('statdesc-attributes-armor');
+    // data-stat is unchanged (the tooltip attach still matches on it, dupes ok).
+    expect(attr).toContain('data-stat="armor"');
+    expect(def).toContain('data-stat="armor"');
   });
 
   it('uses one Warfare name and describes both live PvP effects in accessible output', () => {

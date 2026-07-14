@@ -110,7 +110,6 @@ import {
   type RiteIntensity,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
-  virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
@@ -353,6 +352,7 @@ import {
 } from './map_window_view';
 import { MarketWindow } from './market_window';
 import { Meters } from './meters';
+import { renderMilestonesOverview } from './milestones_overview_view';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
 import {
@@ -491,6 +491,14 @@ import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
 
 let lpAdvancedLast = -1;
+// Local design-review seam for the character header. It is deliberately
+// DEV-only and opt-in so screenshots can exercise real balance widths without
+// ever presenting sample holdings to a production player.
+const CHAR_BALANCE_PREVIEW = { woc: 1_250, claudium: 75 } as const;
+const charBalancePreviewEnabled = (): boolean =>
+  import.meta.env.DEV &&
+  typeof location !== 'undefined' &&
+  new URLSearchParams(location.search).get('charbalances') === 'preview';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -4014,11 +4022,23 @@ export class Hud {
     ...this.presentationBag,
     root: () => $('#char-window'),
     world: () => this.sim,
+    wocBalance: () => {
+      const balance = walletUiEnabled() ? wocBalance() : null;
+      return balance ?? (charBalancePreviewEnabled() ? CHAR_BALANCE_PREVIEW.woc : null);
+    },
+    wocBalanceVerified: () => wocBalanceVerified(),
+    // Claudium is a planned account currency, but IWorld has no balance field
+    // for it yet. The opt-in DEV preview is sample display data only; normal
+    // sessions keep the honest unavailable state until an account source lands.
+    claudiumBalance: () => (charBalancePreviewEnabled() ? CHAR_BALANCE_PREVIEW.claudium : null),
     closeOthers: () => this.closeOtherWindows('#char-window'),
     hideTooltip: () => this.hideTooltip(),
+    consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#char-window'),
+    focusFirst: () => this.focusManager.focusFirst($('#char-window')),
     slotName: (slot) => itemSlotName(slot),
-    statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS),
+    statCellHtml: (stat, idNamespace) =>
+      statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, idNamespace),
     statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
     talentSummaryHtml: () => this.talentSummaryHtml(),
     progressionHtml: (level) => this.progressionHtml(level),
@@ -4054,6 +4074,40 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
+    // Specialization panel's Choose/Change button (Phase 3): OPEN the Talents
+    // window, never toggle it. `toggleTalents()` (the 'N' keybind) CLOSES talents
+    // when it is already open, and Character + Talents can be open at once
+    // (closeOtherWindows only closes the named window, not the character sheet),
+    // so a toggle here would hide the very window the button means to reveal.
+    // TalentsWindow.open() is idempotent (re-seeds the staged buffer + repaints),
+    // so calling it while already open is a harmless refresh.
+    openTalents: () => this.talentsWindow.open(),
+    // Phase 4 embedded bags: the header's "+" always OPENS the standalone
+    // window (never toggle-closes it: toggleBags() would close an already-open
+    // #bags, which is never what this control means).
+    openBags: () => {
+      if (!bagsWindowShown($('#bags').style.display)) this.toggleBags();
+    },
+    // Lets the embedded bags grid read the SAME drag-in-progress slot the
+    // paperdoll's beginUnequipDrag sets, so it can become a second drop target
+    // for the drag alongside #bags (this file's own #bags dragover/dragleave/
+    // drop wiring above is untouched).
+    dragUnequipSlot: () => this.dragUnequipSlot,
+    // Bag-socket right-click (Phase 4): the same side-effect bundle unequip()
+    // uses for an equip slot (click cue, tooltip hide, both windows repaint).
+    unequipBag: (socket) => {
+      this.sim.unequipBag(socket);
+      audio.click();
+      this.hideTooltip();
+      this.renderBags();
+      this.renderCharIfOpen();
+    },
+    // Repaint the standalone #bags window only when it is actually shown, so a
+    // use/equip from the embedded grid keeps it fresh when both windows are
+    // open (the mirror of the standalone window's own renderCharIfOpen()).
+    renderBagsIfOpen: () => {
+      if ($('#bags').style.display !== 'none') this.renderBags();
+    },
   });
   // Options window painter (options_view.ts core + options_window.ts painter). The
   // window renders no item rows, so it composes no PainterHostPresentation bag; it
@@ -12486,7 +12540,10 @@ export class Hud {
       this.sim.player.skinCatalog ?? 'class',
     );
     if (preview.visualKey !== 'player_mech') {
-      this.mountCharPreview(container, this.sim.cfg.playerClass, preview.skin, preview.visualKey);
+      this.mountCharPreview(container, this.sim.cfg.playerClass, preview.skin, preview.visualKey, {
+        pedestal: true,
+        equipment: this.sim.equipment,
+      });
       return;
     }
     if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
@@ -12506,6 +12563,7 @@ export class Hud {
             this.sim.cfg.playerClass,
             currentPreview.skin,
             currentPreview.visualKey,
+            { pedestal: true, equipment: this.sim.equipment },
           );
         }
       })
@@ -12514,12 +12572,21 @@ export class Hud {
 
   /** Mount the shared character turntable into `container` showing `cls`/`skin`.
    *  The single CharacterPreview canvas is moved between hosts (char sheet, the
-   *  skin-select overlay) via setContainer, so only one WebGL context exists. */
+   *  skin-select overlay) via setContainer, so only one WebGL context exists.
+   *  `opts.pedestal` (default off) is the char-equipment redesign's Phase 2b
+   *  procedural dais: only the char-window mount (renderCharPreview and its
+   *  inline skin-swap re-mounts, both targeting #char-model-preview) passes
+   *  `true`; the cosmetic skin-event overlay (a different container) and every
+   *  other CharacterPreview consumer stay default-off. `opts.equipment` is the
+   *  equipment-visual base seam: the char-window mount supplies the world's
+   *  full equipped-item map so the data path is live end to end, even though
+   *  only the mainhand weapon renders today. */
   private mountCharPreview(
     container: HTMLElement,
     cls: PlayerClass,
     skin: number,
     previewKey?: string,
+    opts?: { pedestal?: boolean; equipment?: Partial<Record<EquipSlot, string>> },
   ): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
     if (!this.charPreview) {
@@ -12528,6 +12595,7 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
+    this.charPreview.setPedestal(opts?.pedestal ?? false);
     // Show the player's currently equipped mainhand on the character sheet, so the
     // 3D model reflects gear changes (the char window repaints the preview after an
     // equip via charWindow.renderIfOpen -> renderPreview).
@@ -12541,6 +12609,7 @@ export class Hud {
       this.charPreview.setClass(cls, weapon);
     }
     this.charPreview.setSkin(skin);
+    if (opts?.equipment) this.charPreview.setEquipment(opts.equipment);
   }
 
   private renderCharSkinPicker(): void {
@@ -12560,9 +12629,10 @@ export class Hud {
       const labelNumber = formatNumber(option.label, { maximumFractionDigits: 0 });
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = `skin-swatch${option.kind === currentCatalog && option.skin === current ? ' sel' : ''}`;
+      const selected = option.kind === currentCatalog && option.skin === current;
+      b.className = `skin-swatch${selected ? ' sel' : ''}`;
       b.textContent = labelNumber;
-      b.setAttribute('role', 'listitem');
+      b.setAttribute('aria-pressed', String(selected));
       b.setAttribute(
         'aria-label',
         option.kind === 'class'
@@ -12572,8 +12642,10 @@ export class Hud {
       b.addEventListener('click', () => {
         row.querySelectorAll('.skin-swatch').forEach((x) => {
           x.classList.remove('sel');
+          x.setAttribute('aria-pressed', 'false');
         });
         b.classList.add('sel');
+        b.setAttribute('aria-pressed', 'true');
         if (option.kind === 'class') {
           this.sim.changeSkin(option.skin, 'class');
           const preview = activeCharacterAppearancePreview(
@@ -12586,6 +12658,7 @@ export class Hud {
             this.sim.cfg.playerClass,
             preview.skin,
             preview.visualKey,
+            { pedestal: true, equipment: this.sim.equipment },
           );
           return;
         }
@@ -12608,6 +12681,7 @@ export class Hud {
                 this.sim.cfg.playerClass,
                 preview.skin,
                 preview.visualKey,
+                { pedestal: true, equipment: this.sim.equipment },
               );
             }
           })
@@ -13533,52 +13607,56 @@ export class Hud {
     return `${html}</div>`;
   }
 
-  // The "Progression" group on the character sheet: total XP, virtual level,
-  // prestige rank (when prestiged), unlocked milestone badges, and — at the cap
-  // — the opt-in Prestige button.
+  // The Overview tab's "Milestones" block (Phase 5, docs/char-equipment/): a
+  // thin data-gatherer that resolves the localized strings + prestige state and
+  // delegates the HTML assembly to the pure renderMilestonesOverview core. Total
+  // XP, Virtual Level, and Prestige Rank already render in the Equipment tab's
+  // Progression panel (char_panels_view.ts buildProgressionPanel), so this block
+  // shows ONLY what that panel does NOT: unlocked milestone badges, plus, at the
+  // level cap, the opt-in Prestige action. The heading resolves the existing
+  // game.progression.milestones key ("Milestones", already translated) instead
+  // of game.progression.heading ("Progression"), so the two tabs never stamp the
+  // same title over different content. (Which rows exist + which heading key are
+  // asserted decisively in tests/milestones_overview_view.test.ts.)
   private progressionHtml(level: number): string {
     const sim = this.sim;
-    const vlevel = virtualLevel(sim.lifetimeXp);
     const unlocked = new Set(sim.unlockedMilestones);
-    // Earned Book of Deeds border rewards join the badge row through the same
-    // ms-badge plumbing (nameplate border display is a deliberate v1 cut).
-    const borderBadges = DEED_ORDER.filter(
-      (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
-    )
-      .map((id) => `<span class="ms-badge ms-deed-border">${esc(deedName(id))}</span>`)
-      .join('');
-    const badges =
-      MILESTONES.filter((m) => unlocked.has(m.id))
-        .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
-        .join('') + borderBadges;
-    let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
-    html += `<div class="char-stats cp-stats">
-      <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>
-      <span>${t('game.progression.virtualLevel')}: <b>${vlevel}</b></span>`;
-    if (sim.prestigeRank > 0)
-      html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
-    html += `</div>`;
-    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
-    // The active Book of Deeds title line; the button opens the Book (its
-    // Titles section is one click away). Title text is deed content localized
-    // through deed_i18n, never a raw id.
+    // Preserve v0.26 Book of Deeds rewards in the redesigned Milestones block.
+    const badges = [
+      ...MILESTONES.filter((m) => unlocked.has(m.id)).map((m) => ({
+        kind: m.kind,
+        name: this.milestoneName(m.id),
+      })),
+      ...DEED_ORDER.filter(
+        (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
+      ).map((id) => ({ kind: 'deed-border', name: deedName(id) })),
+    ];
+    // The button reflects the server's authoritative prestige gate (post-cap XP
+    // earned): disabled + hinted until eligible; the server re-checks
+    // regardless, so a forged click does nothing. Below the cap there is no row.
+    const atMaxLevel = level >= MAX_LEVEL;
+    const ready = atMaxLevel && canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
+    const overview = renderMilestonesOverview({
+      headingText: t('game.progression.milestones'),
+      badges,
+      noneText: t('game.progression.none'),
+      prestige: atMaxLevel
+        ? {
+            ready,
+            actionText: `${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (${sim.prestigeRank})` : ''}`,
+            hint: ready
+              ? null
+              : `${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}`,
+          }
+        : null,
+    });
     const activeTitleText = sim.activeTitle ? deedTitleText(sim.activeTitle) : '';
-    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
+    const deedsRow = `<div class="cp-milestones"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
       activeTitleText !== ''
         ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
         : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
     } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
-    if (level >= MAX_LEVEL) {
-      // The button reflects the server's authoritative prestige gate (post-cap
-      // XP earned). It's disabled — and the requirement shown — until eligible;
-      // the server re-checks regardless, so a forged click does nothing.
-      const ready = canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
-      html += `<div class="cp-actions"><button class="btn" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (★ ${sim.prestigeRank})` : ''}</button>`;
-      if (!ready)
-        html += `<span class="cp-hint">${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}</span>`;
-      html += `</div>`;
-    }
-    return `<div class="char-progression">${html}</div>`;
+    return `${overview.slice(0, -6)}${deedsRow}</div>`;
   }
 
   private openPrestigeDialog(): void {
@@ -14535,6 +14613,7 @@ export class Hud {
     const view = buildPaperdollView(e.equippedItems, ITEMS);
     const leftCol = el.querySelector('#inspect-equip-left');
     const rightCol = el.querySelector('#inspect-equip-right');
+    leftCol?.appendChild(this.buildInspectSlotRow(view.top));
     for (const cell of view.left) leftCol?.appendChild(this.buildInspectSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildInspectSlotRow(cell));
     el.querySelector('[data-close]')?.addEventListener('click', () => {

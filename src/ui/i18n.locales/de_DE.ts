@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Leere Plätze',
+  'hudChrome.character.bags.emptySummary': '+{count} leer',
   'entities.abilities.sport_boot.description':
     'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
   'entities.abilities.sport_boot.name': 'Weitschlag',

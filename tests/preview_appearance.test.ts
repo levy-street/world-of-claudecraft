@@ -114,6 +114,54 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, skinCatalog: 'mech' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
   });
+
+  it('is unchanged when equippedItems is absent, undefined, or empty (Phase 2b seam)', () => {
+    const base = appearance({ cls: 'warrior', skin: 1, mainhandItemId: 'sword_x' });
+    const sig = appearanceSignature(base);
+    expect(appearanceSignature({ ...base, equippedItems: undefined })).toBe(sig);
+    expect(appearanceSignature({ ...base, equippedItems: {} })).toBe(sig);
+  });
+
+  it('changes when an equipped item id changes on any slot (Phase 2b equipment seam)', () => {
+    const base = appearance({
+      cls: 'warrior',
+      skin: 1,
+      mainhandItemId: 'sword_x',
+      equippedItems: { chest: 'chest_a', legs: 'legs_a' },
+    });
+    const sig = appearanceSignature(base);
+    // Same map (a fresh object, same contents) stays stable.
+    expect(
+      appearanceSignature({
+        ...base,
+        equippedItems: { chest: 'chest_a', legs: 'legs_a' },
+      }),
+    ).toBe(sig);
+    // Changing one slot's item id changes the signature, so a future armor
+    // swap on any slot (not just the mainhand) invalidates a cached appearance.
+    expect(
+      appearanceSignature({ ...base, equippedItems: { chest: 'chest_b', legs: 'legs_a' } }),
+    ).not.toBe(sig);
+    // A different slot (legs only, chest unchanged) is equally decisive.
+    expect(
+      appearanceSignature({ ...base, equippedItems: { chest: 'chest_a', legs: 'legs_b' } }),
+    ).not.toBe(sig);
+    // Adding or dropping a slot also changes it.
+    expect(appearanceSignature({ ...base, equippedItems: { chest: 'chest_a' } })).not.toBe(sig);
+    expect(
+      appearanceSignature({
+        ...base,
+        equippedItems: { chest: 'chest_a', legs: 'legs_a', feet: 'feet_a' },
+      }),
+    ).not.toBe(sig);
+    // Insertion order does not matter (sorted by slot internally).
+    expect(
+      appearanceSignature({
+        ...base,
+        equippedItems: { legs: 'legs_a', chest: 'chest_a' },
+      }),
+    ).toBe(sig);
+  });
 });
 
 describe('CharacterPreview.setAppearance', () => {
@@ -155,5 +203,85 @@ describe('CharacterPreview.setAppearance', () => {
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
     expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+  });
+});
+
+// Phase 2b equipment-visual base seam: CharacterVisual itself is GLB/WebGL-heavy
+// (mocked to a bare class above), so these cover the cheap, Three-free part of
+// the seam: CharacterPreview.setEquipment's delegation to whatever visual is
+// currently mounted, and setAppearance's pass-through when the field is set.
+describe('CharacterPreview.setEquipment', () => {
+  it('delegates to the current visual, and no-ops when none is mounted yet', () => {
+    const { preview } = barePreview();
+    const state = preview as unknown as { currentVisual: unknown };
+
+    // No visual mounted (e.g. construction still pending): must not throw.
+    expect(() => preview.setEquipment({ mainhand: 'sword_x' })).not.toThrow();
+
+    const setEquipment = vi.fn();
+    state.currentVisual = { setEquipment };
+    const equipped = { mainhand: 'sword_x', chest: 'chest_a' };
+    preview.setEquipment(equipped);
+    expect(setEquipment).toHaveBeenCalledOnce();
+    expect(setEquipment).toHaveBeenCalledWith(equipped);
+  });
+});
+
+// Phase 2b pedestal opt-in: the headline behavior of this phase. buildPedestal
+// is real (plain THREE geometry/material, no WebGL), so a fake scene with add/
+// remove spies is enough to assert the full state machine: default off, add on
+// enable, no-op (and never rebuilt) on a repeat enable, remove on disable.
+describe('CharacterPreview.setPedestal (Phase 2b state machine)', () => {
+  it('is default off, adds once on enable, no-ops on repeat, and removes on disable', () => {
+    const { preview } = barePreview();
+    const state = preview as unknown as {
+      scene: { add: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> };
+      pedestal: unknown;
+      pedestalVisible: boolean;
+    };
+    state.scene = { add: vi.fn(), remove: vi.fn() };
+    state.pedestalVisible = false;
+    state.pedestal = null;
+
+    // Default off: disabling while already off never touches the scene or builds.
+    preview.setPedestal(false);
+    expect(state.scene.add).not.toHaveBeenCalled();
+    expect(state.scene.remove).not.toHaveBeenCalled();
+    expect(state.pedestal).toBeNull();
+
+    // Enable: builds once and adds it to the scene.
+    preview.setPedestal(true);
+    expect(state.scene.add).toHaveBeenCalledOnce();
+    const built = state.pedestal;
+    expect(built).not.toBeNull();
+
+    // Repeat enable: no-op (guarded by the visible === pedestalVisible early
+    // return), and the pedestal is never rebuilt (per-instance alloc discipline).
+    preview.setPedestal(true);
+    expect(state.scene.add).toHaveBeenCalledOnce();
+    expect(state.pedestal).toBe(built);
+
+    // Disable: removes from the scene, keeps the built instance for reuse.
+    preview.setPedestal(false);
+    expect(state.scene.remove).toHaveBeenCalledOnce();
+    expect(state.pedestal).toBe(built);
+  });
+});
+
+describe('CharacterPreview.setAppearance equipment pass-through (Phase 2b seam)', () => {
+  it('calls setEquipment with the appearance equippedItems map when provided', () => {
+    const { preview } = barePreview();
+    const setEquipmentSpy = vi.spyOn(preview, 'setEquipment').mockImplementation(() => {});
+    const equippedItems = { chest: 'chest_a', legs: 'legs_a' };
+    preview.setAppearance(appearance({ cls: 'mage', mainhandItemId: 'staff_x', equippedItems }));
+    expect(setEquipmentSpy).toHaveBeenCalledOnce();
+    expect(setEquipmentSpy).toHaveBeenCalledWith(equippedItems);
+  });
+
+  it('does not call setEquipment when equippedItems is absent (unchanged behavior)', () => {
+    const { preview } = barePreview();
+    const setEquipmentSpy = vi.spyOn(preview, 'setEquipment').mockImplementation(() => {});
+    preview.setAppearance(appearance({ cls: 'mage', mainhandItemId: 'staff_x' }));
+    expect(setEquipmentSpy).not.toHaveBeenCalled();
   });
 });

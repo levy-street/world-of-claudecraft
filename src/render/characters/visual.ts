@@ -5,6 +5,7 @@
 // only releases mixer bindings.
 import * as THREE from 'three';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import type { EquipSlot } from '../../sim/types';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
 import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
@@ -173,6 +174,13 @@ export class CharacterVisual {
   // the swap moment); -1 = inactive. Bone resolved lazily once (null = absent).
   private stowLift = { t: -1, dur: 0 };
   private stowArmBone: THREE.Object3D | null | undefined;
+  // The full equipped-item map (equipment-visual base seam, Phase 2b of the
+  // char-equipment redesign): stored so a later phase can attach per-slot
+  // armor meshes without re-plumbing the seam; today setEquipment only reads
+  // the mainhand back out (delegated to setWeapon), so this is write-only
+  // until the armor-on-model feature adds a read path.
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only equipment-visual seam state (Phase 2b); read path lands with armor-on-model.
+  private equippedItems: Partial<Record<EquipSlot, string>> = {};
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -612,6 +620,17 @@ export class CharacterVisual {
         this.originalMaterials.set(mesh, mesh.material);
     });
     this.applyVisualMaterials();
+  }
+
+  /** Store the full equipped-item map and apply it to the visual (equipment-visual
+   *  base seam, Phase 2b of the char-equipment redesign: preview_appearance.ts
+   *  carries the same map through PreviewAppearance.equippedItems). Today this
+   *  only delegates the mainhand slot to the existing setWeapon path below;
+   *  per-slot armor attachment (chest, legs, etc.) lands on this same seam
+   *  later, once armor meshes exist, without needing to re-wire the caller. */
+  setEquipment(equipped: Partial<Record<EquipSlot, string>>): void {
+    this.equippedItems = equipped;
+    this.setWeapon(equipped.mainhand ?? null);
   }
 
   /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if

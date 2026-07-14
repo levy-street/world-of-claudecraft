@@ -2754,12 +2754,15 @@
      modal (it already traps focus / blocks world input), so nothing actionable
      is hidden behind it. */
   body.mobile-touch #char-window {
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    transform: none;
-    width: auto;
+    left: env(safe-area-inset-left) !important;
+    top: env(safe-area-inset-top) !important;
+    right: env(safe-area-inset-right) !important;
+    bottom: env(safe-area-inset-bottom) !important;
+    transform: none !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0;
+    min-height: 0;
     max-width: none;
     max-height: none;
     box-sizing: border-box;
@@ -2779,33 +2782,264 @@
     max-width: 100%;
     box-sizing: border-box;
   }
-  body.mobile-touch #char-window > .char-stats {
-    margin-top: 6px;
+  /* Fill the window with the frame (proportion-fix round): the frame mounts
+     on an anonymous inner div (char_window.ts ensureFrame) with no height of
+     its own; stretching mount + frame to the window's height makes the
+     shared frame grammar's own .window-body the ONE working scroller (the
+     window root's legacy overflow scroll otherwise scrolls the whole frame,
+     chrome and all, out of view: the "empty gold border over bare world"
+     scrolled shot, caught by a live geometry probe). */
+  body.mobile-touch #char-window > * {
+    height: 100%;
   }
+  body.mobile-touch #char-window > * > .window-frame {
+    height: 100%;
+  }
+  /* NOTE: the old `body.mobile-touch #char-window > .char-stats { margin-top:
+     6px }` compat rule from the pre-redesign sheet is gone: `.char-stats` has
+     not been a direct child of #char-window since the Phase 2 tabbed-frame
+     rebuild (it now nests inside a stat panel or the Overview identity
+     strip), so the selector never matched post-redesign; dead CSS removed as
+     part of this mobile rework rather than left to rot. */
+
+  /* Phase 6 mobile layout (own SEPARATE layout, not a scaled-down desktop):
+     the ornate nameplate banner (components.css "char window ornate frame
+     chrome") absolutely centers the title/subtitle column at 55% max-width,
+     which at phone widths crowds the money chips against the close X (the
+     phase-06 contract's explicit "coins must not crowd the close button at
+     390px" ask). Drop the absolute centering: the title-col becomes a normal
+     flex child forced to its own full-width line (`flex: 1 1 100%`), so it
+     wraps onto row 1 by itself; the money accessory + close naturally flow
+     to row 2, right-aligned by the shared (still-active) `justify-content:
+     flex-end` on .window-titlebar. `position: relative` (not `static`) keeps
+     the nameplate's own diamond corner marks (::before/::after) anchored to
+     THIS element rather than jumping to the titlebar. */
+  /* ONE compact header strip (~64px, the orchestrator's proportion review):
+     chip + name/level LEFT and coins + close RIGHT of the SAME line (no
+     wrap, no second row), so at 390px landscape height at least ~280px of
+     content remains below the header + slim tab rail. */
+  body.mobile-touch #char-window .window-titlebar {
+    flex-wrap: nowrap;
+    min-height: 0;
+    align-items: center;
+    padding-block: var(--spacing-xs);
+    padding-inline: var(--spacing-sm);
+    gap: var(--spacing-sm);
+    flex: 0 0 auto;
+  }
+  /* Mobile-landscape-brief header: LEFT-aligned portrait chip + stacked name/
+     level-class (never the desktop's equipment-column nameplate banner). A small
+     grid: the chip spans both text rows in column 1, the title/subtitle sit
+     stacked in column 2. `flex: 1 1 auto` (NOT 100%) keeps the money chips +
+     close on this same line, pushed right by the grid filling the middle. */
+  body.mobile-touch #char-window .window-title-col {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: var(--spacing-sm);
+    row-gap: 0;
+    text-align: left;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    padding: 0 var(--spacing-xs);
+    border: none;
+    background: none;
+  }
+  body.mobile-touch #char-window .char-header-chip {
+    display: inline-flex;
+    grid-column: 1;
+    grid-row: 1 / 3;
+  }
+  /* ~40px chip (the brief's small header chip; the shared .portrait-sm is
+     46px, sized in shell.css, which this later hud-mobile layer outranks). */
+  body.mobile-touch #char-window .char-header-chip .portrait-chip {
+    width: 40px;
+    height: 40px;
+  }
+  body.mobile-touch #char-window .window-title {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: left;
+    font-size: var(--text-md);
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch #char-window .window-subtitle {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: left;
+    font-size: var(--text-xs);
+    line-height: 1.15;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Compact coins + close on the same strip: tighter chip padding and a
+     smaller close square than the desktop ornate treatment. */
+  body.mobile-touch #char-window .window-accessory {
+    gap: 4px;
+    flex: none;
+  }
+  body.mobile-touch #char-window .char-earned-title {
+    display: none;
+  }
+  body.mobile-touch #char-window .char-header-balances {
+    gap: 2px;
+  }
+  body.mobile-touch #char-window .char-balance-chip {
+    min-height: 28px;
+    gap: 3px;
+    padding: 3px 5px;
+    font-size: 9px;
+  }
+  /* Keep the currency name available to assistive technology while reducing
+     the visual chip to its unique mark + number on narrow touch headers. */
+  body.mobile-touch #char-window .char-balance-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  body.mobile-touch #char-window .char-balance-icon {
+    width: 9px;
+    height: 9px;
+    flex-basis: 9px;
+  }
+  body.mobile-touch #char-window .char-header-share {
+    width: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 4px;
+  }
+  body.mobile-touch #char-window .char-header-share-label {
+    display: none;
+  }
+  body.mobile-touch #char-window .window-accessory .coin-part {
+    padding: 1px 6px 1px 2px;
+  }
+  body.mobile-touch #char-window .window-close {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    flex: none;
+  }
+  /* Portrait-width phones cannot carry identity, two token balances, the
+     three legacy coin denominations, Share, and Close on one honest row.
+     Keep the newly requested account balances and actions; the ordinary
+     purse remains available everywhere else in the HUD and returns as soon
+     as the window has landscape room. */
+  @media (max-width: 520px) {
+    body.mobile-touch #char-window .char-header-money {
+      display: none;
+    }
+  }
+  /* Slim tab rail directly under the strip (the brief's "keep the tab
+     mechanism but compact"): mechanism/aria untouched (window_frame.ts),
+     only the visual footprint shrinks. Tab height stays AT the 40px touch
+     floor (the review asked for ~32px, but the repo's mobile tap-target
+     floor is 40x40 and must not be weakened), which still reads as one slim
+     strip versus the previous roomy rail. */
+  body.mobile-touch #char-window .tab-rail {
+    min-height: 0;
+    padding-block: 0;
+  }
+  body.mobile-touch #char-window .tab-rail .tab {
+    padding: 2px 12px;
+    min-height: 40px;
+    font-size: 11px;
+  }
+
+  /* The equipment stage: a SEPARATE mobile arrangement (the user's explicit
+     ask), never the desktop's free-form radial orbit (whose absolute
+     percentage anchors are already inert here: char_window.ts's own comment
+     notes .equip-slot stays position:static on mobile-touch). Order, top to
+     bottom: the helmet crown, the model niche (a smaller arch than
+     desktop's tall one), the ten balanced side slots, and the full-width
+     appearance row -- the phase-06 contract's explicit "become a compact
+     two-column grid below... the model" option, replacing the old Phase-2
+     108px-flanking-column compat shim this supersedes. Named grid areas (not
+     the base rule's grid-column/grid-row numbers) so the layer order
+     (hud-mobile always outranks components regardless of specificity)
+     cleanly wins over the desktop grid coordinates without a specificity
+     fight. */
   body.mobile-touch #char-window .paperdoll {
+    --char-mobile-gear-cell: clamp(var(--touch-cell), 12cqi, 56px);
+    container: char-mobile-paperdoll / inline-size;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "top top"
+      "model model"
+      "left right"
+      "skins skins";
+    gap: var(--spacing-sm);
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
   }
-  body.mobile-touch #char-window .char-model-panel {
-    min-width: 0;
+  body.mobile-touch #char-window .equip-top-center {
+    grid-area: top;
+    display: grid;
+    place-items: center;
   }
-  @media (orientation: landscape) {
-    body.mobile-touch #char-window {
-      padding-left: calc(var(--window-pad) + env(safe-area-inset-left));
-    }
-    body.mobile-touch #char-window .char-model-panel {
-      flex: 0 1 180px;
-      width: 180px;
-      min-height: 132px;
-      height: 132px;
-    }
-    body.mobile-touch #char-window .char-model-preview {
-      min-height: 0;
-    }
-    body.mobile-touch #char-window .char-skin-row {
-      padding: 4px 0 5px;
-    }
+  body.mobile-touch #char-window .equip-top-center .equip-slot {
+    width: auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  body.mobile-touch #char-window .equip-top-center .slot-label {
+    display: none;
+  }
+  body.mobile-touch #char-window .char-skin-row {
+    grid-area: skins;
+    width: 100%;
+    justify-content: center;
+  }
+  body.mobile-touch #char-window .char-model-panel {
+    grid-area: model;
+    min-width: 0;
+    min-height: 200px;
+    height: 200px;
+  }
+  body.mobile-touch #char-window #equip-col-left {
+    grid-area: left;
+  }
+  body.mobile-touch #char-window #equip-col-right {
+    grid-area: right;
+  }
+  /* Read every row left-to-right (icon then label): drop the shared,
+     inspect-window-shared `.equip-col-right .equip-slot { flex-direction:
+     row-reverse }` rule for the char window on mobile (the exact same fix
+     the inspect-paperdoll mobile block above already applies for its own
+     stacked layout: "every row reads left to right"). The desktop-only arc
+     fix (components.css) cannot reach mobile since it is scoped
+     body:not(.mobile-touch); this is the mobile-scoped twin. */
+  body.mobile-touch #char-window #equip-col-right .equip-slot {
+    flex-direction: row;
+  }
+  body.mobile-touch #char-window #equip-col-right .slot-label {
+    text-align: left;
+  }
+  /* Phase 2 compat, still true post-rework: the slot text collapsed from two
+     lines (name + item name) to one outside label (.slot-label); .slot-name/
+     .slot-item no longer exist. */
+  body.mobile-touch .equip-slot .slot-label {
+    font-size: 9px;
   }
   body.mobile-touch #char-window .char-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2819,15 +3053,422 @@
     margin-inline: 0;
     overflow-wrap: anywhere;
   }
-  /* Narrow the flanking equip columns so both fit beside the model on a phone. */
-  body.mobile-touch .equip-col {
-    width: 108px;
+  /* Mobile-landscape-brief Zone 4 (stats): PROGRESSION and SPECIALIZATION
+     (the fourth and fifth of the six fixed-order panels, docs/char-equipment/
+     Phase 3) share ONE row as two half-width panels, GATHERING (and every
+     other panel) stays full width. Pure CSS Grid, no markup change: every
+     panel defaults to spanning both columns, and only those two get pulled
+     to a single column each, which the grid auto-placement algorithm then
+     lands side by side (Defense, immediately before them, already fills its
+     own full row). Applied in both orientations (implementer's judgment,
+     consistent with the landscape reference in portrait too). */
+  body.mobile-touch #char-window .char-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
-  body.mobile-touch .equip-slot .slot-name {
-    font-size: 9px;
+  body.mobile-touch #char-window .char-panels > .char-panel {
+    grid-column: 1 / -1;
   }
-  body.mobile-touch .equip-slot .slot-item {
-    font-size: 10px;
+  body.mobile-touch #char-window .char-panels > .char-panel:nth-child(4),
+  body.mobile-touch #char-window .char-panels > .char-panel:nth-child(5) {
+    grid-column: span 1;
+  }
+  /* >=40px touch floor for equipment cells (the --touch-cell twin
+     of the desktop --slot-cell density token), on every mobile orientation. */
+  body.mobile-touch #char-window .equip-item-cell {
+    width: var(--char-mobile-gear-cell);
+    height: var(--char-mobile-gear-cell);
+  }
+  /* Keep the 40px unequip hit target fully inside its owner cell. Only the
+     small medallion and glyph paint at the top-right corner, so adjacent rows
+     never steal one another's taps on short landscape screens. */
+  body.mobile-touch #char-window .equip-item-cell .equip-unequip-btn {
+    top: 0;
+    right: 0;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 1px 2px 0 0;
+  }
+  body.mobile-touch #char-window .equip-item-cell .equip-unequip-btn::before {
+    inset: 0 0 auto auto;
+    width: 16px;
+    height: 16px;
+  }
+  /* Zone 3 BAGS: the same owned-bag shelf used on desktop replaces the old
+     repeated per-container grids. Icon-only cards keep every real bag within
+     a horizontal swipe, while the selected bag owns the single grid below. */
+  body.mobile-touch #char-window .char-bags {
+    --char-owned-bag-cell: clamp(40px, 14cqi, 52px);
+    container: char-mobile-bags / inline-size;
+  }
+  body.mobile-touch #char-window .char-bags-controls {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 4px;
+    margin-bottom: 5px;
+  }
+  body.mobile-touch #char-window .char-bags-tab {
+    grid-template-columns: var(--char-owned-bag-cell);
+    min-width: calc(var(--char-owned-bag-cell) + 6px);
+    min-height: calc(var(--char-owned-bag-cell) + 6px);
+    padding: 2px;
+  }
+  body.mobile-touch #char-window .char-bags-tab-wrap {
+    grid-template-columns: calc(var(--char-owned-bag-cell) + 6px) 40px;
+    gap: 0;
+  }
+  body.mobile-touch #char-window .char-bags-tab-wrap:first-child {
+    grid-template-columns: calc(var(--char-owned-bag-cell) + 6px);
+  }
+  body.mobile-touch #char-window .char-bags-tab-icon {
+    width: var(--char-owned-bag-cell);
+    height: var(--char-owned-bag-cell);
+  }
+  body.mobile-touch #char-window .char-bags-tab-remove {
+    width: 40px;
+    min-width: 40px;
+    min-height: 46px;
+    font-size: 22px;
+  }
+  body.mobile-touch #char-window .char-bags-tab-copy {
+    display: none;
+  }
+  body.mobile-touch #char-window .char-bags-empty-toggle.is-compact {
+    width: 44px;
+    height: 40px;
+    min-width: 44px;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 40px;
+    gap: 1px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--gold-dim);
+  }
+  body.mobile-touch #char-window .char-bags-empty-toggle.is-compact:focus-within {
+    outline: 0;
+  }
+  body.mobile-touch #char-window .char-bags-empty-toggle.is-compact .char-bags-empty-mark {
+    width: 18px;
+    height: 18px;
+    border-radius: 0;
+  }
+  body.mobile-touch
+    #char-window
+    .char-bags-empty-toggle.is-compact
+    .char-bags-empty-input:focus-visible
+    + .char-bags-empty-mark {
+    outline: 0;
+  }
+  body.mobile-touch
+    #char-window
+    .char-bags-empty-toggle.is-compact
+    .char-bags-empty-input:focus-visible
+    ~ .char-bags-empty-label {
+    color: var(--color-text-light);
+    text-decoration: underline;
+    text-underline-offset: 1px;
+  }
+  body.mobile-touch #char-window .char-bags-empty-toggle.is-compact .char-bags-empty-label {
+    display: -webkit-box;
+    width: 44px;
+    max-height: 14px;
+    overflow: hidden;
+    font-size: 8px;
+    line-height: 1;
+    text-align: center;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  /* The narrower Zone 3 (bags) column can pinch the header row; keep the
+     counter/title text from wrapping mid-word (a real clipping-adjacent bug
+     caught by screenshot review) and let the header wrap as whole rows
+     instead. */
+  body.mobile-touch #char-window .char-bags-header {
+    min-height: 40px;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin-bottom: 4px;
+    row-gap: 0;
+  }
+  body.mobile-touch #char-window .char-bags-counter,
+  body.mobile-touch #char-window .char-bags-title {
+    white-space: nowrap;
+  }
+  body.mobile-touch #char-window .char-bags-counter {
+    margin-left: 2px;
+  }
+  /* Portrait default: the MAIN GRID (equipment+bags, then stats) stacks to
+     one column, in DOM order (the phase-06 contract's stacking order falls
+     out for free: .char-equip-col-left, carrying the paperdoll then the bags
+     panel, is the grid's first child; .char-equip-col-right, the stats
+     panels, is the second), zero JS/order tricks needed. The landscape media
+     query below restores a two-column split and, being declared LATER at
+     equal specificity, wins the cascade tie whenever it is active. */
+  body.mobile-touch #char-window .char-equip-grid {
+    grid-template-columns: 1fr;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #char-window .window-title-col {
+      padding-inline-end: 92px;
+    }
+    /* Landscape has width to spare (844px at the reference size): recover a
+       two-column MAIN GRID (equipment+bags left, stats right), matching the
+       phase-06 contract's "model + slots on the left, stats on the right or
+       below" ask, instead of portrait's forced single column. Declared after
+       the unconditional 1fr rule above so it wins the equal-specificity tie
+       while this media query is active. */
+    body.mobile-touch #char-window .char-equip-grid {
+      grid-template-columns: minmax(0, 31fr) minmax(0, 31fr) minmax(0, 38fr);
+      grid-template-rows: minmax(0, 1fr);
+      align-items: stretch;
+      height: 100%;
+      gap: 6px;
+    }
+    /* Mobile-landscape-brief rework: the LEFT main column splits further into
+       [rail+stage] beside [bags], recovering the reference's 4-zone layout
+       (rail | stage | bags | stats) without any markup change: `.paperdoll`
+       (rail+stage) keeps its natural compact width, `.char-bags` grows to
+       fill the rest. */
+    body.mobile-touch #char-window .char-equip-col-left {
+      display: contents;
+    }
+    body.mobile-touch #char-window .char-bags {
+      container: char-mobile-bags / inline-size;
+      grid-column: 2;
+      min-height: 0;
+      min-width: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      touch-action: pan-y;
+      padding: 6px;
+      scrollbar-color: var(--gold-dim) transparent;
+      scrollbar-width: thin;
+    }
+    body.mobile-touch #char-window .char-equip-col-right {
+      grid-column: 3;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    body.mobile-touch #char-window .char-panels {
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      touch-action: pan-y;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      scrollbar-color: var(--gold-dim) transparent;
+      scrollbar-width: thin;
+    }
+    /* Zone 1 + 2: five equipment cells flank each side of the model, while the
+       helmet occupies a centered crown above the character. The full-width
+       appearance row gets its own bottom band so all four choices stay visible. */
+    body.mobile-touch #char-window .paperdoll {
+      grid-column: 1;
+      width: auto;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      container: char-mobile-paperdoll / size;
+      padding-bottom: 0;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: clamp(48px, 18%, 64px) minmax(0, 1fr) clamp(48px, 18%, 64px);
+      grid-template-rows: clamp(44px, 10vh, 60px) minmax(0, 1fr) auto;
+      grid-template-areas:
+        "left helmet right"
+        "left model right"
+        "skins skins skins";
+      column-gap: 6px;
+      align-items: stretch;
+    }
+    /* Dissolve only the structural wrapper. Its three children become direct
+       paperdoll grid items and can occupy the left, helmet, and right areas. */
+    body.mobile-touch #char-window .char-equip-rail {
+      display: contents;
+    }
+    body.mobile-touch #char-window .equip-top-center {
+      grid-area: helmet;
+      display: grid;
+      min-width: 0;
+      place-items: center;
+    }
+    body.mobile-touch #char-window #equip-col-left {
+      grid-area: left;
+    }
+    body.mobile-touch #char-window #equip-col-right {
+      grid-area: right;
+    }
+    body.mobile-touch #char-window #equip-col-left,
+    body.mobile-touch #char-window #equip-col-right {
+      display: grid;
+      grid-template-rows: repeat(5, minmax(var(--char-mobile-gear-cell), 1fr));
+      min-width: 0;
+      min-height: 0;
+      place-items: center;
+      gap: 0;
+    }
+    /* Icon-primary columns: no text labels (the accessible name still lives on
+       the cell/button's own aria-label, set by char_window.ts, so nothing is
+       lost for assistive tech). Cells stay at the 40px touch floor. */
+    body.mobile-touch #char-window .paperdoll .slot-label {
+      display: none;
+    }
+    body.mobile-touch #char-window .paperdoll .equip-slot {
+      width: auto;
+      flex: none;
+      justify-content: center;
+    }
+    body.mobile-touch #char-window .paperdoll .equip-item-cell {
+      width: var(--char-mobile-gear-cell);
+      height: var(--char-mobile-gear-cell);
+    }
+    /* Zone 2, the stage: the arch fills the grid row's full height and the
+       model preview fills the whole arch interior, so the character no longer renders minuscule in a
+       squat dome. overflow stays visible ONLY so the absolute loadout row
+       can sit outside the panel; the preview clips itself to the arch shape
+       instead (its own radius + hidden overflow), so the canvas corners
+       never poke past the rounded stone top. */
+    body.mobile-touch #char-window .char-model-panel {
+      grid-area: model;
+      min-width: 0;
+      height: auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    body.mobile-touch #char-window .char-model-preview {
+      min-height: 0;
+      border-radius: 130px 130px var(--radius-sm) var(--radius-sm);
+      overflow: hidden;
+    }
+    /* Loadout 1-4 occupy the full paperdoll width below the stage. */
+    body.mobile-touch #char-window .char-skin-row {
+      position: static;
+      grid-area: skins;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      align-self: end;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 2px;
+      overflow: visible;
+      padding: 0;
+      margin: 0;
+    }
+    body.mobile-touch #char-window .char-skin-row .skin-swatch {
+      width: clamp(40px, 11cqi, 48px);
+      height: clamp(40px, 11cqi, 48px);
+      min-width: 40px;
+      min-height: 40px;
+      flex: 0 0 clamp(40px, 11cqi, 48px);
+    }
+    /* Preserve the 40px touch floor on very narrow landscape stages. Once a
+       four-button row no longer fits, use the paperdoll's own width (rather
+       than a device-name breakpoint) to form a centered 2x2 preset grid. */
+    @container char-mobile-paperdoll (max-width: 174px) {
+      body.mobile-touch #char-window .char-skin-row {
+        display: grid;
+        grid-template-columns: repeat(2, clamp(40px, 20cqi, 48px));
+        grid-template-rows: repeat(2, clamp(40px, 20cqi, 48px));
+        width: calc(2 * clamp(40px, 20cqi, 48px) + 2px);
+        justify-self: center;
+      }
+    }
+    /* Zone 3, bags: smaller square cells than the desktop grid's roomy 96px
+       floor, so the narrower mobile bags zone still lands several honest
+       columns instead of one giant white-bordered cell (the "white block"
+       bug: minmax(96px, 1fr) collapsed to a single huge column at this
+       width, caught by a screenshot crop). */
+    body.mobile-touch #char-window .char-bags-grid {
+      grid-template-columns: repeat(4, minmax(40px, 1fr));
+    }
+    @container char-mobile-bags (min-width: 330px) {
+      body.mobile-touch #char-window .char-bags-grid {
+        grid-template-columns: repeat(6, minmax(40px, 1fr));
+      }
+    }
+    @container char-mobile-bags (min-width: 500px) {
+      body.mobile-touch #char-window .char-bags-grid {
+        grid-template-columns: repeat(8, minmax(40px, 1fr));
+      }
+    }
+    body.mobile-touch #char-window .window-titlebar {
+      min-height: 48px;
+      height: 48px;
+      padding-block: 4px;
+    }
+    body.mobile-touch #char-window .tab-rail {
+      position: absolute;
+      z-index: 8;
+      top: 4px;
+      left: clamp(170px, 25vw, 238px);
+      width: 84px;
+      height: 40px;
+      min-height: 40px;
+      max-height: 40px;
+      box-sizing: border-box;
+      align-items: stretch;
+      padding: 0;
+      border: 0;
+      gap: 2px;
+      overflow: hidden;
+    }
+    body.mobile-touch #char-window .tab-rail .tab {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+      place-items: center;
+      gap: 0;
+      padding: 0;
+      font-size: 0;
+    }
+    body.mobile-touch #char-window .tab-rail .tab-icon {
+      display: block;
+      width: 18px;
+      height: 18px;
+      flex: none;
+    }
+    body.mobile-touch #char-window .tab-rail::after,
+    body.mobile-touch #char-window .tab-rail .tab[aria-selected="true"]::after {
+      display: none;
+    }
+    body.mobile-touch #char-window .window-body {
+      min-height: 0;
+      overflow: hidden;
+      padding: 6px;
+    }
+    body.mobile-touch #char-window .char-panel-header {
+      padding: 5px 8px 3px;
+    }
+    body.mobile-touch #char-window .char-panel-body {
+      padding: 3px 8px 7px;
+    }
+    body.mobile-touch #char-window .char-panel + .char-panel {
+      border-top: 1px solid var(--panel-edge);
+    }
+  }
+  @media (max-width: 740px) and (orientation: landscape) {
+    body.mobile-touch #char-window .tab-rail {
+      left: 158px;
+    }
+    body.mobile-touch #char-window .window-accessory .coin-part {
+      padding-inline: 0;
+    }
   }
   /* Phones (the long-press peek audience, same body.mobile-touch gate attachTooltip
      uses) get a comfortable >=40px long-press target per .stat-cell. Symmetric

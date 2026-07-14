@@ -565,7 +565,35 @@ export const sv_SE: EnTranslations = {
       "durationUnitDays": "d"
     },
     "character": {
-      "modelPreview": "Förhandsvisning av karaktärsmodell"
+      "modelPreview": "Förhandsvisning av karaktärsmodell",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Tomma platser",
+        "emptySummary": "+{count} tomma"
+      }
     },
     "skipLinks": {
       "mainHud": "Hoppa till huvud-HUD",

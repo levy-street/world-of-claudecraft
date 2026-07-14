@@ -61,7 +61,39 @@ export type UiIconName =
   | 'lock'
   | 'mail'
   | 'ball'
-  | 'book';
+  | 'book'
+  // character-sheet stat-panel section headers (docs/char-equipment/, Phase 3):
+  // `attack`/`talents` above are reused for Combat/Specialization; these four
+  // have no existing fit (Attributes, Defense, Progression, Gathering)
+  | 'attributes'
+  | 'shield'
+  | 'banner'
+  | 'leaf'
+  // gathering profession marks: compact tool and herb silhouettes used by the
+  // character sheet's profession plaques.
+  | 'mining'
+  | 'logging'
+  | 'herbalism'
+  // hand-authored plus/add glyph (docs/char-equipment/, ornate redesign): the
+  // character sheet's embedded-bags header "open full bags window" control,
+  // reading as an ornate gold "+" per the mockup rather than the generic
+  // ellipsis `more` glyph used elsewhere.
+  | 'plus'
+  // hand-authored paperdoll slot-type silhouettes (docs/char-equipment/, ornate
+  // redesign Round 2): one glyph per equip slot, shown in an EMPTY slot cell so
+  // the mockup's "clear silhouette of what goes here" reads even with no item
+  // icon to draw. Ring1/ring2 share `slotRing`; the bag sockets reuse the
+  // existing `bags` glyph above rather than adding a twelfth name.
+  | 'slotHelmet'
+  | 'slotNeck'
+  | 'slotShoulder'
+  | 'slotChest'
+  | 'slotGloves'
+  | 'slotMainhand'
+  | 'slotWaist'
+  | 'slotLegs'
+  | 'slotFeet'
+  | 'slotRing';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -165,6 +197,53 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
+  // hand-authored bust silhouette (a circle head over a curved-shoulder torso
+  // base): the Attributes panel header, distinct from the full-body `character`
+  // glyph used elsewhere.
+  attributes:
+    '<path d="M256 72a72 72 0 1 0 0 144 72 72 0 0 0 0-144zM256 240c-88 0-176 48-176 128v40h352v-40c0-80-88-128-176-128z"/>',
+  // hand-authored heraldic shield outline: the Defense panel header.
+  shield: '<path d="M256 48L432 112V240C432 364 344 448 256 480C168 448 80 364 80 240V112Z"/>',
+  // hand-authored pennant ribbon (a rectangle with a swallow-tail notch cut from
+  // the bottom edge): the Progression panel header.
+  banner: '<path d="M176 48H336V368L256 320L176 368Z"/>',
+  // hand-authored leaf (a symmetric pointed vesica built from two mirrored cubic
+  // curves): the Gathering panel header.
+  leaf: '<path d="M256 72C168 120 96 208 96 296c0 88 72 152 160 152s160-64 160-152c0-88-72-176-160-224z"/>',
+  // Hand-authored gathering marks. Broad heads and handles keep the tools
+  // readable at 18-24px, while the herb uses a three-leaf sprig so it cannot be
+  // confused with the solid Gathering header leaf.
+  mining:
+    '<path d="M66 128c92-62 213-78 329-40 24 8 43 18 57 31l-27 45c-14-10-31-18-49-24-42-14-87-18-130-12l-17 42-47-19 7-17c-35 10-69 25-98 45z"/><path d="M241 145l58 24-125 302-58-24z"/>',
+  logging:
+    '<path d="M278 62l58 36-232 374-58-36z"/><path d="M271 76c58-24 126-9 175 38-7 76-49 135-118 166l-96-59c30-39 43-84 39-145z"/>',
+  herbalism:
+    '<path d="M232 452c16-97 49-177 101-241l31 25c-48 60-79 133-94 223z"/><path d="M306 224c-5-68 35-126 112-158 8 78-27 139-112 158zM258 316c-67-3-117-45-139-124 77 1 130 39 139 124zM297 286c22-61 74-94 153-91-18 76-67 115-153 91z"/>',
+  // hand-authored plus (two overlapping bars forming a cross), matching the
+  // geometric weight of close/prev/next above.
+  plus: '<path d="M226 86H286V226H426V286H286V426H226V286H86V226H226Z"/>',
+  // hand-authored paperdoll slot-type silhouettes (docs/char-equipment/, ornate
+  // redesign Round 2). Each is a simple, legible shape at small size, drawn with
+  // the same primitive-composition style as the other hand-authored glyphs above.
+  slotHelmet:
+    '<path d="M106 268a150 150 0 0 1 300 0v36H106z"/><rect x="86" y="292" width="340" height="26" rx="10"/>',
+  slotNeck:
+    '<path d="M118 118a180 180 0 0 0 276 0" stroke="currentColor" stroke-width="26" fill="none" stroke-linecap="round"/><circle cx="256" cy="332" r="42"/>',
+  slotShoulder:
+    '<path d="M76 322a180 128 0 0 1 360 0z"/><circle cx="176" cy="292" r="13"/><circle cx="336" cy="292" r="13"/>',
+  slotChest:
+    '<path d="M256 92c-72 0-124 42-124 102v186c0 22 18 40 40 40h168c22 0 40-18 40-40V194c0-60-52-102-124-102z"/><rect x="248" y="150" width="16" height="230" rx="8"/>',
+  slotGloves:
+    '<rect x="176" y="258" width="160" height="182" rx="28"/><rect x="192" y="132" width="34" height="132" rx="16"/><rect x="239" y="112" width="34" height="152" rx="16"/><rect x="286" y="132" width="34" height="132" rx="16"/>',
+  slotMainhand:
+    '<rect x="240" y="64" width="32" height="256" rx="6"/><rect x="184" y="326" width="144" height="26" rx="8"/><rect x="240" y="352" width="32" height="86" rx="8"/><circle cx="256" cy="452" r="22"/>',
+  slotWaist:
+    '<rect x="66" y="228" width="380" height="56" rx="10"/><rect x="206" y="204" width="100" height="104" rx="16"/>',
+  slotLegs: '<path d="M170 88h172l16 344h-72l-30-222-30 222h-72z"/>',
+  slotFeet:
+    '<rect x="196" y="80" width="90" height="228" rx="14"/><path d="M196 278h90v42h108a30 30 0 0 1 30 30v18a20 20 0 0 1-20 20H216a20 20 0 0 1-20-20z"/>',
+  slotRing:
+    '<path fill-rule="evenodd" d="M256 176a124 124 0 1 0 0 248 124 124 0 0 0 0-248zm0 46a78 78 0 1 1 0 156 78 78 0 0 1 0-156z"/><path d="M214 118l42-42 42 42-42 42z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

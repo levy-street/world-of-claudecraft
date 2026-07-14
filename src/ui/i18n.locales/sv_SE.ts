@@ -2,6 +2,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Tomma platser',
+  'hudChrome.character.bags.emptySummary': '+{count} tomma',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',

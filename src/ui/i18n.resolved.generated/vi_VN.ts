@@ -565,7 +565,35 @@ export const vi_VN: EnTranslations = {
       "durationUnitDays": "ng"
     },
     "character": {
-      "modelPreview": "Xem Trước Mô Hình Nhân Vật"
+      "modelPreview": "Xem Trước Mô Hình Nhân Vật",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Ô trống",
+        "emptySummary": "+{count} ô trống"
+      }
     },
     "skipLinks": {
       "mainHud": "Chuyển tới HUD Chính",

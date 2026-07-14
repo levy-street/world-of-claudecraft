@@ -2,6 +2,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Ruang kosong',
+  'hudChrome.character.bags.emptySummary': '+{count} kosong',
   'loading.tips.classes':
     'Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.',
   'loading.tips.dungeons':

@@ -86,11 +86,31 @@
        raw hex). Exact pre-existing value. */
     --color-quality-default: #fff;
 
-    /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
-       no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
-       Exact pre-existing values. */
-    --color-slot-empty-text: #666;
-    --color-slot-empty-border: #444;
+    /* Empty paperdoll slot colors (char_window.ts uses these so the painter carries
+       no raw hex): the "Empty" label/glyph and the placeholder-icon cell border.
+       Paperdoll rework: recolored from plain grey to a dim warm gold/tan so an
+       empty slot still reads as part of the ornate gold-brown metal frame family
+       (components.css "char equipment tab" section), just dimmer than a filled
+       slot's bright gold label; the TOKEN NAMES are unchanged (char_window.ts
+       references them by name, never the hex, so this is a value-only change). */
+    /* Visual-restraint pass (docs/char-equipment/): darkened to a muted,
+       embossed dark grey-gold (was a bright warm tan) so an empty slot reads
+       as a recessed, low-contrast glyph rather than a glowing placeholder. */
+    --color-slot-empty-text: #5c5648;
+    --color-slot-empty-border: #2b2620;
+
+    /* Ornate slot-cell metal frame (paperdoll rework, docs/char-equipment/): the
+       beveled ring painted around every equip slot / bag-socket cell
+       (components.css). Light corresponds to the embossed top/left highlight,
+       dark to the bottom/right shadow side. Visual-restraint pass: the RING
+       itself is now a dark gunmetal/iron bevel (was bright gold-brown), so a
+       slot reads calm and dark by default; the rivet studs keep a separate,
+       DIMMER muted-gold tone (small corner accents only, never a full gold
+       border) via their own two tokens below. */
+    --color-slot-frame-light: #3c4552;
+    --color-slot-frame-dark: #0d1015;
+    --color-slot-rivet-light: #b9a06a;
+    --color-slot-rivet-dark: #453419;
 
     /* delve minimap / world-map schematic (resolved by delve_map_painter.ts via
        getComputedStyle: a 2D canvas context cannot read a CSS var directly) */
@@ -203,6 +223,17 @@
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
     --cursor-shield: var(--cursor-point);
+
+    /* Character screen surfaces: scoped by the #char-window rules in
+       components.css and intentionally independent of the reverted shared
+       window-frame token system. */
+    --color-char-navy: #0a1024;
+    --color-char-navy-deep: #04060f;
+    --color-char-stone-light: #6f7f92;
+    --color-char-stone-mid: #4c596b;
+    --color-char-stone-dark: #262e38;
+    --color-char-stone-mortar: #12161b;
+    --color-char-arch-glow: #3a648c;
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal

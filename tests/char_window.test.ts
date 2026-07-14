@@ -20,8 +20,7 @@ describe('char_window: no magic values', () => {
     );
   });
 
-  it('routes the quality + empty-slot colors through CSS tokens', () => {
-    expect(painter).toContain("const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)'");
+  it('routes the empty-slot colors through CSS tokens (rarity itself is a data-quality attribute)', () => {
     expect(painter).toContain("const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)'");
     expect(painter).toContain("const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)'");
   });
@@ -43,7 +42,7 @@ describe('char_window: WCAG 2.2 AA', () => {
   it('labels its controls (close, unequip, the skin row)', () => {
     expect(painter).toContain('hud.options.returnToGame'); // close button aria-label key
     expect(painter).toContain('hudChrome.paperdoll.unequipAria'); // unequip button aria-label
-    expect(painter).toContain('role="list"'); // the skin row
+    expect(painter).toContain('role="group"'); // the skin-row toggle group
     expect(painter).toContain("t('auth.appearance')"); // skin-row aria-label
   });
 

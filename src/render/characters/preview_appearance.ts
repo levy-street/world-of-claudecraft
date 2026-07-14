@@ -1,16 +1,21 @@
-import type { PlayerClass } from '../../sim/types';
+import type { EquipSlot, PlayerClass } from '../../sim/types';
 import type { WeaponLayoutOverride } from './manifest';
 import { mechHeldWeaponOverride } from './manifest';
 
 /** A character's real, in-world appearance for the char-select / char-sheet
  *  turntable: body class, appearance skin, whether it is the class rig or the
  *  class-agnostic Combat Mech cosmetic, and the equipped mainhand (null when
- *  unarmed, so the preview shows no weapon rather than a class default). */
+ *  unarmed, so the preview shows no weapon rather than a class default).
+ *  `equippedItems` (optional, the full worn-gear map) is the equipment-visual
+ *  base seam: today only the mainhand renders (see CharacterVisual.setEquipment),
+ *  but carrying the whole map through the signature means a future armor swap
+ *  on any other slot already invalidates a cached appearance and re-renders. */
 export interface PreviewAppearance {
   cls: PlayerClass;
   skin: number;
   skinCatalog: 'class' | 'mech';
   mainhandItemId: string | null;
+  equippedItems?: Partial<Record<EquipSlot, string>>;
 }
 
 /** The model key + held-weapon layout the appearance resolves to. */
@@ -34,7 +39,18 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
 }
 
 /** Stable identity of an appearance, so an async mech re-apply can bail out if a
- *  newer selection superseded it. */
+ *  newer selection superseded it. Includes the full equipped-item map (sorted
+ *  by slot for a deterministic order) so the signature changes whenever ANY
+ *  slot's item id changes, not just the mainhand, ready for a future armor
+ *  feature that re-renders on any gear swap. */
 export function appearanceSignature(a: PreviewAppearance): string {
-  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}`;
+  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${equippedItemsSignature(a.equippedItems)}`;
+}
+
+function equippedItemsSignature(equipped: Partial<Record<EquipSlot, string>> | undefined): string {
+  if (!equipped) return '';
+  return Object.keys(equipped)
+    .sort()
+    .map((slot) => `${slot}:${equipped[slot as EquipSlot]}`)
+    .join(',');
 }

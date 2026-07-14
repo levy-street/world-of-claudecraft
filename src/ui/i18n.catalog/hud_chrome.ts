@@ -347,6 +347,71 @@ export const hudChromeStrings = {
   // pending; Title Case does not make it non-wordy.
   character: {
     modelPreview: 'Character Model Preview',
+    // The char-equipment redesign (docs/char-equipment/, Phase 2): the shared
+    // frame's tab rail (EQUIPMENT default, OVERVIEW). Both wordy by M16
+    // ("Equipment" -> "quipment", "Overview" -> "verview"), so the five
+    // non-Latin overlays carry real fills.
+    tabs: {
+      equipment: 'Equipment',
+      overview: 'Overview',
+    },
+    // Persistent character-header economy chips. $WOC is the on-chain wallet
+    // balance; Claudium is reserved for the account balance once that source is
+    // exposed through IWorld/account state. Brand labels stay compact so the
+    // responsive header can retain both values beside the ordinary coin purse.
+    balances: {
+      woc: '$WOC',
+      claudium: 'Claudium',
+    },
+    // Accessible name for a top-center equipped-bag-socket cell (display +
+    // tooltip only this phase; Phase 4 adds the unequip-bag interaction).
+    // {name} is the bag's display name, or itemUi.equipment.empty when the
+    // socket is empty. Wordy by M16 ("Socket" -> "ocket"), five non-Latin fills.
+    bagSocket: 'Bag Socket: {name}',
+    // The Equipment tab's stat-panel headers (Phase 3, docs/char-equipment/):
+    // one icon-header title per panel (char_window.ts panelHtml). Only the three
+    // panels with NO existing equivalent key live here (Attributes/Combat/Defense,
+    // WORDY by M16, five non-Latin fills). Progression/Specialization/Gathering
+    // reuse the existing game.progression.heading / game.talents.specTab /
+    // hudChrome.gathering.title (byte-identical English), per state.md LOCKED
+    // "Reuse, do not duplicate".
+    sections: {
+      attributes: 'Attributes',
+      combat: 'Combat',
+      defense: 'Defense',
+    },
+    // The Progression panel's level-XP bar centered "current / max" label. The
+    // other progression rows reuse game.progression.totalXp/virtualLevel/
+    // prestigeRank. xpLabel: stripping {current}/{max} leaves only " / " (no
+    // four-plus lowercase run), so it is NOT wordy and carries no non-Latin fill.
+    progression: {
+      xpLabel: '{current} / {max}',
+    },
+    // The Specialization panel's Choose/Change button labels (both call
+    // deps.openTalents()). The none-state copy reuses game.talents.noSpec. Both
+    // are WORDY by M16, five non-Latin fills.
+    spec: {
+      choose: 'Choose',
+      change: 'Change',
+    },
+    // Phase 4 (docs/char-equipment/): the embedded BAGS section (header,
+    // container selector, grid) filling the Equipment tab's #char-bags mount.
+    // The header TITLE is not here: it reuses the standalone bags window's own
+    // itemUi.bags.title ("Bags", already translated in every locale), rendered
+    // via t('itemUi.bags.title'), rather than duplicating that string.
+    // counter's "{used} / {total}" strips to no 4+ lowercase run (NOT wordy,
+    // English-only, no fills). openFull's "Open bags window" contains a real
+    // 4+ lowercase run ("bags"/"window" mid-sentence), so it IS wordy by M16
+    // and needs the five non-Latin fills. container ("Bag {n}") is short enough
+    // that it does not strictly trip the M16 regex on its own, but carries the
+    // same five non-Latin fills anyway for glossary consistency.
+    bags: {
+      counter: '{used} / {total}',
+      openFull: 'Open bags window',
+      container: 'Bag {n}',
+      emptySpaces: 'Empty spaces',
+      emptySummary: '+{count} empty',
+    },
   },
   // Skip links: the first focusable elements on both game entries, a keyboard /
   // screen-reader shortcut to the main HUD and the chat log (mirrors the src/guide

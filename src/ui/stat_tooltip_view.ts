@@ -213,18 +213,31 @@ export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): s
   return int0(deps, model.statValue);
 }
 
-/** Build one focusable character-sheet stat cell: "Name: <b>value</b>" plus a
+/** Build one focusable character-sheet stat cell with separate label/value spans plus a
  *  visually-hidden, aria-describedby breakdown carrying the same live numbers as
  *  the (sighted-only) floating tooltip. The HUD attaches the tooltip afterwards
  *  by matching the data-stat attribute. The value comes from formatNumber, so it
- *  is left unescaped (digits / separators / percent only). */
-export function statCellHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
+ *  is left unescaped (digits / separators / percent only).
+ *
+ *  `idNamespace` disambiguates the aria-describedby target id when the SAME
+ *  StatId is rendered in more than one panel at once (the char sheet shows e.g.
+ *  armor/dodge in both Attributes and Defense): passing a distinct namespace per
+ *  panel yields `statdesc-<ns>-<stat>` so no two live cells share an element id
+ *  (which would be invalid HTML and break aria-describedby resolution). Omitted
+ *  (the default), the id stays the legacy `statdesc-<stat>`, so every existing
+ *  single-render caller is byte-identical. */
+export function statCellHtml(
+  model: StatTooltipModel,
+  deps: StatTooltipI18n,
+  idNamespace?: string,
+): string {
   const name = esc(deps.t(statNameKey(model.stat)));
   const value = statValueText(model, deps);
   const aria = esc(statTooltipAria(model, deps));
+  const descId = idNamespace ? `statdesc-${idNamespace}-${model.stat}` : `statdesc-${model.stat}`;
   return (
-    `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="statdesc-${model.stat}">` +
-    `${name}: <b>${value}</b>` +
-    `<span id="statdesc-${model.stat}" class="visually-hidden">${aria}</span></span>`
+    `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="${descId}">` +
+    `<span class="stat-label">${name}</span><b class="stat-value">${value}</b>` +
+    `<span id="${descId}" class="visually-hidden">${aria}</span></span>`
   );
 }

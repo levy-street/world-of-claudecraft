@@ -2,6 +2,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Ô trống',
+  'hudChrome.character.bags.emptySummary': '+{count} ô trống',
   'loading.tips.classes':
     'Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.',
   'loading.tips.dungeons':

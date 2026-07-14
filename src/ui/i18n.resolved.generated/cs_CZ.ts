@@ -565,7 +565,35 @@ export const cs_CZ: EnTranslations = {
       "durationUnitDays": "d"
     },
     "character": {
-      "modelPreview": "Náhled modelu postavy"
+      "modelPreview": "Náhled modelu postavy",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Prázdná místa",
+        "emptySummary": "+{count} prázdných"
+      }
     },
     "skipLinks": {
       "mainHud": "Přeskočit na hlavní HUD",

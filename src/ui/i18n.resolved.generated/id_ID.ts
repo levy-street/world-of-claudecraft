@@ -565,7 +565,35 @@ export const id_ID: EnTranslations = {
       "durationUnitDays": "h"
     },
     "character": {
-      "modelPreview": "Pratinjau Model Karakter"
+      "modelPreview": "Pratinjau Model Karakter",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Ruang kosong",
+        "emptySummary": "+{count} kosong"
+      }
     },
     "skipLinks": {
       "mainHud": "Lewati ke HUD Utama",

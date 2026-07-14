@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.character.bags.emptySpaces': 'Spazi vuoti',
+  'hudChrome.character.bags.emptySummary': '+{count} vuoti',
   'entities.abilities.sport_boot.description':
     'Un calcione alto e lungo verso il punto mirato. La folla lo adora.',
   'entities.abilities.sport_boot.name': 'Calcione',

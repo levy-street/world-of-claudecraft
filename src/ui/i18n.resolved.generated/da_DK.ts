@@ -565,7 +565,35 @@ export const da_DK: EnTranslations = {
       "durationUnitDays": "d"
     },
     "character": {
-      "modelPreview": "Forhåndsvisning af karaktermodel"
+      "modelPreview": "Forhåndsvisning af karaktermodel",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Tomme pladser",
+        "emptySummary": "+{count} tomme"
+      }
     },
     "skipLinks": {
       "mainHud": "Spring til hoved-HUD",

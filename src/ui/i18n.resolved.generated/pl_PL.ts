@@ -565,7 +565,35 @@ export const pl_PL: EnTranslations = {
       "durationUnitDays": "d"
     },
     "character": {
-      "modelPreview": "Podgląd modelu postaci"
+      "modelPreview": "Podgląd modelu postaci",
+      "tabs": {
+        "equipment": "Equipment",
+        "overview": "Overview"
+      },
+      "balances": {
+        "woc": "$WOC",
+        "claudium": "Claudium"
+      },
+      "bagSocket": "Bag Socket: {name}",
+      "sections": {
+        "attributes": "Attributes",
+        "combat": "Combat",
+        "defense": "Defense"
+      },
+      "progression": {
+        "xpLabel": "{current} / {max}"
+      },
+      "spec": {
+        "choose": "Choose",
+        "change": "Change"
+      },
+      "bags": {
+        "counter": "{used} / {total}",
+        "openFull": "Open bags window",
+        "container": "Bag {n}",
+        "emptySpaces": "Puste miejsca",
+        "emptySummary": "+{count} pustych"
+      }
     },
     "skipLinks": {
       "mainHud": "Przejdź do głównego HUD",
