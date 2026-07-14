@@ -29,8 +29,6 @@ CREATE INDEX IF NOT EXISTS player_account_facts_first_character
 CREATE INDEX IF NOT EXISTS player_account_facts_first_play
   ON player_account_facts(realm, first_play_at)
   WHERE first_play_at IS NOT NULL;
-CREATE INDEX IF NOT EXISTS play_sessions_account_started_id
-  ON play_sessions(account_id, started_at, id);
 
 CREATE TABLE IF NOT EXISTS player_activity_daily (
   realm TEXT NOT NULL,
@@ -48,6 +46,15 @@ CREATE TABLE IF NOT EXISTS player_business_daily (
   characters_created INT NOT NULL DEFAULT 0,
   PRIMARY KEY (realm, day)
 );
+`;
+
+// play_sessions can be large in production. This index is deliberately kept
+// out of PLAYER_METRICS_SCHEMA because ensureSchema applies that schema inside
+// a transaction, where CREATE INDEX CONCURRENTLY is not allowed. The boot
+// coordinator runs this idempotent migration after committing the schema DDL.
+export const PLAYER_METRICS_CONCURRENT_INDEX_SQL = `
+CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id
+  ON play_sessions(account_id, started_at, id);
 `;
 
 export interface PlayerBusinessDay {

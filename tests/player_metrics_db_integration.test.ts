@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   closePlayerSession,
   openPlayerSession,
+  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
   PLAYER_METRICS_SCHEMA,
   playerBusinessSnapshot,
   recordCharacterCreation,
@@ -47,6 +48,7 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
         );
       `);
       await db.query(PLAYER_METRICS_SCHEMA);
+      await db.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
     } finally {
       db.release();
     }

@@ -30,6 +30,7 @@ import {
   closeOrphanPlayerSessions,
   closePlayerSession,
   openPlayerSession,
+  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
@@ -810,6 +811,8 @@ CREATE INDEX IF NOT EXISTS character_deeds_character_earned
   ON character_deeds(character_id, earned_at DESC);
 `;
 
+const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
+
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the
   // same database at once. Their idempotent CREATE/ALTER statements would
@@ -819,7 +822,7 @@ export async function ensureSchema(): Promise<void> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
+    await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
     // Compact player analytics facts depend on accounts, characters, and
     // play_sessions from the core schema. The tables start empty and collect
@@ -894,6 +897,20 @@ export async function ensureSchema(): Promise<void> {
       );
     }
     await client.query('COMMIT');
+    // CREATE INDEX CONCURRENTLY cannot run inside the schema transaction. Keep
+    // the session-level form of the same advisory lock while running this
+    // post-commit migration so simultaneous realm boots cannot race the index
+    // name. The concurrent build permits normal play_sessions writes to continue.
+    let concurrentMigrationLocked = false;
+    try {
+      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      concurrentMigrationLocked = true;
+      await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
+    } finally {
+      if (concurrentMigrationLocked) {
+        await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      }
+    }
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).

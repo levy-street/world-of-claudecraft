@@ -4,6 +4,7 @@ import {
   closePlayerSession,
   openPlayerSession,
   PLAYER_BUSINESS_SNAPSHOT_SQL,
+  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
   PLAYER_METRICS_SCHEMA,
   playerBusinessSnapshot,
   recordCharacterCreation,
@@ -20,7 +21,13 @@ describe('player metric lifecycle facts', () => {
     expect(PLAYER_METRICS_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS player_business_daily');
     expect(PLAYER_METRICS_SCHEMA).toContain('PRIMARY KEY (realm, day, account_id)');
     expect(PLAYER_METRICS_SCHEMA).toContain('ON player_account_facts(first_session_id, realm)');
-    expect(PLAYER_METRICS_SCHEMA).toContain('ON play_sessions(account_id, started_at, id)');
+    expect(PLAYER_METRICS_SCHEMA).not.toContain('ON play_sessions(account_id, started_at, id)');
+    expect(PLAYER_METRICS_CONCURRENT_INDEX_SQL).toContain(
+      'CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id',
+    );
+    expect(PLAYER_METRICS_CONCURRENT_INDEX_SQL).toContain(
+      'ON play_sessions(account_id, started_at, id)',
+    );
     expect(PLAYER_METRICS_SCHEMA).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
   });
 

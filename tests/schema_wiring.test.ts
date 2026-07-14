@@ -196,6 +196,18 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(ddl).toBeDefined();
     expect(ddl).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
+
+    const commitIndex = h.calls.indexOf('COMMIT');
+    const concurrentIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
+    );
+    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
+    const sessionUnlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(commitIndex).toBeGreaterThan(-1);
+    expect(concurrentIndex).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeLessThan(concurrentIndex);
+    expect(sessionUnlock).toBeGreaterThan(concurrentIndex);
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {
