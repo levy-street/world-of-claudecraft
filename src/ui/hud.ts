@@ -8960,6 +8960,10 @@ export class Hud {
         }
         case 'honor': {
           const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const honorMessage = t('hudChrome.warfare.honorGain', {
+            amount,
+            reason: t(HONOR_REASON_KEYS[ev.reason]),
+          });
           const honorShape = fctSpawnShape({ type: 'honor' });
           if (honorShape) {
             this.fctPainter.spawn(
@@ -8971,13 +8975,8 @@ export class Hud {
               now,
             );
           }
-          this.combatLog(
-            t('hudChrome.warfare.honorGain', {
-              amount,
-              reason: t(HONOR_REASON_KEYS[ev.reason]),
-            }),
-            '#ffd100',
-          );
+          this.log(honorMessage, '#ffd100');
+          this.combatLog(honorMessage, '#ffd100');
           break;
         }
         case 'levelup': {
@@ -9546,18 +9545,18 @@ export class Hud {
           const sign = delta >= 0 ? '+' : '';
           const ratingDelta = `${sign}${formatNumber(delta, { maximumFractionDigits: 0 })}`;
           const ratingAfter = formatNumber(ev.ratingAfter, { maximumFractionDigits: 0 });
+          let arenaResultLine: string;
+          let arenaResultColor: string;
           if (ev.draw) {
             this.showBanner(
               t('hud.system.arenaDrawBanner', { name: ev.oppName, delta: ratingDelta }),
             );
-            this.combatLog(
-              t('hud.system.arenaDrawLog', {
-                name: ev.oppName,
-                rating: ratingAfter,
-                delta: ratingDelta,
-              }),
-              '#fa6',
-            );
+            arenaResultLine = t('hud.system.arenaDrawLog', {
+              name: ev.oppName,
+              rating: ratingAfter,
+              delta: ratingDelta,
+            });
+            arenaResultColor = '#fa6';
           } else if (ev.won) {
             this.showBanner(
               t('hud.system.arenaVictoryBanner', {
@@ -9566,14 +9565,12 @@ export class Hud {
                 delta: ratingDelta,
               }),
             );
-            this.combatLog(
-              t('hud.system.arenaVictoryLog', {
-                name: ev.oppName,
-                rating: ratingAfter,
-                delta: ratingDelta,
-              }),
-              '#7fdc4f',
-            );
+            arenaResultLine = t('hud.system.arenaVictoryLog', {
+              name: ev.oppName,
+              rating: ratingAfter,
+              delta: ratingDelta,
+            });
+            arenaResultColor = '#7fdc4f';
             audio.duelEnd();
           } else {
             this.showBanner(
@@ -9583,16 +9580,16 @@ export class Hud {
                 delta: ratingDelta,
               }),
             );
-            this.combatLog(
-              t('hud.system.arenaDefeatLog', {
-                name: ev.oppName,
-                rating: ratingAfter,
-                delta: ratingDelta,
-              }),
-              '#ff7a6a',
-            );
+            arenaResultLine = t('hud.system.arenaDefeatLog', {
+              name: ev.oppName,
+              rating: ratingAfter,
+              delta: ratingDelta,
+            });
+            arenaResultColor = '#ff7a6a';
             audio.death();
           }
+          this.log(arenaResultLine, arenaResultColor);
+          this.combatLog(arenaResultLine, arenaResultColor);
           break;
         }
         // The yumi events are personal per participant; offline the sim hands

@@ -60,6 +60,12 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
     expect(painter).not.toContain("'pvpDefense'");
   });
 
+  it('shows the current spendable Honor balance in the character-sheet header', () => {
+    expect(painter).toContain('world.honor');
+    expect(painter).toContain("t('hudChrome.warfare.balance'");
+    expect(painter).toContain('char-honor-balance');
+  });
+
   it('drives the paperdoll off the pure char_view core', () => {
     expect(painter).toContain('buildPaperdollView(world.equipment, ITEMS)');
   });

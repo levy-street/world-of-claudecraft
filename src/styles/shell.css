@@ -5631,6 +5631,11 @@
     flex: 1 1 auto;
     min-width: 0;
   }
+  .panel-title.char-title-portrait .char-honor-balance {
+    display: block;
+    color: var(--gold);
+    margin-top: var(--spacing-xs);
+  }
   .panel-title.char-title-portrait .portrait-chip {
     flex: 0 0 auto;
   }
