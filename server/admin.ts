@@ -8,6 +8,7 @@ import {
   levelDistribution,
   listAccounts,
   listCharacters,
+  listModerationActions,
   listSharedIps,
   onlineHistory,
   overviewCounts,
@@ -52,6 +53,7 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  loadAccountFlair,
   pool,
   revokeTokensExcept,
   saveToken,
@@ -87,6 +89,10 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   recordPasswordReset,
+  setAccountAiFlag,
+  setAccountStreamerFlair,
+  setDailyRewardsBan,
+  setDailyRewardsIpBan,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
@@ -112,6 +118,32 @@ const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
+
+// Account-flair validation messages. Named constants so the two dispatch twins (the
+// legacy handleAdminApi arm and the RouteDef handler) can never drift, and so the
+// dashboard has a stable string to map onto its own i18n key. `invalid streamer
+// link` is raised by moderation_db.setAccountStreamerFlair and surfaces through the
+// same err.message path every other admin write uses.
+const AI_FLAG_REQUIRED = 'ai must be a boolean';
+const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
+const STREAMER_LINKS_REQUIRED = 'a links object is required';
+const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
+
+/**
+ * Decode the request's `links` bag, three-valued:
+ *  - an object: the bag REPLACES the stored links (an explicit `{}` clears them);
+ *  - `undefined` (key absent): LEAVE the stored links alone. The dashboard's three
+ *    streamer actions (mark / unmark / save links) all send the full bag, but a caller
+ *    that sends only the flag must never wipe an account's links by omission, and
+ *    unmarking a streamer deliberately keeps them (wireStreamerLinks is what stops
+ *    them shipping, so stored-but-not-shipped is the correct state);
+ *  - `null`: malformed (an array or a scalar), which the handler turns into a 400.
+ */
+function streamerLinksBody(value: unknown): Record<string, unknown> | null | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
 
 // Map editor moderation reads/writes go straight to the db layer (like the
 // other *_db imports here); the player-facing rules stay in maps.ts. LAZY
@@ -173,6 +205,7 @@ function cleanTier(value: unknown): WordTier | null {
 
 type SharedIpSort = 'accounts' | 'last_seen';
 type SharedIpSortDirection = 'asc' | 'desc';
+type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
 function sharedIpSortParams(params: URLSearchParams): {
   sort: SharedIpSort;
@@ -201,6 +234,11 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
         : b.lastSeenAt.localeCompare(a.lastSeenAt);
     return primary * multiplier || secondary || a.ip.localeCompare(b.ip);
   });
+}
+
+function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
+  const tab = params.get('tab');
+  return tab === 'mine' || tab === 'notes' ? tab : 'all';
 }
 
 function getBlockedIpsForAccount(
@@ -485,6 +523,47 @@ export async function handleAdminApi(
         return fail(res, 400, err instanceof Error ? err.message : 'chat mute failed');
       }
     }
+    const dailyRewardsBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsBan({
+          accountId: Number(dailyRewardsBanMatch[1]),
+          adminAccountId: accountId,
+          banned: dailyRewardsBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards moderation failed',
+        );
+      }
+    }
+    const dailyRewardsIpBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsIpBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsIpBan({
+          accountId: Number(dailyRewardsIpBanMatch[1]),
+          adminAccountId: accountId,
+          ip: body.ip,
+          banned: dailyRewardsIpBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+        );
+      }
+    }
     const ignoreMatch = /^\/admin\/api\/moderation\/reports\/(\d+)\/ignore$/.exec(path);
     if (req.method === 'POST' && ignoreMatch) {
       const body = await readBody(req);
@@ -585,6 +664,52 @@ export async function handleAdminApi(
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'password reset failed');
+      }
+    }
+
+    // Account flair: the AI-operated mark and an official streamer's links. Both
+    // are cosmetic and non-punitive, so (unlike suspend/ban/chat-mute) there is
+    // deliberately NO isAdminAccount guard: marking a staff account as a streamer
+    // is a legitimate edit (a developer who streams), and no reason is required.
+    // The write is still audited, and the live push lands the change on a connected
+    // player with no reconnect (the identity diff re-broadcasts it).
+    const aiFlagMatch = /^\/admin\/api\/accounts\/(\d+)\/ai$/.exec(path);
+    if (req.method === 'POST' && aiFlagMatch) {
+      const targetAccountId = Number(aiFlagMatch[1]);
+      const body = await readBody(req);
+      if (typeof body.ai !== 'boolean') return fail(res, 400, AI_FLAG_REQUIRED);
+      try {
+        await setAccountAiFlag({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          ai: body.ai,
+          reason: body.reason,
+        });
+        game.applyAccountFlairLive(targetAccountId, await loadAccountFlair(targetAccountId));
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
+      }
+    }
+    const streamerFlairMatch = /^\/admin\/api\/accounts\/(\d+)\/streamer$/.exec(path);
+    if (req.method === 'POST' && streamerFlairMatch) {
+      const targetAccountId = Number(streamerFlairMatch[1]);
+      const body = await readBody(req);
+      if (typeof body.streamer !== 'boolean') return fail(res, 400, STREAMER_FLAG_REQUIRED);
+      const links = streamerLinksBody(body.links);
+      if (links === null) return fail(res, 400, STREAMER_LINKS_REQUIRED);
+      try {
+        await setAccountStreamerFlair({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          streamer: body.streamer,
+          links,
+          reason: body.reason,
+        });
+        game.applyAccountFlairLive(targetAccountId, await loadAccountFlair(targetAccountId));
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
       }
     }
 
@@ -808,6 +933,13 @@ export async function handleAdminApi(
     if (path === '/admin/api/moderation/queue') {
       return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
     }
+    if (path === '/admin/api/moderation/history') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      return ok(
+        res,
+        await listModerationActions(moderationHistoryTab(url.searchParams), accountId, page, limit),
+      );
+    }
     if (path === '/admin/api/bug-reports') {
       const { page, limit } = parsePageParams(url.searchParams);
       const { rows, total } = await listBugReports(limit, (page - 1) * limit);
@@ -960,6 +1092,9 @@ export type AdminRuntime = Pick<
   | 'muteAccountChat'
   | 'liftChatMuteLive'
   | 'resetChatStrikesLive'
+  // Push an operator's account-flair edit onto the account's live session, so the
+  // AI mark / streamer links change without a reconnect.
+  | 'applyAccountFlairLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -1009,6 +1144,7 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listModerationActions,
     listSharedIps,
     onlineHistory,
     overviewCounts,
@@ -1054,6 +1190,13 @@ function makeRealAdminDb() {
     updatePasswordHash,
     revokeTokensExcept,
     recordPasswordReset,
+    setDailyRewardsBan,
+    setDailyRewardsIpBan,
+    // Account flair: the two audited writes plus the read-back the live push sends
+    // (the DB row, never the request body, is the source of truth for what ships).
+    setAccountAiFlag,
+    setAccountStreamerFlair,
+    loadAccountFlair,
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
@@ -1519,6 +1662,48 @@ async function chatMuteHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/** POST daily-rewards-ban/unban: change reward eligibility with an audited reason. */
+async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards moderation failed',
+    );
+  }
+}
+
+async function dailyRewardsIpBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ip-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsIpBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      ip: body.ip,
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+    );
+  }
+}
+
 /** POST /admin/api/moderation/reports/:id/ignore: resolve one open report. */
 async function ignoreReportHandler(ctx: Ctx): Promise<void> {
   const body = await readBody(ctx.req);
@@ -1594,6 +1779,20 @@ async function moderationQueueHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows: await adminDb().moderationQueue(useAdminRuntime().liveAccountIds()) });
 }
 
+/** GET /admin/api/moderation/history: latest audit actions, optionally scoped to caller. */
+async function moderationHistoryHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  ok(
+    ctx.res,
+    await adminDb().listModerationActions(
+      moderationHistoryTab(ctx.url.searchParams),
+      ctxAccountId(ctx),
+      page,
+      limit,
+    ),
+  );
+}
+
 /** GET /admin/api/moderation/accounts/:id: full moderation detail for one account. */
 async function moderationAccountDetailHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
@@ -1661,6 +1860,60 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'password reset failed');
+  }
+}
+
+/**
+ * POST /admin/api/accounts/:id/ai: mark the account as AI-operated (or clear it).
+ * Cosmetic and non-punitive: no reason is required and, unlike suspend/ban/chat-mute,
+ * there is NO isAdminAccount guard (a staff account can legitimately carry flair).
+ * The audited write lands first, then the freshly-read flair is pushed to any live
+ * session so a connected player sees it without reconnecting.
+ */
+async function accountAiFlagHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  if (typeof body.ai !== 'boolean') return fail(ctx.res, 400, AI_FLAG_REQUIRED);
+  try {
+    await adminDb().setAccountAiFlag({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      ai: body.ai,
+      reason: body.reason,
+    });
+    rt.applyAccountFlairLive(targetAccountId, await adminDb().loadAccountFlair(targetAccountId));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
+  }
+}
+
+/**
+ * POST /admin/api/accounts/:id/streamer: set the streamer flag + platform links.
+ * Every link is validated by normalizeStreamerLink inside the db write (https only,
+ * that platform's own hosts, no credentials): a hostile value throws before any row
+ * changes, so a rejected link never reaches the database, let alone a client.
+ */
+async function accountStreamerFlairHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  if (typeof body.streamer !== 'boolean') return fail(ctx.res, 400, STREAMER_FLAG_REQUIRED);
+  const links = streamerLinksBody(body.links);
+  if (links === null) return fail(ctx.res, 400, STREAMER_LINKS_REQUIRED);
+  try {
+    await adminDb().setAccountStreamerFlair({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      streamer: body.streamer,
+      links,
+      reason: body.reason,
+    });
+    rt.applyAccountFlairLive(targetAccountId, await adminDb().loadAccountFlair(targetAccountId));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
   }
 }
 
@@ -1923,6 +2176,24 @@ export const routes: RouteDef[] = [
     handler: resetPasswordHandler,
   },
 
+  // Account flair: the AI-operated mark and an official streamer's platform links.
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/ai',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountAiFlagHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/streamer',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountStreamerFlairHandler,
+  },
+
   // Staff-role management (release v0.22.0 fine-grained permissions).
   {
     method: 'GET',
@@ -2013,6 +2284,38 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
+  },
+  {
+    method: 'POST',
     path: '/admin/api/moderation/accounts/:id/lift-mute',
     surface: 'admin',
     middleware: [requireAdmin, requireAdminTarget('account')],
@@ -2066,6 +2369,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: moderationQueueHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/moderation/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: moderationHistoryHandler,
   },
   {
     method: 'GET',

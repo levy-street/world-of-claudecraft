@@ -9,7 +9,12 @@
 
 import type * as http from 'node:http';
 import { avatarPng, isPlayerClass, isValidSkin } from './avatar';
-import { type CharacterSheet, characterSheet, type SheetRank } from './character_sheet';
+import {
+  type CharacterSheet,
+  characterSheet,
+  type SheetRank,
+  sheetTitleText,
+} from './character_sheet';
 import {
   findCharacterReportTargetByName,
   getCharacterById,
@@ -140,6 +145,11 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const guildLine = sheet.guild
     ? `<li>Guild: <strong>&lt;${escapeHtml(sheet.guild)}&gt;</strong></li>`
     : '';
+  // The selected Book of Deeds title, under the name. sheetTitleText returns
+  // null for unset/stale/non-title ids, so the line simply disappears (never
+  // a raw deed id, never a crash on an old state blob).
+  const earnedTitle = sheetTitleText(sheet.deeds.activeTitle);
+  const deedTitleLine = earnedTitle ? `<p class="deed-title">${escapeHtml(earnedTitle)}</p>` : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -171,6 +181,7 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   img.avatar { width: 160px; height: 160px; border-radius: 16px; border: 1px solid #4a3a18;
     box-shadow: 0 12px 48px rgba(0,0,0,.6); image-rendering: pixelated; }
   h1 { color: var(--gold); font-size: clamp(22px, 4vw, 32px); margin: 0; overflow-wrap: anywhere; }
+  p.deed-title { margin: -10px 0 0; color: #caa64a; font-size: 15px; }
   p.sub { margin: 0; color: #c9bb92; }
   ul { list-style: none; padding: 0; margin: 8px 0; color: #d8ca9c; line-height: 1.8; }
   nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
@@ -184,6 +195,7 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   <main>
     <img class="avatar" src="${avatar}" alt="${name} portrait" width="256" height="256">
     <h1>${name}</h1>
+    ${deedTitleLine}
     <p class="sub">Level ${sheet.level} ${escapeHtml(sheet.classLabel)}${sheet.spec ? ` · ${escapeHtml(sheet.spec)}` : ''} · ${escapeHtml(sheet.realm)}</p>
     <ul>
       <li>Zone: <strong>${escapeHtml(sheet.zone)}</strong></li>

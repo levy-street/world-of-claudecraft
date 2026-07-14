@@ -125,6 +125,12 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
+  /** Whether the player currently carries a `kind:'stealth'` aura (Stealth or
+   *  Vanish). Gates a `requiresStealth` ability's usable state (issue #1890):
+   *  without this the bar never dimmed Cheap Shot/Ambush/Garrote out of
+   *  stealth, so they looked equally "ready" whether or not the cast would
+   *  actually succeed. */
+  stealthed: boolean;
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -335,11 +341,13 @@ export function createActionBarView(
             : 0;
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
-        slot.usable = !(player.resource < ability.cost);
+        slot.usable =
+          !(player.resource < ability.cost) && (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
-          tgtDist > (def.range > 0 ? def.range : MELEE_RANGE);
+          (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
+            (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

@@ -75,6 +75,8 @@ describe('unitFrameView: the present / hidden gate', () => {
       resText: '',
       levelText: null,
       name: '',
+      titlePre: '',
+      titlePost: '',
       portraitKey: '',
       absorbFrac: 0,
       absorbOvershield: false,
@@ -227,5 +229,23 @@ describe('unit_frame core stays DOM-free, i18n-free, and id-free (no single-inst
     expect(code).not.toMatch(/#pf-/);
     expect(code).not.toMatch(/player-frame/);
     expect(code).not.toMatch(/querySelector|getElementById/);
+  });
+});
+
+describe('unitFrameView: the title decoration pass-through (Book of Deeds)', () => {
+  it('passes titlePre/titlePost through pre-localized, verbatim', () => {
+    const v = unitFrameView(playerDescriptor({ titlePre: '', titlePost: ' [Veteran]' }));
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe(' [Veteran]');
+    // A prefix-placing locale flows the same way (the core knows no layout).
+    const pre = unitFrameView(playerDescriptor({ titlePre: '[Veterano] ', titlePost: '' }));
+    expect(pre.titlePre).toBe('[Veterano] ');
+    expect(pre.titlePost).toBe('');
+  });
+
+  it('defaults both to empty when the instance passes no title fields (player, party)', () => {
+    const v = unitFrameView(playerDescriptor());
+    expect(v.titlePre).toBe('');
+    expect(v.titlePost).toBe('');
   });
 });

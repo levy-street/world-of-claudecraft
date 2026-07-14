@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/ensure-hooks.sh\"",
+            "timeout": 15,
+            "statusMessage": "Enabling the shared pre-push gate"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/hooks/qa-stop.sh\"",
+            "timeout": 30,
+            "statusMessage": "Checking newly added lines"
+          }
+        ]
+      }
+    ]
+  }
+}

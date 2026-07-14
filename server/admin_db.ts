@@ -1,3 +1,4 @@
+import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
 import { pool } from './db';
 import { REALM } from './realm';
 
@@ -515,6 +516,10 @@ export interface AdminAccountRow {
   characterCount: number;
   maxLevel: number;
   playtimeSeconds: number;
+  // Operator-set account flair. The list carries only the two flags (the links
+  // themselves ride the detail response, where the edit form reads them).
+  isAi: boolean;
+  isStreamer: boolean;
 }
 
 export interface Paginated<T> {
@@ -723,7 +728,7 @@ export async function listAccounts(
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
-              a.banned_at, a.suspended_until,
+              a.banned_at, a.suspended_until, a.is_ai, a.is_streamer,
               count(c.id)::int AS character_count,
               COALESCE(max(c.level), 0)::int AS max_level,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
@@ -750,6 +755,8 @@ export async function listAccounts(
       characterCount: r.character_count,
       maxLevel: r.max_level,
       playtimeSeconds: Number(r.playtime_seconds),
+      isAi: r.is_ai === true,
+      isStreamer: r.is_streamer === true,
     })),
     total: total.rows[0].total,
     page,
@@ -841,6 +848,15 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  // Operator-set account flair, as the dashboard's edit form needs to read it back:
+  // the two flags plus the stored links. The links are re-normalized on the way out
+  // (normalizeAccountFlair), so a value that could not survive the write gate is not
+  // echoed to the dashboard either.
+  isAi: boolean;
+  isStreamer: boolean;
+  streamerLinks: StreamerLinks;
+  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -873,14 +889,130 @@ export interface AccountDetail {
   }[];
 }
 
+export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
+
+export interface ModerationActionHistoryEntry {
+  source: 'account' | 'ip';
+  id: number;
+  accountId: number | null;
+  username: string | null;
+  ip: string | null;
+  action: string;
+  reason: string;
+  createdAt: string;
+  expiresAt: string | null;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface ModerationActionHistoryPage {
+  rows: ModerationActionHistoryEntry[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function listModerationActions(
+  tab: ModerationHistoryTab,
+  adminAccountId: number,
+  page: number,
+  limit: number,
+): Promise<ModerationActionHistoryPage> {
+  const offset = (page - 1) * limit;
+  const params: unknown[] = [];
+  let accountWhereSql = '';
+  let ipWhereSql = '';
+  if (tab === 'mine') {
+    params.push(adminAccountId);
+    accountWhereSql = 'WHERE action_log.admin_account_id = $1';
+    ipWhereSql = 'WHERE ip_action.admin_account_id = $1';
+  } else if (tab === 'notes') {
+    params.push(adminAccountId);
+    accountWhereSql = "WHERE action_log.admin_account_id = $1 AND action_log.action = 'note'";
+    ipWhereSql = 'WHERE false';
+  }
+  const pageParams = [...params, limit, offset];
+  const limitParam = params.length + 1;
+  const offsetParam = params.length + 2;
+  const auditSql = `SELECT *
+       FROM (
+         SELECT 'account' AS source,
+                action_log.id,
+                action_log.account_id,
+                target.username,
+                NULL::text AS ip,
+                action_log.action,
+                action_log.reason,
+                action_log.created_at,
+                action_log.expires_at,
+                action_log.admin_account_id,
+                admin.username AS admin_username
+         FROM account_moderation_actions action_log
+         JOIN accounts target ON target.id = action_log.account_id
+         LEFT JOIN accounts admin ON admin.id = action_log.admin_account_id
+         ${accountWhereSql}
+         UNION ALL
+         SELECT 'ip' AS source,
+                ip_action.id,
+                NULL::int AS account_id,
+                NULL::text AS username,
+                ip_action.ip,
+                ip_action.action,
+                ip_action.reason,
+                ip_action.created_at,
+                NULL::timestamptz AS expires_at,
+                ip_action.admin_account_id,
+                admin.username AS admin_username
+         FROM blocked_ip_actions ip_action
+         LEFT JOIN accounts admin ON admin.id = ip_action.admin_account_id
+         ${ipWhereSql}
+       ) audit_log`;
+  const [rows, total] = await Promise.all([
+    pool.query(
+      `${auditSql}
+       ORDER BY created_at DESC, id DESC, source
+       LIMIT $${limitParam} OFFSET $${offsetParam}`,
+      pageParams,
+    ),
+    pool.query(
+      `SELECT count(*)::int AS total
+       FROM (${auditSql}) count_log`,
+      params,
+    ),
+  ]);
+  return {
+    rows: rows.rows.map((entry) => ({
+      source: entry.source,
+      id: Number(entry.id),
+      accountId: entry.account_id === null ? null : Number(entry.account_id),
+      username: entry.username ?? null,
+      ip: entry.ip ?? null,
+      action: entry.action,
+      reason: entry.reason,
+      createdAt: entry.created_at,
+      expiresAt: entry.expires_at ?? null,
+      adminAccountId: entry.admin_account_id === null ? null : Number(entry.admin_account_id),
+      adminUsername: entry.admin_username ?? null,
+    })),
+    total: Number(total.rows[0]?.total ?? 0),
+    page,
+    limit,
+  };
+}
+
 export async function accountDetail(accountId: number): Promise<AccountDetail | null> {
-  const [account, characters, sessions, moderationHistory] = await Promise.all([
+  const [account, characters, sessions, moderationHistory, dailyRewardsIpBans] = await Promise.all([
     pool.query(
       `SELECT id, username, created_at, last_login, is_admin, banned_at, suspended_until,
               COALESCE(moderation_reason, '') AS moderation_reason,
               chat_muted_until,
               COALESCE(chat_mute_reason, '') AS chat_mute_reason,
               COALESCE(chat_strikes, 0) AS chat_strikes,
+              is_ai, is_streamer, streamer_links,
+              (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
+                AS daily_rewards_ban_reason,
+              (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
+                AS daily_rewards_banned_at,
               last_login_ip,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                         FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
@@ -912,9 +1044,25 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
        LIMIT 50`,
       [accountId],
     ),
+    pool.query(
+      `SELECT ib.ip_address, ib.reason, ib.created_at
+         FROM daily_reward_ip_bans ib
+        WHERE ib.ip_address = (SELECT last_login_ip FROM accounts WHERE id = $1)
+           OR EXISTS (
+             SELECT 1 FROM play_sessions ps
+              WHERE ps.account_id = $1 AND ps.ip_address = ib.ip_address
+           )
+        ORDER BY ib.created_at DESC`,
+      [accountId],
+    ),
   ]);
   const a = account.rows[0];
   if (!a) return null;
+  const flair = normalizeAccountFlair({
+    ai: a.is_ai,
+    streamer: a.is_streamer,
+    links: a.streamer_links,
+  });
   return {
     id: a.id,
     username: a.username,
@@ -927,6 +1075,21 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    isAi: flair.ai,
+    isStreamer: flair.streamer,
+    streamerLinks: flair.links,
+    dailyRewardsBan:
+      a.daily_rewards_ban_reason == null
+        ? null
+        : {
+            reason: String(a.daily_rewards_ban_reason),
+            createdAt: a.daily_rewards_banned_at,
+          },
+    dailyRewardsIpBans: (dailyRewardsIpBans?.rows ?? []).map((row) => ({
+      ip: String(row.ip_address),
+      reason: String(row.reason),
+      createdAt: row.created_at,
+    })),
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

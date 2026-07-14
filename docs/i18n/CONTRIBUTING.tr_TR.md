@@ -14,7 +14,7 @@ zindan inşa etmek: hepsinin değeri var ve burada hoş geldiniz.
 
 Bu rehber, kurulumu yapmanıza ve ilk katkınızı sorunsuz bir şekilde
 gerçekleştirmenize yardımcı olacak. Uzman olmanıza gerek yok. Bir şey belirsizse
-[Discord](https://discord.gg/GjhnUsBtw) üzerinden sorun, biri size memnuniyetle
+[Discord](https://discord.com/invite/worldofclaudecraft) üzerinden sorun, biri size memnuniyetle
 yardımcı olacaktır.
 
 Katılarak, [Davranış Kuralları](../../CODE_OF_CONDUCT.md) belgemize uymayı kabul
@@ -180,7 +180,7 @@ istiyorsunuz? Bunu yapmak için herhangi bir oyun kodu yazmanıza gerek yok:
    ardından bir PR açın.
 
 Yepyeni bir yerel ayar önermek veya üslup ve terminolojiyi tartışmak için
-[Discord](https://discord.gg/GjhnUsBtw) üzerinde bir konu başlatın, onu bağlamanıza
+[Discord](https://discord.com/invite/worldofclaudecraft) üzerinde bir konu başlatın, onu bağlamanıza
 yardımcı olacağız. Anadili olan ve akıcı konuşanlar özellikle hoş karşılanır. İyi
 çeviriler, oyunu her yerdeki oyuncular için ev gibi hissettirir.
 
@@ -197,7 +197,7 @@ kullanın:
 
 ## Yardım alma
 
-Takıldınız mı, yoksa sadece merhaba mı demek istiyorsunuz? [Topluluk Discord'una](https://discord.gg/GjhnUsBtw)
+Takıldınız mı, yoksa sadece merhaba mı demek istiyorsunuz? [Topluluk Discord'una](https://discord.com/invite/worldofclaudecraft)
 katılın. Hiçbir soru çok küçük değildir ve yeni katkıda bulunanlar her zaman hoş
 karşılanır.
 

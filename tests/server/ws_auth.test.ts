@@ -83,7 +83,12 @@ function setup() {
     permissionsForRoles: vi.fn((roles: readonly string[]) => new Set<string>(roles)),
     metaRequestUserData: vi.fn(() => ({ fbp: null, fbc: null })),
     metaEventSourceUrl: vi.fn(() => undefined as string | undefined),
-    loadAccountCosmetics: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+    loadAccountCosmetics: vi.fn(async () => ({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    })),
     // Character-lease deps: the happy path holds the lease so every existing case
     // reaches game.join unchanged; the lease branches themselves are covered by
     // tests/character_lease_ws.test.ts.
@@ -279,7 +284,12 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
         mutedUntil: null,
         reason: '',
         chatStrikes: 0,
-        accountCosmetics: { completedQuestIds: [], mechChromaIds: [] },
+        accountCosmetics: {
+          completedQuestIds: [],
+          mechChromaIds: [],
+          weaponSkinIds: [],
+          weaponSkinLoadout: {},
+        },
         isAdmin: false,
         // Not staff: the snapshotted permission set is EMPTY (fail closed), never
         // an is_admin-derived fallback.

@@ -252,25 +252,37 @@ describe('anti-farm level-diff scaling', () => {
 // -------------------------------------------------------------------------
 
 describe('cosmetic milestones', () => {
-  it('unlocks, emits, and persists the first milestone', () => {
+  // Milestones unified into the Book of Deeds: crossing a threshold marks the
+  // player dirty, the tick-tail evaluator grants the prog_ deed, and the grant
+  // dual-writes the legacy unlockedMilestones set. deedUnlocked is the single
+  // grant event; the legacy milestoneUnlocked emit is gone.
+  it('unlocks at the tick tail, emits deedUnlocked, and dual-writes the legacy set', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     const first = MILESTONES[0];
-    sim.events.length = 0;
     sim.grantXp(first.lifetimeXp + 1);
+    const evs = sim.tick();
     expect(sim.unlockedMilestones).toContain(first.id);
-    expect(
-      sim.events.some((e: any) => e.type === 'milestoneUnlocked' && e.milestoneId === first.id),
-    ).toBe(true);
+    expect(evs.some((e: any) => e.type === 'deedUnlocked' && e.deedId === `prog_${first.id}`)).toBe(
+      true,
+    );
+    expect(evs.some((e: any) => e.type === 'milestoneUnlocked')).toBe(false);
   });
 
   it('does not re-unlock a milestone already earned', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(MILESTONES[0].lifetimeXp + 1);
-    sim.events.length = 0;
+    sim.tick();
     sim.grantXp(1000);
-    expect(sim.events.some((e: any) => e.type === 'milestoneUnlocked')).toBe(false);
+    const evs = sim.tick();
+    expect(
+      evs.some(
+        (e: any) =>
+          e.type === 'milestoneUnlocked' ||
+          (e.type === 'deedUnlocked' && e.deedId === `prog_${MILESTONES[0].id}`),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -354,6 +366,7 @@ describe('persistence', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(MILESTONES[0].lifetimeXp + 5);
+    sim.tick(); // milestone deeds grant (and dual-write the legacy set) at the tick tail
     sim.prestige();
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.lifetimeXp).toBeGreaterThan(0);

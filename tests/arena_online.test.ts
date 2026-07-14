@@ -3,17 +3,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => ({ listings: [], collections: new Map() })),
   saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
+  releaseCharacterLease: vi.fn(async () => true),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
+import { saveCharacterAndMarketState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+import { RANKED_ARENA_WIN_HONOR } from '../src/sim/pvp';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -80,6 +85,7 @@ describe('arena: online integration (GameServer)', () => {
 
   beforeEach(() => {
     server = new GameServer();
+    vi.mocked(saveCharacterAndMarketState).mockClear();
   });
 
   it('routes arena_queue format=2v2 and seats four solos with wire-safe arena snapshots', () => {
@@ -173,5 +179,29 @@ describe('arena: online integration (GameServer)', () => {
     expect(snapA.self.arena.match.enemies).toHaveLength(1);
     expect(snapA.self.arena.match.allies).toHaveLength(0);
     expect(snapA.self.arena.ladder).toEqual(snapA.self.arena.ladders['1v1']);
+  });
+
+  it('resolves a disconnect win before leave saves so a near-simultaneous winner leave persists honor', async () => {
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const sa = joinServer(server, fcA, 30, 'Deserter', 'warrior');
+    const sb = joinServer(server, fcB, 31, 'Victor', 'mage');
+    server.sim.utcDay = '2026-07-11';
+    teleport(server.sim, sa.pid, 0, -40);
+    teleport(server.sim, sb.pid, 4, -40);
+    server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    server.handleMessage(sb, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    for (let i = 0; i < 20 * 6; i++) advance(server);
+    expect(server.sim.arenaMatchFor(sa.pid)?.state).toBe('active');
+
+    await server.leave(sa, 'disconnect');
+    expect(server.sim.meta(sb.pid)!.honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    await server.leave(sb, 'disconnect');
+
+    const victorSave = vi
+      .mocked(saveCharacterAndMarketState)
+      .mock.calls.find(([characterId]) => characterId === sb.characterId);
+    expect(victorSave?.[2].honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    expect(victorSave?.[2].lifetimeHonor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
   });
 });

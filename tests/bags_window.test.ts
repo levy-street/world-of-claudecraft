@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 const painter = readFileSync(new URL('../src/ui/bags_window.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 
 describe('bags_window: no magic values', () => {
   it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
@@ -31,10 +32,23 @@ describe('bags_window: no magic values', () => {
 });
 
 describe('bags_window: load-bearing behaviors preserved', () => {
+  it('uses the branded Claudium icon and matching balance color', () => {
+    expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
+    expect(components).toMatch(/\.claudium-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
+  });
+
   it('reuses bag_filter via buildBagGrid (does not re-derive the filter)', () => {
     expect(painter).toContain('buildBagGrid(');
     // the filter/sort stays in bag_filter.ts; the painter must not call it directly
     expect(painter).not.toContain('applyBagFilter(');
+  });
+
+  it("asks for the backpack icon by the id the art is wired under ('backpack')", () => {
+    // The bar's first socket is the implicit backpack, whose painted art is wired in
+    // icons.ts under exactly this id (UI_ITEM_IMAGE_IDS, guarded by item_icons.test.ts).
+    // Rename the id here and the socket silently falls back to the procedural sack while
+    // every icon guard stays green, so the call site is pinned too.
+    expect(painter).toContain("iconDataUrl('item', 'backpack')");
   });
 
   it('captures and reapplies the .bag-grid scroll offset across a rebuild', () => {
@@ -202,5 +216,51 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     expect(painter).toMatch(
       /if \(ke\.key === 'Enter' \|\| ke\.key === ' ' \|\| ke\.code === 'Space'\) \{\s*ke\.stopPropagation\(\);\s*if \(!prompt\.isConnected\) ke\.preventDefault\(\);\s*return;\s*\}/,
     );
+  });
+
+  it('a plain right-click runs the primary bagItemAction, not the destroy prompt (issue 1852)', () => {
+    // Right-click used to jump straight to the destroy confirmation, surprising
+    // players expecting a WoW-style right-click-to-use/equip. The non-shift branch
+    // of the contextmenu handler must preventDefault and dispatch through the same
+    // runBagItemAction the left-click handler uses, before ever consulting
+    // bagDestroyAction.
+    const start = painter.indexOf("row.addEventListener('contextmenu'");
+    const handler = painter.slice(start, painter.indexOf('});', start));
+    expect(start).toBeGreaterThan(0);
+    expect(handler).toMatch(
+      /if \(!ev\.shiftKey\) \{\s*ev\.preventDefault\(\);\s*this\.runBagItemAction\(s, bagItemAction\(item, this\.bagMode\(\)\), ev\);\s*return;\s*\}/,
+    );
+    // The destroy branch (bagDestroyAction) must appear AFTER the non-shift early
+    // return, so a plain right-click never reaches it.
+    const nonShiftIdx = handler.indexOf('if (!ev.shiftKey)');
+    const destroyIdx = handler.indexOf('bagDestroyAction(item, this.bagMode())');
+    expect(nonShiftIdx).toBeGreaterThan(0);
+    expect(destroyIdx).toBeGreaterThan(nonShiftIdx);
+  });
+
+  it('the left-click and non-shift right-click handlers share one dispatch (runBagItemAction)', () => {
+    expect(painter).toMatch(
+      /this\.runBagItemAction\(s, bagItemAction\(item, this\.bagMode\(\)\), ev\);\s*\}\);/,
+    );
+    expect(painter).toContain(
+      'private runBagItemAction(s: InvSlot, action: BagAction, ev: MouseEvent): void {',
+    );
+  });
+
+  it('the shared dispatch reaches the transactional modes too, not just equip/use (issue 1852 review)', () => {
+    // runBagItemAction runs the FULL mode switch for a plain right-click, so trade /
+    // mail / market-sell / bank-deposit / pet-feed also fire on right-click now
+    // (previously inert there, since bagDestroyAction returned 'none' for them).
+    // bagItemAction's per-mode dispatch is exhaustively pinned in bags_view.test.ts;
+    // this pins that runBagItemAction's switch actually wires each of those actions
+    // to its staging call, so the two pins together prove reachability from
+    // right-click without a live DOM harness.
+    const start = painter.indexOf('private runBagItemAction(');
+    const body = painter.slice(start, painter.indexOf('\n  }\n', start));
+    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
+    expect(body).toMatch(/case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId\);/);
+    expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
+    expect(body).toMatch(/case 'bankDeposit': \{/);
+    expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
   });
 });

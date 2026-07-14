@@ -211,19 +211,19 @@ const SPECS: SpecDef[] = [
     id: 'arms', class: 'warrior', name: 'Battlecraft', role: 'dps', icon: '⚔',
     description: 'A master of two-handed weapons who strikes with deadly, deliberate blows.',
     signature: 'mortal_strike',
-    mastery: { name: 'Sharpened Blades', description: 'Increases all melee ability damage by 10%.', effect: { global: { meleeDmgPct: 0.10 } } },
+    mastery: { name: 'Sharpened Blades', description: 'Increases your melee ability damage by 15% and the damage of your critical strikes by 25%.', effect: { global: { meleeDmgPct: 0.15, critDmgPhysPct: 0.25 } } },
   },
   {
     id: 'fury', class: 'warrior', name: 'Bloodrush', role: 'dps', icon: '🪓',
     description: 'A whirlwind of blows fuelled by unrelenting rage.',
     signature: 'bloodthirst',
-    mastery: { name: 'Bloodletter', description: 'Increases your critical strike chance by 5% and attack power by 10.', effect: { stats: { crit: 0.05, ap: 10 } } },
+    mastery: { name: 'Bloodletter', description: 'Increases your critical strike chance by 10% and your melee ability damage by 10%.', effect: { stats: { crit: 0.10 }, global: { meleeDmgPct: 0.10 } } },
   },
   {
     id: 'prot', class: 'warrior', name: 'Ironguard', role: 'tank', icon: '🛡',
     description: 'An immovable wall who holds the enemy’s attention and shields allies.',
     signature: 'shield_slam',
-    mastery: { name: 'Recompense', description: 'Increases all threat you generate by 30% and your armor by 10%.', effect: { global: { threatPct: 0.30 }, stats: { armorPct: 0.10 } } },
+    mastery: { name: 'Recompense', description: 'Increases all threat you generate by 50% and your armor by 20%.', effect: { global: { threatPct: 0.50 }, stats: { armorPct: 0.20 } } },
   },
 ];
 

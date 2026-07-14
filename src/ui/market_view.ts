@@ -167,7 +167,8 @@ export function buildMarketBrowse(info: MarketInfo, filters: MarketFilters): Mar
 export function buildMarketSell(sellItemId: string | null, sellHave: number): MarketSellBody {
   const item = sellItemId ? ITEMS[sellItemId] : null;
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
-  if (item.kind === 'quest' || item.noMarketList) return { state: 'cannot-market' };
+  if (item.kind === 'quest' || item.noMarketList || item.soulbound)
+    return { state: 'cannot-market' };
   // A gentle starting ask: a few times vendor value, never below 1c.
   const suggested = Math.max(1, item.buyValue ?? Math.max(1, item.sellValue) * 4);
   const gold = Math.floor(suggested / COPPER_PER_GOLD);

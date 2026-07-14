@@ -52,11 +52,11 @@ function leaderBody(model: LootSettingsModel): string {
   return `
     <div class="ls-row">
       <span class="ls-lbl">${esc(t('hudChrome.lootSettings.method'))}</span>
-      <select id="ls-method">${methodOpts}</select>
+      <select id="ls-method" class="hud-select">${methodOpts}</select>
     </div>
     <div class="ls-row" id="ls-threshold-row"${thrHidden}>
       <span class="ls-lbl">${esc(t('hudChrome.lootSettings.rollThreshold'))}</span>
-      <select id="ls-threshold">${thrOpts}</select>
+      <select id="ls-threshold" class="hud-select">${thrOpts}</select>
     </div>`;
 }
 

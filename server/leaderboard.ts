@@ -27,17 +27,20 @@ import type * as http from 'node:http';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateDeedsLeaderboard,
   paginateDevLeaderboard,
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import type { ArenaFormat } from '../src/sim/types';
 import type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from '../src/world_api';
-import { characterSheet, type SheetRank } from './character_sheet';
+import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   type ArenaLeaderRow,
   type CharacterRow,
@@ -51,6 +54,7 @@ import {
   searchCharacters,
   topArenaRatings,
 } from './db';
+import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -58,6 +62,10 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
+// From the config module directly (not the ./steam barrel): the barrel drags
+// routes.ts and its load-time middleware construction into this module's
+// graph, which partial db mocks in tests cannot serve.
+import { steamEnabled } from './steam/config';
 
 // ---------------------------------------------------------------------------
 // Named constants (single source of truth for the query decoders + fixed args).
@@ -77,6 +85,8 @@ const LEADERBOARD_SCOPE_GLOBAL = 'global';
 const LEADERBOARD_GUILD_BOARD = 'guilds';
 /** The ?board value that selects the open-source contributor (developer) board. */
 const LEADERBOARD_DEV_BOARD = 'devs';
+/** The ?board value that selects the Renown (deeds) board. */
+const LEADERBOARD_DEEDS_BOARD = 'deeds';
 /** Upper bound for the legacy ?limit=N single-page board (mirrors LEADERBOARD_MAX). */
 export const LEADERBOARD_LEGACY_LIMIT_MAX = LEADERBOARD_MAX;
 /** How many arena ranks the public ladder returns (mirrors the legacy fixed arg). */
@@ -126,6 +136,11 @@ export interface LeaderboardRuntime {
   getGuildLeaderboard(scope: LeaderboardScope): Promise<GuildLeaderboardEntry[]>;
   /** Cache-fronted contributor (developer) leaderboard read (main.ts topContributors). */
   getDevLeaderboard(): Promise<DevLeaderboardEntry[]>;
+  /** Cache-fronted Renown (deeds) board read (main.ts getDeedsLeaderboard):
+   *  the FULL pre-cap public entry list; the handler pages it. */
+  getDeedsLeaderboard(): Promise<DeedsLeaderboardEntry[]>;
+  /** The caller's Renown-board standing off the same cache, null when unranked. */
+  deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null>;
   /** Cache-fronted GitHub releases proxy read (main.ts getReleases). */
   getReleases(): Promise<ReleaseEntry[]>;
   /** The repo slug the releases feed reports (main.ts GITHUB_REPO). */
@@ -259,6 +274,31 @@ export function buildGuildBoard(
   return { realm, scope, board: 'guilds', metric: 'guildLifetimeXp', ...slice };
 }
 
+/**
+ * The Renown (deeds) board body: its own golden case. Account-level and
+ * therefore GLOBAL-ONLY (Renown counts each deed once per ACCOUNT and accounts
+ * span realms, so a realm scope is not well defined): the body always carries
+ * scope 'global' whatever ?scope said. `self` rides only when the route
+ * resolved an authenticated caller who is on the board.
+ */
+export function buildDeedsBoard(
+  realm: string,
+  entries: readonly DeedsLeaderboardEntry[],
+  page: number,
+  pageSize: number,
+  self: DeedsLeaderboardSelf | null,
+): unknown {
+  const slice = paginateDeedsLeaderboard(entries as DeedsLeaderboardEntry[], page, pageSize);
+  return {
+    realm,
+    scope: LEADERBOARD_SCOPE_GLOBAL,
+    board: 'deeds',
+    metric: 'renown',
+    ...slice,
+    ...(self ? { self } : {}),
+  };
+}
+
 /** The contributor (developer) board body: the dev-metric slice, its own golden case. */
 export function buildDevBoard(
   realm: string,
@@ -352,6 +392,7 @@ interface PublicSheetDb {
   getCharacterById(characterId: number): Promise<CharacterRow | null>;
   guildNameForCharacter(characterId: number): Promise<string | null>;
   lifetimeXpRankForCharacter(characterId: number): Promise<{ rank: number; total: number } | null>;
+  recentDeedsForCharacter(characterId: number, limit: number): Promise<RecentDeedRow[]>;
 }
 
 /** The non-DB inputs the public sheet needs (realm, share origin, rank shaper). */
@@ -376,9 +417,10 @@ export async function readPublicSheet(
   if (!target) return { status: 404, body: { error: 'character not found' } };
   const row = await db.getCharacterById(target.characterId);
   if (!row) return { status: 404, body: { error: 'character not found' } };
-  const [guild, rank] = await Promise.all([
+  const [guild, rank, deedsRecent] = await Promise.all([
     db.guildNameForCharacter(row.id),
     db.lifetimeXpRankForCharacter(row.id),
+    db.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
   ]);
   return {
     status: 200,
@@ -389,6 +431,7 @@ export async function readPublicSheet(
       origin: deps.origin,
       guild,
       rank: deps.toSheetRank(rank),
+      deedsRecent,
     }),
   };
 }
@@ -407,6 +450,7 @@ const REAL_DB_READS = {
   getCharacterById,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
+  recentDeedsForCharacter,
 };
 let dbReads = REAL_DB_READS;
 
@@ -450,6 +494,27 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 200, buildDevBoard(REALM, scope, entries, page, pageSize));
     return;
   }
+  // The Renown (deeds) board fork. GLOBAL-ONLY like the dev board is
+  // realm-agnostic: the decoder stays lenient (?scope is accepted and ignored)
+  // and buildDeedsBoard fixes scope 'global'. Auth is OPTIONAL and composed
+  // IN-HANDLER, never as route middleware: mounting optionalReadAccount on the
+  // shared route would newly 401 present-but-invalid tokens on the existing
+  // boards, breaking their parity. Here an anonymous caller gets the board
+  // with no self row; a present token is validated per module convention
+  // (malformed -> 401 auth.token_missing, unknown -> 401 auth.token_invalid,
+  // locked -> 403) and a ranked caller gets their self row. The legacy
+  // main.ts arm serves the same body with the lenient legacy bearer shape
+  // (the authz-gap-close divergence class).
+  if (firstQueryValue(ctx.query.board) === LEADERBOARD_DEEDS_BOARD) {
+    await optionalReadAccount(ctx, async () => {
+      const entries = await rt.getDeedsLeaderboard();
+      const page = decodePage(firstQueryValue(ctx.query.page));
+      const pageSize = decodePageSize(firstQueryValue(ctx.query.pageSize));
+      const self = ctx.account ? await rt.deedsSelfRank(ctx.account.accountId) : null;
+      json(ctx.res, 200, buildDeedsBoard(REALM, entries, page, pageSize, self));
+    });
+    return;
+  }
   const entries = await rt.getLeaderboard(scope);
   const limitParam = firstQueryValue(ctx.query.limit);
   if (limitParam !== undefined) {
@@ -485,10 +550,17 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * GET /api/status: the public realm + online snapshot. LABELED knownDeviation
  * (status-name-list-trim): the online player name-list the legacy arm returned is
  * dropped here, so the public endpoint exposes counts only, not who is online.
+ * steam.enabled is the capability advert clients read before rendering any
+ * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
-  json(ctx.res, 200, { ok: true, realm: REALM, players_online: rt.playersOnline() });
+  json(ctx.res, 200, {
+    ok: true,
+    realm: REALM,
+    players_online: rt.playersOnline(),
+    steam: { enabled: steamEnabled() },
+  });
 }
 
 /**

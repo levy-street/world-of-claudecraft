@@ -210,6 +210,7 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
     let sawCastBar = false;
     let castYell = false;
     let unleashed = false;
+    let wasCasting = false;
     // 40s cadence + 3.5s cast, with slack for chase/knockback interruptions.
     for (let t = 0; t < 20 * 60 && !unleashed; t++) {
       // Step back into melee after every Tectonic Heave shove, and keep chipping
@@ -220,14 +221,17 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
         (sim as any).dealDamage(p, boss, 1, false, 'physical', 'Chip', 'hit', true);
       }
       const events = sim.tick();
-      if (boss.castingAbility === 'thunzharr_stormcall') {
+      const castingNow = boss.castingAbility === 'thunzharr_stormcall';
+      if (castingNow) {
         sawCastBar = true;
         expect(boss.castTotal).toBeCloseTo(3.5, 5);
       }
       if (chatYells(events).some((e) => /The storm answers my call!/.test((e as any).text)))
         castYell = true;
-      if (events.some((e) => e.type === 'log' && /unleashes Stormcall!$/.test((e as any).text)))
-        unleashed = true;
+      // The quiet world boss no longer barks "unleashes Stormcall!", so the spell
+      // landing is the falling edge of the cast bar: casting last tick, cleared now.
+      if (wasCasting && !castingNow) unleashed = true;
+      wasCasting = castingNow;
     }
     expect(sawCastBar).toBe(true);
     expect(castYell).toBe(true);
@@ -777,6 +781,37 @@ describe('world boss is imposing and loud', () => {
     expect(yellTextTo(far).some((t) => /THUNDER ANSWERS/.test(t))).toBe(true);
     // ...but nothing reaches a player 400yd away, past the loud range.
     expect(yellTextTo(tooFar)).toHaveLength(0);
+  });
+});
+
+describe('world boss keeps a quiet combat log (quietMechanics)', () => {
+  it('opts into quiet mechanics and a battle cry about every 45s', () => {
+    expect(MOBS[BOSS_ID]?.quietMechanics).toBe(true);
+    expect(MOBS[BOSS_ID]?.battleYells?.every).toBe(45);
+  });
+
+  it('fires its mechanics without ever barking "unleashes X" or "becomes enraged" to the log', () => {
+    const sim = makeSim();
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const { boss } = spawnBossNow(sim);
+    const p = (sim as any).entities.get(tank) as Entity;
+    p.gm = true; // survive the raid-tier melee so the pull runs for real seconds
+    p.maxHp = p.hp = 1_000_000;
+    let barks = 0;
+    let bossSpellfx = 0;
+    for (let t = 0; t < 20 * 60; t++) {
+      p.pos = { x: boss.pos.x + 2, z: boss.pos.z, y: boss.pos.y };
+      if (t % 10 === 0) (sim as any).dealDamage(p, boss, 1, false, 'physical', 'Chip', 'hit', true);
+      // Drop him under the 20% enrage threshold partway through so the enrage
+      // path (which also barked "becomes enraged!") runs during the sample.
+      if (t === 20 * 30) boss.hp = Math.floor(boss.maxHp * 0.15);
+      for (const e of sim.tick()) {
+        if (e.type === 'log' && /unleashes|becomes enraged/i.test((e as any).text)) barks++;
+        if (e.type === 'spellfx' && (e as any).sourceId === boss.id) bossSpellfx++;
+      }
+    }
+    expect(barks).toBe(0); // the log stayed quiet...
+    expect(bossSpellfx).toBeGreaterThan(0); // ...but the mechanics (spellfx novas) still fired
   });
 });
 

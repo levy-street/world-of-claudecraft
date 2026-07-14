@@ -17,6 +17,7 @@ import {
   frenzyPackmates,
   respawnMob,
 } from '../src/sim/mob/lifecycle';
+import { updateMob } from '../src/sim/mob/locomotion';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -177,5 +178,67 @@ describe('mob_lifecycle module: respawnMob + despawnSummonedAdds', () => {
     mob.summonedIds = [];
     expect(() => despawnSummonedAdds(ctxOf(sim), mob)).not.toThrow();
     expect(mob.summonedIds.length).toBe(0);
+  });
+});
+
+// Corpse loot lifetime across an in-place respawn (issue #1539). The mob and its
+// corpse are one entity: respawnMob reuses the id, so it MUST wipe the corpse loot
+// state or the next kill would inherit the previous corpse's un-looted drops. The
+// respawn gate in updateMob defers that reuse while the corpse is still lootable,
+// so the tapping player keeps a bounded, classic-faithful window before the loot
+// decays with the corpse. Both facets were previously unpinned.
+describe('mob_lifecycle module: un-looted corpse loot on respawn (issue #1539)', () => {
+  it('respawnMob wipes the reused corpse loot state (lootable/loot/tappedById/lootRecipientIds)', () => {
+    const sim = makeSim();
+    const p = sim.player as any;
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    mob.spawnPos = { x: 40, y: mob.pos.y, z: 40 };
+    // a killed, tapped, un-looted corpse still carrying its drops
+    mob.dead = true;
+    mob.hp = 0;
+    mob.lootable = true;
+    mob.loot = { copper: 120, items: [{ itemId: 'wolf_pelt', count: 1 }] };
+    mob.tappedById = p.id;
+    mob.lootRecipientIds = [p.id];
+
+    respawnMob(ctxOf(sim), mob);
+
+    expect(mob.lootable).toBe(false);
+    expect(mob.loot).toBe(null);
+    expect(mob.tappedById).toBe(null);
+    expect(mob.lootRecipientIds).toBeUndefined();
+  });
+
+  it('the in-place respawn is deferred while the corpse is lootable, then wipes the loot when the corpse decays', () => {
+    const sim = makeSim();
+    const p = sim.player as any;
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    mob.spawnPos = { x: 40, y: mob.pos.y, z: 40 };
+    // Killed, tapped, drops still on the corpse. A short respawn timer with a
+    // longer corpse timer: the corpse-decay window (not the respawn timer) must
+    // bound how long the loot stays obtainable.
+    mob.dead = true;
+    mob.hp = 0;
+    mob.aiState = 'dead';
+    mob.lootable = true;
+    mob.loot = { copper: 120, items: [{ itemId: 'wolf_pelt', count: 1 }] };
+    mob.tappedById = p.id;
+    mob.respawnTimer = 1; // due after 1s
+    mob.corpseTimer = 3; // real default is CORPSE_DURATION (60s); shortened for the test
+
+    const ctx = ctxOf(sim);
+    // Tick past the respawn timer but not the corpse timer (1.5s at 20Hz).
+    for (let i = 0; i < 30; i++) updateMob(ctx, mob);
+    expect(mob.respawnTimer).toBeLessThanOrEqual(0); // respawn is due,
+    expect(mob.dead).toBe(true); // but deferred: the corpse still stands
+    expect(mob.lootable).toBe(true); // loot remains obtainable through the window
+    expect(mob.loot).not.toBe(null);
+
+    // Tick until the corpse timer elapses: only now does the mob respawn in place.
+    for (let i = 0; i < 100 && mob.dead; i++) updateMob(ctx, mob);
+    expect(mob.dead).toBe(false); // respawned in place
+    expect(mob.lootable).toBe(false); // loot decayed with the corpse (classic behavior)
+    expect(mob.loot).toBe(null);
+    expect(mob.tappedById).toBe(null);
   });
 });

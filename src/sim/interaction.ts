@@ -25,6 +25,7 @@
 
 import { bagCapacity, fitsAll } from './bags';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
+import * as deedsMod from './deeds';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
@@ -350,6 +351,8 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void
   ctx.addItem(obj.objectItemId, 1, meta.entityId);
   obj.lootable = false;
   obj.respawnTimer = OBJECT_RESPAWN;
+  // Success only: a capacity-refused attempt returned above and never counts.
+  ctx.bumpDeedStat(meta, 'groundObjectsLooted', 1);
 }
 
 export function interact(ctx: SimContext, pid?: number): void {
@@ -405,6 +408,8 @@ export function interact(ctx: SimContext, pid?: number): void {
         return;
       }
       if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
+        // Opening the bank window counts as banker business for the NPC ledger.
+        deedsMod.onBankerBusinessForDeeds(ctx, r.meta, target.templateId);
         ctx.emit({ type: 'bank', pid: p.id });
         return;
       }
@@ -460,6 +465,8 @@ export function interact(ctx: SimContext, pid?: number): void {
     return;
   }
   if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
+    // Opening the bank window counts as banker business for the NPC ledger.
+    deedsMod.onBankerBusinessForDeeds(ctx, r.meta, questEntity.templateId);
     ctx.emit({ type: 'bank', pid: p.id });
     return;
   }

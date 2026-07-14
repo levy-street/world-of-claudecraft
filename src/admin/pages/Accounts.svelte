@@ -104,6 +104,10 @@
             <td>
               {account.username}
               {#if account.isAdmin}<Badge>{t('accounts.badgeAdmin')}</Badge>{/if}
+              {#if account.isAi}<Badge variant="neutral">{t('accounts.badgeAi')}</Badge>{/if}
+              {#if account.isStreamer}
+                <Badge variant="success">{t('accounts.badgeStreamer')}</Badge>
+              {/if}
               {#if status === 'banned'}
                 <Badge variant="bad">{t('accounts.badgeBanned')}</Badge>
               {:else if status === 'suspended'}

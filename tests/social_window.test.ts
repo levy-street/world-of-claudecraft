@@ -32,9 +32,10 @@ describe('social_window: no magic values', () => {
 describe('social_window: WAI-ARIA tabs', () => {
   it('renders the tab strip as a role=tablist with role=tab + aria-selected + roving tabindex', () => {
     expect(painter).toContain('role="tablist"');
-    // Exactly four real tabs (friends / guild / ignore / raid), each a role=tab. The
-    // closing quote in /role="tab"/ does NOT match role="tablist" / role="tabpanel".
-    expect(painter.match(/role="tab"/g)?.length).toBe(4);
+    // Exactly five real tabs (friends / guild / ignore / block / raid), each a role=tab:
+    // ignore and block are two distinct tiers and get a tab each. The closing quote in
+    // /role="tab"/ does NOT match role="tablist" / role="tabpanel".
+    expect(painter.match(/role="tab"/g)?.length).toBe(5);
     expect(painter).toContain('aria-selected="${tab ===');
     expect(painter).toContain('tabindex="${tab ===');
     expect(painter).toContain('aria-controls="soc-body-panel"');
@@ -73,5 +74,34 @@ describe('social_window: delegated row listeners (no per-tick churn)', () => {
     const body = painter.slice(start, next);
     expect(body).toContain('body.innerHTML');
     expect(body).not.toContain('addEventListener');
+  });
+});
+
+describe('social_window: Book of Deeds title spans (both roster surfaces)', () => {
+  // The pure row model carries the deed ID (social_view.test.ts); these pins
+  // hold the RENDER arm: each surface localizes through deedTitleText, hides
+  // entirely on '' (untitled/stale, never an empty decorated span), and emits
+  // the muted .soc-title INSIDE the ellipsized name cell. Deleting either
+  // span emission, either hide guard, or the localization call reds here.
+  it('friends rows localize the id, gate on it, and emit .soc-title inside the name', () => {
+    expect(painter).toContain(
+      "const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';",
+    );
+    expect(painter).toContain(
+      'const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : \'\';',
+    );
+    expect(painter).toContain('${esc(f.name)}${titleSpan}');
+  });
+
+  it('guild rows localize the id, gate on it, and place the title AFTER the rank chip', () => {
+    expect(painter).toContain(
+      "const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';",
+    );
+    expect(painter).toContain('<span class="soc-title">${esc(memberTitle)}</span>');
+    // name, then rank chip, then title: a long title trims off the tail and
+    // can never push the chip out of the ellipsized cell.
+    expect(painter).toContain(
+      '${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}',
+    );
   });
 });

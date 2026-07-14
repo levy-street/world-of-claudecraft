@@ -15,6 +15,10 @@ export interface LeaderboardEntry {
   virtualLevel: number;
   lifetimeXp: number;
   prestigeRank: number;
+  // The character's selected Book of Deeds title: a deed id the client
+  // localizes through deed_i18n.ts (never display text), null when untitled
+  // (the DeedsLeaderboardEntry shape).
+  title: string | null;
   realm?: string; // present on the global (cross-realm) home-page board
 }
 

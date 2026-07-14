@@ -113,6 +113,45 @@ describe('mailbox_window: recipient autocomplete wiring', () => {
   });
 });
 
+describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () => {
+  it('routes +/- clamping through the clampParcelQty view helper', () => {
+    expect(painter).toContain('clampParcelQty(');
+  });
+
+  it('the ceiling excludes instanced (non-fungible) copies, matching the sim send-path check', () => {
+    expect(painter).toMatch(/inventory\.filter\(\(s\) => s\.itemId === itemId && !s\.instance\)/);
+  });
+
+  it('renders both stepper aria-labels', () => {
+    expect(painter).toContain('parcelQtyDecreaseAria');
+    expect(painter).toContain('parcelQtyIncreaseAria');
+  });
+
+  it('the stepper only renders once more than one is owned', () => {
+    expect(painter).toContain('owned > 1');
+  });
+
+  it('the +/- buttons truly disable (not just visually) at the floor/ceiling', () => {
+    expect(painter).toMatch(/minus\.disabled = slot\.count <= 1/);
+    expect(painter).toMatch(/plus\.disabled = slot\.count >= owned/);
+  });
+
+  it('the quantity value is an aria-live region so screen readers hear the new count', () => {
+    expect(painter).toMatch(/qty\.setAttribute\('aria-live', 'polite'\)/);
+  });
+
+  it('the item name is keyboard-focusable so its tooltip is Tab-reachable', () => {
+    expect(painter).toMatch(/name\.tabIndex = 0/);
+  });
+
+  it('rebuilding the parcel list restores focus to the equivalent control by item + role', () => {
+    expect(painter).toContain('focusKey');
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+  });
+});
+
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);

@@ -53,6 +53,7 @@ const baseEnTable = {
   'error.potionNotReady': 'That potion is not ready yet.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
+  'error.nothingToConsume': 'Nothing to consume.',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -158,6 +159,7 @@ const baseEnTable = {
   'log.partyLeft': '{name} has left the party.',
   'log.partyRemoved': '{name} has been removed from the party.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
+  'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
   'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
@@ -195,6 +197,7 @@ const baseEnTable = {
   'error.notInChannelJoin': 'You are not in the {channel} channel. Type /join {channel} first.',
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
   'log.mobChannels': '{name} channels {mechanic}.',
+  'log.channelInterrupted': '{mechanic} is interrupted!',
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
@@ -382,6 +385,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'That potion is not ready yet.',
     'error.fullHealth': 'You are already at full health.',
     'error.nothingRestore': 'Nothing to restore.',
+    'error.nothingToConsume': 'Nothing to consume.',
     'error.merchantUnavailable': 'That merchant is not available.',
     'error.notForSale': 'That item is not for sale.',
     'error.noMerchant': 'There is no merchant nearby.',
@@ -683,6 +687,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Esa poción aún no está lista.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
+    'error.nothingToConsume': 'No hay nada que consumir.',
+    'loot.rollWinnerOffline': '{winner} estaba sin conexión; {item} volvió al cadáver.',
+    'log.channelInterrupted': '¡Se ha interrumpido {mechanic}!',
     'error.merchantUnavailable': 'Ese vendedor no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
     'error.noMerchant': 'No hay ningún vendedor cerca.',
@@ -927,6 +934,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Esa poción aún no está lista.',
     'error.fullHealth': 'Ya tienes la salud al máximo.',
     'error.nothingRestore': 'No hay nada que restaurar.',
+    'error.nothingToConsume': 'No hay nada que consumir.',
+    'loot.rollWinnerOffline': '{winner} estaba sin conexión; {item} volvió al cadáver.',
+    'log.channelInterrupted': '¡Se ha interrumpido {mechanic}!',
     'error.merchantUnavailable': 'Ese mercader no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
     'error.noMerchant': 'No hay ningún mercader cerca.',
@@ -1172,6 +1182,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
     'error.fullHealth': 'Vous êtes déjà à pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
+    'error.nothingToConsume': 'Rien à consommer.',
+    'loot.rollWinnerOffline': '{winner} était hors ligne ; {item} est de nouveau sur le cadavre.',
+    'log.channelInterrupted': 'Interruption de {mechanic} !',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
@@ -1417,6 +1430,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': "Cette potion n'est pas encore prête.",
     'error.fullHealth': 'Vous êtes déjà en pleine santé.',
     'error.nothingRestore': 'Rien à restaurer.',
+    'error.nothingToConsume': 'Rien à consommer.',
+    'loot.rollWinnerOffline': '{winner} était hors ligne ; {item} est de nouveau sur le cadavre.',
+    'log.channelInterrupted': 'Interruption de {mechanic} !',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
@@ -1609,6 +1625,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'That potion is not ready yet.',
     'error.fullHealth': 'You are already at full health.',
     'error.nothingRestore': 'Nothing to restore.',
+    'error.nothingToConsume': 'Nothing to consume.',
     'error.merchantUnavailable': 'That merchant is not available.',
     'error.notForSale': 'That item is not for sale.',
     'error.noMerchant': 'There is no merchant nearby.',
@@ -1828,6 +1845,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Quella pozione non è ancora pronta.',
     'error.fullHealth': 'Sei già al massimo della salute.',
     'error.nothingRestore': 'Niente da ripristinare.',
+    'error.nothingToConsume': 'Niente da consumare.',
+    'loot.rollWinnerOffline': '{winner} era offline; {item} è di nuovo sul cadavere.',
+    'log.channelInterrupted': 'Interruzione di {mechanic}!',
     'error.merchantUnavailable': 'Quel mercante non è disponibile.',
     'error.notForSale': "Quell'oggetto non è in vendita.",
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
@@ -2068,6 +2088,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Dieser Trank ist noch nicht bereit.',
     'error.fullHealth': 'Ihr habt bereits volle Gesundheit.',
     'error.nothingRestore': 'Nichts wiederherzustellen.',
+    'error.nothingToConsume': 'Nichts zu verbrauchen.',
+    'loot.rollWinnerOffline': '{winner} war offline; {item} wurde auf die Leiche zurückgelegt.',
+    'log.channelInterrupted': '{mechanic} wurde unterbrochen!',
     'error.merchantUnavailable': 'Dieser Händler ist nicht verfügbar.',
     'error.notForSale': 'Dieser Gegenstand ist nicht zu verkaufen.',
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
@@ -2316,6 +2339,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '那瓶药水尚未冷却完毕。',
     'error.fullHealth': '你的生命值已满。',
     'error.nothingRestore': '没有可恢复的东西。',
+    'error.nothingToConsume': '没有可吞噬的效果。',
+    'loot.rollWinnerOffline': '{winner}处于离线状态；{item}已放回尸体。',
+    'log.channelInterrupted': '{mechanic}被打断了！',
     'error.merchantUnavailable': '该商人无法提供服务。',
     'error.notForSale': '该物品不出售。',
     'error.noMerchant': '附近没有商人。',
@@ -2546,6 +2572,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '那瓶藥水尚未準備好。',
     'error.fullHealth': '你的生命值已滿。',
     'error.nothingRestore': '沒有可恢復的東西。',
+    'error.nothingToConsume': '沒有可吞噬的效果。',
+    'loot.rollWinnerOffline': '{winner}處於離線狀態；{item}已放回屍體。',
+    'log.channelInterrupted': '{mechanic}被打斷了！',
     'error.merchantUnavailable': '那名商人無法使用。',
     'error.notForSale': '那件物品非賣品。',
     'error.noMerchant': '附近沒有商人。',
@@ -2781,6 +2810,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': '그 물약은 아직 사용할 수 없습니다.',
     'error.fullHealth': '이미 생명력이 가득 찼습니다.',
     'error.nothingRestore': '회복할 것이 없습니다.',
+    'error.nothingToConsume': '소모할 효과가 없습니다.',
+    'loot.rollWinnerOffline': '{winner} 님이 오프라인 상태라 {item} 아이템이 시체로 돌아갔습니다.',
+    'log.channelInterrupted': '{mechanic} 시전이 중단되었습니다!',
     'error.merchantUnavailable': '그 상인은 지금 이용할 수 없습니다.',
     'error.notForSale': '그 아이템은 판매하지 않습니다.',
     'error.noMerchant': '근처에 상인이 없습니다.',
@@ -3023,6 +3055,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'そのポーションはまだ使用できません。',
     'error.fullHealth': 'すでに体力は全快です。',
     'error.nothingRestore': '回復するものがありません。',
+    'error.nothingToConsume': '消費できる効果がありません。',
+    'loot.rollWinnerOffline': '{winner}がオフラインだったため、{item}は死体に戻されました。',
+    'log.channelInterrupted': '{mechanic}が中断されました！',
     'error.merchantUnavailable': 'その商人は利用できません。',
     'error.notForSale': 'そのアイテムは売り物ではありません。',
     'error.noMerchant': '近くに商人がいません。',
@@ -3253,6 +3288,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Essa poção ainda não está pronta.',
     'error.fullHealth': 'Você já está com a vida cheia.',
     'error.nothingRestore': 'Nada a restaurar.',
+    'error.nothingToConsume': 'Não há nada para consumir.',
+    'loot.rollWinnerOffline': '{winner} estava offline; {item} voltou para o cadáver.',
+    'log.channelInterrupted': 'Interrupção de {mechanic}!',
     'error.merchantUnavailable': 'Esse comerciante não está disponível.',
     'error.notForSale': 'Esse item não está à venda.',
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
@@ -3510,6 +3548,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.potionNotReady': 'Это зелье ещё не готово к использованию.',
     'error.fullHealth': 'У вас и так полное здоровье.',
     'error.nothingRestore': 'Восстанавливать нечего.',
+    'error.nothingToConsume': 'Поглощать нечего.',
+    'loot.rollWinnerOffline': '{winner} не в сети; предмет {item} возвращён к трупу.',
+    'log.channelInterrupted': 'Действие «{mechanic}» прервано!',
     'error.merchantUnavailable': 'Этот торговец недоступен.',
     'error.notForSale': 'Этот предмет не продаётся.',
     'error.noMerchant': 'Поблизости нет торговца.',
@@ -4130,7 +4171,7 @@ export function tSim(
 
 // Reverse maps: the sim splices English item/mob names into its text; localize them.
 const itemNameToId = new Map<string, string>();
-for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, id);
+for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, it.heroicOf ?? id);
 const mobNameToId = new Map<string, string>();
 for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
 const abilityNameToId = new Map<string, string>();
@@ -5345,6 +5386,12 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
+  {
+    re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
+    build: (m) =>
+      t('hudChrome.readyCheck.result', { ready: m[1], notReady: m[2], noResponse: m[3] }),
+  },
   { re: /^Your class has no talent tree yet\.$/, build: () => t('game.talents.readout.noTree') },
   {
     re: /^You have not unlocked talents yet — they begin at level (.+)\.$/,
@@ -5515,6 +5562,10 @@ const RULES: Rule[] = [
   {
     re: /^(.+) wins (.+) \((\d+)\)$/,
     build: (m) => tSim('loot.rollWin', { winner: m[1], item: m[2], roll: m[3] }),
+  },
+  {
+    re: /^(.+) was offline; (.+) returned to the corpse\.$/,
+    build: (m) => tSim('loot.rollWinnerOffline', { winner: m[1], item: m[2] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,
@@ -5967,6 +6018,11 @@ const RULES: Rule[] = [
   {
     re: /^(.+) applies to your group listing\.$/,
     build: (m) => tSim('dfinder.applicantApplies', { name: m[1] }),
+  },
+  // "{mechanic} is interrupted!" (a channeled mob heal broken by a stun/silence).
+  {
+    re: /^(.+) is interrupted!$/,
+    build: (m) => tSim('log.channelInterrupted', { mechanic: locBossMechanic(m[1]) }),
   },
   {
     re: /^(.+) unleashes (.+)!$/,
