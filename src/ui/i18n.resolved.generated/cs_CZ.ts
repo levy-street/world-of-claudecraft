@@ -7649,6 +7649,15 @@ export const cs_CZ: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Žezlo nesmrtelného dvora"
       },
+      "deathless_warguard_legmail": {
+        "name": "Nesmrtelné nohavice válečné stráže"
+      },
+      "soulrend_diadem": {
+        "name": "Diadém rozervání duše"
+      },
+      "scourgehide_carapace": {
+        "name": "Krunýř z kůže pohromy"
+      },
       "cryptplate_helm": {
         "name": "Kryptoplátová helma"
       },
@@ -7687,6 +7696,9 @@ export const cs_CZ: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Nesmrtelná velká čepel"
+      },
+      "soulforged_warplate": {
+        "name": "Duší kovaný válečný plát"
       },
       "stormcallers_focus": {
         "name": "Ohnisko volání vichru"

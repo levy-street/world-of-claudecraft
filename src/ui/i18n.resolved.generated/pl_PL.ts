@@ -7649,6 +7649,15 @@ export const pl_PL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Berło nieśmiertelnego dworu"
       },
+      "deathless_warguard_legmail": {
+        "name": "Nieśmiertelne nogawice wojennej straży"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem rozdarcia dusz"
+      },
+      "scourgehide_carapace": {
+        "name": "Pancerz ze skóry plagi"
+      },
       "cryptplate_helm": {
         "name": "Hełm z kryptowej płyty"
       },
@@ -7687,6 +7696,9 @@ export const pl_PL: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Nieśmiertelne wielkie ostrze"
+      },
+      "soulforged_warplate": {
+        "name": "Bojowa zbroja kuta z duszy"
       },
       "stormcallers_focus": {
         "name": "Ognisko przyzywacza burz"

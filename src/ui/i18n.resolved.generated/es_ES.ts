@@ -7649,6 +7649,15 @@ export const es_ES: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
       },
+      "deathless_warguard_legmail": {
+        "name": "Malla de piernas del Guardián Imperecedero"
+      },
+      "soulrend_diadem": {
+        "name": "Diadema Desgarralmas"
+      },
+      "scourgehide_carapace": {
+        "name": "Caparazón de piel de Azote"
+      },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
       },
@@ -7687,6 +7696,9 @@ export const es_ES: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Mandoble Imperecedero"
+      },
+      "soulforged_warplate": {
+        "name": "Coraza de guerra forjada en almas"
       },
       "stormcallers_focus": {
         "name": "Foco del Invocador de Tormentas"

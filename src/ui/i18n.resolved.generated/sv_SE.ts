@@ -7649,6 +7649,15 @@ export const sv_SE: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Odödliga hovets spira"
       },
+      "deathless_warguard_legmail": {
+        "name": "Odödlig krigsvakts benbrynja"
+      },
+      "soulrend_diadem": {
+        "name": "Själsrivardiadem"
+      },
+      "scourgehide_carapace": {
+        "name": "Gisselhudspansar"
+      },
       "cryptplate_helm": {
         "name": "Kryptplåtshjälm"
       },
@@ -7687,6 +7696,9 @@ export const sv_SE: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Odödlig storklinga"
+      },
+      "soulforged_warplate": {
+        "name": "Själssmidd krigsplåt"
       },
       "stormcallers_focus": {
         "name": "Stormkallarens fokus"

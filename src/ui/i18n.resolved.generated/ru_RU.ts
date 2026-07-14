@@ -7649,6 +7649,15 @@ export const ru_RU: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Скипетр бессмертного двора"
       },
+      "deathless_warguard_legmail": {
+        "name": "Ножные латы бессмертного стража"
+      },
+      "soulrend_diadem": {
+        "name": "Диадема разрыва души"
+      },
+      "scourgehide_carapace": {
+        "name": "Панцирь бичевой шкуры"
+      },
       "cryptplate_helm": {
         "name": "Гробничный латный шлем"
       },
@@ -7687,6 +7696,9 @@ export const ru_RU: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"
+      },
+      "soulforged_warplate": {
+        "name": "Душекованый боевой доспех"
       },
       "stormcallers_focus": {
         "name": "Средоточие буревестника"
