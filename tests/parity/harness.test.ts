@@ -131,6 +131,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   it('ENTITY_EXCLUDE membership is exactly the pinned set', () => {
     expect([...ENTITY_EXCLUDE].sort()).toEqual([
       'color',
+      'equippedInstances',
       'equippedItems',
       'guild',
       'holderBalance',
@@ -152,12 +153,15 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'vx',
       'vy',
       'vz',
+      'weaponSkinId',
+      'weaponSkinLoadout',
     ]);
   });
 
   it('META_EXCLUDE membership is exactly the pinned set', () => {
     expect([...META_EXCLUDE].sort()).toEqual([
       'away',
+      'bankBonusSources',
       'characterId',
       'fiestaMods',
       'fiestaSpecial',

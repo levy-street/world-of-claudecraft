@@ -20,8 +20,6 @@ const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
   'druid',
 ]);
 const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
-const OLD_WARRIOR_WEAPON_ARCHETYPE = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
-const OLD_CASTER_WEAPON_ARCHETYPE = new Set<PlayerClass>(['mage', 'priest', 'warlock', 'druid']);
 
 const ARMOR_RANK: Record<ArmorType, number> = {
   cloth: 0,
@@ -29,8 +27,9 @@ const ARMOR_RANK: Record<ArmorType, number> = {
   mail: 2,
 };
 
-function subsetOf(classes: readonly PlayerClass[], allowed: ReadonlySet<PlayerClass>): boolean {
-  return classes.length > 0 && classes.every((cls) => allowed.has(cls));
+// True when `classes` names exactly the members of `allowed` (order-independent).
+function sameClassSet(classes: readonly PlayerClass[], allowed: ReadonlySet<PlayerClass>): boolean {
+  return classes.length === allowed.size && classes.every((cls) => allowed.has(cls));
 }
 
 export function armorTypeForItem(item: ItemDef): ArmorType | null {
@@ -60,11 +59,17 @@ export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {
   return 'cloth';
 }
 
+// A weapon's `requiredClass` lists exactly the classes that can equip it, i.e. the
+// full weapon-proficiency group (weapons are proficiency-based, not class-locked).
+// Recover the archetype by matching that list against each group. A weapon with a
+// narrower, bespoke class lock (not one of the three groups) has no archetype and
+// falls through to the literal `requiredClass` check in canEquipItem, and shows its
+// class line on the tooltip.
 export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
   if (item.kind !== 'weapon' || !item.requiredClass) return null;
-  if (subsetOf(item.requiredClass, OLD_WARRIOR_WEAPON_ARCHETYPE)) return 'warrior';
-  if (subsetOf(item.requiredClass, OLD_CASTER_WEAPON_ARCHETYPE)) return 'caster';
-  if (subsetOf(item.requiredClass, ROGUE_WEAPON_CLASSES)) return 'rogue';
+  if (sameClassSet(item.requiredClass, WARRIOR_WEAPON_CLASSES)) return 'warrior';
+  if (sameClassSet(item.requiredClass, CASTER_WEAPON_CLASSES)) return 'caster';
+  if (sameClassSet(item.requiredClass, ROGUE_WEAPON_CLASSES)) return 'rogue';
   return null;
 }
 

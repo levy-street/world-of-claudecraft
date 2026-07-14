@@ -76,6 +76,19 @@ export interface DesktopBridge {
   reportRendererError?(report: DesktopRendererErrorReport): void;
   onUpdateEvent?(callback: (event: DesktopUpdateEvent) => void): () => void;
   installUpdate?(): Promise<null>;
+  // A Steam link ticket (hex) for POST /api/steam/link, or null when Steam is
+  // unavailable (website build, Steam not running, ticket failure). Feature-
+  // check before use like the other post-trio methods.
+  steamLinkTicket?(): Promise<string | null>;
+  // Whether the shell can mint link tickets at all (false on packaged website
+  // builds, where every steamLinkTicket call answers null). Absent on older
+  // shells that predate the capability probe: fall back to steamLinkTicket
+  // presence there. Feature-check before use like the other post-trio methods.
+  steamLinkSupported?(): Promise<boolean>;
+  // Signals that the link POST settled (success or failure) so the shell can
+  // cancel the outstanding Steam auth ticket promptly (Valve's CancelAuthTicket
+  // contract). Absent on older shells: feature-check before use.
+  steamLinkSettled?(): Promise<unknown>;
 }
 
 export function desktopBridge(): DesktopBridge | null {

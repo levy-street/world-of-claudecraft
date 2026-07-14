@@ -1,13 +1,17 @@
 // Flat per-craft skill tracking (issue #1126). A player has one independent skill
 // value for each of the ten crafts on the ring (see content/professions.ts). This is
-// a flat model on purpose: no conserved-mass economy yet, so gains are purely
-// additive and never draw down another craft's value. The wheel/mass-conservation
-// mechanic (a later issue) will extend this file rather than replace it.
+// a flat model on purpose: no conserved-mass economy. Per the #107 design-review
+// decision, the conserved-mass "wheel" thesis was retired in favor of a back-loaded
+// attunement/empowerment model: craft skill only ever goes up (this module never
+// draws one craft's value down to raise another), but only a swappable subset of a
+// player's crafts is "empowered" at a time, gated by a later issue rather than this
+// file. A later issue will layer that empowerment ceiling on top of this flat state,
+// not replace it.
 //
 // Free-floor rule: crafting at the common tier never costs anything, regardless of
-// whether conserved mass exists yet. Since this module has no cost/spend path at
-// all (skill only ever goes up), that rule holds trivially: there is nothing here
-// that could charge a common-tier craft.
+// empowerment status. Since this module has no cost/spend path at all (skill only
+// ever goes up), that rule holds trivially: there is nothing here that could charge
+// a common-tier craft.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net
 // imports, no Math.random/Date.now, host-agnostic so it runs offline, on the
@@ -78,6 +82,16 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
 // - recipe exactly one tier below capability: reduced amount (diminishing
 //   returns for crafting something already mastered).
 // - recipe two or more tiers below capability: zero (no progress at all).
+//
+// #1148 tuning pass: this diminishing-returns shape (full at/above capability,
+// reduced one tier below, zero two-plus tiers below) matches the design doc's
+// own decided text ("crafting below your current capability gives diminishing
+// returns, and a craft two tiers under your capability gives nothing"), so it
+// is CONFIRMED, not re-tuned. The doc's own Open Questions section leaves the
+// "crafts-per-tier" step size itself open ("the example uses about 20");
+// TIER_SKILL_STEP of 25 is kept as the working value (a round number close to
+// that example, over the 1-300 classic skill scale used elsewhere in this
+// module) rather than re-guessed, pending a real number from that open item.
 export const TIER_SKILL_STEP = 25;
 
 /** Bucket a flat skill value into a tier index. Skill 0-24 -> tier 0 (common),

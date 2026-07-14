@@ -1,24 +1,21 @@
 # tests/parity: the golden-trace parity gate
 
-This is the safety net for the ongoing `refactor/sim` extraction work. Every later
-session MOVES a slice of behavior out of the large `Sim` class; the #1 risk is silent
-behavior drift during a "move." This harness records the FULL deterministic Sim
-behavior for seeded scenarios and fails if any future change alters it.
+The sim-drift safety net. The SimContext extraction campaign motivated it (moving a
+slice of behavior out of the large `Sim` class risks silent drift during a "move"),
+but it now guards ALL sim behavior change: any PR that alters sim behavior turns this
+gate red BY DESIGN. The harness records the FULL deterministic Sim behavior for
+seeded scenarios and fails if any future change alters it.
 
 ## What it captures (the trace)
 
 Per scenario, on a fixed tick cadence, each `Frame` pins:
 
-- **Every player's `PlayerMeta`** (`samplePlayerMeta`): xp/lifetimeXp/restedXp/
-  prestige, copper, inventory/vendorBuyback, equipment, questLog/questsDone,
-  counters, arena (1v1 + 2v2) standings, delve progression, talents/loadouts,
-  raidLockouts, fiesta state. Session/presentation/derived fields are excluded
-  (`META_EXCLUDE`).
-- **Every player + explicitly tracked mob/pet `Entity`** (`sampleEntity`): hp/pos/
-  facing, resources, stats/weapon, auras, cooldowns, threat, ccDr, casting, combat,
-  AI, loot, mob timers. Presentation/interpolation fields are excluded
-  (`ENTITY_EXCLUDE`). We sample players + tracked ids only (NOT every world entity)
-  to keep goldens ~100 KB, not MB.
+- **Every player's `PlayerMeta` and every player + explicitly tracked mob/pet
+  `Entity`, by EXCLUSION** (`trace.ts`): `samplePlayerMeta`/`sampleEntity` copy every
+  field NOT listed in `META_EXCLUDE`/`ENTITY_EXCLUDE`, whose entries each carry a
+  per-field justification comment (session-only, presentation, derived from sampled
+  inputs). A NEW field is therefore pinned BY DEFAULT (see Adding a field). Players +
+  tracked ids only are sampled (NOT every world entity) to keep goldens lean.
 - **The SimEvent stream**, folded per window into one `eventDigest` (emit order
   preserved, reordering events IS drift).
 - **The rng draw-order fingerprint**: a rolling FNV-1a over every `sim.rng` draw's
@@ -29,12 +26,22 @@ Maps/Sets are canonicalized to sorted arrays; floats are quantized to 1e-6
 sentinels so JSON round-trips losslessly. Samples are VALUE COPIES (the sim mutates
 in place; the sampler must snapshot, never retain a live reference).
 
+## Adding a field (the everyday workflow)
+
+Every new `Entity`/`PlayerMeta` field interacts with this harness; decide once, in the
+same change. **Gameplay-affecting** (persisted, sim-read): leave it sampled (the
+default) and regenerate goldens via `UPDATE_PARITY=1` in its own reviewed commit
+(precedent: `craftThrottle`). **Session-only / presentation / derived from sampled
+inputs**: add it to `ENTITY_EXCLUDE`/`META_EXCLUDE` in `trace.ts` with a one-line
+justification comment mirroring the existing entries (precedent: `wireRev`,
+`bankBonusSources`, `marketQuery`), or every golden churns for no gameplay reason.
+
 ## RNG draw-order log: the design decision
 
-There is ONE shared `mulberry32` stream (`sim.rng`) with ~109 draw sites. A
-reordered guard or early-bail that draws at a different global stream position
-forks the world for all later draws while final scalars can still match by luck.
-The draw-order digest is the precise detector.
+There is ONE shared `mulberry32` stream (`sim.rng`) drawn from sites all over
+`src/sim`. A reordered guard or early-bail that draws at a different global stream
+position forks the world for all later draws while final scalars can still match by
+luck. The draw-order digest is the precise detector.
 
 - We observe **only the shared `sim.rng`** via the default-off `Rng.setObserver`
   seam (`src/sim/rng.ts`). The observer is pure bookkeeping: it never draws, never
@@ -43,26 +50,25 @@ The draw-order digest is the precise detector.
   between recordings (each `Recorder.finish` detaches it).
 - We fold the **draw VALUE in draw ORDER** (count + ordered values), NOT a
   callsite tag. A stack-derived tag churns on every `sim.ts` edit (which is
-  exactly what the refactor does), so it would make every extraction's golden
+  exactly what an extraction does), so it would make every extraction's golden
   falsely red. Count + ordered-value already catches reordering without that churn.
 - **Construction-time draws** happen inside the `Sim` ctor, before the Rng exists
   to be observed; they are pinned by the frame-0 state sample instead. The draw log
   covers everything from `drive()` onward (the tick loop + in-drive internal calls),
-  which is the refactor target.
+  which is the extraction target.
 - **Sub-streams** (`FiestaState.rng`, per-delve/lockpick seeds) are NOT folded into
   the digest. Their effects are fully observable through the sampled `PlayerMeta` +
   entity state + event stream, so drift there still turns a scenario red.
 
-## Coverage matrix
+## Coverage
 
-Scenarios (`scenarios.ts`) span: warrior/mage/rogue/hunter/warlock/paladin; the
-`meleeSwing` weaponStrike entry (heroic_strike, sinister_strike); player
-auto-attack + base `mobSwing`; a frenzy + on-hit affix cascade (old_greyjaw +
-ridge_stalker); a hunter ranged pet (`updateRangedPetAttack`) and a warlock melee
-pet (`mobSwing` pet arm + `applyTaunt`); a ground AoE (`updateGroundAoEs` first +
-`pulseGroundAoE` both callers); an arena 1v1 match; a fiesta match; a delve +
-lockpick; and loot rolls (solo death-roll + party need/greed). `coverage.test.ts`
-asserts each subsystem actually FIRES (not merely named in a comment).
+`SCENARIOS` in `scenarios.ts` is the source of truth: scenarios span combat (swings,
+pets, affixes, ground AoE), arena/duel/fiesta, delves + lockpick, dungeons/raids,
+quests, loot rolls, market, bank, trade, chat/social, talents, xp/prestige, casting,
+and mob lifecycle. Every playable class appears in some scenario; enumerate with
+`grep -o "playerClass: '[a-z]*'\|addPlayer('[a-z]*'" tests/parity/scenarios.ts | sort -u`.
+`coverage.test.ts` asserts each scenario's subsystem actually FIRES (not merely named
+in a comment). Read those two files, never a hand-written list, before adding a scenario.
 
 ## Known boundaries (what is NOT pinned, read before extracting these)
 
@@ -82,8 +88,9 @@ confirmed each):
 - **Transient Sim-owned collections are not sampled directly.** `arenaMatches`,
   `delveRuns`, `marketListings`/`marketCollections`, `instances`, `groundAoEs`,
   `pendingMobRespawns` are pinned only via their entity/event/`PlayerMeta`
-  projection. Extracting one of these should add a scenario that drives it (or
-  sample the collection directly).
+  projection. Extracting one of these should add a scenario that drives it (the
+  precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
+  the collection directly.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only
@@ -103,8 +110,10 @@ confirmed each):
 ```
 npx vitest run tests/parity                  # the gate (+ coverage + unit tests)
 UPDATE_PARITY=1 npx vitest run tests/parity  # mint/refresh goldens (deliberate, reviewable)
-du -sh tests/parity/golden                   # confirm ~100 KB, NOT MB
+du -sh tests/parity/golden                   # sanity: a few MB TOTAL, tens of KB per scenario
 ```
+
+One scenario ballooning past a few hundred KB means you are tracking too many entities.
 
 ## The rule
 

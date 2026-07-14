@@ -187,3 +187,74 @@ describe.each(HTML_ENTRIES)('mobile window backdrop (%s)', (entry) => {
     expect(z).toBeLessThan(uiOpenZ);
   });
 });
+
+describe('tier player-frame nudges are landscape-gated (hud.mobile.css)', () => {
+  // The compact narrow-width (-44px) and tablet (-10px) player-frame seats exist
+  // to clear the bottom-right Jump crescent, a landscape-only geometry. The tier
+  // classes themselves carry no orientation gate (a 390x844 portrait phone still
+  // resolves compact), so without an orientation media the nudges would off-centre
+  // the frame in browser portrait. Pin both rules inside an
+  // `@media (orientation: landscape)` block. Raw-text scan on purpose: the flat
+  // rule scan above unwraps only the outer @layer, not nested @media blocks.
+  // Strip CSS comments first (like the coverage test next door) so a stray `{`/`}` or a
+  // `@media` word inside a comment cannot throw off the brace-depth scan below.
+  const css = readFileSync(
+    fileURLToPath(new URL('../src/styles/hud.mobile.css', import.meta.url)),
+    'utf8',
+  ).replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Enumerate every @media block with its prelude text and body brace range, matched
+  // by a brace-depth scan from each @media's opening brace to its balanced close.
+  function mediaBlocks(): Array<{ prelude: string; bodyStart: number; bodyEnd: number }> {
+    const blocks: Array<{ prelude: string; bodyStart: number; bodyEnd: number }> = [];
+    const re = /@media\b/g;
+    let m: RegExpExecArray | null = re.exec(css);
+    while (m !== null) {
+      const preludeStart = m.index;
+      const open = css.indexOf('{', preludeStart);
+      if (open >= 0) {
+        // Walk from the opening brace to its balanced close via a brace-depth scan.
+        let depth = 0;
+        let close = -1;
+        for (let i = open; i < css.length; i++) {
+          const ch = css[i];
+          if (ch === '{') depth++;
+          else if (ch === '}') {
+            depth--;
+            if (depth === 0) {
+              close = i;
+              break;
+            }
+          }
+        }
+        if (close >= 0) {
+          blocks.push({ prelude: css.slice(preludeStart, open), bodyStart: open, bodyEnd: close });
+        }
+      }
+      m = re.exec(css);
+    }
+    return blocks;
+  }
+
+  function mediaPrelude(needle: string): string {
+    const at = css.indexOf(needle);
+    expect(at, `${needle} rule should exist`).toBeGreaterThanOrEqual(0);
+    // The INNERMOST @media block whose body contains the rule (smallest enclosing body
+    // range): nesting-proof. An inner nested @media sitting between the outer block's
+    // open brace and the rule no longer mis-grabs, because we pick the smallest-body
+    // block that still encloses the rule index, not the nearest '@media' token above it.
+    const enclosing = mediaBlocks()
+      .filter((b) => at > b.bodyStart && at < b.bodyEnd)
+      .sort((a, b) => a.bodyEnd - a.bodyStart - (b.bodyEnd - b.bodyStart))[0];
+    expect(enclosing, `${needle} should sit inside a media block`).toBeTruthy();
+    return enclosing.prelude;
+  }
+
+  it('keys the compact -44px seat to landscape', () => {
+    expect(mediaPrelude('left: calc(50% - 44px)')).toContain('(orientation: landscape)');
+  });
+
+  it('keys the tablet -10px seat to landscape', () => {
+    expect(mediaPrelude('left: calc(50% - 10px)')).toContain('(orientation: landscape)');
+  });
+});

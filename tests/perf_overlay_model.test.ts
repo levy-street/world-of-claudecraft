@@ -35,6 +35,7 @@ function sample(over: Partial<MetricsSample> = {}): MetricsSample {
     jitterMs: 5,
     predLeadMs: 90,
     snapshotHz: 20,
+    serverTickHz: 19.8,
     connectionType: '4g',
     drawCalls: 300,
     triangles: 1_200_000,
@@ -89,6 +90,20 @@ describe('perf overlay metric registry', () => {
     expect(apm?.group).toBe('input');
     expect(apm?.read(sample({ apm: 42 }))).toEqual({ kind: 'int', v: 42 });
   });
+
+  it('renders the server tick rate (network group) at one decimal, off by default', () => {
+    expect(defaultMetricsMap().serverTick).toBe(false);
+    const def = METRIC_REGISTRY.find((d) => d.key === 'serverTick');
+    expect(def?.group).toBe('network');
+    expect(def?.read(sample({ serverTickHz: 19.4 }))).toEqual({ kind: 'hz', v: 19.4, digits: 1 });
+    // sag severity derives from the 20 Hz nominal: healthy / mild sag / bad sag
+    expect(def?.severity(sample({ serverTickHz: 19.8 }))).toBe('good');
+    expect(def?.severity(sample({ serverTickHz: 17 }))).toBe('warn');
+    expect(def?.severity(sample({ serverTickHz: 12 }))).toBe('bad');
+    expect(def?.severity(sample({ serverTickHz: null }))).toBe('none');
+    // hidden until the server's meter reports (old server or warm-up)
+    expect(def?.read(sample({ serverTickHz: null }))).toBeNull();
+  });
 });
 
 describe('perf metric grouping', () => {
@@ -105,7 +120,14 @@ describe('perf metric grouping', () => {
     expect(grouped.map((g) => g.group.id)).toEqual(PERF_METRIC_GROUPS.map((g) => g.id));
     const byId = Object.fromEntries(grouped.map((g) => [g.group.id, g.chips.map((c) => c.key)]));
     expect(byId.frame).toEqual(['fps', 'frameTime', 'fps1Low', 'fps01Low', 'hitches']);
-    expect(byId.network).toEqual(['ping', 'jitter', 'predLead', 'snapshot', 'connection']);
+    expect(byId.network).toEqual([
+      'ping',
+      'jitter',
+      'predLead',
+      'snapshot',
+      'serverTick',
+      'connection',
+    ]);
     expect(byId.renderer).toEqual([
       'drawCalls',
       'triangles',
@@ -140,6 +162,7 @@ describe('buildPerfOverlayView', () => {
     expect(keys).not.toContain('ping');
     expect(keys).not.toContain('jitter');
     expect(keys).not.toContain('snapshot');
+    expect(keys).not.toContain('serverTick');
     // local metrics still present
     expect(keys).toContain('fps');
     expect(keys).toContain('entities');

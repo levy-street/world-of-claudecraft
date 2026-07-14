@@ -38,13 +38,13 @@ describe('runWeaponProcs: determinism / parity safety', () => {
   it('draws NO rng for a wielder holding a weapon with no procs', () => {
     const { ctx, rolls } = fakeCtx(true);
     // rusty_hatchet is a plain weapon with no weaponProcs
-    fire(ctx, ent(1, 'rusty_hatchet'), ent(2, null), 'meleeHit');
+    fire(ctx, ent(1, 'rusty_hatchet'), ent(2, null), 'weaponHit');
     expect(rolls()).toBe(0);
   });
 
   it('draws NO rng for a wielder with an empty mainhand', () => {
     const { ctx, rolls } = fakeCtx(true);
-    fire(ctx, ent(1, null), ent(2, null), 'meleeHit');
+    fire(ctx, ent(1, null), ent(2, null), 'weaponHit');
     expect(rolls()).toBe(0);
   });
 
@@ -52,12 +52,12 @@ describe('runWeaponProcs: determinism / parity safety', () => {
     const { ctx, rolls } = fakeCtx(true);
     const target = ent(2, null);
     target.dead = true;
-    fire(ctx, ent(1, 'kingsbane_last_oath'), target, 'meleeHit');
+    fire(ctx, ent(1, 'kingsbane_last_oath'), target, 'weaponHit');
     expect(rolls()).toBe(0);
   });
 
   it('does NOT roll a proc whose trigger does not match the action', () => {
-    // Thronebane only has a meleeHit proc; a heal action must not roll it.
+    // Thronebane only has a weaponHit proc; a heal action must not roll it.
     const { ctx, rolls } = fakeCtx(true);
     fire(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'heal');
     expect(rolls()).toBe(0);
@@ -67,18 +67,18 @@ describe('runWeaponProcs: determinism / parity safety', () => {
     // recalcPlayerStats keeps an over-level mainhand worn but inert; its procs
     // must be inert too, and the gate short-circuits before any rng draw.
     const { ctx, rolls, calls } = fakeCtx(true);
-    fire(ctx, ent(1, 'kingsbane_last_oath', 10), ent(2, null), 'meleeHit');
+    fire(ctx, ent(1, 'kingsbane_last_oath', 10), ent(2, null), 'weaponHit');
     expect(rolls()).toBe(0);
     expect(calls.length).toBe(0);
   });
 });
 
-describe('Thronebane Chain Arc (meleeHit)', () => {
+describe('Thronebane Chain Arc (weaponHit)', () => {
   it('on proc: arcs the primary target, chains to nearby foes, and slows the primary', () => {
     const nearby = [ent(2, null), ent(3, null), ent(4, null)];
     const target = nearby[0];
     const { ctx, calls } = fakeCtx(true, nearby);
-    fire(ctx, ent(1, 'kingsbane_last_oath'), target, 'meleeHit');
+    fire(ctx, ent(1, 'kingsbane_last_oath'), target, 'weaponHit');
 
     const dmg = calls.filter((c) => c.fn === 'dealDamage');
     // primary + up to `jumps` (3) other foes; here 2 others (id 3 and 4)
@@ -100,14 +100,14 @@ describe('Thronebane Chain Arc (meleeHit)', () => {
 
   it('on no proc: nothing fires', () => {
     const { ctx, calls } = fakeCtx(false, [ent(2, null)]);
-    fire(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'meleeHit');
+    fire(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'weaponHit');
     expect(calls.length).toBe(0);
   });
 
   it('caps the number of chain jumps', () => {
     const nearby = [ent(2, null), ent(3, null), ent(4, null), ent(5, null), ent(6, null)];
     const { ctx, calls } = fakeCtx(true, nearby);
-    fire(ctx, ent(1, 'kingsbane_last_oath'), nearby[0], 'meleeHit');
+    fire(ctx, ent(1, 'kingsbane_last_oath'), nearby[0], 'weaponHit');
     // primary + 3 jumps max = 4 dealDamage, not 5
     expect(calls.filter((c) => c.fn === 'dealDamage').length).toBe(4);
   });

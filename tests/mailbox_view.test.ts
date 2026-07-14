@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildMailboxView,
+  clampParcelQty,
   mailIndicatorView,
   mailSendBlocked,
   mailSendCost,
@@ -118,6 +119,28 @@ describe('buildMailboxView', () => {
       attachments: [],
     });
     expect(a).toEqual(b);
+  });
+});
+
+describe('clampParcelQty (#1444 attach-a-quantity stepper)', () => {
+  it('increments within the owned ceiling', () => {
+    expect(clampParcelQty(3, 1, 5)).toBe(4);
+  });
+
+  it('refuses to step past what the bag holds', () => {
+    expect(clampParcelQty(5, 1, 5)).toBe(5);
+  });
+
+  it('decrements but never below 1 (use remove to drop the parcel)', () => {
+    expect(clampParcelQty(1, -1, 5)).toBe(1);
+  });
+
+  it('clamps a stale staged count down if the bag total shrank underneath it', () => {
+    expect(clampParcelQty(9, 0, 5)).toBe(5);
+  });
+
+  it('floors at 1 even if the bag emptied to 0 underneath the staged parcel (the sim refuses the send regardless)', () => {
+    expect(clampParcelQty(3, -1, 0)).toBe(1);
   });
 });
 

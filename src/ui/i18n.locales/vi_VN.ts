@@ -2,6 +2,307 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'loading.tips.classes':
+    'Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.',
+  'loading.tips.dungeons':
+    'Mẹo: khi trang bị đã vượt mức thường, hãy thử hầm ngục ở độ khó anh hùng để có trận chiến khó hơn và phần thưởng hậu hĩnh hơn.',
+  'loading.tips.guilds':
+    'Mẹo: gia nhập bang hội cho bạn một kênh trò chuyện riêng và danh sách chung các thành viên trong bang.',
+  'loading.tips.loadouts':
+    'Mẹo: lưu nhiều hơn một bộ tài năng để chuyển đổi giữa các lối xây dựng mà không phải dùng điểm hai lần.',
+  'loading.tips.market':
+    'Mẹo: Chợ Thế Giới cho phép bạn mua bán với người chơi trên toàn thế giới.',
+  'loading.tips.professions':
+    'Mẹo: có thể rèn luyện nghề thu thập và chế tác song song với lớp chiến đấu của bạn.',
+  'loading.tips.pvp':
+    'Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn.',
+  'loading.tips.talents':
+    'Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.',
+  'entities.items.chunk_of_ore.name': 'Khối Quặng',
+  'entities.quests.q_prof_intro.completion':
+    'Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Khối Quặng',
+  'entities.quests.q_prof_intro.text':
+    'Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.',
+  'entities.quests.q_prof_intro.title': 'Nghề Cho Mọi Đôi Tay',
+  'hudChrome.auth.appleChoiceExpired':
+    'Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.',
+  'hudChrome.auth.appleError': 'Không thể đăng nhập bằng Apple. Vui lòng thử lại.',
+  'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
+  'hudChrome.dailyRewards.reason.banned':
+    'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
+  'hudChrome.itemHeroicTag': '[ANH HÙNG]',
+  'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
+  'hudChrome.keybinds.categoryPet': 'Thú Cưng',
+  'hudChrome.keybinds.petAggressive': 'Thú Cưng: Hung Hăng',
+  'hudChrome.keybinds.petAttack': 'Thú Cưng: Tấn Công',
+  'hudChrome.keybinds.petDefensive': 'Thú Cưng: Phòng Thủ',
+  'hudChrome.keybinds.petStop': 'Thú Cưng: Dừng',
+  'hudChrome.keybinds.petTaunt': 'Thú Cưng: Khiêu Khích',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
+  'hudChrome.readyCheck.notReady': 'Chưa Sẵn Sàng',
+  'hudChrome.readyCheck.prompt': '{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?',
+  'hudChrome.readyCheck.ready': 'Sẵn Sàng',
+  'hudChrome.readyCheck.result':
+    'Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.',
+  'hudChrome.readyCheck.notInPartyError': 'Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.',
+  'hudChrome.readyCheck.inProgressError': 'Một lượt kiểm tra sẵn sàng đang diễn ra.',
+  'entities.abilities.sport_boot.description':
+    'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
+  'entities.abilities.sport_boot.name': 'Cú Sút Lớn',
+  'entities.abilities.sport_dive.description':
+    'Lao người về phía điểm ngắm. Bóng bay ngang sẽ dính vào bạn.',
+  'entities.abilities.sport_dive.name': 'Bay Người',
+  'entities.abilities.sport_feint.description':
+    'Một cú lách người bứt tốc nhanh về phía điểm ngắm.',
+  'entities.abilities.sport_feint.name': 'Động Tác Giả',
+  'entities.abilities.sport_hoof.description': 'Nện bóng sệt và mạnh lên phía trên sân.',
+  'entities.abilities.sport_hoof.name': 'Phá Bóng',
+  'entities.abilities.sport_kick.description': 'Đẩy bóng lăn sệt trên mặt đất về phía điểm ngắm.',
+  'entities.abilities.sport_kick.name': 'Đá Bóng',
+  'entities.abilities.sport_pass.description':
+    'Chuyền sệt chắc chân cho đồng đội đang chọn, đón trước đường chạy của họ.',
+  'entities.abilities.sport_pass.name': 'Chuyền Bóng',
+  'entities.abilities.sport_punt.description': 'Cú phát bóng của thủ môn, cao và xa.',
+  'entities.abilities.sport_punt.name': 'Phát Bóng Dài',
+  'entities.abilities.sport_second_wind.description':
+    'Lấy lại đôi chân: di chuyển nhanh hơn 50% trong 4 giây.',
+  'entities.abilities.sport_second_wind.name': 'Đôi Chân Sung Sức',
+  'entities.abilities.sport_shoot.description':
+    'Giữ để dồn lực, thả để sút vào khung thành. Dồn lực quá tay bóng sẽ bay vọt xà.',
+  'entities.abilities.sport_shoot.name': 'Sút Bóng',
+  'entities.abilities.sport_shoulder.description':
+    'Một cú vai đúng luật hưu chiến mùa gặt. Khiến đối thủ ngã lăn khỏi bóng.',
+  'entities.abilities.sport_shoulder.name': 'Va Vai',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'Lệnh hưu chiến vẫn giữ vững tại Sân Heo Nái, {className}: chỉ có sút bóng và va vai thôi. Muốn thi đấu vì Chiếc Xô Đồng chứ?',
+  'entities.npcs.groundskeeper_bram.name': 'Quản Sân Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Người Trông Coi Sân Heo Nái',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Sân Heo Nái',
+  'guide.nav.professions': 'Nghề Nghiệp',
+  'guide.nav.valeCup': 'Cúp Thung Lũng',
+  'guide.professions.archetypeChooseBody':
+    'Tuyên bố một hình mẫu sẽ là một khoảnh khắc cốt truyện: một nhiệm vụ chính thức đón nhận bạn vào danh phận đó. Con đường ấy vẫn đang được xây dựng, nên hiện giờ mọi nhân vật đều bước đi trong thế giới với lựa chọn còn ở phía trước, và trong lúc chờ đợi, mọi nghề chế tác đều thăng tiến tới phẩm cấp Hiếm.',
+  'guide.professions.archetypeChooseTitle': 'Chọn hình mẫu của bạn',
+  'guide.professions.archetypeIdentityBody':
+    'Hình mẫu đang mang là một lời tuyên bố về việc nhân vật của bạn là ai trong thế giới, được ghi nhận trong cách người khác và thế giới xưng gọi bạn. Những phần thưởng và sự công nhận cụ thể đi kèm vẫn đang được hoàn thiện; hãy quay lại xem khi hệ thống dần đầy đủ.',
+  'guide.professions.archetypeIdentityTitle': 'Hình mẫu của bạn có ý nghĩa gì',
+  'guide.professions.archetypeIntro':
+    'Mỗi nghề trong mười nghề chế tác cũng đại diện cho một hình mẫu, một danh phận rộng hơn mà bạn có thể khoác lên ngoài việc chỉ hành nghề. Hình mẫu đang mang là một lựa chọn duy nhất tại một thời điểm, không phải một danh sách cần hoàn thành: bạn mang một, và có thể đổi sang cái khác sau này nếu muốn.',
+  'guide.professions.archetypeSwitchBody':
+    'Một lời tuyên bố cũng sẽ không phải là bản án chung thân. Kế hoạch là một hành động chuộc lỗi lặp lại được với nghề cũ trước khi bạn nhận lấy nghề mới, với phần chuộc lỗi càng lúc càng nặng hơn mỗi lần bạn đổi, để lựa chọn luôn có ý nghĩa thay vì không mất gì. Giống như chính lời tuyên bố, nó vẫn đang trên đường tới.',
+  'guide.professions.archetypeSwitchTitle': 'Đổi ý',
+  'guide.professions.archetypeTitle': 'Mười hình mẫu',
+  'guide.professions.craftComboBody':
+    'Ngoài danh sách công thức của riêng từng nghề, bánh xe còn hỗ trợ các công thức kết hợp cần tới hai nghề kề nhau cùng lúc, tưởng thưởng cho nhân vật đã đầu tư vào các nghề liền kề trên vòng thay vì một nghề đơn lẻ. Người chế tác phải tự mình nắm cả hai nghề; kỹ năng của một người bạn hàng không thể thay thế cho nửa nào.',
+  'guide.professions.craftComboTitle': 'Công thức kết hợp',
+  'guide.professions.craftIntro':
+    'Mười nghề chế tác biến nguyên liệu thu thập thành trang bị và hàng hóa hoàn chỉnh: Chế Giáp, Rèn Vũ Khí và Kim Hoàn nhào nặn vật chất thô thành trang bị mặc được; Giả Kim và Cơ Khí vận hành bằng thử và sai; Nấu Ăn, Khắc Chữ và Phù Phép đều chạm tới sản phẩm của các nghề khác; May Vá và Thuộc Da làm việc theo những mẫu rập chính xác. Cùng nhau chúng tạo thành một bánh xe, mỗi nghề nằm cạnh hai nghề láng giềng và đối diện một nghề khác.',
+  'guide.professions.craftMasteryBody':
+    'Chế tác thành công sẽ tích lũy kỹ năng trong nghề đó, và kỹ năng không bao giờ khóa các công thức của một nghề lại: nếu bạn biết một công thức và có nguyên liệu của nó, bạn có thể thử làm. Thứ mà kỹ năng mang lại cho bạn thay vào đó là phẩm chất, một đôi tay lành nghề cho ra sản phẩm tinh xảo hơn. Ngoại lệ duy nhất là các công thức kết hợp, vốn đòi hỏi bạn phải chứng tỏ mình trong cả hai nghề của chúng trước khi chúng mở ra.',
+  'guide.professions.craftMasteryTitle': 'Kỹ năng và tinh thông',
+  'guide.professions.craftRecipesBody':
+    'Mỗi công thức đòi hỏi những nguyên liệu cụ thể bạn thu thập hoặc mua. Các công thức đơn giản nhất chẳng cần gì ngoài nguyên liệu thường và chế được ngay từ đầu, nên bạn có thể bắt tay vào một nghề ngay khoảnh khắc nhận nó. Các danh sách công thức vẫn đang được bổ sung: một vài nghề còn đang chờ những công thức đầu tiên, và sẽ có thêm khi các nghề lớn dần.',
+  'guide.professions.craftRecipesTitle': 'Công thức và nguyên liệu',
+  'guide.professions.craftRingBody':
+    'Mười nghề được xếp trên một vòng cố định, và vị trí của một nghề trên vòng đó rất quan trọng: các nghề kề nhau trên bánh xe có nhiều điểm chung với nhau hơn các nghề ở hai phía đối diện. Gắn bó với một nghề được thiết kế để giống như gia nhập một gia đình các nghề liên quan, chứ không phải chọn một kỹ năng đơn độc.',
+  'guide.professions.craftRingTitle': 'Bánh xe chuyên môn',
+  'guide.professions.craftTitle': 'Mười nghề chế tác',
+  'guide.professions.gatherIntro':
+    'Ba nghề thu thập cho bạn lấy nguyên liệu thô thẳng từ thế giới: Khai Khoáng đục quặng và đá từ mạch khoáng, Đốn Gỗ hạ cây lấy gỗ từ các cụm rừng, và Thảo Dược Học hái cây cỏ mọc hoang. Mỗi nghề được theo dõi riêng, nên làm nghề này không bao giờ làm chậm tiến độ nghề kia. Mới mẻ với tất cả những điều này? Đốc Công Odell ở Eastbrook có một việc vặt ngắn, Nghề Cho Mọi Bàn Tay, dẫn bạn qua lần thu hoạch đầu tiên.',
+  'guide.professions.gatherProficiencyBody':
+    'Mỗi lần thu hoạch thành công đều tích lũy độ thành thạo của bạn trong nghề thu thập đó, và bảng nhân vật của bạn theo dõi từng nghề một cách riêng biệt. Luyện tập thêm không bao giờ làm hại tiến độ của bạn, nó chỉ luôn cộng thêm vào đó.',
+  'guide.professions.gatherProficiencyTitle': 'Độ thành thạo',
+  'guide.professions.gatherTitle': 'Thu thập: Khai Khoáng, Đốn Gỗ và Thảo Dược Học',
+  'guide.professions.gatherToolsBody':
+    'Thương nhân bán dụng cụ cơ bản cho từng nghề thu thập, và dụng cụ tốt hơn có thể được chế tác. Hiện không cần dụng cụ nào để khai thác một điểm tài nguyên: dụng cụ là nền móng cho những điểm tài nguyên giàu có hơn sắp tới, nơi cuốc, rìu, và liềm bậc cao hơn sẽ là lối vào.',
+  'guide.professions.gatherToolsTitle': 'Dụng cụ hành nghề',
+  'guide.professions.gatherWhatBody':
+    'Các mạch quặng, cụm gỗ và bãi thảo dược được đặt rải rác khắp Thung Lũng và đầm lầy như những điểm cố định hữu hình, không thuộc về ai. Đi tới một điểm và tương tác với nó để thu hoạch những gì nó chứa. Sau khi bạn thu hoạch một điểm, nó cần thời gian hồi phục trước khi chính bạn có thể thu hoạch lại, nhưng nó không bao giờ chặn người khác: một người chơi khác vẫn có thể thu hoạch chính điểm đó trong lúc ấy.',
+  'guide.professions.gatherWhatTitle': 'Điểm tài nguyên',
+  'guide.professions.intro':
+    'Ngoài chiến đấu và nhiệm vụ, thế giới còn tưởng thưởng cho bạn khi cày cuốc và rèn đúc: thu thập nguyên liệu thô, biến chúng thành trang bị và hàng hóa qua mười nghề chế tác, và an cư trong một danh phận là một trong mười hình mẫu mà các nghề ấy đại diện.',
+  'guide.valeCupPage.heading': 'Cúp Thung Lũng',
+  'guide.valeCupPage.howHeading': 'Cách chơi',
+  'guide.valeCupPage.howMatch':
+    'Khi giao bóng, bộ kỹ năng lớp nhân vật của bạn được thay bằng bộ kỹ năng thể thao và được khôi phục nguyên vẹn sau trận. Cú đá nhắm vào hồng tâm dưới đất, bóng nảy bật khỏi ván chắn, còn dẫn bóng chỉ đơn giản là chạy cùng bóng. Ghi nhiều bàn hơn đối phương trước khi hết giờ; hòa sẽ bước vào bàn thắng vàng.',
+  'guide.valeCupPage.howQueue':
+    'Xếp hàng từ bất cứ đâu qua cửa sổ Cúp Thung Lũng, hoặc trò chuyện với Quản Sân Bram tại cổng Sân Heo Nái. Chọn hạng đấu từ một đấu một tới năm đấu năm, một quốc gia cờ hiệu, và một vai trò thi đấu; xếp hàng một mình hoặc dẫn theo tổ đội.',
+  'guide.valeCupPage.howTruce':
+    'Không ai đổ máu tại Sân Heo Nái: cú vai chỉ khiến bạn ngã lăn, chẳng có gì đau, còn thú cưng thì ngồi ngoài trận đấu.',
+  'guide.valeCupPage.intro':
+    'Bóng Heo Rừng tại Sân Heo Nái: chọn một cờ hiệu, chọn một vai trò, và sút tấm da heo rừng nhồi rơm qua tay thủ môn để giành Chiếc Xô Đồng. Không đổ máu, không chiến lợi phẩm, chỉ có tiếng gầm vang của khán đài.',
+  'guide.valeCupPage.loreHeading': 'Bóng Heo Rừng và lệnh hưu chiến mùa gặt',
+  'guide.valeCupPage.loreOldSow':
+    'Từ rất lâu trước khi người chết thức giấc, đám nông dân Đông Khê đã chơi bóng heo rừng trên những cánh đồng rạ sau mùa gặt: hai đám đông, một tấm da heo rừng nhồi rơm, và hai cánh cổng xe ngựa kéo về hai đầu bãi cỏ. Quả bóng đầu tiên, Heo Nái Già, được mạ đồng treo trên lò sưởi quán rượu.',
+  'guide.valeCupPage.loreTruce':
+    'Khi Đấu Trường Tro Tàn bắt đầu tổ chức các trò chơi chiến tranh, Cảnh Trưởng Redbrook đáp lại bằng một điều dịu dàng hơn: một lệnh hưu chiến mùa gặt thường trực trên bãi cỏ xưa. Cánh cổng xe ngựa trở thành cột gôn, bãi cỏ có thêm tường, khán đài và một cái tên, Sân Heo Nái, còn phần thưởng luôn là chiếc xô sữa móp méo mà đội thắng dùng để uống mừng: Chiếc Xô Đồng.',
+  'guide.valeCupPage.nationChoir':
+    'Xanh nhạt và bạc dưới quả chuông: kỳ dị, chuẩn xác, và rất lặng lẽ.',
+  'guide.valeCupPage.nationColiseum':
+    'Đỏ và đen với đôi kiếm chéo: họ chơi như thể đây vẫn là một trò chơi chiến tranh.',
+  'guide.valeCupPage.nationCopperdig':
+    'Màu đồng và nâu với chiếc cuốc chim: những thợ đào không bao giờ ngừng chạy.',
+  'guide.valeCupPage.nationMirefen':
+    'Xanh mòng két và xám dưới cánh diệc: kiên nhẫn, chân dài, không bao giờ vội.',
+  'guide.valeCupPage.nationMoon':
+    'Tím và bạc dưới vầng trăng khuyết: những cầu thủ của màn đêm, bước chân nhẹ nhàng.',
+  'guide.valeCupPage.nationOgre':
+    'Cam và nâu sẫm sau nắm đấm: lấy vai làm đầu và tự hào về điều đó.',
+  'guide.valeCupPage.nationThornpeak': 'Xanh băng và trắng dưới đỉnh núi: vững chân và lì lợm.',
+  'guide.valeCupPage.nationVale':
+    'Xanh lục và vàng kim, giương cao bó lúa mì: đội chủ nhà, nông dân chính hiệu tới tận xương tủy.',
+  'guide.valeCupPage.nationsBody':
+    'Mỗi đội thi đấu dưới một lá cờ. Đội trưởng chọn quốc gia, và nếu cả hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.',
+  'guide.valeCupPage.nationsHeading': 'Tám quốc gia cờ hiệu',
+  'guide.valeCupPage.rewardsBody':
+    'Luật hưu chiến nghĩa là không kinh nghiệm và không chiến lợi phẩm: một trận có kết quả được tính vào thành tích của bạn và bảng vô địch, và một chiến thắng còn được tính vào các nhiệm vụ phần thưởng của ngày. Bỏ trận sẽ khiến bạn bị treo lượt, và Quản Sân sẽ nhớ đấy.',
+  'guide.valeCupPage.rewardsHeading': 'Luật hưu chiến',
+  'guide.valeCupPage.rolesBody':
+    'Vai trò quyết định bộ kỹ năng bạn mang vào sân. Ai cũng đá được; phần còn lại là khí chất. Ở các hạng đấu một người và hai người mỗi bên, mọi người đều chơi bộ kỹ năng toàn diện, nên các lựa chọn vai trò mới thực sự phát huy từ ba người mỗi bên trở lên.',
+  'guide.valeCupPage.rolesHeading': 'Vai trò thi đấu',
+  'guide.valeCupPage.spectateBody':
+    'Mỗi lần chỉ có một trận diễn ra tại sân vận động, và bất kỳ ai cũng có thể tới xem từ khán đài.',
+  'hudChrome.keybinds.valecup': 'Cúp Thung Lũng',
+  'hudChrome.mobile.dailyRewards': 'Cửa hàng',
+  'hudChrome.perf.labels.predLead': 'Độ Sớm Dự Đoán',
+  'hudChrome.townFocus.budgetLabel': 'Điểm còn lại: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Giảm trọng tâm cho {component}',
+  'hudChrome.townFocus.hint':
+    'Điểm trọng tâm cộng thêm một khoản trên mức sản lượng cơ bản của từng hạng mục. Hạng mục không được dồn trọng tâm giữ nguyên mức cơ bản.',
+  'hudChrome.townFocus.increaseAria': 'Tăng trọng tâm cho {component}',
+  'hudChrome.townFocus.notInTownHint': 'Bạn phải ở trong thị trấn để đặt trọng tâm.',
+  'hudChrome.townFocus.saveButton': 'Lưu Trọng Tâm',
+  'hudChrome.townFocus.title': 'Trọng Tâm Thị Trấn',
+  'hudChrome.vcup.awayNote':
+    'Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.',
+  'hudChrome.vcup.bannerCountdown': 'Giao bóng sau {seconds}...',
+  'hudChrome.vcup.bannerDraw': 'Một trận hòa tại Sân Heo Nái.',
+  'hudChrome.vcup.bannerEnd': 'Hết giờ: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'Cúp Thung Lũng vẫy gọi: {nationA} đấu {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'VÀO! {nation} ghi bàn!',
+  'hudChrome.vcup.bannerGolden': 'BÀN THẮNG VÀNG: bàn tiếp theo định đoạt trận đấu!',
+  'hudChrome.vcup.bannerKickoff': 'GIAO BÓNG!',
+  'hudChrome.vcup.bannerLoss': 'Thất bại tại Sân Heo Nái.',
+  'hudChrome.vcup.bannerSave': '{name} CẢN PHÁ!',
+  'hudChrome.vcup.bannerWin': 'Chiến thắng tại Sân Heo Nái!',
+  'hudChrome.vcup.bet.aria': 'Cá cược trận đấu Cúp Thung Lũng',
+  'hudChrome.vcup.bet.back': 'Cược cho {team}',
+  'hudChrome.vcup.bet.closed': 'Đã đóng cược',
+  'hudChrome.vcup.bet.closesIn': 'Đóng cược sau {seconds} giây',
+  'hudChrome.vcup.bet.collapse': 'Ẩn cược',
+  'hudChrome.vcup.bet.expand': 'Xem cược và đặt tiền',
+  'hudChrome.vcup.bet.form': '{wins}T-{losses}B',
+  'hudChrome.vcup.bet.lostLog': 'Cược Cúp Thung Lũng của bạn đã thua: {amount}.',
+  'hudChrome.vcup.bet.mine': 'Cược của bạn: {amount} cho {team}',
+  'hudChrome.vcup.bet.none': 'Bạn chưa đặt cược cho trận này.',
+  'hudChrome.vcup.bet.oddsLabel': 'Trả thưởng',
+  'hudChrome.vcup.bet.prize': 'Quỹ cược {amount}',
+  'hudChrome.vcup.bet.record': 'Thành tích cược: {wins}T-{losses}B, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog': 'Cược bị hủy, {amount} tiền cược của bạn đã được hoàn lại.',
+  'hudChrome.vcup.bet.splitAria': 'Tỷ trọng quỹ cược đặt cho mỗi đội',
+  'hudChrome.vcup.bet.title': 'Cược Trận Đấu',
+  'hudChrome.vcup.bet.wonBanner': 'Cược của bạn thắng rồi!',
+  'hudChrome.vcup.bet.wonLog': 'Cược Cúp Thung Lũng của bạn đã thắng: nhận về {amount}.',
+  'hudChrome.vcup.blockNation': 'Hãy chọn một quốc gia cờ hiệu trước.',
+  'hudChrome.vcup.blockNotLeader': 'Chỉ trưởng nhóm mới có thể xếp hàng cho cả đội.',
+  'hudChrome.vcup.blockPartySize': 'Hạng đấu này cần một tổ đội nhỏ hơn.',
+  'hudChrome.vcup.boardEmpty': 'Chưa có nhà vô địch nào được ghi danh. Chiếc Xô Đồng vẫn đang chờ.',
+  'hudChrome.vcup.boardHeading': 'Bảng vô địch',
+  'hudChrome.vcup.boardWins': '{count} trận thắng',
+  'hudChrome.vcup.bracketLabel': '{n}v{n}',
+  'hudChrome.vcup.bracketsAria': 'Hạng đấu',
+  'hudChrome.vcup.briefing.bot': 'Máy',
+  'hudChrome.vcup.briefing.kitHeading': 'Bộ kỹ năng của bạn',
+  'hudChrome.vcup.briefing.kitNote':
+    'Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.',
+  'hudChrome.vcup.briefing.ready': 'Tôi sẵn sàng',
+  'hudChrome.vcup.briefing.readyAria': 'Sẵn sàng cho giờ giao bóng',
+  'hudChrome.vcup.briefing.readyCount': '{ready} trên {total} đã sẵn sàng',
+  'hudChrome.vcup.briefing.readyDone': 'Sẵn sàng',
+  'hudChrome.vcup.briefing.rosterHeading': 'Danh sách ra sân',
+  'hudChrome.vcup.briefing.rule1': 'Đá hoặc chuyền bóng vào khung thành đối phương để ghi bàn.',
+  'hudChrome.vcup.briefing.rule2':
+    'Đội đạt 5 bàn trước sẽ thắng, hoặc đội nhiều bàn hơn khi còi hết giờ vang lên.',
+  'hudChrome.vcup.briefing.rule3':
+    'Trận hòa khi hết giờ sẽ vào bàn thắng vàng: bàn tiếp theo định đoạt.',
+  'hudChrome.vcup.briefing.rule4':
+    'Cú vai chỉ khiến bạn ngã lăn. Không ai bị thương dưới lệnh hưu chiến mùa gặt.',
+  'hudChrome.vcup.briefing.rule5': 'Ai cũng có thể tới cổ vũ bạn từ trên khán đài.',
+  'hudChrome.vcup.briefing.rulesHeading': 'Cách chơi',
+  'hudChrome.vcup.briefing.subtitle': 'Họp trước trận',
+  'hudChrome.vcup.briefing.vs': 'đấu',
+  'hudChrome.vcup.briefing.waiting': 'Đang chờ phía bên kia sẵn sàng...',
+  'hudChrome.vcup.briefing.whistle': 'Tiếng còi vang lên sau {seconds} giây.',
+  'hudChrome.vcup.briefing.you': 'Bạn',
+  'hudChrome.vcup.clock': '{minutes}:{seconds}',
+  'hudChrome.vcup.close': 'Đóng cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.deserterNote': 'Quản Sân sẽ nhớ đấy. Bạn có thể xếp hàng lại sau {seconds} giây.',
+  'hudChrome.vcup.enterAsGuild': 'Ra sân dưới cờ hiệu của {guild}',
+  'hudChrome.vcup.gossipOpen': 'Sổ lịch thi đấu',
+  'hudChrome.vcup.gossipOpenAria': 'Mở cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.guildBoardEmpty': 'Chưa có bang hội nào ra sân. Hãy giương cao cờ hiệu của bạn!',
+  'hudChrome.vcup.guildBoardHeading': 'Cờ hiệu bang hội',
+  'hudChrome.vcup.guildBoardWl': '{wins} T, {losses} B',
+  'hudChrome.vcup.guildRecordLine': 'Thành tích bang hội của bạn: {wins} thắng, {losses} thua.',
+  'hudChrome.vcup.inMatchNote': 'Đội của bạn đang trên sân. Tiếp tục thi đấu!',
+  'hudChrome.vcup.indicatorLive': 'Cúp Thung Lũng',
+  'hudChrome.vcup.indicatorOpen': 'Mở cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.indicatorQueued':
+    'Hàng chờ Cúp Thung Lũng: {bracket}, vị trí {position} trên {count}',
+  'hudChrome.vcup.leaveQueue': 'Rời Hàng Chờ',
+  'hudChrome.vcup.liveAria': 'Cúp Thung Lũng: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Đang diễn ra tại Sân Heo Nái',
+  'hudChrome.vcup.logDraw': 'Trận đấu tại Sân Heo Nái kết thúc với tỷ số hòa.',
+  'hudChrome.vcup.logFound': 'Trận Cúp Thung Lũng của bạn đã sẵn sàng: {nationA} đấu {nationB}.',
+  'hudChrome.vcup.logGoal': '{name} ghi bàn cho {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': 'Bạn thua trận đấu tại Sân Heo Nái.',
+  'hudChrome.vcup.logQueued':
+    'Bạn tham gia hàng chờ Cúp Thung Lũng cho {bracket} (vị trí {position}).',
+  'hudChrome.vcup.logRoster': 'Phe của bạn: {allies}. Phe đối phương: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} cản phá thành công!',
+  'hudChrome.vcup.logUnqueued': 'Bạn rời hàng chờ Cúp Thung Lũng.',
+  'hudChrome.vcup.logWin': 'Bạn thắng trận đấu tại Sân Heo Nái.',
+  'hudChrome.vcup.mobileLabel': 'Cúp',
+  'hudChrome.vcup.nation.choir': 'Hợp Ca Nhợt Nhạt',
+  'hudChrome.vcup.nation.coliseum': 'Đấu Trường Tro Tàn',
+  'hudChrome.vcup.nation.copperdig': 'Mỏ Đồng',
+  'hudChrome.vcup.nation.mirefen': 'Đầm Lầy Bùn Sâu',
+  'hudChrome.vcup.nation.moon': 'Trăng Nhợt',
+  'hudChrome.vcup.nation.ogre': 'Các Bộ Tộc Ogre',
+  'hudChrome.vcup.nation.thornpeak': 'Đỉnh Gai',
+  'hudChrome.vcup.nation.vale': 'Thung Lũng Đông Khê',
+  'hudChrome.vcup.nationsHeading': 'Quốc gia cờ hiệu',
+  'hudChrome.vcup.noLive': 'Sân bóng đang yên ắng. Không có trận nào diễn ra.',
+  'hudChrome.vcup.offlineNote': 'Sổ lịch thi đấu đã gấp lại. Cúp Thung Lũng hiện không mở.',
+  'hudChrome.vcup.phaseCountdown': 'Giao bóng sau {seconds}',
+  'hudChrome.vcup.phaseGoal': 'VÀO!',
+  'hudChrome.vcup.phaseGolden': 'BÀN THẮNG VÀNG',
+  'hudChrome.vcup.phaseOver': 'HẾT GIỜ',
+  'hudChrome.vcup.practice': 'Tập Luyện Với Máy',
+  'hudChrome.vcup.practiceNote': 'Bắt đầu ngay một trận riêng với máy trên sân tập của riêng bạn.',
+  'hudChrome.vcup.practicingNow': 'Đang tập luyện ({count}):',
+  'hudChrome.vcup.queue': 'Vào Hàng Chờ',
+  'hudChrome.vcup.queueNote': 'Xếp hàng từ bất cứ đâu; tiếng còi sẽ gọi bạn tới Sân Heo Nái.',
+  'hudChrome.vcup.queuedStatus': 'Đang chờ cho {bracket}: vị trí {position} trên {count}.',
+  'hudChrome.vcup.recordLine': 'Thành tích của bạn: {wins} thắng, {losses} thua, {draws} hòa.',
+  'hudChrome.vcup.role.allrounder.desc':
+    'Biết một chút mọi thứ: đá bóng, sút bổng, và một cú vai đúng luật.',
+  'hudChrome.vcup.role.allrounder.name': 'Toàn Năng',
+  'hudChrome.vcup.role.keeper.desc': 'Trấn giữ khung thành với bắt bóng, bay người và phát bóng.',
+  'hudChrome.vcup.role.keeper.name': 'Thủ Môn',
+  'hudChrome.vcup.role.striker.desc': 'Sống vì cú sút xa và pha lách người chớp nhoáng.',
+  'hudChrome.vcup.role.striker.name': 'Tiền Đạo',
+  'hudChrome.vcup.role.sweeper.desc': 'Húc văng đối thủ khỏi bóng và phá bóng lên.',
+  'hudChrome.vcup.role.sweeper.name': 'Hậu Vệ Quét',
+  'hudChrome.vcup.rolesHeading': 'Vai trò thi đấu',
+  'hudChrome.vcup.shootPower': 'LỰC SÚT',
+  'hudChrome.vcup.title': 'Cúp Thung Lũng',
+  'hudChrome.vcup.waitingCount': '{count} đang chờ',
+  'hudChrome.vcup.walkUp': 'Hãy đi tới Sân Heo Nái để xem từ khán đài.',
   'hudChrome.archetypeTitle.label': 'Danh hiệu',
   'hudChrome.archetypeTitle.none': 'Không có',
   'hudChrome.archetypeTitle.armorcrafting': 'Thợ Giáp',
@@ -35,7 +336,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Mũ Trụ của Mẹ Hợp Ca',
   'entities.items.cryptplate_helm.name': 'Mũ Giáp Tấm Hầm Mộ',
   'entities.items.deathless_greatblade.name': 'Đại Kiếm Bất Tử',
-  'entities.items.deathless_warguard_legmail.name': 'Giáp Chân Lưới Vệ Chiến Bất Tử',
   'entities.items.gravescale_girdle.name': 'Đai Lưng Vảy Mộ',
   'entities.items.gravewyrm_claws.name': 'Vuốt Mộ Long',
   'entities.items.gravewyrm_cleaver.name': 'Đao Phanh Mộ Long',
@@ -51,13 +351,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Găng Kẻ Rình Thánh Đường',
   'entities.items.sash_of_the_sunken_court.name': 'Đai Lưng Triều Đình Chìm',
   'entities.items.scepter_of_the_deathless_court.name': 'Vương Trượng Triều Đình Bất Tử',
-  'entities.items.scourgehide_carapace.name': 'Giáp Mai Da Tai Ương',
   'entities.items.seal_of_the_nine_oaths.name': 'Ấn Chín Lời Thề',
   'entities.items.shadowpulse_handwraps.name': 'Quấn Tay Mạch Bóng Tối',
   'entities.items.shadowpulse_slippers.name': 'Hài Mạch Bóng Tối',
   'entities.items.shroud_of_the_gravewyrm.name': 'Vải Liệm Mộ Long',
-  'entities.items.soulforged_warplate.name': 'Chiến Giáp Rèn Hồn',
-  'entities.items.soulrend_diadem.name': 'Vương Miện Xé Hồn',
   'entities.items.stormcallers_focus.name': 'Pháp Khí của Kẻ Gọi Bão',
   'entities.items.sunken_court_mantle.name': 'Áo Choàng Triều Đình Chìm',
   'entities.items.sutils_gambit.name': 'Nước Cờ của Sutil',
@@ -77,7 +374,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Dấu Ấn Anh Hùng: {count}',
   'heroicShop.buyAria': 'Mua {item} với giá {marks} Dấu Ấn Anh Hùng',
   'hudChrome.bags.cannotDestroy': 'Không thể phá hủy vật phẩm này.',
-  'hudChrome.bags.rightClickDestroy': 'Nhấp phải để phá hủy',
   'hudChrome.crafting.comboRequirementUnmet':
     'Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.',
   'hudChrome.discord.roleTag.coredevs': 'Nhà Phát Triển Chính',
@@ -891,6 +1187,25 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Hiện Huy Hiệu Nhà Phát Triển',
   'hudChrome.options.groundReticle': 'Vòng ngắm mục tiêu mặt đất',
   'hudChrome.options.startAttackOnAbility': 'Tự Đánh Khi Dùng Kỹ Năng',
+  'hudChrome.playerMenu.info': 'Thông tin người chơi',
+  'hudChrome.playerMenu.block': 'Chặn',
+  'hudChrome.playerMenu.unblock': 'Bỏ chặn',
+  'hudChrome.playerMenu.openFor': 'Mở menu người chơi {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Không tìm thấy hồ sơ của {name}.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Tài khoản do AI điều khiển',
+  'hudChrome.playerMenu.watchTwitch': 'Xem trên Twitch',
+  'hudChrome.playerMenu.watchX': 'Xem trên X',
+  'hudChrome.playerMenu.watchKick': 'Xem trên Kick',
+  'hudChrome.playerMenu.watchYouTube': 'Xem trên YouTube',
+  'hudChrome.social.ignoredTab': 'Đã bỏ qua',
+  'hudChrome.social.ignoredEmpty': 'Bạn không bỏ qua ai.',
+  'hudChrome.social.blockedEmpty': 'Bạn chưa chặn ai.',
+  'hudChrome.social.blockSearchPlaceholder': 'Tên người chơi',
+  'hudChrome.social.blockAction': 'Chặn',
+  'hudChrome.social.nowBlocking': 'Đã chặn {name}.',
+  'hudChrome.social.blockedTab': 'Đã chặn',
+  'hudChrome.social.stopBlockingTitle': 'Bỏ chặn {name}',
   'hudChrome.party.promoteLeader': 'Thăng Làm Đội Trưởng',
   'hudChrome.plurals.playersMatching.few': 'Ai: {count} người chơi khớp "{query}" trên {realm}.',
   'hudChrome.plurals.playersMatching.many': 'Ai: {count} người chơi khớp "{query}" trên {realm}.',
@@ -1258,7 +1573,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_explosion.description':
     'Một luồng năng lượng Bí Thuật bùng nổ giáng vào mọi kẻ địch lân cận gây {damage} sát thương Bí Thuật.',
   'entities.abilities.arcane_explosion.name': 'Nổ Ê-te',
-  'entities.abilities.arcane_intellect.description': 'Tăng 2 Trí Tuệ trong 30 phút.',
+  'entities.abilities.arcane_intellect.description': 'Tăng Trí Tuệ thêm {buff} trong 30 phút.',
   'entities.abilities.arcane_intellect.name': 'Tuệ Giác Ê-te',
   'entities.abilities.arcane_missiles.description':
     'Phóng các Phi Tiêu Ê-te vào kẻ địch, gây {damage} sát thương Bí Thuật mỗi giây trong 3 giây.',
@@ -1270,7 +1585,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khoác lên lốt tuấn mã, tăng tốc độ di chuyển thêm 30% trong 30 phút.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Lốt Tuấn Mã',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Khoác lên lốt diều hâu, tăng 20 sức mạnh tấn công trong 30 phút.',
+    'Khoác lên lốt diều hâu, tăng sức mạnh tấn công thêm {buff} trong 30 phút.',
   'entities.abilities.aspect_of_the_hawk.name': 'Lốt Diều Hâu',
   'entities.abilities.aspect_of_the_monkey.description':
     'Khoác lên lốt chồn, tăng tỷ lệ né đòn thêm 8% trong 30 phút.',
@@ -1285,19 +1600,19 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Làm choáng mục tiêu trong 2 giây. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bash.name': 'Chấn Choáng',
   'entities.abilities.battle_shout.description':
-    'Tăng sức mạnh tấn công của ngươi thêm 20 trong 2 phút.',
+    'Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút.',
   'entities.abilities.battle_shout.name': 'Tiếng Gầm Thép',
   'entities.abilities.bear_charge.description':
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.bear_charge.name': 'Cú Lao Bruin',
   'entities.abilities.bear_form.description':
-    'Biến hình thành gấu: giáp +65%, sức mạnh tấn công +15, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
+    'Biến hình thành gấu: giáp +90%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư.',
   'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
   'entities.abilities.berserker_rage.name': 'Thịnh Nộ Sục Sôi',
   'entities.abilities.blessing_of_might.description':
-    'Ban một Phúc Lành lên mục tiêu thân thiện, tăng sức mạnh tấn công thêm 15 trong 5 phút.',
+    'Ban một Phúc Lành lên mục tiêu thân thiện, tăng sức mạnh tấn công thêm {buff} trong 5 phút.',
   'entities.abilities.blessing_of_might.name': 'Lời Thề Sắt Thép',
   'entities.abilities.blind.description':
     'Làm mù mục tiêu, khiến nó lảo đảo mất phương hướng trong 8 giây. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng.',
@@ -1305,7 +1620,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Tạo 10 nộ khí bằng cái giá sinh lực.',
   'entities.abilities.bloodrage.name': 'Giá Máu',
   'entities.abilities.bloodthirst.description':
-    'Tấn công tức thời trong cơn cuồng huyết gây {damage}. (Tuyệt chiêu Cuồng Nộ)',
+    'Tấn công tức thời trong cơn cuồng huyết gây 60% sát thương vũ khí cộng thêm {damage}. (Tuyệt chiêu Cuồng Nộ)',
   'entities.abilities.bloodthirst.name': 'Trích Huyết',
   'entities.abilities.cat_form.description':
     'Biến hình thành sói: sức mạnh tấn công tăng theo cấp độ của ngươi, các đòn đánh dùng năng lượng và điểm liên hoàn, và ngươi tạo ít hơn 29% đe dọa. Niệm lại để trở về hình pháp sư.',
@@ -1314,7 +1629,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước.',
   'entities.abilities.charge.name': 'Xông Tới',
   'entities.abilities.cheap_shot.description':
-    'Đánh mục tiêu, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn.',
+    'Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn.',
   'entities.abilities.cheap_shot.name': 'Thụi Bụng',
   'entities.abilities.claw.description':
     'Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Thưởng 1 điểm liên hoàn. Chỉ khi ở Hình Sói.',
@@ -1322,10 +1637,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Một đòn chém quét trúng mọi kẻ địch phía trước ngươi gây {damage} sát thương.',
   'entities.abilities.cleave.name': 'Vòng Chém Gặt',
-  'entities.abilities.commanding_shout.description': 'Tăng Thể Lực của ngươi thêm 6 trong 2 phút.',
+  'entities.abilities.commanding_shout.description':
+    'Tăng Thể Lực của ngươi thêm {buff} trong 2 phút.',
   'entities.abilities.commanding_shout.name': 'Tiếng Hô Trợ Uy',
   'entities.abilities.concussive_shot.description':
-    'Làm choáng váng mục tiêu, giảm 50% tốc độ di chuyển trong 4 giây.',
+    'Làm choáng váng mục tiêu gây {damage} sát thương, giảm 50% tốc độ di chuyển trong 4 giây.',
   'entities.abilities.concussive_shot.name': 'Bắn Rúng Động',
   'entities.abilities.conjure_food.description':
     'Tạo ra 2 phần bánh mì, hồi sinh lực khi ăn. Cấp cao hơn tạo ra món ăn no đủ hơn.',
@@ -1334,13 +1650,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tạo ra 2 chai nước, hồi pháp lực khi uống. Cấp cao hơn tạo ra nước tinh khiết hơn.',
   'entities.abilities.conjure_water.name': 'Kết Nước',
   'entities.abilities.consecration.description':
-    'Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh.',
+    'Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây.',
   'entities.abilities.consecration.name': 'Thánh Địa',
   'entities.abilities.corruption.description':
     'Hủ hóa mục tiêu, gây {damage} sát thương Bóng Tối trong 18 giây.',
   'entities.abilities.corruption.name': 'Hắc Hủ',
   'entities.abilities.crippling_poison.description':
-    'Tẩm vào mục tiêu một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây.',
+    'Đánh mục tiêu bằng một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây.',
   'entities.abilities.crippling_poison.name': 'Nọc Độc Chì',
   'entities.abilities.curse_of_agony.description':
     'Nguyền rủa mục tiêu bằng thống khổ: gây {damage} sát thương Bóng Tối trong 24 giây.',
@@ -1355,20 +1671,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
   'entities.abilities.defensive_stance.name': 'Thế Thủ',
   'entities.abilities.demon_skin.description':
-    'Lớp da quỷ tăng giáp của bạn thêm 30 trong 30 phút.',
+    'Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút.',
   'entities.abilities.demon_skin.name': 'Da Ác Quỷ',
   'entities.abilities.demoralizing_roar.description':
     'Áp chế kẻ địch xung quanh, giảm sức tấn công của chúng đi 20 trong 20 giây. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.demoralizing_roar.name': 'Tiếng Gầm Khiếp Đảm',
   'entities.abilities.demoralizing_shout.description':
-    'Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi 30 trong 30 giây.',
+    'Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây.',
   'entities.abilities.demoralizing_shout.name': 'Tiếng Hú Hung Hiểm',
-  'entities.abilities.devotion_aura.description': 'Tăng giáp của bạn thêm 40 trong 30 phút.',
+  'entities.abilities.devotion_aura.description': 'Tăng giáp của bạn thêm {buff} trong 30 phút.',
   'entities.abilities.devotion_aura.name': 'Hào Quang Kiên Định',
   'entities.abilities.dismiss_pet.description': 'Thả thú cưng của bạn về lại nơi hoang dã.',
   'entities.abilities.dismiss_pet.name': 'Thả Bạn Đồng Hành',
   'entities.abilities.divine_protection.description':
-    'Một tấm bùa hộ mệnh hấp thụ 50 sát thương trong 10 giây.',
+    'Một tấm bùa hộ mệnh hấp thụ {damage} sát thương trong 10 giây.',
   'entities.abilities.divine_protection.name': 'Bùa Hộ Đức Tin',
   'entities.abilities.drain_life.description':
     'Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây.',
@@ -1383,8 +1699,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Rễ Siết Chặt',
   'entities.abilities.evasion.description': 'Tăng tỷ lệ né đòn của bạn thêm 50% trong 15 giây.',
   'entities.abilities.evasion.name': 'Bước Chân Ma',
-  'entities.abilities.eviscerate.description':
-    'Đòn kết liễu gây sát thương theo mỗi điểm liên hoàn.',
+  'entities.abilities.eviscerate.description': 'Đòn kết liễu gây {damage}.',
   'entities.abilities.eviscerate.name': 'Giấc Ngủ Vùi Đất',
   'entities.abilities.execute.description':
     'Cố gắng kết liễu kẻ thù đang trọng thương, gây {damage} sát thương. Chỉ dùng được trên kẻ địch còn dưới 20% máu.',
@@ -1393,15 +1708,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Trục xuất kẻ xấu xa bằng cơn thịnh nộ Thần Thánh, gây {damage} sát thương Thần Thánh.',
   'entities.abilities.exorcism.name': 'Nghi Lễ Trục Xuất',
   'entities.abilities.expose_armor.description':
-    'Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng. Càng nhiều điểm liên hoàn được dùng thì vết cắt càng sâu.',
+    'Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng đi {damage} trong 30 giây.',
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
-  'entities.abilities.faerie_fire.description': 'Giảm giáp của mục tiêu đi 35 trong 40 giây.',
+  'entities.abilities.faerie_fire.description':
+    'Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp.',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
   'entities.abilities.fear.description':
     'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
   'entities.abilities.ferocious_bite.description':
-    'Đòn kết liễu gây sát thương theo mỗi điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
+    'Đòn kết liễu gây {damage}. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':
     'Nổ tung kẻ địch, gây {damage} sát thương Hỏa. Tức thời.',
@@ -1411,24 +1727,24 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Tia Tàn Lửa',
   'entities.abilities.rain_of_fire.name': 'Mưa Lửa',
   'entities.abilities.rain_of_fire.description':
-    'Trút một cơn mưa lửa xuống khu vực mục tiêu, thiêu đốt kẻ địch gây {damage} sát thương Lửa.',
+    'Trút một cơn mưa lửa xuống khu vực mục tiêu trong 4 giây, thiêu đốt kẻ địch gây {damage} sát thương Lửa mỗi giây.',
   'entities.abilities.volley.name': 'Loạt Tên',
   'entities.abilities.volley.description':
-    'Trút mưa tên xuống khu vực mục tiêu, gây {damage} sát thương cho kẻ địch bên trong.',
+    'Trút mưa tên xuống khu vực mục tiêu trong 3 giây, gây {damage} sát thương mỗi 0.5 giây cho kẻ địch bên trong.',
   'entities.abilities.hurricane.name': 'Cuồng Phong',
   'entities.abilities.hurricane.description':
-    'Triệu hồi cuồng phong xuống khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên.',
+    'Triệu hồi cuồng phong xuống khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi giây.',
   'entities.abilities.earthquake.name': 'Động Đất',
   'entities.abilities.earthquake.description':
-    'Làm rung chuyển khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên.',
+    'Làm rung chuyển khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi 1.5 giây.',
   'entities.abilities.flamestrike.name': 'Cú Đánh Lửa',
   'entities.abilities.flamestrike.description':
     'Gọi một vụ nổ lửa xuống khu vực mục tiêu, gây {damage} sát thương Lửa cho kẻ địch trong vụ nổ.',
   'entities.abilities.flame_shock.description':
-    'Thiêu đốt mục tiêu bằng lửa gây 25 sát thương cộng thêm {damage} trong 12 giây.',
+    'Thiêu đốt mục tiêu bằng lửa gây {damage} sát thương cộng thêm {overTime} trong 12 giây.',
   'entities.abilities.flame_shock.name': 'Giật Tàn Lửa',
   'entities.abilities.flametongue_weapon.description':
-    'Phù phép vũ khí của bạn bằng lửa nguyên tố: mỗi đòn đánh gây thêm 8 sát thương Hỏa trong 5 phút.',
+    'Phù phép vũ khí của bạn bằng lửa nguyên tố: mỗi đòn đánh gây thêm {damage} sát thương Hỏa trong 5 phút.',
   'entities.abilities.flametongue_weapon.name': 'Vũ Khí Khắc Hỏa',
   'entities.abilities.flash_heal.description':
     'Một lời cầu nguyện nhanh trị liệu cho đồng minh {damage} máu.',
@@ -1437,7 +1753,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một luồng Thánh Quang nhanh và hiệu quả trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.flash_of_light.name': 'Ánh Quang Hàn Gắn',
   'entities.abilities.frost_armor.description':
-    'Bao bọc bạn trong băng giá, tăng giáp thêm 30 trong 30 phút.',
+    'Bao bọc bạn trong băng giá, tăng giáp thêm {buff} trong 30 phút.',
   'entities.abilities.frost_armor.name': 'Áo Choàng Sương Giá',
   'entities.abilities.frost_nova.description':
     'Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng.',
@@ -1449,24 +1765,24 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Phóng ra một mũi tiễn băng, gây {damage} sát thương Băng và làm chậm di chuyển 40%.',
   'entities.abilities.frostbolt.name': 'Thương Băng Giá',
   'entities.abilities.frostbrand_weapon.description':
-    'Phù phép vũ khí của bạn bằng băng giá buốt lạnh: mỗi đòn đánh gây thêm 8 sát thương trong 5 phút.',
+    'Phù phép vũ khí của bạn bằng băng giá buốt lạnh: mỗi đòn đánh gây thêm {damage} sát thương trong 5 phút.',
   'entities.abilities.frostbrand_weapon.name': 'Vũ Khí Khắc Băng',
   'entities.abilities.garrote.description':
-    'Siết cổ kẻ địch, gây sát thương ngay lập tức và khiến nó chảy máu {damage} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn.',
+    'Siết cổ kẻ địch, gây {damage} sát thương ngay lập tức và khiến nó chảy máu {overTime} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn.',
   'entities.abilities.garrote.name': 'Dây Siết Cổ',
   'entities.abilities.ghost_wolf.description':
     'Biến bạn thành Shadewolf, tăng tốc độ di chuyển 40% trong 10 phút.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
-    'Đâm vào mục tiêu, khiến nó bất lực trong 4 giây. Mọi sát thương sẽ phá vỡ hiệu ứng. Tặng 1 điểm liên hoàn.',
+    'Đâm vào mục tiêu gây {damage} sát thương, khiến nó bất lực trong 4 giây. Mọi sát thương sẽ phá vỡ hiệu ứng. Tặng 1 điểm liên hoàn.',
   'entities.abilities.gouge.name': 'Thọc Mắt',
   'entities.abilities.growl.description':
     'Gầm gừ với mục tiêu: mối đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form.',
   'entities.abilities.growl.name': 'Hăm Dọa',
-  'entities.abilities.hammer_of_justice.description': 'Làm choáng mục tiêu trong 3 giây.',
+  'entities.abilities.hammer_of_justice.description': 'Làm choáng mục tiêu trong {duration} giây.',
   'entities.abilities.hammer_of_justice.name': 'Búa Phán Nứt Vỡ',
   'entities.abilities.hamstring.description':
-    'Làm bị thương kẻ địch 5 sát thương, làm chậm di chuyển của nó 50% trong 15 giây.',
+    'Làm bị thương kẻ địch gây {damage} sát thương, làm chậm di chuyển của nó 50% trong 15 giây.',
   'entities.abilities.hamstring.name': 'Nhát Cắt Què Chân',
   'entities.abilities.heal.description':
     'Một lời cầu nguyện chậm nhưng mạnh mẽ trị liệu cho đồng minh {damage} máu.',
@@ -1484,10 +1800,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.holy_light.name': 'Thánh Quang Chữa Lành',
   'entities.abilities.ice_barrier.description':
-    'Che chắn bạn trong băng, hấp thụ 130 sát thương trong 60 giây.',
+    'Che chắn bạn trong băng, hấp thụ {damage} sát thương trong 60 giây.',
   'entities.abilities.ice_barrier.name': 'Màn Băng',
   'entities.abilities.immolate.description':
-    'Thiêu đốt kẻ địch 11 sát thương Hỏa cùng thêm {damage} trong 15 giây.',
+    'Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây.',
   'entities.abilities.immolate.name': 'Khế Ước Rực Cháy',
   'entities.abilities.insect_swarm.description':
     'Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây.',
@@ -1502,20 +1818,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đòn kết liễu làm choáng mục tiêu. Kéo dài thêm 1 giây cho mỗi điểm liên hoàn.',
   'entities.abilities.kidney_shot.name': 'Đòn Chơi Xấu',
   'entities.abilities.lay_on_hands.description':
-    'Một luồng trị liệu khổng lồ: hồi phục 250 máu. Hồi chiêu 10 phút.',
+    'Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút.',
   'entities.abilities.lay_on_hands.name': 'Nghi Thức Cuối Cùng',
   'entities.abilities.lesser_heal.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.lesser_heal.name': 'Lời Nguyện Thì Thầm',
-  'entities.abilities.life_tap.description': 'Chuyển hóa 30 máu thành 30 mana.',
+  'entities.abilities.life_tap.description': 'Chuyển hóa {damage} máu thành {damage} mana.',
   'entities.abilities.life_tap.name': 'Mặc Cả Nghiệt Ngã',
   'entities.abilities.lightning_bolt.description':
     'Phóng ra một tia sét gây {damage} sát thương Tự Nhiên.',
   'entities.abilities.lightning_bolt.name': 'Tia Hồ Quang',
   'entities.abilities.lightning_shield.description':
-    'Bao quanh bạn bằng sét lốp bốp: kẻ tấn công cận chiến nhận 13 sát thương Tự Nhiên.',
+    'Bao quanh bạn bằng sét lốp bốp: kẻ tấn công cận chiến nhận {buff} sát thương Tự Nhiên, tối đa 3 tích trữ và nhiều nhất một lần mỗi 5 giây.',
   'entities.abilities.lightning_shield.name': 'Bùa Hộ Sấm Sét',
   'entities.abilities.mark_of_the_wild.description':
-    'Đặt Wildward lên một đồng minh, tăng giáp thêm 25 trong 30 phút.',
+    'Đặt Wildward lên một đồng minh, tăng giáp thêm {buff} trong 30 phút.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.maul.description':
     'Một đòn vồ tăng sát thương cận chiến thêm {damage} và gây ra lượng đe dọa lớn. Kích hoạt ở đòn đánh tiếp theo của bạn. Chỉ dùng được ở Bruin Form.',
@@ -1527,7 +1843,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây.',
   'entities.abilities.mind_flay.name': 'Kinh Cầu Thống Khổ',
   'entities.abilities.mongoose_bite.description':
-    'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm 12. Không thể bị né.',
+    'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né.',
   'entities.abilities.mongoose_bite.name': 'Phản Nanh',
   'entities.abilities.moonfire.description':
     'Thiêu đốt kẻ địch bằng nguyệt hỏa gây {damage} sát thương Bí Thuật cùng sát thương theo thời gian.',
@@ -1536,19 +1852,19 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)',
   'entities.abilities.mortal_strike.name': 'Đòn Tàn Phế',
   'entities.abilities.overpower.description':
-    'Đòn tấn công tức thời gây sát thương vũ khí +5. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né.',
+    'Đòn tấn công tức thời gây sát thương vũ khí cộng thêm {damage}. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né.',
   'entities.abilities.overpower.name': 'Bàn Tay Đẫm Máu',
   'entities.abilities.polymorph.description':
-    'Biến kẻ địch thành một con cóc trong tối đa 15 giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',
+    'Biến kẻ địch thành một con cóc trong tối đa {duration} giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',
   'entities.abilities.polymorph.name': 'Mê Hoặc',
   'entities.abilities.pounce.description':
     'Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.pounce.name': 'Đòn Lẻn Vồ',
   'entities.abilities.power_word_fortitude.description':
-    'Tăng Thể Lực của mục tiêu thêm 3 trong 30 phút.',
+    'Tăng Thể Lực của mục tiêu thêm {buff} trong 30 phút.',
   'entities.abilities.power_word_fortitude.name': 'Kinh Cầu Kiên Định',
   'entities.abilities.power_word_shield.description':
-    'Che chắn mục tiêu, hấp thụ 48 sát thương trong 30 giây.',
+    'Che chắn mục tiêu, hấp thụ {damage} sát thương trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Thi Hộ Mệnh',
   'entities.abilities.prowl.description':
     'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
@@ -1563,7 +1879,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây.',
   'entities.abilities.rapid_fire.name': 'Giương Cung Cuồng Loạn',
   'entities.abilities.raptor_strike.description':
-    'Một đòn cận chiến mạnh tăng sát thương thêm 5. Kích hoạt ở đòn đánh tiếp theo của bạn.',
+    'Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',
   'entities.abilities.raptor_strike.name': 'Đòn Moi Ruột',
   'entities.abilities.regrowth.description':
     'Trị liệu cho đồng minh {damage} máu cùng một lượng bổ sung trong 21 giây.',
@@ -1572,7 +1888,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Trị liệu cho mục tiêu {damage} máu trong 12 giây.',
   'entities.abilities.rejuvenation.name': 'Hoa Nở Hoang Dã',
   'entities.abilities.rend.description':
-    'Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong 9 giây.',
+    'Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây.',
   'entities.abilities.rend.name': 'Vết Rạch Sâu',
   'entities.abilities.renew.description': 'Trị liệu cho mục tiêu {damage} trong 15 giây.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
@@ -1586,10 +1902,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tăng 60% mối đe dọa tạo ra từ sát thương Thánh của bạn trong 30 phút. Nền tảng của thánh kỵ sĩ giữ aggro.',
   'entities.abilities.righteous_fury.name': 'Lời Thề Rực Cháy',
   'entities.abilities.rip.description':
-    'Đòn kết liễu gây sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
+    'Đòn kết liễu gây {damage} sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.rip.name': 'Xé Rách',
   'entities.abilities.rockbiter_weapon.description':
-    'Phù phép vũ khí với cơn cuồng nộ của đá: mỗi cú vung gây thêm 5 sát thương trong 5 phút.',
+    'Phù phép vũ khí với cơn cuồng nộ của đá: mỗi cú vung gây thêm {damage} sát thương trong 5 phút.',
   'entities.abilities.rockbiter_weapon.name': 'Vũ Khí Khắc Đá',
   'entities.abilities.rupture.description':
     'Đòn kết liễu gây vết thương cho mục tiêu, khiến nó chảy máu nhận {damage} trong 16 giây.',
@@ -1601,7 +1917,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thiêu cháy kẻ địch nhận {damage} sát thương Lửa. Niệm nhanh.',
   'entities.abilities.scorch.name': 'Bỏng Rát',
   'entities.abilities.seal_of_righteousness.description':
-    'Tràn đầy sức mạnh Thánh trong 30 giây, khiến mỗi cú vung cận chiến của bạn gây thêm 4 sát thương Thánh. Giải phóng bằng Verdict.',
+    'Tràn đầy sức mạnh Thánh trong 30 giây, khiến mỗi cú vung cận chiến của bạn gây thêm {damage} sát thương Thánh. Giải phóng bằng Verdict.',
   'entities.abilities.seal_of_righteousness.name': 'Ấn Khắc Lời Thề',
   'entities.abilities.searing_pain.description':
     'Thiêu đốt kẻ địch bằng ngọn lửa đau đớn nhận {damage} sát thương Lửa. Niệm nhanh.',
@@ -1619,7 +1935,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tức thì thiêu đốt mục tiêu bằng bóng tối nung cháy gây {damage} sát thương Bóng Tối.',
   'entities.abilities.shadowburn.name': 'Lửa Chạng Vạng',
   'entities.abilities.shield_slam.description':
-    'Giáng khiên vào mục tiêu gây {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)',
+    'Giáng khiên vào mục tiêu gây 50% sát thương vũ khí cộng thêm {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)',
   'entities.abilities.shield_slam.name': 'Giáng Nứt Khiên',
   'entities.abilities.sinister_strike.description':
     'Một đòn đánh tức thì gây sát thương vũ khí cộng thêm {damage}. Tích 1 điểm liên hoàn.',
@@ -1664,8 +1980,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_voidwalker.description':
     'Triệu hồi một Gloomshade dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Gloomshade là con quỷ vững chãi khiêu khích kẻ địch của bạn và hứng chịu đòn tấn công. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc.',
   'entities.abilities.summon_voidwalker.name': 'Triệu Hồi Gloomshade',
-  'entities.abilities.sunder_armor.description':
-    'Nghiền nát giáp của mục tiêu, giảm giáp đi {damage} mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo lượng đe dọa cao.',
   'entities.abilities.sunder_armor.name': 'Xẻ Giáp',
   'entities.abilities.swipe.description':
     'Quật quét các kẻ địch lân cận gây {damage} sát thương. Tạo thêm đe dọa. Chỉ dùng được ở Bruin Form.',
@@ -1677,7 +1991,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khiêu khích mục tiêu: đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó buộc phải tấn công bạn trong 3 giây.',
   'entities.abilities.taunt.name': 'Chọc Tức',
   'entities.abilities.thorns.description':
-    'Gai nhọn mọc ra từ mục tiêu: kẻ tấn công cận chiến nhận 3 sát thương Tự Nhiên.',
+    'Gai nhọn mọc ra từ mục tiêu: kẻ tấn công cận chiến nhận {buff} sát thương Tự Nhiên.',
   'entities.abilities.thorns.name': 'Bụi Gai Hộ Thân',
   'entities.abilities.thunder_clap.description':
     'Giáng đòn lên các kẻ địch lân cận gây {damage} sát thương và làm chậm 10% đòn tấn công của chúng trong 10 giây.',
@@ -1695,11 +2009,77 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',
   'entities.abilities.whirlwind.name': 'Vòng Xoáy Lưỡi Kiếm',
   'entities.abilities.wing_clip.description':
-    'Gây một vết thương làm chậm kẻ địch 40% trong 10 giây.',
+    'Gây một vết thương với {damage} sát thương, làm chậm kẻ địch 40% trong 10 giây.',
   'entities.abilities.wing_clip.name': 'Nhát Chém Xiềng Xích',
   'entities.abilities.wrath.description':
     'Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên.',
   'entities.abilities.wrath.name': 'Tia Hoang Dã',
+  'entities.abilities.holy_shock.name': 'Sốc Thánh',
+  'entities.abilities.holy_shock.description':
+    'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
+  'entities.abilities.holy_shield.name': 'Khiên Thánh',
+  'entities.abilities.holy_shield.description':
+    'Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)',
+  'entities.abilities.bestial_wrath.name': 'Cơn Thịnh Nộ Dã Thú',
+  'entities.abilities.bestial_wrath.description':
+    'Đưa bạn vào cơn giận dã thú, tăng sức mạnh tấn công thêm 55 trong 15 giây. (dấu ấn Thuần Thú)',
+  'entities.abilities.trueshot_aura.name': 'Hào Quang Bắn Chuẩn',
+  'entities.abilities.trueshot_aura.description':
+    'Truyền cảm hứng cho đồng minh gần đó, tăng sức mạnh tấn công thêm 35 trong 5 phút. (dấu ấn Thiện Xạ)',
+  'entities.abilities.wyvern_sting.name': 'Cú Chích Rồng Bay',
+  'entities.abilities.wyvern_sting.description':
+    'Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)',
+  'entities.abilities.arcane_power.name': 'Sức Mạnh Bí Thuật',
+  'entities.abilities.arcane_power.description':
+    'Tăng sát thương phép 20% và tốc độ phép 10% trong 10 giây. (kỹ năng đặc trưng Arcane)',
+  'entities.abilities.combustion.name': 'Thiêu Đốt',
+  'entities.abilities.combustion.description':
+    'Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)',
+  'entities.abilities.icy_veins.name': 'Huyết Mạch Băng Giá',
+  'entities.abilities.icy_veins.description':
+    'Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)',
+  'entities.abilities.cold_blood.name': 'Máu Lạnh',
+  'entities.abilities.cold_blood.description':
+    'Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)',
+  'entities.abilities.blade_flurry.name': 'Loạn Đao',
+  'entities.abilities.blade_flurry.description':
+    'Tung ra một loạt lưỡi dao, tăng tốc độ tấn công thêm 20% trong 12 giây. (dấu ấn Chiến Đấu)',
+  'entities.abilities.hemorrhage.name': 'Xuất Huyết',
+  'entities.abilities.hemorrhage.description':
+    'Đánh kẻ địch gây sát thương vũ khí cộng {damage} và gây sát thương chảy máu trong 12 giây. Nhận 1 điểm combo. (dấu ấn Tinh Tế)',
+  'entities.abilities.power_infusion.name': 'Truyền Sức Mạnh',
+  'entities.abilities.power_infusion.description':
+    'Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)',
+  'entities.abilities.holy_nova.name': 'Nova Thánh',
+  'entities.abilities.holy_nova.description':
+    'Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)',
+  'entities.abilities.shadowform.name': 'Dạng Bóng Tối',
+  'entities.abilities.shadowform.description':
+    'Nhận dạng bóng tối, cường hóa ma thuật bóng tối cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Bóng Tối)',
+  'entities.abilities.elemental_mastery.name': 'Tinh Thông Nguyên Tố',
+  'entities.abilities.elemental_mastery.description':
+    'Kêu gọi tinh thông nguyên tố, khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Nguyên Tố)',
+  'entities.abilities.siphon_life.name': 'Hút Sự Sống',
+  'entities.abilities.siphon_life.description':
+    'Hút sự sống từ kẻ địch, gây {damage} sát thương Bóng Tối trong 30 giây và hồi cho bạn bằng lượng sát thương đã gây. (dấu ấn Đau Khổ)',
+  'entities.abilities.conflagrate.name': 'Bùng Cháy',
+  'entities.abilities.conflagrate.description':
+    'Tiêu thụ Thiêu Đốt của bạn trên kẻ địch để đốt chúng, gây {damage} sát thương Lửa. (dấu ấn Hủy Diệt)',
+  'entities.abilities.moonkin_form.name': 'Dạng Cú Mặt Trăng',
+  'entities.abilities.moonkin_form.description':
+    'Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)',
+  'entities.abilities.feral_charge.name': 'Xung Phong Hoang Dã',
+  'entities.abilities.feral_charge.description':
+    'Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)',
+  'entities.abilities.swiftmend.name': 'Hồi Phục Nhanh',
+  'entities.abilities.swiftmend.description':
+    'Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)',
+  'entities.abilities.crusader_strike.name': 'Đòn Thập Tự',
+  'entities.abilities.crusader_strike.description':
+    'Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)',
+  'entities.abilities.metamorphosis.name': 'Biến Hình',
+  'entities.abilities.metamorphosis.description':
+    'Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)',
   'entities.delves.collapsed_reliquary.enterText': 'Bạn đi xuống thánh tích sụp đổ.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Bạn trèo trở lại chỗ Tu Huynh Halven tại tàn tích thánh tích.',
@@ -1743,6 +2123,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.bogiron_mace.name': 'Chùy Sắt Đầm Lầy',
   'entities.items.bogiron_nugget.name': 'Cục Sắt Đầm Lầy',
   'entities.items.bone_fragments.name': 'Mảnh Xương',
+  'entities.items.arcane_dust.name': 'Bụi Bí Thuật',
+  'entities.items.arcane_essence.name': 'Tinh Chất Bí Thuật',
+  'entities.items.arcane_shard.name': 'Mảnh Bí Thuật',
   'entities.items.boneguard_breastplate.name': 'Giáp Ngực Vệ Cốt',
   'entities.items.boneplate_vest.name': 'Áo Giáp Tấm Xương',
   'entities.items.boundstone_girdle.name': 'Đai Lưng Đá Trói',
@@ -1926,6 +2309,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_axe.name': 'Rìu Gỗ Cổ Thụ',
   'entities.items.goldleaf_sickle.name': 'Liềm Lá Vàng',
   'entities.items.sunpetal_sickle.name': 'Liềm Cánh Hoa Mặt Trời',
+  'entities.items.thorium_ore.name': 'Quặng Thori',
+  'entities.items.arcanite_bar.name': 'Thỏi Arcanite',
+  'entities.items.ashwood_log.name': 'Khúc Gỗ Tần Bì Tro',
+  'entities.items.elderwood_log.name': 'Khúc Gỗ Cơm Cháy Cổ',
+  'entities.items.goldleaf_herb.name': 'Thảo Dược Lá Vàng',
+  'entities.items.sunpetal_herb.name': 'Thảo Dược Cánh Mặt Trời',
   'entities.items.moongate_rubbing.name': 'Bản Rập Bùa Phòng Hộ',
   'entities.items.moonpale_scale.name': 'Vảy Trăng Nhợt',
   'entities.items.moonscale_saber.name': 'Mã Tấu Vảy Trăng',
@@ -2146,6 +2535,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen Kẻ Gọi Mộ',
   'entities.mobs.mudfin_murloc.name': 'Kẻ Lẩn Vây Bùn',
   'entities.mobs.nhalia_mourner.name': 'Nhalia Kẻ Khóc Tang',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, Đại Tư Tế Bất Tử',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, Lưỡi Dao Bất Tử',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, Vệ Chiến Bất Tử',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Tai Họa Đỉnh Gai',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Cấm Vệ Hồi Sinh',
   'entities.mobs.ogre_crusher.name': 'Kẻ Nghiền Đỉnh Gai',
@@ -3153,13 +3545,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'Cường hóa và tăng lực chỉ kéo dài trong trận đấu. Chúng là về những lối chơi ngẫu hứng, vui nhộn ngay tại chỗ, chứ không phải sức mạnh lâu dài, nên không ai mua được chiến thắng.',
   'guide.arenaPage.coliseumBody':
-    'Coliseum là đấu trường của vương quốc, nơi bạn đối đầu với những người chơi khác trong các trận xếp hạng, một đấu một hoặc hai đấu hai. Mỗi hạng đấu giữ bảng xếp hạng riêng, nên một chiến thắng đưa bạn leo cao trên thang đó cho cả vương quốc cùng chiêm ngưỡng.',
+    'Coliseum là đấu trường của vương quốc, nơi bạn đối đầu với những người chơi khác trong các trận xếp hạng, một đấu một hoặc hai đấu hai. Mỗi hạng đấu giữ bảng xếp hạng riêng, nên một chiến thắng đưa bạn leo cao trên thang đó cho cả vương quốc cùng chiêm ngưỡng. Mở cửa sổ Đấu Trường để đăng ký một hạng đấu, một mình hay cùng người đồng đội của bạn.',
   'guide.arenaPage.coliseumHeading': 'Đấu Trường Tro Tàn',
   'guide.arenaPage.duelsBody':
     'Thách đấu giao hữu bất kỳ người chơi nào bạn gặp. Chẳng có gì đặt cược ngoài lòng tự tôn, nên đây là cách dễ nhất để học một thế đối đầu hay phân định một cuộc tranh luận thân tình.',
   'guide.arenaPage.duelsHeading': 'Đấu Tay Đôi',
   'guide.arenaPage.fiestaBody':
-    'Fiesta là chế độ nhanh, hai đấu hai chơi theo những hiệp ngắn. Giữa các hiệp bạn chọn cường hóa, những đòn tăng lực nhanh tái định hình bộ kỹ năng của bạn ngay tức thì, nên không trận nào giống trận nào.',
+    'Fiesta là một trận ẩu đả nhanh, hai đấu hai diễn ra như một hiệp liền mạch, với mọi đấu thủ được đưa về cùng một vạch xuất phát. Khi trận đấu diễn ra bạn chọn cường hóa, những đòn tăng lực nhanh tái định hình bộ kỹ năng của bạn ngay tức thì, nên không trận nào giống trận nào.',
   'guide.arenaPage.fiestaHeading': 'Fiesta Hai Đấu Hai',
   'guide.arenaPage.heading': 'Đấu Trường và PvP',
   'guide.arenaPage.intro':
@@ -3180,7 +3572,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đợt mở màn: những đòn tăng lực đơn chỉ số gọn gàng giúp mài giũa nền tảng cơ bản của lớp nhân vật bạn.',
   'guide.arenaPage.waveSilverTitle': 'Bạc',
   'guide.arenaPage.wavesBody':
-    'Mỗi hiệp Fiesta trao cho bạn một lượt chọn mới, và các lựa chọn càng táo bạo hơn khi trận đấu tiếp diễn. Bạn xây dựng từ đợt này sang đợt khác, mỗi lần chọn một trong vài tùy chọn và giữ nó cho hết phần còn lại của trận.',
+    'Một trận Fiesta trao cho bạn những lượt chọn mới khi nó diễn ra, và các lựa chọn càng táo bạo hơn khi trận đấu kéo dài. Bạn xây dựng từ đợt này sang đợt khác, mỗi lần chọn một trong vài tùy chọn và giữ nó cho hết phần còn lại của trận.',
   'guide.arenaPage.wavesTitle': 'Cường hóa ập đến theo từng đợt',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Những kẻ phục dịch khoác áo choàng của giáo phái tử thần, kẻ mà công việc làm ô uế những nấm mồ từ Thung Lũng đến những đỉnh núi. Nơi chúng tụ họp, người chết không được yên nghỉ.',
@@ -3194,7 +3586,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một tinh linh bão tố được ban cho thân hình, lang thang trên những vách đá xa xôi phía trên Stormcrag với một mảnh tâm thạch đáng để liều mình giữa sấm sét.',
   'guide.bestiary.heading': 'Thú Lục',
   'guide.bestiary.intro':
-    'Các sinh vật của thế giới, phân theo họ loài. Đây là những kẻ thù bạn gặp ngoài hoang dã. Những thứ chết chóc nhất đang chờ, không liệt kê ở đây, sau những cánh cửa hầm ngục.',
+    'Các sinh vật của thế giới, phân theo họ loài. Đây là những kẻ thù thường ngày bạn gặp ngoài hoang dã. Kẻ địch tinh nhuệ và các lãnh chúa của chúng tự giấu mình khỏi những trang này, còn những thứ chết chóc nhất trong tất cả đang chờ sau những cánh cửa hầm ngục.',
   'guide.bestiary.levels': 'Cấp {min} đến {max}',
   'guide.bestiary.levelsSame': 'Cấp {min}',
   'guide.bestiary.notedLabel': 'Đáng chú ý',
@@ -3241,7 +3633,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.back': 'Tất cả lớp nhân vật',
   'guide.classPage.fullKitHeading': 'Toàn bộ kỹ năng',
   'guide.classPage.fullKitNote':
-    'Mọi kỹ năng lớp này có thể học, theo thứ tự chúng mở khóa. Điểm thiên phú quyết định kỹ năng nào dẫn dắt lối xây dựng của bạn.',
+    'Bộ kỹ năng lớp này học được khi lên cấp, theo thứ tự chúng mở ra. Tài năng ban thêm một vài kỹ năng và quyết định kỹ năng nào dẫn dắt lối xây dựng của bạn.',
   'guide.classPage.masteryLabel': 'Tinh Thông',
   'guide.classPage.petsHeading': 'Quỷ Triệu Hồi',
   'guide.classPage.petsNote':
@@ -3250,15 +3642,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.roleLabel': 'Đóng vai',
   'guide.classPage.specsHeading': 'Chuyên Môn Hóa',
   'guide.combat.ccBody':
-    'Khống chế là một dạng debuff đặc biệt giới hạn những gì mục tiêu có thể làm: choáng, trói và làm chậm, câm lặng ngăn niệm phép, tước vũ khí, gieo sợ hãi, và biến hình khiến kẻ thù vô hại trong chốc lát. Một số trong đó, như trói, sợ hãi và biến hình, mất hiệu lực khi bị áp lại quá nhanh, nên không thể nối chuỗi mãi mãi.',
+    'Khống chế là một dạng debuff đặc biệt giới hạn những gì mục tiêu có thể làm: choáng, trói và làm chậm, câm lặng ngăn niệm phép, tước vũ khí, gieo sợ hãi, và biến hình khiến kẻ thù vô hại trong chốc lát. Khi dùng lên người chơi khác, khống chế mòn dần khi lặp lại: cùng một loại áp lại quá nhanh sẽ yếu đi rồi thất bại hẳn, và một đòn choáng mở màn từ ẩn thân được tính riêng khỏi những đòn choáng nối theo, nên không ai có thể bị trói buộc bất lực mãi mãi. Sinh vật của thế giới không hề để bụng như vậy: khống chế không bao giờ yếu đi khi lặp lại lên chúng, dù nhiều kẻ thù hùng mạnh nhất, gồm những kẻ tinh nhuệ có tên và các trùm mạnh nhất trong số đó, hoàn toàn không thể bị khống chế.',
   'guide.combat.deathBody':
-    'Nếu máu của bạn về không, bạn gục ngã. Hãy giải thoát linh hồn để hồi sinh tại nghĩa địa gần nhất với đầy máu, rồi tự tìm đường quay lại, nên một cái chết chỉ tốn của bạn một chút thời gian, chứ không phải tiến trình. Giữa các trận, hãy ngồi ăn uống để bạn bắt đầu trận kế tiếp với sức lực đầy đủ.',
+    'Nếu máu của bạn về không, bạn gục ngã ngay tại chỗ, và thi thể bạn nằm lại đó. Hãy giải thoát linh hồn và bạn trỗi dậy thành một hồn ma tại nghĩa địa gần nhất: nhanh chân hơn người sống, ngoài tầm với của kẻ thù, nhưng không thể chiến đấu, nhặt chiến lợi phẩm, hay nói chuyện với bất kỳ ai ngoài Người Canh Giữ Nhợt Nhạt lơ lửng trên những bia đá. Từ đó bạn chọn. Chạy hồn ma về lại thi thể và bạn hồi sinh ngay tại chỗ với một phần máu và mana được hồi phục, không một hình phạt nào. Hoặc nhờ Người Canh Giữ Nhợt Nhạt hồi sinh tức thì ngay nơi bạn đứng, đổi lại là Cái Giá của Người Canh Giữ: một sự suy yếu tạm thời cho tất cả những gì làm nên bạn, kéo dài càng lâu khi bạn càng dày dạn, và miễn hoàn toàn cho những nhân vật vừa mới vào đời. Ngã xuống bên trong một hầm ngục thì linh hồn bạn chờ ở nghĩa địa bên ngoài; đưa hồn ma trở lại qua cánh cửa và bạn hồi sinh tại lối vào. Delve là ngoại lệ: ngã xuống ở đó thì bạn chỉ đơn giản được dựng lại trên đôi chân mình tại lối vào delve, dù một lần ngã thứ hai sẽ kết thúc lượt chạy. Dù chọn đường nào, bạn cũng không mất kinh nghiệm, trang bị hay tiền vàng. Giữa các trận, hãy ngồi ăn uống để bạn bắt đầu trận kế tiếp với sức lực đầy đủ.',
   'guide.combat.deathTitle': 'Khi bạn ngã xuống',
   'guide.combat.effectsBody':
-    'Nhiều kỹ năng áp một hiệu ứng lưu lại. Những hiệu ứng có lợi (buff) tăng chỉ số, che chắn, hoặc hồi máu cho bạn từng chút một; những hiệu ứng có hại (debuff) rút máu bạn bằng sát thương theo thời gian hoặc làm bạn suy yếu. Hãy để mắt đến những biểu tượng nhỏ gần thanh kỹ năng để biết những gì đang trên người bạn và còn kéo dài bao lâu.',
+    'Nhiều kỹ năng áp một hiệu ứng lưu lại. Những hiệu ứng có lợi (buff) tăng chỉ số, che chắn, hoặc hồi máu cho bạn từng chút một; những hiệu ứng có hại (debuff) rút máu bạn bằng sát thương theo thời gian hoặc làm bạn suy yếu. Hãy để mắt đến những biểu tượng nhỏ ở góc trên màn hình, cạnh bản đồ nhỏ, để biết những gì đang trên người bạn và còn kéo dài bao lâu.',
   'guide.combat.effectsTitle': 'Buff, debuff và khống chế',
   'guide.combat.growBody':
-    'Mỗi cấp khiến bạn cứng cáp hơn và mở khóa kỹ năng mới, suốt chặng đường đến giới hạn cấp {cap}. Làm nhiệm vụ là cách lên cấp nhanh nhất; hầm ngục và khám phá bổ sung thêm.',
+    'Mỗi cấp khiến bạn cứng cáp hơn và mở khóa kỹ năng mới, suốt chặng đường đến giới hạn cấp {cap}. Làm nhiệm vụ là cách lên cấp nhanh nhất; săn quái, chạy hầm ngục và delve bổ sung thêm.',
   'guide.combat.growTitle': 'Bạn mạnh lên qua mỗi cấp',
   'guide.combat.hitBody':
     'Đòn tấn công có thể trượt hoặc bị né, và đòn của kẻ địch cũng vậy, trong khi phép thuật có thể bị kháng hoàn toàn. Chiến đấu gần cấp của chính bạn là điều giữ cho những đòn của bạn trúng đích; khoảng cách cấp càng lớn, bạn càng đánh hụt vào không khí.',
@@ -3276,7 +3668,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': 'Hành động',
   'guide.controls.arena': 'Đấu Trường',
   'guide.controls.controllerBody':
-    'Tay cầm cũng dùng được, và hỗ trợ tay cầm được bật sẵn theo mặc định. Cần trái để di chuyển, cần phải để chỉnh máy quay, còn các nút mặt và nút vai lo phần kỹ năng, nhảy và tương tác của bạn. Mở bất kỳ cửa sổ nào để hiện một con trỏ trên màn hình cho các menu. Bạn có thể đổi lại các nút và chỉnh vùng chết của cần, tốc độ máy quay, rung và đảo chiều nhìn trong phần cài đặt tay cầm ở mục tùy chọn.',
+    'Tay cầm cũng dùng được, và hỗ trợ tay cầm được bật sẵn theo mặc định. Cần trái để di chuyển, cần phải để chỉnh máy quay, còn các nút mặt và nút vai lo phần kỹ năng, nhảy và tương tác của bạn. Mở một cửa sổ như túi đồ để hiện một con trỏ trên màn hình, còn menu trò chơi thì điều hướng trực tiếp bằng phím D-pad và các nút mặt. Bạn có thể đổi lại các nút và chỉnh vùng chết của cần, tốc độ máy quay, rung và đảo chiều nhìn trong phần cài đặt tay cầm ở mục tùy chọn.',
   'guide.controls.controllerHeading': 'Trên tay cầm',
   'guide.controls.cycleFriendly': 'Lần lượt chọn mục tiêu thân thiện',
   'guide.controls.gameMenu': 'Mở menu trò chơi và tùy chọn',
@@ -3285,16 +3677,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Giao diện',
   'guide.controls.groupMovement': 'Di chuyển',
   'guide.controls.intro':
-    'Phím mặc định cho máy tính. Mọi phím gán đều có thể thay đổi trong phần tùy chọn của trò chơi.',
+    'Phím mặc định cho máy tính. Mọi phím gán đều có thể thay đổi trong phần tùy chọn của trò chơi, trừ Esc vốn luôn mở menu trò chơi, và một phím gán có thể là một tổ hợp phím bổ trợ như Shift+Z.',
   'guide.controls.keyHeader': 'Phím',
   'guide.controls.leaderboard': 'Bảng xếp hạng',
   'guide.controls.mobileBody':
-    'Điều khiển cảm ứng tự động xuất hiện trên điện thoại và máy tính bảng: cần di chuyển ở bên trái, kéo bất cứ đâu ở bên phải để nhìn quanh, và các nút trên màn hình cho kỹ năng và menu của bạn.',
+    'Điều khiển cảm ứng tự động xuất hiện trên điện thoại và máy tính bảng: cần di chuyển ở bên trái, kéo bất cứ đâu khác để nhìn quanh, chụm hai ngón tay để phóng máy quay, và các nút trên màn hình cho kỹ năng và menu của bạn. Một mũi tên nhỏ ở góc trên bên trái hiện hoặc ẩn các nút menu, và nút Thêm ở đó chứa những cửa sổ còn lại của bạn.',
   'guide.controls.mobileHeading': 'Trên di động',
   'guide.controls.talents': 'Thiên Phú',
   'guide.controls.targetFriendly': 'Chọn mục tiêu thân thiện gần nhất',
   'guide.delvesPage.affixesBody':
-    'Những lượt khó hơn sẽ bốc một đặc tính làm thay đổi cách cuộc xuống hầm diễn ra, từ người chết không yên đến không khí độc hại đến mái vòm rệu rã. Chúng nâng cả hiểm nguy lẫn phần thưởng lên cùng lúc. Một hang sâu lấy chủ đề hầm mộ có thể bốc bất kỳ đặc tính nào sau đây:',
+    'Những lượt khó hơn sẽ bốc một đặc tính làm thay đổi cách cuộc xuống hầm diễn ra, từ người chết không yên đến không khí độc hại đến mái vòm rệu rã. Chúng nâng cả hiểm nguy lẫn phần thưởng lên cùng lúc. Mỗi hang sâu bốc từ những đặc tính hợp với chủ đề của nó; trên khắp vương quốc, kho đặc tính trông như thế này:',
   'guide.delvesPage.affixesHeading': 'Đặc tính lượt chơi',
   'guide.delvesPage.affixesLabel': 'Đặc tính có thể gặp',
   'guide.delvesPage.companionBody':
@@ -3326,7 +3718,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hang sâu là một hầm ngục instance nhỏ làm riêng cho bạn và tối đa một đồng đội, một bản sao riêng tư mà không ai quấy rầy bạn được. Bạn khởi nó từ một cái bảng do một người giữ hang sâu trông coi ngoài thế giới, nhảy vào, đánh xuống qua một nhúm căn phòng, và kết thúc ở một kẻ canh giữ duy nhất. Các lượt chơi nhanh gọn và được tạo ra để chơi lại, nên hang sâu là một nguồn tiến triển đáng tin cậy mỗi khi thế giới mở đã cạn việc để làm.',
   'guide.delvesPage.whatHeading': 'Hang sâu là gì',
   'guide.delvesPage.whereBody':
-    'Hang sâu đầu tiên, Thánh Tích Sụp Đổ, mở ra ở Đồi Thánh Tích trong thung lũng khởi đầu Thung Lũng Đông Khê. Tu Huynh Halven trông coi cái bảng ở đó, và ông sẽ cử bạn xuống một khi bạn đã sẵn sàng.',
+    'Hang sâu đầu tiên, Thánh Tích Sụp Đổ, mở ra ở Đồi Thánh Tích trong thung lũng khởi đầu Thung Lũng Đông Khê. Tu Huynh Halven trông coi cái bảng ở đó, và ông sẽ cử bạn xuống một khi bạn đã sẵn sàng. Vòng đi của ông không dừng ở đó: vượt qua Gò Mộ Troll ở rìa phía bắc Đầm Lầy Bùn Sâu, cũng chính người giữ ấy mở ra Kinh Cầu Chết Chìm cho những người dò hang đã vững chân.',
   'guide.delvesPage.whereHeading': 'Tìm ở đâu',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
@@ -3363,7 +3755,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeLoreTitle': 'Ngôi Đền Chết Chìm, sâu hơn một chút',
   'guide.dungeonsPage.templeName': 'Ngôi Đền Chết Chìm',
   'guide.economy.buyingBody':
-    'Đứng gần một thương nhân để mở cửa sổ của họ. Bạn có thể mua bất cứ thứ gì họ bán nếu đủ tiền, và bán hầu hết những gì trong túi để lấy bạc. Nếu bạn lỡ tay bán nhầm thứ gì đó, người bán sẽ giữ lại những món bạn vừa bán để bạn mua lại.',
+    'Hãy nói chuyện với một thương nhân và chọn xem hàng của họ, cửa hàng của họ mở ra với ba thẻ: Xem Hàng, Bán, và Mua Lại. Xem Hàng chứa mọi thứ họ có trong kho, là của bạn nếu bạn đủ tiền. Bán liệt kê những gì trong túi bạn mà họ chịu trả tiền, và bán một món mang phẩm chất tự tung riêng của nó sẽ yêu cầu bạn xác nhận trước, để một bản quý giá không bao giờ lỡ tay tuột mất. Nếu bạn trót chia tay thứ gì đó rồi tiếc, thẻ Mua Lại giữ những món bạn vừa bán để bạn mua lại chúng bằng đúng số tiền bạn được trả.',
   'guide.economy.buyingTitle': 'Mua và bán',
   'guide.economy.coinBody':
     'Tiền có ba loại đồng. Một trăm đồng đồng đổi một đồng bạc, và một trăm đồng bạc đổi một đồng vàng, nên ví của bạn đầy lên từ loại đồng nhỏ nhất trước. Bạn kiếm được tiền từ phần thưởng nhiệm vụ, từ nhặt chiến lợi phẩm của kẻ địch ngã xuống, và từ việc bán những gì bạn không còn cần.',
@@ -3371,10 +3763,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.economy.intro':
     'Tiền bạc bôi trơn cả thế giới: nó mua trang bị, vật phẩm tiếp tế và đồ đi đường của bạn, và đổi tay giữa những người chơi. Bạn nhặt được tất cả những thứ này chỉ bằng cách chơi, nên hãy xem trang này như một bản đồ về nơi tiền của bạn đến từ đâu và đi về đâu.',
   'guide.economy.junkBody':
-    'Những món rơi ra mà bạn không dùng đến vẫn bán được cho bất kỳ người bán nào, nên hãy dọn trống túi mỗi khi đi qua thị trấn thay vì để chúng đầy ứ. Những thứ vụn vặt thực sự vô giá trị cũng có thể vứt bỏ hẳn để lấy chỗ.',
+    'Những món rơi ra mà bạn không dùng đến vẫn bán được cho bất kỳ người bán nào, nên hãy dọn trống túi mỗi khi đi qua thị trấn thay vì để chúng đầy ứ. Thẻ Bán của người bán thậm chí có một nút bấm một lần bán sạch mọi món phẩm chất Kém cùng lúc. Những thứ vụn vặt thực sự vô giá trị cũng có thể vứt bỏ hẳn để lấy chỗ.',
   'guide.economy.junkTitle': 'Dọn dẹp đồ tạp',
   'guide.economy.marketBody':
-    'Thương Nhân điều hành Chợ Thế Giới, một sàn giao dịch do người chơi vận hành nơi bạn có thể mua bán với những người có thể bạn chẳng bao giờ gặp. Hãy nói chuyện với Thương Nhân để mở nó. Thương Nhân cũng luôn niêm yết một lượng hàng hóa của riêng họ ở đó, nên luôn có thứ để mua ngay cả khi không người chơi nào khác đăng bán.',
+    'Thương Nhân điều hành Chợ Thế Giới, một sàn giao dịch do người chơi vận hành nơi bạn có thể mua bán với những người có thể bạn chẳng bao giờ gặp. Hãy nói chuyện với Thương Nhân ở Eastbrook, hoặc với Đấu Giá Viên Voss trên Highwatch, để mở nó: cả hai người trông coi đều phục vụ chung một cái chợ. Thương Nhân cũng luôn niêm yết một lượng hàng hóa của riêng họ ở đó, nên luôn có thứ để mua ngay cả khi không người chơi nào khác đăng bán.',
   'guide.economy.marketBrowse':
     'Duyệt: cuộn qua danh sách hoặc tìm theo tên để thấy thứ đang được rao bán. Mỗi mục rao hiển thị món hàng, người bán, và giá yêu cầu cho cả chồng.',
   'guide.economy.marketCollect':
@@ -3385,8 +3777,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Định giá là tùy bạn. Rao thấp hơn một chút so với người khác thường bán nhanh hơn, trong khi giá cao ngất có thể nằm im không ai động đến. Hãy duyệt trước để xem mức giá hiện hành trông thế nào trước khi đăng.',
   'guide.economy.marketTitle': 'Chợ Thế Giới',
   'guide.economy.marksBody':
-    'Tiền vàng không phải thứ duy nhất bạn cất giữ. Hang sâu trả Huy Hiệu Hang Sâu, một loại tiền tệ riêng mà bạn chỉ tiêu ở chỗ người giữ hang sâu, vào việc nâng cấp đồng hành và trang bị bạn không tìm thấy ở nơi khác. Chúng không bao giờ lẫn với tiền vàng của bạn.',
-  'guide.economy.marksTitle': 'Một loại tiền tệ thứ hai: Huy Hiệu Hang Sâu',
+    'Tiền vàng không phải thứ duy nhất bạn cất giữ. Hang sâu trả Huy Hiệu Hang Sâu, chỉ tiêu được ở chỗ người giữ hang sâu vào việc nâng cấp đồng hành và trang bị bạn không tìm thấy ở nơi khác. Những lượt hầm ngục Anh Hùng để lại Dấu Ấn Anh Hùng trên trùm cuối, tiêu với Quân Nhu Trưởng Anh Hùng ở Highwatch để mua trang sức mà không góc nào khác của vương quốc bán. Cả hai đều không bao giờ lẫn với tiền vàng của bạn.',
+  'guide.economy.marksTitle': 'Huy hiệu và dấu ấn: những loại tiền tệ ngoài tiền vàng',
   'guide.economy.tradeBody':
     'Bạn có thể trao đổi mặt đối mặt với bất kỳ ai đứng gần bạn. Cả hai bên đặt vật phẩm và tiền vào một cửa sổ chung và cuộc đổi chỉ diễn ra một khi cả hai cùng xác nhận, nên không bên nào bị mắc lừa. Đó là cách đơn giản để trao cho bạn bè một món đồ rơi hoặc dàn xếp một thỏa thuận.',
   'guide.economy.tradeTitle': 'Giao dịch với người chơi khác',
@@ -3425,15 +3817,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a1':
     'Đúng vậy. Cả trò chơi đều miễn phí chơi đến cấp tối đa, và mã nguồn được mở trên GitHub.',
   'guide.faqPage.a10':
-    'Giới hạn là cấp {cap}. Từ đó bạn chạy các hầm ngục năm người và raid mười người, săn lùng trang bị tốt hơn, và thử sức ở đấu trường.',
+    'Giới hạn là cấp {cap}. Từ đó bạn chạy các hầm ngục năm người và raid mười người, thử lại chúng ở chế độ Anh Hùng để nhận chiến lợi phẩm nâng cấp, đối mặt với trùm thế giới khi hắn trỗi dậy, thử sức ở đấu trường, dấn vào các delve cùng một bạn đồng hành kề bên, và săn kỳ công trong Sách Kỳ Công để leo lên bảng xếp hạng của vương quốc.',
   'guide.faqPage.a11':
     'Mời bất kỳ ai bạn gặp vào nhóm, hỏi trong kênh chat, hoặc hợp sức tại một hầm ngục. Phần lớn thế giới có thể chơi một mình, nên lập nhóm là một lựa chọn, không phải yêu cầu bắt buộc.',
   'guide.faqPage.a2':
-    'Không. Trò chơi hoàn toàn chơi được mà không cần đến nó. Token cộng đồng tùy chọn chỉ mở khóa những điểm nhấn trang trí và không bao giờ ảnh hưởng đến sức mạnh hay tiến trình.',
+    'Không. Trò chơi hoàn toàn chơi được mà không cần đến nó. Token cộng đồng tùy chọn chỉ thêm những điểm nhấn trang trí và một phần chia từ quỹ giải thưởng hằng ngày, và không bao giờ ảnh hưởng đến sức mạnh hay tiến trình.',
   'guide.faqPage.a3':
     'Đúng vậy. Trò chơi chạy trong trình duyệt di động với điều khiển cảm ứng, và còn có cả một trình khởi chạy trên máy tính.',
   'guide.faqPage.a4':
-    'Đúng vậy. Có chế độ một người chơi ngoại tuyến tức thì, và thế giới trực tuyến hoàn toàn chơi một mình được trừ các hầm ngục và raid.',
+    'Đúng vậy. Có chế độ một người chơi ngoại tuyến tức thì, và thế giới trực tuyến hoàn toàn chơi một mình được trừ các hầm ngục, raid, và trùm thế giới.',
   'guide.faqPage.a5':
     'Chín lớp, bao trùm các vai tank, hồi máu và sát thương cổ điển, mỗi lớp có một hệ tài nguyên (Cuồng Nộ, mana, hoặc Năng Lượng) và những kỹ năng đặc trưng riêng.',
   'guide.faqPage.a6':
@@ -3484,7 +3876,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Có hai dòng trang trí để sưu tầm. Hầu hết các lớp đều có một vài diện mạo thay thế, một cách thể hiện mới mẻ cho hình tượng của lớp mà chỉ riêng bạn được mặc. Bên cạnh chúng là các chroma: những bảng màu hai tông được đặt tên, sơn lại hoàn toàn một diện mạo, từ kim loại trầm mặc đến những màu hoàng gia rực rỡ.',
   'guide.gear.cosmeticsTitle': 'Diện mạo và đồ trang trí',
   'guide.gear.fishingBody':
-    'Câu cá là một sự đổi nhịp êm ả. Trang bị một cần câu, quăng xuống vùng nước thoáng, và kéo lên thứ gì cắn câu. Bạn chủ yếu câu được cá vốn là đồ ăn bạn có thể ăn, đôi khi là vài món đồ tạp bán lấy ít tiền, và thỉnh thoảng là một mẻ hiếm quý giá. Bạn tìm được gì tùy thuộc vào vùng nước bạn câu.',
+    'Câu cá là một sự đổi nhịp êm ả. Hãy mang theo một cần câu, dùng nó cạnh vùng nước thoáng, và kéo lên thứ gì cắn câu. Bạn chủ yếu câu được cá vốn là đồ ăn bạn có thể ăn, đôi khi vài món đồ tạp bán lấy ít tiền, và thỉnh thoảng là một mẻ hiếm quý giá. Bạn tìm được gì tùy thuộc vào vùng nước bạn câu.',
   'guide.gear.fishingFood':
     'Cá bạn kéo lên là đồ ăn: ăn một con trong lúc bạn ngồi nghỉ và nó hồi máu, với những con cá ngon hơn đến từ vùng nước lạnh hơn, sâu hơn ở phía bắc. Một đường câu nơi hồ là cách lặng lẽ để giữ túi đồ đầy ắp giữa các trận đánh.',
   'guide.gear.fishingRare':
@@ -3493,7 +3885,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'Trang bị là đồ mà nhân vật của bạn mặc và những vật phẩm bạn mang theo. Trang bị tốt hơn là cách ổn định nhất để mạnh lên, và bạn nhặt được phần lớn chúng chỉ bằng cách chơi.',
   'guide.gear.itemLevelBody':
-    'Nếu bạn muốn một cách nhanh để so hai món đồ, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Khi đó mỗi vũ khí và mảnh giáp sẽ hiện một cấp vật phẩm, một con số duy nhất cho biết món đó mạnh cỡ nào dựa trên nơi nó đến, nên bạn có thể nhìn thoáng qua là biết món nâng cấp nào nặng ký hơn, kể cả khi khác ô trang bị.',
+    'Nếu bạn muốn một cách nhanh để so hai món đồ, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị giành được ngoài thế giới, từ kẻ địch và nhiệm vụ, khi đó sẽ hiện một cấp vật phẩm, một con số duy nhất cho biết đại khái món đó mạnh cỡ nào dựa trên nơi nó đến, nên bạn có thể nhìn thoáng qua là biết món nâng cấp nào nặng ký hơn, kể cả khi khác ô trang bị. Những món không có nguồn như vậy, như hàng cơ bản trơn của người bán và trang bị khởi đầu, không hiện cấp vật phẩm, nên một con số vắng mặt là chuyện thường, không phải lỗi.',
   'guide.gear.qualityBody':
     'Mỗi vật phẩm đều có một độ chất lượng, và tên của nó được tô màu tương ứng để bạn đọc được giá trị của nó trong nháy mắt. Từ phổ biến nhất đến quý giá nhất:',
   'guide.gear.qualityCommon': 'Phổ Thông',
@@ -3506,7 +3898,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityTitle': 'Chất lượng, nhìn thoáng qua',
   'guide.gear.qualityUncommon': 'Khác Thường',
   'guide.gear.setsBody':
-    'Giáp hiếm nhất đến theo những gia đình đồng bộ, vài món được tạo để trông và đánh như một thể thống nhất. Mặc đủ số món của một gia đình cùng lúc thì bộ thức dậy, trao thêm hiệu ứng bên trên các chỉ số riêng của từng món, và càng mặc nhiều món thì nó càng mạnh. Những món này rơi ra từ nội dung theo nhóm khó nhất gần cấp tối đa, nên săn cho đủ một bộ là một mục tiêu hậu kỳ kinh điển.',
+    'Một số giáp đến theo những gia đình đồng bộ, vài món được tạo để trông và đánh như một thể thống nhất. Mặc đủ số món của một gia đình cùng lúc thì bộ thức dậy, trao thêm hiệu ứng bên trên các chỉ số riêng của từng món, và càng mặc nhiều món thì nó càng mạnh. Vài gia đình như vậy xuất hiện dưới dạng những món rơi quý giá khi bạn lên cấp; những bộ vĩ đại nhất đến từ nội dung theo nhóm khó nhất gần cấp tối đa, nên săn cho đủ một bộ là một mục tiêu hậu kỳ kinh điển.',
   'guide.gear.setsTitle': 'Bộ trang bị và hiệu ứng bộ',
   'guide.gear.slotChest': 'Ngực',
   'guide.gear.slotFeet': 'Chân',
@@ -3517,10 +3909,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Vai',
   'guide.gear.slotWaist': 'Thắt Lưng',
   'guide.gear.slotsBody':
-    'Bạn có một ô vũ khí và bảy ô giáp. Mỗi lớp chỉ dùng được một số loại vũ khí nhất định và mặc giáp tới trọng lượng của riêng mình, vải, da, hoặc giáp lưới, nên những món nâng cấp hợp với bạn là những món được làm cho lớp của bạn. Trong giới hạn đó, hãy lấp đầy mọi ô bằng món tốt nhất bạn tìm được.',
+    'Bạn có một ô vũ khí, bảy ô giáp, và ba ô trang sức: một ô Cổ và hai ô Ngón Tay. Mỗi lớp chỉ dùng được một số loại vũ khí nhất định và mặc giáp tới trọng lượng của riêng mình, vải, da, hoặc giáp lưới, nên những món nâng cấp hợp với bạn là những món được làm cho lớp của bạn. Trang sức thì hoàn toàn không có trọng lượng: lớp nào cũng đeo được bất cứ thứ gì mình giành được. Trong giới hạn đó, hãy lấp đầy mọi ô bằng món tốt nhất bạn tìm được.',
   'guide.gear.slotsTitle': 'Những gì bạn có thể trang bị',
   'guide.gear.sourcesBody':
-    'Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác.',
+    'Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, thợ chế tác biến nguyên liệu thu thập thành những món mặc được, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác. Ở đỉnh cao, hai loại tiền huy hiệu mua được trang bị không tìm thấy ở đâu khác: Huy Hiệu Hang Sâu ở chỗ người giữ hang sâu, và Dấu Ấn Anh Hùng ở chỗ Quân Nhu Trưởng Anh Hùng.',
   'guide.gear.sourcesTitle': 'Trang bị đến từ đâu',
   'guide.gear.upgradeBody':
     'Thay một món cũ bằng một món nâng cấp mới giúp ích cho bạn nhiều hơn là chơi hoàn hảo trong bộ đồ bạn đã vượt qua. Khi thứ gì đó tốt hơn rơi ra hoặc một nhiệm vụ trao tặng nó, hãy nhận lấy. Đừng để dành những món tốt của bạn cho sau này.',
@@ -3606,7 +3998,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Có. Toàn bộ trò chơi miễn phí đến cấp tối đa, và nó là mã nguồn mở trên GitHub.',
   'guide.home.faq.a2':
-    'Không. Trò chơi hoàn toàn chơi được mà không cần ví. Token cộng đồng tùy chọn chỉ mở khóa trang trí làm đẹp và không bao giờ ảnh hưởng đến sức mạnh.',
+    'Không. Trò chơi hoàn toàn chơi được mà không cần ví. Token cộng đồng tùy chọn chỉ thêm những điểm nhấn trang trí và một phần chia từ quỹ giải thưởng hằng ngày, và không bao giờ ảnh hưởng đến sức mạnh.',
   'guide.home.faq.a3':
     'Có. Có chế độ chơi đơn tức thì ngay trong trình duyệt của bạn, cộng thêm thế giới trực tuyến chung.',
   'guide.home.faq.a4':
@@ -3659,7 +4051,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.basicsHeading': 'Những điều cơ bản',
   'guide.howToPlay.controlsLink': 'Xem bảng tra điều khiển đầy đủ',
   'guide.howToPlay.deathBody':
-    'Nếu bạn gục ngã, bạn giải thoát linh hồn và hồi sinh tại nghĩa địa gần nhất, đầy máu trở lại, rồi tự tìm đường về nơi bạn đã ở. Không mất kinh nghiệm nào.',
+    'Nếu bạn gục ngã, thi thể bạn nằm lại nơi ngã xuống và bạn trỗi dậy thành một hồn ma tại nghĩa địa gần nhất. Chạy linh hồn về lại thi thể để hồi sinh ngay tại chỗ, không hình phạt, hoặc nhờ Người Canh Giữ Nhợt Nhạt ở nghĩa địa hồi sinh tức thì với cái giá là một sự suy yếu thoáng qua. Những anh hùng vừa mới vào đời được miễn hoàn toàn sự suy yếu ấy, và không thứ gì bạn sở hữu hay giành được bị mất đi bao giờ.',
   'guide.howToPlay.deathTitle': 'Cái chết không phải là kết thúc',
   'guide.howToPlay.firstHeading': '15 phút đầu tiên của bạn',
   'guide.howToPlay.groupingBody':
@@ -3674,7 +4066,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nhận nhiệm vụ từ những người có dấu hiệu trên đầu, hoàn thành mục tiêu, rồi nộp lại để nhận kinh nghiệm, tiền vàng và trang bị. Bảng theo dõi trên màn hình giúp bạn luôn nhìn thấy mục tiêu của mình.',
   'guide.howToPlay.questsTitle': 'Nhiệm vụ',
   'guide.howToPlay.reassure':
-    'Tài năng mở khóa ở cấp 10 và có thể thiết lập lại bất cứ lúc nào, nên những lựa chọn ban đầu của bạn không bao giờ là vĩnh viễn. Cứ thoải mái thử nghiệm.',
+    'Tài năng mở khóa ở cấp 10 và có thể thiết lập lại bất cứ lúc nào khi bạn ở ngoài chiến đấu, nên những lựa chọn ban đầu của bạn không bao giờ là vĩnh viễn. Cứ thoải mái thử nghiệm.',
   'guide.howToPlay.resourcesBody':
     'Các phép và kỹ năng tiêu hao một loại tài nguyên. Chiến Binh tích Nộ Khí bằng cách chiến đấu, Đạo Tặc tiêu Năng Lượng tự hồi đầy, và những lớp còn lại thi triển phép từ nguồn Pháp Lực.',
   'guide.howToPlay.resourcesTitle': 'Tài nguyên',
@@ -3682,7 +4074,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chọn một lớp và một ngoại hình, đặt tên cho người hùng của bạn, rồi tiến vào thế giới. Bạn có thể tạo thêm nhân vật về sau.',
   'guide.howToPlay.step1Title': 'Tạo một nhân vật',
   'guide.howToPlay.step2Body':
-    'Thống Soái Redbrook đang chờ ở thị trấn khởi đầu. Nói chuyện với ông ấy và nhận nhiệm vụ Bầy Sói Trước Cửa.',
+    'Thống Soái Redbrook đang chờ ở thị trấn khởi đầu với nhiệm vụ Bầy Sói Trước Cửa, và Đốc Công Odell gần đó cũng có việc. Nói chuyện với một trong hai người để nhận nhiệm vụ đầu tiên của bạn.',
   'guide.howToPlay.step2Title': 'Tìm nhiệm vụ đầu tiên của bạn',
   'guide.howToPlay.step3Body':
     'Di chuyển bằng W, A, S, D. Giữ nút chuột phải và rê để nhìn quanh. Đại khái chỉ có vậy thôi.',
@@ -3772,7 +4164,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     'Mỗi cấp độ khiến bạn cứng cáp hơn và mang đến những kỹ năng mới, suốt chặng đường lên đến giới hạn cấp {cap}.',
   'guide.progression.capJourneyBody':
-    'Cấp {cap} là giới hạn, điểm kết thúc của việc lên cấp nhưng không phải của sự trưởng thành. Từ đó bạn chạy hầm ngục và raid, săn lùng trang bị tốt hơn, và thử thách bản thân trong đấu trường.',
+    'Cấp {cap} là giới hạn, điểm kết thúc của việc lên cấp nhưng không phải của sự trưởng thành. Từ đó bạn chạy các hầm ngục và raid ở chế độ Thường và Anh Hùng, đối mặt với trùm thế giới khi hắn trỗi dậy, săn lùng trang bị tốt hơn, và thử thách bản thân trong đấu trường.',
   'guide.progression.capTitle': 'Đạt cấp {cap}',
   'guide.progression.intro':
     'Mỗi trận chiến, nhiệm vụ, và mỗi bước về phương bắc đều khiến anh hùng của bạn mạnh hơn. Đây là cách lên cấp hoạt động và điều gì giúp bạn tiếp tục trưởng thành khi đã lên đến đỉnh.',
@@ -3782,15 +4174,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     'Không cần vội. Thế giới ở đó để bạn tận hưởng theo nhịp độ của riêng mình, vậy nên hãy lang thang, nhận những nhiệm vụ thu hút bạn, và để anh hùng của mình trưởng thành dọc đường đi.',
   'guide.progression.prestigeBody':
-    'Kinh nghiệm vẫn tiếp tục được tính ngay cả sau khi đạt giới hạn. Nó nuôi một cấp độ ảo mang tính trang trí, nên thanh kinh nghiệm của bạn vẫn cứ leo lên, cùng một hạng danh vọng dài hạn bạn có thể đạt được để ghi nhận. Vượt qua những cột mốc kinh nghiệm trọn đời lớn còn mở khóa những danh hiệu trang trí và viền bảng tên hiển thị trên bảng nhân vật của bạn. Tất cả hoàn toàn tùy chọn và không bao giờ ban sức mạnh, chỉ là dấu ấn của con đường bạn đã đi qua.',
+    'Kinh nghiệm vẫn tiếp tục được tính ngay cả sau khi đạt giới hạn. Nó nuôi một cấp độ ảo mang tính trang trí, nên thanh kinh nghiệm của bạn vẫn cứ leo lên, cùng một hạng uy danh dài hạn bạn có thể nhận từ bảng nhân vật một khi đã tới đó. Vượt qua những cột mốc kinh nghiệm trọn đời lớn còn mang về những kỳ công trong Sách Kỳ Công của bạn, kèm những danh hiệu trang trí và viền bảng tên hiển thị trên bảng nhân vật. Tất cả hoàn toàn tùy chọn và không bao giờ ban sức mạnh, chỉ là dấu ấn của con đường bạn đã đi qua.',
   'guide.progression.restedBody':
-    'Hãy nghỉ ngơi ở một nơi an toàn như quán trọ, ngoài chiến đấu, và nhân vật của bạn tích lũy kinh nghiệm nghỉ ngơi trong lúc bạn ngồi đó. Lần kế tiếp khi bạn ra ngoài chiến đấu, vốn tích lũy đó cho mỗi đòn hạ gục của bạn thêm một khoản thưởng cho đến khi cạn. Một khoảng dừng chân nơi quán trọ không bao giờ là thời gian lãng phí; nó đẩy nhanh chặng lên cấp kế tiếp của bạn.',
+    'Bước vào một quán trọ và ở ngoài chiến đấu, nhân vật của bạn sẽ tích lũy kinh nghiệm nghỉ ngơi trong lúc bạn chờ. Thị trấn nào cũng có một quán. Lần kế tiếp khi bạn ra ngoài chiến đấu, vốn tích lũy đó cho mỗi đòn hạ gục của bạn thêm một khoản thưởng cho đến khi cạn. Một khoảng dừng chân nơi quán trọ không bao giờ là thời gian lãng phí; nó đẩy nhanh chặng lên cấp kế tiếp của bạn.',
   'guide.progression.restedTitle': 'Kinh nghiệm nghỉ ngơi',
   'guide.progression.xpBody':
-    'Bạn kiếm kinh nghiệm bằng cách hoàn thành nhiệm vụ và đánh bại kẻ địch. Nhiệm vụ cho nhiều nhất, vượt xa các cách khác, nên theo dấu nhiệm vụ là cách lên cấp nhanh nhất. Hạ gục kẻ địch dọc đường lấp đầy phần còn lại.',
+    'Bạn kiếm kinh nghiệm bằng cách hoàn thành nhiệm vụ, đánh bại kẻ địch, và dọn sạch các delve. Nhiệm vụ cho nhiều nhất, vượt xa các cách khác, nên theo dấu nhiệm vụ là cách lên cấp nhanh nhất. Những cú hạ gục và các lượt chạy delve dọc đường lấp đầy phần còn lại.',
   'guide.progression.xpTitle': 'Cách bạn nhận kinh nghiệm',
   'guide.questsPage.acceptBody':
-    'Những người có dấu hiệu phía trên đầu có việc cho bạn. Hãy trò chuyện với họ để nhận nhiệm vụ. Nhiệm vụ đầu tiên của bạn là Bầy Sói Trước Cửa, từ Thống Chế Redbrook ở Eastbrook.',
+    'Những người có dấu hiệu phía trên đầu có việc cho bạn. Hãy trò chuyện với họ để nhận một nhiệm vụ. Ở Eastbrook, Thống Soái Redbrook đang chờ với nhiệm vụ Bầy Sói Trước Cửa, một trong những nhiệm vụ đầu tiên bạn có thể nhận.',
   'guide.questsPage.acceptTitle': 'Tìm và nhận nhiệm vụ',
   'guide.questsPage.heading': 'Nhiệm Vụ',
   'guide.questsPage.intro':
@@ -3799,7 +4191,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hạ gục một số kẻ địch nhất định, thu thập vật phẩm, hoặc tương tác với thứ gì đó trong thế giới. Bảng theo dõi trên màn hình đếm tiến độ của bạn khi bạn thực hiện. Nếu bạn đổi ý, bạn có thể bỏ một nhiệm vụ khỏi nhật ký nhiệm vụ và nhận lại nó từ người giao sau này.',
   'guide.questsPage.objectivesTitle': 'Mục tiêu',
   'guide.questsPage.partyBody':
-    'Các thành viên trong tổ đội ở gần cùng chia sẻ công hạ gục và mục tiêu, nên làm nhiệm vụ cùng nhau thì nhanh hơn, không bao giờ chậm hơn. Bạn cũng có thể chia sẻ một nhiệm vụ với nhóm của mình: đăng nó lên chat dưới dạng một liên kết bấm được bằng lệnh /share, và bất kỳ thành viên ở gần nào đủ điều kiện đều có thể nhận cùng nhiệm vụ đó chỉ bằng một cú bấm.',
+    'Các thành viên trong tổ đội ở gần cùng chia sẻ công hạ gục và mục tiêu, nên làm nhiệm vụ cùng nhau thì nhanh hơn, không bao giờ chậm hơn. Bạn cũng có thể chia sẻ một nhiệm vụ với nhóm của mình: đăng nó lên chat dưới dạng một liên kết bấm được bằng lệnh /share, và bất kỳ thành viên nào đủ điều kiện đều có thể nhận cùng nhiệm vụ đó chỉ bằng một cú bấm.',
   'guide.questsPage.partyTitle': 'Làm nhiệm vụ theo nhóm',
   'guide.questsPage.sagaBody':
     'Cốt truyện chính là một cuộc truy đuổi dài. Một giáo phái tử thần đang hoạt động trên những ngôi mộ của vương quốc, và mỗi chương bạn khép lại đều chỉ về phía bắc thêm một khu vực trên con đường. Bạn không bao giờ đối đầu với toàn bộ âm mưu cùng lúc; bạn kéo một sợi chỉ, và nó dẫn đến bàn tay tiếp theo đang nắm giữ nó.',
@@ -3832,7 +4224,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hãy mang một nhiệm vụ đã hoàn thành đến điểm nộp của nó, bản đồ sẽ chỉ chỗ cho bạn, để nhận kinh nghiệm, tiền vàng, và thường là một món trang bị được chọn hợp với lớp nhân vật của bạn. Đó thường là người đã giao nó cho bạn, dù một số nhiệm vụ sẽ gửi bạn đến một người khác.',
   'guide.questsPage.turninTitle': 'Trả nhiệm vụ',
   'guide.questsPage.typeGatherBody':
-    'Thu thập vật phẩm từ thế giới hoặc từ thứ kẻ địch rơi ra: thảo dược, quặng, những lá thư thất lạc, những nguyên liệu rùng rợn của một giáo phái. Vài món chỉ rơi từ một kẻ địch cụ thể, nên cuộc săn và chiến lợi phẩm đi liền với nhau.',
+    'Thu thập vật phẩm từ thế giới hoặc từ thứ kẻ địch rơi ra: thảo dược, quặng, những nguyên liệu rùng rợn của một giáo phái. Vài món chỉ rơi từ một kẻ địch cụ thể, nên cuộc săn và chiến lợi phẩm đi liền với nhau.',
   'guide.questsPage.typeGatherTitle': 'Thu thập',
   'guide.questsPage.typeGroupBody':
     'Mỗi chương của cốt truyện chính kết thúc tại cửa một hầm ngục. Phần dẫn vào có thể chơi đơn, nhưng đòn kết liễu kẻ phản diện của một chương được dành cho một tổ đội năm người.',
@@ -3844,7 +4236,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một số nhiệm vụ giao cho bạn tập hợp một thị trấn trước một đợt tiến quân về phương bắc: làm thưa mối đe dọa nơi cổng thành và thu thập những gì người phòng thủ cần. Đó là những mục tiêu hạ gục và thu thập phục vụ những con người mà câu chuyện của họ bạn đang ở trong đó, và chúng giúp bạn luôn di chuyển cùng họ.',
   'guide.questsPage.typeMusterTitle': 'Tập hợp lực lượng phòng thủ',
   'guide.questsPage.typeSlayBody':
-    'Tỉa bớt một bầy thú hoặc bẻ gãy thế kìm kẹp của một giáo phái bằng cách đánh bại một số lượng nhất định một kẻ địch được đánh dấu. Nhiệm vụ đầu tiên trong trò chơi, dọn sạch bầy sói trên con đường Eastbrook, là một trong số đó.',
+    'Tỉa bớt một bầy thú hoặc bẻ gãy thế kìm kẹp của một giáo phái bằng cách đánh bại một số lượng nhất định một kẻ địch được đánh dấu. Một trong những nhiệm vụ đầu tiên của bạn, dọn sạch bầy sói trên con đường Eastbrook, là một trong số đó.',
   'guide.questsPage.typeSlayTitle': 'Hạ sát',
   'guide.questsPage.typesBody':
     'Hầu hết các nhiệm vụ đều thuộc một trong vài dạng quen thuộc. Bảng theo dõi trên màn hình ghi rõ chính xác mỗi nhiệm vụ muốn gì, nên bạn không bao giờ phải đoán mò.',
@@ -3875,7 +4267,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một kênh phủ toàn vương quốc luôn bật, đến với mọi người đang trực tuyến, tiện để hỏi một câu hoặc trò chuyện chung. Khác với World và Looking for Group, bạn không bao giờ phải tự đăng ký tham gia.',
   'guide.social.chanGuild': 'Bang Hội và Sĩ Quan.',
   'guide.social.chanGuildBody':
-    'Các kênh dành cho bang hội của bạn. Kênh bang hội đến được mọi thành viên; kênh sĩ quan chỉ dành cho các sĩ quan.',
+    'Các kênh dành cho bang hội của bạn. Kênh bang hội đến được mọi thành viên; kênh sĩ quan dành cho các sĩ quan và bang chủ.',
   'guide.social.chanLfg': 'Tìm Nhóm.',
   'guide.social.chanLfgBody':
     'Một kênh toàn server tùy chọn để tìm người chạy hầm ngục. Mở thẻ của nó để tham gia.',
@@ -3898,7 +4290,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Khung chat được chia thành các kênh, mỗi kênh hiển thị trên thẻ riêng của nó. Gõ một tin nhắn để gửi trên kênh đang hoạt động, hoặc dùng một lệnh gạch chéo để chuyển một dòng đi nơi khác. Đây là những kênh bạn có thể trò chuyện:',
   'guide.social.chatHeading': 'Các kênh chat',
   'guide.social.etiquetteBody':
-    'Tham gia nhóm là một lựa chọn, không phải nghĩa vụ. Hãy chào hỏi khi bạn vào, chỉ tung Cần với trang bị bạn thực sự sẽ dùng, và báo cho nhóm biết trước khi bạn rời đi. Một chút lịch sự giúp ích rất nhiều, và hầu hết người chơi đều vui khi có bạn đồng hành.',
+    'Tham gia nhóm là một lựa chọn, không phải nghĩa vụ. Hãy chào hỏi khi bạn vào, chỉ tung Cần với trang bị bạn thực sự sẽ dùng, và báo cho nhóm biết trước khi bạn rời đi. Một chút lịch sự giúp ích rất nhiều, và hầu hết người chơi đều vui khi có bạn đồng hành. Các điều hành viên giữ gìn trật tự, và một người chơi không chịu để người khác tận hưởng trò chơi có thể bị đưa vào một buồng giam cho tới khi một điều hành viên thả họ ra.',
   'guide.social.etiquetteHeading': 'Phép lịch sự khi tham gia nhóm',
   'guide.social.friendsBody':
     'Thêm người chơi vào danh sách bạn bè để biết khi nào họ trực tuyến và họ đang ở đâu, để bạn có thể lập nhóm ngay khoảnh khắc họ đăng nhập.',
@@ -3918,7 +4310,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiền từ một đòn hạ gục có thể về tay người nhặt, hoặc chia đều cho cả tổ đội.',
   'guide.social.lootCoinTitle': 'Tiền vàng.',
   'guide.social.lootCommonBody':
-    'Những món rơi ra thông thường có thể về tay người nhặt, trong khi những món tốt hơn được đưa ra tung xúc xắc để mọi người có cơ hội công bằng.',
+    'Những món rơi ra thông thường có thể luân phiên quanh tổ đội hoặc về tay người nhặt, trong khi những món tốt hơn được đưa ra tung xúc xắc để mọi người có cơ hội công bằng.',
   'guide.social.lootCommonTitle': 'Vật phẩm.',
   'guide.social.lootHeading': 'Chiến lợi phẩm tổ đội',
   'guide.social.lootMasterBody':
@@ -3938,13 +4330,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nhanh Nhẹn mài giũa bạn theo nhiều cách: nó nâng cơ hội tung ra một đòn chí mạng và cơ hội né của bạn, và thêm một chút giáp. Với đạo tặc và thợ săn nó còn nuôi sức tấn công, và nó chi phối những phát bắn từ xa của thợ săn.',
   'guide.stats.agiTitle': 'Nhanh Nhẹn',
   'guide.stats.apBody':
-    'Sức tấn công đo lường vũ khí của bạn đánh mạnh đến đâu. Các thuộc tính chính của bạn nuôi nó, và vũ khí cùng trang bị mạnh hơn nâng nó lên cao hơn nữa, đó là lý do một lần nâng cấp có thể là một bước nhảy thực sự về sát thương.',
+    'Sức tấn công đo lường vũ khí của bạn đánh mạnh đến đâu. Các thuộc tính chính của bạn nuôi nó, và trang bị mang những thuộc tính ấy nâng nó lên cao hơn nữa, trong khi một vũ khí mạnh hơn nâng sát thương của bạn một cách trực tiếp, đó là lý do một lần nâng cấp có thể là một bước nhảy thực sự về sát thương.',
   'guide.stats.apTitle': 'Sức tấn công',
   'guide.stats.armorBody':
     'Giáp giảm sát thương vật lý bạn phải chịu. Nó đến chủ yếu từ những gì bạn mặc, và các lớp giáp nặng mang nhiều giáp hơn hẳn. Nhiều giáp hơn trước một kẻ địch gần cấp của bạn nghĩa là mỗi đòn của nó giáng nhẹ hơn.',
   'guide.stats.armorTitle': 'Giáp',
   'guide.stats.critBody':
-    'Cơ hội chí mạng của bạn là mức độ thường xuyên một đòn tấn công giáng ra sát thương thêm. Mọi người đều khởi đầu với một cơ hội nền nhỏ, và Nhanh Nhẹn (cùng vài thiên phú và trang bị) bồi đắp thêm.',
+    'Cơ hội chí mạng của bạn là mức độ thường xuyên một đòn tấn công giáng ra sát thương thêm. Mọi người đều khởi đầu với một cơ hội nền nhỏ, và Nhanh Nhẹn (cùng vài thiên phú và trang bị) bồi đắp thêm. Bảng chỉ số của bạn hiển thị cả bản thân cơ hội đó lẫn chỉ số chí mạng mà trang bị của bạn đóng góp vào nó.',
   'guide.stats.critTitle': 'Đòn chí mạng',
   'guide.stats.dodgeBody':
     'Né là cơ hội của bạn để hoàn toàn tránh một đòn cận chiến đang đến. Bạn bắt đầu với một cơ hội nền nhỏ, và Nhanh Nhẹn nâng nó lên, nên các lớp nhanh nhẹn lách được nhiều đòn hơn.',
@@ -3970,7 +4362,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sức mạnh phép thuật là đối ứng của một pháp sư với sức tấn công: nó nâng sát thương các phép của bạn. Trí Tuệ nuôi nó, và trang bị cùng buff cho pháp sư cộng thêm bên trên, nên một người niệm phép theo dõi sức mạnh phép thuật giống như một chiến binh cận chiến theo dõi sức tấn công.',
   'guide.stats.spTitle': 'Sức mạnh phép thuật',
   'guide.stats.spiBody':
-    'Tinh Thần chi phối tốc độ mana của một pháp sư hồi lại khi ngoài chiến đấu. Giống Trí Tuệ, nó phục vụ các lớp dùng mana và ít có ý nghĩa với các lớp khác.',
+    'Tinh Thần chi phối tốc độ mana của một người niệm phép hồi lại mỗi khi họ ngưng niệm, tức là gần như suốt thời gian giữa các trận. Giống Trí Tuệ, nó phục vụ các lớp dùng mana và ít có ý nghĩa với các lớp khác.',
   'guide.stats.spiTitle': 'Tinh Thần',
   'guide.stats.staBody':
     'Thể Lực là khả năng trụ vững của bạn. Nhiều Thể Lực hơn nghĩa là vốn máu lớn hơn, và nó đẩy nhanh lượng máu bạn hồi khi nghỉ ngơi ngoài chiến đấu. Mọi lớp đều cần một ít.',
@@ -3991,17 +4383,17 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Một MMO phong cách cổ điển bạn chơi miễn phí ngay trên trình duyệt.',
   'guide.talentsPage.heading': 'Tài năng và chuyên môn hóa',
   'guide.talentsPage.howBody':
-    'Tài năng mở ra ở cấp 10, và bạn tiếp tục kiếm điểm khi leo dần lên cấp tối đa. Bạn tiêu chúng trong bảng tài năng của lớp nhân vật, và có thể lưu nhiều hơn một bố cục để hoán đổi giữa các lối xây dựng.',
+    'Tài năng mở ra ở cấp 10, và bạn tiếp tục kiếm điểm khi leo dần lên cấp tối đa. Bạn tiêu chúng trong bảng tài năng của lớp nhân vật, nơi các hàng sâu hơn mở ra khi bạn đầu tư và lên cấp, và bạn có thể lưu nhiều hơn một bố cục để hoán đổi giữa các lối xây dựng.',
   'guide.talentsPage.howHeading': 'Cách chúng hoạt động',
   'guide.talentsPage.intro':
     'Tài năng là cách bạn biến một lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ tha thứ và dễ thay đổi, nên bạn có thể thử nghiệm mà không phải lo sợ.',
   'guide.talentsPage.resetNote':
-    'Bạn có thể đặt lại tài năng bất cứ khi nào bạn ở ngoài chiến đấu, nên một lựa chọn sớm không bao giờ là cái bẫy. Cứ thử, xem bạn thích gì, và đổi ý thoải mái.',
+    'Bạn có thể đặt lại tài năng bất cứ khi nào bạn ở ngoài chiến đấu và không ở trong một trận đấu trường, nên một lựa chọn sớm không bao giờ là cái bẫy. Cứ thử, xem bạn thích gì, và đổi ý thoải mái.',
   'guide.talentsPage.resetTitle': 'Không có gì là vĩnh viễn',
   'guide.talentsPage.shareNote':
     'Một cấu hình hoàn chỉnh có thể được sao thành một mã chia sẻ ngắn rồi trao cho một người bạn, người đó dán thẳng vào bảng tài năng của mình để nạp nó.',
   'guide.talentsPage.specsBody':
-    'Mỗi lớp nhân vật có một vài chuyên môn hóa, mỗi cái có vai trò riêng và một trọng tâm đặc trưng. Đây là hình hài của tất cả chúng. Mở một lớp để xem trọn bộ kỹ năng của nó.',
+    'Mỗi lớp nhân vật có một vài chuyên môn hóa, mỗi cái có vai trò riêng và một trọng tâm đặc trưng. Chọn một chuyên môn trong bảng tài năng sẽ ban một kỹ năng đặc trưng và một tinh thông bền vững của riêng nó. Đây là hình hài của tất cả chúng. Mở một lớp để xem trọn bộ kỹ năng của nó.',
   'guide.talentsPage.specsHeading': 'Chuyên môn hóa theo lớp',
   'guide.talentsPage.whatBody':
     'Khi lên cấp, bạn kiếm được điểm tài năng để tiêu vào những nâng cấp nhỏ, vĩnh viễn cho các kỹ năng và chỉ số của mình. Chúng định hình cảm giác của một lớp nhân vật, nghiêng nó về hướng sát thương nhiều hơn, phòng thủ vững chắc hơn, hoặc trị liệu mạnh hơn.',
@@ -4020,10 +4412,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Lớp nhân vật nào cũng có thể tự đứng vững và đạt tới cấp tối đa. Hãy chọn câu chuyện viễn tưởng mà bạn thích, không phải cái mà người khác cho là tốt nhất.',
   'guide.wishPage.i1Title': 'Bạn không thể chọn nhầm lớp nhân vật',
   'guide.wishPage.i2Body':
-    'Khi gục ngã, bạn giải thoát linh hồn và hồi sinh tại nghĩa địa gần nhất, rồi tự tìm đường quay lại. Không mất kinh nghiệm nào, nên cứ an tâm mạo hiểm và học hỏi.',
+    'Khi gục ngã, bạn trỗi dậy thành một hồn ma tại nghĩa địa gần nhất. Chạy về lại thi thể để hồi sinh miễn phí, hoặc nhận sự hồi sinh tức thì của Người Canh Giữ Nhợt Nhạt và mang theo một sự suy yếu ngắn ngủi để đổi lấy tiện lợi. Không mất kinh nghiệm, trang bị hay tiền vàng bao giờ, nên cứ an tâm mạo hiểm và học hỏi.',
   'guide.wishPage.i2Title': 'Cái chết hầu như không tốn của bạn gì',
   'guide.wishPage.i3Body':
-    'Chúng mở khóa ở cấp 10 và đặt lại bất cứ khi nào bạn muốn, nên những lựa chọn ban đầu của bạn không bao giờ là vĩnh viễn.',
+    'Chúng mở khóa ở cấp 10 và đặt lại bất cứ khi nào bạn muốn, khi ở ngoài chiến đấu, nên những lựa chọn ban đầu của bạn không bao giờ là vĩnh viễn.',
   'guide.wishPage.i3Title': 'Tài năng không phải là cái bẫy',
   'guide.wishPage.i4Body':
     'Nhiệm vụ là cách lên cấp nhanh nhất và chúng dẫn bạn đi khắp thế giới. Khi không chắc nên đi đâu, hãy tìm dấu mốc tiếp theo.',
@@ -4058,14 +4450,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshGreeting':
     'Dừng lại ở cổng. Vượt qua đám sậy kia, đầm lầy sẽ giết thay cho chúng ta.',
   'guide.worldPage.marshPlaceNotes':
-    'Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds chứa những hiểm họa cổ xưa hơn; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.',
+    'Fenbridge canh giữ con đường khô ráo duy nhất. Prowler Reeds và Deepfen Shallows đầy ắp thú đầm lầy và mudfin; Widow Thicket giăng kín mạng nhện dày đặc; Drowned Chapel và Troll Mounds giữ những hiểm họa cổ xưa hơn, với Kinh Cầu Chết Chìm, delve của riêng đầm lầy, mở ra ngay phía bắc các gò mộ; Gravecaller Encampment là nơi giáo phái đào hầm ẩn náu, và Pháo Đài Chìm là trái tim hầm ngục của đầm lầy.',
   'guide.worldPage.peaksBlurb':
     'Những rặng núi bị gió bào mòn và các hầm mỏ cũ vươn tới những hiểm họa lạnh giá, cao nhất của vương quốc, được trấn giữ bởi tiền đồn Highwatch.',
   'guide.worldPage.peaksGreeter': 'Đại Úy Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố và Glimmermere phát sáng bên dưới nó; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
   'guide.worldPage.places': 'Những địa điểm đáng chú ý',
   'guide.worldPage.residents': 'Những người bạn sẽ gặp',
   'guide.worldPage.valeBlurb':
@@ -4073,7 +4465,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Cảnh Sát Trưởng Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Hãy giữ lưỡi kiếm bên mình. Thung Lũng không còn như xưa nữa.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước tĩnh lặng để câu cá; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của thế giới; và Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc.',
+    'Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.',
   'highscores.desc':
     'Theo dõi những nhà vô địch vĩ đại nhất của thế giới và so sánh tiến độ của bạn.',
   'highscores.title': 'Bảng Xếp Hạng Điểm Cao',
@@ -4184,6 +4576,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileControls': 'Điều khiển di động',
   'hud.core.mobileMap': 'Bản Đồ',
   'hud.core.mobileMenu': 'Menu',
+  'hud.core.mobileSettings': 'Cài Đặt',
   'hud.core.mobileMeters': 'Đồng Hồ',
   'hud.core.mobileMore': 'Thêm',
   'hud.core.mobileMoreAria': 'Hiện thêm menu',
@@ -4783,7 +5176,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/g',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}g',
-  'hudChrome.mobile.autorun': 'Tự Chạy',
   'hudChrome.mobile.haptics': 'Phản Hồi Rung',
   'hudChrome.mobile.hapticsOff': 'Tắt Phản Hồi Rung',
   'hudChrome.mobile.jump': 'Nhảy',
@@ -4853,6 +5245,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.programs': 'Shader',
   'hudChrome.perf.labels.renderScale': 'Tỷ Lệ Kết Xuất',
   'hudChrome.perf.labels.snapshot': 'Tốc Độ Ảnh Chụp',
+  'hudChrome.perf.labels.serverTick': 'Tốc Độ Nhịp Máy Chủ',
   'hudChrome.perf.labels.textures': 'Vân Bề Mặt',
   'hudChrome.perf.labels.triangles': 'Tam Giác',
   'hudChrome.perf.opacity': 'Độ Mờ Nền',
@@ -5683,7 +6076,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'worldContent.dungeonInstanceBusy': 'Tất cả các phiên bản của {name} đang bận. Hãy thử lại sau.',
   'worldContent.dungeonPartyWarning':
     '{name} dành cho một nhóm đầy đủ {count} người. Hãy cẩn thận.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Gây {value} sát thương {school} mỗi {interval} giây',
   'hudChrome.auraEffect.hot': 'Hồi {value} máu mỗi {interval} giây',
   'hudChrome.auraEffect.absorb': 'Hấp thụ {value} sát thương',
@@ -5993,7 +6385,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Bưu Quạ',
   'entities.letters.ravenpost_welcome.subject': 'Giờ đây bầy quạ bay vì bạn',
   'entities.letters.ravenpost_welcome.body':
@@ -6083,7 +6474,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'Xác thực hai yếu tố chưa được bật.',
   'apiError.two_factor.setup_required': 'Hãy bắt đầu thiết lập xác thực hai yếu tố trước.',
   'apiError.validation.failed': 'Một số trường không hợp lệ. Hãy kiểm tra biểu mẫu và thử lại.',
-  // Release v0.22.0 locale fill.
   'download.linuxCta': 'Tải xuống cho Linux',
   'download.linuxHint': 'AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.',
   'loading.reconnecting': 'Mất kết nối. Đang kết nối lại...',
@@ -6159,7 +6549,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Xung quanh mưa và tuyết. Chỉ có khí quyển và tắt nó sẽ tiết kiệm được một chút khi có bão.',
   'guide.settingsPage.tableFoot':
     'Bạn đang tìm kiếm thanh trượt khoảng cách vẽ hoặc giới hạn FPS? Không có gì để tìm kiếm: khoảng cách xem là một phần của từng bậc chất lượng và tốc độ khung hình sẽ tuân theo màn hình của bạn.',
-  'guide.settingsPage.tableHeading': 'Mọi lựa chọn, được giải thích',
+  'guide.settingsPage.tableHeading': 'Mọi tùy chọn đồ họa, được giải thích',
   'guide.settingsPage.tagReload': 'sau khi tải lại',
   'guide.settingsPage.value100': '100%',
   'guide.settingsPage.value50to70': '50 đến 70%',
@@ -6171,7 +6561,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsWhy':
     'Ultra hiển thị ở độ phân giải cao nhất mà màn hình của bạn cung cấp với ánh sáng phong phú nhất. Nó cũng tắt mạng lưới an toàn và chỉ dành cho máy tính để bàn: điện thoại và ứng dụng có mức tối đa High.',
   'guide.settingsPage.wherePath':
-    'Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc và tìm trong Đồ họa, Giao diện và Lớp phủ hiệu suất.',
+    'Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc để mở phần tùy chọn. Menu mở ra ở một Tổng Quan gồm những mục thiết yếu được ghim, với các hạng mục trên một thanh bên cạnh: các cài đặt dưới đây nằm trong Đồ Họa, Giao Diện, và Trợ Năng thuộc nhóm Hiển Thị, còn Lớp Phủ Hiệu Suất nằm trong Hệ Thống. Nhanh hơn nữa, gõ một cái tên vào ô tìm kiếm ở phía trên và nhảy thẳng tới nó.',
   'guide.settingsPage.whyLabel': 'Tại sao nó hoạt động:',
   'hudChrome.crafting.close': 'Đóng chế tạo',
   'hudChrome.crafting.craft': 'thủ công',
@@ -6191,7 +6581,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Mục tiêu',
   'hudChrome.options.mobileCameraJoystick': 'Cần điều khiển máy ảnh',
   'hudChrome.options.mobileLeftHanded': 'Bố cục thuận tay trái',
-  // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Một nghề để gọi riêng của bạn',
   'entities.quests.q_archetype_acceptance.text':
     'Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.',
@@ -6203,4 +6592,752 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_make_amends.completion':
     'Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Sói rừng bị giết',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Mọi thùng hàng, rương tiền, và món trang sức đều an toàn trong tay Két Sắt Mạ Vàng.',
+  'entities.npcs.bursar_aldous_crane.name': 'Thủ Quỹ Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Két Sắt Mạ Vàng',
+  'entities.npcs.bursar_fernando.greeting':
+    'Chào mừng đến với Két Sắt Mạ Vàng. Hàng hóa của ngươi nằm yên an toàn sau những ổ khóa của chúng tôi.',
+  'entities.npcs.bursar_fernando.name': 'Thủ Quỹ Fernando',
+  'entities.npcs.bursar_fernando.title': 'Két Sắt Mạ Vàng',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Két Sắt Mạ Vàng giữ sổ sách sạch sẽ và những kho két còn sạch sẽ hơn. Chúng tôi cất giữ gì cho ngươi đây?',
+  'entities.npcs.bursar_petra_vell.name': 'Thủ Quỹ Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Két Sắt Mạ Vàng',
+  'guide.economy.bankBody':
+    'Mỗi thị trấn trung tâm đều có một chi nhánh của Két Sắt Mạ Vàng, ngân hiệu của cả vương quốc. Hãy nói chuyện với thủ quỹ ở đó để mở kho két của bạn, một khoang chứa riêng ngoài túi đồ mà nhân vật của bạn giữ trọn đời. Bất cứ thứ gì bạn gửi lại đều chờ bạn an toàn, dù lần sau bạn ghé chi nhánh nào.',
+  'guide.economy.bankHow':
+    'Khi kho két đang mở, nhấp một vật phẩm trong túi để gửi vào và nhấp nó trong kho két để lấy lại. Kho két chỉ giữ hàng hóa, không bao giờ giữ tiền, và vật phẩm nhiệm vụ luôn ở lại bên bạn. Khi túi đầy giữa chuyến đi, một nút bấm sẽ quét toàn bộ nguyên liệu chế tác của bạn vào cùng một lúc.',
+  'guide.economy.bankSlots':
+    'Một kho két mới mở khởi đầu nhỏ bé và lớn dần cùng bạn. Thủ quỹ bán thêm ô với giá tiền vàng ngày một đắt hơn, và chơi trực tuyến còn mang lại chỗ chứa thưởng thêm, cho những việc như xác minh email, liên kết tài khoản, và những người bạn mà bạn đưa vào trò chơi.',
+  'guide.economy.bankTitle': 'Ngân Hàng',
+  'hudChrome.bank.bonusAdvertDiscord': 'Liên kết Discord của bạn để nhận 2 ô.',
+  'hudChrome.bank.bonusAdvertEmail': 'Xác minh email của bạn để nhận 2 ô.',
+  'hudChrome.bank.bonusAdvertWallet': 'Liên kết một ví để nhận 2 ô.',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Mời một người bạn: khi họ đạt cấp 10, cả bạn lẫn họ mỗi người nhận 2 ô, tối đa 5 người bạn.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'hudChrome.bank.bonusSectionAria': 'Ô ngân hàng thưởng và cách kiếm thêm',
+  'hudChrome.bank.bonusSourceDiscord': 'Đã liên kết Discord',
+  'hudChrome.bank.bonusSourceEmail': 'Email đã xác minh',
+  'hudChrome.bank.bonusSourceReferral': 'Bạn bè được giới thiệu',
+  'hudChrome.bank.bonusSourceWallet': 'Đã liên kết ví',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusTitle': 'Ô Thưởng',
+  'hudChrome.bank.buyConfirm': 'Mua thêm {count} ô ngân hàng với giá {price}?',
+  'hudChrome.bank.buyConfirmAccept': 'Mua',
+  'hudChrome.bank.buySlots': 'Mua {count} ô',
+  'hudChrome.bank.buySlotsMaxed': 'Đã mở rộng tối đa',
+  'hudChrome.bank.cannotDeposit': 'Không thể gửi vào ngân hàng',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Ô ngân hàng đã dùng: {used} trên {total}',
+  'hudChrome.bank.close': 'Đóng ngân hàng',
+  'hudChrome.bank.depositAll': 'Gửi tất cả nguyên liệu',
+  'hudChrome.bank.depositAllDone': 'Nguyên liệu đã gửi: {count}.',
+  'hudChrome.bank.depositAllFull': 'Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.',
+  'hudChrome.bank.depositAllNone': 'Ngân hàng đầy: không gửi được gì.',
+  'hudChrome.bank.depositHint': 'Nhấp để gửi vào',
+  'hudChrome.bank.depositPartialHint': 'Shift-click để gửi vào một phần',
+  'hudChrome.bank.depositQuantityConfirm': 'Gửi Vào',
+  'hudChrome.bank.depositQuantityInput': 'Số lượng cần gửi',
+  'hudChrome.bank.depositQuantityTitle': 'Gửi {item}',
+  'hudChrome.bank.empty': 'Ngân hàng của bạn đang trống.',
+  'hudChrome.bank.filterGroupAria': 'Lọc ngân hàng theo danh mục',
+  'hudChrome.bank.searchAria': 'Tìm vật phẩm ngân hàng theo tên',
+  'hudChrome.bank.sortAria': 'Sắp xếp vật phẩm ngân hàng',
+  'hudChrome.bank.subtitle': 'Két Sắt Mạ Vàng',
+  'hudChrome.bank.title': 'Ngân Hàng',
+  'hudChrome.bank.tooFar': 'Bạn phải ở chỗ nhân viên ngân hàng mới xem được ngân hàng của mình.',
+  'hudChrome.bank.withdrawHint': 'Nhấp để rút ra',
+  'hudChrome.bank.withdrawPartialHint': 'Shift-click để rút ra một phần',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Rút Ra',
+  'hudChrome.bank.withdrawQuantityInput': 'Số lượng cần rút',
+  'hudChrome.bank.withdrawQuantityTitle': 'Rút {item}',
+  'abilityUi.tooltip.selfOnly': 'Chỉ bản thân',
+  'itemUi.lootRoll.rolled': 'Đã tung {answered}/{total}',
+  'entities.abilities.sunder_armor.description':
+    'Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn.',
+  'entities.mobs.training_dummy.name': 'Hình Nộm Tập Luyện',
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Bảo Vệ Yumi là chế độ tranh mục tiêu theo đội chơi trong một mê cung: mỗi bên canh giữ linh thú mèo của mình trong khi săn lùng con của đối phương. Thỉnh thoảng cả hai chú mèo lại chớp dịch tới những góc mới của mê cung, nên trận đấu xoay vần giữa việc phòng thủ, săn lùng và chạy đua đi tìm lại chúng. Xếp hàng chờ theo dạng ba đấu ba hoặc năm đấu năm; gục ngã trong trận chỉ khiến bạn phải ngồi ngoài trong chốc lát.',
+  'guide.arenaPage.yumiHeading': 'Bảo Vệ Yumi',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Sở Thích',
+  'hudChrome.auraEffect.armorPct': 'Giảm giáp đi {pct}%',
+  'hudChrome.auraEffect.armorPctStacks': 'Giảm giáp đi {pct}% ({stacks} tích trữ)',
+  'hudChrome.auraEffect.increasePct.allStats': 'Tăng tất cả thuộc tính thêm {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Tăng sức mạnh tấn công thêm {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': 'Tăng giáp thêm {pct}%',
+  'hudChrome.auraEffect.increasePct.int': 'Tăng Trí Tuệ thêm {pct}%',
+  'hudChrome.auraEffect.increasePct.sta': 'Tăng Thể Lực thêm {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.',
+  'hudChrome.crafting.recipeNotLearned': 'Bạn chưa học công thức đó.',
+  'hudChrome.crafting.throttled': 'Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.',
+  'hudChrome.mobile.chatPlaceholder': 'Nói gì đó...',
+  'hudChrome.mobile.hideKeyboard': 'Ẩn bàn phím',
+  'hudChrome.unitFrame.partyChip': 'Tổ Đội',
+  'yumi.banner.sudden': 'ĐỘT TỬ! Các Yumi vẫn trụ vững!',
+  'yumi.banner.teleport': 'Các Yumi dịch chuyển tức thời!',
+  'yumi.bracket3': 'Yumi 3 đấu 3',
+  'yumi.bracket5': 'Yumi 5 đấu 5',
+  'yumi.end.loss': 'THẤT BẠI! Yumi của bạn đã gục ngã.',
+  'yumi.end.win': 'CHIẾN THẮNG! Yumi đã an toàn!',
+  'yumi.enterQueue': 'Tham Gia Bảo Vệ Yumi!',
+  'yumi.error.partyTooBig3': 'Bảo Vệ Yumi 3 đấu 3 chỉ cho phép tổ đội tối đa ba người.',
+  'yumi.error.partyTooBig5': 'Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người.',
+  'yumi.hud.aria': 'Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.',
+  'yumi.hud.collapse': 'Thu gọn thanh Bảo Vệ Yumi',
+  'yumi.hud.enemyYumi': 'Yumi Địch',
+  'yumi.hud.expand': 'Mở rộng thanh Bảo Vệ Yumi',
+  'yumi.hud.getReady': 'Sẵn sàng…',
+  'yumi.hud.suddenDeath': 'ĐỘT TỬ',
+  'yumi.hud.teleportIn': 'Các Yumi dịch chuyển sau {s}',
+  'yumi.hud.title': 'BẢO VỆ YUMI',
+  'yumi.hud.yourYumi': 'Yumi Của Bạn',
+  'yumi.log.start': 'Bảo Vệ Yumi! Bảo vệ linh thú của bạn và săn lùng linh thú của đối phương.',
+  'yumi.queue.join': 'Bạn vào hàng chờ Bảo Vệ Yumi. Hãy canh giữ linh thú của bạn…',
+  'yumi.queue.leave': 'Bạn rời hàng chờ Bảo Vệ Yumi.',
+  'yumi.queue.teamLeave': 'Đội của bạn rời hàng chờ Bảo Vệ Yumi.',
+  'yumi.respawn.title': 'GỤC NGÃ!',
+  'hudChrome.auth.forgotPrompt': 'Quên mật khẩu?',
+  'hudChrome.auth.forgotTitle': 'Đặt lại mật khẩu',
+  'hudChrome.auth.forgotHint':
+    'Nhập tên người dùng của bạn và chúng tôi sẽ gửi liên kết đặt lại tới địa chỉ email đã đăng ký.',
+  'hudChrome.auth.forgotUsername': 'Tên người dùng',
+  'hudChrome.auth.forgotSubmit': 'Gửi liên kết đặt lại',
+  'hudChrome.auth.forgotSent':
+    'Nếu tài khoản với tên người dùng đó có địa chỉ email đã đăng ký, chúng tôi đã gửi liên kết đặt lại. Hãy kiểm tra hộp thư của bạn.',
+  'hudChrome.auth.forgotBack': 'Quay lại đăng nhập',
+  'hudChrome.auth.resetTitle': 'Chọn mật khẩu mới',
+  'hudChrome.auth.resetNewPassword': 'Mật khẩu mới',
+  'hudChrome.auth.resetConfirm': 'Xác nhận mật khẩu mới',
+  'hudChrome.auth.resetSubmit': 'Cập nhật mật khẩu',
+  'hudChrome.auth.resetDone': 'Mật khẩu của bạn đã được cập nhật. Bây giờ bạn có thể đăng nhập.',
+  'hudChrome.auth.resetMismatch': 'Mật khẩu không khớp.',
+  'hudChrome.auth.resetErrInvalid':
+    'Liên kết đặt lại này không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới.',
+  'apiError.deeds.invalid_input': 'Dữ liệu nhập không hợp lệ.',
+  'apiError.steam.account_taken': 'Tài khoản Steam đó đã được liên kết với một tài khoản khác.',
+  'apiError.steam.already_linked': 'Tài khoản của bạn đã liên kết với một tài khoản Steam.',
+  'apiError.steam.banned': 'Không thể liên kết tài khoản Steam đó.',
+  'apiError.steam.disabled': 'Hiện không thể liên kết Steam.',
+  'apiError.steam.invalid_ticket':
+    'Steam không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.',
+  'apiError.steam.upstream': 'Steam không phản hồi. Hãy thử lại sau giây lát.',
+  'entities.npcs.chronicler_edda_hartwell.greeting':
+    'Ngọn núi không quên bất cứ điều gì, {playerName}, và ta cũng vậy. Để xem ngươi đã làm nên những gì nào.',
+  'entities.npcs.chronicler_edda_hartwell.name': 'Sử Quan Zenzie',
+  'entities.npcs.chronicler_edda_hartwell.title': 'Biên Niên Sử Đỉnh Núi',
+  'entities.npcs.chronicler_osric_fenn.greeting':
+    'Coi chừng hơi ẩm trên trang sách đấy, {playerName}. Đầm lầy nuốt sách còn nhiều hơn người đọc cả đời nuốt nổi.',
+  'entities.npcs.chronicler_osric_fenn.name': 'Sử Quan Osric Fenn',
+  'entities.npcs.chronicler_osric_fenn.title': 'Biên Niên Sử Đầm Lầy',
+  'entities.npcs.chronicler_saul.greeting':
+    'Kỳ công nào đáng làm thì cũng đáng chép lại hai lần, {playerName}: một lần cho sổ cái, một lần cho chuyện kể bên bếp lửa.',
+  'entities.npcs.chronicler_saul.name': 'Sử Quan Saul',
+  'entities.npcs.chronicler_saul.title': 'Biên Niên Sử Thung Lũng',
+  'guide.controls.deeds': 'Sách Kỳ Công',
+  'guide.deedsPage.cat.chronicle': 'Biên Niên Sử',
+  'guide.deedsPage.cat.collection': 'Sưu Tầm',
+  'guide.deedsPage.cat.combat': 'Chiến Đấu',
+  'guide.deedsPage.cat.delve': 'Hang Sâu',
+  'guide.deedsPage.cat.dungeon': 'Hầm Ngục',
+  'guide.deedsPage.cat.exploration': 'Khám Phá',
+  'guide.deedsPage.cat.feat': 'Kỳ Tích',
+  'guide.deedsPage.cat.progression': 'Tiến Trình',
+  'guide.deedsPage.cat.pvp': 'PvP và Thi Đấu',
+  'guide.deedsPage.cat.social': 'Xã Hội',
+  'guide.deedsPage.catHeading': '{label} ({count})',
+  'guide.deedsPage.catalogBody':
+    'Đây là toàn bộ kỳ công mà cuốn Sách có thể lưu giữ, xếp theo từng hạng mục. Những kỳ công bí mật được cố ý lược khỏi danh sách này, chờ chính bạn tìm ra. Hãy mở Sách Kỳ Công trong trò chơi để xem chính xác mỗi kỳ công đòi hỏi điều gì.',
+  'guide.deedsPage.catalogHeading': 'Toàn bộ danh mục kỳ công',
+  'guide.deedsPage.chroniclesBody':
+    'Mỗi vùng đất giữ một cuốn Biên Niên Sử riêng, một bộ kỳ công do vị Sử Quan địa phương tập hợp, người đã tự nhận lấy việc ghi chép về mọi lữ khách ngang qua. Saul của Thung Lũng Đông Khê là người đầu tiên trong số họ. Một cuốn Biên Niên Sử được chia thành nhiều chương, và bạn cứ tùy ý hoàn thành theo thứ tự nào thuận tiện nhất.',
+  'guide.deedsPage.chroniclesHeading': 'Biên Niên Sử',
+  'guide.deedsPage.colName': 'Kỳ Công',
+  'guide.deedsPage.colRenown': 'Danh Vọng',
+  'guide.deedsPage.colReward': 'Phần Thưởng',
+  'guide.deedsPage.featTag': 'Kỳ Tích',
+  'guide.deedsPage.featsBody':
+    'Kỳ Tích là một ngăn sách riêng: ghi chép về di sản và những lần đầu tiên của thế giới, những kỳ công gắn với một thời đã qua hay một khoảnh khắc chỉ xảy ra đúng một lần. Chúng không mang Danh Vọng và nằm ngoài số đếm hoàn thành, được lưu giữ mãi mãi như ký ức về những gì đã làm nên.',
+  'guide.deedsPage.featsHeading': 'Kỳ Tích',
+  'guide.deedsPage.howBody':
+    'Kỳ công được lập và giữ lại theo từng nhân vật một, nên mỗi anh hùng bạn chơi đều dựng nên cuốn Sách của riêng mình; chỉ Bảng Xếp Hạng của vương quốc mới gom Danh Vọng của bạn qua tất cả các nhân vật bạn chơi, và tính mỗi kỳ công đúng một lần. Mỗi kỳ công ghi rõ ràng nó đòi hỏi gì ở bạn, ngay trong Sách Kỳ Công trong trò chơi, nên bạn luôn biết mình đang theo đuổi điều gì, và bạn có thể theo dõi những kỳ công mình nhắm tới để giữ chúng trong tầm mắt khi chơi. Một số ít vẫn được giữ bí mật và chỉ lộ diện khi bạn đã lập được chúng. Sách cũng tự giữ mình trung thực: bất cứ điều gì hồ sơ quá khứ của bạn có thể chứng minh, nó ghi công ngay lập tức, nên một kỳ cựu chẳng bao giờ mở sách ra thấy một trang trống; chỉ những kỳ công đếm số mới bắt đầu đếm lại từ đầu.',
+  'guide.deedsPage.howHeading': 'Cách kỳ công hoạt động',
+  'guide.deedsPage.intro':
+    'Sách Kỳ Công là nơi thế giới ghi sổ tất cả những gì bạn đã làm, từ những bước chân đầu tiên rời thung lũng khởi đầu cho đến những trận đánh khó nhất mà vương quốc có thể bày ra. Hãy lập kỳ công khi chơi, mang những danh hiệu chúng ban tặng, và nhìn Danh Vọng của bạn leo cao.',
+  'guide.deedsPage.renownBody':
+    'Danh Vọng là điểm số đứng sau cuốn Sách. Mỗi kỳ công bạn lập được đều mang về một lượng điểm cố định, và tổng điểm chỉ có tăng chứ không bao giờ giảm, nên một tuần thảnh thơi không hề khiến bạn tụt lại. Một nhúm kỳ công phụ thuộc vào may mắn hơn là kỹ năng, còn Kỳ Tích là một vinh dự riêng, nên cả hai loại này đều không mang chút Danh Vọng nào.',
+  'guide.deedsPage.renownHeading': 'Danh Vọng',
+  'guide.deedsPage.rewardBorder': 'Viền',
+  'guide.deedsPage.rewardsBody':
+    'Phần thưởng đều chỉ để phô diễn, và đó chính là chủ ý. Một số kỳ công ban danh hiệu để bạn mang hoặc viền để đóng khung tên bạn, và không bao giờ có thứ gì khiến anh hùng của bạn mạnh hơn. Hãy chọn danh hiệu bạn muốn trong Sách Kỳ Công, nó sẽ theo bạn trên bảng tên, trong kênh trò chuyện và trên các bảng xếp hạng cho mọi người cùng thấy.',
+  'guide.deedsPage.rewardsHeading': 'Danh hiệu và viền tên',
+  'guide.deedsPage.standingsNote':
+    'Các vương quốc luôn ghi sổ Danh Vọng của mọi tài khoản. Muốn biết ai đứng ở đâu, hãy mở Bảng Xếp Hạng trong trò chơi và lật đến thẻ Danh Vọng của nó; bảng xếp hạng nằm ở đó, không nằm trên wiki.',
+  'guide.nav.deeds': 'Sách Kỳ Công',
+  'hudChrome.deeds.broadcastLine': '{name} vừa lập một kỳ công: {deed}',
+  'hudChrome.deeds.broadcastsLabel': 'Chia sẻ kỳ công vừa lập với bang hội và bạn bè',
+  'hudChrome.deeds.catChronicle': 'Biên Niên Sử',
+  'hudChrome.deeds.catCollection': 'Sưu Tầm',
+  'hudChrome.deeds.catCombat': 'Chiến Đấu',
+  'hudChrome.deeds.catDelve': 'Hang Sâu',
+  'hudChrome.deeds.catDungeon': 'Hầm Ngục',
+  'hudChrome.deeds.catExploration': 'Khám Phá',
+  'hudChrome.deeds.catFeat': 'Kỳ Tích',
+  'hudChrome.deeds.catProgression': 'Tiến Trình',
+  'hudChrome.deeds.catPvp': 'PvP và Thi Đấu',
+  'hudChrome.deeds.catSocial': 'Xã Hội',
+  'hudChrome.deeds.categoriesAria': 'Các hạng mục kỳ công',
+  'hudChrome.deeds.categoryCountAria': '{category}: đã lập {earned} trên {visible} kỳ công',
+  'hudChrome.deeds.charOpenBook': 'Sách Kỳ Công',
+  'hudChrome.deeds.charTitleLabel': 'Danh Hiệu',
+  'hudChrome.deeds.charTitleNone': 'Chưa chọn danh hiệu',
+  'hudChrome.deeds.close': 'Đóng Sách Kỳ Công',
+  'hudChrome.deeds.collapseHint': 'Thu gọn bảng theo dõi kỳ công',
+  'hudChrome.deeds.completionAria': 'Kỳ công đã lập: {earned} trên {total}',
+  'hudChrome.deeds.countLabel': '{earned}/{total} kỳ công',
+  'hudChrome.deeds.earnedDate': 'Lập ngày {date}',
+  'hudChrome.deeds.emptyCategory': 'Không có kỳ công nào khớp ở đây.',
+  'hudChrome.deeds.expandHint': 'Mở rộng bảng theo dõi kỳ công',
+  'hudChrome.deeds.featRibbon': 'Kỳ Tích',
+  'hudChrome.deeds.filterAll': 'Tất Cả',
+  'hudChrome.deeds.filterEarned': 'Đã Lập',
+  'hudChrome.deeds.filterGroupAria': 'Lọc kỳ công',
+  'hudChrome.deeds.filterNearly': 'Sắp Xong',
+  'hudChrome.deeds.filterUnearned': 'Chưa Lập',
+  'hudChrome.deeds.hiddenBadge': 'Ẩn',
+  'hudChrome.deeds.lbDeedsCol': 'Kỳ Công',
+  'hudChrome.deeds.lbEmpty': 'Chưa có sử quan nào được xếp hạng.',
+  'hudChrome.deeds.lbSelf': 'Thứ hạng của bạn: hạng {rank}, trong top {percent} phần trăm',
+  'hudChrome.deeds.lbTab': 'Danh Vọng',
+  'hudChrome.deeds.lbTitleCol': 'Danh Hiệu',
+  'hudChrome.deeds.nearestLabel': 'Sắp đạt:',
+  'hudChrome.deeds.progressAria': 'Tiến độ: {current} trên {target}',
+  'hudChrome.deeds.progressText': '{current}/{target}',
+  'hudChrome.deeds.rarityLine': 'Đã có {percent} nhà phiêu lưu lập được',
+  'hudChrome.deeds.recentLabel': 'Gần đây:',
+  'hudChrome.deeds.renownChip': '{renown} Danh Vọng',
+  'hudChrome.deeds.renownLabel': 'Danh Vọng',
+  'hudChrome.deeds.retroSummary': 'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.deeds.searchAria': 'Tìm kỳ công theo tên',
+  'hudChrome.deeds.searchPlaceholder': 'Tìm kỳ công',
+  'hudChrome.deeds.title': 'Sách Kỳ Công',
+  'hudChrome.deeds.titleChip': 'Thưởng Danh Hiệu',
+  'hudChrome.deeds.titledName': '{name} [{title}]',
+  'hudChrome.deeds.titlesAria': 'Chọn danh hiệu hiển thị của bạn',
+  'hudChrome.deeds.titlesEmpty': 'Hãy lập một kỳ công có thưởng danh hiệu để mở ngăn sách này.',
+  'hudChrome.deeds.titlesNone': 'Không Danh Hiệu',
+  'hudChrome.deeds.titlesSection': 'Danh Hiệu',
+  'hudChrome.deeds.trackerLabel': 'Kỳ Công',
+  'hudChrome.deeds.unlockedBanner': 'Đã lập kỳ công: {name}',
+  'hudChrome.deeds.unlockedTitleHint':
+    'Đã nhận danh hiệu mới: {title}. Hãy chọn nó trong Sách Kỳ Công.',
+  'hudChrome.deeds.unwatch': 'Bỏ Theo Dõi',
+  'hudChrome.deeds.unwatchAria': 'Ngừng theo dõi {name}',
+  'hudChrome.deeds.watch': 'Theo Dõi',
+  'hudChrome.deeds.watchAria': 'Theo dõi {name} trên bảng theo dõi HUD',
+  'hudChrome.deeds.watchFull': 'Danh sách theo dõi đã đầy (tối đa {cap})',
+  'hudChrome.mobile.deeds': 'Kỳ Công',
+  'hudChrome.steam.benefits':
+    'Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.',
+  'hudChrome.steam.link': 'Liên Kết Steam',
+  'hudChrome.steam.linked': 'Đã liên kết với tài khoản Steam {id}',
+  'hudChrome.steam.noTicket': 'Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại.',
+  'hudChrome.steam.title': 'Steam',
+  'hudChrome.steam.unlink': 'Hủy Liên Kết Steam',
+  'guide.bestiary.flavor.sethrael_palecoil':
+    'Một con rắn trắng nhợt như xương lượn lờ nơi thềm sâu của Hồ Lung Linh, kẻ canh giữ lặng lẽ vùng nước mà nó đã chiếm làm của riêng. Những ai bơi chung hồ với nó hiếm khi ngoi lên lại.',
+  'guide.combat.metersBody':
+    'Tò mò xem một trận đấu diễn ra thế nào? Nhấn Z để mở bảng thống kê tổ đội, ghi lại sát thương, hồi máu và đe dọa của cả nhóm, theo từng trận một.',
+  'guide.combat.queueBody':
+    'Bạn không cần canh chính xác từng khung hình để nhấn phím. Hãy nhấn kỹ năng kế tiếp trong những khoảnh khắc cuối của lượt niệm hiện tại và nó sẽ được xếp hàng, kích hoạt ngay khi lượt niệm hoàn tất, nên lối chơi thuần thục trôi chảy không hở nhịp. Một cú nhấn quá sớm chỉ đơn giản bị từ chối, nên không có gì lãng phí. Một số đòn cận chiến cũng hoạt động y như vậy, phát ra theo nhát vung vũ khí kế tiếp của bạn.',
+  'guide.combat.queueTitle': 'Nước đi kế tiếp của bạn đã sẵn sàng',
+  'guide.controls.arrowKeys': 'Phím Mũi Tên',
+  'guide.controls.attackMoveNote':
+    'Còn một phím nữa, tắt sẵn theo mặc định: bật Di Chuyển Tấn Công trong tùy chọn để dành riêng một phím (phím A, khi tùy chọn đang bật) đưa bạn tiến về phía con trỏ và khai hỏa vào kẻ địch nằm dưới nó, hoặc kẻ đầu tiên gặp trên đường đi.',
+  'guide.controls.bothMouse': 'Cả Hai Nút Chuột',
+  'guide.controls.calendar': 'Lịch Sự Kiện',
+  'guide.controls.crafting': 'Chế Tác',
+  'guide.controls.discord': 'Discord',
+  'guide.controls.groupPet': 'Lệnh thú cưng',
+  'guide.controls.petBar':
+    'Thanh thú cưng: Tấn Công, Dừng, Khiêu Khích, Phòng Thủ, Hung Hăng (khi có thú cưng của Thợ Săn hoặc Thuật Sĩ Hắc Ám ra trận)',
+  'guide.controls.runForward': 'Chạy tới trước',
+  'guide.controls.valeCup': 'Cúp Thung Lũng',
+  'guide.dungeonsPage.heroicBody':
+    'Mỗi hầm ngục năm người, và cả raid, đều có một phiên bản Anh Hùng chờ sẵn sau khi bạn đạt giới hạn cấp. Vẫn những sảnh đường ấy, được làm lại cho một tổ đội cuối trận trang bị đầy đủ: mọi thứ đánh đau hơn, không gì có thể bị bỏ lại bằng cách chạy bộ, và các trùm phớt lờ hoàn toàn choáng và trói. Hãy vượt qua các phiên bản thường trước đã; chế độ Anh Hùng mặc định là bạn đã làm được điều đó.',
+  'guide.dungeonsPage.heroicHowBody':
+    'Hãy chọn độ khó trước khi nhóm của bạn nhận phó bản: gõ /dungeon heroic, hoặc gạt công tắc Độ Khó Hầm Ngục trên menu tổ đội. Lựa chọn này được cả tổ đội chia sẻ và chốt lại ngay tại cửa, nên một lượt chạy giữ nguyên như lúc được nhận.',
+  'guide.dungeonsPage.heroicLockoutBody':
+    'Hầm ngục thường có thể chạy cả ngày. Chế độ Anh Hùng đòi hỏi kiên nhẫn: cú hạ trùm cuối khóa mọi người trong lượt chạy lại còn một lần dọn sạch Anh Hùng của hầm ngục đó mỗi ngày, và raid giữ một khóa lượt hằng ngày riêng cho từng độ khó. Một lượt chạy năm người đã dọn xong vẫn mở cho chính tổ đội ấy để chạy xác và nhặt đồ, nên không ai bị khóa khỏi thứ họ đã giành được ở đó. Raid thì nghiêm hơn: một khi cú hạ trùm của nó khóa bạn lại, cánh cửa vẫn đóng cho tới lần đặt lại hằng ngày, nên hãy thu chiến lợi phẩm trước khi rời đấu trường.',
+  'guide.dungeonsPage.heroicRewardsBody':
+    'Trùm Anh Hùng rơi ra thứ chiến lợi phẩm bạn đã quen, được nâng cấp và gắn nhãn Anh Hùng trên chú giải, còn trùm cuối của mỗi lượt chạy thêm những món sử thi không tìm thấy ở đâu khác. Cú hạ cuối cùng đó cũng để lại Dấu Ấn Anh Hùng cho mọi người tham gia: một loại tiền tệ dùng để giao dịch với Quân Nhu Trưởng Vex ở Highwatch, người có kho nhẫn và dây chuyền là món trang sức duy nhất trong cả vương quốc.',
+  'guide.dungeonsPage.heroicRewardsTitle': 'Dấu Ấn Anh Hùng và chiến lợi phẩm nâng cấp',
+  'guide.dungeonsPage.heroicTitle': 'Chế độ Anh Hùng',
+  'guide.economy.dailyBody':
+    'Một nút rương báu trên màn hình mở cửa sổ phần thưởng hằng ngày. Mỗi ngày bày ra một nhúm nhiệm vụ, hoàn thành nhiệm vụ, chiến đấu trong Đấu Trường Tro Tàn, thắng một trận Cúp Thung Lũng, và tặng một lượt quay vòng quay may mắn miễn phí, tất cả đều đáng giá điểm cho bảng xếp hạng của ngày hôm đó, và những người kiếm nhiều điểm nhất trong ngày cùng chia một quỹ giải thưởng dành cho người sở hữu token cộng đồng tùy chọn. Không thứ gì trong đó ban sức mạnh trong trò chơi. Bản thân cửa sổ nêu rõ luật lệ của ngày và ai đủ điều kiện, hiển thị bảng xếp hạng, và lưu lại lịch sử của bạn.',
+  'guide.economy.dailyTitle': 'Phần thưởng hằng ngày',
+  'guide.economy.mailBody':
+    'Mỗi thị trấn trung tâm đều có một trụ quạ chạm khắc: một hòm thư của Bưu Quạ, dịch vụ thư tín của cả vương quốc. Hãy đứng cạnh một trụ để viết thư cho bất kỳ nhân vật nào theo tên, một người bạn đang trực tuyến hay đã ngoại tuyến từ lâu, và đính kèm tiền vàng hoặc hàng hóa vào lá thư với một khoản cước phí nhỏ. Con quạ mất một lúc để bay đi; khi nó đáp xuống, một biểu tượng phong thư báo cho người nhận biết có thứ đang chờ.',
+  'guide.economy.mailHow':
+    'Nhận thư cũng hoạt động y như vậy theo chiều ngược lại: đứng cạnh bất kỳ trụ nào để đọc thư của bạn và lấy những gì chúng mang theo vào túi tiền và túi đồ của bạn. Một lá thư trơn sẽ phai đi sau một thời gian, nhưng lá thư còn mang theo tiền vàng hay hàng hóa sẽ chờ bạn, dù bạn có thong thả đến đâu. Có những thứ bưu điện thẳng thừng từ chối: vật phẩm ràng buộc linh hồn, hàng hóa nhiệm vụ, và những token trang trí độc nhất vô nhị đi cùng bạn hoặc không đi đâu cả. Và hãy để mắt đến trụ quạ sau một lần nộp nhiệm vụ tốt đẹp; vài người giao nhiệm vụ có viết thư đấy.',
+  'guide.economy.mailTitle': 'Bưu Quạ',
+  'guide.footer.linksLabel': 'Liên kết chơi và cộng đồng',
+  'guide.gear.bagsBody':
+    'Mọi thứ bạn nhặt được đều nằm trong một túi hành trang chung, và bạn mở rộng nó bằng cách trang bị thêm túi. Cửa sổ túi đồ của bạn có bốn khe túi: bấm vào một chiếc túi trong hành trang để nhét nó vào một khe trống, và mỗi chiếc túi bạn đeo đều thêm không gian riêng của nó. Túi đơn sơ là hàng rẻ tiền của người bán, túi rộng rãi hơn rơi ra từ dã thú, còn túi tốt nhất đến từ các trùm hầm ngục, nên sức chứa của bạn lớn dần song song với trang bị.',
+  'guide.gear.bagsTitle': 'Túi đồ và sức chứa',
+  'guide.gear.slotFinger': 'Ngón Tay',
+  'guide.gear.slotNeck': 'Cổ',
+  'guide.gear.soulboundBody':
+    'Một vài phần thưởng đặc biệt là ràng buộc linh hồn, gắn với nhân vật của bạn ngay từ khoảnh khắc bạn giành được chúng. Một vật phẩm ràng buộc linh hồn không thể trao đổi, gửi thư, bán cho người bán, hay niêm yết trên chợ; nó là của bạn và chỉ của riêng bạn. Ngày nay sự bảo vệ ấy canh giữ những token phần thưởng như Dấu Ấn Anh Hùng, trong khi trang bị bạn giành được là của bạn để tùy ý trao đổi, bán, hay san sẻ.',
+  'guide.gear.soulboundTitle': 'Ràng Buộc Linh Hồn: của bạn và chỉ của riêng bạn',
+  'guide.glossary.deedDef':
+    'Một thành tựu được ghi lại trong Sách Kỳ Công. Lập được một kỳ công sẽ ban Danh Vọng, và một số kỳ công còn ban một danh hiệu trang trí hoặc viền bảng tên.',
+  'guide.glossary.deedTerm': 'Kỳ Công',
+  'guide.glossary.heroicDef':
+    'Phiên bản khó hơn của một hầm ngục hoặc raid, được tinh chỉnh cho các tổ đội cuối trận trang bị đầy đủ. Trùm Anh Hùng rơi ra chiến lợi phẩm nâng cấp, và trùm cuối trả Dấu Ấn Anh Hùng.',
+  'guide.glossary.heroicTerm': 'Anh Hùng',
+  'guide.glossary.loadoutDef':
+    'Một bố cục tài năng đã lưu. Hãy giữ vài bố cục và hoán đổi giữa các lối xây dựng mà không cần tiêu lại từng điểm một.',
+  'guide.glossary.loadoutTerm': 'Bố Cục',
+  'guide.glossary.lockoutDef':
+    'Một giới hạn hằng ngày cho những phần thưởng lặp lại lớn nhất. Mỗi hầm ngục Anh Hùng trả một lần dọn sạch mỗi ngày, raid theo dõi thường và Anh Hùng riêng biệt, và việc nhặt đồ từ một trùm thế giới bắt đầu khóa lượt của bạn. Một lượt chạy năm người đã dọn xong vẫn mở cho chính tổ đội của nó; cánh cửa raid đã khóa không mở lại cho tới lần đặt lại.',
+  'guide.glossary.lockoutTerm': 'Khóa Lượt',
+  'guide.glossary.metersDef':
+    'Cửa sổ bảng điểm tổ đội cho trận đấu hiện tại: sát thương gây ra, hồi máu đã làm, và ai đang giữ nhiều đe dọa nhất, lưu theo từng trận. Mở nó bằng phím gán của nó (mặc định là Z).',
+  'guide.glossary.metersTerm': 'Bảng Sát Thương',
+  'guide.glossary.petBarDef':
+    'Hàng lệnh mà thú cưng của Thợ Săn hoặc Thuật Sĩ Hắc Ám thêm vào: Tấn Công, Dừng, Khiêu Khích, Phòng Thủ, và Hung Hăng, mặc định gán vào Ctrl cộng 1 tới 5.',
+  'guide.glossary.petBarTerm': 'Thanh Thú Cưng',
+  'guide.glossary.readyCheckDef':
+    'Trưởng nhóm gõ /ready để hỏi ý cả tổ đội hoặc raid: mọi người xác nhận Sẵn Sàng hoặc Chưa Sẵn Sàng, và cả nhóm thấy số lượng.',
+  'guide.glossary.readyCheckTerm': 'Kiểm Tra Sẵn Sàng',
+  'guide.glossary.renownDef':
+    'Điểm số trọn đời mà các kỳ công của bạn cộng lại. Nó chỉ có leo lên, và vương quốc lưu bảng xếp hạng của nó trên Bảng Xếp Hạng.',
+  'guide.glossary.renownTerm': 'Danh Vọng',
+  'guide.glossary.restedDef':
+    'Kinh nghiệm thưởng mà nhân vật của bạn tích lũy khi nghỉ ngơi ở quán trọ, ngoài chiến đấu. Những đòn hạ gục kế tiếp của bạn kiếm thêm kinh nghiệm cho tới khi vốn ấy cạn.',
+  'guide.glossary.restedTerm': 'Nghỉ Ngơi',
+  'guide.glossary.soulboundDef':
+    'Một vật phẩm ràng buộc với nhân vật của bạn ngay từ khoảnh khắc bạn có được nó. Nó không thể trao đổi, gửi thư, bán cho người bán, hay niêm yết trên chợ.',
+  'guide.glossary.soulboundTerm': 'Ràng Buộc Linh Hồn',
+  'guide.glossary.spiritHealerDef':
+    'Người chữa lành linh hồn của vương quốc, lơ lửng trên mọi nghĩa địa: nó có thể hồi sinh hồn ma của bạn ngay tại chỗ với cái giá là một sự suy yếu thoáng qua.',
+  'guide.glossary.spiritHealerTerm': 'Người Canh Giữ Nhợt Nhạt',
+  'guide.glossary.targetMarkerDef':
+    'Một biểu tượng mà bất kỳ thành viên tổ đội hay raid nào cũng có thể ghim lên một mục tiêu để mọi người cùng tập trung, hoặc cùng tránh, đúng mục tiêu ấy. Tám biểu tượng, mỗi biểu tượng một mục tiêu.',
+  'guide.glossary.targetMarkerTerm': 'Dấu Mục Tiêu',
+  'guide.glossary.worldBossDef':
+    'Một con trùm mạnh cỡ raid trỗi dậy giữa thế giới mở theo một nhịp đều đặn, được chiến đấu bởi bất kỳ ai tụ lại đáp lời chứ không phải một tổ đội cố định.',
+  'guide.glossary.worldBossTerm': 'Trùm Thế Giới',
+  'guide.models.formBear': 'Bruin Form',
+  'guide.models.formCat': 'Hình Sói',
+  'guide.models.formTravel': 'Fleet Form',
+  'guide.models.groupForms': 'Hình Dạng Druid',
+  'guide.nav.sidebarLabel': 'Chủ đề hướng dẫn',
+  'guide.professions.craftHowBody':
+    'Mở cửa sổ Chế Tác (phím mặc định T) để xem mọi công thức bạn biết, mỗi công thức cần gì, và bạn đang có sẵn những gì; khi đủ nguyên liệu, một cú bấm là xong việc. Các công thức thông thường có thể chế tác ở bất cứ đâu trên thế giới. Một số ít công thức dụng cụ cao cấp thì lại yêu cầu bạn đứng tại trạm chế tác ở Highwatch.',
+  'guide.professions.craftHowTitle': 'Cửa sổ chế tác',
+  'guide.professions.focusBody':
+    'Mỗi thị trấn trung tâm đều có một bảng Trọng Tâm Thị Trấn dành cho những người thu hoạch ghé qua: đứng trong thị trấn, mở nó từ cạnh bản đồ nhỏ, và nhắm một khoản nhỏ điểm trọng tâm vào những loại thành phần bạn quan tâm. Bạn dồn càng nhiều trọng tâm vào một thành phần, nó ra càng tinh và càng dồi dào từ mỗi cái xác về sau; phân bổ của bạn đi theo nhân vật dù họ rong ruổi đến đâu, và bạn có thể sắp xếp lại nó, miễn phí, trong bất kỳ lần ghé thị trấn nào sau này.',
+  'guide.professions.focusTitle': 'Trọng Tâm Thị Trấn',
+  'guide.professions.harvestBody':
+    'Việc thu thập không dừng lại ở các điểm tài nguyên. Một số dã thú bị hạ có thể được thu hoạch để lấy thành phần, da, nanh, tơ, và những thứ lạ lùng hơn, ngay từ cái xác cùng với chiến lợi phẩm thông thường của nó. Mỗi cú hạ chỉ một người thu hoạch: ai thu hoạch trước giành lấy tất cả. Lựa chọn cũng nằm ở bạn mỗi lần: lột sạch mọi thứ cái xác có, hoặc dồn vào một thành phần duy nhất và lấy một phẩm cấp tinh hơn của nó. Bất kỳ nhân vật nào cũng có thể thu hoạch, không cần nghề hay huấn luyện gì, và một thành phần đặc biệt tinh xảo còn mang tên của người đã thu hoạch nó.',
+  'guide.professions.harvestTitle': 'Thu hoạch chính cuộc đi săn',
+  'guide.search.typeAbility': 'Kỹ Năng',
+  'guide.search.typeDeed': 'Kỳ Công',
+  'guide.settingsPage.audioBody':
+    'Cửa sổ tùy chọn không chỉ toàn hình ảnh. Mục Âm Thanh có các thanh chỉnh âm lượng riêng cho hiệu ứng, nhạc nền, và giọng nói, còn mục Giao Diện mang theo bộ chọn ngôn ngữ giúp bản địa hóa lại toàn bộ giao diện ngay tức thì, không cần tải lại, cùng một bộ chọn chủ đề cho phần trang trí cửa sổ. Ngôn ngữ cũng được ghim đầu tiên ở Tổng Quan, nên nó luôn chỉ cách một bước từ khi mở menu.',
+  'guide.settingsPage.audioTitle': 'Âm thanh và ngôn ngữ',
+  'guide.settingsPage.autolootBody':
+    'Không muốn bấm từng cái xác? Một tùy chọn giao diện, tắt sẵn theo mặc định, tự hốt chiến lợi phẩm từ những con bạn hạ khi bạn đi ngang qua chúng.',
+  'guide.settingsPage.factSearchBody':
+    'Không chắc một tùy chọn nằm ở đâu? Hãy gõ vào ô tìm kiếm ở đầu menu. Nó cũng hiểu những cách nói thông dụng, nên gõ fps sẽ tìm ra mục hiển thị FPS, và chọn một kết quả sẽ đưa bạn thẳng tới cài đặt đó và để nó được tô sáng.',
+  'guide.settingsPage.factSearchTitle': 'Tìm kiếm sẽ ra trước tiên',
+  'guide.settingsPage.touchBody':
+    'Trên màn hình cảm ứng, phần tùy chọn còn mọc thêm một cụm tiện nghi của riêng nó: kích thước và độ nhạy cần điều khiển, kích thước và độ mờ của nút trên màn hình, một bố cục đảo gương cho người thuận tay trái, một cần máy quay tùy chọn, và đảo chiều nhìn cảm ứng, để màn hình vừa với đôi tay bạn thay vì ngược lại.',
+  'guide.social.calendarBody':
+    'Nhấn I để mở lịch sự kiện. Nó đánh dấu những ngày đáng để lên kế hoạch của vương quốc, từ buổi gọi raid hằng tuần đến đêm fiesta, và đó là nơi các bang hội giữ lịch của mình: bang chủ và các sĩ quan có thể đặt sự kiện lên đó, và mọi thành viên đều thấy chúng trên cùng một trang.',
+  'guide.social.calendarHeading': 'Lịch sự kiện',
+  'guide.social.communityBody':
+    'Bắt đầu một dòng chat bằng dấu chấm than để tạo một lời gọi cộng đồng: !lfg để tìm nhóm, !wts và !wtb để giao dịch, !recruit để tuyển bang, !event để thông báo một buổi raid hay gặp mặt, và !help để nhờ giúp đỡ. Một menu các lời gọi bật lên ngay khoảnh khắc bạn gõ dấu chấm than. Mỗi lời gọi được phát ra trong thế giới và vọng sang Discord cộng đồng, nên nó tới được cả những người chơi thậm chí chưa đăng nhập. Lời gọi cộng đồng là một phần của lối chơi trực tuyến.',
+  'guide.social.communityHeading': 'Gọi cả cộng đồng',
+  'guide.social.emotesBody':
+    'Nhân vật của bạn cũng có thể nói mà không cần lời: gõ một biểu cảm như /wave, /dance, /cheer, hay /bow, nhắm vào một người bạn trước để hướng nó tới họ, hoặc giữ X để mở vòng biểu cảm cho một biểu lộ nhanh trên đầu.',
+  'guide.social.markersBody':
+    'Trong một tổ đội, hãy nhắm vào một sinh vật thù địch và bấm chuột phải vào chân dung của nó trên khung mục tiêu (nhấn giữ khi dùng cảm ứng) để gắn cho nó một trong tám biểu tượng raid. Bất kỳ thành viên nào cũng có thể đánh dấu, mỗi biểu tượng chỉ nằm trên một mục tiêu tại một thời điểm, và áp lại một biểu tượng lên chính mục tiêu của nó sẽ xóa nó đi. Thứ tự hạ gục, phân công khống chế, hay chỉ đơn giản một câu "con này trước" đều truyền đi nhanh hơn dưới dạng một biểu tượng so với một câu nói.',
+  'guide.social.markersHeading': 'Dấu mục tiêu',
+  'guide.social.readyBody':
+    'Trước một cú kéo lớn, trưởng nhóm có thể gõ /ready để hỏi ý cả phòng: mọi người còn lại nhận một lời nhắc Sẵn Sàng hoặc Chưa Sẵn Sàng, và một khi tất cả đã trả lời, hoặc hết 30 giây, cả nhóm thấy một bản tóm tắt duy nhất về số lượng. Không ai bị nêu tên; điều quan trọng là con số, không phải kẻ có lỗi.',
+  'guide.social.readyHeading': 'Kiểm tra sẵn sàng',
+  'guide.social.slashBody':
+    'Một vài lệnh thường ngày đáng để ghi nhớ: /w Tên gửi một lời thì thầm và /r đáp lại lời cuối cùng bạn nhận được, /invite mời ai đó vào tổ đội, /follow bước theo sau một người bạn, /roll tung xúc xắc cho cả nhóm cùng thấy, /who cho biết ai đang trực tuyến, và /afk đánh dấu bạn đang vắng mặt. Gõ /help trong trò chơi để xem danh sách đầy đủ.',
+  'guide.social.slashHeading': 'Những lệnh gạch chéo tiện dụng',
+  'guide.stats.hasteBody':
+    'Tốc Độ là chỉ số làm mọi thứ bạn làm trở nên nhanh hơn: nhát vung cận chiến, phát bắn tầm xa, và niệm phép đều tăng tốc cùng nhau. Nó đến từ trang bị, đáng chú ý nhất là thưởng bộ giáp, trong khi một vài kỹ năng ban một đợt bùng ngắn những nhát vung nhanh hơn. Bảng nhân vật của bạn hiển thị nó là Chỉ Số Tốc Độ.',
+  'guide.stats.hasteTitle': 'Tốc Độ',
+  'guide.talentsPage.choiceNote':
+    'Một vài điểm trên mỗi nhánh là một ngã ba đường chứ không phải một lần mua: nút đó đưa ra hai hoặc ba lựa chọn và bạn cam kết với một trong số chúng. Lần đặt lại kế tiếp của bạn mở lại lựa chọn ấy, như mọi thứ khác trên nhánh.',
+  'guide.valeCupPage.bettingBody':
+    'Khán giả ở Sân Heo Nái có thể đặt cược cho một bên khi một trận đang thành hình: tiền cược gộp lại, và ở tiếng còi cuối cùng những người thắng chia quỹ của kẻ thua theo tỷ lệ họ đã đặt. Một trận hòa, hoặc một cú lật kèo không ai đặt, hoàn lại từng đồng. Người chơi có ghế trong trận không thể cược vào nó, và lan can lưu lại thành tích trọn đời của bạn về thắng, thua, và tiền lời ròng.',
+  'guide.valeCupPage.bettingHeading': 'Một ván cược bên lan can',
+  'guide.valeCupPage.practiceBody':
+    'Cửa sổ Cúp Thung Lũng cũng có chế độ tập luyện: một bản sao riêng của sân đấu nơi bot lấp cả hai bên và không gì tính vào thành tích của bạn. Thiếu một hai người cho trận thật? Sau một khoảng chờ ngắn, bot sẽ điền đủ các đội, và bất kỳ trận nào có bot trên sân đều là trận giao hữu, không bao giờ được xếp hạng. Và khi Sân Heo Nái nằm không, đám bot bày ra một trận biểu diễn mà bạn có thể xem, và đặt cược, từ khán đài; ngay khoảnh khắc người chơi thật sẵn sàng, trận biểu diễn nhường lại sân và mọi khoản cược được trả lại.',
+  'guide.valeCupPage.practiceHeading': 'Những trận tập và sân lúc nhàn rỗi',
+  'guide.worldPage.worldBossBody':
+    'Cao trên Đỉnh Gai, cơn bão trên Stormcrag đôi khi tụ lại thành một hình hài. Thunzharr, Đỉnh Núi Thức Giấc trỗi dậy nơi đó theo một nhịp đều đặn, một nguyên tố mạnh cỡ raid được chiến đấu giữa thế giới mở bởi bất kỳ ai đáp lời, và hắn càng lúc càng hùng mạnh hơn khi càng nhiều người thách đấu đứng lên chống lại. Mọi người tham gia trận chiến đều kiếm được lượt bốc chiến lợi phẩm của riêng mình từ hắn, theo lệ khóa lượt raid, và cái chết của hắn nán lại đủ lâu để những người đã ngã xuống chạy về và nhận phần của mình. Hãy tụ hội nhiều gươm đao hơn bạn nghĩ mình cần.',
+  'guide.worldPage.worldBossTitle': 'Khi đỉnh núi thức giấc: con trùm thế giới',
+  'entities.abilities.chain_heal.description':
+    'Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)',
+  'entities.abilities.chain_heal.name': 'Hồi Máu Liên Hoàn',
+  'entities.abilities.counter_shot.description':
+    'Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây.',
+  'entities.abilities.counter_shot.name': 'Phát Bắn Phản Đòn',
+  'entities.abilities.counterspell.description':
+    'Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây.',
+  'entities.abilities.counterspell.name': 'Phản Phép',
+  'entities.abilities.holy_taunt.description':
+    'Chế nhạo mục tiêu: mối đe dọa của bạn tăng lên tương đương với kẻ thù đáng ghét nhất của nó và nó buộc phải tấn công bạn trong 3 giây.',
+  'entities.abilities.holy_taunt.name': 'Khiêu Khích Thánh',
+  'entities.abilities.kick.description':
+    'Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây.',
+  'entities.abilities.kick.name': 'Cú Đá',
+  'entities.abilities.pummel.description':
+    'Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây.',
+  'entities.abilities.pummel.name': 'Đấm Dồn Dập',
+  'entities.abilities.rebuke.description':
+    'Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây.',
+  'entities.abilities.rebuke.name': 'Quở Trách',
+  'entities.abilities.skull_bash.description':
+    'Một cú húc đầu lao tới làm gián đoạn niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây.',
+  'entities.abilities.skull_bash.name': 'Húc Sọ',
+  'entities.abilities.spell_lock.description':
+    'Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây.',
+  'entities.abilities.spell_lock.name': 'Khóa Phép',
+  'entities.items.ashen_focus_ring.name': 'Nhẫn Hội Tụ Tro Tàn',
+  'entities.items.ashstalker_cowl.name': 'Mũ Trùm Ashstalker',
+  'entities.items.ashstalker_grips.name': 'Găng Tay Ashstalker',
+  'entities.items.ashstalker_harness.name': 'Giáp Thân Ashstalker',
+  'entities.items.ashstalker_legguards.name': 'Giáp Chân Ashstalker',
+  'entities.items.ashstalker_shoulderguards.name': 'Giáp Vai Ashstalker',
+  'entities.items.ashstalker_treads.name': 'Giày Ashstalker',
+  'entities.items.ashstalker_waistband.name': 'Thắt lưng Ashstalker',
+  'entities.items.cinder_sigil_pendant.name': 'Mặt dây chuyền Cinder-Sigil',
+  'entities.items.cinderweave_cord.name': 'Dây Lưng Cinderweave',
+  'entities.items.cinderweave_cowl.name': 'Mũ Trùm Cinderweave',
+  'entities.items.cinderweave_handwraps.name': 'Băng Tay Cinderweave',
+  'entities.items.cinderweave_legwraps.name': 'Băng Chân Cinderweave',
+  'entities.items.cinderweave_mantle.name': 'Áo Choàng Vai Cinderweave',
+  'entities.items.cinderweave_raiment.name': 'Pháp Bào Cinderweave',
+  'entities.items.cinderweave_slippers.name': 'Hài Cinderweave',
+  'entities.items.emberglass_warstaff.name': 'Chiến Trượng Emberglass',
+  'entities.items.final_argument_greatblade.name': 'Đại Kiếm Lời Biện Luận Cuối',
+  'entities.items.final_oath_medallion.name': 'Huy Chương Lời Thề Cuối',
+  'entities.items.first_blood_razor.name': 'Lưỡi Dao Máu Đầu',
+  'entities.items.fleetblood_band.name': 'Nhẫn Fleetblood',
+  'entities.items.furyforged_gauntlets.name': 'Găng Tay Furyforged',
+  'entities.items.furyforged_girdle.name': 'Đai Lưng Furyforged',
+  'entities.items.furyforged_legguards.name': 'Giáp Chân Furyforged',
+  'entities.items.furyforged_sabatons.name': 'Ủng Giáp Furyforged',
+  'entities.items.furyforged_warhelm.name': 'Mũ Chiến Furyforged',
+  'entities.items.furyforged_warplate.name': 'Giáp Tấm Furyforged',
+  'entities.items.furyforged_warspaulders.name': 'Giáp Vai Furyforged',
+  'entities.items.iron_vow_band.name': 'Nhẫn Lời Thề Sắt',
+  'entities.items.last_step_signet.name': 'Nhẫn Ấn Bước Cuối',
+  'entities.items.razorwind_torque.name': 'Kiềng Cổ Razorwind',
+  'entities.items.spellbreakers_seal.name': 'Ấn Phá Phép',
+  'entities.items.stormbound_crown.name': 'Vương Miện Stormbound',
+  'entities.items.stormbound_greaves.name': 'Giáp Ống Chân Stormbound',
+  'entities.items.stormbound_handguards.name': 'Giáp Tay Stormbound',
+  'entities.items.stormbound_hauberk.name': 'Áo Giáp Xích Stormbound',
+  'entities.items.stormbound_legmail.name': 'Giáp Xích Chân Stormbound',
+  'entities.items.stormbound_spaulders.name': 'Giáp Vai Stormbound',
+  'entities.items.stormbound_waistguard.name': 'Đai Lưng Stormbound',
+  'entities.items.unbroken_circle.name': 'Vòng Tròn Bất Diệt',
+  'entities.npcs.fury.greeting': 'Cát nhớ từng chiến thắng. Hãy dành danh dự của bạn thật tốt.',
+  'entities.npcs.fury.name': 'NỘ KHÍ',
+  'entities.npcs.fury.title': 'Thủ Lĩnh Danh Dự',
+  'hudChrome.claudium.amountLabel': 'Số lượng',
+  'hudChrome.claudium.balanceLabel': 'Số dư',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Mua',
+  'hudChrome.claudium.buyTitle': 'Mua Claudium',
+  'hudChrome.claudium.buyUnavailable': 'Mua hàng không có sẵn ngay bây giờ.',
+  'hudChrome.claudium.checkoutClose': 'Đóng thanh toán',
+  'hudChrome.claudium.checkoutFailed': 'Không thể tải thanh toán. Vui lòng thử lại.',
+  'hudChrome.claudium.checkoutLoading': 'Đang tải thanh toán...',
+  'hudChrome.claudium.checkoutNotSettled':
+    'Giao dịch đã được gửi nhưng Claudium vẫn chưa được ghi có. Vui lòng thử lại trong thời gian ngắn.',
+  'hudChrome.claudium.checkoutPending':
+    'Giao dịch đang được tiến hành. Xác nhận trong ví của bạn và giữ bảng này mở.',
+  'hudChrome.claudium.checkoutPendingButton': 'Xử lý',
+  'hudChrome.claudium.checkoutTitle': 'Hoàn tất mua hàng',
+  'hudChrome.claudium.checkoutUnavailable': 'Việc mua Claudium đó hiện không khả dụng.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Kết nối ví Solana trước khi mua Claudium bằng tiền điện tử.',
+  'hudChrome.claudium.checkoutWalletUnsupported': 'Ví này không thể ký và gửi giao dịch Solana.',
+  'hudChrome.claudium.close': 'Đóng Claudium',
+  'hudChrome.claudium.disclosure':
+    'Claudium là loại tiền mềm một chiều: mua bằng tiền và tiêu vào mỹ phẩm. Nó không thể được đổi, chuyển nhượng hoặc rút tiền mặt.',
+  'hudChrome.claudium.hideAmounts': 'Ẩn số lượng Claudium bổ sung',
+  'hudChrome.claudium.kindCosmetic': 'Mỹ phẩm',
+  'hudChrome.claudium.kindItem': 'Vật phẩm',
+  'hudChrome.claudium.kindSkin': 'Ngoại hình',
+  'hudChrome.claudium.loading': 'Đang tải Claudium...',
+  'hudChrome.claudium.open': 'Mở Claudium',
+  'hudChrome.claudium.railLabel': 'Phương thức thanh toán',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC hiện không khả dụng.',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Thẻ',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': 'Giảm 20%',
+  'hudChrome.claudium.railWocUnavailable': 'Giá WOC hiện không có sẵn.',
+  'hudChrome.claudium.showAmounts': 'Hiển thị tất cả số lượng Claudium',
+  'hudChrome.claudium.skuRow': '{usd} đổi lấy {claudium} Claudium',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Đổi',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Không có mỹ phẩm có sẵn ngay bây giờ.',
+  'hudChrome.claudium.storeTitle': 'Cửa hàng mỹ phẩm',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Thu hoạch: thu thập nguyên liệu chế tạo từ xác chết này (da, răng nanh, lụa và các thành phần tương tự), tách biệt với bất kỳ chiến lợi phẩm nào. Bất cứ ai cũng có thể thu hoạch; chỉ một người chơi có thể thu hoạch một xác chết nhất định.',
+  'hudChrome.deeds.openBookHint': 'Mở Sách Kỳ Công',
+  'hudChrome.loot.takeAllTooltip':
+    'Lấy Tất Cả: thu thập mọi xu và vật phẩm trong cửa sổ chiến lợi phẩm này.',
+  'hudChrome.statInfo.desc.warfare':
+    'Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%.',
+  'hudChrome.statInfo.names.warfare': 'Chiến Tranh',
+  'hudChrome.statInfo.warfareValue': '+{increase}% gây ra / -{reduction}% nhận vào',
+  'hudChrome.tutorial.nextTipMap':
+    'Kiểm tra Bản đồ thế giới ({key}) để xem nhiệm vụ đang chờ ở đâu.',
+  'hudChrome.tutorial.nextTipQuestLog':
+    'Mở Nhật ký nhiệm vụ ({key}) của bạn để tìm nhiệm vụ tiếp theo ở gần.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Mở Xã Hội ({key}) để tìm nhóm có những trận chiến khó khăn hơn.',
+  'hudChrome.tutorial.nextTipsTitle': 'Tiếp theo sẽ ở đâu',
+  'hudChrome.tutorial.slayTargetHint':
+    'Mới tham gia chiến đấu? Nhấn {targetKey} hoặc nhấp vào một con sói để nhắm mục tiêu vào nó, sau đó sử dụng khả năng trên thanh hành động để tấn công nó.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Mới tham gia chiến đấu? Chạm vào con sói để nhắm mục tiêu, sau đó chạm vào khả năng của thanh hành động để tấn công nó.',
+  'hudChrome.warfare.balance': 'Danh dự: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': 'Danh dự {amount}',
+  'hudChrome.warfare.honorFloat': '+{amount} Danh dự',
+  'hudChrome.warfare.honorGain': 'Bạn nhận được Danh dự {amount} ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Không đủ danh dự.',
+  'hudChrome.warfare.reasons.arenaWin': 'Chiến thắng đấu trường',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Fiesta đã hoàn thành',
+  'hudChrome.warfare.reasons.fiestaKill': 'Hạ gục trong Fiesta',
+  'hudChrome.warfare.reasons.fiestaWin': 'Chiến thắng Fiesta',
+  'hudChrome.wocStore.applied': 'Đã áp dụng',
+  'hudChrome.wocStore.apply': 'Áp dụng ngoại hình',
+  'hudChrome.wocStore.armoryBody':
+    'Ngoại hình vũ khí giới hạn từ Kho Vũ Khí Mùa 1. Dùng chung toàn tài khoản, hoàn toàn mang tính thẩm mỹ và hiển thị với mọi người xung quanh bạn.',
+  'hudChrome.wocStore.armoryEyebrow': 'Mùa 1',
+  'hudChrome.wocStore.armoryTitle': 'Kho Vũ Khí',
+  'hudChrome.wocStore.badge.flagship': 'Chủ lực',
+  'hudChrome.wocStore.badge.hero': 'Anh hùng',
+  'hudChrome.wocStore.balance': 'Số dư Claudium',
+  'hudChrome.wocStore.buyClaudium': 'Mua Claudium',
+  'hudChrome.wocStore.buySkin': 'Mua ngoại hình',
+  'hudChrome.wocStore.cancel': 'Hủy',
+  'hudChrome.wocStore.close': 'Đóng cửa hàng WOC',
+  'hudChrome.wocStore.collectionLine': 'Bộ sưu tập {collection}',
+  'hudChrome.wocStore.collections.emberwrought': 'Emberwrought',
+  'hudChrome.wocStore.collections.fallen_star': 'Sao rơi',
+  'hudChrome.wocStore.collections.guildmark': 'Nhãn hiệu bang hội',
+  'hudChrome.wocStore.collections.hoarfrost': 'Sương muối',
+  'hudChrome.wocStore.confirmBody': 'Mua {item} với giá {cost} Claudium?',
+  'hudChrome.wocStore.confirmPurchase': 'Mua',
+  'hudChrome.wocStore.confirmTitle': 'Xác nhận mua mỹ phẩm',
+  'hudChrome.wocStore.detach': 'Gỡ ngoại hình',
+  'hudChrome.wocStore.equipHint': 'Hãy trang bị {type} để áp dụng ngoại hình này.',
+  'hudChrome.wocStore.error':
+    'Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.',
+  'hudChrome.wocStore.inspectAria': 'Kiểm tra {item}',
+  'hudChrome.wocStore.loading': 'Đang tải Cửa hàng WOC...',
+  'hudChrome.wocStore.lore': 'Truyền thuyết',
+  'hudChrome.wocStore.needMoreBody': 'Bạn cần thêm {shortfall} Claudium để mua {item}.',
+  'hudChrome.wocStore.needMoreTitle': 'Cần thêm Claudium',
+  'hudChrome.wocStore.owned': 'Sở hữu',
+  'hudChrome.wocStore.priceChanged':
+    'Giá đã thay đổi trước khi việc mua hàng hoàn tất. Xem lại giá đã làm mới và xác nhận lại.',
+  'hudChrome.wocStore.rarity.epic': 'Sử Thi',
+  'hudChrome.wocStore.rarity.legendary': 'Huyền thoại',
+  'hudChrome.wocStore.rarity.rare': 'Hiếm',
+  'hudChrome.wocStore.rarity.uncommon': 'Không phổ biến',
+  'hudChrome.wocStore.rewardsTab': 'Phần thưởng hàng ngày',
+  'hudChrome.wocStore.scene.day': 'Ngày',
+  'hudChrome.wocStore.scene.dusk': 'Chạng vạng',
+  'hudChrome.wocStore.scene.night': 'Đêm',
+  'hudChrome.wocStore.sceneLabel': 'Chiếu sáng cảnh',
+  'hudChrome.wocStore.seasonOne': 'Mùa 1',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Lưỡi kiếm ngắn màu đen có đường vân màu cam hồng rực, một viên ngọc nhỏ đang âm ỉ ở chuôi kiếm, tro và tia lửa.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'Một lưỡi kiếm trong ngõ hẻm với ngọn lửa của ngọn núi được lén nhét vào chuôi đá bằng đá, một trò đùa thầm lặng của một người thợ chế tạo áo giáp: ngay cả một chiếc ví cắt cũng có thể mang theo một viên than hồng của lần rèn đầu tiên. Màu đen, có gân màu cam, luôn có màu quá ấm ở vỏ. Vẽ nó trong bóng tối dưới Highwatch và ánh sáng chiếu vào bàn tay của bạn vừa đủ để tìm ra khoảng trống trong sự đề phòng của một người đàn ông.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Đoản Đao Tia Tro',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'Một mảnh sao rơi, viền vàng nóng chảy phát sáng trên nền kim loại đen vũ trụ, một ngôi sao sáng quay quanh chuôi dao, một vệt cực quang mỏng.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Mảnh nhỏ nhất của ngôi sao Aldric đã kéo ra khỏi miệng núi lửa và theo một số tính toán thì đây là mảnh nguy hiểm nhất. Một mảnh duy nhất của trái tim thuộc thế giới khác, cạnh vàng nóng chảy của nó cưỡi trên kim loại đen vũ trụ, một ngôi sao đơn độc quay quanh chuôi kiếm như một mặt trăng mất đi thế giới. Nó gần như không nặng chút nào và có thể chia cắt hầu hết mọi thứ. Đủ nhỏ để ẩn nấp, đủ sáng để tìm thấy trong bóng tối bằng chính ánh sáng của nó.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, Nanh Sao Rơi',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Mũi thép được đánh bóng, nắp và lưỡi bằng đồng trên thân tro sơn mài, bọc gọn gàng, tem của nhà sản xuất.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    'Một chiếc rìu được đóng dấu là một niềm tự hào mà bạn có thể nắm giữ. Mũ đồng và langets là một nửa áo giáp, một nửa đặc trưng: chúng giữ cho một nửa không bị tách ra và bắt ánh sáng trong quán rượu để mọi người biết rằng bạn đã mua tác phẩm của Armorer Hode chứ không phải đồ cũ của dân quân. “Nếu nó cắt, tôi sẽ bán nó,” thợ rèn Highwatch nói. Cái này cắt.',
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Rìu Chụp Đồng',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Mặt trượng bằng gỗ cứng có núm vặn bằng đồng thau, vòng sắt bằng đồng, dây da nhuộm.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Được làm từ gỗ cứng dày dặn và được bọc bằng đồng thau, hàng trăm thợ rèn ở Eastbrook đã đúc được hàng trăm chiếc nhưng chỉ có một chiếc hoàn hảo. Nó thuộc loại du khách muốn được coi trọng ở cổng Fenbridge cũng như bức tường của Highwatch. Một chiếc gậy đi bộ chưa bao giờ thực sự cần thiết để đi bộ; dải băng nhuộm phù hợp với chiếc áo khoác mà bạn có thể đoán được giá của nó.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Trượng Bộ Hành Brasscrown',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Lưỡi kiếm bằng thép rèn màu sẫm, đầy những chữ rune màu cam hồng rực rỡ, những vết nứt do nhiệt, một viên ngọc đang cháy âm ỉ trên tấm chắn bảo vệ.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    "Lưỡi kiếm đầu tiên được tôi không phải trong nước mà ở Embers may mắn được cào từ Stormcrag, những viên than mà thợ rèn Highwatch thề rằng 'cháy xanh và sạch sẽ, bởi vì ngọn núi vẫn nhớ lời thề xưa của nó.' Ngân Hàng được đổ đầy hơn, ngọn lửa đó sẽ cháy âm ỉ màu cam hồng và sẽ không chết; những chữ rune giữ ấm cho bàn tay trần trong đêm lạnh giá nhất của bức tường. Cinderbrand không bao giờ cần ánh sáng. Nó chỉ đơn giản là từ chối đi ra ngoài.",
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Cinderbrand',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Nỏ thép đen, ánh sáng màu cam hồng rỉ ra từ vết nứt trên mũi khoan, than cháy âm ỉ trong máy xới.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Điều kỳ lạ nhất trong lò rèn than hồng: lửa núi đổ vào máy. Màu cam rỉ ra từ các vết nứt trên máy xới, và than cháy âm ỉ trong máy xới giữ cho sợi dây không bao giờ bị cứng lại trong cái lạnh ở Thornpeak hoặc ẩm ướt ở Mirefen. Các bu lông của nó rời khỏi rãnh đã ấm và tiếp đất ấm hơn. Câu trả lời của người thợ săn về bức tường mà kẻ thù cũng không cảm thấy lạnh giá.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Cinderlatch',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'Cụm sao vàng quay quanh lõi vàng nóng chảy, trục màu đen vũ trụ được khắc hình chòm sao, dải băng cực quang uốn lượn hướng lên trên.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    "Một trục kim loại hình sao có lõi vàng nóng chảy và một vòng gồm các mảnh vàng di chuyển xung quanh nó theo quỹ đạo chậm rãi, vô tận: một vũ trụ nhỏ, được khắc bằng các chòm sao không phù hợp với bầu trời trên Thornpeak. Cực quang cuộn lên theo chiều dài của nó như làn khói quên bay lên. Những người chịu đựng nó khẳng định họ có thể cảm nhận được khoảng trống xuyên qua nó, giống như cách Ysolei 'uống ánh trăng': kiên nhẫn, lạnh lùng và nhìn lại.",
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Cosmarch, Đỉnh Hư Không Vô Tận',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Rìu sắt đen với những vết nứt màu cam hồng phát sáng xuyên qua lưỡi rìu, một viên đá quý bằng than đá, những tia nhiệt.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Armorer Hode đã đưa than lửa núi sống vào tâm của mũi khoan, do đó, cạnh này không bao giờ thực sự nguội đi giữa các cú đánh. Các vết nứt có màu cam khi thực hiện cú đánh xuống, như thể cú đánh đánh thức thứ gì đó mà lần rèn đầu tiên đã ngủ yên trong bàn ủi. Người ta nói rằng một nguyên tố Stormcrag đã từ bỏ cục than hồng để có được nó; họ nói rất nhiều điều ở Highwatch khi gió nổi lên.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Emberbite',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Vi trần sao chết bằng vàng nóng chảy bị giam giữ được bao bọc trong các tia lửa quay quanh, trục màu đen vũ trụ khắc các chòm sao phát sáng.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Không phải bản thân ngôi sao sa ngã mà là hạt bụi cuối cùng của một ngôi sao đang hấp hối: một đốm than hồng vàng nóng chảy duy nhất của mặt trời đã tắt, bao bọc trong những tia lửa là ánh sáng cuối cùng của nó. Trục màu đen vũ trụ của nó được khắc các chòm sao đã chứng kiến ​​nó chết. Những người trồng trọt ở Mirefen nói rằng nó ban một điều ước cho bất cứ ai giữ nó vào lúc hoàng hôn thực sự; họ cũng nói rằng mọi linh hồn nắm giữ nó đều mong muốn có thêm thời gian, và Mặt trăng chết đuối không ban cho ai trong số họ bất kỳ điều gì.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Emberwish, Hạt Mặt Trời Chết',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Cây đũa phép bằng kim loại đen có đầu than hồng rực trong móng sắt, những vết nứt do nhiệt ở chân tóc, ánh sáng ấm áp bên trong.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'Cây đũa phép đặt tên cho lớp. Khi một thợ chế tạo áo giáp của Highwatch lần đầu tiên đặt một cục than lửa vào móng vuốt sắt và bắt nó đáp trả bàn tay phàm trần, ngay cả Tu Sĩ của Ánh sáng cũng ngừng gọi nó là dị giáo và bắt đầu gọi nó là hữu ích. Ấm áp, kiên nhẫn và âm thầm nguy hiểm: cục than hồng ở đầu nó đã cháy rụi, không hề vỡ, kể từ trước khi chủ nhân của nó kịp thở.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Cây Đũa Phép Emberwrought',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Khẩu pháo sao cỡ lớn hài hước: nòng súng màu đen vũ trụ được khắc các chòm sao vàng rực rỡ, mõm chuông loe có vỏ sao chổi bằng vàng nóng chảy bên trong, phụ kiện bằng đồng, báng vai bằng gỗ.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    'Những người thợ rèn làm việc với ngôi sao sa ngã đã tạo ra sáu di vật từ nó và vẫn còn sót lại một thùng kim loại sao, và khi đó những người học việc đã có ý kiến. Thứ xuất hiện từ chiếc đe là khẩu súng đầu tiên của vương quốc hoặc động cơ bao vây nhỏ nhất của nó: một khẩu pháo đeo vai không bắn quá nhiều như yêu cầu của ngôi sao thứ hai, nhằm mục đích. Anh Aldric từ chối chúc phúc cho nó, lý luận rằng bất cứ điều gì ồn ào như vậy thì trời cũng đã để ý đến rồi. Thợ Săn yêu thích nó. Không có gì hạ cấp bao giờ có.',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Encore, Ngôi Sao Rơi Thứ Hai',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'Một nhánh băng sông băng màu lục lam phát sáng, sương muối nở ra từ cổ áo bạc, sương mù lạnh lẽo.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    'Một nhánh băng sông băng phát sáng, được cho là bị vỡ ra từ vùng đất sâu bên dưới Sanctum, nơi cái lạnh của ngọn núi có răng. Sương muối nở không ngừng từ vòng cổ bạc của nó và không bao giờ tan, không phải do lửa hay mùa hè. Pháp Sư giữ nó ở gần vì cái lạnh mà nó mang lại cho công việc của họ, và giữ nó ở xa vào những đêm nó dường như nghiêng về phía hầm mộ của Nythraxis và lắng nghe.',
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Mảnh vỡ của Everwinter',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Nơ uốn cong bằng gỗ óc chó sơn mài, đầu ống bằng đồng, dây vải lanh phủ sáp, tem hội trên thanh nâng.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Thứ gần gũi nhất mà vương quốc có với một hội là một con tem của Fletcher trên nắp thùng, một lời hứa về những gì bên trong, cách một người bán rượu vang niêm phong một chiếc thùng. Gỗ óc chó sơn mài, đầu cánh bằng đồng, một sợi dây bằng vải lanh phủ sáp không bị sờn khi gặp mưa Mirefen. Mỗi khớp tranh luận về giá cả. Vẽ nó một lần qua Widow Thicket và cuộc tranh luận sẽ thắng.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Cây cung của hội Fletcher',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Cây trượng bọc sắt có gắn lõi than hồng phát sáng trong lồng, than hồng chảy lên trục, tỏa nhiệt lung linh.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Một cục than sống của lửa núi được lồng sắt ở đỉnh đầu. Loremaster Caddis gọi đó là bằng chứng cho thấy ngọn lửa của lần rèn đầu tiên có thể có tác dụng chứ không chỉ để phong ấn. Ánh sáng lung linh tỏa ra từ nó thành một dải ruy băng mỏng, vô tận; một pháp sư mang theo một người không bao giờ muốn có lò rèn hay người gác lửa. Họ thì thầm, cục than hồng được rút ra từ hơi thở của chính Voskar the Emberwing, và kể từ đó nó không hề nguội đi.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Trượng Forgeheart',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Con dao găm mỏng đến mức độc ác có lớp băng trong xanh, một đường gân màu lục lam phát sáng ở giữa, những tinh thể băng giá như kim, chuôi kiếm sương muối.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Mỏng như hơi thở và lạnh gấp đôi: một mảnh sông băng Thornpeak được mài giũa thành một đường mạch phát sáng duy nhất, sắc bén đến mức vết thương sẽ đông cứng lại trước khi máu kịp chảy. Tên của nó được mượn từ ngôi mộ lạnh lẽo mà người chết mang xuống khỏi đỉnh núi. Nó không bao giờ cần mài giũa; băng không buồn tẻ, Loremaster Caddis khô khốc lưu ý, nó chỉ chờ đợi.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Kim Băng Giá',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Phần đầu là băng băng xanh mờ, bên trong nứt nẻ màu lục lam phát sáng, những tinh thể băng giá dựng đứng, một nửa vệt hơi lạnh kéo theo.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Được đẽo từ trái tim xanh của sông băng Thornpeak, nơi hai thế kỷ băng đã ép cái lạnh cho đến khi nó tự phát sáng. Nó để lại hơi nước ngay cả khi ở trạng thái nghỉ và vết nứt khi hạ cánh là một khe hở dưới Rình Rậper Ridge. Highwatch cho nó rơi xuống băng trên đó; vì vậy đây là vũ khí dùng để ngăn chặn sự tan băng, và bất kể sự tan băng nào sẽ xảy ra.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Rìu Tách Băng',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Lưỡi thép xanh, thanh bảo vệ đuôi cá bằng đồng, tay cầm bằng da nhuộm màu xanh mòng két, huy hiệu bang hội được đóng dấu nhỏ.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Trường hợp lưỡi rèn được ẩn danh, cái này được ký tên. Một thợ chế tạo áo giáp chỉ có quyền đưa nhãn hiệu của mình vào ricasso khi Thương nhân của Chợ Thế giới xác nhận cho thép của anh ta và nhãn hiệu của Smith Haldren được xác nhận. Màu xanh lam trên nền ẩm ướt của xứ Vale, cân đối với một sợi tóc. Bạn trả tiền cho con tem nhiều như thanh kiếm, và nó đáng giá.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Kiếm Guildmark',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Dao găm bằng thép cường lực mỏng, phần bảo vệ và đai ốc chuôi kiếm bằng đồng, tay cầm dây màu xanh đậm, dấu hiệu được đóng dấu.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Điều mà một người đàn ông tự chế mặc khi đeo thanh kiếm ở nhà: thanh mảnh, tôi luyện, được đóng dấu giống như dấu chứng nhận một lưỡi kiếm đầy đủ, đeo trên thắt lưng như một con dấu có lưỡi. Nói giảm đi cho tất cả mọi người trừ những người có thể đọc được bằng chứng của người chế tạo áo giáp. Sĩ quan quân sự Bree giữ một ngăn kéo đựng chúng ở Highwatch dành cho những sĩ quan được bức tường tôn trọng.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Đoản Kiếm Guildmark',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Quyền trượng bạc được đội một mảnh băng màu lục lam phát sáng, đang trôi nổi, quay chậm, các tinh thể tỏa ra và hơi lạnh.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'Cây trượng của đội canh gác không bao giờ ngủ trên tường thành Highwatch. Vương miện của nó là một mảnh băng màu lục lam lơ lửng khỏi lớp bạc và tự xoay chậm rãi; người lính gác thề rằng nó luôn hướng về cái lạnh tụ lại dưới các đỉnh núi. Mang Vigil nghĩa là đứng gác hai trăm năm chỉ trong một đêm và hứa không rời mắt.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Trượng Canh Gác Sương Giá',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Lưỡi cong làm bằng băng băng nhạt, những tinh thể sương muối lởm chởm dọc theo sống lưng, một lõi đông lạnh màu lục lam phát sáng ở lớp chắn ngang đầy đặn hơn bằng băng.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    "Sản phẩm hàng đầu của loại đông lạnh và là sản phẩm mà mọi nhà sưu tập đều hướng tới đầu tiên. Ice Fang được chạm khắc chứ không phải rèn từ một nhánh sông băng bao phủ Thornpeak phía trên Highwatch, lõi màu lục lam của nó cháy lạnh như ánh sáng của Glimmermere. Nó tạo ra không khí mà nó cắt. Người bảo vệ tường thề rằng một người lính đã mang nó vào đêm tuyết dày đã cản trở Wyrmcult, và 'đã mua được bức tường trong mùa đông'.",
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Nanh băng',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Đũa sơn mài mảnh màu đỏ đậm, hai dải đồng thau đánh bóng, đầu đũa tròn nhỏ bằng đồng.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Sơn mài màu đỏ đậm trong bảy chiếc áo khoác kiên nhẫn, được buộc hai lần bằng đồng thau bóng loáng: loại đũa phép mà một pháp sư hàng rào mua ở Chợ Thế giới sau khi họ bắt đầu tính tiền thật và muốn xem nó. Nó truyền ánh sáng không tốt hơn một cây bạch dương. Nhưng nó tỏa sáng rực rỡ khắp quầy hàng của Người buôn bán và một nửa phép thuật nhỏ luôn được tin tưởng.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Thanh sơn mài',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Sao băng kim loại, lõi vàng nóng chảy dọc theo máy xới, các chi màu đen vũ trụ khắc các chòm sao, một tia lửa sao thuần khiết có chốt.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    "Được rèn từ kim loại sao băng thô trong khi miệng núi lửa Mirefen vẫn phát sáng, các mảnh vụn 'quá nóng để xử lý', được rèn thành các nhánh của vũ trụ màu đen được khắc các chòm sao, một lõi vàng nóng chảy dọc theo máy xới. Nó không chọc vào chốt mà gợi lên một điều: một trục lửa sao, lỏng lẻo như một lời phán quyết và đáp xuống như phần cuối của một tia lửa. Khi Highwatch lo sợ ngay cả chiếc vương miện bất tử của Nythraxis cũng có thể không phải là thứ tồi tệ nhất dưới đỉnh núi, thì đây chính là vũ khí mà họ muốn có trên tường thành. Hãy nhắm thật tốt.",
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name':
+    'Meteorlatch, Phán quyết cuối cùng của bầu trời',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Cụm tinh thể băng lởm chởm xung quanh lõi màu lục lam rực sáng, sương muối lan xuống một nửa màu bạc.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    'Không được chạm khắc nhưng đã trưởng thành: Băng Thornpeak quấn quanh lõi màu lục lam lạnh lẽo cho đến khi nó cứng lại như loại thép tốt nhất của Hode. Sương muối bò dọc theo nửa thân bạc về phía bàn tay và không bao giờ đến nữa. Nơi nó chạm tới, nước đóng băng; nơi nó nằm, mặt đất trắng xóa. Cái lạnh thấu xương của những đỉnh núi, đủ nhỏ để có thể đu đưa những vật leo lên tường.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Chùy Nghiền Băng Rimecrusher',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Đầu giống như một mảnh trời đêm bị xé nát, những vết nứt bằng vàng nóng chảy và những hình khắc của chòm sao, những mảnh ánh sao lơ lửng, một vệt cực quang lung linh kéo dài ở rìa.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Bị đánh từ vành miệng núi lửa, nơi ngôi sao rơi xé toạc hình ảnh phản chiếu của bầu trời ra khỏi Mirefen và để lại vết thương vẫn còn bốc hơi. Cái đầu trông giống như một mảnh màn đêm bị xé nát: những vết nứt vàng nóng chảy, những chòm sao mà không học giả nào ở Highwatch có thể đặt tên, một luồng cực quang chảy ra từ mép sau mỗi cú vung. Anh Aldric đã ban phước cho nó và không chạm vào nó. Nâng nó lên là giữ lại cái lỗ mà trời để lại.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Skyrender, Vết Thương Thiên Không',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Những mặt bích bằng sắt sẫm màu phát sáng màu cam hồng dọc theo các vết nứt bên trong, một viên ngọc nóng chảy ở phần đầu.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    "Một chiếc chùy có lò sưởi riêng: một viên đá có lõi nóng chảy được mài ra từ dấu ấn Sanctum được 'làm bằng lửa núi', phát sáng trên đầu. Các mặt bích giữ ấm khi chạm vào và ấm hơn ở nơi tiếp đất; một trung sĩ Highwatch thề rằng một đòn từ nó sẽ để lại vết bầm tím mờ nhạt cho đến sáng. Ngọn lửa của ngọn núi cuối cùng được tạo ra để phá vỡ chứ không phải để hàn kín.",
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Smoulderfall',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Đại kiếm được rèn từ một ngôi sao sa ngã, lõi vàng nóng chảy tách ra khỏi lưỡi kiếm, thép đen vũ trụ được viền trong ánh sao, những mảnh vàng quay quanh người bảo vệ, dải băng cực quang.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    "Khi ngôi sao rơi khỏi bầu trời phía tây và 'nổ tung như một lò rèn' bên ngoài Widow Thicket, Anh Aldric đã kéo trái tim vẫn còn âm ỉ của nó ra khỏi miệng núi lửa Mirefen và cầu xin những người thợ rèn của vương quốc làm việc 'một thứ không thuộc về thế giới này.' Họ đã tạo ra một thanh đại kiếm từ nó: Solheim. Lõi vàng nóng chảy của nó xẻ đôi lưỡi kiếm đen vũ trụ như bình minh làm nứt bầu trời đêm, và những mảnh kim loại hình sao quay quanh người bảo vệ trên những con đường không có bàn tay định sẵn. Chỉ có một chiếc được rèn. Sẽ không có cái khác.",
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, Ánh sáng bình minh cuối cùng',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Lõi sao bằng vàng nóng chảy bị giam giữ được bao quanh bởi các mảnh quay quanh, các mặt bích màu đen vũ trụ có vân ánh sao, cực quang tràn ra từ các đường nối.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    'Một lõi sao bắt được khoảnh khắc trước khi nó chết, bao quanh bởi những mảnh vụn rơi xuống cùng với nó, đóng băng một inch từ quên lãng. Các mặt bích màu đen vũ trụ của nó chạy với ánh sáng sao bị mắc kẹt và cực quang tràn ra từ các đường nối khi nó được nâng lên. Tu Sĩ cũ của Ánh sáng gọi ngôi sao băng là một sự phán xét, một phán quyết được truyền lại từ trên cao rằng không có tấm khiên nào có ý nghĩa ngăn chặn và đặt tên này theo tên cái đã giáng xuống Mirefen.',
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Starfall, Phán Quyết Thiên Đường',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Đầu bằng thép xanh được tôi luyện sáu mặt, cổ và chuôi bằng đồng, tay cầm bằng da màu đỏ rượu vang.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Sáu mặt bích bằng thép tôi luyện xanh, mỗi mặt được mài để mở mũ, được bọc bằng đồng và quấn bằng da màu đỏ rượu vang. Những người thợ chế tạo vũ khí của vương quốc không tạo ra những vũ khí xấu xí ngay cả khi công việc rất tàn bạo. Cái này được ủy quyền thông qua Thị trường Thế giới, không phải lấy ra khỏi giá; ở đâu đó có một cuốn sổ cái ghi tên một người mua đáng tự hào và số tiền anh ta đã trả cho Hode để mua nó.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Chùy Cánh Tôi Luyện',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    'Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó.',
+  'hudChrome.wocStore.skins.winterbite.name': 'Nanh Đông',
+  'hudChrome.wocStore.storeTab': 'Cửa hàng',
+  'hudChrome.wocStore.tabsLabel': 'Các phần của Cửa hàng WOC',
+  'hudChrome.wocStore.title': 'Cửa hàng WOC',
+  'hudChrome.wocStore.tryOn': 'Dùng thử',
+  'hudChrome.wocStore.unavailable': 'Không khả dụng',
+  'hudChrome.wocStore.viewModeLabel': 'Chế độ xem trước',
+  'hudChrome.wocStore.weaponOnly': 'Chỉ vũ khí',
+  'hudChrome.wocStore.wtype.axe': 'Rìu',
+  'hudChrome.wocStore.wtype.bow': 'Cung',
+  'hudChrome.wocStore.wtype.crossbow': 'Nỏ',
+  'hudChrome.wocStore.wtype.dagger': 'Dao găm',
+  'hudChrome.wocStore.wtype.mace': 'Chùy',
+  'hudChrome.wocStore.wtype.staff': 'Trượng',
+  'hudChrome.wocStore.wtype.sword': 'Gươm',
+  'hudChrome.wocStore.wtype.wand': 'Đũa phép',
 };

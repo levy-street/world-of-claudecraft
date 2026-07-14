@@ -3,7 +3,7 @@ import { isBlocked, resolveMovement } from '../src/sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
-import { terrainHeight, terrainSteepness, WATER_LEVEL } from '../src/sim/world';
+import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 
 // The parity gate for the movement-kernel extraction (MV1) and the foundation
 // of the online self extrapolator: stepPlayerMotion driven with CLIENT-shaped
@@ -191,6 +191,34 @@ describe('player motion kernel parity with the live Sim', () => {
     const actor2pos = { ...sim.player.pos };
     runParity(sim, mi({ forward: true, jump: true }), 20 * 5, 'uphill push');
     expect(sim.player.pos.x).toBeGreaterThan(actor2pos.x - 40); // never crested the rim
+  });
+
+  it('routes terrain wall standoff through the collision sweep', () => {
+    const standoffSeed = 20061;
+    const sim = new Sim({ seed: standoffSeed, playerClass: 'warrior', autoEquip: true });
+    const start = { x: -150, z: 546.75 };
+    teleport(sim, start.x, start.z);
+    expect(terrainSteepnessAt(start.x, start.z, standoffSeed)).toBeLessThan(1.0);
+
+    const actor = mirrorActor(sim);
+    let swept = false;
+    const deps: PlayerMotionDeps = {
+      ...clientDeps(standoffSeed),
+      resolveMove: (fromX, fromZ, nx, nz, _r, _e, ignoreFences) => {
+        swept = true;
+        expect(fromX).toBe(start.x);
+        expect(fromZ).toBe(start.z);
+        expect(Math.hypot(nx - fromX, nz - fromZ)).toBeGreaterThan(0.1);
+        expect(ignoreFences).toBe(false);
+        return { x: fromX, z: fromZ };
+      },
+    };
+
+    stepPlayerMotion(deps, actor, mi());
+
+    expect(swept).toBe(true);
+    expect(actor.pos.x).toBe(start.x);
+    expect(actor.pos.z).toBe(start.z);
   });
 
   it('enters deep water, treads the surface, and shore-hops identically', () => {

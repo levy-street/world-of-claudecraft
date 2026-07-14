@@ -1,5 +1,16 @@
-import { pool } from './db';
+import { ELIGIBLE_ACCOUNT_SQL, pool } from './db';
 import { REALM } from './realm';
+
+// Every ranked read below embeds ELIGIBLE_ACCOUNT_SQL: banned and suspended
+// accounts are delisted from the daily board (and stop inflating other
+// players' ranks) the same way as every other public board. All five ranked
+// reads share the predicate so the page, the total, and the self rank always
+// agree on one population. These reads run per request (no board cache), so
+// the SQL exclusion alone delists immediately; there is nothing to bust.
+// The payout path embeds it too: finalizeDay selects winners from the same
+// population the board displays, and pendingPayouts rechecks eligibility at
+// pay time so a ban or suspension landing after finalization still blocks
+// the transfer.
 
 export interface DailyRewardTaskRow {
   taskId: string;
@@ -60,6 +71,7 @@ export interface DailyRewardWinnerAnnouncement {
 }
 
 export interface DailyRewardDb {
+  banForAccount(accountId: number): Promise<{ reason: string } | null>;
   ensureDay(day: string, prizePoolUsd: number, wocUsdPrice: number | null): Promise<void>;
   seedTasks(day: string, tasks: DailyRewardTaskSeed[]): Promise<void>;
   tasksForAccount(day: string, accountId: number): Promise<DailyRewardTaskRow[]>;
@@ -158,6 +170,14 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
 }
 
 export class PgDailyRewardDb implements DailyRewardDb {
+  async banForAccount(accountId: number): Promise<{ reason: string } | null> {
+    const res = await pool.query(
+      'SELECT reason FROM daily_reward_excluded_accounts WHERE account_id = $1 LIMIT 1',
+      [accountId],
+    );
+    return res.rows[0] ? { reason: String(res.rows[0].reason) } : null;
+  }
+
   async ensureDay(day: string, prizePoolUsd: number, wocUsdPrice: number | null): Promise<void> {
     await pool.query(
       `INSERT INTO daily_reward_days (day, realm, prize_pool_usd, woc_usd_price)
@@ -316,8 +336,13 @@ export class PgDailyRewardDb implements DailyRewardDb {
       `WITH ranked AS (
          SELECT account_id,
                 row_number() OVER (ORDER BY points DESC, updated_at ASC, account_id ASC) AS rank
-           FROM daily_reward_scores
+           FROM daily_reward_scores s
           WHERE day = $1 AND realm = $2 AND points > 0
+            AND EXISTS (SELECT 1 FROM accounts a
+                         WHERE a.id = s.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
+            AND NOT EXISTS (
+              SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id
+            )
        )
        SELECT rank FROM ranked WHERE account_id = $3`,
       [day, REALM, accountId],
@@ -336,6 +361,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
          FROM daily_reward_scores s
          JOIN accounts a ON a.id = s.account_id
         WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+          AND ${ELIGIBLE_ACCOUNT_SQL}
+          AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
         ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC
         LIMIT $3`,
       [day, REALM, Math.max(1, Math.min(100, limit))],
@@ -354,6 +381,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
            FROM daily_reward_scores s
            JOIN accounts a ON a.id = s.account_id
           WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+            AND ${ELIGIBLE_ACCOUNT_SQL}
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
        )
        SELECT account_id, username, points, rank FROM ranked WHERE account_id = $3`,
       [day, REALM, accountId],
@@ -364,8 +393,13 @@ export class PgDailyRewardDb implements DailyRewardDb {
   async leaderboardTotal(day: string): Promise<number> {
     const res = await pool.query(
       `SELECT COUNT(*) AS total
-         FROM daily_reward_scores
-        WHERE day = $1 AND realm = $2 AND points > 0`,
+         FROM daily_reward_scores s
+        WHERE day = $1 AND realm = $2 AND points > 0
+          AND EXISTS (SELECT 1 FROM accounts a
+                       WHERE a.id = s.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
+          AND NOT EXISTS (
+            SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id
+          )`,
       [day, REALM],
     );
     return Number(res.rows[0]?.total ?? 0);
@@ -388,6 +422,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
          FROM daily_reward_scores s
          JOIN accounts a ON a.id = s.account_id
         WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+          AND ${ELIGIBLE_ACCOUNT_SQL}
+          AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
         ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC
         OFFSET $3
         LIMIT $4`,
@@ -426,7 +462,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
   ): Promise<boolean> {
     const res = await pool.query(
       `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
-       VALUES ($1, $2, $3, $4, $5)
+       SELECT $1, $2, $3, $4, $5
+       WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
        ON CONFLICT (day, realm, account_id) DO NOTHING`,
       [day, REALM, accountId, outcomeKey, points],
     );
@@ -447,7 +484,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
       const event = await client.query(
         `INSERT INTO daily_reward_events
           (day, realm, account_id, kind, points, idempotency_key, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
+         SELECT $1, $2, $3, $4, $5, $6, $7::jsonb
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
          ON CONFLICT (day, realm, account_id, idempotency_key) DO NOTHING`,
         [day, REALM, accountId, kind, points, idempotencyKey, JSON.stringify(meta)],
       );
@@ -504,6 +542,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
            JOIN accounts a ON a.id = s.account_id
            LEFT JOIN wallet_links wl ON wl.account_id = s.account_id
           WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+            AND ${ELIGIBLE_ACCOUNT_SQL}
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
           ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC
           LIMIT 10`,
         [day, REALM],
@@ -546,6 +586,9 @@ export class PgDailyRewardDb implements DailyRewardDb {
          FROM daily_reward_payouts p
          LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
         WHERE p.status IN ('pending', 'failed')
+          AND EXISTS (SELECT 1 FROM accounts a
+                       WHERE a.id = p.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
+          AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
         ORDER BY p.day ASC, p.rank ASC
         LIMIT $1`,
       [Math.max(1, Math.min(100, limit))],
@@ -578,6 +621,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
            FROM daily_reward_payouts p
            LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
           WHERE p.day = $1 AND p.realm = $2
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
           ORDER BY p.rank ASC
           LIMIT 10`,
         [String(day.day), String(day.realm)],

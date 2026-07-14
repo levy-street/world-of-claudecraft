@@ -17,21 +17,27 @@ the merge conflict markers surface. This audit has paid for itself four times on
    disabled the gate.
 3. A release added 12 routes the branch's surface inventory did not know about, 6 of them
    invisible to the parity corpus.
-4. A release hotfix pre-landed half of a planned phase (the market realm-scoping) with a
-   different mechanism than the packet assumed, invalidating the packet's premise.
+4. A release hotfix pre-landed half of some planned work (the market realm-scoping) with a
+   different mechanism than the branch's plan assumed, invalidating the plan's premise.
 
 Run every step; each targets one of those failure classes. No em dashes or emojis in anything
 you write.
 
 ## Step 1: identify the merge and its delta
 
-The merge commit is the argument if given, else the most recent RELEASE merge:
+The merge commit is the argument if given, else the most recent RELEASE merge. Both subject
+forms occur in this history: the plain form (`Merge branch 'release/v0.23.0' ...`) and the far
+more common remote-tracking form (`Merge remote-tracking branch 'origin/release/v0.25.0' ...`,
+also with `upstream/` or `up/`). Match both:
 
 ```sh
-git log --merges --grep="Merge branch 'release/" -1 --format=%H HEAD
+git log --merges -1 --format='%H %s' \
+  --grep="branch '\(origin/\|upstream/\|up/\)\?release/" HEAD
 ```
 
-(a bare `git log --merges -1` can grab an unrelated merge, e.g. a main-merge). The audit
+Print `%s` and read it: hand-written subjects (e.g. `merge: resync with release/v0.23.0`) do
+not match this grep, and a bare `git log --merges -1` can grab an unrelated merge, e.g. a
+main-merge, so when in doubt pass the commit explicitly. The audit
 assumes a true two-parent merge commit; a squash-merged release has no `^2`, so pass the
 commit explicitly and treat its own diff as the incoming delta. The incoming delta (what the
 release brought, relative to the branch):
@@ -80,11 +86,12 @@ skips the new behavior.
 
 ## Step 6: planning-doc premise re-check
 
-Locate the branch's planning docs first: an epic's phase docs live under `docs/<epic>/` (for
-the API pipeline, `docs/api-pipeline/`), and its `state.md`/`progress.md` name the active
-phase and packet. Re-read the ACTIVE phase packet and those two files. Did the merge land code
-they assume absent, or implement a planned mechanism a different way? If yes, correct the
-premise in the docs BEFORE implementing against it, and note the correction in memory.
+Locate the branch's planning docs first: they usually live under `docs/<epic>/` (for the API
+pipeline, `docs/api-pipeline/`), and files like `state.md`/`progress.md` name the work in
+flight. Re-read whichever doc describes the ACTIVE work plus those two files. Did the merge
+land code they assume absent, or implement a planned mechanism a different way? If yes,
+correct the premise in the docs BEFORE implementing against it, and note the correction in
+memory.
 
 ## Step 7: report and fix
 
@@ -92,3 +99,20 @@ Produce a short report: overlaps read (Step 2), divergences mirrored (Step 3), i
 added (Step 4), bindings re-checked (Step 5), premises corrected (Step 6), each with file:line.
 Apply the fixes in the same change with a parity/regression test per divergence, then run the
 targeted suites plus `npx tsc --noEmit` (or `npm run gate` if the merge was large).
+
+One recurring merge-mechanics trap to check every time (it has reddened the gate twice on the
+bank-system branch, once on a v0.22.0 merge and once on a v0.23.0 merge): when a merge
+conflicts on the generated i18n artifacts and BOTH sides changed catalog keys, taking either
+side of `src/ui/i18n.resolved.sha256` leaves a stale baseline, and `npm run i18n:gen` does NOT
+rewrite it (the merged union table hashes to a value neither parent had). After regenerating,
+run `node scripts/i18n_resolved_hash.mjs --write` and confirm
+`npx vitest run tests/i18n_resolved_equivalence.test.ts` is green, in the SAME merge commit.
+
+A second recurring trap (reddened the gate on a later v0.23.0 merge into the bank-system
+branch): a release-authored test that drives GameServer mocks `../server/db` with the export
+list as of the RELEASE tree, so a db function the BRANCH added to game.join/leave or the
+autosave loop throws "No X export is defined on the mock" only on the merged tree. Neither parent can carry
+the fix, targeted suites miss it, and only the full gate catches it. After any merge that
+brings new `vi.mock('../server/db')` sites, diff each new mock's keys against what
+`server/game.ts` imports from db on the branch, and mirror the branch's canonical mock shape
+(for the character-lease surface: `tests/character_lease_game.test.ts`).

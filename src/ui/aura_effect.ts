@@ -17,6 +17,7 @@
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
 import type { AuraKind } from '../sim/types';
+import { FAERIE_FIRE_ARMOR_PCT, SUNDER_ARMOR_PCT_PER_STACK } from '../sim/types';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -112,6 +113,17 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       // Percentage drain on the whole stat block (The Keeper's Toll / Resurrection
       // Sickness: value -0.75 -> "Reduces all attributes by 75%"). Always a drain.
       return { key: `${KEY}.allStatsPctReduce`, nums: { pct: pctFromFrac(a.value) } };
+    // Percent raid buffs: value is integer percent POINTS (5 = +5%), rendered directly.
+    case 'buff_stats_pct':
+      return { key: `${KEY}.increasePct.allStats`, nums: { pct: round(a.value) } };
+    case 'buff_int_pct':
+      return { key: `${KEY}.increasePct.int`, nums: { pct: round(a.value) } };
+    case 'buff_sta_pct':
+      return { key: `${KEY}.increasePct.sta`, nums: { pct: round(a.value) } };
+    case 'buff_armor_pct':
+      return { key: `${KEY}.increasePct.armor`, nums: { pct: round(a.value) } };
+    case 'buff_ap_pct':
+      return { key: `${KEY}.increasePct.ap`, nums: { pct: round(a.value) } };
     case 'buff_dodge':
       // The staggerHit mob affix rides buff_dodge with a NEGATIVE value, so the
       // sign picks the direction (mirrors flatStat).
@@ -121,8 +133,21 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       };
 
     case 'sunder': {
-      // value is a FLAT armor amount per stack; total reduction is value * stacks
-      // (armor -= a.value * (a.stacks ?? 1) in the mitigation pass).
+      // Sunder Armor is a PERCENT reduction: SUNDER_ARMOR_PCT_PER_STACK per stack
+      // (effectiveArmor max-combines it, not the aura's `value`, which now carries the
+      // threat constant). Expose Armor lands the full cap in one cast.
+      const stacks = a.stacks ?? 1;
+      const pct = round(SUNDER_ARMOR_PCT_PER_STACK * stacks * 100);
+      return stacks > 1
+        ? { key: `${KEY}.armorPctStacks`, nums: { pct, stacks } }
+        : { key: `${KEY}.armorPct`, nums: { pct } };
+    }
+    case 'faerie_fire':
+      // Fixed-percent armor reduction (does not stack with Sunder).
+      return { key: `${KEY}.armorPct`, nums: { pct: round(FAERIE_FIRE_ARMOR_PCT * 100) } };
+    case 'corrode': {
+      // Mob corrosion: a FLAT, stacking armor shred (value per stack). Keeps the
+      // flat-reduction wording the old shared `sunder` kind used.
       const stacks = a.stacks ?? 1;
       const total = round(a.value * stacks);
       return stacks > 1

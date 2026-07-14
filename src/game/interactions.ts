@@ -44,6 +44,10 @@ export function activePvpOpponentIds(
     for (const enemy of match.enemies) {
       if (enemy.pid !== selfId) ids.add(enemy.pid);
     }
+    // Protect Yumi: the ENEMY team's cat is an attackable objective (the
+    // own cat stays out of the set, matching the sim hostility rule).
+    const yumi = match.yumi;
+    if (yumi) ids.add(yumi.team === 'A' ? yumi.yumiB.entityId : yumi.yumiA.entityId);
   }
   return ids;
 }
@@ -77,7 +81,11 @@ export function isAttackableEntity(
   activePvpOpponentSet: ReadonlySet<number> = new Set(),
 ): boolean {
   if (!e || e.dead || e.id === playerId) return false;
-  if (e.kind === 'mob') return e.hostile;
+  // A mob is attackable when wild-hostile OR a match objective in the
+  // opponent set (the enemy Yumi cat carries hostile=false; its team
+  // hostility lives in the sim rule, and activePvpOpponentIds mirrors it
+  // here so every attack affordance agrees with the sim).
+  if (e.kind === 'mob') return e.hostile || activePvpOpponentSet.has(e.id);
   return e.kind === 'player' && activePvpOpponentSet.has(e.id);
 }
 
@@ -151,10 +159,13 @@ export function handlePickedEntity(
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
-    } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
-      // Right-click a hostile mob (or an active PvP opponent) to start auto-attack,
-      // the classic-MMO convention the attack tooltip promises. A camera right-drag
-      // can't reach this: clickPickFromMouseGesture drops a right gesture past the
+    } else if (
+      isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
+    ) {
+      // Right-click any attackable target (hostile mob, active PvP opponent,
+      // or the enemy Yumi objective) to start auto-attack, the classic-MMO
+      // convention the attack tooltip promises. A camera right-drag can't
+      // reach this: clickPickFromMouseGesture drops a right gesture past the
       // drag threshold, so only a deliberate right-click attacks.
       world.startAutoAttack();
     }

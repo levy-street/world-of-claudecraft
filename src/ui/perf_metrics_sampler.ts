@@ -36,6 +36,8 @@ export interface SamplerOnline {
   connected: boolean;
   /** ms between server snapshots; <=0 means unknown (snapshot row hidden). */
   snapInterval: number;
+  /** Server-measured achieved sim tick rate (Hz); null until reported (row hidden). */
+  serverTickHz: number | null;
 }
 
 export interface SamplerDeps {
@@ -105,6 +107,10 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
       jitterMs: isOnline && echo > 0 ? deps.getJitterMs() : null,
       predLeadMs: isOnline ? (deps.getPredLeadMs?.() ?? null) : null,
       snapshotHz: isOnline && online.snapInterval > 0 ? 1000 / online.snapInterval : null,
+      serverTickHz:
+        isOnline && online.serverTickHz != null && online.serverTickHz > 0
+          ? online.serverTickHz
+          : null,
       connectionType: readConnectionType(),
       drawCalls: r.calls,
       triangles: r.triangles,

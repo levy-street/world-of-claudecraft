@@ -10,6 +10,7 @@
 // CharactersDb / LeaderboardDb / ReportsDb, mirroring the SocialDb/PgSocialDb
 // idiom in server/social.ts + server/social_db.ts.
 import type * as Db from '../../../server/db';
+import type * as DeedsDb from '../../../server/deeds_db';
 import type * as ModDb from '../../../server/moderation_db';
 import type { CharacterState, MailSave, MarketSave } from '../../../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../../../src/sim/types';
@@ -56,6 +57,7 @@ export interface CharactersDb {
   guildNameForCharacter(characterId: number): Promise<string | null>;
   findCharacterReportTargetByName(name: string): Promise<ModDb.LiveReportTarget | null>;
   listCharacterNamesForSitemap(limit?: number): Promise<string[]>;
+  recentDeedsForCharacter(characterId: number, limit: number): Promise<DeedsDb.RecentDeedRow[]>;
 }
 
 export interface LeaderboardDb {
@@ -92,9 +94,10 @@ export class FakeCharactersDb implements CharactersDb {
   // Keyed by character id, the in-memory equivalent of the characters table.
   private readonly rows = new Map<number, Db.CharacterRow>();
   private nextId = 1;
-  // Optional seedable lookups for the standing/guild reads.
+  // Optional seedable lookups for the standing/guild/recent-deeds reads.
   private readonly standings = new Map<number, { rank: number; total: number }>();
   private readonly guildNames = new Map<number, string>();
+  private readonly recentDeeds = new Map<number, DeedsDb.RecentDeedRow[]>();
   // The last market and mail blobs saved alongside a character, for assertions.
   lastMarket: MarketSave | null = null;
   lastMail: MailSave | null = null;
@@ -112,6 +115,11 @@ export class FakeCharactersDb implements CharactersDb {
 
   seedGuildName(characterId: number, guildName: string): void {
     this.guildNames.set(characterId, guildName);
+  }
+
+  // Seed newest-first, the order the real query returns.
+  seedRecentDeeds(characterId: number, rows: DeedsDb.RecentDeedRow[]): void {
+    this.recentDeeds.set(characterId, [...rows]);
   }
 
   private owned(accountId: number): Db.CharacterRow[] {
@@ -243,6 +251,13 @@ export class FakeCharactersDb implements CharactersDb {
   async listCharacterNamesForSitemap(limit = DEFAULT_SITEMAP_LIMIT): Promise<string[]> {
     return [...this.rows.values()].map((r) => r.name).slice(0, Math.max(0, limit));
   }
+
+  async recentDeedsForCharacter(
+    characterId: number,
+    limit: number,
+  ): Promise<DeedsDb.RecentDeedRow[]> {
+    return (this.recentDeeds.get(characterId) ?? []).slice(0, Math.max(0, limit));
+  }
 }
 
 export class FakeLeaderboardDb implements LeaderboardDb {
@@ -332,6 +347,7 @@ type _CharactersConforms = _AssertAssignable<
     guildNameForCharacter: typeof Db.guildNameForCharacter;
     findCharacterReportTargetByName: typeof Db.findCharacterReportTargetByName;
     listCharacterNamesForSitemap: typeof Db.listCharacterNamesForSitemap;
+    recentDeedsForCharacter: typeof DeedsDb.recentDeedsForCharacter;
   },
   CharactersDb
 >;

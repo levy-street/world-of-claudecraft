@@ -20,6 +20,9 @@
 export const TAP_SLOP_PX = 12;
 /** How long after a handled touch tap the synthesized click stays swallowed. */
 export const CLICK_SUPPRESS_MS = 700;
+/** Two touch taps within this window count as a double-tap (matches the camera
+ *  recenter double-tap in mobile_controls.ts). */
+export const DOUBLE_TAP_MS = 300;
 
 interface TapTarget {
   addEventListener(type: string, listener: (e: PointerEvent & MouseEvent) => void): void;
@@ -59,5 +62,52 @@ export function bindTouchTap(el: TapTarget, onTap: (e: Event) => void): void {
       return;
     }
     onTap(e);
+  });
+}
+
+/** Bind `onDoubleTap` so it fires when TWO touch taps land on `el` within
+ *  `windowMs` of each other. Each tap must be a real tap (touch pointerdown then
+ *  pointerup on the same pointer, within TAP_SLOP_PX), so a DRAG never counts:
+ *  this is the touch-only counterpart to right-click on a `MovableFrame`, where a
+ *  finger sliding the frame around must not be read as a double-tap. Touch-only
+ *  by design (mouse/keyboard already have their own activation paths); the second
+ *  tap's own PointerEvent is passed through so the caller can anchor a popup at
+ *  the tap point, mirroring the desktop contextmenu's clientX/clientY. */
+export function bindTouchDoubleTap(
+  el: TapTarget,
+  onDoubleTap: (e: Event) => void,
+  windowMs = DOUBLE_TAP_MS,
+): void {
+  let downId: number | null = null;
+  let downX = 0;
+  let downY = 0;
+  let lastTapAt = 0;
+  el.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    downId = e.pointerId;
+    downX = e.clientX;
+    downY = e.clientY;
+  });
+  el.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'touch' || e.pointerId !== downId) return;
+    downId = null;
+    // A finger that slid past the slop is a drag (a frame move), not a tap: it
+    // neither fires the double-tap, nor primes one, nor keeps an earlier tap
+    // primed (tap, drag, tap is two separate interactions, not a double-tap
+    // sandwiching a drag).
+    if (Math.hypot(e.clientX - downX, e.clientY - downY) > TAP_SLOP_PX) {
+      lastTapAt = 0;
+      return;
+    }
+    const now = Date.now();
+    if (lastTapAt > 0 && now - lastTapAt <= windowMs) {
+      lastTapAt = 0;
+      onDoubleTap(e);
+    } else {
+      lastTapAt = now;
+    }
+  });
+  el.addEventListener('pointercancel', (e) => {
+    if (e.pointerId === downId) downId = null;
   });
 }

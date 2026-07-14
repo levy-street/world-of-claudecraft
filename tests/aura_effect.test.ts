@@ -67,16 +67,57 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
-  it('shows flat total armor and stack count for a stacking sunder', () => {
-    // sunder value is a FLAT armor amount per stack (e.g. Sunder Armor: 25);
-    // total reduction = value * stacks (armor -= value * stacks in mitigation).
-    expect(desc({ kind: 'sunder', value: 25, stacks: 5 })).toEqual({
-      key: 'hudChrome.auraEffect.armorFlatStacks',
-      nums: { value: 125, stacks: 5 },
+  it('shows Sunder Armor as a percent reduction scaling with stacks', () => {
+    // Sunder is now a PERCENT debuff (2% per stack); the aura value carries the threat
+    // constant and is ignored for the tooltip. 5 stacks = 10%.
+    expect(desc({ kind: 'sunder', value: 170, stacks: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.armorPctStacks',
+      nums: { pct: 10, stacks: 5 },
     });
-    expect(desc({ kind: 'sunder', value: 40, stacks: 1 })).toEqual({
+    expect(desc({ kind: 'sunder', value: 25, stacks: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.armorPct',
+      nums: { pct: 2 },
+    });
+  });
+
+  it('shows Faerie Fire as a fixed percent armor reduction', () => {
+    expect(desc({ kind: 'faerie_fire', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.armorPct',
+      nums: { pct: 10 },
+    });
+  });
+
+  it('shows mob corrosion as a flat, stacking armor shred', () => {
+    expect(desc({ kind: 'corrode', value: 30, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.armorFlatStacks',
+      nums: { value: 90, stacks: 3 },
+    });
+    expect(desc({ kind: 'corrode', value: 6, stacks: 1 })).toEqual({
       key: 'hudChrome.auraEffect.armorFlat',
-      nums: { value: 40 },
+      nums: { value: 6 },
+    });
+  });
+
+  it('shows the percent raid buffs as +N% stat lines', () => {
+    expect(desc({ kind: 'buff_int_pct', value: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.increasePct.int',
+      nums: { pct: 5 },
+    });
+    expect(desc({ kind: 'buff_ap_pct', value: 10 })).toEqual({
+      key: 'hudChrome.auraEffect.increasePct.ap',
+      nums: { pct: 10 },
+    });
+    expect(desc({ kind: 'buff_stats_pct', value: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.increasePct.allStats',
+      nums: { pct: 5 },
+    });
+    expect(desc({ kind: 'buff_armor_pct', value: 10 })).toEqual({
+      key: 'hudChrome.auraEffect.increasePct.armor',
+      nums: { pct: 10 },
+    });
+    expect(desc({ kind: 'buff_sta_pct', value: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.increasePct.sta',
+      nums: { pct: 5 },
     });
   });
 

@@ -46,7 +46,7 @@ function delveCard(d: GuideDelve): string {
     );
   }
   return `
-    <section class="guide-dungeon-card">
+    <section class="guide-dungeon-card" id="delve-${esc(d.id)}">
       <div class="guide-dungeon-head">
         <h2 class="guide-dungeon-name">${esc(d.name)}</h2>
         <span class="guide-badge guide-badge-level">${esc(t('guide.delvesPage.fromLevel', { n: formatNumber(d.minLevel) }))}</span>

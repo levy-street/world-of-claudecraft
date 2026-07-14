@@ -3,10 +3,12 @@ import { ZONES } from '../src/sim/data';
 import {
   applyFocusBonus,
   applyFocusTierBonus,
+  computeRespecCost,
   EMPTY_FOCUS_ALLOCATION,
   FOCUS_POINT_BUDGET,
   isInTownZone,
   POINTS_PER_TIER_BONUS,
+  RESPEC_TIER_CONFIG,
   setTownFocus,
 } from '../src/sim/professions/focus';
 
@@ -112,5 +114,51 @@ describe('setTownFocus: gated on town, budget-capped, rejects leave prior state 
     const result = setTownFocus({}, { hide: 3, fang: 0 }, true);
     expect(result.ok).toBe(true);
     expect(result.allocation).toEqual({ hide: 3 });
+  });
+});
+
+describe('computeRespecCost (#1144): three payment tiers for the same reallocation', () => {
+  it('costs nothing at any tier for a no-op reallocation', () => {
+    const previous = { hide: 4 };
+    for (const tier of Object.keys(RESPEC_TIER_CONFIG) as (keyof typeof RESPEC_TIER_CONFIG)[]) {
+      const cost = computeRespecCost(previous, previous, tier);
+      expect(cost).toEqual({ durationMs: 0, coin: 0, materials: 0 });
+    }
+  });
+
+  it('an instant, coin-and-materials re-spec completes faster than a time-only one', () => {
+    const previous = { hide: 2 };
+    const requested = { hide: 6, fang: 1 };
+    const timeOnly = computeRespecCost(previous, requested, 'time');
+    const partial = computeRespecCost(previous, requested, 'timeAndPartial');
+    const instant = computeRespecCost(previous, requested, 'instant');
+    expect(instant.durationMs).toBeLessThan(partial.durationMs);
+    expect(partial.durationMs).toBeLessThan(timeOnly.durationMs);
+  });
+
+  it('coin and material cost rise as duration falls, tier by tier', () => {
+    const previous = { hide: 2 };
+    const requested = { hide: 6 };
+    const timeOnly = computeRespecCost(previous, requested, 'time');
+    const partial = computeRespecCost(previous, requested, 'timeAndPartial');
+    const instant = computeRespecCost(previous, requested, 'instant');
+    expect(timeOnly.coin).toBe(0);
+    expect(timeOnly.materials).toBe(0);
+    expect(partial.coin).toBeGreaterThan(0);
+    expect(instant.coin).toBeGreaterThan(partial.coin);
+    expect(instant.materials).toBeGreaterThan(partial.materials);
+  });
+
+  it('scales linearly with the number of points actually moved', () => {
+    const previous = { hide: 0 };
+    const small = computeRespecCost(previous, { hide: 2 }, 'time');
+    const large = computeRespecCost(previous, { hide: 4 }, 'time');
+    expect(large.durationMs).toBe(small.durationMs * 2);
+  });
+
+  it('counts points moved away from a component the same as points moved onto one', () => {
+    const previous = { hide: 5, fang: 0 };
+    const cost = computeRespecCost(previous, { hide: 0, fang: 5 }, 'time');
+    expect(cost.durationMs).toBe(10 * RESPEC_TIER_CONFIG.time.durationMsPerPoint);
   });
 });

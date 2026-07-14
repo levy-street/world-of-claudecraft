@@ -45,7 +45,7 @@ import type * as http from 'node:http';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
-import { characterSheet, type SheetRank } from './character_sheet';
+import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
   type CharacterRow,
@@ -61,7 +61,9 @@ import {
   renameCharacter,
   scopeAllowsMutation,
 } from './db';
+import { recentDeedsForCharacter } from './deeds_db';
 import { ctxAccountId } from './http/context';
+import { gameMetricsCounters } from './http/game_signals';
 import { withBody } from './http/middleware/body';
 import {
   CHARACTER_CREATE_POLICY,
@@ -201,6 +203,7 @@ const REAL_CHARACTERS_DB = {
   lifetimeXpStanding,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
+  recentDeedsForCharacter,
 };
 let charactersDb = REAL_CHARACTERS_DB;
 
@@ -376,6 +379,7 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
       rt.initialCharacterState(cls, name, skin),
     );
   const respondCreated = (c: CharacterRow): void => {
+    gameMetricsCounters().characterCreated();
     json(ctx.res, 200, {
       id: c.id,
       name: c.name,
@@ -432,9 +436,10 @@ async function standingHandler(ctx: Ctx): Promise<void> {
 async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const row = ownedCharacter(ctx);
-  const [guild, rank] = await Promise.all([
+  const [guild, rank, deedsRecent] = await Promise.all([
     charactersDb.guildNameForCharacter(row.id),
     charactersDb.lifetimeXpRankForCharacter(row.id),
+    charactersDb.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
   ]);
   json(
     ctx.res,
@@ -446,6 +451,7 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
       origin: rt.publicOrigin(ctx.req),
       guild,
       rank: toSheetRank(rank),
+      deedsRecent,
     }),
   );
 }

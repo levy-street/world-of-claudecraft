@@ -547,6 +547,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Crafted base tools, tier 4 and 5 (#1135). Same shape and gating as the
   // vendor tools above (infinite-durability, `use.tier` gates node AND
   // monster-material tier access via src/sim/professions/tools.ts), but these
+  // are produced by a profession (see COMMON_RECIPES in content/recipes.ts),
+  // never sold by any vendor: no `buyValue` and deliberately absent from
+  // every NPC `vendorItems` list. `quality` (rarity) is independent of
+  // `use.tier` and never affects gating: only the tool's `use.tier` value is
+  // read by the gate.
   // are produced by a profession, never sold by any vendor: no `buyValue` and
   // deliberately absent from every NPC `vendorItems` list. `quality` (rarity)
   // is independent of `use.tier` and never affects gating: only the tool's
@@ -599,6 +604,64 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 5 },
     sellValue: 150,
   },
+  // Tier 4/5 crafting reagents for the tools directly above (#1135's
+  // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
+  // #1127's crafting action existed to consume them). `kind: 'junk'`, same
+  // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
+  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE).
+  // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
+  // recipe has a live reagent source; buyValue is the trade-goods staple
+  // markup already used in this file (4x sellValue, travelers_knapsack's
+  // exact ratio, with linen_pouch and spring_water close by at 4.17x), not
+  // a new balance number.
+  thorium_ore: {
+    id: 'thorium_ore',
+    name: 'Thorium Ore',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 15,
+    buyValue: 60,
+  },
+  arcanite_bar: {
+    id: 'arcanite_bar',
+    name: 'Arcanite Bar',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 40,
+    buyValue: 160,
+  },
+  ashwood_log: {
+    id: 'ashwood_log',
+    name: 'Ashwood Log',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 15,
+    buyValue: 60,
+  },
+  elderwood_log: {
+    id: 'elderwood_log',
+    name: 'Elderwood Log',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 40,
+    buyValue: 160,
+  },
+  goldleaf_herb: {
+    id: 'goldleaf_herb',
+    name: 'Goldleaf Herb',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 15,
+    buyValue: 60,
+  },
+  sunpetal_herb: {
+    id: 'sunpetal_herb',
+    name: 'Sunpetal Herb',
+    kind: 'junk',
+    quality: 'epic',
+    sellValue: 40,
+    buyValue: 160,
+  },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
   event_skin_token: {
@@ -610,7 +673,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
   },
   // Heroic-dungeon participation token: the final boss of a heroic instance
-  // drops one personal mark per eligible participant (awardHeroicMarks in
+  // directly awards marks to every eligible participant (awardHeroicMarks in
   // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   heroic_mark: {
     id: 'heroic_mark',
@@ -621,6 +684,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     // (content/heroic_vendor.ts) does not eat a bag slot per mark.
     stackSize: 20,
     sellValue: 0,
+    // Bound to the earner: marks can only be spent at the Heroic Quartermaster,
+    // never traded, mailed, listed, or destroyed.
+    soulbound: true,
+    noDiscard: true,
   },
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
@@ -1152,6 +1219,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     questId: 'q_greyjaw',
   },
+  chunk_of_ore: {
+    id: 'chunk_of_ore',
+    name: 'Chunk of Ore',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_prof_intro',
+  },
   weathered_ledger_page: {
     id: 'weathered_ledger_page',
     name: 'Weathered Ledger Page',
@@ -1269,6 +1343,34 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'poor',
     sellValue: 3,
+  },
+
+  // --- Enchanting materials ------------------------------------------------
+  // Disenchant yield (src/sim/professions/enchanting.ts), tiered by the
+  // disenchanted item's rarity: common/uncommon -> dust, rare -> essence,
+  // epic/legendary -> shard. Consumed as reagents by the ENCHANTS table
+  // (content/enchants.ts). Reuses the 'junk' kind, same as bone_fragments/
+  // linen_scrap/spider_leg above (this repo has no dedicated material kind).
+  arcane_dust: {
+    id: 'arcane_dust',
+    name: 'Arcane Dust',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 6,
+  },
+  arcane_essence: {
+    id: 'arcane_essence',
+    name: 'Arcane Essence',
+    kind: 'junk',
+    quality: 'uncommon',
+    sellValue: 18,
+  },
+  arcane_shard: {
+    id: 'arcane_shard',
+    name: 'Arcane Shard',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 55,
   },
 
   // --- Quartermaster's Consignment ---------------------------------------

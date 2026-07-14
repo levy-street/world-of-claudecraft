@@ -18,7 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { DT, type Entity, type PlayerClass } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -26,11 +26,14 @@ type Ev = {
   type?: string;
   kind?: string;
   school?: string;
+  fx?: string;
   ability?: string | null;
   sourceId?: number;
   targetId?: number;
   amount?: number;
   crit?: boolean;
+  attackAnimation?: 'ranged-shot';
+  attackAnimationStarted?: true;
 };
 
 function makeSim(
@@ -156,9 +159,43 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     const mob = spawnDummy(sim, p, 8, 20);
     const events = capture(sim);
     rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
-    expect(events.some((e) => e.type === 'spellfx' && e.school === 'physical')).toBe(true);
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'spellfx' && e.school === 'physical' && e.attackAnimation === 'ranged-shot',
+      ),
+    ).toBe(true);
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'damage' && e.ability === 'Auto Shot' && e.attackAnimationStarted === true,
+      ),
+    ).toBe(true);
+  });
+
+  it('Auto Shot launches on the swing tick without adding a universal draw delay', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 8, 20);
+    void mob;
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    // Damage still lands on ARRIVAL, never on the swing tick.
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+  });
+
+  it('Wand keeps its instant tracer: projectile fx on the swing tick, no windup', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 8, 15);
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 3, max: 6, speed: 1.8, wand: true, school: 'arcane' });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    expect(events.some((e) => e.attackAnimation !== undefined)).toBe(false);
   });
 
   it('Wand is an arcane bolt (no dead zone, ignores armor)', () => {
@@ -410,5 +447,41 @@ describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () 
     expect(hits.some((h) => !h.crit)).toBe(true);
     // 100 + 20 = 120 (would be 80 if the 0.6 leaked onto wands)
     for (const h of hits) expect(h.amount).toBe(h.crit ? 240 : 120);
+  });
+});
+
+// A hunter's Auto Shot strikes with the equipped mainhand, so an on-hit weapon proc
+// (Thronebane's Chain Arc, trigger 'weaponHit') must fire from a ranged shot too, not
+// just a melee swing. A caster's wand bolt does NOT swing the mainhand, so it never
+// rolls the mainhand's proc.
+describe('rangedSwing fires weaponHit procs (Thronebane on a hunter Auto Shot)', () => {
+  const chainArcs = (events: Ev[]) =>
+    events.filter((e) => e.type === 'damage' && e.ability === 'Chain Arc' && e.school === 'nature');
+
+  it('a hunter wielding Thronebane procs Chain Arc off Auto Shot', () => {
+    const { sim, p } = makeSim('hunter', 20);
+    const mob = spawnDummy(sim, p, 1, 20); // far below level -> floored miss chance
+    mob.stats = { ...mob.stats, armor: 0 };
+    p.mainhandItemId = 'kingsbane_last_oath'; // Thronebane: 10% weaponHit Chain Arc
+    p.critChance = 0;
+    const events = capture(sim);
+    for (let i = 0; i < 200; i++) rangedSwing(sim.ctx, p, mob, { min: 50, max: 50, speed: 2.8 });
+    for (let i = 0; i < 800 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    // over ~200 landed shots at a 10% proc, the seeded run lands multiple arcs
+    expect(chainArcs(events).length).toBeGreaterThan(0);
+    expect(chainArcs(events)[0].amount).toBe(42); // Chain Arc primary damage
+  });
+
+  it('a wand caster wielding Thronebane never rolls the mainhand proc off a bolt', () => {
+    const { sim, p } = makeSim('mage', 20);
+    const mob = spawnDummy(sim, p, 1, 15);
+    p.mainhandItemId = 'kingsbane_last_oath';
+    const events = capture(sim);
+    for (let i = 0; i < 200; i++)
+      rangedSwing(sim.ctx, p, mob, { min: 50, max: 50, speed: 1.8, wand: true, school: 'arcane' });
+    for (let i = 0; i < 800 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(chainArcs(events).length).toBe(0);
   });
 });

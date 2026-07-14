@@ -6,5 +6,6 @@ class AppViewController: CAPBridgeViewController {
         super.capacitorDidLoad()
         bridge?.registerPluginInstance(NativeAttestationPlugin())
         bridge?.registerPluginInstance(NativeAppUpdatePlugin())
+        bridge?.registerPluginInstance(NativeAppleAuthPlugin())
     }
 }

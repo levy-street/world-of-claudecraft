@@ -19,6 +19,7 @@ import {
   type InterpolationValues,
   type SupportedLanguage,
   supportedLanguages,
+  t,
   tOptional,
 } from './i18n';
 
@@ -183,7 +184,13 @@ function interpolateSource(source: string, values?: InterpolationValues): string
   const legacy = source
     .replace(/\$N/g, String(values.playerName ?? values.name ?? '$N'))
     .replace(/\$C/g, String(className))
-    .replace(/\$d/g, String(values.damage ?? values.d ?? '$d'));
+    .replace(/\$d/g, String(values.damage ?? values.d ?? '$d'))
+    // Ability-description placeholders beyond the damage number: a hybrid's
+    // over-time total ($o), the first buff's resolved value ($b), the first
+    // timed effect's resolved duration ($t); hud.ts supplies all three.
+    .replace(/\$o/g, String(values.overTime ?? '$o'))
+    .replace(/\$b/g, String(values.buff ?? '$b'))
+    .replace(/\$t/g, String(values.duration ?? '$t'));
   return legacy.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
     const value = values[name];
     return value === undefined ? match : String(value);
@@ -342,6 +349,14 @@ export function tEntity(request: EntityTranslationRequest): string {
 }
 
 export function itemDisplayName(item: ItemDef): string {
+  // Heroic upgraded variants share the base item's name (classic behavior: a heroic
+  // drop reads the same as its normal counterpart). The heroic distinction shows as
+  // an "[HEROIC]" tag on the tooltip's quality/kind line, not in the name, so a
+  // variant never needs its own translated name key.
+  if (item.heroicOf) {
+    const base = ITEMS[item.heroicOf];
+    return base ? itemDisplayName(base) : item.heroicOf;
+  }
   return tEntity({ kind: 'item', id: item.id, field: 'name' });
 }
 
@@ -412,6 +427,9 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
     );
   }
   for (const item of Object.values(ITEMS).sort(compareById)) {
+    // Heroic upgraded variants carry no name key: they share the base item's name
+    // (see itemDisplayName), so they never enter the manifest.
+    if (item.heroicOf) continue;
     entries.push(
       entry(
         'item',

@@ -76,12 +76,13 @@ describe('createMetricsSampler', () => {
     expect(sample.jitterMs).toBeNull();
     expect(sample.predLeadMs).toBeNull();
     expect(sample.snapshotHz).toBeNull();
+    expect(sample.serverTickHz).toBeNull();
   });
 
   it('surfaces network rows when online with a measured echo', () => {
     const sample = createMetricsSampler(
       makeDeps({
-        getOnline: () => ({ connected: true, snapInterval: 50 }),
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: 19.5 }),
         getEchoMs: () => 42,
         getJitterMs: () => 6,
         getPredLeadMs: () => 87,
@@ -93,10 +94,13 @@ describe('createMetricsSampler', () => {
     expect(sample.jitterMs).toBe(6);
     expect(sample.predLeadMs).toBe(87); // the sampler wires the predictor source
     expect(sample.snapshotHz).toBe(20); // 1000 / 50ms
+    expect(sample.serverTickHz).toBe(19.5);
   });
 
   it('nulls predLead when the predictor is inactive or the dep is absent', () => {
-    const online = { getOnline: () => ({ connected: true, snapInterval: 50 }) };
+    const online = {
+      getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: null }),
+    };
     // predictor inactive (lead-smoothing fallback, ?nopredict, delve, CC)
     const inactive = createMetricsSampler(makeDeps({ ...online, getPredLeadMs: () => null }))();
     expect(inactive.predLeadMs).toBeNull();
@@ -108,7 +112,7 @@ describe('createMetricsSampler', () => {
   it('hides ping/jitter until an echo is measured (echo <= 0) but keeps snapshot', () => {
     const sample = createMetricsSampler(
       makeDeps({
-        getOnline: () => ({ connected: false, snapInterval: 100 }),
+        getOnline: () => ({ connected: false, snapInterval: 100, serverTickHz: null }),
         getEchoMs: () => 0,
       }),
     )();
@@ -117,6 +121,21 @@ describe('createMetricsSampler', () => {
     expect(sample.pingMs).toBeNull();
     expect(sample.jitterMs).toBeNull();
     expect(sample.snapshotHz).toBe(10);
+  });
+
+  it('nulls the server tick rate until the server reports one', () => {
+    const unreported = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: null }),
+      }),
+    )();
+    expect(unreported.serverTickHz).toBeNull();
+    const zeroed = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: 0 }),
+      }),
+    )();
+    expect(zeroed.serverTickHz).toBeNull();
   });
 
   it('reports memory only when the probe returns a reading', () => {

@@ -122,6 +122,8 @@ export interface BotTrackingContext {
 
 export interface BotDetector {
   createTrackingContext(ref: PlayerSessionRef, meta?: unknown): BotTrackingContext;
+  // Contexts start connected; linkdead drop marks false, same-session resume marks true with fresh meta.
+  setTrackingConnection(ctx: BotTrackingContext, connected: boolean, meta?: unknown): void;
   releaseTrackingContext(ctx: BotTrackingContext): void;
   observeCommand(ctx: BotTrackingContext, cmd: string, now: number, message?: unknown): void;
   observeEvent(ctx: BotTrackingContext, ev: SimEvent, now: number): void;

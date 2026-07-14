@@ -6,7 +6,7 @@ import { weaponProcLines } from '../src/ui/weapon_proc_view';
 const THRONEBANE: WeaponProc = {
   id: 'thronebane_arc',
   name: 'Chain Arc',
-  trigger: 'meleeHit',
+  trigger: 'weaponHit',
   chance: 0.1,
   effects: [
     { kind: 'chainArc', school: 'nature', damage: 42, jumps: 3, falloff: 0.6, radius: 8 },
@@ -40,7 +40,7 @@ describe('weaponProcLines', () => {
 
   it('describes the chain-arc + attack-slow on-hit proc', () => {
     const [line] = weaponProcLines([THRONEBANE]);
-    expect(line.trigger).toBe('meleeHit');
+    expect(line.trigger).toBe('weaponHit');
     expect(line.chancePct).toBe(10);
     expect(line.effects[0]).toEqual({
       kind: 'chainArc',

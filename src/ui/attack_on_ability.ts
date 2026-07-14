@@ -28,13 +28,18 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
+  chainDamage: 'damage',
+  aoeHeal: 'other',
+  chainHeal: 'other',
   groundAoE: 'damage',
   aoeRoot: 'damage',
+  consumeAura: 'other',
   drainTick: 'damage',
   judgement: 'damage',
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
+  feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
@@ -45,13 +50,18 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
+  aoeAllyAttackPower: 'other',
+  aoeAllyHaste: 'other',
   selfBuff: 'other',
+  petBuff: 'other',
+  applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
   charge: 'other',
   sunder: 'other',
+  faerieFire: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',
@@ -79,7 +89,7 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   for (const e of effects) {
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
-    if (cls === 'damage') damaging = true;
+    if (cls === 'damage' || (e.type === 'consumeAura' && e.deal !== undefined)) damaging = true;
   }
   return damaging;
 }

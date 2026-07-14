@@ -273,6 +273,17 @@ export class SelfMotionPredictor {
     inp.strafeLeft = frame.moveInput.strafeLeft;
     inp.strafeRight = frame.moveInput.strafeRight;
     inp.jump = frame.moveInput.jump;
+    // A blocked step needs NO special handling, and must never get any. The
+    // kernel runs the same swept static collision as the server, so when the
+    // display stops at a wall it is already RIGHT and the authoritative anchor
+    // is merely one echo behind, still mid-approach. Both converge on the wall
+    // face on their own, and the divergence measurement below sees ~zero error
+    // throughout (it compares the anchor against the display one echo ago, and
+    // the display stopped one echo ago too). Detecting the block and stripping
+    // the forward lead against the anchor instead yanks the avatar backward by
+    // RUN_SPEED x echo in a SINGLE frame (a yard at 200ms, unsmoothed, because
+    // the renderer follows this pose exactly), and then walks it back into the
+    // wall: the "collide and snap back" artifact. Leave the block alone.
     this.acc = Math.min(this.acc + dt, MAX_FRAME_DT);
     while (this.acc >= DT) {
       actor.prevPos.x = actor.pos.x;

@@ -1,8 +1,19 @@
 import type { TalentModifiers } from './content/talents';
+import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
-import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
+import { pvpFractionsFromRatings } from './pvp';
+import type {
+  Entity,
+  EquipSlot,
+  ItemInstancePayload,
+  MobTemplate,
+  PlayerClass,
+  Stats,
+  Vec3,
+} from './types';
 import {
+  cloneItemInstancePayload,
   critFractionFromRating,
   EQUIP_SLOTS,
   hasteFractionFromRating,
@@ -34,7 +45,16 @@ function baseEntity(id: number, pos: Vec3): Entity {
     overheadEmoteId: null,
     overheadEmoteUntil: 0,
     overheadEmoteSeq: 0,
-    stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
+    stats: {
+      str: 0,
+      agi: 0,
+      sta: 0,
+      int: 0,
+      spi: 0,
+      armor: 0,
+      pvpOffense: 0,
+      pvpDefense: 0,
+    },
     weapon: { min: 1, max: 2, speed: 2 },
     attackPower: 0,
     rangedPower: 0,
@@ -47,6 +67,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    critDmgSpellBonus: 0,
+    critDmgPhysBonus: 0,
+    critDmgHealBonus: 0,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
     knockbackResistance: 0,
@@ -71,6 +94,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     gcdRemaining: 0,
     cooldowns: new Map(),
     queuedOnSwing: null,
+    queuedCastAbility: null,
+    queuedCastAim: null,
     fiveSecondRule: 99,
     comboPoints: 0,
     comboUntil: -1,
@@ -99,6 +124,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     detonateTimer: Infinity,
     mendTimer: 0,
     wardTimer: 0,
+    channelTimer: 0,
+    channelRamp: 0,
     rallyTimer: 0,
     warcryTimer: 0,
     firedSummons: 0,
@@ -106,6 +133,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
+    bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
     ownerId: null,
@@ -136,13 +164,18 @@ function baseEntity(id: number, pos: Vec3): Entity {
     dead: false,
     ghost: false,
     corpsePos: null,
+    corpseInstanceId: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    weaponSkinLoadout: {},
+    weaponSkinId: null,
     equippedItems: {},
+    equippedInstances: {},
     guild: '',
+    title: null,
   };
 }
 
@@ -182,7 +215,8 @@ export function recalcPlayerStats(
   e: Entity,
   cls: PlayerClass,
   equipment: PlayerEquipment,
-  mods?: TalentModifiers,
+  mods: TalentModifiers | undefined,
+  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -193,11 +227,15 @@ export function recalcPlayerStats(
     int: def.baseStats.int + def.statsPerLevel.int * (lvl - 1),
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
+    pvpOffense: 0,
+    pvpDefense: 0,
   };
   const setCounts = new Map<string, number>();
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
+  let bonusPvpOffenseRating = 0;
+  let bonusPvpDefenseRating = 0;
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
@@ -213,13 +251,29 @@ export function recalcPlayerStats(
     bonusSp += item.spellPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
-    if (!item.stats) continue;
-    s.str += item.stats.str ?? 0;
-    s.agi += item.stats.agi ?? 0;
-    s.sta += item.stats.sta ?? 0;
-    s.int += item.stats.int ?? 0;
-    s.spi += item.stats.spi ?? 0;
-    s.armor += item.stats.armor ?? 0;
+    bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
+    bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
+    if (item.stats) {
+      s.str += item.stats.str ?? 0;
+      s.agi += item.stats.agi ?? 0;
+      s.sta += item.stats.sta ?? 0;
+      s.int += item.stats.int ?? 0;
+      s.spi += item.stats.spi ?? 0;
+      s.armor += item.stats.armor ?? 0;
+    }
+    // Enchant bonus (Enchanting profession): additive on top of the item's own
+    // base stats, from this specific instance's rolled.stats (see
+    // src/sim/professions/enchanting.ts applyEnchant). A plain, unenchanted
+    // piece has no entry here, so this is a no-op for the common case.
+    const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
+    if (enchantStats) {
+      s.str += enchantStats.str ?? 0;
+      s.agi += enchantStats.agi ?? 0;
+      s.sta += enchantStats.sta ?? 0;
+      s.int += enchantStats.int ?? 0;
+      s.spi += enchantStats.spi ?? 0;
+      s.armor += enchantStats.armor ?? 0;
+    }
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
@@ -236,7 +290,16 @@ export function recalcPlayerStats(
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
+  let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
+  // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
+  // then folded multiplicatively at the relevant derivation step below.
+  let allStatsPct = 0;
+  let intPct = 0;
+  let staPct = 0;
+  let buffArmorPct = 0;
+  let buffApPct = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -268,8 +331,26 @@ export function recalcPlayerStats(
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Metamorphosis: a temporary demon transform that also makes the caster larger.
+    else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
+    // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
+    // integer-rounding talent value multiplier; converted to a fraction here.
+    else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
+    else if (a.kind === 'buff_int_pct') intPct += a.value / 100;
+    else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
+    else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
+    else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
+    // Moonkin Form carries its Spell Power bonus in the form aura's value, so it lives and
+    // dies with the one toggle (a Balance druid's whole kit is arcane/nature, so a generic
+    // Spell Power bonus is correct). Gloamveil Form (form_shadow) is NOT a Spell Power
+    // buff: it amplifies the priest's Shadow-school DAMAGE by a percent, applied in
+    // combat/damage.ts, so it contributes nothing to the stat pass here.
+    else if (a.kind === 'form_moonkin') {
+      bonusSp += a.value;
+      moonkinForm = true;
+    }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -291,6 +372,16 @@ export function recalcPlayerStats(
     if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
     if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
+  // Percent stat raid buffs, folded multiplicatively on the computed (base + gear +
+  // flat + talent) primary stats so they feed every downstream derivation (AP from
+  // str/agi, Spell Power from int, HP from sta, crit/dodge from agi).
+  if (allStatsPct || intPct || staPct) {
+    s.str = Math.round(s.str * (1 + allStatsPct));
+    s.agi = Math.round(s.agi * (1 + allStatsPct));
+    s.sta = Math.round(s.sta * (1 + allStatsPct + staPct));
+    s.int = Math.round(s.int * (1 + allStatsPct + intPct));
+    s.spi = Math.round(s.spi * (1 + allStatsPct));
+  }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
   s.agi = Math.max(0, s.agi);
@@ -303,12 +394,19 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
+  // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
+  // separate buff_spelldmg aura the form applies).
+  if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
+  const warfare = pvpFractionsFromRatings(bonusPvpOffenseRating, bonusPvpDefenseRating);
+  e.stats.pvpOffense = warfare.offense;
+  e.stats.pvpDefense = warfare.defense;
   // An over-level mainhand is inert like any other gear: fall back to unarmed
   // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
   // until the wearer is high enough level. The mainhand still stays worn (see
@@ -327,10 +425,26 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  // Resolve the active weapon-skin cosmetic against the (possibly changed)
+  // mainhand: swapping to a different weapon type drops a non-matching skin and
+  // re-shows the matching one automatically. Cosmetic only; never feeds stats.
+  e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
   e.equippedItems = { ...equipment };
+  // Render-only mirror of PlayerMeta.equipmentInstance, same copy-not-alias
+  // reasoning as equippedItems above. Deep-cloned via cloneItemInstancePayload
+  // (not a shallow spread) since a payload's own rolled.stats map must not be
+  // aliased into the mirror.
+  e.equippedInstances = equipmentInstance
+    ? Object.fromEntries(
+        Object.entries(equipmentInstance).map(([slot, inst]) => [
+          slot,
+          cloneItemInstancePayload(inst),
+        ]),
+      )
+    : {};
   // Melee AP by class (classic-era-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =
@@ -341,11 +455,15 @@ export function recalcPlayerStats(
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
-  e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
+  // buffApPct (Battle Shout / Blessing of Might) folds into the same AP multiplier.
+  e.attackPower = Math.max(
+    0,
+    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)),
+  );
   // Hunters: ranged AP = 2/agi (classic-era value)
   e.rangedPower =
     cls === 'hunter'
-      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)))
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
@@ -355,9 +473,13 @@ export function recalcPlayerStats(
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  e.meleeHaste = hasteFrac;
+  // Union of the rating system (#1471) and the spec masteries (#1543): ratings and
+  // set haste feed hasteFrac; a spec mastery's passive haste adds on its channel.
+  e.meleeHaste = hasteFrac + (mods?.global.meleeHastePct ?? 0);
   e.rangedHaste = hasteFrac;
-  e.spellHaste = hasteFrac;
+  // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
+  // caster spec can shorten every cast; the cast-time tooltips read the same total.
+  e.spellHaste = hasteFrac + (mods?.global.spellHastePct ?? 0);
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
   // Crit: ~1% per 20 agi at low level
@@ -367,6 +489,11 @@ export function recalcPlayerStats(
     (mods?.stats.crit ?? 0) +
     setEff.crit +
     critFractionFromRating(e.critRating);
+  // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
+  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits).
+  e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
+  e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
+  e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
@@ -426,10 +553,11 @@ export function characterDerivedStats(
   level: number,
   equipment: PlayerEquipment,
   mods?: TalentModifiers,
+  equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>,
 ): DerivedCharacterStats {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = Math.max(1, Math.floor(level));
-  recalcPlayerStats(e, cls, equipment, mods);
+  recalcPlayerStats(e, cls, equipment, mods, equipmentInstance ?? {});
   return {
     stats: e.stats,
     maxHp: e.maxHp,
@@ -475,6 +603,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.mendAlly) e.mendTimer = template.mendAlly.every;
   // Telegraph the first Ward the same way: one full interval after engage.
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
+  // Telegraph the first channeled heal tick: one full interval after engage.
+  if (template.channelHeal) e.channelTimer = template.channelHeal.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.

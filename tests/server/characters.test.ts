@@ -28,6 +28,11 @@ import {
 } from '../../server/characters';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
 import { compose } from '../../server/http/compose';
+import {
+  type GameMetricsCounters,
+  noopGameMetricsCounters,
+  setGameMetricsCounters,
+} from '../../server/http/game_signals';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
@@ -211,6 +216,7 @@ afterEach(() => {
   resetCharactersRuntimeForTests();
   resetCharacterMutationRateLimits();
   resetRateLimitClock();
+  setGameMetricsCounters(noopGameMetricsCounters);
   vi.restoreAllMocks();
 });
 
@@ -399,6 +405,9 @@ describe('owner sheet handler', () => {
     setCharactersDbForTests({
       guildNameForCharacter: async () => 'Guildy',
       lifetimeXpRankForCharacter: async () => ({ rank: 2, total: 50 }),
+      recentDeedsForCharacter: async () => [
+        { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
+      ],
     });
     installRuntime({ publicOrigin: () => 'https://worldofclaudecraft.com' });
     const row = charRow({
@@ -422,6 +431,14 @@ describe('owner sheet handler', () => {
     });
     // Owner visibility carries the private stats block (absent on the public sheet).
     expect(bodyRecord(res.body).stats).toBeDefined();
+    // The owner sheet carries the same deeds summary block the public sheet
+    // serves, with the recent strip read through the db seam.
+    expect(bodyRecord(res.body).deeds).toEqual({
+      renown: 0,
+      earnedCount: 0,
+      activeTitle: null,
+      recent: [{ deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' }],
+    });
   });
 
   it('200s an owner sheet with rank:null when the character has no lifetime-XP rank', async () => {
@@ -429,6 +446,7 @@ describe('owner sheet handler', () => {
     setCharactersDbForTests({
       guildNameForCharacter: async () => null,
       lifetimeXpRankForCharacter: async () => null,
+      recentDeedsForCharacter: async () => [],
     });
     const row = charRow({ id: 4, name: 'Rankless', level: 5, state: st({ skin: 0 }) });
     const res = await callHandler('GET', '/api/characters/:id/sheet', {
@@ -469,6 +487,41 @@ describe('create handler', () => {
       skin: 2,
       forceRename: false,
     });
+  });
+
+  it('increments the characters-created counter on the created path', async () => {
+    let created = 0;
+    const counters: GameMetricsCounters = {
+      ...noopGameMetricsCounters,
+      characterCreated: () => {
+        created++;
+      },
+    };
+    setGameMetricsCounters(counters);
+    setCharactersDbForTests({ createCharacterCapped: async () => charRow({ id: 11 }) });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(created).toBe(1);
+  });
+
+  it('does not increment the characters-created counter when creation is rejected', async () => {
+    let created = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      characterCreated: () => {
+        created++;
+      },
+    });
+    setCharactersDbForTests({ createCharacterCapped: async () => null });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(400);
+    expect(created).toBe(0);
   });
 
   it('400s an invalid name (normalizeCharName -> null)', async () => {

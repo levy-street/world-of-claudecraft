@@ -14,6 +14,7 @@
 // and formats values through formatNumber; this core stays locale-free so the
 // same row/severity logic is unit-testable without a renderer or a locale loaded.
 
+import { TICK_RATE } from '../sim/types';
 import type { TranslationKey } from './i18n';
 
 // ---------------------------------------------------------------------------
@@ -28,6 +29,7 @@ export type PerfMetricKey =
   | 'ping'
   | 'jitter'
   | 'snapshot'
+  | 'serverTick'
   | 'connection'
   | 'predLead'
   | 'drawCalls'
@@ -60,6 +62,8 @@ export interface MetricsSample {
   /** Latency hidden by the self-motion extrapolation; null when inactive. */
   predLeadMs: number | null;
   snapshotHz: number | null;
+  /** Server-measured achieved sim tick rate (Hz); null offline or unreported. */
+  serverTickHz: number | null;
   connectionType: string | null;
   // renderer
   drawCalls: number | null;
@@ -89,7 +93,7 @@ export type PerfValue =
   | { kind: 'int'; v: number }
   | { kind: 'compact'; v: number }
   | { kind: 'percent'; v: number } // 0..1
-  | { kind: 'hz'; v: number }
+  | { kind: 'hz'; v: number; digits?: number }
   | { kind: 'memPair'; usedMb: number; limitMb: number | null }
   | { kind: 'text'; text: string };
 
@@ -312,6 +316,22 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     defaultOn: false,
     read: (s) => (s.online && s.snapshotHz != null ? { kind: 'hz', v: s.snapshotHz } : null),
     severity: () => NONE,
+  },
+  {
+    // One decimal: the interesting signal is a sag from 20.0, which integer
+    // rounding would hide until the loop is already badly degraded.
+    key: 'serverTick',
+    labelKey: 'hudChrome.perf.labels.serverTick',
+    group: 'network',
+    defaultOn: false,
+    read: (s) =>
+      s.online && s.serverTickHz != null ? { kind: 'hz', v: s.serverTickHz, digits: 1 } : null,
+    // Sag thresholds derive from the nominal rate (never a hardcoded 20):
+    // within half a tick of nominal is healthy, a >25% sag is the bad tier.
+    severity: (s) =>
+      s.online && s.serverTickHz != null
+        ? higherBetter(s.serverTickHz, TICK_RATE - 0.5, TICK_RATE * 0.75)
+        : NONE,
   },
   {
     key: 'connection',

@@ -48,6 +48,10 @@
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;
     --color-debuff: #c0392b;
+    /* Protect Yumi team identity (blue team A / red team B), driven by the
+       yumi match HUD + arena window; never hardcoded in painter TS. */
+    --color-team-blue: #2f6fe0;
+    --color-team-red: #d8342c;
     /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
        keeps the base --color-debuff red. Driven by the aura node's data-school. */
     --color-debuff-fire: #e8722a;

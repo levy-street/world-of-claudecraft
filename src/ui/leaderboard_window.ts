@@ -21,11 +21,18 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type {
   DailyRewardLeaderboardPage,
   DailyRewardStatus,
+  DeedsLeaderboardPage,
   DevLeaderboardPage,
   GuildLeaderboardPage,
   IWorld,
   LeaderboardPage,
 } from '../world_api';
+import { deedTitleText } from './deed_i18n';
+import {
+  buildDeedsLeaderboardView,
+  type DeedsLeaderboardRow,
+  type DeedsLeaderboardSelfLine,
+} from './deeds_leaderboard_view';
 import { buildDevLeaderboardView, type DevLeaderboardRow } from './dev_leaderboard_view';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import { markDialogRoot } from './dialog_root';
@@ -44,7 +51,7 @@ import { svgIcon } from './ui_icons';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
-type LeaderboardBoard = 'players' | 'guilds' | 'devs' | 'daily';
+type LeaderboardBoard = 'players' | 'guilds' | 'deeds' | 'devs' | 'daily';
 
 /**
  * Hud-supplied glue. The leaderboard window renders entirely from IWorld + these
@@ -74,14 +81,22 @@ export class LeaderboardWindow {
   private board: LeaderboardBoard = 'players';
   private playerPage = 0;
   private guildPage = 0;
+  private deedsPage = 0;
   private devPage = 0;
   private dailyPage = 0;
+  // Render epoch (the DailyRewardsWindow renderSeq pattern). The five boards
+  // share one .lb-body, so every board arm re-checks this after its await: a
+  // slow response for an older tab or page must neither repaint the shared
+  // body nor mirror its server-clamped page into the now-current board's
+  // pager state (this.page dispatches on the CURRENT this.board).
+  private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
 
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
   private get page(): number {
     if (this.board === 'guilds') return this.guildPage;
+    if (this.board === 'deeds') return this.deedsPage;
     if (this.board === 'devs') return this.devPage;
     if (this.board === 'daily') return this.dailyPage;
     return this.playerPage;
@@ -89,6 +104,7 @@ export class LeaderboardWindow {
 
   private set page(value: number) {
     if (this.board === 'guilds') this.guildPage = value;
+    else if (this.board === 'deeds') this.deedsPage = value;
     else if (this.board === 'devs') this.devPage = value;
     else if (this.board === 'daily') this.dailyPage = value;
     else this.playerPage = value;
@@ -111,6 +127,7 @@ export class LeaderboardWindow {
     this.board = 'players';
     this.playerPage = 0;
     this.guildPage = 0;
+    this.deedsPage = 0;
     this.devPage = 0;
     this.dailyPage = 0;
     this.deps.root().style.display = 'block';
@@ -136,6 +153,9 @@ export class LeaderboardWindow {
   // leaderboard() maps to the error state (a localized retry message), instead of
   // silently masquerading as an empty board.
   async render(focus: FocusTarget = null): Promise<void> {
+    // Claim the epoch before the repaint: any board fetch still in flight is
+    // now stale and bails at its post-await guard.
+    const seq = ++this.renderSeq;
     // The setting may have been turned off after the devs tab was selected (a
     // prior session, or a live Options change while this window is open): fall
     // back to the players board rather than rendering an un-tabbed orphan board.
@@ -153,15 +173,19 @@ export class LeaderboardWindow {
     if (focus === 'tab') (el.querySelector('.lb-tab-active') as HTMLElement | null)?.focus();
 
     if (this.board === 'guilds') {
-      await this.renderGuildBoard(el, world, focus);
+      await this.renderGuildBoard(el, world, focus, seq);
+      return;
+    }
+    if (this.board === 'deeds') {
+      await this.renderDeedsBoard(el, world, focus, seq);
       return;
     }
     if (this.board === 'devs') {
-      await this.renderDevBoard(el, world, focus);
+      await this.renderDevBoard(el, world, focus, seq);
       return;
     }
     if (this.board === 'daily') {
-      await this.renderDailyBoard(el, world, focus);
+      await this.renderDailyBoard(el, world, focus, seq);
       return;
     }
 
@@ -171,8 +195,9 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    // The panel may have been closed while the fetch was in flight.
-    if (el.style.display !== 'block') return;
+    // A newer render may own the body now, or the panel may have been closed,
+    // while the fetch was in flight.
+    if (seq !== this.renderSeq || el.style.display !== 'block') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -186,6 +211,7 @@ export class LeaderboardWindow {
               name: world.player.name,
               level: world.player.level,
               lifetimeXp: world.lifetimeXp,
+              title: world.activeTitle,
             },
           },
     );
@@ -220,6 +246,7 @@ export class LeaderboardWindow {
     el: HTMLElement,
     world: IWorld,
     focus: FocusTarget,
+    seq: number,
   ): Promise<void> {
     let result: GuildLeaderboardPage | null = null;
     try {
@@ -227,7 +254,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'block') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -254,19 +281,72 @@ export class LeaderboardWindow {
     this.wirePager(body as HTMLElement, focus);
   }
 
+  // The Renown tab: same async + page-control shape as the other boards, but
+  // the board is account-scored and character-faced, so the viewer's standing
+  // is the server-resolved `self` line (an account-level rank the client
+  // cannot derive), rendered under the rows when present. That same rank
+  // marks the viewer's own row inside the core, so no viewer identity is
+  // passed here (the character name would miss alts and match same-named
+  // cross-realm characters). Offline (or logged out) this resolves the empty
+  // state; a rejection is the error state.
+  private async renderDeedsBoard(
+    el: HTMLElement,
+    world: IWorld,
+    focus: FocusTarget,
+    seq: number,
+  ): Promise<void> {
+    let result: DeedsLeaderboardPage | null = null;
+    try {
+      result = await world.deedsLeaderboard(this.page, LEADERBOARD_PAGE_SIZE);
+    } catch {
+      result = null;
+    }
+    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    const body = el.querySelector('.lb-body');
+    if (!body) return;
+
+    const view = buildDeedsLeaderboardView(
+      result === null ? { kind: 'error' } : { kind: 'page', page: result },
+    );
+
+    if (view.kind === 'error') {
+      body.innerHTML = `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (view.kind === 'empty') {
+      body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.deeds.lbEmpty'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (view.kind !== 'ranked') return;
+    this.page = view.page;
+    body.innerHTML =
+      this.deedsHeaderHtml() +
+      view.rows.map((r) => this.deedsRowHtml(r)).join('') +
+      this.deedsSelfHtml(view.self) +
+      this.pagerHtml(view.pager);
+    this.wirePager(body as HTMLElement, focus);
+  }
+
   // The developers tab: same async + page-control shape as the player/guild paths,
   // but it awaits the contributor board (the same data for every realm, sourced
   // from GitHub's public stats) and renders contributor rows with their dev badge.
   // Offline / GitHub-unconfigured resolves the empty state; a rejection is the
   // error state.
-  private async renderDevBoard(el: HTMLElement, world: IWorld, focus: FocusTarget): Promise<void> {
+  private async renderDevBoard(
+    el: HTMLElement,
+    world: IWorld,
+    focus: FocusTarget,
+    seq: number,
+  ): Promise<void> {
     let result: DevLeaderboardPage | null = null;
     try {
       result = await world.devLeaderboard(this.page, LEADERBOARD_PAGE_SIZE);
     } catch {
       result = null;
     }
-    if (el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'block') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -299,6 +379,7 @@ export class LeaderboardWindow {
     el: HTMLElement,
     world: IWorld,
     focus: FocusTarget,
+    seq: number,
   ): Promise<void> {
     let result: DailyRewardLeaderboardPage | null = null;
     try {
@@ -306,7 +387,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'block') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
     if (result === null) {
@@ -373,6 +454,7 @@ export class LeaderboardWindow {
       `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
+      tab('deeds', t('hudChrome.deeds.lbTab')) +
       (this.deps.showDevBadges() ? tab('devs', t('hudChrome.leaderboard.tabDevs')) : '') +
       tab('daily', t('hudChrome.dailyRewards.leaderboard')) +
       `</div>`
@@ -413,11 +495,12 @@ export class LeaderboardWindow {
 
   private headerHtml(): string {
     return (
-      `<div class="lb-row lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<div class="lb-row lb-row-players lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
       `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
       `<span class="lb-lvl">${esc(t('game.leaderboard.level'))}</span>` +
       `<span class="lb-vlvl">${esc(t('game.leaderboard.vlevel'))}</span>` +
-      `<span class="lb-xp">${esc(t('game.leaderboard.lifetimeXp'))}</span></div>`
+      `<span class="lb-xp">${esc(t('game.leaderboard.lifetimeXp'))}</span>` +
+      `<span class="lb-deed-title">${esc(t('hudChrome.deeds.lbTitleCol'))}</span></div>`
     );
   }
 
@@ -473,6 +556,48 @@ export class LeaderboardWindow {
     );
   }
 
+  // Renown-board header: rank, chronicler (the account's highest-Renown
+  // character), Renown, deed count, displayed title. Rank/name reuse the
+  // shared player-board headers; the deeds-specific columns get their own
+  // classes so the grid stays aligned with the other tabs.
+  private deedsHeaderHtml(): string {
+    return (
+      `<div class="lb-row lb-row-deeds lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
+      `<span class="lb-renown">${esc(t('hudChrome.deeds.renownLabel'))}</span>` +
+      `<span class="lb-deeds-count">${esc(t('hudChrome.deeds.lbDeedsCol'))}</span>` +
+      `<span class="lb-deed-title">${esc(t('hudChrome.deeds.lbTitleCol'))}</span></div>`
+    );
+  }
+
+  private deedsRowHtml(r: DeedsLeaderboardRow): string {
+    // The class rides as a tooltip on the name, the player-board pattern; the
+    // realm tag is always shown (the board is global). The title is a deed id
+    // in the view-model; deedTitleText localizes it and returns '' for an
+    // unknown or title-less id, which renders as an empty cell.
+    const clsTitle = r.knownClass ? ` title="${esc(classDisplayName(r.cls))}"` : '';
+    const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
+    const titleText = r.title ? deedTitleText(r.title) : '';
+    return (
+      `<div class="lb-row lb-row-deeds${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<span class="lb-name"${clsTitle}>${esc(r.name)}${you} <span class="lb-realm">${esc(r.realm)}</span></span>` +
+      `<span class="lb-renown">${formatNumber(r.renown, { maximumFractionDigits: 0 })}</span>` +
+      `<span class="lb-deeds-count">${formatNumber(r.deedCount, { maximumFractionDigits: 0 })}</span>` +
+      `<span class="lb-deed-title">${esc(titleText)}</span></div>`
+    );
+  }
+
+  // The viewer's own account standing, server-resolved (present only for an
+  // authenticated caller who is on the board).
+  private deedsSelfHtml(self: DeedsLeaderboardSelfLine | null): string {
+    if (!self) return '';
+    const line = t('hudChrome.deeds.lbSelf', {
+      rank: formatNumber(self.rank, { maximumFractionDigits: 0 }),
+      percent: formatNumber(self.topPercent, { maximumFractionDigits: 0 }),
+    });
+    return `<div class="lb-self">${esc(line)}</div>`;
+  }
+
   private dailyHeaderHtml(): string {
     return (
       `<div class="lb-row lb-daily lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
@@ -504,11 +629,15 @@ export class LeaderboardWindow {
         : '';
     const title = r.knownClass ? ` title="${esc(classDisplayName(r.cls))}"` : '';
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
+    // The Renown-tab title-cell treatment: a deed id in the view-model,
+    // localized here; '' (untitled/stale) renders an empty cell.
+    const deedTitle = r.title ? deedTitleText(r.title) : '';
     return (
-      `<div class="lb-row${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<div class="lb-row lb-row-players${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
       `<span class="lb-name"${title}>${star}${esc(r.name)}${you}</span>` +
       `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span>` +
-      `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`
+      `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span>` +
+      `<span class="lb-deed-title">${esc(deedTitle)}</span></div>`
     );
   }
 
@@ -517,11 +646,15 @@ export class LeaderboardWindow {
   // carries no literal em dash (project style rule).
   private stickyHtml(standing: LeaderboardStanding | null): string {
     if (!standing) return '';
+    // The Renown-tab title-cell treatment, mirroring rowHtml: a deed id in the
+    // view-model, localized here; '' (untitled/stale) renders an empty cell.
+    const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
-      `<div class="lb-sticky"><div class="lb-row lb-mine"><span class="lb-rank">&mdash;</span>` +
+      `<div class="lb-sticky"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">&mdash;</span>` +
       `<span class="lb-name">${esc(standing.name)} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${standing.level}</span><span class="lb-vlvl">${standing.virtualLevel}</span>` +
-      `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span></div></div>`
+      `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
+      `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
     );
   }
 

@@ -73,8 +73,9 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
 
   it('the compact-tier ring keeps every control at the floor (smallest sizes)', () => {
     // hud-mobile-compact re-tunes every --mobile-ring-* var downward for short
-    // landscape phones; the smallest of them (toggle 46, Target/Use 50) must
-    // still clear the 40px floor with margin.
+    // landscape phones, then the 0.85 mobile-chrome-scale shrinks them further; the
+    // smallest (toggle 46 * 0.85 = 39.1) is clamped back up to the 40px floor via
+    // max(40px, ...), and Target/Use (50 * 0.85 = 42.5) still clear it.
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const ring = el('div', { id: 'mobile-action-ring' });
     const slot = el('button', { class: 'mobile-action-slot', 'data-mobile-index': '2' });
@@ -108,16 +109,19 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it('party-member rows (role=button tap targets)', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
+    const rows = el('div', { class: 'party-rows' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
-    frames.appendChild(row);
+    rows.appendChild(row);
+    frames.appendChild(rows);
     document.body.appendChild(frames);
     expectAtLeastFloor(row, 'party-frame');
   });
 
   it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
     const leave = el('button', { id: 'party-leave' });
+    leave.textContent = 'Leave Party';
     frames.appendChild(leave);
     document.body.appendChild(frames);
     expectAtLeastFloor(leave, '#party-leave');
@@ -134,12 +138,16 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(close, '#mobile-more-close');
   });
 
-  it('the community HUD toggle', () => {
-    const menu = el('details', { id: 'community-menu' });
-    const toggle = el('summary', { class: 'community-toggle' });
-    menu.appendChild(toggle);
-    document.body.appendChild(menu);
-    expectAtLeastFloor(toggle, '.community-toggle');
+  it('the always-present Donate button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const donate = el('button', { id: 'mobile-donate', class: 'mobile-btn' });
+    donate.textContent = 'Donate';
+    grid.appendChild(donate);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(donate, '#mobile-donate');
   });
 
   it('the movement / camera joystick', () => {

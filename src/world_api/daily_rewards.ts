@@ -45,7 +45,8 @@ export interface DailyRewardPayoutLogEntry {
 
 export interface DailyRewardEligibilityView {
   eligible: boolean;
-  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable';
+  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
+  banReason?: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;

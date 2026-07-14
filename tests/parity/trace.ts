@@ -172,7 +172,10 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'skinCatalog',
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
+  'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay
+  'weaponSkinId', // render-only resolved weapon-skin mirror
   'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
+  'equippedInstances', // render-only mirror (Enchanting); the sim reads the SOURCE (meta.equipmentInstance), never this
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
@@ -196,6 +199,10 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'away', // session-only presence
   'lastWhisperFrom', // session-only
   'marketQuery', // session-only browse query (search + filters + page)
+  // Server-stamped display breakdown behind bank.bonusSlots; session-only, never
+  // persisted, never sim-mutated. The bonus CAPACITY it explains IS pinned (the
+  // sampled meta.bank.bonusSlots), so excluding the rows loses no gameplay net.
+  'bankBonusSources',
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

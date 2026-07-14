@@ -21,6 +21,7 @@
 
 import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import type { SimContext } from '../sim_context';
 import { type Aura, armorReduction, dist2d, type Entity, type MobTemplate } from '../types';
 
@@ -115,6 +116,9 @@ export function runMobSwingAffixes(
         'hit',
         true,
       );
+      // No-ops unless the mob is a tracked splash carrier, so the generic
+      // cleave path stays cheap.
+      deedsMod.onBossSplashHitForDeeds(ctx, mob);
     }
   }
   // venom: a landed swing may inflict a refreshing poison DoT (hostile mobs only,
@@ -510,12 +514,13 @@ export function runMobSwingAffixes(
     if (ctx.applyKnockback(mob, target, knockback.distance) > 0) {
       const school = (knockback.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: target.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${knockback.name}!`,
-        color: '#ff9933',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${knockback.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
     }
   }
   // slowStrike: a landed hit may mire the victim, slowing their attack speed.
@@ -973,7 +978,10 @@ function applyCorrosion(
   target: Entity,
   corrode: NonNullable<MobTemplate['corrode']>,
 ): void {
-  const existing = target.auras.find((a) => a.kind === 'sunder');
+  // Mob corrosion is a FLAT, stacking armor shred on its own `corrode` kind, kept
+  // separate from the warrior/rogue percent `sunder` so effectiveArmor subtracts it
+  // flat (before the percent debuffs) and the two mechanics never collide.
+  const existing = target.auras.find((a) => a.kind === 'corrode');
   if (existing) {
     existing.stacks = Math.min(corrode.maxStacks, (existing.stacks ?? 1) + 1);
     existing.value = corrode.armor;
@@ -983,7 +991,7 @@ function applyCorrosion(
     ctx.applyAura(target, {
       id: `corrode_${mob.templateId}`,
       name: corrode.name,
-      kind: 'sunder',
+      kind: 'corrode',
       remaining: corrode.duration,
       duration: corrode.duration,
       value: corrode.armor,

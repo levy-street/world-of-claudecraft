@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -6,9 +8,12 @@ import {
   type ClipMap,
   manifestUrls,
   manifestUrlsForGraphics,
+  SKINS,
   VISUALS,
   visibleAttachmentsForGraphics,
+  visualKeyFor,
 } from '../src/render/characters/manifest';
+import { NPCS } from '../src/sim/data';
 
 function expectedClipNames(clips: ClipMap): string[] {
   return [
@@ -44,6 +49,58 @@ async function glbAnimationNames(path: string): Promise<Set<string>> {
 }
 
 describe('character visual manifest', () => {
+  it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
+    // The maintainer-approved easter egg: black shoulder-length hair and light
+    // brown skin ride a repainted rogue palette resolved at skin index 0 (NPCs
+    // always resolve skin 0; the mech precedent for a real index-0 texture).
+    // The def must stay TINT-FREE: an entity tint would wash the repaint back
+    // toward the gold villager look. Do not "clean up" any of the three.
+    const key = visualKeyFor({ kind: 'npc', templateId: 'bursar_fernando' } as never);
+    expect(key).toBe('npc_fernando');
+    expect(VISUALS.npc_fernando.tint).toBeUndefined();
+    const atlas = SKINS.npc_fernando?.[0];
+    expect(atlas).toBe('textures/skins/rogue/fernando.png');
+    expect(existsSync(fileURLToPath(new URL(`../public/${atlas}`, import.meta.url)))).toBe(true);
+  });
+
+  it('resolves all three Chroniclers to the shared scholarly-mage visual', () => {
+    // One def, three tints: the per-NPC NpcDef color carries each identity,
+    // so the def must keep tint 'entity', and the three colors must stay
+    // pairwise distinct and off the bursar gold and auctioneer amethyst.
+    for (const templateId of [
+      'chronicler_saul',
+      'chronicler_osric_fenn',
+      'chronicler_edda_hartwell',
+    ]) {
+      expect(visualKeyFor({ kind: 'npc', templateId } as never)).toBe('npc_chronicler');
+    }
+    const visual = VISUALS.npc_chronicler;
+    expect(visual.url).toBe('models/chars/players/mage.glb');
+    expect(visual.show).toEqual(['Mage_Hat']);
+    expect(visual.tint).toBe('entity');
+    expect(visual.attach?.map((a) => a.url)).toEqual([
+      'models/weapons/staff.glb',
+      'models/weapons/spellbook_open.glb',
+    ]);
+    expect(visual.attach?.[1]?.gripRef).toBe('Spellbook_open');
+
+    expect(NPCS.chronicler_saul.color).toBe(0xd08a2e);
+    expect(NPCS.chronicler_osric_fenn.color).toBe(0x3fa66b);
+    expect(NPCS.chronicler_edda_hartwell.color).toBe(0x5a6fd6);
+    const reserved = [NPCS.bursar_petra_vell.color, 0xc9a227, 0x8e5ad6];
+    for (const id of [
+      'chronicler_saul',
+      'chronicler_osric_fenn',
+      'chronicler_edda_hartwell',
+    ] as const) {
+      expect(reserved).not.toContain(NPCS[id].color);
+    }
+    // The Thornpeak chronicler's display name is renamed to Zenzie while the
+    // template id stays (save compatibility); pin the English so a revert
+    // cannot land silently.
+    expect(NPCS.chronicler_edda_hartwell.name).toBe('Chronicler Zenzie');
+  });
+
   it('uses the custom boar death clip without relying on a speed override', () => {
     expect(VISUALS.mob_boar.clips.death).toBe('Dying');
     expect(VISUALS.mob_boar.deathTimeScale).toBeUndefined();
@@ -95,5 +152,13 @@ describe('character visual manifest', () => {
       'models/weapons/dagger.glb',
       'models/weapons/dagger.glb',
     ]);
+  });
+
+  it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
+    // Prose-only claim otherwise (FAMILY_KEYS.reptile comment): the explicit MOB_KEYS
+    // override this pins is what actually keeps the model, and nothing else does.
+    expect(visualKeyFor({ kind: 'mob', templateId: 'deepfen_spearjaw' } as never)).toBe(
+      'mob_spearjaw',
+    );
   });
 });

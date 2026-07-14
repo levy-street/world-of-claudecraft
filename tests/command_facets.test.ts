@@ -284,3 +284,69 @@ describe('command facet tags (W10)', () => {
     }
   });
 });
+
+// Bank: append the personal-bank cluster's tags. The table-consistency invariants in
+// the W6 block above (no orphan tag, no dispatch-only leak) already cover these new
+// entries; this block pins the exact facet per bank command, keyed on the WIRE strings
+// (bank_deposit/bank_withdraw/bank_buy_slots), and that the proximity-gated bankInfo
+// read stays untagged (no wire send). The tokens are personal-bank only forever; a
+// future guild bank gets its own guild_bank_* tokens (state.md decision 16), never a
+// reuse of these. Append-only: never edit a tag.
+const BANK_TAGS: Readonly<Record<string, string>> = {
+  bank_deposit: 'IWorldBank',
+  bank_withdraw: 'IWorldBank',
+  bank_buy_slots: 'IWorldBank',
+};
+
+describe('command facet tags (bank)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags every personal-bank command with the IWorldBank facet', () => {
+    for (const [cmd, facet] of Object.entries(BANK_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case bank wire strings (never normalized to camelCase)', () => {
+    expect('bank_deposit' in tags).toBe(true);
+    expect('bank_withdraw' in tags).toBe(true);
+    expect('bank_buy_slots' in tags).toBe(true);
+    expect('bankDeposit' in tags).toBe(false);
+    expect('bankBuySlots' in tags).toBe(false);
+  });
+
+  it('does not tag bankInfo (proximity-gated snapshot read, no wire command)', () => {
+    expect('bankInfo' in tags).toBe(false);
+  });
+});
+
+// Deeds: append the Book of Deeds cluster's tag. The table-consistency
+// invariants in the W6 block above (no orphan tag, no dispatch-only leak)
+// already cover the new entry; this block pins the exact facet for the one
+// title-selection command and that the four snapshot reads stay untagged.
+// Append-only: never edit a tag.
+const DEEDS_TAGS: Readonly<Record<string, string>> = {
+  deed_set_title: 'IWorldDeeds',
+};
+
+describe('command facet tags (deeds)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags the title-selection command with the IWorldDeeds facet', () => {
+    for (const [cmd, facet] of Object.entries(DEEDS_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case wire string (never normalized to camelCase)', () => {
+    expect('deed_set_title' in tags).toBe(true);
+    expect('deedSetTitle' in tags).toBe(false);
+    expect('setActiveTitle' in tags).toBe(false);
+  });
+
+  it('does not tag the snapshot reads (deedsEarned/deedStats/renown/activeTitle)', () => {
+    for (const read of ['deedsEarned', 'deedStats', 'renown', 'activeTitle']) {
+      expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
+    }
+  });
+});

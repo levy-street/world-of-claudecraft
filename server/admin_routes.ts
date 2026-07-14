@@ -41,6 +41,7 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/ip-associations', permission: 'accounts.read' },
 
   { method: 'GET', pattern: '/admin/api/moderation/queue', permission: 'moderation.read' },
+  { method: 'GET', pattern: '/admin/api/moderation/history', permission: 'moderation.read' },
   {
     method: 'GET',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)$/,
@@ -90,6 +91,16 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   },
   {
     method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-mute$/,
     permission: 'moderation.act',
   },
@@ -101,6 +112,19 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/reset-strikes$/,
+    permission: 'moderation.act',
+  },
+  // Account flair (AI mark / streamer links). Not punitive, but they are
+  // operator-only writes that every player can see, so they sit with the other
+  // moderation actions rather than getting a permission of their own.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/ai$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/streamer$/,
     permission: 'moderation.act',
   },
   {

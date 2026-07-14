@@ -64,17 +64,22 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
     expect(isAuraDebuff(aura({ id: 'x', kind: 'buff_int', value: -20 }))).toBe(true);
   });
 
-  it('matches the exact set of kinds the old inline allowlist named', () => {
+  // This list MUST mirror the sim's HARMFUL_AURA_KINDS (src/sim/aura_classify.ts): the
+  // two classifiers are separate lists, so a kind added to one must be added to both or
+  // the HUD renders it with the wrong buff/debuff styling.
+  it('matches the exact set of harmful kinds (mirrors the sim classifier)', () => {
     expect([...DEBUFF_AURA_KINDS].sort()).toEqual(
       [
         'attackspeed',
         'blind',
+        'corrode',
         'cost_tax',
         'critvuln',
         'debuff_ap',
         'disarm',
         'dot',
         'expose',
+        'faerie_fire',
         'heal_absorb',
         'hex',
         'incapacitate',

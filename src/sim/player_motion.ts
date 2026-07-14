@@ -21,7 +21,13 @@ import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
 import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
-import { groundHeight, terrainDownhill, terrainSteepnessAt, waterLevelAt } from './world';
+import {
+  groundHeight,
+  terrainDownhill,
+  terrainSteepnessAt,
+  terrainWallStandoff,
+  waterLevelAt,
+} from './world';
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
@@ -109,6 +115,8 @@ export interface PlayerMotionDeps {
 }
 
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
+  const stepStartX = p.pos.x;
+  const stepStartZ = p.pos.z;
   // Convention: facing f points along (sin f, cos f); the camera sits behind
   // the player, so screen-right is the world vector (-cos f, sin f).
   // Turning right therefore DECREASES facing.
@@ -299,6 +307,57 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     } else {
       p.pos.y = ground;
       p.fallStartY = ground;
+    }
+  }
+
+  // Ease the body off any terrain wall it now overlaps. The slope gates above
+  // block the CENTER from climbing a wall, but nothing keeps the body's WIDTH
+  // clear of one, so standing at (or strafing along) a wall foot buries the near
+  // side of the model. Only on settled ground (a fall/ledge is resolved above),
+  // and never onto ground steeper than the climb limit (a rare terrace corner:
+  // a tick's clip beats being shoved onto a wall). Lives in the kernel so the
+  // server Sim and the client self-predictor apply it identically; no-op on open
+  // ground and on flat instanced floors.
+  if (p.onGround && !isSwimming(p, deps.seed)) {
+    const s = terrainWallStandoff(p.pos.x, p.pos.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
+    if (s.x !== p.pos.x || s.z !== p.pos.z) {
+      const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
+      let standX = resolved.x;
+      let standZ = resolved.z;
+      if (movingOnGround && wishSpeed > 0) {
+        const startStand = terrainWallStandoff(
+          stepStartX,
+          stepStartZ,
+          deps.seed,
+          BODY_RADIUS,
+          MAX_CLIMB_SLOPE,
+        );
+        const alreadyClear =
+          Math.hypot(startStand.x - stepStartX, startStand.z - stepStartZ) < 1e-4;
+        const netX = standX - stepStartX;
+        const netZ = standZ - stepStartZ;
+        const progress = netX * wishX + netZ * wishZ;
+        if (alreadyClear && progress < -1e-6) {
+          const slideX = standX - wishX * progress;
+          const slideZ = standZ - wishZ * progress;
+          const slide = deps.resolveMove(
+            stepStartX,
+            stepStartZ,
+            slideX,
+            slideZ,
+            BODY_RADIUS,
+            p,
+            false,
+          );
+          standX = slide.x;
+          standZ = slide.z;
+        }
+      }
+      if (terrainSteepnessAt(standX, standZ, deps.seed) <= MAX_CLIMB_SLOPE) {
+        p.pos.x = standX;
+        p.pos.z = standZ;
+        p.pos.y = groundHeight(standX, standZ, deps.seed);
+      }
     }
   }
 }

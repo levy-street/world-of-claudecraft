@@ -10,6 +10,8 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isYumiMazePos,
+  yumiMazeOriginAt,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
@@ -24,6 +26,7 @@ import {
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { generateDecorations, groundHeight } from './world';
+import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -129,7 +132,7 @@ function staticWorldColliders(seed: number): Collider[] {
     out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
   }
 
-  // dock huts
+  // Dock decks are raised walkable ground in world.ts; only the hut blocks.
   for (const d of PROPS.docks) {
     const hut = rotY(d.hutLocal.x, d.hutLocal.z, d.rot);
     const x = d.x + hut.x,
@@ -293,9 +296,16 @@ const FENCE_END_PAD = 0.35;
 /** Blocker walls are full-height (a jump never clears one, unlike a fence);
  * this is only the camera-occlusion top for the record. */
 const BLOCKER_WALL_HEIGHT = 6;
-/** Rail height of a fence (yards), used for camera occlusion. A jump passes
- * through fences while airborne regardless (see sim `Entity.jumping`). */
-const FENCE_RAIL_HEIGHT = 2.8;
+/**
+ * Visual top of a low village fence rail (yards). The fence.glb rail is ~0.33yd
+ * native and renders at ~2.9x, so its silhouette tops out around waist height.
+ * Fences are `camGhost`, so camera occlusion skips them and this value feeds
+ * ONLY the spell line-of-sight check (`sightBlockedAt`): it MUST stay below
+ * `SIGHT_HEIGHT` (1.6) so a caster sees and casts over a fence, matching what
+ * the player sees on screen (issue #1668). The old 2.8 (a stale camera-occlusion
+ * guess, ~3x the real rail) sat above the eye line and wrongly blocked casts. A
+ * jump still clears the rail for movement regardless (see sim `Entity.jumping`). */
+const FENCE_RAIL_HEIGHT = 0.95;
 
 interface ColliderGrid {
   cells: Map<string, Collider[]>;
@@ -428,6 +438,11 @@ export function resolvePosition(
   ignoreFences = false,
   delveModules?: readonly string[],
 ): { x: number; z: number } {
+  if (isYumiMazePos(x)) {
+    const o = yumiMazeOriginAt(z);
+    const local = resolveAgainst(yumiMazeColliders(), x - o.x, z - o.z, r);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
   if (isDelvePos(x)) {
     const delve = delveAt(x);
     const mods = delveModules?.length ? delveModules : delve ? defaultDelveModules(delve.id) : [];
@@ -672,6 +687,20 @@ export function cameraOcclusion(
   pad = 0.35,
   delveModules?: readonly string[],
 ): number {
+  if (isYumiMazePos(ax)) {
+    const o = yumiMazeOriginAt(az);
+    return sweepColliders(
+      yumiMazeColliders(),
+      ax - o.x,
+      ay,
+      az - o.z,
+      bx - o.x,
+      by,
+      bz - o.z,
+      pad,
+      true,
+    );
+  }
   if (isDelvePos(ax)) {
     const delve = delveAt(ax);
     const mods = delveModules?.length ? delveModules : delve ? defaultDelveModules(delve.id) : [];
@@ -744,6 +773,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     }
     return false;
   };
+  if (isYumiMazePos(x)) {
+    const o = yumiMazeOriginAt(z);
+    return overlapsAny(yumiMazeColliders(), x - o.x, z - o.z, false);
+  }
   if (isDelvePos(x)) {
     const delve = delveAt(x);
     const mods = delve ? defaultDelveModules(delve.id) : [];

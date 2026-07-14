@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_BOUNDSTONE_VANGUARD,
   SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
@@ -10,19 +11,19 @@ import {
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
-import { itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
 function statsFor(cls: PlayerClass, level: number, equipment: Record<string, string>): Entity {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = level;
-  recalcPlayerStats(e, cls, equipment as any);
+  recalcPlayerStats(e, cls, equipment as any, undefined, {});
   return e;
 }
 
@@ -130,6 +131,33 @@ describe('aggregateSetBonuses (pure resolver)', () => {
 });
 
 describe('item set tooltip model', () => {
+  it('counts each set as its distinct equip slots (base + all heroic versions are one piece)', () => {
+    const counts = itemSetMemberCounts();
+    // The t2 sets are 5 slots (soulflame cloth is 4). The normal piece, its
+    // auto-generated heroic variant, and any bespoke heroic raid piece for the
+    // same slot all collapse to one member, so the "X/N" denominator reflects the
+    // real number of collectible pieces (not the parallel heroic-variant ids).
+    expect(counts.crownforged).toBe(4);
+    expect(counts.nighttalon).toBe(4);
+    expect(counts.soulflame).toBe(4);
+    expect(counts.stormcallers).toBe(4);
+    // Leveling haste kits: 3 pieces each.
+    expect(counts.vale_arcanist).toBe(3);
+    expect(counts.boundstone_vanguard).toBe(3);
+    expect(counts.greyjaw_stalker).toBe(3);
+  });
+
+  it('keeps four-piece families at four and the Boundstone family at three', () => {
+    const memberCounts = itemSetMemberCounts();
+    expect({
+      [SET_DEATHLORD]: memberCounts[SET_DEATHLORD],
+      [SET_BOUNDSTONE_VANGUARD]: memberCounts[SET_BOUNDSTONE_VANGUARD],
+    }).toEqual({
+      [SET_DEATHLORD]: 4,
+      [SET_BOUNDSTONE_VANGUARD]: 3,
+    });
+  });
+
   it('uses the authored member count, not the highest bonus threshold, as the header total', () => {
     const model = itemSetTooltipModel({
       itemSetId: SET_DEATHLORD,
@@ -193,6 +221,26 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     // Rogue AP = str + agi + bonusAp; the only set bonus at 2pc is +40 AP.
     expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(40);
     expect(two.attackPower).toBeGreaterThan(base.attackPower);
+  });
+
+  it('normal and heroic Nythraxis armor pieces mix for set thresholds', () => {
+    // A heroic helmet variant counts as the same set slot as its normal base, so
+    // mixing it with three normal pieces still reaches the 3-piece Wraithfire
+    // threshold (int +15, spi +15). Derive the expected primary totals from the
+    // live item defs so the heroic-variant stat rescale stays the source of truth.
+    const worn = {
+      helmet: 'heroic_soulflame_cowl', // heroic helmet mixed with normal pieces
+      shoulder: 'soulflame_mantle',
+      gloves: 'soulflame_gloves',
+      waist: 'soulflame_cord',
+    };
+    const base = statsFor('mage', 20, {});
+    const mixed = statsFor('mage', 20, worn);
+    const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
+    const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
+    expect(mixed.knockbackResistance).toBe(1);
+    expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 15); // +15 = 3pc Wraithfire int
+    expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 15); // +15 = 3pc Wraithfire spi
   });
 
   it("Necromancer's (t1 caster): knockback resistance at 2pc, int/sta added at 3pc", () => {

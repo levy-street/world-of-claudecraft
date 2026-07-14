@@ -57,6 +57,8 @@ export function startFiestaPractice(sim: Sim): boolean {
   ];
   for (let i = 0; i < kit.length; i++) {
     const pid = sim.addPlayer(kit[i].cls, kit[i].name);
+    const botMeta = sim.players.get(pid);
+    if (botMeta) botMeta.isFiestaBot = true;
     const e = sim.entities.get(pid);
     if (e) {
       const ang = (i / kit.length) * Math.PI * 2;
@@ -149,7 +151,11 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   if (best > engageRange) meta.moveInput.forward = true;
   e.targetId = target.id;
   if (!e.autoAttack) sim.startAutoAttack(pid);
-  // Fire an offensive ability now and then (staggered per bot by pid).
+  // Fire an offensive ability now and then (staggered per bot by pid). A press that
+  // lands in the tail of an in-flight cast now queues instead of no-oping on "You are
+  // busy." (#1360's single-slot spell queue applies to every castAbility caller,
+  // bots included); this is intended, not an accidental behavior change, and it stays
+  // deterministic since bot presses derive from tickCount/pid, not rng.
   if (sim.tickCount % 24 === pid % 24) {
     const ability = pickBotAbility(meta);
     if (ability) sim.castAbility(ability, pid);

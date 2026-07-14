@@ -121,7 +121,7 @@ describe('mob_swing module: runMobSwingAffixes', () => {
       school: 'arcane',
     });
     // Fold the pushed buff into derived stats (mirrors applyAura's recalc).
-    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     expect(p.stats.armor).toBe(armorBefore + 90);
 
     const removed = devourBeneficialAura(ctxOf(sim), p, 'Devour Magic');
