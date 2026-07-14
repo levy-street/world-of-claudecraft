@@ -6074,15 +6074,15 @@ export const ja_JP: EnTranslations = {
       },
       "ironhold": {
         "name": "鉄壁",
-        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを50%軽減します。"
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
       },
       "sacred_bulwark": {
         "name": "聖なる防壁",
-        "description": "信仰の防壁を呼び降ろし、8秒間、受けるすべてのダメージを50%軽減します。"
+        "description": "信仰の加護で1分間自身を守ります。致命的な一撃を受けても死なず、体力が最大値の35%まで回復します。"
       },
-      "ancestral_resolve": {
-        "name": "祖霊の決意",
-        "description": "祖霊があなたを守り、8秒間、受けるすべてのダメージを50%軽減します。"
+      "tidal_ward": {
+        "name": "潮の守り",
+        "description": "満ちる潮があなたを包み、8秒間、2秒ごとに回復し、受けるすべての回復効果を40%増加させます。"
       },
       "shadow_bolt": {
         "name": "暗鬱の矢",

@@ -10,8 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -22,6 +20,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -40,8 +40,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "es_ES": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -52,6 +50,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -70,8 +70,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "fr_FR": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -82,6 +80,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -100,8 +100,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "fr_CA": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -112,6 +110,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -131,8 +131,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -143,6 +141,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -161,8 +161,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "de_DE": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -173,6 +171,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -195,8 +195,6 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -207,6 +205,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -226,8 +226,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -238,6 +236,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -256,8 +256,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "nl_NL": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -268,6 +266,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -286,8 +286,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "pl_PL": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -298,6 +296,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -316,8 +316,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "id_ID": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -328,6 +326,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -346,8 +346,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "tr_TR": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -358,6 +356,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -376,8 +376,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "sv_SE": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -388,6 +386,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -406,8 +406,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "vi_VN": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -418,6 +416,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",
@@ -436,8 +436,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petFeed.disabledNoFood"
   ],
   "da_DK": [
-    "entities.abilities.ancestral_resolve.description",
-    "entities.abilities.ancestral_resolve.name",
     "entities.abilities.earth_shield.description",
     "entities.abilities.earth_shield.name",
     "entities.abilities.earthbound_weapon.description",
@@ -448,6 +446,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.ironhold.name",
     "entities.abilities.sacred_bulwark.description",
     "entities.abilities.sacred_bulwark.name",
+    "entities.abilities.tidal_ward.description",
+    "entities.abilities.tidal_ward.name",
     "entities.abilities.unleash_weapon.description",
     "entities.abilities.unleash_weapon.name",
     "guide.family.reptile.desc",

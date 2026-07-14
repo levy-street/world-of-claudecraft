@@ -2400,13 +2400,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '현재 무기 부여 효과의 에너지를 대상에게 방출하여 {damage}의 피해를 입히고, 부여 효과에 따라 추가 효과를 발휘합니다: 위협 수준 폭발(대지결속), 화염 화상(화염), 이동 속도 감소(냉기).',
   'entities.abilities.ironhold.name': '철벽',
   'entities.abilities.ironhold.description':
-    '굳건한 방어 태세로 8초 동안 받는 모든 피해를 50% 감소시킵니다.',
+    '굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다.',
   'entities.abilities.sacred_bulwark.name': '신성한 방벽',
   'entities.abilities.sacred_bulwark.description':
-    '신앙의 방벽을 불러내 8초 동안 받는 모든 피해를 50% 감소시킵니다.',
-  'entities.abilities.ancestral_resolve.name': '선조의 결의',
-  'entities.abilities.ancestral_resolve.description':
-    '선조의 혼이 당신을 보호하여 8초 동안 받는 모든 피해를 50% 감소시킵니다.',
+    '1분 동안 신앙으로 자신을 보호합니다. 목숨을 앗아갈 일격을 무효화하고 생명력을 최대치의 35%까지 회복시킵니다.',
+  'entities.abilities.tidal_ward.name': '조수의 수호',
+  'entities.abilities.tidal_ward.description':
+    '차오르는 조수가 당신을 감싸 8초 동안 2초마다 치유하고 받는 모든 치유 효과를 40% 증가시킵니다.',
   'entities.abilities.shadow_bolt.name': '어스름 화살',
   'entities.abilities.shadow_bolt.description':
     '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',

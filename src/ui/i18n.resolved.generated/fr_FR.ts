@@ -6074,15 +6074,15 @@ export const fr_FR: EnTranslations = {
       },
       "ironhold": {
         "name": "Ironhold",
-        "description": "Brace behind your guard, reducing all damage taken by 50% for 8 sec."
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
-        "description": "Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec."
+        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
       },
-      "ancestral_resolve": {
-        "name": "Ancestral Resolve",
-        "description": "The spirits shield you, reducing all damage taken by 50% for 8 sec."
+      "tidal_ward": {
+        "name": "Tidal Ward",
+        "description": "A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec."
       },
       "shadow_bolt": {
         "name": "Trait de pénombre",

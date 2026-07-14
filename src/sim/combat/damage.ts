@@ -421,6 +421,34 @@ export function dealDamage(
     }
   }
 
+  // Sacred Bulwark (Guardian Ward): a divine cheat-death. If this blow would drop a
+  // warded player, the Light denies it: the hit lands (recorded) but instead of dying
+  // they are restored to 35% of max health, and the ward is spent.
+  if (amount > 0 && target.kind === 'player' && target.hp - amount <= 0) {
+    const wardIdx = target.auras.findIndex((a) => a.kind === 'guardian_ward');
+    if (wardIdx >= 0) {
+      const ward = target.auras[wardIdx];
+      target.auras.splice(wardIdx, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: ward.name, gained: false });
+      const restored = Math.round(target.maxHp * 0.35);
+      target.hp = restored;
+      ctx.emit({
+        type: 'damage',
+        sourceId: source?.id ?? -1,
+        targetId: target.id,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+        ...attackAnimation,
+      });
+      ctx.emit({ type: 'heal', targetId: target.id, amount: restored });
+      if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      return;
+    }
+  }
+
   target.hp = Math.max(0, target.hp - amount);
   ctx.emit({
     type: 'damage',

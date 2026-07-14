@@ -128,42 +128,81 @@ describe('Anchorbound Weapon (Earthbound Weapon)', () => {
   });
 });
 
-describe('Shield Wall cooldowns (Ironhold / Sacred Bulwark / Ancestral Resolve)', () => {
+describe('Tank defensive cooldowns (one distinct mechanic per class)', () => {
   const CD: Record<string, string> = {
     warrior: 'ironhold',
     paladin: 'sacred_bulwark',
-    shaman: 'ancestral_resolve',
+    shaman: 'tidal_ward',
   };
+
+  // Level-20 player of any class, learn events flushed.
+  function make(cls: string, spec?: string) {
+    const sim = new Sim({ seed: 4, playerClass: cls as any, autoEquip: true });
+    sim.setPlayerLevel(20);
+    if (spec) sim.setSpec(spec);
+    const pid = sim.playerId;
+    const p = sim.entities.get(pid) as Entity & Record<string, unknown>;
+    for (let i = 0; i < 5; i++) sim.tick();
+    (p as any).resource = (p as any).maxResource;
+    return { sim, p, pid };
+  }
 
   it('all three tank classes know their defensive cooldown at 20', () => {
     for (const [cls, id] of Object.entries(CD)) {
-      const sim = new Sim({ seed: 2, playerClass: cls as any, autoEquip: true });
-      sim.setPlayerLevel(20);
-      if (cls === 'shaman') sim.setSpec('enhancement');
+      const { sim } = make(cls, cls === 'shaman' ? 'enhancement' : undefined);
       expect(!!sim.resolvedAbility(id), `${cls} knows ${id}`).toBe(true);
     }
   });
 
-  it('halves all incoming damage while active, on any school', () => {
-    const { sim, p, pid } = makeEnh();
-    cast(sim, 'ancestral_resolve', pid);
+  it('Ironhold (warrior): flat 40% mitigation on any damage, DoT ticks included', () => {
+    const { sim, p, pid } = make('warrior');
+    cast(sim, 'ironhold', pid);
     expect(p.auras.some((a) => a.kind === 'shield_wall')).toBe(true);
     const mob = spawnMob(sim, p, 3, false);
-    for (const school of ['physical', 'fire', 'nature']) {
+    (p as any).maxHp = p.hp = 1_000_000;
+    for (const school of ['physical', 'fire', 'shadow']) {
       const before = p.hp;
       (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
-      expect(before - p.hp).toBe(50); // 50% reduction
+      expect(before - p.hp).toBe(60); // 40% reduced
     }
+    // non-direct (DoT tick) is reduced too
+    const beforeDot = p.hp;
+    (sim as any).dealDamage(mob, p, 100, false, 'shadow', null, 'hit', false, undefined, false);
+    expect(beforeDot - p.hp).toBe(60);
   });
 
-  it('reduces DoT-tick (non-direct) damage too, unlike Stone Aegis', () => {
-    const { sim, p, pid } = makeEnh();
-    cast(sim, 'ancestral_resolve', pid);
+  it('Sacred Bulwark (paladin): a lethal blow is denied, restoring 35% health', () => {
+    const { sim, p, pid } = make('paladin');
+    cast(sim, 'sacred_bulwark', pid);
+    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
     const mob = spawnMob(sim, p, 3, false);
+    p.hp = p.maxHp;
+    (sim as any).dealDamage(mob, p, p.maxHp * 5, false, 'physical', null, 'hit'); // lethal
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBe(Math.round(p.maxHp * 0.35));
+    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(false); // consumed
+  });
+
+  it('Sacred Bulwark: a non-lethal blow leaves the ward intact', () => {
+    const { sim, p, pid } = make('paladin');
+    cast(sim, 'sacred_bulwark', pid);
+    const mob = spawnMob(sim, p, 3, false);
+    p.hp = p.maxHp;
+    (sim as any).dealDamage(mob, p, 10, false, 'physical', null, 'hit');
+    expect(p.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
+  });
+
+  it('Tidal Ward (shaman): heals over time and boosts healing received', () => {
+    const { sim, p, pid } = make('shaman', 'enhancement');
+    (p as any).maxHp = 100_000;
+    cast(sim, 'tidal_ward', pid);
+    expect(p.auras.some((a) => a.kind === 'hot')).toBe(true);
+    expect(p.auras.find((a) => a.kind === 'heal_taken_up')?.value).toBe(0.4);
+    // injure, then let the HoT tick: health climbs back
+    p.hp = p.maxHp - 5000;
     const before = p.hp;
-    // direct=false: a DoT tick still gets the Shield Wall cut.
-    (sim as any).dealDamage(mob, p, 100, false, 'shadow', null, 'hit', false, undefined, false);
-    expect(before - p.hp).toBe(50);
+    for (let i = 0; i < 45; i++) sim.tick();
+    expect(p.hp).toBeGreaterThan(before);
   });
 });
 

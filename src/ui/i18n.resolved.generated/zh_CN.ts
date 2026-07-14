@@ -6074,15 +6074,15 @@ export const zh_CN: EnTranslations = {
       },
       "ironhold": {
         "name": "铁壁",
-        "description": "以坚固的防御自守，使受到的所有伤害降低 50%，持续 8 秒。"
+        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
       },
       "sacred_bulwark": {
         "name": "神圣壁垒",
-        "description": "召下信仰的壁垒，使受到的所有伤害降低 50%，持续 8 秒。"
+        "description": "以信仰守护自身，持续 1 分钟。下一次致命打击将被抵消，转而将你恢复至 35% 生命值。"
       },
-      "ancestral_resolve": {
-        "name": "先祖坚意",
-        "description": "先祖之灵护佑你，使受到的所有伤害降低 50%，持续 8 秒。"
+      "tidal_ward": {
+        "name": "潮汐守护",
+        "description": "涌动的潮水冲刷全身，每 2 秒治疗你一次，并使你受到的所有治疗提高 40%，持续 8 秒。"
       },
       "shadow_bolt": {
         "name": "幽暗箭",

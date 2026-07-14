@@ -691,9 +691,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
   },
-  // Shield Wall-style emergency defensive cooldown. The warrior/paladin/shaman
-  // versions share the `shield_wall` aura (50% less damage for 8 sec, 3 min
-  // cooldown, off the global) and differ only in flavor. See damage.ts.
+  // Warrior defensive cooldown: a flat mitigation wall (the `shield_wall` aura,
+  // read in damage.ts). One of three distinct tank cooldowns, see also the paladin
+  // Sacred Bulwark (cheat-death) and shaman Tidal Ward (heal-through).
   ironhold: {
     id: 'ironhold',
     name: 'Ironhold',
@@ -701,13 +701,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 10,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
-    description: 'Brace behind your guard, reducing all damage taken by 50% for 8 sec.',
+    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.4, duration: 8 }],
+    description: 'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
   },
   sunder_armor: {
     id: 'sunder_armor',
@@ -1671,7 +1671,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'A holy shield absorbs $d damage for 10 sec.',
   },
-  // Shield Wall-style emergency defensive cooldown (see the `ironhold` note).
+  // Paladin defensive cooldown: a divine cheat-death (the `guardian_ward` aura,
+  // consumed by a lethal blow in damage.ts). Kept up (its 1 min duration matches
+  // its cooldown), so when a killing blow lands the Light restores you instead.
   sacred_bulwark: {
     id: 'sacred_bulwark',
     name: 'Sacred Bulwark',
@@ -1679,13 +1681,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 15,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
     school: 'holy',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
-    description: 'Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec.',
+    effects: [{ type: 'selfBuff', kind: 'guardian_ward', value: 0, duration: 60 }],
+    description:
+      'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
   },
   hammer_of_justice: {
     id: 'hammer_of_justice',
@@ -2648,22 +2651,27 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Discharges your active weapon enchant at the target for $d damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
   },
-  // Shield Wall-style emergency defensive cooldown (see the `ironhold` note),
-  // rounding out the Enhancement tank kit's survivability.
-  ancestral_resolve: {
-    id: 'ancestral_resolve',
-    name: 'Ancestral Resolve',
+  // Shaman defensive cooldown: heal-through, not mitigation. A tide washes over the
+  // shaman, healing them each tick AND raising all healing they receive, so the ward
+  // amplifies its own HoT and any ally heal. Rounds out the Enhancement tank kit.
+  tidal_ward: {
+    id: 'tidal_ward',
+    name: 'Tidal Ward',
     class: 'shaman',
     learnLevel: 20,
-    cost: 20,
+    cost: 30,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
-    school: 'nature',
+    school: 'frost',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
-    description: 'The spirits shield you, reducing all damage taken by 50% for 8 sec.',
+    effects: [
+      { type: 'hot', total: 1200, duration: 8, interval: 2 },
+      { type: 'healTakenBuff', value: 0.4, duration: 8 },
+    ],
+    description:
+      'A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec.',
   },
 
   // ====================== WARLOCK ======================

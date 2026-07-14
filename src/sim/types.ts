@@ -222,9 +222,18 @@ export type AuraKind =
   | 'earth_shield'
   | 'earthbound_weapon'
   // Shield Wall-style tank cooldown: a big, short, all-school damage-taken
-  // reduction (value = fraction less, e.g. 0.5 = 50% less) applied in damage.ts.
-  // Shared by the warrior/paladin/shaman defensive cooldowns.
+  // reduction (value = fraction less, e.g. 0.4 = 40% less) applied in damage.ts.
+  // The warrior tank cooldown (Ironhold).
   | 'shield_wall'
+  // Tidal Ward (shaman tank cooldown): raises the healing the wearer RECEIVES
+  // (value = fraction more, e.g. 0.4 = +40%), read by healingTakenMult so it lifts
+  // both the ward's own HoT and any incoming ally heal. The positive mirror of
+  // mortal_wound.
+  | 'heal_taken_up'
+  // Sacred Bulwark (paladin tank cooldown): a divine cheat-death ward. While it
+  // holds, a lethal blow is denied in damage.ts (the wearer survives, restored to
+  // 35% max health) and the ward is consumed.
+  | 'guardian_ward'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.
@@ -1558,6 +1567,8 @@ export type AbilityEffect =
   // plus an enchant-keyed rider (see src/sim/combat/unleash_weapon.ts).
   | { type: 'earthbindWeapon'; duration: number }
   | { type: 'unleashWeapon'; min: number; max: number }
+  // Tidal Ward: buff the healing the caster RECEIVES for a while (heal_taken_up).
+  | { type: 'healTakenBuff'; value: number; duration: number }
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
   | { type: 'summonPet'; templateId: string } // warlock demon summon: creates/replaces a controlled pet

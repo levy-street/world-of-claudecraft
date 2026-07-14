@@ -1045,21 +1045,21 @@ const classAbilityNamesEn = {
         'Elemental Discharge',
         'Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
       ],
-      // Shield Wall-style defensive cooldowns (warrior/paladin/shaman).
+      // Tank defensive cooldowns, one per class, each a different mechanic.
       [
         'ironhold',
         'Ironhold',
-        'Brace behind your guard, reducing all damage taken by 50% for 8 sec.',
+        'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
       ],
       [
         'sacred_bulwark',
         'Sacred Bulwark',
-        'Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec.',
+        'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
       ],
       [
-        'ancestral_resolve',
-        'Ancestral Resolve',
-        'The spirits shield you, reducing all damage taken by 50% for 8 sec.',
+        'tidal_ward',
+        'Tidal Ward',
+        'A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec.',
       ],
       [
         'shadow_bolt',

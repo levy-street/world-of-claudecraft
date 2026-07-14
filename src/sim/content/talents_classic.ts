@@ -2707,13 +2707,7 @@ const SHAMAN_SPECS: SpecDef[] = [
     // Enhancement tank kit, granted alongside Ancestral Strike so a melee shaman
     // can hold aggro: mitigation, a threat imbue, a taunt, an enchant discharge,
     // and a Shield Wall-style defensive cooldown.
-    [
-      'earth_shield',
-      'earthbound_weapon',
-      'elemental_demand',
-      'unleash_weapon',
-      'ancestral_resolve',
-    ],
+    ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon', 'tidal_ward'],
   ),
   spec(
     'restoration',

@@ -6074,15 +6074,15 @@ export const ko_KR: EnTranslations = {
       },
       "ironhold": {
         "name": "철벽",
-        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 50% 감소시킵니다."
+        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다."
       },
       "sacred_bulwark": {
         "name": "신성한 방벽",
-        "description": "신앙의 방벽을 불러내 8초 동안 받는 모든 피해를 50% 감소시킵니다."
+        "description": "1분 동안 신앙으로 자신을 보호합니다. 목숨을 앗아갈 일격을 무효화하고 생명력을 최대치의 35%까지 회복시킵니다."
       },
-      "ancestral_resolve": {
-        "name": "선조의 결의",
-        "description": "선조의 혼이 당신을 보호하여 8초 동안 받는 모든 피해를 50% 감소시킵니다."
+      "tidal_ward": {
+        "name": "조수의 수호",
+        "description": "차오르는 조수가 당신을 감싸 8초 동안 2초마다 치유하고 받는 모든 치유 효과를 40% 증가시킵니다."
       },
       "shadow_bolt": {
         "name": "어스름 화살",

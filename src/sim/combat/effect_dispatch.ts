@@ -410,6 +410,21 @@ export function runEffects(
         runUnleashWeapon(ctx, p, target, ability, eff.min, eff.max);
         break;
       }
+      case 'healTakenBuff': {
+        // Tidal Ward's heal-received boost. Suffixed id so it coexists with the
+        // ward's own HoT aura (which carries the bare ability id).
+        ctx.applyAura(p, {
+          id: `${ability.id}_healup`,
+          name: ability.name,
+          kind: 'heal_taken_up',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
       case 'judgement': {
         if (!target) break;
         const sealIdx = p.auras.findIndex((a) => a.kind === 'imbue' && a.value2 !== undefined);

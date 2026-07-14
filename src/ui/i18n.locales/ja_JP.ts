@@ -2422,13 +2422,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '現在の武器エンチャントのエネルギーを対象に解き放ち、{damage} のダメージを与え、エンチャントに応じた追加効果を発揮します：脅威度の爆発（大地結び）、火炎の延焼（フレイム）、移動速度の低下（フロスト）。',
   'entities.abilities.ironhold.name': '鉄壁',
   'entities.abilities.ironhold.description':
-    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを50%軽減します。',
+    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。',
   'entities.abilities.sacred_bulwark.name': '聖なる防壁',
   'entities.abilities.sacred_bulwark.description':
-    '信仰の防壁を呼び降ろし、8秒間、受けるすべてのダメージを50%軽減します。',
-  'entities.abilities.ancestral_resolve.name': '祖霊の決意',
-  'entities.abilities.ancestral_resolve.description':
-    '祖霊があなたを守り、8秒間、受けるすべてのダメージを50%軽減します。',
+    '信仰の加護で1分間自身を守ります。致命的な一撃を受けても死なず、体力が最大値の35%まで回復します。',
+  'entities.abilities.tidal_ward.name': '潮の守り',
+  'entities.abilities.tidal_ward.description':
+    '満ちる潮があなたを包み、8秒間、2秒ごとに回復し、受けるすべての回復効果を40%増加させます。',
   'entities.abilities.shadow_bolt.name': '暗鬱の矢',
   'entities.abilities.shadow_bolt.description':
     '敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。',
