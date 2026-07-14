@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Implemented, v0.26 integration QA in progress |
+| Status | Implemented, v0.26 integration reviewed with upstream follow-ups |
 | Date | 2026-07-11 |
 | Branch | `mobile-layout-adjustments` |
 | Base | `release/v0.24.0` at `31182684b4043c92e0df18242bdd731bec02819e` |
@@ -101,7 +101,7 @@
 - [x] T87: Disable player-layout overlap, View, protected-surface, safe-area, and viewport-boundary enforcement after device testing showed false conflicts, editor/runtime geometry drift, and unexpected fallback. Preserve the attempted strict design in this historical plan, keep safe-area measurement only for notch-aware anchoring and editor chrome, and retain blocking validation only for malformed data, unsupported capabilities, invalid scale, and undersized targets (2026-07-14)
 - [x] T88: Make every painted movable context frame, not only its smaller runtime primary footprint, selectable and draggable in Edit Mode, keep context-status proxies above shared controls, hide fixed protected proxies, and restore modal stacking for discard confirmation and More over Consumables (2026-07-15)
 - [x] T89: Preserve 48px combat, menu, and Consumables targets plus 40px compact composite targets while visual art scales to 0.5; elevate the selected proxy and cycle downward on repeated overlap taps; close the game-skinned context dropdown on outside tap (2026-07-15, focused unit and Chromium regressions green)
-- [ ] T90: Complete the v0.26 release merge audit, preserve release-owned QA, versioning, admin localization, Dungeon Finder, camera prompt, and documentation behavior, then run final mobile landscape QA and refresh the local Docker test image (2026-07-15, focused mobile and release suites green; final browser and Docker verification pending)
+- [x] T90: Complete the v0.26 release merge audit, preserve release-owned QA, versioning, admin localization, Dungeon Finder, camera prompt, and documentation behavior, then run final mobile landscape QA and refresh the local Docker test image (2026-07-15, 650 focused mobile tests, 341 release tests, six Chromium landscape scenarios, typecheck, Biome error gate, malware gate, Docker build, database startup, and HTTP smoke checks green; upstream follow-ups recorded below)
 
 ## Outcome
 
@@ -126,6 +126,19 @@ mobile editor, touch sheets, action assignment, Consumables, and free-overlap po
 localization artifacts are rebuilt from the combined source catalogs after conflicts are resolved.
 The release merge audit includes focused release regressions in addition to mobile editor tests so
 a compilable but semantically incomplete conflict resolution cannot be accepted.
+
+### Upstream follow-ups at the integration point
+
+- `upstream/release/v0.26.0` at `d8a871763` still reports version `0.25.0` in package, native,
+  download, HTML, and README surfaces. `node scripts/release_version.mjs check --version 0.26.0`
+  therefore fails until the release branch owns and applies its version synchronization.
+- `npm run sfx:check` passes. The full unit suite still has one upstream failure in
+  `tests/sfx_studio_server_security.test.ts`: the protected production ZIP fixture rejects
+  `mob_demon_hurt.mp3` at peak `-1.6dBFS` because the publish contract requires `-6dBFS`.
+
+Neither release-wide metadata nor production audio is changed in this mobile HUD branch. The full
+gate remains pending those upstream corrections; focused mobile, release integration, browser,
+type, formatting, security, build, database, and HTTP checks remain the acceptance evidence here.
 
 ## File structure
 
