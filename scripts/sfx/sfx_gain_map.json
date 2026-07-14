@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "categoryBaselineDb": {
+    "ui": 0,
+    "movement": 0,
+    "combat": 0,
+    "spells": 0,
+    "voices": 0,
+    "ambience": 0,
+    "other": 0
+  },
+  "keyTrimDb": {}
+}

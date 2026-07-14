@@ -1,4 +1,4 @@
-# Deploying World of Claudecraft on AWS
+# Deploying World of ClaudeCraft on AWS
 
 > **Levy Street production** is deployed via Ansible, not this document:
 > the `eastbrook_game` role in the internal `ansible-scripts` repo runs
@@ -8,7 +8,7 @@
 > pulls and redeploys. The guide below is the generic, standalone path.
 
 One EC2 instance runs everything: the game server, Postgres, MediaWiki, and Caddy
-(TLS reverse proxy). Sized for a small population — a `t4g.small`
+(TLS reverse proxy). Sized for a small population, a `t4g.small`
 (~$14/month all-in) is comfortable for a handful of concurrent players.
 
 ## 1. Confirm the repo is public
@@ -28,10 +28,10 @@ In the EC2 console:
 | AMI | Ubuntu Server 24.04 LTS (**arm64**) |
 | Instance type | `t4g.small` (2 vCPU Graviton, 2 GB) |
 | Storage | 20 GB gp3 |
-| Security group | Inbound: **22** (your IP only), **80**, **443** — nothing else |
+| Security group | Inbound: **22** (your IP only), **80**, **443**, nothing else |
 | User data | Paste `deploy/user-data.sh` with `DOMAIN` filled in |
 
-Leave `DOMAIN=""` if you want to test by IP first over plain HTTP —
+Leave `DOMAIN=""` if you want to test by IP first over plain HTTP,
 you can set the domain later (step 4).
 
 Allocate an **Elastic IP** and associate it with the instance so the
@@ -50,7 +50,7 @@ ssh ubuntu@<elastic-ip> sudo tail -f /var/log/eastbrook-setup.log
 ## 3. Point DNS at it
 
 Create an **A record** for your domain (e.g. `play.example.com`) pointing
-at the Elastic IP. In Route 53: Hosted zone → Create record → A →
+at the Elastic IP. In Route 53: Hosted zone, Create record, type A,
 the Elastic IP.
 
 ## 4. Turn on TLS (if you started without a domain)
@@ -144,7 +144,7 @@ For off-box safety, sync the directory to S3 occasionally:
   are blocked server-side and escalate from a warning to account-wide timed mutes
   (durations editable in the same tab). `CHAT_CENSOR_LIST` / `CHAT_CENSOR_FILE`
   are still read **once**, on the first boot of a fresh database, to seed the soft
-  list — after that they are ignored and the dashboard is authoritative.
+  list; after that they are ignored and the dashboard is authoritative.
 - **Realms (horizontal scaling)**: each server process serves one realm,
   set by `REALM_NAME` (default `Claudemoon`). To add a realm, run another
   process against the **same** `DATABASE_URL` with a different `REALM_NAME`
@@ -179,6 +179,22 @@ For off-box safety, sync the directory to S3 occasionally:
   the canonical token mint and should only be overridden if that mint changes.
   Set `PUBLIC_ORIGIN` in single-realm production so shared player-card pages
   emit stable absolute Open Graph URLs.
+- **Steam link + achievement mirror**: players can link a Steam account so
+  their Book of Deeds achievements mirror to Steam (`server/steam/`). It is
+  **off until configured**: with `STEAM_ENABLED` unset, every `/api/steam`
+  route answers `steam.disabled`, the mirror is inert, and no client renders
+  link UI. To enable, set `STEAM_ENABLED=1` plus the Steamworks `STEAM_APP_ID`
+  and a publisher Web API key in `STEAM_WEB_API_KEY` (partner.steam-api.com)
+  in the server runtime env. Docker Compose passes these three variables from
+  the host `.env` into the game container. The key is a secret: it must never
+  appear in logs or client code. Linking is a cosmetic mirror for deed
+  achievements only; login with Steam does not exist.
+- **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
+  game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
+  run directly on the host. For the Compose game container with a host-run
+  economy service, use `http://host.docker.internal:8798/v1/claudium/`.
+  A separately deployed economy service should use its internal or remote DNS
+  URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
@@ -189,7 +205,7 @@ For off-box safety, sync the directory to S3 occasionally:
   so the same rule applies to deploys that run `docker compose build`: the private
   checkout must exist before the image is built. That directory is not part of the
   public checkout. At build time, confirm which implementation was picked:
-  `[build:server] bot detector: stub (no-op)` vs `… bot detector: private`.
+  `[build:server] bot detector: stub (no-op)` vs `... bot detector: private`.
 - **Anti-bot runtime knobs**: `MAX_WS_PER_IP_HARD` (default `20`) caps simultaneous
   WebSocket connections per source IP; extra connections are refused at the
   handshake. `ANTIBOT_ENFORCE=1` lets the detector act on its findings (e.g. kick);
@@ -218,9 +234,123 @@ For off-box safety, sync the directory to S3 occasionally:
   line to take the default, or set an explicit value (`CHAT_LOG_RETENTION_DAYS=0`
   is still keep-forever).
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
-- If the instance ever feels tight, stop → change instance type →
+- If the instance ever feels tight, stop, change instance type,
   start. Everything lives in Docker plus one EBS volume, so nothing
   else changes.
+
+## Deploying an SFX Studio export
+
+Follow the full local authoring and pre-export checklist in the
+[SFX Studio tutorial](docs/sfx-studio-tutorial.md).
+
+Deploy the game code containing the runtime SFX pack loader once, including a
+store or OTA rollout for native clients. After that, audio-only Studio exports
+for the same compiled catalog do not require another web or native client build.
+Native clients fetch compatible packs from their configured production origin;
+if that request fails, they keep using the SFX bundled with the app.
+
+1. In SFX Studio, publish each finished audio master and apply the playback mix.
+2. Click Export All and extract the downloaded ZIP on the production host.
+3. Ensure the persistent overlay belongs to the deploy user, then run the
+   installer from the extracted artifact:
+
+   ```bash
+   sudo mkdir -p /opt/eastbrook/sfx-runtime
+   sudo chown "$USER":"$(id -gn)" /opt/eastbrook/sfx-runtime
+   sh install.sh /opt/eastbrook/sfx-runtime
+   ```
+
+4. Keep the overlay persistent and set `SFX_PACK_DIR` to its `audio/sfx`
+   directory. Docker Compose does this with `EASTBROOK_SFX_DIR`, which defaults
+   to `./sfx-runtime` beside the compose file.
+
+The POSIX installer needs only `/bin/sh` and either `sha256sum` or `shasum`; the
+bootstrap installs `unzip` for extracting the artifact. A Node-based
+`install.mjs` alternative is included too. The installer verifies every
+content-addressed MP3, installs immutable blobs first, and atomically replaces
+`runtime-pack.json` last. It does not delete old
+blobs, because already-open clients and rollback may still reference them. An
+artifact with a different compiled catalog hash, a missing fixed key, or an
+unsupported extra key is rejected by the client and needs a normal game
+deployment instead. Compatible constrained mob-subfamily keys may be added by
+an artifact.
+
+## Automatic production CPU incident capture
+
+`npm run ops:cpu-monitor` watches Docker CPU and attaches to the game only after a
+confirmed trigger. By default it polls every 30 seconds, confirms that two of three
+samples exceed 90%, and then records a 20-second V8 CPU profile at a 4 ms sampling
+interval. The profile is temporary and event-triggered, so the profiler has no
+steady-state game-loop cost.
+
+Run the monitor as a supervised service on an always-on private operations host,
+not in the game container. The Levy Street deployment should manage that service
+in the private Ansible repo, where SSH aliases and credentials already live. A
+representative direct invocation from that host is:
+
+```bash
+npm run ops:cpu-monitor -- \
+  --direct \
+  --host world-of-claudecraft-prod \
+  --container eastbrook-game \
+  --out-dir /var/lib/woc-prod-cpu-monitor
+```
+
+The service unit should use `Restart=always`, `RestartSec=10`, `UMask=0077`, an
+unprivileged local user, and the repository checkout as its working directory. With
+systemd, use `StateDirectory=woc-prod-cpu-monitor` and
+`StateDirectoryMode=0700`; the monitor safely initializes an empty, private,
+service-owned directory on first use. The remote SSH principal needs narrowly
+controlled access to the Docker operations used by the script and to `flock` for
+capture serialization. General `sudo docker` access is effectively root access.
+Use a dedicated principal plus a root-owned forced-command or validation wrapper
+that admits only the exact expected commands for the named container; do not grant
+a wildcard Docker sudo rule to an ordinary account. The PID and profiler clients
+are immutable, root-owned helpers copied into `/app/ops` by the production image,
+and their `docker exec` calls do not consume client-supplied stdin. The wrapper must
+validate the complete `SSH_ORIGINAL_COMMAND`, reject unexpected stdin, and allow
+only those fixed helper paths. Checking only a `docker exec` command prefix still
+permits arbitrary code execution in the production container and is not sufficient.
+
+The monitor verifies private file ownership and permissions, uses local and remote
+exclusive locks, and retains at most 24 validated captures or 30 days of captures.
+Captures and process logs can contain sensitive operational data, so the artifact
+directory must stay private and must not be served over HTTP.
+
+Each incident directory includes `cpu.cpuprofile`, game and perf logs,
+container/process snapshots, Docker stats before/during/after, metadata, and SHA-256
+checksums. Open `cpu.cpuprofile` with the Load profile action in the Chrome DevTools
+Performance panel. Review `metadata.json` first: `complete` should be true and
+`profileStartDelayMs` records the delay until the profiler acknowledged it had
+started. A fully complete directory also contains a `COMPLETE` marker written after
+the metadata and checksum manifest. A valid CPU profile is retained even if
+supporting context is degraded. The `errors` array explains any missing auxiliary
+artifact without triggering a second profile every two minutes.
+
+Detailed tick-profiler JSON is optional. It requires an existing staff bearer that
+can access the `ops.perf` admin routes, supplied through a service-owned mode-0600
+file with `--ops-token-file`. The current role model does not provide a dedicated
+machine-only bearer, so do not copy a broad personal admin session into the service.
+Provision a narrowly scoped service credential in the server before enabling this
+option. When enabled, `tickCapture` in `metadata.json` must be `complete`.
+The tick result also records loop callback count, sim tick count, catch-up callback
+count, and maximum ticks per callback so callback aggregation is visible during a
+saturation event.
+
+Before enabling the service, verify its SSH user has only the required passwordless
+Docker commands and run one controlled check:
+
+```bash
+npm run ops:cpu-monitor -- --once --dry-run --direct \
+  --host world-of-claudecraft-prod \
+  --container eastbrook-game \
+  --out-dir /var/lib/woc-prod-cpu-monitor
+```
+
+Once automatic tick capture is working, remove `PERF_TICK_LOG=1` from production.
+The admin-triggered profiler enables detailed sim sub-phase timing only during its
+wall-clock capture window; leaving the environment flag enabled would keep that
+extra instrumentation active on every tick.
 
 ## Admin dashboard
 
@@ -238,7 +368,7 @@ server health) is served by the same game server process:
   `npm run dev`).
 
 Access requires signing in with a game account that has the `is_admin`
-flag. The hostname only selects which HTML shell is served — every
+flag. The hostname only selects which HTML shell is served; every
 `/admin/api/*` call is checked against the account flag.
 
 Grant the first admin:

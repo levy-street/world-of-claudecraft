@@ -5,6 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
+import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
@@ -194,12 +195,12 @@ function makeCtx() {
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
+    instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
-    grantHeroicKillLockout: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -216,6 +217,16 @@ function makeCtx() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    deedDirtyPids: new Set<number>(),
+    deedDirtyKeys: new Map<number, Set<string>>(),
+    worldBossEntityIds: [],
+    deedRuntime: createDeedRuntime(),
+    fiestaBotPids: [],
+    bumpDeedStat: vi.fn(),
+    markItemDiscovered: vi.fn(),
+    markVisited: vi.fn(),
+    markDeedsDirty: vi.fn(),
+    grantDeed: vi.fn(() => true),
     grantXp: vi.fn(),
     enterCombat: vi.fn(),
     hexOutputMult: vi.fn(() => 1),

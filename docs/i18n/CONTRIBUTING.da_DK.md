@@ -14,7 +14,7 @@ velkommen her.
 
 Denne guide hjælper dig med at komme i gang og gøre dit første bidrag nemt. Du
 behøver ikke at være ekspert. Hvis noget er uklart, så spørg på
-[Discord](https://discord.gg/GjhnUsBtw), og der er nogen, der gerne hjælper.
+[Discord](https://discord.com/invite/worldofclaudecraft), og der er nogen, der gerne hjælper.
 
 Ved at deltage accepterer du at følge vores [adfærdskodeks](../../CODE_OF_CONDUCT.md).
 
@@ -176,7 +176,7 @@ ikke at skrive nogen spilkode for at gøre det:
    PR.
 
 For at foreslå en helt ny lokalitet eller for at drøfte tone og terminologi kan
-du starte en tråd på [Discord](https://discord.gg/GjhnUsBtw), så hjælper vi dig
+du starte en tråd på [Discord](https://discord.com/invite/worldofclaudecraft), så hjælper vi dig
 med at koble den op. Indfødte og flydende talere er især velkomne. Gode
 oversættelser får spillet til at føles hjemligt for spillere overalt.
 
@@ -194,7 +194,7 @@ Brug venligst [issue-skabelonerne](https://github.com/levy-street/world-of-claud
 ## Få hjælp
 
 Sidder du fast, eller vil du bare sige hej? Tilslut dig
-[fællesskabets Discord](https://discord.gg/GjhnUsBtw). Intet spørgsmål er for
+[fællesskabets Discord](https://discord.com/invite/worldofclaudecraft). Intet spørgsmål er for
 lille, og nye bidragydere er altid velkomne.
 
 ## Licens

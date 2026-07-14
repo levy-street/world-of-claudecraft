@@ -66,6 +66,10 @@ const DISPATCHER_SOURCES = [
   new URL('../../../server/oauth.ts', import.meta.url),
   new URL('../../../server/internal.ts', import.meta.url),
   new URL('../../../server/daily_rewards.ts', import.meta.url),
+  // claudium.ts is a PREFIX-DELEGATED sub-dispatcher like daily_rewards.ts: its
+  // exact-path arms (and the price/:rail Match regex) sit behind
+  // startsWith('/api/claudium') in main.ts, so the scan must read it too.
+  new URL('../../../server/claudium.ts', import.meta.url),
 ] as const;
 
 const API_PREFIX_ALTERNATION = '(?:api|admin\\/api|internal|oauth)';

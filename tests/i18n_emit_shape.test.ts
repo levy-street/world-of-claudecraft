@@ -74,7 +74,7 @@ function assertEmitSurface(
   loaders: Record<string, () => Promise<unknown>>,
   supported: readonly string[],
 ) {
-  // Barrel translations map: exactly the 14 locales, in emit order, en_XA EXCLUDED.
+  // Barrel translations map: exactly the 21 locales, in emit order, en_XA EXCLUDED.
   expect(Object.keys(translations), `${label}: translations key set`).toEqual(ALL_LOCALES);
   expect('en_XA' in translations, `${label}: en_XA must NOT be in translations`).toBe(false);
   expect(translations.en, `${label}: en present`).toBeTypeOf('object');

@@ -1,19 +1,22 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getWallets } from '@wallet-standard/app';
-import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
+import { SOLANA_MAINNET_CHAIN } from '@solana/wallet-standard-chains';
 import {
-  StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
-  type StandardConnectInput,
-  type StandardEventsChangeProperties,
-} from '@wallet-standard/features';
-import {
+  SolanaSignAndSendTransaction,
+  type SolanaSignAndSendTransactionInput,
+  type SolanaSignAndSendTransactionOutput,
   SolanaSignMessage,
   type SolanaSignMessageInput,
   type SolanaSignMessageOutput,
 } from '@solana/wallet-standard-features';
-import { SOLANA_MAINNET_CHAIN } from '@solana/wallet-standard-chains';
+import { getWallets } from '@wallet-standard/app';
+import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
+import {
+  StandardConnect,
+  type StandardConnectInput,
+  StandardDisconnect,
+  StandardEvents,
+  type StandardEventsChangeProperties,
+} from '@wallet-standard/features';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const ICON = 'data:image/svg+xml;base64,PHN2Zy8+' as WalletIcon;
 
@@ -28,23 +31,31 @@ function registerWallet(wallet: Wallet): void {
   unregisters.push(getWallets().register(wallet));
 }
 
-function account(address: string): WalletAccount {
+function account(address: string, transactionSupport = true): WalletAccount {
   return {
     address,
     publicKey: new Uint8Array(32),
     chains: [SOLANA_MAINNET_CHAIN],
-    features: [SolanaSignMessage],
+    features: transactionSupport
+      ? [SolanaSignMessage, SolanaSignAndSendTransaction]
+      : [SolanaSignMessage],
   };
 }
 
-function makeWallet(opts: {
-  name?: string;
-  address?: string;
-  authorized?: boolean;
-  delayConnect?: () => Promise<void>;
-  modifySignedMessage?: boolean;
-} = {}) {
-  const walletAccount = account(opts.address ?? '8zcEHjvY46ETifvoNbnQ6FbsWc9XyF2KxRTkwHqPfank');
+function makeWallet(
+  opts: {
+    name?: string;
+    address?: string;
+    authorized?: boolean;
+    delayConnect?: () => Promise<void>;
+    modifySignedMessage?: boolean;
+    transactionSupport?: boolean;
+  } = {},
+) {
+  const walletAccount = account(
+    opts.address ?? '8zcEHjvY46ETifvoNbnQ6FbsWc9XyF2KxRTkwHqPfank',
+    opts.transactionSupport !== false,
+  );
   let accounts: readonly WalletAccount[] = opts.authorized ? [walletAccount] : [];
   const listeners = new Set<(props: StandardEventsChangeProperties) => void>();
   const emitAccounts = () => {
@@ -61,12 +72,41 @@ function makeWallet(opts: {
     accounts = [];
     emitAccounts();
   });
-  const signMessage = vi.fn(async (...inputs: readonly SolanaSignMessageInput[]): Promise<readonly SolanaSignMessageOutput[]> => {
-    return inputs.map((input) => ({
-      signedMessage: opts.modifySignedMessage ? new Uint8Array([9, 9, 9]) : input.message,
-      signature: new Uint8Array([1, 2, 3, 4]),
-    }));
-  });
+  const signMessage = vi.fn(
+    async (
+      ...inputs: readonly SolanaSignMessageInput[]
+    ): Promise<readonly SolanaSignMessageOutput[]> => {
+      return inputs.map((input) => ({
+        signedMessage: opts.modifySignedMessage ? new Uint8Array([9, 9, 9]) : input.message,
+        signature: new Uint8Array([1, 2, 3, 4]),
+      }));
+    },
+  );
+  const signAndSendTransaction = vi.fn(
+    async (
+      ...inputs: readonly SolanaSignAndSendTransactionInput[]
+    ): Promise<readonly SolanaSignAndSendTransactionOutput[]> =>
+      inputs.map(() => ({ signature: new Uint8Array([4, 3, 2, 1]) })),
+  );
+  const features: Record<string, unknown> = {
+    [StandardConnect]: { version: '1.0.0', connect },
+    [StandardDisconnect]: { version: '1.0.0', disconnect },
+    [StandardEvents]: {
+      version: '1.0.0',
+      on: (_event: 'change', listener: (props: StandardEventsChangeProperties) => void) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener);
+      },
+    },
+    [SolanaSignMessage]: { version: '1.1.0', signMessage },
+  };
+  if (opts.transactionSupport !== false) {
+    features[SolanaSignAndSendTransaction] = {
+      version: '1.0.0',
+      supportedTransactionVersions: ['legacy'],
+      signAndSendTransaction,
+    };
+  }
   const wallet: Wallet = {
     version: '1.0.0',
     name: opts.name ?? 'Mock Wallet',
@@ -75,20 +115,16 @@ function makeWallet(opts: {
     get accounts() {
       return accounts;
     },
-    features: {
-      [StandardConnect]: { version: '1.0.0', connect },
-      [StandardDisconnect]: { version: '1.0.0', disconnect },
-      [StandardEvents]: {
-        version: '1.0.0',
-        on: (_event: 'change', listener: (props: StandardEventsChangeProperties) => void) => {
-          listeners.add(listener);
-          return () => listeners.delete(listener);
-        },
-      },
-      [SolanaSignMessage]: { version: '1.1.0', signMessage },
-    },
+    features: features as Wallet['features'],
   };
-  return { wallet, account: walletAccount, connect, disconnect, signMessage };
+  return {
+    wallet,
+    account: walletAccount,
+    connect,
+    disconnect,
+    signMessage,
+    signAndSendTransaction,
+  };
 }
 
 afterEach(() => {
@@ -171,6 +207,46 @@ describe('Wallet Standard Solana adapter', () => {
     await wallet.openWalletModal();
 
     await expect(wallet.signMessageBase58('hello')).rejects.toThrow(/modified/i);
+  });
+
+  it('allows message signing with a wallet that cannot send transactions', async () => {
+    const mock = makeWallet({ transactionSupport: false });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    wallet.setWalletPicker(async (options) => options[0]?.id ?? null);
+    await wallet.openWalletModal();
+
+    await expect(wallet.signMessageBase58('hello')).resolves.toBe('2VfUX');
+    expect(mock.signMessage).toHaveBeenCalledOnce();
+  });
+
+  it('asks the wallet to sign and send a service-built transaction', async () => {
+    const mock = makeWallet();
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    wallet.setWalletPicker(async (options) => options[0]?.id ?? null);
+    await wallet.openWalletModal();
+
+    await expect(wallet.signAndSendTransactionBase64('AQID')).resolves.toBe('6wxj2');
+    expect(mock.signAndSendTransaction).toHaveBeenCalledWith({
+      account: mock.account,
+      chain: SOLANA_MAINNET_CHAIN,
+      transaction: new Uint8Array([1, 2, 3]),
+      options: { preflightCommitment: 'confirmed' },
+    });
+  });
+
+  it('reports when a connected wallet cannot sign and send transactions', async () => {
+    const mock = makeWallet({ transactionSupport: false });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    wallet.setWalletPicker(async (options) => options[0]?.id ?? null);
+    await wallet.openWalletModal();
+
+    await expect(wallet.signAndSendTransactionBase64('AQID')).rejects.toThrow(
+      /cannot sign and send/i,
+    );
+    expect(mock.signAndSendTransaction).not.toHaveBeenCalled();
   });
 
   it('disconnects the browser wallet session without keeping a stale address', async () => {

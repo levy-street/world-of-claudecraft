@@ -12,7 +12,7 @@ import type { ItemDef } from '../types';
 //
 // Jewelry carries no armorType, so every class can wear every piece; the stat
 // identity picks its audience. Prices are tunable placeholders sized against
-// the daily-gated income of at most 4 marks per UTC day.
+// the four heroic-final-boss rewards available during each realm reset cycle.
 
 export const HEROIC_VENDOR_NPC_ID = 'heroic_quartermaster';
 

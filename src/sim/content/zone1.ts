@@ -29,19 +29,19 @@ export const ZONE1_ZONE: ZoneDef = {
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
-    { x: 0, z: -3, label: 'Eastbrook' },
-    { x: -2, z: 70, label: 'Wolf Run' },
-    { x: 65, z: 0, label: 'Boar Meadow' },
-    { x: -88, z: 82, label: 'Mirror Lake' },
-    { x: -60, z: 4, label: 'Sableweb' },
-    { x: -84, z: -64, label: 'Copper Dig' },
-    { x: 76, z: -76, label: 'Bandit Camp' },
-    { x: 80, z: 80, label: 'Fallen Chapel' },
-    { x: -5, z: -52, label: 'Reliquary Hill' },
-    { x: 40, z: 140, label: 'Brightwood Glade' },
-    { x: -11, z: -112, label: 'The Sowfield' },
+    { x: 0, z: -3, label: 'Eastbrook', id: 'eastbrook' },
+    { x: -2, z: 70, label: 'Wolf Run', id: 'wolf_run' },
+    { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
+    { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
+    { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
+    { x: -84, z: -64, label: 'Copper Dig', id: 'copper_dig' },
+    { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
+    { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
+    { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
+    { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
+    { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
   ],
-  welcome: 'Find Marshal Redbrook in town — he has work for you.',
+  welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
 };
 
@@ -672,6 +672,21 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
   },
+  chronicler_saul: {
+    id: 'chronicler_saul',
+    name: 'Saul the Chronicler',
+    title: 'The Vale Chronicle',
+    // Southeast corner of the square, on the quiet side away from the well
+    // cluster and the player start, looking back northwest across the square
+    // (nearest authored neighbor ~13 units; he had been shoulder to shoulder
+    // with the well crowd).
+    pos: { x: 15, z: -16 },
+    facing: 2.4,
+    color: 0xd08a2e, // warm amber: the chronicler tint is his identity (shared mage visual)
+    questIds: [],
+    greeting:
+      'Every deed worth doing is worth writing down twice, $N: once for the ledger and once for the fireside.',
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -702,7 +717,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'A Trade for Every Hand',
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
-    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins in the rocks around the Copper Dig, southwest of town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
     completionText:
       "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
     objectives: [{ type: 'collect', itemId: 'chunk_of_ore', count: 5, label: 'Chunk of Ore' }],
@@ -1219,7 +1234,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
   wells: [{ x: 0, z: 2, r: 1.5 }],
   stalls: [
     { x: -8.5, z: 3, rot: Math.PI / 2, r: 1.7 },
-    { x: 9.5, z: 17.5, rot: -2.7, r: 1.7 }, // Smith Haldren's smithy stall
+    { x: 9.5, z: 17.5, rot: -2.7, r: 1.7, smithy: true }, // Smith Haldren's stall
     { x: 0, z: 11.5, rot: Math.PI, r: 1.8 }, // The Merchant's World Market stall
   ],
   mines: [{ x: -88, z: -68, rot: 0.8 }],

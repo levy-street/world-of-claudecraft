@@ -18,9 +18,12 @@ COPY public ./public
 COPY private ./private
 # Public client config is inlined into the bundle at build time (Vite reads
 # VITE_* from the environment). Empty defaults keep optional UI disabled:
-# Turnstile widget off. Passed through from compose build args.
+# Turnstile widget off; wallet UI enabled unless explicitly disabled.
+# Passed through from compose build args.
 ARG VITE_TURNSTILE_SITEKEY=""
+ARG VITE_WALLET_DISABLED=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
+    VITE_WALLET_DISABLED="$VITE_WALLET_DISABLED" \
     npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
 
 FROM node:22-alpine
@@ -30,6 +33,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/media-build ./media-build
 COPY --from=build /app/dist-server ./dist-server
 COPY --from=build /app/dist-bot ./dist-bot
+COPY --from=build /app/scripts/prod_cpu_game_helper.mjs /app/ops/
+COPY --from=build /app/scripts/prod_cpu_profile_client.mjs /app/ops/
 RUN mkdir -p /app/dist/media && chown -R node:node /app/dist/media
 EXPOSE 8787
 USER node

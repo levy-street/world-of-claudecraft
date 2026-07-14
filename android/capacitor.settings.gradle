@@ -7,6 +7,3 @@ project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/
 
 include ':capacitor-browser'
 project(':capacitor-browser').projectDir = new File('../node_modules/@capacitor/browser/android')
-
-include ':capacitor-live-updates'
-project(':capacitor-live-updates').projectDir = new File('../node_modules/@capacitor/live-updates/android')

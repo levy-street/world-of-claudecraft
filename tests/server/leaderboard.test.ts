@@ -16,10 +16,11 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase10_u
 
 import type * as http from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { SheetRank } from '../../server/character_sheet';
+import { SHEET_RECENT_DEEDS, type SheetRank } from '../../server/character_sheet';
 import type { ArenaLeaderRow, CharacterRow, CharacterSearchRow } from '../../server/db';
 import {
   ARENA_LEADERBOARD_LIMIT,
+  buildDeedsBoard,
   buildDevBoard,
   buildGuildBoard,
   buildLegacyLimitBoard,
@@ -51,8 +52,10 @@ import {
   publicReadRateLimited,
   resetPublicReadRateLimits,
 } from '../../server/ratelimit';
+import { DEEDS } from '../../src/sim/content/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../../src/sim/leaderboard_page';
 import type {
+  DeedsLeaderboardEntry,
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
   LeaderboardEntry,
@@ -89,6 +92,19 @@ function devRow(rank: number): DevLeaderboardEntry {
   return { rank, login: `dev${rank}`, mergedPrs: 100 - rank, devTier: 5 };
 }
 
+function deedsRow(rank: number): DeedsLeaderboardEntry {
+  return {
+    rank,
+    name: `Chronicler${rank}`,
+    realm: 'Claudemoon',
+    cls: 'warrior' as DeedsLeaderboardEntry['cls'],
+    level: 20,
+    renown: 500 - rank,
+    deedCount: 40 - rank,
+    title: rank === 1 ? 'prog_veteran' : null,
+  };
+}
+
 function arenaRow(name: string): ArenaLeaderRow {
   return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 };
 }
@@ -115,6 +131,8 @@ function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRu
     getLeaderboard: async () => [],
     getGuildLeaderboard: async () => [],
     getDevLeaderboard: async () => [],
+    getDeedsLeaderboard: async () => [],
+    deedsSelfRank: async () => null,
     getReleases: async () => [],
     githubRepo: 'levy-street/world-of-claudecraft',
     releasesMaxLimit: 20,
@@ -254,6 +272,37 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     expect(Array.isArray(body.leaders)).toBe(true);
     expect(body.total).toBe(2);
   });
+
+  it('buildDeedsBoard tags board=deeds, the renown metric, and a FIXED global scope', () => {
+    const body = buildDeedsBoard(REALM_NAME, [deedsRow(1), deedsRow(2)], 0, 50, null) as Record<
+      string,
+      unknown
+    >;
+    expect(body.board).toBe('deeds');
+    expect(body.metric).toBe('renown');
+    // Account-level board: the scope is always 'global', whatever ?scope said.
+    expect(body.scope).toBe('global');
+    expect(body.realm).toBe(REALM_NAME);
+    expect(Array.isArray(body.leaders)).toBe(true);
+    expect(body.total).toBe(2);
+    // No self row for an anonymous or unranked caller: the key is ABSENT, not null.
+    expect('self' in body).toBe(false);
+    // The entry is the public shape: character-faced, never an account id.
+    const first = (body.leaders as Record<string, unknown>[])[0];
+    expect(first.name).toBe('Chronicler1');
+    expect(first.renown).toBe(499);
+    expect(first.deedCount).toBe(39);
+    expect(first.title).toBe('prog_veteran');
+    expect('accountId' in first).toBe(false);
+  });
+
+  it('buildDeedsBoard attaches the self standing when the route resolved one', () => {
+    const body = buildDeedsBoard(REALM_NAME, [deedsRow(1)], 0, 50, {
+      rank: 12,
+      topPercent: 4,
+    }) as Record<string, unknown>;
+    expect(body.self).toEqual({ rank: 12, topPercent: 4 });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -378,6 +427,92 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     expect(body.guild).toBe('Nomads');
     expect(body.rank).toBeNull();
   });
+
+  it('renders a delisted subject with name and level intact but no rank', async () => {
+    // A banned or suspended subject: lifetimeXpRankForCharacter now returns null
+    // for a delisted account (server/db.ts gates the public read's own subquery on
+    // ELIGIBLE_ACCOUNT_SQL), so a banned top account no longer publicly shows rank
+    // #1. The public sheet must still render the character (name + level) with the
+    // rank line simply absent, never a 404. Modeled here as a null rank read.
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(23, 'Delisted'));
+    // No seedStanding: the db-level eligibility gate surfaces as a null rank.
+    const out = await readPublicSheet(db, 'Delisted', sheetDeps);
+    expect(out.status).toBe(200);
+    const body = out.body as Record<string, unknown>;
+    expect(body.name).toBe('Delisted');
+    expect(body.level).toBe(42);
+    expect(body.rank).toBeNull();
+  });
+
+  it('carries the deeds summary block, with the recent strip read through the sheet bound', async () => {
+    const db = new FakeCharactersDb();
+    const row = characterRow(31, 'Chronic');
+    row.state = {
+      ...(row.state ?? {}),
+      deeds: { prog_first_steps: '2026-07-01', prog_veteran: '2026-07-08' },
+      renown: 15,
+      activeTitle: 'prog_veteran',
+    } as typeof row.state;
+    db.seed(row);
+    // Seed one more row than the bound to prove the limit is passed through.
+    // Real catalog ids: the public arm fails CLOSED on unknown or hidden ids
+    // (mixed-version fleet / rollback skew), so a synthetic deed_N fixture
+    // would be stripped and assert nothing about the bound.
+    const recentIds = [
+      'prog_first_steps',
+      'prog_finding_your_feet',
+      'prog_double_digits',
+      'prog_the_long_middle',
+      'prog_level_cap',
+      'prog_well_rested',
+    ];
+    expect(recentIds.length).toBe(SHEET_RECENT_DEEDS + 1);
+    for (const id of recentIds) expect(DEEDS[id]?.hidden).not.toBe(true);
+    const seeded = recentIds.map((deedId, i) => ({
+      deedId,
+      earnedAt: `2026-07-0${Math.min(i + 1, 8)}T00:00:00.000Z`,
+    }));
+    db.seedRecentDeeds(31, seeded);
+    const spy = vi.spyOn(db, 'recentDeedsForCharacter');
+    const out = await readPublicSheet(db, 'Chronic', sheetDeps);
+    expect(out.status).toBe(200);
+    const body = out.body as Record<string, unknown>;
+    expect(spy).toHaveBeenCalledWith(31, SHEET_RECENT_DEEDS);
+    expect(body.deeds).toEqual({
+      renown: 15,
+      earnedCount: 2,
+      activeTitle: 'prog_veteran',
+      // The public arm coarsens earnedAt to the UTC day (activity-timing privacy).
+      recent: seeded
+        .slice(0, SHEET_RECENT_DEEDS)
+        .map(({ deedId, earnedAt }) => ({ deedId, earnedAt: earnedAt.slice(0, 10) })),
+    });
+  });
+
+  it('a pre-deeds save serves a zeroed deeds block, not a missing key', async () => {
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(32, 'Oldtimer'));
+    const out = await readPublicSheet(db, 'Oldtimer', sheetDeps);
+    const body = out.body as Record<string, unknown>;
+    expect(body.deeds).toEqual({ renown: 0, earnedCount: 0, activeTitle: null, recent: [] });
+  });
+
+  it('strips hidden deeds from the public recent strip (existence is part of the contract)', async () => {
+    // Fixture guard: the exemplar must actually be hidden in the catalog.
+    expect(DEEDS.hid_saul_footnote.hidden).toBe(true);
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(33, 'Secretive'));
+    db.seedRecentDeeds(33, [
+      { deedId: 'hid_saul_footnote', earnedAt: '2026-07-08T00:00:00.000Z' },
+      { deedId: 'prog_veteran', earnedAt: '2026-07-07T00:00:00.000Z' },
+    ]);
+    const out = await readPublicSheet(db, 'Secretive', sheetDeps);
+    const body = out.body as Record<string, unknown>;
+    expect((body.deeds as { recent: unknown }).recent).toEqual([
+      { deedId: 'prog_veteran', earnedAt: '2026-07-07' },
+    ]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -386,14 +521,35 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online } with NO names list', async () => {
+  it('returns counts only: { ok, realm, players_online, steam } with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
     const { status, body } = captured(ctx.res);
     expect(status).toBe(200);
-    expect(body).toEqual({ ok: true, realm: REALM_NAME, players_online: 4 });
+    expect(body).toEqual({
+      ok: true,
+      realm: REALM_NAME,
+      players_online: 4,
+      steam: { enabled: false },
+    });
     expect('names' in (body as object)).toBe(false);
+  });
+
+  it('adverts steam.enabled true when STEAM_ENABLED=1 (the capability advert)', async () => {
+    const saved = process.env.STEAM_ENABLED;
+    process.env.STEAM_ENABLED = '1';
+    try {
+      configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+      const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect((body as { steam: { enabled: boolean } }).steam).toEqual({ enabled: true });
+    } finally {
+      if (saved === undefined) delete process.env.STEAM_ENABLED;
+      else process.env.STEAM_ENABLED = saved;
+    }
   });
 });
 
@@ -492,6 +648,104 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     await handlerFor('/api/leaderboard')(ctx);
     expect(scopes).toEqual(['global']);
     expect((captured(ctx.res).body as Record<string, unknown>).scope).toBe('global');
+  });
+
+  it('serves the Renown fork anonymously with no self row and no self read', async () => {
+    const selfReads: number[] = [];
+    configureLeaderboardRuntime(
+      fakeRuntime({
+        getDeedsLeaderboard: async () => [deedsRow(1), deedsRow(2)],
+        deedsSelfRank: async (accountId) => {
+          selfReads.push(accountId);
+          return { rank: 1, topPercent: 1 };
+        },
+      }),
+    );
+    const ctx = fakeCtx({ method: 'GET', url: '/api/leaderboard', query: { board: 'deeds' } });
+    await handlerFor('/api/leaderboard')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    const b = body as Record<string, unknown>;
+    expect(b.board).toBe('deeds');
+    expect(b.metric).toBe('renown');
+    expect(b.total).toBe(2);
+    expect('self' in b).toBe(false);
+    // Anonymous callers never trigger the self-rank read at all.
+    expect(selfReads).toEqual([]);
+  });
+
+  it('ignores ?scope on the Renown fork: the body always says global', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ getDeedsLeaderboard: async () => [deedsRow(1)] }));
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/api/leaderboard',
+      query: { board: 'deeds', scope: 'realm' },
+    });
+    await handlerFor('/api/leaderboard')(ctx);
+    expect((captured(ctx.res).body as Record<string, unknown>).scope).toBe('global');
+  });
+
+  it('serves the self standing to an authenticated ranked caller', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({
+        getDeedsLeaderboard: async () => [deedsRow(1)],
+        deedsSelfRank: async (accountId) => (accountId === 77 ? { rank: 12, topPercent: 4 } : null),
+      }),
+    );
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/api/leaderboard',
+      query: { board: 'deeds' },
+      account: { accountId: 77, scope: 'read' },
+    });
+    await handlerFor('/api/leaderboard')(ctx);
+    const b = captured(ctx.res).body as Record<string, unknown>;
+    expect(b.self).toEqual({ rank: 12, topPercent: 4 });
+  });
+
+  it('serves an authenticated but UNRANKED caller the board with no self key', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({
+        getDeedsLeaderboard: async () => [deedsRow(1)],
+        deedsSelfRank: async () => null,
+      }),
+    );
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/api/leaderboard',
+      query: { board: 'deeds' },
+      account: { accountId: 5, scope: 'read' },
+    });
+    await handlerFor('/api/leaderboard')(ctx);
+    const b = captured(ctx.res).body as Record<string, unknown>;
+    expect(b.board).toBe('deeds');
+    expect('self' in b).toBe(false);
+  });
+
+  it('rejects a malformed bearer on the Renown fork instead of serving it as anonymous', async () => {
+    configureLeaderboardRuntime(fakeRuntime());
+    const ctx = fakeCtx({
+      method: 'GET',
+      url: '/api/leaderboard',
+      query: { board: 'deeds' },
+      headers: { authorization: 'Bearer not-a-real-token' },
+    });
+    // A non-64-hex header fails the format check (auth.token_missing) without
+    // any db read, proving a present token is never served as anonymous. The
+    // unknown-but-well-formed arm (auth.token_invalid, a db lookup) is owned
+    // by the shared requireAccount middleware suite.
+    await expect(handlerFor('/api/leaderboard')(ctx)).rejects.toMatchObject({
+      status: 401,
+      code: 'auth.token_missing',
+    });
+  });
+
+  it('keeps the shared route free of middleware so the existing boards stay anonymous', () => {
+    // The Renown fork composes its optional auth IN-HANDLER; mounting it on the
+    // route would newly reject present-but-invalid tokens on the player, guild,
+    // and dev boards, breaking their legacy parity.
+    const route = routes.find((r) => r.path === '/api/leaderboard');
+    expect(route?.middleware).toBeUndefined();
   });
 });
 

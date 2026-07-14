@@ -7,6 +7,7 @@
 //      same name, and the seam leaves same-seed-same-world determinism intact.
 
 import { describe, expect, it, vi } from 'vitest';
+import { createDeedRuntime } from '../src/sim/deeds';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
@@ -139,12 +140,12 @@ const CALLBACK_KEYS = [
   'raidResetMs',
   'instanceKeyFor',
   'instanceOriginOf',
+  'instanceClaimIdAt',
   'enterDungeon',
   'leaveDungeon',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'awardHeroicMarks',
-  'grantHeroicKillLockout',
   // M3 mob-swing affix cascade surface.
   'effectiveArmor',
   'recalcPlayer',
@@ -282,6 +283,16 @@ function makeFakeHost() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    deedDirtyPids: new Set<number>(),
+    deedDirtyKeys: new Map<number, Set<string>>(),
+    worldBossEntityIds: [],
+    deedRuntime: createDeedRuntime(),
+    fiestaBotPids: [],
+    bumpDeedStat: vi.fn(),
+    markItemDiscovered: vi.fn(),
+    markVisited: vi.fn(),
+    markDeedsDirty: vi.fn(),
+    grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
     dealDamage: vi.fn(),
@@ -349,12 +360,12 @@ function makeFakeHost() {
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
+    instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
-    grantHeroicKillLockout: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),

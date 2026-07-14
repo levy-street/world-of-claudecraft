@@ -27,6 +27,7 @@ services:
       args:
         # Build-time public client config inlined into the bundle (see .env.example).
         VITE_TURNSTILE_SITEKEY: ${VITE_TURNSTILE_SITEKEY:-}
+        VITE_WALLET_DISABLED: ${VITE_WALLET_DISABLED:-}
     container_name: eastbrook-game
     restart: unless-stopped
     depends_on:
@@ -92,6 +93,10 @@ services:
       WOC_DAILY_REWARD_SERVICE_URL: ${WOC_DAILY_REWARD_SERVICE_URL:-}
       WOC_DAILY_REWARD_SERVICE_SECRET: ${WOC_DAILY_REWARD_SERVICE_SECRET:-}
       WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
+      WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
+      WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
+      WOC_MINT: ${WOC_MINT:-}
       META_CAPI_PIXEL_ID: ${META_CAPI_PIXEL_ID:-}
       META_CAPI_ACCESS_TOKEN: ${META_CAPI_ACCESS_TOKEN:-}
       META_CAPI_TEST_EVENT_CODE: ${META_CAPI_TEST_EVENT_CODE:-}
@@ -110,11 +115,22 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       EMAIL_API_URL: ${EMAIL_API_URL:-}
       EMAIL_API_KEY: ${EMAIL_API_KEY:-}
-      # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
+      # Optional Steam account link and Book of Deeds achievement mirror.
+      STEAM_ENABLED: ${STEAM_ENABLED:-}
+      STEAM_APP_ID: ${STEAM_APP_ID:-}
+      STEAM_WEB_API_KEY: ${STEAM_WEB_API_KEY:-}
+      # Optional deployable SFX packs live outside the image. Export from SFX
+      # Studio, run its installer against the host overlay root, and this server
+      # reads only the stable runtime manifest plus immutable audio blobs here.
+      SFX_PACK_DIR: /app/sfx-runtime/audio/sfx
+    # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
+      - ${EASTBROOK_SFX_DIR:-./sfx-runtime}:/app/sfx-runtime:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   discord-bot:
     image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}

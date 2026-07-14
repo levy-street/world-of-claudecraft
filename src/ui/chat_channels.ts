@@ -48,12 +48,14 @@ export type ChatTabId = 'all' | 'combat' | ChatOpenTab;
 // Slash prefix prepended to plain text typed while a channel tab is active, so a
 // message reaches that channel without the player retyping the command. These
 // mirror the commands parsed in src/sim/sim.ts and server/game.ts:
-//  - `say` is empty: unprefixed text is /say by default.
+//  - `say` is explicit: online sessions remember whisper/guild modes, so a
+//    neutral Say input must reset that server-side state instead of relying on
+//    unprefixed text.
 //  - `/general ` (not `/g `, which the server routes to GUILD) hits the
 //    always-on general channel.
 //  - `/gu ` / `/o ` are guild / officer (server-side social channels).
 const CHANNEL_SEND_PREFIX: Record<ChatTabChannel, string> = {
-  say: '',
+  say: '/say ',
   yell: '/y ',
   party: '/p ',
   general: '/general ',
@@ -96,6 +98,47 @@ export function chatOpenTabLabelKey(tab: ChatOpenTab): TranslationKey {
   return tab === WHISPER_TAB ? WHISPER_TAB_LABEL_KEY : CHANNEL_LABEL_KEYS[tab];
 }
 
+// Per-channel display colors: the single source of truth shared by the chat LOG
+// lines (hud.ts tints each line by channel) and the chat INPUT (whose text is
+// tinted to signal the channel a plain typed line will reach). Kept here,
+// DOM-free, so both consumers read one table instead of duplicating hex
+// literals. Covers the send-capable tab channels plus the non-tab log channels
+// (whisper, emote, roll). `say` is the neutral default: it doubles as the
+// fallback for any unrecognized log channel and as the "no tint" signal below.
+export type ChatColorChannel = ChatTabChannel | WhisperTab | 'emote' | 'roll';
+
+const CHAT_CHANNEL_COLORS: Record<ChatColorChannel, string> = {
+  say: '#f0ead8',
+  yell: '#ff5040',
+  party: '#7fd4ff',
+  general: '#ffc864',
+  world: '#ff9d5c',
+  lfg: '#5cd6a0',
+  guild: '#40d264',
+  officer: '#4ce0c0',
+  whisper: '#ff80ff',
+  emote: '#ff8040',
+  roll: '#ffd100',
+};
+
+// Color for a chat LOG line on the given channel. Unknown channels fall back to
+// the neutral `say` color, matching the chat switch's historical default arm.
+export function chatChannelColor(channel: string): string {
+  return CHAT_CHANNEL_COLORS[channel as ChatColorChannel] ?? CHAT_CHANNEL_COLORS.say;
+}
+
+// The tint target for the chat input: a standing send channel or the whisper
+// collector (whose plain text replies as a whisper).
+export type ChatInputTintTarget = ChatTabChannel | WhisperTab;
+
+// Tint color for the chat INPUT when a plain typed line will reach `channel`, or
+// null to keep the input's default color. `say` (the neutral default) and no
+// channel both fall back to the default; every other channel tints to its color.
+export function chatInputTint(channel: ChatInputTintTarget | null): string | null {
+  if (channel === null || channel === 'say') return null;
+  return CHAT_CHANNEL_COLORS[channel];
+}
+
 // Compose the text actually sent for a message typed while a channel tab is
 // active. An explicit slash command the player typed always wins (so "/w bob hi"
 // from the World tab still whispers); otherwise the channel prefix is prepended.
@@ -115,6 +158,30 @@ export function composeWhisperReply(typed: string): string {
   const text = typed.trim();
   if (!text || text.startsWith('/')) return text;
   return `/r ${text}`;
+}
+
+// The standing channel the actually-sent line reached, used to update the sticky
+// "last used" send channel so the next opened input (on the All tab) defaults
+// there. Plain text (no leading slash) went to `say`. An explicit slash command
+// maps by its leading token; only the standing channels below are recognized, so
+// whisper / reply (`/w`, `/r`), emotes (`/me`, `/dance`), rolls (`/roll`),
+// channel membership (`/join`, `/leave`), the ambiguous bare `/g` (say offline,
+// guild online), and any unknown command return null and leave the sticky
+// channel unchanged. Host-independent by design: only prefixes that route
+// identically offline and online are mapped (hence `/gu`/`/general`, never `/g`).
+export function sentLineChannel(line: string): ChatTabChannel | null {
+  const text = line.trim();
+  if (!text) return null;
+  if (!text.startsWith('/')) return 'say';
+  if (/^\/p(arty)?\s/i.test(text)) return 'party';
+  if (/^\/y(ell)?\s/i.test(text)) return 'yell';
+  if (/^\/s(ay)?\s/i.test(text)) return 'say';
+  if (/^\/gu(ild)?\s/i.test(text)) return 'guild';
+  if (/^\/o(fficer)?\s/i.test(text)) return 'officer';
+  if (/^\/general\s/i.test(text)) return 'general';
+  if (/^\/world\s/i.test(text)) return 'world';
+  if (/^\/lfg\s/i.test(text)) return 'lfg';
+  return null;
 }
 
 // Persistence: the ordered list of channel tabs the player has opened. The

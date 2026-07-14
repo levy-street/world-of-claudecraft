@@ -389,6 +389,31 @@ describe('taunt and growl', () => {
     expect(wolf.aggroTargetId).toBe(tank.id);
   });
 
+  it('level 10 paladins know Sacred Goad and taunt at 30 yards', () => {
+    expect(abilitiesKnownAt('paladin', 10).some((a) => a.def.id === 'holy_taunt')).toBe(true);
+
+    const sim = new Sim({ seed: 42, playerClass: 'paladin', noPlayer: true });
+    const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
+    const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+    sim.setPlayerLevel(10, tank.id);
+    const wolf = nearestMob(sim, 'forest_wolf', tank);
+    teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
+    teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
+    wolf.threat.set(dps.id, 1000);
+    wolf.aggroTargetId = dps.id;
+    wolf.aiState = 'chase';
+    wolf.inCombat = true;
+    sim.targetEntity(wolf.id, tank.id);
+    tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+
+    sim.castAbility('holy_taunt', tank.id);
+    for (let i = 0; i < 25; i++) sim.tick();
+
+    expect(wolf.threat.get(tank.id)).toBe(1000);
+    expect(wolf.aggroTargetId).toBe(tank.id);
+    expect(wolf.forcedTargetTimer).toBeGreaterThan(0);
+  });
+
   it('growl requires bear form', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);

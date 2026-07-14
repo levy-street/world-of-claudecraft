@@ -24,6 +24,7 @@ const SECONDARY = [
   ['guide.stats.spTitle', 'guide.stats.spBody'],
   ['guide.stats.critTitle', 'guide.stats.critBody'],
   ['guide.stats.dodgeTitle', 'guide.stats.dodgeBody'],
+  ['guide.stats.hasteTitle', 'guide.stats.hasteBody'],
   ['guide.stats.dpsTitle', 'guide.stats.dpsBody'],
 ] as const;
 

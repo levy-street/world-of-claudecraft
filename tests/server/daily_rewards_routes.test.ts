@@ -48,6 +48,7 @@ const h = vi.hoisted(() => {
     balance: null as number | null,
   };
   const db = {
+    banForAccount: vi.fn(async () => null),
     ensureDay: vi.fn(async () => {
       if (state.ensureDayThrows) throw new Error('db exploded');
     }),
@@ -89,6 +90,7 @@ const h = vi.hoisted(() => {
 vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../server/daily_rewards_db')>();
   class FakePgDailyRewardDb {
+    banForAccount = h.db.banForAccount;
     ensureDay = h.db.ensureDay;
     seedTasks = h.db.seedTasks;
     tasksForAccount = h.db.tasksForAccount;

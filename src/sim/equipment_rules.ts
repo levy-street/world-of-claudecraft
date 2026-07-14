@@ -1,4 +1,10 @@
-import type { ArmorType, EquipSlot, ItemDef, PlayerClass } from './types';
+import {
+  ALL_CLASSES,
+  type ArmorType,
+  type EquipSlot,
+  type ItemDef,
+  type PlayerClass,
+} from './types';
 
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
@@ -71,6 +77,17 @@ export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
   if (sameClassSet(item.requiredClass, CASTER_WEAPON_CLASSES)) return 'caster';
   if (sameClassSet(item.requiredClass, ROGUE_WEAPON_CLASSES)) return 'rogue';
   return null;
+}
+
+// The full set of classes `canEquipItem` actually admits for a given armor weight,
+// i.e. every class whose max armor rank is at least `armorType`'s rank. Used to tell
+// a genuinely enforced armor class list (one that names exactly this set, e.g. mail
+// naming only warrior/paladin/shaman) apart from `requiredClass` values that are
+// narrower loot-targeting metadata `canEquipItem` never reads (armor short-circuits
+// on weight before it would reach `requiredClass`).
+export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[] {
+  const rank = ARMOR_RANK[armorType];
+  return ALL_CLASSES.filter((cls) => ARMOR_RANK[maxArmorTypeForClass(cls)] >= rank);
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {

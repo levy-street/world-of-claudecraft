@@ -25,7 +25,7 @@ export interface BagItemInfo {
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
   noDiscard?: boolean;
-  /** Bound to its owner: cannot be destroyed, traded, mailed, listed, or sold. */
+  /** Bound to its owner: cannot be traded, mailed, listed, or sold. */
   soulbound?: boolean;
 }
 
@@ -167,12 +167,14 @@ export function bagsWindowShown(display: string): boolean {
   return display !== 'none' && display !== '';
 }
 
-/** What a right-click (destroy affordance) on a bag item does. 'discard' opens the
- *  destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
- *  means the destroy affordance is inert. */
+/** What the shift+right-click destroy affordance on a bag item does. 'discard' opens
+ *  the destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
+ *  means the destroy affordance is inert. A plain right-click (no shift) now runs the
+ *  same primary action as a left-click (equip/use/etc, via bagItemAction), matching
+ *  classic-MMO expectations instead of destroying the item by surprise (issue 1852). */
 export type BagDestroyAction = 'discard' | 'discardBlocked' | 'none';
 
-/** Decide the right-click destroy affordance for a bag item. Inert in the
+/** Decide the shift+right-click destroy affordance for a bag item. Inert in the
  *  transactional modes (trade / mail / market / vendor / pet-feed / bank-deposit),
  *  whose own click/contextmenu owns the slot; a noDiscard item is protected with
  *  feedback, every other item can be destroyed (mirrors the sim's discardItem rule,
@@ -187,7 +189,7 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
     mode.bankDeposit
   )
     return 'none';
-  if (item.noDiscard || item.soulbound) return 'discardBlocked';
+  if (item.noDiscard) return 'discardBlocked';
   return 'discard';
 }
 

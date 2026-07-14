@@ -166,6 +166,26 @@ export function shouldSeedFormBar(
   return hotbarActionsEqual(parsedForm, parsedNormal);
 }
 
+// Rebuild the bar for a switched talent loadout. A `SavedLoadout.bar` only ever
+// records ability ids (the caller's currentBar mapping strips item shortcuts
+// before saving), so replacing the WHOLE bar from it wipes any potion/food/drink
+// slot the loadout never captured. A loadout slot with a resolvable ability id
+// fully replaces whatever was there; every other slot keeps its existing item
+// shortcut (if any) instead of being cleared.
+export function applyLoadoutBar(
+  current: readonly HotbarAction[],
+  bar: readonly (string | null)[],
+  slots: number,
+  abilityExists: (id: string) => boolean,
+): HotbarAction[] {
+  return Array.from({ length: slots }, (_, i) => {
+    const v = bar[i];
+    if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
+    const existing = current[i];
+    return existing?.type === 'item' ? existing : null;
+  });
+}
+
 export function syncHotbarActions(
   actions: readonly HotbarAction[],
   knownAbilityIds: readonly string[],

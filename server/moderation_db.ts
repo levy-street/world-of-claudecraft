@@ -1,3 +1,8 @@
+import {
+  normalizeStreamerLink,
+  STREAMER_PLATFORMS,
+  type StreamerLinks,
+} from '../src/sim/account_flair';
 import { pool } from './db';
 
 export const REPORT_REASONS = [
@@ -29,6 +34,16 @@ export const MODERATION_ACTIONS = [
   'note',
   'force_rename',
   'reset_password',
+  'daily_rewards_ban',
+  'daily_rewards_unban',
+  'daily_rewards_ip_ban',
+  'daily_rewards_ip_unban',
+  // Account flair. Not punitive (they grant a cosmetic mark, they do not sanction),
+  // so unlike every action above they take an OPTIONAL reason. Audited all the same:
+  // the AI mark and a streamer's links are visible to every player, so who set them
+  // and when has to be recoverable.
+  'set_ai',
+  'set_streamer',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -384,6 +399,20 @@ export async function ignoreReport(
   return (res.rowCount ?? 0) > 0;
 }
 
+// Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind, so
+// main.ts can bust the public board caches: a ban delists and an unban relists
+// immediately instead of waiting out a board TTL. Injected at boot the same
+// runtime-injection way as the route modules (this module must not import
+// main.ts). Hooking the write itself, rather than one route, covers every
+// caller: both admin dispatch arms AND the in-game GM sanctions
+// (server/game.ts ModerationService).
+let onAccountModerated: (() => void) | null = null;
+
+/** Inject (or clear) the post-moderation hook. Called once at boot by main.ts. */
+export function setOnAccountModerated(hook: (() => void) | null): void {
+  onAccountModerated = hook;
+}
+
 export async function moderateAccount(input: {
   accountId: number;
   adminAccountId: number;
@@ -468,6 +497,13 @@ export async function moderateAccount(input: {
   } finally {
     client.release();
   }
+  // The action is committed; a cache-bust failure must never surface as a
+  // failed moderation action, so the hook runs outside the transaction path.
+  try {
+    onAccountModerated?.();
+  } catch (err) {
+    console.error('post-moderation hook failed:', err);
+  }
 }
 
 export async function muteAccountChat(input: {
@@ -539,6 +575,116 @@ export async function liftAccountChatMute(input: {
   }
 }
 
+/**
+ * Mark an account as AI-operated (or clear the mark). Cosmetic and non-punitive, so
+ * the reason is optional, but the write is audited exactly like a sanction: the mark
+ * shows on the nameplate and every chat line the account sends.
+ */
+export async function setAccountAiFlag(input: {
+  accountId: number;
+  adminAccountId: number;
+  ai: boolean;
+  reason?: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('UPDATE accounts SET is_ai = $2 WHERE id = $1', [input.accountId, input.ai]);
+    await recordModerationAction(client, 'set_ai', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Set an account's streamer flair: the flag plus the platform links. Every supplied
+ * link goes through normalizeStreamerLink (https only, that platform's own hosts, no
+ * credentials, length-capped) and a non-empty value that fails is REJECTED for the
+ * whole write rather than silently dropped, so an operator never believes they saved
+ * a link that was thrown away. Only the normalized bag is stored.
+ *
+ * The links are stored even when `streamer` is false: UNMARKING PRESERVES THEM, so
+ * re-marking an account does not make the operator retype four URLs. wireStreamerLinks
+ * is what gates them off the wire, so nothing ships while the flag is down, and
+ * stored-but-not-shipped is exactly the right state.
+ *
+ * `links` is three-valued on purpose. A bag REPLACES the stored set (an explicit `{}`
+ * clears it); `undefined` leaves the column ALONE, so a caller that sends only the flag
+ * can never wipe an account's links by omission. The write is idempotent: re-sending an
+ * unchanged flag (saving links while already a streamer) is a plain UPDATE, never a
+ * conflict.
+ */
+export async function setAccountStreamerFlair(input: {
+  accountId: number;
+  adminAccountId: number;
+  streamer: boolean;
+  links?: unknown;
+  reason?: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  const raw =
+    // An ARRAY is rejected, not coerced. It is an object, so without this it would
+    // fall through the platform loop, match no keys, and decode to {}, i.e. the CLEAR
+    // branch, silently wiping the operator's stored URLs. That is the exact failure
+    // this function's three-valued contract exists to prevent (absent = leave alone,
+    // {} = clear, object = replace). The admin handler already 400s an array, so this
+    // is unreachable today; the guard lives here anyway because the invariant belongs
+    // next to the SQL that depends on it, not one caller away.
+    input.links && typeof input.links === 'object' && !Array.isArray(input.links)
+      ? (input.links as Record<string, unknown>)
+      : null;
+  if (input.links !== undefined && input.links !== null && raw === null) {
+    throw new Error('invalid streamer link');
+  }
+  let links: StreamerLinks | null = null;
+  if (raw !== null) {
+    links = {};
+    for (const platform of STREAMER_PLATFORMS) {
+      const value = raw[platform];
+      // An absent or blank field is "no link for this platform", not a bad link.
+      if (value === undefined || value === null || String(value).trim() === '') continue;
+      const url = normalizeStreamerLink(platform, value);
+      if (!url) throw new Error('invalid streamer link');
+      links[platform] = url;
+    }
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (links === null) {
+      await client.query('UPDATE accounts SET is_streamer = $2 WHERE id = $1', [
+        input.accountId,
+        input.streamer,
+      ]);
+    } else {
+      await client.query(
+        'UPDATE accounts SET is_streamer = $2, streamer_links = $3 WHERE id = $1',
+        [input.accountId, input.streamer, links],
+      );
+    }
+    await recordModerationAction(client, 'set_streamer', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 // Append a free-form moderator note to an account's audit log. Purely additive: it
 // changes no account state and resolves no reports (unlike moderateAccount), so a
 // single INSERT is atomic on its own and needs no transaction.
@@ -554,6 +700,101 @@ export async function addAccountNote(input: {
     adminAccountId: input.adminAccountId,
     reason: note,
   });
+}
+
+export async function setDailyRewardsBan(input: {
+  accountId: number;
+  adminAccountId: number;
+  banned: boolean;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (input.banned) {
+      await client.query(
+        `INSERT INTO daily_reward_bans (account_id, reason, admin_account_id)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (account_id) DO UPDATE
+           SET reason = EXCLUDED.reason,
+               admin_account_id = EXCLUDED.admin_account_id,
+               updated_at = now()`,
+        [input.accountId, reason, input.adminAccountId],
+      );
+    } else {
+      const removed = await client.query('DELETE FROM daily_reward_bans WHERE account_id = $1', [
+        input.accountId,
+      ]);
+      if ((removed.rowCount ?? 0) === 0)
+        throw new Error('account is not banned from daily rewards');
+    }
+    await recordModerationAction(
+      client,
+      input.banned ? 'daily_rewards_ban' : 'daily_rewards_unban',
+      {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason,
+      },
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function setDailyRewardsIpBan(input: {
+  accountId: number;
+  adminAccountId: number;
+  ip: unknown;
+  banned: boolean;
+  reason: unknown;
+}): Promise<void> {
+  const ip = cleanText(input.ip, 128);
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!ip) throw new Error('IP address is required');
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (input.banned) {
+      await client.query(
+        `INSERT INTO daily_reward_ip_bans (ip_address, reason, admin_account_id)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (ip_address) DO UPDATE
+           SET reason = EXCLUDED.reason,
+               admin_account_id = EXCLUDED.admin_account_id,
+               updated_at = now()`,
+        [ip, reason, input.adminAccountId],
+      );
+    } else {
+      const removed = await client.query('DELETE FROM daily_reward_ip_bans WHERE ip_address = $1', [
+        ip,
+      ]);
+      if ((removed.rowCount ?? 0) === 0)
+        throw new Error('IP address is not banned from daily rewards');
+    }
+    await recordModerationAction(
+      client,
+      input.banned ? 'daily_rewards_ip_ban' : 'daily_rewards_ip_unban',
+      {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason: `${reason} (IP: ${ip})`,
+      },
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 // Audit-only record for an in-game action whose live effect is owned by the

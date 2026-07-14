@@ -64,5 +64,8 @@ describe('render asset preload fallbacks', () => {
 
     const terrain = buildTerrain(20061);
     expect(terrain.group.children.length).toBeGreaterThan(0);
+    // Real timers, never cancelled: without this the far-chunk stream keeps
+    // building on a setTimeout chain in the background for the rest of the suite.
+    terrain.cancelStreaming();
   });
 });

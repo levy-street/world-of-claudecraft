@@ -35,6 +35,8 @@ describe('admin account detail query', () => {
             chat_muted_until: null,
             chat_mute_reason: '',
             chat_strikes: 0,
+            daily_rewards_ban_reason: 'leaderboard manipulation',
+            daily_rewards_banned_at: '2026-06-01T01:00:00Z',
             last_login_ip: '203.0.113.7',
             playtime_seconds: 3600,
           },
@@ -69,6 +71,10 @@ describe('admin account detail query', () => {
         adminUsername: 'moderator',
       },
     ]);
+    expect(detail?.dailyRewardsBan).toEqual({
+      reason: 'leaderboard manipulation',
+      createdAt: '2026-06-01T01:00:00Z',
+    });
     expect(mocks.query).toHaveBeenNthCalledWith(
       4,
       expect.stringContaining('FROM account_moderation_actions action_log'),
