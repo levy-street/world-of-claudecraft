@@ -8336,6 +8336,11 @@ export const zh_TW: EnTranslations = {
         "title": "霜達軍需官",
         "greeting": "邊境以鮮血與寒霜為報。好好花你的英雄點數。"
       },
+      "frontier_marshal": {
+        "name": "德雷格元帥",
+        "title": "邊境元帥",
+        "greeting": "守住陣線，士兵。邊境從不眠，我們也一樣。"
+      },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",
         "title": "博學者",
@@ -9217,6 +9222,16 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗森林之狼"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "邊境集結",
+        "text": "每個士兵在開戰前都要報到。先向軍需官霜衛領取補給，然後回到我這裡集結，領取你的榮譽。",
+        "completion": "很好。邊境又守住了一天。拿好你的榮譽，士兵，在外面小心背後。",
+        "objectives": {
+          "0": {
+            "label": "向軍需官霜衛領取補給"
           }
         }
       },

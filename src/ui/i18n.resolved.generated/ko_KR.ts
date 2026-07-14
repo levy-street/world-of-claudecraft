@@ -8336,6 +8336,11 @@ export const ko_KR: EnTranslations = {
         "title": "서리절경 병참장교",
         "greeting": "프론티어는 피와 서리로 값을 치른다. 영웅 점수를 현명하게 쓰라."
       },
+      "frontier_marshal": {
+        "name": "드레그 원수",
+        "title": "프론티어 원수",
+        "greeting": "전선을 지켜라, 병사여. 프론티어는 결코 잠들지 않는다, 우리도 마찬가지다."
+      },
       "loremaster_caddis": {
         "name": "현자 캐디스",
         "title": "현자",
@@ -9217,6 +9222,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "숲늑대 처치"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "프론티어 소집",
+        "text": "모든 병사는 전투 전에 보고한다. 먼저 병참장교 프로스트워든에게 보급품을 받은 뒤, 내게 돌아와 소집하고 명예를 받아라.",
+        "completion": "좋다. 프론티어가 하루를 더 버텼다. 명예를 받아라, 병사여, 밖에서는 등 뒤를 조심해라.",
+        "objectives": {
+          "0": {
+            "label": "병참장교 프로스트워든에게 보급품 수령"
           }
         }
       },

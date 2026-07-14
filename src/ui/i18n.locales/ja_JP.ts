@@ -14,6 +14,17 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'entities.npcs.frontier_marshal.name': 'マーシャル・ドレッグ',
+  'entities.npcs.frontier_marshal.title': 'フロンティア元帥',
+  'entities.npcs.frontier_marshal.greeting':
+    '戦線を守れ、兵士よ。フロンティアは決して眠らぬ、我らもまた然り。',
+  'entities.quests.frontier_daily_muster.title': 'フロンティアの召集',
+  'entities.quests.frontier_daily_muster.text':
+    '兵士は皆、戦いの前に報告する。まず需品係フロストウォーデンから補給を受け取り、それから私のもとへ集結して名誉を受け取れ。',
+  'entities.quests.frontier_daily_muster.completion':
+    'よし。フロンティアはまた一日持ちこたえた。名誉を受け取れ、兵士よ、外では背後に気をつけろ。',
+  'entities.quests.frontier_daily_muster.objectives.0.label':
+    '需品係フロストウォーデンから補給を受け取る',
   'hudChrome.warfare.notEnoughHero': 'ヒーローポイントが足りません。',
   'entities.items.frostrend_helm.name': 'フロストレンドの兜',
   'entities.items.frostrend_spaulders.name': 'フロストレンドの肩当て',

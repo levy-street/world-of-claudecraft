@@ -14,6 +14,16 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'entities.npcs.frontier_marshal.name': 'Маршал Дрегг',
+  'entities.npcs.frontier_marshal.title': 'Маршал Фронтира',
+  'entities.npcs.frontier_marshal.greeting': 'Держи строй, солдат. Фронтир не спит, и мы тоже.',
+  'entities.quests.frontier_daily_muster.title': 'Сбор на Фронтире',
+  'entities.quests.frontier_daily_muster.text':
+    'Каждый солдат отмечается перед боем. Получи довольствие у интенданта Морозного Стража, затем вернись ко мне на сбор за своей честью.',
+  'entities.quests.frontier_daily_muster.completion':
+    'Хорошо. Фронтир продержался ещё день. Забирай свою честь, солдат, и береги спину там.',
+  'entities.quests.frontier_daily_muster.objectives.0.label':
+    'Получить довольствие у интенданта Морозного Стража',
   'hudChrome.warfare.notEnoughHero': 'Недостаточно очков героя.',
   'entities.items.frostrend_helm.name': 'Шлем Ледяного Разрыва',
   'entities.items.frostrend_spaulders.name': 'Наплечники Ледяного Разрыва',

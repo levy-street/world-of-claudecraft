@@ -8336,6 +8336,11 @@ export const ja_JP: EnTranslations = {
         "title": "フロストリーチの需品係",
         "greeting": "フロンティアは血と氷で報いる。ヒーローポイントを賢く使え。"
       },
+      "frontier_marshal": {
+        "name": "マーシャル・ドレッグ",
+        "title": "フロンティア元帥",
+        "greeting": "戦線を守れ、兵士よ。フロンティアは決して眠らぬ、我らもまた然り。"
+      },
       "loremaster_caddis": {
         "name": "博識者キャディス",
         "title": "博識者",
@@ -9217,6 +9222,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォレストウルフを討伐"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "フロンティアの召集",
+        "text": "兵士は皆、戦いの前に報告する。まず需品係フロストウォーデンから補給を受け取り、それから私のもとへ集結して名誉を受け取れ。",
+        "completion": "よし。フロンティアはまた一日持ちこたえた。名誉を受け取れ、兵士よ、外では背後に気をつけろ。",
+        "objectives": {
+          "0": {
+            "label": "需品係フロストウォーデンから補給を受け取る"
           }
         }
       },

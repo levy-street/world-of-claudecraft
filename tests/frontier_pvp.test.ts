@@ -6,11 +6,13 @@ import {
   isDelvePos,
   isYumiMazePos,
   MOBS,
+  QUESTS,
   YUMI_BAND_X_MAX,
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { itemLevel } from '../src/sim/item_level';
 import {
+  FRONTIER_DAILY_HONOR,
   FRONTIER_HUB,
   FRONTIER_RARE_HERO_POINTS,
   FRONTIER_RARE_HONOR,
@@ -22,6 +24,12 @@ import {
   normalizeHeroPoints,
   spendHeroPoints,
 } from '../src/sim/pvp';
+import {
+  dailyQuestDoneToday,
+  normalizeDailyQuestState,
+  recordDailyQuestDone,
+} from '../src/sim/quests/daily_quest';
+import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { Sim } from '../src/sim/sim';
 
 const makeSim = (seed = 7) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -204,5 +212,73 @@ describe('Frostreach Quartermaster (Season 1 hero-points vendor)', () => {
     ]) {
       expect(itemLevel(ITEMS[id])).toBe(31);
     }
+  });
+});
+
+describe('Daily quest reset logic (pure leaf)', () => {
+  it('normalizes junk to a well-formed state or undefined', () => {
+    expect(normalizeDailyQuestState(undefined)).toBeUndefined();
+    expect(normalizeDailyQuestState({ date: '', done: [] })).toBeUndefined();
+    expect(normalizeDailyQuestState({ date: '2026-07-14', done: ['a', 2, 'b'] })).toEqual({
+      date: '2026-07-14',
+      done: ['a', 'b'],
+    });
+  });
+
+  it('treats a stale record from a previous day as not-done', () => {
+    const state = { date: '2026-07-14', done: ['q'] };
+    expect(dailyQuestDoneToday(state, '2026-07-14', 'q')).toBe(true);
+    expect(dailyQuestDoneToday(state, '2026-07-15', 'q')).toBe(false); // day rolled
+    expect(dailyQuestDoneToday(state, '2026-07-14', 'other')).toBe(false);
+    expect(dailyQuestDoneToday(undefined, '2026-07-14', 'q')).toBe(false);
+  });
+
+  it('records a completion, resetting the list when the day rolls', () => {
+    const day1 = recordDailyQuestDone(undefined, '2026-07-14', 'q1');
+    expect(day1).toEqual({ date: '2026-07-14', done: ['q1'] });
+    const both = recordDailyQuestDone(day1, '2026-07-14', 'q2');
+    expect(both).toEqual({ date: '2026-07-14', done: ['q1', 'q2'] });
+    const day2 = recordDailyQuestDone(both, '2026-07-15', 'q1');
+    expect(day2).toEqual({ date: '2026-07-15', done: ['q1'] }); // rolled, list reset
+  });
+});
+
+describe('Frontier honor daily quest', () => {
+  const QID = 'frontier_daily_muster';
+
+  it('pays honor on turn-in, stays out of questsDone, and re-opens next day', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const pid = sim.player.id;
+    const meta = sim.meta(pid)!;
+    sim.utcDay = '2026-07-14';
+    // Simulate an accepted daily with its interact objective satisfied.
+    meta.questLog.set(QID, { questId: QID, counts: [1], state: 'ready' });
+    const honorBefore = meta.honor;
+
+    turnInQuestCore(sim.ctx, QID, QUESTS[QID], meta);
+
+    expect(meta.honor).toBe(honorBefore + FRONTIER_DAILY_HONOR);
+    expect(meta.lifetimeHonor).toBe(honorBefore + FRONTIER_DAILY_HONOR);
+    expect(meta.questsDone.has(QID)).toBe(false); // dailies never permanently done
+    expect(meta.dailyQuests).toEqual({ date: '2026-07-14', done: [QID] });
+    // On cooldown for the rest of the day, then available again once the day rolls.
+    expect(sim.questState(QID, pid)).toBe('done');
+    sim.utcDay = '2026-07-15';
+    expect(sim.questState(QID, pid)).toBe('available');
+  });
+
+  it('grants a repeatable daily giver at the Frontier hub', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warrior', autoEquip: true });
+    const marshal = [...sim.entities.values()].find((e) => e.templateId === 'frontier_marshal');
+    expect(marshal).toBeTruthy();
+    expect(isFrontierPos(marshal!.pos.x)).toBe(true);
+    const quest = QUESTS[QID];
+    expect(quest.daily).toBe(true);
+    expect(quest.honorReward).toBe(FRONTIER_DAILY_HONOR);
+    expect(quest.objectives[0]).toMatchObject({
+      type: 'interact',
+      targetNpcId: 'frostreach_quartermaster',
+    });
   });
 });

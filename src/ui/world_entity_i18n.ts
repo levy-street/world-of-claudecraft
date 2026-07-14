@@ -129,6 +129,7 @@ const NPC_IDS = [
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
   'frostreach_quartermaster', // Season 1 hero-points vendor (Frostreach Frontier)
+  'frontier_marshal', // Frontier daily-quest giver (Frostreach Frontier)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
@@ -222,6 +223,7 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'frontier_daily_muster', // Frostreach Frontier honor daily
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;

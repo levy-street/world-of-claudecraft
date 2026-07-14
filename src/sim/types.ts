@@ -1824,6 +1824,22 @@ export interface QuestDef {
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
+  // Daily quest: repeatable once per host calendar day (the utcDay boundary the
+  // server injects; offline/headless never rolls a day, so a daily is one-and-done
+  // there, deterministically). A daily is never added to questsDone permanently; its
+  // per-day completion is tracked in PlayerMeta.dailyQuests so it re-opens on reset.
+  daily?: boolean;
+  // Honor granted on turn-in (via grantHonor). PvP dailies pay honor instead of, or
+  // on top of, xp/copper. Zero/omitted grants no honor.
+  honorReward?: number;
+}
+
+// Per-player daily-quest completion record: the host calendar day (utcDay) plus the
+// daily quest ids finished that day. When utcDay rolls, the list is cleared so every
+// daily re-opens. Persisted with the character (mirrors HonorArenaDailyState).
+export interface DailyQuestState {
+  date: string;
+  done: string[];
 }
 
 export function questTurnInNpcIds(quest: QuestDef): readonly string[] {

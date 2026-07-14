@@ -8336,6 +8336,11 @@ export const id_ID: EnTranslations = {
         "title": "Frostreach Quartermaster",
         "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
+      "frontier_marshal": {
+        "name": "Marshal Dregg",
+        "title": "Frontier Marshal",
+        "greeting": "Hold the line, soldier. The Frontier never sleeps, and neither do we."
+      },
       "loremaster_caddis": {
         "name": "Ahli Sejarah Caddis",
         "title": "Ahli Sejarah",
@@ -9217,6 +9222,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Serigala Hutan dibunuh"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "Frontier Muster",
+        "text": "Every soldier reports before the day's fighting. Draw your requisition from Quartermaster Frostwarden, then muster back to me for your honor.",
+        "completion": "Good. The Frontier holds another day. Take your honor, soldier, and mind your back out there.",
+        "objectives": {
+          "0": {
+            "label": "Requisition from Quartermaster Frostwarden"
           }
         }
       },

@@ -14,6 +14,15 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'entities.npcs.frontier_marshal.name': '德雷格元帥',
+  'entities.npcs.frontier_marshal.title': '邊境元帥',
+  'entities.npcs.frontier_marshal.greeting': '守住陣線，士兵。邊境從不眠，我們也一樣。',
+  'entities.quests.frontier_daily_muster.title': '邊境集結',
+  'entities.quests.frontier_daily_muster.text':
+    '每個士兵在開戰前都要報到。先向軍需官霜衛領取補給，然後回到我這裡集結，領取你的榮譽。',
+  'entities.quests.frontier_daily_muster.completion':
+    '很好。邊境又守住了一天。拿好你的榮譽，士兵，在外面小心背後。',
+  'entities.quests.frontier_daily_muster.objectives.0.label': '向軍需官霜衛領取補給',
   'hudChrome.warfare.notEnoughHero': '英雄點數不足。',
   'entities.items.frostrend_helm.name': '裂霜頭盔',
   'entities.items.frostrend_spaulders.name': '裂霜肩甲',

@@ -8336,6 +8336,11 @@ export const zh_CN: EnTranslations = {
         "title": "霜达军需官",
         "greeting": "边境以鲜血与寒霜为报。好好花你的英雄点数。"
       },
+      "frontier_marshal": {
+        "name": "德雷格元帅",
+        "title": "边境元帅",
+        "greeting": "守住阵线，士兵。边境从不眠，我们也一样。"
+      },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
         "title": "博学者",
@@ -9217,6 +9222,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败森林之狼"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "边境集结",
+        "text": "每个士兵在开战前都要报到。先向军需官霜卫领取补给，然后回到我这里集结，领取你的荣誉。",
+        "completion": "很好。边境又守住了一天。拿好你的荣誉，士兵，在外面小心背后。",
+        "objectives": {
+          "0": {
+            "label": "向军需官霜卫领取补给"
           }
         }
       },

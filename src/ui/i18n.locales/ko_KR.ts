@@ -14,6 +14,17 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'entities.npcs.frontier_marshal.name': '드레그 원수',
+  'entities.npcs.frontier_marshal.title': '프론티어 원수',
+  'entities.npcs.frontier_marshal.greeting':
+    '전선을 지켜라, 병사여. 프론티어는 결코 잠들지 않는다, 우리도 마찬가지다.',
+  'entities.quests.frontier_daily_muster.title': '프론티어 소집',
+  'entities.quests.frontier_daily_muster.text':
+    '모든 병사는 전투 전에 보고한다. 먼저 병참장교 프로스트워든에게 보급품을 받은 뒤, 내게 돌아와 소집하고 명예를 받아라.',
+  'entities.quests.frontier_daily_muster.completion':
+    '좋다. 프론티어가 하루를 더 버텼다. 명예를 받아라, 병사여, 밖에서는 등 뒤를 조심해라.',
+  'entities.quests.frontier_daily_muster.objectives.0.label':
+    '병참장교 프로스트워든에게 보급품 수령',
   'hudChrome.warfare.notEnoughHero': '영웅 점수가 부족합니다.',
   'entities.items.frostrend_helm.name': '서리절단 투구',
   'entities.items.frostrend_spaulders.name': '서리절단 어깨보호구',

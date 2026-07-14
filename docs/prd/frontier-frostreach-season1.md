@@ -65,16 +65,25 @@ reads 31 after the epic +6 bump; primary-stat sums match the slot budgets in
   Frostreach Quartermaster for hero points via the new `priceHero` cost field
   (`items.buyItem` spends hero points, sparing lifetime). The Quartermaster spawns
   at a reserved id after the world roster (mirroring FURY), so parity is untouched.
+- The honor daily-quest mechanism (`quests/daily_quest.ts`): a repeatable quest resets
+  once per host day (the `utcDay` boundary the honor arena taper already uses; offline
+  and headless never roll a day, so a daily is one-and-done there, deterministically).
+  A daily is never marked permanently `questsDone`; its per-day completion lives in
+  `PlayerMeta.dailyQuests` (persisted). `QuestDef.honorReward` grants honor on turn-in
+  via `grantHonor`. The first daily, `frontier_daily_muster`, is given by the new hub
+  Frontier Marshal, pays `FRONTIER_DAILY_HONOR` (40), and is completable at the hub
+  today (report to the Marshal, requisition from the Quartermaster, muster back).
 - Tests: `tests/frontier_pvp.test.ts` (band disjointness, hub perimeter, currency
   grant/spend/persist round-trip, hostility inside/outside/hub/overworld, the
-  frost-rare kill reward in-band vs out, and the hero-points vendor buy/refuse +
-  item-level-31 pricing).
+  frost-rare kill reward in-band vs out, the hero-points vendor buy/refuse +
+  item-level-31 pricing, the daily-reset leaf, and the daily turn-in paying honor +
+  re-opening the next day without entering `questsDone`).
 
 ## Deferred to follow-up commits on this draft
 
-The honor daily quests; the enter/leave teleport surface and the PvP window
-section; the hero-points wallet readout (IWorld facet + `ClientWorld` + server
-wire); the death/respawn-at-hub graveyard; the frost rare spawn camps + the
-Frostreach zone label (deferred so the world-gen spawn rng and the parity goldens
-stay untouched until a deliberate regen); the Book of Deeds records for the new
-rares and the zone; the frost render/terrain treatment for the band.
+The enter/leave teleport surface and the PvP window section; the hero-points wallet
+readout (IWorld facet + `ClientWorld` + server wire); the death/respawn-at-hub
+graveyard; the frost rare spawn camps (a player-gated spawner so the always-idle
+wander rng never forks the parity goldens) and the Frostreach zone label, which
+together unlock the kill/PvP dailies; the Book of Deeds records for the new rares and
+the zone; the frost render/terrain treatment for the band.

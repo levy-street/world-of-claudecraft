@@ -63,7 +63,12 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import { FRONTIER_QM_ENTITY_ID, FRONTIER_QM_NPC_ID } from './content/frontier_vendor';
+import {
+  FRONTIER_MARSHAL_ENTITY_ID,
+  FRONTIER_MARSHAL_NPC_ID,
+  FRONTIER_QM_ENTITY_ID,
+  FRONTIER_QM_NPC_ID,
+} from './content/frontier_vendor';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -333,6 +338,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { normalizeDailyQuestState } from './quests/daily_quest';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -396,6 +402,7 @@ import {
   type CrowdControlDrState,
   cloneInvSlot,
   cloneItemInstancePayload,
+  type DailyQuestState,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DeedStats,
   type DelveDef,
@@ -898,6 +905,8 @@ export interface PlayerMeta {
   lifetimeHeroPoints: number;
   // Persisted per-day, per-opponent ranked-win accounting for honor DR.
   honorArenaDaily?: HonorArenaDailyState;
+  // Persisted per-day daily-quest completion record (the utcDay + ids done that day).
+  dailyQuests?: DailyQuestState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1101,6 +1110,7 @@ export interface CharacterState {
   heroPoints?: number;
   lifetimeHeroPoints?: number;
   honorArenaDaily?: HonorArenaDailyState;
+  dailyQuests?: DailyQuestState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -1657,6 +1667,16 @@ export class Sim {
         const qm = createNpc(FRONTIER_QM_ENTITY_ID, qmDef, this.groundPos(safe.x, safe.z));
         this.addEntity(qm);
       }
+      const marshalDef = worldContent.npcs[FRONTIER_MARSHAL_NPC_ID];
+      if (marshalDef && !this.entities.has(FRONTIER_MARSHAL_ENTITY_ID)) {
+        const safe = this.findSafePos(marshalDef.pos.x, marshalDef.pos.z, waterLevel() + 0.6);
+        const marshal = createNpc(
+          FRONTIER_MARSHAL_ENTITY_ID,
+          marshalDef,
+          this.groundPos(safe.x, safe.z),
+        );
+        this.addEntity(marshal);
+      }
     }
 
     for (const delve of DELVE_LIST) {
@@ -1980,6 +2000,7 @@ export class Sim {
         honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
       );
       meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
+      meta.dailyQuests = normalizeDailyQuestState(s.dailyQuests);
       meta.heroPoints = honorMod.normalizeHeroPoints(s.heroPoints);
       meta.lifetimeHeroPoints = Math.max(
         meta.heroPoints,
@@ -2385,6 +2406,9 @@ export class Sim {
               totalWins: meta.honorArenaDaily.totalWins,
             },
           }
+        : {}),
+      ...(meta.dailyQuests && (meta.dailyQuests.date || meta.dailyQuests.done.length)
+        ? { dailyQuests: { date: meta.dailyQuests.date, done: [...meta.dailyQuests.done] } }
         : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],

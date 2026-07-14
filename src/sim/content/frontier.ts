@@ -6,7 +6,9 @@
 // a follow-up (kept out of this slice so world-gen spawn rng, and parity, are
 // untouched).
 
-import type { MobTemplate } from '../types';
+import { FRONTIER_DAILY_HONOR } from '../pvp/frontier';
+import type { MobTemplate, QuestDef } from '../types';
+import { FRONTIER_MARSHAL_NPC_ID, FRONTIER_QM_NPC_ID } from './frontier_vendor';
 
 export const FRONTIER_MOBS: Record<string, MobTemplate> = {
   // Rimefang Stalker: a fast frost beast that opens with a chilling bite.
@@ -51,5 +53,37 @@ export const FRONTIER_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1.35,
     color: 0xbfe6ff,
+  },
+};
+
+// Frontier daily quests: repeatable once per host day (the daily-quest mechanism in
+// src/sim/quests/daily_quest.ts), paying honor instead of xp/copper. The muster daily
+// is completable at the hub today (report to the Marshal, requisition from the
+// Quartermaster, muster back); the kill/PvP dailies land with the frost-rare spawner
+// (a player-gated spawner is a follow-up so the always-idle wander rng never forks
+// the parity goldens).
+export const FRONTIER_QUESTS: Record<string, QuestDef> = {
+  frontier_daily_muster: {
+    id: 'frontier_daily_muster',
+    name: 'Frontier Muster',
+    giverNpcId: FRONTIER_MARSHAL_NPC_ID,
+    turnInNpcId: FRONTIER_MARSHAL_NPC_ID,
+    text: "Every soldier reports before the day's fighting. Draw your requisition from Quartermaster Frostwarden, then muster back to me for your honor.",
+    completionText:
+      'Good. The Frontier holds another day. Take your honor, soldier, and mind your back out there.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: FRONTIER_QM_NPC_ID,
+        count: 1,
+        label: 'Requisition from Quartermaster Frostwarden',
+      },
+    ],
+    xpReward: 0,
+    copperReward: 0,
+    itemRewards: {},
+    honorReward: FRONTIER_DAILY_HONOR,
+    daily: true,
+    minLevel: 20,
   },
 };

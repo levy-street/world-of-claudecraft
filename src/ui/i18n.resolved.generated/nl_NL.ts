@@ -8336,6 +8336,11 @@ export const nl_NL: EnTranslations = {
         "title": "Frostreach Quartermaster",
         "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
+      "frontier_marshal": {
+        "name": "Marshal Dregg",
+        "title": "Frontier Marshal",
+        "greeting": "Hold the line, soldier. The Frontier never sleeps, and neither do we."
+      },
       "loremaster_caddis": {
         "name": "Verhalenmeester Caddis",
         "title": "Verhalenmeester",
@@ -9217,6 +9222,16 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Boswolf gedood"
+          }
+        }
+      },
+      "frontier_daily_muster": {
+        "title": "Frontier Muster",
+        "text": "Every soldier reports before the day's fighting. Draw your requisition from Quartermaster Frostwarden, then muster back to me for your honor.",
+        "completion": "Good. The Frontier holds another day. Take your honor, soldier, and mind your back out there.",
+        "objectives": {
+          "0": {
+            "label": "Requisition from Quartermaster Frostwarden"
           }
         }
       },

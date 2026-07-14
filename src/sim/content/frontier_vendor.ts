@@ -182,3 +182,21 @@ export const FRONTIER_QM_NPC: NpcDef = {
   dynamic: true,
   greeting: 'The Frontier pays in blood and frost. Spend your hero points well.',
 };
+
+// The Frontier Marshal: the hub's daily-quest giver. Stands opposite the
+// Quartermaster and hands out the repeatable honor daily. Same reserved-id,
+// dynamic, spawn-after-the-roster pattern as the vendor, so parity is untouched.
+export const FRONTIER_MARSHAL_NPC_ID = 'frontier_marshal';
+export const FRONTIER_MARSHAL_ENTITY_ID = 1_000_000_003;
+
+export const FRONTIER_MARSHAL_NPC: NpcDef = {
+  id: FRONTIER_MARSHAL_NPC_ID,
+  name: 'Marshal Dregg',
+  title: 'Frontier Marshal',
+  pos: { x: FRONTIER_HUB.x + 8, z: FRONTIER_HUB.z - 6 },
+  facing: Math.PI / 2,
+  color: 0x4a6fa5,
+  questIds: ['frontier_daily_muster'],
+  dynamic: true,
+  greeting: 'Hold the line, soldier. The Frontier never sleeps, and neither do we.',
+};

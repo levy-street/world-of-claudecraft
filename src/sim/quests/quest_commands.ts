@@ -26,6 +26,7 @@
 import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import { grantHonor } from '../pvp';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -38,6 +39,7 @@ import {
   type QuestState,
   questTurnInNpcIds,
 } from '../types';
+import { dailyQuestDoneToday, recordDailyQuestDone } from './daily_quest';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -47,10 +49,16 @@ export function computeQuestState(
   questLog: Map<string, QuestProgress>,
   questsDone: Set<string>,
   playerLevel: number,
+  // A daily quest already completed on the current host day: shows 'done' (on
+  // cooldown) until the day rolls. Only consulted when the quest is NOT active in
+  // the log (an accepted daily still reads active/ready). Defaults false so the
+  // ClientWorld's four-arg call site stays byte-identical.
+  dailyCompletedToday = false,
 ): QuestState {
   if (questsDone.has(questId)) return 'done';
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
+  if (dailyCompletedToday) return 'done';
   const quest = QUESTS[questId];
   if (!quest) return 'unavailable';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
@@ -62,7 +70,16 @@ export function computeQuestState(
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
-  return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
+  const quest = QUESTS[questId];
+  const dailyCompletedToday =
+    !!quest?.daily && dailyQuestDoneToday(r.meta.dailyQuests, ctx.utcDay, questId);
+  return computeQuestState(
+    questId,
+    r.meta.questLog,
+    r.meta.questsDone,
+    r.e.level,
+    dailyCompletedToday,
+  );
 }
 
 function questNpcFor(
@@ -242,10 +259,20 @@ export function turnInQuestCore(
   }
   qp.state = 'done';
   meta.questLog.delete(questId);
-  meta.questsDone.add(questId);
+  if (quest.daily) {
+    // A daily is never marked permanently done: instead record today's completion so
+    // it re-opens once the host day rolls (dailyQuestDoneToday/computeQuestState gate
+    // re-accept until then). Offline/headless never rolls a day, so it stays done.
+    meta.dailyQuests = recordDailyQuestDone(meta.dailyQuests, ctx.utcDay, questId);
+  } else {
+    meta.questsDone.add(questId);
+  }
   meta.counters.questsCompleted++;
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
+  if (quest.honorReward && quest.honorReward > 0) {
+    grantHonor(ctx, meta, quest.honorReward, 'frontier_daily');
+  }
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({
