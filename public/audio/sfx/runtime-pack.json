@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "b8746cc609464ce83cbecbb371ffbdef876cc0a4959671b060bad06a896ff62a",
-  "catalogHash": "254e9eaf1ab3c6c8c113ee046ced2b9013c6b9527e5f707b95e661b10e66c34b",
+  "bundleId": "3de6b985ff908ba9f62a1c878ef92fad32cb1580803f61f49ad849c7ebd56d61",
+  "catalogHash": "91f09770fd63cf4e52f493c7b1ec45892f66f08b3bb6b1641d23e7a523227dbc",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -20,9 +20,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/amb_campfire.mp3?v=0a368764a819",
+          "url": "/audio/sfx/amb_campfire.mp3?v=d270bf1ef650",
           "bytes": 121669,
-          "sha256": "0a368764a819398fdd6474fa46e616f5c2f4ff5ad2654647be228a9ac3cb51ba"
+          "sha256": "d270bf1ef650016985ce855491e573f35de1cdedf2a8fd7cda00212a1d14f2a9"
         }
       ],
       "gain": 1,
@@ -44,9 +44,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/amb_forge.mp3?v=31aefb6e1067",
+          "url": "/audio/sfx/amb_forge.mp3?v=57b4f4fab760",
           "bytes": 145492,
-          "sha256": "31aefb6e10670c7c87e72937425ee1e0c942b82b9436fd9cf95859369c126e3f"
+          "sha256": "57b4f4fab76020eeb2399f46d359cad32c08e4560efaae07fb93944587b2b964"
         }
       ],
       "gain": 1,

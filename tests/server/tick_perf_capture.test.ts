@@ -14,8 +14,10 @@ vi.mock('../../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, SIM_LAP_PHASES } from '../../server/game';
+import { GameServer, mobZonePhase, SIM_LAP_PHASES, SIM_MOB_ZONE_PHASES } from '../../server/game';
+import { ZONES } from '../../src/sim/data';
 import { Sim } from '../../src/sim/sim';
+import type { Entity } from '../../src/sim/types';
 
 // Drive 60 nominal samples into the capture, then move its wall deadline to now and
 // finalize. Production closes on wall time; this helper keeps the percentile sample
@@ -207,5 +209,66 @@ describe('tick perf capture lifecycle', () => {
     for (const phase of emitted) {
       expect(registered.has(`sim.${phase}`), `sim.${phase} is not in SIM_LAP_PHASES`).toBe(true);
     }
+  });
+
+  it('registers every mob.update per-zone bucket so its timing is never silently dropped', () => {
+    // TickProfiler.add() ignores an unregistered phase. The per-zone mob.update buckets
+    // are host-derived, so unlike SIM_LAP_PHASES the sim never emits them;
+    // pin that the GameServer profiler registered ALL of them, or a mob.update split
+    // would vanish from the report.
+    const server = new GameServer();
+    const phases = (
+      server as unknown as { tickProfiler: { profile: () => { phases: Record<string, unknown> } } }
+    ).tickProfiler.profile().phases;
+    expect(SIM_MOB_ZONE_PHASES.length).toBe(ZONES.length + 2); // every zone + instance + other
+    for (const phase of SIM_MOB_ZONE_PHASES) {
+      expect(phase in phases, `${phase} is not registered in the tick profiler`).toBe(true);
+    }
+  });
+
+  it('maps a mob to its zone/group bucket (mobZonePhase)', () => {
+    const at = (x: number, z: number): string => mobZonePhase({ pos: { x, z } } as Entity);
+    // Each overworld zone resolves to its own registered bucket.
+    for (const zone of ZONES) {
+      const mid = (zone.zMin + zone.zMax) / 2;
+      const bucket = at(0, mid);
+      expect(bucket).toBe(`sim.mob.z:${zone.id}`);
+      expect(SIM_MOB_ZONE_PHASES).toContain(bucket);
+    }
+    // Instance/delve mobs (x beyond the dungeon threshold) share the 'instance' bucket.
+    expect(at(10_000, 0)).toBe('sim.mob.z:instance');
+    // Distinct overworld zones do not collapse into one bucket.
+    expect(at(0, (ZONES[0].zMin + ZONES[0].zMax) / 2)).not.toBe(
+      at(0, (ZONES[1].zMin + ZONES[1].zMax) / 2),
+    );
+  });
+
+  it('records the injected GameServer mob lap in both total and zone phases', () => {
+    const server = new GameServer();
+    server.startPerfCapture(3000);
+    const mob = [...server.sim.entities.values()].find((entity) => entity.kind === 'mob');
+    if (!mob) throw new Error('fresh GameServer world did not spawn a mob');
+
+    const perfLap = (
+      server.sim as unknown as {
+        cfg: { perfLap?: (phase: string, entity?: Entity) => void };
+      }
+    ).cfg.perfLap;
+    if (!perfLap) throw new Error('GameServer did not inject its sim perf probe');
+
+    const internal = server as unknown as {
+      simLapMark: bigint;
+      tickProfiler: {
+        commit(ms: number): void;
+        profile(): { phases: Record<string, { mean: number }> };
+      };
+    };
+    internal.simLapMark = process.hrtime.bigint() - 5_000_000n;
+    perfLap('mob.update', mob);
+    internal.tickProfiler.commit(8);
+
+    const phases = internal.tickProfiler.profile().phases;
+    expect(phases['sim.mob.update'].mean).toBeGreaterThan(0);
+    expect(phases[mobZonePhase(mob)].mean).toBeGreaterThan(0);
   });
 });

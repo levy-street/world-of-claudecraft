@@ -248,6 +248,31 @@ describe('sampled SFX loading', () => {
     expect(internals(player).buffers.get(cue)).toBe(loaded);
   });
 
+  it('retains both channels of the global water ambience bed', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => response()),
+    );
+    const { player, ctx } = startWithStartupCached();
+    ctx.decodedBuffer = {
+      duration: 2 / 48_000,
+      length: 2,
+      numberOfChannels: 2,
+      sampleRate: 48_000,
+      getChannelData(channel: number) {
+        return channel === 0 ? new Float32Array([1, 0]) : new Float32Array([0, 1]);
+      },
+    } as AudioBuffer;
+
+    const loaded = await (
+      player as unknown as { loadBuffer(key: string): Promise<AudioBuffer | null> }
+    ).loadBuffer('amb_water');
+
+    if (!loaded) throw new Error('water ambience did not load');
+    expect(SFX_CLIPS.amb_water.spatial).toBe(false);
+    expect(loaded.numberOfChannels).toBe(2);
+  });
+
   it('deduplicates a shared lazy fetch and decode across one-shots and loops', async () => {
     const gate = deferred<Response>();
     const fetchMock = vi.fn(() => gate.promise);

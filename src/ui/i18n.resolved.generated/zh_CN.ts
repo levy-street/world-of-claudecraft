@@ -617,6 +617,15 @@ export const zh_CN: EnTranslations = {
       "notNow": "暂不",
       "update": "更新"
     },
+    "cameraPrompt": {
+      "title": "选择你的镜头",
+      "intro": "选择镜头跟随角色的方式。",
+      "mouseDesc": "无需按住鼠标按键，移动鼠标即可转动镜头。",
+      "classicTitle": "经典镜头",
+      "classicDesc": "按住鼠标右键并移动鼠标来转动镜头。",
+      "changeLater": "稍后可在 Esc 菜单的“按键绑定”中更改。",
+      "confirm": "确认"
+    },
     "castBar": {
       "playerAria": "你的施法条",
       "targetAria": "目标施法条"
