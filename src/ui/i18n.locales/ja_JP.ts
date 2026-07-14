@@ -5833,6 +5833,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。',
   'hudChrome.discord.link.error': 'Discordを連携できませんでした。もう一度お試しください。',
   'hudChrome.discord.link.success': 'Discordを連携しました。',
+  'hudChrome.discord.link.joinServer': 'アカウント連携なしでサーバーに参加',
   'hudChrome.discord.linkedAs': '{name}として連携済み',
   'hudChrome.discord.linkedTitle': 'Discord：{name}',
   'hudChrome.discord.viewProfile': 'このキャラクターの公開プロフィールを開く',

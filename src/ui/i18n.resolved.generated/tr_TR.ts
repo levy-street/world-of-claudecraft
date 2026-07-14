@@ -1463,7 +1463,8 @@ export const tr_TR: EnTranslations = {
         "connecting": "Discord açılıyor...",
         "benefits": "Oyun ve topluluk etkinliğinden puan kazanmak ve statü kademelerini tırmanmak için Discord hesabını bağla.",
         "error": "Discord bağlanamadı. Lütfen tekrar dene.",
-        "success": "Discord bağlandı."
+        "success": "Discord bağlandı.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Discord ile devam et",

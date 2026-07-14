@@ -1463,7 +1463,8 @@ export const en: EnTranslations = {
         "connecting": "Opening Discord...",
         "benefits": "Link your Discord to earn points from play and community activity, and climb the status tiers.",
         "error": "Could not link Discord. Please try again.",
-        "success": "Discord linked."
+        "success": "Discord linked.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continue with Discord",

@@ -5829,6 +5829,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.',
   'hudChrome.discord.link.error': 'Discord를 연결할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.discord.link.success': 'Discord가 연결되었습니다.',
+  'hudChrome.discord.link.joinServer': '연동 없이 서버 참여하기',
   'hudChrome.discord.linkedAs': '{name}(으)로 연결됨',
   'hudChrome.discord.linkedTitle': 'Discord: {name}',
   'hudChrome.discord.viewProfile': '이 캐릭터의 공개 프로필 열기',

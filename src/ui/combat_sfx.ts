@@ -59,6 +59,17 @@ const MOB_VOICE_CUES = {
 type MobVoiceFamily = keyof typeof MOB_VOICE_CUES;
 const NO_CUE = (): boolean => false;
 
+// Templates that should share one recorded subfamily voice instead of each
+// needing its own separate take, e.g. every wolf-shaped beast. Maps a
+// templateId to the shared subfamily name used when building the specific
+// cue in mobVoiceCue. A templateId not listed here keys off its own id.
+const SUBFAMILY_ALIAS: Record<string, string> = {
+  forest_wolf: 'wolf',
+  ridge_stalker: 'wolf',
+  mire_prowler: 'wolf',
+  old_greyjaw: 'wolf',
+};
+
 function magicSchool(value: string | null | undefined): MagicSchool | null {
   return value && value in SCHOOL_CUES ? (value as MagicSchool) : null;
 }
@@ -144,7 +155,8 @@ export function mobVoiceCue(
 ): string | null {
   const family = mobVoiceFamily(templateId);
   if (!family) return null;
-  const specific = `mob_${family}_${templateId}_${action}`;
+  const subfamily = SUBFAMILY_ALIAS[templateId] ?? templateId;
+  const specific = `mob_${family}_${subfamily}_${action}`;
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];
 }
 

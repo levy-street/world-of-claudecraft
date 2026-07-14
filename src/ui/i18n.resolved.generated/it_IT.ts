@@ -1463,7 +1463,8 @@ export const it_IT: EnTranslations = {
         "connecting": "Apertura di Discord...",
         "benefits": "Collega il tuo Discord per ottenere punti dal gioco e dall'attivita nella comunita, e scalare i gradi di stato.",
         "error": "Impossibile collegare Discord. Riprova.",
-        "success": "Discord collegato."
+        "success": "Discord collegato.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continua con Discord",

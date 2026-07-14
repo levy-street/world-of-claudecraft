@@ -1463,7 +1463,8 @@ export const cs_CZ: EnTranslations = {
         "connecting": "Otevírá se Discord...",
         "benefits": "Propoj Discord, získávej body za hraní a komunitní aktivitu a stoupej ve statusových stupních.",
         "error": "Discord se nepodařilo propojit. Zkus to prosím znovu.",
-        "success": "Discord propojen."
+        "success": "Discord propojen.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Pokračovat přes Discord",

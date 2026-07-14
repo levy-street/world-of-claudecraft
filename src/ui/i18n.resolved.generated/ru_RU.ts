@@ -1463,7 +1463,8 @@ export const ru_RU: EnTranslations = {
         "connecting": "Открываем Discord...",
         "benefits": "Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.",
         "error": "Не удалось привязать Discord. Пожалуйста, попробуйте снова.",
-        "success": "Discord привязан."
+        "success": "Discord привязан.",
+        "joinServer": "Просто присоединиться к серверу Discord"
       },
       "choice": {
         "title": "Продолжить через Discord",

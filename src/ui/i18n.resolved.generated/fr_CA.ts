@@ -1463,7 +1463,8 @@ export const fr_CA: EnTranslations = {
         "connecting": "Ouverture de Discord...",
         "benefits": "Liez votre Discord pour gagner des points en jouant et en participant à la communauté, et gravir les rangs de statut.",
         "error": "Impossible de lier Discord. Veuillez réessayer.",
-        "success": "Discord lié."
+        "success": "Discord lié.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Continuer avec Discord",

@@ -52,6 +52,10 @@ export function discoverSfxTracks(catalog, sfxDir) {
   const entries = {};
   const errors = [];
   const catalogKeys = new Set();
+  // Filenames already accounted for by a catalog entry (bare or numbered), so
+  // the mob-extension pass below can tell "this belongs to the catalog loop"
+  // apart from "this looks like a mob sfx file but matches nothing."
+  const consumedFilenames = new Set();
   const sfxFiles = existsSync(sfxDir) ? readdirSync(sfxDir).sort() : [];
 
   for (const source of catalog) {
@@ -71,6 +75,7 @@ export function discoverSfxTracks(catalog, sfxDir) {
       .map((filename) => ({ filename, id: filename.match(numberedPattern)?.[1] ?? null }))
       .filter((candidate) => candidate.id !== null);
     for (const candidate of numbered) {
+      consumedFilenames.add(candidate.filename);
       const numericId = Number(candidate.id);
       if (
         !/^[1-9]\d*$/.test(candidate.id) ||
@@ -97,6 +102,7 @@ export function discoverSfxTracks(catalog, sfxDir) {
         const filename = `${source.key}${extension}`;
         if (!existsSync(path.join(sfxDir, filename))) continue;
         tracks.push(track('main', filename));
+        consumedFilenames.add(filename);
         break;
       }
     }
@@ -115,9 +121,19 @@ export function discoverSfxTracks(catalog, sfxDir) {
     (filename) => filename.startsWith('mob_') && filename.endsWith('.mp3'),
   );
   for (const filename of mobFiles) {
+    if (consumedFilenames.has(filename)) continue;
     const stem = filename.slice(0, -4);
     const parts = stem.split('_');
-    if (parts.length < 5 || !/^\d+$/.test(parts.at(-1) ?? '')) continue;
+    if (parts.length < 5 || !/^\d+$/.test(parts.at(-1) ?? '')) {
+      // Not a fixed catalog file (already handled above) and not a valid
+      // mob_<family>_<subfamily>_<action>_<N>.mp3 subfamily file either.
+      // A file shaped like this was never meant to be silently ignored: flag
+      // it instead of letting it vanish from every rebuild with no signal.
+      errors.push(
+        `unrecognized mob sfx file (not a catalog entry, not a valid numbered subfamily file): ${filename}`,
+      );
+      continue;
+    }
 
     const variantId = parts.at(-1) ?? '';
     const variantNumber = Number(variantId);

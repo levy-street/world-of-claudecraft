@@ -14224,7 +14224,7 @@ export class Hud {
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
       `<div class="inspect-card">` +
-      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
+      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg', framing: 'body' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
       // The active Book of Deeds title (the entity `title` wire field, a deed
       // id): a subtitle line under the name, exactly the nameplate surface.

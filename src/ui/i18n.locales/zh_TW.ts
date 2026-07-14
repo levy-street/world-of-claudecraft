@@ -5566,6 +5566,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.benefits': '連結你的 Discord，從遊玩與社群活動中賺取點數，並攀升階級。',
   'hudChrome.discord.link.error': '無法連結 Discord。請再試一次。',
   'hudChrome.discord.link.success': 'Discord 已連結。',
+  'hudChrome.discord.link.joinServer': '直接加入 Discord 伺服器',
   'hudChrome.discord.linkedAs': '已連結為 {name}',
   'hudChrome.discord.linkedTitle': 'Discord：{name}',
   'hudChrome.discord.viewProfile': '開啟此角色的公開檔案',

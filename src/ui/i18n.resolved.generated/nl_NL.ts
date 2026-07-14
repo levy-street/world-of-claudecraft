@@ -1463,7 +1463,8 @@ export const nl_NL: EnTranslations = {
         "connecting": "Discord openen...",
         "benefits": "Koppel je Discord om punten te verdienen door spelen en gemeenschapsactiviteit, en klim door de statusrangen.",
         "error": "Kon Discord niet koppelen. Probeer het opnieuw.",
-        "success": "Discord gekoppeld."
+        "success": "Discord gekoppeld.",
+        "joinServer": "Just join the Discord server"
       },
       "choice": {
         "title": "Doorgaan met Discord",
