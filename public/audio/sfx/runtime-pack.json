@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "3de6b985ff908ba9f62a1c878ef92fad32cb1580803f61f49ad849c7ebd56d61",
-  "catalogHash": "91f09770fd63cf4e52f493c7b1ec45892f66f08b3bb6b1641d23e7a523227dbc",
+  "bundleId": "0f08c240f956222d47c41f9b345724ee41ce59559accb7c8ffa7aea8e671dfcd",
+  "catalogHash": "5465d5cc1ffb7d30921f47c5bc5b873659d81c63660e547e28bbc70888b32708",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1235,6 +1235,18 @@
           "url": "/audio/sfx/mob_reptile_hurt.mp3?v=c928f69207e1",
           "bytes": 15089,
           "sha256": "c928f69207e10688d06be28e90892e3575ee878347c71ae09ba3435e94170500"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mob_reptile_idle": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mob_reptile_idle.mp3?v=4dac1654ddda",
+          "bytes": 27001,
+          "sha256": "4dac1654ddda2ca7bda36de1d2db4ab8ee736365f6c0e231e273d6305ae41ddb"
         }
       ],
       "gain": 1,

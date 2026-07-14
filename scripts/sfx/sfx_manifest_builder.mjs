@@ -21,7 +21,7 @@ export const PROBE_EXTENSIONS = Object.freeze([
 
 // Valid mob vocalization actions, used as the right-hand anchor when parsing
 // mob_<family>_<subfamily>_<action>_<N>.mp3.
-export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt']);
+export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt', 'idle']);
 
 const KEY_PATTERN = /^[a-z0-9][a-z0-9_]*$/;
 const MOB_EXTENSION_FAMILIES = new Set(MOB_VOICE_FAMILIES);
