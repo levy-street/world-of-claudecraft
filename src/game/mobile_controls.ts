@@ -280,6 +280,17 @@ export class MobileControls {
   // owned by the router and never reach this canvas path.
   private pinchPointers = new Map<number, { x: number; y: number }>();
   private pinchPrevDist: number | null = null;
+  // Pointer ids for which releaseSwipeLook() has just performed its own
+  // deliberate releasePointerCapture() call. An explicit release also fires
+  // lostpointercapture per spec (same as an implicit one), and when a second
+  // finger lands mid pinch, onPinchDown -> releaseSwipeLook releases the
+  // swipe-look pointer's capture. Without this guard, the canvas
+  // lostpointercapture handler treats that echo as a real capture loss and
+  // tears down the pinch that just started (deletes the pointer, nulls
+  // pinchPrevDist), so the pinch is dead on arrival. Each id is consumed
+  // (deleted) by the handler the first time its echo is seen, rather than
+  // cleared on a timer, since the echo is not guaranteed to be synchronous.
+  private readonly releasingCaptureForPointer = new Set<number>();
   private swipeLookPointer: number | null = null;
   private swipeLookStartX = 0;
   private swipeLookStartY = 0;
@@ -416,6 +427,22 @@ export class MobileControls {
       this.onSwipeLookEnd(e);
     });
     this.canvas?.addEventListener('pointercancel', (e) => {
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
+    });
+    // iOS Safari can silently invalidate an active touch's pointer capture (a
+    // system gesture, Control Center swipe, an alert) WITHOUT ever firing
+    // pointerup or pointercancel. Without this, swipe-look/pinch state stays
+    // latched (setTouchLook never flips back), which reads to the player as
+    // the camera getting stuck spinning or losing rotate/zoom control
+    // (issue #1892). `lostpointercapture` is the one event guaranteed to
+    // fire when capture is lost, so treat it exactly like pointercancel here,
+    // mirroring the moveSurface/cameraJoystick handlers above.
+    this.canvas?.addEventListener('lostpointercapture', (e) => {
+      // Ignore the echo from releaseSwipeLook()'s own deliberate release (see
+      // releasingCaptureForPointer above): that release is already handled
+      // inline and must not also run onPinchEnd/onSwipeLookEnd here.
+      if (this.releasingCaptureForPointer.delete(e.pointerId)) return;
       this.onPinchEnd(e);
       this.onSwipeLookEnd(e);
     });
@@ -1053,6 +1080,7 @@ export class MobileControls {
     if (this.swipeLookPointer !== null) {
       try {
         if (this.canvas?.hasPointerCapture?.(this.swipeLookPointer)) {
+          this.releasingCaptureForPointer.add(this.swipeLookPointer);
           this.canvas.releasePointerCapture(this.swipeLookPointer);
         }
       } catch {

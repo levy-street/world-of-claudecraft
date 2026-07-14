@@ -87,7 +87,8 @@ export interface InputCallbacks {
       | 'calendar'
       | 'discord'
       | 'deeds'
-      | 'crafting',
+      | 'crafting'
+      | 'sheathe',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -916,6 +917,9 @@ export class Input {
         return;
       case 'chat':
         this.cb.onUiKey('chat');
+        return;
+      case 'sheathe':
+        this.cb.onUiKey('sheathe');
         return;
     }
   }

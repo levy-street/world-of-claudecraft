@@ -390,6 +390,7 @@ export const COMMAND_NAMES = [
   // (An admin "mute" is a moderation action, not a wire command.)
   'ignore_add',
   'ignore_remove',
+  'stow_weapon',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -497,6 +498,7 @@ export const COMMAND_FACETS = {
   claim_event_skin: 'IWorldCosmetics',
   unequip_mech_chroma: 'IWorldCosmetics',
   change_weapon_skin: 'IWorldCosmetics',
+  stow_weapon: 'IWorldCosmetics',
   // IWorldPet: hunter-pet commands (snake_case wire strings, by design; pet state
   // mirrors on the owned-mob entity wire, not a self-snapshot field).
   pet_abandon: 'IWorldPet',

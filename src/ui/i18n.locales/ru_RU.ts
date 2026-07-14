@@ -710,6 +710,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы недавно отправили несколько отчётов. Подождите немного перед следующим.',
   'hudChrome.bugReport.failed': 'Не удалось отправить отчёт об ошибке. Попробуйте снова.',
   'hudChrome.keybinds.emoteWheel': 'Колесо эмоций',
+  'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.targetFriendly': 'Ближайший союзник',
   'hudChrome.keybinds.targetFriendlyNext': 'Следующий союзник',
   'hudChrome.petFeed.disabledFullHp': 'Питомец полностью здоров',

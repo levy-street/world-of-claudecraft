@@ -1011,6 +1011,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    weaponStowed: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1888,6 +1889,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;
@@ -2426,6 +2428,14 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  toggleWeaponStow(): void {
+    // Optimistic local nudge (like changeSkin/playEmote) so the sheathe pose and
+    // its sound cue land instantly; the server re-validates (dead-gate) and the
+    // next snapshot's `ws` bit reconciles.
+    const p = this.entities.get(this.playerId);
+    if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
+    this.cmd({ cmd: 'stow_weapon' });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);

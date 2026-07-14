@@ -672,6 +672,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited': '你最近已傳送多份回報。請稍候再傳送。',
   'hudChrome.bugReport.failed': '無法傳送錯誤回報。請重試。',
   'hudChrome.keybinds.emoteWheel': '表情輪盤',
+  'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.targetFriendly': '選取最近友方',
   'hudChrome.keybinds.targetFriendlyNext': '切換友方目標',
   'hudChrome.petFeed.disabledFullHp': '寵物生命值已滿',

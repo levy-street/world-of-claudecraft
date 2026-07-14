@@ -694,6 +694,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.',
   'hudChrome.bugReport.failed': '버그 신고를 보낼 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.keybinds.emoteWheel': '감정 표현 휠',
+  'hudChrome.keybinds.sheathe': '무기 넣기/빼기',
   'hudChrome.keybinds.targetFriendly': '가장 가까운 아군 대상 지정',
   'hudChrome.keybinds.targetFriendlyNext': '아군 대상 순환',
   'hudChrome.petFeed.disabledFullHp': '펫의 체력이 가득 찼습니다',

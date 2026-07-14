@@ -928,6 +928,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
@@ -3775,6 +3776,11 @@ export class GameServer {
         if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
+      // and the combat auto-unsheathe rule.
+      case 'stow_weapon':
+        sim.toggleWeaponStow(pid);
+        break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':

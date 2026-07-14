@@ -253,6 +253,13 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'held',
     defaults: ['KeyX'],
   },
+  {
+    id: 'sheathe',
+    label: 'Sheathe/Unsheathe Weapon',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyZ'],
+  },
   // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
   // action-bar 1..5 stay free; every one is rebindable like any other action. The
   // handlers live in main.ts (onPet -> the IWorld pet commands).

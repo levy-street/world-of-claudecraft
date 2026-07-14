@@ -26,7 +26,7 @@ export const MOB_ACTIONS = new Set(['aggro', 'attack', 'death', 'hurt', 'idle'])
 const KEY_PATTERN = /^[a-z0-9][a-z0-9_]*$/;
 const MOB_EXTENSION_FAMILIES = new Set(MOB_VOICE_FAMILIES);
 export const SFX_MOB_EXTENSION_KEY_PATTERN =
-  /^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$/;
+  /^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$/;
 
 /** Return the canonical positive variant number, or null for zero, leading-zero,
  * unsafe, or otherwise invalid ids. Manifest discovery and source conformance
