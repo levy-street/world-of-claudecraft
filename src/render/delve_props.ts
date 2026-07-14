@@ -2,11 +2,62 @@
 // All geometry is deterministic: any randomness uses entityId as a seed,
 // never Math.random. Procedural materials go through surfaceMat() for dedup.
 // The chest prefers the real dungeon-kit GLB (chest_gold) when loaded and falls
-// back to procedural geometry otherwise. No DOM, no sim imports (render-only).
+// back to procedural geometry otherwise. The grave/wall/crate props each
+// prefer a small Tripo-generated GLB (see public/models/props/CLAUDE.md), same
+// fallback contract. No DOM, no sim imports (render-only).
 
 import * as THREE from 'three';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
+
+// Small standalone GLB props (not part of the shared dungeon-kit pack): load
+// once, clone per placement, and normalize to a target height like the reward
+// chest does with buildDungeonPropMesh below.
+const STANDALONE_PROP_URL = {
+  crackedGrave: '/models/props/cracked_grave.glb',
+  destructibleWall: '/models/props/destructible_wall.glb',
+  fallbackCrate: '/models/props/fallback_crate.glb',
+} as const;
+type StandalonePropKey = keyof typeof STANDALONE_PROP_URL;
+const loadedStandaloneProp = new Map<StandalonePropKey, THREE.Group>();
+
+if (typeof window !== 'undefined') {
+  for (const [key, url] of Object.entries(STANDALONE_PROP_URL) as [StandalonePropKey, string][]) {
+    registerPreload(
+      loadGltf(url).then((gltf) => {
+        loadedStandaloneProp.set(key, gltf.scene);
+      }),
+    );
+  }
+}
+
+/** Test-only window into the preload asset set (mirrors props.ts). */
+export const delvePropsPreloadInternalsForTest = { standalonePropUrl: STANDALONE_PROP_URL };
+
+// Clone the loaded GLB, scale it so its height matches targetHeight, and
+// re-seat its base on the floor (the GLB's own origin is not guaranteed to
+// sit at y=0). Returns null if the asset has not finished preloading yet.
+function buildStandaloneGlb(key: StandalonePropKey, targetHeight: number): THREE.Group | null {
+  const src = loadedStandaloneProp.get(key);
+  if (!src) return null;
+  const inst = src.clone(true);
+  inst.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+  const size = new THREE.Vector3();
+  new THREE.Box3().setFromObject(inst).getSize(size);
+  if (size.y > 1e-3) inst.scale.setScalar(targetHeight / size.y);
+  const seated = new THREE.Box3().setFromObject(inst);
+  inst.position.y -= seated.min.y;
+  const group = new THREE.Group();
+  group.add(inst);
+  return group;
+}
 
 // ---------------------------------------------------------------------------
 // Shared material helpers
@@ -199,7 +250,18 @@ function buildPressurePlate(
 // ---------------------------------------------------------------------------
 // delve_cracked_grave, broken/tilted tombstone over disturbed earth
 // ---------------------------------------------------------------------------
+const GRAVE_TARGET_H = 2.2;
+
 function buildCrackedGrave(entityId: number): { group: THREE.Group; height: number } {
+  const glb = buildStandaloneGlb('crackedGrave', GRAVE_TARGET_H);
+  if (glb) {
+    glb.rotation.z = ((entityId * 13) % 10) * 0.025 - 0.12;
+    return { group: glb, height: GRAVE_TARGET_H };
+  }
+  return buildProceduralCrackedGrave(entityId);
+}
+
+function buildProceduralCrackedGrave(entityId: number): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
 
   const tilt = ((entityId * 13) % 10) * 0.025 - 0.12; // -0.12 .. +0.1 rad
@@ -559,7 +621,15 @@ function buildSurfaceExit(): { group: THREE.Group; height: number } {
 // ---------------------------------------------------------------------------
 // delve_destructible_wall, cracked masonry wall section (80 HP breakable)
 // ---------------------------------------------------------------------------
+const DESTRUCTIBLE_WALL_TARGET_H = 6.5;
+
 function buildDestructibleWall(entityId: number): { group: THREE.Group; height: number } {
+  const glb = buildStandaloneGlb('destructibleWall', DESTRUCTIBLE_WALL_TARGET_H);
+  if (glb) return { group: glb, height: DESTRUCTIBLE_WALL_TARGET_H };
+  return buildProceduralDestructibleWall(entityId);
+}
+
+function buildProceduralDestructibleWall(entityId: number): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
 
   const wallMat = stoneMat(0x6a6460);
@@ -629,7 +699,15 @@ function buildDestructibleWall(entityId: number): { group: THREE.Group; height: 
 // ---------------------------------------------------------------------------
 // Fallback crate (for unknown delve_* ids)
 // ---------------------------------------------------------------------------
+const FALLBACK_CRATE_TARGET_H = 1.0;
+
 function buildFallbackCrate(entityId: number): { group: THREE.Group; height: number } {
+  const glb = buildStandaloneGlb('fallbackCrate', FALLBACK_CRATE_TARGET_H);
+  if (glb) return { group: glb, height: FALLBACK_CRATE_TARGET_H };
+  return buildProceduralFallbackCrate(entityId);
+}
+
+function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
   group.rotation.y = ((entityId * 17) % 7) * 0.45;
 

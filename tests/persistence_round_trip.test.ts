@@ -28,6 +28,14 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.arena2v2Rating = 1880;
     meta.arena2v2Wins = 11;
     meta.arena2v2Losses = 4;
+    meta.honor = 321;
+    meta.lifetimeHonor = 654;
+    meta.honorArenaDaily = {
+      date: '2026-07-11',
+      winsByOpponent: { '1v1:["character:9"]': 2 },
+      fiestaCompletionsByOpponent: { 'fiesta:["character:10","character:11"]': 1 },
+      totalWins: 5,
+    };
     meta.prestigeRank = 2;
     meta.unlockedMilestones = new Set(['m_first', 'm_second']);
     meta.restedXp = 321;
@@ -52,9 +60,20 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     const sim2 = makeWorld();
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const s2 = sim2.serializeCharacter(pid2)!;
-    expect(s2).toEqual(s1);
+    // The Book of Deeds legitimately enriches a save across a load: joining
+    // seeds the discovery ledger from held items (the hand-stuffed bank rows
+    // above bypassed the addItem hub) and the retro pass back-credits state
+    // predicates at join, while sim1 never ticked to evaluate. Everything
+    // else must round-trip byte-equal; the deed round-trip itself is pinned
+    // in tests/deeds.test.ts.
+    const { deeds: _d1, deedStats: _ds1, renown: _r1, ...rest1 } = s1;
+    const { deeds: _d2, deedStats: _ds2, renown: _r2, ...rest2 } = s2;
+    expect(rest2).toEqual(rest1);
     // spot-check that the rich fields actually survived (not all defaulted to empty).
     expect(s2.arena2v2Rating).toBe(1880);
+    expect(s2.honor).toBe(321);
+    expect(s2.lifetimeHonor).toBe(654);
+    expect(s2.honorArenaDaily).toEqual(meta.honorArenaDaily);
     expect(s2.delveMarks).toBe(17);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
@@ -79,6 +98,9 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'arena2v2Rating',
       'arena2v2Wins',
       'arena2v2Losses',
+      'honor',
+      'lifetimeHonor',
+      'honorArenaDaily',
       'skin',
       'skinCatalog',
       'pendingSkinRank',
@@ -105,6 +127,9 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     const m = sim2.meta(pid)!;
     expect(m.arena2v2Rating).toBe(m.arenaRating); // both default to ARENA_BASE_RATING
     expect(m.arena2v2Wins).toBe(0);
+    expect(m.honor).toBe(0);
+    expect(m.lifetimeHonor).toBe(0);
+    expect(m.honorArenaDaily).toBeUndefined();
     expect(m.delveMarks).toBe(0);
     expect(m.delveClears).toEqual({});
     expect(m.companionUpgrades).toEqual({});
@@ -119,6 +144,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     // re-serializing a defaulted character does not throw and fills the new fields.
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
     expect(sim2.serializeCharacter(pid)!.delveMarks).toBe(0);
+    expect(sim2.serializeCharacter(pid)!.honor).toBeUndefined();
   });
 
   it('the fiesta snapshot persists the PRE-fiesta level, not the standardized one', () => {

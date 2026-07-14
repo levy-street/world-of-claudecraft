@@ -35,14 +35,14 @@ export type FctKind =
   | 'heal'
   | 'xp'
   | 'rested-xp'
+  | 'honor'
   | 'self-note';
 
 /**
  * The combat-DAMAGE FCT kinds: the high-volume floaters (one per hit, the AoE / boss
- * burst spam) and the ONLY kinds that can crit. The low-tier drop-non-crit gate
- * applies ONLY to these, so a low-preset player still sees crit hits PLUS every low-volume
- * informational floater (xp, rested-xp, self-note) and avoidance word (miss, dodge); only
- * the non-crit damage-number spam (the actual cost driver) is shed.
+ * burst spam) and the ONLY kinds that can crit. This taxonomy classifies a floater as a
+ * damage NUMBER (versus an avoidance word or an informational floater like xp / self-note);
+ * every kind still spawns on every tier (no tier drops a damage number).
  */
 export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-done-ability',
@@ -50,7 +50,7 @@ export const DAMAGE_FCT_KINDS: ReadonlySet<FctKind> = new Set<FctKind>([
   'damage-taken',
 ]);
 
-/** Whether `kind` is a combat-damage floater (the low-tier drop-non-crit target). */
+/** Whether `kind` is a combat-damage floater (a damage number, not a word/info floater). */
 export function isDamageFctKind(kind: FctKind): boolean {
   return DAMAGE_FCT_KINDS.has(kind);
 }
@@ -73,6 +73,7 @@ export type FctColorToken =
   | 'heal'
   | 'xp'
   | 'rested-xp'
+  | 'honor'
   | 'self-note';
 
 /**
@@ -159,7 +160,7 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
       // (self grey / other white) so it needs no new CSS class.
       return isSelf ? 'miss-self' : 'miss-other';
     default:
-      // The seven non-avoidance kinds are their own color token 1:1; isSelf never
+      // Non-avoidance kinds are their own color token 1:1; isSelf never
       // changes their color in the live fct(), so it is ignored here.
       return kind;
   }

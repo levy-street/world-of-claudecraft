@@ -1,4 +1,5 @@
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
+import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -439,16 +440,28 @@ function baseHeight(x: number, z: number, seed: number): number {
   return h;
 }
 
+// The renderer seats each dock section relative to its shore anchor, then uses
+// the plank top as a raised walkable surface. Return the matching absolute
+// surface height, or -Infinity outside every deck footprint.
+function dockSurfaceHeight(x: number, z: number, seed: number): number {
+  let surface = -Infinity;
+  for (const dock of world().content.props.docks) {
+    const local = dockLocalPoint(dock, x, z);
+    if (dockSectionAtLocal(local.x, local.z) < 0) continue;
+    const line = dockSurfaceLine(dock, (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed));
+    surface = Math.max(surface, dockSurfaceYAt(line, local.z));
+  }
+  return surface;
+}
+
 // Ground height including instanced dungeon floors (flat, far off-world).
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
-  // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
-  // players can climb the bleachers (the boss-dais pattern, raised WALKABLE ground
-  // is the heightfield). This lives in groundHeight, NOT terrainHeight, so the
-  // render's flat terrain baseline (and the wooden deck/post geometry it seats on
-  // that baseline) is unchanged; the ramp just raises where the player stands, up
-  // onto the decks. Zero outside the stand footprints, so the pitch stays flat.
-  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  // Raised walkable props live in groundHeight, NOT terrainHeight, so the
+  // renderer's terrain baseline stays unchanged. Vale Cup adds tier lifts while
+  // docks contribute absolute plank surfaces seated against that baseline.
+  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -485,20 +498,26 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   for (const ridge of w.ridges) {
     const dz = Math.abs(z - ridge.z);
     if (dz < RIDGE_SIGMA * 3) {
-      const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
       const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
-      // jagged crest so the wall reads as mountains, not a berm: a coarse layer
-      // for peak/saddle shape plus a finer layer for crag/shoulder detail.
-      // Combined variance kept tight so the lowest saddle still beats the
-      // climb limit (tests/terrain_walls.test.ts).
-      // (each noise term is scaled by mountainDetail separately: multiplying
-      // by an exact 1 keeps in-world samples bit-identical, where regrouping
-      // the sum would drift them by ULPs and desync the parity goldens)
-      const crest =
-        1 +
-        (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
-        (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
-      mountainAdd += RIDGE_HEIGHT * crest * profile * pass;
+      // Inside the road pass `pass` is exactly 0, which zeroes the whole term
+      // (RIDGE_HEIGHT * crest * profile * pass), so skip the two crest fbm2
+      // there. The dropped term is a positive product times +0 = +0, and
+      // mountainAdd only ever accumulates >= 0, so this stays bit-identical.
+      if (pass > 0) {
+        const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
+        // jagged crest so the wall reads as mountains, not a berm: a coarse layer
+        // for peak/saddle shape plus a finer layer for crag/shoulder detail.
+        // Combined variance kept tight so the lowest saddle still beats the
+        // climb limit (tests/terrain_walls.test.ts).
+        // (each noise term is scaled by mountainDetail separately: multiplying
+        // by an exact 1 keeps in-world samples bit-identical, where regrouping
+        // the sum would drift them by ULPs and desync the parity goldens)
+        const crest =
+          1 +
+          (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
+          (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
+        mountainAdd += RIDGE_HEIGHT * crest * profile * pass;
+      }
     }
   }
 
@@ -516,11 +535,17 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
   // crag layer, same conservative combined variance so the climb-limit
   // invariant still holds along the whole rim.
-  const rimCrest =
-    1 +
-    (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
-    (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
-  mountainAdd += rim * 55 * rimCrest;
+  // Everywhere off the rim (the entire open world) `rim` is exactly 0, which
+  // zeroes rim * 55 * rimCrest; skip the two crest fbm2 there. The dropped
+  // term is +0 (rimCrest is always positive), and mountainAdd only ever
+  // accumulates >= 0, so this early-out is bit-identical (issue #1620).
+  if (rim > 0) {
+    const rimCrest =
+      1 +
+      (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
+      (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
+    mountainAdd += rim * 55 * rimCrest;
+  }
   // Terrace the combined mountain rise into stair-stepped bands (flat treads
   // + steep risers) instead of one smooth ramp, so slopes read as a stacked
   // rocky mountainside rather than a uniform incline. This does not reduce
@@ -534,8 +559,14 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // before the mountains got their craggy pass. (Blended as two products, not
   // lerp(a, b, t): at mountainDetail 1 / 0 the products are exactly
   // terraced + 0 / 0 + mountainAdd, keeping in-world samples bit-identical.)
-  const terraced = terraceStep(mountainAdd, TERRACE_STEP, TERRACE_TREAD, TERRACE_APRON);
-  h += terraced * mountainDetail + mountainAdd * (1 - mountainDetail);
+  // terraceStep(0) === 0 and the blend of a zero rise is +0, so away from every
+  // ridge/rim (mountainAdd === 0, the open world) this whole step is a no-op;
+  // skip it there. mountainAdd only accumulates >= 0, so === 0 means exactly +0
+  // and the guard is bit-identical (issue #1620).
+  if (mountainAdd !== 0) {
+    const terraced = terraceStep(mountainAdd, TERRACE_STEP, TERRACE_TREAD, TERRACE_APRON);
+    h += terraced * mountainDetail + mountainAdd * (1 - mountainDetail);
+  }
   h += mirefenImpactCraterOffset(x, z);
   h = applyEditLayer(x, z, h);
   return h;

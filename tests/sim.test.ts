@@ -202,7 +202,7 @@ describe('classic formulas', () => {
       'blade_dance',
       'sigil_of_flame',
       'eye_beam',
-      'metamorphosis',
+      'demon_ascendance',
     ]);
   });
 
@@ -384,7 +384,7 @@ describe('classic formulas', () => {
     const p = sim.player;
     p.resource = p.maxResource;
 
-    sim.castAbility('metamorphosis');
+    sim.castAbility('demon_ascendance');
 
     expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'form_demon' }));
     expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'buff_ap' }));

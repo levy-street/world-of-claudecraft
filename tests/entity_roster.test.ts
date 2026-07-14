@@ -5,6 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { DELVES, DELVE_X_MIN, isDelvePos, MOBS } from '../src/sim/data';
+import { createDeedRuntime } from '../src/sim/deeds';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
@@ -125,6 +126,7 @@ function makeCtx() {
     utcDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
+    readyChecks: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
@@ -187,12 +189,15 @@ function makeCtx() {
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
     countFungibleItem: vi.fn(() => 0),
+    countEnchantableItem: vi.fn(() => 0),
+    removeEnchantableItem: vi.fn(),
     completeQuestForDev: vi.fn(() => false),
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
     raidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
+    instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
@@ -214,6 +219,16 @@ function makeCtx() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    deedDirtyPids: new Set<number>(),
+    deedDirtyKeys: new Map<number, Set<string>>(),
+    worldBossEntityIds: [],
+    deedRuntime: createDeedRuntime(),
+    fiestaBotPids: [],
+    bumpDeedStat: vi.fn(),
+    markItemDiscovered: vi.fn(),
+    markVisited: vi.fn(),
+    markDeedsDirty: vi.fn(),
+    grantDeed: vi.fn(() => true),
     grantXp: vi.fn(),
     enterCombat: vi.fn(),
     hexOutputMult: vi.fn(() => 1),
@@ -285,6 +300,7 @@ function makeCtx() {
     lineOfSightBlocked: vi.fn(() => false),
     stopFollow: vi.fn(),
     partyInvite: vi.fn(),
+    readyCheckStart: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),

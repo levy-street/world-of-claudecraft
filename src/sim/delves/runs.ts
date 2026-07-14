@@ -39,6 +39,7 @@ import {
   MOBS,
   resolveDelveShopOffers,
 } from '../data';
+import * as deedsMod from '../deeds';
 import {
   DELVE_MODULE_LAYOUTS,
   type DelveModuleId,
@@ -61,6 +62,7 @@ import {
   DT,
   dist2d,
   type Entity,
+  emptyMoveInput,
   INSTANCE_EMPTY_TIMEOUT,
   type RiteIntensity,
   type Vec3,
@@ -394,6 +396,9 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.targetId = null;
   p.autoAttack = false;
   run.emptyFor = 0;
+  // Whole-run roster watermark, taken after the teleport so the count includes
+  // this player; it only ever grows for the life of the run.
+  run.deedMaxParty = Math.max(run.deedMaxParty ?? 0, ctx.partyMembersForKey(key).length);
   if (key.startsWith('solo:') && delve.autoCompanionId && !run.companion) {
     ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId);
   }
@@ -447,6 +452,7 @@ export function claimDelveRun(
   run.completed = false;
   run.emptyFor = 0;
   run.deathsThisRun = {};
+  run.deedMaxParty = 0;
   run.objectState = {};
   run.raiseDeadChannel = null;
   run.restlessPending = [];
@@ -563,6 +569,7 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.completed = false;
   run.emptyFor = 0;
   run.deathsThisRun = {};
+  run.deedMaxParty = 0;
   run.objectState = {};
   run.raiseDeadChannel = null;
   run.restlessPending = [];
@@ -632,13 +639,14 @@ export function ejectToDelveDoor(
   // The Keeper's Toll survives a delve eject too (see resurrection.ts); all else clears.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
-  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods);
+  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);
   p.hp = p.maxHp;
   p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
   p.targetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
   p.autoAttack = false;
+  Object.assign(r.meta.moveInput, emptyMoveInput());
 }
 
 export function failDelveRun(ctx: SimContext, run: DelveRun): void {
@@ -759,6 +767,9 @@ export function grantDelveClearTo(
   );
   meta.copper += copper;
   unlockNextDelveLore(ctx, meta, pid);
+  // Clear predicates re-check; a heroic run whose watermark never saw a second
+  // player is the solo task.
+  deedsMod.onDelveClearForDeeds(ctx, meta, run);
   ctx.maybeCompanionBark(run, pid, 'completion');
   restorePetFromDelveStash(ctx, pid);
   ctx.emit({ type: 'delveComplete', delveId: run.delveId, tierId: run.tierId, pid });
@@ -1517,6 +1528,8 @@ export function companionUpgrade(ctx: SimContext, companionId: string, pid?: num
   r.meta.delveMarks -= cost.marks;
   r.meta.copper -= cost.copper;
   r.meta.companionUpgrades[companionId] = next;
+  // Companion-rank predicates read this map; re-evaluate on the next pass.
+  ctx.markDeedsDirty(r.meta.entityId);
   ctx.emit({
     type: 'log',
     text: `${def.name} reaches rank ${next}.`,

@@ -93,12 +93,12 @@
       "source": "scripts/assets/demon_hunter_skill_atlas.png"
     },
     {
-      "abilityId": "metamorphosis",
+      "abilityId": "demon_ascendance",
       "sourceCell": {
         "column": 1,
         "row": 2
       },
-      "output": "metamorphosis.webp",
+      "output": "demon_ascendance.webp",
       "source": "scripts/assets/demon_hunter_skill_atlas.png"
     },
     {

@@ -15,6 +15,7 @@ import { CLASSES } from '../sim/data';
 import {
   type AuraKind,
   armorReduction,
+  type CoreStats,
   type PlayerClass,
   SPELL_POWER_PER_INT,
   type Stats,
@@ -48,7 +49,8 @@ export type StatId =
   | 'critChance'
   | 'dodge'
   | 'critRating'
-  | 'hasteRating';
+  | 'hasteRating'
+  | 'warfare';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -99,7 +101,7 @@ export interface StatSource {
 /** One equipped item's stat contribution, as the HUD reads it from ITEMS. */
 export interface GearStatSource {
   name: string;
-  stats?: Partial<Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>>;
+  stats?: Partial<CoreStats>;
   spellPower?: number;
 }
 
@@ -117,6 +119,9 @@ export interface StatTooltipModel {
   isPrimary: boolean;
   /** The stat's current displayed value (header / informational). */
   statValue: number;
+  /** The two live effects summarized by the single player-facing Warfare stat. */
+  warfareDamageIncrease?: number;
+  warfareDamageReduction?: number;
   effects: StatEffect[];
   /** Show "Of little benefit to your class." (Int/Spi on a non-mana class). */
   minorForClass: boolean;
@@ -240,6 +245,8 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
   let dpsApproxNote = false;
   let isPrimary = true;
   let statValue = 0;
+  let warfareDamageIncrease: number | undefined;
+  let warfareDamageReduction: number | undefined;
 
   switch (stat) {
     case 'str': {
@@ -336,12 +343,21 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.hasteRating;
       break;
     }
+    case 'warfare': {
+      isPrimary = false;
+      statValue = stats.pvpOffense * 100;
+      warfareDamageIncrease = stats.pvpOffense * 100;
+      warfareDamageReduction = stats.pvpDefense * 100;
+      break;
+    }
   }
 
   return {
     stat,
     isPrimary,
     statValue,
+    warfareDamageIncrease,
+    warfareDamageReduction,
     effects,
     minorForClass,
     baseChanceNote,
@@ -365,13 +381,13 @@ const PRIMARY_BUFF_KINDS: Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'
 
 /** Base value of a primary attribute (or armor) from class + level, before any
  *  gear / buff / talent layer. Mirrors recalcPlayerStats' opening derivation. */
-function basePrimary(cls: PlayerClass, key: keyof Stats, level: number): number {
+function basePrimary(cls: PlayerClass, key: keyof CoreStats, level: number): number {
   const def = CLASSES[cls];
   return def.baseStats[key] + def.statsPerLevel[key] * (level - 1);
 }
 
 /** Sum the contribution of one attribute (or spellPower) across equipped gear. */
-function gearTotal(gear: GearStatSource[], key: keyof Stats | 'spellPower'): number {
+function gearTotal(gear: GearStatSource[], key: keyof CoreStats | 'spellPower'): number {
   let total = 0;
   for (const g of gear) {
     if (key === 'spellPower') total += g.spellPower ?? 0;
@@ -483,6 +499,7 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // description carries the meaning, so no per-source breakdown line.
     case 'critRating':
     case 'hasteRating':
+    case 'warfare':
       return sources;
   }
 }

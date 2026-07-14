@@ -329,6 +329,24 @@ export function ensureDungeonAssets(): Promise<void> {
   return dungeonAssetsPromise;
 }
 
+// Kit-pack modules loaded on demand by scenes outside the dungeon interiors
+// (the jail). They land in the same moduleAssets/material registry, so
+// buildDungeonPropMesh serves them once resolved.
+const extraModulePromises = new Map<string, Promise<void>>();
+
+export function loadKitModules(names: readonly string[]): Promise<void> {
+  return Promise.all(
+    names.map((name) => {
+      let task = extraModulePromises.get(name);
+      if (!task) {
+        task = loadModuleAsset(name, 'kit');
+        extraModulePromises.set(name, task);
+      }
+      return task;
+    }),
+  ).then(() => undefined);
+}
+
 // Fold the dungeon GLBs into the boot preload (like terrain/foliage/props/sky)
 // instead of fetching them lazily on first dungeon approach. Without this the
 // kit + Halloween-bits modules stream in (and their shaders compile) the moment

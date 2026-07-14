@@ -33,29 +33,39 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import type { SpatialAudioSink, Surface } from './audio_sink';
+import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
-import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
+import {
+  type AnimState,
+  type CharacterVisual,
+  createCharacterVisual,
+  setWeaponVfxViewportHeight,
+} from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
+import {
+  playerRangedAttackAlreadyStarted,
+  playerRangedAttackStartsAtLaunch,
+} from './characters/skin_attack';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
-import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -76,6 +86,7 @@ import {
 } from './gfx';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { buildJailScene } from './jail_scene';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
@@ -88,6 +99,11 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import {
+  applyPointLightBudget,
+  type RankedPointLight,
+  reconcileViewPointLights,
+} from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
@@ -121,8 +137,13 @@ import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_tea
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
+import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+
+// Festival gold/white celebration palette, shared by the Vale Cup full-time
+// draw show and the Book of Deeds unlock burst (one palette, two sites).
+const FESTIVAL_GOLD_COLORS: readonly number[] = [0xffd14d, 0xfff2c0];
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -169,25 +190,9 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 const ENTITY_LOD_RANGE_SQ = 58 * 58;
 
-// Crowd-adaptive character LOD. In a dense scene (capital, raid, world boss) the
-// dominant client cost is many full-articulated rigs plus their shadow passes,
-// which the frame-budget governor cannot shed (characters are non-governable).
-// Once the visible-rig count climbs past a soft knee, pull the articulated-LOD
-// and full-shadow distances in toward a floor so more of the throng collapses to
-// the single-draw far LOD + static proxy shadow. Below the knee (ordinary play,
-// a handful of rigs) the scale is exactly 1, so normal scenes are untouched.
-// FPS-first: in a crowd the frozen far-pose that shows a little sooner is a fair
-// trade for staying above 60. Distances compare squared, so scale is squared.
-const CROWD_LOD_SOFT_RIGS = 14;
-const CROWD_LOD_HARD_RIGS = 48;
-const CROWD_LOD_MIN_SCALE = 0.6;
-function crowdLodScaleSq(visibleRigs: number): number {
-  if (visibleRigs <= CROWD_LOD_SOFT_RIGS) return 1;
-  const span = CROWD_LOD_HARD_RIGS - CROWD_LOD_SOFT_RIGS;
-  const t = Math.min(1, (visibleRigs - CROWD_LOD_SOFT_RIGS) / span);
-  const scale = 1 - t * (1 - CROWD_LOD_MIN_SCALE);
-  return scale * scale;
-}
+// Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
+// animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
+//
 // Feet-above-terrain margin that counts as "airborne" for the jump pose. Mirrors
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
@@ -540,6 +545,7 @@ export interface EntityView {
   demonVisual: CharacterVisual | null; // demon hunter metamorphosis form, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -548,6 +554,7 @@ export interface EntityView {
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
   nameEl: HTMLDivElement;
+  titleEl: HTMLDivElement; // Book of Deeds title subtitle (players only)
   guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
   hpFill: HTMLDivElement;
@@ -565,6 +572,7 @@ export interface EntityView {
   nameplateTransform: string;
   nameplateSig: string;
   nameplateHpWidth: string;
+  titleSig: string; // cheap-diff for the deed-title subtitle (lang|deed id)
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
@@ -572,6 +580,7 @@ export interface EntityView {
   devTierValue: number; // last-applied devTier, to diff cheaply
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
   discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
+  aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -889,6 +898,11 @@ export class Renderer {
   // engage re-seeds from the live interpolated facing instead of snapping. See
   // facing_smooth.ts for why the camera-driven yaw must be rate-limited.
   private selfFacingOverride: number | null = null;
+  // Camera yaw applied on the previous camera-driven frame. advanceSelfFacing
+  // subtracts it to tell the camera's ongoing rotation (applied 1:1) apart from
+  // the residual engage gap (rate-limited), so a fast flick never lags. Null
+  // while disengaged so the next engage re-seeds cleanly.
+  private selfFacingLastTarget: number | null = null;
   private cameraLookAt = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
   private chatBubbles = new Map<number, { el: HTMLDivElement; until: number }>();
@@ -932,12 +946,7 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: {
-    light: THREE.PointLight;
-    d2: number;
-    worldPos: THREE.Vector3;
-    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
-  }[] = [];
+  private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -954,6 +963,7 @@ export class Renderer {
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
+  private readonly ambientPointSources: readonly AmbientPointSource[];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -1041,6 +1051,7 @@ export class Renderer {
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
+    this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
@@ -1275,7 +1286,14 @@ export class Renderer {
       this.scene.add(cl);
     }
 
-    this.terrainView = buildTerrain(this.sim.cfg.seed);
+    // A returning character can log out anywhere in a zone, not only at a
+    // hub, so the far streaming queue is ordered by distance to the actual
+    // entry position (entity_roster.ts: this.sim.player.pos.x/z) rather than
+    // whatever row-major order the chunk grid happens to walk.
+    this.terrainView = buildTerrain(this.sim.cfg.seed, {
+      x: this.sim.player.pos.x,
+      z: this.sim.player.pos.z,
+    });
     setRenderCategory(this.terrainView.group, 'terrain');
     this.scene.add(this.terrainView.group);
     // Terrain chunks never move after build (the LOD update only toggles
@@ -1351,6 +1369,10 @@ export class Renderer {
       setRenderCategory(this.placedAssetsView.group, 'props');
       this.scene.add(this.placedAssetsView.group);
     }
+
+    const jailScene = buildJailScene(this.sim.cfg.seed);
+    setRenderCategory(jailScene, 'props');
+    this.scene.add(jailScene);
 
     const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
     setRenderCategory(gatherNodes.group, 'props');
@@ -1583,7 +1605,12 @@ export class Renderer {
       this.post.composer.setPixelRatio(ratio);
       this.post.setSize(this.viewport.width, this.viewport.height);
     }
-    this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
+    this.vfx.setViewportScale(devicePxHeight, 60);
+    // Weapon-skin VFX point sprites size against the device-pixel height too:
+    // future rigs read the module value, live rigs re-scale in place.
+    setWeaponVfxViewportHeight(devicePxHeight);
+    for (const v of this.views.values()) v.visual?.setWeaponVfxPixelScale(devicePxHeight);
   }
 
   /** Tone-mapping exposure multiplier (1.0 = the default look). */
@@ -1604,13 +1631,7 @@ export class Renderer {
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
-    if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevelAt(x, z);
-    if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
-    const biome = zoneBiomeAt(z);
-    if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
-    return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
+    return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
@@ -2918,15 +2939,23 @@ export class Renderer {
     switch (ev.type) {
       case 'spellfx':
         if (ev.fx === 'windup') {
-          // A petSpell windup telegraph: start the throw animation NOW; the
+          // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
-          // the clip's release pose (the acolyte def's attackTimeScale is
-          // tuned so both meet).
+          // the clip's release pose.
           this.triggerAttack(ev.sourceId);
           break;
         }
+        // Player ranged attacks begin when their projectile launches. The live
+        // CharacterVisual chooses the authored crossbow/default clip or the bow
+        // skin's cosmetic draw override without changing the sim timeline.
+        if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
+            this.triggerAttack(ev.sourceId);
+        }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
@@ -2963,15 +2992,24 @@ export class Renderer {
         this.triggerAttack(ev.sourceId);
         this.vfx.bladeDance(ev.targetId, ev.school);
         break;
-      case 'damage':
-        // every melee/ranged swing animates the attacker for all to see
-        if (ev.school === 'physical' && ev.sourceId !== -1) this.triggerAttack(ev.sourceId);
+      case 'damage': {
+        // Every melee/ranged hit animates the attacker. A ranged projectile
+        // carrying the typed launch cue already began its cosmetic one-shot,
+        // so do not restart that same shot when its damage lands.
+        const source = this.sim.entities.get(ev.sourceId);
+        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
+          source?.kind,
+          ev.attackAnimationStarted,
+        );
+        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
+          this.triggerAttack(ev.sourceId);
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
         break;
+      }
       case 'heal2':
         if (ev.amount > 0 || ev.crit) this.vfx.healGlow(ev.targetId);
         break;
@@ -2991,6 +3029,25 @@ export class Renderer {
       case 'levelup':
         this.vfx.levelUpPillar(this.sim.playerId);
         break;
+      case 'deedUnlocked': {
+        // Book of Deeds earned moment: one festival-gold shell just above the
+        // player's head (the hud pid gate already dropped other players'
+        // copies). Retro back-credits (the on-join catch-up) draw nothing;
+        // the HUD folds them into a single summary line. A reduced-motion
+        // player skips the burst too: it is a sudden personal flash at the
+        // camera's focus, and the banner plus gold log line carry the moment.
+        if (!shouldPlayDeedFirework(ev, this.reducedMotion())) break;
+        const v = this.views.get(this.sim.playerId);
+        if (!v) break;
+        const p = this.sim.player;
+        this.tmpV.set(
+          v.group.position.x,
+          v.group.position.y + v.height * (p.scale ?? 1) + 2.2,
+          v.group.position.z,
+        );
+        this.vfx.fireworkBurst(this.tmpV, FESTIVAL_GOLD_COLORS, 46, 1.1);
+        break;
+      }
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
@@ -3059,7 +3116,7 @@ export class Renderer {
           const nation = ev.winner === 'A' ? ev.nationA : ev.nationB;
           this.queueValeCupFireworks(ev.x, ev.z, nationColors(nation, away), 10);
         } else {
-          this.queueValeCupFireworks(ev.x, ev.z, [0xffd14d, 0xfff2c0], 5);
+          this.queueValeCupFireworks(ev.x, ev.z, FESTIVAL_GOLD_COLORS, 5);
         }
         break;
       }
@@ -3483,9 +3540,21 @@ export class Renderer {
     // CDN); if it fails to load, hide it rather than leave the browser's broken-image
     // placeholder on the plate. Attached once here; the element is reused per entity.
     attachAvatarFallback(discordEl);
+    // operator-set AI-account tag, inline before the name. A SEPARATE span, never a
+    // restyled .np-name: the name's black text-shadow is what keeps it legible over
+    // bright terrain, and the tag's background-clip: text cannot coexist with it.
+    // Keeping them apart also lets an AI account who is also Discord staff keep its
+    // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
+    const aiEl = document.createElement('span');
+    aiEl.className = 'np-ai';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
+    // Book of Deeds title subtitle under the name (players only); hidden
+    // until the entity's `title` wire field resolves to real text
+    const titleEl = document.createElement('div');
+    titleEl.className = 'np-title';
+    titleEl.style.display = 'none';
     // guild tag under the name (players in a guild); hidden until set
     const guildEl = document.createElement('div');
     guildEl.className = 'np-guild';
@@ -3512,7 +3581,9 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       castBar,
@@ -3524,22 +3595,12 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
-    const viewLights: THREE.PointLight[] = [];
-    group.traverse((o) => {
-      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
-    });
-    if (viewLights.length > 0) {
-      for (const light of viewLights) {
-        // Remember the design intensity ONCE: pooled object views are reused, and by
-        // the time one is re-taken the budget may have dimmed the light to 0, so
-        // reading it again would stick it dark. userData persists on the pooled light.
-        if (typeof light.userData.budgetBase !== 'number')
-          light.userData.budgetBase = light.intensity;
-        this.viewLights.push(light);
-      }
+    const reconciledLights = reconcileViewPointLights(group, [], this.viewLights);
+    const viewLights = reconciledLights.lights;
+    if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light-budget rebuild caches light.getWorldPosition, and r165's
+      // the light budget reads light.getWorldPosition, and r165's
       // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
       // ancestor, so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
@@ -3558,6 +3619,7 @@ export class Renderer {
       clickTarget,
       nameplate: np,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       hpFill,
@@ -3574,6 +3636,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -3583,6 +3646,7 @@ export class Renderer {
       nameplateTransform: '',
       nameplateSig: '',
       nameplateHpWidth: '',
+      titleSig: '',
       comboSig: '',
       tierValue: 0,
       devTierValue: 0,
@@ -3597,6 +3661,8 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
+      // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
+      weaponSkinId: null,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3675,7 +3741,18 @@ export class Renderer {
     v.height = next.height;
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.group.add(next.root);
+    this.reconcileViewLights(v);
+  }
+
+  private reconcileViewLights(v: EntityView): void {
+    const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
+    if (!reconciled.changed) return;
+    v.viewLights = reconciled.lights;
+    this.lightRankDirty = true;
+    if (v.viewLights.length > 0) this.lightOwnerGroups.add(v.group);
+    else this.lightOwnerGroups.delete(v.group);
   }
 
   triggerAttack(entityId: number): void {
@@ -4036,6 +4113,7 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
         const i = this.viewLights.indexOf(light);
@@ -4184,6 +4262,7 @@ export class Renderer {
       this.lastSelfId = p.id;
       this.selfRenderPositionReady = false;
       this.selfFacingOverride = null;
+      this.selfFacingLastTarget = null;
       // A still-decaying predictor-handoff offset belongs to the previous
       // character; leaking it would displace the new one for a few frames.
       this.selfMotionOffset.set(0, 0, 0);
@@ -4235,6 +4314,7 @@ export class Renderer {
     const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
     const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
     const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
+    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -4252,6 +4332,9 @@ export class Renderer {
       let hasDemonForm = false;
       let hasBlur = false;
       let hasStealth = false;
+      let hasShadowform = false;
+      let hasMoonkin = false;
+      let hasMetamorph = false;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4261,6 +4344,9 @@ export class Renderer {
         if (a.kind === 'form_demon') hasDemonForm = true;
         if (a.id === 'blur' || a.id.startsWith('blur_')) hasBlur = true;
         if (a.kind === 'stealth') hasStealth = true;
+        if (a.kind === 'form_shadow') hasShadowform = true;
+        if (a.kind === 'form_moonkin') hasMoonkin = true;
+        if (a.kind === 'form_metamorph') hasMetamorph = true;
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -4351,12 +4437,16 @@ export class Renderer {
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
       if (id === p.id && renderFacingOverride !== null) {
-        // Rate-limit the camera-driven heading so engaging mouselook (or starting
-        // to move in Mouse Camera mode) rotates the model smoothly toward the
-        // camera instead of teleporting it up to 180deg in a single frame. Seed
-        // from the current interpolated facing on first engage.
-        facing = stepSelfFacing(this.selfFacingOverride ?? facing, renderFacingOverride, dt);
+        // Follow the camera-driven heading, easing in the one-time engage gap
+        // (up to 180deg when engaging after an orbit) under the rate limiter
+        // while applying the camera's ongoing rotation 1:1. Seed the model and
+        // the last-target from the current values on first engage so the whole
+        // seed gap is treated as residual and a fast flick never trails behind.
+        const prevModel = this.selfFacingOverride ?? facing;
+        const lastTarget = this.selfFacingLastTarget ?? renderFacingOverride;
+        facing = advanceSelfFacing(prevModel, renderFacingOverride, lastTarget, dt);
         this.selfFacingOverride = facing;
+        this.selfFacingLastTarget = renderFacingOverride;
       } else if (id === p.id && this.selfFacingOverride !== null) {
         // Disengage frame: route the return to the interpolated sim facing
         // through the SAME rate limiter so releasing mouselook mid-flick (before
@@ -4365,6 +4455,7 @@ export class Renderer {
         const r = releaseSelfFacing(this.selfFacingOverride, facing, dt);
         facing = r.facing;
         this.selfFacingOverride = r.done ? null : r.facing;
+        this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
 
@@ -4446,6 +4537,15 @@ export class Renderer {
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
         v.visual.setWeapon(e.mainhandItemId);
+        this.reconcileViewLights(v);
+      }
+
+      // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
+      // or a peer, via the identity wire); replaces the held model + rarity VFX
+      if (e.weaponSkinId !== v.weaponSkinId) {
+        v.weaponSkinId = e.weaponSkinId;
+        v.visual.setWeaponSkin(e.weaponSkinId);
+        this.reconcileViewLights(v);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
@@ -4518,6 +4618,12 @@ export class Renderer {
       v.travelVisual?.setBlurred(active === v.travelVisual && hasBlur);
       v.demonVisual?.setBlurred(active === v.demonVisual && hasBlur);
       active.setSoulRend(characterSoulRendActive(e));
+      // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
+      // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
+      // Metamorphosis also grows the body via Entity.scale in the sim.
+      active.setShadowform(hasShadowform);
+      active.setMoonkin(hasMoonkin);
+      active.setMetamorph(hasMetamorph);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
@@ -4640,14 +4746,24 @@ export class Renderer {
       }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // distance-tiered mixer updates: near = every frame, mid = every 2nd,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless
+      // Distance-tiered mixer updates: near = every frame, mid = every Nth,
+      // far (static LOD mesh visible) = every 6th; edges latch regardless.
+      // Both the near band and the mid cadence follow the same crowd-adaptive
+      // LOD the shadow bands use, because sampling clips + rebuilding bone
+      // matrices is the per-rig cost that actually scales with the crowd.
+      //
+      // Animation smoothness is cosmetic, but a cast windup is a telegraph the
+      // player reacts to, so the local player, the current target, and anything
+      // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      if (id !== p.id) {
+      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
+        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
       active.update(dt, st, animate);
+      // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
+      // few uniform writes per handle, so they stay smooth at every LOD tier
+      v.visual.updateWeaponVfx(dt);
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -4674,6 +4790,14 @@ export class Renderer {
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+      }
+      // Shapeshift-form particle auras riding the tints above: metamorph fire,
+      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+      // (the auras themselves drop, but a corpse must not smolder for a frame).
+      if (!e.dead) {
+        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
@@ -5094,9 +5218,9 @@ export class Renderer {
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
   // but only the nearest GFX.maxPointLights within range shine each frame.
-  // Rank entries are pooled (extended only when interiors add lights) and
-  // world positions cached once — the lights never move — so this hot loop
-  // allocates nothing and skips the sort while the budget isn't contended.
+  // Rank entries are pooled (extended only when interiors or view lights change).
+  // Static world positions stay cached; moving weapon VFX refresh into their
+  // existing vectors, so this hot loop allocates nothing.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
     // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
@@ -5104,7 +5228,8 @@ export class Renderer {
     // numPointLights would change as it streams in/out and recompile every lit
     // material. Rebuild only when the set changes (dirty), or when fire lights grow
     // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. View positions are cached at rebuild; lights never move.
+    // refreshes distances. Static positions are cached; dynamic weapon-light
+    // positions refresh in applyPointLightBudget.
     const want = this.fireLights.length + this.viewLights.length;
     if (this.lightRankDirty || ranked.length !== want) {
       ranked.length = 0;
@@ -5114,19 +5239,22 @@ export class Renderer {
           d2: 0,
           worldPos: light.getWorldPosition(new THREE.Vector3()),
           base: null,
+          dynamic: false,
         });
       }
       for (const light of this.viewLights) {
         const stored = light.userData.budgetBase;
         const base = typeof stored === 'number' ? stored : light.intensity;
-        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+        const dynamic = light.userData.budgetDynamic === true;
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: dynamic ? null : base,
+          dynamic,
+        });
       }
       this.lightRankDirty = false;
-    }
-    for (const entry of ranked) {
-      const dx = entry.worldPos.x - px,
-        dz = entry.worldPos.z - pz;
-      entry.d2 = dx * dx + dz * dz;
     }
     // Keep a CONSTANT number of point lights `visible` so numPointLights in every
     // material's program cache key never changes as the player travels. Three counts
@@ -5139,19 +5267,7 @@ export class Renderer {
     // governor (effectivePointLights) only changes how many SHINE, not the count.
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
-    for (let i = 0; i < ranked.length; i++) {
-      const entry = ranked[i];
-      const counted = i < visibleCount;
-      entry.light.visible = counted;
-      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
-      if (entry.base !== null) {
-        // view light: no flicker pass restores it, so drive its intensity directly
-        entry.light.intensity = shine ? entry.base : 0;
-      } else if (counted && !shine) {
-        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
-      }
-    }
+    applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only
@@ -5286,6 +5402,7 @@ export class Renderer {
       this.terrainView.rebuildRegion(region.minX, region.minZ, region.maxX, region.maxZ);
       return;
     }
+    this.terrainView.cancelStreaming();
     const old = this.terrainView.group;
     this.scene.remove(old);
     const firstMesh = old.children.find((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh | undefined;
@@ -5484,8 +5601,8 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
-      const crowd = !inDungeon && isAtSowfield(px, pz) ? (this.sim.cupInfo?.live ? 1 : 0.4) : 0;
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd);
+      const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
     }
   }
 

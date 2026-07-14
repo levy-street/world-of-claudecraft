@@ -132,7 +132,7 @@ function staticWorldColliders(seed: number): Collider[] {
     out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
   }
 
-  // dock huts
+  // Dock decks are raised walkable ground in world.ts; only the hut blocks.
   for (const d of PROPS.docks) {
     const hut = rotY(d.hutLocal.x, d.hutLocal.z, d.rot);
     const x = d.x + hut.x,
@@ -296,9 +296,16 @@ const FENCE_END_PAD = 0.35;
 /** Blocker walls are full-height (a jump never clears one, unlike a fence);
  * this is only the camera-occlusion top for the record. */
 const BLOCKER_WALL_HEIGHT = 6;
-/** Rail height of a fence (yards), used for camera occlusion. A jump passes
- * through fences while airborne regardless (see sim `Entity.jumping`). */
-const FENCE_RAIL_HEIGHT = 2.8;
+/**
+ * Visual top of a low village fence rail (yards). The fence.glb rail is ~0.33yd
+ * native and renders at ~2.9x, so its silhouette tops out around waist height.
+ * Fences are `camGhost`, so camera occlusion skips them and this value feeds
+ * ONLY the spell line-of-sight check (`sightBlockedAt`): it MUST stay below
+ * `SIGHT_HEIGHT` (1.6) so a caster sees and casts over a fence, matching what
+ * the player sees on screen (issue #1668). The old 2.8 (a stale camera-occlusion
+ * guess, ~3x the real rail) sat above the eye line and wrongly blocked casts. A
+ * jump still clears the rail for movement regardless (see sim `Entity.jumping`). */
+const FENCE_RAIL_HEIGHT = 0.95;
 
 interface ColliderGrid {
   cells: Map<string, Collider[]>;

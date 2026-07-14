@@ -76,7 +76,7 @@ export function hobbyCraftText(craftId: string | null): string {
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
-// The ten character-sheet stat cells, primaries down the left column and derived
+// The character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
 // from the unit-tested stat_tooltip_view model, so the order is the only stat
 // concern this painter owns.
@@ -94,6 +94,7 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'warfare',
 ];
 
 /**
@@ -128,6 +129,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderSkinPicker(): void;
   openPlayerCard(): void;
   openPrestige(): void;
+  /** Open the Book of Deeds (the active-title line's button). */
+  openDeeds(): void;
 }
 
 // Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
@@ -209,6 +212,10 @@ export class CharWindow {
     el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
       this.deps.openPrestige(),
     );
+    el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openDeeds();
+    });
     el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openPlayerCard();

@@ -19,7 +19,7 @@ const abilities = [
   'blade_dance',
   'sigil_of_flame',
   'eye_beam',
-  'metamorphosis',
+  'demon_ascendance',
   'vengeful_retreat',
 ];
 

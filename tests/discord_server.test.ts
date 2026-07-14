@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,11 +25,13 @@ import {
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
+  handleNativeDiscordExchange,
   handleSwagClaim,
 } from '../server/discord';
+import { resetNativeDiscordHandoffsForTest } from '../server/native_discord_handoff';
 import { resetAuthFailures, resetDiscordRateLimits } from '../server/ratelimit';
 
-function makeReq(opts: { url?: string; body?: unknown } = {}): any {
+function makeReq(opts: { url?: string; body?: unknown; origin?: string } = {}): any {
   const req: any =
     opts.body !== undefined
       ? Readable.from([Buffer.from(JSON.stringify(opts.body))])
@@ -38,7 +41,7 @@ function makeReq(opts: { url?: string; body?: unknown } = {}): any {
           },
         });
   req.url = opts.url ?? '/';
-  req.headers = { host: 'worldofclaudecraft.com' };
+  req.headers = { host: 'worldofclaudecraft.com', ...(opts.origin ? { origin: opts.origin } : {}) };
   req.socket = { remoteAddress: '127.0.0.1' };
   return req;
 }
@@ -126,6 +129,7 @@ beforeEach(() => {
   findAccountRows = [];
   accountInsertRow = [{ id: 5, username: 'Maxp', password_hash: 'h' }];
   resetDiscordRateLimits();
+  resetNativeDiscordHandoffsForTest();
   resetAuthFailures();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
@@ -135,6 +139,9 @@ afterEach(() => {
 });
 
 const noopGrant = () => {};
+const NATIVE_VERIFIER = 'A'.repeat(43);
+const NATIVE_CHALLENGE = createHash('sha256').update(NATIVE_VERIFIER).digest('base64url');
+const NATIVE_STATE_REDIRECT = `worldofclaudecraft://discord-auth?challenge=${NATIVE_CHALLENGE}`;
 function parse(res: any) {
   return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
 }
@@ -201,6 +208,20 @@ describe('POST /api/auth/discord/start', () => {
     );
     expect(insert).toBeTruthy();
     expect(url.searchParams.get('code_challenge')).not.toBeNull();
+  });
+
+  it('marks native starts with the allowlisted app return URL', async () => {
+    const res = makeRes();
+    await handleDiscordStart(makeReq({ origin: 'capacitor://localhost' }), res, {
+      mode: 'login',
+      accountId: null,
+      native: true,
+      nativeChallenge: NATIVE_CHALLENGE,
+    });
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO discord_oauth_states'),
+    );
+    expect(insert?.[1]?.[4]).toBe(NATIVE_STATE_REDIRECT);
   });
 
   it('503s when Discord is not configured', async () => {
@@ -584,6 +605,158 @@ describe('GET /api/auth/discord/callback', () => {
     // A session token is minted in the payload; the chooser is not offered.
     expect(res.body).toContain('"token"');
     expect(res.body).not.toContain('"choose":true');
+  });
+
+  it('returns a native returning user through a one-time handoff code', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: NATIVE_STATE_REDIRECT,
+      },
+    ];
+    ownerRows = [{ account_id: 1 }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(res.statusCode).toBe(302);
+    const location = new URL(String(res.headers.Location));
+    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.hostname).toBe('discord-auth');
+    expect(location.searchParams.get('mode')).toBe('login');
+    const handoffCode = location.searchParams.get('code') ?? '';
+    expect(handoffCode).toMatch(/^[A-Za-z0-9_-]{20,80}$/);
+    expect(location.searchParams.has('token')).toBe(false);
+    expect(location.searchParams.has('linkToken')).toBe(false);
+
+    const exchange = makeRes();
+    await handleNativeDiscordExchange(
+      makeReq({ body: { code: handoffCode, verifier: NATIVE_VERIFIER } }),
+      exchange,
+    );
+    expect(parse(exchange).status).toBe(200);
+    expect(parse(exchange).data.token).toMatch(/^[a-f0-9]{64}$/);
+    expect(parse(exchange).data.username).toBe('maxp');
+  });
+
+  it('keeps a first-time native chooser secret behind the app-held verifier', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: NATIVE_STATE_REDIRECT,
+      },
+    ];
+    ownerRows = [];
+    mockDiscordFetch();
+    const callback = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      callback,
+    );
+    const location = new URL(String(callback.headers.Location));
+    const handoffCode = location.searchParams.get('code') ?? '';
+    expect(callback.statusCode).toBe(302);
+    expect(location.searchParams.has('linkToken')).toBe(false);
+    expect(location.searchParams.has('choose')).toBe(false);
+
+    const intercepted = makeRes();
+    await handleNativeDiscordExchange(
+      makeReq({ body: { code: handoffCode, verifier: 'B'.repeat(43) } }),
+      intercepted,
+    );
+    expect(parse(intercepted).status).toBe(401);
+
+    const exchange = makeRes();
+    await handleNativeDiscordExchange(
+      makeReq({ body: { code: handoffCode, verifier: NATIVE_VERIFIER } }),
+      exchange,
+    );
+    expect(parse(exchange).status).toBe(200);
+    expect(parse(exchange).data.choose).toBe(true);
+    expect(parse(exchange).data.linkToken).toMatch(/^[a-f0-9]{64}$/);
+    expect(parse(exchange).data.token).toBeUndefined();
+  });
+
+  it('returns a native cancellation to the app after consuming its state', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: NATIVE_STATE_REDIRECT,
+      },
+    ];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch' as any);
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?error=access_denied&state=s' }),
+      res,
+    );
+    expect(res.statusCode).toBe(302);
+    const location = new URL(String(res.headers.Location));
+    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.searchParams.get('ok')).toBe('0');
+    expect(location.searchParams.get('error')).toBe('cancelled');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns a blocked native callback to the app without revealing the block', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: NATIVE_STATE_REDIRECT,
+      },
+    ];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch' as any);
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+      () => true,
+    );
+    expect(res.statusCode).toBe(302);
+    const location = new URL(String(res.headers.Location));
+    expect(location.searchParams.get('ok')).toBe('0');
+    expect(location.searchParams.get('error')).toBe('server_error');
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns a successful native link to the app', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'link',
+        account_id: 1,
+        redirect_to: NATIVE_STATE_REDIRECT,
+      },
+    ];
+    ownerRows = [];
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(res.statusCode).toBe(302);
+    const location = new URL(String(res.headers.Location));
+    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.searchParams.get('ok')).toBe('1');
+    expect(location.searchParams.get('mode')).toBe('link');
+    expect(location.searchParams.get('username')).toBe('Maxp');
   });
 });
 

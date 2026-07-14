@@ -236,4 +236,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
+  'guide.deedsPage.cat.delve': 'Excavations',
+  'hudChrome.deeds.catDelve': 'Excavations',
 };

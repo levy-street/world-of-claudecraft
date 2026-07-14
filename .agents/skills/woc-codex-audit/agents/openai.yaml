@@ -1,0 +1,6 @@
+interface:
+  display_name: "Codex Architecture Audit"
+  short_description: "Audit Codex support for safety, clarity, and drift"
+  default_prompt: "Use $woc-codex-audit to assess the World of ClaudeCraft Codex architecture against current official conventions."
+policy:
+  allow_implicit_invocation: true

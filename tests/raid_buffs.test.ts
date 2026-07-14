@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { FAERIE_FIRE_ARMOR_PCT, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
+import {
+  type Aura,
+  type Entity,
+  FAERIE_FIRE_ARMOR_PCT,
+  SUNDER_ARMOR_PCT_PER_STACK,
+} from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // Standardized percent raid buffs (resurrecting PR #1038 on release/v0.21.0): the six
@@ -33,6 +38,17 @@ const ready = (sim: Sim, pid: number) => {
   const e = sim.entities.get(pid)!;
   e.resource = e.maxResource;
 };
+
+const blessingAura = (sourceId: number, value: number, remaining = 1800): Aura => ({
+  id: 'blessing_of_might',
+  name: 'Oath of Iron',
+  kind: 'buff_ap_pct',
+  remaining,
+  duration: remaining,
+  value,
+  sourceId,
+  school: 'holy',
+});
 
 describe('standardized percent raid buffs', () => {
   it('the six raid-buff abilities carry the percent-point buffTarget shape', () => {
@@ -147,6 +163,54 @@ describe('standardized percent raid buffs', () => {
     sim.castAbility('devotion_aura', pal);
     expect(sim.entities.get(ally)!.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
     expect(sim.entities.get(ally)!.stats.armor).toBe(Math.round(armorBefore * 1.1));
+  });
+
+  it('replaces the previous Blessing of Might from another caster', () => {
+    const sim = makeWorld();
+    const first = sim.addPlayer('paladin', 'Ald');
+    const second = sim.addPlayer('paladin', 'Borin');
+    const targetId = sim.addPlayer('warrior', 'War');
+    const target = sim.entities.get(targetId)!;
+    sim.setPlayerLevel(4, first);
+    sim.setPlayerLevel(4, second);
+
+    ready(sim, first);
+    sim.targetEntity(targetId, first);
+    sim.castAbility('blessing_of_might', first);
+    const firstAura = target.auras.find((a) => a.id === 'blessing_of_might')!;
+    firstAura.remaining = 1200;
+
+    ready(sim, second);
+    sim.targetEntity(targetId, second);
+    sim.castAbility('blessing_of_might', second);
+
+    const blessings = target.auras.filter((a) => a.id === 'blessing_of_might');
+    expect(blessings).toHaveLength(1);
+    expect(blessings[0].sourceId).toBe(second);
+    expect(blessings[0].value).toBe(10);
+    expect(blessings[0].remaining).toBe(1800);
+  });
+
+  it('keeps the newest stronger Blessing of Might value', () => {
+    const sim = makeWorld();
+    const first = sim.addPlayer('paladin', 'Ald');
+    const second = sim.addPlayer('paladin', 'Borin');
+    const target = sim.entities.get(sim.addPlayer('warrior', 'War'))!;
+
+    (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(
+      target,
+      blessingAura(first, 10, 900),
+    );
+    (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(
+      target,
+      blessingAura(second, 15, 1800),
+    );
+
+    const blessings = target.auras.filter((a) => a.id === 'blessing_of_might');
+    expect(blessings).toHaveLength(1);
+    expect(blessings[0].sourceId).toBe(second);
+    expect(blessings[0].value).toBe(15);
+    expect(blessings[0].duration).toBe(1800);
   });
 });
 

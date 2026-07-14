@@ -49,6 +49,8 @@ export interface IWorldParty {
   partyInfo: PartyInfo | null;
   partyInvite(targetPid: number): void;
   partyAccept(): void;
+  // Answer the leader's active ready check (yes/no prompt on readyCheckStart).
+  readyCheckRespond(ready: boolean): void;
   partyDecline(): void;
   partyLeave(): void;
   partyKick(targetPid: number): void;

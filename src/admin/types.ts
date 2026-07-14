@@ -1,3 +1,4 @@
+import type { StreamerLinks } from './account_flair';
 import type { AccountStatus } from './account_status';
 
 // Shapes returned by the /admin/api endpoints (mirrors server/admin_db.ts
@@ -202,6 +203,8 @@ export interface AccountRow {
   createdAt: string;
   lastLogin: string | null;
   isAdmin: boolean;
+  isAi: boolean;
+  isStreamer: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
   characterCount: number;
@@ -272,6 +275,9 @@ export interface AccountDetail {
   createdAt: string;
   lastLogin: string | null;
   isAdmin: boolean;
+  isAi: boolean;
+  isStreamer: boolean;
+  streamerLinks: StreamerLinks;
   online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
@@ -279,6 +285,8 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -533,8 +541,13 @@ export interface PerfPhaseStats {
 }
 
 export interface PerfCaptureResult {
+  captureId: string;
   capturedAt: number; // epoch ms the window closed
   durationMs: number;
+  loopCallbacks: number;
+  simTicks: number;
+  catchUpCallbacks: number;
+  maxTicksPerCallback: number;
   online: number;
   simEntities: number;
   profile: {
@@ -545,6 +558,7 @@ export interface PerfCaptureResult {
 }
 
 export interface PerfCaptureStatus {
+  captureId: string | null;
   capturing: boolean;
   endsAt: number | null; // epoch ms the in-flight capture closes
   last: PerfCaptureResult | null;

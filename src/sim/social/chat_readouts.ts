@@ -290,6 +290,8 @@ export function formReadout(e: Entity): string {
       a.kind === 'form_bear' ||
       a.kind === 'form_cat' ||
       a.kind === 'form_travel' ||
+      a.kind === 'form_moonkin' ||
+      a.kind === 'form_shadow' ||
       a.kind === 'defensive_stance' ||
       a.kind === 'stealth',
   );

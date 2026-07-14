@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
 
@@ -16,7 +16,10 @@ function installStorage(): void {
   };
 }
 
-function makeInput() {
+function makeInput(userAgent?: string) {
+  vi.stubGlobal('navigator', {
+    userAgent: userAgent ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0',
+  });
   const canvasListeners = new Map<string, (event: any) => void>();
   const windowListeners = new Map<string, (event: any) => void>();
   const documentListeners = new Map<string, (event: any) => void>();
@@ -57,6 +60,7 @@ function makeInput() {
     onTab: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
+    onPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -87,6 +91,33 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe('Input camera zoom', () => {
+  it('zooms the camera with the mouse wheel on desktop', () => {
+    const { canvasListeners, input } = makeInput();
+    const preventDefault = vi.fn();
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBeCloseTo(13.4);
+  });
+
+  it('ignores canvas wheel zoom while the mobile touch HUD is active', () => {
+    const { canvasListeners, input, setMobileTouch } = makeInput();
+    const preventDefault = vi.fn();
+    setMobileTouch(true);
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBe(12);
+  });
+});
+
 describe('Input autorun', () => {
   it('toggleAutorun flips state and feeds forward into readMoveInput', () => {
     const { input } = makeInput();
@@ -95,6 +126,14 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.toggleAutorun()).toBe(false);
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('setAutorun idempotently syncs external analog latches', () => {
+    const { input } = makeInput();
+    expect(input.setAutorun(true)).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.setAutorun(false)).toBe(false);
     expect(input.readMoveInput().forward).toBe(false);
   });
 
@@ -174,6 +213,35 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.debugState().keys).toEqual([]);
+  });
+});
+
+describe('Input pet bar chords', () => {
+  it('dispatches onPet for the default Ctrl+Digit pet chords and cancels the browser default', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const cases: Array<[string, string]> = [
+      ['Digit1', 'attack'],
+      ['Digit2', 'stop'],
+      ['Digit3', 'taunt'],
+      ['Digit4', 'defensive'],
+      ['Digit5', 'aggressive'],
+    ];
+    for (const [code, action] of cases) {
+      const preventDefault = vi.fn();
+      windowListeners.get('keydown')!({ code, ctrlKey: true, repeat: false, preventDefault });
+      expect(cb.onPet).toHaveBeenCalledWith(action);
+      // The chord carries Ctrl, so the browser accelerator default is cancelled.
+      expect(preventDefault).toHaveBeenCalled();
+    }
+  });
+
+  it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onPet).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0); // Digit1 -> action bar slot 0
   });
 });
 
@@ -313,7 +381,7 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
-  it('uses normal mouse dragging instead of pointer lock while browser fullscreen is active', () => {
+  it('requests pointer lock while browser fullscreen is active', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
@@ -322,7 +390,167 @@ describe('Input pointer lock', () => {
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, requests pointer lock synchronously from mousedown for the camera-look button (#1834)', () => {
+    // Firefox denies requestPointerLock() when it is deferred to a later
+    // mousemove once the drag threshold is crossed, so on Firefox the request
+    // must happen inside the mousedown handler itself, before any movement.
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, does not request pointer lock on mousedown for the click-to-move button', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setClickMoveMouseButton(0);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('on Firefox in classic camera mode, requests pointer lock synchronously for a LEFT drag too (blocking regression #1840)', () => {
+    // Classic mode still lets either button start a camera drag (leftDown ||
+    // rightDown in onMouseMove); the synchronous Firefox request must cover
+    // left, not only the mode's nominal look button (right, in classic mode).
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox in Mouse Camera mode, requests pointer lock synchronously for button 0', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setMouseCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox in Mouse Camera mode, requests pointer lock synchronously for a RIGHT drag too (blocking regression #1840)', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setMouseCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, does not request pointer lock on mousedown when "Lock Cursor While Rotating" is off', () => {
+    const { canvas, input, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+    input.setLockCursorOnRotate(false);
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('on Chrome, does not request pointer lock synchronously on mousedown (deferred path keeps #116 fixed)', () => {
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('exits pointer lock if the async grant lands after mouseup already released (should-fix regression #1840)', () => {
+    // A fast click can beat requestPointerLock()'s async resolution: mouseup
+    // runs first (nothing to release yet, since pointerLockElement is still
+    // null), then the grant lands late via pointerlockchange with no button
+    // held. Without the pointerlockchange guard the canvas would stay locked
+    // with no drag active until the next press/release cycle.
+    const { canvas, documentListeners, canvasListeners, windowListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: canvas });
+    expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
+
+    (globalThis as any).document.pointerLockElement = canvas;
+    documentListeners.get('pointerlockchange')!({});
+
+    expect((globalThis as any).document.exitPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the lock when the grant lands while the button is still held', () => {
+    const { canvas, documentListeners, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+
+    (globalThis as any).document.pointerLockElement = canvas;
+    documentListeners.get('pointerlockchange')!({});
+
+    expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
   });
 
   it('does not rotate the camera before the drag threshold, so short sloppy clicks stay stable', () => {
@@ -602,6 +830,70 @@ describe('Input Discord keybind', () => {
   });
 });
 
+describe('Input Book of Deeds keybind', () => {
+  it("dispatches onUiKey('deeds') for the default Shift+Z chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('deeds');
+  });
+
+  it('bare KeyZ no longer reaches deeds (Damage Meters owns the letter now)', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('deeds');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input chat keybind', () => {
+  it("dispatches onUiKey('chat') for the default Enter key", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault: vi.fn() });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('chat');
+  });
+
+  it('cancels the default action so the newly-focused composer does not also see this keydown as a newline', () => {
+    // Regression: opening chat focuses the composer textarea as a side effect
+    // of this very keydown. Left un-prevented, the browser still delivers the
+    // follow-up keypress/input (and its default newline insertion) to
+    // whichever element is now focused, so Enter both opened chat AND typed a
+    // newline into it before the placeholder was ever visible.
+    const { windowListeners } = makeInput();
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  it('does not cancel a focused button own Enter activation when it also opens chat', () => {
+    // A focused button (e.g. a HUD button reached via Tab) still activates on
+    // Enter today; only the composer-newline case needs its default cancelled.
+    const { cb, windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON' };
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('chat');
+    expect(preventDefault).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input Space handling', () => {
   it('prevents native Space button activation while preserving jump input', () => {
     const { input, windowListeners } = makeInput();
@@ -792,7 +1084,7 @@ describe('Input modifier combos', () => {
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
     cb.onAbilityDown.mockClear();
-    // Shift+1 is a distinct, unbound chord — it must NOT fire bare slot 0.
+    // Shift+1 is a distinct, unbound chord: it must NOT fire bare slot 0.
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
     expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });
