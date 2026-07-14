@@ -123,6 +123,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
@@ -165,6 +166,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   HEROIC_ITEMS,
+  WARFARE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -195,6 +197,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
+  [FURY_NPC.id]: FURY_NPC,
   brother_halven: BROTHER_HALVEN,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
@@ -220,6 +223,13 @@ export const QUEST_ORDER: string[] = [
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
 ];
+
+// The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
+// here: this merge module sits on the guide entry's static import graph (via
+// icons.ts and the entity localizers), and a re-export would color the deeds
+// table, hidden deeds included, into a chunk the public wiki serves (guarded
+// by tests/guide.test.ts). Consumers import DEEDS/DEED_ORDER directly from
+// './content/deeds'.
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
 // before others shifts their spawn positions. New rare-elite camps

@@ -7,28 +7,61 @@
 esbuild-bundled for Node via `npm run server` (output `dist-server`); persists to
 Postgres and serves the built client from `dist/`.
 
+## Module-first: where new server code lands
+- **A new REST endpoint** is a `RouteDef` module (`server/<domain>.ts`) registered in
+  `server/http/registry.ts` (recipe below), never an inline handler in `main.ts`.
+- **New WS/loop-side behavior** is a sibling module, never another `GameServer`/`main.ts`
+  method cluster. Pure decision logic (join rules, command parsing, rate windows) goes in a
+  host-agnostic module a Vitest imports directly (exemplars: `linkdead.ts` `planJoin`,
+  `moderation_commands.ts`); anything needing IO goes behind an injected deps bag or a narrow
+  host interface so it tests without a DB or HTTP server (exemplars: `ws_auth.ts`
+  `createWsAuth`, `moderation_service.ts`). `wallet_link.ts` (pure, IO-free) versus
+  `wallet.ts` (DB+HTTP shell) is the same split for REST domains.
+- **A new domain's tables** go in an exported `<DOMAIN>_SCHEMA` DDL constant in its
+  `<domain>_db.ts`, applied by `ensureSchema` (`db.ts`) under the advisory lock (exemplars:
+  `SOCIAL_SCHEMA`, `MAPS_SCHEMA`); only core character/account/token/world-state DDL lives
+  in `db.ts` `SCHEMA` itself.
+- **Tests** go in `tests/` (endpoint tests via the `FakeDb` helpers below). Bug fixes are
+  test-first: a failing repro (extract the pure core if buried), then the smallest green change.
+
 ## Key files
+The load-bearing seams, not an inventory (`ls server/*.ts` for the live set; a `<domain>.ts`
+logic module pairs with a `<domain>_db.ts` that owns its SQL).
+
 | File | Role |
 |---|---|
-| `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade + auth handshake, boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
-| `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file** |
-| `db.ts` | `pg` pool, `SCHEMA` DDL, all character/account/token/world-state queries |
+| `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
+| `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
+| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit |
+| `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
+| `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
+| `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries |
 | `auth.ts` | scrypt hashing, `newToken`, name/password validators (`obscenity` profanity) |
+| `account.ts`, `totp.ts` | account self-service routes: password change/forgot/reset, verified email change, data export, TOTP 2FA (`totp.ts` is the pure RFC 6238 core) |
 | `social.ts`/`social_db.ts` | friends/guilds/blocks/presence, logic / SQL |
-| `admin.ts`/`admin_db.ts`, `moderation_db.ts` | admin API + dashboard reads / moderation writes |
-| `admin_permissions.ts`/`admin_routes.ts`/`staff_db.ts` | fine-grained admin authz: permission vocabulary + role bundles / declarative route-to-permission map (fail-closed, guarded by `tests/admin_routes.test.ts`) / `accounts.admin_roles` SQL + `admin_role_changes` audit (docs/prd/admin-permissions.md) |
+| `admin.ts`/`admin_db.ts` | admin API + dashboard reads |
+| `admin_permissions.ts`/`admin_routes.ts`/`staff_db.ts` | fine-grained admin authz: permission vocabulary + role bundles / declarative route-to-permission map (fail-closed, guarded by `tests/admin_routes.test.ts`) / `accounts.admin_roles` SQL + `admin_role_changes` audit |
+| `moderation_commands.ts`/`moderation_service.ts`/`moderation_db.ts` | pure parser for the in-game moderator chat commands (`/kick` `/mute` `/ban` `/suspend` `/spectate` `/jail`, ..., with duration caps) / the moderation service behind a host interface, wired into `GameServer` / writes + unified history |
 | `chat_filter.ts`/`chat_filter_db.ts` | host-agnostic profanity/slur filter (soft cosmetic + hard server-enforced tiers) / admin word-list SQL |
 | `bot_detector/contract.ts` / `stub.ts` | `BotDetector` seam (`#bot-detector`): the contract interface / the no-op stub used when the private clone is absent |
-| `antibot_config_db.ts` | per-realm JSONB state plus append-only audit history for the bot-detector runtime config (the admin Bot Detector > Configuration panel); validation and live apply happen inside the detector (`BotDetector.applyConfig`), replayed in `startServer()` right after the first `liveGame()` touch (next to `configureAdminRuntime`) |
+| `antibot_config_db.ts` | per-realm JSONB state plus append-only audit history for the bot-detector runtime config (the admin Bot Detector > Configuration panel); validation and live apply happen inside the detector (`BotDetector.applyConfig`) |
 | `turnstile.ts`, `web_login_guard.ts` | Cloudflare Turnstile siteverify / auth-endpoint Origin guard (anti-bot) |
 | `realm.ts` | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
 | `ratelimit.ts` | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
 | `internal.ts` | secret-gated `/internal/*` ops endpoints (e.g. restart-countdown trigger) |
-| `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `woc_balance.ts` | the sole Solana RPC reader: holder-tier flair and connected-wallet balance, cached |
 | `player_card.ts` | shareable player-card PNGs, Open Graph unfurl, referral capture |
 | `bank_ledger.ts` | append-only `bank_ledger` observer: diffs `Sim.bankInfoFor` around each bank dispatch and writes the moved delta via a fire-and-forget FIFO (audited offline by `scripts/bank_audit.mjs`) |
 | `bank_entitlements.ts` | pure bonus-slot source registry + `computeBankBonus` (email verified / Discord / wallet / qualified referrals); stamped at the fresh-join handshake via the injected `WsAuthDeps.bankBonusForAccount`, never client-supplied |
+| `deeds_db.ts` / `deeds_records.ts` | deeds SQL boundary (`character_deeds` upserts, rarity counts, recent earns, broadcast opt-out; the board roll-up is `deedsBoardRanked` in `db.ts`, aggregated SQL-side with Renown passed as parameters) / the `deedUnlocked` observer: fire-and-forget FIFO upserts, the `isMarqueeDeed` predicate, and the env-gated Steam mirror hook (the marquee guild/friend broadcast fan-out itself lives in `game.ts`); the sim decides unlocks, this only records them |
+| `deeds_board.ts` / `deeds.ts` | the Renown leaderboard's pure scoring core (account-level dedupe, entry floor, score-then-earliest tie-break; Renown values come from the content table, never SQL) / the `RouteDef` API surface (public rarity read, broadcast toggle), TTL-cached in `main.ts` |
+| `steam/` | the env-gated (`STEAM_ENABLED`, off by default) Steam achievements mirror: link-not-login ticket handshake, `achievement_map.ts` (deed id to `ACH_*`, hard cap 100), publisher Web API push + reconcile-on-link |
+| `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans live HERE, not in `moderation_db` |
+| `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains |
+| `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
+| `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
+| `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
+| `tick_profiler.ts` / `tick_rate_meter.ts` / `client_perf_metrics_db.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header), capped client-perf aggregates behind `/metrics` |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
 
 ## Invariants, YOU MUST keep these
@@ -44,20 +77,28 @@ Postgres and serves the built client from `dist/`.
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,
   `social.ts`, `admin.ts`) carry zero raw SQL: `SocialService` talks to a
   `SocialDb` interface so tests use an in-memory fake. Don't inline `pool.query` in a logic module.
-  `wallet_link.ts` (pure, IO-free, unit-testable without a DB) versus `wallet.ts` (DB+HTTP shell) is the canonical IO/pure split to copy, mirroring `chat_filter.ts`/`chat_filter_db.ts` and `SocialService`/`SocialDb`.
 - **`ALLOW_DEV_COMMANDS=1` gates `dev_level`/`dev_teleport`/`dev_give`** (dev/E2E only, **never prod**).
 
 ## Persistence model
-- Character level + full state (gear/bags/bank/quests/position/money/talents/arena/lifetimeXp)
-  stored as **JSONB** in `characters.state`; `serializeCharacter` converts to and from the `Sim`.
+- Character level + full state (gear/bags/bank/quests/position/money/talents/arena/lifetimeXp/
+  deeds/deedStats/activeTitle/renown) stored as **JSONB** in `characters.state`;
+  `serializeCharacter` converts to and from the `Sim`.
   Same-blob atomicity is the bank's anti-dupe cornerstone: the personal bank NEVER gets its own
   `world_state` row. Treat the bank rollout as forward-only (a pre-bank binary's save drops the field).
 - **Per-character load lease** (`character_leases`): acquired at the WS handshake between
   `getCharacter` and `game.join` (90 s TTL, heartbeats on the autosave loop, nonce-fenced release),
   so two processes can never double-load one character. `bank_ledger` is the append-only per-op
   audit trail (`scripts/bank_audit.mjs` replays it offline).
+- **Disconnect is not leave.** `linkdead.ts` holds a dropped session in-world for
+  `LINKDEAD_GRACE_MS` (5 min); `planJoin` (pure, unit-tested) decides resume/reject/join, and a
+  resume never re-acquires the lease. Forced disconnects (moderation, takeover, anti-bot) skip
+  grace and tear down via `GameServer.leave()`. Never resume a session whose teardown has begun
+  (the `left` flag): the reconnect would get a zombie whose lease is released under it.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
-  `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state` key `market:<realm>`), realm-scoped like everything else; a pre-scoping bare `'market'` row is migrated by a one-shot per-seller-realm partitioned backfill (`server/market_backfill.ts`) that `ensureSchema` runs under the advisory lock, recording completion in the `'market_backfill_done'` marker row and RETAINING the legacy `'market'` row for rollback (see `docs/api-pipeline/phase-20-rollback-runbook.md`). Market writes are gated at boot until that marker is confirmed.
+  `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state`
+  key `market:<realm>`), realm-scoped like everything else; the one-shot legacy `'market'` row
+  backfill lives in `server/market_backfill.ts`, its rollback story in
+  `docs/api-pipeline/phase-20-rollback-runbook.md`.
 - **Character names are globally `UNIQUE`** (catch `23505`, return 409 "name taken").
 - Leaderboards (`topLifetimeXp`, `topArenaRatings`) sort on JSONB expressions and
   are read through the **in-memory cache in main.ts**, never per-request under load.
@@ -69,6 +110,12 @@ Postgres and serves the built client from `dist/`.
 - Auth: scrypt + bearer token (`auth_tokens`, 64-hex). REST uses
   `Authorization: Bearer`; WS authenticates via the first message. Banned/suspended
   accounts blocked at both entry points (`moderationStatusForAccount`).
+- Sign-in surfaces beyond password: Apple native sign-in (`apple_auth.ts`/`apple_auth_db.ts`),
+  the native-app Discord login handoff (`native_discord_handoff.ts`), Electron desktop login
+  codes (`desktop_login.ts`/`desktop_login_routes.ts`), and the companion OAuth grants
+  (`oauth.ts`). Native apps must present a platform attestation (`native_attestation.ts`);
+  the Electron `app://` desktop origins bypass Turnstile by Origin header alone, a deliberate,
+  documented softening (see the `passesTurnstile` header in `turnstile.ts`).
 - Rate limiting: `rateLimited(req)` on register/login + admin login. Behind a proxy
   set `TRUSTED_PROXY_IPS`; otherwise private/loopback sources are trusted to set XFF.
 
@@ -86,20 +133,16 @@ Postgres and serves the built client from `dist/`.
    `tests/command_schema.test.ts` (W0b).
 
 - **Delta-key registry.** The heavy self fields `selfWireJson` may omit are written
-  with `maybe(...)`; the 35 such keys plus their terse-key to IWorld-name mapping are
+  with `maybe(...)`; the delta keys and their terse-key to IWorld-name mapping are
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
-  which guards the `selfWireJson` (encode) to `applySnapshot` (decode) round-trip. A
-  new heavy self field lands in `selfWireJson` (here) and `applySnapshot` (`online.ts`)
-  in one commit, and is added to that registry.
+  which owns the list and guards the `selfWireJson` (encode) to `applySnapshot`
+  (decode) round-trip. A new heavy self field lands in `selfWireJson` (here) and
+  `applySnapshot` (`online.ts`) in one commit, and is added to that registry.
 
-- **Workstream #4 inherits this command + encoder surface.** Workstream #3 (the World
-  API refactor) made the `CommandName` table and the 20-facet `IWorld` real; the
-  PHYSICAL `game.ts` restructure is workstream #4. #4 owns reordering the
-  `dispatchMessage` switch into facet sections, extracting per-facet command modules,
-  and grouping/extracting the `selfWireJson` encoder into a facet-aligned encoder.
-  Until #4 lands, add new commands inline as above. See
-  `docs/refactor/world-api-to-server-runtime-handoff.md` for exactly what #4 inherits
-  and owns.
+- The PHYSICAL `game.ts` restructure (facet-ordered dispatch, per-facet command
+  modules, a facet-aligned encoder) is workstream #4; until it lands, add new
+  commands inline as above. Scope and ownership:
+  `docs/refactor/world-api-to-server-runtime-handoff.md`.
 
 ## The REST request pipeline (`server/http/`)
 Every REST surface (`/api`, `/oauth`, `/admin/api`, `/internal`) runs through the in-house

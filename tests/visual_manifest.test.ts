@@ -13,6 +13,7 @@ import {
   visibleAttachmentsForGraphics,
   visualKeyFor,
 } from '../src/render/characters/manifest';
+import { NPCS } from '../src/sim/data';
 
 function expectedClipNames(clips: ClipMap): string[] {
   return [
@@ -60,6 +61,44 @@ describe('character visual manifest', () => {
     const atlas = SKINS.npc_fernando?.[0];
     expect(atlas).toBe('textures/skins/rogue/fernando.png');
     expect(existsSync(fileURLToPath(new URL(`../public/${atlas}`, import.meta.url)))).toBe(true);
+  });
+
+  it('resolves all three Chroniclers to the shared scholarly-mage visual', () => {
+    // One def, three tints: the per-NPC NpcDef color carries each identity,
+    // so the def must keep tint 'entity', and the three colors must stay
+    // pairwise distinct and off the bursar gold and auctioneer amethyst.
+    for (const templateId of [
+      'chronicler_saul',
+      'chronicler_osric_fenn',
+      'chronicler_edda_hartwell',
+    ]) {
+      expect(visualKeyFor({ kind: 'npc', templateId } as never)).toBe('npc_chronicler');
+    }
+    const visual = VISUALS.npc_chronicler;
+    expect(visual.url).toBe('models/chars/players/mage.glb');
+    expect(visual.show).toEqual(['Mage_Hat']);
+    expect(visual.tint).toBe('entity');
+    expect(visual.attach?.map((a) => a.url)).toEqual([
+      'models/weapons/staff.glb',
+      'models/weapons/spellbook_open.glb',
+    ]);
+    expect(visual.attach?.[1]?.gripRef).toBe('Spellbook_open');
+
+    expect(NPCS.chronicler_saul.color).toBe(0xd08a2e);
+    expect(NPCS.chronicler_osric_fenn.color).toBe(0x3fa66b);
+    expect(NPCS.chronicler_edda_hartwell.color).toBe(0x5a6fd6);
+    const reserved = [NPCS.bursar_petra_vell.color, 0xc9a227, 0x8e5ad6];
+    for (const id of [
+      'chronicler_saul',
+      'chronicler_osric_fenn',
+      'chronicler_edda_hartwell',
+    ] as const) {
+      expect(reserved).not.toContain(NPCS[id].color);
+    }
+    // The Thornpeak chronicler's display name is renamed to Zenzie while the
+    // template id stays (save compatibility); pin the English so a revert
+    // cannot land silently.
+    expect(NPCS.chronicler_edda_hartwell.name).toBe('Chronicler Zenzie');
   });
 
   it('uses the custom boar death clip without relying on a speed override', () => {

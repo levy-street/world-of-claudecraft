@@ -457,6 +457,7 @@ export function yumiCatDamaged(
   school: string,
   ability: string | null,
   kind: 'hit' | 'miss' | 'dodge',
+  attackAnimationStarted = false,
 ): void {
   if (match.state !== 'active' || cat.dead) return;
   const y = match.yumi!;
@@ -475,6 +476,7 @@ export function yumiCatDamaged(
     school,
     ability,
     kind,
+    ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
   });
   if (source && source.id !== cat.id) ctx.enterCombat(source, cat);
   if (cat.hp <= 0) killYumiCat(ctx, match, cat, source);

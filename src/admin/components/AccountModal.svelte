@@ -70,6 +70,8 @@
           {#if detail}
             <AccountIndicators
               isAdmin={detail.isAdmin}
+              isAi={detail.isAi}
+              isStreamer={detail.isStreamer}
               online={detail.online}
               status={accountStatusFor(detail)}
               suspendedUntil={detail.suspendedUntil}

@@ -1,4 +1,10 @@
-import type { DevLeaderboardEntry, GuildLeaderboardEntry, LeaderboardEntry } from '../world_api';
+import type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
+  DevLeaderboardEntry,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from '../world_api';
 
 // Host-agnostic pagination for the high-score boards. Lives in src/sim/
 // (no DOM, no randomness) so BOTH the authoritative server and the offline Sim
@@ -26,6 +32,12 @@ export interface RankedPage<T> {
 export type LeaderboardPage = RankedPage<LeaderboardEntry>;
 export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry>;
 export type DevLeaderboardPage = RankedPage<DevLeaderboardEntry>;
+// The Renown board page also carries the viewer's own standing when the
+// server resolved one (an authenticated, ranked caller); the paginator never
+// sets it, the route builder does.
+export type DeedsLeaderboardPage = RankedPage<DeedsLeaderboardEntry> & {
+  self?: DeedsLeaderboardSelf;
+};
 
 // Slice `entries` (already sorted, rank ascending) into a single page. The
 // requested page is clamped into range so a stale page index never yields an
@@ -81,5 +93,15 @@ export function paginateDevLeaderboard(
   requestedPage: number,
   requestedPageSize: number = LEADERBOARD_PAGE_SIZE,
 ): DevLeaderboardPage {
+  return paginateRanked(entries, requestedPage, requestedPageSize);
+}
+
+// The Renown board (accounts ranked by lifetime deed Renown, character-faced).
+// Thin typed wrapper over paginateRanked.
+export function paginateDeedsLeaderboard(
+  entries: readonly DeedsLeaderboardEntry[],
+  requestedPage: number,
+  requestedPageSize: number = LEADERBOARD_PAGE_SIZE,
+): DeedsLeaderboardPage {
   return paginateRanked(entries, requestedPage, requestedPageSize);
 }

@@ -57,6 +57,7 @@ function makeInput() {
     onTab: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
+    onPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -208,6 +209,35 @@ describe('Input autorun', () => {
   });
 });
 
+describe('Input pet bar chords', () => {
+  it('dispatches onPet for the default Ctrl+Digit pet chords and cancels the browser default', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const cases: Array<[string, string]> = [
+      ['Digit1', 'attack'],
+      ['Digit2', 'stop'],
+      ['Digit3', 'taunt'],
+      ['Digit4', 'defensive'],
+      ['Digit5', 'aggressive'],
+    ];
+    for (const [code, action] of cases) {
+      const preventDefault = vi.fn();
+      windowListeners.get('keydown')!({ code, ctrlKey: true, repeat: false, preventDefault });
+      expect(cb.onPet).toHaveBeenCalledWith(action);
+      // The chord carries Ctrl, so the browser accelerator default is cancelled.
+      expect(preventDefault).toHaveBeenCalled();
+    }
+  });
+
+  it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onPet).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0); // Digit1 -> action bar slot 0
+  });
+});
+
 describe('Input click-to-move marker pulses', () => {
   it('increments the pulse id for every accepted click-move target', () => {
     const { input } = makeInput();
@@ -344,7 +374,7 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
-  it('uses normal mouse dragging instead of pointer lock while browser fullscreen is active', () => {
+  it('requests pointer lock while browser fullscreen is active', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
@@ -353,7 +383,7 @@ describe('Input pointer lock', () => {
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
-    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
   it('does not rotate the camera before the drag threshold, so short sloppy clicks stay stable', () => {
@@ -633,6 +663,70 @@ describe('Input Discord keybind', () => {
   });
 });
 
+describe('Input Book of Deeds keybind', () => {
+  it("dispatches onUiKey('deeds') for the default Shift+Z chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('deeds');
+  });
+
+  it('bare KeyZ no longer reaches deeds (Damage Meters owns the letter now)', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('deeds');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyZ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input chat keybind', () => {
+  it("dispatches onUiKey('chat') for the default Enter key", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault: vi.fn() });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('chat');
+  });
+
+  it('cancels the default action so the newly-focused composer does not also see this keydown as a newline', () => {
+    // Regression: opening chat focuses the composer textarea as a side effect
+    // of this very keydown. Left un-prevented, the browser still delivers the
+    // follow-up keypress/input (and its default newline insertion) to
+    // whichever element is now focused, so Enter both opened chat AND typed a
+    // newline into it before the placeholder was ever visible.
+    const { windowListeners } = makeInput();
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  it('does not cancel a focused button own Enter activation when it also opens chat', () => {
+    // A focused button (e.g. a HUD button reached via Tab) still activates on
+    // Enter today; only the composer-newline case needs its default cancelled.
+    const { cb, windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON' };
+    const preventDefault = vi.fn();
+
+    windowListeners.get('keydown')!({ code: 'Enter', repeat: false, preventDefault });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('chat');
+    expect(preventDefault).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input Space handling', () => {
   it('prevents native Space button activation while preserving jump input', () => {
     const { input, windowListeners } = makeInput();
@@ -823,7 +917,7 @@ describe('Input modifier combos', () => {
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
     expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
     cb.onAbilityDown.mockClear();
-    // Shift+1 is a distinct, unbound chord — it must NOT fire bare slot 0.
+    // Shift+1 is a distinct, unbound chord: it must NOT fire bare slot 0.
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
     expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });

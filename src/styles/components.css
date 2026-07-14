@@ -1366,6 +1366,701 @@
   #daily-rewards-window {
     width: 480px;
   }
+  #daily-rewards-window {
+    top: 24px;
+    width: min(1040px, calc(100vw - 40px));
+    max-height: calc(100vh - 48px);
+    background:
+      radial-gradient(circle at 76% 8%, rgb(34 144 191 / 16%), transparent 34%),
+      linear-gradient(155deg, #07121b 0%, #081018 52%, #050a0f 100%);
+    border-color: #8d7138;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
+  }
+  .woc-store-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0 12px;
+    border-bottom: 1px solid #463a1c;
+  }
+  .woc-store-tabs button {
+    min-height: 42px;
+    padding: 0 18px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .woc-store-tabs button:hover,
+  .woc-store-tabs button.active {
+    color: #f3dfaa;
+    border-bottom-color: #c8a34a;
+  }
+  .woc-store-tabs button:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: -2px;
+  }
+  .woc-store-loading {
+    display: grid;
+    width: 42px;
+    min-height: 42px;
+    margin-left: auto;
+    place-items: center;
+    visibility: hidden;
+  }
+  .woc-store-loading.active {
+    visibility: visible;
+  }
+  .woc-store-loading i {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgb(200 163 74 / 28%);
+    border-top-color: #c8a34a;
+    border-radius: 50%;
+    animation: woc-store-spin 700ms linear infinite;
+  }
+  @keyframes woc-store-spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .woc-store-loading i {
+      animation: none;
+      border-color: #c8a34a;
+    }
+  }
+  #daily-rewards-window .woc-store-body {
+    max-height: calc(100vh - 148px);
+    padding: 14px;
+  }
+  .woc-store-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 20px;
+    min-height: 168px;
+    padding: 26px 28px;
+    overflow: hidden;
+    border: 1px solid #6f592d;
+    background:
+      linear-gradient(90deg, rgb(3 10 16 / 96%) 0%, rgb(4 17 27 / 72%) 58%, transparent),
+      url("/claudium/claudium_coin_hero_3q.webp") 88% 50% / 270px auto no-repeat,
+      radial-gradient(circle at 86% 50%, rgb(44 184 232 / 24%), transparent 38%);
+  }
+  .woc-store-hero > div:first-child {
+    align-self: center;
+    max-width: 560px;
+  }
+  .woc-store-hero span,
+  .woc-store-section-title span,
+  .woc-store-card-copy > span {
+    color: #c8a34a;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .woc-store-hero h2 {
+    margin: 7px 0;
+    color: #f5ecd5;
+    font-family: var(--title-font);
+    font-size: clamp(24px, 3vw, 38px);
+    line-height: 1.05;
+  }
+  .woc-store-hero p {
+    max-width: 520px;
+    margin: 0;
+    color: #b9c3c9;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .woc-store-notice {
+    margin: 0 0 12px;
+    border: 1px solid var(--color-primary-glow-heavy);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--color-accent);
+    background: var(--color-primary-glow);
+  }
+  .woc-store-balance {
+    z-index: 1;
+    align-self: start;
+    display: grid;
+    grid-template-columns: 30px auto;
+    align-items: center;
+    gap: 1px 8px;
+    min-width: 168px;
+    padding: 10px 12px;
+    border: 1px solid #866c35;
+    background: rgb(3 9 14 / 88%);
+  }
+  .woc-store-balance img {
+    grid-row: 1 / 3;
+    width: 30px;
+    height: 30px;
+  }
+  .woc-store-balance span {
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .woc-store-balance strong {
+    color: #f3dfaa;
+    font-size: 18px;
+  }
+  .woc-store-balance button {
+    grid-column: 1 / -1;
+    min-height: 36px;
+    margin-top: 8px;
+    border: 1px solid #b18b3d;
+    background: linear-gradient(#6e5427, #3b2b16);
+    color: #fff0c5;
+    font-family: var(--title-font);
+    cursor: pointer;
+  }
+  .woc-store-section-title {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 22px 2px 10px;
+  }
+  .woc-store-section-title h3 {
+    margin: 2px 0 0;
+    color: #f5ecd5;
+    font-family: var(--title-font);
+    font-size: 20px;
+  }
+  .woc-store-section-title small {
+    max-width: 390px;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+  .woc-store-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .woc-store-card {
+    position: relative;
+    min-height: 250px;
+    overflow: hidden;
+    border: 1px solid #3e4b51;
+    background: #09141c;
+  }
+  .woc-store-card > img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    transition: opacity 160ms ease;
+  }
+  .woc-store-card:hover > img,
+  .woc-store-card:focus-within > img {
+    opacity: 0.82;
+  }
+  .woc-store-owned {
+    position: absolute;
+    top: 78px;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    padding: 9px 12px;
+    border-top: 1px solid #c9a85e;
+    border-bottom: 1px solid #c9a85e;
+    background: rgb(5 14 20 / 88%);
+    color: #f4dda0;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .woc-store-card-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 6px 12px;
+    padding: 12px;
+    border-top: 1px solid #5c4c29;
+  }
+  .woc-store-card-copy > span {
+    grid-column: 1 / -1;
+  }
+  .woc-store-card h4 {
+    margin: 0;
+    overflow: hidden;
+    color: #e9e2d2;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .woc-store-card button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 82px;
+    min-height: 36px;
+    padding: 4px 10px;
+    border: 1px solid #9b7a36;
+    background: #17212a;
+    color: #f4dda0;
+    cursor: pointer;
+  }
+  .woc-store-card button:hover {
+    background: #253442;
+  }
+  .woc-store-card button:disabled {
+    border-color: #58636a;
+    background: #121b21;
+    color: #aeb6b8;
+    cursor: default;
+  }
+  .woc-store-card.owned > img {
+    opacity: 0.58;
+  }
+  .woc-store-card button:focus-visible,
+  .woc-store-balance button:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .woc-store-card button img {
+    width: 19px;
+    height: 19px;
+  }
+  .woc-store-card.short button {
+    border-color: #6f5b35;
+    color: #c8b98f;
+  }
+  .woc-store-empty {
+    grid-column: 1 / -1;
+    padding: 48px 20px;
+    border: 1px solid #3e4b51;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  /* ── Season 1 Armory: rarity-themed skin sections + cards + inspect panel ──
+     Rarity accents follow the classic loot colors; the legendary tier gets an
+     animated sheen so it reads a clear step above epic. */
+  .armory-section {
+    --rarity: #8fa3ad;
+    --rarity-soft: rgb(143 163 173 / 0.16);
+    margin: 16px 0 4px;
+  }
+  .armory-section.rarity-uncommon {
+    --rarity: #1eff00;
+    --rarity-soft: rgb(30 255 0 / 0.12);
+  }
+  .armory-section.rarity-rare {
+    --rarity: #2f8dff;
+    --rarity-soft: rgb(47 141 255 / 0.14);
+  }
+  .armory-section.rarity-epic {
+    --rarity: #a335ee;
+    --rarity-soft: rgb(163 53 238 / 0.16);
+  }
+  .armory-section.rarity-legendary {
+    --rarity: #ff8000;
+    --rarity-soft: rgb(255 128 0 / 0.18);
+  }
+  .armory-section > header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--rarity);
+    border-bottom: none;
+    background: linear-gradient(180deg, var(--rarity-soft), transparent);
+  }
+  .armory-section > header span {
+    color: var(--rarity);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .armory-section > header h3 {
+    margin: 2px 0 0;
+    font-size: 15px;
+  }
+  .armory-section-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+  }
+  .armory-section-price img {
+    width: 16px;
+    height: 16px;
+  }
+  .armory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--rarity);
+    border-top: 1px solid rgb(255 255 255 / 0.06);
+    background: #0a1119;
+  }
+  .armory-card {
+    position: relative;
+    border: 1px solid var(--rarity);
+    background: #0d1620;
+    box-shadow: 0 0 0 rgb(0 0 0 / 0);
+    transition: box-shadow 160ms ease;
+  }
+  .armory-card:hover,
+  .armory-card:focus-within {
+    box-shadow: 0 0 14px var(--rarity-soft);
+  }
+  .armory-section.rarity-legendary .armory-card {
+    border-width: 2px;
+    background:
+      linear-gradient(#0d1620, #0d1620) padding-box,
+      linear-gradient(120deg, #ff8000, #ffd27a, #ff8000) border-box;
+    border-color: transparent;
+    animation: armory-legend-sheen 4s linear infinite;
+    background-size:
+      auto,
+      300% 100%;
+  }
+  @keyframes armory-legend-sheen {
+    to {
+      background-position:
+        0 0,
+        300% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .armory-section.rarity-legendary .armory-card {
+      animation: none;
+    }
+  }
+  .armory-card > button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .armory-card-art {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 42%, var(--rarity-soft), #070d14 78%);
+  }
+  .armory-card-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 160ms ease;
+  }
+  /* Hover affordance is glow only: the UI rules ban scale() on hover/focus of
+     grid items, so brighten instead of transforming. */
+  .armory-card:hover .armory-card-art img,
+  .armory-card:focus-within .armory-card-art img {
+    filter: brightness(1.12);
+  }
+  .armory-card > button:focus-visible {
+    outline: 2px solid var(--rarity);
+    outline-offset: -2px;
+  }
+  .armory-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 1;
+    padding: 2px 7px;
+    border: 1px solid var(--rarity, #ffd27a);
+    background: rgb(7 11 16 / 0.85);
+    color: var(--rarity, #ffd27a);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* Eligible-class face chips, top-right of the card art (badge sits top-left). */
+  .armory-classes {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 1;
+    display: flex;
+  }
+  .armory-class-chip {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    margin-left: -6px;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+  }
+  .armory-class-chip:first-child {
+    margin-left: 0;
+  }
+  /* The inner portrait chip is the shared shell.css family; its armory-size
+     variant (fill the 20px wrapper, thin ring) lives with the family styles
+     in shell.css, which is the later cascade layer. */
+  .armory-card-copy {
+    display: grid;
+    gap: 4px;
+    padding: 8px 9px 10px;
+  }
+  .armory-card-type {
+    color: var(--rarity);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .armory-card-copy h4 {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.25;
+  }
+  .armory-cost,
+  .armory-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .armory-cost img {
+    width: 14px;
+    height: 14px;
+  }
+  .armory-state {
+    color: #c9a85e;
+  }
+  .armory-state.applied {
+    color: #7fe07f;
+  }
+  /* Inspect overlay: viewport left, codex panel right. */
+  .armory-inspect-overlay {
+    position: fixed;
+    inset: 0;
+    /* Above the window-manager band (50-89), below the confirm dialog (95). */
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgb(4 8 12 / 0.78);
+  }
+  .armory-inspect {
+    --rarity: #8fa3ad;
+    --rarity-soft: rgb(143 163 173 / 0.16);
+    position: relative;
+    color: var(--color-text-light);
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 1fr);
+    width: min(980px, 100%);
+    max-height: min(640px, calc(100vh - 40px));
+    overflow: hidden;
+    border: 1px solid var(--rarity);
+    background: #0a1119;
+    box-shadow: 0 0 40px var(--rarity-soft);
+  }
+  .armory-inspect.rarity-uncommon {
+    --rarity: #1eff00;
+    --rarity-soft: rgb(30 255 0 / 0.12);
+  }
+  .armory-inspect.rarity-rare {
+    --rarity: #2f8dff;
+    --rarity-soft: rgb(47 141 255 / 0.14);
+  }
+  .armory-inspect.rarity-epic {
+    --rarity: #a335ee;
+    --rarity-soft: rgb(163 53 238 / 0.16);
+  }
+  .armory-inspect.rarity-legendary {
+    --rarity: #ff8000;
+    --rarity-soft: rgb(255 128 0 / 0.2);
+  }
+  .armory-inspect-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+  }
+  .armory-inspect-stage {
+    position: relative;
+    min-height: 380px;
+    background: #070d14;
+  }
+  .armory-inspect-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .armory-inspect-controls {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .armory-mode-toggle,
+  .armory-scene-toggle {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid #3e4b51;
+    background: rgb(7 11 16 / 0.85);
+  }
+  .armory-mode-toggle button,
+  .armory-scene-toggle button {
+    padding: 6px 10px;
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .armory-mode-toggle button.active,
+  .armory-scene-toggle button.active {
+    background: var(--rarity-soft);
+    color: #fff;
+  }
+  .armory-mode-toggle button:focus-visible,
+  .armory-scene-toggle button:focus-visible,
+  .armory-inspect-actions button:focus-visible,
+  .armory-inspect-close:focus-visible {
+    outline: 2px solid var(--rarity, var(--color-border-focus));
+    outline-offset: 1px;
+  }
+  .armory-inspect-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 16px 14px;
+    overflow-y: auto;
+    border-left: 1px solid var(--rarity);
+  }
+  .armory-inspect-details {
+    display: contents;
+  }
+  .armory-inspect-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .armory-collection {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .armory-rarity-pill {
+    padding: 2px 8px;
+    border: 1px solid var(--rarity);
+    color: var(--rarity);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .armory-inspect-panel h2 {
+    margin: 0;
+    color: var(--rarity);
+    font-size: 19px;
+    line-height: 1.2;
+  }
+  .armory-type-line {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .armory-look {
+    margin: 0;
+    color: #cdc4a9;
+    font-size: 12.5px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .armory-lore {
+    padding: 11px 13px;
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-left: 2px solid var(--rarity);
+    background: rgb(0 0 0 / 0.35);
+  }
+  .armory-lore h3 {
+    margin: 0 0 6px;
+    color: var(--rarity);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .armory-lore p {
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .armory-inspect-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+  }
+  .armory-price {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .armory-price img {
+    width: 18px;
+    height: 18px;
+  }
+  .armory-price em {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 400;
+  }
+  .armory-inspect-actions button {
+    padding: 8px 16px;
+    border: 1px solid var(--rarity);
+    background: var(--rarity-soft);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .armory-inspect-actions button:hover:not(:disabled) {
+    background: var(--rarity);
+    color: #06111a;
+  }
+  .armory-inspect-actions button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .armory-owned-pill {
+    padding: 3px 10px;
+    border: 1px solid #c9a85e;
+    color: #c9a85e;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .armory-owned-pill.applied {
+    border-color: #7fe07f;
+    color: #7fe07f;
+  }
+  .armory-equip-hint {
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+  }
   /* Title subtitle ("Lifetime XP, realm"): the muted-gold token + 11px the painter
      used to set with an inline style (keeps the literals out of TS). */
   .lb-subtitle {
@@ -1398,6 +2093,12 @@
   .lb-row-guild {
     grid-template-columns: 44px 1fr 64px 44px 96px;
   }
+  /* Players (lifetime-XP) board: the base grid plus the trailing Book of
+     Deeds title column (the Renown tab's .lb-deed-title treatment; the muted
+     cell ellipsizes, so a long title never widens the row). */
+  .lb-row-players {
+    grid-template-columns: 44px 1fr 44px 48px 96px 90px;
+  }
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
@@ -1410,6 +2111,36 @@
   .lb-members {
     text-align: center;
     color: var(--color-text-muted);
+  }
+  /* Renown (deeds) board: rank, chronicler (class tooltip + realm tag),
+     Renown, deed count, displayed title. */
+  .lb-row-deeds {
+    grid-template-columns: 44px 1fr 56px 48px 110px;
+  }
+  .lb-realm {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .lb-renown {
+    text-align: right;
+    color: #ffe27a;
+  }
+  .lb-deeds-count {
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  .lb-deed-title {
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* The viewer's server-resolved Renown standing, under the visible rows. */
+  .lb-self {
+    margin-top: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #ffe27a;
   }
   /* Developer board: rank, contributor (badge + handle), earned tier, commits. */
   .lb-row-dev {
@@ -2010,6 +2741,475 @@
   .dr-rank.mine {
     outline: 1px solid #b8902a;
     background: #f5c84322;
+  }
+
+  /* ---------- claudium ---------- */
+  /* These are the two largest overlapping HUD surfaces. Paint containment keeps
+     an internal refresh or moving sibling from invalidating the WebGL canvas
+     behind their opaque frames. Isolation also keeps their stacking contexts
+     independent when Chromium reallocates layers with DevTools open. */
+  #daily-rewards-window,
+  #claudium-window {
+    contain: paint;
+    isolation: isolate;
+  }
+  /* Promote these large layers only while they overlap. Keeping the promotion
+     conditional avoids permanently reserving two Retina-sized GPU surfaces. */
+  body.store-stack-open #daily-rewards-window,
+  body.store-stack-open #claudium-window {
+    will-change: transform;
+  }
+  #claudium-window {
+    width: min(940px, calc(100vw - 40px));
+    max-height: calc(100vh - 40px);
+    border-color: #8d7138;
+    background:
+      radial-gradient(circle at 18% 0%, rgb(22 126 168 / 18%), transparent 34%),
+      linear-gradient(155deg, #07121b, #050a0f 72%);
+    box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
+  }
+  /* Both store surfaces already paint opaque backgrounds. Keeping them in the
+     backdrop blur compositor adds no visual benefit and can drop the front
+     window's root layer for a frame when the two windows overlap. */
+  body.frosted-panels #daily-rewards-window,
+  body.frosted-panels #claudium-window {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  /* A live window drag is intentionally a reduced-effects moment. The moving
+     window is compositor-translated by window_drag.ts, while the covered store
+     pauses its decorative border raster and both large shadows use a smaller
+     damage region until the final left/top position is committed. */
+  body.window-drag-active #daily-rewards-window,
+  body.window-drag-active #claudium-window {
+    box-shadow: 0 12px 36px rgb(0 0 0 / 72%);
+  }
+  body.window-drag-active .armory-section.rarity-legendary .armory-card {
+    animation-play-state: paused;
+  }
+  .cl-body {
+    max-height: calc(100vh - 96px);
+    padding: 14px 18px 18px;
+    overflow-y: auto;
+  }
+  .cl-loading {
+    min-height: 132px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .cl-refresh-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: auto;
+    visibility: hidden;
+  }
+  .cl-refresh-status.active {
+    visibility: visible;
+  }
+  .cl-refresh-status.failed {
+    visibility: visible;
+    color: #ffb07a;
+  }
+  .cl-refresh-error {
+    display: none;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .cl-refresh-status.failed .cl-spinner {
+    display: none;
+  }
+  .cl-refresh-status.failed .cl-refresh-error {
+    display: block;
+  }
+  .cl-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #463a1c;
+    border-top-color: #ffe27a;
+    border-radius: 50%;
+    animation: cl-spin 900ms linear infinite;
+  }
+  @keyframes cl-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cl-spinner {
+      animation: none;
+    }
+  }
+  .cl-balance {
+    position: relative;
+    display: grid;
+    grid-template-columns: 112px 1fr auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-height: 112px;
+    padding: 10px 24px 10px 10px;
+    overflow: hidden;
+    border: 1px solid #6f592d;
+    background:
+      linear-gradient(90deg, rgb(4 17 27 / 94%), rgb(3 10 16 / 78%)),
+      radial-gradient(circle at 12% 50%, rgb(44 184 232 / 22%), transparent 34%);
+  }
+  .cl-balance-art {
+    width: 112px;
+    height: 92px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 18px rgb(35 179 229 / 28%));
+  }
+  .cl-balance-main,
+  .cl-wallet-balances {
+    display: grid;
+    gap: 2px;
+  }
+  .cl-balance-label {
+    color: #c8a34a;
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .cl-balance-value {
+    color: #f5ecd5;
+    font-family: var(--title-font);
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .cl-wallet-balances {
+    justify-items: end;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .cl-notice {
+    margin: 10px 0 0;
+    padding: 8px 10px;
+    border: 1px solid #8a6427;
+    border-radius: 4px;
+    background: #160f08;
+    color: #ffb07a;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .cl-disclosure {
+    margin: 12px 0 2px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .cl-section {
+    margin-top: 18px;
+  }
+  .cl-section h3 {
+    margin: 0 0 10px;
+    color: #f5ecd5;
+    font-family: var(--title-font);
+    font-size: 19px;
+  }
+  .cl-rails {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid #463a1c;
+  }
+  .cl-rail {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    min-height: 46px;
+    padding: 8px 18px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: #f0e4c8;
+    font-size: 13px;
+    cursor: var(--cursor-pointer);
+  }
+  .cl-rail-icon {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+  }
+  .cl-rail-brand {
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  .cl-rail-woc {
+    padding-top: 12px;
+  }
+  .cl-rail-discount {
+    position: absolute;
+    top: -7px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    min-height: 16px;
+    padding: 1px 5px;
+    border: 1px solid #f2cc62;
+    border-radius: 999px;
+    background: linear-gradient(#ffe17a, #c68b1e);
+    color: #1b1104;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(245, 200, 67, 0.35);
+  }
+  .cl-rail[aria-pressed="true"] {
+    border-bottom-color: #c8a34a;
+    background: linear-gradient(0deg, rgb(200 163 74 / 14%), transparent);
+    color: #ffe27a;
+  }
+  .cl-rail:disabled {
+    opacity: 0.45;
+    cursor: var(--cursor-arrow);
+  }
+  .cl-rail:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .cl-rail-note {
+    margin: 6px 0 0;
+    color: #ffb07a;
+    font-size: 11px;
+  }
+  .cl-amount-label {
+    margin: 14px 0 8px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .cl-purchase-error {
+    margin: 6px 0;
+    padding: 7px 9px;
+    border: 1px solid #8a3a27;
+    border-radius: 4px;
+    background: #22100e;
+    color: #ffb07a;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .cl-sku-list,
+  .cl-item-list {
+    display: grid;
+    gap: 12px;
+  }
+  .cl-sku-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cl-sku {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: end;
+    gap: 6px;
+    min-height: 276px;
+    padding: 0 14px 14px;
+    overflow: hidden;
+    border: 1px solid #3e4b51;
+    border-radius: 0;
+    background: radial-gradient(circle at 50% 28%, rgb(42 180 226 / 14%), transparent 38%), #09141c;
+    color: #f0e4c8;
+    font-size: 13px;
+    text-align: left;
+    cursor: var(--cursor-pointer);
+  }
+  .cl-sku:focus-visible,
+  .cl-item-buy:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .cl-sku:disabled {
+    opacity: 0.58;
+    cursor: default;
+  }
+  /* A background price refresh disables purchases without changing the mounted
+     cards' appearance. The header spinner is the refresh indicator, so dimming
+     the full grid here would make the game appear to flash through the panel. */
+  .cl-body[aria-busy="true"] .cl-sku:disabled {
+    opacity: 1;
+  }
+  .cl-sku:disabled .cl-sku-buy {
+    color: #b2a47d;
+  }
+  .cl-sku.pending {
+    border-color: #b8902a;
+    background: #f5c8431f;
+    opacity: 1;
+  }
+  .cl-sku-claudium {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #f5ecd5;
+    font-family: var(--title-font);
+    font-size: 17px;
+    text-align: center;
+  }
+  .cl-sku-claudium img {
+    width: 22px;
+    height: 22px;
+  }
+  .cl-pack-art {
+    display: grid;
+    min-height: 148px;
+    margin: 0 -14px 6px;
+    place-items: center;
+    border-bottom: 1px solid #5c4c29;
+    background: linear-gradient(180deg, rgb(5 13 19 / 20%), rgb(3 9 14 / 72%));
+  }
+  .cl-pack-art img {
+    width: 138px;
+    height: 132px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 17px rgb(39 181 230 / 28%));
+  }
+  .cl-pack[data-pack-tier="5"] .cl-pack-art img,
+  .cl-pack[data-pack-tier="6"] .cl-pack-art img {
+    width: 158px;
+  }
+  .cl-sku-usd {
+    color: #c8a34a;
+    font-size: 12px;
+    text-align: center;
+  }
+  .cl-sku-buy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    justify-self: stretch;
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid #a8863f;
+    background: linear-gradient(#5f4823, #30220f);
+    color: #f9e8bc;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .cl-sku-buy-spinner {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+  }
+  .cl-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    background: #ffffff08;
+  }
+  .cl-item-name {
+    color: #f0e4c8;
+    font-size: 13px;
+  }
+  .cl-item-kind {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .cl-item-cost {
+    color: #ffe27a;
+    font-size: 12px;
+  }
+  .cl-item-buy {
+    grid-column: 1 / -1;
+    justify-self: end;
+    min-height: 40px;
+    min-width: 80px;
+    padding: 6px 12px;
+    border: 1px solid #8a6427;
+    border-radius: 4px;
+    background: #f5c84322;
+    color: #ffe27a;
+    font-size: 12px;
+    cursor: var(--cursor-pointer);
+  }
+  .cl-item-buy:disabled {
+    border-color: #514421;
+    background: #ffffff08;
+    color: #9f9271;
+    opacity: 0.48;
+    cursor: default;
+  }
+  .cl-empty {
+    margin: 4px 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+
+  #stripe-checkout-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+  }
+  .stripe-checkout-panel {
+    width: min(100%, 720px);
+    max-height: min(92vh, 900px);
+    overflow: auto;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: #15110d;
+    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.6);
+  }
+  .stripe-checkout-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 12px 0 16px;
+    border-bottom: 1px solid #463a1c;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 14px;
+  }
+  .stripe-checkout-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #8a6427;
+    border-radius: 4px;
+    background: #ffffff08;
+    color: #ffe27a;
+    cursor: var(--cursor-pointer);
+  }
+  .stripe-checkout-close:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  #stripe-checkout-mount {
+    min-height: 520px;
+    padding: 12px;
+    background: #fff;
+  }
+  .stripe-checkout-loading {
+    padding: 32px;
+    color: #191919;
+    font-size: 14px;
   }
 
   /* ---------- talents ---------- */
@@ -2924,6 +4124,15 @@
     font-size: 11px;
     color: #ddd;
   }
+  .vendor-item .vi-price .warfare-price,
+  .warfare-balance {
+    color: var(--gold);
+  }
+  .warfare-balance {
+    margin: 6px 5px;
+    font-family: var(--title-font);
+    font-size: 12px;
+  }
   .vendor-item .vi-sub {
     display: block;
     font-size: 10px;
@@ -3041,6 +4250,37 @@
   }
   .woc-balance.is-verified {
     color: var(--color-text-success);
+  }
+  .claudium-launcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 3px 7px;
+    border: 1px solid #478ba5;
+    border-radius: 4px;
+    background: #4ac9ef18;
+    color: #9eeeff;
+    font: inherit;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: var(--cursor-pointer);
+  }
+  .claudium-launcher:hover,
+  .claudium-launcher:focus-visible {
+    border-color: #8cecff;
+    background: #4ac9ef28;
+  }
+  .claudium-launcher:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .claudium-coin {
+    display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 4px rgb(74 201 239 / 55%));
   }
   .woc-coin {
     display: inline-block;
@@ -3559,10 +4799,489 @@
     transform: translateX(var(--bank-dock-gap));
   }
 
+  /* ---------- deeds ---------- */
+  /* The Book of Deeds: a cold catalog browser (summary strip, category rail,
+     entry-card list, title picker, filter bar) over the IWorldDeeds facet.
+     Progress bars and crest urls are build-time writes; the unearned-card
+     crest desaturation is a class-driven CSS filter, never inline style. */
+  #deeds-window {
+    width: 560px;
+    max-height: calc(var(--app-vh, 100vh) * 0.78 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #deeds-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #deeds-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .deed-search {
+    flex: 0 1 190px;
+    min-width: 100px;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid #5a4a2e;
+    background: #14110b;
+    color: inherit;
+  }
+  .deed-search:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .deeds-summary {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0 4px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold-dim);
+  }
+  .deeds-summary b {
+    color: var(--gold);
+  }
+  .deeds-pct {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .deed-bar {
+    display: inline-block;
+    width: 90px;
+    height: 8px;
+    border: 1px solid #3a3325;
+    border-radius: 4px;
+    background: #14110b;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  .deed-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#e6c76a, #a8842f);
+  }
+  .deeds-recent,
+  .deeds-nearest {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 4px;
+    font-size: 11px;
+    color: var(--gold-dim);
+    flex-wrap: wrap;
+  }
+  .deeds-strip-label {
+    font-family: var(--title-font);
+  }
+  .deeds-nearest-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 6px;
+    border: 1px solid #3a3325;
+    border-radius: 8px;
+    background: #171309;
+  }
+  .deeds-body {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 8px;
+    min-height: 120px;
+  }
+  .deeds-rail {
+    flex: 0 0 128px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+  .deeds-cat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    text-align: left;
+    padding: 5px 7px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 28px;
+  }
+  .deeds-cat:hover {
+    color: var(--gold);
+    background: #1c1812;
+  }
+  .deeds-cat.active {
+    color: var(--gold);
+    border-color: #6a5320;
+    background: linear-gradient(#2a220f, #1c1812);
+  }
+  .deeds-cat:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .deeds-cat-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  .deeds-cat-titles {
+    margin-top: 6px;
+    border-top: 1px solid #3a3325;
+    border-radius: 0 0 4px 4px;
+  }
+  body.mobile-touch .deeds-cat {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .deeds-scroll {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .deeds-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px;
+  }
+  .deed-card {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 7px;
+    border: 1px solid #4a3d26;
+    border-radius: 6px;
+    background: linear-gradient(160deg, #17130c, #0c0a07);
+  }
+  .deed-card.earned {
+    border-color: #6a5320;
+    background: linear-gradient(160deg, #221b0e, #120e08);
+  }
+  .deed-crest {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    flex: none;
+  }
+  .deed-crest.desat {
+    filter: grayscale(0.8) brightness(0.75);
+  }
+  .deed-crest-mini {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+  .deed-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .deed-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .deed-name {
+    font-family: var(--title-font);
+    font-weight: bold;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .deed-card.unearned .deed-name {
+    color: var(--gold-dim);
+  }
+  .deed-chip {
+    font-size: 10.5px;
+    padding: 1px 7px;
+    border-radius: 8px;
+    font-family: var(--title-font);
+    border: 1px solid #56472a;
+    color: #d8c489;
+    background: #1d1810;
+    white-space: nowrap;
+  }
+  .deed-chip.deed-renown {
+    margin-left: auto;
+    border-color: #b8902a;
+    color: #ffe27a;
+    background: #2a210c;
+  }
+  .deed-chip.deed-feat {
+    border-color: #7a7a8a;
+    color: #cfd0e0;
+    background: #1a1a22;
+  }
+  .deed-chip.deed-hidden {
+    border-color: #6a4a8a;
+    color: #d9c2f2;
+    background: #201628;
+  }
+  .deed-desc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .deed-progress {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .deed-progress .deed-bar {
+    width: 150px;
+  }
+  .deed-progress-text {
+    font-size: 11px;
+    color: var(--gold-dim);
+  }
+  .deed-rarity {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+  .deed-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .deed-earned-date {
+    font-size: 11px;
+    color: var(--gold-dim);
+    font-style: italic;
+  }
+  .deed-watch {
+    margin-left: auto;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .deed-watch:hover:not(:disabled) {
+    filter: brightness(1.12);
+  }
+  .deed-watch:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .deed-watch:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .deed-watch.watching {
+    border-color: #8a6a26;
+    background: #241c0c;
+  }
+  body.mobile-touch .deed-watch {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .deeds-empty {
+    padding: 12px 5px;
+    font-size: 12px;
+    color: var(--gold-dim);
+    text-align: center;
+  }
+  .deeds-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 2px;
+  }
+  .deed-title-option {
+    font-family: var(--title-font);
+    font-size: 13px;
+    text-align: left;
+    padding: 6px 9px;
+    border-radius: 4px;
+    border: 1px solid #4a3d26;
+    background: linear-gradient(160deg, #17130c, #0c0a07);
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 32px;
+  }
+  .deed-title-option:hover {
+    color: var(--gold);
+  }
+  .deed-title-option.active {
+    border-color: #b8902a;
+    color: #ffe27a;
+    background: linear-gradient(160deg, #2a220f, #171208);
+  }
+  .deed-title-option:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .deed-title-option {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .deeds-filterbar {
+    flex: none;
+    display: flex;
+    gap: 6px;
+    padding-top: 6px;
+    flex-wrap: wrap;
+  }
+  .deed-filter-chip {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #56472a;
+    background: #1d1810;
+    color: #d8c489;
+    cursor: var(--cursor-point);
+    min-height: 24px;
+  }
+  .deed-filter-chip:hover {
+    color: var(--gold);
+  }
+  .deed-filter-chip.active {
+    border-color: #b8902a;
+    color: #ffe27a;
+    background: #2a210c;
+  }
+  .deed-filter-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .deed-filter-chip {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  /* Character-sheet active-title line + earned deed-border badges (the
+     ms-badge family), and the inspect-window title subtitle. */
+  .cp-active-title {
+    color: var(--gold);
+    font-family: var(--title-font);
+  }
+  .cp-deeds-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-left: 6px;
+  }
+  .ms-badge.ms-deed-border {
+    border-color: #7a5aa0;
+    color: #d9c2f2;
+    background: #201628;
+  }
+  .inspect-title {
+    font-size: 12px;
+    font-style: italic;
+    color: #ffe9a0;
+    font-family: var(--title-font);
+    margin-top: -2px;
+  }
+  /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
+  /* The quest log, mailbox, social panel, and spellbook adopt the shared
+     window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
+     frame on an INNER container, so the shared .window.panel root keeps its
+     drag/resize/position machinery and the frame draws its own chrome; these
+     overrides neutralize the legacy .panel shell while a frame is mounted and let
+     the frame bound the window as a height-clamped flex column (titlebar/footer
+     pinned, .window-body scrolls). Tokens only, no literal colours; batch 1
+     anchors its own section after the vendor AAA block to keep merges clean. */
+
+  /* Neutralize the legacy .panel chrome while a frame is mounted (the inner
+     .window-frame draws its own border, edge line, and background). The
+     :has(> .window-frame) selector tracks the mounted frame exactly. The painter
+     opens the window with an inline display:flex, so the global
+     .window:has(> .window-frame) rule (flex-direction:column; overflow:hidden)
+     bounds the frame as a height-clamped flex column; closed windows keep
+     display:none. */
+  #quest-log-window:has(> .window-frame),
+  #spellbook:has(> .window-frame),
+  #mailbox-window:has(> .window-frame),
+  #social-window:has(> .window-frame) {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  /* Social keeps the '.open' class as its visibility switch (never inline display);
+     the frame grammar bounds it as a flex column the same way. The per-tab list,
+     notice, and add-row footer flow inside the scrolling .window-body, matching the
+     pre-frame whole-panel scroll. */
+
+  /* Quest log: the two panes (list + measure-capped detail) fill the scrolling
+     body. The frame body owns the outer scroll; the list scrolls with it and the
+     detail caps its own reading measure. */
+  #quest-log-window {
+    width: 520px;
+  }
+  #quest-log-window .window-body .ql-cols {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+    min-height: 0;
+  }
+  #quest-log-window .window-body .ql-detail {
+    max-height: none;
+    max-width: 46ch;
+  }
+  #quest-log-window .window-footer .btn {
+    min-width: 0;
+  }
+  /* An empty log renders no footer action: collapse the bar (spellbook parity). */
+  #quest-log-window .window-footer:empty {
+    display: none;
+  }
+
+  /* Spellbook: the class kit list fills the scrolling body; the reset-bar action
+     (form-bar classes only) sits in the footer, which collapses when empty so
+     single-bar classes show no bare sticky bar. Drag-to-actionbar rows keep the
+     existing .spell-row grammar from the spellbook section. */
+  #spellbook .window-body .spell-list {
+    min-height: 0;
+  }
+  #spellbook .window-footer:empty {
+    display: none;
+  }
+  #spellbook .window-footer .spellbook-reset {
+    white-space: nowrap;
+  }
+
+  /* Mailbox: the frame body is a flex column so the in-body inbox/send tabs stay
+     pinned above the #mailbox-body pane, which owns the inner scroll (the pre-frame
+     behavior). The reading pane / send form scroll inside #mailbox-body as before. */
+  #mailbox-window .window-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   /* ---------- social ---------- */
   /* social: friends / guild / ignore */
   #social-window {
-    width: 348px;
+    /* Wider than the other windows: the tab rail carries FIVE tabs (Friends,
+       Guild, Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
+       roster rows carry a name + rank + zone + last-seen line. */
+    width: 520px;
+    max-width: calc(100vw - 24px);
     height: 560px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
@@ -3571,6 +5290,19 @@
   }
   #social-window.open {
     display: flex;
+  }
+  /* The social rail carries FIVE tabs (Friends, Guild, Ignored, Blocked, Raid) and
+     is the only frame rail that should span the window, so scope the fill here
+     rather than touching the shared `.tab` grammar. `flex: 1 0 auto` grows each tab
+     to share the width but never shrinks one below its own text, so a long locale
+     label (Russian "Игнорируемые" is far wider than "Ignored") overflows into the
+     rail's existing horizontal scroll instead of being clipped. */
+  #social-window .tab-rail {
+    padding: 0;
+  }
+  #social-window .tab {
+    flex: 1 0 auto;
+    text-align: center;
   }
   .soc-realm-tag {
     color: #7fd4ff;
@@ -3691,6 +5423,17 @@
     font-size: 10px;
     margin-left: 4px;
     display: inline-block;
+    text-decoration: none;
+  }
+  /* Book of Deeds title beside a friend/roster name (the .lb-deed-title muted
+     treatment): inline INSIDE the ellipsized .soc-name cell, so a long combo
+     trims the title tail and never pushes the rank chip, meta column, or
+     action buttons at the 348px window width. */
+  .soc-name .soc-title {
+    color: var(--color-text-muted);
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 4px;
     text-decoration: none;
   }
   .soc-sub {

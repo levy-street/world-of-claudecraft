@@ -21,6 +21,7 @@ import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type GatherNodeDef, type GatherNodeType, INTERACT_RANGE, type ItemDef } from '../types';
+import { gatherActionXp } from './profession_xp';
 import type { PlayerProfessionSkill } from './types';
 
 // Quest-gated bonus grant (#1701 follow-up review): while the paired quest is
@@ -237,6 +238,12 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
   if (questItemId && ctx.canAddItem(questItemId, 1, meta.entityId)) {
     ctx.addItem(questItemId, 1, meta.entityId);
   }
+  // Zone gather mark: one entry per zone and node type ever harvested.
+  ctx.markVisited(meta, `gather:${node.zoneId}:${node.type}`);
+  // Character XP for the harvest (profession_xp.ts), tier-scaled and
+  // level-gated the same way kill XP is: a max-level player farming a
+  // trivial (gray) node gets zero.
+  ctx.grantXp(gatherActionXp(node.level, p.level), meta);
 }
 
 export interface PendingGatherGrant {

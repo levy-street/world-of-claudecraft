@@ -72,7 +72,7 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
-  if (def.noDiscard || def.soulbound) return;
+  if (def.noDiscard) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
   removePreferFungible(ctx, itemId, discardCount, meta.entityId);
@@ -128,6 +128,8 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
+  // The all-slots deed reads equipment, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
@@ -149,6 +151,8 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
   if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+  // The all-slots deed reads equipment, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless. An
@@ -247,13 +251,16 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // uncommon potion, exactly as before this issue.
     const [drunkInstance] = ctx.removeItem(itemId, 1, meta.entityId);
     if (drunkInstance) {
-      battlefieldExperienceTrickle(meta.craftSkills, {
+      const granted = battlefieldExperienceTrickle(meta.craftSkills, {
         itemId,
         instance: drunkInstance,
         observerName: meta.name,
         observerActiveArchetype: meta.archetype.activeArchetype,
         observerPairedMajor: meta.archetype.pairedMajor,
       });
+      // A nonzero trickle changed a craft skill (returns 0 on every
+      // short-circuit), so the craft-skill deeds re-check this player.
+      if (granted > 0) ctx.markDeedsDirty(meta.entityId);
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
@@ -304,7 +311,17 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'That item is not sold here.');
     return;
   }
-  if (!def?.buyValue) {
+  const copperUnitPrice =
+    def?.buyValue !== undefined && Number.isFinite(def.buyValue) && def.buyValue > 0
+      ? def.buyValue
+      : 0;
+  const honorPrice =
+    def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
+      ? Math.floor(def.priceHonor)
+      : 0;
+  const hasCopperPrice = copperUnitPrice > 0;
+  const hasHonorPrice = honorPrice > 0;
+  if (!def || (!hasCopperPrice && !hasHonorPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -322,16 +339,22 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
   const qty = vendorStackSize(def);
-  const cost = def.buyValue * qty;
-  if (meta.copper < cost) {
+  const copperCost = copperUnitPrice * qty;
+  const honorCost = honorPrice;
+  if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  if (meta.honor < honorCost) {
+    ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  meta.copper -= cost;
+  meta.copper -= copperCost;
+  meta.honor -= honorCost;
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }
@@ -474,6 +497,9 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
   addItemSilent(itemId, 1, meta);
+  // The silent add bypasses the inventory hub, so credit the discovery
+  // ledger here (an acquisition like any other; the mark is idempotent).
+  ctx.markItemDiscovered(meta, itemId);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({

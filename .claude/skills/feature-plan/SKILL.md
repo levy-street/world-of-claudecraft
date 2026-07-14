@@ -17,13 +17,10 @@ The user will provide a feature description either inline (e.g., `/feature-plan 
 
 ## What this repo is (so the plan fits it)
 
-World of ClaudeCraft is a classic-style micro-MMO **and** a headless RL environment, both driven by one deterministic TypeScript simulation core. The load-bearing ideas the plan must respect:
+Architecture and invariants live in the root `CLAUDE.md` (one sim three hosts, the `IWorld` seam, server authority, 20 Hz determinism via `Rng`, the i18n contract); the plan must respect all of them, so reference that file rather than restating it. Two planning-specific consequences:
 
-- **One sim, three hosts.** The exact same `src/sim/` code runs the offline browser world, the online authoritative server (`server/`), and the RL env (`headless/`). Behavior must be identical everywhere. A feature added to the offline `Sim` is not done until it is mirrored online (via `ClientWorld`) and, where relevant, exposed to the env.
-- **`IWorld` is the only seam** (`src/world_api.ts`). `render/` and `ui/` talk only to `IWorld`; the offline `Sim` satisfies it structurally and the online `ClientWorld` implements it by mirroring server snapshots. New feature: extend `IWorld` first, then implement it in **both** worlds.
-- **The server is authoritative.** Clients stream intent + commands at 20 Hz; the server runs the one shared `Sim` and returns interest-scoped snapshots (radius defined in `server/game.ts`) + per-player events. All combat, loot, quest credit, and economy resolve server-side. The client never decides outcomes.
-- **Determinism is non-negotiable.** Fixed 20 Hz tick (`DT = 1/20`, `src/sim/types.ts`); all randomness goes through `Rng` (`src/sim/rng.ts`). Never `Math.random`, `Date.now`, or `performance.now` in sim logic. Same seed gives the same world.
-- **i18n is a release gate.** Every player-visible string is a `t()` key present in **every** locale. Sim/server stay language-agnostic (no `t()`, no DOM) but emit player text that is re-localized at the client boundary via the matchers in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts`. The S3 guard (`tests/localization_fixes.test.ts`) enforces it.
+- A feature added to the offline `Sim` is not done until it is mirrored online (via `ClientWorld`) and, where relevant, exposed to the RL env. Extend `IWorld` first, then implement it in **both** worlds.
+- **The contributor i18n policy is English-only.** Every new player-visible string is a `t()` key added in ENGLISH to the matching `src/ui/i18n.catalog/<domain>.ts` module and rendered via `t()`. Never edit the `src/ui/i18n.locales/<lang>.ts` overlays: locale fills are release-time maintainer work (the one exception, M16: a wordy new English value also needs its five non-Latin fills in the same change, see `src/ui/CLAUDE.md`). Sim/server stay language-agnostic (no `t()`, no DOM) but their player text needs a matcher rule in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the SAME change; the S3 guard (`tests/localization_fixes.test.ts`) enforces it.
 
 ---
 
@@ -50,7 +47,7 @@ Hard rules (Opus 4.8 + this repo):
 
 ## Opus 4.8 Prompting Discipline (apply to EVERY prompt this skill emits)
 
-1. **State scope literally and exhaustively.** 4.8 follows instructions literally and will NOT generalize from one example. Write "all three hosts", "every locale in `translations`", "each of the nine classes" - never "the sections" or "the files".
+1. **State scope literally and exhaustively.** 4.8 follows instructions literally and will NOT generalize from one example. Write "all three hosts", "every new player string", "each of the nine classes" - never "the sections" or "the files".
 2. **Reserve ALL-CAPS / NON-NEGOTIABLE for genuine determinism, server-authority, security, and data-integrity gates.** If everything is emphasized, nothing is. Routine conventions read fine in plain voice.
 3. **For review/QA agents, the finding stage is COVERAGE, not filtering.** 4.8 honors "be conservative / don't nitpick" literally and reports fewer real issues. Always prompt: "report every issue including low-severity and uncertain ones; ranking happens in a later step."
 4. **Review agents truncate mid-analysis.** Budget 2-3 SendMessage rounds; resume with: *"Stop reading more files. Output the full report now based on what you've already seen. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
@@ -60,7 +57,7 @@ Hard rules (Opus 4.8 + this repo):
 
 ## Context Discipline (how each phase stays cheap)
 
-- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts` ~6.4k; the big i18n surface is now `src/ui/i18n.catalog/*` plus the generated overlays, not `i18n.ts`; never read these whole in the main loop.)
+- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (The coordinator monoliths `src/ui/hud.ts`, `src/sim/sim.ts`, and `src/main.ts` are huge, and the big i18n surface is `src/ui/i18n.catalog/*` plus the generated overlays; never read these whole in the main loop.)
 - Give each implementation agent ONLY the slice of context it needs (the Explore summary + its own files), never the raw planning docs.
 - Delegate web/doc lookups to a subagent (classic-era MMO formula references, a Three.js or GLB asset technique, the `pg` Postgres driver, Cloudflare Turnstile, any third-party surface); keep raw docs out of the main context.
 - For 12+ phase packets, use per-phase resume files so a fresh session resumes from a checkpoint, not from scratch.
@@ -158,15 +155,15 @@ Every phase runs on **Opus 4.8 at xhigh effort** (1m context variant where the f
 2. **Step 1 - Load Context**: Spawn an Explore agent to read planning docs and relevant source files. The main agent does NOT read large docs directly. The Explore agent returns a focused summary.
 3. **Step 2 - Choose Orchestration + Execute**: Pick the lightest tool from the Orchestration Toolbox. Default: parallel Agent fan-out, one agent per vertical slice (give each ONLY the Explore summary, not raw planning docs). For batch-heavy/audit/content-sweep phases, run an `ultracode` Workflow (pipeline + adversarial-verify) instead. Use `isolation: "worktree"` only when agents mutate overlapping files in parallel.
 4. **Step 3 - Validation + Multi-Agent Review Dispatch**:
-   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If `src/sim/` changed, run `npx vitest run tests/architecture.test.ts` (the sim-purity guard: no render/ui/game/net/three imports, no DOM globals, no nondeterminism). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If `src/sim/` changed, run `npx vitest run tests/architecture.test.ts` (the sim-purity guard: no render/ui/game/net/three imports, no DOM globals, no nondeterminism). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, run `npm run gate` (the CI-equivalent gate: i18n gen + freshness, malware scan, changed-files biome, sfx check, full tests with bounded workers, typecheck, all builds; release-tier automatically on a `release/**` branch). Never an ad-hoc `&&` chain: piping `npm test` masks its exit code and an unbounded run flakes heavy suites.
    - Spawn review agents using the **Review Dispatch Matrix** below. Spawn ONLY the agents
      whose surface this change actually touches. Most phases trigger one or two, not all
-     four; a docs/test-only change triggers none. (Each agent also self-gates and exits
+     of them; a docs/test-only change triggers none. (Each agent also self-gates and exits
      cheaply if mis-dispatched, but spawning an out-of-scope agent still costs tokens, so
      gate at dispatch too.)
    - Prompt every review agent you DO spawn for COVERAGE not filtering ("report every issue including low-severity and uncertain ones"). Do not commit until each reports no BLOCKING issues. Resume any agent that truncates with: *"Stop reading more files. Output the full report now based on what you've already seen. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
 
-#### Review Dispatch Matrix (single source of truth - keep the starter-prompt copies below in sync)
+#### Review Dispatch Matrix (single source of truth: copy this table into the generated `implementation-plan.md`; starter prompts reference it, never inline a copy)
 
 Match the change surface to the agent. Spawn an agent ONLY when its row matches the diff:
 
@@ -174,8 +171,9 @@ Match the change surface to the agent. Spawn an agent ONLY when its row matches 
 |-------|----------------------------------|-------------|
 | `privacy-security-review` | `server/`, `src/admin/`, `src/net/`, a deploy/secret file (Docker/compose/env/CI yml/`DEPLOY.md`), OR introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new `Math.random`\|`Date.now`\|`performance.now` in `src/sim/` | a pure `src/ui` / `src/render` / `src/game` / `src/sim/content` / docs / test change |
 | `migration-safety` | `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`, or a `characters.state` JSONB serialize/deserialize path | any diff with no DDL and no persisted-state shape change |
-| `cross-platform-sync` | `src/world_api.ts` (IWorld), `src/sim/` behavior/obs/`SimEvent`, `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`\|`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) | a pure i18n *catalog* refactor (only `src/ui/i18n.ts` + locale data, `t()` keys unchanged) - `tsc` (`: typeof en`) + the resolved-equivalence test already cover it |
+| `cross-platform-sync` | `src/world_api.ts` or `src/world_api/**` (the IWorld facets), `src/sim/` behavior/obs/`SimEvent`, `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`\|`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) | a pure i18n *catalog* refactor (only `src/ui/i18n.ts` + locale data, `t()` keys unchanged) - `tsc` (`: typeof en`) + the resolved-equivalence test already cover it |
 | `architecture-reviewer` | a `src/sim/` change: determinism, rng draw-order, tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation | a non-sim change, or a pure data/content/test change |
+| `frontend-seam-reviewer` | `src/ui/`, `src/render/`, `src/game/`, or `src/styles/` (the view-core + `PainterHost` painter seams, graphics-settings fairness, mobile/touch surfaces) | a diff with no frontend surface |
 | `qa-checklist` | a phase / deliverable set is COMPLETE (it self-scales via its per-category Skip rules) | per-commit / mid-phase work, or a docs/test-only change |
 
 If NO row matches (e.g. a docs-only, test-only, or comment change), spawn NO review agent.
@@ -188,7 +186,7 @@ The starter prompts suggest a default split (sim + server + client + tests), but
 - **Merge small work into a single agent** when one side has only 1-2 trivial changes (e.g., adding one `IWorld` getter, adding one i18n key). Do not spawn a dedicated agent for work that takes five minutes.
 - **Split large client work** when a phase adds 3+ HUD windows plus renderer changes plus input wiring. One agent for HUD/i18n, one for renderer, one for input/camera/mobile.
 - **Use dedicated test agents** when a phase has complex test requirements across multiple suites. A test agent can run in parallel after implementation agents commit their code.
-- **Escalate to a Workflow past the manual cap.** Hand-orchestrated parallel fan-out tops out at ~5 agents. When a phase has 10+ independent, uniform tasks (e.g., add a new field to every zone's mob table, register 30 new i18n keys across 14 locales, transform many content entries), do not hand-spawn - write an `ultracode` Workflow that pipelines them with structured outputs and verifies each.
+- **Escalate to a Workflow past the manual cap.** Hand-orchestrated parallel fan-out tops out at ~5 agents. When a phase has 10+ independent, uniform tasks (e.g., add a new field to every zone's mob table, register 30 new English i18n keys across the catalog domains, transform many content entries), do not hand-spawn - write an `ultracode` Workflow that pipelines them with structured outputs and verifies each.
 - **Each agent should own complete vertical slices** - do not split by file type (one for types, another for tests). Split by domain (one for the sim behavior + its tests, another for the HUD surface + its tests). Each agent writes its own tests for the code it creates.
 
 **Code Hygiene section (include in Team Workflow):**
@@ -211,7 +209,7 @@ This is Phase N of the {Feature Name} feature: {Phase Title}.
 Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m context variant where the file load demands it.
 Harness: Claude Code.
 ULTRACODE: add the keyword `ultracode` to this prompt if this phase is batch-heavy
-(content sweeps across many tables, many-locale i18n additions, exhaustive audit) so you
+(content sweeps across many tables, bulk i18n catalog additions, exhaustive audit) so you
 orchestrate via a Workflow (pipeline + adversarial-verify) instead of hand-spawning agents.
 
 Goal: {one sentence}
@@ -254,8 +252,11 @@ INVARIANTS THIS PHASE MUST KEEP (call out the ones in play):
 - Determinism: all randomness via `Rng`; no `Math.random` / `Date.now` / `performance.now` in `src/sim/`.
 - Seam: extend `IWorld` first, then implement in BOTH `Sim` and `ClientWorld`.
 - Server authority: the client never decides combat/loot/quest/economy outcomes.
-- i18n: every new player string is a `t()` key in every locale; sim/server emit English
-  re-localized via the matchers (`src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts`).
+- i18n: every new player string is a `t()` key added in ENGLISH ONLY to the matching
+  `src/ui/i18n.catalog/<domain>.ts` module (never edit the locale overlays; M16: a wordy
+  new English value also needs its five non-Latin fills in the same change); sim/server
+  player text gets a matcher rule in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in
+  the SAME change.
 - Classic-era formulas only; do not invent balance numbers.
 
 Out of scope (do NOT do in this phase):
@@ -266,24 +267,10 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
   (baseline: `npx tsc --noEmit` + `npx vitest run tests/<affected>.ts`; add
   `npx vitest run tests/localization_fixes.test.ts` if any player text changed; add the
   wire/snapshot suites if the protocol changed).
-- Spawn review agents in parallel, but ONLY the ones whose surface this diff touches
-  (check `git diff --name-only` against the phase-start commit). Spawning an out-of-scope
-  agent wastes tokens; most phases trigger one or two, not all four.
-  - `privacy-security-review` - ONLY if the diff touches `server/`, `src/admin/`, `src/net/`,
-    a deploy/secret file (Docker/compose/env/CI), or introduces SQL / auth / a secret /
-    `ALLOW_DEV_COMMANDS` / a new `Math.random`|`Date.now`|`performance.now` in `src/sim/`.
-    NOT for a pure `src/ui` / `src/render` / `src/game` / content / docs / test change.
-  - `migration-safety` - ONLY if `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`,
-    or a `characters.state` JSONB serialize/deserialize path changed.
-  - `cross-platform-sync` - ONLY if `src/world_api.ts`, `src/sim/` behavior/obs/`SimEvent`,
-    `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`
-    |`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) changed. A pure
-    i18n catalog refactor (only `src/ui/i18n.ts` + locale data, keys unchanged) is NOT in
-    scope - `tsc` + the resolved-equivalence test cover it.
-  - `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
-    tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation).
-  - `qa-checklist` - when this phase completes a deliverable set.
-  - If none of the above match, spawn no review agent.
+- Spawn review agents in parallel per the Review Dispatch Matrix in
+  docs/{feature-name}/implementation-plan.md (the plan carries the one canonical copy).
+  Check `git diff --name-only` against the phase-start commit and spawn ONLY the agents
+  whose row matches; most phases trigger one or two, and if no row matches, spawn none.
 - Prompt each agent you spawn for COVERAGE not filtering. Resume any that truncates with the
   "Stop reading. Output verdict now." message.
 - Do not commit until each reports no BLOCKING issues.
@@ -372,20 +359,10 @@ Dead code & cleanup agent:
 - Verify no TODO/FIXME items were left unresolved
 - Check for inconsistent naming or patterns vs the rest of the codebase
 
-Multi-agent review dispatch (spawn ONLY the agents whose surface the Phase N diff touches;
-check `git diff --name-only` against the phase-start commit - do not run all four by default):
-- `privacy-security-review` - ONLY if the diff touches `server/`, `src/admin/`, `src/net/`,
-  a deploy/secret file, or introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new
-  `Math.random`|`Date.now`|`performance.now` in `src/sim/`. NOT for a pure UI/render/game/
-  content/docs/test change.
-- `migration-safety` - ONLY if server schema/DDL or a `characters.state` persisted-state
-  shape changed.
-- `cross-platform-sync` - ONLY if IWorld / `src/sim` behavior/obs/`SimEvent` / `ClientWorld`
-  / `wireEntity` dispatch / the `sim_i18n`|`server_i18n` matchers / the RL surface changed.
-  A pure i18n catalog refactor (keys unchanged) is NOT in scope.
-- `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
-  tick-phase, the `SimContext` seam, or a move-not-rewrite relocation).
-- `qa-checklist` - yes (this is the phase-completion QA gate).
+Multi-agent review dispatch: apply the Review Dispatch Matrix in
+docs/{feature-name}/implementation-plan.md (the plan carries the one canonical copy).
+Check `git diff --name-only` against the phase-start commit and spawn ONLY the agents
+whose row matches, plus `qa-checklist` (this is the phase-completion QA gate).
 Resume any review agent that truncates mid-analysis with: *"Stop reading more files. Output the full report now. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
 
 STEP 3 - FIX: Apply all BLOCKING and SHOULD-FIX items. Run the full validation matrix from state.md
@@ -440,7 +417,7 @@ STOPPING RULES:
 **Deploy gates (any phase that ships server or client changes to production):**
 - Production runs in Docker (see `DEPLOY.md`). Standalone update path: ssh to the host, `cd /opt/eastbrook`, `sudo git pull`, `sudo docker compose up -d --build`. Players are saved on shutdown and briefly disconnect.
 - Health check after deploy: `curl -s localhost:8787/api/status` returns `{"ok":true,"players_online":N,...}`.
-- Before any deploy, the CI-equivalent gate must be green locally: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build` (this mirrors `.github/workflows/ci.yml`).
+- Before any deploy, the CI-equivalent gate must be green locally: `npm run gate` (mirrors `.github/workflows/ci.yml`: i18n gen + freshness, malware scan, changed-files biome, sfx check, full tests, typecheck, all builds; release-tier on `release/**`).
 - Never set `ALLOW_DEV_COMMANDS=1` in production (it enables level/teleport/item cheats).
 - Most phases do not deploy; deploys are manual and infrequent. Treat deploy as a deliberate, separate step, not part of every phase.
 
@@ -464,7 +441,7 @@ The planning packet in `docs/{feature-name}/` is cross-session scaffolding, not 
 Cross-phase cheat sheet. Contains ONLY what the next session needs:
 - Current phase number + status
 - Locked design decisions (record once, reference forever)
-- Non-negotiable constraints (determinism, server authority, `IWorld`-first, i18n in all locales, no generated-file edits, shared-worktree commit care)
+- Non-negotiable constraints (determinism, server authority, `IWorld`-first, English-only i18n catalog keys, no generated-file edits, shared-worktree commit care)
 - Validation matrix by change type:
   - **sim-only**: `npx tsc --noEmit` + `npx vitest run tests/sim.test.ts` (and the relevant command suites); determinism check.
   - **content-only**: `npx tsc --noEmit` + `npx vitest run tests/progression.test.ts tests/talents.test.ts` (referential integrity); i18n if new names.
@@ -472,7 +449,7 @@ Cross-phase cheat sheet. Contains ONLY what the next session needs:
   - **net/wire**: `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts` + parity check.
   - **ui/render**: `npx tsc --noEmit` + `npx vitest run tests/localization_fixes.test.ts` (if text) + a mobile screenshot script.
   - **headless/RL**: `npm run build:env` + `npx vitest run tests/env_protocol.test.ts` + a short `npm run bench`.
-  - **full-stack / pre-merge**: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+  - **full-stack / pre-merge**: `npm run gate` (the CI-equivalent gate; release-tier on `release/**`).
   - **any code change (Biome / CI ratchet)**: `npm run ci:changed` (Biome on the files you changed, what the `.githooks/pre-push` floor runs). Fix formatting with a SCOPED `npx @biomejs/biome check --write <file>`, never a whole-tree `--write`.
 - Key file paths (existing + created by this feature)
 - New files created per phase
@@ -488,13 +465,13 @@ Cross-phase cheat sheet. Contains ONLY what the next session needs:
 Whole-feature integration matrix verified once at packet completion:
 - **Three-host parity**: the offline browser `Sim`, the online `ClientWorld`, and the headless env behave consistently for this feature.
 - **Determinism**: same seed gives the same world; no `Math.random` / `Date.now` / `performance.now` in `src/sim/`; determinism tests pass.
-- **i18n completeness**: every new player-visible string is a `t()` key present in all locales in `translations`; sim/server emits have matcher rules in `sim_i18n.ts` / `server_i18n.ts`; `npx tsc --noEmit` and `npx vitest run tests/localization_fixes.test.ts` (S3 guard) are green; numbers/money/dates go through `formatNumber` / `formatMoney` / `formatDateTime`.
+- **i18n completeness**: every new player-visible string is a `t()` key in the English catalog (`src/ui/i18n.catalog/`), rendered via `t()`, with the locale overlays untouched (release-tier fills them; M16 wordy strings carry their five non-Latin fills); sim/server emits have matcher rules in `sim_i18n.ts` / `server_i18n.ts`; `npx tsc --noEmit` and `npx vitest run tests/localization_fixes.test.ts` (S3 guard) are green; numbers/money/dates go through `formatNumber` / `formatMoney` / `formatDateTime`.
 - **Classic-era fidelity**: formulas match the cited references; no invented balance numbers.
 - **Server authority**: no client-trusted outcomes; WS commands validated server-side.
 - **Persistence**: characters saved before this feature still load; save/load round-trip verified; DDL changes are additive and idempotent.
 - **Performance / budgets**: snapshot bandwidth sane; `npm run asset:budget` and `npm run perf:tour` within budget.
 - **Copy review**: no em dashes or emojis in player-facing text (raw emojis as in-game icons are also disallowed by the aesthetic rule).
-- **Build gate**: the CI-equivalent gate is green (`npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`).
+- **Build gate**: `npm run gate` is green (the CI-equivalent gate; release-tier on `release/**`).
 - **Deploy verification** (only if deployed): `curl -s localhost:8787/api/status` returns ok with the expected build.
 
 ## Step 5: Commit

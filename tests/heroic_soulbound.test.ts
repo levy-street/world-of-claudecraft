@@ -1,5 +1,5 @@
-// Soulbound items (the heroic_mark reward token) cannot be traded, mailed,
-// listed, or destroyed. This pins the two paths a player hits most directly:
+// The heroic_mark reward token is soulbound and explicitly non-discardable, so
+// it cannot be traded, mailed, listed, or destroyed. This pins the two paths a player hits most directly:
 // right-click destroy (discardItem) and player trade (tradeSetOffer), plus the
 // flag itself. The mail/market/vendor gates fold into the same def.soulbound
 // check at their existing quest/noMarketList/noVendorSell guards.
@@ -12,6 +12,7 @@ import { tradeSetOffer } from '../src/sim/social/trade';
 describe('soulbound: heroic_mark is bound', () => {
   it('flags heroic_mark soulbound (and it is not soulbound for ordinary items)', () => {
     expect(ITEMS.heroic_mark.soulbound).toBe(true);
+    expect(ITEMS.heroic_mark.noDiscard).toBe(true);
     expect(ITEMS.minor_healing_potion.soulbound).toBeFalsy();
   });
 

@@ -16,6 +16,18 @@ const workers = Math.max(1, Math.floor(os.cpus().length / 2));
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
+const missingAudioTools = ['ffmpeg', 'ffprobe'].filter((tool) => {
+  const probe = spawnSync(tool, ['-version'], { stdio: 'ignore', shell });
+  return probe.error !== undefined || probe.status !== 0;
+});
+if (missingAudioTools.length > 0) {
+  console.error(
+    `[gate] missing required SFX audio tooling on PATH: ${missingAudioTools.join(', ')}\n` +
+      '[gate] install FFmpeg (including ffprobe), then re-run npm run gate',
+  );
+  process.exit(1);
+}
+
 const branch =
   spawnSync('git', ['branch', '--show-current'], { encoding: 'utf8', shell }).stdout?.trim() ?? '';
 const releaseTier = branch.startsWith('release/');
@@ -38,8 +50,10 @@ const steps = [
   ],
   ['malware scan', 'npm', ['run', 'security:gate']],
   ['biome (changed files)', 'npm', ['run', 'ci:changed']],
+  ['sfx check', 'npm', ['run', 'sfx:check']],
   ['vitest (full suite)', 'npm', ['test', '--', `--maxWorkers=${workers}`]],
-  ['typecheck', 'npx', ['tsc', '--noEmit']],
+  ['browser regressions', 'npm', ['run', 'test:browser']],
+  ['typecheck', 'npm', ['run', 'check:types']],
   ['env build', 'npm', ['run', 'build:env']],
   ['server build', 'npm', ['run', 'build:server']],
   ['client build', 'npm', ['run', 'build']],

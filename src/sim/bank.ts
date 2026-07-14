@@ -18,6 +18,7 @@
 import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit } from './bags';
 import { ITEMS } from './data';
+import * as deedsMod from './deeds';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -127,6 +128,16 @@ function nearBanker(ctx: SimContext, e: Entity): boolean {
   return false;
 }
 
+/** The in-reach banker's templateId, or null when none: the same scan as
+ *  nearBanker, resolved to an identity for the deeds NPC ledger. */
+function nearBankerTemplateId(ctx: SimContext, p: Entity): string | null {
+  for (const id of ctx.bankerIds) {
+    const b = ctx.entities.get(id);
+    if (b && b.kind === 'npc' && dist2d(p.pos, b.pos) <= BANKER_RANGE) return b.templateId;
+  }
+  return null;
+}
+
 /** Deposit a carried-inventory slot into the bank. Quest items are refused (they
  *  are quest-bound); everything else follows the pooled capacity rules. A counted
  *  fungible leaving the bags must un-credit any collect quest, so success pokes the
@@ -165,6 +176,9 @@ export function bankDeposit(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A completed deposit is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
 }
 
 /** Withdraw a bank slot back into the carried inventory: the mirror of deposit,
@@ -200,6 +214,9 @@ export function bankWithdraw(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A completed withdrawal is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
 }
 
 /** Buy the next 6-slot bank expansion for exact copper, non-refundable. Blocked at
@@ -229,6 +246,11 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
   meta.copper -= price;
   meta.bank.purchasedSlots += BANK_EXPANSION_SLOTS;
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
+  // A completed expansion is banker business; the gate above guarantees a banker.
+  const bankerId = nearBankerTemplateId(ctx, p);
+  if (bankerId) deedsMod.onBankerBusinessForDeeds(ctx, meta, bankerId);
+  // purchasedSlots feeds a deed meter, so re-check this player's triggers.
+  ctx.markDeedsDirty(meta.entityId);
 }
 
 /** The proximity-gated bank snapshot the IWorld seam exposes (the mailInfoFor

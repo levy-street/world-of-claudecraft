@@ -1099,15 +1099,14 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     /* No chrome-scale here: the More tray is a TRANSIENT modal, not persistent
-       chrome, so shrinking it frees no world view; and its pills already sit
-       under the 40px floor (36px), so scaling them 0.85x only worsened the tap
-       targets the chrome-scale token promises never to push below the floor. */
-    grid-auto-rows: 36px;
+       chrome, so shrinking it frees no world view. Keep its pills at the 40px
+       touch floor regardless of the persistent-HUD chrome scale. */
+    grid-auto-rows: 40px;
     gap: 6px;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
-    height: 36px;
+    height: 40px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1120,7 +1119,7 @@
        (elliptical corner radii bigger than the box is tall). A pill needs the
        radius capped at half the height so the ends are true semicircles and
        the sides stay straight. */
-    border-radius: 18px;
+    border-radius: 20px;
   }
   body.mobile-touch #mobile-extra-controls .mobile-label {
     display: inline;
@@ -2201,13 +2200,177 @@
      to stack in a single tall column, wasting the wide landscape viewport and
      forcing a long scroll. Flow them into 2 balanced columns; break-inside:avoid
      keeps each card whole across the column break. */
-  body.mobile-touch #daily-rewards-window .dr-body {
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
     column-count: 2;
     column-gap: 12px;
   }
-  body.mobile-touch #daily-rewards-window .dr-body > * {
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body > * {
     break-inside: avoid;
     margin-bottom: 10px;
+  }
+  body.mobile-touch #daily-rewards-window {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  body.mobile-touch #daily-rewards-window .woc-store-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
+    padding: 10px;
+  }
+  body.mobile-touch .woc-store-tabs button {
+    min-width: 112px;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+  body.mobile-touch .woc-store-hero {
+    grid-template-columns: 1fr;
+    min-height: 190px;
+    padding: 18px;
+    background:
+      linear-gradient(90deg, rgb(3 10 16 / 96%), rgb(4 17 27 / 76%)),
+      url("/claudium/claudium_coin_hero_3q.webp") 100% 50% / 190px auto no-repeat;
+  }
+  body.mobile-touch .woc-store-balance {
+    width: min(190px, 100%);
+  }
+  body.mobile-touch .woc-store-balance button,
+  body.mobile-touch .woc-store-card button {
+    min-height: 40px;
+  }
+  body.mobile-touch .woc-store-section-title {
+    align-items: start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  body.mobile-touch .woc-store-section-title small {
+    text-align: left;
+  }
+  body.mobile-touch .woc-store-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Season 1 Armory: two-up cards; the inspect panel stacks viewport over codex
+     so the lore stays scrollable under the 3D stage. */
+  body.mobile-touch .armory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body.mobile-touch .armory-inspect {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: calc(100dvh - 24px);
+  }
+  body.mobile-touch .armory-inspect-stage {
+    min-height: 250px;
+  }
+  body.mobile-touch .armory-inspect-panel {
+    border-top: 1px solid var(--rarity);
+    border-left: none;
+  }
+  /* Touch-target floor: the desktop toggles are compact; give thumbs 40px. */
+  body.mobile-touch .armory-mode-toggle button,
+  body.mobile-touch .armory-scene-toggle button {
+    min-height: 40px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  body.mobile-touch .armory-inspect-actions button {
+    min-height: 44px;
+  }
+  /* The game is landscape-only on touch. Keep a complete Armory card within
+     the store scrollport instead of stretching two square previews across the
+     full phone width. The inspect dialog uses that same wide viewport as two
+     columns, reserving a fixed footer for Buy / Apply / Detach while only the
+     lore copy scrolls. */
+  @media (orientation: landscape) {
+    body.mobile-touch .woc-store-hero {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      min-height: 118px;
+      padding: 12px 14px;
+    }
+    body.mobile-touch .woc-store-balance {
+      align-self: center;
+    }
+    body.mobile-touch .armory-section {
+      margin-top: 10px;
+    }
+    body.mobile-touch .armory-section > header {
+      padding: 6px 8px;
+    }
+    body.mobile-touch .armory-grid {
+      grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+      gap: 8px;
+      padding: 8px;
+    }
+    body.mobile-touch .armory-card {
+      width: 100%;
+      max-width: 116px;
+      justify-self: center;
+    }
+    body.mobile-touch .armory-card-copy {
+      gap: 2px;
+      padding: 6px 7px 7px;
+    }
+    body.mobile-touch .armory-inspect-overlay {
+      padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+        max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    }
+    body.mobile-touch .armory-inspect {
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.8fr);
+      grid-template-rows: minmax(0, 1fr);
+      width: min(920px, 100%);
+      height: 100%;
+      max-height: none;
+    }
+    body.mobile-touch .armory-inspect-stage {
+      min-width: 0;
+      min-height: 0;
+    }
+    body.mobile-touch .armory-inspect-panel {
+      min-width: 0;
+      min-height: 0;
+      gap: 6px;
+      padding: 12px;
+      overflow: hidden;
+      border-top: none;
+      border-left: 1px solid var(--rarity);
+    }
+    body.mobile-touch .armory-inspect-details {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      padding-inline-end: 40px;
+      overflow-y: auto;
+    }
+    body.mobile-touch .armory-lore {
+      padding: 8px 10px;
+    }
+    body.mobile-touch .armory-inspect-actions {
+      flex: 0 0 auto;
+      gap: 8px;
+      margin-top: 0;
+      padding-top: 8px;
+    }
+  }
+  body.mobile-touch .woc-store-card {
+    min-height: 214px;
+  }
+  body.mobile-touch .woc-store-card > img {
+    height: 140px;
+  }
+  body.mobile-touch .woc-store-card-copy {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .woc-store-card button {
+    width: 100%;
+    justify-content: center;
+  }
+  @media (max-width: 520px) {
+    body.mobile-touch .woc-store-grid {
+      grid-template-columns: 1fr;
+    }
+    body.mobile-touch .woc-store-card > img {
+      height: 180px;
+    }
   }
   body.mobile-touch.mobile-window-open #ui {
     z-index: 90;
@@ -2239,7 +2402,8 @@
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
   body.mobile-touch #loot-settings-window,
-  body.mobile-touch #town-focus-window {
+  body.mobile-touch #town-focus-window,
+  body.mobile-touch #claudium-window {
     left: 10px;
     right: 10px;
     top: 10px;
@@ -2247,6 +2411,92 @@
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
+  }
+  body.mobile-touch #claudium-window .cl-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
+    padding: 10px;
+  }
+  body.mobile-touch #claudium-window .cl-balance {
+    grid-template-columns: 72px 1fr;
+    gap: 10px;
+    min-height: 86px;
+    padding: 8px 12px 8px 6px;
+  }
+  body.mobile-touch #claudium-window .cl-balance-art {
+    width: 72px;
+    height: 70px;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-balances {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+  }
+  body.mobile-touch #claudium-window .cl-rail {
+    min-height: 44px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  body.mobile-touch #claudium-window .cl-sku {
+    min-height: 236px;
+    padding: 0 8px 10px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art {
+    min-height: 118px;
+    margin: 0 -8px 4px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art img {
+    width: 112px;
+    height: 108px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-buy {
+    min-height: 40px;
+  }
+  body.mobile-touch #claudium-window .cl-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
+    padding: 10px;
+  }
+  body.mobile-touch #claudium-window .cl-balance {
+    grid-template-columns: 72px 1fr;
+    gap: 10px;
+    min-height: 86px;
+    padding: 8px 12px 8px 6px;
+  }
+  body.mobile-touch #claudium-window .cl-balance-art {
+    width: 72px;
+    height: 70px;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-balances {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+  }
+  body.mobile-touch #claudium-window .cl-rail {
+    min-height: 44px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  body.mobile-touch #claudium-window .cl-sku {
+    min-height: 236px;
+    padding: 0 8px 10px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art {
+    min-height: 118px;
+    margin: 0 -8px 4px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art img {
+    width: 112px;
+    height: 108px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-buy {
+    min-height: 40px;
   }
   body.mobile-touch #vendor-window {
     max-height: calc(58vh - 20px);
@@ -2368,7 +2618,10 @@
     max-width: none;
     box-sizing: border-box;
     overflow: hidden;
-    z-index: 95;
+    /* Managed windows receive an inline desktop z-index. Bags is a modal sheet
+       here, so this scoped override must beat that inline value while leaving
+       desktop Need/Greed above its compact Bags window. */
+    z-index: 95 !important;
   }
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
@@ -2414,6 +2667,13 @@
   body.mobile-touch #trade-window .btn {
     min-height: 40px;
     font-size: 16px;
+  }
+  /* Short landscape phones keep only actionable roll cards (hud.ts filters the
+     answered watch rows). The desktop vote monitor is useful context, but its
+     multi-row strip makes one mobile card taller than the rail's usable height
+     and pushes Need/Greed/Pass below the fold. Results still land in loot chat. */
+  body.mobile-touch .loot-roll-votes {
+    display: none;
   }
   body.mobile-touch .soc-add input,
   body.mobile-touch .trade-money input {
@@ -2779,6 +3039,107 @@
     body.mobile-touch #bank-window .bank-buy-row {
       margin-top: 4px;
     }
+  }
+  /* ---------- mobile deeds (standalone window + tracker) ---------- */
+  /* The Book of Deeds follows the bank's STANDALONE full-screen convention on
+     touch (it has no companion panel, so no 50/50 pairing): fixed inside the
+     safe-area insets, transform reset (neutralizing the desktop centering),
+     max-width unclamped (the base .window clamp divides by --window-scale, not
+     --ui-scale, and under-fills below uiScale 1). The entry list
+     (.deeds-scroll) is the internal scroll container; the title bar, summary,
+     category chips, and filter bar stay pinned chrome. */
+  body.mobile-touch #deeds-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area;
+       this window is already inset-pinned on all four edges, so that rule
+       would double count the inset and eat the short-landscape height
+       budget below. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Category navigation collapses from the desktop sidebar to ONE horizontally
+     scrollable chip row (the bank chip idiom). Nothing hidden: every chip
+     stays reachable by scroll and keeps its full 40px tap height (the
+     components.css touch floor on .deeds-cat). */
+  body.mobile-touch #deeds-window .deeds-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.mobile-touch #deeds-window .deeds-rail {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat {
+    flex: 0 0 auto;
+  }
+  /* The Titles divider is a column-rail idiom; in the chip row it reads as a
+     plain sibling chip. */
+  body.mobile-touch #deeds-window .deeds-cat-titles {
+    margin-top: 0;
+    border-top-color: transparent;
+    border-radius: 4px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat-titles.active {
+    border-top-color: #6a5320;
+  }
+  /* Short landscape phones: the pinned chrome (title bar, summary, recent and
+     nearest strips, chip row, filter bar) can eat the whole panel height and
+     clip the filter bar below the window edge. The strips tighten and the
+     entry list yields to roughly one visible card and scrolls; the
+     components.css 100px floor is what must give, or the flex column pushes
+     the filter bar out (the bank's clipped buy row, which hid exactly because
+     a fresh character DROPS the recent/nearest strips, so verify with the
+     strips present AND absent). */
+  @media (max-height: 480px) {
+    body.mobile-touch #deeds-window .deeds-body {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-summary {
+      padding: 1px 0 2px;
+    }
+    body.mobile-touch #deeds-window .deeds-recent,
+    body.mobile-touch #deeds-window .deeds-nearest {
+      padding-bottom: 2px;
+    }
+  }
+  /* Watchlist tracker on phones: compact rows, the list capped (it is
+     glanceable decoration, the Book itself carries the full watch set) so the
+     strip can never run down into the bottom combat cluster. On the compact
+     tier (every real landscape phone, mobile_hud_layout.ts) the rows fold away
+     entirely and the header stays as a count chip; hud.ts routes that tap to
+     the Book of Deeds window instead of the invisible collapse toggle. */
+  body.mobile-touch #deed-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #deed-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
+    display: none;
   }
   /* On touch, stack the categories back into a single column so the large
      touch targets keep their full width. */
@@ -3567,9 +3928,9 @@
       /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
          tier so each More-tray pill stays narrow on a wide landscape phone.
          No chrome-scale on the rows (see the base-tier rule): transient modal,
-         already under the 40px floor. */
+         always held at the 40px floor. */
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-auto-rows: 34px;
+      grid-auto-rows: 40px;
       gap: 5px;
     }
     /* The base square map can dip into the fixed Jump/Interact/combat row on a
@@ -3620,10 +3981,10 @@
     }
     body.mobile-touch #mobile-extra-controls .mobile-btn {
       width: 100%;
-      height: 34px;
+      height: 40px;
       font-size: 13px;
       padding: 0 7px;
-      border-radius: 17px;
+      border-radius: 20px;
     }
     body.mobile-touch #mobile-extra-controls .mobile-label {
       font-size: 9px;
@@ -3953,6 +4314,16 @@
     --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));
     right: max(14px, env(safe-area-inset-right));
     bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  /* The 40px touch floor above is shorter than the toggle's natural scaled size,
+     so its border-box inner height (40px - 2 * 2px border = 36px) is tighter than
+     the standard/tablet tiers. The base page-indicator digit (20px text + a 2px
+     icon gap + a 15px icon = 37px) overflowed that by a hair, and the button's
+     circular overflow:hidden (added for the cooldown-sweep clip, see above)
+     clipped the digit's top pixels instead of showing it in full. Shrink the
+     digit to fit the compact floor with room to spare. */
+  body.mobile-touch.hud-mobile-compact #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 15px;
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {
     left: max(14px, env(safe-area-inset-left));

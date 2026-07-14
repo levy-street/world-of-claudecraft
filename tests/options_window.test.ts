@@ -74,6 +74,30 @@ describe('options_window: WCAG 2.2 AA', () => {
   });
 });
 
+describe('options_window: deed-broadcast account row', () => {
+  it('renders ONLY when the online seam is wired (offline shows no row)', () => {
+    expect(painter).toContain(
+      'if (hooks?.deedBroadcasts) buildDeedBroadcastRow(body, hooks.deedBroadcasts);',
+    );
+    // The hooks seam is optional by declaration: offline main.ts never wires it.
+    expect(hudTs).toMatch(/deedBroadcasts\?: \{/);
+  });
+
+  it('reads before it enables and reflects busy/pressed state programmatically', () => {
+    const start = painter.indexOf('export function buildDeedBroadcastRow(');
+    expect(start).toBeGreaterThan(-1);
+    const body = painter.slice(start, painter.indexOf('export class OptionsWindow'));
+    expect(body).toContain("toggle.setAttribute('aria-busy', 'true');");
+    expect(body).toContain("toggle.setAttribute('aria-pressed', String(on));");
+    expect(body).toContain('toggle.disabled = true;');
+    // The row renders in the classic set-row grammar beside the chat rows.
+    expect(body).toContain("row.className = 'set-row';");
+    expect(body).toContain("toggle.className = 'btn set-toggle';");
+    // The behavior round-trip (echo wins, failed write reverts) is jsdom-driven
+    // in tests/deed_broadcast_row.test.ts.
+  });
+});
+
 // The exact control-dispatch wiring. The pure value coercion is unit-tested in
 // options_view.test.ts (sliderDispatchValue / toggleNextValue / boolToggleNextValue);
 // here we pin that the painter routes each descriptor kind to its builder and fires

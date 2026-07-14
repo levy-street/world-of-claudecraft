@@ -29,6 +29,7 @@
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -55,6 +56,11 @@ import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
 import { emitMobYell } from './yells';
 
+// Hard ceiling on a mob's effective aggro/detection radius, whatever its template
+// aggroRadius or level advantage. Exported so the dungeon door-clearance module and
+// its guard test pin the same number: a mob spawned strictly outside this radius of
+// a dungeon door can never aggro a player standing on the door.
+export const MAX_AGGRO_RADIUS = 20;
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
 // water or a collider sits between it and its spawn. Since evading mobs are
@@ -243,7 +249,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           if (e.dead) return;
           const radius = Math.max(
             4,
-            Math.min(20, template.aggroRadius + (mob.level - e.level) * 1.5),
+            Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
           );
           const d = Math.sqrt(d2);
           if (d < radius && d < detectedD) {
@@ -260,7 +266,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
         if (e.dead) return;
         if (isTrivialTo(mob, e)) return;
-        let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - e.level) * 1.5));
+        let radius = Math.max(
+          4,
+          Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
+        );
         radius *= ctx.delveDetectMult(e);
         // stealthed rogues are harder to detect, relative to observer level
         if (e.auras.some((a) => a.kind === 'stealth'))
@@ -629,6 +638,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // a wiped pull must not receive a personal slot from a later kill).
   mob.bossDamagers.clear();
   ctx.despawnSummonedAdds(mob);
+  // An evade ends the attempt; the deed window re-arms.
+  deedsMod.resetDeedEncounter(ctx, mob);
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
@@ -639,6 +650,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.loudYellIndex = 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
+  mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;
+  mob.channelRamp = 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;

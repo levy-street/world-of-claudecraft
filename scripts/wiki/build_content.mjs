@@ -14,6 +14,7 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
+import { assertFamiliesKnown } from './family_guard.mjs';
 import { stillUrl } from './still_key.mjs';
 
 const root = process.cwd();
@@ -30,6 +31,8 @@ const entrySource = `
   export { ZONE3_MOBS } from './src/sim/content/zone3.ts';
   export { TEMPLE_MOBS } from './src/sim/content/temple.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
+  export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
+  export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
 `;
 
@@ -65,6 +68,9 @@ const {
   NPCS,
   DELVE_COMPANIONS,
   DELVE_AFFIXES,
+  DEEDS,
+  DEED_ORDER,
+  DEED_IMAGE_IDS,
   VISUALS,
   visualKeyFor,
 } = await import(dataUrl);
@@ -195,6 +201,23 @@ const dungeons = Object.values(DUNGEONS)
   })
   .sort((a, b) => (a.min ?? 99) - (b.min ?? 99) || a.suggestedPlayers - b.suggestedPlayers);
 
+// Druid shapeshift forms: player-worn models a reader meets constantly, shown as their own
+// gallery group. Labels are guide.models.form* keys on the client, not baked names.
+// form_sheep stays out: it is the polymorph victim model, not a druid form.
+const DRUID_FORM_KEYS = ['form_bear', 'form_cat', 'form_travel'];
+const druidForms = DRUID_FORM_KEYS.map((vk) => {
+  const model = modelKeyFor(vk);
+  if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);
+  const tint = tintFor(vk, 0xffffff);
+  const tintHex = tint != null ? hex(tint) : null;
+  return {
+    id: vk,
+    model,
+    ...(tintHex != null ? { tint: tintHex } : {}),
+    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+  };
+});
+
 // Warlock demons, in summon order. Names only; role flavor is authored guide copy.
 const warlockPets = Object.values(WARLOCK_PET_MOBS).map((p) => {
   const vk = mobVisualKey(p.id);
@@ -229,6 +252,7 @@ const FAMILY_ORDER = [
 // Encounter adds that only ever arrive via a boss `summonAdds` are not wild creatures, so
 // they are excluded here even though they are not flagged elite/boss.
 const campedMobIds = new Set(CAMPS.map((c) => c.mobId));
+const publishedMobIds = new Set();
 const famMap = {};
 for (const [id, m] of Object.entries({
   ...ZONE1_MOBS,
@@ -240,6 +264,7 @@ for (const [id, m] of Object.entries({
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures
   if (!campedMobIds.has(id)) continue; // summon-only encounter adds, never met in the open
   if (/vision/i.test(id) || /^Vision\b/.test(m.name)) continue; // cinematic apparitions, not creatures
+  if (m.dummy) continue; // inert practice fixtures (the training dummy), not creatures
   const vk = mobVisualKey(id);
   const tint = tintFor(vk, m.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
@@ -255,11 +280,33 @@ for (const [id, m] of Object.entries({
     ...(tintHex != null ? { tint: tintHex } : {}),
     ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
   });
+  publishedMobIds.add(id);
 }
+// A published creature whose family lacks an order slot would silently vanish from the
+// bestiary (the freshness test faithfully reproduces a buggy generator), so fail loudly.
+assertFamiliesKnown(famMap, FAMILY_ORDER);
 const families = FAMILY_ORDER.filter((f) => famMap[f]).map((f) => ({
   family: f,
   creatures: [...famMap[f].values()].sort((a, b) => a.min - b.min || a.name.localeCompare(b.name)),
 }));
+
+// Which bestiary families actually live in each zone, from camp GEOGRAPHY (a camp's
+// center z falls inside exactly one zone's z-band), never from level-band overlap: a
+// creature whose levels straddle a zone border is not a resident of a zone it has no
+// camp in. Drives the world page's "who you will meet" cross-links.
+const zoneIdForZ = (zv) => ZONES.find((z) => zv >= z.zMin && zv <= z.zMax)?.id ?? null;
+const familiesByZone = {};
+for (const c of CAMPS) {
+  const m = MOBS[c.mobId];
+  if (!m || !publishedMobIds.has(c.mobId)) continue; // only bestiary-published creatures
+  const zid = zoneIdForZ(c.center.z);
+  if (!zid) continue;
+  familiesByZone[zid] ??= new Set();
+  familiesByZone[zid].add(m.family);
+}
+for (const z of zones) {
+  z.families = FAMILY_ORDER.filter((f) => familiesByZone[z.id]?.has(f));
+}
 
 // Delves: a spoiler-safe overview of each delve, the small-group instanced descents.
 // Only the high-level structural facts surface (display name, level floor, suggested
@@ -292,6 +339,30 @@ const delves = DELVE_LIST.map((d) => {
     affixes,
   };
 });
+
+// The Book of Deeds catalog, spoiler-safe. Hidden deeds are filtered out STRUCTURALLY
+// here (by the def's own `hidden` flag, not the category), so a secret deed never reaches
+// the generated file and cannot leak through the wiki even if a page forgot to hide it.
+// Only the fields a public reader needs are emitted: name, category, Renown, whether it is
+// a Feat, and the cosmetic reward. The trigger is never emitted, and neither is the
+// player-facing `desc`: deed descriptions name instanced bosses and per-encounter mechanics
+// that the wiki withholds by policy (the same reason the raid boss and elite creatures stay
+// out of the bestiary), so the criteria live only in the in-game Book of Deeds.
+// The crest URL points at art the game client already ships publicly under /ui/deeds
+// (the id doubles as the filename), and it is only ever computed AFTER the hidden filter,
+// so no hidden deed's id can ride out through a crest path.
+const deeds = DEED_ORDER.map((id) => DEEDS[id])
+  .filter((d) => d && !d.hidden)
+  .map((d) => ({
+    id: d.id,
+    name: d.name,
+    category: d.category,
+    renown: d.renown,
+    feat: !!d.feat,
+    ...(d.reward?.kind === 'title' ? { rewardTitle: d.reward.text } : {}),
+    ...(d.reward?.kind === 'border' ? { rewardBorder: true } : {}),
+    ...(DEED_IMAGE_IDS.has(d.id) ? { crest: `/ui/deeds/${d.id}.webp` } : {}),
+  }));
 
 const header = `// GENERATED by scripts/wiki/build_content.mjs from src/sim/content. Do not edit by hand.
 // Regenerate with \`npm run wiki:content\`; tests/guide.test.ts checks it stays fresh.
@@ -345,6 +416,8 @@ export interface GuideZoneInfo {
   hub: string;
   pois: string[];
   welcome: string;
+  /** Bestiary families with at least one camp inside this zone, in family order. */
+  families: string[];
 }
 
 export interface GuideDungeon {
@@ -357,6 +430,10 @@ export interface GuideDungeon {
 }
 
 export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+
+// Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
+// keys so the names localize like the rest of the picker chrome.
+export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
 
 export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
@@ -374,6 +451,24 @@ export interface GuideDelve {
   tiers: string[];
   affixes: string[];
 }
+
+// A single public deed. Names and reward title text are the English sim source (proper
+// nouns), baked like creature and POI names. No criteria beyond this reaches the wiki: the
+// trigger and the player-facing desc are deliberately omitted (see the generator note), and
+// hidden deeds are filtered out entirely, so this list is safe to publish in full.
+export interface GuideDeed {
+  id: string;
+  name: string;
+  category: string;
+  renown: number;
+  feat: boolean;
+  /** Cosmetic title text (English proper noun), when the deed grants one. */
+  rewardTitle?: string;
+  /** True when the deed grants a cosmetic nameplate border. */
+  rewardBorder?: true;
+  /** Painted crest URL under /ui/deeds, present only when committed art backs this deed. */
+  crest?: string;
+}
 `;
 
 writeFileSync(
@@ -384,12 +479,14 @@ writeFileSync(
     `\nexport const GUIDE_ZONES: GuideZoneInfo[] = ${JSON.stringify(zones, null, 2)};\n`,
     `\nexport const GUIDE_DUNGEONS: GuideDungeon[] = ${JSON.stringify(dungeons, null, 2)};\n`,
     `\nexport const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = ${JSON.stringify(warlockPets, null, 2)};\n`,
+    `\nexport const GUIDE_DRUID_FORMS: GuideDruidForm[] = ${JSON.stringify(druidForms, null, 2)};\n`,
     `\nexport const GUIDE_FAMILIES: GuideFamily[] = ${JSON.stringify(families, null, 2)};\n`,
     `\nexport const GUIDE_DELVES: GuideDelve[] = ${JSON.stringify(delves, null, 2)};\n`,
+    `\nexport const GUIDE_DEEDS: GuideDeed[] = ${JSON.stringify(deeds, null, 2)};\n`,
     `\nexport const GUIDE_MODELS: Record<string, GuideModelSpec> = ${JSON.stringify(MODELS, null, 2)};\n`,
   ].join(''),
 );
 // eslint-disable-next-line no-console
 console.log(
-  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${families.length} families, ${delves.length} delves, ${Object.keys(MODELS).length} models)`,
+  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${Object.keys(MODELS).length} models)`,
 );

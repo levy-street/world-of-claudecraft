@@ -181,6 +181,41 @@ describe('Nythraxis raid encounter', () => {
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
+    expect(MOBS.nythraxis_heroic_warrior_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      dmgBase: 26,
+      dmgPerLevel: 5.6,
+    });
+    // Malric: CC-able (must be stunned/silenced to break his heal channel), squishy,
+    // and channels an escalating heal on the boss instead of a shield.
+    expect(MOBS.nythraxis_heroic_priest_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      channelHeal: expect.objectContaining({
+        every: 4,
+        baseHeal: 320,
+        rampAdd: 240,
+        maxHeal: 1440,
+      }),
+    });
+    expect(MOBS.nythraxis_heroic_priest_add.wardAllies).toBeUndefined();
+    // Voss: untauntable but CC-able, medium damage, low health.
+    expect(MOBS.nythraxis_heroic_rogue_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: false,
+      minLevel: 20,
+      maxLevel: 20,
+      ignoreTaunt: true,
+      dmgBase: 16,
+    });
 
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
@@ -2407,6 +2442,67 @@ describe('Nythraxis raid encounter', () => {
     now = reset + 1; // just past the daily reset boundary
     sim.enterDungeon('nythraxis_boss_arena', tankPid);
     expect(tank.pos.x).toBeGreaterThan(3000); // lockout lifted, re-entry allowed
+  });
+
+  it('the kill locks EVERY raid member, even one who never entered the arena', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    // enterRaid moves only the tank through the door: the raid fills stay at the
+    // world spawn, outside the arena and the boss room. A member who released
+    // (or camped the door) must still be locked by the kill, or one unlocked
+    // raider re-claims the arena for the whole locked raid.
+    enterRaid(sim, tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+
+    const members = sim.partyOf(tankPid)!.members;
+    expect(members.length).toBeGreaterThanOrEqual(5);
+    for (const pid of members) {
+      // The fills really are outside the arena footprint (never zoned in), so
+      // this exercises the party-membership arm, not the position arm.
+      if (pid !== tankPid) {
+        expect(sim.entities.get(pid)!.pos.x, `fill ${pid} outside`).toBeLessThan(3000);
+      }
+      expect(sim.players.get(pid)!.raidLockouts.get('nythraxis_boss_arena'), `pid ${pid}`).toBe(
+        reset,
+      );
+    }
+  });
+
+  it('a raider who left the raid while parked in a side wing is still locked by the kill', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    const origin = enterRaid(sim, tankPid);
+    // Bring one raider inside and park them in the east wing: inside the arena
+    // walls (the 260yd boss room) but OUTSIDE the generic 120-wide instance
+    // footprint, then have them leave the raid. Neither the group arm nor the
+    // footprint arm of the sweep sees them, so only the room-radius union does.
+    const wingPid = sim.partyOf(tankPid)!.members.find((pid) => pid !== tankPid)!;
+    sim.enterDungeon('nythraxis_boss_arena', wingPid);
+    teleport(sim, wingPid, origin.x + 200, origin.z + 82);
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    const wing = sim.entities.get(wingPid)!;
+    expect(Math.abs(wing.pos.x - origin.x)).toBeGreaterThan(120); // outside the footprint
+    expect(dist2d(wing.pos, boss.spawnPos)).toBeLessThanOrEqual(260); // inside the room
+    sim.partyLeave(wingPid);
+    expect(sim.partyOf(wingPid)).toBeNull();
+
+    const tank = sim.entities.get(tankPid)!;
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+    expect(sim.players.get(wingPid)!.raidLockouts.get('nythraxis_boss_arena')).toBe(reset);
   });
 
   it('a heroic kill locks the :heroic key only; the normal raid stays open that day', () => {

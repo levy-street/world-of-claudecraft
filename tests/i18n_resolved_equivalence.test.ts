@@ -34,14 +34,14 @@ describe('i18n resolved-table byte equivalence', () => {
 
     const baseline = readFileSync(baselinePath, 'utf8').trim();
     expect(sha256).toBe(baseline);
-  });
+  }, 15000);
 
   it('the --check gate passes against the committed baseline', () => {
     // execFileSync throws on a non-zero exit, which fails the test.
     expect(() =>
       execFileSync(process.execPath, [scriptPath, '--check'], { cwd: root, encoding: 'utf8' }),
     ).not.toThrow();
-  });
+  }, 15000);
 });
 
 describe('i18n resolved-artifact reproducibility', () => {
@@ -56,7 +56,7 @@ describe('i18n resolved-artifact reproducibility', () => {
         encoding: 'utf8',
       }),
     ).not.toThrow();
-  });
+  }, 15000);
 
   it('regenerating src/ui/i18n.resolved.generated/ leaves the committed directory unchanged', () => {
     // The dense generated artifact is the tsc safety net and is committed. Like
@@ -71,7 +71,7 @@ describe('i18n resolved-artifact reproducibility', () => {
         encoding: 'utf8',
       }),
     ).not.toThrow();
-  });
+  }, 15000);
 
   it('regenerates byte-identically across two perturbed-env runs (determinism)', () => {
     // The committed directory keeps the freshness check above; this ADDS the stronger

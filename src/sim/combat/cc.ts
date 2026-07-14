@@ -23,6 +23,10 @@ export function isRooted(e: Entity): boolean {
   return isStunned(e) || e.auras.some((a) => a.kind === 'root');
 }
 
+export function isRootedOrChilled(e: Entity): boolean {
+  return isRooted(e) || e.auras.some((a) => a.kind === 'slow');
+}
+
 // Silence locks out spell (non-physical) casts but leaves physical abilities,
 // movement and melee untouched, unlike a stun, which freezes everything.
 export function isSilenced(e: Entity): boolean {

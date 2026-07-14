@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 const painter = readFileSync(new URL('../src/ui/bags_window.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const components = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 
 describe('bags_window: no magic values', () => {
   it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
@@ -31,10 +32,23 @@ describe('bags_window: no magic values', () => {
 });
 
 describe('bags_window: load-bearing behaviors preserved', () => {
+  it('uses the branded Claudium icon and matching balance color', () => {
+    expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
+    expect(components).toMatch(/\.claudium-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
+  });
+
   it('reuses bag_filter via buildBagGrid (does not re-derive the filter)', () => {
     expect(painter).toContain('buildBagGrid(');
     // the filter/sort stays in bag_filter.ts; the painter must not call it directly
     expect(painter).not.toContain('applyBagFilter(');
+  });
+
+  it("asks for the backpack icon by the id the art is wired under ('backpack')", () => {
+    // The bar's first socket is the implicit backpack, whose painted art is wired in
+    // icons.ts under exactly this id (UI_ITEM_IMAGE_IDS, guarded by item_icons.test.ts).
+    // Rename the id here and the socket silently falls back to the procedural sack while
+    // every icon guard stays green, so the call site is pinned too.
+    expect(painter).toContain("iconDataUrl('item', 'backpack')");
   });
 
   it('captures and reapplies the .bag-grid scroll offset across a rebuild', () => {
