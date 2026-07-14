@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Ready to implement (do not start slices without operator go-ahead) |
 | **Source PRD** | `docs/prd/frontier-pvp.md`, section 11 Phase F1 |
-| **Prerequisite** | `docs/prd/pvp-honor-and-quartermaster.md` ships FIRST. It adds the `honor` currency, `grantHonor`, the honor DR machinery, the Honor Quartermaster, and the PvP Offense/Defense stats. Its own executor-ready slices are in that doc, section 9. THIS handoff assumes `honor` + `grantHonor` already exist and only wires the zone. |
+| **Prerequisite** | SATISFIED: `docs/prd/pvp-honor-and-quartermaster.md` SHIPPED in #1817 (release/v0.25.0). The `honor` currency, `grantHonor`, the honor DR machinery, the FURY Quartermaster, and the Warfare PvP stat (the Offense/Defense pair shipped as one combined player-facing stat) all exist on the release line. THIS handoff only wires the zone; re-anchor every symbol against release/v0.25.0 before starting a slice. |
 | **Scope** | Factionless zone skeleton ONLY: the band, enter/leave via the G window, **everyone-hostile** auto-flagging (no teams), the single/multi-combat lock, one safe hub, the depth gradient, hub graveyard respawn, and the **2x honor on open-world kills** routed through the existing `grantHonor`. NO cargo/nodes (F2), NO events (F3), NO $WOC (section 12, later). |
 | **Verified against** | Repository snapshot on 2026-07-03, re-anchor before implementation; trust symbols, not line numbers. |
 | **Executor routing** | Route by slice complexity and the active session model. Use `$woc-extract-and-test` for implementation and `$woc-qa` for each completed slice. UI and render work also receives `woc_frontend` review. No slice depends on a named model. |

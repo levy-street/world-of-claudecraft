@@ -2,11 +2,11 @@
 
 | | |
 |---|---|
-| **Status** | Draft v3 (factionless / free-for-all rework; honor + quartermaster + PvP power split out to `pvp-honor-and-quartermaster.md`) |
+| **Status** | Draft v3, the ACTIVE next-phase spec. Its foundation (honor + quartermaster + the Warfare PvP stat, `pvp-honor-and-quartermaster.md`) SHIPPED in #1817 on release/v0.25.0; the zone phases below are what remains. |
 | **Owner** | design |
 | **Created** | 2026-07-03 (v3 rework 2026-07-11) |
 | **Design reference** | RuneScape's Wilderness (a single lawless zone: no factions, everyone-hostile-to-everyone, opt-in-by-entering, high-risk high-reward gathering, a danger gradient that deepens the further in you go, and full loot of what you carry when you die). Classic-era world-PvP objectives (contested nodes, rare spawns, a world boss, timed zone events) for the content. The degen-gaming thesis and Cambria's extraction loop (risk-native design, seasons, tunable rake) for the stakes layer. |
-| **Depends on** | `docs/prd/pvp-honor-and-quartermaster.md` (Honor currency, the Honor Quartermaster, and the PvP Offense/Defense stats: the Frontier reuses all of it and adds the 2x-honor open-world premium) |
+| **Depends on** | `docs/prd/pvp-honor-and-quartermaster.md`, SHIPPED in #1817 (Honor currency, the FURY quartermaster, and the Warfare PvP stat: the Frontier reuses all of it and adds the 2x-honor open-world premium) |
 | **Related systems** | Duel/arena hostility (`src/sim/social/duel.ts`, `src/sim/social/arena.ts`, `isHostileTo` in `src/sim/sim.ts`), world boss (`src/sim/world_boss.ts`), rare spawns (`MobTemplate.rare`), currencies (`copper`, `delveMarks`, `honor` on `CharacterState`), vendors (`NpcDef.vendorItems`), realms (`server/realm.ts`), instance x-bands (`src/sim/data.ts`), wallet verification (`docs/prd/woc/wallet-link.md`), headless RL env (`headless/`, `python/`) |
 | **Companion docs** | `docs/prd/pvp-honor-and-quartermaster.md` (the honor economy this builds on), `docs/prd/badges.md` (deterministic-currency precedent), `docs/prd/woc/holder-cosmetic-flair.md` |
 | **Implementation handoff** | `docs/prd/FRONTIER_PHASE1_HANDOFF.md` |
@@ -28,9 +28,9 @@ where you learn and gather in relative safety; the deep interior has the richest
 nodes, the rares, the boss, and **multi-combat** (more than one attacker can pile on
 at once), with no easy way out.
 
-Honor, the Honor Quartermaster, and the PvP Power stats are **not** defined here; they
-are the standalone system in `docs/prd/pvp-honor-and-quartermaster.md`, which ships
-first. The Frontier reuses that system as-is and adds one headline rule:
+Honor, the FURY Quartermaster, and the Warfare PvP stat are **not** defined here;
+they are the standalone system in `docs/prd/pvp-honor-and-quartermaster.md`, which
+SHIPPED first (#1817). The Frontier reuses that system as-is and adds one headline rule:
 
 > **Open-world kills in the Frontier pay 2x honor.** Fighting in the lawless zone,
 > where anyone can jump you and your cargo is on the line, is worth double the honor
@@ -79,7 +79,7 @@ overworld* uses Frontier flagging rules remains a config-plus-small-code follow-
 | Concern | Exists today | Gap for this feature |
 |---|---|---|
 | PvP hostility | `isHostileTo` gates on active duels and arena/Fiesta matches only | Add a clause: **both players inside the Frontier band -> hostile** (free-for-all, no team check) |
-| Honor / QM / PvP Power | Shipped by `pvp-honor-and-quartermaster.md` (honor currency, `grantHonor`, the Quartermaster, PvP Offense/Defense) | Reuse verbatim; add zone honor sources incl. the 2x kill premium (section 7) |
+| Honor / QM / Warfare | SHIPPED in #1817 (honor currency, `grantHonor`, the FURY Quartermaster, the Warfare PvP stat) | Reuse verbatim; add zone honor sources incl. the 2x kill premium (section 7) |
 | World boss | `src/sim/world_boss.ts`: interval spawns, personal loot, daily gate via `PlayerMeta.worldBossDaily` | Add a Frontier boss (event-driven spawn, section 8) |
 | Rare spawns | `MobTemplate.rare` + `elite` + `respawnMult`, exclusive loot roll groups | New Frontier rare templates; no engine work |
 | Gathering | None. Only quest sparkle pickups (`ground_pickup_lines.ts`) | New: resource node entity type + gather channel + carried cargo (section 6) |
@@ -325,9 +325,9 @@ HUD (each its own module the HUD composes, not new `hud.ts` banner sections):
 
 ## 11. Phasing
 
-Honor + Quartermaster + PvP Power ship first as their own feature
-(`pvp-honor-and-quartermaster.md`). The Frontier phases below assume that system
-exists.
+Honor + Quartermaster + the Warfare PvP stat shipped first as their own feature
+(`pvp-honor-and-quartermaster.md`, #1817 on release/v0.25.0). The Frontier phases
+below build on that shipped system.
 
 | Phase | Scope | Acceptance |
 |---|---|---|

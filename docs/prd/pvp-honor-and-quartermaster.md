@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Draft v1 (the standalone PvP economy, split out of the Frontier PRD) |
+| **Status** | SHIPPED in #1817 (release/v0.25.0, merged 2026-07-13). Kept as the reference spec; see the as-shipped note below for where the implementation diverged. |
 | **Owner** | design |
 | **Created** | 2026-07-11 |
 | **Design reference** | Classic-era honor currencies and battleground/arena reward loops (a deterministic PvP currency spent at a quartermaster on PvP-statted gear). PvP Power / mitigation is the classic "PvP stat" idea, renamed to original terms (see the naming note in section 5). |
@@ -10,6 +10,17 @@
 | **Companion docs** | `docs/prd/frontier-pvp.md` (the factionless open-world PvP zone that builds ON this system and pays 2x honor on open-world kills), `docs/prd/badges.md` (deterministic-currency + vendor precedent) |
 
 ---
+
+> **As shipped (#1817).** The implementation matches this spec with two naming and
+> shape changes. The PvP Offense / PvP Defense stat pair shipped as **one
+> player-facing stat named Warfare**: it increases damage dealt to players and
+> reduces damage taken from players, with independent internal caps and no PvE
+> effect (one gear line, one character-sheet row). The Honor Quartermaster shipped
+> as **FURY in Eastbrook**, stocking 40 honor-priced item-level 28 epic PvP items
+> covering every supported equipment slot, including neck and two rings. Honor
+> sources, diminishing returns, daily arena tapering, soulbinding, persistence,
+> and the IWorld surfaces shipped as specified. Read the stat sections below
+> through that rename.
 
 ## 0. Why this doc exists (the split)
 
