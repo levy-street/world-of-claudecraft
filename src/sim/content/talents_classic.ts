@@ -3675,8 +3675,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'Increases your spell damage by 10% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.1, spellHastePct: 0.1 } },
   ),
   spec(
     'feral',

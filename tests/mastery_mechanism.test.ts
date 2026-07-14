@@ -7,6 +7,7 @@
 // Plus Gloamveil Form: a +15% Shadow-school damage amplifier (not flat spell power),
 //  and healing ends the form.
 import { describe, expect, it } from 'vitest';
+import { spellDamageMultFromAuras } from '../src/sim/combat/spell_combat';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
@@ -179,6 +180,38 @@ describe('Gloamveil Form amplifies Shadow damage by 15%', () => {
     sim.castAbility('lesser_heal', sim.playerId);
     for (let i = 0; i < 60 && p.auras.some((a) => a.kind === 'form_shadow'); i++) sim.tick();
     expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(false);
+  });
+});
+
+describe('Balance druid permanent spell-damage stack matches the priest template', () => {
+  // Balance is the caster analogue of Shadow priest: a permanent form plus a caster
+  // mastery. It was overtuned because BOTH ran at full strength (form +20%, mastery
+  // +15%) where the priest was deliberately discounted (form +15%, mastery +10%). These
+  // pin the two levers at the priest-template values so the permanent stack (form x
+  // mastery) lands near the sibling spec instead of well above it.
+  it('Moonkin Form amplifies spell damage by 15% (not 20%)', () => {
+    // The form bonus is carried on the form aura itself and read by every spell hit via
+    // spellDamageMultFromAuras, so this one function is the whole form-damage lever.
+    const p = { auras: [] as Aura[] } as unknown as Entity;
+    expect(spellDamageMultFromAuras(p)).toBe(1);
+    p.auras.push({
+      kind: 'form_moonkin',
+      name: 'Moonwing Form',
+      value: 0,
+      remaining: 3600,
+      duration: 3600,
+      sourceId: 0,
+    } as Aura);
+    expect(spellDamageMultFromAuras(p)).toBeCloseTo(1.15);
+  });
+
+  it('the Moonrage mastery grants +10% spell damage (not +15%)', () => {
+    // The spec mastery folds into the flat global mods at allocation time. With no talent
+    // points spent, the balance mastery is the only contributor to global spell damage.
+    const mods = computeTalentModifiers('druid', { spec: 'balance', ranks: {}, choices: {} }, 20);
+    expect(mods.global.spellDmgPct ?? 0).toBeCloseTo(0.1);
+    // Haste is unchanged by this pass.
+    expect(mods.global.spellHastePct ?? 0).toBeCloseTo(0.1);
   });
 });
 

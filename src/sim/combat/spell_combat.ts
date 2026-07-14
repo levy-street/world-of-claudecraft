@@ -12,9 +12,11 @@ export function spellDamageMultFromAuras(p: Entity): number {
   let bonus = 0;
   for (const aura of p.auras) {
     if (aura.kind === 'buff_spelldmg') bonus += aura.value;
-    // Moonkin Form carries its +20% spell damage on the form aura itself (a toggle, so no
-    // companion buff aura to strand when the druid shifts out).
-    else if (aura.kind === 'form_moonkin') bonus += 0.2;
+    // Moonkin Form carries its +15% spell damage on the form aura itself (a toggle, so no
+    // companion buff aura to strand when the druid shifts out). This mirrors the shadow
+    // priest form-caster template (+15% form plus a 0.10 mastery), so balance's permanent
+    // stack (form x mastery) matches its sibling spec instead of running well above it.
+    else if (aura.kind === 'form_moonkin') bonus += 0.15;
   }
   return 1 + bonus;
 }
