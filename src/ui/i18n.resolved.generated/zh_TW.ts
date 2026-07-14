@@ -1068,6 +1068,12 @@ export const zh_TW: EnTranslations = {
         "many": "你是{rank}，{count}名成員",
         "other": "你是{rank}，{count}名成員"
       },
+      "finderPartySize": {
+        "one": "{count} 名玩家",
+        "few": "{count} 名玩家",
+        "many": "{count} 名玩家",
+        "other": "{count} 名玩家"
+      },
       "characterCount": {
         "one": "{count} 個角色",
         "few": "{count} 個角色",
@@ -1847,7 +1853,8 @@ export const zh_TW: EnTranslations = {
       "kindSolo": "單人冒險",
       "levels": "等級 {min} 至 {max}",
       "levelOne": "等級 {level}",
-      "partySize": "{count} 名玩家",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
       "roleTank": "坦克",
       "roleHealer": "補師",
       "roleDps": "輸出",
@@ -1900,7 +1907,7 @@ export const zh_TW: EnTranslations = {
       "declineApplicantAria": "拒絕 {name}",
       "levelClass": "{level} 級 {className}",
       "leader": "隊長：{name}",
-      "needs": "需要",
+      "needs": "需要：{roles}",
       "slots": "{size}/{capacity}",
       "apply": "申請",
       "withdraw": "撤回申請",

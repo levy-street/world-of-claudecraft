@@ -1095,6 +1095,12 @@ export const hudChromeStrings = {
       many: 'you are {rank}, {count} members',
       other: 'you are {rank}, {count} members',
     },
+    finderPartySize: {
+      one: '{count} player',
+      few: '{count} players',
+      many: '{count} players',
+      other: '{count} players',
+    },
     characterCount: {
       one: '{count} character',
       few: '{count} characters',
@@ -2058,7 +2064,12 @@ export const hudChromeStrings = {
     kindSolo: 'Solo adventure',
     levels: 'Levels {min} to {max}',
     levelOne: 'Level {level}',
-    partySize: '{count} players',
+    // Group size renders through tPlural(hudChrome.plurals.finderPartySize).
+    // The mm:ss clock separator is a token pattern, like every other HUD clock.
+    clock: '{minutes}:{seconds}',
+    // Count-plus-role composition ({count} tanks): a token pattern so a locale
+    // owns the ORDER, never a `${n} ${label}` concat at the call site.
+    roleCount: '{count} {role}',
     roleTank: 'Tank',
     roleHealer: 'Healer',
     roleDps: 'Damage',
@@ -2112,7 +2123,7 @@ export const hudChromeStrings = {
     declineApplicantAria: 'Decline {name}',
     levelClass: 'Lv {level} {className}',
     leader: 'Leader: {name}',
-    needs: 'Needs',
+    needs: 'Needs {roles}',
     slots: '{size}/{capacity}',
     apply: 'Apply',
     withdraw: 'Withdraw application',

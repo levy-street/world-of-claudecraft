@@ -37,7 +37,13 @@ export class DungeonFinderProposalPopup {
   // Opened from the dfProposal SimEvent (hud.handleEvents), with the prompt cue.
   show(): void {
     if (!this.isOpen) {
-      this.deps.root().style.display = 'block';
+      const root = this.deps.root();
+      // The popup deliberately never steals focus (the player may be fighting), so
+      // a screen reader would otherwise miss the whole 30-second answer window:
+      // role=alert announces the prompt where it stands, without moving focus.
+      root.setAttribute('role', 'alert');
+      root.setAttribute('aria-live', 'assertive');
+      root.style.display = 'block';
       audio.duelChallenge();
     }
     this.lastSig = '';
@@ -110,7 +116,9 @@ export class DungeonFinderProposalPopup {
         return (
           `<span class="dfp-slot${s.mine ? ' mine' : ''}${full ? ' full' : ''}" title="${esc(label)}" aria-label="${esc(label)}">` +
           `${svgIcon(s.role === 'tank' ? 'tank' : s.role === 'healer' ? 'healer' : 'attack')}` +
-          `<span class="dfp-count">${num(s.accepted)}/${num(s.total)}</span></span>`
+          `<span class="dfp-count">${esc(
+            t('hudChrome.finder.slots', { size: num(s.accepted), capacity: num(s.total) }),
+          )}</span></span>`
         );
       })
       .join('');

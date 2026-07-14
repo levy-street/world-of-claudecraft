@@ -21,7 +21,7 @@ import {
   finderActivity,
 } from '../sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../sim/content/heroic_loot';
-import type { Role } from '../sim/content/talents';
+import { FIRST_TALENT_LEVEL, type Role } from '../sim/content/talents';
 import { DUNGEONS, ITEMS, MOBS, zoneAt } from '../sim/data';
 import { compatibleFinderRoles } from '../sim/social/dungeon_finder';
 import type { DungeonDifficulty, PlayerClass } from '../sim/types';
@@ -219,7 +219,7 @@ function blockReasonFor(
   specRole: Role | null,
 ): FinderBlockReason {
   if (level < activity.minLevel || level > activity.maxLevel) return 'level';
-  if (level >= 10 && specRole === null) return 'spec';
+  if (level >= FIRST_TALENT_LEVEL && specRole === null) return 'spec';
   return null;
 }
 
@@ -381,7 +381,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
   const proposalActivity = info.proposal ? finderActivity(info.proposal.activityId) : null;
   const queuePanel: FinderQueuePanelView = {
     roles: roleOptions,
-    needsSpec: level >= 10 && specRole === null,
+    needsSpec: level >= FIRST_TALENT_LEVEL && specRole === null,
     inParty: input.party !== null,
     isLeader,
     queuedActivities: info.queue ? [...info.queue.activities] : [],

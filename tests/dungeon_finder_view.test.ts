@@ -2,12 +2,15 @@
 // Sim-shaped and ClientWorld-shaped inputs, catalogue/queue/board derivation,
 // and render-skip signature stability (clocks stay OUTSIDE the signature).
 
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import {
   buildDungeonFinderView,
   buildFinderProposalPopupView,
   type DungeonFinderViewInput,
+  FINDER_PORTRAIT_DIR,
 } from '../src/ui/dungeon_finder_view';
 import type { DungeonFinderInfo } from '../src/world_api';
 
@@ -370,5 +373,23 @@ describe('proposal popup view', () => {
       }),
     );
     expect(accepted?.sig).not.toBe(a?.sig);
+  });
+});
+
+// A catalogued encounter with no committed portrait ships a silent 404 in the rail and
+// the detail header (the view builds the URL blindly from the mob id), so pin every
+// encounter, on both difficulties, against the real files under public/.
+describe('every catalogued encounter has a committed portrait', () => {
+  it('resolves a webp under public/ui/dungeons for every encounter mob id', () => {
+    const missing: string[] = [];
+    for (const activity of FINDER_ACTIVITIES) {
+      for (const enc of activity.encounters) {
+        const file = resolve(process.cwd(), `public${FINDER_PORTRAIT_DIR}/${enc.mobId}.webp`);
+        if (!existsSync(file)) missing.push(`${activity.id}: ${enc.mobId}`);
+      }
+    }
+    expect(missing, `catalogued encounters with no portrait webp:\n${missing.join('\n')}`).toEqual(
+      [],
+    );
   });
 });

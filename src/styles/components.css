@@ -5823,11 +5823,15 @@
   }
 
   /* ---------- Dungeon Finder ---------- */
+  /* Closed by default: this @layer components rule outranks `.window { display: none }`
+     in @layer layout, so the closed state has to be declared HERE or the empty panel
+     sits on screen from boot (same reason #market-window declares it). The painter
+     opens with inline `flex`, which is what the flex-column bounds below assume. */
   #dungeon-finder-window {
     width: 640px;
     max-width: 96%;
     --window-pad: 14px;
-    display: flex;
+    display: none;
     flex-direction: column;
     max-height: min(700px, 80vh);
   }

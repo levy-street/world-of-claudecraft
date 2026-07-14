@@ -48,6 +48,29 @@ describe('dungeon finder window painter (source contract)', () => {
     expect(src).toMatch(/role="checkbox" aria-checked=/);
   });
 
+  it('never half-applies a tablist / listbox contract over plain toggle buttons', () => {
+    // aria-pressed buttons with no role=tab / role=option children read WORSE to a
+    // screen reader under role=tablist / role=listbox than under a labelled group.
+    expect(src).not.toContain('role="tablist"');
+    expect(src).not.toContain('role="listbox"');
+    expect(src).toContain('class="df-tabs" role="group"');
+    expect(src).toContain('class="df-rail" role="group"');
+  });
+
+  it('composes every localizable sentence from tokens, never from a concat', () => {
+    // Count-plus-role, the needs line, the mm:ss clock and the slot fraction are all
+    // token templates, so a locale owns the ORDER (and the clock separator).
+    expect(src).toContain(
+      "t('hudChrome.finder.roleCount', { count: num(n), role: this.roleLabel(role) })",
+    );
+    expect(src).toContain("htmlTemplate('hudChrome.finder.needs', { roles: neededRoles })");
+    expect(src).toContain("t('hudChrome.finder.clock', {");
+    expect(src).toContain("tPlural('hudChrome.plurals.finderPartySize'");
+    // No hand-rolled ':' clock and no `${count} ${label}` role concat.
+    expect(src).not.toMatch(/seconds < 10 \? '0' : ''/);
+    expect(src).not.toMatch(/\$\{num\(n\)\} \$\{esc\(this\.roleLabel/);
+  });
+
   it('ships prerendered portraits with fixed dimensions and lazy decode (no live 3D)', () => {
     expect(src).toContain('width="64" height="64" loading="lazy" decoding="async"');
     // No renderer import: the header may SAY "no Three.js", the code must not use it.
@@ -70,5 +93,66 @@ describe('dungeon finder window painter (source contract)', () => {
   it('routes the map action through the injected non-teleporting hook', () => {
     expect(src).toContain('this.deps.showOnMap(detail.entrance.x, detail.entrance.z)');
     expect(src).not.toMatch(/enterDungeon|leaveDungeon|setDungeonDifficulty/);
+  });
+
+  // The window's own components rule sits in @layer components, which OUTRANKS the
+  // shared `.window { display: none }` in @layer layout: a `display: flex` there would
+  // leave the closed window on screen from HUD boot (issue found in review of #1789).
+  // The house pattern (#market-window) is: closed state in the components rule, painter
+  // opens with inline flex. These three assertions pin all three halves of it.
+  it('opens and closes with inline flex, matching its flex-column components rule', () => {
+    expect(src).toContain("root.style.display = 'flex';");
+    expect(src).toContain("el.style.display = 'none';");
+    expect(src).toContain("return this.deps.root().style.display === 'flex';");
+    expect(src).not.toContain("style.display = 'block'");
+  });
+});
+
+describe('dungeon finder group-found popup (source contract)', () => {
+  const popup = readFileSync(
+    resolve(process.cwd(), 'src/ui/dungeon_finder_proposal_popup.ts'),
+    'utf8',
+  );
+
+  it('announces itself to a screen reader without stealing focus', () => {
+    // The popup deliberately never moves focus (the player may be fighting), so with no
+    // live region an SR user misses the whole 30-second answer window.
+    expect(popup).toContain("setAttribute('role', 'alert')");
+    expect(popup).toContain("setAttribute('aria-live', 'assertive')");
+    expect(popup).not.toContain('.focus()');
+  });
+
+  it('builds the accepted/total meter from the shared slots template', () => {
+    expect(popup).toContain(
+      "t('hudChrome.finder.slots', { size: num(s.accepted), capacity: num(s.total) })",
+    );
+    expect(popup).not.toMatch(/\$\{num\(s\.accepted\)\}\/\$\{num\(s\.total\)\}/);
+  });
+});
+
+describe('dungeon finder window stylesheet contract', () => {
+  const components = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+  const mobile = readFileSync(resolve(process.cwd(), 'src/styles/hud.mobile.css'), 'utf8');
+
+  it('defaults the window to display: none in its own components rule', () => {
+    const rule = /#dungeon-finder-window \{([^}]*)\}/.exec(components);
+    expect(rule, 'the #dungeon-finder-window base rule').toBeTruthy();
+    expect(rule?.[1]).toContain('display: none;');
+    expect(rule?.[1]).not.toContain('display: flex;');
+  });
+
+  it('keeps every mobile finder rule inside @layer hud-mobile and sets no root display', () => {
+    // Unlayered rules outrank every layer: a block appended after the wrapper closes
+    // would beat both the closed-state default and the painter's own cascade.
+    const afterLayer = mobile.slice(mobile.lastIndexOf('\n}\n') + 3).trim();
+    expect(afterLayer, 'no CSS may sit after the @layer hud-mobile wrapper closes').toBe('');
+    expect(mobile).toContain('body.mobile-touch #dungeon-finder-window {');
+    const rule = /body\.mobile-touch #dungeon-finder-window \{([^}]*)\}/.exec(mobile);
+    expect(rule?.[1]).not.toContain('display:');
+  });
+
+  it('gives the HUD render gate the same flex open-state check the painter writes', () => {
+    const hud = readFileSync(resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain("$('#dungeon-finder-window').style.display === 'flex'");
   });
 });

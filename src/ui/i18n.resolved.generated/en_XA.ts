@@ -1068,6 +1068,12 @@ export const en_XA: EnTranslations = {
         "many": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]",
         "other": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
       },
+      "finderPartySize": {
+        "one": "[{count} þļáýéŕ]",
+        "few": "[{count} þļáýéŕš]",
+        "many": "[{count} þļáýéŕš]",
+        "other": "[{count} þļáýéŕš]"
+      },
       "characterCount": {
         "one": "[{count} çĥáŕáçţéŕ]",
         "few": "[{count} çĥáŕáçţéŕš]",
@@ -1847,7 +1853,8 @@ export const en_XA: EnTranslations = {
       "kindSolo": "[Šóļó áðʋéñţúŕé]",
       "levels": "[Ļéʋéļš {min} ţó {max}]",
       "levelOne": "[Ļéʋéļ {level}]",
-      "partySize": "[{count} þļáýéŕš]",
+      "clock": "[{minutes}:{seconds}]",
+      "roleCount": "[{count} {role}]",
       "roleTank": "[Ţáñķ]",
       "roleHealer": "[Ĥéáļéŕ]",
       "roleDps": "[Ðáɱáĝé]",
@@ -1900,7 +1907,7 @@ export const en_XA: EnTranslations = {
       "declineApplicantAria": "[Ðéçļíñé {name}]",
       "levelClass": "[Ļʋ {level} {className}]",
       "leader": "[Ļéáðéŕ: {name}]",
-      "needs": "[Ñééðš]",
+      "needs": "[Ñééðš {roles}]",
       "slots": "[{size}/{capacity}]",
       "apply": "[Áþþļý]",
       "withdraw": "[Ŵíţĥðŕáŵ áþþļíçáţíóñ]",

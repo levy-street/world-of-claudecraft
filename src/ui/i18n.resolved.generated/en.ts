@@ -1068,6 +1068,12 @@ export const en: EnTranslations = {
         "many": "you are {rank}, {count} members",
         "other": "you are {rank}, {count} members"
       },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
+      },
       "characterCount": {
         "one": "{count} character",
         "few": "{count} characters",
@@ -1847,7 +1853,8 @@ export const en: EnTranslations = {
       "kindSolo": "Solo adventure",
       "levels": "Levels {min} to {max}",
       "levelOne": "Level {level}",
-      "partySize": "{count} players",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
       "roleTank": "Tank",
       "roleHealer": "Healer",
       "roleDps": "Damage",
@@ -1900,7 +1907,7 @@ export const en: EnTranslations = {
       "declineApplicantAria": "Decline {name}",
       "levelClass": "Lv {level} {className}",
       "leader": "Leader: {name}",
-      "needs": "Needs",
+      "needs": "Needs {roles}",
       "slots": "{size}/{capacity}",
       "apply": "Apply",
       "withdraw": "Withdraw application",

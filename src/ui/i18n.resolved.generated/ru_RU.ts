@@ -1068,6 +1068,12 @@ export const ru_RU: EnTranslations = {
         "many": "вы {rank}, {count} участников",
         "other": "вы {rank}, {count} участника"
       },
+      "finderPartySize": {
+        "one": "{count} игрок",
+        "few": "{count} игрока",
+        "many": "{count} игроков",
+        "other": "{count} игрока"
+      },
       "characterCount": {
         "one": "{count} персонаж",
         "few": "{count} персонажа",
@@ -1847,7 +1853,8 @@ export const ru_RU: EnTranslations = {
       "kindSolo": "Одиночное приключение",
       "levels": "Уровни {min}-{max}",
       "levelOne": "Уровень {level}",
-      "partySize": "Игроков: {count}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role}: {count}",
       "roleTank": "Танк",
       "roleHealer": "Лекарь",
       "roleDps": "Боец",
@@ -1900,7 +1907,7 @@ export const ru_RU: EnTranslations = {
       "declineApplicantAria": "Отклонить {name}",
       "levelClass": "{className}, {level}-й уровень",
       "leader": "Лидер: {name}",
-      "needs": "Нужны",
+      "needs": "Нужны: {roles}",
       "slots": "{size}/{capacity}",
       "apply": "Подать заявку",
       "withdraw": "Отозвать заявку",

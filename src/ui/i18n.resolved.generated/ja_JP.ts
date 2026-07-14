@@ -1068,6 +1068,12 @@ export const ja_JP: EnTranslations = {
         "many": "あなたは{rank}、{count}人のメンバー",
         "other": "あなたは{rank}、{count}人のメンバー"
       },
+      "finderPartySize": {
+        "one": "{count} 人",
+        "few": "{count} 人",
+        "many": "{count} 人",
+        "other": "{count} 人"
+      },
       "characterCount": {
         "one": "{count}キャラクター",
         "few": "{count}キャラクター",
@@ -1847,7 +1853,8 @@ export const ja_JP: EnTranslations = {
       "kindSolo": "ソロ攻略",
       "levels": "レベル {min} ～ {max}",
       "levelOne": "レベル {level}",
-      "partySize": "{count} 人",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
       "roleTank": "タンク",
       "roleHealer": "ヒーラー",
       "roleDps": "ダメージ",
@@ -1900,7 +1907,7 @@ export const ja_JP: EnTranslations = {
       "declineApplicantAria": "{name} を辞退",
       "levelClass": "Lv {level} {className}",
       "leader": "リーダー：{name}",
-      "needs": "募集中",
+      "needs": "募集中：{roles}",
       "slots": "{size}/{capacity}",
       "apply": "応募",
       "withdraw": "応募を取り下げる",

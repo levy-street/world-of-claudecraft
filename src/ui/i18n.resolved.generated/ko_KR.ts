@@ -1068,6 +1068,12 @@ export const ko_KR: EnTranslations = {
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
       },
+      "finderPartySize": {
+        "one": "{count}인",
+        "few": "{count}인",
+        "many": "{count}인",
+        "other": "{count}인"
+      },
       "characterCount": {
         "one": "캐릭터 {count}개",
         "few": "캐릭터 {count}개",
@@ -1847,7 +1853,8 @@ export const ko_KR: EnTranslations = {
       "kindSolo": "솔로 모험",
       "levels": "레벨 {min} ~ {max}",
       "levelOne": "레벨 {level}",
-      "partySize": "{count}인",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role} {count}",
       "roleTank": "방어 전담",
       "roleHealer": "치유 전담",
       "roleDps": "공격 전담",
@@ -1900,7 +1907,7 @@ export const ko_KR: EnTranslations = {
       "declineApplicantAria": "{name} 거절",
       "levelClass": "Lv {level} {className}",
       "leader": "파티장: {name}",
-      "needs": "필요",
+      "needs": "필요: {roles}",
       "slots": "{size}/{capacity}",
       "apply": "신청",
       "withdraw": "신청 취소",

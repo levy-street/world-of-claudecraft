@@ -4481,57 +4481,60 @@
   :root[data-fx-level="low"] body.mobile-touch .fct-rested-xp {
     animation-name: fct-rise-mobile;
   }
-}
 
-/* ---------- Dungeon Finder (mobile) ---------- */
-/* One navigable pane: the catalogue rail and the detail never compete for
+  /* ---------- Dungeon Finder (mobile) ---------- */
+  /* One navigable pane: the catalogue rail and the detail never compete for
      width; the painter's df-pane-* class picks which one shows, and the Back
-     button (hidden on desktop) returns to the list. */
-body.mobile-touch #dungeon-finder-window {
-  display: block;
-  max-height: calc(100% - 20px);
-}
-body.mobile-touch #dungeon-finder-window .df-body {
-  overflow: visible;
-  min-height: auto;
-}
-body.mobile-touch #dungeon-finder-window .df-body-catalogue {
-  display: block;
-}
-body.mobile-touch #dungeon-finder-window .df-cols {
-  display: block;
-}
-body.mobile-touch #dungeon-finder-window .df-rail,
-body.mobile-touch #dungeon-finder-window .df-detail {
-  max-height: none;
-  overflow: visible;
-}
-body.mobile-touch #dungeon-finder-window .df-pane-list .df-detail {
-  display: none;
-}
-body.mobile-touch #dungeon-finder-window .df-pane-detail .df-rail {
-  display: none;
-}
-body.mobile-touch #dungeon-finder-window .df-back {
-  display: inline-block;
-}
-/* Bottom action bar: the primary queue action stays reachable by thumb. */
-body.mobile-touch #dungeon-finder-window .df-footer {
-  position: sticky;
-  bottom: 0;
-  background: var(--panel-bg, #17120a);
-  padding: 4px 0;
-}
-/* 40x40 touch floor for every tappable finder control. */
-body.mobile-touch #dungeon-finder-window .df-tab,
-body.mobile-touch #dungeon-finder-window .df-row,
-body.mobile-touch #dungeon-finder-window .df-role,
-body.mobile-touch #dungeon-finder-window .df-opt,
-body.mobile-touch #dungeon-finder-window .df-tag,
-body.mobile-touch #dungeon-finder-window .df-map-btn,
-body.mobile-touch #dungeon-finder-window .btn,
-body.mobile-touch #dungeon-finder-window select,
-body.mobile-touch #dfinder-proposal-popup .btn {
-  min-height: 40px;
-  box-sizing: border-box;
+     button (hidden on desktop) returns to the list.
+     No `display` on the root here: the closed state (components.css) and the
+     painter's inline `flex` on open own it; a layer rule that forced `block`
+     would both re-show the closed window at boot and defeat the flex-column
+     bounds while open. */
+  body.mobile-touch #dungeon-finder-window {
+    max-height: calc(100% - 20px);
+  }
+  body.mobile-touch #dungeon-finder-window .df-body {
+    overflow: visible;
+    min-height: auto;
+  }
+  body.mobile-touch #dungeon-finder-window .df-body-catalogue {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-cols {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-rail,
+  body.mobile-touch #dungeon-finder-window .df-detail {
+    max-height: none;
+    overflow: visible;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-list .df-detail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-detail .df-rail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-back {
+    display: inline-block;
+  }
+  /* Bottom action bar: the primary queue action stays reachable by thumb. */
+  body.mobile-touch #dungeon-finder-window .df-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--panel-bg, #17120a);
+    padding: 4px 0;
+  }
+  /* 40x40 touch floor for every tappable finder control. */
+  body.mobile-touch #dungeon-finder-window .df-tab,
+  body.mobile-touch #dungeon-finder-window .df-row,
+  body.mobile-touch #dungeon-finder-window .df-role,
+  body.mobile-touch #dungeon-finder-window .df-opt,
+  body.mobile-touch #dungeon-finder-window .df-tag,
+  body.mobile-touch #dungeon-finder-window .df-map-btn,
+  body.mobile-touch #dungeon-finder-window .btn,
+  body.mobile-touch #dungeon-finder-window select,
+  body.mobile-touch #dfinder-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
 }

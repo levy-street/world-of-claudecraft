@@ -99,30 +99,11 @@ export function matchFinderRoles(
   const holders: Record<Role, number[]> = { tank: [], healer: [], dps: [] };
   const roleOf = new Map<number, Role>();
 
-  const seat = (i: number, visited: Set<Role>): boolean => {
-    for (const role of FINDER_ROLE_ORDER) {
-      if (!members[i].roles.includes(role) || visited.has(role)) continue;
-      visited.add(role);
-      if (holders[role].length < caps[role]) {
-        holders[role].push(members[i].pid);
-        roleOf.set(members[i].pid, role);
-        return true;
-      }
-      for (let h = 0; h < holders[role].length; h++) {
-        const otherPid = holders[role][h];
-        const otherIdx = members.findIndex((m) => m.pid === otherPid);
-        if (otherIdx < 0) continue;
-        if (seatElsewhere(otherIdx, role, visited)) {
-          holders[role][h] = members[i].pid;
-          roleOf.set(members[i].pid, role);
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  const seatElsewhere = (i: number, except: Role, visited: Set<Role>): boolean => {
+  // One augmenting path (Kuhn), used both for a fresh member (no `except`) and for the
+  // holder being displaced out of `except`, which may not simply take that seat back.
+  // FINDER_ROLE_ORDER is a total order and `visited` bounds the recursion, so the walk
+  // stays deterministic and terminates.
+  const seat = (i: number, visited: Set<Role>, except?: Role): boolean => {
     for (const role of FINDER_ROLE_ORDER) {
       if (role === except || !members[i].roles.includes(role) || visited.has(role)) continue;
       visited.add(role);
@@ -135,7 +116,7 @@ export function matchFinderRoles(
         const otherPid = holders[role][h];
         const otherIdx = members.findIndex((m) => m.pid === otherPid);
         if (otherIdx < 0) continue;
-        if (seatElsewhere(otherIdx, role, visited)) {
+        if (seat(otherIdx, visited, role)) {
           holders[role][h] = members[i].pid;
           roleOf.set(members[i].pid, role);
           return true;

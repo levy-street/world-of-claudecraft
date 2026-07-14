@@ -40,7 +40,7 @@ import {
 } from './dungeon_finder_view';
 import { classDisplayName, dungeonDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
@@ -79,7 +79,7 @@ export class DungeonFinderWindow {
   constructor(private readonly deps: DungeonFinderWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   toggle(): void {
@@ -100,7 +100,7 @@ export class DungeonFinderWindow {
       // Dialog identity is a static property of the stable root node: set once
       // on open, never inside render() (which mediumHud repeats while open).
       markDialogRoot(root, { labelledBy: 'dfinder-title' });
-      root.style.display = 'block';
+      root.style.display = 'flex';
     }
     this.lastSig = '';
     this.render();
@@ -111,7 +111,7 @@ export class DungeonFinderWindow {
 
   close(): void {
     const el = this.deps.root();
-    if (el.style.display !== 'block') {
+    if (el.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }
@@ -355,7 +355,11 @@ export class DungeonFinderWindow {
   }
 
   private liveHtml(view: Extract<DungeonFinderViewModel, { kind: 'live' }>): string {
-    const tabs = `<div class="df-tabs" role="tablist">${(
+    // A plain toggle-button group, deliberately NOT role=tablist: these are
+    // aria-pressed buttons with no role=tab / aria-selected children and no
+    // arrow-key roving focus, and a half-applied tablist reads worse to a screen
+    // reader than none. Same reasoning for the catalogue rail below.
+    const tabs = `<div class="df-tabs" role="group" aria-label="${esc(t('hudChrome.finder.title'))}">${(
       [
         ['catalogue', 'hudChrome.finder.tabCatalogue', 'skull'],
         ['queue', 'hudChrome.finder.tabQueue', 'social'],
@@ -383,7 +387,9 @@ export class DungeonFinderWindow {
     rows: FinderActivityRowView[],
     detail: FinderActivityDetailView | null,
   ): string {
-    const rail = `<div class="df-rail" role="listbox">${rows.map((r) => this.rowHtml(r)).join('')}</div>`;
+    const rail = `<div class="df-rail" role="group" aria-label="${esc(
+      t('hudChrome.finder.tabCatalogue'),
+    )}">${rows.map((r) => this.rowHtml(r)).join('')}</div>`;
     const detailHtml = `<div class="df-detail">${detail ? this.detailHtml(detail) : ''}</div>`;
     return `<div class="df-cols df-pane-${this.pane}">${rail}${detailHtml}</div>`;
   }
@@ -401,7 +407,7 @@ export class DungeonFinderWindow {
       `<img class="df-row-icon" src="${esc(r.portraitUrl)}" width="30" height="30" loading="lazy" decoding="async" alt="">` +
       `<span class="df-row-text"><span class="df-row-name">${esc(name)} ${badge}</span>` +
       `<span class="df-row-meta">${esc(this.levelsLabel(r.minLevel, r.maxLevel))} · ${esc(
-        t('hudChrome.finder.partySize', { count: num(r.size) }),
+        tPlural('hudChrome.plurals.finderPartySize', r.size, { count: num(r.size) }),
       )}</span>${lock}${blocked}</span></button>`
     );
   }
@@ -424,10 +430,7 @@ export class DungeonFinderWindow {
             ['dps', d.composition.dps],
           ] as const
         )
-          .map(
-            ([role, n]) =>
-              `<span class="df-role-count">${this.roleIcon(role)}${num(n)} ${esc(this.roleLabel(role))}</span>`,
-          )
+          .map(([role, n]) => this.roleCountHtml(role, n))
           .join(' ')
       : esc(t('hudChrome.finder.freeRoles'));
     const lockLine =
@@ -452,7 +455,7 @@ export class DungeonFinderWindow {
     const meta =
       `<div class="df-meta">` +
       `<div class="df-meta-row">${esc(this.levelsLabel(d.minLevel, d.maxLevel))} · ${esc(
-        t('hudChrome.finder.partySize', { count: num(d.size) }),
+        tPlural('hudChrome.plurals.finderPartySize', d.size, { count: num(d.size) }),
       )}</div>` +
       `<div class="df-meta-row">${comp}</div>` +
       `<div class="df-meta-row">${lockLine}</div>` +
@@ -672,8 +675,8 @@ export class DungeonFinderWindow {
 
   private listingHtml(l: FinderListingRowView): string {
     const name = dungeonDisplayName(l.dungeonId);
-    const needed = l.needed
-      ? `<span class="df-needed">${esc(t('hudChrome.finder.needs'))} ${(
+    const neededRoles = l.needed
+      ? (
           [
             ['tank', l.needed.tank],
             ['healer', l.needed.healer],
@@ -681,11 +684,13 @@ export class DungeonFinderWindow {
           ] as const
         )
           .filter(([, n]) => n > 0)
-          .map(
-            ([role, n]) =>
-              `<span class="df-role-count">${this.roleIcon(role)}${num(n)} ${esc(this.roleLabel(role))}</span>`,
-          )
-          .join(' ')}</span>`
+          .map(([role, n]) => this.roleCountHtml(role, n))
+          .join(' ')
+      : '';
+    // The prefix is part of the template ('Needs {roles}'), never a concat: a locale
+    // owns where the roles sit in the sentence.
+    const needed = neededRoles
+      ? `<span class="df-needed">${htmlTemplate('hudChrome.finder.needs', { roles: neededRoles })}</span>`
       : '';
     const members = l.members
       .map(
@@ -734,6 +739,15 @@ export class DungeonFinderWindow {
     return t('hudChrome.finder.kindDungeon');
   }
 
+  // Count plus role label through one token template, so the ORDER belongs to the
+  // locale (the icon is decoration and sits outside the localized run).
+  private roleCountHtml(role: Role, n: number): string {
+    return (
+      `<span class="df-role-count">${this.roleIcon(role)}` +
+      `${esc(t('hudChrome.finder.roleCount', { count: num(n), role: this.roleLabel(role) }))}</span>`
+    );
+  }
+
   private roleLabel(role: Role): string {
     if (role === 'tank') return t('hudChrome.finder.roleTank');
     if (role === 'healer') return t('hudChrome.finder.roleHealer');
@@ -774,10 +788,31 @@ function num(v: number): string {
   return formatNumber(v, { maximumFractionDigits: 0, useGrouping: false });
 }
 
+/** mm:ss through the same token pattern every other HUD clock uses. */
 function mmss(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${num(minutes)}:${seconds < 10 ? '0' : ''}${num(seconds)}`;
+  return t('hudChrome.finder.clock', {
+    minutes: num(minutes),
+    seconds: String(seconds).padStart(2, '0'),
+  });
+}
+
+/**
+ * A t() template whose values are already-built, trusted HTML fragments (an icon plus an
+ * escaped label). The template TEXT is escaped and the fragments are spliced after, so a
+ * locale still owns the sentence order and our own markup is not double-escaped.
+ */
+function htmlTemplate(key: TranslationKey, parts: Record<string, string>): string {
+  // A control character no localized value can contain, so the splice can never
+  // collide with a real word of the template.
+  const mark = String.fromCharCode(1);
+  const values: Record<string, string> = {};
+  for (const name of Object.keys(parts)) values[name] = `${mark}${name}${mark}`;
+  return esc(t(key, values)).replace(
+    new RegExp(`${mark}(\\w+)${mark}`, 'g'),
+    (_m, name: string) => parts[name] ?? '',
+  );
 }
 
 function itemName(itemId: string): string {
