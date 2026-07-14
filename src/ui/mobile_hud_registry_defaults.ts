@@ -4,7 +4,7 @@ function placement(
   anchor: MobileHudPlacement['anchor'],
   offsetX: number,
   offsetY: number,
-  extras: Partial<Omit<MobileHudPlacement, 'anchor' | 'offsetX' | 'offsetY' | 'scale'>> = {},
+  extras: Partial<Omit<MobileHudPlacement, 'anchor' | 'offsetX' | 'offsetY'>> = {},
 ): MobileHudPlacement {
   return { anchor, offsetX, offsetY, scale: 1, ...extras };
 }
@@ -25,21 +25,23 @@ export function createMobileHudDefaultPlacements(): Readonly<{
     'action.page': placement('bottom-right', -230, -10),
     'control.movement': placement('bottom-left', 0, 0),
     'control.view': placement('top-right', -18, 64),
-    'utility.consumables': placement('bottom-left', 136, -16, { openingDirection: 'right' }),
+    'utility.consumables': placement('bottom-left', 136, -68, { openingDirection: 'right' }),
     'pet.commands': placement('bottom-right', -14, -126, {
       orientation: 'horizontal',
       reverse: false,
     }),
     party: placement('top-left', 101, 6, { orientation: 'horizontal', reverse: false }),
     'menu.top': placement('top-right', -12, 8, { orientation: 'horizontal', reverse: false }),
-    'minimap.cluster': placement('top-left', 6, 6),
-    'frame.target': placement('top-center', 0, 68),
-    'frame.player': placement('bottom-center', 0, -14),
-    'auras.player_buffs': placement('top-right', -216, 8, {
+    'minimap.cluster': placement('top-left', 6, 6, { scale: 0.6 }),
+    'frame.target': placement('top-center', 0, 8, { scale: 0.65 }),
+    'frame.player': placement('bottom-center', 0, -10, { scale: 0.7 }),
+    'auras.player_buffs': placement('top-right', -172, 8, {
+      scale: 0.75,
       orientation: 'horizontal',
       reverse: false,
     }),
-    'auras.player_debuffs': placement('top-right', -216, 40, {
+    'auras.player_debuffs': placement('top-right', -172, 40, {
+      scale: 0.75,
       orientation: 'horizontal',
       reverse: false,
     }),
@@ -50,6 +52,7 @@ export function createMobileHudDefaultPlacements(): Readonly<{
     'status.vale_cup.indicator': placement('top-center', 0, 6),
     'status.vale_cup.match': placement('top-center', 0, 6),
     'status.vale_cup.charge': placement('bottom-center', 0, -128),
+    'tracker.deeds': placement('top-right', -12, 56),
     'tracker.delve': placement('top-right', -12, 96),
   };
 
@@ -64,25 +67,29 @@ export function createMobileHudDefaultPlacements(): Readonly<{
     'action.target': placement('bottom-right', -22, -90),
     'action.jump_use': placement('bottom-right', -18, -20),
     'action.page': placement('bottom-right', -274, -20),
+    'control.movement': placement('bottom-left', 0, 0),
     'control.view': placement('top-right', -24, 80),
-    'utility.consumables': placement('bottom-left', 154, -20, { openingDirection: 'right' }),
+    'utility.consumables': placement('bottom-left', 154, -16, { openingDirection: 'right' }),
     'pet.commands': placement('bottom-right', -18, -154, {
       orientation: 'horizontal',
       reverse: false,
     }),
-    party: placement('top-left', 118, 10, { orientation: 'horizontal', reverse: false }),
-    'menu.top': placement('top-right', -16, 12, { orientation: 'horizontal', reverse: false }),
-    'minimap.cluster': placement('top-left', 10, 10),
-    'frame.target': placement('top-center', 0, 76),
-    'frame.player': placement('bottom-center', 0, -20),
-    'auras.player_buffs': placement('top-right', -320, 12, {
+    party: placement('top-left', 101, 6, { orientation: 'horizontal', reverse: false }),
+    'menu.top': placement('top-right', -12, 8, { orientation: 'horizontal', reverse: false }),
+    'minimap.cluster': placement('top-left', 6, 6, { scale: 0.6 }),
+    'frame.target': placement('top-center', 0, 8),
+    'frame.player': placement('bottom-center', 0, -10, { scale: 1.1 }),
+    'auras.player_buffs': placement('top-right', -276, 8, {
+      scale: 0.75,
       orientation: 'horizontal',
       reverse: false,
     }),
-    'auras.player_debuffs': placement('top-right', -320, 46, {
+    'auras.player_debuffs': placement('top-right', -276, 40, {
+      scale: 0.75,
       orientation: 'horizontal',
       reverse: false,
     }),
+    'tracker.deeds': placement('top-right', -16, 66),
     'tracker.delve': placement('top-right', -16, 116),
   };
 

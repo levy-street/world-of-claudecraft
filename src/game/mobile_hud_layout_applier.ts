@@ -4,17 +4,13 @@
 // module only reads inputs and performs the DOM writes the core cannot do
 // itself (it must stay host-agnostic for tests/architecture.test.ts).
 //
-// Safe-area insets: this reads 0 for all four and lets CSS own inset handling
-// via env(safe-area-inset-*) directly in hud.mobile.css (the repo's existing
-// idiom, see the ring/joystick rules there). The core still accepts insets as
-// inputs (so a future JS-side need, e.g. combining an inset with a tier
-// threshold, has a seam) but nothing here currently probes the real env()
-// values from JS: doing so would need a throwaway probe element and a
-// getComputedStyle read every call, which is unnecessary work when CSS already
-// applies the same insets natively and unconditionally.
+// Safe-area insets are measured as a device-aware coordinate reference for
+// defaults, anchors, and editor chrome. They never constrain player-authored
+// placements or trigger validation, storage fallback, or runtime fallback.
 
 import {
   mirrorMobileHudPlacement,
+  normalizeMobileHudPlacementForDescriptor,
   resolveMobileHudSurfaceGeometry,
   validateMobileHudContext,
 } from '../ui/mobile_hud_editor_core';
@@ -180,6 +176,7 @@ export class MobileHudFallbackWarningState {
         failure.surfaceIds,
         failure.viewportId,
         failure.safeAreaFixtureId,
+        failure.handedness,
         failure.activeVariantIds,
       ]),
     );
@@ -219,6 +216,55 @@ function resolveConsumablesOpeningProperties(
     [`${prefix}-grid-columns`]: horizontal ? 'repeat(3, 48px)' : 'repeat(2, 48px)',
     [`${prefix}-grid-rows`]: horizontal ? 'repeat(2, 48px)' : 'repeat(3, 48px)',
     [`${prefix}-item-direction`]: opensBefore && horizontal ? 'rtl' : 'ltr',
+  };
+}
+
+function resolvePartyMemberViewportProperties(
+  prefix: string,
+  surfaceId: MobileHudSurfaceId,
+  orientation: 'horizontal' | 'vertical' | undefined,
+): Readonly<Record<string, string>> {
+  if (surfaceId !== 'party') return {};
+  const vertical = orientation === 'vertical';
+  return {
+    // A sparse party must shrink to its actual rows; only a populated raid
+    // reaches these caps and starts scrolling. The editor's separate layout
+    // envelope still advertises the full registered raid-capacity surface.
+    [`${prefix}-members-width`]: vertical ? '68px' : 'max-content',
+    [`${prefix}-members-height`]: vertical ? 'max-content' : '40px',
+    [`${prefix}-members-max-width`]: `${vertical ? 68 : 284}px`,
+    [`${prefix}-members-max-height`]: `${vertical ? 172 : 40}px`,
+    [`${prefix}-members-overflow-x`]: vertical ? 'hidden' : 'auto',
+    [`${prefix}-members-overflow-y`]: vertical ? 'auto' : 'hidden',
+  };
+}
+
+function resolveAuraViewportProperties(
+  prefix: string,
+  surfaceId: MobileHudSurfaceId,
+  orientation: 'horizontal' | 'vertical' | undefined,
+): Readonly<Record<string, string>> {
+  if (surfaceId !== 'auras.player_buffs' && surfaceId !== 'auras.player_debuffs') return {};
+  const vertical = orientation === 'vertical';
+  return {
+    [`${prefix}-overflow-x`]: vertical ? 'hidden' : 'auto',
+    [`${prefix}-overflow-y`]: vertical ? 'auto' : 'hidden',
+    [`${prefix}-touch-action`]: vertical ? 'pan-y' : 'pan-x',
+    [`${prefix}-duration-bottom`]: '0',
+  };
+}
+
+function resolvePetViewportProperties(
+  prefix: string,
+  surfaceId: MobileHudSurfaceId,
+  orientation: 'horizontal' | 'vertical' | undefined,
+): Readonly<Record<string, string>> {
+  if (surfaceId !== 'pet.commands') return {};
+  const vertical = orientation === 'vertical';
+  return {
+    [`${prefix}-overflow-x`]: vertical ? 'hidden' : 'auto',
+    [`${prefix}-overflow-y`]: vertical ? 'auto' : 'hidden',
+    [`${prefix}-touch-action`]: vertical ? 'pan-y' : 'pan-x',
   };
 }
 
@@ -298,15 +344,15 @@ export class MobileHudCustomLayoutDomApplier {
       registry: this.#registry,
       profileId: options.profileId,
       placements: activePlacements,
-      baselinePlacements: this.#registry.defaults[options.profileId],
       geometry: options.measurement.geometry,
       contextId: options.contextId,
+      handedness: options.handedness,
       isSurfaceAvailable: options.isSurfaceAvailable,
     });
-    // Invalid persisted data must fall back safely, but an editor drag is
-    // deliberately allowed to pass through invalid intermediate positions.
-    // The editor paints those failures red and blocks Save while the live HUD
-    // continues to follow the pointer.
+    // Invalid persisted data must fall back safely, but an editor preview may
+    // temporarily contain malformed capability, scale, or target-size values.
+    // Overlap and safe-area position are deliberate player choices and never
+    // produce failures here.
     const fallback = !this.#state.previewActive && failures.length > 0;
     const placements = fallback
       ? (this.#registry.defaults[options.profileId] ?? {})
@@ -323,8 +369,9 @@ export class MobileHudCustomLayoutDomApplier {
       ) {
         continue;
       }
-      const canonical = placements[descriptor.id];
-      if (!canonical) continue;
+      const storedCanonical = placements[descriptor.id];
+      if (!storedCanonical) continue;
+      const canonical = normalizeMobileHudPlacementForDescriptor(descriptor, storedCanonical);
       const placement =
         options.handedness === 'left'
           ? mirrorMobileHudPlacement(canonical, descriptor.mirrorPolicy)
@@ -343,6 +390,13 @@ export class MobileHudCustomLayoutDomApplier {
       }
       const authorScale =
         descriptor.coordinateHost === 'ui-author' ? options.measurement.uiScale : 1;
+      // A ui-author root lives below #ui's global CSS zoom. Coordinates must be
+      // written in author space, but the complete surface (including fixed-pixel
+      // children, gaps, and touch targets) must remain in the registry's canonical
+      // visual-pixel geometry. Counter-scale the root and keep its local dimensions
+      // canonical; dividing only the outer box would leave its children zoomed and
+      // make the validated footprint disagree with the real hit area.
+      const appliedScale = placement.scale / authorScale;
       const originX =
         descriptor.coordinateHost === 'ui-author' ? options.measurement.geometry.visualOffsetX : 0;
       const originY =
@@ -354,16 +408,69 @@ export class MobileHudCustomLayoutDomApplier {
         runtimeSizing === 'base-footprint'
           ? (descriptor.profileSizes?.[options.profileId] ?? descriptor.defaultSize)
           : resolved.unscaledSize;
+      const touchFloor =
+        descriptor.lowScaleTouchCompensation && descriptor.minimumTargetSize
+          ? {
+              width: Math.max(40, descriptor.minimumTargetSize.width),
+              height: Math.max(40, descriptor.minimumTargetSize.height),
+            }
+          : null;
+      // Small visuals are allowed to scale to 0.5, but gameplay hit targets are
+      // not. The author-space target grows inversely for roots that remain
+      // transformed. Atomic actions and compact composites additionally consume
+      // the centered touch-hit rectangle below and keep the root itself unscaled.
+      const touchHitSize = touchFloor
+        ? {
+            width: Math.max(resolved.canonicalRect.width, runtimeSize.width, touchFloor.width),
+            height: Math.max(resolved.canonicalRect.height, runtimeSize.height, touchFloor.height),
+          }
+        : null;
       const values: Readonly<Record<string, string>> = {
         [`${prefix}-x`]: `${(resolved.canonicalRect.x - originX) / authorScale}px`,
         [`${prefix}-y`]: `${(resolved.canonicalRect.y - originY) / authorScale}px`,
+        ...(descriptor.primaryFootprint
+          ? {
+              [`${prefix}-interactive-x`]: `${
+                (resolved.interactiveRect.x - originX) / authorScale
+              }px`,
+              [`${prefix}-interactive-y`]: `${
+                (resolved.interactiveRect.y - originY) / authorScale
+              }px`,
+              [`${prefix}-interactive-width`]: `${
+                resolved.interactiveRect.width / placement.scale
+              }px`,
+              [`${prefix}-interactive-height`]: `${
+                resolved.interactiveRect.height / placement.scale
+              }px`,
+            }
+          : {}),
         ...(runtimeSizing === 'intrinsic'
           ? {}
           : {
-              [`${prefix}-width`]: `${runtimeSize.width / authorScale}px`,
-              [`${prefix}-height`]: `${runtimeSize.height / authorScale}px`,
+              [`${prefix}-width`]: `${runtimeSize.width}px`,
+              [`${prefix}-height`]: `${runtimeSize.height}px`,
             }),
-        [`${prefix}-scale`]: `${placement.scale}`,
+        [`${prefix}-scale`]: `${appliedScale}`,
+        ...(touchFloor && touchHitSize
+          ? {
+              [`${prefix}-touch-target-width`]: `${touchFloor.width / placement.scale}px`,
+              [`${prefix}-touch-target-height`]: `${touchFloor.height / placement.scale}px`,
+              [`${prefix}-touch-hit-x`]: `${
+                (resolved.canonicalRect.x +
+                  (resolved.canonicalRect.width - touchHitSize.width) / 2 -
+                  originX) /
+                authorScale
+              }px`,
+              [`${prefix}-touch-hit-y`]: `${
+                (resolved.canonicalRect.y +
+                  (resolved.canonicalRect.height - touchHitSize.height) / 2 -
+                  originY) /
+                authorScale
+              }px`,
+              [`${prefix}-touch-hit-width`]: `${touchHitSize.width / authorScale}px`,
+              [`${prefix}-touch-hit-height`]: `${touchHitSize.height / authorScale}px`,
+            }
+          : {}),
         ...(placement.orientation ? { [`${prefix}-orientation`]: placement.orientation } : {}),
         ...(placement.reverse === undefined
           ? {}
@@ -372,7 +479,16 @@ export class MobileHudCustomLayoutDomApplier {
           ? { [`${prefix}-opening-direction`]: placement.openingDirection }
           : {}),
         ...(flow ? { [`${prefix}-flow`]: flow } : {}),
+        ...(descriptor.id === 'frame.player'
+          ? {
+              [`${prefix}-castbar-top-offset`]: `${8 / authorScale}px`,
+              [`${prefix}-swingbar-top-offset`]: `${16 / authorScale}px`,
+            }
+          : {}),
         ...resolveConsumablesOpeningProperties(prefix, placement.openingDirection),
+        ...resolvePartyMemberViewportProperties(prefix, descriptor.id, placement.orientation),
+        ...resolveAuraViewportProperties(prefix, descriptor.id, placement.orientation),
+        ...resolvePetViewportProperties(prefix, descriptor.id, placement.orientation),
       };
       const boundElements = new Set<HTMLElement>([element]);
       for (const selector of descriptor.binding.dependentRootSelectors ?? []) {

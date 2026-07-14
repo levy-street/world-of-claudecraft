@@ -235,6 +235,14 @@ describe('delve registry', () => {
       }
     }
   });
+
+  it('keeps every tier within the single-affix mobile tracker contract', () => {
+    for (const delve of DELVE_LIST) {
+      for (const tier of delve.tiers) {
+        expect(tier.affixCount, `${delve.id}:${tier.id}`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
 });
 
 describe('delve lifecycle', () => {

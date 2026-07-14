@@ -990,6 +990,8 @@
     display: none;
   }
   .buff {
+    -webkit-appearance: none;
+    appearance: none;
     width: 28px;
     height: 28px;
     border: 1px solid var(--color-buff);
@@ -1038,12 +1040,17 @@
   .buff.own:not(.debuff) {
     border-color: var(--color-primary);
   }
-  /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
+  /* The player's own cancelable buffs: desktop right-click or a deliberate
+     mobile hold drops one; the hover cue remains desktop-only affordance. */
   .buff.cancelable {
     cursor: context-menu;
   }
   .buff.cancelable:hover {
     border-color: var(--color-gold, #d8b56b);
+  }
+  .buff:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .buff .dur {
     position: absolute;

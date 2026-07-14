@@ -78,11 +78,11 @@ describe('mobile HUD editor vocabulary', () => {
     expect(t('hudChrome.mobileHudEditor.status.selected', { surface: 'Party' })).toBe(
       'Selected: Party',
     );
-    expect(
-      t('hudChrome.mobileHudEditor.failure.overlap', { surface: 'Party', other: 'View' }),
-    ).toBe('Party overlaps View.');
-    expect(t('hudChrome.mobileHudEditor.failure.outOfBounds', { surface: 'Movement' })).toBe(
-      'Movement is outside the safe area.',
+    expect(t('hudChrome.mobileHudEditor.failure.scaleOutOfRange', { surface: 'Party' })).toBe(
+      'Party size is outside its allowed range.',
+    );
+    expect(t('hudChrome.mobileHudEditor.failure.targetTooSmall', { surface: 'Movement' })).toBe(
+      'Movement is too small to use safely.',
     );
     expect(t('hudChrome.mobileHudEditor.runtimeFallback', { profile: 'Phone' })).toBe(
       'The Phone layout does not fit this viewport. Built-in defaults are active temporarily.',

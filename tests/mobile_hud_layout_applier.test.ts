@@ -355,7 +355,17 @@ describe('MobileHudCustomLayoutState', () => {
 
 describe('MobileHudCustomLayoutDomApplier', () => {
   const requireDescriptor = (
-    id: 'action.a1' | 'control.movement' | 'frame.target' | 'pet.commands' | 'utility.consumables',
+    id:
+      | 'action.a1'
+      | 'control.movement'
+      | 'control.view'
+      | 'frame.player'
+      | 'frame.target'
+      | 'party'
+      | 'pet.commands'
+      | 'auras.player_buffs'
+      | 'auras.player_debuffs'
+      | 'utility.consumables',
   ) => {
     const descriptor = MOBILE_HUD_REGISTRY.getDescriptor(id);
     if (!descriptor?.binding) throw new Error(`missing DOM applier test binding: ${id}`);
@@ -408,18 +418,46 @@ describe('MobileHudCustomLayoutDomApplier', () => {
     uiScale,
   });
 
+  it('keeps a half-scale action visually small while preserving a 48px runtime hitbox', () => {
+    const { action, state, applier } = makeDomApplier();
+    state.setValidatedDocument({
+      schemaVersion: 1,
+      enabled: true,
+      profiles: {
+        phone: {
+          ...contextRegistry.defaults.phone,
+          'action.a1': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 0.5 },
+        },
+        tablet: contextRegistry.defaults.tablet,
+      },
+    });
+
+    applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: measurement(1),
+      eligible: true,
+    });
+
+    expect(action.styleProps.get('--mobile-hud-action-a1-scale')).toBe('0.5');
+    expect(action.styleProps.get('--mobile-hud-action-a1-touch-target-width')).toBe('96px');
+    expect(action.styleProps.get('--mobile-hud-action-a1-touch-hit-x')).toBe('18px');
+    expect(action.styleProps.get('--mobile-hud-action-a1-touch-hit-width')).toBe('48px');
+  });
+
   it('annotates informational roots for click-through foreground CSS and clears the marker', () => {
-    const descriptor = MOBILE_HUD_REGISTRY.getDescriptor('auras.player_buffs');
-    if (!descriptor?.binding) throw new Error('missing player buffs DOM binding');
-    const buffs = new FakeElement('buffs');
+    const descriptor = MOBILE_HUD_REGISTRY.getDescriptor('status.arena.generic');
+    if (!descriptor?.binding) throw new Error('missing Arena status DOM binding');
+    const status = new FakeElement('arena-status');
     const registry = buildMobileHudRegistry({
       descriptors: [descriptor],
       defaults: {
         phone: {
-          'auras.player_buffs': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 1 },
+          'status.arena.generic': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 1 },
         },
         tablet: {
-          'auras.player_buffs': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 1 },
+          'status.arena.generic': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 1 },
         },
       },
     });
@@ -429,7 +467,7 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       {
         body,
         querySelector: (selector: string) =>
-          selector === descriptor.binding?.rootSelector ? buffs : null,
+          selector === descriptor.binding?.rootSelector ? status : null,
       } as unknown as Document,
       registry,
       state,
@@ -437,18 +475,20 @@ describe('MobileHudCustomLayoutDomApplier', () => {
 
     applier.apply({
       profileId: 'phone',
-      contextId: 'world.base',
+      contextId: 'arena.standard',
       handedness: 'right',
       measurement: measurement(1),
       eligible: true,
     });
-    expect(buffs.getAttribute('data-mobile-hud-overlap-policy')).toBe('informational-overlay');
+    expect(status.getAttribute('data-mobile-hud-overlap-policy')).toBe('informational-overlay');
 
     applier.clear();
-    expect(buffs.getAttribute('data-mobile-hud-overlap-policy')).toBeNull();
+    expect(status.getAttribute('data-mobile-hud-overlap-policy')).toBeNull();
   });
 
-  it.each([0.85, 1, 1.4])('converts only ui-author properties at UI Scale %s', (uiScale) => {
+  it.each([
+    0.85, 1, 1.4,
+  ])('keeps complete ui-author visual geometry stable at UI Scale %s', (uiScale) => {
     const { action, target, applier } = makeDomApplier();
     applier.apply({
       profileId: 'phone',
@@ -458,12 +498,64 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       eligible: true,
     });
     expect(action.styleProps.get('--mobile-hud-action-a1-x')).toBe('30px');
+    expect(action.styleProps.get('--mobile-hud-action-a1-scale')).toBe('1');
     expect(target.styleProps.get('--mobile-hud-frame-target-x')).toBe(`${200 / uiScale}px`);
-    expect(target.styleProps.get('--mobile-hud-frame-target-width')).toBe(`${236 / uiScale}px`);
-    expect(target.styleProps.get('--mobile-hud-frame-target-height')).toBe(`${68 / uiScale}px`);
+    expect(target.styleProps.get('--mobile-hud-frame-target-width')).toBe('236px');
+    expect(target.styleProps.get('--mobile-hud-frame-target-height')).toBe('68px');
+    expect(target.styleProps.get('--mobile-hud-frame-target-scale')).toBe(`${1 / uiScale}`);
     expect(action.style.transform).toBe('legacy-transform');
     expect(action.style.left).toBe('17px');
     expect(action.style.top).toBe('22px');
+  });
+
+  it.each([0.85, 1, 1.4])('keeps Player dependent-bar offsets stable at UI Scale %s', (uiScale) => {
+    const playerFixture = requireDescriptor('frame.player');
+    const player = new FakeElement('player');
+    const castbar = new FakeElement('castbar');
+    const swingbar = new FakeElement('swingbar');
+    const placement = {
+      anchor: 'top-left' as const,
+      offsetX: 100,
+      offsetY: 80,
+      scale: 1,
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [playerFixture.descriptor],
+      defaults: {
+        phone: { 'frame.player': placement },
+        tablet: { 'frame.player': placement },
+      },
+    });
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) => {
+          if (selector === playerFixture.rootSelector) return player;
+          if (selector === '#castbar') return castbar;
+          if (selector === '#swingbar') return swingbar;
+          return null;
+        },
+      } as unknown as Document,
+      registry,
+      new MobileHudCustomLayoutState(registry),
+    );
+
+    applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: measurement(uiScale),
+      eligible: true,
+    });
+
+    for (const element of [player, castbar, swingbar]) {
+      expect(element.styleProps.get('--mobile-hud-frame-player-castbar-top-offset')).toBe(
+        `${8 / uiScale}px`,
+      );
+      expect(element.styleProps.get('--mobile-hud-frame-player-swingbar-top-offset')).toBe(
+        `${16 / uiScale}px`,
+      );
+    }
   });
 
   it('mirrors visually without changing canonical right-handed data', () => {
@@ -480,7 +572,66 @@ describe('MobileHudCustomLayoutDomApplier', () => {
     expect(state.activeDocument().profiles.phone?.['action.a1']).toBe(stored);
   });
 
-  it('temporarily falls back on an unusual invalid viewport without mutating stored data', () => {
+  it('applies a left-handed layout even when mirroring makes controls overlap', () => {
+    const fixedDescriptor = MOBILE_HUD_REGISTRY.getDescriptor('action.a2');
+    if (!fixedDescriptor) throw new Error('action.a2 descriptor fixture is incomplete');
+    const mirrored = {
+      ...actionFixture.descriptor,
+      mirrorPolicy: 'position' as const,
+      visibleIn: ['world.base'] as const,
+      validateIn: ['world.base'] as const,
+    };
+    const fixed = {
+      ...fixedDescriptor,
+      mirrorPolicy: 'none' as const,
+      visibleIn: ['world.base'] as const,
+      validateIn: ['world.base'] as const,
+    };
+    const placements = {
+      'action.a1': { anchor: 'top-left' as const, offsetX: 10, offsetY: 10, scale: 1 },
+      'action.a2': { anchor: 'top-right' as const, offsetX: -10, offsetY: 10, scale: 1 },
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [mirrored, fixed],
+      defaults: { phone: placements, tablet: placements },
+    });
+    const first = new FakeElement('first');
+    const second = new FakeElement('second');
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) => {
+          if (selector === mirrored.binding?.rootSelector) return first;
+          if (selector === fixed.binding?.rootSelector) return second;
+          return null;
+        },
+      } as unknown as Document,
+      registry,
+      new MobileHudCustomLayoutState(registry),
+    );
+
+    const result = applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'left',
+      measurement: {
+        geometry: {
+          id: 'phone-740x360',
+          width: 740,
+          height: 360,
+          visualOffsetX: 0,
+          visualOffsetY: 0,
+          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        uiScale: 1,
+      },
+      eligible: true,
+    });
+
+    expect(result).toEqual({ fallback: false, failures: [] });
+  });
+
+  it('applies an off-safe-area placement without fallback or stored-data mutation', () => {
     const { action, state, applier } = makeDomApplier();
     const invalid = {
       schemaVersion: 1 as const,
@@ -500,12 +651,38 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       measurement: measurement(1),
       eligible: true,
     });
-    expect(result.fallback).toBe(true);
-    expect(action.styleProps.get('--mobile-hud-action-a1-x')).toBe('30px');
+    expect(result).toEqual({ fallback: false, failures: [] });
+    expect(action.styleProps.get('--mobile-hud-action-a1-x')).toBe('10009px');
     expect(invalid.profiles.phone['action.a1'].offsetX).toBe(9999);
   });
 
-  it('keeps an invalid ephemeral editor preview live instead of falling back to defaults', () => {
+  it('falls back for a persisted placement with an invalid scale', () => {
+    const { action, state, applier } = makeDomApplier();
+    state.setValidatedDocument({
+      schemaVersion: 1,
+      enabled: true,
+      profiles: {
+        phone: {
+          ...contextRegistry.defaults.phone,
+          'action.a1': { anchor: 'top-left', offsetX: 20, offsetY: 20, scale: 0.45 },
+        },
+      },
+    });
+
+    const result = applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: measurement(1),
+      eligible: true,
+    });
+
+    expect(result.fallback).toBe(true);
+    expect(result.failures.map((failure) => failure.reason)).toEqual(['scale-out-of-range']);
+    expect(action.styleProps.get('--mobile-hud-action-a1-x')).toBe('30px');
+  });
+
+  it('keeps an invalid-scale editor preview live without adding a bounds failure', () => {
     const { action, state, applier } = makeDomApplier();
     const entry = state.activeDocument();
     const invalidPreview = {
@@ -514,7 +691,7 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       profiles: {
         phone: {
           ...contextRegistry.defaults.phone,
-          'action.a1': { anchor: 'top-left' as const, offsetX: 9999, offsetY: 20, scale: 1 },
+          'action.a1': { anchor: 'top-left' as const, offsetX: 9999, offsetY: 20, scale: 0.45 },
         },
       },
     };
@@ -530,7 +707,7 @@ describe('MobileHudCustomLayoutDomApplier', () => {
     });
 
     expect(result.fallback).toBe(false);
-    expect(result.failures.some((failure) => failure.reason === 'out-of-bounds')).toBe(true);
+    expect(result.failures.map((failure) => failure.reason)).toEqual(['scale-out-of-range']);
     expect(action.styleProps.get('--mobile-hud-action-a1-x')).toBe('10009px');
   });
 
@@ -563,7 +740,10 @@ describe('MobileHudCustomLayoutDomApplier', () => {
     });
     applier.apply(options);
 
-    expect(action.styleSetCalls).toEqual([['--mobile-hud-action-a1-x', '34px']]);
+    expect(action.styleSetCalls).toEqual([
+      ['--mobile-hud-action-a1-x', '34px'],
+      ['--mobile-hud-action-a1-touch-hit-x', '34px'],
+    ]);
     expect(action.styleRemoveCalls).toEqual([]);
     expect(target.styleSetCalls).toEqual([]);
     expect(target.styleRemoveCalls).toEqual([]);
@@ -641,19 +821,75 @@ describe('MobileHudCustomLayoutDomApplier', () => {
     expect(joystick.styleProps.size).toBe(0);
   });
 
+  it('emits the exact scaled View hitbox for its joystick dependent', () => {
+    const viewFixture = requireDescriptor('control.view');
+    const root = new FakeElement('controls');
+    const joystick = new FakeElement('camera-joystick');
+    const placement = {
+      anchor: 'top-left' as const,
+      offsetX: 20,
+      offsetY: 30,
+      scale: 1.4,
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [viewFixture.descriptor],
+      defaults: {
+        phone: { 'control.view': placement },
+        tablet: { 'control.view': placement },
+      },
+    });
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) => {
+          if (selector === viewFixture.rootSelector) return root;
+          if (selector === '#mobile-camera-joystick') return joystick;
+          return null;
+        },
+      } as unknown as Document,
+      registry,
+      new MobileHudCustomLayoutState(registry),
+    );
+
+    applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: {
+        geometry: {
+          id: 'view-900x500',
+          width: 900,
+          height: 500,
+          visualOffsetX: 0,
+          visualOffsetY: 0,
+          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        uiScale: 1,
+      },
+      eligible: true,
+    });
+
+    for (const element of [root, joystick]) {
+      expect(element.styleProps.get('--mobile-hud-control-view-interactive-x')).toBe('116.6px');
+      expect(element.styleProps.get('--mobile-hud-control-view-interactive-y')).toBe('42.6px');
+      expect(element.styleProps.get('--mobile-hud-control-view-interactive-width')).toBe('82px');
+      expect(element.styleProps.get('--mobile-hud-control-view-interactive-height')).toBe('82px');
+    }
+  });
+
   it.each([
-    ['horizontal', false, 'row'],
-    ['horizontal', true, 'row-reverse'],
-    ['vertical', false, 'column'],
-    ['vertical', true, 'column-reverse'],
-  ] as const)('writes the CSS-ready %s reverse=%s composite flow', (orientation, reverse, expectedFlow) => {
+    ['horizontal', false, 'row', 'auto', 'hidden', 'pan-x'],
+    ['horizontal', true, 'row-reverse', 'auto', 'hidden', 'pan-x'],
+    ['vertical', false, 'column', 'hidden', 'auto', 'pan-y'],
+    ['vertical', true, 'column-reverse', 'hidden', 'auto', 'pan-y'],
+  ] as const)('writes the CSS-ready %s reverse=%s bounded Pet command viewport', (orientation, reverse, expectedFlow, expectedOverflowX, expectedOverflowY, expectedTouchAction) => {
     const petFixture = requireDescriptor('pet.commands');
     const pet = new FakeElement('pet');
     const placement = {
       anchor: 'top-left' as const,
       offsetX: 20,
       offsetY: 20,
-      scale: 1,
+      scale: 0.5,
       orientation,
       reverse,
     };
@@ -693,6 +929,144 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       eligible: true,
     });
     expect(pet.styleProps.get('--mobile-hud-pet-commands-flow')).toBe(expectedFlow);
+    expect(pet.styleProps.get('--mobile-hud-pet-commands-overflow-x')).toBe(expectedOverflowX);
+    expect(pet.styleProps.get('--mobile-hud-pet-commands-overflow-y')).toBe(expectedOverflowY);
+    expect(pet.styleProps.get('--mobile-hud-pet-commands-touch-action')).toBe(expectedTouchAction);
+    expect(pet.styleProps.get('--mobile-hud-pet-commands-touch-target-width')).toBe('80px');
+    expect(pet.styleProps.get('--mobile-hud-pet-commands-touch-target-height')).toBe('80px');
+  });
+
+  it.each([
+    ['phone', 'horizontal', '128px', '40px', 'auto', 'hidden', 'pan-x', '0'],
+    ['phone', 'vertical', '40px', '128px', 'hidden', 'auto', 'pan-y', '0'],
+    ['tablet', 'horizontal', '260px', '40px', 'auto', 'hidden', 'pan-x', '0'],
+    ['tablet', 'vertical', '40px', '260px', 'hidden', 'auto', 'pan-y', '0'],
+  ] as const)('writes the %s %s bounded Player aura viewport contract', (profileId, orientation, expectedWidth, expectedHeight, expectedOverflowX, expectedOverflowY, expectedTouchAction, expectedDurationBottom) => {
+    const auraFixture = requireDescriptor('auras.player_buffs');
+    const aura = new FakeElement('buff-bar');
+    const placement = {
+      anchor: 'top-left' as const,
+      offsetX: 20,
+      offsetY: 20,
+      scale: 1,
+      orientation,
+      reverse: false,
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [auraFixture.descriptor],
+      defaults: {
+        phone: { 'auras.player_buffs': placement },
+        tablet: { 'auras.player_buffs': placement },
+      },
+    });
+    const state = new MobileHudCustomLayoutState(registry);
+    state.setValidatedDocument({
+      schemaVersion: 1,
+      enabled: true,
+      profiles: {
+        phone: { 'auras.player_buffs': placement },
+        tablet: { 'auras.player_buffs': placement },
+      },
+    });
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) => (selector === auraFixture.rootSelector ? aura : null),
+      } as unknown as Document,
+      registry,
+      state,
+    );
+
+    applier.apply({
+      profileId,
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: {
+        geometry: {
+          id: 'dynamic-1024x768',
+          width: 1024,
+          height: 768,
+          visualOffsetX: 0,
+          visualOffsetY: 0,
+          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        uiScale: 1,
+      },
+      eligible: true,
+    });
+
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-width')).toBe(expectedWidth);
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-height')).toBe(expectedHeight);
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-overflow-x')).toBe(
+      expectedOverflowX,
+    );
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-overflow-y')).toBe(
+      expectedOverflowY,
+    );
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-touch-action')).toBe(
+      expectedTouchAction,
+    );
+    expect(aura.styleProps.get('--mobile-hud-auras-player_buffs-duration-bottom')).toBe(
+      expectedDurationBottom,
+    );
+  });
+
+  it.each([
+    ['horizontal', 0.85, 'max-content', '40px', '284px', '40px', 'auto', 'hidden'],
+    ['horizontal', 1, 'max-content', '40px', '284px', '40px', 'auto', 'hidden'],
+    ['horizontal', 1.4, 'max-content', '40px', '284px', '40px', 'auto', 'hidden'],
+    ['vertical', 0.85, '68px', 'max-content', '68px', '172px', 'hidden', 'auto'],
+    ['vertical', 1, '68px', 'max-content', '68px', '172px', 'hidden', 'auto'],
+    ['vertical', 1.4, '68px', 'max-content', '68px', '172px', 'hidden', 'auto'],
+  ] as const)('caps %s Party members inside the registered scroll viewport at UI Scale %s', (orientation, uiScale, expectedWidth, expectedHeight, expectedMaxWidth, expectedMaxHeight, expectedOverflowX, expectedOverflowY) => {
+    const partyFixture = requireDescriptor('party');
+    const party = new FakeElement('party');
+    const placement = {
+      anchor: 'top-left' as const,
+      offsetX: 20,
+      offsetY: 20,
+      scale: 1,
+      orientation,
+      reverse: false,
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [partyFixture.descriptor],
+      defaults: { phone: { party: placement }, tablet: { party: placement } },
+    });
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) =>
+          selector === partyFixture.rootSelector ? party : null,
+      } as unknown as Document,
+      registry,
+      new MobileHudCustomLayoutState(registry),
+    );
+    applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness: 'right',
+      measurement: {
+        geometry: {
+          id: 'dynamic-900x500',
+          width: 900,
+          height: 500,
+          visualOffsetX: 0,
+          visualOffsetY: 0,
+          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        uiScale,
+      },
+      eligible: true,
+    });
+
+    expect(party.styleProps.get('--mobile-hud-party-members-width')).toBe(expectedWidth);
+    expect(party.styleProps.get('--mobile-hud-party-members-height')).toBe(expectedHeight);
+    expect(party.styleProps.get('--mobile-hud-party-members-max-width')).toBe(expectedMaxWidth);
+    expect(party.styleProps.get('--mobile-hud-party-members-max-height')).toBe(expectedMaxHeight);
+    expect(party.styleProps.get('--mobile-hud-party-members-overflow-x')).toBe(expectedOverflowX);
+    expect(party.styleProps.get('--mobile-hud-party-members-overflow-y')).toBe(expectedOverflowY);
+    expect(party.styleProps.get('--mobile-hud-party-scale')).toBe(`${1 / uiScale}`);
   });
 
   it.each([
@@ -816,6 +1190,60 @@ describe('MobileHudCustomLayoutDomApplier', () => {
       expect(consumables.styleProps.get(`--mobile-hud-utility-consumables-${suffix}`)).toBe(value);
     }
   });
+
+  it.each([
+    ['right', 'right'],
+    ['left', 'left'],
+  ] as const)('materializes an omitted Consumables opening before %s-handed rendering', (handedness, expectedOpening) => {
+    const consumablesFixture = requireDescriptor('utility.consumables');
+    const consumables = new FakeElement('consumables');
+    const placement = {
+      anchor: 'top-left' as const,
+      offsetX: 300,
+      offsetY: 100,
+      scale: 1,
+    };
+    const registry = buildMobileHudRegistry({
+      descriptors: [consumablesFixture.descriptor],
+      defaults: {
+        phone: { 'utility.consumables': placement },
+        tablet: { 'utility.consumables': placement },
+      },
+    });
+    const applier = new MobileHudCustomLayoutDomApplier(
+      {
+        body: new FakeBody(),
+        querySelector: (selector: string) =>
+          selector === consumablesFixture.rootSelector ? consumables : null,
+      } as unknown as Document,
+      registry,
+      new MobileHudCustomLayoutState(registry),
+    );
+    applier.apply({
+      profileId: 'phone',
+      contextId: 'world.base',
+      handedness,
+      measurement: {
+        geometry: {
+          id: 'dynamic-900x500',
+          width: 900,
+          height: 500,
+          visualOffsetX: 0,
+          visualOffsetY: 0,
+          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+        },
+        uiScale: 1,
+      },
+      eligible: true,
+    });
+
+    expect(consumables.styleProps.get('--mobile-hud-utility-consumables-opening-direction')).toBe(
+      expectedOpening,
+    );
+    expect(consumables.styleProps.get('--mobile-hud-utility-consumables-grid-columns')).toBe(
+      'repeat(3, 48px)',
+    );
+  });
 });
 
 describe('MobileHudFallbackWarningState', () => {
@@ -825,7 +1253,7 @@ describe('MobileHudFallbackWarningState', () => {
       fallback: true,
       failures: [
         {
-          reason: 'out-of-bounds' as const,
+          reason: 'scale-out-of-range' as const,
           profileId: 'phone' as const,
           contextId: 'world.base' as const,
           surfaceIds: ['action.a1' as const],

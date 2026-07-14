@@ -135,6 +135,9 @@ function recordingTooltips() {
   const attached: Array<{ el: unknown; html: () => string }> = [];
   const attachTooltip = (el: HTMLElement, html: () => string) => {
     attached.push({ el, html });
+    return () => {
+      html();
+    };
   };
   return { attached, attachTooltip };
 }
@@ -168,6 +171,11 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
   let container: FakeEl;
   let calls: Call[];
   let tooltips: ReturnType<typeof recordingTooltips>;
+  let tapTooltips: Array<{
+    el: unknown;
+    show: () => void;
+    cancelableAuraId: () => string | null;
+  }>;
   let iconUrl: ReturnType<typeof makeIconUrl>;
   let painter: AurasPainter;
 
@@ -176,11 +184,15 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     const facet = recordingFacet();
     calls = facet.calls;
     tooltips = recordingTooltips();
+    tapTooltips = [];
     iconUrl = makeIconUrl();
     const deps: AurasPainterDeps = {
       resolveIconUrl: (key) => iconUrl(key),
       renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
       attachTooltip: tooltips.attachTooltip,
+      attachTapTooltip: (el, show, cancelableAuraId) => {
+        tapTooltips.push({ el, show, cancelableAuraId });
+      },
       attachCancel: () => {},
     };
     painter = new AurasPainter(facet.writers, container as unknown as HTMLElement, deps, fakeDoc);
@@ -194,17 +206,60 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     // each pooled node has the two children (dur, stacks) appended once.
     expect(nodes()[0].childNodes).toHaveLength(2);
     expect(nodes()[0].className).toBe('buff');
+    expect(nodes()[0].tagName).toBe('BUTTON');
+    expect(nodes()[0].type).toBe('button');
+  });
+
+  it('keeps status-only party-style aura glyphs noninteractive', () => {
+    const statusContainer = fakeEl('div');
+    const facet = recordingFacet();
+    const statusTooltips = recordingTooltips();
+    const statusPainter = new AurasPainter(
+      facet.writers,
+      statusContainer as unknown as HTMLElement,
+      {
+        resolveIconUrl: (key) => `url(${key})`,
+        renderTooltip: (name) => name,
+        attachTooltip: statusTooltips.attachTooltip,
+      },
+      fakeDoc,
+    );
+
+    statusPainter.paint(state([slot({ key: 'party-might', name: 'Might' })]));
+
+    expect(statusContainer.childNodes[0].tagName).toBe('DIV');
+    expect(facet.calls.some((call) => call.m === 'setAttr' && call.args[0] === 'aria-label')).toBe(
+      false,
+    );
   });
 
   it('attaches the tooltip ONCE per pooled node across frames (no duplicate listeners)', () => {
     painter.paint(state([slot({ key: 'a', name: 'Might', remaining: 8 })]));
     expect(tooltips.attached).toHaveLength(1);
+    expect(tapTooltips).toHaveLength(1);
     const nodeA = nodes()[0];
     // Re-paint the SAME aura (a stat changed): the node is reused, not rebuilt, and the
     // tooltip is NOT re-attached.
     painter.paint(state([slot({ key: 'a', name: 'Might', remaining: 7 })]));
     expect(nodes()[0]).toBe(nodeA);
     expect(tooltips.attached).toHaveLength(1);
+    expect(tapTooltips).toHaveLength(1);
+  });
+
+  it('gives the tap owner a live cancel id only while the pooled node is cancelable', () => {
+    painter.paint(state([slot({ key: 'might', name: 'Might', cancelable: true, remaining: 8 })]));
+    const owner = tapTooltips[0];
+    expect(owner.cancelableAuraId()).toBe('might');
+
+    painter.paint(state([slot({ key: 'might', name: 'Might', cancelable: false, remaining: 7 })]));
+    expect(owner.cancelableAuraId()).toBeNull();
+
+    painter.paint(state([]));
+    painter.paint(
+      state([slot({ key: 'fortitude', name: 'Fortitude', cancelable: true, remaining: 9 })]),
+    );
+    expect(owner.cancelableAuraId()).toBe('fortitude');
+    expect(tapTooltips).toHaveLength(1);
   });
 
   it('STALE-CAPTURE regression: a recycled node reads the NEW aura, not the old one', () => {
@@ -335,6 +390,7 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     // the school border tint via setAttr(data-school), a structural attribute the
     // stylesheet maps to a --color-debuff-* token.
     expect(has('setAttr', (c) => c.args[0] === 'data-school' && c.args[1] === 'nature')).toBe(true);
+    expect(has('setAttr', (c) => c.args[0] === 'aria-label' && c.args[1] === 'a')).toBe(true);
     // duration + stacks via setText.
     expect(has('setText', (c) => c.args[0] === '5s')).toBe(true);
     expect(has('setText', (c) => c.args[0] === '3')).toBe(true);

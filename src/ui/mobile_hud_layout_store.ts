@@ -245,7 +245,6 @@ export async function loadMobileHudLayout(
     const failures = validateMobileHudLayoutMatrix({
       registry: options.registry,
       profiles: { [profileId]: merged },
-      baselineProfiles: options.registry.defaults,
       matrix: options.matrix,
       isSurfaceAvailable: options.isSurfaceAvailable,
     });
@@ -289,10 +288,23 @@ export type SaveMobileHudLayoutResult =
 export async function saveMobileHudLayout(
   options: SaveMobileHudLayoutOptions,
 ): Promise<SaveMobileHudLayoutResult> {
+  // Saving is the persistence boundary: always materialize the complete pair
+  // of responsive profiles, even when a caller supplies a partial v1 draft.
+  const profiles: MobileHudLayoutDocumentV1['profiles'] = {
+    phone: mergeMobileHudPlacementDefaults(
+      options.registry,
+      'phone',
+      options.document.profiles.phone,
+    ),
+    tablet: mergeMobileHudPlacementDefaults(
+      options.registry,
+      'tablet',
+      options.document.profiles.tablet,
+    ),
+  };
   const failures = validateMobileHudLayoutMatrix({
     registry: options.registry,
-    profiles: options.document.profiles,
-    baselineProfiles: options.registry.defaults,
+    profiles,
     matrix: options.matrix,
     isSurfaceAvailable: options.isSurfaceAvailable,
   });
@@ -300,13 +312,7 @@ export async function saveMobileHudLayout(
   const activated: MobileHudLayoutDocumentV1 = {
     ...options.document,
     enabled: true,
-    profiles: {
-      ...options.document.profiles,
-      phone: options.document.profiles.phone ? { ...options.document.profiles.phone } : undefined,
-      tablet: options.document.profiles.tablet
-        ? { ...options.document.profiles.tablet }
-        : undefined,
-    },
+    profiles,
   };
   const serialized = encodeMobileHudLayoutV1(activated, options.registry);
   try {

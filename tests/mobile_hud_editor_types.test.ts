@@ -17,7 +17,7 @@ import {
 describe('mobile HUD editor model', () => {
   it('pins the versioned storage contract', () => {
     expect(MOBILE_HUD_LAYOUT_SCHEMA_VERSION).toBe(1);
-    expect(MOBILE_HUD_LAYOUT_STORAGE_KEY).toBe('woc_mobile_hud_layout_v1');
+    expect(MOBILE_HUD_LAYOUT_STORAGE_KEY).toBe('woc_mobile_hud_layout_v1_defaults_3');
   });
 
   it('pins the two profiles and coordinate hosts', () => {
@@ -107,6 +107,7 @@ describe('mobile HUD editor model', () => {
       'status.vale_cup.match',
       'status.vale_cup.charge',
       'protected.vale_cup.betting',
+      'tracker.deeds',
       'tracker.delve',
       'protected.system.center_message',
     ]);

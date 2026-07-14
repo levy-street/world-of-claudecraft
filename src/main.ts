@@ -1627,7 +1627,10 @@ async function startGame(
       mobileHudLayoutState.setValidatedDocument(document);
       applyMobileHudCustomLayout();
     },
-    confirmDiscard: (copy) => window.confirm(`${copy.title}\n\n${copy.body}`),
+    confirmDiscard: (copy, onConfirm) => {
+      hud.showConfirmDialog(copy.title, copy.body, copy.confirm, copy.continueEditing, onConfirm);
+      return false;
+    },
     translate: (key, values) => t(key, values),
     onOpenChange: (open) => {
       input.setHudEditorActive(open);

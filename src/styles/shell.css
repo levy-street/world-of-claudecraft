@@ -1881,7 +1881,10 @@
   #loading-screen {
     position: absolute;
     inset: 0;
-    z-index: 150;
+    /* The initial zone banner can raise the mobile #ui stacking context to
+       1000 before loading fades. Loading owns the full transition and must
+       remain above every in-game HUD child until its visible class clears. */
+    z-index: 1100;
     display: none;
     background: #0a0d14 url("/loading-screen.jpg") center / cover no-repeat;
     flex-direction: column;

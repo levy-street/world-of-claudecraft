@@ -214,7 +214,7 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     expect(resolved.scaledSize).toEqual({ width: 226.60000000000002, height: 110.00000000000001 });
   });
 
-  it('keeps movement and View runtime zones while exposing only their visible joysticks', () => {
+  it('protects the complete Movement capture zone and the visible View joystick', () => {
     const movement = resolveMobileHudSurfaceGeometry(
       descriptor('control.movement'),
       'phone',
@@ -231,12 +231,12 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     );
 
     expect(movement.canonicalRect).toEqual({ x: 162, y: 57, width: 134, height: 172 });
-    expect(movement.interactiveRect).toEqual({ x: 170, y: 111, width: 116, height: 116 });
+    expect(movement.interactiveRect).toEqual(movement.canonicalRect);
     expect(view.canonicalRect).toEqual({ x: 162, y: 57, width: 220, height: 100 });
     expect(view.interactiveRect).toEqual({ x: 231, y: 66, width: 82, height: 82 });
   });
 
-  it('excludes minimap text below the map from its interactive footprint', () => {
+  it('protects the complete Minimap cluster including its satellite controls', () => {
     const resolved = resolveMobileHudSurfaceGeometry(
       descriptor('minimap.cluster'),
       'phone',
@@ -245,11 +245,11 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
       'world.base',
     );
 
-    expect(resolved.canonicalRect).toEqual({ x: 162, y: 57, width: 98, height: 132 });
-    expect(resolved.interactiveRect).toEqual({ x: 162, y: 57, width: 98, height: 98 });
+    expect(resolved.canonicalRect).toEqual({ x: 162, y: 57, width: 162, height: 220 });
+    expect(resolved.interactiveRect).toEqual(resolved.canonicalRect);
   });
 
-  it('uses only the Consumables toggle as its interactive footprint', () => {
+  it('protects every slot in the expanded Consumables tray', () => {
     const resolved = resolveMobileHudSurfaceGeometry(
       descriptor('utility.consumables'),
       'phone',
@@ -259,10 +259,10 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     );
 
     expect(resolved.canonicalRect).toEqual({ x: 162, y: 57, width: 206, height: 100 });
-    expect(resolved.interactiveRect).toEqual({ x: 162, y: 109, width: 48, height: 48 });
+    expect(resolved.interactiveRect).toEqual(resolved.canonicalRect);
   });
 
-  it('uses orientation-specific Party and aura maxima instead of combining impossible variants', () => {
+  it('uses orientation-specific Party and bounded aura profile footprints', () => {
     const verticalAura = resolveMobileHudSurfaceGeometry(
       descriptor('auras.player_buffs'),
       'phone',
@@ -277,8 +277,16 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
       geometry,
       'world.base',
     );
-    expect(verticalAura.unscaledSize).toEqual({ width: 28, height: 252 });
-    expect(horizontalParty.unscaledSize).toEqual({ width: 444, height: 40 });
+    const tabletAura = resolveMobileHudSurfaceGeometry(
+      descriptor('auras.player_buffs'),
+      'tablet',
+      { ...basePlacement, orientation: 'horizontal' },
+      geometry,
+      'world.base',
+    );
+    expect(verticalAura.unscaledSize).toEqual({ width: 40, height: 128 });
+    expect(tabletAura.unscaledSize).toEqual({ width: 260, height: 40 });
+    expect(horizontalParty.unscaledSize).toEqual({ width: 372, height: 40 });
   });
 
   it('keeps representative editor fallbacks separate from worst-case validation envelopes', () => {
@@ -325,18 +333,18 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
       'world.base',
     );
 
-    expect(party.canonicalRect.width).toBe(444);
+    expect(party.canonicalRect.width).toBe(372);
     expect(party.editorFallbackRect).toMatchObject({ width: 28, height: 28 });
-    expect(verticalPet.canonicalRect).toMatchObject({ width: 40, height: 284 });
+    expect(verticalPet.canonicalRect).toMatchObject({ width: 40, height: 164 });
     expect(verticalPet.editorFallbackRect).toMatchObject({ width: 32, height: 156 });
-    expect(target.interactiveRect).toMatchObject({ width: 236, height: 68 });
+    expect(target.interactiveRect).toMatchObject({ width: 236, height: 121 });
     expect(target.editorFallbackRect).toMatchObject({ width: 239, height: 69 });
     expect(player.canonicalRect).toMatchObject({ width: 300, height: 68 });
     expect(player.interactiveRect).toEqual(player.canonicalRect);
     expect(player.editorFallbackRect).toMatchObject({ width: 285, height: 74 });
     expect(player.editorFallbackRect.x).toBe(player.canonicalRect.x - 5);
     expect(player.editorFallbackRect.y).toBe(player.canonicalRect.y - 5);
-    expect(buffs.editorFallbackRect).toMatchObject({ width: 28, height: 28 });
+    expect(buffs.editorFallbackRect).toMatchObject({ width: 40, height: 40 });
     expect(menu.editorFallbackRect).toMatchObject({ width: 40, height: 48 });
   });
 
@@ -344,12 +352,23 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     const invalidStep = resolveMobileHudSurfaceGeometry(
       descriptor('action.jump_use'),
       'phone',
-      { ...basePlacement, scale: 1.05 },
+      { ...basePlacement, scale: 1.03 },
       geometry,
       'world.base',
     );
     const belowFloor = resolveMobileHudSurfaceGeometry(
       descriptor('action.a1'),
+      'phone',
+      { ...basePlacement, scale: 0.4 },
+      geometry,
+      'world.base',
+    );
+    const undersizedViewHitbox = resolveMobileHudSurfaceGeometry(
+      {
+        ...descriptor('control.view'),
+        minimumTargetSize: { width: 74, height: 74 },
+        scaleLimits: { min: 0.9, max: 1.4, step: 0.1 },
+      },
       'phone',
       { ...basePlacement, scale: 0.9 },
       geometry,
@@ -359,6 +378,8 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     expect(invalidStep.targetSizeValid).toBe(true);
     expect(belowFloor.scaleValid).toBe(false);
     expect(belowFloor.targetSizeValid).toBe(false);
+    expect(undersizedViewHitbox.scaleValid).toBe(true);
+    expect(undersizedViewHitbox.targetSizeValid).toBe(false);
   });
 
   it('adds comfort padding to the collision envelope without changing artwork bounds', () => {
@@ -373,7 +394,22 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
     expect(resolved.collisionRect).toEqual({ x: 160, y: 55, width: 52, height: 52 });
   });
 
-  it('temporarily clamps a narrow preview and restores the untouched canonical placement when space returns', () => {
+  it.each([
+    'control.movement',
+    'minimap.cluster',
+  ] as const)('protects the complete interactive %s surface, not only its painted center', (surfaceId) => {
+    const resolved = resolveMobileHudSurfaceGeometry(
+      descriptor(surfaceId),
+      'phone',
+      basePlacement,
+      geometry,
+      'world.base',
+    );
+
+    expect(resolved.interactiveRect).toEqual(resolved.canonicalRect);
+  });
+
+  it('keeps preview geometry outside the safe viewport when the player places it there', () => {
     const source: MobileHudPlacement = {
       anchor: 'top-left',
       offsetX: 600,
@@ -404,7 +440,8 @@ describe('mobile HUD scaled footprints and temporary viewport clamps', () => {
       'world.base',
     );
     expect(narrowResolved.canonicalRect.x).toBe(600);
-    expect(narrowResolved.previewRect.x).toBe(348);
+    expect(narrowResolved.previewRect).toEqual(narrowResolved.interactiveRect);
+    expect(narrowResolved.previewRect.x).toBe(600);
     expect(wideResolved.previewRect.x).toBe(600);
     expect(source).toEqual({ anchor: 'top-left', offsetX: 600, offsetY: 20, scale: 1 });
   });
@@ -460,55 +497,49 @@ describe('one canonical mobile HUD context validator', () => {
     expect(unsupported.map((failure) => failure.reason)).toEqual(['unsupported-capability']);
   });
 
-  it('reports scale range, target floor, and safe bounds independently', () => {
-    const scaled = validate(['action.a1'], { 'action.a1': at(100, 100, 0.9) });
+  it('allows positions outside the safe area while preserving scale and target validation', () => {
+    const scaled = validate(['action.a1'], { 'action.a1': at(100, 100, 0.45) });
     const outside = validate(['action.a1'], { 'action.a1': at(-45, 100) });
     expect(scaled.map((failure) => failure.reason)).toEqual([
       'scale-out-of-range',
       'target-too-small',
     ]);
-    expect(outside.map((failure) => failure.reason)).toEqual(['out-of-bounds']);
+    expect(outside).toEqual([]);
   });
 
-  it('reports ordinary overlap unless both descriptors explicitly allow it', () => {
+  it('allows movable surfaces to overlap without explicit exceptions', () => {
     const overlap = validate(['action.a1', 'action.a2'], {
       'action.a1': at(100, 100),
       'action.a2': at(120, 100),
     });
-    expect(overlap).toMatchObject([{ reason: 'overlap', surfaceIds: ['action.a1', 'action.a2'] }]);
-
-    const allowed = buildMobileHudRegistry({
-      descriptors: [
-        { ...get('action.a1'), allowOverlapWith: ['action.a2'] },
-        { ...get('action.a2'), allowOverlapWith: ['action.a1'] },
-      ],
-    });
-    expect(
-      validateMobileHudContext({
-        registry: allowed,
-        profileId: 'phone',
-        placements: { 'action.a1': at(100, 100), 'action.a2': at(120, 100) },
-        geometry: viewport,
-        contextId: 'world.base',
-      }),
-    ).toEqual([]);
+    expect(overlap).toEqual([]);
   });
 
-  it('allows the non-interactive Delve tracker to paint over controls without disabling Save', () => {
+  it('allows Delve text, its affix pocket, and off-safe-area placement', () => {
     const delveTracker = {
       ...get('tracker.delve'),
       visibleIn: ['world.base'] as const,
       validateIn: ['world.base'] as const,
     };
     const registry = buildMobileHudRegistry({
-      descriptors: [get('menu.top'), delveTracker],
+      descriptors: [get('action.a1'), delveTracker],
     });
 
-    const overlap = validateMobileHudContext({
+    const textOverlap = validateMobileHudContext({
       registry,
       profileId: 'phone',
       placements: {
-        'menu.top': at(100, 100),
+        'action.a1': at(100, 100),
+        'tracker.delve': at(100, 100),
+      },
+      geometry: viewport,
+      contextId: 'world.base',
+    });
+    const affixOverlap = validateMobileHudContext({
+      registry,
+      profileId: 'phone',
+      placements: {
+        'action.a1': at(190, 100),
         'tracker.delve': at(100, 100),
       },
       geometry: viewport,
@@ -518,20 +549,19 @@ describe('one canonical mobile HUD context validator', () => {
       registry,
       profileId: 'phone',
       placements: {
-        'menu.top': at(100, 100),
+        'action.a1': at(100, 100),
         'tracker.delve': at(999, 100),
       },
       geometry: viewport,
       contextId: 'world.base',
     });
 
-    expect(overlap.filter((failure) => failure.reason === 'overlap')).toEqual([]);
-    expect(outside).toContainEqual(
-      expect.objectContaining({ reason: 'out-of-bounds', surfaceIds: ['tracker.delve'] }),
-    );
+    expect(textOverlap).toEqual([]);
+    expect(affixOverlap).toEqual([]);
+    expect(outside).toEqual([]);
   });
 
-  it('allows informational and foreground UI over controls but protects interactive status UI', () => {
+  it('allows informational, interactive status, and protected UI to overlap controls', () => {
     const inWorld = <T extends ReturnType<typeof get>>(descriptor: T): T =>
       ({
         ...descriptor,
@@ -573,12 +603,12 @@ describe('one canonical mobile HUD context validator', () => {
       contextId: 'world.base',
     });
 
-    expect(informational.some((failure) => failure.reason === 'overlap')).toBe(false);
-    expect(interactive.some((failure) => failure.reason === 'overlap')).toBe(true);
-    expect(foreground.some((failure) => failure.reason === 'protected-overlap')).toBe(false);
+    expect(informational).toEqual([]);
+    expect(interactive).toEqual([]);
+    expect(foreground).toEqual([]);
   });
 
-  it('lets player aura information overlap the Target action without blocking Save', () => {
+  it('allows an interactive player aura viewport to overlap the Target action', () => {
     const failures = validateMobileHudContext({
       registry: buildMobileHudRegistry({
         descriptors: [get('action.target'), get('auras.player_buffs')],
@@ -592,7 +622,7 @@ describe('one canonical mobile HUD context validator', () => {
       contextId: 'world.base',
     });
 
-    expect(failures.some((failure) => failure.reason === 'overlap')).toBe(false);
+    expect(failures).toEqual([]);
   });
 
   it('reserves only the Yumi collapse toggle while its status text remains overlay content', () => {
@@ -605,12 +635,12 @@ describe('one canonical mobile HUD context validator', () => {
       'arena.yumi.base',
     );
 
-    expect(resolved.canonicalRect).toMatchObject({ x: 100, y: 100, width: 520, height: 54 });
-    expect(resolved.interactiveRect).toEqual({ x: 580, y: 107, width: 40, height: 40 });
-    expect(descriptor.scaleLimits?.min).toBe(1);
+    expect(resolved.canonicalRect).toMatchObject({ x: 100, y: 100, width: 224, height: 54 });
+    expect(resolved.interactiveRect).toEqual({ x: 192, y: 107, width: 40, height: 40 });
+    expect(descriptor.scaleLimits?.min).toBe(0.5);
   });
 
-  it('does not block Save when two physical hitboxes are separated inside comfort padding', () => {
+  it('does not block Save for separated or intersecting physical hitboxes', () => {
     expect(
       validate(['action.a1', 'action.a2'], {
         'action.a1': at(100, 100),
@@ -622,10 +652,10 @@ describe('one canonical mobile HUD context validator', () => {
         'action.a1': at(100, 100),
         'action.a2': at(147.49, 100),
       }),
-    ).toMatchObject([{ reason: 'overlap' }]);
+    ).toEqual([]);
   });
 
-  it('allows an expanded Consumables row to cross another HUD surface but protects its toggle', () => {
+  it('allows controls to overlap every part of the expanded Consumables tray', () => {
     const expandedOnly = validate(['utility.consumables', 'action.a1'], {
       'utility.consumables': { ...at(100, 100), openingDirection: 'right' },
       'action.a1': at(170, 100),
@@ -636,16 +666,14 @@ describe('one canonical mobile HUD context validator', () => {
     });
 
     expect(expandedOnly).toEqual([]);
-    expect(toggleOverlap).toMatchObject([
-      { reason: 'overlap', surfaceIds: ['utility.consumables', 'action.a1'] },
-    ]);
+    expect(toggleOverlap).toEqual([]);
   });
 
-  it('keeps an improved grandfathered overlap suppressed but reports a worsened one', () => {
+  it('never blocks a changed overlap between two interactive controls', () => {
     const registry = buildMobileHudRegistry({
       descriptors: [get('action.a1'), get('action.a2')],
     });
-    const baselinePlacements = {
+    const overlappingPlacements = {
       'action.a1': at(100, 100),
       'action.a2': at(120, 100),
     };
@@ -653,29 +681,24 @@ describe('one canonical mobile HUD context validator', () => {
       validateMobileHudContext({
         registry,
         profileId: 'phone',
-        placements: { ...baselinePlacements, 'action.a2': at(a2X, 100) },
-        baselinePlacements,
+        placements: { ...overlappingPlacements, 'action.a2': at(a2X, 100) },
         geometry: viewport,
         contextId: 'world.base',
       });
 
     expect(check(130)).toEqual([]);
-    expect(check(110)).toMatchObject([
-      { reason: 'overlap', surfaceIds: ['action.a1', 'action.a2'] },
-    ]);
+    expect(check(110)).toEqual([]);
   });
 
-  it('treats View intrusion, including Movement, as its own non-exempt failure', () => {
+  it('allows Movement and View to overlap', () => {
     const failures = validate(['control.movement', 'control.view'], {
       'control.movement': at(100, 100),
       'control.view': at(150, 100),
     });
-    expect(failures).toMatchObject([
-      { reason: 'view-intrusion', surfaceIds: ['control.movement', 'control.view'] },
-    ]);
+    expect(failures).toEqual([]);
   });
 
-  it('reports movable overlap with an active protected footprint', () => {
+  it('allows a movable surface to overlap an active protected footprint', () => {
     const protectedRespawn = {
       ...get('protected.arena.fiesta_respawn'),
       visibleIn: ['arena.fiesta.respawn'] as const,
@@ -693,15 +716,10 @@ describe('one canonical mobile HUD context validator', () => {
         geometry: viewport,
         contextId: 'arena.fiesta.respawn',
       }),
-    ).toMatchObject([
-      {
-        reason: 'protected-overlap',
-        surfaceIds: ['action.a1', 'protected.arena.fiesta_respawn'],
-      },
-    ]);
+    ).toEqual([]);
   });
 
-  it('classifies View against protected UI as protected overlap, not View against itself', () => {
+  it('allows View to overlap protected UI', () => {
     const protectedPrompt = {
       ...get('protected.arena.fiesta_respawn'),
       visibleIn: ['world.base'] as const,
@@ -721,15 +739,10 @@ describe('one canonical mobile HUD context validator', () => {
         geometry: viewport,
         contextId: 'world.base',
       }),
-    ).toMatchObject([
-      {
-        reason: 'protected-overlap',
-        surfaceIds: ['control.view', 'protected.arena.fiesta_respawn'],
-      },
-    ]);
+    ).toEqual([]);
   });
 
-  it('accepts exact touching and 0.5px overlap but rejects anything beyond epsilon', () => {
+  it('does not change validation when overlap crosses the legacy collision epsilon', () => {
     expect(
       validate(['action.a1', 'action.a2'], {
         'action.a1': at(100, 100),
@@ -747,7 +760,7 @@ describe('one canonical mobile HUD context validator', () => {
         'action.a1': at(100, 100),
         'action.a2': at(147.49, 100),
       }),
-    ).toMatchObject([{ reason: 'overlap' }]);
+    ).toEqual([]);
   });
 });
 
@@ -765,18 +778,72 @@ describe('complete mobile HUD profile matrix validator', () => {
     return value;
   };
 
-  it('accepts the shipped defaults across the complete canonical matrix', () => {
+  it('accepts the shipped defaults strictly across both handedness variants of the matrix', () => {
     const failures = validateMobileHudLayoutMatrix({
       registry: MOBILE_HUD_REGISTRY,
       profiles: MOBILE_HUD_REGISTRY.defaults,
-      baselineProfiles: MOBILE_HUD_REGISTRY.defaults,
     });
-    expect([
-      ...new Set(failures.map((failure) => `${failure.reason}:${failure.surfaceIds.join('+')}`)),
-    ]).toEqual([]);
+    expect(failures).toEqual([]);
   });
 
-  it('allows a one-pixel custom nudge without reviving grandfathered matrix failures', () => {
+  it('accepts the advertised 0.5x scale for every movable surface', () => {
+    for (const profileId of ['phone', 'tablet'] as const) {
+      const profileGeometry =
+        profileId === 'phone'
+          ? { ...geometry, id: 'phone-min-scale', width: 740, height: 360 }
+          : { ...geometry, id: 'tablet-min-scale', width: 1024, height: 768 };
+      for (const descriptor of MOBILE_HUD_REGISTRY.descriptors) {
+        if (descriptor.class !== 'movable') continue;
+        const placement = MOBILE_HUD_REGISTRY.defaults[profileId]?.[descriptor.id];
+        if (!placement || !descriptor.scaleLimits) continue;
+        const resolved = resolveMobileHudSurfaceGeometry(
+          descriptor,
+          profileId,
+          { ...placement, scale: descriptor.scaleLimits.min },
+          profileGeometry,
+          descriptor.visibleIn[0],
+        );
+        expect(resolved.scaleValid, descriptor.id).toBe(true);
+        expect(resolved.targetSizeValid, descriptor.id).toBe(true);
+      }
+    }
+  });
+
+  it('allows a layout that becomes overlapping only after left-handed mirroring', () => {
+    const matrixCase = requireMatrixCase(
+      (entry) =>
+        entry.viewport.id === 'phone-740x360' &&
+        entry.sideInset.id === 'side-none' &&
+        entry.bottomInset.id === 'bottom-0' &&
+        entry.context.id === 'world.base',
+    );
+    const mirrored = {
+      ...requireDescriptor('action.a1'),
+      visibleIn: ['world.base'] as const,
+      validateIn: ['world.base'] as const,
+      mirrorPolicy: 'position' as const,
+    };
+    const fixed = {
+      ...requireDescriptor('action.a2'),
+      visibleIn: ['world.base'] as const,
+      validateIn: ['world.base'] as const,
+      mirrorPolicy: 'none' as const,
+    };
+    const failures = validateMobileHudLayoutMatrix({
+      registry: buildMobileHudRegistry({ descriptors: [mirrored, fixed] }),
+      profiles: {
+        phone: {
+          'action.a1': { anchor: 'top-left', offsetX: 10, offsetY: 10, scale: 1 },
+          'action.a2': { anchor: 'top-right', offsetX: -10, offsetY: 10, scale: 1 },
+        },
+      },
+      matrix: [matrixCase],
+    });
+
+    expect(failures).toEqual([]);
+  });
+
+  it('allows a one-pixel nudge that remains strictly valid', () => {
     const baseline = MOBILE_HUD_REGISTRY.defaults.phone?.['action.a1'];
     if (!baseline) throw new Error('phone A1 baseline missing');
     const failures = validateMobileHudLayoutMatrix({
@@ -788,7 +855,6 @@ describe('complete mobile HUD profile matrix validator', () => {
         },
         tablet: MOBILE_HUD_REGISTRY.defaults.tablet,
       },
-      baselineProfiles: MOBILE_HUD_REGISTRY.defaults,
     });
     expect(failures).toEqual([]);
   });
@@ -804,7 +870,6 @@ describe('complete mobile HUD profile matrix validator', () => {
           'pet.commands': { ...baseline },
         },
       },
-      baselineProfiles: MOBILE_HUD_REGISTRY.defaults,
       isSurfaceAvailable: (surfaceId) => surfaceId !== 'pet.commands',
     });
 
@@ -826,21 +891,14 @@ describe('complete mobile HUD profile matrix validator', () => {
         ...MOBILE_HUD_REGISTRY.defaults.phone,
         'action.a1': { anchor: 'top-center', offsetX: 0, offsetY: 90, scale: 1 },
       },
-      baselinePlacements: MOBILE_HUD_REGISTRY.defaults.phone,
       geometry: matrixCase.geometry,
       contextId: 'world.base',
     });
 
-    expect(
-      failures.some(
-        (failure) =>
-          failure.reason === 'protected-overlap' &&
-          failure.surfaceIds.includes('protected.system.center_message'),
-      ),
-    ).toBe(false);
+    expect(failures).toEqual([]);
   });
 
-  it('revalidates a grandfathered default conflict when an involved placement changes', () => {
+  it('allows a default control to move outside the safe viewport', () => {
     const phone = {
       ...MOBILE_HUD_REGISTRY.defaults.phone,
       'control.movement': {
@@ -854,14 +912,11 @@ describe('complete mobile HUD profile matrix validator', () => {
     const failures = validateMobileHudLayoutMatrix({
       registry: MOBILE_HUD_REGISTRY,
       profiles: { phone, tablet: MOBILE_HUD_REGISTRY.defaults.tablet },
-      baselineProfiles: MOBILE_HUD_REGISTRY.defaults,
     });
-    expect(failures).toContainEqual(
-      expect.objectContaining({ reason: 'out-of-bounds', surfaceIds: ['control.movement'] }),
-    );
+    expect(failures).toEqual([]);
   });
 
-  it('evaluates all 768 canonical profile, geometry, safe-area, and context cases', () => {
+  it('evaluates both hands for all 768 profile, geometry, safe-area, and context cases', () => {
     let evaluatedCases = 0;
     const failures = validateMobileHudLayoutMatrix({
       registry: buildMobileHudRegistry({ descriptors: [] }),
@@ -871,7 +926,7 @@ describe('complete mobile HUD profile matrix validator', () => {
       },
     });
     expect(MOBILE_HUD_GEOMETRY_MATRIX).toHaveLength(768);
-    expect(evaluatedCases).toBe(768);
+    expect(evaluatedCases).toBe(1_536);
     expect(failures).toEqual([]);
   });
 
@@ -885,7 +940,7 @@ describe('complete mobile HUD profile matrix validator', () => {
       registry: buildMobileHudRegistry({ descriptors: [hiddenOnly] }),
       profiles: { phone: {} },
     });
-    expect(failures).toHaveLength(40);
+    expect(failures).toHaveLength(80);
     expect(failures.every((failure) => failure.contextId === 'world.vale_cup_indicator')).toBe(
       true,
     );
@@ -901,7 +956,7 @@ describe('complete mobile HUD profile matrix validator', () => {
     const failures = validateMobileHudLayoutMatrix({
       registry: buildMobileHudRegistry({ descriptors: [worldOnly] }),
       profiles: {
-        phone: { 'action.a1': { anchor: 'top-left', offsetX: -100, offsetY: 100, scale: 1 } },
+        phone: { 'action.a1': { anchor: 'top-left', offsetX: -100, offsetY: 100, scale: 0.45 } },
         tablet: { 'action.a1': { anchor: 'top-left', offsetX: 100, offsetY: 100, scale: 1 } },
       },
     });
@@ -921,12 +976,14 @@ describe('complete mobile HUD profile matrix validator', () => {
       matrix: [matrixCase, matrixCase],
     });
     expect(failures).toMatchObject([
-      { reason: 'invalid-placement', surfaceIds: ['action.a1'] },
-      { reason: 'invalid-placement', surfaceIds: ['action.a2'] },
+      { reason: 'invalid-placement', handedness: 'right', surfaceIds: ['action.a1'] },
+      { reason: 'invalid-placement', handedness: 'right', surfaceIds: ['action.a2'] },
+      { reason: 'invalid-placement', handedness: 'left', surfaceIds: ['action.a1'] },
+      { reason: 'invalid-placement', handedness: 'left', surfaceIds: ['action.a2'] },
     ]);
   });
 
-  it('attaches active dynamic variants to a failing geometry', () => {
+  it('allows active dynamic variants to extend outside the safe viewport', () => {
     const matrixCase = requireMatrixCase(
       (entry) =>
         entry.viewport.id === 'phone-740x360' &&
@@ -957,13 +1014,7 @@ describe('complete mobile HUD profile matrix validator', () => {
       },
       matrix: [matrixCase],
     });
-    expect(failures).toMatchObject([
-      {
-        reason: 'out-of-bounds',
-        activeVariantIds: ['closed', 'expanded-right-6'],
-        safeAreaFixtureId: 'side-none/bottom-0',
-      },
-    ]);
+    expect(failures).toEqual([]);
   });
 });
 
@@ -1199,7 +1250,7 @@ describe('immutable mobile HUD draft lock, selection, scene, and move actions', 
       { registry: MOBILE_HUD_REGISTRY },
     );
     expect(maximum.document.profiles.phone?.['action.a1']?.scale).toBe(1.5);
-    expect(minimum.document.profiles.phone?.['action.a1']?.scale).toBe(1);
+    expect(minimum.document.profiles.phone?.['action.a1']?.scale).toBe(0.5);
   });
 
   it('nudges in unscaled visual CSS pixels and inverse-mirrors left-handed input', () => {
@@ -1338,24 +1389,24 @@ describe('immutable mobile HUD draft lock, selection, scene, and move actions', 
   it('cycles every ordered failure with wraparound and selects its exact context', () => {
     const failures: MobileHudDraft['failures'] = [
       {
-        reason: 'overlap',
+        reason: 'invalid-placement',
         profileId: 'phone',
         contextId: 'arena.fiesta.offer',
-        surfaceIds: ['action.a1', 'protected.arena.fiesta_offer'],
+        surfaceIds: ['action.a1'],
         viewportId: 'phone-740x360',
       },
       {
-        reason: 'out-of-bounds',
+        reason: 'scale-out-of-range',
         profileId: 'tablet',
         contextId: 'vale_cup.match.charge',
         surfaceIds: ['status.vale_cup.charge'],
         viewportId: 'tablet-1024x768',
       },
       {
-        reason: 'view-intrusion',
+        reason: 'target-too-small',
         profileId: 'phone',
         contextId: 'instance.delve',
-        surfaceIds: ['control.movement', 'control.view'],
+        surfaceIds: ['control.movement'],
         viewportId: 'phone-932x430',
       },
     ];

@@ -240,6 +240,12 @@ import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
+  PLAYER_FRAME_POS_KEY,
+  resetFramePositionsOnce,
+  TARGET_FRAME_POS_KEY,
+} from './frame_pos_reset';
+import { gossipMenuIsEmpty } from './gossip_menu';
+import {
   type AimPoint,
   abilityAoeRadius,
   cancelGroundAim,
@@ -396,6 +402,7 @@ import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { bindTouchTooltipDismiss } from './touch_tooltip_dismiss';
+import { TouchTooltipToggleGroup } from './touch_tooltip_toggle';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { TutorialOverlay } from './tutorial';
@@ -736,9 +743,8 @@ const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
 // bottom resize handle. CSS clamps it to a valid range for the live viewport, so a value
 // saved in one orientation stays safe in another (never an off-screen / tiny panel).
 const MOBILE_CHAT_BOTTOM_KEY = 'woc_mobile_chat_bottom';
-// Persisted top-left for each movable unit frame (MovableFrame in movable_frame.ts).
-const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
-const PLAYER_FRAME_POS_KEY = 'woc_player_frame_pos';
+// The persisted unit-frame keys live in frame_pos_reset.ts so the one-time
+// cleanup and MovableFrame always address the same storage entries.
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -753,7 +759,7 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type HotbarForm = 'normal' | 'bear' | 'cat' | 'stealth' | 'sport';
+type HotbarForm = 'normal' | 'bear' | 'cat' | 'stealth' | 'cat_stealth' | 'sport';
 
 const DELVE_AFFIX_COLORS: Record<string, string> = {
   restless_graves: '#8b7355',
@@ -976,6 +982,11 @@ export class Hud {
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
+  private readonly auraTooltipTapGroup = new TouchTooltipToggleGroup({
+    isTouchUi: () => this.isMobileLayout(),
+    isVisible: () => this.tooltipEl.style.display === 'block',
+    hide: () => this.hideTooltip(),
+  });
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
   // Timestamp of the last touch/pen press on a tooltip-bearing element. The
@@ -1569,6 +1580,12 @@ export class Hud {
     this.updateClock();
     // classic MMOs: the player interaction menu opens from the target portrait
     $('#target-frame').addEventListener('contextmenu', (ev) => {
+      if ((ev.target as HTMLElement | null)?.closest('#tf-debuffs')) {
+        // Aura icons own their tooltip gesture. Suppress the native browser menu
+        // without routing the same press into the target-frame unit menu.
+        ev.preventDefault();
+        return;
+      }
       ev.preventDefault();
       this.openTargetFrameMenuAt((ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
     });
@@ -1578,11 +1595,21 @@ export class Hud {
     // desktop path above owns the contextmenu case.
     bindTouchDoubleTap($('#target-frame'), (ev) => {
       if (!this.isMobileLayout()) return;
+      if ((ev.target as HTMLElement | null)?.closest('#tf-debuffs')) return;
       const pe = ev as PointerEvent;
       this.openTargetFrameMenuAt(pe.clientX, pe.clientY);
     });
-    this.bindMobileFrameLongPress($('#target-frame'), (x, y) => this.openTargetFrameMenuAt(x, y));
+    this.bindMobileFrameLongPress($('#target-frame'), (x, y) => this.openTargetFrameMenuAt(x, y), {
+      ignoreSelector: '#tf-debuffs',
+    });
     $('#player-frame').addEventListener('contextmenu', (ev) => {
+      if ((ev.target as HTMLElement | null)?.closest('#buff-bar, #debuff-bar')) {
+        // Buff cancellation owns this context menu when the optional desktop
+        // setting reparents the buff bar under the player frame. Do not also
+        // open the self menu after the aura handler bubbles here.
+        ev.preventDefault();
+        return;
+      }
       ev.preventDefault();
       this.openSelfContextMenu((ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
     });
@@ -2715,6 +2742,9 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
+    // Clear positions saved against the reverted v0.24.0 layout before either
+    // MovableFrame constructor has a chance to apply them.
+    resetFramePositionsOnce(localStorage);
     const isMobileLayout = () => this.isMobileLayout();
     // A live desktop-to-mobile viewport flip must re-home the anchored aura
     // bars (mobile owns its own aura placement), and the flip back re-anchors.
@@ -3572,6 +3602,20 @@ export class Hud {
     renderTooltip: (name, remaining, effectHtml) =>
       `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
+    attachTapTooltip: (el, showTooltip, cancelableAuraId) =>
+      this.auraTooltipTapGroup.bind(el, showTooltip, {
+        capture: () => {
+          const auraId = cancelableAuraId();
+          if (auraId === null) return null;
+          return () => {
+            // A pooled icon can be recycled during the hold. Never let a press
+            // begun on one aura cancel the replacement now occupying its node.
+            if (cancelableAuraId() !== auraId) return;
+            this.hideTooltip();
+            this.sim.cancelAura(auraId);
+          };
+        },
+      }),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
   // #debuff-bar, so a fresh debuff is never buried under a wall of long-lived buffs.
@@ -3588,13 +3632,21 @@ export class Hud {
   private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
     ownFirst: true,
   });
-  // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
-  // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
-  // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).
+  // The buff-bar painter alone gets attachCancel: desktop right-click or a
+  // slop-guarded mobile hold cancels one of the local player's helpful buffs.
+  // A normal mobile tap only toggles its tooltip. The debuff / target painters
+  // reuse the shared deps (a debuff or another entity's aura is never cancelable).
   private readonly buffBarPainterDeps: AurasPainterDeps = {
     ...this.aurasPainterDeps,
     attachCancel: (el, cancelableAuraId) => {
       el.addEventListener('contextmenu', (ev) => {
+        // Touch owns cancellation through the explicit slop-guarded hold bound
+        // by auraTooltipTapGroup. Some browsers synthesize contextmenu before
+        // that hold threshold; never let the compatibility event cancel early.
+        if (this.isMobileLayout() && (ev as PointerEvent).pointerType !== 'mouse') {
+          ev.preventDefault();
+          return;
+        }
         const auraId = cancelableAuraId();
         if (auraId === null) return;
         ev.preventDefault();
@@ -4311,7 +4363,9 @@ export class Hud {
       touchStartX = x;
       touchStartY = y;
       touchMoved = false;
-      touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
+      if (!el.hasAttribute('data-tooltip-tap-toggle')) {
+        touchTimer = window.setTimeout(() => showAt(x, y, 'touch'), TOOLTIP_PEEK_MS);
+      }
     });
     el.addEventListener('pointermove', (e) => {
       if (!mobile() || e.pointerType !== 'touch' || touchTimer === undefined) return;
@@ -5173,7 +5227,10 @@ export class Hud {
     if (cupMatch && cupMatch.team !== null) return 'sport';
     if (this.sim.cfg.playerClass === 'druid') {
       if (this.sim.player.auras.some((a) => a.kind === 'form_bear')) return 'bear';
-      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) return 'cat';
+      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) {
+        if (this.sim.player.auras.some((a) => a.kind === 'stealth')) return 'cat_stealth';
+        return 'cat';
+      }
     }
     if (
       this.sim.cfg.playerClass === 'rogue' &&
@@ -5196,13 +5253,14 @@ export class Hud {
   // Whether an ability belongs on a given form's default bar. Bear/cat bars hold
   // only that form's kit (its `requiresForm` abilities) plus the shift toggles;
   // the caster ('normal') bar excludes form-only abilities so they no longer
-  // auto-dump onto it. Rogue stealth has no `requiresForm` kit, so it keeps the
-  // full caster set.
+  // auto-dump onto it. Stealth pages are intentionally manual: they begin empty
+  // and never receive automatic placements.
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
     // The sport bar holds ONLY the sport kit; conversely no sport id may ever
     // auto-place onto (and pollute) a persisted class bar.
     if (form === 'sport') return !!SPORT_ABILITIES[id];
     if (SPORT_ABILITIES[id]) return false;
+    if (this.isStealthHotbarForm(form)) return false;
     if (form === 'bear' || form === 'cat') {
       return ABILITIES[id]?.requiresForm === form || Hud.FORM_TOGGLE_IDS.has(id);
     }
@@ -5214,11 +5272,14 @@ export class Hud {
     return this.sim.known.map((k) => k.def.id).filter((id) => this.shouldAutoPlaceOnForm(id, form));
   }
 
-  // True for the druid form bars that own a dedicated kit (bear/cat). Rogue
-  // stealth is excluded: the sim does not lock the caster kit in stealth, so its
-  // bar legitimately mirrors the normal layout.
+  // True only for the druid form bars that seed a form-specific kit. Rogue and
+  // cat stealth pages take the separate blank/manual path below.
   private isFormKitBar(form: HotbarForm = this.activeHotbarForm): boolean {
     return this.sim.cfg.playerClass === 'druid' && (form === 'bear' || form === 'cat');
+  }
+
+  private isStealthHotbarForm(form: HotbarForm = this.activeHotbarForm): boolean {
+    return form === 'stealth' || form === 'cat_stealth';
   }
 
   // Gates form-bar-only UI (e.g. the spellbook "Reset bar" button) so it never
@@ -5237,6 +5298,54 @@ export class Hud {
   private markFormBarSeeded(form: HotbarForm = this.activeHotbarForm): void {
     try {
       localStorage.setItem(this.formBarSeededKey(form), '1');
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  // Versioned separately from the druid form-kit migration. The first blank-page
+  // rollout also clears a byte-identical parent clone created by the previous
+  // behavior, while leaving every customized stealth layout untouched.
+  private stealthBarInitializedKey(form: HotbarForm = this.activeHotbarForm): string {
+    return `${this.slotMapKey(form)}_blank_v1`;
+  }
+
+  private loadStealthSlotMap(
+    parsed: HotbarAction[],
+    stored: boolean,
+    storedRaw: string | null,
+  ): void {
+    let initialized = false;
+    try {
+      initialized = localStorage.getItem(this.stealthBarInitializedKey()) === '1';
+    } catch {
+      /* storage unavailable */
+    }
+
+    let actions = parsed;
+    let shouldPersist = !stored;
+    if (!initialized) {
+      const parentForm: HotbarForm = this.activeHotbarForm === 'cat_stealth' ? 'cat' : 'normal';
+      let parentStoredRaw: string | null = null;
+      try {
+        parentStoredRaw = localStorage.getItem(this.slotMapKey(parentForm));
+      } catch {
+        /* storage unavailable */
+      }
+      if (!stored || (storedRaw !== null && storedRaw === parentStoredRaw)) {
+        actions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, () => null);
+        shouldPersist = true;
+      }
+    }
+
+    this.loadedSlotMapFromStorage = true;
+    this.hotbarActions = actions;
+    this.knownAbilityIdsAtLastSlotSync = null;
+    try {
+      // Persist first so a failed page write never leaves a success marker that
+      // suppresses the next migration attempt.
+      if (shouldPersist) localStorage.setItem(this.slotMapKey(), JSON.stringify(actions));
+      if (!initialized) localStorage.setItem(this.stealthBarInitializedKey(), '1');
     } catch {
       /* storage unavailable */
     }
@@ -5286,10 +5395,11 @@ export class Hud {
   private loadSlotMap(): void {
     let arr: unknown = null;
     let stored = false;
+    let storedRaw: string | null = null;
     try {
-      const raw = localStorage.getItem(this.slotMapKey());
-      stored = raw !== null;
-      arr = JSON.parse(raw ?? 'null');
+      storedRaw = localStorage.getItem(this.slotMapKey());
+      arr = JSON.parse(storedRaw ?? 'null');
+      stored = Array.isArray(arr);
     } catch {
       /* corrupt */
     }
@@ -5320,6 +5430,10 @@ export class Hud {
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
     }
+    if (this.isStealthHotbarForm()) {
+      this.loadStealthSlotMap(parsed, stored, storedRaw);
+      return;
+    }
     // Druid bear/cat bars auto-populate with that form's kit instead of cloning
     // the caster bar; existing characters are migrated once (see seedFormBarIfNeeded).
     if (this.isFormKitBar()) {
@@ -5328,28 +5442,6 @@ export class Hud {
       this.hotbarActions = parsed;
       this.knownAbilityIdsAtLastSlotSync = null;
       return;
-    }
-    const emptyFormMap =
-      this.activeHotbarForm !== 'normal' && parsed.every((action) => action === null);
-    if (emptyFormMap) {
-      let fallback: unknown = null;
-      try {
-        fallback = JSON.parse(localStorage.getItem(this.slotMapKey('normal')) ?? 'null');
-      } catch {
-        /* corrupt */
-      }
-      const normalActions = parseHotbarActions(
-        fallback,
-        Hud.BAR_ABILITY_SLOTS,
-        (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-        (id) => this.isHotbarItemId(id),
-      );
-      if (normalActions.some((action) => action !== null)) {
-        this.loadedSlotMapFromStorage = true;
-        this.hotbarActions = normalActions;
-        this.knownAbilityIdsAtLastSlotSync = null;
-        return;
-      }
     }
     this.loadedSlotMapFromStorage = stored;
     this.hotbarActions = parsed;
@@ -5421,7 +5513,7 @@ export class Hud {
     this.spellbookWindow.closePicker();
     this.activeHotbarForm = next;
     this.dragAction = null;
-    this.clearActionDropTargets();
+    this.clearMobileHotbarDrag();
     this.loadSlotMap();
     this.mobileActionPage = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
   }
@@ -11150,10 +11242,9 @@ export class Hud {
     this.renderGossip(npc);
   }
 
-  private renderGossip(npc: Entity): void {
-    this.openGossipNpcId = npc.id;
-    this.openQuestDetailId = null;
-    const el = $('#quest-dialog');
+  // A fresh visit and Back always show the greeting. Only a re-render after an
+  // accept/turn-in closes an otherwise empty menu.
+  private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const def = NPCS[npc.templateId];
     // accepted-but-unfinished quests are tracked in the quest log; the NPC
     // only offers new quests (at the giver) and turn-ins (at the turn-in NPC)
@@ -11175,6 +11266,29 @@ export class Hud {
         ),
       )
       .map((qp) => qp.questId);
+    const hasVendor = npc.vendorItems.length > 0;
+    const hasMarket = !!def?.market;
+    const hasHeroicVendor = !!def?.heroicVendor;
+    const hasDelveBoard = Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId);
+    const hasVcup = npc.templateId === 'groundskeeper_bram';
+    if (
+      closeIfEmpty &&
+      gossipMenuIsEmpty({
+        questCount: interesting.length,
+        discussionCount: discussionQuests.length,
+        hasVendor,
+        hasMarket,
+        hasHeroicVendor,
+        hasDelveBoard,
+        hasVcup,
+      })
+    ) {
+      this.closeQuestDialog();
+      return;
+    }
+    this.openGossipNpcId = npc.id;
+    this.openQuestDetailId = null;
+    const el = $('#quest-dialog');
     markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
@@ -11199,16 +11313,16 @@ export class Hud {
         html += `<button type="button" class="qd-list-item" data-discuss="${esc(qid)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
       }
     }
-    if (npc.vendorItems.length > 0) {
+    if (hasVendor) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
-    if (def?.market) {
+    if (hasMarket) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
-    if (def?.heroicVendor) {
+    if (hasHeroicVendor) {
       html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
-    if (Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId)) {
+    if (hasDelveBoard) {
       const delveForNpc = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
       const openLabel = delveForNpc
         ? delveDisplayName(delveForNpc.id)
@@ -11217,7 +11331,7 @@ export class Hud {
     }
     // Groundskeeper Bram keeps the book of fixtures at the Sowfield gate: his
     // gossip menu opens the Vale Cup window (the delve-board button precedent).
-    if (npc.templateId === 'groundskeeper_bram') {
+    if (hasVcup) {
       html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
     el.innerHTML = html;
@@ -11308,7 +11422,7 @@ export class Hud {
         this.sim.reportTelemetry('quest_accept', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
         });
-        this.renderGossip(npc);
+        this.renderGossip(npc, true);
       });
       el.appendChild(btn);
     } else if (state === 'ready') {
@@ -11321,7 +11435,7 @@ export class Hud {
         this.sim.reportTelemetry('quest_turnin', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
         });
-        this.renderGossip(npc);
+        this.renderGossip(npc, true);
       });
       el.appendChild(btn);
     }
@@ -13478,6 +13592,16 @@ export class Hud {
 
   // Minimal modal confirm dialog (reuses the .window/.panel chrome). Built on
   // demand and removed on dismiss.
+  public showConfirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void {
+    this.confirmDialog(title, body, okText, cancelText, onOk);
+  }
+
   private confirmDialog(
     title: string,
     body: string,

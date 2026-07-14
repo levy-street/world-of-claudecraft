@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MobileHudEditor } from '../src/ui/mobile_hud_editor';
 import {
@@ -11,6 +12,15 @@ import type {
   MobileHudViewportGeometry,
 } from '../src/ui/mobile_hud_editor_types';
 import { MOBILE_HUD_REGISTRY } from '../src/ui/mobile_hud_registry';
+
+const mobileHudCss = readFileSync(
+  new URL('../src/styles/hud.mobile.css', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 
 class FakeClassList {
   readonly values = new Set<string>();
@@ -141,6 +151,7 @@ class FakeEvent {
   pointerId = 1;
   clientX = 0;
   clientY = 0;
+  detail = 0;
   defaultPrevented = false;
   propagationStopped = false;
   key = '';
@@ -162,6 +173,7 @@ class FakeDocument {
   readonly body = new FakeElement('BODY', this);
   readonly selectorMatches = new Map<string, FakeElement[]>();
   activeElement: FakeElement | null = null;
+  readonly #listeners = new Map<string, Array<(event: FakeEvent) => void>>();
 
   createElement(tagName: string): FakeElement {
     return new FakeElement(tagName.toUpperCase(), this);
@@ -169,6 +181,24 @@ class FakeDocument {
 
   querySelectorAll<T extends FakeElement>(selector: string): T[] {
     return (this.selectorMatches.get(selector) ?? []) as T[];
+  }
+
+  addEventListener(type: string, listener: (event: FakeEvent) => void): void {
+    const listeners = this.#listeners.get(type) ?? [];
+    listeners.push(listener);
+    this.#listeners.set(type, listeners);
+  }
+
+  removeEventListener(type: string, listener: (event: FakeEvent) => void): void {
+    this.#listeners.set(
+      type,
+      (this.#listeners.get(type) ?? []).filter((entry) => entry !== listener),
+    );
+  }
+
+  dispatch(type: string, init: Partial<FakeEvent> = {}): void {
+    const event = new FakeEvent(init);
+    for (const listener of this.#listeners.get(type) ?? []) listener(event);
   }
 }
 
@@ -276,8 +306,9 @@ function setup(
         },
       }),
     },
-    confirmDiscard: (copy) => {
+    confirmDiscard: (copy, onConfirm) => {
       discardPrompts.push(copy);
+      if (confirmDiscard) onConfirm();
       return confirmDiscard;
     },
     translate,
@@ -352,8 +383,15 @@ describe('MobileHudEditor shell and lifecycle', () => {
     expect(position().every(Boolean)).toBe(true);
   });
 
-  it('keeps a primary proxy on the live HUD position instead of safe-area clamping it', () => {
-    const { document, editor } = setup();
+  it('keeps a primary proxy frame on the live HUD position when its hit wrapper is clamped', () => {
+    const source = entryDocument();
+    const movement = source.profiles.phone?.['control.movement'];
+    if (!movement) throw new Error('movement editor fixture is incomplete');
+    source.profiles.phone = {
+      ...source.profiles.phone,
+      'control.movement': { ...movement, offsetY: 80 },
+    };
+    const { document, editor } = setup(true, 'right', () => [], false, source);
     editor.open();
     const descriptor = MOBILE_HUD_REGISTRY.getDescriptor('control.movement');
     const placement = editor.draft?.document.profiles.phone?.['control.movement'];
@@ -369,10 +407,15 @@ describe('MobileHudEditor shell and lifecycle', () => {
       'data-mobile-hud-surface-id',
       'control.movement',
     );
+    const frame = proxy?.querySelector<FakeElement>('.mobile-hud-editor-proxy-frame');
+    const renderedX =
+      Number.parseFloat(proxy?.style.left ?? '') + Number.parseFloat(frame?.style.left ?? '');
+    const renderedY =
+      Number.parseFloat(proxy?.style.top ?? '') + Number.parseFloat(frame?.style.top ?? '');
 
-    expect(resolved.interactiveRect.y).not.toBe(resolved.previewRect.y);
-    expect(proxy?.style.left).toBe(`${resolved.interactiveRect.x}px`);
-    expect(proxy?.style.top).toBe(`${resolved.interactiveRect.y}px`);
+    expect(resolved.previewRect).toEqual(resolved.interactiveRect);
+    expect(renderedX).toBe(resolved.interactiveRect.x);
+    expect(renderedY).toBe(resolved.interactiveRect.y);
   });
 
   it('owns body state, restores focus, and removes every lifecycle node and class on close', () => {
@@ -482,7 +525,7 @@ describe('MobileHudEditor scene preview', () => {
     }
   });
 
-  it('renders exactly the active context surfaces with View and nonselectable protected ghosts', () => {
+  it('renders only editable active-context surfaces and keeps protected ghosts hidden', () => {
     const { document, editor } = setup();
     editor.open();
     const root = document.body.children[0];
@@ -491,7 +534,10 @@ describe('MobileHudEditor scene preview', () => {
       .map((element) => element.getAttribute('data-mobile-hud-surface-id'))
       .filter((id): id is string => id !== null);
     const expectedIds = MOBILE_HUD_REGISTRY.descriptors
-      .filter((descriptor) => descriptor.visibleIn.includes('world.base'))
+      .filter(
+        (descriptor) =>
+          descriptor.class === 'movable' && descriptor.visibleIn.includes('world.base'),
+      )
       .map((descriptor) => descriptor.id);
 
     expect(renderedIds).toEqual(expectedIds);
@@ -503,19 +549,49 @@ describe('MobileHudEditor scene preview', () => {
     expect(
       movableProxy?.querySelector('.mobile-hud-editor-proxy-frame')?.getAttribute('aria-hidden'),
     ).toBe('true');
-    const protectedGhost = root.findByAttribute(
-      'data-mobile-hud-surface-id',
-      'protected.system.center_message',
-    );
-    expect(protectedGhost?.getAttribute('data-mobile-hud-surface-class')).toBe('protected');
-    expect(protectedGhost?.getAttribute('role')).toBe('note');
-    expect(protectedGhost?.getAttribute('aria-label')).toBe(
-      'translated:hudChrome.mobileHudEditor.surface.protectedCenterMessage',
-    );
-    expect(protectedGhost?.getAttribute('aria-disabled')).toBe('true');
+    expect(
+      root.findByAttribute('data-mobile-hud-surface-id', 'protected.system.center_message'),
+    ).toBeUndefined();
   });
 
-  it('keeps every preview state in one compact dropdown', () => {
+  it('shows exact placeholder frames without a second mismatched layout envelope', () => {
+    const { document, editor } = setup();
+    editor.open();
+    const root = document.body.children[0];
+
+    const expectFrame = (surfaceId: 'party' | 'auras.player_buffs') => {
+      const descriptor = MOBILE_HUD_REGISTRY.getDescriptor(surfaceId);
+      const placement = editor.draft?.document.profiles.phone?.[surfaceId];
+      if (!descriptor || !placement) throw new Error(`${surfaceId} editor fixture is incomplete`);
+      const resolved = resolveMobileHudSurfaceGeometry(
+        descriptor,
+        'phone',
+        placement,
+        geometry,
+        'world.base',
+      );
+      const proxy = root.findByAttribute('data-mobile-hud-surface-id', surfaceId);
+      const frame = proxy?.querySelector<FakeElement>('.mobile-hud-editor-proxy-frame');
+      expect(Number.parseFloat(frame?.style.width ?? '')).toBeCloseTo(resolved.canonicalRect.width);
+      expect(Number.parseFloat(frame?.style.height ?? '')).toBeCloseTo(
+        resolved.canonicalRect.height,
+      );
+      return { proxy, resolved };
+    };
+
+    const party = expectFrame('party');
+    const buffs = expectFrame('auras.player_buffs');
+
+    expect(party.proxy?.getAttribute('data-mobile-hud-placeholder')).toBe('when-empty');
+    expect(buffs.proxy?.getAttribute('data-mobile-hud-placeholder')).toBe('when-empty');
+    expect(
+      root
+        .descendants()
+        .some((element) => element.classList.contains('mobile-hud-editor-layout-envelope')),
+    ).toBe(false);
+  });
+
+  it('keeps every preview state in one game-skinned custom dropdown', () => {
     const { document, editor } = setup();
     editor.open();
     const root = document.body.children[0];
@@ -531,27 +607,58 @@ describe('MobileHudEditor scene preview', () => {
       'instance.delve',
     ] as const;
 
-    const contextSelect = root.findByAttribute('data-mobile-hud-selector', 'context');
-    expect(contextSelect?.tagName).toBe('SELECT');
-    expect(root.descendants().filter((element) => element.tagName === 'SELECT')).toHaveLength(1);
+    const contextDropdown = root.findByAttribute('data-mobile-hud-selector', 'context');
+    const trigger = contextDropdown?.querySelector<FakeElement>('.ui-dd-btn');
+    const menu = contextDropdown?.querySelector<FakeElement>('.ui-dd-menu');
+    expect(contextDropdown?.tagName).toBe('DIV');
+    expect(contextDropdown?.classList.contains('ui-dd')).toBe(true);
+    expect(root.descendants().filter((element) => element.tagName === 'SELECT')).toHaveLength(0);
+    expect(trigger?.getAttribute('aria-haspopup')).toBe('listbox');
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    expect(menu?.getAttribute('role')).toBe('listbox');
     expect(
       root
         .descendants()
         .filter((element) => element.getAttribute('data-mobile-hud-context-id') !== null),
     ).toHaveLength(contextIds.length);
+    trigger?.click();
+    expect(trigger?.getAttribute('aria-expanded')).toBe('true');
+    document.dispatch('click');
+    expect(trigger?.getAttribute('aria-expanded')).toBe('false');
+    editor.setLocked(false);
     for (const contextId of contextIds) {
-      if (!contextSelect) throw new Error('context dropdown missing');
-      contextSelect.value = contextId;
-      contextSelect.dispatch('change');
+      trigger?.click();
+      root.findByAttribute('data-mobile-hud-context-id', contextId)?.click();
       expect(editor.draft?.contextId).toBe(contextId);
+      expect(trigger?.getAttribute('aria-expanded')).toBe('false');
       expect(
         document.body.classList.contains(`mobile-hud-context-${contextId.replaceAll('.', '-')}`),
       ).toBe(true);
+      const contextSurfaceIds = MOBILE_HUD_REGISTRY.descriptors
+        .filter(
+          (descriptor) =>
+            descriptor.class === 'movable' &&
+            descriptor.visibleIn.includes(contextId) &&
+            !descriptor.visibleIn.includes('world.base'),
+        )
+        .map((descriptor) => descriptor.id);
+      for (const surfaceId of contextSurfaceIds) {
+        const proxy = root.findByAttribute('data-mobile-hud-surface-id', surfaceId);
+        expect(proxy, `${surfaceId} must be editable in ${contextId}`).toBeDefined();
+        proxy?.click();
+        expect(editor.draft?.selectedSurfaceId).toBe(surfaceId);
+        const before = editor.draft?.document.profiles.phone?.[surfaceId];
+        proxy?.dispatch('pointerdown', { pointerId: 23, clientX: 100, clientY: 100 });
+        proxy?.dispatch('pointermove', { pointerId: 23, clientX: 110, clientY: 100 });
+        proxy?.dispatch('pointerup', { pointerId: 23, clientX: 110, clientY: 100 });
+        expect(editor.draft?.document.profiles.phone?.[surfaceId]?.offsetX).toBe(
+          (before?.offsetX ?? 0) + 10,
+        );
+      }
     }
 
-    if (!contextSelect) throw new Error('context dropdown missing');
-    contextSelect.value = 'arena.fiesta.pending';
-    contextSelect.dispatch('change');
+    trigger?.click();
+    root.findByAttribute('data-mobile-hud-context-id', 'arena.fiesta.pending')?.click();
     expect(
       root.findByAttribute('data-mobile-hud-surface-id', 'status.arena.fiesta_pending'),
     ).toBeDefined();
@@ -561,18 +668,23 @@ describe('MobileHudEditor scene preview', () => {
     expect(
       root.findByAttribute('data-mobile-hud-surface-id', 'protected.arena.fiesta_offer'),
     ).toBeUndefined();
+  });
 
-    contextSelect.value = 'arena.fiesta.respawn_offer';
-    contextSelect.dispatch('change');
-    expect(
-      root.findByAttribute('data-mobile-hud-surface-id', 'status.arena.fiesta_pending'),
-    ).toBeUndefined();
-    expect(
-      root.findByAttribute('data-mobile-hud-surface-id', 'protected.arena.fiesta_respawn'),
-    ).toBeDefined();
-    expect(
-      root.findByAttribute('data-mobile-hud-surface-id', 'protected.arena.fiesta_offer'),
-    ).toBeDefined();
+  it('cycles to the next lower proxy when the selected surface is tapped again', () => {
+    const { document, editor } = setup();
+    editor.open();
+    editor.setLocked(false);
+    const root = document.body.children[0];
+    const lower = root.findByAttribute('data-mobile-hud-surface-id', 'action.a1');
+    const upper = root.findByAttribute('data-mobile-hud-surface-id', 'action.a2');
+    if (!lower || !upper) throw new Error('overlap cycle fixtures are missing');
+    lower.rect = { x: 100, y: 100, width: 48, height: 48 };
+    upper.rect = { ...lower.rect };
+
+    upper.dispatch('click', { detail: 1, clientX: 120, clientY: 120 });
+    expect(editor.draft?.selectedSurfaceId).toBe('action.a2');
+    upper.dispatch('click', { detail: 1, clientX: 120, clientY: 120 });
+    expect(editor.draft?.selectedSurfaceId).toBe('action.a1');
   });
 
   it('opens the compact palette centered and moves it as one unit by its header', () => {
@@ -643,6 +755,11 @@ describe('MobileHudEditor scene preview', () => {
     expect(root.findByAttribute('data-mobile-hud-control', 'scale-increase')?.textContent).toBe(
       '+',
     );
+    for (const controlId of controls()) {
+      expect(
+        root.findByAttribute('data-mobile-hud-control', controlId)?.classList.contains('btn'),
+      ).toBe(true);
+    }
 
     editor.selectSurface('pet.commands');
     expect(controls()).toEqual(['scale-decrease', 'scale-increase', 'reset-selected', 'reset-all']);
@@ -652,6 +769,18 @@ describe('MobileHudEditor scene preview', () => {
 
     editor.selectSurface('protected.system.center_message');
     expect(editor.draft?.selectedSurfaceId).toBe('utility.consumables');
+  });
+
+  it('uses the shared game button skin for editor actions', () => {
+    const { document, editor } = setup();
+    editor.open();
+    const root = document.body.children[0];
+
+    for (const actionId of ['lock', 'save', 'cancel']) {
+      expect(
+        root.findByAttribute('data-mobile-hud-action', actionId)?.classList.contains('btn'),
+      ).toBe(true);
+    }
   });
 
   it('Lock keeps the exact preview and enabled state while disabling movable proxies', () => {
@@ -900,6 +1029,12 @@ describe('MobileHudEditor inspector edits', () => {
       root.findByAttribute('data-mobile-hud-control', 'scale-increase')?.click();
     }
     expect(editor.draft?.document.profiles.phone?.['action.a1']?.scale).toBe(1.5);
+    expect(root.findByAttribute('data-mobile-hud-control', 'scale-increase')?.disabled).toBe(true);
+    for (let index = 0; index < 40; index += 1) {
+      root.findByAttribute('data-mobile-hud-control', 'scale-decrease')?.click();
+    }
+    expect(editor.draft?.document.profiles.phone?.['action.a1']?.scale).toBe(0.5);
+    expect(root.findByAttribute('data-mobile-hud-control', 'scale-decrease')?.disabled).toBe(true);
     root.findByAttribute('data-mobile-hud-control', 'reset-selected')?.click();
     expect(editor.draft?.document.profiles.phone?.['action.a1']).toEqual(
       MOBILE_HUD_REGISTRY.defaults.phone?.['action.a1'],
@@ -913,24 +1048,47 @@ describe('MobileHudEditor inspector edits', () => {
 });
 
 describe('MobileHudEditor validation UI', () => {
+  it('hides foreign-hand owned fragments without requiring a live-visual marker', () => {
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.mobile-hud-editor-open\s+\[data-mobile-hud-editor-hidden="true"\]\s*\{[^}]*visibility:\s*hidden !important;[^}]*pointer-events:\s*none !important;/,
+    );
+  });
+
+  it('keeps editor buttons on the shared game skin and discard on the in-game dialog', () => {
+    expect(mobileHudCss).toMatch(/button:not\(\.mobile-hud-editor-proxy\):not\(\.btn\)/);
+    expect(mobileHudCss).not.toMatch(
+      /\[data-mobile-hud-action="save"\]:disabled\s*\{[^}]*filter:\s*saturate/,
+    );
+    expect(mainSource).toContain('hud.showConfirmDialog(');
+    expect(mainSource).not.toContain(['window.confirm(`', '$', '{copy.title}'].join(''));
+  });
+
+  it('keeps the custom minimap clock and rim buttons on the production mobile geometry', () => {
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.mobile-hud-custom-active #minimap-clock\s*\{[^}]*position:\s*static;[^}]*order:\s*4;[^}]*transform:\s*none;/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.mobile-hud-custom-active #minimap-disc,\s*body\.mobile-touch\.mobile-hud-custom-active #minimap\s*\{[^}]*width:\s*162px;[^}]*height:\s*162px;/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.mobile-hud-custom-active #raid-lockout\s*\{[^}]*left:\s*0;[^}]*top:\s*156px;/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.mobile-hud-custom-active #mail-indicator\s*\{[^}]*left:\s*74px;[^}]*top:\s*156px;/,
+    );
+  });
+
   it.each([
     'invalid-placement',
     'unsupported-capability',
     'scale-out-of-range',
     'target-too-small',
-    'out-of-bounds',
-    'overlap',
-    'view-intrusion',
-    'protected-overlap',
   ] as const)('blocks Save and exposes a non-color signal for %s', (reason) => {
     const failure: MobileHudValidationFailure = {
       reason,
       profileId: 'phone',
       contextId: 'world.base',
-      surfaceIds:
-        reason.includes('overlap') || reason === 'view-intrusion'
-          ? ['action.a1', 'control.view']
-          : ['action.a1'],
+      surfaceIds: ['action.a1'],
     };
     const { document, editor } = setup(true, 'right', () => [failure]);
     editor.open();
@@ -952,30 +1110,21 @@ describe('MobileHudEditor validation UI', () => {
     expect(error?.getAttribute('aria-hidden')).toBeNull();
     expect(error?.textContent).toContain(`translated:hudChrome.mobileHudEditor.failure.`);
     expect(save?.getAttribute('aria-disabled')).toBe('true');
-    if (failure.surfaceIds.length === 2) {
-      expect(
-        root
-          .findByAttribute('data-mobile-hud-surface-id', 'control.view')
-          ?.classList.contains('is-invalid'),
-      ).toBe(true);
-    }
   });
 
-  it('names the intruding control on both sides of a View collision', () => {
+  it('shows the failing surface name in the central validation status', () => {
     const failure: MobileHudValidationFailure = {
-      reason: 'view-intrusion',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
-      surfaceIds: ['action.attack', 'control.view'],
+      surfaceIds: ['action.attack'],
     };
     const translate = (key: string, values?: Readonly<Record<string, string | number>>): string =>
-      key.endsWith('viewIntrusion')
-        ? `${String(values?.surface)} overlaps the View area.`
+      key.endsWith('scaleOutOfRange')
+        ? `${String(values?.surface)} has an invalid scale.`
         : key.endsWith('actionAttack')
           ? 'Attack'
-          : key.endsWith('controlView')
-            ? 'View'
-            : `translated:${key}`;
+          : `translated:${key}`;
     const { document, editor } = setup(
       true,
       'right',
@@ -991,99 +1140,16 @@ describe('MobileHudEditor validation UI', () => {
     );
 
     editor.open();
-    const root = document.body.children[0];
-    for (const surfaceId of failure.surfaceIds) {
-      const error = root
-        .findByAttribute('data-mobile-hud-surface-id', surfaceId)
-        ?.descendants()
-        .find((element) => element.classList.contains('mobile-hud-editor-proxy-error'));
-      expect(error?.textContent).toBe('Attack overlaps the View area.');
-    }
-  });
-
-  it('shows the concrete colliding surface names in the central validation status', () => {
-    const failure: MobileHudValidationFailure = {
-      reason: 'overlap',
-      profileId: 'phone',
-      contextId: 'world.base',
-      surfaceIds: ['pet.commands', 'action.a1'],
-    };
-    const translate = (key: string, values?: Readonly<Record<string, string | number>>): string =>
-      key.endsWith('failure.overlap')
-        ? `${String(values?.surface)} overlaps ${String(values?.other)}.`
-        : key.endsWith('petCommands')
-          ? 'Pet commands'
-          : key.endsWith('actionA1')
-            ? 'Action A1'
-            : `translated:${key}`;
-    const { document, editor } = setup(
-      true,
-      'right',
-      () => [failure],
-      false,
-      entryDocument(),
-      true,
-      () => true,
-      undefined,
-      undefined,
-      undefined,
-      translate,
-    );
-
-    editor.open();
-
     expect(
       document.body.children[0]
         .descendants()
         .find((element) => element.classList.contains('mobile-hud-editor-status'))?.textContent,
-    ).toBe('Pet commands overlaps Action A1.');
+    ).toBe('Attack has an invalid scale.');
   });
 
-  it('names the exact protected surface instead of generic protected game UI', () => {
+  it('reports an off-device scale fixture without rescaling the physical stage', () => {
     const failure: MobileHudValidationFailure = {
-      reason: 'protected-overlap',
-      profileId: 'phone',
-      contextId: 'arena.fiesta.respawn',
-      surfaceIds: ['action.attack', 'protected.arena.fiesta_respawn'],
-    };
-    const translate = (key: string, values?: Readonly<Record<string, string | number>>): string =>
-      key.endsWith('protectedOverlap')
-        ? `${String(values?.surface)} overlaps ${String(values?.other)}.`
-        : key.endsWith('failureWithContext')
-          ? `${String(values?.message)} [${String(values?.context)}]`
-          : key.endsWith('actionAttack')
-            ? 'Attack'
-            : key.endsWith('protectedFiestaRespawn')
-              ? 'Fiesta respawn prompt'
-              : `translated:${key}`;
-    const { document, editor } = setup(
-      true,
-      'right',
-      () => [failure],
-      false,
-      entryDocument(),
-      true,
-      () => true,
-      undefined,
-      undefined,
-      undefined,
-      translate,
-    );
-
-    editor.open();
-
-    expect(
-      document.body.children[0]
-        .descendants()
-        .find((element) => element.classList.contains('mobile-hud-editor-status'))?.textContent,
-    ).toBe(
-      'Attack overlaps Fiesta respawn prompt. [translated:hudChrome.mobileHudEditor.context.arenaFiestaRespawn]',
-    );
-  });
-
-  it('reports an off-device failure fixture without rescaling the physical stage', () => {
-    const failure: MobileHudValidationFailure = {
-      reason: 'out-of-bounds',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
       surfaceIds: ['frame.target'],
@@ -1091,8 +1157,8 @@ describe('MobileHudEditor validation UI', () => {
       safeAreaFixtureId: 'side-none/bottom-0',
     };
     const translate = (key: string, values?: Readonly<Record<string, string | number>>): string =>
-      key.endsWith('failure.outOfBounds')
-        ? `${String(values?.surface)} is outside.`
+      key.endsWith('failure.scaleOutOfRange')
+        ? `${String(values?.surface)} has an invalid scale.`
         : key.endsWith('failureWithFixture')
           ? `${String(values?.message)} [${String(values?.context)}; ${String(values?.profile)}; ${String(values?.viewport)}]`
           : key.endsWith('frameTarget')
@@ -1122,15 +1188,17 @@ describe('MobileHudEditor validation UI', () => {
       document.body.children[0]
         .descendants()
         .find((element) => element.classList.contains('mobile-hud-editor-status'))?.textContent,
-    ).toBe('Target frame is outside. [World; Phone; phone-1280x720 / side-none/bottom-0]');
+    ).toBe(
+      'Target frame has an invalid scale. [World; Phone; phone-1280x720 / side-none/bottom-0]',
+    );
   });
 
   it('opens on the context and geometry of the first off-context blocking failure', () => {
     const failure: MobileHudValidationFailure = {
-      reason: 'overlap',
+      reason: 'target-too-small',
       profileId: 'phone',
       contextId: 'instance.delve',
-      surfaceIds: ['action.a5', 'tracker.delve'],
+      surfaceIds: ['action.a5'],
       viewportId: 'phone-740x360/side-none/bottom-0',
       safeAreaFixtureId: 'side-none/bottom-0',
     };
@@ -1141,24 +1209,158 @@ describe('MobileHudEditor validation UI', () => {
     expect(editor.draft?.contextId).toBe('instance.delve');
     expect(editor.draft?.activeFailureIndex).toBe(0);
     expect(
-      document.body.children[0].findByAttribute('data-mobile-hud-selector', 'context')?.value,
+      document.body.children[0]
+        .findByAttribute('data-mobile-hud-selector', 'context')
+        ?.getAttribute('data-mobile-hud-context-value'),
     ).toBe('instance.delve');
     expect(document.body.classList.contains('mobile-hud-context-instance-delve')).toBe(true);
+  });
+
+  it('previews, edits, and diagnoses a failure in its handedness instead of the global setting', async () => {
+    const source = entryDocument();
+    source.profiles.phone = {
+      ...source.profiles.phone,
+      'action.a1': {
+        anchor: 'top-left',
+        offsetX: 55,
+        offsetY: 110,
+        scale: 1,
+      },
+    };
+    const failure: MobileHudValidationFailure = {
+      reason: 'scale-out-of-range',
+      profileId: 'phone',
+      contextId: 'arena.yumi.base',
+      surfaceIds: ['action.a1'],
+      handedness: 'left',
+      viewportId: 'phone-740x360',
+      safeAreaFixtureId: 'side-none/bottom-0',
+    };
+    const translate = (key: string, values?: Readonly<Record<string, string | number>>): string =>
+      key.endsWith('failure.scaleOutOfRange')
+        ? `${String(values?.surface)} has an invalid scale.`
+        : key.endsWith('failureWithFixture')
+          ? `${String(values?.message)} [${String(values?.viewport)}]`
+          : key.endsWith('actionA1')
+            ? 'Action A1'
+            : `translated:${key}`;
+    const { document, editor } = setup(
+      true,
+      'right',
+      (layout) => (layout.profiles.phone?.['action.a1']?.offsetX === 55 ? [failure] : []),
+      false,
+      source,
+      true,
+      () => true,
+      undefined,
+      undefined,
+      undefined,
+      translate,
+    );
+    const minimapSelectors = [
+      '#minimap-wrap',
+      '#zone-label',
+      '#minimap-disc',
+      '#minimap-clock',
+      '#minimap-coords',
+      '#compass',
+      '#raid-lockout',
+      '#mail-indicator',
+      '#minimap-zoom',
+    ] as const;
+    const minimapElements = minimapSelectors.map((selector) => {
+      const element = document.createElement('div');
+      document.selectorMatches.set(selector, [element]);
+      return element;
+    });
+
+    editor.open();
+
+    const root = document.body.children[0];
+    const preview = root
+      .descendants()
+      .find((element) => element.classList.contains('mobile-hud-editor-preview'));
+    const action = root.findByAttribute('data-mobile-hud-surface-id', 'action.a1');
+    const status = root
+      .descendants()
+      .find((element) => element.classList.contains('mobile-hud-editor-status'));
+    const beforeDocument = structuredClone(editor.draft?.document) as MobileHudLayoutDocumentV1;
+    const beforeRect = actionA1DisplayedRect(beforeDocument, 'left');
+
+    expect(editor.draft?.contextId).toBe('arena.yumi.base');
+    expect(preview?.getAttribute('data-mobile-hud-preview-handedness')).toBe('left');
+    expect(Number.parseFloat(action?.style.left ?? '')).toBe(beforeRect.x);
+    expect(Number.parseFloat(action?.style.top ?? '')).toBe(beforeRect.y);
+    expect(action?.getAttribute('data-mobile-hud-live-visual')).toBe('false');
+    expect(
+      root
+        .findByAttribute('data-mobile-hud-surface-id', 'minimap.cluster')
+        ?.getAttribute('data-mobile-hud-live-visual'),
+    ).toBe('false');
+    expect(
+      minimapElements.every(
+        (element) => element.getAttribute('data-mobile-hud-editor-hidden') === 'true',
+      ),
+    ).toBe(true);
+    expect(status?.textContent).toContain(
+      'translated:hudChrome.options.mobileLeftHanded: translated:hud.options.on',
+    );
+    expect(await editor.save()).toBe(false);
+    expect(status?.textContent).toContain(
+      'translated:hudChrome.options.mobileLeftHanded: translated:hud.options.on',
+    );
+
+    editor.setLocked(false);
+    const unlockedAction = root.findByAttribute('data-mobile-hud-surface-id', 'action.a1');
+    unlockedAction?.dispatch('pointerdown', { pointerId: 12, clientX: 50, clientY: 50 });
+    unlockedAction?.dispatch('pointermove', { pointerId: 12, clientX: 70, clientY: 50 });
+
+    const afterLeftRect = actionA1DisplayedRect(
+      editor.draft?.document as MobileHudLayoutDocumentV1,
+      'left',
+    );
+    expect(afterLeftRect.x).toBe(beforeRect.x + 20);
+    expect(afterLeftRect.y).toBe(beforeRect.y);
+    expect(unlockedAction?.hasPointerCapture(12)).toBe(true);
+    expect(preview?.getAttribute('data-mobile-hud-preview-handedness')).toBe('left');
+
+    unlockedAction?.dispatch('pointerup', { pointerId: 12, clientX: 70, clientY: 50 });
+
+    const afterRightRect = actionA1DisplayedRect(
+      editor.draft?.document as MobileHudLayoutDocumentV1,
+      'right',
+    );
+    const runtimeHandAction = root.findByAttribute('data-mobile-hud-surface-id', 'action.a1');
+    expect(unlockedAction?.hasPointerCapture(12)).toBe(false);
+    expect(runtimeHandAction).not.toBe(unlockedAction);
+    expect(preview?.getAttribute('data-mobile-hud-preview-handedness')).toBe('right');
+    expect(Number.parseFloat(runtimeHandAction?.style.left ?? '')).toBe(afterRightRect.x);
+    expect(Number.parseFloat(runtimeHandAction?.style.top ?? '')).toBe(afterRightRect.y);
+    expect(
+      root
+        .findByAttribute('data-mobile-hud-surface-id', 'minimap.cluster')
+        ?.getAttribute('data-mobile-hud-live-visual'),
+    ).toBe('true');
+    expect(
+      minimapElements.every(
+        (element) => element.getAttribute('data-mobile-hud-editor-hidden') === null,
+      ),
+    ).toBe(true);
   });
 
   it('marks only failures from the context currently shown in the preview', () => {
     const failures: readonly MobileHudValidationFailure[] = [
       {
-        reason: 'overlap',
+        reason: 'scale-out-of-range',
         profileId: 'phone',
         contextId: 'instance.delve',
-        surfaceIds: ['action.a5', 'tracker.delve'],
+        surfaceIds: ['action.a5'],
       },
       {
-        reason: 'protected-overlap',
+        reason: 'target-too-small',
         profileId: 'phone',
         contextId: 'arena.fiesta.respawn',
-        surfaceIds: ['action.attack', 'protected.arena.fiesta_respawn'],
+        surfaceIds: ['action.attack'],
       },
     ];
     const { document, editor } = setup(true, 'right', () => failures);
@@ -1187,7 +1389,7 @@ describe('MobileHudEditor validation UI', () => {
       layout.profiles.phone?.['action.a1']?.offsetX === initialOffset
         ? [
             {
-              reason: 'out-of-bounds',
+              reason: 'scale-out-of-range',
               profileId: 'phone',
               contextId: 'world.base',
               surfaceIds: ['action.a1'],
@@ -1221,7 +1423,7 @@ describe('MobileHudEditor validation UI', () => {
       layout.profiles.phone?.['action.a1']?.scale === initialScale
         ? [
             {
-              reason: 'out-of-bounds',
+              reason: 'scale-out-of-range',
               profileId: 'phone',
               contextId: 'world.base',
               surfaceIds: ['action.a1'],
@@ -1257,10 +1459,10 @@ describe('MobileHudEditor validation UI', () => {
 describe('MobileHudEditor transactional Save', () => {
   it('never calls storage for an invalid draft', async () => {
     const failure: MobileHudValidationFailure = {
-      reason: 'overlap',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
-      surfaceIds: ['action.a1', 'action.a2'],
+      surfaceIds: ['action.a1'],
     };
     const { editor, storageWrites, committedDocuments, previewEnds } = setup(true, 'right', () => [
       failure,

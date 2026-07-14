@@ -986,6 +986,10 @@
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    /* The generic window manager writes a small inline z-index. More is a
+       body-class modal inside #mobile-controls, so it must still cover the
+       open Consumables drawer and every persistent control sibling. */
+    z-index: 200 !important;
     transform: var(--mobile-more-open-transform);
     transition:
       opacity 150ms ease,
@@ -1711,6 +1715,7 @@
     border-color: var(--gold-dim);
     transform: rotate(90deg);
   }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-rows,
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame,
   body.mobile-touch #party-frames:not(.party-expanded) #party-leave {
     display: none;
@@ -1724,6 +1729,94 @@
     right: max(20px, calc(env(safe-area-inset-right) + 10px));
     top: calc(max(140px, env(safe-area-inset-top)) + 36px);
     max-width: calc(180px * var(--mobile-chrome-scale, 1));
+  }
+  /* Aura art keeps the dense 28px classic face (34px for the player's own
+     emphasized target aura), but the live mobile control and flex layout slot
+     are 40px. The parent retains the painter-owned background image at zero
+     paint size so the centered pseudo-face can inherit it without hot-path DOM
+     changes. Duration and stack copy never intercepts the tooltip/cancel hit. */
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff {
+    width: 40px;
+    height: 40px;
+    border-color: transparent;
+    background-color: transparent;
+    background-size: 0 0;
+    box-shadow: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-buff);
+    border-radius: 4px;
+    background-color: #10141c;
+    background-image: inherit;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff.debuff::before {
+    border-width: 2px;
+    border-color: var(--color-debuff);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="fire"]::before {
+    border-color: var(--color-debuff-fire);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="frost"]::before {
+    border-color: var(--color-debuff-frost);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="arcane"]::before {
+    border-color: var(--color-debuff-arcane);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="shadow"]::before {
+    border-color: var(--color-debuff-shadow);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="nature"]::before {
+    border-color: var(--color-debuff-nature);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.debuff[data-school="holy"]::before {
+    border-color: var(--color-debuff-holy);
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff.own::before {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.own:not(.debuff)::before {
+    border-color: var(--color-primary);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff.cancelable:hover::before {
+    border-color: var(--color-gold, #d8b56b);
+  }
+  body.mobile-touch.game-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
+  }
+  body.mobile-touch.game-active :is(#buff-bar, #debuff-bar, #tf-debuffs) > .buff > .dur {
+    bottom: 0;
   }
   body.mobile-touch #minimap-wrap {
     right: max(20px, calc(env(safe-area-inset-right) + 10px));
@@ -4487,27 +4580,27 @@
       transform: none;
       transform-origin: right top;
     }
-    /* The landscape target frame sits on the top row right beside the Chat
-       button (the direct-menu cluster is right-anchored), so the target reads
-       in the same glance as the navigation chrome and the top center stays
-       free for the protected center messages. */
+    /* Keep the responsive target frame centered across phone and tablet tiers.
+       It stays high enough to leave the world center readable while matching
+       the player's safe-area-aware horizontal axis. */
     body.mobile-touch #target-frame {
-      left: auto;
-      right: calc(max(12px, env(safe-area-inset-right)) + var(--mobile-direct-menu-width) + 12px);
+      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
+      right: auto;
       top: max(8px, env(safe-area-inset-top));
-      transform: scale(
-        calc(
-          var(--mobile-player-frame-scale, 0.9) *
-          var(--mobile-target-frame-ratio, 0.9) *
-          var(--mobile-chrome-scale, 1)
-        )
-      );
-      transform-origin: right top;
+      transform: translateX(-50%)
+        scale(
+          calc(
+            var(--mobile-player-frame-scale, 0.9) *
+            var(--mobile-target-frame-ratio, 0.9) *
+            var(--mobile-chrome-scale, 1)
+          )
+        );
+      transform-origin: center top;
     }
     body.mobile-touch.mobile-left-handed #target-frame {
+      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
       right: auto;
-      left: calc(max(12px, env(safe-area-inset-left)) + var(--mobile-direct-menu-width) + 12px);
-      transform-origin: left top;
+      transform-origin: center top;
     }
     body.mobile-touch #party-chip {
       grid-area: chip;
@@ -4757,137 +4850,234 @@
   }
 
   /* ---------- mobile custom HUD layout ---------- */
-  body.mobile-touch.mobile-hud-custom-active {
-    --mobile-hud-view-joystick-offset-x: 62px;
-    --mobile-hud-view-joystick-offset-y: 2px;
-  }
-  body.mobile-touch.hud-mobile-compact.mobile-hud-custom-active {
-    --mobile-hud-view-joystick-offset-x: 69px;
-    --mobile-hud-view-joystick-offset-y: 9px;
-  }
-  body.mobile-touch.mobile-hud-custom-active
-    #mobile-action-ring
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-ring
     > .mobile-action-slot[data-mobile-index="0"] {
     position: fixed;
-    left: var(--mobile-hud-action-a1-x);
-    top: var(--mobile-hud-action-a1-y);
-    width: var(--mobile-hud-action-a1-width);
-    height: var(--mobile-hud-action-a1-height);
+    left: var(--mobile-hud-action-a1-touch-hit-x);
+    top: var(--mobile-hud-action-a1-touch-hit-y);
+    width: var(--mobile-hud-action-a1-touch-hit-width);
+    height: var(--mobile-hud-action-a1-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-a1-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-a1-scale);
   }
   body.mobile-touch.mobile-hud-custom-active
     #mobile-action-ring
     > .mobile-action-slot[data-mobile-index="1"] {
     position: fixed;
-    left: var(--mobile-hud-action-a2-x);
-    top: var(--mobile-hud-action-a2-y);
-    width: var(--mobile-hud-action-a2-width);
-    height: var(--mobile-hud-action-a2-height);
+    left: var(--mobile-hud-action-a2-touch-hit-x);
+    top: var(--mobile-hud-action-a2-touch-hit-y);
+    width: var(--mobile-hud-action-a2-touch-hit-width);
+    height: var(--mobile-hud-action-a2-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-a2-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-a2-scale);
   }
   body.mobile-touch.mobile-hud-custom-active
     #mobile-action-ring
     > .mobile-action-slot[data-mobile-index="2"] {
     position: fixed;
-    left: var(--mobile-hud-action-a3-x);
-    top: var(--mobile-hud-action-a3-y);
-    width: var(--mobile-hud-action-a3-width);
-    height: var(--mobile-hud-action-a3-height);
+    left: var(--mobile-hud-action-a3-touch-hit-x);
+    top: var(--mobile-hud-action-a3-touch-hit-y);
+    width: var(--mobile-hud-action-a3-touch-hit-width);
+    height: var(--mobile-hud-action-a3-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-a3-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-a3-scale);
   }
   body.mobile-touch.mobile-hud-custom-active
     #mobile-action-ring
     > .mobile-action-slot[data-mobile-index="3"] {
     position: fixed;
-    left: var(--mobile-hud-action-a4-x);
-    top: var(--mobile-hud-action-a4-y);
-    width: var(--mobile-hud-action-a4-width);
-    height: var(--mobile-hud-action-a4-height);
+    left: var(--mobile-hud-action-a4-touch-hit-x);
+    top: var(--mobile-hud-action-a4-touch-hit-y);
+    width: var(--mobile-hud-action-a4-touch-hit-width);
+    height: var(--mobile-hud-action-a4-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-a4-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-a4-scale);
   }
   body.mobile-touch.mobile-hud-custom-active
     #mobile-action-ring
     > .mobile-action-slot[data-mobile-index="4"] {
     position: fixed;
-    left: var(--mobile-hud-action-a5-x);
-    top: var(--mobile-hud-action-a5-y);
-    width: var(--mobile-hud-action-a5-width);
-    height: var(--mobile-hud-action-a5-height);
+    left: var(--mobile-hud-action-a5-touch-hit-x);
+    top: var(--mobile-hud-action-a5-touch-hit-y);
+    width: var(--mobile-hud-action-a5-touch-hit-width);
+    height: var(--mobile-hud-action-a5-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-a5-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-a5-scale);
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-action-attack {
     position: fixed;
-    left: var(--mobile-hud-action-attack-x);
-    top: var(--mobile-hud-action-attack-y);
-    width: var(--mobile-hud-action-attack-width);
-    height: var(--mobile-hud-action-attack-height);
+    left: var(--mobile-hud-action-attack-touch-hit-x);
+    top: var(--mobile-hud-action-attack-touch-hit-y);
+    width: var(--mobile-hud-action-attack-touch-hit-width);
+    height: var(--mobile-hud-action-attack-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-attack-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-attack-scale);
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-target-cycle {
     position: fixed;
-    left: var(--mobile-hud-action-target-x);
-    top: var(--mobile-hud-action-target-y);
-    width: var(--mobile-hud-action-target-width);
-    height: var(--mobile-hud-action-target-height);
+    left: var(--mobile-hud-action-target-touch-hit-x);
+    top: var(--mobile-hud-action-target-touch-hit-y);
+    width: var(--mobile-hud-action-target-touch-hit-width);
+    height: var(--mobile-hud-action-target-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-target-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-target-scale);
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-jump {
     position: fixed;
-    left: var(--mobile-hud-action-jump_use-x);
-    top: var(--mobile-hud-action-jump_use-y);
-    width: var(--mobile-hud-action-jump_use-width);
-    height: var(--mobile-hud-action-jump_use-height);
+    left: var(--mobile-hud-action-jump_use-touch-hit-x);
+    top: var(--mobile-hud-action-jump_use-touch-hit-y);
+    width: var(--mobile-hud-action-jump_use-touch-hit-width);
+    height: var(--mobile-hud-action-jump_use-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-jump_use-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-jump_use-scale);
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-action-page-toggle {
     position: fixed;
-    left: var(--mobile-hud-action-page-x);
-    top: var(--mobile-hud-action-page-y);
-    width: var(--mobile-hud-action-page-width);
-    height: var(--mobile-hud-action-page-height);
+    left: var(--mobile-hud-action-page-touch-hit-x);
+    top: var(--mobile-hud-action-page-touch-hit-y);
+    width: var(--mobile-hud-action-page-touch-hit-width);
+    height: var(--mobile-hud-action-page-touch-hit-height);
     translate: 0 0;
-    scale: var(--mobile-hud-action-page-scale);
+    scale: 1;
+    --btn-scale: var(--mobile-hud-action-page-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-action-ring > button {
+    transform-origin: left top;
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls {
-    left: var(--mobile-hud-menu-top-x);
+    left: var(--mobile-hud-menu-top-touch-hit-x);
     right: auto;
-    top: var(--mobile-hud-menu-top-y);
+    top: var(--mobile-hud-menu-top-touch-hit-y);
     bottom: auto;
-    width: var(--mobile-hud-menu-top-width);
-    height: var(--mobile-hud-menu-top-height);
+    width: var(--mobile-hud-menu-top-touch-hit-width);
+    height: var(--mobile-hud-menu-top-touch-hit-height);
     transform: none;
     translate: 0 0;
-    scale: var(--mobile-hud-menu-top-scale);
+    scale: 1;
     transform-origin: left top;
+    pointer-events: none;
+    --btn-scale: var(--mobile-hud-menu-top-scale);
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls > .mobile-btn {
+    position: relative;
+    isolation: isolate;
+    border-color: transparent;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls > .mobile-btn::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: -1;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 50%;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+    transform: translate(-50%, -50%) scale(var(--mobile-hud-menu-top-scale));
+    transform-origin: center;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls > .mobile-btn.is-on::before {
+    border-color: var(--gold);
   }
   body.mobile-touch.mobile-hud-custom-active #minimap-wrap {
     --mobile-minimap-layout-scale: 1;
+    position: fixed;
     left: var(--mobile-hud-minimap-cluster-x);
+    right: auto;
     top: var(--mobile-hud-minimap-cluster-y);
+    bottom: auto;
     width: var(--mobile-hud-minimap-cluster-width);
     height: var(--mobile-hud-minimap-cluster-height);
     transform: none;
     translate: 0 0;
     scale: var(--mobile-hud-minimap-cluster-scale);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-disc {
+    position: static;
+    order: 1;
   }
   body.mobile-touch.mobile-hud-custom-active #minimap-disc,
   body.mobile-touch.mobile-hud-custom-active #minimap {
-    width: 98px;
-    height: 98px;
+    width: 162px;
+    height: 162px;
   }
   body.mobile-touch.mobile-hud-custom-active #zone-label {
-    position: absolute;
-    bottom: 100%;
+    position: static;
+    order: 0;
     width: 100%;
-    margin-bottom: 3px;
+    margin: 0 0 3px;
+    line-height: 16px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-coords {
+    position: static;
+    order: 2;
+    margin-top: 0;
+    translate: none;
+    z-index: auto;
+    transform: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #compass {
+    position: static;
+    order: 3;
+    width: 162px;
+    margin: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #minimap-clock {
+    position: static;
+    order: 4;
+    margin: 5px auto 0;
+    min-height: 0;
+    display: block;
+    translate: none;
+    transform: none;
+    z-index: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #raid-lockout,
+  body.mobile-touch.mobile-hud-custom-active #mail-indicator {
+    right: auto;
+    width: 44px;
+    height: 44px;
+    transform: scale(1.25);
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-hud-custom-active #raid-lockout {
+    left: 0;
+    top: 156px;
+    bottom: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#zone-label, #minimap-coords, #compass),
+  body.mobile-touch.mobile-hud-custom-active :is(#zone-label, #minimap-coords, #compass) * {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mail-indicator {
+    left: 74px;
+    top: 156px;
+    bottom: auto;
   }
   body.mobile-touch.mobile-hud-custom-active #player-frame {
     left: var(--mobile-hud-frame-player-x);
@@ -4920,12 +5110,20 @@
     translate: 0 0;
     scale: var(--mobile-hud-frame-player-scale);
     transform-origin: left top;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #castbar *,
+  body.mobile-touch.mobile-hud-custom-active #swingbar * {
+    pointer-events: none;
   }
   body.mobile-touch.mobile-hud-custom-active #castbar {
-    top: calc(var(--mobile-hud-frame-player-y) - 8px);
+    top: calc(var(--mobile-hud-frame-player-y) - var(--mobile-hud-frame-player-castbar-top-offset));
   }
   body.mobile-touch.mobile-hud-custom-active #swingbar {
-    top: calc(var(--mobile-hud-frame-player-y) - 16px);
+    top: calc(
+      var(--mobile-hud-frame-player-y) -
+      var(--mobile-hud-frame-player-swingbar-top-offset)
+    );
   }
   body.mobile-touch.mobile-hud-custom-active #target-frame {
     left: var(--mobile-hud-frame-target-x);
@@ -4938,6 +5136,39 @@
     translate: 0 0;
     scale: var(--mobile-hud-frame-target-scale);
     transform-origin: left top;
+  }
+  /* Target aura tooltips remain usable in custom mode. Keep the unbounded
+     painter output inside one registered horizontal viewport instead of
+     allowing a long aura list to grow over arbitrary gameplay controls. */
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs {
+    top: 74px;
+    left: 0;
+    width: 236px;
+    max-width: 236px;
+    height: 47px;
+    margin: 0;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior: contain;
+    touch-action: pan-x;
+    scrollbar-width: none;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #target-frame > #tf-debuffs > .buff {
+    flex: 0 0 auto;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    #target-frame
+    > #tf-debuffs
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
   }
   body.mobile-touch.mobile-hud-custom-active #buff-bar {
     left: var(--mobile-hud-auras-player_buffs-x);
@@ -4969,6 +5200,90 @@
   body.mobile-touch.mobile-hud-custom-active #buff-bar {
     flex-direction: var(--mobile-hud-auras-player_buffs-flow);
   }
+  /* Player auras expose tooltips (and buffs expose cancel), so their icons are
+     blocking controls. Blank viewport space stays camera-click-through while
+     the finite viewport scrolls every painter-owned icon into reach. */
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar) {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 4px;
+    overflow-x: var(--mobile-hud-auras-player_buffs-overflow-x, auto);
+    overflow-y: var(--mobile-hud-auras-player_buffs-overflow-y, hidden);
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar {
+    overflow-x: var(--mobile-hud-auras-player_debuffs-overflow-x, auto);
+    overflow-y: var(--mobile-hud-auras-player_debuffs-overflow-y, hidden);
+    touch-action: var(--mobile-hud-auras-player_debuffs-touch-action, pan-x);
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar {
+    touch-action: var(--mobile-hud-auras-player_buffs-touch-action, pan-x);
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar)::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active :is(#buff-bar, #debuff-bar) > .buff {
+    flex: 0 0 auto;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar > .buff {
+    width: var(--mobile-hud-auras-player_buffs-touch-target-width, 40px);
+    height: var(--mobile-hud-auras-player_buffs-touch-target-height, 40px);
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar > .buff {
+    width: var(--mobile-hud-auras-player_debuffs-touch-target-width, 40px);
+    height: var(--mobile-hud-auras-player_debuffs-touch-target-height, 40px);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(#buff-bar, #debuff-bar)
+    > .buff
+    > :is(.dur, .stacks) {
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #buff-bar > .buff > .dur {
+    bottom: var(--mobile-hud-auras-player_buffs-duration-bottom, -13px);
+  }
+  body.mobile-touch.mobile-hud-custom-active #debuff-bar > .buff > .dur {
+    bottom: var(--mobile-hud-auras-player_debuffs-duration-bottom, -13px);
+  }
+  body.mobile-touch.mobile-hud-custom-active
+    :is(#buff-bar, #debuff-bar, #tf-debuffs)
+    > .buff
+    > .stacks {
+    top: 0;
+    right: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #deed-tracker {
+    position: fixed;
+    left: var(--mobile-hud-tracker-deeds-x);
+    right: auto;
+    top: var(--mobile-hud-tracker-deeds-y);
+    bottom: auto;
+    width: var(--mobile-hud-tracker-deeds-width);
+    height: var(--mobile-hud-tracker-deeds-height);
+    transform: none;
+    translate: 0 0;
+    scale: var(--mobile-hud-tracker-deeds-scale);
+    transform-origin: left top;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #deed-tracker .dt-header {
+    width: 100%;
+    min-height: var(--mobile-hud-tracker-deeds-touch-target-height, 40px);
+    justify-content: center;
+    gap: 3px;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+  /* The phone profile uses the tracker header as a compact count chip; its
+     full localized name remains the editor/ARIA label and the tablet keeps the
+     wider header. */
+  body.mobile-touch.mobile-hud-custom-active.hud-mobile-compact #deed-tracker .dt-label,
+  body.mobile-touch.mobile-hud-custom-active.hud-mobile-standard #deed-tracker .dt-label {
+    display: none;
+  }
   body.mobile-touch.mobile-hud-custom-active #mobile-move-zone {
     left: var(--mobile-hud-control-movement-x);
     right: auto;
@@ -4996,40 +5311,41 @@
     bottom: auto;
     transform: none;
     scale: var(--mobile-hud-control-movement-scale);
-    transform-origin: center;
+    transform-origin: left top;
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-camera-joystick {
     --mobile-joystick-layout-scale: 1;
-    left: calc(var(--mobile-hud-control-view-x) + var(--mobile-hud-view-joystick-offset-x));
+    left: var(--mobile-hud-control-view-interactive-x);
     right: auto;
-    top: calc(var(--mobile-hud-control-view-y) + var(--mobile-hud-view-joystick-offset-y));
+    top: var(--mobile-hud-control-view-interactive-y);
     bottom: auto;
-    width: var(--mobile-camera-joystick-size);
-    min-width: 82px;
-    max-width: var(--mobile-hud-control-view-width);
-    height: var(--mobile-camera-joystick-size);
-    min-height: 82px;
-    max-height: var(--mobile-hud-control-view-height);
+    width: var(--mobile-hud-control-view-interactive-width);
+    min-width: 0;
+    max-width: none;
+    height: var(--mobile-hud-control-view-interactive-height);
+    min-height: 0;
+    max-height: none;
     transform: none;
     translate: 0 0;
     scale: var(--mobile-hud-control-view-scale);
-    transform-origin: center;
+    transform-origin: left top;
   }
   body.mobile-touch.mobile-hud-custom-active:not(.mobile-camera-joystick-on)
     #mobile-camera-joystick {
     display: none;
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-consumables {
-    left: var(--mobile-hud-utility-consumables-x);
+    left: var(--mobile-hud-utility-consumables-touch-hit-x);
     right: auto;
-    top: var(--mobile-hud-utility-consumables-y);
+    top: var(--mobile-hud-utility-consumables-touch-hit-y);
     bottom: auto;
-    width: var(--mobile-hud-utility-consumables-width);
-    height: var(--mobile-hud-utility-consumables-height);
+    width: var(--mobile-hud-utility-consumables-touch-hit-width);
+    height: var(--mobile-hud-utility-consumables-touch-hit-height);
     transform: none;
     translate: 0 0;
-    scale: var(--mobile-hud-utility-consumables-scale);
+    scale: 1;
     transform-origin: left top;
+    --btn-scale: var(--mobile-hud-utility-consumables-scale);
   }
   body.mobile-touch.mobile-hud-custom-active #mobile-consumables-toggle {
     position: absolute;
@@ -5049,13 +5365,39 @@
     grid-template-rows: var(--mobile-hud-utility-consumables-grid-rows);
     direction: var(--mobile-hud-utility-consumables-item-direction);
   }
-  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls,
-  body.mobile-touch.mobile-hud-custom-active #mobile-combat-buttons {
-    flex-direction: var(--mobile-hud-menu-top-flow);
+  body.mobile-touch.mobile-hud-custom-active #mobile-consumables-toggle::before,
+  body.mobile-touch.mobile-hud-custom-active .mobile-consumable-slot .icon-label,
+  body.mobile-touch.mobile-hud-custom-active .mobile-consumable-slot .cdtext,
+  body.mobile-touch.mobile-hud-custom-active .mobile-consumable-slot .item-count {
+    transform: scale(var(--mobile-hud-utility-consumables-scale));
+    transform-origin: center;
   }
-  body.mobile-touch.mobile-hud-custom-active #mobile-combat-buttons {
-    display: flex;
+  body.mobile-touch.mobile-hud-custom-active .mobile-consumable-slot .cd-overlay {
+    transform: scale(var(--mobile-hud-utility-consumables-scale)) scaleY(0.833333);
+    transform-origin: center bottom;
+  }
+  /* Compact and handedness rules above this layer have extra class
+     specificity. Reassert the registry-owned geometry, and force Grid so the
+     vertical opening variants cannot inherit the compact horizontal flex row. */
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #mobile-consumables {
+    left: var(--mobile-hud-utility-consumables-touch-hit-x);
+    right: auto;
+    top: var(--mobile-hud-utility-consumables-touch-hit-y);
+    bottom: auto;
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #mobile-consumables-row {
+    left: var(--mobile-hud-utility-consumables-row-left);
+    right: var(--mobile-hud-utility-consumables-row-right);
+    top: var(--mobile-hud-utility-consumables-row-top);
+    bottom: var(--mobile-hud-utility-consumables-row-bottom);
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-consumables-open #mobile-consumables-row {
+    display: grid;
     width: auto;
+    flex-flow: initial;
+  }
+  body.mobile-touch.mobile-hud-custom-active #mobile-combat-controls {
+    flex-direction: var(--mobile-hud-menu-top-flow);
   }
   body.mobile-touch.mobile-hud-custom-active #party-frames {
     position: fixed;
@@ -5068,20 +5410,50 @@
     display: flex;
     flex-direction: var(--mobile-hud-party-flow);
     gap: 4px;
+    align-items: flex-start;
     transform: none;
     translate: 0 0;
     scale: var(--mobile-hud-party-scale);
     transform-origin: left top;
   }
-  body.mobile-touch.mobile-hud-custom-active #party-frames .party-rows {
+  /* A collapsed Party must expose only its chip at runtime. The editor paints
+     the separate pointer-through max-state envelope, so this hidden scroll
+     viewport must never remain as a transparent camera/input deadzone. */
+  body.mobile-touch.mobile-hud-custom-active #party-frames.party-expanded .party-rows {
     display: flex;
     flex-direction: var(--mobile-hud-party-flow);
+    flex: 0 0 auto;
+    width: var(--mobile-hud-party-members-width);
+    height: var(--mobile-hud-party-members-height);
+    max-width: var(--mobile-hud-party-members-max-width);
+    max-height: var(--mobile-hud-party-members-max-height);
+    gap: 4px;
+    overflow-x: var(--mobile-hud-party-members-overflow-x);
+    overflow-y: var(--mobile-hud-party-members-overflow-y);
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+    scrollbar-width: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-rows::-webkit-scrollbar {
+    display: none;
   }
   body.mobile-touch.mobile-hud-custom-active #party-frames .party-frame,
   body.mobile-touch.mobile-hud-custom-active #party-frames #party-chip,
   body.mobile-touch.mobile-hud-custom-active #party-frames #party-leave {
-    min-width: 40px;
-    min-height: 40px;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    min-width: var(--mobile-hud-party-touch-target-width, 40px);
+    min-height: var(--mobile-hud-party-touch-target-height, 40px);
+    margin: 0;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames .party-frame {
+    width: 68px;
+    height: 40px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-chip,
+  body.mobile-touch.mobile-hud-custom-active #party-frames #party-leave {
+    width: 40px;
+    height: 40px;
   }
   body.mobile-touch.mobile-hud-custom-active #petbar {
     left: var(--mobile-hud-pet-commands-x);
@@ -5091,17 +5463,35 @@
     width: var(--mobile-hud-pet-commands-width);
     height: var(--mobile-hud-pet-commands-height);
     flex-direction: var(--mobile-hud-pet-commands-flow);
+    overflow-x: var(--mobile-hud-pet-commands-overflow-x, auto);
+    overflow-y: var(--mobile-hud-pet-commands-overflow-y, hidden);
+    overscroll-behavior: contain;
+    touch-action: var(--mobile-hud-pet-commands-touch-action, pan-x);
+    scrollbar-width: none;
     transform: none;
     translate: 0 0;
     scale: var(--mobile-hud-pet-commands-scale);
     transform-origin: left top;
   }
+  body.mobile-touch.mobile-hud-custom-active #petbar::-webkit-scrollbar {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active.mobile-left-handed #petbar {
+    left: var(--mobile-hud-pet-commands-x);
+    right: auto;
+    top: var(--mobile-hud-pet-commands-y);
+    bottom: auto;
+    transform-origin: left top;
+  }
   body.mobile-touch.mobile-hud-custom-active #petbar .petbar-group {
     flex-direction: var(--mobile-hud-pet-commands-flow);
   }
+  body.mobile-touch.mobile-hud-custom-active #petbar .petbar-stances.expanded {
+    gap: 0;
+  }
   body.mobile-touch.mobile-hud-custom-active #petbar .pet-btn {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: var(--mobile-hud-pet-commands-touch-target-width, 40px);
+    min-height: var(--mobile-hud-pet-commands-touch-target-height, 40px);
   }
   body.mobile-touch.mobile-hud-custom-active
     :is(
@@ -5163,6 +5553,35 @@
     translate: 0 0;
     scale: var(--mobile-hud-status-arena-yumi-scale);
   }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) {
+    box-sizing: border-box;
+    gap: 8px;
+    padding: 6px 8px 6px 148px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) .yh-name {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud:not(.collapsed) .yh-track {
+    width: 88px;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #yumi-hud:not(.collapsed) {
+    padding-left: 140px;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #yumi-hud:not(.collapsed)
+    .yh-track {
+    width: 68px;
+  }
+  body.mobile-touch.mobile-hud-custom-active #yumi-hud .yh-toggle {
+    position: absolute;
+    /* The bordered root contributes one CSS pixel to the containing block;
+       these author offsets make the visual hitbox match registry x=92,y=7. */
+    left: 91px;
+    top: 6px;
+    width: var(--mobile-hud-status-arena-yumi-touch-target-width, 40px);
+    height: var(--mobile-hud-status-arena-yumi-touch-target-height, 40px);
+  }
   body.mobile-touch.mobile-hud-custom-active #vcup-indicator {
     position: fixed;
     left: var(--mobile-hud-status-vale_cup-indicator-x);
@@ -5173,6 +5592,17 @@
     height: var(--mobile-hud-status-vale_cup-indicator-height);
     translate: 0 0;
     scale: var(--mobile-hud-status-vale_cup-indicator-scale);
+    min-width: var(--mobile-hud-status-vale_cup-indicator-touch-target-width, 40px);
+    min-height: var(--mobile-hud-status-vale_cup-indicator-touch-target-height, 40px);
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #vcup-indicator {
+    overflow: hidden;
+  }
+  body.mobile-touch.mobile-hud-custom-active:is(.hud-mobile-compact, .hud-mobile-standard)
+    #vcup-indicator
+    .vcupi-title {
+    display: none;
   }
   body.mobile-touch.mobile-hud-custom-active #vcup-match-hud {
     position: fixed;
@@ -5206,19 +5636,50 @@
     height: var(--mobile-hud-tracker-delve-height);
     translate: 0 0;
     scale: var(--mobile-hud-tracker-delve-scale);
+    box-sizing: border-box;
+    padding-top: 40px;
+    padding-bottom: 0;
     pointer-events: none;
     z-index: 100;
   }
-  body.mobile-touch.mobile-hud-custom-active #delve-tracker * {
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker > :not(.dt-affix-row),
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-label {
     pointer-events: none;
   }
+  /* Delve copy may overlap ordinary HUD as information, but its affix tooltips
+     are real controls. Pin the mixed surface's only interactive region to the
+     registry-owned pocket so validation and runtime input cannot diverge. */
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-row {
+    position: absolute;
+    left: 88px;
+    right: auto;
+    top: 0;
+    bottom: auto;
+    width: var(--mobile-hud-tracker-delve-touch-target-width, 40px);
+    height: var(--mobile-hud-tracker-delve-touch-target-height, 40px);
+    min-height: var(--mobile-hud-tracker-delve-touch-target-height, 40px);
+    margin: 0;
+    flex-wrap: nowrap;
+    overflow: visible;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-label {
+    display: none;
+  }
+  body.mobile-touch.mobile-hud-custom-active #delve-tracker .dt-affix-icon {
+    flex: 0 0 var(--mobile-hud-tracker-delve-touch-target-width, 40px);
+    width: var(--mobile-hud-tracker-delve-touch-target-width, 40px);
+    height: var(--mobile-hud-tracker-delve-touch-target-height, 40px);
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
   body.mobile-touch.mobile-hud-custom-active
-    [data-mobile-hud-overlap-policy="informational-overlay"] {
+    [data-mobile-hud-overlap-policy="informational-overlay"]:not(.mobile-hud-editor-proxy) {
     z-index: 100;
     pointer-events: none !important;
   }
   body.mobile-touch.mobile-hud-custom-active
-    [data-mobile-hud-overlap-policy="informational-overlay"]
+    [data-mobile-hud-overlap-policy="informational-overlay"]:not(.mobile-hud-editor-proxy)
     * {
     pointer-events: none !important;
   }
@@ -5229,6 +5690,12 @@
 
   /* ---------- mobile custom HUD editor ---------- */
   @media (orientation: landscape) {
+    body.mobile-touch.mobile-hud-editor-open #confirm-dialog {
+      /* The discard prompt is appended beside the z=1000 editor and receives
+         a normal-window inline z-index. Keep the modal decision above the
+         editor palette it is confirming. */
+      z-index: 1100 !important;
+    }
     body.mobile-touch.game-active.mobile-hud-editor-open.mobile-center-message-visible #ui {
       z-index: 80;
     }
@@ -5281,8 +5748,7 @@
       [data-mobile-hud-editor-visual][data-mobile-hud-editor-state="selected"] {
       opacity: 1 !important;
     }
-    body.mobile-touch.mobile-hud-editor-open
-      [data-mobile-hud-editor-visual][data-mobile-hud-editor-hidden="true"] {
+    body.mobile-touch.mobile-hud-editor-open [data-mobile-hud-editor-hidden="true"] {
       visibility: hidden !important;
       pointer-events: none !important;
     }
@@ -5293,13 +5759,18 @@
       box-sizing: border-box;
       width: 100%;
       min-width: 0;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-contexts > .ui-dd-btn {
+      width: 100%;
+      min-width: 0;
       min-height: 40px;
-      border: 1px solid var(--mobile-glass-border, #cba43d8c);
-      border-radius: 8px;
-      background: #171923f2;
       color: #fff7d4;
-      padding: 4px 32px 4px 8px;
       font-size: 16px;
+    }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-contexts > .ui-dd-menu {
+      width: 100%;
+      max-height: min(184px, calc(100vh - 24px));
+      z-index: 8;
     }
     body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy {
       position: absolute;
@@ -5317,22 +5788,22 @@
       cursor: move;
       z-index: 2;
     }
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy[aria-pressed="true"] {
+      z-index: 3;
+    }
     body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-frame {
       position: absolute;
+      z-index: 1;
       box-sizing: border-box;
       display: grid;
       grid-template: auto minmax(0, 1fr) auto / auto minmax(0, 1fr);
       gap: 3px 5px;
       padding: 0;
-      border: 1px dashed transparent;
+      border: 1px solid transparent;
       border-radius: 8px;
       background: transparent;
       color: inherit;
       pointer-events: none;
-    }
-    body.mobile-touch.mobile-hud-editor-open
-      .mobile-hud-editor-proxy[data-mobile-hud-overlap-policy="informational-overlay"] {
-      z-index: 1;
     }
     body.mobile-touch.mobile-hud-editor-open
       .mobile-hud-editor-proxy[data-mobile-hud-surface-class="movable"] {
@@ -5344,19 +5815,6 @@
       button {
       min-height: 40px;
       min-width: 40px;
-    }
-    body.mobile-touch.mobile-hud-editor-open
-      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"] {
-      color: #cbeaff;
-      pointer-events: none;
-      cursor: default;
-    }
-    body.mobile-touch.mobile-hud-editor-open
-      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"]
-      .mobile-hud-editor-proxy-frame {
-      border-style: dotted;
-      border-color: #8fc7e8a8;
-      background: #36596d38;
     }
     body.mobile-touch.mobile-hud-editor-open
       .mobile-hud-editor-proxy[data-mobile-hud-placeholder="when-empty"][data-mobile-hud-live-visual="false"]
@@ -5377,14 +5835,6 @@
       box-shadow: 0 0 14px #e3c66a55;
     }
     body.mobile-touch.mobile-hud-editor-open
-      .mobile-hud-editor-proxy[data-mobile-hud-surface-class="protected"].is-selected
-      .mobile-hud-editor-proxy-frame {
-      border-color: #f4dc858f;
-      outline: 3px solid var(--gold, #e3c66a);
-      outline-offset: 2px;
-      box-shadow: 0 0 18px #e3c66a70;
-    }
-    body.mobile-touch.mobile-hud-editor-open
       .mobile-hud-editor-proxy.is-invalid
       .mobile-hud-editor-proxy-frame {
       border-color: var(--color-border-invalid, #ff8f85);
@@ -5393,7 +5843,7 @@
       box-shadow: 0 0 0 2px #260c0ccc;
     }
     body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy:focus-visible {
-      outline: 3px solid var(--focus-ring-color);
+      outline: 3px solid var(--color-border-focus);
       outline-offset: 3px;
     }
     body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-proxy-icon {
@@ -5470,8 +5920,8 @@
       -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
       backdrop-filter: blur(var(--mobile-glass-blur, 8px));
       translate: -50% -50%;
-      overflow: auto;
-      touch-action: pan-y;
+      overflow: visible;
+      touch-action: none;
     }
     body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor-drag-handle {
       grid-column: 1;
@@ -5526,7 +5976,7 @@
     }
     body.mobile-touch.mobile-hud-editor-open
       .mobile-hud-editor
-      button:not(.mobile-hud-editor-proxy) {
+      button:not(.mobile-hud-editor-proxy):not(.btn) {
       border: 1px solid var(--mobile-glass-border, #cba43d8c);
       border-radius: 8px;
       background: #171923e8;
@@ -5536,13 +5986,12 @@
       font-weight: 700;
       line-height: 1.1;
     }
-    body.mobile-touch.mobile-hud-editor-open
-      .mobile-hud-editor
-      [data-mobile-hud-action="save"]:disabled {
-      opacity: 0.4;
-      filter: saturate(0.3);
-      cursor: not-allowed;
-      box-shadow: none;
+    body.mobile-touch.mobile-hud-editor-open .mobile-hud-editor .btn {
+      margin: 0;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     body.mobile-touch.mobile-hud-editor-open.mobile-hud-context-world-base
       .mobile-hud-editor-preview,

@@ -75,6 +75,9 @@ function assertDescriptorSchema(descriptor: MobileHudSurfaceDescriptor): void {
   if (descriptor.capabilities.includes('scale') !== (descriptor.scaleLimits !== undefined)) {
     throw new Error(`${descriptor.id} scale capability and limits must be declared together`);
   }
+  if (descriptor.lowScaleTouchCompensation && !descriptor.minimumTargetSize) {
+    throw new Error(`${descriptor.id} touch compensation requires a minimum target size`);
+  }
   if (descriptor.class === 'protected' && descriptor.capabilities.length > 0) {
     throw new Error(`${descriptor.id} protected surfaces cannot expose edit capabilities`);
   }
@@ -319,7 +322,15 @@ export function mergeMobileHudPlacementDefaults(
   const merged: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>> = {};
   for (const descriptor of registry.descriptors) {
     if (descriptor.class === 'protected') continue;
-    const candidate = placements[descriptor.id] ?? registry.defaults[profileId]?.[descriptor.id];
+    const defaultPlacement = registry.defaults[profileId]?.[descriptor.id];
+    const override = placements[descriptor.id];
+    // v1 made capability fields optional. Merge at field granularity so an old
+    // placement that omits opening/orientation/reverse inherits the canonical
+    // registry value instead of validating one geometry and rendering another.
+    const candidate =
+      defaultPlacement && override
+        ? { ...defaultPlacement, ...override }
+        : (override ?? defaultPlacement);
     if (!candidate) {
       throw new Error(`${descriptor.id} has no ${profileId} mobile HUD default placement`);
     }

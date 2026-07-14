@@ -6,8 +6,9 @@
 | Date | 2026-07-11 |
 | Branch | `dev-td-mobile-custom-layout` |
 | Base | `release/v0.24.0` at `31182684b4043c92e0df18242bdd731bec02819e` |
+| Current integration base | `upstream/release/v0.25.0` at `f81518ec9`, merged into the local integration branch at `c19d44ca8` |
 | Product spec | [Mobile Custom HUD Layout Editor](../specs/2026-07-11-mobile-custom-hud-layout-editor.md) |
-| Estimated tasks | 77 |
+| Estimated tasks | 88 |
 
 ## Progress
 
@@ -25,7 +26,7 @@
 - [x] T12: Implement canonical handedness transforms (2026-07-11, involutive placement mirroring green)
 - [x] T13: Resolve scale, footprints, margins, and temporary clamps (2026-07-11, dynamic footprints and non-mutating clamp green)
 - [x] T14: Validate one canonical context (2026-07-11, all failure classes and 0.5px epsilon green)
-- [x] T15: Validate the complete profile matrix (2026-07-11, all 768 cases and stable diagnostics green)
+- [x] T15: Validate the complete profile matrix (2026-07-13, all 768 geometry/context cases in both handedness variants, 1,536 evaluations, and stable diagnostics green)
 - [x] T16: Map scaled failing previews back to canonical coordinates (2026-07-11, letterbox and UI-author round trips green)
 - [x] T17: Add lock, selection, move, and scene draft actions (2026-07-11, immutable locked and mirrored moves green)
 - [x] T18: Add scale and capability-specific draft actions (2026-07-11, capability limits and left-hand round trips green)
@@ -78,24 +79,35 @@
 - [x] T65: Consolidate editor chrome into one movable center palette (2026-07-12, one context dropdown, scale/reset-only inspector, automatic red failures, full-height landscape map, 576 focused and 47 browser tests green)
 - [x] T66: Replace opaque editor area boxes with live HUD visuals and transparent proxies, then verify in real mobile landscape runtime (2026-07-12, live fragment opacity, transparent proxy hit layer, real mobile audit, and refreshed 740x360 screenshot green)
 - [x] T67: Fix device-tested editor feedback: class-gate Pet Controls, coalesce pointer moves to one update per animation frame, keep invalid drag previews live without fallback, validate only the active context during pointer moves, force the real View joystick visible and inert, align proxies one-to-one with the viewport, remove selected proxy labels over live icons, isolate the live HUD with inert, and complete keyboard palette and teardown behavior (2026-07-12, unit, browser, typecheck, and real pointer-drag mobile runtime audit green)
-- [x] T68: Repair Save validation after device testing: use real interactive footprints for pair collisions, preserve equal or improved built-in validation debt while blocking worsened/new failures, prioritize protected diagnostics over View, and make the runtime audit persist a genuinely customized placement (2026-07-12, regression tests and complete-matrix one-pixel nudge green)
+- [x] T68: Repair Save validation after device testing: use real interactive footprints for pair collisions, temporarily preserve equal or improved built-in validation debt while blocking worsened/new failures, prioritize protected diagnostics over View, and make the runtime audit persist a genuinely customized placement (2026-07-12, regression tests and complete-matrix one-pixel nudge green; all baseline-debt handling was removed by T79)
 - [x] T69: Make invalid Save visually disabled as well as natively disabled, with a real-browser regression proving muted styling, `not-allowed` feedback, and zero storage writes (2026-07-12)
-- [x] T70: Separate stable primary HUD footprints from runtime layout and gesture extents, inset editor outlines to the real visual, ignore decorative text and expanded Consumables for pair collisions, keep the expanded drawer viewport-bounded, and raise its interactive row above ordinary HUD frames (2026-07-12)
+- [x] T70: Separate stable primary HUD footprints from runtime layout and gesture extents, inset editor outlines to the real visual, keep decorative text non-blocking, keep the expanded Consumables drawer viewport-bounded, and raise its interactive row above ordinary HUD frames (2026-07-12; pairwise drawer protection completed by T79)
 - [x] T71: Stop unavailable class-specific surfaces from validating, falling back, or blocking Save; make center messages non-blocking and always-front; and replace the generic invalid status with the exact colliding surface names (2026-07-12, 232 focused tests and typecheck green)
 - [x] T72: Focus the editor on the exact context and geometry of an off-context matrix failure, name protected collision partners instead of generic protected game UI, and paint only failures belonging to the displayed context (2026-07-12, device-screenshot regression and 45 editor tests green)
-- [x] T73: Treat the informational Delve tracker as a non-blocking, click-through overlay that may paint above controls while retaining viewport-bound validation (2026-07-12)
+- [x] T73: Audit Delve tracker text as click-through while retaining viewport-bound validation (2026-07-12; the first pass did not account for the affix icon, which the mixed-surface audit in T83 corrects)
 - [x] T74: Make empty Player Buffs and Player Debuffs discoverable and selectable through semantic editor placeholders, then hand selection back to the real aura icons when populated (2026-07-12, unit, browser CSS, selection, and type tests green)
 - [x] T75: Audit all 16 runtime contexts, reduce the dropdown to nine unique editable signatures, classify informational versus foreground overlays, preserve only real interactive footprints, add scalable empty status placeholders, and document the decision contract for future contributors and AI agents (2026-07-12)
 - [x] T76: Extract phone and tablet default placements into a registered pure sibling module after the full architecture gate exposed registry growth beyond 1000 lines (2026-07-12, 69 focused registry and architecture tests, typecheck, and all build targets green)
-- [x] T77: Remove the redundant visible palette title, classify player auras as informational overlays, paint informational roots above controls without pointer interception, and keep their editor proxies below interactive buttons (2026-07-12, unit and real-browser regressions green)
+- [x] T77: Remove the redundant visible palette title and complete a first pass over player-aura foreground styling (2026-07-12; the visual simplification remains, while T82 corrects the interaction classification after tooltip and cancellation ownership was audited)
 - [x] T78: Separate interactive collision, exact painted geometry, and the minimum drag proxy; measure DOM and pseudo-element artwork for Target, Player, action faces, Party, Pet, and dynamic auras; refresh dynamic geometry through event-driven observation instead of drag-frame queries (2026-07-12, Warrior and Rogue runtime measurements plus focused unit and browser regressions green)
+- [x] T79: Remove baseline collision waivers, repack phone and tablet defaults so the strict canonical matrix is valid, protect the complete Movement capture zone and expanded Consumables tray, normalize the full Minimap/Party/Pet runtime geometry, and reject unsafe stored v1 profiles through the existing validated fallback (2026-07-13)
+- [x] T80: Complete the post-merge mobile landscape safety audit: validate and runtime-fallback both handedness variants, normalize omitted capability fields, serialize complete phone/tablet profiles, bound nine raid-member rows inside the registered Party scroll viewport, retain 40px Minimap satellite targets at minimum scale, isolate compact/left custom CSS, and render pointer-through validation envelopes plus full empty Party/Target/Pet placeholders (2026-07-13)
+- [x] T81: Correct `ui-author` placement conversion so visual X/Y and root scale divide by live UI scale while descriptor-local geometry remains canonical; pin UI scale 0.85, 1, and 1.4 and retain strict validation in both handedness variants (2026-07-13)
+- [x] T82: Reclassify every interactive dynamic state as blocking and either reserve its maximum envelope or constrain it to a bounded scroll viewport: Player Buffs/Debuffs show three phone or six tablet 40 by 40 targets around unchanged classic faces, Target reserves 236 by 121 with five visible aura targets, Pet commands scroll, and sparse Party / Raid shrinks within its maximum raid envelope (2026-07-13)
+- [x] T83: Complete the missing-surface audit: register the blocking `tracker.deeds` header, make `tracker.delve` mixed with click-through text and one 40 by 40 affix pocket, retain Delve as a distinct dropdown signature, and hide the duplicate mobile Discord call-to-action during active gameplay because More still owns Discord (2026-07-13)
+- [x] T84: Align the architecture contract, product spec, and plan with T79 through T83, remove superseded informational/transient wording, and record the adversarial inventory result that no other persistent mobile gameplay control requires a registry surface (2026-07-13)
+- [x] T85: Add touch-owned Player/Target aura descriptions and safe buff cancellation: 40px native aura buttons toggle the tooltip on tap, outside taps dismiss it, and a 650ms slop-guarded hold cancels only the exact helpful player buff pressed; keep Party mini auras as noninteractive row status and stop reparented desktop aura context menus before the Player self menu (2026-07-13)
+- [x] T86: Make automatic failure preview honor the failure's handedness without changing the runtime preference, hide every foreign-hand owned fragment, snapshot handedness through pointer capture, defer proxy rebuild until release, and include localized hand state in diagnostics (2026-07-13)
+- [x] T87: Disable player-layout overlap, View, protected-surface, safe-area, and viewport-boundary enforcement after device testing showed false conflicts, editor/runtime geometry drift, and unexpected fallback. Preserve the attempted strict design in this historical plan, keep safe-area measurement only for notch-aware anchoring and editor chrome, and retain blocking validation only for malformed data, unsupported capabilities, invalid scale, and undersized targets (2026-07-14)
+- [x] T88: Make every painted movable context frame, not only its smaller runtime primary footprint, selectable and draggable in Edit Mode, keep context-status proxies above shared controls, hide fixed protected proxies, and restore modal stacking for discard confirmation and More over Consumables (2026-07-15)
+- [x] T89: Preserve 48px combat, menu, and Consumables targets plus 40px compact composite targets while visual art scales to 0.5; elevate the selected proxy and cycle downward on repeated overlap taps; close the game-skinned context dropdown on outside tap (2026-07-15, focused unit and Chromium regressions green)
 
 ## Outcome
 
 Add a landscape touch HUD editor that moves and scales every registered mobile HUD surface,
 supports capability-specific orientation, validates phone and tablet profiles across the complete
-geometry and gameplay-context matrix, derives left-handed layouts from canonical right-handed
-data, preserves a guaranteed camera area, and persists only valid local layouts. The editor must
+gameplay-context matrix, derives left-handed layouts from canonical right-handed data, allows
+intentional overlap and off-safe-area placement, and persists structurally valid local layouts. The editor must
 own all touch input while open and must leave desktop, portrait, gameplay, simulation, wire, and
 server behavior unchanged.
 
@@ -109,9 +121,9 @@ server behavior unchanged.
 - `src/ui/mobile_hud_context.ts`
   - Canonical scene/context fixtures and pure runtime context resolver.
 - `src/ui/mobile_hud_registry.ts`
-  - Capability registry, defaults, dynamic footprints, protected ghosts, and DOM bindings.
+  - Capability registry, defaults, dynamic footprints, protected runtime surfaces, and DOM bindings.
 - `src/ui/mobile_hud_editor_core.ts`
-  - Pure anchor, mirror, geometry, collision, matrix validation, preview mapping, and draft logic.
+  - Pure anchor, mirror, geometry, data validation, preview mapping, and draft logic.
 - `src/ui/mobile_hud_layout_store.ts`
   - Version 1 codec, async storage adapter, partial recovery, and validated load/save operations.
 - `src/ui/mobile_hud_editor.ts`
@@ -223,23 +235,27 @@ No files.
   resolver: compact and standard use `phone`; tablet uses `tablet`.
 - **Coordinates and transforms:** persisted placements, editor proxies, safe areas, and collision
   rectangles use one canonical visual CSS-pixel space. Every DOM binding declares
-  `body-visual` or `ui-author`. Convert visual coordinates and sizes by live `#ui` zoom only when
-  writing a `ui-author` binding; body-level controls never receive that conversion. Adapters write
-  named CSS custom properties or individual `translate`/`scale` properties, never a universal
-  inline `transform`. Movement floating `left`/`top` remains owned by `MobileControls`.
+  `body-visual` or `ui-author`. Body-level controls receive canonical coordinates directly. When
+  writing a `ui-author` binding, divide visual X/Y by live UI scale and apply
+  `placementScale / uiScale` at the root while descriptor-local geometry remains in canonical
+  author space. Adapters write named CSS custom properties or individual `translate`/`scale`
+  properties, never a universal inline `transform`. Movement floating `left`/`top` remains owned
+  by `MobileControls`.
 - **Performance:** storage reads and safe-area measurements happen at startup, editor open, save,
   and viewport/fullscreen events only. No per-frame DOM reads, storage work, or allocations.
-- **Persistence:** key `woc_mobile_hud_layout_v1`; schema version `1`; canonical right-handed data;
-  async adapter contract; Save and load share the complete matrix validator.
-- **Validation constants:** `COLLISION_EPSILON_CSS_PX = 0.5`; exact phone/tablet geometry and safe-area
-  matrix from the product spec; touching padded envelopes is valid.
+- **Persistence:** key `woc_mobile_hud_layout_v1_defaults_3`; schema version `1`; canonical
+  right-handed data; async adapter contract; Save and load share structural, capability, scale, and
+  minimum-target validation.
+- **Validation policy:** canonical phone/tablet, safe-area, context, and handedness fixtures remain
+  developer regression inputs. T87 supersedes the earlier strict collision tasks: overlap, View,
+  protected UI, and bounds are allowed and never block Save, load, or runtime application.
 - **Accessibility:** preserve existing 48 by 48 gameplay target floors and existing 40 by 40 Party
   and pet floors; every drag and resize operation has button alternatives; color is never the only
   invalid signal.
 - **Localization:** add source English strings only to `hud_chrome.ts`, render through `t()`, then
   run `npm run i18n:gen`.
-- **Git:** keep all work on `dev-td-mobile-custom-layout`; do not stage, commit, push, rebase, or
-  mutate the draft PR without separate user authorization.
+- **Git:** consolidate the work on `mobile-layout-adjustments`; local checkpoint and release merge are
+  authorized for this integration session, but do not push or mutate the draft PR remotely.
 
 ## Stable interfaces
 
@@ -285,7 +301,8 @@ diagnostics, preview coordinate mapping, and deterministic draft transitions. Th
 either a document already validated by the store/editor boundary or an explicitly ephemeral editor
 preview. Ephemeral preview is never serialized and always yields to the restored entry document on
 Cancel. Core/editor geometry always stays in canonical visual CSS pixels. Registry host metadata is
-used only to convert an applied `ui-author` surface into the zoomed `#ui` author's coordinates.
+used only to convert an applied `ui-author` surface into the zoomed `#ui` author's coordinates:
+visual X/Y and placement scale divide by live UI scale, while descriptor-local geometry does not.
 
 Before T1, confirm `git branch --show-current` is exactly `dev-td-mobile-custom-layout`, confirm the
 release commit named above is an ancestor, and run `git status --short`. Preserve the approved spec,
@@ -407,10 +424,10 @@ staging, committing, stashing, rebasing, or pushing.
 ### T13: Resolve scale, footprints, margins, and temporary clamps
 - **Files:** modify src/ui/mobile_hud_editor_core.ts and tests/mobile_hud_editor_core.test.ts.
 - **Changes:** RED/GREEN descriptor scale limits/steps, target floors, margins, and non-persisting
-  clamps. Convert each descriptor's host-native size into the common visual collision space using
-  host metadata and live UI Scale before computing envelopes.
-- **Tests:** invalid values and undersized targets fail; mixed-host visual sizes are correct at UI
-  scales 0.85/1/1.4; returning viewport restores exact canonical placement.
+  clamps. Resolve every descriptor's canonical local size directly in the common visual collision
+  space; host conversion remains an applier concern and cannot change validation geometry.
+- **Tests:** invalid values and undersized targets fail; mixed-host visual sizes remain identical
+  at UI scales 0.85/1/1.4; returning viewport restores exact canonical placement.
 - **Interfaces - Consumes / Produces:** T10 descriptors and T11 coordinates / resolved rectangles and clamp result.
 - **Depends on:** T10, T11.
 - **Estimated time:** 5 minutes.
@@ -532,8 +549,9 @@ staging, committing, stashing, rebasing, or pushing.
 ### T27: Apply custom properties and unusual-viewport fallback
 - **Files:** modify src/game/mobile_hud_layout_applier.ts and tests/mobile_hud_layout_applier.test.ts.
 - **Changes:** resolve/mirror in visual space, then leave `body-visual` writes unchanged and divide
-  only `ui-author` coordinates/sizes by live UI Scale. Write named properties, preserve transforms
-  and Movement inline left/top, clear stale state, and temporarily use defaults on runtime failure.
+  only `ui-author` X/Y and placement root scale by live UI Scale. Keep descriptor-local sizes
+  canonical. Write named properties, preserve transforms and Movement inline left/top, clear stale
+  state, and temporarily use defaults on runtime failure.
 - **Tests:** mixed hosts at 0.85/1/1.4, desktop no-op, mirror, transform/Movement preservation,
   fallback without mutation, and idempotent clear.
 - **Interfaces - Consumes / Produces:** T10, T12-T15, T25-T26 / applied state and fallback diagnostic for T49.
@@ -622,7 +640,9 @@ staging, committing, stashing, rebasing, or pushing.
 
 ### T37: Render scenes and capability-aware controls
 - **Files:** modify src/ui/mobile_hud_editor.ts and tests/mobile_hud_editor.test.ts.
-- **Changes:** render shared proxies plus one selected context; protected ghosts stay nonselectable; build only descriptor-supported controls; Lock preserves current preview and enabled state.
+- **Changes:** render shared editable proxies plus one selected context; fixed protected surfaces remain
+  registry-owned runtime metadata but stay hidden in the editor; build only descriptor-supported
+  controls; Lock preserves current preview and enabled state.
 - **Tests:** every context selectable, mutually exclusive variants separated, View always shown in editor, and excluded/unsupported controls absent.
 - **Interfaces - Consumes / Produces:** T4, T9-T10, T36 shell / proxy and inspector DOM.
 - **Depends on:** T4, T9, T10, T36.
@@ -881,11 +901,113 @@ staging, committing, stashing, rebasing, or pushing.
 - **Depends on:** T36, T38, T39, T40, T45, T51, T59, T60, T61, T62, T64.
 - **Estimated time:** completed 2026-07-12.
 
+### T81: Correct UI-author conversion and handedness validation
+
+- **Files:** modify `src/game/mobile_hud_layout_applier.ts`, pure geometry tests, and runtime
+  applier tests.
+- **Changes:** keep persisted and registry geometry in canonical visual CSS pixels. Write
+  `ui-author` X/Y as `visualOffset / uiScale`, apply `placementScale / uiScale` at the root, and
+  keep descriptor-local width/height in canonical author space. Apply the same rule to dependent
+  cast and swing offsets. Run runtime fallback and canonical profile validation for both right- and
+  left-handed presentation with no waiver path.
+- **Tests:** visual rectangles remain stable at UI scale 0.85, 1, and 1.4; both handedness variants
+  pass every profile, viewport, safe-area, and context fixture.
+- **Interfaces - Consumes / Produces:** T11-T16, T27, T79-T80 / one host-aware visual-space
+  conversion contract.
+- **Depends on:** T15, T27, T79, T80.
+- **Estimated time:** completed 2026-07-13.
+
+### T82: Bound interactive dynamic surfaces
+
+- **Files:** modify the registry, runtime applier, mobile HUD CSS, editor proxy rendering, and
+  focused unit/browser tests.
+- **Changes:** treat every interactive state expansion as blocking. Use complete maximum envelopes
+  or bounded scroll viewports: Player Buffs/Debuffs expose three phone or six tablet 40 by 40 icon
+  targets before scrolling, Target grows from 236 by 68 to a 236 by 121 aura maximum with five
+  visible aura targets, Pet commands retain every
+  command and stance inside a scroll viewport, and Party / Raid shrinks for sparse groups while
+  retaining the 372 by 40 horizontal or 68 by 260 vertical raid-capacity envelope.
+- **Tests:** pointer hits reach aura icons, tooltip/cancel behavior is not covered by another HUD
+  surface, all scroll content is reachable, sparse Party has no empty deadzone, and the full raid
+  envelope remains visible and blocking in Edit Mode.
+- **Interfaces - Consumes / Produces:** T8, T13-T15, T29, T74, T78-T80 / conservative interactive
+  geometry without unbounded runtime expansion.
+- **Depends on:** T15, T29, T74, T78, T79, T80, T81.
+- **Estimated time:** completed 2026-07-13.
+
+### T83: Register missed persistent interceptors
+
+- **Files:** modify registry/default data, context CSS, English HUD catalog, and focused
+  registry/browser tests.
+- **Changes:** add the blocking `tracker.deeds` header; reclassify `tracker.delve` as mixed with
+  click-through status text and one fixed 40 by 40 interactive affix pocket; retain Delve in the
+  dropdown because that mixed surface creates a distinct editable signature. Hide the standalone
+  Discord call-to-action during mobile `game-active`, since More already exposes Discord and the
+  duplicate banner would otherwise be an unregistered pointer interceptor.
+- **Tests:** Deeds header and Delve affix receive pointer hits, Delve text passes through, the
+  Delve dropdown signature remains unique, current Delve content never exceeds one affix icon, and
+  the Discord banner is absent only in active mobile gameplay.
+- **Interfaces - Consumes / Produces:** T9-T10, T73, T75, T79-T82 / complete persistent gameplay
+  surface inventory.
+- **Depends on:** T73, T75, T79, T80, T81, T82.
+- **Estimated time:** completed 2026-07-13.
+
+### T84: Reconcile the contract and run the missing-surface audit
+
+- **Files:** modify the mobile HUD architecture classification, product spec, and this plan only.
+- **Changes:** remove superseded compatibility-debt, non-blocking interactive expansion, aura
+  pointer-ownership, and Delve interaction language. Record T81-T83 as the current normative
+  contract.
+  Audit persistent mobile gameplay roots, optional class controls, context surfaces, and top-level
+  interceptors. The resulting inventory adds no surface beyond Deeds and the mixed Delve affix
+  pocket; temporary windows, prompts, tutorials, and foreground overlays remain intentionally
+  outside player placement.
+- **Tests:** search all three documents for stale interaction classifications, inspect their diff,
+  and leave final deterministic and browser verification to the shared Done definition.
+- **Interfaces - Consumes / Produces:** T75, T79-T83 / one non-contradictory contributor contract.
+- **Depends on:** T75, T79, T80, T81, T82, T83.
+- **Estimated time:** completed 2026-07-13.
+
+### T85: Add touch aura inspection and deliberate cancellation
+
+- **Files:** modify the aura painter, HUD gesture wiring, HUD CSS, architecture/spec documentation,
+  and focused aura/gesture/context-menu tests.
+- **Changes:** expose Player and Target auras as named native buttons with 40 by 40 touch boxes. A
+  short tap shows, swaps, or closes the shared tooltip; an outside tap dismisses it. A 650ms hold
+  captures the exact helpful player aura under the finger, aborts on scroll slop, and never cancels
+  a replacement that recycles the same pooled DOM node. Retain Party mini auras as status-only
+  glyphs inside the member target row. Prevent a desktop buff context menu reparented under the
+  Player frame from also opening the self menu.
+- **Tests:** pooled live tooltip/cancel identity, first/second/outside tap, non-primary touch,
+  long-hold consumption, scroll slop, status-only Party semantics, 40px CSS targets, and
+  player-frame context-menu ownership.
+- **Interfaces - Consumes / Produces:** T74, T78, T82 / one input-modality-complete aura contract.
+- **Depends on:** T74, T78, T82.
+- **Estimated time:** completed 2026-07-13.
+
+### T86: Preview validation failures in their handedness
+
+- **Files:** modify the editor presentation coordinator, mobile editor CSS, and focused editor/CSS
+  tests; reconcile architecture/spec wording.
+- **Changes:** derive preview handedness from the active drag or focused failure before the runtime
+  preference. Opposite-hand failures use canonical ghost geometry and hide every surface-owned
+  runtime fragment without hiding shared roots such as `#mobile-controls`. Snapshot handedness at
+  pointerdown and defer any proxy rebuild until pointerup so pointer capture remains intact. Name
+  the localized left-handed On/Off state alongside viewport and safe-area diagnostics.
+- **Tests:** opposite-hand Yumi collision, inverse drag/nudge/scale, pointer capture through failure
+  resolution, Minimap satellite hiding, standalone hidden selector, localized diagnostics, and
+  teardown back to the runtime hand.
+- **Interfaces - Consumes / Produces:** T12, T15, T40-T41, T72, T80-T81 / truthful automatic
+  failure presentation without mutating player settings.
+- **Depends on:** T12, T15, T40, T41, T72, T80, T81.
+- **Estimated time:** completed 2026-07-13.
+
 ## Done definition
 - Every task is complete in dependency order using RED, GREEN, REFACTOR.
 - Every file in File structure is either created/modified as listed or explicitly removed from the
   plan with a recorded reason before execution reaches its dependent task.
-- Both device profiles pass every canonical geometry, safe-area, and context fixture.
+- Both device profiles pass structural, capability, scale, and target-size validation in every
+  canonical context. Overlap and bounds never block a player-authored layout.
 - Input suspension, persistence failure, unusual viewport fallback, and left-handed inverse editing
   have direct behavioral tests.
 - The five before/after screenshot pairs are inspected, not merely generated.

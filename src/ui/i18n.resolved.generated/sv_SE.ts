@@ -219,7 +219,7 @@ export const sv_SE: EnTranslations = {
         "controlView": "View",
         "utilityConsumables": "Consumables",
         "petCommands": "Pet commands",
-        "party": "Party",
+        "party": "Party / Raid",
         "menuTop": "Top menu",
         "minimapCluster": "Minimap",
         "frameTarget": "Target frame",

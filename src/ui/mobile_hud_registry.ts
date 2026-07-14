@@ -21,6 +21,7 @@ export {
 } from './mobile_hud_registry_builder';
 
 const ALL_CONTEXTS = Object.freeze([...MOBILE_HUD_CONTEXT_IDS]);
+const PLAYER_SCALE_LIMITS = Object.freeze({ min: 0.5, max: 1.5, step: 0.05 });
 
 function bodyBinding(
   surfaceId: MobileHudSurfaceId,
@@ -41,7 +42,6 @@ function actionSeatDescriptor(
   rootSelector: string,
   phoneSize = 48,
   tabletSize = 56,
-  minimumScale = 1,
 ): MobileHudSurfaceDescriptor {
   return {
     id,
@@ -55,9 +55,10 @@ function actionSeatDescriptor(
       tablet: { width: tabletSize, height: tabletSize },
     },
     minimumTargetSize: { width: 48, height: 48 },
+    lowScaleTouchCompensation: true,
     edgeMargin: 4,
     comfortPadding: 2,
-    scaleLimits: { min: minimumScale, max: 1.5, step: 0.1 },
+    scaleLimits: PLAYER_SCALE_LIMITS,
     capabilities: ['scale'],
     mirrorPolicy: 'position',
     binding: {
@@ -92,7 +93,7 @@ const sharedActionRegistry = buildMobileHudRegistry({
     ),
     actionSeatDescriptor('action.attack', '#mobile-action-attack'),
     actionSeatDescriptor('action.target', '#mobile-target-cycle'),
-    actionSeatDescriptor('action.jump_use', '#mobile-jump', 56, 64, 0.9),
+    actionSeatDescriptor('action.jump_use', '#mobile-jump', 56, 64),
     actionSeatDescriptor('action.page', '#mobile-action-page-toggle'),
     {
       id: 'control.movement',
@@ -101,18 +102,15 @@ const sharedActionRegistry = buildMobileHudRegistry({
       visibleIn: ALL_CONTEXTS,
       validateIn: ALL_CONTEXTS,
       defaultSize: { width: 134, height: 172 },
-      minimumTargetSize: { width: 112, height: 112 },
+      minimumTargetSize: { width: 24, height: 24 },
       edgeMargin: 8,
       comfortPadding: 4,
-      scaleLimits: { min: 0.9, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
-      primaryFootprint: ({ layoutSize }) => ({
-        x: 8,
-        y: layoutSize.height - 118,
-        width: 116,
-        height: 116,
-      }),
+      // The transparent zone starts movement anywhere inside this rectangle, so
+      // its complete capture area is interactive even though Edit Mode outlines
+      // only the smaller painted joystick.
       binding: {
         ...bodyBinding('control.movement', '#mobile-move-zone', ['#mobile-move-joystick']),
         editorVisualSelectors: ['#mobile-move-joystick'],
@@ -126,10 +124,10 @@ const sharedActionRegistry = buildMobileHudRegistry({
       visibleIn: ALL_CONTEXTS,
       validateIn: ALL_CONTEXTS,
       defaultSize: { width: 220, height: 100 },
-      minimumTargetSize: { width: 82, height: 82 },
+      minimumTargetSize: { width: 24, height: 24 },
       edgeMargin: 8,
       comfortPadding: 2,
-      scaleLimits: { min: 0.9, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
       primaryFootprint: ({ profileId, layoutSize }) => {
@@ -176,9 +174,10 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       validateIn: ALL_CONTEXTS,
       defaultSize: { width: 48, height: 48 },
       minimumTargetSize: { width: 48, height: 48 },
+      lowScaleTouchCompensation: true,
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 1, max: 1.5, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale', 'opening-direction'],
       mirrorPolicy: 'position-and-order',
       variants: [
@@ -188,12 +187,8 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
         { id: 'expanded-up-6', size: { width: 100, height: 206 } },
         { id: 'expanded-down-6', size: { width: 100, height: 206 } },
       ],
-      primaryFootprint: ({ placement, layoutSize }) => ({
-        x: placement.openingDirection === 'left' ? layoutSize.width - 48 : 0,
-        y: placement.openingDirection === 'down' ? 0 : layoutSize.height - 48,
-        width: 48,
-        height: 48,
-      }),
+      // Do not narrow this to the disclosure toggle: every supported opening
+      // direction exposes six live buttons inside the worst-case variant.
       constrainLayoutToViewport: true,
       binding: {
         ...bodyBinding('utility.consumables', '#mobile-consumables', [
@@ -211,25 +206,28 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       validateIn: ALL_CONTEXTS,
       defaultSize: { width: 164, height: 40 },
       minimumTargetSize: { width: 40, height: 40 },
+      lowScaleTouchCompensation: true,
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 1, max: 1.5, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale', 'orientation', 'reverse'],
       mirrorPolicy: 'position-and-order',
       editorFallbackFootprint: ({ placement }) =>
         placement.orientation === 'vertical'
           ? { x: 4, y: 4, width: 32, height: 156 }
           : { x: 4, y: 4, width: 156, height: 32 },
-      variants: [
-        { id: 'current-stance', size: { width: 164, height: 40 } },
-        { id: 'all-seven-buttons', size: { width: 284, height: 40 } },
-        { id: 'all-seven-buttons-vertical', size: { width: 40, height: 284 } },
-      ],
+      // Attack, class utility, and the current stance stay visible in this
+      // four-button viewport. Opening all stance options adds scroll content,
+      // not an unbounded input row over neighboring controls.
+      constrainLayoutToViewport: true,
       binding: {
         ...uiBinding('pet.commands', '#petbar'),
-        runtimeSizing: 'intrinsic',
         editorVisualSelectors: ['#petbar .pet-btn .icon-label'],
-        editorGeometrySelectors: ['#petbar .pet-btn .icon-label'],
+        // Geometry follows the bounded scroll viewport. Measuring every child
+        // would include clipped, offscreen stance buttons in the editor hitbox.
+        editorGeometrySelectors: ['#petbar'],
+        editorPlaceholderWhenEmpty: true,
+        editorPlaceholderUsesLayoutFootprint: true,
       },
     },
     {
@@ -240,26 +238,30 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       validateIn: ALL_CONTEXTS,
       defaultSize: { width: 40, height: 40 },
       minimumTargetSize: { width: 40, height: 40 },
+      lowScaleTouchCompensation: true,
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 1, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale', 'orientation', 'reverse'],
       mirrorPolicy: 'position-and-order',
       editorFallbackFootprint: () => ({ x: 6, y: 6, width: 28, height: 28 }),
       variants: [
         { id: 'collapsed', size: { width: 40, height: 40 } },
-        { id: 'expanded-five-with-leave', size: { width: 444, height: 40 } },
-        { id: 'expanded-five-with-leave-vertical', size: { width: 112, height: 253 } },
+        // The member wrapper is a clipped scroll viewport. It exposes every
+        // supported raid member without letting nine rows expand beyond this
+        // registered interactive surface.
+        { id: 'expanded-raid-scroll-horizontal', size: { width: 372, height: 40 } },
+        { id: 'expanded-raid-scroll-vertical', size: { width: 68, height: 260 } },
       ],
       binding: {
         ...uiBinding('party', '#party-frames', ['#party-chip', '.party-rows', '#party-leave']),
         runtimeSizing: 'intrinsic',
         editorVisualSelectors: ['#party-chip', '#party-frames .party-frame', '#party-leave'],
-        editorGeometrySelectors: [
-          '#party-chip .ui-icon',
-          '#party-frames .party-frame',
-          '#party-leave .ui-icon',
-        ],
+        // The live root shrinks for a sparse party and caps a populated raid.
+        // Offscreen member rows must not enlarge the editor selection proxy.
+        editorGeometrySelectors: ['#party-frames'],
+        editorPlaceholderWhenEmpty: true,
+        editorPlaceholderUsesLayoutFootprint: true,
       },
     },
     {
@@ -268,34 +270,28 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       coordinateHost: 'body-visual',
       visibleIn: ALL_CONTEXTS,
       validateIn: ALL_CONTEXTS,
-      defaultSize: { width: 40, height: 48 },
+      defaultSize: { width: 204, height: 48 },
+      profileSizes: {
+        phone: { width: 204, height: 48 },
+        tablet: { width: 308, height: 48 },
+      },
       minimumTargetSize: { width: 48, height: 48 },
+      lowScaleTouchCompensation: true,
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 1, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale', 'orientation', 'reverse'],
       mirrorPolicy: 'position-and-order',
       editorFallbackFootprint: () => ({ x: 0, y: 0, width: 40, height: 48 }),
       variants: [
         { id: 'collapsed', size: { width: 40, height: 48 } },
-        { id: 'expanded-compact', size: { width: 196, height: 48 } },
-        { id: 'expanded-standard', size: { width: 300, height: 48 } },
-        { id: 'expanded-vertical', size: { width: 48, height: 300 } },
+        { id: 'expanded-vertical', size: { width: 48, height: 308 } },
       ],
       binding: {
-        ...bodyBinding('menu.top', '#mobile-combat-controls', [
-          '#mobile-menu-collapse-toggle',
-          '#mobile-combat-buttons',
-        ]),
+        ...bodyBinding('menu.top', '#mobile-combat-controls'),
         runtimeSizing: 'intrinsic',
-        editorVisualSelectors: [
-          '#mobile-menu-collapse-toggle',
-          '#mobile-combat-buttons > .mobile-btn',
-        ],
-        editorGeometrySelectors: [
-          '#mobile-menu-collapse-toggle',
-          '#mobile-combat-buttons > .mobile-btn',
-        ],
+        editorVisualSelectors: ['#mobile-combat-controls > .mobile-btn'],
+        editorGeometrySelectors: ['#mobile-combat-controls > .mobile-btn'],
       },
     },
     {
@@ -304,13 +300,17 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       coordinateHost: 'ui-author',
       visibleIn: ALL_CONTEXTS,
       validateIn: ALL_CONTEXTS,
-      defaultSize: { width: 98, height: 132 },
+      // Includes the clock and the two rim controls, not only the map disc.
+      // At the 0.6 default scale this matches the compact production footprint.
+      defaultSize: { width: 162, height: 220 },
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 0.8, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
-      primaryFootprint: () => ({ x: 0, y: 0, width: 98, height: 98 }),
+      // The clock and raid/mail satellites receive input too. Keeping the full
+      // normalized cluster blocking prevents an apparently decorative edge from
+      // covering another control after the player moves the minimap.
       binding: {
         ...uiBinding('minimap.cluster', '#minimap-wrap', [
           '#zone-label',
@@ -334,14 +334,16 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       defaultSize: { width: 236, height: 68 },
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 0.8, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
-      primaryFootprint: () => ({ x: 0, y: 0, width: 236, height: 68 }),
       editorFallbackFootprint: () => ({ x: 0, y: 0, width: 239, height: 69 }),
       variants: [
         { id: 'base', size: { width: 236, height: 68 } },
-        { id: 'with-target-auras', size: { width: 236, height: 142 } },
+        // Target auras are tooltip-enabled controls, not decoration. The live
+        // strip scrolls inside this bounded 47px viewport, so an arbitrary aura
+        // count never grows the registered surface beyond the landscape screen.
+        { id: 'with-target-auras', size: { width: 236, height: 121 } },
       ],
       binding: {
         ...uiBinding('frame.target', '#target-frame', ['#tf-debuffs']),
@@ -352,8 +354,11 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
           '#target-frame > .portrait-wrap > #tf-elite-tag',
           '#target-frame > .uf-bars',
           '#target-frame > .uf-bars > #tf-castbar',
-          '#target-frame > #tf-debuffs > .buff',
+          // The bounded strip, not every clipped aura child, owns live geometry.
+          '#target-frame > #tf-debuffs',
         ],
+        editorPlaceholderWhenEmpty: true,
+        editorPlaceholderUsesLayoutFootprint: true,
       },
     },
     {
@@ -365,7 +370,7 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
       defaultSize: { width: 300, height: 68 },
       edgeMargin: 4,
       comfortPadding: 2,
-      scaleLimits: { min: 0.8, max: 1.4, step: 0.1 },
+      scaleLimits: PLAYER_SCALE_LIMITS,
       capabilities: ['scale'],
       mirrorPolicy: 'position',
       editorFallbackFootprint: () => ({ x: -5, y: -5, width: 285, height: 74 }),
@@ -384,6 +389,38 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
         editorPseudoGeometry: [{ selector: '#player-frame', pseudo: '::before' }],
       },
     },
+    {
+      id: 'tracker.deeds',
+      class: 'movable',
+      coordinateHost: 'ui-author',
+      visibleIn: ALL_CONTEXTS,
+      validateIn: ALL_CONTEXTS,
+      defaultSize: { width: 48, height: 40 },
+      profileSizes: {
+        phone: { width: 48, height: 40 },
+        tablet: { width: 152, height: 40 },
+      },
+      minimumTargetSize: { width: 40, height: 40 },
+      lowScaleTouchCompensation: true,
+      edgeMargin: 4,
+      comfortPadding: 2,
+      scaleLimits: PLAYER_SCALE_LIMITS,
+      capabilities: ['scale'],
+      mirrorPolicy: 'position',
+      primaryFootprint: ({ layoutSize }) => ({
+        x: 0,
+        y: 0,
+        width: layoutSize.width,
+        height: 40,
+      }),
+      binding: {
+        ...uiBinding('tracker.deeds', '#deed-tracker'),
+        editorVisualSelectors: ['#deed-tracker .dt-header'],
+        editorGeometrySelectors: ['#deed-tracker .dt-header'],
+        editorPlaceholderWhenEmpty: true,
+        editorPlaceholderUsesLayoutFootprint: true,
+      },
+    },
     ...(['auras.player_buffs', 'auras.player_debuffs'] as const).map(
       (id): MobileHudSurfaceDescriptor => ({
         id,
@@ -391,25 +428,35 @@ const sharedCompositeRegistry = buildMobileHudRegistry({
         coordinateHost: 'ui-author',
         visibleIn: ALL_CONTEXTS,
         validateIn: ALL_CONTEXTS,
-        defaultSize: { width: 28, height: 28 },
-        minimumTargetSize: { width: 28, height: 28 },
+        // Every aura remains reachable through a bounded scroll viewport. The
+        // phone profile exposes three icons at once; tablet exposes six. A
+        // vertical placement swaps these dimensions in the pure geometry core.
+        defaultSize: { width: 260, height: 40 },
+        profileSizes: {
+          // Aura art remains 28px (34px for an emphasized own aura), while
+          // each live tooltip/cancel target owns a full 40px touch box.
+          phone: { width: 128, height: 40 },
+          tablet: { width: 260, height: 40 },
+        },
+        minimumTargetSize: { width: 40, height: 40 },
+        lowScaleTouchCompensation: true,
         edgeMargin: 4,
-        comfortPadding: 2,
-        scaleLimits: { min: 1, max: 1.4, step: 0.1 },
+        // Adjacent 40px slots may touch; their centered 28px faces still keep
+        // a 12px visual gutter without inflating the strict collision matrix.
+        comfortPadding: 0,
+        scaleLimits: PLAYER_SCALE_LIMITS,
         capabilities: ['scale', 'orientation', 'reverse'],
         mirrorPolicy: 'position-and-order',
-        editorFallbackFootprint: () => ({ x: 0, y: 0, width: 28, height: 28 }),
-        overlapPolicy: 'informational-overlay',
-        variants: [
-          { id: 'populated-horizontal-8', size: { width: 252, height: 28 } },
-          { id: 'populated-vertical-8', size: { width: 28, height: 252 } },
-        ],
+        constrainLayoutToViewport: true,
+        editorFallbackFootprint: () => ({ x: 0, y: 0, width: 40, height: 40 }),
         binding: {
           ...uiBinding(id, id === 'auras.player_buffs' ? '#buff-bar' : '#debuff-bar'),
-          runtimeSizing: 'intrinsic',
           editorVisualSelectors: [
             id === 'auras.player_buffs' ? '#buff-bar .buff' : '#debuff-bar .buff',
           ],
+          // The scroll viewport is the interactive geometry. Child rectangles
+          // may extend beyond it while remaining clipped and reachable by pan.
+          editorGeometrySelectors: [id === 'auras.player_buffs' ? '#buff-bar' : '#debuff-bar'],
           editorPlaceholderWhenEmpty: true,
           editorPlaceholderUsesLayoutFootprint: true,
         },
@@ -483,7 +530,8 @@ function contextStatusDescriptor(
     edgeMargin: 4,
     comfortPadding: 2,
     minimumTargetSize: interaction === 'interactive' ? { width: 40, height: 40 } : undefined,
-    scaleLimits: { min: interaction === 'interactive' ? 1 : 0.8, max: 1.4, step: 0.1 },
+    lowScaleTouchCompensation: interaction === 'interactive' || undefined,
+    scaleLimits: PLAYER_SCALE_LIMITS,
     capabilities: ['scale'],
     mirrorPolicy: 'position',
     primaryFootprint,
@@ -591,21 +639,31 @@ const contextRegistry = buildMobileHudRegistry({
         };
       },
     },
-    contextStatusDescriptor(
-      'status.arena.yumi',
-      MOBILE_HUD_CONTEXT_ALIASES.YUMI_ACTIVE,
-      {
-        width: 520,
-        height: 54,
+    {
+      ...contextStatusDescriptor(
+        'status.arena.yumi',
+        MOBILE_HUD_CONTEXT_ALIASES.YUMI_ACTIVE,
+        {
+          width: 520,
+          height: 54,
+        },
+        'interactive',
+        ({ layoutSize }) => ({
+          x: Math.min(92, Math.max(0, layoutSize.width - 40)),
+          y: Math.max(0, (layoutSize.height - 40) / 2),
+          width: Math.min(40, layoutSize.width),
+          height: Math.min(40, layoutSize.height),
+        }),
+      ),
+      profileSizes: {
+        phone: { width: 224, height: 54 },
+        tablet: { width: 520, height: 54 },
       },
-      'interactive',
-      ({ layoutSize }) => ({
-        x: Math.max(0, layoutSize.width - 40),
-        y: Math.max(0, (layoutSize.height - 40) / 2),
-        width: Math.min(40, layoutSize.width),
-        height: Math.min(40, layoutSize.height),
-      }),
-    ),
+      // The compact custom strip reserves a stable internal pocket for its
+      // collapse toggle. Keeping the strip unmirrored makes that pocket match
+      // the same validated rect for both handedness modes.
+      mirrorPolicy: 'none',
+    },
     {
       id: 'protected.arena.yumi_respawn',
       class: 'protected',
@@ -621,15 +679,26 @@ const contextRegistry = buildMobileHudRegistry({
       allowProtectedOverlapWith: ['protected.system.center_message'],
       protectedFootprint: (geometry) => centeredProtectedRect(geometry, 176, 94, 0.38),
     },
-    contextStatusDescriptor(
-      'status.vale_cup.indicator',
-      contextIds('world.vale_cup_indicator'),
-      {
-        width: 220,
-        height: 40,
+    {
+      ...contextStatusDescriptor(
+        'status.vale_cup.indicator',
+        contextIds('world.vale_cup_indicator'),
+        {
+          width: 220,
+          height: 40,
+        },
+        'interactive',
+      ),
+      profileSizes: {
+        phone: { width: 120, height: 40 },
+        tablet: { width: 220, height: 40 },
       },
-      'interactive',
-    ),
+      // The phone default deliberately ends on the bottom-safe boundary. Its
+      // compact visual keeps internal padding, so no extra collision halo is
+      // needed beside the adjacent 40px aura slots.
+      edgeMargin: 0,
+      comfortPadding: 0,
+    },
     {
       id: 'protected.vale_cup.briefing',
       class: 'protected',
@@ -696,8 +765,16 @@ const contextRegistry = buildMobileHudRegistry({
           width: 280,
           height: 180,
         },
-        'informational',
+        'interactive',
+        // The tracker copy remains click-through, but its affix owns focus and
+        // long-press tooltips. Current Delve data permits at most one affix, so
+        // custom CSS pins that icon to this exact mobile touch pocket.
+        () => ({ x: 88, y: 0, width: 40, height: 40 }),
       ),
+      constrainLayoutToViewport: true,
+      // Unlike handed controls, this mixed tracker keeps one stable left-side
+      // home; its internal affix pocket is intentionally asymmetric.
+      mirrorPolicy: 'none',
     },
     {
       id: 'protected.system.center_message',

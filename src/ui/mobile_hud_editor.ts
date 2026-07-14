@@ -7,12 +7,17 @@ import {
   resolveMobileHudEditorContext,
 } from './mobile_hud_context';
 import {
+  createMobileHudContextDropdown,
+  type MobileHudContextDropdownHandle,
+} from './mobile_hud_context_dropdown';
+import {
   createMobileHudPreviewTransform,
   isMobileHudDraftDirty,
   type MobileHudPreviewTransform,
   mapMobileHudPreviewDeltaToCanonical,
   mapMobileHudVisualPointToPreview,
   mirrorMobileHudPlacement,
+  normalizeMobileHudPlacementForDescriptor,
   reduceMobileHudDraft,
   resolveMobileHudSurfaceGeometry,
   validateMobileHudContext,
@@ -68,6 +73,7 @@ const SURFACE_LABEL_KEYS = {
   'status.vale_cup.match': 'hudChrome.mobileHudEditor.surface.statusValeCupMatch',
   'status.vale_cup.charge': 'hudChrome.mobileHudEditor.surface.statusValeCupCharge',
   'protected.vale_cup.betting': 'hudChrome.mobileHudEditor.surface.protectedValeCupBetting',
+  'tracker.deeds': 'hudChrome.deeds.trackerLabel',
   'tracker.delve': 'hudChrome.mobileHudEditor.surface.trackerDelve',
   'protected.system.center_message': 'hudChrome.mobileHudEditor.surface.protectedCenterMessage',
 } as const satisfies Record<MobileHudSurfaceId, TranslationKey>;
@@ -96,10 +102,6 @@ const FAILURE_LABEL_KEYS = {
   'unsupported-capability': 'hudChrome.mobileHudEditor.failure.unsupportedCapability',
   'scale-out-of-range': 'hudChrome.mobileHudEditor.failure.scaleOutOfRange',
   'target-too-small': 'hudChrome.mobileHudEditor.failure.targetTooSmall',
-  'out-of-bounds': 'hudChrome.mobileHudEditor.failure.outOfBounds',
-  overlap: 'hudChrome.mobileHudEditor.failure.overlap',
-  'view-intrusion': 'hudChrome.mobileHudEditor.failure.viewIntrusion',
-  'protected-overlap': 'hudChrome.mobileHudEditor.failure.protectedOverlap',
 } as const satisfies Record<MobileHudValidationFailure['reason'], TranslationKey>;
 
 const EDITOR_TOUCH_TARGET_SIZE = 48;
@@ -193,6 +195,7 @@ export interface MobileHudEditorDeps {
   };
   confirmDiscard(
     copy: Readonly<Record<'title' | 'body' | 'confirm' | 'continueEditing', string>>,
+    onConfirm: () => void,
   ): boolean;
   translate: Translate;
   onOpenChange(open: boolean): void;
@@ -207,6 +210,7 @@ interface MobileHudEditorDrag {
   size: { width: number; height: number };
   geometry: MobileHudViewportGeometry;
   transform: MobileHudPreviewTransform;
+  handedness: 'left' | 'right';
 }
 
 interface MobileHudEditorPaletteDrag {
@@ -247,13 +251,14 @@ export class MobileHudEditor {
   #focusTrap: FocusTrapHandle | null = null;
   #contextClass: string | null = null;
   #preview: HTMLElement | null = null;
-  #contextSelector: HTMLSelectElement | null = null;
+  #contextSelector: MobileHudContextDropdownHandle<MobileHudContextId> | null = null;
   #inspector: HTMLElement | null = null;
   #status: HTMLElement | null = null;
   #lockButton: HTMLButtonElement | null = null;
   #saveButton: HTMLButtonElement | null = null;
   readonly #proxies = new Map<MobileHudSurfaceId, HTMLElement>();
   readonly #liveVisualElements = new Map<MobileHudSurfaceId, Set<HTMLElement>>();
+  readonly #liveOwnedElements = new Map<MobileHudSurfaceId, Set<HTMLElement>>();
   readonly #liveGeometryElements = new Map<MobileHudSurfaceId, Set<HTMLElement>>();
   readonly #livePseudoGeometry = new Map<
     MobileHudSurfaceId,
@@ -447,7 +452,13 @@ export class MobileHudEditor {
         element.removeAttribute('data-mobile-hud-editor-hidden');
       }
     }
+    for (const elements of this.#liveOwnedElements.values()) {
+      for (const element of elements) {
+        element.removeAttribute('data-mobile-hud-editor-hidden');
+      }
+    }
     this.#liveVisualElements.clear();
+    this.#liveOwnedElements.clear();
     this.#liveGeometryElements.clear();
     this.#livePseudoGeometry.clear();
   }
@@ -551,6 +562,7 @@ export class MobileHudEditor {
   #syncLiveVisualState(): void {
     this.#clearLiveVisualState();
     if (!this.#draft) return;
+    const previewUsesRuntimeHandedness = this.#previewHandedness() === this.#deps.getHandedness();
     for (const proxy of this.#proxies.values()) {
       proxy.setAttribute('data-mobile-hud-live-visual', 'false');
     }
@@ -563,6 +575,25 @@ export class MobileHudEditor {
       for (const selector of selectors) {
         for (const element of this.#deps.document.querySelectorAll<HTMLElement>(selector)) {
           elements.add(element);
+        }
+      }
+      // Most surfaces own their root and every registered satellite. View is
+      // the exception: its force-existing root is the shared #mobile-controls
+      // layer, so hiding that root would erase all other touch controls too.
+      const ownedSelectors =
+        binding.editorVisibility === 'force-existing-root'
+          ? [...(binding.editorVisualSelectors ?? []), ...(binding.dependentRootSelectors ?? [])]
+          : [binding.rootSelector, ...(binding.dependentRootSelectors ?? [])];
+      const ownedElements = new Set<HTMLElement>();
+      for (const selector of ownedSelectors) {
+        for (const element of this.#deps.document.querySelectorAll<HTMLElement>(selector)) {
+          ownedElements.add(element);
+        }
+      }
+      if (ownedElements.size > 0) this.#liveOwnedElements.set(descriptor.id, ownedElements);
+      if (!descriptor.visibleIn.includes(this.#draft.contextId) || !previewUsesRuntimeHandedness) {
+        for (const element of ownedElements) {
+          element.setAttribute('data-mobile-hud-editor-hidden', 'true');
         }
       }
       if (elements.size === 0) continue;
@@ -587,13 +618,14 @@ export class MobileHudEditor {
       proxy?.setAttribute(
         'data-mobile-hud-live-visual',
         String(
-          visible && this.#hasRenderableLiveVisual(descriptor, geometryElements, pseudoGeometry),
+          visible &&
+            previewUsesRuntimeHandedness &&
+            this.#hasRenderableLiveVisual(descriptor, geometryElements, pseudoGeometry),
         ),
       );
       for (const element of elements) {
         element.setAttribute('data-mobile-hud-editor-visual', descriptor.id);
         element.setAttribute('data-mobile-hud-editor-state', selected ? 'selected' : 'unselected');
-        if (!visible) element.setAttribute('data-mobile-hud-editor-hidden', 'true');
       }
     }
   }
@@ -608,15 +640,38 @@ export class MobileHudEditor {
     }
   }
 
+  #surfaceForRepeatedTap(surfaceId: MobileHudSurfaceId, event: MouseEvent): MobileHudSurfaceId {
+    if (!this.#draft || event.detail <= 0 || this.#draft.selectedSurfaceId !== surfaceId) {
+      return surfaceId;
+    }
+    const overlapping = [...this.#proxies]
+      .filter(([, proxy]) => {
+        const rect = proxy.getBoundingClientRect();
+        return (
+          event.clientX >= rect.x &&
+          event.clientX <= rect.x + rect.width &&
+          event.clientY >= rect.y &&
+          event.clientY <= rect.y + rect.height
+        );
+      })
+      .map(([id]) => id);
+    if (overlapping.length < 2) return surfaceId;
+    const currentIndex = overlapping.indexOf(surfaceId);
+    if (currentIndex < 0) return surfaceId;
+    // Proxies share registry paint order. Repeated taps walk downward through
+    // that order so a fully covered control is always recoverable on touch.
+    return overlapping[(currentIndex - 1 + overlapping.length) % overlapping.length];
+  }
+
   #renderPreview(preview: HTMLElement): void {
     if (!this.#draft) return;
     preview.replaceChildren();
     this.#proxies.clear();
     for (const descriptor of this.#deps.registry.descriptors) {
-      if (!this.#isSurfaceVisible(descriptor)) continue;
-      const proxy = this.#deps.document.createElement(
-        descriptor.class === 'movable' ? 'button' : 'div',
-      );
+      // Fixed system overlays remain registry-owned context metadata, but they
+      // are not player-editable and must not look like selectable editor UI.
+      if (descriptor.class !== 'movable' || !this.#isSurfaceVisible(descriptor)) continue;
+      const proxy = this.#deps.document.createElement('button');
       proxy.classList.add('mobile-hud-editor-proxy', `mobile-hud-editor-${descriptor.class}`);
       proxy.setAttribute('data-mobile-hud-surface-id', descriptor.id);
       proxy.setAttribute('data-mobile-hud-surface-class', descriptor.class);
@@ -638,48 +693,45 @@ export class MobileHudEditor {
       frame.setAttribute('aria-hidden', 'true');
       frame.append(label, error);
       proxy.append(frame);
-      if (descriptor.class === 'movable') {
-        (proxy as HTMLButtonElement).type = 'button';
-        proxy.tabIndex = this.#draft.locked ? -1 : 0;
-        proxy.setAttribute('aria-disabled', this.#draft.locked ? 'true' : 'false');
-        proxy.setAttribute('aria-pressed', String(descriptor.id === this.#draft.selectedSurfaceId));
-        proxy.addEventListener('click', () => this.selectSurface(descriptor.id));
-        proxy.addEventListener('pointerdown', (event) =>
-          this.#startDrag(proxy, descriptor.id, event as PointerEvent),
-        );
-        proxy.addEventListener('pointermove', (event) => this.#moveDrag(event as PointerEvent));
-        proxy.addEventListener('pointerup', (event) =>
-          this.#endDrag(proxy, (event as PointerEvent).pointerId),
-        );
-        proxy.addEventListener('pointercancel', (event) =>
-          this.#endDrag(proxy, (event as PointerEvent).pointerId),
-        );
-        proxy.addEventListener('keydown', (event) => {
-          if (!this.#draft || this.#draft.locked) return;
-          const delta =
-            (event as KeyboardEvent).key === 'ArrowUp'
-              ? { deltaX: 0, deltaY: -1 }
-              : (event as KeyboardEvent).key === 'ArrowDown'
-                ? { deltaX: 0, deltaY: 1 }
-                : (event as KeyboardEvent).key === 'ArrowLeft'
-                  ? { deltaX: -1, deltaY: 0 }
-                  : (event as KeyboardEvent).key === 'ArrowRight'
-                    ? { deltaX: 1, deltaY: 0 }
-                    : null;
-          if (!delta) return;
-          event.preventDefault();
-          event.stopPropagation();
-          this.selectSurface(descriptor.id);
-          this.#applyDraftEdit({
-            type: 'nudge-selected',
-            ...delta,
-            handedness: this.#deps.getHandedness(),
-          });
+      (proxy as HTMLButtonElement).type = 'button';
+      proxy.tabIndex = this.#draft.locked ? -1 : 0;
+      proxy.setAttribute('aria-disabled', this.#draft.locked ? 'true' : 'false');
+      proxy.setAttribute('aria-pressed', String(descriptor.id === this.#draft.selectedSurfaceId));
+      proxy.addEventListener('click', (event) =>
+        this.selectSurface(this.#surfaceForRepeatedTap(descriptor.id, event as MouseEvent)),
+      );
+      proxy.addEventListener('pointerdown', (event) =>
+        this.#startDrag(proxy, descriptor.id, event as PointerEvent),
+      );
+      proxy.addEventListener('pointermove', (event) => this.#moveDrag(event as PointerEvent));
+      proxy.addEventListener('pointerup', (event) =>
+        this.#endDrag(proxy, (event as PointerEvent).pointerId),
+      );
+      proxy.addEventListener('pointercancel', (event) =>
+        this.#endDrag(proxy, (event as PointerEvent).pointerId),
+      );
+      proxy.addEventListener('keydown', (event) => {
+        if (!this.#draft || this.#draft.locked) return;
+        const delta =
+          (event as KeyboardEvent).key === 'ArrowUp'
+            ? { deltaX: 0, deltaY: -1 }
+            : (event as KeyboardEvent).key === 'ArrowDown'
+              ? { deltaX: 0, deltaY: 1 }
+              : (event as KeyboardEvent).key === 'ArrowLeft'
+                ? { deltaX: -1, deltaY: 0 }
+                : (event as KeyboardEvent).key === 'ArrowRight'
+                  ? { deltaX: 1, deltaY: 0 }
+                  : null;
+        if (!delta) return;
+        event.preventDefault();
+        event.stopPropagation();
+        this.selectSurface(descriptor.id);
+        this.#applyDraftEdit({
+          type: 'nudge-selected',
+          ...delta,
+          handedness: this.#previewHandedness(),
         });
-      } else {
-        proxy.setAttribute('role', 'note');
-        proxy.setAttribute('aria-disabled', 'true');
-      }
+      });
       this.#proxies.set(descriptor.id, proxy);
       preview.append(proxy);
     }
@@ -700,16 +752,15 @@ export class MobileHudEditor {
       registry: this.#deps.registry,
       profileId: this.#draft.activeProfileId,
       placements: this.#draft.document.profiles[this.#draft.activeProfileId] ?? {},
-      baselinePlacements: this.#deps.registry.defaults[this.#draft.activeProfileId],
       geometry: this.#deps.getGeometry(),
       contextId: this.#draft.contextId,
+      handedness: this.#previewHandedness(),
       isSurfaceAvailable: (surfaceId) => this.#isSurfaceAvailable(surfaceId),
     });
     if (scope === 'current') return current;
     const matrix = validateMobileHudLayoutMatrix({
       registry: this.#deps.registry,
       profiles: this.#draft.document.profiles,
-      baselineProfiles: this.#deps.registry.defaults,
       isSurfaceAvailable: (surfaceId) => this.#isSurfaceAvailable(surfaceId),
     });
     const failures: MobileHudValidationFailure[] = [];
@@ -733,12 +784,22 @@ export class MobileHudEditor {
         ? this.#draft.activeFailureIndex
         : null;
     if (focusFailure && failures.length > 0) {
-      const currentContextFailureIndex = failures.findIndex(
+      const currentHandedness = this.#deps.getHandedness();
+      const matchesCurrentPresentation = (failure: MobileHudValidationFailure): boolean =>
+        failure.profileId === this.#draft?.activeProfileId &&
+        resolveMobileHudEditorContext(failure.contextId) === this.#draft?.contextId;
+      const currentHandednessFailureIndex = failures.findIndex(
         (failure) =>
-          failure.profileId === this.#draft?.activeProfileId &&
-          failure.contextId === this.#draft?.contextId,
+          matchesCurrentPresentation(failure) &&
+          (failure.handedness === undefined || failure.handedness === currentHandedness),
       );
-      activeFailureIndex = currentContextFailureIndex >= 0 ? currentContextFailureIndex : 0;
+      const currentContextFailureIndex = failures.findIndex(matchesCurrentPresentation);
+      activeFailureIndex =
+        currentHandednessFailureIndex >= 0
+          ? currentHandednessFailureIndex
+          : currentContextFailureIndex >= 0
+            ? currentContextFailureIndex
+            : 0;
       const activeFailure = failures[activeFailureIndex];
       contextId = resolveMobileHudEditorContext(activeFailure.contextId);
       sceneId = MOBILE_HUD_CONTEXTS.find((context) => context.id === contextId)?.sceneId ?? sceneId;
@@ -754,10 +815,12 @@ export class MobileHudEditor {
 
   #renderValidation(): void {
     if (!this.#draft) return;
+    const previewHandedness = this.#previewHandedness();
     const visibleFailures = this.#draft.failures.filter(
       (failure) =>
         failure.profileId === this.#draft?.activeProfileId &&
-        failure.contextId === this.#draft?.contextId,
+        resolveMobileHudEditorContext(failure.contextId) === this.#draft?.contextId &&
+        (failure.handedness === undefined || failure.handedness === previewHandedness),
     );
     const invalidSurfaceIds = new Set(
       visibleFailures.flatMap((failure) => [...failure.surfaceIds]),
@@ -784,6 +847,7 @@ export class MobileHudEditor {
       this.#saveButton.setAttribute('aria-disabled', String(disabled));
     }
     if (this.#preview) {
+      this.#preview.setAttribute('data-mobile-hud-preview-handedness', previewHandedness);
       if (visibleFailures.length > 0) {
         this.#preview.classList.add('is-failing-preview');
       } else {
@@ -800,7 +864,18 @@ export class MobileHudEditor {
         const firstFailure = activeFailure ?? visibleFailures[0] ?? this.#draft.failures[0];
         const message = this.#failureMessage(firstFailure, firstFailure.surfaceIds[0]);
         const context = this.#deps.translate(CONTEXT_LABEL_KEYS[firstFailure.contextId]);
-        this.#status.textContent = firstFailure.viewportId
+        const diagnosticFixture = [
+          firstFailure.viewportId,
+          firstFailure.safeAreaFixtureId,
+          firstFailure.handedness
+            ? `${this.#deps.translate('hudChrome.options.mobileLeftHanded')}: ${this.#deps.translate(
+                firstFailure.handedness === 'left' ? 'hud.options.on' : 'hud.options.off',
+              )}`
+            : undefined,
+        ]
+          .filter((value): value is string => Boolean(value))
+          .join(' / ');
+        this.#status.textContent = diagnosticFixture
           ? this.#deps.translate('hudChrome.mobileHudEditor.failureWithFixture', {
               message,
               context,
@@ -809,9 +884,7 @@ export class MobileHudEditor {
                   ? 'hudChrome.mobileHudEditor.profileTablet'
                   : 'hudChrome.mobileHudEditor.profilePhone',
               ),
-              viewport: [firstFailure.viewportId, firstFailure.safeAreaFixtureId]
-                .filter((value): value is string => Boolean(value))
-                .join(' / '),
+              viewport: diagnosticFixture,
             })
           : firstFailure.contextId === this.#draft.contextId
             ? message
@@ -826,15 +899,31 @@ export class MobileHudEditor {
   }
 
   #failureMessage(failure: MobileHudValidationFailure, surfaceId: MobileHudSurfaceId): string {
-    const subjectId =
-      failure.reason === 'view-intrusion'
-        ? (failure.surfaceIds.find((id) => id !== 'control.view') ?? surfaceId)
-        : surfaceId;
+    const subjectId = surfaceId;
     const otherId = failure.surfaceIds.find((id) => id !== subjectId);
     return this.#deps.translate(FAILURE_LABEL_KEYS[failure.reason], {
       surface: this.#deps.translate(SURFACE_LABEL_KEYS[subjectId]),
       other: otherId ? this.#deps.translate(SURFACE_LABEL_KEYS[otherId]) : '',
     });
+  }
+
+  #focusedFailure(): MobileHudValidationFailure | undefined {
+    if (!this.#draft || this.#draft.activeFailureIndex === null) return undefined;
+    const failure = this.#draft.failures[this.#draft.activeFailureIndex];
+    if (
+      !failure ||
+      failure.profileId !== this.#draft.activeProfileId ||
+      resolveMobileHudEditorContext(failure.contextId) !== this.#draft.contextId
+    ) {
+      return undefined;
+    }
+    return failure;
+  }
+
+  #previewHandedness(): 'left' | 'right' {
+    return (
+      this.#drag?.handedness ?? this.#focusedFailure()?.handedness ?? this.#deps.getHandedness()
+    );
   }
 
   #activeGeometry(): MobileHudViewportGeometry {
@@ -843,6 +932,7 @@ export class MobileHudEditor {
 
   #usesPhysicalPreviewGeometry(geometry: MobileHudViewportGeometry): boolean {
     if (!this.#draft || this.#draft.activeProfileId !== this.#deps.getProfileId()) return false;
+    if (this.#previewHandedness() !== this.#deps.getHandedness()) return false;
     const physical = this.#deps.getGeometry();
     return (
       geometry.width === physical.width &&
@@ -882,16 +972,19 @@ export class MobileHudEditor {
       const proxy = this.#proxies.get(descriptor.id);
       if (!proxy || !this.#isSurfaceVisible(descriptor)) continue;
       let rect: MobileHudRect | undefined;
+      let hitRect: MobileHudRect | undefined;
       if (descriptor.class === 'protected') {
         rect = descriptor.protectedFootprint?.(geometry);
+        hitRect = rect;
       } else {
         const canonical =
           this.#draft.document.profiles[this.#draft.activeProfileId]?.[descriptor.id];
         if (!canonical) continue;
+        const normalized = normalizeMobileHudPlacementForDescriptor(descriptor, canonical);
         const displayed =
-          this.#deps.getHandedness() === 'left'
-            ? mirrorMobileHudPlacement(canonical, descriptor.mirrorPolicy)
-            : canonical;
+          this.#previewHandedness() === 'left'
+            ? mirrorMobileHudPlacement(normalized, descriptor.mirrorPolicy)
+            : normalized;
         const resolved = resolveMobileHudSurfaceGeometry(
           descriptor,
           this.#draft.activeProfileId,
@@ -906,25 +999,31 @@ export class MobileHudEditor {
         rect =
           liveRect ??
           (descriptor.binding?.editorPlaceholderUsesLayoutFootprint &&
-          proxy.getAttribute('data-mobile-hud-live-visual') === 'false' &&
-          !descriptor.editorFallbackFootprint
+          proxy.getAttribute('data-mobile-hud-live-visual') === 'false'
             ? resolved.canonicalRect
             : resolved.editorFallbackRect);
+        // In Edit Mode the painted frame is the interaction contract. Runtime
+        // click-through regions and smaller primary controls must not make a
+        // visible layout surface impossible to select or drag.
+        hitRect = rect;
       }
-      if (!rect) continue;
+      if (!rect || !hitRect) continue;
       const point = mapMobileHudVisualPointToPreview({ x: rect.x, y: rect.y }, transform);
       const visualWidth = rect.width * transform.scale;
       const visualHeight = rect.height * transform.scale;
+      const hitPoint = mapMobileHudVisualPointToPreview({ x: hitRect.x, y: hitRect.y }, transform);
+      const hitVisualWidth = hitRect.width * transform.scale;
+      const hitVisualHeight = hitRect.height * transform.scale;
       const hitWidth =
         descriptor.class === 'movable'
-          ? Math.max(EDITOR_TOUCH_TARGET_SIZE, visualWidth)
-          : visualWidth;
+          ? Math.max(EDITOR_TOUCH_TARGET_SIZE, hitVisualWidth)
+          : hitVisualWidth;
       const hitHeight =
         descriptor.class === 'movable'
-          ? Math.max(EDITOR_TOUCH_TARGET_SIZE, visualHeight)
-          : visualHeight;
-      const desiredHitLeft = point.x - (hitWidth - visualWidth) / 2;
-      const desiredHitTop = point.y - (hitHeight - visualHeight) / 2;
+          ? Math.max(EDITOR_TOUCH_TARGET_SIZE, hitVisualHeight)
+          : hitVisualHeight;
+      const desiredHitLeft = hitPoint.x - (hitWidth - hitVisualWidth) / 2;
+      const desiredHitTop = hitPoint.y - (hitHeight - hitVisualHeight) / 2;
       const hitLeft = Math.min(
         previewRect.x + previewRect.width - hitWidth,
         Math.max(previewRect.x, desiredHitLeft),
@@ -956,10 +1055,12 @@ export class MobileHudEditor {
     const canonical = this.#draft.document.profiles[this.#draft.activeProfileId]?.[surfaceId];
     if (descriptor?.class !== 'movable' || !canonical) return;
     const geometry = this.#activeGeometry();
+    const normalized = normalizeMobileHudPlacementForDescriptor(descriptor, canonical);
+    const handedness = this.#previewHandedness();
     const displayed =
-      this.#deps.getHandedness() === 'left'
-        ? mirrorMobileHudPlacement(canonical, descriptor.mirrorPolicy)
-        : canonical;
+      handedness === 'left'
+        ? mirrorMobileHudPlacement(normalized, descriptor.mirrorPolicy)
+        : normalized;
     const resolved = resolveMobileHudSurfaceGeometry(
       descriptor,
       this.#draft.activeProfileId,
@@ -980,6 +1081,7 @@ export class MobileHudEditor {
       size: resolved.scaledSize,
       geometry,
       transform: createMobileHudPreviewTransform(geometry, previewRect),
+      handedness,
     };
   }
 
@@ -996,7 +1098,7 @@ export class MobileHudEditor {
       topLeft: { x: drag.startTopLeft.x + delta.x, y: drag.startTopLeft.y + delta.y },
       size: drag.size,
       geometry: drag.geometry,
-      handedness: this.#deps.getHandedness(),
+      handedness: drag.handedness,
     });
   }
 
@@ -1004,10 +1106,15 @@ export class MobileHudEditor {
     if (!this.#drag || this.#drag.pointerId !== pointerId) return;
     this.#flushPendingDragEdit();
     if (proxy.hasPointerCapture(pointerId)) proxy.releasePointerCapture(pointerId);
+    const previousPreviewHandedness = this.#previewHandedness();
     this.#drag = null;
     const previousContextId = this.#draft?.contextId;
     this.#revalidate('matrix', true);
-    if (this.#draft && previousContextId !== this.#draft.contextId) {
+    if (
+      this.#draft &&
+      (previousContextId !== this.#draft.contextId ||
+        previousPreviewHandedness !== this.#previewHandedness())
+    ) {
       if (this.#contextClass) this.#deps.document.body.classList.remove(this.#contextClass);
       this.#contextClass = mobileHudContextClass(this.#draft.contextId);
       this.#deps.document.body.classList.add(this.#contextClass);
@@ -1052,7 +1159,7 @@ export class MobileHudEditor {
     if (!this.#draft) return;
     const previousContextId = this.#draft.contextId;
     const previousProfileId = this.#draft.activeProfileId;
-    const previousFailureIndex = this.#draft.activeFailureIndex;
+    const previousPreviewHandedness = this.#previewHandedness();
     const next = reduceMobileHudDraft(this.#draft, action, this.#deps);
     if (next === this.#draft) return;
     const documentChanged = next.document !== this.#draft.document;
@@ -1062,7 +1169,7 @@ export class MobileHudEditor {
     const presentationChanged =
       previousContextId !== this.#draft.contextId ||
       previousProfileId !== this.#draft.activeProfileId ||
-      previousFailureIndex !== this.#draft.activeFailureIndex;
+      previousPreviewHandedness !== this.#previewHandedness();
     if (presentationChanged) {
       if (this.#contextClass) this.#deps.document.body.classList.remove(this.#contextClass);
       this.#contextClass = mobileHudContextClass(this.#draft.contextId);
@@ -1081,15 +1188,7 @@ export class MobileHudEditor {
 
   #renderSelectors(): void {
     if (!this.#draft || !this.#contextSelector) return;
-    this.#contextSelector.replaceChildren();
-    for (const context of MOBILE_HUD_EDITOR_CONTEXTS) {
-      const option = this.#deps.document.createElement('option');
-      option.textContent = this.#deps.translate(CONTEXT_LABEL_KEYS[context.id]);
-      option.setAttribute('value', context.id);
-      option.setAttribute('data-mobile-hud-context-id', context.id);
-      this.#contextSelector.append(option);
-    }
-    this.#contextSelector.value = this.#draft.contextId;
+    this.#contextSelector.setValue(this.#draft.contextId);
   }
 
   #appendInspectorControl(
@@ -1098,13 +1197,17 @@ export class MobileHudEditor {
     inspector: HTMLElement,
     action: Parameters<typeof reduceMobileHudDraft>[1],
     visibleLabel?: string,
+    disabled = false,
   ): void {
     const button = this.#deps.document.createElement('button');
     button.type = 'button';
+    button.classList.add('btn');
     button.setAttribute('data-mobile-hud-control', controlId);
     const label = this.#deps.translate(labelKey);
     button.textContent = visibleLabel ?? label;
     button.setAttribute('aria-label', label);
+    button.disabled = disabled;
+    button.setAttribute('aria-disabled', String(disabled));
     button.addEventListener('click', () => this.#applyDraftEdit(action));
     inspector.append(button);
   }
@@ -1123,19 +1226,23 @@ export class MobileHudEditor {
     }
 
     if (descriptor.capabilities.includes('scale')) {
+      const placement = this.#draft.document.profiles[this.#draft.activeProfileId]?.[descriptor.id];
+      const limits = descriptor.scaleLimits;
       this.#appendInspectorControl(
         'scale-decrease',
         'hudChrome.mobileHudEditor.control.decreaseScale',
         this.#inspector,
-        { type: 'scale-selected', steps: -1, handedness: this.#deps.getHandedness() },
+        { type: 'scale-selected', steps: -2, handedness: this.#previewHandedness() },
         '−',
+        placement !== undefined && limits !== undefined && placement.scale <= limits.min,
       );
       this.#appendInspectorControl(
         'scale-increase',
         'hudChrome.mobileHudEditor.control.increaseScale',
         this.#inspector,
-        { type: 'scale-selected', steps: 1, handedness: this.#deps.getHandedness() },
+        { type: 'scale-selected', steps: 2, handedness: this.#previewHandedness() },
         '+',
+        placement !== undefined && limits !== undefined && placement.scale >= limits.max,
       );
     }
     this.#appendInspectorControl(
@@ -1290,10 +1397,7 @@ export class MobileHudEditor {
   async save(): Promise<boolean> {
     if (!this.#draft || this.#saving) return false;
     if (this.#draft.failures.length > 0) {
-      if (this.#status) {
-        const firstFailure = this.#draft.failures[0];
-        this.#status.textContent = this.#failureMessage(firstFailure, firstFailure.surfaceIds[0]);
-      }
+      this.#renderValidation();
       return false;
     }
     this.#saving = true;
@@ -1329,16 +1433,19 @@ export class MobileHudEditor {
 
   requestClose(): boolean {
     if (!this.#draft) return true;
-    if (
-      isMobileHudDraftDirty(this.#draft) &&
-      !this.#deps.confirmDiscard({
-        title: this.#deps.translate('hudChrome.mobileHudEditor.discard.title'),
-        body: this.#deps.translate('hudChrome.mobileHudEditor.discard.body'),
-        confirm: this.#deps.translate('hudChrome.mobileHudEditor.discard.confirm'),
-        continueEditing: this.#deps.translate('hudChrome.mobileHudEditor.discard.continueEditing'),
-      })
-    ) {
-      return false;
+    if (isMobileHudDraftDirty(this.#draft)) {
+      const confirmed = this.#deps.confirmDiscard(
+        {
+          title: this.#deps.translate('hudChrome.mobileHudEditor.discard.title'),
+          body: this.#deps.translate('hudChrome.mobileHudEditor.discard.body'),
+          confirm: this.#deps.translate('hudChrome.mobileHudEditor.discard.confirm'),
+          continueEditing: this.#deps.translate(
+            'hudChrome.mobileHudEditor.discard.continueEditing',
+          ),
+        },
+        () => this.cancel(),
+      );
+      if (!confirmed) return false;
     }
     this.cancel();
     return true;
@@ -1446,35 +1553,39 @@ export class MobileHudEditor {
 
     const selectors = this.#deps.document.createElement('div');
     selectors.classList.add('mobile-hud-editor-selectors');
-    const contextSelector = this.#deps.document.createElement('select');
-    contextSelector.classList.add('mobile-hud-editor-contexts');
-    contextSelector.setAttribute('data-mobile-hud-selector', 'context');
-    contextSelector.setAttribute(
-      'aria-label',
-      this.#deps.translate('hudChrome.mobileHudEditor.contextLabel'),
-    );
-    contextSelector.addEventListener('change', () =>
-      this.setContext(contextSelector.value as MobileHudContextId),
-    );
-    selectors.append(contextSelector);
-    this.#contextSelector = contextSelector as HTMLSelectElement;
+    const contextSelector = createMobileHudContextDropdown({
+      document: this.#deps.document,
+      ariaLabel: this.#deps.translate('hudChrome.mobileHudEditor.contextLabel'),
+      value: this.#draft.contextId,
+      options: MOBILE_HUD_EDITOR_CONTEXTS.map((context) => ({
+        value: context.id,
+        label: this.#deps.translate(CONTEXT_LABEL_KEYS[context.id]),
+      })),
+      onChange: (contextId) => this.setContext(contextId),
+    });
+    selectors.append(contextSelector.root);
+    this.#contextSelector = contextSelector;
     this.#renderSelectors();
 
     const actions = this.#deps.document.createElement('div');
     actions.classList.add('mobile-hud-editor-actions');
     const lockStatus = this.#deps.document.createElement('button');
     lockStatus.type = 'button';
+    lockStatus.classList.add('btn');
+    lockStatus.setAttribute('data-mobile-hud-action', 'lock');
     lockStatus.addEventListener('click', () => this.setLocked(!this.#draft?.locked));
     this.#lockButton = lockStatus;
     this.#renderLock();
     const save = this.#deps.document.createElement('button');
     save.type = 'button';
+    save.classList.add('btn');
     save.setAttribute('data-mobile-hud-action', 'save');
     save.textContent = this.#deps.translate('hudChrome.mobileHudEditor.save');
     save.addEventListener('click', () => void this.save());
     this.#saveButton = save;
     const cancel = this.#deps.document.createElement('button');
     cancel.type = 'button';
+    cancel.classList.add('btn');
     cancel.setAttribute('data-mobile-hud-action', 'cancel');
     cancel.textContent = this.#deps.translate('hudChrome.mobileHudEditor.cancel');
     cancel.addEventListener('click', () => this.requestClose());

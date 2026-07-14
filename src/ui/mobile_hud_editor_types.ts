@@ -1,5 +1,8 @@
 export const MOBILE_HUD_LAYOUT_SCHEMA_VERSION = 1 as const;
-export const MOBILE_HUD_LAYOUT_STORAGE_KEY = 'woc_mobile_hud_layout_v1' as const;
+// Defaults revision 3 deliberately leaves the revision-2 WIP key untouched.
+// Those saved layouts were authored against mismatched frame/minimap geometry
+// and would otherwise re-break the HUD immediately on the next startup.
+export const MOBILE_HUD_LAYOUT_STORAGE_KEY = 'woc_mobile_hud_layout_v1_defaults_3' as const;
 export const COLLISION_EPSILON_CSS_PX = 0.5 as const;
 
 export const MOBILE_HUD_PROFILE_IDS = ['phone', 'tablet'] as const;
@@ -86,6 +89,7 @@ export const MOBILE_HUD_SURFACE_IDS = [
   'status.vale_cup.match',
   'status.vale_cup.charge',
   'protected.vale_cup.betting',
+  'tracker.deeds',
   'tracker.delve',
   'protected.system.center_message',
 ] as const;
@@ -93,6 +97,7 @@ export type MobileHudSurfaceId = (typeof MOBILE_HUD_SURFACE_IDS)[number];
 
 export type MobileHudOrientation = 'horizontal' | 'vertical';
 export type MobileHudOpeningDirection = 'left' | 'right' | 'up' | 'down';
+export type MobileHudHandedness = 'left' | 'right';
 
 export interface MobileHudPlacement {
   anchor: MobileHudAnchor;
@@ -176,6 +181,8 @@ export interface MobileHudSurfaceDescriptor {
   defaultSize: MobileHudSize;
   profileSizes?: Partial<Record<MobileHudProfileId, MobileHudSize>>;
   minimumTargetSize?: MobileHudSize;
+  /** Keep a small control's live hitbox at minimumTargetSize while its art scales lower. */
+  lowScaleTouchCompensation?: boolean;
   edgeMargin: number;
   comfortPadding: number;
   scaleLimits?: MobileHudScaleLimits;
@@ -217,17 +224,14 @@ export type MobileHudValidationReason =
   | 'invalid-placement'
   | 'unsupported-capability'
   | 'scale-out-of-range'
-  | 'target-too-small'
-  | 'out-of-bounds'
-  | 'overlap'
-  | 'view-intrusion'
-  | 'protected-overlap';
+  | 'target-too-small';
 
 export interface MobileHudValidationFailure {
   reason: MobileHudValidationReason;
   profileId: MobileHudProfileId;
   contextId: MobileHudContextId;
   surfaceIds: readonly MobileHudSurfaceId[];
+  handedness?: MobileHudHandedness;
   viewportId?: string;
   safeAreaFixtureId?: string;
   activeVariantIds?: readonly string[];

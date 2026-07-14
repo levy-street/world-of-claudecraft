@@ -219,7 +219,7 @@ export const en_XA: EnTranslations = {
         "controlView": "[Ʋíéŵ]",
         "utilityConsumables": "[Çóñšúɱáƀļéš]",
         "petCommands": "[Þéţ çóɱɱáñðš]",
-        "party": "[Þáŕţý]",
+        "party": "[Þáŕţý / Ŕáíð]",
         "menuTop": "[Ţóþ ɱéñú]",
         "minimapCluster": "[Ɱíñíɱáþ]",
         "frameTarget": "[Ţáŕĝéţ ƒŕáɱé]",

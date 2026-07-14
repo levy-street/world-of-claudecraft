@@ -153,10 +153,10 @@ describe('installWindowResize tap safety', () => {
   // Window at (100,100), 400x300 author px, scale 1: SE client corner (500,400).
   const CORNER = { x: 495, y: 395 };
 
-  const setup = (opts: { touchLayout?: boolean } = {}) => {
+  const setup = (opts: { touchLayout?: boolean; windowId?: string } = {}) => {
     const classes = new Set<string>(['window', 'panel']);
     const el: any = {
-      id: 'quest-log-window',
+      id: opts.windowId ?? 'quest-log-window',
       dataset: {} as Record<string, string>,
       style: {} as Record<string, string>,
       classList: {
@@ -291,6 +291,33 @@ describe('installWindowResize tap safety', () => {
       expect(pins).toHaveLength(0);
       expect(el.style).toEqual({});
       expect(el.dataset).toEqual({});
+    } finally {
+      restore();
+    }
+  });
+
+  it('resizes the centered spellbook card on the touch layout', () => {
+    const { el, pins, fire, restore } = setup({ touchLayout: true, windowId: 'spellbook' });
+    try {
+      fire('pointerdown', {
+        pointerType: 'touch',
+        clientX: CORNER.x,
+        clientY: CORNER.y,
+      });
+      fire('pointermove', {
+        pointerType: 'touch',
+        clientX: CORNER.x - RESIZE_ENGAGE_SLOP_TOUCH - 40,
+        clientY: CORNER.y - 40,
+      });
+      expect(pins).toHaveLength(1);
+      expect(el.dataset.windowMoved).toBe('1');
+      fire('pointermove', {
+        pointerType: 'touch',
+        clientX: CORNER.x - RESIZE_ENGAGE_SLOP_TOUCH - 80,
+        clientY: CORNER.y - 70,
+      });
+      expect(el.style.width).toBe('360px');
+      expect(el.style.height).toBe('270px');
     } finally {
       restore();
     }

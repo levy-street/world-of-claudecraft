@@ -152,6 +152,11 @@ export class SpellbookWindow {
       this.openerFocus = null;
       return;
     }
+    // Clear the HUD's mobile open stamp before hiding. The touch layout uses
+    // `[data-window-open="1"] { display:flex !important; }` so the list can be
+    // the sole scroll surface; leaving the stamp behind would override this
+    // inline display:none and make the close button appear broken.
+    delete el.dataset.windowOpen;
     el.style.display = 'none';
     this.deps.hideTooltip();
     this.descriptionAbilityId = null;
@@ -256,7 +261,7 @@ export class SpellbookWindow {
       : '';
     el.innerHTML = `<div class="panel-title"><span>${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(t('abilityUi.spellbook.classSubtitle', { className }))}</span></span><div class="panel-title-actions">${resetBtnHtml}<button type="button" class="x-btn" data-close aria-label="${esc(t('abilityUi.spellbook.close'))}">${svgIcon('close')}</button></div></div>`;
     const status = document.createElement('div');
-    status.className = 'spell-assignment-status';
+    status.className = 'spell-assignment-status visually-hidden';
     status.setAttribute('aria-live', 'polite');
     status.setAttribute('aria-atomic', 'true');
     el.appendChild(status);
@@ -272,15 +277,17 @@ export class SpellbookWindow {
       empty.textContent = t('abilityUi.spellbook.empty');
       list.appendChild(empty);
     }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    const resetBtn = el.querySelector('[data-reset-bar]');
-    resetBtn?.addEventListener('pointerdown', (ev) => ev.stopPropagation());
-    resetBtn?.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.deps.resetFormBar();
-      audio.click();
-    });
+    const closeButton = el.querySelector<HTMLElement>('[data-close]');
+    if (closeButton) bindTouchTap(closeButton, () => this.close());
+    const resetBtn = el.querySelector<HTMLElement>('[data-reset-bar]');
+    if (resetBtn) {
+      bindTouchTap(resetBtn, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.deps.resetFormBar();
+        audio.click();
+      });
+    }
   }
 
   // In-place refresh of the per-row hotbar toggles, called from hud.update() while
@@ -496,7 +503,7 @@ export class SpellbookWindow {
       add.dataset.abilityId = row.abilityId;
       add.textContent = '+';
       add.setAttribute('aria-label', t('hudChrome.spellbook.addToBarAria', { name }));
-      add.addEventListener('click', (event) => {
+      bindTouchTap(add, (event) => {
         event.preventDefault();
         event.stopPropagation();
         this.openPicker(row.abilityId, add);
@@ -519,7 +526,7 @@ export class SpellbookWindow {
         'aria-label',
         t('hudChrome.spellbook.moveAssignmentAria', { name, slot: label }),
       );
-      chip.addEventListener('click', (event) => {
+      bindTouchTap(chip, (event) => {
         event.preventDefault();
         event.stopPropagation();
         if (this.pickerAbilityId === row.abilityId) this.closePicker();
@@ -531,7 +538,7 @@ export class SpellbookWindow {
       remove.dataset.abilityId = row.abilityId;
       remove.innerHTML = svgIcon('close');
       remove.setAttribute('aria-label', t('hudChrome.spellbook.removeFromBarAria', { name }));
-      remove.addEventListener('click', (event) => {
+      bindTouchTap(remove, (event) => {
         event.preventDefault();
         event.stopPropagation();
         if (this.deps.removeFromBar(row.abilityId)) audio.click();
@@ -599,7 +606,7 @@ export class SpellbookWindow {
       button.dataset.pickerPage = String(tab.page);
       button.tabIndex = tab.tabIndex;
       button.textContent = this.formatAbilityNumber(tab.page + 1);
-      button.addEventListener('click', () => this.selectPickerPage(tab.page));
+      bindTouchTap(button, () => this.selectPickerPage(tab.page));
       button.addEventListener('keydown', (event) => {
         const page = nextMobileSpellbookPickerPage(tab.page, event.key);
         if (page === tab.page) return;
@@ -632,14 +639,7 @@ export class SpellbookWindow {
         ? `<span class="spell-slot-icon" style="background-image:url(${iconDataUrl(destination.occupant.type, destination.occupant.id)})"></span><span class="spell-slot-label">A${esc(this.formatAbilityNumber(destination.position))}</span>`
         : `<span class="spell-slot-label">A${esc(this.formatAbilityNumber(destination.position))}</span>`;
       const assign = () => this.assignPickerDestination(destination.sourceSlot - 1);
-      button.addEventListener('click', assign);
-      button.addEventListener('keydown', (event) => {
-        const key = event.key;
-        if (key === 'Enter' || key === ' ') {
-          event.preventDefault();
-          assign();
-        }
-      });
+      bindTouchTap(button, assign);
       group.appendChild(button);
     }
     const close = document.createElement('button');
@@ -647,7 +647,7 @@ export class SpellbookWindow {
     close.className = 'spell-slot-picker-close';
     close.setAttribute('aria-label', t('hudChrome.spellbook.closePicker'));
     close.innerHTML = svgIcon('close');
-    close.addEventListener('click', () => this.closePicker());
+    bindTouchTap(close, () => this.closePicker());
     panel.append(tabs, group, close);
     root.querySelector('.panel-title')?.after(panel);
     const destinations = panel.querySelectorAll<HTMLButtonElement>('.spell-slot-destination');

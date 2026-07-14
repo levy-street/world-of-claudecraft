@@ -56,6 +56,8 @@ describe('SpellbookWindow touch description controls', () => {
   let window: SpellbookWindow;
   let abilityTooltip: SpellbookWindowDeps['abilityTooltip'];
   let removeFromBar: SpellbookWindowDeps['removeFromBar'];
+  let resetFormBar: SpellbookWindowDeps['resetFormBar'];
+  let assignMobileSlot: NonNullable<SpellbookWindowDeps['assignMobileSlot']>;
   // The right-edge boundary each description show received (undefined = none).
   let shownBoundaries: Array<number | undefined>;
 
@@ -80,6 +82,8 @@ describe('SpellbookWindow touch description controls', () => {
       actions[index] = null;
       return true;
     });
+    resetFormBar = vi.fn();
+    assignMobileSlot = vi.fn(() => ({ changed: true, stale: false }));
     const hideTooltip = () => {
       tooltip.style.display = 'none';
     };
@@ -116,16 +120,98 @@ describe('SpellbookWindow touch description controls', () => {
       hasFreeSlot: () => actions.some((action) => action === null),
       addToBar: vi.fn(() => false),
       removeFromBar,
-      hasFormBars: () => false,
-      resetFormBar: vi.fn(),
+      hasFormBars: () => true,
+      resetFormBar,
       setDragAction: vi.fn(),
       clearActionDropTargets: vi.fn(),
       isTouch: () => true,
       hotbarActions: () => actions,
       barToken: () => actions.map((action) => action?.id ?? '').join('|'),
+      assignMobileSlot,
     };
     window = new SpellbookWindow(deps);
     window.render();
+  });
+
+  it('closes from a touch tap without waiting for a synthetic click', () => {
+    root.dataset.windowOpen = '1';
+    const close = required(
+      root.querySelector<HTMLButtonElement>('[data-close]'),
+      'Spellbook close button',
+    );
+
+    tap(close, 21);
+
+    expect(root.style.display).toBe('none');
+    expect(root.dataset.windowOpen).toBeUndefined();
+  });
+
+  it('keeps assignment announcements available to assistive tech without a visible row', () => {
+    const status = required(
+      root.querySelector<HTMLElement>('.spell-assignment-status'),
+      'assignment status',
+    );
+
+    expect(status.classList.contains('visually-hidden')).toBe(true);
+    expect(status.getAttribute('aria-live')).toBe('polite');
+  });
+
+  it('activates every touch-facing control from pointer events alone', () => {
+    const reset = required(
+      root.querySelector<HTMLButtonElement>('[data-reset-bar]'),
+      'reset bar button',
+    );
+    tap(reset, 22);
+    expect(resetFormBar).toHaveBeenCalledTimes(1);
+
+    const chip = required(
+      root.querySelector<HTMLButtonElement>('.spell-assignment-chip'),
+      'assignment chip',
+    );
+    tap(chip, 23);
+    expect(root.classList.contains('spell-slot-picker-open')).toBe(true);
+
+    const secondPage = required(
+      root.querySelector<HTMLButtonElement>('[data-picker-page="1"]'),
+      'second picker page',
+    );
+    tap(secondPage, 24);
+    expect(
+      root
+        .querySelector<HTMLButtonElement>('[data-picker-page="1"]')
+        ?.getAttribute('aria-selected'),
+    ).toBe('true');
+
+    const destination = required(
+      root.querySelector<HTMLButtonElement>('.spell-slot-destination'),
+      'picker destination',
+    );
+    tap(destination, 25);
+    expect(assignMobileSlot).toHaveBeenCalledTimes(1);
+    expect(root.classList.contains('spell-slot-picker-open')).toBe(false);
+
+    const reopenedChip = required(
+      root.querySelector<HTMLButtonElement>('.spell-assignment-chip'),
+      'rerendered assignment chip',
+    );
+    tap(reopenedChip, 26);
+    const closePicker = required(
+      root.querySelector<HTMLButtonElement>('.spell-slot-picker-close'),
+      'picker close button',
+    );
+    tap(closePicker, 27);
+    expect(root.classList.contains('spell-slot-picker-open')).toBe(false);
+
+    const remove = required(
+      root.querySelector<HTMLButtonElement>('.spell-hotbar-remove'),
+      'remove button',
+    );
+    tap(remove, 28);
+    expect(removeFromBar).toHaveBeenCalledTimes(1);
+
+    const add = required(root.querySelector<HTMLButtonElement>('.spell-hotbar-add'), 'add button');
+    tap(add, 29);
+    expect(root.classList.contains('spell-slot-picker-open')).toBe(true);
   });
 
   it('shows a row description only while the picker is closed', () => {

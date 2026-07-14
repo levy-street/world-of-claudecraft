@@ -9,6 +9,7 @@ import type {
   MobileHudEditCapability,
   MobileHudSurfaceDescriptor,
 } from '../src/ui/mobile_hud_editor_types';
+import { MOBILE_HUD_CONTEXT_IDS } from '../src/ui/mobile_hud_editor_types';
 import {
   buildMobileHudRegistry,
   MOBILE_HUD_CONTEXT_ALIASES,
@@ -54,6 +55,40 @@ describe('createMobileHudDefaultPlacements', () => {
       scale: 1,
     });
     expect(defaults.tablet['status.arena.generic']).toEqual(defaults.phone['status.arena.generic']);
+  });
+
+  it('starts custom landscape profiles from the approved built-in HUD topology', () => {
+    const defaults = createMobileHudDefaultPlacements();
+
+    expect(defaults.phone['frame.player']).toEqual({
+      anchor: 'bottom-center',
+      offsetX: 0,
+      offsetY: -10,
+      scale: 0.7,
+    });
+    expect(defaults.phone['frame.target']).toEqual({
+      anchor: 'top-center',
+      offsetX: 0,
+      offsetY: 8,
+      scale: 0.65,
+    });
+    expect(defaults.phone['utility.consumables']).toMatchObject({ offsetY: -68 });
+    expect(defaults.phone['minimap.cluster']).toMatchObject({ offsetX: 6, offsetY: 6, scale: 0.6 });
+    expect(defaults.phone['auras.player_buffs']).toMatchObject({ offsetX: -172, scale: 0.75 });
+    expect(defaults.phone['auras.player_debuffs']).toMatchObject({ offsetX: -172, scale: 0.75 });
+
+    expect(defaults.tablet['frame.player']).toMatchObject({ offsetY: -10, scale: 1.1 });
+    expect(defaults.tablet['frame.target']).toMatchObject({ offsetY: 8, scale: 1 });
+    expect(defaults.tablet['minimap.cluster']).toMatchObject({
+      offsetX: 6,
+      offsetY: 6,
+      scale: 0.6,
+    });
+    expect(defaults.tablet['auras.player_buffs']).toMatchObject({ offsetX: -276, scale: 0.75 });
+    expect(defaults.tablet['auras.player_debuffs']).toMatchObject({
+      offsetX: -276,
+      scale: 0.75,
+    });
   });
 });
 
@@ -206,7 +241,7 @@ describe('shared mobile HUD action and joystick descriptors', () => {
     }
   });
 
-  it('pins one 48px target floor and DOM binding per combat seat', () => {
+  it('keeps every half-scale combat seat at the 48px gameplay target floor', () => {
     const expectedBindings = new Map([
       ['action.a1', '#mobile-action-ring > .mobile-action-slot[data-mobile-index="0"]'],
       ['action.a2', '#mobile-action-ring > .mobile-action-slot[data-mobile-index="1"]'],
@@ -223,6 +258,7 @@ describe('shared mobile HUD action and joystick descriptors', () => {
         width: 48,
         height: 48,
       });
+      expect(entry.lowScaleTouchCompensation, `${entry.id} compensation`).toBe(true);
       expect(entry.binding?.rootSelector, `${entry.id} binding`).toBe(
         expectedBindings.get(entry.id),
       );
@@ -238,7 +274,7 @@ describe('shared mobile HUD action and joystick descriptors', () => {
     );
     expect(jump?.defaultSize).toEqual({ width: 56, height: 56 });
     expect(jump?.profileSizes?.tablet).toEqual({ width: 64, height: 64 });
-    expect(jump?.scaleLimits).toEqual({ min: 0.9, max: 1.5, step: 0.1 });
+    expect(jump?.scaleLimits).toEqual({ min: 0.5, max: 1.5, step: 0.05 });
   });
 
   it('pins the Movement capture envelope and its resting joystick dependent root', () => {
@@ -247,9 +283,9 @@ describe('shared mobile HUD action and joystick descriptors', () => {
     );
     expect(movement).toMatchObject({
       defaultSize: { width: 134, height: 172 },
-      minimumTargetSize: { width: 112, height: 112 },
+      minimumTargetSize: { width: 24, height: 24 },
       comfortPadding: 4,
-      scaleLimits: { min: 0.9, max: 1.4, step: 0.1 },
+      scaleLimits: { min: 0.5, max: 1.5, step: 0.05 },
       binding: {
         rootSelector: '#mobile-move-zone',
         dependentRootSelectors: ['#mobile-move-joystick'],
@@ -263,9 +299,9 @@ describe('shared mobile HUD action and joystick descriptors', () => {
     const view = MOBILE_HUD_SHARED_ACTION_DESCRIPTORS.find((entry) => entry.id === 'control.view');
     expect(view).toMatchObject({
       defaultSize: { width: 220, height: 100 },
-      minimumTargetSize: { width: 82, height: 82 },
+      minimumTargetSize: { width: 24, height: 24 },
       comfortPadding: 2,
-      scaleLimits: { min: 0.9, max: 1.4, step: 0.1 },
+      scaleLimits: { min: 0.5, max: 1.5, step: 0.05 },
       binding: {
         rootSelector: '#mobile-controls',
         dependentRootSelectors: ['#mobile-camera-joystick'],
@@ -290,7 +326,7 @@ describe('shared mobile HUD action and joystick descriptors', () => {
 });
 
 describe('shared mobile HUD composite descriptors', () => {
-  it('registers the nine semantic composites and frames', () => {
+  it('registers the ten semantic composites, frames, and shared trackers', () => {
     expect(MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.map((entry) => entry.id)).toEqual([
       'utility.consumables',
       'pet.commands',
@@ -299,6 +335,7 @@ describe('shared mobile HUD composite descriptors', () => {
       'minimap.cluster',
       'frame.target',
       'frame.player',
+      'tracker.deeds',
       'auras.player_buffs',
       'auras.player_debuffs',
     ]);
@@ -317,9 +354,26 @@ describe('shared mobile HUD composite descriptors', () => {
       'minimap.cluster': ['scale'],
       'frame.target': ['scale'],
       'frame.player': ['scale'],
+      'tracker.deeds': ['scale'],
       'auras.player_buffs': ['scale', 'orientation', 'reverse'],
       'auras.player_debuffs': ['scale', 'orientation', 'reverse'],
     });
+  });
+
+  it('anchors the top menu from its live phone and tablet width', () => {
+    const menu = MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.find((entry) => entry.id === 'menu.top');
+
+    expect(menu?.defaultSize).toEqual({ width: 204, height: 48 });
+    expect(menu?.profileSizes).toEqual({
+      phone: { width: 204, height: 48 },
+      tablet: { width: 308, height: 48 },
+    });
+    expect(menu?.minimumTargetSize).toEqual({ width: 48, height: 48 });
+    expect(menu?.lowScaleTouchCompensation).toBe(true);
+    expect(menu?.variants?.map((variant) => [variant.id, variant.size])).toEqual([
+      ['collapsed', { width: 40, height: 48 }],
+      ['expanded-vertical', { width: 48, height: 308 }],
+    ]);
   });
 
   it('models closed and six-slot Consumables footprints in every opening direction', () => {
@@ -327,6 +381,7 @@ describe('shared mobile HUD composite descriptors', () => {
       (entry) => entry.id === 'utility.consumables',
     );
     expect(consumables?.minimumTargetSize).toEqual({ width: 48, height: 48 });
+    expect(consumables?.lowScaleTouchCompensation).toBe(true);
     expect(consumables?.variants?.map((variant) => [variant.id, variant.size])).toEqual([
       ['closed', { width: 48, height: 48 }],
       ['expanded-left-6', { width: 206, height: 100 }],
@@ -336,21 +391,22 @@ describe('shared mobile HUD composite descriptors', () => {
     ]);
   });
 
-  it('pins maximum Party and pet command footprints with their 40px target floors', () => {
+  it('pins the Party envelope and bounded pet command viewport with 40px target floors', () => {
     const party = MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.find((entry) => entry.id === 'party');
     const pet = MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.find(
       (entry) => entry.id === 'pet.commands',
     );
     expect(party?.minimumTargetSize).toEqual({ width: 40, height: 40 });
+    expect(party?.lowScaleTouchCompensation).toBe(true);
     expect(party?.variants?.map((variant) => [variant.id, variant.size])).toContainEqual([
-      'expanded-five-with-leave',
-      { width: 444, height: 40 },
+      'expanded-raid-scroll-horizontal',
+      { width: 372, height: 40 },
     ]);
     expect(pet?.minimumTargetSize).toEqual({ width: 40, height: 40 });
-    expect(pet?.variants?.map((variant) => [variant.id, variant.size])).toContainEqual([
-      'all-seven-buttons',
-      { width: 284, height: 40 },
-    ]);
+    expect(pet?.lowScaleTouchCompensation).toBe(true);
+    expect(pet?.defaultSize).toEqual({ width: 164, height: 40 });
+    expect(pet?.variants).toBeUndefined();
+    expect(pet?.constrainLayoutToViewport).toBe(true);
   });
 
   it('keeps Minimap dependents, target auras, and player bars on their parent binding', () => {
@@ -390,7 +446,7 @@ describe('shared mobile HUD composite descriptors', () => {
     expect(visuals['auras.player_debuffs']).toEqual(['#debuff-bar .buff']);
   });
 
-  it('measures dynamic composites from their painted children instead of transparent roots', () => {
+  it('measures bounded scroll composites from their viewport roots', () => {
     const geometrySelectors = Object.fromEntries(
       MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.map((entry) => [
         entry.id,
@@ -398,23 +454,16 @@ describe('shared mobile HUD composite descriptors', () => {
       ]),
     );
 
-    expect(geometrySelectors['pet.commands']).toEqual(['#petbar .pet-btn .icon-label']);
-    expect(geometrySelectors.party).toEqual([
-      '#party-chip .ui-icon',
-      '#party-frames .party-frame',
-      '#party-leave .ui-icon',
-    ]);
-    expect(geometrySelectors['menu.top']).toEqual([
-      '#mobile-menu-collapse-toggle',
-      '#mobile-combat-buttons > .mobile-btn',
-    ]);
+    expect(geometrySelectors['pet.commands']).toEqual(['#petbar']);
+    expect(geometrySelectors.party).toEqual(['#party-frames']);
+    expect(geometrySelectors['menu.top']).toEqual(['#mobile-combat-controls > .mobile-btn']);
     expect(geometrySelectors['frame.target']).toEqual([
       '#target-frame > .portrait-wrap > .portrait',
       '#target-frame > .portrait-wrap > .level-chip',
       '#target-frame > .portrait-wrap > #tf-elite-tag',
       '#target-frame > .uf-bars',
       '#target-frame > .uf-bars > #tf-castbar',
-      '#target-frame > #tf-debuffs > .buff',
+      '#target-frame > #tf-debuffs',
     ]);
     expect(geometrySelectors['frame.player']).toEqual([
       '#player-frame > .portrait-wrap > .portrait',
@@ -424,6 +473,8 @@ describe('shared mobile HUD composite descriptors', () => {
       '#castbar',
       '#swingbar',
     ]);
+    expect(geometrySelectors['auras.player_buffs']).toEqual(['#buff-bar']);
+    expect(geometrySelectors['auras.player_debuffs']).toEqual(['#debuff-bar']);
   });
 
   it('keeps Player interaction on its root while live geometry owns visual overflow', () => {
@@ -439,15 +490,15 @@ describe('shared mobile HUD composite descriptors', () => {
     ]);
   });
 
-  it('keeps Target interaction fixed while reserving its measured aura overflow', () => {
+  it('blocks the whole Target frame including its bounded aura viewport', () => {
     const target = MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.find(
       (entry) => entry.id === 'frame.target',
     );
 
-    expect(target?.primaryFootprint).toBeTypeOf('function');
+    expect(target?.primaryFootprint).toBeUndefined();
     expect(target?.variants?.map(({ id, size }) => ({ id, size }))).toEqual([
       { id: 'base', size: { width: 236, height: 68 } },
-      { id: 'with-target-auras', size: { width: 236, height: 142 } },
+      { id: 'with-target-auras', size: { width: 236, height: 121 } },
     ]);
   });
 
@@ -472,24 +523,30 @@ describe('shared mobile HUD composite descriptors', () => {
 
     expect(runtimeSizing).toMatchObject({
       'utility.consumables': 'validation-footprint',
-      'pet.commands': 'intrinsic',
+      'pet.commands': 'validation-footprint',
       party: 'intrinsic',
       'menu.top': 'intrinsic',
       'minimap.cluster': 'validation-footprint',
       'frame.target': 'base-footprint',
       'frame.player': 'base-footprint',
-      'auras.player_buffs': 'intrinsic',
-      'auras.player_debuffs': 'intrinsic',
+      'tracker.deeds': 'validation-footprint',
+      'auras.player_buffs': 'validation-footprint',
+      'auras.player_debuffs': 'validation-footprint',
     });
   });
 
-  it('pins populated eight-aura horizontal and vertical footprints independently', () => {
+  it('pins bounded blocking aura viewports for phone and tablet profiles', () => {
     for (const id of ['auras.player_buffs', 'auras.player_debuffs'] as const) {
       const descriptor = MOBILE_HUD_SHARED_COMPOSITE_DESCRIPTORS.find((entry) => entry.id === id);
-      expect(descriptor?.variants?.map((variant) => [variant.id, variant.size])).toEqual([
-        ['populated-horizontal-8', { width: 252, height: 28 }],
-        ['populated-vertical-8', { width: 28, height: 252 }],
-      ]);
+      expect(descriptor?.profileSizes).toEqual({
+        phone: { width: 128, height: 40 },
+        tablet: { width: 260, height: 40 },
+      });
+      expect(descriptor?.minimumTargetSize).toEqual({ width: 40, height: 40 });
+      expect(descriptor?.lowScaleTouchCompensation).toBe(true);
+      expect(descriptor?.variants).toBeUndefined();
+      expect(descriptor?.constrainLayoutToViewport).toBe(true);
+      expect(descriptor?.overlapPolicy).toBeUndefined();
     }
   });
 
@@ -602,12 +659,7 @@ describe('context-specific mobile HUD descriptors', () => {
         expect(entry.protectedFootprint, entry.id).toBeTypeOf('function');
       } else {
         expect(entry.capabilities, entry.id).toEqual(['scale']);
-        expect(entry.scaleLimits, entry.id).toEqual({
-          min:
-            entry.id === 'status.arena.yumi' || entry.id === 'status.vale_cup.indicator' ? 1 : 0.8,
-          max: 1.4,
-          step: 0.1,
-        });
+        expect(entry.scaleLimits, entry.id).toEqual({ min: 0.5, max: 1.5, step: 0.05 });
         expect(entry.protectedFootprint, entry.id).toBeUndefined();
       }
     }
@@ -622,6 +674,44 @@ describe('context-specific mobile HUD descriptors', () => {
     }
   });
 
+  it('keeps conditionally empty shared surfaces visible with their full layout footprint', () => {
+    for (const surfaceId of ['pet.commands', 'party', 'frame.target'] as const) {
+      const binding = MOBILE_HUD_REGISTRY.getDescriptor(surfaceId)?.binding;
+      expect(binding?.editorPlaceholderWhenEmpty, surfaceId).toBe(true);
+      expect(binding?.editorPlaceholderUsesLayoutFootprint, surfaceId).toBe(true);
+    }
+  });
+
+  it('registers the mobile Deed header as a blocking shared touch surface', () => {
+    const descriptor = MOBILE_HUD_REGISTRY.getDescriptor('tracker.deeds');
+
+    expect(descriptor).toMatchObject({
+      class: 'movable',
+      coordinateHost: 'ui-author',
+      minimumTargetSize: { width: 40, height: 40 },
+      lowScaleTouchCompensation: true,
+      visibleIn: MOBILE_HUD_CONTEXT_IDS,
+      validateIn: MOBILE_HUD_CONTEXT_IDS,
+    });
+    expect(descriptor?.overlapPolicy).toBeUndefined();
+    expect(descriptor?.profileSizes).toEqual({
+      phone: { width: 48, height: 40 },
+      tablet: { width: 152, height: 40 },
+    });
+    expect(
+      descriptor?.primaryFootprint?.({
+        profileId: 'phone',
+        placement: { anchor: 'top-left', offsetX: 0, offsetY: 0, scale: 1 },
+        contextId: 'world.base',
+        layoutSize: { width: 48, height: 40 },
+      }),
+    ).toEqual({ x: 0, y: 0, width: 48, height: 40 });
+    expect(descriptor?.binding).toMatchObject({
+      rootSelector: '#deed-tracker',
+      editorGeometrySelectors: ['#deed-tracker .dt-header'],
+    });
+  });
+
   it('classifies informational and foreground overlays explicitly', () => {
     expect(
       Object.fromEntries(
@@ -630,8 +720,6 @@ describe('context-specific mobile HUD descriptors', () => {
           .map((entry) => [entry.id, entry.overlapPolicy]),
       ),
     ).toEqual({
-      'auras.player_buffs': 'informational-overlay',
-      'auras.player_debuffs': 'informational-overlay',
       'status.arena.generic': 'informational-overlay',
       'status.arena.fiesta_score': 'informational-overlay',
       'status.arena.fiesta_pending': 'informational-overlay',
@@ -642,7 +730,6 @@ describe('context-specific mobile HUD descriptors', () => {
       'status.vale_cup.match': 'informational-overlay',
       'status.vale_cup.charge': 'informational-overlay',
       'protected.vale_cup.betting': 'foreground-overlay',
-      'tracker.delve': 'informational-overlay',
       'protected.system.center_message': 'foreground-overlay',
     });
     expect(MOBILE_HUD_REGISTRY.getDescriptor('status.vale_cup.indicator')?.overlapPolicy).toBe(
@@ -759,8 +846,8 @@ describe('complete mobile HUD defaults and DOM adapter metadata', () => {
     .map((entry) => entry.id);
 
   it('combines all shared and context descriptors into one registry', () => {
-    expect(MOBILE_HUD_REGISTRY.descriptors).toHaveLength(34);
-    expect(new Set(MOBILE_HUD_REGISTRY.descriptors.map((entry) => entry.id)).size).toBe(34);
+    expect(MOBILE_HUD_REGISTRY.descriptors).toHaveLength(35);
+    expect(new Set(MOBILE_HUD_REGISTRY.descriptors.map((entry) => entry.id)).size).toBe(35);
   });
 
   it('defines deterministic phone and tablet defaults for every movable surface only', () => {
@@ -775,6 +862,14 @@ describe('complete mobile HUD defaults and DOM adapter metadata', () => {
         expect(MOBILE_HUD_REGISTRY.defaults.phone?.[descriptor.id], descriptor.id).toBeUndefined();
         expect(MOBILE_HUD_REGISTRY.defaults.tablet?.[descriptor.id], descriptor.id).toBeUndefined();
       }
+    }
+  });
+
+  it('gives every player-movable surface the same half-to-one-and-a-half scale range', () => {
+    for (const entry of MOBILE_HUD_REGISTRY.descriptors) {
+      if (entry.class !== 'movable') continue;
+      expect(entry.capabilities, entry.id).toContain('scale');
+      expect(entry.scaleLimits, entry.id).toEqual({ min: 0.5, max: 1.5, step: 0.05 });
     }
   });
 

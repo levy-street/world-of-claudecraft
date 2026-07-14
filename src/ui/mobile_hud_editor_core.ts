@@ -10,6 +10,7 @@ import {
   type MobileHudAnchor,
   type MobileHudContextId,
   type MobileHudDraft,
+  type MobileHudHandedness,
   type MobileHudMirrorPolicy,
   type MobileHudOpeningDirection,
   type MobileHudPlacement,
@@ -142,6 +143,28 @@ export function mirrorMobileHudPlacement(
   return mirrored;
 }
 
+/** Materialize semantic capability defaults before mirroring or emitting CSS.
+ * Persisted v1 placements may omit these optional fields, but the geometry and
+ * the rendered DOM must still resolve the same orientation and opening. */
+export function normalizeMobileHudPlacementForDescriptor(
+  descriptor: MobileHudSurfaceDescriptor,
+  placement: MobileHudPlacement,
+): MobileHudPlacement {
+  return {
+    ...placement,
+    ...(descriptor.capabilities.includes('orientation') && placement.orientation === undefined
+      ? { orientation: 'horizontal' as const }
+      : {}),
+    ...(descriptor.capabilities.includes('reverse') && placement.reverse === undefined
+      ? { reverse: false }
+      : {}),
+    ...(descriptor.capabilities.includes('opening-direction') &&
+    placement.openingDirection === undefined
+      ? { openingDirection: 'right' as const }
+      : {}),
+  };
+}
+
 export interface MobileHudResolvedSurfaceGeometry {
   unscaledSize: MobileHudSize;
   scaledSize: MobileHudSize;
@@ -150,6 +173,8 @@ export interface MobileHudResolvedSurfaceGeometry {
   editorFallbackRect: MobileHudRect;
   collisionRect: MobileHudRect;
   boundsRect: MobileHudRect;
+  /** Compatibility alias for the editor's fallback geometry. Player-authored
+   * positions are intentionally not clamped to safe-area or viewport bounds. */
   previewRect: MobileHudRect;
   scaleValid: boolean;
   targetSizeValid: boolean;
@@ -202,37 +227,6 @@ function validScale(descriptor: MobileHudSurfaceDescriptor, scale: number): bool
   if (scale < limits.min - epsilon || scale > limits.max + epsilon) return false;
   const steps = (scale - limits.min) / limits.step;
   return Math.abs(steps - Math.round(steps)) <= epsilon;
-}
-
-function clampRectToSafeViewport(
-  rect: MobileHudRect,
-  geometry: MobileHudViewportGeometry,
-  edgeMargin: number,
-): MobileHudRect {
-  const minimumX = geometry.visualOffsetX + geometry.safeAreaInsets.left + edgeMargin;
-  const minimumY = geometry.visualOffsetY + geometry.safeAreaInsets.top + edgeMargin;
-  const maximumX = Math.max(
-    minimumX,
-    geometry.visualOffsetX +
-      geometry.width -
-      geometry.safeAreaInsets.right -
-      edgeMargin -
-      rect.width,
-  );
-  const maximumY = Math.max(
-    minimumY,
-    geometry.visualOffsetY +
-      geometry.height -
-      geometry.safeAreaInsets.bottom -
-      edgeMargin -
-      rect.height,
-  );
-  return {
-    x: Math.min(maximumX, Math.max(minimumX, rect.x)),
-    y: Math.min(maximumY, Math.max(minimumY, rect.y)),
-    width: rect.width,
-    height: rect.height,
-  };
 }
 
 export function resolveMobileHudSurfaceGeometry(
@@ -295,10 +289,15 @@ export function resolveMobileHudSurfaceGeometry(
     width: boundsSource.width + padding * 2,
     height: boundsSource.height + padding * 2,
   };
-  const targetSourceSize = descriptor.profileSizes?.[profileId] ?? descriptor.defaultSize;
+  const effectiveTargetWidth = descriptor.lowScaleTouchCompensation
+    ? Math.max(primaryFootprint.width * placement.scale, descriptor.minimumTargetSize?.width ?? 0)
+    : primaryFootprint.width * placement.scale;
+  const effectiveTargetHeight = descriptor.lowScaleTouchCompensation
+    ? Math.max(primaryFootprint.height * placement.scale, descriptor.minimumTargetSize?.height ?? 0)
+    : primaryFootprint.height * placement.scale;
   const targetSizeValid = descriptor.minimumTargetSize
-    ? targetSourceSize.width * placement.scale >= descriptor.minimumTargetSize.width &&
-      targetSourceSize.height * placement.scale >= descriptor.minimumTargetSize.height
+    ? effectiveTargetWidth >= descriptor.minimumTargetSize.width &&
+      effectiveTargetHeight >= descriptor.minimumTargetSize.height
     : true;
   return {
     unscaledSize,
@@ -308,7 +307,7 @@ export function resolveMobileHudSurfaceGeometry(
     editorFallbackRect,
     collisionRect,
     boundsRect,
-    previewRect: clampRectToSafeViewport(interactiveRect, geometry, descriptor.edgeMargin),
+    previewRect: interactiveRect,
     scaleValid: validScale(descriptor, placement.scale),
     targetSizeValid,
     activeVariantIds: footprint.activeVariantIds,
@@ -319,9 +318,9 @@ export interface ValidateMobileHudContextOptions {
   registry: MobileHudRegistry;
   profileId: MobileHudProfileId;
   placements: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>;
-  baselinePlacements?: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>;
   geometry: MobileHudViewportGeometry;
   contextId: MobileHudContextId;
+  handedness?: MobileHudHandedness;
   isSurfaceAvailable?(surfaceId: MobileHudSurfaceId): boolean;
 }
 
@@ -337,33 +336,11 @@ function placementUsesUnsupportedCapability(
   );
 }
 
-function isRectWithinSafeMargin(
-  rect: MobileHudRect,
-  geometry: MobileHudViewportGeometry,
-  margin: number,
-): boolean {
-  const left = geometry.visualOffsetX + geometry.safeAreaInsets.left + margin;
-  const top = geometry.visualOffsetY + geometry.safeAreaInsets.top + margin;
-  const right = geometry.visualOffsetX + geometry.width - geometry.safeAreaInsets.right - margin;
-  const bottom = geometry.visualOffsetY + geometry.height - geometry.safeAreaInsets.bottom - margin;
-  return (
-    rect.x >= left - COLLISION_EPSILON_CSS_PX &&
-    rect.y >= top - COLLISION_EPSILON_CSS_PX &&
-    rect.x + rect.width <= right + COLLISION_EPSILON_CSS_PX &&
-    rect.y + rect.height <= bottom + COLLISION_EPSILON_CSS_PX
-  );
-}
-
-function rectsOverlap(a: MobileHudRect, b: MobileHudRect): boolean {
-  const width = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
-  const height = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
-  return width > COLLISION_EPSILON_CSS_PX && height > COLLISION_EPSILON_CSS_PX;
-}
-
 export function validateMobileHudContext(
   options: ValidateMobileHudContextOptions,
 ): readonly MobileHudValidationFailure[] {
   const { registry, profileId, placements, geometry, contextId } = options;
+  const handedness = options.handedness ?? 'right';
   const failures: MobileHudValidationFailure[] = [];
   const failure = (
     reason: MobileHudValidationFailure['reason'],
@@ -375,33 +352,32 @@ export function validateMobileHudContext(
       profileId,
       contextId,
       surfaceIds,
+      handedness,
       viewportId: geometry.id,
       activeVariantIds,
     });
   };
-  const active: {
-    descriptor: MobileHudSurfaceDescriptor;
-    rect: MobileHudRect;
-    activeVariantIds: readonly string[];
-  }[] = [];
-
   for (const descriptor of registry.descriptors) {
     if (options.isSurfaceAvailable && !options.isSurfaceAvailable(descriptor.id)) continue;
     if (!descriptor.validateIn.includes(contextId)) continue;
-    if (descriptor.class === 'protected') {
-      const rect = descriptor.protectedFootprint?.(geometry);
-      if (rect) active.push({ descriptor, rect, activeVariantIds: [] });
-      continue;
-    }
+    if (descriptor.class === 'protected') continue;
 
-    const placement = placements[descriptor.id];
-    if (!isMobileHudPlacement(placement)) {
+    const canonicalPlacement = placements[descriptor.id];
+    if (!isMobileHudPlacement(canonicalPlacement)) {
       failure('invalid-placement', [descriptor.id]);
       continue;
     }
-    if (placementUsesUnsupportedCapability(descriptor, placement)) {
+    if (placementUsesUnsupportedCapability(descriptor, canonicalPlacement)) {
       failure('unsupported-capability', [descriptor.id]);
     }
+    const normalizedPlacement = normalizeMobileHudPlacementForDescriptor(
+      descriptor,
+      canonicalPlacement,
+    );
+    const placement =
+      handedness === 'left'
+        ? mirrorMobileHudPlacement(normalizedPlacement, descriptor.mirrorPolicy)
+        : normalizedPlacement;
     const resolved = resolveMobileHudSurfaceGeometry(
       descriptor,
       profileId,
@@ -415,174 +391,14 @@ export function validateMobileHudContext(
     if (!resolved.targetSizeValid) {
       failure('target-too-small', [descriptor.id], resolved.activeVariantIds);
     }
-    if (!isRectWithinSafeMargin(resolved.boundsRect, geometry, descriptor.edgeMargin)) {
-      failure('out-of-bounds', [descriptor.id], resolved.activeVariantIds);
-    }
-    active.push({
-      descriptor,
-      // Pairwise Save blocking follows the actual interactive footprint. The
-      // comfort padding remains a safe-edge constraint, but must not turn a
-      // visible gap between two buttons into a reported overlap.
-      rect: resolved.interactiveRect,
-      activeVariantIds: resolved.activeVariantIds,
-    });
   }
 
-  for (let index = 0; index < active.length; index += 1) {
-    const current = active[index];
-    for (let otherIndex = index + 1; otherIndex < active.length; otherIndex += 1) {
-      const other = active[otherIndex];
-      if (!rectsOverlap(current.rect, other.rect)) continue;
-      if (current.descriptor.class === 'protected' && other.descriptor.class === 'protected') {
-        continue;
-      }
-      if (current.descriptor.overlapPolicy || other.descriptor.overlapPolicy) continue;
-      const surfaceIds = [current.descriptor.id, other.descriptor.id] as const;
-      const activeVariantIds = Object.freeze([
-        ...new Set([...current.activeVariantIds, ...other.activeVariantIds]),
-      ]);
-      if (current.descriptor.class === 'protected' || other.descriptor.class === 'protected') {
-        failure('protected-overlap', surfaceIds, activeVariantIds);
-        continue;
-      }
-      if (surfaceIds.includes('control.view')) {
-        failure('view-intrusion', surfaceIds, activeVariantIds);
-        continue;
-      }
-      if (
-        current.descriptor.allowOverlapWith?.includes(other.descriptor.id) &&
-        other.descriptor.allowOverlapWith?.includes(current.descriptor.id)
-      ) {
-        continue;
-      }
-      failure('overlap', surfaceIds, activeVariantIds);
-    }
-  }
-
-  if (!options.baselinePlacements) return Object.freeze(failures);
-  const baselineFailures = validateMobileHudContext({
-    registry,
-    profileId,
-    placements: options.baselinePlacements,
-    geometry,
-    contextId,
-    isSurfaceAvailable: options.isSurfaceAvailable,
-  });
-  const baselineKeys = new Set(
-    baselineFailures.map((failure) =>
-      JSON.stringify([failure.reason, failure.surfaceIds, failure.activeVariantIds]),
-    ),
-  );
-  const placementMatchesBaseline = (surfaceId: MobileHudSurfaceId): boolean => {
-    const descriptor = registry.getDescriptor(surfaceId);
-    if (descriptor?.class === 'protected') return true;
-    return (
-      JSON.stringify(placements[surfaceId]) ===
-      JSON.stringify(options.baselinePlacements?.[surfaceId])
-    );
-  };
-  const resolvedRect = (
-    surfaceId: MobileHudSurfaceId,
-    sourcePlacements: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>,
-    collision: boolean,
-  ): MobileHudRect | null => {
-    const descriptor = registry.getDescriptor(surfaceId);
-    if (!descriptor) return null;
-    if (descriptor.class === 'protected') return descriptor.protectedFootprint?.(geometry) ?? null;
-    const placement = sourcePlacements[surfaceId];
-    if (!isMobileHudPlacement(placement)) return null;
-    const resolved = resolveMobileHudSurfaceGeometry(
-      descriptor,
-      profileId,
-      placement,
-      geometry,
-      contextId,
-    );
-    return collision ? resolved.boundsRect : resolved.interactiveRect;
-  };
-  const magnitude = (
-    target: MobileHudValidationFailure,
-    sourcePlacements: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>,
-  ): number => {
-    if (
-      target.reason === 'overlap' ||
-      target.reason === 'view-intrusion' ||
-      target.reason === 'protected-overlap'
-    ) {
-      const first = resolvedRect(target.surfaceIds[0], sourcePlacements, false);
-      const second = resolvedRect(target.surfaceIds[1], sourcePlacements, false);
-      if (!first || !second) return Number.POSITIVE_INFINITY;
-      const width = Math.max(
-        0,
-        Math.min(first.x + first.width, second.x + second.width) - Math.max(first.x, second.x),
-      );
-      const height = Math.max(
-        0,
-        Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y),
-      );
-      return width * height;
-    }
-    const surfaceId = target.surfaceIds[0];
-    const descriptor = registry.getDescriptor(surfaceId);
-    const placement = sourcePlacements[surfaceId];
-    if (!descriptor || !isMobileHudPlacement(placement)) return Number.POSITIVE_INFINITY;
-    if (target.reason === 'out-of-bounds') {
-      const rect = resolvedRect(surfaceId, sourcePlacements, true);
-      if (!rect) return Number.POSITIVE_INFINITY;
-      const left = geometry.visualOffsetX + geometry.safeAreaInsets.left + descriptor.edgeMargin;
-      const top = geometry.visualOffsetY + geometry.safeAreaInsets.top + descriptor.edgeMargin;
-      const right =
-        geometry.visualOffsetX +
-        geometry.width -
-        geometry.safeAreaInsets.right -
-        descriptor.edgeMargin;
-      const bottom =
-        geometry.visualOffsetY +
-        geometry.height -
-        geometry.safeAreaInsets.bottom -
-        descriptor.edgeMargin;
-      return (
-        Math.max(0, left - rect.x) +
-        Math.max(0, top - rect.y) +
-        Math.max(0, rect.x + rect.width - right) +
-        Math.max(0, rect.y + rect.height - bottom)
-      );
-    }
-    if (target.reason === 'scale-out-of-range' && descriptor.scaleLimits) {
-      return Math.max(
-        0,
-        descriptor.scaleLimits.min - placement.scale,
-        placement.scale - descriptor.scaleLimits.max,
-      );
-    }
-    if (target.reason === 'target-too-small' && descriptor.minimumTargetSize) {
-      const source = descriptor.profileSizes?.[profileId] ?? descriptor.defaultSize;
-      return (
-        Math.max(0, descriptor.minimumTargetSize.width - source.width * placement.scale) +
-        Math.max(0, descriptor.minimumTargetSize.height - source.height * placement.scale)
-      );
-    }
-    return 1;
-  };
-  return Object.freeze(
-    failures.filter((failure) => {
-      const key = JSON.stringify([failure.reason, failure.surfaceIds, failure.activeVariantIds]);
-      if (!baselineKeys.has(key)) return true;
-      if (failure.surfaceIds.every((surfaceId) => placementMatchesBaseline(surfaceId)))
-        return false;
-      const baselineMagnitude = magnitude(failure, options.baselinePlacements ?? {});
-      const currentMagnitude = magnitude(failure, placements);
-      return currentMagnitude > baselineMagnitude + COLLISION_EPSILON_CSS_PX;
-    }),
-  );
+  return Object.freeze(failures);
 }
 
 export interface ValidateMobileHudLayoutMatrixOptions {
   registry: MobileHudRegistry;
   profiles: Partial<
-    Record<MobileHudProfileId, Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>>
-  >;
-  baselineProfiles?: Partial<
     Record<MobileHudProfileId, Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>>
   >;
   matrix?: readonly MobileHudGeometryMatrixFixture[];
@@ -598,6 +414,7 @@ function matrixFailureKey(failure: MobileHudValidationFailure): string {
     failure.surfaceIds,
     failure.viewportId,
     failure.safeAreaFixtureId,
+    failure.handedness,
     failure.activeVariantIds,
   ]);
 }
@@ -607,28 +424,31 @@ export function validateMobileHudLayoutMatrix(
 ): readonly MobileHudValidationFailure[] {
   const failures: MobileHudValidationFailure[] = [];
   const seen = new Set<string>();
+  const handednessVariants: readonly MobileHudHandedness[] = ['right', 'left'];
   for (const fixture of options.matrix ?? MOBILE_HUD_GEOMETRY_MATRIX) {
     const placements = options.profiles[fixture.profileId];
     if (!placements) continue;
-    options.onCase?.(fixture);
-    const contextFailures = validateMobileHudContext({
-      registry: options.registry,
-      profileId: fixture.profileId,
-      placements,
-      baselinePlacements: options.baselineProfiles?.[fixture.profileId],
-      geometry: fixture.geometry,
-      contextId: fixture.context.id,
-      isSurfaceAvailable: options.isSurfaceAvailable,
-    });
-    for (const contextFailure of contextFailures) {
-      const enriched = {
-        ...contextFailure,
-        safeAreaFixtureId: `${fixture.sideInset.id}/${fixture.bottomInset.id}`,
-      };
-      const key = matrixFailureKey(enriched);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      failures.push(Object.freeze(enriched));
+    for (const handedness of handednessVariants) {
+      options.onCase?.(fixture);
+      const contextFailures = validateMobileHudContext({
+        registry: options.registry,
+        profileId: fixture.profileId,
+        placements,
+        geometry: fixture.geometry,
+        contextId: fixture.context.id,
+        handedness,
+        isSurfaceAvailable: options.isSurfaceAvailable,
+      });
+      for (const contextFailure of contextFailures) {
+        const enriched = {
+          ...contextFailure,
+          safeAreaFixtureId: `${fixture.sideInset.id}/${fixture.bottomInset.id}`,
+        };
+        const key = matrixFailureKey(enriched);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        failures.push(Object.freeze(enriched));
+      }
     }
   }
   return Object.freeze(failures);
@@ -867,8 +687,9 @@ export function reduceMobileHudDraft(
   const surfaceId = draft.selectedSurfaceId;
   if (!surfaceId) return draft;
   const descriptor = environment.registry.getDescriptor(surfaceId);
-  const canonical = layoutDocument.profiles[draft.activeProfileId]?.[surfaceId];
-  if (descriptor?.class !== 'movable' || !canonical) return draft;
+  const storedCanonical = layoutDocument.profiles[draft.activeProfileId]?.[surfaceId];
+  if (descriptor?.class !== 'movable' || !storedCanonical) return draft;
+  const canonical = normalizeMobileHudPlacementForDescriptor(descriptor, storedCanonical);
 
   if (action.type === 'reset-selected') {
     const defaultPlacement = environment.registry.defaults[draft.activeProfileId]?.[surfaceId];

@@ -550,10 +550,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #party-frames #party-leave .ui-icon {\n      box-sizing: content-box;\n      width: 12px;\n      height: 12px;\n      padding: 7px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame {\n      left: auto;\n      right: calc(max(12px, env(safe-area-inset-right)) + var(--mobile-direct-menu-width) + 12px);\n      top: max(8px, env(safe-area-inset-top));',
+      'body.mobile-touch #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      top: max(8px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #target-frame {\n      right: auto;\n      left: calc(max(12px, env(safe-area-inset-left)) + var(--mobile-direct-menu-width) + 12px);',
+      'body.mobile-touch.mobile-left-handed #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      transform-origin: center top;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar {\n      left: auto;\n      right: max(18px, env(safe-area-inset-right));\n      top: auto;\n      bottom: calc(136px + env(safe-area-inset-bottom));',
@@ -578,7 +578,7 @@ describe('client HTML shell', () => {
   it('keeps the landscape target subordinate and compacts pet and view controls', () => {
     expect(hudMobileCss).toContain('--mobile-target-frame-ratio: 0.9;');
     expect(hudMobileCss).toContain(
-      'transform: scale(\n        calc(\n          var(--mobile-player-frame-scale, 0.9) *\n          var(--mobile-target-frame-ratio, 0.9) *\n          var(--mobile-chrome-scale, 1)\n        )\n      );',
+      'transform: translateX(-50%)\n        scale(\n          calc(\n            var(--mobile-player-frame-scale, 0.9) *\n            var(--mobile-target-frame-ratio, 0.9) *\n            var(--mobile-chrome-scale, 1)\n          )\n        );',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #petbar .petbar-group {\n      gap: 0;\n      padding: 0;\n      border: 0;\n      outline: 0;\n      background: transparent;\n      box-shadow: none;',
@@ -1395,6 +1395,20 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch .donate-cta {\n    display: none;');
   });
 
+  it('keeps the loading screen above the temporarily raised mobile HUD', () => {
+    // The first HUD update can show the zone banner before loading has faded.
+    // That state raises the whole #ui stacking context, so the loading overlay
+    // must still sit above it or the minimap and player frame paint over the art.
+    const loadingZ = Number(shellCss.match(/#loading-screen\s*\{[^}]*z-index:\s*(\d+)/s)?.[1]);
+    const raisedHudZ = Number(
+      hudMobileCss.match(
+        /body\.mobile-touch\.game-active\.mobile-center-message-visible #ui\s*\{[^}]*z-index:\s*(\d+)/s,
+      )?.[1],
+    );
+
+    expect(loadingZ).toBeGreaterThan(raisedHudZ);
+  });
+
   it('closes mobile community and More trays when tapping outside', () => {
     expect(hudTs).toContain(
       "const communityMenu = document.getElementById('community-menu') as HTMLDetailsElement | null;",
@@ -1783,8 +1797,9 @@ describe('client HTML shell', () => {
       'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    opacity: 1;\n    visibility: visible;\n    pointer-events: auto;\n    transform: var(--mobile-more-open-transform);',
+      'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    opacity: 1;\n    visibility: visible;\n    pointer-events: auto;',
     );
+    expect(hudMobileCss).toContain('z-index: 200 !important;');
     expect(hudMobileCss).toContain(
       'transition:\n      opacity 150ms ease,\n      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),',
     );
@@ -2393,15 +2408,18 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar.many-spells');
   });
 
-  it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
+  it('seeds druid form bars with the form kit and initializes stealth bars independently', () => {
     expect(hudTs).toContain('if (this.isFormKitBar()) {');
     expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
     expect(hudTs).toMatch(
       /buildDefaultFormBar\(\s*this\.formKitAbilityIds\(this\.activeHotbarForm\),\s*Hud\.BAR_ABILITY_SLOTS,\s*\)/,
     );
-    expect(hudTs).toMatch(
-      /const emptyFormMap =\s*this\.activeHotbarForm !== 'normal' && parsed\.every\(\(action\) => action === null\);/,
+    expect(hudTs).toContain('if (this.isStealthHotbarForm()) {');
+    expect(hudTs).toContain('this.loadStealthSlotMap(parsed, stored, storedRaw);');
+    expect(hudTs).toContain(
+      "const parentForm: HotbarForm = this.activeHotbarForm === 'cat_stealth'",
     );
+    expect(hudTs).toContain('actions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, () => null);');
     expect(hudTs).toContain("localStorage.getItem(this.slotMapKey('normal'))");
     expect(hudTs).not.toContain(
       "this.loadedSlotMapFromStorage = stored || this.activeHotbarForm !== 'normal';",

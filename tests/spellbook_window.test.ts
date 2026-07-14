@@ -101,11 +101,11 @@ describe('spellbook_window: inline mobile slot picker', () => {
 
   it('owns picker keyboard navigation, assignment announcement, and focus return', () => {
     expect(code).toContain('nextMobileSpellbookPickerPage(');
-    expect(code).toContain("key === 'Enter' || key === ' '");
+    expect(code).toContain('bindTouchTap(button, assign)');
     expect(code).toContain("status.setAttribute('aria-live', 'polite')");
     expect(code).toContain('focusDestinationIndex');
     expect(code).toContain('this.focusPickerOpener()');
-    expect(code).toContain("status.className = 'spell-assignment-status'");
+    expect(code).toContain("status.className = 'spell-assignment-status visually-hidden'");
     expect(code).toContain('this.rerenderPreservingView();');
     expect(code).toContain("querySelector<HTMLElement>('.spell-assignment-status')");
   });
@@ -303,17 +303,20 @@ describe('spellbook_window: inline mobile slot picker', () => {
     );
   });
 
-  it('never freezes or resizes inset-pinned windows on the touch layout', () => {
+  it('protects inset-pinned touch sheets while allowing the centered spellbook to resize', () => {
     // The drag/resize seed writes inline left/top with bottom:auto, which
     // unpins a top+bottom sheet and leaves it content-tall (offscreen and
-    // unscrollable). Both entry points bail on body.mobile-touch.
+    // unscrollable). Dragging still bails on body.mobile-touch, and resizing
+    // bails for every window except the centered, viewport-capped Spellbook.
     expect(hud).toContain('// draggable on touch, the same hazard placeNewWindow already guards.');
     expect(hud).toContain("if (document.body.classList.contains('mobile-touch')) return;");
     const windowResize = readFileSync(
       new URL('../src/ui/window_resize.ts', import.meta.url),
       'utf8',
     );
-    expect(windowResize).toContain('if (deps.isTouchLayout?.()) return null;');
+    expect(windowResize).toContain(
+      "if (deps.isTouchLayout?.() && el.id !== 'spellbook') return null;",
+    );
   });
 
   it('keeps a focus-driven reshow clamped to the last passed boundary', () => {

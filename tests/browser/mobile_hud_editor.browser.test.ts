@@ -7,7 +7,11 @@ import {
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MobileHudEditor } from '../../src/ui/mobile_hud_editor';
 import type {
+  MobileHudContextId,
   MobileHudLayoutDocumentV1,
+  MobileHudPlacement,
+  MobileHudProfileId,
+  MobileHudSurfaceId,
   MobileHudValidationFailure,
 } from '../../src/ui/mobile_hud_editor_types';
 import { MOBILE_HUD_REGISTRY } from '../../src/ui/mobile_hud_registry';
@@ -16,6 +20,9 @@ import { cleanup } from './_harness';
 afterEach(() => {
   cleanup();
   document.body.className = '';
+  for (const property of ['--app-vw', '--app-vh', '--ui-scale']) {
+    document.body.style.removeProperty(property);
+  }
 });
 
 function documentFixture(): MobileHudLayoutDocumentV1 {
@@ -39,16 +46,161 @@ function expectSameRect(actual: DOMRect | undefined, expected: DOMRect): void {
   expect(actual?.height).toBeCloseTo(expected.height, 1);
 }
 
+const PHONE_GEOMETRY = {
+  id: '740x360',
+  width: 740,
+  height: 360,
+  visualOffsetX: 0,
+  visualOffsetY: 0,
+  safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+} as const;
+
+function documentWithPlacements(
+  placements: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>,
+  profileId: MobileHudProfileId = 'phone',
+): MobileHudLayoutDocumentV1 {
+  const base = documentFixture();
+  return {
+    ...base,
+    enabled: true,
+    profiles: {
+      ...base.profiles,
+      [profileId]: {
+        ...base.profiles[profileId],
+        ...placements,
+      },
+    },
+  };
+}
+
+function applyFocusedCustomLayout(options: {
+  placements: Partial<Record<MobileHudSurfaceId, MobileHudPlacement>>;
+  surfaceIds: readonly MobileHudSurfaceId[];
+  profileId?: MobileHudProfileId;
+  contextId?: MobileHudContextId;
+  handedness?: 'left' | 'right';
+  uiScale?: number;
+}): MobileHudCustomLayoutDomApplier {
+  const profileId = options.profileId ?? 'phone';
+  const contextId = options.contextId ?? 'world.base';
+  const uiScale = options.uiScale ?? 1;
+  const state = new MobileHudCustomLayoutState(MOBILE_HUD_REGISTRY);
+  state.beginPreview(documentWithPlacements(options.placements, profileId));
+  const applier = new MobileHudCustomLayoutDomApplier(document, MOBILE_HUD_REGISTRY, state);
+  const available = new Set(options.surfaceIds);
+  const result = applier.apply({
+    profileId,
+    contextId,
+    handedness: options.handedness ?? 'right',
+    measurement: { geometry: PHONE_GEOMETRY, uiScale },
+    eligible: true,
+    isSurfaceAvailable: (surfaceId) => available.has(surfaceId),
+  });
+  expect(result.fallback).toBe(false);
+  expect(result.failures).toEqual([]);
+  return applier;
+}
+
+function expectElementOwnsCenter(element: HTMLElement): void {
+  const rect = element.getBoundingClientRect();
+  const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  expect(hit === element || (hit !== null && element.contains(hit))).toBe(true);
+}
+
+async function expectScrollableChildReachable(
+  viewport: HTMLElement,
+  child: HTMLElement,
+): Promise<void> {
+  child.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  await waitForEditorGeometry();
+  const viewportRect = viewport.getBoundingClientRect();
+  const childRect = child.getBoundingClientRect();
+  const visibleLeft = Math.max(viewportRect.left, childRect.left);
+  const visibleRight = Math.min(viewportRect.right, childRect.right);
+  const visibleTop = Math.max(viewportRect.top, childRect.top);
+  const visibleBottom = Math.min(viewportRect.bottom, childRect.bottom);
+  expect(visibleRight - visibleLeft).toBeGreaterThan(1);
+  expect(visibleBottom - visibleTop).toBeGreaterThan(1);
+  const hit = document.elementFromPoint(
+    (visibleLeft + visibleRight) / 2,
+    (visibleTop + visibleBottom) / 2,
+  );
+  expect(hit === child || (hit !== null && child.contains(hit))).toBe(true);
+}
+
+function makeParty(
+  memberCount: number,
+  expanded: boolean,
+): {
+  party: HTMLElement;
+  rows: HTMLElement;
+  members: HTMLButtonElement[];
+} {
+  const party = document.createElement('div');
+  party.id = 'party-frames';
+  party.classList.toggle('party-expanded', expanded);
+  const chip = document.createElement('button');
+  chip.id = 'party-chip';
+  const chipIcon = document.createElement('span');
+  chipIcon.className = 'ui-icon';
+  chip.append(chipIcon);
+  const rows = document.createElement('div');
+  rows.className = 'party-rows';
+  const members = Array.from({ length: memberCount }, (_, index) => {
+    const member = document.createElement('button');
+    member.className = 'party-frame';
+    member.dataset.memberIndex = String(index);
+    rows.append(member);
+    return member;
+  });
+  const leave = document.createElement('button');
+  leave.id = 'party-leave';
+  const leaveIcon = document.createElement('span');
+  leaveIcon.className = 'ui-icon';
+  leave.append(leaveIcon);
+  party.append(chip, rows, leave);
+  return { party, rows, members };
+}
+
 describe('mobile HUD editor real DOM and CSS', () => {
+  it.each([
+    [740, 360, 'hud-mobile-compact'],
+    [1024, 768, 'hud-mobile-tablet'],
+  ] as const)('keeps the intentionally excluded Quest Tracker inert at %sx%s landscape', async (width, height, tier) => {
+    await page.viewport(width, height);
+    document.body.className = `mobile-touch game-active ${tier}`;
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const stack = document.createElement('div');
+    stack.id = 'right-tracker-stack';
+    const tracker = document.createElement('div');
+    tracker.id = 'quest-tracker';
+    const header = document.createElement('button');
+    header.className = 'qt-header';
+    const row = document.createElement('div');
+    row.className = 'qt-title';
+    row.tabIndex = 0;
+    tracker.append(header, row);
+    stack.append(tracker);
+    ui.append(stack);
+    document.body.append(ui);
+
+    expect(getComputedStyle(tracker).display).toBe('none');
+    expect(tracker.getClientRects()).toHaveLength(0);
+    expect(header.getClientRects()).toHaveLength(0);
+    expect(row.getClientRects()).toHaveLength(0);
+    expect(MOBILE_HUD_REGISTRY.descriptors.some((entry) => entry.id.includes('quest'))).toBe(false);
+  });
+
   it('makes Save visibly and functionally disabled while validation errors exist', async () => {
     await page.viewport(740, 360);
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const storageSave = vi.fn(async () => undefined);
     const failure: MobileHudValidationFailure = {
-      reason: 'overlap',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
-      surfaceIds: ['action.attack', 'action.a1'],
+      surfaceIds: ['action.attack'],
     };
     const editor = new MobileHudEditor({
       document,
@@ -85,8 +237,10 @@ describe('mobile HUD editor real DOM and CSS', () => {
 
     expect(save?.disabled).toBe(true);
     expect(save?.getAttribute('aria-disabled')).toBe('true');
-    expect(Number(style.opacity)).toBeLessThanOrEqual(0.45);
-    expect(style.cursor).toBe('not-allowed');
+    expect(save?.classList.contains('btn')).toBe(true);
+    expect(Number(style.opacity)).toBe(1);
+    expect(style.filter).toContain('grayscale(1)');
+    expect(style.cursor).toBe('default');
     save?.click();
     await Promise.resolve();
     expect(storageSave).not.toHaveBeenCalled();
@@ -216,6 +370,102 @@ describe('mobile HUD editor real DOM and CSS', () => {
     editor.close();
   });
 
+  it('keeps max-state envelopes visible and pointer-through in small left-handed landscape', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact mobile-left-handed';
+
+    const party = document.createElement('div');
+    party.id = 'party-frames';
+    party.style.cssText = 'position:fixed;left:8px;top:8px;display:flex;width:40px;height:40px';
+    const partyChip = document.createElement('button');
+    partyChip.id = 'party-chip';
+    partyChip.style.cssText = 'display:block;width:40px;height:40px';
+    const partyIcon = document.createElement('span');
+    partyIcon.className = 'ui-icon';
+    partyIcon.style.cssText = 'display:block;width:28px;height:28px';
+    partyChip.append(partyIcon);
+    party.append(partyChip);
+
+    const buffs = document.createElement('div');
+    buffs.id = 'buff-bar';
+    buffs.style.cssText = 'position:fixed;left:60px;top:8px;display:flex';
+    const buff = document.createElement('button');
+    buff.className = 'buff';
+    buff.style.cssText = 'display:block;width:28px;height:28px;flex:none';
+    buffs.append(buff);
+
+    const target = document.createElement('div');
+    target.id = 'target-frame';
+    target.style.display = 'none';
+    const pet = document.createElement('div');
+    pet.id = 'petbar';
+    pet.style.display = 'none';
+    document.body.append(party, buffs, target, pet);
+
+    const editor = new MobileHudEditor({
+      document,
+      registry: MOBILE_HUD_REGISTRY,
+      canOpen: () => true,
+      getDocument: documentFixture,
+      getProfileId: () => 'phone',
+      getSceneId: () => 'world',
+      getContextId: () => 'world.base',
+      getGeometry: () => ({
+        id: '740x360',
+        width: 740,
+        height: 360,
+        visualOffsetX: 0,
+        visualOffsetY: 0,
+        safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+      }),
+      getHandedness: () => 'left',
+      beginPreview: vi.fn(),
+      updatePreview: vi.fn(),
+      storage: { load: async () => null, save: async () => undefined },
+      commitValidatedDocument: vi.fn(),
+      endPreview: vi.fn(),
+      focusManager: new FocusManager(),
+      confirmDiscard: () => true,
+      translate: (key) => String(key),
+      onOpenChange: vi.fn(),
+    });
+
+    expect(editor.open()).toBe(true);
+    await waitForEditorGeometry();
+
+    const proxy = (surfaceId: string) =>
+      document.querySelector<HTMLElement>(`[data-mobile-hud-surface-id="${surfaceId}"]`);
+    const frame = (surfaceId: string) =>
+      proxy(surfaceId)?.querySelector<HTMLElement>('.mobile-hud-editor-proxy-frame');
+
+    expect(proxy('party')?.getAttribute('data-mobile-hud-live-visual')).toBe('true');
+    expect(proxy('auras.player_buffs')?.getAttribute('data-mobile-hud-live-visual')).toBe('true');
+    expectSameRect(frame('party')?.getBoundingClientRect(), party.getBoundingClientRect());
+    expectSameRect(
+      frame('auras.player_buffs')?.getBoundingClientRect(),
+      buffs.getBoundingClientRect(),
+    );
+    expect(proxy('party')?.getBoundingClientRect().width).toBeCloseTo(48, 1);
+    expect(
+      document.querySelectorAll<HTMLElement>('.mobile-hud-editor-layout-envelope'),
+    ).toHaveLength(0);
+
+    expect(proxy('frame.target')?.getAttribute('data-mobile-hud-live-visual')).toBe('false');
+    expect(proxy('frame.target')?.getAttribute('data-mobile-hud-placeholder')).toBe('when-empty');
+    expect(frame('frame.target')?.getBoundingClientRect().width).toBeCloseTo(188.8, 1);
+    expect(frame('frame.target')?.getBoundingClientRect().height).toBeCloseTo(96.8, 1);
+    expect(proxy('frame.target')?.getBoundingClientRect().height).toBeCloseTo(96.8, 1);
+    expect(proxy('pet.commands')?.getAttribute('data-mobile-hud-placeholder')).toBe('when-empty');
+    expect(frame('pet.commands')?.getBoundingClientRect().width).toBeCloseTo(164, 1);
+
+    expect(frame('minimap.cluster')?.getBoundingClientRect().width).toBeCloseTo(97.2, 1);
+    expect(frame('minimap.cluster')?.getBoundingClientRect().height).toBeCloseTo(132, 1);
+    expect(frame('control.movement')?.getBoundingClientRect().width).toBeCloseTo(120.6, 1);
+    expect(frame('control.movement')?.getBoundingClientRect().height).toBeCloseTo(154.8, 1);
+
+    editor.close();
+  });
+
   it('portals only the center message above the editor and restores its HUD home', async () => {
     await page.viewport(740, 360);
     document.body.className =
@@ -257,6 +507,7 @@ describe('mobile HUD editor real DOM and CSS', () => {
     });
 
     expect(editor.open()).toBe(true);
+    expect(document.querySelector('[data-mobile-hud-surface-class="protected"]')).toBeNull();
     const root = document.querySelector<HTMLElement>('.mobile-hud-editor');
     expect(banner.parentElement).toBe(document.body);
     expect(getComputedStyle(ui).zIndex).toBe('80');
@@ -267,6 +518,44 @@ describe('mobile HUD editor real DOM and CSS', () => {
     expect(banner.parentElement).toBe(ui);
     expect(ui.children[0]).toBe(banner);
     expect(ui.children[1]).toBe(sibling);
+  });
+
+  it('stacks the discard confirmation above the open editor', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const editor = new MobileHudEditor({
+      document,
+      registry: MOBILE_HUD_REGISTRY,
+      canOpen: () => true,
+      getDocument: documentFixture,
+      getProfileId: () => 'phone',
+      getSceneId: () => 'world',
+      getContextId: () => 'world.base',
+      getGeometry: () => PHONE_GEOMETRY,
+      getHandedness: () => 'right',
+      beginPreview: vi.fn(),
+      updatePreview: vi.fn(),
+      storage: { load: async () => null, save: async () => undefined },
+      commitValidatedDocument: vi.fn(),
+      endPreview: vi.fn(),
+      focusManager: new FocusManager(),
+      confirmDiscard: () => true,
+      translate: (key) => String(key),
+      onOpenChange: vi.fn(),
+    });
+
+    expect(editor.open()).toBe(true);
+    const confirmation = document.createElement('div');
+    confirmation.id = 'confirm-dialog';
+    confirmation.className = 'window panel';
+    confirmation.style.zIndex = '51';
+    document.body.append(confirmation);
+    const editorRoot = document.querySelector<HTMLElement>('.mobile-hud-editor');
+
+    expect(Number(getComputedStyle(confirmation).zIndex)).toBeGreaterThan(
+      Number(getComputedStyle(editorRoot as HTMLElement).zIndex),
+    );
+    editor.close();
   });
 
   it('fits a live Target proxy to its painted frame instead of the transparent root envelope', async () => {
@@ -980,7 +1269,7 @@ describe('mobile HUD editor real DOM and CSS', () => {
     editor.close();
   });
 
-  it('outlines painted Party and Pet icons instead of their transparent button hitboxes', async () => {
+  it('outlines bounded Party and Pet roots instead of their offscreen scroll children', async () => {
     await page.viewport(740, 360);
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
     const party = document.createElement('div');
@@ -996,7 +1285,6 @@ describe('mobile HUD editor real DOM and CSS', () => {
     petbar.style.display = 'flex';
     const petGroup = document.createElement('div');
     petGroup.className = 'petbar-group';
-    const petIcons: HTMLElement[] = [];
     for (let index = 0; index < 4; index += 1) {
       const button = document.createElement('button');
       button.className = 'pet-btn';
@@ -1004,7 +1292,6 @@ describe('mobile HUD editor real DOM and CSS', () => {
       icon.className = 'icon-label';
       button.append(icon);
       petGroup.append(button);
-      petIcons.push(icon);
     }
     petbar.append(petGroup);
     document.body.append(party, petbar);
@@ -1044,25 +1331,8 @@ describe('mobile HUD editor real DOM and CSS', () => {
     const petFrame = document.querySelector<HTMLElement>(
       '[data-mobile-hud-surface-id="pet.commands"] .mobile-hud-editor-proxy-frame',
     );
-    const partyRect = partyIcon.getBoundingClientRect();
-    const petRects = petIcons.map((icon) => icon.getBoundingClientRect());
-    const petLeft = Math.min(...petRects.map((rect) => rect.left));
-    const petTop = Math.min(...petRects.map((rect) => rect.top));
-    const petRight = Math.max(...petRects.map((rect) => rect.right));
-    const petBottom = Math.max(...petRects.map((rect) => rect.bottom));
-
-    expect(partyFrame?.getBoundingClientRect()).toMatchObject({
-      x: partyRect.x,
-      y: partyRect.y,
-      width: partyRect.width,
-      height: partyRect.height,
-    });
-    expect(petFrame?.getBoundingClientRect()).toMatchObject({
-      x: petLeft,
-      y: petTop,
-      width: petRight - petLeft,
-      height: petBottom - petTop,
-    });
+    expectSameRect(partyFrame?.getBoundingClientRect(), party.getBoundingClientRect());
+    expectSameRect(petFrame?.getBoundingClientRect(), petbar.getBoundingClientRect());
     editor.close();
   });
 
@@ -1087,7 +1357,7 @@ describe('mobile HUD editor real DOM and CSS', () => {
     target.append(bars, portrait);
     document.body.append(target);
     const failure: MobileHudValidationFailure = {
-      reason: 'out-of-bounds',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
       surfaceIds: ['frame.target'],
@@ -1159,7 +1429,7 @@ describe('mobile HUD editor real DOM and CSS', () => {
     target.append(bars, portrait);
     document.body.append(target);
     const failure: MobileHudValidationFailure = {
-      reason: 'out-of-bounds',
+      reason: 'scale-out-of-range',
       profileId: 'phone',
       contextId: 'world.base',
       surfaceIds: ['frame.target'],
@@ -1348,10 +1618,201 @@ describe('mobile HUD editor real DOM and CSS', () => {
     document.body.style.removeProperty('--target-frame-scale');
   });
 
-  it('keeps an overlapping informational proxy behind the Target action proxy', async () => {
+  it('keeps overflowing live Party and aura outlines bounded to their scroll viewports', async () => {
     await page.viewport(740, 360);
     document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const { party, rows } = makeParty(9, true);
+    const buffs = document.createElement('div');
+    buffs.id = 'buff-bar';
+    for (let index = 0; index < 10; index += 1) {
+      const buff = document.createElement('button');
+      buff.className = 'buff';
+      buffs.append(buff);
+    }
+    const target = document.createElement('div');
+    target.id = 'target-frame';
+    target.className = 'unitframe';
+    target.style.display = 'flex';
+    const targetBars = document.createElement('div');
+    targetBars.className = 'uf-bars';
+    const targetPortraitWrap = document.createElement('div');
+    targetPortraitWrap.className = 'portrait-wrap';
+    const targetPortrait = document.createElement('div');
+    targetPortrait.className = 'portrait';
+    const targetLevel = document.createElement('div');
+    targetLevel.className = 'level-chip';
+    targetPortraitWrap.append(targetPortrait, targetLevel);
+    const targetAuras = document.createElement('div');
+    targetAuras.id = 'tf-debuffs';
+    for (let index = 0; index < 10; index += 1) {
+      const aura = document.createElement('button');
+      aura.className = 'buff debuff';
+      targetAuras.append(aura);
+    }
+    target.append(targetBars, targetPortraitWrap, targetAuras);
+    ui.append(party, buffs, target);
+    document.body.append(ui);
+
+    const layoutDocument = documentWithPlacements({
+      party: {
+        anchor: 'top-left',
+        offsetX: 20,
+        offsetY: 20,
+        scale: 1,
+        orientation: 'horizontal',
+        reverse: false,
+      },
+      'auras.player_buffs': {
+        anchor: 'top-left',
+        offsetX: 20,
+        offsetY: 80,
+        scale: 1,
+        orientation: 'horizontal',
+        reverse: false,
+      },
+      'frame.target': {
+        anchor: 'top-left',
+        offsetX: 200,
+        offsetY: 140,
+        scale: 1,
+      },
+    });
+    const state = new MobileHudCustomLayoutState(MOBILE_HUD_REGISTRY);
+    const applier = new MobileHudCustomLayoutDomApplier(document, MOBILE_HUD_REGISTRY, state);
+    const available = new Set<MobileHudSurfaceId>(['party', 'auras.player_buffs', 'frame.target']);
+    const apply = () =>
+      applier.apply({
+        profileId: 'phone',
+        contextId: 'world.base',
+        handedness: 'right',
+        measurement: { geometry: PHONE_GEOMETRY, uiScale: 1 },
+        eligible: true,
+        isSurfaceAvailable: (surfaceId) => available.has(surfaceId),
+      });
+    const editor = new MobileHudEditor({
+      document,
+      registry: MOBILE_HUD_REGISTRY,
+      canOpen: () => true,
+      getDocument: () => layoutDocument,
+      getProfileId: () => 'phone',
+      getSceneId: () => 'world',
+      getContextId: () => 'world.base',
+      getGeometry: () => PHONE_GEOMETRY,
+      getHandedness: () => 'right',
+      beginPreview: (document) => {
+        state.beginPreview(document);
+        apply();
+      },
+      updatePreview: (document) => {
+        state.updatePreview(document);
+        apply();
+      },
+      storage: { load: async () => null, save: async () => undefined },
+      commitValidatedDocument: vi.fn(),
+      endPreview: () => {
+        state.endPreview();
+        apply();
+      },
+      focusManager: new FocusManager(),
+      confirmDiscard: () => true,
+      translate: (key) => String(key),
+      onOpenChange: vi.fn(),
+    });
+
+    expect(editor.open()).toBe(true);
+    await waitForEditorGeometry();
+    const frame = (surfaceId: MobileHudSurfaceId) =>
+      document.querySelector<HTMLElement>(
+        `[data-mobile-hud-surface-id="${surfaceId}"] .mobile-hud-editor-proxy-frame`,
+      );
+    const partyFrame = frame('party')?.getBoundingClientRect();
+    const buffFrame = frame('auras.player_buffs')?.getBoundingClientRect();
+    const targetFrame = frame('frame.target')?.getBoundingClientRect();
+    expectSameRect(partyFrame, party.getBoundingClientRect());
+    expectSameRect(buffFrame, buffs.getBoundingClientRect());
+    expect(partyFrame?.width).toBeLessThan(rows.scrollWidth);
+    expect(buffFrame?.width).toBeLessThan(buffs.scrollWidth);
+    expect(targetAuras.scrollWidth).toBeGreaterThan(targetAuras.clientWidth);
+    expect(targetFrame?.width).toBeCloseTo(236, 1);
+    expect(targetFrame?.height).toBeCloseTo(121, 1);
+    editor.close();
+  });
+
+  it('makes the complete Delve tracker frame selectable while runtime copy stays click-through', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const delve = document.createElement('div');
+    delve.id = 'delve-tracker';
+    delve.style.cssText =
+      'display:block;position:fixed;left:100px;top:100px;width:280px;height:180px';
+    delve.textContent = 'Delve objective';
+    document.body.append(delve);
+    const layoutDocument: MobileHudLayoutDocumentV1 = {
+      schemaVersion: 1,
+      enabled: true,
+      profiles: {
+        phone: {
+          'action.target': {
+            anchor: 'top-left',
+            offsetX: 100,
+            offsetY: 100,
+            scale: 1,
+          },
+          'tracker.delve': {
+            anchor: 'top-left',
+            offsetX: 100,
+            offsetY: 100,
+            scale: 1,
+          },
+        },
+      },
+    };
+    const editor = new MobileHudEditor({
+      document,
+      registry: MOBILE_HUD_REGISTRY,
+      canOpen: () => true,
+      getDocument: () => layoutDocument,
+      getProfileId: () => 'phone',
+      getSceneId: () => 'instance.delve',
+      getContextId: () => 'instance.delve',
+      getGeometry: () => PHONE_GEOMETRY,
+      getHandedness: () => 'right',
+      beginPreview: vi.fn(),
+      updatePreview: vi.fn(),
+      storage: { load: async () => null, save: async () => undefined },
+      commitValidatedDocument: vi.fn(),
+      endPreview: vi.fn(),
+      focusManager: new FocusManager(),
+      confirmDiscard: () => true,
+      translate: (key) => String(key),
+      onOpenChange: vi.fn(),
+    });
+
+    expect(editor.open()).toBe(true);
+    editor.setLocked(false);
+    await waitForEditorGeometry();
+    const surfaceAt = (x: number, y: number) =>
+      document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-mobile-hud-surface-id]')?.dataset
+        .mobileHudSurfaceId;
+    expect(surfaceAt(124, 124)).toBe('tracker.delve');
+    expect(surfaceAt(140, 220)).toBe('tracker.delve');
+    expect(
+      document
+        .querySelector<HTMLElement>('[data-mobile-hud-surface-id="tracker.delve"]')
+        ?.getBoundingClientRect(),
+    ).toMatchObject({ x: 100, y: 100, width: 280, height: 180 });
+    editor.close();
+  });
+
+  it('keeps an overlapping context-status proxy selectable above shared controls', async () => {
+    await page.viewport(740, 360);
+    document.body.className =
+      'mobile-touch game-active hud-mobile-compact mobile-hud-custom-active';
     const base = documentFixture();
+    const storageSave = vi.fn(async () => undefined);
+    const commitValidatedDocument = vi.fn();
     const overlapPlacement = {
       anchor: 'top-left' as const,
       offsetX: 100,
@@ -1369,13 +1830,13 @@ describe('mobile HUD editor real DOM and CSS', () => {
           phone: {
             ...base.profiles.phone,
             'action.target': overlapPlacement,
-            'auras.player_buffs': overlapPlacement,
+            'status.arena.generic': overlapPlacement,
           },
         },
       }),
       getProfileId: () => 'phone',
-      getSceneId: () => 'world',
-      getContextId: () => 'world.base',
+      getSceneId: () => 'arena.standard',
+      getContextId: () => 'arena.standard',
       getGeometry: () => ({
         id: '740x360',
         width: 740,
@@ -1387,8 +1848,8 @@ describe('mobile HUD editor real DOM and CSS', () => {
       getHandedness: () => 'right',
       beginPreview: vi.fn(),
       updatePreview: vi.fn(),
-      storage: { load: async () => null, save: async () => undefined },
-      commitValidatedDocument: vi.fn(),
+      storage: { load: async () => null, save: storageSave },
+      commitValidatedDocument,
       endPreview: vi.fn(),
       focusManager: new FocusManager(),
       confirmDiscard: () => true,
@@ -1408,46 +1869,423 @@ describe('mobile HUD editor real DOM and CSS', () => {
           ?.closest<HTMLElement>('[data-mobile-hud-surface-id]')
       : null;
 
-    expect(hit?.dataset.mobileHudSurfaceId).toBe('action.target');
-    editor.close();
+    expect(hit?.dataset.mobileHudSurfaceId).toBe('status.arena.generic');
+    if (!rect || !hit) throw new Error('overlap cycle fixture is missing');
+    const tap = () =>
+      hit.dispatchEvent(
+        new MouseEvent('click', {
+          bubbles: true,
+          clientX: rect.left + rect.width / 2,
+          clientY: rect.top + rect.height / 2,
+          detail: 1,
+        }),
+      );
+    tap();
+    expect(editor.draft?.selectedSurfaceId).toBe('status.arena.generic');
+    tap();
+    expect(editor.draft?.selectedSurfaceId).toBe('action.target');
+    const contextSurfaces = [
+      ['arena.standard', ['status.arena.generic']],
+      ['arena.fiesta.base', ['status.arena.generic', 'status.arena.fiesta_score']],
+      [
+        'arena.fiesta.pending',
+        ['status.arena.generic', 'status.arena.fiesta_score', 'status.arena.fiesta_pending'],
+      ],
+      ['vale_cup.match', ['status.vale_cup.match']],
+      ['vale_cup.match.charge', ['status.vale_cup.match', 'status.vale_cup.charge']],
+    ] as const;
+    for (const [contextId, surfaceIds] of contextSurfaces) {
+      editor.setContext(contextId);
+      for (const surfaceId of surfaceIds) {
+        const proxy = document.querySelector<HTMLElement>(
+          `[data-mobile-hud-surface-id="${surfaceId}"]`,
+        );
+        expect(getComputedStyle(proxy as HTMLElement).pointerEvents, surfaceId).toBe('auto');
+        proxy?.click();
+        expect(editor.draft?.selectedSurfaceId).toBe(surfaceId);
+      }
+    }
+    const save = document.querySelector<HTMLButtonElement>('[data-mobile-hud-action="save"]');
+    expect(editor.draft?.failures).toEqual([]);
+    expect(save?.disabled).toBe(false);
+    expect(save?.getAttribute('aria-disabled')).toBe('false');
+    expect(await editor.save()).toBe(true);
+    expect(storageSave).toHaveBeenCalledOnce();
+    expect(commitValidatedDocument).toHaveBeenCalledOnce();
   });
 
-  it('paints mobile aura information above controls while passing taps through it', async () => {
+  it('bounds player auras in a scroll viewport while icons stay hittable and blank space passes through', async () => {
     await page.viewport(740, 360);
-    document.body.className = 'mobile-touch game-active mobile-hud-custom-active';
-    const target = document.createElement('button');
-    target.id = 'mobile-target-cycle';
-    target.style.cssText = 'position:fixed;left:100px;top:100px;width:48px;height:48px';
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const background = document.createElement('button');
+    background.id = 'world-hit-surface';
+    background.style.cssText = 'position:fixed;inset:0;width:100%;height:100%';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
     const buffs = document.createElement('div');
     buffs.id = 'buff-bar';
-    buffs.style.cssText = 'position:fixed;left:100px;top:100px;width:120px;height:48px';
-    document.body.append(target, buffs);
-    const state = new MobileHudCustomLayoutState(MOBILE_HUD_REGISTRY);
-    const applier = new MobileHudCustomLayoutDomApplier(document, MOBILE_HUD_REGISTRY, state);
-    applier.apply({
-      profileId: 'phone',
-      contextId: 'world.base',
-      handedness: 'right',
-      measurement: {
-        geometry: {
-          id: '740x360',
-          width: 740,
-          height: 360,
-          visualOffsetX: 0,
-          visualOffsetY: 0,
-          safeAreaInsets: { top: 0, right: 0, bottom: 0, left: 0 },
+    const makeBuff = (index: number) => {
+      const buff = document.createElement('button');
+      buff.className = 'buff cancelable';
+      buff.dataset.auraIndex = String(index);
+      const duration = document.createElement('span');
+      duration.className = 'dur';
+      buff.append(duration);
+      return buff;
+    };
+    const auraIcons = [makeBuff(0)];
+    buffs.append(...auraIcons);
+    ui.append(buffs);
+    document.body.append(background, ui);
+    applyFocusedCustomLayout({
+      placements: {
+        'auras.player_buffs': {
+          anchor: 'top-left',
+          offsetX: 100,
+          offsetY: 100,
+          scale: 1,
+          orientation: 'horizontal',
+          reverse: false,
         },
-        uiScale: 1,
       },
-      eligible: true,
+      surfaceIds: ['auras.player_buffs'],
     });
 
     const buffStyle = getComputedStyle(buffs);
-    const hit = document.elementFromPoint(124, 124);
-
+    const sparseRect = buffs.getBoundingClientRect();
     expect(buffStyle.pointerEvents).toBe('none');
-    expect(buffStyle.zIndex).toBe('100');
-    expect(hit).toBe(target);
+    expect(buffStyle.overflowX).toBe('auto');
+    expect(buffStyle.overflowY).toBe('hidden');
+    expect(sparseRect).toMatchObject({ x: 100, y: 100, width: 128, height: 40 });
+    expect(auraIcons[0].getBoundingClientRect()).toMatchObject({ width: 40, height: 40 });
+    expect(getComputedStyle(auraIcons[0], '::before')).toMatchObject({
+      width: '28px',
+      height: '28px',
+    });
+    expect(getComputedStyle(auraIcons[0]).pointerEvents).toBe('auto');
+    expectElementOwnsCenter(auraIcons[0]);
+    expect(document.elementFromPoint(sparseRect.right - 2, sparseRect.top + 14)).toBe(background);
+
+    for (let index = 1; index < 10; index += 1) {
+      const buff = makeBuff(index);
+      auraIcons.push(buff);
+      buffs.append(buff);
+    }
+    expect(buffs.clientWidth).toBe(128);
+    expect(buffs.clientHeight).toBe(40);
+    expect(buffs.scrollWidth).toBeGreaterThan(buffs.clientWidth);
+    await expectScrollableChildReachable(buffs, auraIcons[0]);
+    await expectScrollableChildReachable(buffs, auraIcons.at(-1) as HTMLButtonElement);
+  });
+
+  it('removes collapsed Party rows from hit-testing instead of leaving a transparent deadzone', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const background = document.createElement('button');
+    background.id = 'world-hit-surface';
+    background.style.cssText = 'position:fixed;inset:0;width:100%;height:100%';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const { party, rows } = makeParty(9, false);
+    ui.append(party);
+    document.body.append(background, ui);
+    applyFocusedCustomLayout({
+      placements: {
+        party: {
+          anchor: 'top-left',
+          offsetX: 100,
+          offsetY: 80,
+          scale: 1,
+          orientation: 'horizontal',
+          reverse: false,
+        },
+      },
+      surfaceIds: ['party'],
+    });
+
+    const partyRect = party.getBoundingClientRect();
+    expect(getComputedStyle(rows).display).toBe('none');
+    expect(rows.getBoundingClientRect()).toMatchObject({ width: 0, height: 0 });
+    expect(partyRect).toMatchObject({ x: 100, y: 80, width: 40, height: 40 });
+    expect(document.elementFromPoint(partyRect.left + 100, partyRect.top + 20)).toBe(background);
+  });
+
+  it.each([
+    {
+      label: 'horizontal',
+      orientation: 'horizontal' as const,
+      reverse: false,
+      raidWidth: 284,
+      raidHeight: 40,
+      scrollAxis: 'horizontal' as const,
+    },
+    {
+      label: 'vertical reverse',
+      orientation: 'vertical' as const,
+      reverse: true,
+      raidWidth: 68,
+      raidHeight: 172,
+      scrollAxis: 'vertical' as const,
+    },
+  ])('shrinks a sparse Party and keeps every $label Raid member reachable', async ({
+    orientation,
+    reverse,
+    raidWidth,
+    raidHeight,
+    scrollAxis,
+  }) => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const { party, rows, members } = makeParty(1, true);
+    ui.append(party);
+    document.body.append(ui);
+    applyFocusedCustomLayout({
+      placements: {
+        party: {
+          anchor: 'top-left',
+          offsetX: 100,
+          offsetY: 80,
+          scale: 1,
+          orientation,
+          reverse,
+        },
+      },
+      surfaceIds: ['party'],
+    });
+
+    expect(rows.getBoundingClientRect()).toMatchObject({ width: 68, height: 40 });
+    expect(rows.scrollWidth).toBe(rows.clientWidth);
+    expect(rows.scrollHeight).toBe(rows.clientHeight);
+
+    for (let index = 1; index < 9; index += 1) {
+      const member = document.createElement('button');
+      member.className = 'party-frame';
+      member.dataset.memberIndex = String(index);
+      members.push(member);
+      rows.append(member);
+    }
+    await waitForEditorGeometry();
+    expect(rows.clientWidth).toBe(raidWidth);
+    expect(rows.clientHeight).toBe(raidHeight);
+    if (scrollAxis === 'horizontal') {
+      expect(rows.scrollWidth).toBeGreaterThan(rows.clientWidth);
+      expect(rows.scrollHeight).toBe(rows.clientHeight);
+    } else {
+      expect(rows.scrollHeight).toBeGreaterThan(rows.clientHeight);
+      expect(rows.scrollWidth).toBe(rows.clientWidth);
+    }
+    await expectScrollableChildReachable(rows, members[0]);
+    await expectScrollableChildReachable(rows, members.at(-1) as HTMLButtonElement);
+  });
+
+  it('keeps target aura children inside a bounded strip and directly hit-testable', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const target = document.createElement('div');
+    target.id = 'target-frame';
+    target.className = 'unitframe';
+    target.style.display = 'flex';
+    const bars = document.createElement('div');
+    bars.className = 'uf-bars';
+    const portrait = document.createElement('div');
+    portrait.className = 'portrait-wrap';
+    const targetAuras = document.createElement('div');
+    targetAuras.id = 'tf-debuffs';
+    const auraIcons = Array.from({ length: 10 }, (_, index) => {
+      const aura = document.createElement('button');
+      aura.className = `buff debuff${index === 1 ? ' own' : ''}`;
+      aura.dataset.auraIndex = String(index);
+      targetAuras.append(aura);
+      return aura;
+    });
+    target.append(bars, portrait, targetAuras);
+    ui.append(target);
+    document.body.append(ui);
+    applyFocusedCustomLayout({
+      placements: {
+        'frame.target': {
+          anchor: 'top-left',
+          offsetX: 50,
+          offsetY: 50,
+          scale: 1,
+        },
+      },
+      surfaceIds: ['frame.target'],
+    });
+
+    expect(target.getBoundingClientRect()).toMatchObject({ x: 50, y: 50, width: 236, height: 68 });
+    expect(targetAuras.getBoundingClientRect()).toMatchObject({
+      x: 50,
+      y: 124,
+      width: 236,
+      height: 47,
+    });
+    expect(getComputedStyle(targetAuras).pointerEvents).toBe('none');
+    expect(getComputedStyle(auraIcons[0]).pointerEvents).toBe('auto');
+    expect(auraIcons[0].getBoundingClientRect()).toMatchObject({ width: 40, height: 40 });
+    expect(getComputedStyle(auraIcons[0], '::before')).toMatchObject({
+      width: '28px',
+      height: '28px',
+    });
+    expect(getComputedStyle(auraIcons[1], '::before')).toMatchObject({
+      width: '34px',
+      height: '34px',
+    });
+    expect(targetAuras.scrollWidth).toBeGreaterThan(targetAuras.clientWidth);
+    await expectScrollableChildReachable(targetAuras, auraIcons[0]);
+    await expectScrollableChildReachable(targetAuras, auraIcons.at(-1) as HTMLButtonElement);
+  });
+
+  it('keeps Deed and Delve mixed tracker controls hittable without blocking their copy', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const background = document.createElement('button');
+    background.id = 'world-hit-surface';
+    background.style.cssText = 'position:fixed;inset:0;width:100%;height:100%';
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const deeds = document.createElement('div');
+    deeds.id = 'deed-tracker';
+    const deedHeader = document.createElement('button');
+    deedHeader.className = 'dt-header';
+    deedHeader.append(document.createElement('span'));
+    deeds.append(deedHeader);
+    const delve = document.createElement('div');
+    delve.id = 'delve-tracker';
+    delve.style.display = 'block';
+    const delveCopy = document.createElement('div');
+    delveCopy.className = 'dt-header';
+    delveCopy.textContent = 'Delve objective';
+    const affixRow = document.createElement('div');
+    affixRow.className = 'dt-affix-row';
+    const affixLabel = document.createElement('span');
+    affixLabel.className = 'dt-affix-label';
+    const affix = document.createElement('button');
+    affix.className = 'dt-affix-icon';
+    affixRow.append(affixLabel, affix);
+    delve.append(delveCopy, affixRow);
+    ui.append(deeds, delve);
+    document.body.append(background, ui);
+    applyFocusedCustomLayout({
+      placements: {
+        'tracker.deeds': {
+          anchor: 'top-left',
+          offsetX: 400,
+          offsetY: 60,
+          scale: 1,
+        },
+        'tracker.delve': {
+          anchor: 'top-left',
+          offsetX: 50,
+          offsetY: 50,
+          scale: 1,
+        },
+      },
+      surfaceIds: ['tracker.deeds', 'tracker.delve'],
+      contextId: 'instance.delve',
+    });
+
+    expect(deeds.getBoundingClientRect()).toMatchObject({ x: 400, y: 60, width: 48, height: 40 });
+    expect(getComputedStyle(deeds).pointerEvents).toBe('none');
+    expect(getComputedStyle(deedHeader).pointerEvents).toBe('auto');
+    expectElementOwnsCenter(deedHeader);
+    expect(getComputedStyle(delveCopy).pointerEvents).toBe('none');
+    const copyRect = delveCopy.getBoundingClientRect();
+    expect(document.elementFromPoint(copyRect.left + 4, copyRect.top + copyRect.height / 2)).toBe(
+      background,
+    );
+    expect(affix.getBoundingClientRect()).toMatchObject({ x: 138, y: 50, width: 40, height: 40 });
+    expect(getComputedStyle(affix).pointerEvents).toBe('auto');
+    expectElementOwnsCenter(affix);
+  });
+
+  it.each([
+    0.85, 1.4,
+  ])('keeps ui-author Party and minimap satellite geometry stable at UI scale %s', async (uiScale) => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    document.body.style.setProperty('--app-vw', '740px');
+    document.body.style.setProperty('--app-vh', '360px');
+    document.body.style.setProperty('--ui-scale', String(uiScale));
+    const ui = document.createElement('div');
+    ui.id = 'ui';
+    const { party, rows, members } = makeParty(1, true);
+    const minimap = document.createElement('div');
+    minimap.id = 'minimap-wrap';
+    const zone = document.createElement('div');
+    zone.id = 'zone-label';
+    const disc = document.createElement('div');
+    disc.id = 'minimap-disc';
+    const canvas = document.createElement('canvas');
+    canvas.id = 'minimap';
+    const raid = document.createElement('button');
+    raid.id = 'raid-lockout';
+    const mail = document.createElement('button');
+    mail.id = 'mail-indicator';
+    const clock = document.createElement('div');
+    clock.id = 'minimap-clock';
+    const coords = document.createElement('div');
+    coords.id = 'minimap-coords';
+    const compass = document.createElement('div');
+    compass.id = 'compass';
+    disc.append(canvas, raid, mail);
+    minimap.append(zone, disc, clock, coords, compass);
+    ui.append(party, minimap);
+    document.body.append(ui);
+    applyFocusedCustomLayout({
+      placements: {
+        party: {
+          anchor: 'top-left',
+          offsetX: 300,
+          offsetY: 200,
+          scale: 1,
+          orientation: 'horizontal',
+          reverse: false,
+        },
+        'minimap.cluster': {
+          anchor: 'top-left',
+          offsetX: 50,
+          offsetY: 50,
+          scale: 1,
+        },
+      },
+      surfaceIds: ['party', 'minimap.cluster'],
+      uiScale,
+    });
+    await waitForEditorGeometry();
+
+    const minimapRect = minimap.getBoundingClientRect();
+    expect(minimapRect.x).toBeCloseTo(50, 1);
+    expect(minimapRect.y).toBeCloseTo(50, 1);
+    expect(minimapRect.width).toBeCloseTo(170, 1);
+    expect(minimapRect.height).toBeCloseTo(224, 1);
+    const canvasRect = canvas.getBoundingClientRect();
+    expect(canvasRect.width).toBeCloseTo(162, 1);
+    expect(canvasRect.height).toBeCloseTo(162, 1);
+    const raidRect = raid.getBoundingClientRect();
+    expect(raidRect.x).toBeLessThan(canvasRect.x);
+    expect(raidRect.y).toBeGreaterThan(canvasRect.y + canvasRect.height - 8);
+    expect(raidRect.width).toBeCloseTo(55, 1);
+    expect(raidRect.height).toBeCloseTo(55, 1);
+    const mailRect = mail.getBoundingClientRect();
+    expect(mailRect.x).toBeLessThan(raidRect.x);
+    expect(mailRect.y).toBeCloseTo(raidRect.y, 1);
+    expect(mailRect.width).toBeCloseTo(55, 1);
+    expect(mailRect.height).toBeCloseTo(55, 1);
+    const clockRect = clock.getBoundingClientRect();
+    expect(clockRect.y).toBeGreaterThan(compass.getBoundingClientRect().bottom);
+    expect(clockRect.x).toBeGreaterThan(canvasRect.x);
+    expect(clockRect.right).toBeLessThan(canvasRect.right);
+    expect(party.getBoundingClientRect().x).toBeCloseTo(300, 1);
+    expect(party.getBoundingClientRect().y).toBeCloseTo(200, 1);
+    expect(rows.getBoundingClientRect().width).toBeCloseTo(68, 1);
+    expect(rows.getBoundingClientRect().height).toBeCloseTo(40, 1);
+    expect(members[0].getBoundingClientRect().width).toBeCloseTo(68, 1);
+    expect(members[0].getBoundingClientRect().height).toBeCloseTo(40, 1);
   });
 
   it('removes legacy transforms and clamps before applying custom HUD geometry', async () => {
@@ -1606,6 +2444,108 @@ describe('mobile HUD editor real DOM and CSS', () => {
       Number(getComputedStyle(ui).zIndex),
     );
     expect(getComputedStyle(potion).pointerEvents).toBe('auto');
+  });
+
+  it('keeps the More modal above an already-open Consumables drawer', async () => {
+    await page.viewport(740, 360);
+    document.body.className =
+      'mobile-touch game-active hud-mobile-compact mobile-consumables-open mobile-more-open';
+    const controls = document.createElement('section');
+    controls.id = 'mobile-controls';
+    const consumables = document.createElement('div');
+    consumables.id = 'mobile-consumables';
+    const more = document.createElement('div');
+    more.id = 'mobile-extra-controls';
+    more.className = 'window panel';
+    // The generic window manager writes this inline value when the class-driven
+    // More modal opens. Its modal layer must deliberately override that value.
+    more.style.zIndex = '51';
+    controls.append(consumables, more);
+    document.body.append(controls);
+
+    expect(Number(getComputedStyle(more).zIndex)).toBeGreaterThan(
+      Number(getComputedStyle(consumables).zIndex),
+    );
+  });
+
+  it('visibly decreases a selected action control in phone landscape', async () => {
+    await page.viewport(740, 360);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const controls = document.createElement('section');
+    controls.id = 'mobile-controls';
+    const ring = document.createElement('div');
+    ring.id = 'mobile-action-ring';
+    const attack = document.createElement('button');
+    attack.id = 'mobile-action-attack';
+    attack.className = 'mobile-action-slot';
+    ring.append(attack);
+    controls.append(ring);
+    document.body.append(controls);
+
+    const state = new MobileHudCustomLayoutState(MOBILE_HUD_REGISTRY);
+    const applier = new MobileHudCustomLayoutDomApplier(document, MOBILE_HUD_REGISTRY, state);
+    const apply = () =>
+      applier.apply({
+        profileId: 'phone',
+        contextId: 'world.base',
+        handedness: 'right',
+        measurement: { geometry: PHONE_GEOMETRY, uiScale: 1 },
+        eligible: true,
+        isSurfaceAvailable: (surfaceId) => surfaceId === 'action.attack',
+      });
+    const editor = new MobileHudEditor({
+      document,
+      registry: MOBILE_HUD_REGISTRY,
+      canOpen: () => true,
+      getDocument: documentFixture,
+      getProfileId: () => 'phone',
+      getSceneId: () => 'world',
+      getContextId: () => 'world.base',
+      getGeometry: () => PHONE_GEOMETRY,
+      getHandedness: () => 'right',
+      isSurfaceAvailable: (surfaceId) => surfaceId === 'action.attack',
+      beginPreview: (layout) => {
+        state.beginPreview(layout);
+        apply();
+      },
+      updatePreview: (layout) => {
+        state.updatePreview(layout);
+        apply();
+      },
+      storage: { load: async () => null, save: async () => undefined },
+      commitValidatedDocument: vi.fn(),
+      endPreview: () => {
+        state.endPreview();
+        apply();
+      },
+      focusManager: new FocusManager(),
+      confirmDiscard: () => true,
+      translate: (key) => String(key),
+      onOpenChange: vi.fn(),
+    });
+
+    expect(editor.open()).toBe(true);
+    editor.setLocked(false);
+    document
+      .querySelector<HTMLButtonElement>('[data-mobile-hud-surface-id="action.attack"]')
+      ?.click();
+    const before = attack.getBoundingClientRect();
+    const beforeFaceScale = new DOMMatrixReadOnly(getComputedStyle(attack, '::before').transform).a;
+    document
+      .querySelector<HTMLButtonElement>('[data-mobile-hud-control="scale-decrease"]')
+      ?.click();
+    await waitForEditorGeometry();
+    const after = attack.getBoundingClientRect();
+    const afterFaceScale = new DOMMatrixReadOnly(getComputedStyle(attack, '::before').transform).a;
+
+    expect(editor.draft?.document.profiles.phone?.['action.attack']?.scale).toBe(0.9);
+    expect(after.width).toBeGreaterThanOrEqual(48);
+    expect(after.height).toBeGreaterThanOrEqual(48);
+    expect(after.width).toBeCloseTo(before.width, 1);
+    expect(after.height).toBeCloseTo(before.height, 1);
+    expect(getComputedStyle(attack).getPropertyValue('--btn-scale')).toBe('0.9');
+    expect(afterFaceScale).toBeCloseTo(beforeFaceScale * 0.9, 2);
+    editor.close();
   });
 
   it.each([
