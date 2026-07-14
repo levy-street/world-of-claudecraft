@@ -197,6 +197,23 @@ export function mobVoiceCue(
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];
 }
 
+/** Resolves the cue for `action`, but falls back to the `attack` cue when the
+ *  resolved cue is not yet buffered. `attack` plays on every ordinary hit, so
+ *  it is always warm; a rare action (e.g. `hurt`, triggered only on a crit)
+ *  can otherwise lose the race to fetch and decode its clip in time to play
+ *  on the very event that needed it. `isBuffered` is injected the same way
+ *  `hasCue` is, so this stays host-agnostic and directly testable. */
+export function mobVoiceCueWithFallback(
+  templateId: string,
+  action: MobVoiceAction,
+  hasCue: (key: string) => boolean,
+  isBuffered: (key: string) => boolean,
+): string | null {
+  const primary = mobVoiceCue(templateId, action, hasCue);
+  if (primary && isBuffered(primary)) return primary;
+  return mobVoiceCue(templateId, 'attack', hasCue);
+}
+
 export function shouldPlayCritSfxForTarget(target: Entity): boolean {
   return target.kind !== 'mob' || !MOBS[target.templateId]?.boss;
 }

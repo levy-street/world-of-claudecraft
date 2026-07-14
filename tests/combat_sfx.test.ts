@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error scripts use the repository's untyped Node ESM convention
-import { SFX_MOB_EXTENSION_FAMILIES } from '../scripts/sfx/manifest.mjs';
-import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
+import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
@@ -10,6 +8,7 @@ import {
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
   mobVoiceCue,
+  mobVoiceCueWithFallback,
   mobVoiceFamily,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
@@ -266,6 +265,20 @@ describe('combat SFX policy', () => {
     expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
+  });
+
+  it('falls back to the attack cue only when the resolved cue is not yet buffered', () => {
+    const hasCue = () => false;
+    const warm = () => true;
+    const cold = () => false;
+    // warm arm: the resolved hurt cue is already buffered, use it as is.
+    expect(mobVoiceCueWithFallback('crypt_shambler', 'hurt', hasCue, warm)).toBe('mob_undead_hurt');
+    // cold arm: the resolved hurt cue is not buffered yet, fall back to attack.
+    expect(mobVoiceCueWithFallback('crypt_shambler', 'hurt', hasCue, cold)).toBe(
+      'mob_undead_attack',
+    );
+    // no-cue arm: an unmapped templateId resolves neither cue nor a fallback.
+    expect(mobVoiceCueWithFallback('not_a_real_mob', 'hurt', hasCue, warm)).toBeNull();
   });
 
   it('classifies gained aura polarity and stays silent on removal or missing state', () => {

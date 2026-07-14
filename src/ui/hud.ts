@@ -204,6 +204,7 @@ import {
   type MobVoiceAction,
   mobVoiceActionForDamage,
   mobVoiceCue,
+  mobVoiceCueWithFallback,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -8645,15 +8646,12 @@ export class Hud {
         } else {
           const mobAction = mobVoiceActionForDamage(ev, tgt);
           if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
-            // hurt has exactly one trigger (this one), so on a cold cache it
-            // can lose the race to fetch+decode within playAt's 0.12s replay
-            // window. attack is always warm (it plays on every ordinary
-            // hit), so fall back to it rather than risk silence.
-            const hurtVoice = availableMobVoiceCue(tgt.templateId, mobAction);
-            const voice =
-              hurtVoice && sfx.isBuffered(hurtVoice)
-                ? hurtVoice
-                : availableMobVoiceCue(tgt.templateId, 'attack');
+            const voice = mobVoiceCueWithFallback(
+              tgt.templateId,
+              mobAction,
+              (key) => sfx.hasVariants(key),
+              (key) => sfx.isBuffered(key),
+            );
             if (voice) this.combat(voice, tp.x, tp.y, tp.z, 0.6, { cooldown: 0.1 });
           }
         }
@@ -8741,12 +8739,15 @@ export class Hud {
     if (src.kind === 'mob') {
       if (this.ensureMobEngaged(src)) return; // just fired the aggro alert
       const voice = availableMobVoiceCue(src.templateId, 'attack');
-      if (voice && shouldPlayMobVoiceSfxForEntity(src))
+      if (voice && shouldPlayMobVoiceSfxForEntity(src)) {
         this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
-      // Warm the crit-only hurt cue alongside the frequently-played attack
-      // bark, so it is resident well before a crit could ever need it.
-      const hurtVoice = availableMobVoiceCue(src.templateId, 'hurt');
-      if (hurtVoice) sfx.preload(hurtVoice);
+        // Warm the crit-only hurt cue alongside the frequently-played attack
+        // bark, so it is resident well before a crit could ever need it. Gated
+        // the same as the play above (a muted Nythraxis mob never plays it)
+        // and short-circuited once warm so this doesn't re-scan every hit.
+        const hurtVoice = availableMobVoiceCue(src.templateId, 'hurt');
+        if (hurtVoice && !sfx.isBuffered(hurtVoice)) sfx.preload(hurtVoice);
+      }
     }
   }
 

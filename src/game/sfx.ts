@@ -341,21 +341,27 @@ class Sfx {
     );
   }
 
-  /** True when a key's first variant is already decoded and resident, so a
+  /** True when EVERY variant of a key is already decoded and resident, so a
    *  caller expecting playback THIS event (not a lazy-loaded 0.12s race) can
    *  check before playing, e.g. a rare crit-only cue that a warm-but-similar
-   *  cue can fall back to on a cold cache. */
+   *  cue can fall back to on a cold cache. Checking only variant 0 would miss
+   *  that playAt's round-robin cursor can land on a still-cold later variant. */
   isBuffered(key: string): boolean {
-    return this.buffers.has(assetCacheKey(key, 0));
+    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
+    for (let index = 0; index < count; index++) {
+      if (!this.buffers.has(assetCacheKey(key, index))) return false;
+    }
+    return true;
   }
 
-  /** Fire-and-forget warm of a key's first variant. Safe to call repeatedly;
+  /** Fire-and-forget warm of EVERY variant of a key. Safe to call repeatedly;
    *  loadBuffer is idempotent once cached, in flight, or failed. Lets a
    *  frequently-triggered cue (e.g. a mob's attack bark) also warm a rare
    *  sibling cue (its hurt reaction) that would otherwise race a cold fetch
    *  the first time it is actually needed. */
   preload(key: string): void {
-    void this.loadBuffer(key, 0);
+    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
+    for (let index = 0; index < count; index++) void this.loadBuffer(key, index);
   }
 
   /** Squared distance from the listener. Callers can pre-cull, but playAt also
