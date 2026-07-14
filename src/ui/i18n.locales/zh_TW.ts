@@ -4046,7 +4046,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': '收合任務追蹤器',
   'hudChrome.questTracker.expandHint': '展開任務追蹤器',
   'hudChrome.bags.cannotDestroy': '此物品無法銷毀。',
-  'hudChrome.bags.rightClickDestroy': '右鍵單擊以銷毀',
+  'hudChrome.bags.rightClickDestroy': 'Shift+右鍵單擊以銷毀',
   'hudChrome.bags.filterGroupAria': '依類別篩選背包',
   'hudChrome.bags.filterAll': '全部',
   'hudChrome.bags.filterWeapon': '武器',

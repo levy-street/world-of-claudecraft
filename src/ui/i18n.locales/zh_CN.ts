@@ -4044,7 +4044,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': '收起任务追踪器',
   'hudChrome.questTracker.expandHint': '展开任务追踪器',
   'hudChrome.bags.cannotDestroy': '该物品无法销毁。',
-  'hudChrome.bags.rightClickDestroy': '右键单击以销毁',
+  'hudChrome.bags.rightClickDestroy': 'Shift+右键单击以销毁',
   'hudChrome.bags.filterGroupAria': '按类别筛选背包',
   'hudChrome.bags.filterAll': '全部',
   'hudChrome.bags.filterWeapon': '武器',

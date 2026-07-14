@@ -348,7 +348,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Marchi Eroici: {count}',
   'heroicShop.buyAria': 'Compra {item} per {marks} Marchi Eroici',
   'hudChrome.bags.cannotDestroy': 'Questo oggetto non può essere distrutto.',
-  'hudChrome.bags.rightClickDestroy': 'Clic destro per distruggere',
   'hudChrome.crafting.comboRequirementUnmet':
     'Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.',
   'hudChrome.discord.roleTag.coredevs': 'Sviluppatore Principale',

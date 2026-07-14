@@ -348,7 +348,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Marcas Heroicas: {count}',
   'heroicShop.buyAria': 'Comprar {item} por {marks} Marcas Heroicas',
   'hudChrome.bags.cannotDestroy': 'Este item não pode ser destruído.',
-  'hudChrome.bags.rightClickDestroy': 'Clique com o botão direito para destruir',
   'hudChrome.crafting.comboRequirementUnmet':
     'Você não possui os dois ofícios exigidos no nível necessário para essa receita.',
   'hudChrome.discord.roleTag.coredevs': 'Dev Principal',

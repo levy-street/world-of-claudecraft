@@ -1263,7 +1263,7 @@ export const ko_KR: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "이 아이템은 파괴할 수 없습니다.",
-      "rightClickDestroy": "마우스 오른쪽 버튼으로 파괴",
+      "rightClickDestroy": "Shift + 마우스 오른쪽 버튼으로 파괴",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",

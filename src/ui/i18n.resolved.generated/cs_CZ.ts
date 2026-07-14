@@ -1263,7 +1263,7 @@ export const cs_CZ: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
-      "rightClickDestroy": "Zničíš pravým kliknutím",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",

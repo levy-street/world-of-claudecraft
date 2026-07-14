@@ -12,32 +12,38 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "es_ES": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "fr_FR": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "fr_CA": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "en_CA": [],
   "it_IT": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "de_DE": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "zh_CN": [],
@@ -47,47 +53,56 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "nl_NL": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "pl_PL": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "id_ID": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "tr_TR": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "sv_SE": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "vi_VN": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ],
   "da_DK": [
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.discord.link.joinServer"
   ]
 };

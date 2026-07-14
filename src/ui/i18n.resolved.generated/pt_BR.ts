@@ -1263,7 +1263,7 @@ export const pt_BR: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Este item não pode ser destruído.",
-      "rightClickDestroy": "Clique com o botão direito para destruir",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",

@@ -1263,7 +1263,7 @@ export const id_ID: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Item ini tidak dapat dihancurkan.",
-      "rightClickDestroy": "Klik kanan untuk menghancurkan",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",

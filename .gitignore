@@ -1,6 +1,9 @@
 # dependencies
 node_modules
 
+# agent-local git worktrees
+.worktrees/
+
 # build outputs
 dist/
 dist-env/

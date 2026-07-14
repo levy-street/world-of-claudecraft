@@ -1263,7 +1263,7 @@ export const ru_RU: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Этот предмет нельзя уничтожить.",
-      "rightClickDestroy": "Правый клик, чтобы уничтожить",
+      "rightClickDestroy": "Shift+правый клик, чтобы уничтожить",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",

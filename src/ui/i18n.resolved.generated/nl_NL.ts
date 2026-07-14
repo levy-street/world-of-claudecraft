@@ -1263,7 +1263,7 @@ export const nl_NL: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Dit voorwerp kan niet worden vernietigd.",
-      "rightClickDestroy": "Rechtsklik om te vernietigen",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",

@@ -4835,8 +4835,13 @@ export class Sim {
   // moved fully (no delegate). The corpse-loot helpers (distributeLootCopper/
   // awardSharedLootItem/lootSlotVisibleTo/pruneCorpseLoot) had their sole Sim caller
   // (lootCorpse) moved to interaction.ts (W3), which now imports them directly.
-  private rollLoot(mob: Entity, meta: PlayerMeta, eligible: PlayerMeta[] = [meta]): void {
-    rollLootImpl(this.ctx, mob, meta, eligible);
+  private rollLoot(
+    mob: Entity,
+    meta: PlayerMeta,
+    eligible: PlayerMeta[] = [meta],
+    contributors?: PlayerMeta[],
+  ): void {
+    rollLootImpl(this.ctx, mob, meta, eligible, contributors);
   }
 
   // World-boss personal loot: an independent roll per contributor, once per day.

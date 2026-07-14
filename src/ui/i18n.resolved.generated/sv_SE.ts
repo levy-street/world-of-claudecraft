@@ -1263,7 +1263,7 @@ export const sv_SE: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Det här föremålet kan inte förstöras.",
-      "rightClickDestroy": "Högerklicka för att förstöra",
+      "rightClickDestroy": "Shift+right-click to destroy",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
