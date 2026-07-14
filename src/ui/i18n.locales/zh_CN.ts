@@ -6995,4 +6995,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
+  'hudChrome.glitchVoice.off': '语音聊天已关闭',
+  'hudChrome.glitchVoice.connecting': '正在连接语音聊天',
+  'hudChrome.glitchVoice.on': '语音聊天已开启',
+  'hudChrome.glitchVoice.muted': '语音聊天已静音',
+  'hudChrome.glitchVoice.authError': '语音聊天需要重新登录 Glitch。',
+  'hudChrome.glitchVoice.bannedError': '此玩家无法使用语音聊天。',
+  'hudChrome.glitchVoice.retryError': '语音聊天正忙，请稍后重试。',
+  'hudChrome.glitchVoice.invalidError': '语音聊天配置无效。',
+  'hudChrome.glitchVoice.unavailableError': '语音聊天暂时不可用。',
+  'hudChrome.glitchVoice.permissionError': '请允许麦克风访问以使用语音聊天。',
 };

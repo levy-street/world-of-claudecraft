@@ -6995,4 +6995,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有幾個日常指令值得記住：/w 名稱 可發送密語，/r 則回覆你最近收到的一則，/invite 邀請某人加入你的隊伍，/follow 跟隨在朋友身後，/roll 為隊伍擲骰讓大家看見，/who 顯示誰在線上，而 /afk 則標示你暫時離開。在遊戲中輸入 /help 可查看完整清單。',
   'guide.social.slashHeading': '實用的斜線指令',
+  'hudChrome.glitchVoice.off': '語音聊天已關閉',
+  'hudChrome.glitchVoice.connecting': '正在連線語音聊天',
+  'hudChrome.glitchVoice.on': '語音聊天已開啟',
+  'hudChrome.glitchVoice.muted': '語音聊天已靜音',
+  'hudChrome.glitchVoice.authError': '語音聊天需要重新登入 Glitch。',
+  'hudChrome.glitchVoice.bannedError': '此玩家無法使用語音聊天。',
+  'hudChrome.glitchVoice.retryError': '語音聊天忙碌中，請稍後再試。',
+  'hudChrome.glitchVoice.invalidError': '語音聊天設定無效。',
+  'hudChrome.glitchVoice.unavailableError': '語音聊天暫時無法使用。',
+  'hudChrome.glitchVoice.permissionError': '請允許麥克風存取以使用語音聊天。',
 };

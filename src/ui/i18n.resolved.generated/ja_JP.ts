@@ -154,6 +154,18 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "glitchVoice": {
+      "off": "ボイスチャット：オフ",
+      "connecting": "ボイスチャットに接続中",
+      "on": "ボイスチャット：オン",
+      "muted": "ボイスチャット：ミュート",
+      "authError": "ボイスチャットには Glitch への再ログインが必要です。",
+      "bannedError": "このプレイヤーはボイスチャットを利用できません。",
+      "retryError": "ボイスチャットが混み合っています。しばらくしてからもう一度お試しください。",
+      "invalidError": "ボイスチャットの設定が無効です。",
+      "unavailableError": "ボイスチャットは一時的に利用できません。",
+      "permissionError": "ボイスチャットを使用するにはマイクへのアクセスを許可してください。"
+    },
     "readyCheck": {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",

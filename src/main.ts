@@ -40,6 +40,7 @@ import {
   startGlitchInstallHeartbeat,
 } from './game/glitch';
 import { GlitchBehaviorTracker } from './game/glitch_events';
+import { bindGlitchVoiceChat, type GlitchVoiceControl } from './game/glitch_voice';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
@@ -483,6 +484,16 @@ declare const __APP_BUILD_ID__: string;
 declare const __APP_BUILD_DATE__: string;
 
 const GLITCH_CONFIG = readGlitchConfig(import.meta.env, __APP_VERSION__);
+let activeGlitchVoice: GlitchVoiceControl | null = null;
+
+function stopActiveGlitchVoice(): void {
+  activeGlitchVoice?.stop();
+  activeGlitchVoice = null;
+}
+
+function leaveActiveGlitchVoice(keepalive = false): void {
+  activeGlitchVoice?.leave(keepalive);
+}
 function syncBuildInfo(): void {
   const el = document.getElementById('game-version');
   if (!el) return;
@@ -882,6 +893,7 @@ async function startGame(
   keybindScope: string,
   playIntro = false,
   glitchBehavior: GlitchBehaviorTracker | null = null,
+  glitchSession: GlitchSession | null = null,
 ): Promise<void> {
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
@@ -1008,6 +1020,34 @@ async function startGame(
     }
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+    stopActiveGlitchVoice();
+    if (glitchSession) {
+      const buttons = ['mm-glitch-voice', 'mobile-glitch-voice']
+        .map((id) => document.getElementById(id))
+        .filter((button): button is HTMLButtonElement => button instanceof HTMLButtonElement);
+      activeGlitchVoice = bindGlitchVoiceChat({
+        session: glitchSession,
+        displayName: world.player.name,
+        buttons,
+        getScope: () => ({
+          realm: api.realm || 'offline',
+          x: world.player.pos.x,
+          z: world.player.pos.z,
+        }),
+        labels: {
+          off: 'hudChrome.glitchVoice.off',
+          connecting: 'hudChrome.glitchVoice.connecting',
+          on: 'hudChrome.glitchVoice.on',
+          muted: 'hudChrome.glitchVoice.muted',
+          authError: 'hudChrome.glitchVoice.authError',
+          bannedError: 'hudChrome.glitchVoice.bannedError',
+          retryError: 'hudChrome.glitchVoice.retryError',
+          invalidError: 'hudChrome.glitchVoice.invalidError',
+          unavailableError: 'hudChrome.glitchVoice.unavailableError',
+          permissionError: 'hudChrome.glitchVoice.permissionError',
+        },
+      });
+    }
     glitchBehavior?.track('world_load', 'renderer_ready');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
@@ -3170,14 +3210,11 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
-  if (glitchBehavior) {
-    window.addEventListener(
-      'pagehide',
-      () => {
-        glitchBehavior.track('world_session', 'end');
-      },
-      { once: true },
-    );
+  if (glitchBehavior || glitchSession) {
+    window.addEventListener('pagehide', () => {
+      glitchBehavior?.track('world_session', 'end');
+      leaveActiveGlitchVoice(true);
+    });
   }
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
@@ -3799,7 +3836,10 @@ async function runGlitchCharacterAction(
     }
 
     glitchCharselectState = { ...state, existing: character };
-    await enterWorld(character, primaryButton, { glitchBehavior: state.behavior });
+    await enterWorld(character, primaryButton, {
+      glitchBehavior: state.behavior,
+      glitchSession: state.session,
+    });
     glitchCharselectState = null;
   } catch (err) {
     primaryButton.disabled = false;
@@ -5063,7 +5103,10 @@ function syncCharselectEnterButton(): void {
 async function enterWorld(
   c: CharacterSummary,
   button?: HTMLButtonElement,
-  opts: { glitchBehavior?: GlitchBehaviorTracker | null } = {},
+  opts: {
+    glitchBehavior?: GlitchBehaviorTracker | null;
+    glitchSession?: GlitchSession | null;
+  } = {},
 ): Promise<void> {
   try {
     if (button) {
@@ -5109,7 +5152,15 @@ async function enterWorld(
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
       opts.glitchBehavior?.track('world_load', 'first_snapshot');
-      void startGame(world, null, world, `char:${c.id}`, true, opts.glitchBehavior ?? null);
+      void startGame(
+        world,
+        null,
+        world,
+        `char:${c.id}`,
+        true,
+        opts.glitchBehavior ?? null,
+        opts.glitchSession ?? null,
+      );
     } else if (Date.now() - waitStart > 10000) {
       clearInterval(poll);
       world.close();
@@ -5124,6 +5175,7 @@ async function enterWorld(
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    stopActiveGlitchVoice();
     opts.glitchBehavior?.trackDisconnect(reason, world);
     hideReconnectOverlay();
     fatalOverlay(userFacingApiError(reason));

@@ -154,6 +154,18 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "glitchVoice": {
+      "off": "语音聊天已关闭",
+      "connecting": "正在连接语音聊天",
+      "on": "语音聊天已开启",
+      "muted": "语音聊天已静音",
+      "authError": "语音聊天需要重新登录 Glitch。",
+      "bannedError": "此玩家无法使用语音聊天。",
+      "retryError": "语音聊天正忙，请稍后重试。",
+      "invalidError": "语音聊天配置无效。",
+      "unavailableError": "语音聊天暂时不可用。",
+      "permissionError": "请允许麦克风访问以使用语音聊天。"
+    },
     "readyCheck": {
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",

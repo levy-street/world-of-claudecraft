@@ -17,13 +17,43 @@ It is off by default. A Glitch-enabled build activates only when
 - Enters the authoritative MMO server over the normal WebSocket world path, so
   Glitch players share the same live realm as regular web players.
 - Starts an Aegis install heartbeat every 60 seconds.
+- Adds opt-in Glitch voice chat after the player enters the world. The controls
+  remain hidden for regular web, native, offline, and non-Glitch sessions.
 - Sends optional behavioral events for launch, auth, world loading, input, UI
   surfaces, chat intent, zone entry, level reach, quest lifecycles, quest
   dialogue choices, NPC talk options, merchant/store actions, combat friction,
   economy, social systems, delves, lockpicking, and disconnects.
 - Exposes helper functions for progression run submission, leaderboard reads,
   achievements reads, and stats reads. Automatic leaderboard or achievement
-  submission is not enabled until dashboard `api_key` values are chosen.
+submission is not enabled until dashboard `api_key` values are chosen.
+
+## Glitch Voice Chat
+
+Voice chat uses the Glitch multiplayer voice-room HTTP transport directly. It
+does not replace the game's authoritative WebSocket simulation protocol and it
+does not send audio through the World of ClaudeCraft server.
+
+The player must click the Voice Chat control before microphone access is
+requested. The client then follows this lifecycle:
+
+1. List active proximity voice rooms for the title.
+2. Create a Glitch relay room when none exists.
+3. Join the room and retain only the returned participant `voice_token`.
+4. Capture mono PCM16 audio at 16 kHz in 60 ms frames.
+5. Include the sender's current World of ClaudeCraft realm and position in each
+   packet, and play it only for listeners in the same realm within 32 world units.
+6. Heartbeat the participant, send frames, and poll ordered packets. Upload
+   backpressure retains only the newest unsent frame so stale audio cannot build
+   an unbounded queue.
+7. Leave the room on disconnect or page exit. Page-exit leave requests use the
+   browser keepalive transport, and a back-forward-cache restore leaves the
+   controls available for the player to reconnect deliberately.
+
+The participant token remains in memory and is never written to storage or sent
+to the World of ClaudeCraft server. The shipped title token must permit the
+documented multiplayer voice-room title-token routes. The game server's
+Permissions-Policy allows microphone access only from the game origin; camera
+and unused sensor capabilities remain denied.
 
 ## Behavioral Events And Funnels
 

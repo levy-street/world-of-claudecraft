@@ -7338,4 +7338,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '몇 가지 자주 쓰는 명령어는 외워 둘 만합니다. /w 이름은 귓속말을 보내고, /r은 마지막으로 받은 귓속말에 답하며, /invite는 상대를 파티로 초대하고, /follow는 친구 뒤를 따라 걷게 하며, /roll은 파티가 함께 볼 주사위를 굴리고, /who는 접속 중인 사람을 보여주며, /afk는 자리 비움으로 표시합니다. 전체 목록은 게임에서 /help를 입력해 확인하세요.',
   'guide.social.slashHeading': '유용한 슬래시 명령어',
+  'hudChrome.glitchVoice.off': '음성 채팅 꺼짐',
+  'hudChrome.glitchVoice.connecting': '음성 채팅 연결 중',
+  'hudChrome.glitchVoice.on': '음성 채팅 켜짐',
+  'hudChrome.glitchVoice.muted': '음성 채팅 음소거됨',
+  'hudChrome.glitchVoice.authError': '음성 채팅을 사용하려면 Glitch에 다시 로그인해야 합니다.',
+  'hudChrome.glitchVoice.bannedError': '이 플레이어는 음성 채팅을 사용할 수 없습니다.',
+  'hudChrome.glitchVoice.retryError': '음성 채팅이 사용 중입니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.glitchVoice.invalidError': '음성 채팅 설정이 올바르지 않습니다.',
+  'hudChrome.glitchVoice.unavailableError': '음성 채팅을 일시적으로 사용할 수 없습니다.',
+  'hudChrome.glitchVoice.permissionError': '음성 채팅을 사용하려면 마이크 접근을 허용하세요.',
 };

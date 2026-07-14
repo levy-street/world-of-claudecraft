@@ -7351,4 +7351,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
+  'hudChrome.glitchVoice.off': 'ボイスチャット：オフ',
+  'hudChrome.glitchVoice.connecting': 'ボイスチャットに接続中',
+  'hudChrome.glitchVoice.on': 'ボイスチャット：オン',
+  'hudChrome.glitchVoice.muted': 'ボイスチャット：ミュート',
+  'hudChrome.glitchVoice.authError': 'ボイスチャットには Glitch への再ログインが必要です。',
+  'hudChrome.glitchVoice.bannedError': 'このプレイヤーはボイスチャットを利用できません。',
+  'hudChrome.glitchVoice.retryError':
+    'ボイスチャットが混み合っています。しばらくしてからもう一度お試しください。',
+  'hudChrome.glitchVoice.invalidError': 'ボイスチャットの設定が無効です。',
+  'hudChrome.glitchVoice.unavailableError': 'ボイスチャットは一時的に利用できません。',
+  'hudChrome.glitchVoice.permissionError':
+    'ボイスチャットを使用するにはマイクへのアクセスを許可してください。',
 };

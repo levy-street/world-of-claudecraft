@@ -951,6 +951,21 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
   });
 
+  it('ships hidden Glitch-only voice controls in both desktop and mobile shells', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toMatch(/id="mm-glitch-voice"[^>]*hidden/);
+      expect(entry, name).toMatch(/id="mm-glitch-voice"[^>]*data-icon="voice"/);
+      expect(entry, name).toMatch(/id="mobile-glitch-voice"[^>]*hidden/);
+      expect(entry, name).toMatch(/id="mobile-glitch-voice"[^>]*data-icon="voice"/);
+    }
+    expect(mainTs).toContain('activeGlitchVoice = bindGlitchVoiceChat({');
+    expect(mainTs).toContain('session: glitchSession');
+    expect(mainTs).toContain("realm: api.realm || 'offline'");
+  });
+
   it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
     for (const [name, entry] of [
       ['index.html', html],

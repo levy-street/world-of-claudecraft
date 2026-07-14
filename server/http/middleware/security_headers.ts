@@ -58,7 +58,8 @@ const GLITCH_EMBED_ORIGINS: ReadonlySet<string> = new Set([
 // deliberately ABSENT: the game client calls the Fullscreen API (src/main.ts,
 // required for the mobile landscape orientation lock) and the Gamepad API
 // (src/game/gamepad.ts). Autoplay and screen-wake-lock are likewise excluded as
-// plausible game features a blanket deny would silently break. Everything below
+// plausible game features a blanket deny would silently break. Microphone is
+// allowed only to the game origin for opt-in Glitch voice chat. Everything below
 // is a sensor / capability the game never uses.
 const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
   'accelerometer',
@@ -73,7 +74,6 @@ const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
   'idle-detection',
   'local-fonts',
   'magnetometer',
-  'microphone',
   'midi',
   'payment',
   'serial',
@@ -84,9 +84,10 @@ const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
 // Each denied feature as `name=()` (an empty allowlist), joined into the single
 // Permissions-Policy value. Built once from the list above so the list is the
 // one source of truth.
-const PERMISSIONS_POLICY_VALUE = PERMISSIONS_POLICY_DENY_FEATURES.map(
-  (feature) => `${feature}=()`,
-).join(', ');
+const PERMISSIONS_POLICY_VALUE = [
+  ...PERMISSIONS_POLICY_DENY_FEATURES.map((feature) => `${feature}=()`),
+  'microphone=(self)',
+].join(', ');
 
 /**
  * Set the security headers on `res` for every HTTP response. A plain top-level

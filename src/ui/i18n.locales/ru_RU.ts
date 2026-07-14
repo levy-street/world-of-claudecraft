@@ -7486,4 +7486,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
+  'hudChrome.glitchVoice.off': 'Голосовой чат выключен',
+  'hudChrome.glitchVoice.connecting': 'Подключение к голосовому чату',
+  'hudChrome.glitchVoice.on': 'Голосовой чат включён',
+  'hudChrome.glitchVoice.muted': 'Микрофон в голосовом чате выключен',
+  'hudChrome.glitchVoice.authError': 'Для голосового чата нужно снова войти в Glitch.',
+  'hudChrome.glitchVoice.bannedError': 'Голосовой чат недоступен этому игроку.',
+  'hudChrome.glitchVoice.retryError': 'Голосовой чат занят. Повторите попытку позже.',
+  'hudChrome.glitchVoice.invalidError': 'Настройки голосового чата недействительны.',
+  'hudChrome.glitchVoice.unavailableError': 'Голосовой чат временно недоступен.',
+  'hudChrome.glitchVoice.permissionError': 'Разрешите доступ к микрофону для голосового чата.',
 };

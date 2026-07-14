@@ -25,8 +25,8 @@ const EXPECT = {
   permissionsPolicy:
     'accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), ' +
     'display-capture=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), ' +
-    'local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), ' +
-    'usb=(), xr-spatial-tracking=()',
+    'local-fonts=(), magnetometer=(), midi=(), payment=(), serial=(), usb=(), ' +
+    'xr-spatial-tracking=(), microphone=(self)',
   crossOriginOpenerPolicy: 'same-origin',
   crossOriginResourcePolicy: 'same-origin',
   crossOriginResourcePolicyEmbed: 'cross-origin',
@@ -121,15 +121,17 @@ describe('withSecurityHeaders (unit)', () => {
     }
   });
 
-  it('excludes the gameplay features from the Permissions-Policy and denies the sensors', () => {
+  it('allows gameplay features from self and denies unused sensors', () => {
     const value = run('/anything').getHeader('Permissions-Policy') as string;
     // Fullscreen (mobile landscape lock) and Gamepad are in active use, so denying
     // them would break the game; they must NOT appear in the deny list.
     expect(value.includes('fullscreen')).toBe(false);
     expect(value.includes('gamepad')).toBe(false);
-    // Sensitive capabilities the game never uses ARE denied.
+    // Glitch voice chat needs the microphone only from the game origin. Other
+    // sensitive capabilities the game never uses remain denied.
     expect(value.includes('camera=()')).toBe(true);
-    expect(value.includes('microphone=()')).toBe(true);
+    expect(value.includes('microphone=(self)')).toBe(true);
+    expect(value.includes('microphone=()')).toBe(false);
     expect(value.includes('geolocation=()')).toBe(true);
   });
 

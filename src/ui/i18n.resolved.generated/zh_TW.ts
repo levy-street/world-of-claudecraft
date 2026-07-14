@@ -154,6 +154,18 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "glitchVoice": {
+      "off": "語音聊天已關閉",
+      "connecting": "正在連線語音聊天",
+      "on": "語音聊天已開啟",
+      "muted": "語音聊天已靜音",
+      "authError": "語音聊天需要重新登入 Glitch。",
+      "bannedError": "此玩家無法使用語音聊天。",
+      "retryError": "語音聊天忙碌中，請稍後再試。",
+      "invalidError": "語音聊天設定無效。",
+      "unavailableError": "語音聊天暫時無法使用。",
+      "permissionError": "請允許麥克風存取以使用語音聊天。"
+    },
     "readyCheck": {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",

@@ -1591,6 +1591,10 @@
     animation-duration: calc(1.6s * var(--motion-scale, 1));
     animation-play-state: var(--fx-ambient-anim, running);
   }
+  #mm-glitch-voice.active {
+    border-color: var(--gold);
+    color: #fff;
+  }
   @keyframes tal-pulse {
     0%,
     100% {
