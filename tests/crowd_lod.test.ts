@@ -1,5 +1,6 @@
 // Crowd-adaptive character LOD policy. Ordinary scenes must be bit-for-bit
 // untouched (scale exactly 1, cadence exactly 2); only a genuine crowd degrades.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from '../src/render/crowd_lod';
 
@@ -91,5 +92,17 @@ describe('animatesEveryFrame', () => {
 
   it('does not exempt a stranger just because the player has no target', () => {
     expect(animatesEveryFrame(STRANGER, SELF, null, null)).toBe(false);
+  });
+});
+
+describe('renderer crowd LOD integration', () => {
+  it('uses the adaptive cadence while exempting gameplay-critical rigs', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain(
+      'const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);',
+    );
+    expect(renderer).toContain('if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility))');
+    expect(renderer).toContain('else if (d2 > shadowRangeSq)');
+    expect(renderer).toContain('% midAnimCadenceFrames === 0');
   });
 });

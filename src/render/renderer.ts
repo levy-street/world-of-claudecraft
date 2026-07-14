@@ -4251,6 +4251,7 @@ export class Renderer {
     const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
     const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
     const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
+    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -4623,12 +4624,13 @@ export class Renderer {
       }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // distance-tiered mixer updates: near = every frame, mid = every 2nd,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless
+      // Distance-tiered mixer updates: near = every frame, mid cadence adapts
+      // to crowd size, and far static LOD rigs update every 6th. The player,
+      // current target, and active cast telegraphs always animate every frame.
       let animate = true;
-      if (id !== p.id) {
+      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
+        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
       active.update(dt, st, animate);
 
