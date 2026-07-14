@@ -6053,6 +6053,18 @@ export const ja_JP: EnTranslations = {
         "name": "エレメンタル解放",
         "description": "現在の武器エンチャントのエネルギーを対象に解き放ち、{damage} のダメージを与え、エンチャントに応じた追加効果を発揮します：脅威度の爆発（大地結び）、火炎の延焼（フレイム）、移動速度の低下（フロスト）。"
       },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを50%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "信仰の防壁を呼び降ろし、8秒間、受けるすべてのダメージを50%軽減します。"
+      },
+      "ancestral_resolve": {
+        "name": "祖霊の決意",
+        "description": "祖霊があなたを守り、8秒間、受けるすべてのダメージを50%軽減します。"
+      },
       "shadow_bolt": {
         "name": "暗鬱の矢",
         "description": "敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。"

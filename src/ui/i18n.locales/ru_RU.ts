@@ -2440,6 +2440,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Стихийный разряд',
   'entities.abilities.unleash_weapon.description':
     'Высвобождает энергию активного усиления оружия по цели, нанося {damage} ед. урона и добавляя эффект в зависимости от усиления: всплеск угрозы (земная привязь), огненный ожог (пламя) или замедление (лед).',
+  'entities.abilities.ironhold.name': 'Железная стена',
+  'entities.abilities.ironhold.description':
+    'Укрывшись за щитом, вы снижаете весь получаемый урон на 50% на 8 сек.',
+  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
+  'entities.abilities.sacred_bulwark.description':
+    'Призывает оплот веры, снижая весь получаемый урон на 50% на 8 сек.',
+  'entities.abilities.ancestral_resolve.name': 'Воля предков',
+  'entities.abilities.ancestral_resolve.description':
+    'Духи предков защищают вас, снижая весь получаемый урон на 50% на 8 сек.',
   'entities.abilities.shadow_bolt.name': 'Сумрачная стрела',
   'entities.abilities.shadow_bolt.description':
     'Посылает во врага темную стрелу, нанося {damage} ед. урона от темной магии.',

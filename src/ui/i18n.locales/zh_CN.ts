@@ -2312,6 +2312,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '元素释放',
   'entities.abilities.unleash_weapon.description':
     '释放当前武器附魔的能量攻击目标，造成 {damage} 点伤害，并根据附魔产生额外效果：威胁值爆发（大地之锚）、火焰灼烧（烈焰）或减速（寒冰）。',
+  'entities.abilities.ironhold.name': '铁壁',
+  'entities.abilities.ironhold.description':
+    '以坚固的防御自守，使受到的所有伤害降低 50%，持续 8 秒。',
+  'entities.abilities.sacred_bulwark.name': '神圣壁垒',
+  'entities.abilities.sacred_bulwark.description':
+    '召下信仰的壁垒，使受到的所有伤害降低 50%，持续 8 秒。',
+  'entities.abilities.ancestral_resolve.name': '先祖坚意',
+  'entities.abilities.ancestral_resolve.description':
+    '先祖之灵护佑你，使受到的所有伤害降低 50%，持续 8 秒。',
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',

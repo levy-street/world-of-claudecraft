@@ -1045,6 +1045,22 @@ const classAbilityNamesEn = {
         'Elemental Discharge',
         'Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
       ],
+      // Shield Wall-style defensive cooldowns (warrior/paladin/shaman).
+      [
+        'ironhold',
+        'Ironhold',
+        'Brace behind your guard, reducing all damage taken by 50% for 8 sec.',
+      ],
+      [
+        'sacred_bulwark',
+        'Sacred Bulwark',
+        'Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec.',
+      ],
+      [
+        'ancestral_resolve',
+        'Ancestral Resolve',
+        'The spirits shield you, reducing all damage taken by 50% for 8 sec.',
+      ],
       [
         'shadow_bolt',
         'Gloom Bolt',

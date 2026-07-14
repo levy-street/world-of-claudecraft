@@ -6053,6 +6053,18 @@ export const zh_TW: EnTranslations = {
         "name": "元素釋放",
         "description": "釋放當前武器附魔的能量攻擊目標，造成 {damage} 點傷害，並根據附魔產生額外效果：威脅值爆發（大地之錨）、火焰灼燒（烈焰）或減速（寒冰）。"
       },
+      "ironhold": {
+        "name": "鐵壁",
+        "description": "以堅固的防禦自守，使受到的所有傷害降低 50%，持續 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神聖壁壘",
+        "description": "召下信仰的壁壘，使受到的所有傷害降低 50%，持續 8 秒。"
+      },
+      "ancestral_resolve": {
+        "name": "先祖堅意",
+        "description": "先祖之靈護佑你，使受到的所有傷害降低 50%，持續 8 秒。"
+      },
       "shadow_bolt": {
         "name": "幽暗箭",
         "description": "向敵人發射暗影箭，造成 {damage} 點暗影傷害。"

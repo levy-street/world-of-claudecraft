@@ -2705,8 +2705,15 @@ const SHAMAN_SPECS: SpecDef[] = [
     'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
     { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
     // Enhancement tank kit, granted alongside Ancestral Strike so a melee shaman
-    // can hold aggro: mitigation, a threat imbue, a taunt, and an enchant discharge.
-    ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon'],
+    // can hold aggro: mitigation, a threat imbue, a taunt, an enchant discharge,
+    // and a Shield Wall-style defensive cooldown.
+    [
+      'earth_shield',
+      'earthbound_weapon',
+      'elemental_demand',
+      'unleash_weapon',
+      'ancestral_resolve',
+    ],
   ),
   spec(
     'restoration',

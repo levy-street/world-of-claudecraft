@@ -120,6 +120,14 @@ export function dealDamage(
     amount = Math.round(amount * 0.9);
   }
 
+  // Shield Wall: a big defensive cooldown (fraction less damage from any source,
+  // any school, DoT ticks included). Non-stacking: the strongest active ward wins.
+  if (source && source.id !== target.id && amount > 0) {
+    let ward = 0;
+    for (const a of target.auras) if (a.kind === 'shield_wall') ward = Math.max(ward, a.value);
+    if (ward > 0) amount = Math.round(amount * (1 - ward));
+  }
+
   // Earth Shield (Stone Aegis): a charge-limited damage-taken reduction on the
   // shaman. Only a real incoming attack (a DIRECT hit from another entity) spends
   // a charge; DoT ticks and reflects (direct=false) and self-damage leave it be,

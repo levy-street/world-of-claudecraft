@@ -221,6 +221,10 @@ export type AuraKind =
   // damage of its own.
   | 'earth_shield'
   | 'earthbound_weapon'
+  // Shield Wall-style tank cooldown: a big, short, all-school damage-taken
+  // reduction (value = fraction less, e.g. 0.5 = 50% less) applied in damage.ts.
+  // Shared by the warrior/paladin/shaman defensive cooldowns.
+  | 'shield_wall'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.

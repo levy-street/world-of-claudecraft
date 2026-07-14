@@ -128,6 +128,45 @@ describe('Anchorbound Weapon (Earthbound Weapon)', () => {
   });
 });
 
+describe('Shield Wall cooldowns (Ironhold / Sacred Bulwark / Ancestral Resolve)', () => {
+  const CD: Record<string, string> = {
+    warrior: 'ironhold',
+    paladin: 'sacred_bulwark',
+    shaman: 'ancestral_resolve',
+  };
+
+  it('all three tank classes know their defensive cooldown at 20', () => {
+    for (const [cls, id] of Object.entries(CD)) {
+      const sim = new Sim({ seed: 2, playerClass: cls as any, autoEquip: true });
+      sim.setPlayerLevel(20);
+      if (cls === 'shaman') sim.setSpec('enhancement');
+      expect(!!sim.resolvedAbility(id), `${cls} knows ${id}`).toBe(true);
+    }
+  });
+
+  it('halves all incoming damage while active, on any school', () => {
+    const { sim, p, pid } = makeEnh();
+    cast(sim, 'ancestral_resolve', pid);
+    expect(p.auras.some((a) => a.kind === 'shield_wall')).toBe(true);
+    const mob = spawnMob(sim, p, 3, false);
+    for (const school of ['physical', 'fire', 'nature']) {
+      const before = p.hp;
+      (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
+      expect(before - p.hp).toBe(50); // 50% reduction
+    }
+  });
+
+  it('reduces DoT-tick (non-direct) damage too, unlike Stone Aegis', () => {
+    const { sim, p, pid } = makeEnh();
+    cast(sim, 'ancestral_resolve', pid);
+    const mob = spawnMob(sim, p, 3, false);
+    const before = p.hp;
+    // direct=false: a DoT tick still gets the Shield Wall cut.
+    (sim as any).dealDamage(mob, p, 100, false, 'shadow', null, 'hit', false, undefined, false);
+    expect(before - p.hp).toBe(50);
+  });
+});
+
 describe('Elemental Demand (taunt)', () => {
   it('taunts a mob at 15 yard range, forcing it onto the shaman', () => {
     const { sim, p, pid } = makeEnh();

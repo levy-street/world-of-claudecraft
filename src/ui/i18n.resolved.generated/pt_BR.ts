@@ -6053,6 +6053,18 @@ export const pt_BR: EnTranslations = {
         "name": "Elemental Discharge",
         "description": "Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound)."
       },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 50% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec."
+      },
+      "ancestral_resolve": {
+        "name": "Ancestral Resolve",
+        "description": "The spirits shield you, reducing all damage taken by 50% for 8 sec."
+      },
       "shadow_bolt": {
         "name": "Raio Lúgubre",
         "description": "Envia uma seta sombria contra o inimigo, causando {damage} de dano de Sombra."

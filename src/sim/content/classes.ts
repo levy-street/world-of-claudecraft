@@ -82,6 +82,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sunder_armor',
       'taunt',
       'pummel',
+      'ironhold',
     ],
     color: 0xc79c6e,
   },
@@ -187,6 +188,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'righteous_fury',
       'retribution_aura',
       'rebuke',
+      'sacred_bulwark',
     ],
     color: 0xf58cba,
   },
@@ -688,6 +690,24 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
     description:
       'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
+  },
+  // Shield Wall-style emergency defensive cooldown. The warrior/paladin/shaman
+  // versions share the `shield_wall` aura (50% less damage for 8 sec, 3 min
+  // cooldown, off the global) and differ only in flavor. See damage.ts.
+  ironhold: {
+    id: 'ironhold',
+    name: 'Ironhold',
+    class: 'warrior',
+    learnLevel: 20,
+    cost: 10,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
+    description: 'Brace behind your guard, reducing all damage taken by 50% for 8 sec.',
   },
   sunder_armor: {
     id: 'sunder_armor',
@@ -1651,6 +1671,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'A holy shield absorbs $d damage for 10 sec.',
   },
+  // Shield Wall-style emergency defensive cooldown (see the `ironhold` note).
+  sacred_bulwark: {
+    id: 'sacred_bulwark',
+    name: 'Sacred Bulwark',
+    class: 'paladin',
+    learnLevel: 20,
+    cost: 15,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
+    description: 'Call down a bulwark of faith, reducing all damage taken by 50% for 8 sec.',
+  },
   hammer_of_justice: {
     id: 'hammer_of_justice',
     name: 'Sundering Gavel',
@@ -2611,6 +2647,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'unleashWeapon', min: 20, max: 26 }],
     description:
       'Discharges your active weapon enchant at the target for $d damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
+  },
+  // Shield Wall-style emergency defensive cooldown (see the `ironhold` note),
+  // rounding out the Enhancement tank kit's survivability.
+  ancestral_resolve: {
+    id: 'ancestral_resolve',
+    name: 'Ancestral Resolve',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 20,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.5, duration: 8 }],
+    description: 'The spirits shield you, reducing all damage taken by 50% for 8 sec.',
   },
 
   // ====================== WARLOCK ======================
