@@ -964,6 +964,7 @@ export const id_ID: EnTranslations = {
       "honorFloat": "+{amount} Kehormatan",
       "honorGain": "Anda mendapatkan Kehormatan {amount} ({reason}).",
       "notEnoughHonor": "Tidak cukup Kehormatan.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
         "fiestaKill": "Eliminasi Fiesta",
@@ -7143,6 +7144,33 @@ export const id_ID: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Tongkat Perang Emberglass"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
       },
@@ -8302,6 +8330,11 @@ export const id_ID: EnTranslations = {
         "name": "AMARAH",
         "title": "Kepala Suku Kehormatan",
         "greeting": "Pasir mengingat setiap kemenangan. Habiskan kehormatanmu dengan baik."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Ahli Sejarah Caddis",

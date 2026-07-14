@@ -964,6 +964,7 @@ export const ko_KR: EnTranslations = {
       "honorFloat": "명예 +{amount}",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
+      "notEnoughHero": "영웅 점수가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
         "fiestaKill": "피에스타 처치",
@@ -7143,6 +7144,33 @@ export const ko_KR: EnTranslations = {
       "emberglass_warstaff": {
         "name": "불씨유리 전투지팡이"
       },
+      "frostrend_helm": {
+        "name": "서리절단 투구"
+      },
+      "frostrend_spaulders": {
+        "name": "서리절단 어깨보호구"
+      },
+      "frostrend_hauberk": {
+        "name": "서리절단 사슬갑옷"
+      },
+      "frostrend_girdle": {
+        "name": "서리절단 허리띠"
+      },
+      "frostrend_legguards": {
+        "name": "서리절단 다리보호구"
+      },
+      "frostrend_gauntlets": {
+        "name": "서리절단 장갑"
+      },
+      "frostrend_sabatons": {
+        "name": "서리절단 전투화"
+      },
+      "frostrend_choker": {
+        "name": "서리절단 목걸이"
+      },
+      "frostrend_band": {
+        "name": "서리절단 반지"
+      },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
       },
@@ -8302,6 +8330,11 @@ export const ko_KR: EnTranslations = {
         "name": "퓨리",
         "title": "명예 병참장교",
         "greeting": "전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라."
+      },
+      "frostreach_quartermaster": {
+        "name": "바엘카 서리감시자",
+        "title": "서리절경 병참장교",
+        "greeting": "프론티어는 피와 서리로 값을 치른다. 영웅 점수를 현명하게 쓰라."
       },
       "loremaster_caddis": {
         "name": "현자 캐디스",

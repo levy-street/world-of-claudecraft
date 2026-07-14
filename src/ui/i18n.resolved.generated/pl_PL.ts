@@ -964,6 +964,7 @@ export const pl_PL: EnTranslations = {
       "honorFloat": "+{amount} Honor",
       "honorGain": "Otrzymujesz {amount} Honor ({reason}).",
       "notEnoughHonor": "Za mało Honoru.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Zwycięstwo na arenie",
         "fiestaKill": "Upadek Fiesty",
@@ -7143,6 +7144,33 @@ export const pl_PL: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Warstaff z Żarowego Szkła"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Młot Gallowglass"
       },
@@ -8302,6 +8330,11 @@ export const pl_PL: EnTranslations = {
         "name": "FURIA",
         "title": "Honorowy kwatermistrz",
         "greeting": "Piaski pamiętają każde zwycięstwo. Spędź dobrze swój honor."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Mistrz Wiedzy Caddis",

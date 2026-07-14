@@ -964,6 +964,7 @@ export const vi_VN: EnTranslations = {
       "honorFloat": "+{amount} Danh dự",
       "honorGain": "Bạn nhận được Danh dự {amount} ({reason}).",
       "notEnoughHonor": "Không đủ danh dự.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Chiến thắng đấu trường",
         "fiestaKill": "Hạ gục trong Fiesta",
@@ -7143,6 +7144,33 @@ export const vi_VN: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Chiến Trượng Emberglass"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Búa Gallowglass"
       },
@@ -8302,6 +8330,11 @@ export const vi_VN: EnTranslations = {
         "name": "NỘ KHÍ",
         "title": "Thủ Lĩnh Danh Dự",
         "greeting": "Cát nhớ từng chiến thắng. Hãy dành danh dự của bạn thật tốt."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Sử Gia Caddis",

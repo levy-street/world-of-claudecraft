@@ -964,6 +964,7 @@ export const ru_RU: EnTranslations = {
       "honorFloat": "+{amount} чести",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
+      "notEnoughHero": "Недостаточно очков героя.",
       "reasons": {
         "arenaWin": "Победа на арене",
         "fiestaKill": "Устранение на Фиесте",
@@ -7143,6 +7144,33 @@ export const ru_RU: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Боевой посох из огненного стекла"
       },
+      "frostrend_helm": {
+        "name": "Шлем Ледяного Разрыва"
+      },
+      "frostrend_spaulders": {
+        "name": "Наплечники Ледяного Разрыва"
+      },
+      "frostrend_hauberk": {
+        "name": "Кольчуга Ледяного Разрыва"
+      },
+      "frostrend_girdle": {
+        "name": "Пояс Ледяного Разрыва"
+      },
+      "frostrend_legguards": {
+        "name": "Поножи Ледяного Разрыва"
+      },
+      "frostrend_gauntlets": {
+        "name": "Рукавицы Ледяного Разрыва"
+      },
+      "frostrend_sabatons": {
+        "name": "Сапоги Ледяного Разрыва"
+      },
+      "frostrend_choker": {
+        "name": "Ожерелье Ледяного Разрыва"
+      },
+      "frostrend_band": {
+        "name": "Кольцо Ледяного Разрыва"
+      },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"
       },
@@ -8302,6 +8330,11 @@ export const ru_RU: EnTranslations = {
         "name": "Фьюри",
         "title": "Интендант чести",
         "greeting": "Пески поля боя помнят каждую победу. Распорядись своей честью достойно."
+      },
+      "frostreach_quartermaster": {
+        "name": "Ваэлка Морозный Страж",
+        "title": "Интендант Морозного Предела",
+        "greeting": "Фронтир платит кровью и морозом. Трать очки героя с умом."
       },
       "loremaster_caddis": {
         "name": "Хранитель знаний Каддис",

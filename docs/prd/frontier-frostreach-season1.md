@@ -57,14 +57,24 @@ reads 31 after the epic +6 bump; primary-stat sums match the slot budgets in
   outside the safe hub are hostile; `isFriendlyTo` mirrors it for free).
 - The honor-reason additions (`frontier_kill` / `frontier_rare` / `frontier_daily`)
   and their HUD labels.
+- Frost rares (`content/frontier.ts`: Rimefang Stalker, Frostbound Revenant) and
+  the reward loop (`pvp/frontier_rewards.ts`, hooked from `handleDeath`): a rare
+  killed in the band drops 15 honor + 3 hero points to every contributor.
+- The item-level 31 Season 1 set (`content/frontier_vendor.ts`: the Frostrend mail
+  Strength/Stamina pieces, source level 25 so each reads item level 31) sold by the
+  Frostreach Quartermaster for hero points via the new `priceHero` cost field
+  (`items.buyItem` spends hero points, sparing lifetime). The Quartermaster spawns
+  at a reserved id after the world roster (mirroring FURY), so parity is untouched.
 - Tests: `tests/frontier_pvp.test.ts` (band disjointness, hub perimeter, currency
-  grant/spend/persist round-trip, hostility inside/outside/hub/overworld).
+  grant/spend/persist round-trip, hostility inside/outside/hub/overworld, the
+  frost-rare kill reward in-band vs out, and the hero-points vendor buy/refuse +
+  item-level-31 pricing).
 
 ## Deferred to follow-up commits on this draft
 
-Frost rare templates + the Frostreach content module and camps; the frost-rare
-kill honor/hero grant hook; the hero-point Quartermaster + the item-level 31 set;
-the honor daily quests; the enter/leave teleport surface and the PvP window
+The honor daily quests; the enter/leave teleport surface and the PvP window
 section; the hero-points wallet readout (IWorld facet + `ClientWorld` + server
-wire); the death/respawn-at-hub graveyard; the Book of Deeds records for the new
-rares and the zone; the frost render/terrain treatment for the band; wiki content.
+wire); the death/respawn-at-hub graveyard; the frost rare spawn camps + the
+Frostreach zone label (deferred so the world-gen spawn rng and the parity goldens
+stay untouched until a deliberate regen); the Book of Deeds records for the new
+rares and the zone; the frost render/terrain treatment for the band.

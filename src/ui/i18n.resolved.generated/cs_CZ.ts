@@ -964,6 +964,7 @@ export const cs_CZ: EnTranslations = {
       "honorFloat": "+{amount} cti",
       "honorGain": "Získáváš {amount} cti ({reason}).",
       "notEnoughHonor": "Nemáš dost cti.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
@@ -7143,6 +7144,33 @@ export const cs_CZ: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bojová hůl z uhlíkového skla"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Gallowglassské kladivo"
       },
@@ -8302,6 +8330,11 @@ export const cs_CZ: EnTranslations = {
         "name": "FÚRIE",
         "title": "Intendant cti",
         "greeting": "Písky si pamatují každé vítězství. Utrácej svou čest moudře."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Kronikář Caddis",

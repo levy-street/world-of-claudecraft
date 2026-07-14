@@ -964,6 +964,7 @@ export const zh_TW: EnTranslations = {
       "honorFloat": "+{amount} 榮譽",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
+      "notEnoughHero": "英雄點數不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
         "fiestaKill": "嘉年華擊倒",
@@ -7143,6 +7144,33 @@ export const zh_TW: EnTranslations = {
       "emberglass_warstaff": {
         "name": "燼晶戰杖"
       },
+      "frostrend_helm": {
+        "name": "裂霜頭盔"
+      },
+      "frostrend_spaulders": {
+        "name": "裂霜肩甲"
+      },
+      "frostrend_hauberk": {
+        "name": "裂霜鎖甲"
+      },
+      "frostrend_girdle": {
+        "name": "裂霜腰帶"
+      },
+      "frostrend_legguards": {
+        "name": "裂霜護腿"
+      },
+      "frostrend_gauntlets": {
+        "name": "裂霜護手"
+      },
+      "frostrend_sabatons": {
+        "name": "裂霜戰靴"
+      },
+      "frostrend_choker": {
+        "name": "裂霜項鍊"
+      },
+      "frostrend_band": {
+        "name": "裂霜指環"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"
       },
@@ -8302,6 +8330,11 @@ export const zh_TW: EnTranslations = {
         "name": "怒焰",
         "title": "榮譽軍需官",
         "greeting": "戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。"
+      },
+      "frostreach_quartermaster": {
+        "name": "維爾卡·霜衛",
+        "title": "霜達軍需官",
+        "greeting": "邊境以鮮血與寒霜為報。好好花你的英雄點數。"
       },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",

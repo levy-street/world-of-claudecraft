@@ -964,6 +964,7 @@ export const nl_NL: EnTranslations = {
       "honorFloat": "+{amount} Eer",
       "honorGain": "Je krijgt {amount} eer ({reason}).",
       "notEnoughHonor": "Niet genoeg eer.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
         "fiestaKill": "Fiesta-uitschakeling",
@@ -7143,6 +7144,33 @@ export const nl_NL: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Sintelglazen Oorlogsstaf"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
       },
@@ -8302,6 +8330,11 @@ export const nl_NL: EnTranslations = {
         "name": "WOEDE",
         "title": "Erekwartiermeester",
         "greeting": "Het zand herinnert zich elke overwinning. Besteed je eer goed."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Verhalenmeester Caddis",

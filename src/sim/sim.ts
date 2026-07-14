@@ -63,6 +63,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { FRONTIER_QM_ENTITY_ID, FRONTIER_QM_NPC_ID } from './content/frontier_vendor';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -1643,6 +1644,18 @@ export class Sim {
         const safe = this.findSafePos(furyDef.pos.x, furyDef.pos.z, waterLevel() + 0.6);
         const fury = createNpc(FURY_ENTITY_ID, furyDef, this.groundPos(safe.x, safe.z));
         this.addEntity(fury);
+      }
+    }
+
+    // The Frostreach Quartermaster (Season 1 hero-points vendor) mirrors FURY: a
+    // reserved id spawned after the rng-driven roster, standing in the Frontier
+    // safe hub. Cannot perturb existing entity ids or replay RNG.
+    {
+      const qmDef = worldContent.npcs[FRONTIER_QM_NPC_ID];
+      if (qmDef && !this.entities.has(FRONTIER_QM_ENTITY_ID)) {
+        const safe = this.findSafePos(qmDef.pos.x, qmDef.pos.z, waterLevel() + 0.6);
+        const qm = createNpc(FRONTIER_QM_ENTITY_ID, qmDef, this.groundPos(safe.x, safe.z));
+        this.addEntity(qm);
       }
     }
 

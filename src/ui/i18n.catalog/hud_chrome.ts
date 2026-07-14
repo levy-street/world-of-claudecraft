@@ -946,6 +946,7 @@ export const hudChromeStrings = {
     honorFloat: '+{amount} Honor',
     honorGain: 'You gain {amount} Honor ({reason}).',
     notEnoughHonor: 'Not enough Honor.',
+    notEnoughHero: 'Not enough hero points.',
     reasons: {
       arenaWin: 'Arena victory',
       fiestaKill: 'Fiesta takedown',

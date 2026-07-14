@@ -319,9 +319,14 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
       ? Math.floor(def.priceHonor)
       : 0;
+  const heroPrice =
+    def?.priceHero !== undefined && Number.isFinite(def.priceHero) && def.priceHero > 0
+      ? Math.floor(def.priceHero)
+      : 0;
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
-  if (!def || (!hasCopperPrice && !hasHonorPrice)) {
+  const hasHeroPrice = heroPrice > 0;
+  if (!def || (!hasCopperPrice && !hasHonorPrice && !hasHeroPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -341,6 +346,7 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   const qty = vendorStackSize(def);
   const copperCost = copperUnitPrice * qty;
   const honorCost = honorPrice;
+  const heroCost = heroPrice;
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -349,12 +355,19 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
+  if (meta.heroPoints < heroCost) {
+    ctx.error(meta.entityId, 'Not enough hero points.');
+    return;
+  }
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
+  // Hero points spend like honor: the spendable pool drops, lifetimeHeroPoints
+  // (earned total) is never touched.
+  meta.heroPoints -= heroCost;
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   DELVE_BAND_X_MIN,
+  ITEMS,
   isArenaPos,
   isDelvePos,
   isYumiMazePos,
@@ -8,6 +9,7 @@ import {
   YUMI_BAND_X_MAX,
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { itemLevel } from '../src/sim/item_level';
 import {
   FRONTIER_HUB,
   FRONTIER_RARE_HERO_POINTS,
@@ -156,5 +158,51 @@ describe('Frost rare kill reward', () => {
     sim.tick();
     expect(meta.honor).toBe(0);
     expect(meta.heroPoints).toBe(0);
+  });
+});
+
+describe('Frostreach Quartermaster (Season 1 hero-points vendor)', () => {
+  it('sells the item-level-31 set for hero points, sparing lifetime', () => {
+    const sim = new Sim({ seed: 8, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.player.id;
+    const meta = sim.meta(pid)!;
+    const qm = [...sim.entities.values()].find((e) => e.templateId === 'frostreach_quartermaster')!;
+    expect(qm).toBeTruthy();
+    const player = sim.entities.get(pid)!;
+    player.pos = { x: qm.pos.x, y: 1, z: qm.pos.z };
+    player.prevPos = { ...player.pos };
+    meta.inventory.length = 0;
+    grantHeroPoints(sim.ctx, meta, 200, 'frontier_rare');
+    // frostrend_hauberk (chest) costs priceHero 90.
+    sim.buyItem(qm.id, 'frostrend_hauberk', pid);
+    expect(sim.countItem('frostrend_hauberk', pid)).toBe(1);
+    expect(meta.heroPoints).toBe(110);
+    expect(meta.lifetimeHeroPoints).toBe(200); // lifetime never drops on spend
+  });
+
+  it('refuses a purchase the player cannot afford', () => {
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.player.id;
+    const meta = sim.meta(pid)!;
+    const qm = [...sim.entities.values()].find((e) => e.templateId === 'frostreach_quartermaster')!;
+    const player = sim.entities.get(pid)!;
+    player.pos = { x: qm.pos.x, y: 1, z: qm.pos.z };
+    player.prevPos = { ...player.pos };
+    meta.heroPoints = 10; // below every price
+    sim.buyItem(qm.id, 'frostrend_hauberk', pid);
+    expect(sim.countItem('frostrend_hauberk', pid)).toBe(0);
+    expect(meta.heroPoints).toBe(10);
+  });
+
+  it('prices the whole set at item level 31 (epic, one tier above FURY)', () => {
+    for (const id of [
+      'frostrend_helm',
+      'frostrend_hauberk',
+      'frostrend_legguards',
+      'frostrend_choker',
+      'frostrend_band',
+    ]) {
+      expect(itemLevel(ITEMS[id])).toBe(31);
+    }
   });
 });

@@ -964,6 +964,7 @@ export const tr_TR: EnTranslations = {
       "honorFloat": "+{amount} Onur",
       "honorGain": "{amount} Onur ({reason}) kazanırsınız.",
       "notEnoughHonor": "Yeterli Onur yok.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Arena zaferi",
         "fiestaKill": "Fiesta avlaması",
@@ -7143,6 +7144,33 @@ export const tr_TR: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Korgözlü Savaş Asası"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"
       },
@@ -8302,6 +8330,11 @@ export const tr_TR: EnTranslations = {
         "name": "ÖFKE",
         "title": "Onur Malzeme Sorumlusu",
         "greeting": "Kumlar her zaferi hatırlar. Onurunu iyi harca."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "İrfan Ustası Caddis",

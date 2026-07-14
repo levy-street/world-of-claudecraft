@@ -964,6 +964,7 @@ export const en_XA: EnTranslations = {
       "honorFloat": "[+{amount} Ĥóñóŕ]",
       "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
+      "notEnoughHero": "[Ñóţ éñóúĝĥ ĥéŕó þóíñţš.]",
       "reasons": {
         "arenaWin": "[Áŕéñá ʋíçţóŕý]",
         "fiestaKill": "[Ƒíéšţá ţáķéðóŵñ]",
@@ -7143,6 +7144,33 @@ export const en_XA: EnTranslations = {
       "emberglass_warstaff": {
         "name": "[Éɱƀéŕĝļášš Ŵáŕšţáƒƒ]"
       },
+      "frostrend_helm": {
+        "name": "[Ƒŕóšţŕéñð Ĥéļɱ]"
+      },
+      "frostrend_spaulders": {
+        "name": "[Ƒŕóšţŕéñð Šþáúļðéŕš]"
+      },
+      "frostrend_hauberk": {
+        "name": "[Ƒŕóšţŕéñð Ĥáúƀéŕķ]"
+      },
+      "frostrend_girdle": {
+        "name": "[Ƒŕóšţŕéñð Ĝíŕðļé]"
+      },
+      "frostrend_legguards": {
+        "name": "[Ƒŕóšţŕéñð Ļéĝĝúáŕðš]"
+      },
+      "frostrend_gauntlets": {
+        "name": "[Ƒŕóšţŕéñð Ĝáúñţļéţš]"
+      },
+      "frostrend_sabatons": {
+        "name": "[Ƒŕóšţŕéñð Šáƀáţóñš]"
+      },
+      "frostrend_choker": {
+        "name": "[Ƒŕóšţŕéñð Çĥóķéŕ]"
+      },
+      "frostrend_band": {
+        "name": "[Ƒŕóšţŕéñð Ɓáñð]"
+      },
       "bristleback_maul": {
         "name": "[Ĝáļļóŵĝļášš Ĥáɱɱéŕ]"
       },
@@ -8302,6 +8330,11 @@ export const en_XA: EnTranslations = {
         "name": "[ƑÚŔÝ]",
         "title": "[Ĥóñóŕ Ɋúáŕţéŕɱášţéŕ]",
         "greeting": "[Ţĥé šáñðš ŕéɱéɱƀéŕ éʋéŕý ʋíçţóŕý. Šþéñð ýóúŕ ĥóñóŕ ŵéļļ.]"
+      },
+      "frostreach_quartermaster": {
+        "name": "[Ʋáéļķá Ƒŕóšţŵáŕðéñ]",
+        "title": "[Ƒŕóšţŕéáçĥ Ɋúáŕţéŕɱášţéŕ]",
+        "greeting": "[Ţĥé Ƒŕóñţíéŕ þáýš íñ ƀļóóð áñð ƒŕóšţ. Šþéñð ýóúŕ ĥéŕó þóíñţš ŵéļļ.]"
       },
       "loremaster_caddis": {
         "name": "[Ļóŕéɱášţéŕ Çáððíš]",

@@ -964,6 +964,7 @@ export const it_IT: EnTranslations = {
       "honorFloat": "+{amount} Onore",
       "honorGain": "Ottieni {amount} Onore ({reason}).",
       "notEnoughHonor": "Onore insufficiente.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Vittoria nell'Arena",
         "fiestaKill": "Abbattimento della Fiesta",
@@ -7143,6 +7144,33 @@ export const it_IT: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bastone da Guerra Vetrobrace"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Martello Gallowglass"
       },
@@ -8302,6 +8330,11 @@ export const it_IT: EnTranslations = {
         "name": "FURIA",
         "title": "Quartiermastro d'Onore",
         "greeting": "Le sabbie ricordano ogni vittoria. Spendi bene il tuo onore."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Maestro del sapere Caddis",

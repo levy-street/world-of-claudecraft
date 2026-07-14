@@ -964,6 +964,7 @@ export const ja_JP: EnTranslations = {
       "honorFloat": "名誉 +{amount}",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
       "notEnoughHonor": "名誉が足りません。",
+      "notEnoughHero": "ヒーローポイントが足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
         "fiestaKill": "フィエスタ撃破",
@@ -7143,6 +7144,33 @@ export const ja_JP: EnTranslations = {
       "emberglass_warstaff": {
         "name": "熾火硝子の戦杖"
       },
+      "frostrend_helm": {
+        "name": "フロストレンドの兜"
+      },
+      "frostrend_spaulders": {
+        "name": "フロストレンドの肩当て"
+      },
+      "frostrend_hauberk": {
+        "name": "フロストレンドの鎖鎧"
+      },
+      "frostrend_girdle": {
+        "name": "フロストレンドの帯"
+      },
+      "frostrend_legguards": {
+        "name": "フロストレンドの具足"
+      },
+      "frostrend_gauntlets": {
+        "name": "フロストレンドの手甲"
+      },
+      "frostrend_sabatons": {
+        "name": "フロストレンドの脛当て"
+      },
+      "frostrend_choker": {
+        "name": "フロストレンドの首飾り"
+      },
+      "frostrend_band": {
+        "name": "フロストレンドの指輪"
+      },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
       },
@@ -8302,6 +8330,11 @@ export const ja_JP: EnTranslations = {
         "name": "フューリー",
         "title": "名誉補給官",
         "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
+      },
+      "frostreach_quartermaster": {
+        "name": "ヴァエルカ・フロストウォーデン",
+        "title": "フロストリーチの需品係",
+        "greeting": "フロンティアは血と氷で報いる。ヒーローポイントを賢く使え。"
       },
       "loremaster_caddis": {
         "name": "博識者キャディス",

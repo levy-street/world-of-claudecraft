@@ -964,6 +964,7 @@ export const fr_CA: EnTranslations = {
       "honorFloat": "+{amount} points d’honneur",
       "honorGain": "Vous gagnez {amount} points d’honneur ({reason}).",
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Victoire en arène",
         "fiestaKill": "Élimination en Fiesta",
@@ -7143,6 +7144,33 @@ export const fr_CA: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Bâton de guerre de verre ardent"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Marteau Gallowglass"
       },
@@ -8302,6 +8330,11 @@ export const fr_CA: EnTranslations = {
         "name": "FURIE",
         "title": "Intendant de l’honneur",
         "greeting": "Les sables se souviennent de chaque victoire. Dépensez votre honneur à bon escient."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Maître du savoir Caddis",

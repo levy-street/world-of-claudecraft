@@ -964,6 +964,7 @@ export const sv_SE: EnTranslations = {
       "honorFloat": "+{amount} Heder",
       "honorGain": "Du får {amount} Heder ({reason}).",
       "notEnoughHonor": "Inte tillräckligt med heder.",
+      "notEnoughHero": "Not enough hero points.",
       "reasons": {
         "arenaWin": "Arenaseger",
         "fiestaKill": "Fiesta-nedtagning",
@@ -7143,6 +7144,33 @@ export const sv_SE: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Glödglas-Krigsstav"
       },
+      "frostrend_helm": {
+        "name": "Frostrend Helm"
+      },
+      "frostrend_spaulders": {
+        "name": "Frostrend Spaulders"
+      },
+      "frostrend_hauberk": {
+        "name": "Frostrend Hauberk"
+      },
+      "frostrend_girdle": {
+        "name": "Frostrend Girdle"
+      },
+      "frostrend_legguards": {
+        "name": "Frostrend Legguards"
+      },
+      "frostrend_gauntlets": {
+        "name": "Frostrend Gauntlets"
+      },
+      "frostrend_sabatons": {
+        "name": "Frostrend Sabatons"
+      },
+      "frostrend_choker": {
+        "name": "Frostrend Choker"
+      },
+      "frostrend_band": {
+        "name": "Frostrend Band"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-hammare"
       },
@@ -8302,6 +8330,11 @@ export const sv_SE: EnTranslations = {
         "name": "RASERI",
         "title": "Hederskvartermästare",
         "greeting": "Sanden minns varje seger. Spendera din ära väl."
+      },
+      "frostreach_quartermaster": {
+        "name": "Vaelka Frostwarden",
+        "title": "Frostreach Quartermaster",
+        "greeting": "The Frontier pays in blood and frost. Spend your hero points well."
       },
       "loremaster_caddis": {
         "name": "Läromästare Caddis",

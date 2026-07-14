@@ -454,6 +454,9 @@ interface BaseItemDef {
   // Honor price for a Quartermaster purchase. An honor-only item omits
   // buyValue; both fields may coexist when a vendor charges both currencies.
   priceHonor?: number;
+  // Hero-points price for a Season 1 Frostreach Quartermaster purchase. Hero
+  // points are the frost-rare PvP currency; a hero-priced item omits buyValue.
+  priceHero?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)

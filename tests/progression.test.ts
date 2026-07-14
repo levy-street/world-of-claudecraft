@@ -23,6 +23,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { isFrontierPos } from '../src/sim/pvp';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
@@ -101,7 +102,7 @@ describe('content referential integrity', () => {
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!ITEMS[itemId]) problems.push(`${npc.id}: vendor item ${itemId} missing`);
-        else if (!ITEMS[itemId].buyValue && !ITEMS[itemId].priceHonor)
+        else if (!ITEMS[itemId].buyValue && !ITEMS[itemId].priceHonor && !ITEMS[itemId].priceHero)
           problems.push(`${npc.id}: vendor item ${itemId} has no purchase price`);
       }
       for (const qid of npc.questIds) {
@@ -135,6 +136,10 @@ describe('content referential integrity', () => {
       expect(zone.hub.z).toBeLessThan(zone.zMax);
     }
     for (const npc of Object.values(NPCS)) {
+      // The Frostreach Frontier is a far-off always-on PvP band (like the arena,
+      // delve, and yumi bands, which simply carry no static NPCs). Its dynamic
+      // Quartermaster legitimately stands in that band, past the overworld bounds.
+      if (isFrontierPos(npc.pos.x)) continue;
       if (!inWorld(npc.pos.x, npc.pos.z))
         problems.push(`${npc.id} outside world at (${npc.pos.x},${npc.pos.z})`);
     }

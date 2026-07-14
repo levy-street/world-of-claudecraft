@@ -10435,6 +10435,7 @@ export class Hud {
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
       'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
+      'Not enough hero points.': 'hudChrome.warfare.notEnoughHero',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',
