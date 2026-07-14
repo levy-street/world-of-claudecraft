@@ -166,6 +166,9 @@ export class CharacterVisual {
   }[] = [];
   private weaponVfxSpriteScale = WORLD_FOV_SPRITE_SCALE;
   private stow = createStowTransition();
+  // Set whenever the held-prop graph is rebuilt OUTSIDE a renderer-driven call
+  // (the deferred stow swap); the renderer consumes it to re-rank view lights.
+  private weaponGraphDirty = false;
   // The gesture's additive arm-raise window: t rises 0..dur (peak at dur/2,
   // the swap moment); -1 = inactive. Bone resolved lazily once (null = absent).
   private stowLift = { t: -1, dur: 0 };
@@ -731,6 +734,14 @@ export class CharacterVisual {
     }
   }
 
+  /** True exactly once after a deferred re-attach rebuilt the held-prop graph
+   *  (the sheathe swap): the caller must re-reconcile its point lights. */
+  consumeWeaponGraphDirty(): boolean {
+    if (!this.weaponGraphDirty) return false;
+    this.weaponGraphDirty = false;
+    return true;
+  }
+
   /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
    *  without an active skin; the renderer calls it once per entity per frame.
    *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
@@ -843,6 +854,11 @@ export class CharacterVisual {
    *  shared re-attach tail (materials, caster snapshot, skin VFX rebuilt on the
    *  new payloads). Mixer state is untouched. */
   private applyStowSwap(): void {
+    // The swap lands mid-gesture, long after the renderer's stow diff returned,
+    // so the rig it rebuilds (and the skin VFX point light hanging off it) can
+    // only be reconciled into the light budget on a later frame: raise an edge
+    // the renderer consumes (consumeWeaponGraphDirty).
+    this.weaponGraphDirty = true;
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
     const payloads = setWeaponsStowed(

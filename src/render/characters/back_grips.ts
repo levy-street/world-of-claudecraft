@@ -70,12 +70,30 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   VAR_STAFF: { position: [0.12, 0.0, -0.3], euler: [0.1, 0, Math.PI * 0.78] },
   VAR_AXE: { position: [0.16, 0.14, -0.27], euler: [0.1, 0, Math.PI * 0.72] },
   VAR_POLEARM: { position: [0.12, 0.0, -0.3], euler: [0.1, 0, Math.PI * 0.78] },
+  // The variant-pack families the Season 1 Armory added (weapon skins) plus the
+  // item models that share them. Each reuses the carry already tuned for the
+  // shape it matches, so a skin sheathes exactly like its mundane twin: hafted
+  // one-handers ride the shoulder like a sword, short casting sticks and held
+  // books carry at the hip, and the ranged families lie flat across the
+  // shoulders like the crossbows.
+  VAR_MACE: { position: [0.16, 0.14, -0.27], euler: [0.1, 0, Math.PI * 0.72] },
+  VAR_HAMMER: { position: [0.16, 0.14, -0.27], euler: [0.1, 0, Math.PI * 0.72] },
+  VAR_WAND: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
+  VAR_BOOK: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
+  VAR_CROSSBOW: { position: [0.0, 0.1, -0.3], euler: [0, Math.PI / 2, Math.PI] },
+  VAR_BOW: { position: [0.0, 0.1, -0.32], euler: [0, Math.PI / 2, Math.PI] },
   // Off-hand gear from the two-slot loadout (release/v0.24.0-ptr): a left-hand
   // prop of any family above mirrors automatically via backGripFor's side
   // argument. Families that branch introduces (shields, held off-hands like
-  // books or lanterns) get their own entries here when it merges; until then
-  // an unknown family falls back to DEFAULT_BACK instead of vanishing.
+  // lanterns) get their own entries here when it merges; until then an unknown
+  // family falls back to DEFAULT_BACK instead of vanishing.
 };
+
+/** The grip families that have a tuned on-back carry. Every family the character
+ *  assets can hand `backGripFor` must appear here, or that weapon sheathes with
+ *  the default sword pose; `tests/back_grips.test.ts` scans the asset tables and
+ *  fails when a new family lands without a carry. */
+export const BACK_GRIP_FAMILIES: ReadonlySet<string> = new Set(Object.keys(BACK_GRIPS));
 
 /** The on-back transform for a sheathed prop: family-specific, mirrored across X
  *  (position and lean) for a left-hand prop, defaulting for unknown families. */

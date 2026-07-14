@@ -1,7 +1,12 @@
 // src/render/characters/back_grips.ts: the pure on-back transform table for
 // sheathed weapons (family dispatch, side mirroring, unknown-family fallback).
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { backGripFor, quatFromEulerXYZ } from '../src/render/characters/back_grips';
+import {
+  BACK_GRIP_FAMILIES,
+  backGripFor,
+  quatFromEulerXYZ,
+} from '../src/render/characters/back_grips';
 
 function quatLength(q: [number, number, number, number]): number {
   return Math.hypot(q[0], q[1], q[2], q[3]);
@@ -73,5 +78,43 @@ describe('backGripFor', () => {
       expect(quatLength(backGripFor(fam, 'r').quaternion), fam).toBeCloseTo(1, 12);
       expect(quatLength(backGripFor(fam, 'l').quaternion), fam).toBeCloseTo(1, 12);
     }
+  });
+});
+
+// The asset tables (assets.ts) import three.js, so they cannot be imported in the
+// plain-Node env: scan the source instead. This is the guard that would have caught
+// the Season 1 Armory families (maces, wands, bows, crossbows) sheathing as swords.
+describe('every weapon grip family has a tuned on-back carry', () => {
+  const assetsSrc = readFileSync(
+    new URL('../src/render/characters/assets.ts', import.meta.url),
+    'utf8',
+  );
+
+  const variantFamilies = (): string[] => {
+    const table = assetsSrc.match(/const VARIANT_GRIPS[^{]*\{([\s\S]*?)\n\};/);
+    expect(table, 'VARIANT_GRIPS table not found in assets.ts').toBeTruthy();
+    return [...(table as RegExpMatchArray)[1].matchAll(/^\s*([A-Za-z0-9_']+):/gm)].map((m) =>
+      m[1].replace(/'/g, ''),
+    );
+  };
+
+  const accessoryFamilies = (): string[] => {
+    const table = assetsSrc.match(/const KAYKIT_WEAPON_ACCESSORY[^{]*\{([\s\S]*?)\n\};/);
+    expect(table, 'KAYKIT_WEAPON_ACCESSORY table not found in assets.ts').toBeTruthy();
+    return [...(table as RegExpMatchArray)[1].matchAll(/:\s*'([A-Za-z0-9_]+)'/g)].map((m) => m[1]);
+  };
+
+  it('covers every VARIANT_GRIPS family (the weapon-skin variant packs)', () => {
+    const families = variantFamilies();
+    expect(families.length).toBeGreaterThan(5);
+    const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
+    expect(missing, `variant families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);
+  });
+
+  it('covers every family a held item model resolves to', () => {
+    const families = [...new Set(accessoryFamilies())];
+    expect(families.length).toBeGreaterThan(5);
+    const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
+    expect(missing, `item families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);
   });
 });
