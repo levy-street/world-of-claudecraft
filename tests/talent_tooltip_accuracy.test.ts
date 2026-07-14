@@ -23,9 +23,20 @@ const PCT_FIELDS = new Set([
   'intPct',
   'spiPct',
   'meleeDmgPct',
+  'meleeHastePct',
   'spellDmgPct',
   'healPct',
   'threatPct',
+  'critDmgSpellPct',
+  'critDmgPhysPct',
+  'critDmgHealPct',
+  'dotDmgPct',
+  'hotHealPct',
+  'absorbPct',
+  'critVsRooted',
+  'spellHastePct',
+  'petDmgPct',
+  'petDmgSharePct',
   'dmgPct',
   'costPct',
   'cooldownPct',
@@ -43,6 +54,12 @@ function expectedTokens(effect: unknown, maxRank: number): string[] {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
+        // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
+        // hand-written descriptions phrase as "double" rather than "50%".
+        if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
+          toks.push('double');
+          continue;
+        }
         toks.push(
           PCT_FIELDS.has(key)
             ? `${+(Math.abs(value) * 100).toFixed(1)}%`
@@ -175,7 +192,12 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 
   it('the rendered English tooltip states the numbers when the effect has any (no vague text)', () => {
     const vague = entries
-      .filter((e) => hasNumericEffect(e.effect, e.maxRank) && !/\d/.test(e.render()))
+      .filter(
+        (e) =>
+          hasNumericEffect(e.effect, e.maxRank) &&
+          !/\d/.test(e.render()) &&
+          !expectedTokens(e.effect, e.maxRank).every((t) => e.render().includes(t)),
+      )
       .map((e) => `${e.cls}:${e.id} -> "${e.render()}"`);
     expect(vague).toEqual([]);
   });
@@ -241,10 +263,10 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     const arcane = render('mage', (e) => e.id === 'mag_school_focus.mag_school_arcane');
     expect(arcane).toContain('Intellect');
     expect(arcane).toContain('8%');
-    // Survival mastery promised "+10% Agility"; the effect now grants agiPct 0.10.
+    // Survival mastery grants 15% Agility and 15% physical ability damage.
     const lr = render('hunter', (e) => e.id === 'survival.mastery');
     expect(lr).toContain('Agility');
-    expect(lr).toContain('10%');
-    expect(lr).toContain('dodge');
+    expect(lr).toContain('15%');
+    expect(lr).toContain('physical ability damage');
   });
 });

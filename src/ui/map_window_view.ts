@@ -238,6 +238,8 @@ export interface OverworldMapModel {
   allies: MapAllyMarker[];
   /** The zoomed-detail overlay, or null below MAP_DETAIL_ZOOM. */
   detail: MapDetail | null;
+  /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
+  ping: { mx: number; my: number } | null;
 }
 
 /** Inputs the painter feeds the builder each redraw. The cached terrain bg + the
@@ -254,6 +256,8 @@ export interface OverworldMapInput {
   canvasSize: number;
   /** The cached whole-world decorations (generated once from the seed). */
   decorations: readonly Decoration[];
+  /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
+  ping?: { x: number; z: number } | null;
 }
 
 /** Which world-map surface this world renders. Delve when the player stands in a
@@ -313,6 +317,17 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,
   });
+
+  // Dungeon Finder "Show on Map" ping: a canvas-space highlight at an authored
+  // entrance, drawn only while the point sits inside the painted region.
+  const ping =
+    input.ping &&
+    input.ping.x >= region.minX &&
+    input.ping.x <= region.maxX &&
+    input.ping.z >= region.minZ &&
+    input.ping.z <= region.maxZ
+      ? toMap(input.ping.x, input.ping.z)
+      : null;
 
   const detail =
     zoom >= MAP_DETAIL_ZOOM ? buildDetail(region, toMap, S / spanX, decorations) : null;
@@ -421,6 +436,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     player,
     allies,
     detail,
+    ping,
   };
 }
 

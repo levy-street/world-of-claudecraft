@@ -38,6 +38,40 @@ export function clampTargetFramePos(
   };
 }
 
+// A positive, finite divisor for the UI-scale compensation below. A bad read
+// (0, negative, NaN, Infinity) falls back to 1 so a drag never blanks the frame.
+function safeScale(scale: number): number {
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+}
+
+export interface TargetFramePlacement {
+  /** Clamped top-left in VISUAL (screen / pointer) space: persist THIS. It stays
+   *  scale-independent, so a spot saved at one UI Scale renders at the same visual
+   *  place at another (the css write divides by whatever scale is live at paint). */
+  pos: TargetFramePos;
+  /** Top-left to write to style.left/top, in AUTHOR space (visual / scale): the
+   *  frame lives inside #ui (`zoom: var(--ui-scale)`), which re-multiplies the
+   *  author length back to `pos` on screen. */
+  css: TargetFramePos;
+}
+
+// Clamp a desired VISUAL top-left so the whole frame (its visual `size`) stays on
+// screen, then derive the AUTHOR-space css write the #ui zoom re-multiplies back.
+// Mirrors hud.ts setWindowPixelPosition: getBoundingClientRect() and pointer
+// clientX/clientY are post-zoom, but style.left/top are author lengths, so the
+// write divides by the live UI scale. `scale` of 1 (the default) is a no-op.
+export function placeTargetFrame(
+  pos: TargetFramePos,
+  viewport: { w: number; h: number },
+  size: { w: number; h: number },
+  scale: number,
+  margin: number = TARGET_FRAME_MARGIN,
+): TargetFramePlacement {
+  const clamped = clampTargetFramePos(pos, viewport, size, margin);
+  const z = safeScale(scale);
+  return { pos: clamped, css: { left: clamped.left / z, top: clamped.top / z } };
+}
+
 export function serializeTargetFramePos(pos: TargetFramePos): string {
   return JSON.stringify({ left: pos.left, top: pos.top });
 }

@@ -19,8 +19,10 @@ COPY glitch.public.env .env.production
 COPY private ./private
 # Public client config is inlined into the bundle at build time (Vite reads
 # VITE_* from the environment). Empty defaults keep optional UI disabled:
-# Turnstile widget off. Passed through from compose/Glitch build args.
+# Turnstile widget off; wallet UI enabled unless explicitly disabled.
+# Passed through from compose/Glitch build args.
 ARG VITE_TURNSTILE_SITEKEY=""
+ARG VITE_WALLET_DISABLED=""
 ARG VITE_GLITCH_ENABLED=""
 ARG VITE_GLITCH_TITLE_ID=""
 ARG VITE_GLITCH_TITLE_TOKEN=""
@@ -28,6 +30,7 @@ ARG VITE_GLITCH_DEFAULT_CLASS=""
 ARG VITE_API_ORIGIN=""
 ARG VITE_DESKTOP_RELATIVE_API=""
 RUN if [ -n "$VITE_TURNSTILE_SITEKEY" ]; then export VITE_TURNSTILE_SITEKEY; else unset VITE_TURNSTILE_SITEKEY; fi; \
+    if [ -n "$VITE_WALLET_DISABLED" ]; then export VITE_WALLET_DISABLED; else unset VITE_WALLET_DISABLED; fi; \
     if [ -n "$VITE_GLITCH_ENABLED" ]; then export VITE_GLITCH_ENABLED; else unset VITE_GLITCH_ENABLED; fi; \
     if [ -n "$VITE_GLITCH_TITLE_ID" ]; then export VITE_GLITCH_TITLE_ID; else unset VITE_GLITCH_TITLE_ID; fi; \
     if [ -n "$VITE_GLITCH_TITLE_TOKEN" ]; then export VITE_GLITCH_TITLE_TOKEN; else unset VITE_GLITCH_TITLE_TOKEN; fi; \
@@ -44,6 +47,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/media-build ./media-build
 COPY --from=build /app/dist-server ./dist-server
 COPY --from=build /app/dist-bot ./dist-bot
+COPY --from=build /app/scripts/prod_cpu_game_helper.mjs /app/ops/
+COPY --from=build /app/scripts/prod_cpu_profile_client.mjs /app/ops/
 RUN mkdir -p /app/dist/media && chown -R node:node /app/dist/media
 EXPOSE 3000
 USER node

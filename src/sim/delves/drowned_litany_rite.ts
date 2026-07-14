@@ -4,6 +4,7 @@
 import { drownedLitanyChestItemsForTier } from '../content/delves/drowned_litany_loot';
 import { LOCKPICK_TIER_REWARD } from '../content/delves/lockpick_tiers';
 import { DELVES } from '../data';
+import * as deedsMod from '../deeds';
 import { DELVE_MODULE_LAYOUTS } from '../delve_layout';
 import type { LootTier } from '../lockpick';
 import { Rng } from '../rng';
@@ -341,6 +342,8 @@ export function interactDrownedLitanyRite(
         riteCeiling(st.intensity),
       );
       openDrownedReliquary(ctx, run, tier, pid);
+      // Finale completed on the last correct touch (not the out-of-tries path).
+      deedsMod.onRiteFinaleForDeeds(ctx, pid, st.mistakes);
     }
     return true;
   }

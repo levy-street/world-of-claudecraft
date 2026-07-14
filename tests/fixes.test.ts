@@ -77,7 +77,7 @@ describe('quest lifecycle', () => {
     const starterZone = zoneAt(sim.player.pos.z);
 
     expect(zoneWelcomeText(starterZone, (questId) => sim.questState(questId))).toBe(
-      'Find Marshal Redbrook in town — he has work for you.',
+      'Find Marshal Redbrook in town - he has work for you.',
     );
 
     const redbrook = [...sim.entities.values()].find((e) => e.templateId === 'marshal_redbrook')!;
@@ -1985,6 +1985,33 @@ describe('spell visuals', () => {
     expect(lineOfSightClear(seed, { x: b.x - span, z: b.z }, { x: b.x + span, z: b.z })).toBe(
       false,
     );
+  });
+
+  it('a LOW fence no longer blocks spell line of sight, tall walls still do (#1668)', () => {
+    const sim = makeSim('mage');
+    const seed = sim.cfg.seed;
+    // Caster and target on opposite sides of a waist-high village fence: the
+    // rail top (~0.95yd) sits under the eye line (1.6), so the cast sees over it,
+    // the way the player sees the mob on screen. The rail is still solid mover
+    // collision, so this is not a "walk through the fence" change.
+    const f = PROPS.fences[0];
+    const mx = (f.x1 + f.x2) / 2,
+      mz = (f.z1 + f.z2) / 2;
+    const dx = f.x2 - f.x1,
+      dz = f.z2 - f.z1;
+    const len = Math.hypot(dx, dz);
+    const nx = -dz / len,
+      nz = dx / len; // unit normal across the fence run
+    const a = { x: mx + nx * 3, z: mz + nz * 3 };
+    const b = { x: mx - nx * 3, z: mz - nz * 3 };
+    expect(isBlocked(seed, mx, mz, 0.5)).toBe(true); // movement still collides
+    expect(lineOfSightClear(seed, a, b)).toBe(true);
+    // A building straddled through its centre still blocks (top far above eyes).
+    const bld = PROPS.buildings[0];
+    const span = bld.w + bld.d;
+    expect(
+      lineOfSightClear(seed, { x: bld.x - span, z: bld.z }, { x: bld.x + span, z: bld.z }),
+    ).toBe(false);
   });
 
   it('ranged auto shot does not fire through dungeon walls', () => {

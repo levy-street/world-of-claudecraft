@@ -272,12 +272,12 @@ export function behaviorEventInputsFromSimEvent(
           metadata: { virtual_level: ev.level },
         },
       ];
-    case 'milestoneUnlocked':
+    case 'deedUnlocked':
       return [
         {
-          stepKey: 'post_cap_progression',
-          actionKey: 'milestone_unlock',
-          metadata: { milestone_id: ev.milestoneId },
+          stepKey: 'deeds',
+          actionKey: 'unlock',
+          metadata: { deed_id: ev.deedId, retro: ev.retro === true },
         },
       ];
     case 'learnAbility':

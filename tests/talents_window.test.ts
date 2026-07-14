@@ -49,4 +49,16 @@ describe('talents_window: no magic values', () => {
     expect(painter.includes('—'), 'em dash found').toBe(false);
     expect(painter.includes('–'), 'en dash found').toBe(false);
   });
+
+  it('un-zooms the fitBodyToWindow rect measurements by the live UI Scale before writing an author-space cap', () => {
+    // fitBodyToWindow reads getBoundingClientRect() (visual/zoomed px under #ui's
+    // `zoom: var(--ui-scale)`) but writes body.style.maxHeight (author px, which the
+    // browser re-multiplies by that same zoom). Regression guard for the bug where
+    // the cap came out ~47px too generous at uiScale 0.85 and clipped the foot panel
+    // again, or ~120px too small at uiScale 1.4.
+    expect(painter).toContain("import { getUiScale } from './ui_scale';");
+    expect(painter).toMatch(/const uiScale = getUiScale\(\);/);
+    expect(painter).toMatch(/bodyTop = \(.*\) \/ uiScale;/);
+    expect(painter).toMatch(/footHeight = foot\.getBoundingClientRect\(\)\.height \/ uiScale;/);
+  });
 });

@@ -13,11 +13,12 @@
 import { t } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
 import {
-  clampTargetFramePos,
   parseTargetFramePos,
+  placeTargetFrame,
   serializeTargetFramePos,
   type TargetFramePos,
 } from './target_frame_pos';
+import { getUiScale } from './ui_scale';
 
 export interface MovableFrameConfig {
   frame: HTMLElement;
@@ -85,6 +86,11 @@ export class MovableFrame {
   /** Re-resolve the button's t() label in place (called on a language switch). */
   relocalize(): void {
     this.refreshBtn();
+  }
+
+  /** Repaint the saved visual-space position against the live UI Scale. */
+  reapplyPosition(): void {
+    if (this.pos) this.applyPos();
   }
 
   /** Snap the frame back to its stock CSS spot: forget the saved position,
@@ -195,14 +201,20 @@ export class MovableFrame {
       w: rect.width || this.cfg.fallbackSize.w,
       h: rect.height || this.cfg.fallbackSize.h,
     };
-    const clamped = clampTargetFramePos(
+    // this.pos, the rect, and the viewport are all in visual (post-zoom) space; the
+    // frame lives inside #ui (`zoom: var(--ui-scale)`), so the style write divides by
+    // the live UI scale into author space (placeTargetFrame). The clamped VISUAL spot
+    // is what we keep + persist, so a saved position renders at the same visual place
+    // at any UI Scale.
+    const placement = placeTargetFrame(
       this.pos,
       { w: window.innerWidth, h: window.innerHeight },
       size,
+      getUiScale(),
     );
-    this.pos = clamped;
-    frame.style.left = `${clamped.left}px`;
-    frame.style.top = `${clamped.top}px`;
+    this.pos = placement.pos;
+    frame.style.left = `${placement.css.left}px`;
+    frame.style.top = `${placement.css.top}px`;
     frame.style.right = 'auto';
     frame.style.bottom = 'auto';
   }

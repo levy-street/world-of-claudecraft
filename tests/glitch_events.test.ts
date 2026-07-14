@@ -93,6 +93,7 @@ describe('Glitch behavioral events', () => {
       },
       { type: 'questDone', questId: 'q_wolves' },
       { type: 'levelup', level: 2 },
+      { type: 'deedUnlocked', deedId: 'cmb_first_blood', pid: 1 },
       { type: 'lockpickEnd', sessionId: 'lp-1', outcome: 'fail' },
       { type: 'delveFailed', delveId: 'drowned_litany', tierId: 't1' },
     ];
@@ -109,6 +110,11 @@ describe('Glitch behavioral events', () => {
         metadata: { quest_id: 'q_wolves', quest_stage: 'complete' },
       },
       { stepKey: 'level_02', actionKey: 'reach', metadata: { level: 2 } },
+      {
+        stepKey: 'deeds',
+        actionKey: 'unlock',
+        metadata: { deed_id: 'cmb_first_blood', retro: false },
+      },
       {
         stepKey: 'lockpick',
         actionKey: 'fail',

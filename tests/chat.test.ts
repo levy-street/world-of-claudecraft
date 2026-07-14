@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { zoneAt } from '../src/sim/data';
+import { grantDeed } from '../src/sim/deeds';
+import { emitMobYell } from '../src/sim/mob/yells';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import * as chatMod from '../src/sim/social/chat';
@@ -1118,7 +1120,9 @@ describe('chat module (direct, no Sim)', () => {
     const line = chatMod.inspectReadout(target, e);
     expect(line).toContain('Bet: Level 7');
     expect(line).toContain('50%');
-    expect(chatMod.helpLines().length).toBe(7);
+    // 8 lines: the 7 original groups plus the ignore/block line
+    expect(chatMod.helpLines().length).toBe(8);
+    expect(chatMod.helpLines().join('\n')).toContain('/ignore <name>');
   });
 
   it('handleDevChat: parses dev cheats; returns undefined for non-dev input', () => {
@@ -1265,5 +1269,112 @@ describe('/sit and /stand pose', () => {
     e.dead = true;
     sim.chat('/sit', a);
     expect(e.sitting).toBe(false);
+  });
+});
+
+describe('chat speaker titles (Book of Deeds)', () => {
+  // A titled speaker's chat events carry `fromTitle`, the selected deed ID
+  // (never display text; the client localizes via deed_i18n). Untitled
+  // players omit the key entirely, and mob/boss yells never stamp one.
+  function titledSpeaker(sim: Sim, name = 'Aleph') {
+    const pid = sim.addPlayer('warrior', name);
+    const meta = sim.players.get(pid)!;
+    grantDeed(sim.ctx, meta, 'prog_veteran'); // reward: title "Veteran"
+    sim.setActiveTitle('prog_veteran', pid);
+    return pid;
+  }
+
+  it('stamps the deed id on every player channel a titled speaker uses', () => {
+    const sim = makeWorld();
+    const a = titledSpeaker(sim);
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 5, -40);
+    sim.tick();
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.chat('/join world', a);
+    sim.tick();
+
+    const lines: [string, string][] = [
+      ['hello', 'say'],
+      ['/y over here', 'yell'],
+      ['/w bet psst', 'whisper'],
+      ['/p party up', 'party'],
+      ['/g to the world', 'general'],
+      ['/world anyone', 'world'],
+      ['/roll', 'roll'],
+      ['/wave', 'emote'],
+    ];
+    for (const [line, channel] of lines) {
+      sim.ctx.chatTokens.delete(a); // refill the throttle bucket between lines
+      sim.chat(line, a);
+      const msgs = chatEvents(sim.tick()).filter((m) => m.channel === channel);
+      expect(msgs.length, channel).toBeGreaterThan(0);
+      for (const m of msgs) {
+        expect(m.fromTitle, channel).toBe('prog_veteran');
+      }
+    }
+  });
+
+  it('omits the key entirely for an untitled speaker', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('untitled hello', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.length).toBeGreaterThan(0);
+    for (const m of msgs) {
+      expect('fromTitle' in m).toBe(false);
+    }
+  });
+
+  it('clearing the title back to null stops the stamp', () => {
+    const sim = makeWorld();
+    const a = titledSpeaker(sim);
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.setActiveTitle(null, a);
+    sim.chat('cleared', a);
+    const msgs = chatEvents(sim.tick());
+    expect(msgs.length).toBeGreaterThan(0);
+    for (const m of msgs) {
+      expect('fromTitle' in m).toBe(false);
+    }
+  });
+
+  it('a mob yell never carries a title, even with a titled player in range', () => {
+    const sim = makeWorld();
+    const a = titledSpeaker(sim);
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    emitMobYell(sim.ctx, mob, 'Graaah!', 1e9);
+    const msgs = chatEvents(sim.tick()).filter((m) => m.from === mob.name);
+    expect(msgs.length).toBeGreaterThan(0);
+    for (const m of msgs) {
+      expect(m.channel).toBe('yell');
+      expect('fromTitle' in m).toBe(false);
+    }
+  });
+
+  it('the whisper sender echo keeps the SENDER title beside the recipient name', () => {
+    const sim = makeWorld();
+    const a = titledSpeaker(sim);
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 5, -40);
+    sim.tick();
+    sim.chat('/w bet psst', a);
+    const msgs = chatEvents(sim.tick());
+    const echo = msgs.find((m) => m.to === 'Bet')!;
+    // from stays the sender; the title is the sender's even on the echo whose
+    // DISPLAYED name is the recipient (the client's toWhisper arm must not
+    // decorate the recipient with it).
+    expect(echo.from).toBe('Aleph');
+    expect(echo.fromTitle).toBe('prog_veteran');
+    const toTarget = msgs.find((m) => m.pid === b)!;
+    expect(toTarget.fromTitle).toBe('prog_veteran');
   });
 });

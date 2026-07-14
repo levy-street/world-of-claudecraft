@@ -109,16 +109,19 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
   });
 
   it('party-member rows (role=button tap targets)', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
+    const rows = el('div', { class: 'party-rows' });
     const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
-    frames.appendChild(row);
+    rows.appendChild(row);
+    frames.appendChild(rows);
     document.body.appendChild(frames);
     expectAtLeastFloor(row, 'party-frame');
   });
 
   it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames' });
+    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
     const leave = el('button', { id: 'party-leave' });
+    leave.textContent = 'Leave Party';
     frames.appendChild(leave);
     document.body.appendChild(frames);
     expectAtLeastFloor(leave, '#party-leave');
@@ -135,12 +138,16 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(close, '#mobile-more-close');
   });
 
-  it('the community HUD toggle', () => {
-    const menu = el('details', { id: 'community-menu' });
-    const toggle = el('summary', { class: 'community-toggle' });
-    menu.appendChild(toggle);
-    document.body.appendChild(menu);
-    expectAtLeastFloor(toggle, '.community-toggle');
+  it('the always-present Donate button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const donate = el('button', { id: 'mobile-donate', class: 'mobile-btn' });
+    donate.textContent = 'Donate';
+    grid.appendChild(donate);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(donate, '#mobile-donate');
   });
 
   it('the movement / camera joystick', () => {

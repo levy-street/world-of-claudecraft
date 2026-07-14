@@ -28,6 +28,43 @@ export const GLOSSARY_TERMS: { slug: string; term: TranslationKey; def: Translat
   { slug: 'raid', term: 'guide.glossary.raidTerm', def: 'guide.glossary.raidDef' },
   { slug: 'delve', term: 'guide.glossary.delveTerm', def: 'guide.glossary.delveDef' },
   { slug: 'augment', term: 'guide.glossary.augmentTerm', def: 'guide.glossary.augmentDef' },
+  { slug: 'deed', term: 'guide.glossary.deedTerm', def: 'guide.glossary.deedDef' },
+  { slug: 'renown', term: 'guide.glossary.renownTerm', def: 'guide.glossary.renownDef' },
+  { slug: 'heroic', term: 'guide.glossary.heroicTerm', def: 'guide.glossary.heroicDef' },
+  { slug: 'lockout', term: 'guide.glossary.lockoutTerm', def: 'guide.glossary.lockoutDef' },
+  { slug: 'rested', term: 'guide.glossary.restedTerm', def: 'guide.glossary.restedDef' },
+  { slug: 'pet-bar', term: 'guide.glossary.petBarTerm', def: 'guide.glossary.petBarDef' },
+  { slug: 'loadout', term: 'guide.glossary.loadoutTerm', def: 'guide.glossary.loadoutDef' },
+  {
+    slug: 'damage-meters',
+    term: 'guide.glossary.metersTerm',
+    def: 'guide.glossary.metersDef',
+  },
+  {
+    slug: 'target-marker',
+    term: 'guide.glossary.targetMarkerTerm',
+    def: 'guide.glossary.targetMarkerDef',
+  },
+  {
+    slug: 'ready-check',
+    term: 'guide.glossary.readyCheckTerm',
+    def: 'guide.glossary.readyCheckDef',
+  },
+  {
+    slug: 'soulbound',
+    term: 'guide.glossary.soulboundTerm',
+    def: 'guide.glossary.soulboundDef',
+  },
+  {
+    slug: 'spirit-healer',
+    term: 'guide.glossary.spiritHealerTerm',
+    def: 'guide.glossary.spiritHealerDef',
+  },
+  {
+    slug: 'world-boss',
+    term: 'guide.glossary.worldBossTerm',
+    def: 'guide.glossary.worldBossDef',
+  },
 ];
 
 export const glossary: GuidePage = {

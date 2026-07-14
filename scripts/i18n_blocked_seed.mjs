@@ -237,6 +237,35 @@ export const COPIED_ALLOW_IDS = [
   'admin::sv_SE::tickPerf.ms',
   'admin::tr_TR::tickPerf.ms',
   'admin::vi_VN::tickPerf.ms',
+  // "streamer" is the borrowed term these locales actually use for the role; the
+  // native calques ("retransmisor", "nadawca", "uitzender") are not what a Spanish,
+  // Polish or Dutch operator would ever say. Translating it would be worse
+  // localization than leaving the loanword, so these are cognates, not omissions.
+  // Locales that DO have a real native word for it (fr "streameur", tr "yayinci",
+  // ru, ja, ko, zh) are translated normally and are deliberately absent here.
+  'admin::cs_CZ::accounts.badgeStreamer',
+  'admin::da_DK::accounts.badgeStreamer',
+  'admin::es::accounts.badgeStreamer',
+  'admin::es_ES::accounts.badgeStreamer',
+  'admin::id_ID::accounts.badgeStreamer',
+  'admin::it_IT::accounts.badgeStreamer',
+  'admin::nl_NL::accounts.badgeStreamer',
+  'admin::pl_PL::accounts.badgeStreamer',
+  'admin::pt_BR::accounts.badgeStreamer',
+  'admin::sv_SE::accounts.badgeStreamer',
+  'admin::vi_VN::accounts.badgeStreamer',
+  'admin::cs_CZ::detail.streamerLabel',
+  'admin::da_DK::detail.streamerLabel',
+  'admin::de_DE::detail.streamerLabel',
+  'admin::es::detail.streamerLabel',
+  'admin::es_ES::detail.streamerLabel',
+  'admin::id_ID::detail.streamerLabel',
+  'admin::it_IT::detail.streamerLabel',
+  'admin::nl_NL::detail.streamerLabel',
+  'admin::pl_PL::detail.streamerLabel',
+  'admin::pt_BR::detail.streamerLabel',
+  'admin::sv_SE::detail.streamerLabel',
+  'admin::vi_VN::detail.streamerLabel',
 ];
 
 export const V07_SLASH = [
@@ -334,4 +363,11 @@ export const V07_SLASH = [
   '[dev] Level set to 5.',
   '[dev] Teleported to Aki, Aki.',
   "[dev] Unknown item 'Aki'.",
+  '[dev] Spawned the Test Quartermaster (free epic gear) next to you.',
+  '[dev] Could not spawn the test vendor.',
+  '[dev] God mode ON.',
+  '[dev] God mode OFF.',
+  '[dev] Attuned: marked 5 quests complete (in-progress quests untouched).',
+  '[dev] Raid lockouts cleared.',
+  '[dev] Entering Nythraxis raid (Aki).',
 ];

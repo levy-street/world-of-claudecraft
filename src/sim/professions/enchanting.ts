@@ -126,7 +126,12 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   const count = disenchantYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);
   const meta = ctx.players.get(pid);
-  if (meta) gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+  if (meta) {
+    gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+    // The skill gain feeds the craftSkill deed triggers, so the site marks
+    // the player dirty itself (the crafting.ts craftItem contract).
+    ctx.markDeedsDirty(meta.entityId);
+  }
   return { ok: true, itemId, materialItemId, count };
 }
 
@@ -198,7 +203,12 @@ export function resolveApplyEnchant(
   merged.rolled = { ...merged.rolled, stats: { ...enchant.statBonus } };
   ctx.addItemInstance(itemId, merged, pid);
   const meta = ctx.players.get(pid);
-  if (meta) gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+  if (meta) {
+    gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+    // The skill gain feeds the craftSkill deed triggers, so the site marks
+    // the player dirty itself (the crafting.ts craftItem contract).
+    ctx.markDeedsDirty(meta.entityId);
+  }
   return { ok: true, itemId, enchantId };
 }
 

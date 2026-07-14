@@ -19,12 +19,15 @@ import {
   createCharacterCapped,
   deleteCharacter,
   grantAccountMechChroma,
+  grantAccountWeaponSkins,
   loadAccountCosmetics,
   markAccountQuestComplete,
   openPlaySession,
   reclaimDeactivatedName,
   renameCharacter,
   revokeAccountMechChroma,
+  SCHEMA,
+  setAccountWeaponSkinLoadout,
   touchLogin,
 } from '../server/db';
 import { REALM } from '../server/realm';
@@ -266,6 +269,8 @@ describe('account cosmetics', () => {
     await expect(loadAccountCosmetics(7)).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson', 'onyx_gold'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
 
     expect(dbMock.query.mock.calls[0][0]).toContain('cosmetics');
@@ -273,92 +278,196 @@ describe('account cosmetics', () => {
   });
 
   it('persists account-wide quest completion without replacing existing cosmetic unlocks', async () => {
-    dbMock.query
-      .mockResolvedValueOnce({
-        rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: ['onyx_gold'] } }],
-      } as any)
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            cosmetics: {
-              completedQuestIds: ['q_aldrics_fallen_star'],
-              mechChromaIds: ['onyx_gold'],
-            },
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star'],
+            mechChromaIds: ['onyx_gold'],
           },
-        ],
-      } as any);
+        },
+      ],
+    } as any);
 
     await expect(markAccountQuestComplete(7, 'q_aldrics_fallen_star')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
 
-    const [sql, params] = dbMock.query.mock.calls[1];
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/UPDATE accounts/);
-    expect(sql).toMatch(/cosmetics/);
-    expect(params[0]).toBe(7);
-    expect(params[1]).toEqual({
-      completedQuestIds: ['q_aldrics_fallen_star'],
-      mechChromaIds: ['onyx_gold'],
-    });
+    expect(sql).toMatch(/jsonb_set/);
+    expect(sql).toMatch(/LEFT JOIN account_weapon_cosmetics/);
+    expect(params).toEqual([7, 'completedQuestIds', 'q_aldrics_fallen_star']);
   });
 
   it('persists mech chroma unlocks without replacing account quest lockouts', async () => {
-    dbMock.query
-      .mockResolvedValueOnce({
-        rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] } }],
-      } as any)
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            cosmetics: {
-              completedQuestIds: ['q_aldrics_fallen_star'],
-              mechChromaIds: ['amber_crimson'],
-            },
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star'],
+            mechChromaIds: ['amber_crimson'],
           },
-        ],
-      } as any);
+        },
+      ],
+    } as any);
 
     await expect(grantAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/jsonb_set/);
+    expect(params).toEqual([7, 'mechChromaIds', 'amber_crimson']);
   });
 
   it('persists mech chroma removal without replacing account quest lockouts', async () => {
-    dbMock.query
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            cosmetics: {
-              completedQuestIds: ['q_aldrics_fallen_star'],
-              mechChromaIds: ['amber_crimson', 'onyx_gold'],
-            },
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star'],
+            mechChromaIds: ['onyx_gold'],
           },
-        ],
-      } as any)
-      .mockResolvedValueOnce({
-        rows: [
-          {
-            cosmetics: {
-              completedQuestIds: ['q_aldrics_fallen_star'],
-              mechChromaIds: ['onyx_gold'],
-            },
-          },
-        ],
-      } as any);
+        },
+      ],
+    } as any);
 
     await expect(revokeAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
     });
 
-    const [sql, params] = dbMock.query.mock.calls[1];
+    const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/UPDATE accounts/);
-    expect(params[1]).toEqual({
+    expect(sql).toMatch(/jsonb_set/);
+    expect(params).toEqual([7, 'amber_crimson']);
+  });
+});
+
+describe('account weapon skin cosmetics', () => {
+  it('keeps paid weapon cosmetics in a dedicated rollback-safe table', async () => {
+    expect(SCHEMA).toMatch(/CREATE TABLE IF NOT EXISTS account_weapon_cosmetics/);
+    expect(SCHEMA).toMatch(/INSERT INTO account_weapon_cosmetics/);
+    expect(SCHEMA).toMatch(/ON CONFLICT \(account_id\) DO NOTHING/);
+
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star'],
+            mechChromaIds: ['amber_crimson'],
+            // A stale legacy copy must not override the dedicated paid state.
+            weaponSkinIds: ['guildmark_arming_sword'],
+            weaponSkinLoadout: { sword: 'guildmark_arming_sword' },
+          },
+          weapon_skin_ids: ['ice_fang_sword'],
+          weapon_skin_loadout: { sword: 'ice_fang_sword' },
+        },
+      ],
+    } as any);
+
+    await expect(loadAccountCosmetics(7)).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
-      mechChromaIds: ['onyx_gold'],
+      mechChromaIds: ['amber_crimson'],
+      weaponSkinIds: ['ice_fang_sword'],
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
     });
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/LEFT JOIN account_weapon_cosmetics/);
+    expect(params).toEqual([7]);
+  });
+
+  it('grants skins atomically in the dedicated table and returns the merged row', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star'],
+            mechChromaIds: [],
+          },
+          // Junk shapes in the dedicated JSONB normalize away on the way out.
+          weapon_skin_ids: ['ice_fang_sword', 4, 'ice_fang_sword'],
+          weapon_skin_loadout: { sword: 'ice_fang_sword', axe: 9 },
+        },
+      ],
+    } as any);
+
+    await expect(grantAccountWeaponSkins(7, ['ice_fang_sword'])).resolves.toEqual({
+      completedQuestIds: ['q_aldrics_fallen_star'],
+      mechChromaIds: [],
+      weaponSkinIds: ['ice_fang_sword'],
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+    });
+
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/INSERT INTO account_weapon_cosmetics/);
+    expect(sql).toMatch(/ON CONFLICT \(account_id\) DO UPDATE/);
+    expect(sql).toMatch(/RETURNING account_id, skin_ids, loadout/);
+    expect(params).toEqual([7, ['ice_fang_sword']]);
+  });
+
+  it('drops empty ids from the grant params (defensive filter)', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
+
+    await grantAccountWeaponSkins(7, ['ice_fang_sword', '']);
+
+    expect(dbMock.query.mock.calls[0][1]).toEqual([7, ['ice_fang_sword']]);
+  });
+
+  it('replaces the dedicated loadout atomically with the JSON-encoded record', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: [],
+            mechChromaIds: [],
+          },
+          weapon_skin_ids: ['ice_fang_sword'],
+          weapon_skin_loadout: { sword: 'ice_fang_sword' },
+        },
+      ],
+    } as any);
+
+    await expect(setAccountWeaponSkinLoadout(7, { sword: 'ice_fang_sword' })).resolves.toEqual({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: ['ice_fang_sword'],
+      weaponSkinLoadout: { sword: 'ice_fang_sword' },
+    });
+
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toMatch(/INSERT INTO account_weapon_cosmetics/);
+    expect(sql).toMatch(/loadout = EXCLUDED\.loadout/);
+    expect(sql).toMatch(/RETURNING account_id, skin_ids, loadout/);
+    expect(params).toEqual([7, JSON.stringify({ sword: 'ice_fang_sword' })]);
+  });
+
+  it('normalizes a malformed RETURNING (no row) into the 4-field default shape', async () => {
+    const defaults = {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    };
+
+    dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
+    await expect(setAccountWeaponSkinLoadout(7, {})).resolves.toEqual(defaults);
+
+    dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
+    await expect(grantAccountWeaponSkins(7, ['ice_fang_sword'])).resolves.toEqual(defaults);
   });
 });
 

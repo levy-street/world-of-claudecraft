@@ -2967,7 +2967,8 @@
        dangling underneath. Overrides the base .cs-wallet row layout (label
        beside actions, separator border-top), which the card/mobile layouts
        keep. */
-    body:not(.mobile-touch) #charselect-panel.cs-wow :is(.cs-wallet-group, .cs-github-group) {
+    body:not(.mobile-touch) #charselect-panel.cs-wow
+      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group) {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
@@ -5606,6 +5607,18 @@
   }
   .portrait-sm .portrait-badge {
     border-width: 1px;
+  }
+  /* Armory store card variant: the chip shrinks into a 20px eligibility face
+     inside .armory-class-chip (components.css), so the class-colored ring
+     thins and the drop shadow moves to the wrapper. */
+  .armory-class-chip .portrait-chip {
+    width: 100%;
+    height: 100%;
+    filter: none;
+  }
+  .armory-class-chip .portrait-ring {
+    border-width: 1px;
+    box-shadow: none;
   }
 
   /* Profile/character-window header with a portrait beside the name */

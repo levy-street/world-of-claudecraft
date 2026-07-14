@@ -253,4 +253,28 @@ describe('Nythraxis encounter module (N1)', () => {
       expect(meta?.raidLockouts.get('nythraxis_boss_arena')).toBeGreaterThan(ctx.lockoutNowMs());
     }
   });
+
+  it('the lockout roster never crosses into the adjacent arena slot (z-band clip)', () => {
+    const { sim, ctx, boss, tank } = setup();
+    // A bystander parked in the ADJACENT slot's territory: arena slots sit
+    // 500 apart in z with the spawn skewed high, so the raw 260 yd circle
+    // around this slot's boss reaches past this slot's own z band. Membership
+    // (the lockout) must clip to the band, exactly like the deed task window,
+    // or a kill would lock out a player who was never in this raid's room.
+    const outsiderPid = sim.addPlayer('mage', 'Bystander') as number;
+    const outsider = sim.entities.get(outsiderPid) as AnyEntity;
+    const inst = ctx.instances.find((i) => i.mobIds.includes(boss.id));
+    expect(inst).toBeDefined();
+    const origin = ctx.instanceOriginOf(inst!);
+    const skewSide = boss.spawnPos.z >= origin.z ? 1 : -1;
+    teleport(sim, outsider, origin.x, origin.z + skewSide * 252);
+    // Geometry preconditions, so this test cannot rot into a vacuous pass:
+    // inside the raw circle, outside the slot's z band.
+    expect(dist2d(outsider.pos, boss.spawnPos)).toBeLessThanOrEqual(260);
+    expect(Math.abs(outsider.pos.z - origin.z)).toBeGreaterThanOrEqual(250);
+
+    nythraxis.grantNythraxisLockout(ctx, boss);
+    expect(sim.players.get(tank.id)!.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
+    expect(sim.players.get(outsiderPid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
+  });
 });

@@ -15,10 +15,24 @@ import { vendorStackSize } from '../sim/vendor_stack';
 export interface VendorGoodsRow {
   itemId: string;
   item: ItemDef;
-  /** Total copper for one purchase (per-unit buyValue times quantity). Always > 0. */
-  price: number;
+  /** Server-matching price for one purchase. Either component may be zero. */
+  price: VendorPrice;
   /** Units handed over per purchase: food/drink come in a stack, the rest are 1. */
   quantity: number;
+  /** Advisory UI state only; the authoritative buy path rechecks both balances. */
+  affordable: boolean;
+}
+
+export interface VendorPrice {
+  /** Total copper: the per-unit buyValue multiplied by vendor quantity. */
+  copper: number;
+  /** Honor is authored as a per-purchase price and is not stack-multiplied. */
+  honor: number;
+}
+
+export interface VendorBalances {
+  copper: number;
+  honor: number;
 }
 
 export interface VendorBuybackRow {
@@ -32,26 +46,41 @@ export interface VendorBuybackRow {
 export interface VendorView {
   goods: VendorGoodsRow[];
   buyback: VendorBuybackRow[];
+  honorBalance: number;
+  hasHonorGoods: boolean;
 }
 
 /**
  * Build the structured vendor view from raw inputs.
  *
  * Goods: a vendor item is offered only if it exists in the item table and has a
- * truthy buyValue (vendors never list a priceless item). Buyback: a stored slot
- * is redeemable only if the item still exists and the stack count is positive.
+ * positive copper or Honor price (vendors never list a priceless item). Buyback:
+ * a stored slot is redeemable only if the item still exists and the stack count
+ * is positive.
  */
 export function buildVendorView(
   vendorItemIds: readonly string[],
   buybackSlots: readonly InvSlot[],
   items: Record<string, ItemDef>,
+  balances: VendorBalances,
 ): VendorView {
   const goods: VendorGoodsRow[] = [];
   for (const itemId of vendorItemIds) {
     const item = items[itemId];
-    if (!item?.buyValue) continue;
+    if (!item) continue;
     const quantity = vendorStackSize(item);
-    goods.push({ itemId, item, price: item.buyValue * quantity, quantity });
+    const price: VendorPrice = {
+      copper: Math.max(0, item.buyValue ?? 0) * quantity,
+      honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
+    };
+    if (price.copper <= 0 && price.honor <= 0) continue;
+    goods.push({
+      itemId,
+      item,
+      price,
+      quantity,
+      affordable: balances.copper >= price.copper && balances.honor >= price.honor,
+    });
   }
   const buyback: VendorBuybackRow[] = [];
   for (const slot of buybackSlots) {
@@ -59,5 +88,10 @@ export function buildVendorView(
     if (!item || slot.count <= 0) continue;
     buyback.push({ itemId: slot.itemId, item, count: slot.count, price: item.sellValue });
   }
-  return { goods, buyback };
+  return {
+    goods,
+    buyback,
+    honorBalance: Math.max(0, Math.floor(balances.honor)),
+    hasHonorGoods: goods.some((row) => row.price.honor > 0),
+  };
 }

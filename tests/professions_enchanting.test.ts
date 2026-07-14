@@ -375,7 +375,6 @@ describe('applyEnchant', () => {
     const state = sim.serializeCharacter(pid)!;
     // Simulate an old save recorded before this feature existed: the key is
     // absent entirely, not just empty.
-    // biome-ignore lint/performance/noDelete: simulating a legacy record shape.
     delete (state as { equipmentInstance?: unknown }).equipmentInstance;
 
     const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });

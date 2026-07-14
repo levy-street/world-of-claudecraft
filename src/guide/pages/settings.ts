@@ -9,7 +9,7 @@ import { esc } from '../../ui/esc';
 import { type TranslationKey, t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
-import { callout, loreBeat, pageHeader, related, section, tag } from './ui';
+import { callout, loreBeat, p, pageHeader, related, section, tag } from './ui';
 
 interface LoadoutRow {
   /** Setting label, from the game's own options catalog. */
@@ -103,6 +103,7 @@ const FACTS: Fact[] = [
   { title: 'guide.settingsPage.factDetectTitle', body: 'guide.settingsPage.factDetectBody' },
   { title: 'guide.settingsPage.factReloadTitle', body: 'guide.settingsPage.factReloadBody' },
   { title: 'guide.settingsPage.factGovernorTitle', body: 'guide.settingsPage.factGovernorBody' },
+  { title: 'guide.settingsPage.factSearchTitle', body: 'guide.settingsPage.factSearchBody' },
 ];
 
 type Impact = 'none' | 'light' | 'moderate' | 'heavy';
@@ -275,10 +276,14 @@ export const settings: GuidePage = {
           </div>
           <p class="guide-set-foot">${esc(t('guide.settingsPage.tableFoot'))}</p>`,
         )}
-        ${callout(`<p>${esc(t('guide.settingsPage.mobileBody'))}</p>`, {
-          variant: 'note',
-          titleKey: 'guide.settingsPage.mobileTitle',
-        })}
+        ${section('guide.settingsPage.audioTitle', p('guide.settingsPage.audioBody') + p('guide.settingsPage.autolootBody'))}
+        ${callout(
+          `<p>${esc(t('guide.settingsPage.mobileBody'))}</p><p>${esc(t('guide.settingsPage.touchBody'))}</p>`,
+          {
+            variant: 'note',
+            titleKey: 'guide.settingsPage.mobileTitle',
+          },
+        )}
         ${related([
           { href: hrefFor('reference/controls'), key: 'guide.nav.controls' },
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },

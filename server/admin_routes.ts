@@ -114,6 +114,19 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/reset-strikes$/,
     permission: 'moderation.act',
   },
+  // Account flair (AI mark / streamer links). Not punitive, but they are
+  // operator-only writes that every player can see, so they sit with the other
+  // moderation actions rather than getting a permission of their own.
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/ai$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/streamer$/,
+    permission: 'moderation.act',
+  },
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/reports\/(\d+)\/ignore$/,
