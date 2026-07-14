@@ -44,6 +44,7 @@ import { terrainHeight } from '../sim/world';
 import type { CupInfo } from '../world_api/vale_cup';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { toFloatAttribute } from './attribute_float';
 import { GFX, sharedUniforms } from './gfx';
 import { groundSplatMaps } from './textures';
 import { flagTexture } from './vale_cup_flags';
@@ -109,14 +110,12 @@ interface KitAsset {
 const kitAssets = new Map<string, KitAsset>();
 let kitSourceMaterial: THREE.MeshStandardMaterial | null = null;
 
+// Meshopt-quantized attributes are normalized ints; bake them to plain floats
+// so applyMatrix4/merge cannot clamp world-space values into the [-1,1] range.
 function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   const attr = geo.getAttribute(name);
   if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
-  const out = new Float32Array(attr.count * attr.itemSize);
-  for (let i = 0; i < attr.count; i++) {
-    for (let c = 0; c < attr.itemSize; c++) out[i * attr.itemSize + c] = attr.getComponent(i, c);
-  }
-  geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
+  geo.setAttribute(name, toFloatAttribute(attr));
 }
 
 function extractKitPiece(name: string, gltf: GLTF): void {

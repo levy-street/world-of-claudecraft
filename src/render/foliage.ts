@@ -22,6 +22,7 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { toFloatAttribute } from './attribute_float';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
 
@@ -416,20 +417,9 @@ function foliageMaterial(src: THREE.Material, hasVertexColors: boolean): THREE.M
   return mat;
 }
 
-// The shipped GLBs are meshopt-quantized: positions/normals/colors live in
-// normalized integer attributes with a dequantization node transform. Bake
+// The shipped GLBs are meshopt-quantized (see attribute_float.ts). Bake
 // everything to float32 + world space once so geometries can be shared by
 // InstancedMeshes and merged into clusters without overflow.
-function toFloatAttribute(
-  attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
-): THREE.BufferAttribute {
-  const out = new Float32Array(attr.count * attr.itemSize);
-  for (let i = 0; i < attr.count; i++) {
-    for (let j = 0; j < attr.itemSize; j++) out[i * attr.itemSize + j] = attr.getComponent(i, j);
-  }
-  return new THREE.BufferAttribute(out, attr.itemSize);
-}
-
 function bakeGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
   const src = mesh.geometry;
   const out = new THREE.BufferGeometry();

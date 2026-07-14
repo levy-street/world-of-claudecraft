@@ -35,6 +35,7 @@ import {
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { toFloatAttribute } from './attribute_float';
 import {
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
@@ -278,11 +279,7 @@ let dungeonAssetsPromise: Promise<void> | null = null;
 function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   const attr = geo.getAttribute(name);
   if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
-  const out = new Float32Array(attr.count * attr.itemSize);
-  for (let i = 0; i < attr.count; i++) {
-    for (let c = 0; c < attr.itemSize; c++) out[i * attr.itemSize + c] = attr.getComponent(i, c);
-  }
-  geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
+  geo.setAttribute(name, toFloatAttribute(attr));
 }
 
 function extractModule(name: string, pack: Pack, gltf: GLTF): void {
