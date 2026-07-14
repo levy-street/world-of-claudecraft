@@ -1321,6 +1321,7 @@ export const da_DK: EnTranslations = {
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
@@ -2395,7 +2396,8 @@ export const da_DK: EnTranslations = {
     "resourceName": {
       "rage": "Raseri",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Alle klasser",
@@ -2499,7 +2501,19 @@ export const da_DK: EnTranslations = {
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
       "moonfire": "Rammer øjeblikkeligt og efterlader målet brændende, god mens du bevæger dig.",
       "rejuvenation": "Kastes øjeblikkeligt og helbreder en allieret over tid, så du kan blive ved med at handle.",
-      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår."
+      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår.",
+      "demon_bite": "Your reliable builder: bite in with twin blades and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard unstable melee strike.",
+      "vengeful_retreat": "Flip back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target with a crescent blade and slow it long enough to catch up.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Surge across open ground and land with a burst of Chaos damage.",
+      "immolation_aura": "Brand nearby enemies with green fire while your attacks hit harder.",
+      "blur": "A defensive shimmer for dodging through danger.",
+      "blade_dance": "Spend Fury to blink around enemies with rapid slashes.",
+      "sigil_of_flame": "Place a burning rune to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused green beam into your target.",
+      "demon_ascendance": "Turn a fight with a short demon-form power window."
     },
     "petHook": {
       "emberkin": "En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.",
@@ -3852,6 +3866,7 @@ export const da_DK: EnTranslations = {
     "mage": "Magiker",
     "warlock": "Heksemester",
     "druid": "Druide",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Kriger-klasse",
     "paladinAria": "Paladin-klasse",
     "hunterAria": "Jæger-klasse",
@@ -3860,7 +3875,8 @@ export const da_DK: EnTranslations = {
     "shamanAria": "Shaman-klasse",
     "mageAria": "Magiker-klasse",
     "warlockAria": "Heksemester-klasse",
-    "druidAria": "Druide-klasse"
+    "druidAria": "Druide-klasse",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Guide til Styring",
@@ -4617,7 +4633,8 @@ export const da_DK: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energi",
-      "rage": "Raseri"
+      "rage": "Raseri",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / Nærkamps-DPS",
@@ -4628,7 +4645,8 @@ export const da_DK: EnTranslations = {
       "shaman": "Healer / Nærkamps- eller Afstands-DPS",
       "mage": "Afstands-DPS",
       "warlock": "Afstands-DPS",
-      "druid": "Tank / Healer / Nærkamps- eller Afstands-DPS"
+      "druid": "Tank / Healer / Nærkamps- eller Afstands-DPS",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Ringbrynje, Læder, Stof",
@@ -4652,7 +4670,8 @@ export const da_DK: EnTranslations = {
       "shaman": "Shamaner befaler elementerne, gennemtrænger våben med kraft, chokerer fjender med lyn og genopretter allierede.",
       "mage": "Magikere bøjer Ild-, Frost- og arkankraft for at tilintetgøre fjender, frembringe vand og fryse trusler på stedet.",
       "warlock": "Heksemestre tilkalder dæmoner, kaster forbandelser og skade-over-tid-magi og suger liv fra fjender for at holde ud.",
-      "druid": "Druider kanaliserer naturen, helbreder sår, omslynger fjender og skifter til dyreformer til forsvar eller skade."
+      "druid": "Druider kanaliserer naturen, helbreder sår, omslynger fjender og skifter til dyreformer til forsvar eller skade.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Klassedetaljer for {className}: rolle {role}. Startværdier: Styrke {str}, Smidighed {agi}, Udholdenhed {sta}, Intellekt {int}, Ånd {spi}.",
     "statBarAria": "{stat}: {value} ud af 25"
@@ -4993,6 +5012,7 @@ export const da_DK: EnTranslations = {
       "abilityNotReady": "Den evne er ikke klar endnu.",
       "notEnoughRage": "Ikke nok raseri!",
       "notEnoughEnergy": "Ikke nok energi!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Ikke nok mana!",
       "notEnoughResource": "Ikke nok {resource}!",
       "notEnoughHealth": "Ikke nok helbred.",
@@ -5292,7 +5312,8 @@ export const da_DK: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Raseri",
-      "energy": "Energi"
+      "energy": "Energi",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Bjørn",
@@ -6203,6 +6224,54 @@ export const da_DK: EnTranslations = {
       "rip": {
         "name": "Sønderriv",
         "description": "Afslutningsangreb der forårsager {damage} Blødningsskade over 12 sek. Forbruger kombopoint. Kun i Ulveform."
+      },
+      "demon_bite": {
+        "name": "Soul Bite",
+        "description": "Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury."
+      },
+      "chaos_strike": {
+        "name": "Rift Strike",
+        "description": "Cut through the target with unstable energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Reaver's Recoil",
+        "description": "Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Crescent Toss",
+        "description": "Hurl a crescent blade for {damage} Chaos damage and a brief snare."
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Felsurge",
+        "description": "Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Burning Brand",
+        "description": "Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Shimmerstep",
+        "description": "Shimmer through danger, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Razor Cyclone",
+        "description": "Blink through a razor-edged cyclone for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Flame Rune",
+        "description": "Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Gaze of Ruin",
+        "description": "Channel a ruinous green beam, dealing {damage} Chaos damage each pulse."
+      },
+      "demon_ascendance": {
+        "name": "Demon Ascendance",
+        "description": "Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Lemlæstende Slag",

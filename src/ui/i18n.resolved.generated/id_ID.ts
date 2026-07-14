@@ -1321,6 +1321,7 @@ export const id_ID: EnTranslations = {
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
@@ -2395,7 +2396,8 @@ export const id_ID: EnTranslations = {
     "resourceName": {
       "rage": "Amukan",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Semua kelas",
@@ -2499,7 +2501,19 @@ export const id_ID: EnTranslations = {
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
       "moonfire": "Menghantam seketika dan meninggalkan sasaran terbakar, bagus sambil bergerak.",
       "rejuvenation": "Dirapalkan seketika dan menyembuhkan sekutu seiring waktu, sehingga kamu bisa terus bertindak.",
-      "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul."
+      "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul.",
+      "demon_bite": "Your reliable builder: bite in with twin blades and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard unstable melee strike.",
+      "vengeful_retreat": "Flip back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target with a crescent blade and slow it long enough to catch up.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Surge across open ground and land with a burst of Chaos damage.",
+      "immolation_aura": "Brand nearby enemies with green fire while your attacks hit harder.",
+      "blur": "A defensive shimmer for dodging through danger.",
+      "blade_dance": "Spend Fury to blink around enemies with rapid slashes.",
+      "sigil_of_flame": "Place a burning rune to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused green beam into your target.",
+      "demon_ascendance": "Turn a fight with a short demon-form power window."
     },
     "petHook": {
       "emberkin": "Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.",
@@ -3852,6 +3866,7 @@ export const id_ID: EnTranslations = {
     "mage": "Penyihir",
     "warlock": "Penyihir Iblis",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Kelas Prajurit",
     "paladinAria": "Kelas Paladin",
     "hunterAria": "Kelas Pemburu",
@@ -3860,7 +3875,8 @@ export const id_ID: EnTranslations = {
     "shamanAria": "Kelas Dukun",
     "mageAria": "Kelas Penyihir",
     "warlockAria": "Kelas Penyihir Iblis",
-    "druidAria": "Kelas Druid"
+    "druidAria": "Kelas Druid",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Panduan Kontrol",
@@ -4617,7 +4633,8 @@ export const id_ID: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energi",
-      "rage": "Amukan"
+      "rage": "Amukan",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / DPS Jarak Dekat",
@@ -4628,7 +4645,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Penyembuh / DPS Jarak Dekat atau Jauh",
       "mage": "DPS Jarak Jauh",
       "warlock": "DPS Jarak Jauh",
-      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh"
+      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Zirah Rantai, Kulit, Kain",
@@ -4652,7 +4670,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Dukun memerintah unsur-unsur alam, mengisi senjata dengan kekuatan, mengejutkan musuh dengan petir, dan memulihkan sekutu.",
       "mage": "Penyihir menundukkan kekuatan Api, Beku, dan Arkana untuk membinasakan musuh, memanggil air, dan membekukan ancaman di tempat.",
       "warlock": "Penyihir Iblis memanggil iblis, menebar kutukan dan sihir kerusakan berkelanjutan, serta menyedot nyawa musuh untuk bertahan.",
-      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang."
+      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Detail kelas untuk {className}: peran {role}. Statistik awal: Kekuatan {str}, Kegesitan {agi}, Stamina {sta}, Kecerdasan {int}, Semangat {spi}.",
     "statBarAria": "{stat}: {value} dari 25"
@@ -4993,6 +5012,7 @@ export const id_ID: EnTranslations = {
       "abilityNotReady": "Kemampuan itu belum siap.",
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Mana tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
       "notEnoughHealth": "Nyawa tidak cukup.",
@@ -5292,7 +5312,8 @@ export const id_ID: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Amukan",
-      "energy": "Energi"
+      "energy": "Energi",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Beruang",
@@ -6203,6 +6224,54 @@ export const id_ID: EnTranslations = {
       "rip": {
         "name": "Robekan",
         "description": "Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
+      },
+      "demon_bite": {
+        "name": "Soul Bite",
+        "description": "Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury."
+      },
+      "chaos_strike": {
+        "name": "Rift Strike",
+        "description": "Cut through the target with unstable energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Reaver's Recoil",
+        "description": "Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Crescent Toss",
+        "description": "Hurl a crescent blade for {damage} Chaos damage and a brief snare."
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Felsurge",
+        "description": "Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Burning Brand",
+        "description": "Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Shimmerstep",
+        "description": "Shimmer through danger, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Razor Cyclone",
+        "description": "Blink through a razor-edged cyclone for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Flame Rune",
+        "description": "Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Gaze of Ruin",
+        "description": "Channel a ruinous green beam, dealing {damage} Chaos damage each pulse."
+      },
+      "demon_ascendance": {
+        "name": "Demon Ascendance",
+        "description": "Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",

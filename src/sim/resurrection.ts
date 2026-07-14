@@ -4,6 +4,7 @@
 // "which auras survive death" predicate and the level-scaled duration WITHOUT an import
 // cycle (spirit <-> entity_roster both need it).
 
+import { DEMON_HUNTER_LIFESTEAL_AURA_ID } from './class_passives';
 import { type Aura, MAX_LEVEL } from './types';
 
 export const RESURRECTION_SICKNESS_ID = 'resurrection_sickness';
@@ -28,9 +29,10 @@ export function resSicknessDuration(level: number): number {
   );
 }
 
-// Auras that survive a death / respawn reset. Only Resurrection Sickness (The Keeper's
-// Toll) does: it must not be sheddable by dying, in the overworld OR a delve. Every other
-// aura clears. Used at every player death/respawn site so the rule cannot drift.
+// Auras that survive a death / respawn reset. Resurrection Sickness must not be
+// sheddable by dying, and always-on class passives should keep their UI slot.
 export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
-  return auras.filter((a) => a.id === RESURRECTION_SICKNESS_ID);
+  return auras.filter(
+    (a) => a.id === RESURRECTION_SICKNESS_ID || a.id === DEMON_HUNTER_LIFESTEAL_AURA_ID,
+  );
 }

@@ -170,7 +170,7 @@ function allEntries(): Entry[] {
 
 const NO_EFFECT = 'Provides a specialization benefit.';
 
-describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
+describe('talent tooltip accuracy (all 10 classes x 3 specs)', () => {
   beforeAll(async () => {
     await ensureLocaleLoaded('en');
     setLanguage('en');
@@ -179,7 +179,7 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
   const entries = allEntries();
 
   it('covers every class and a meaningful number of nodes', () => {
-    expect(new Set(entries.map((e) => e.cls)).size).toBe(9);
+    expect(new Set(entries.map((e) => e.cls)).size).toBe(10);
     expect(entries.length).toBeGreaterThan(250);
   });
 

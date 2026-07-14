@@ -3,7 +3,8 @@ import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import { mechAssetsReady, preloadMechAssets } from './assets';
-import type { WeaponLayoutOverride } from './manifest';
+import { skinCount, type WeaponLayoutOverride } from './manifest';
+import { playerPortraitDataUrl } from './portrait';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -23,6 +24,7 @@ const PREVIEW_ANIM_STATE = {
   casting: false,
   swimming: false,
   sitting: false,
+  retreatFlip: 0,
 };
 
 const LIVE_PREVIEW_X = 0;
@@ -35,6 +37,8 @@ export class CharacterPreview {
   private camera: THREE.PerspectiveCamera;
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
+  private currentVisualKey = '';
+  private fallbackImg: HTMLImageElement | null = null;
   private currentSkin = 0;
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
@@ -84,14 +88,14 @@ export class CharacterPreview {
     this.scene.add(this.characterGroup);
 
     // 5. Add Lights
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.4);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x6d5a3a, 2.0);
     this.scene.add(hemiLight);
 
-    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.6);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.4);
     dirLight1.position.set(3, 5, 4);
     this.scene.add(dirLight1);
 
-    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    const dirLight2 = new THREE.DirectionalLight(0xd7ecff, 1.2);
     dirLight2.position.set(-3, 3, -4);
     this.scene.add(dirLight2);
 
@@ -150,6 +154,8 @@ export class CharacterPreview {
     weaponOverride: WeaponLayoutOverride | null = null,
   ): void {
     if (this.destroyed) return;
+    const availableSkins = skinCount(visualKey);
+    if (this.currentSkin < 0 || this.currentSkin >= availableSkins) this.currentSkin = 0;
     // Clean up current visual if it exists
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
@@ -158,6 +164,7 @@ export class CharacterPreview {
     }
 
     try {
+      this.currentVisualKey = visualKey;
       this.currentVisual = new CharacterVisual(
         visualKey,
         0xffffff,
@@ -170,6 +177,8 @@ export class CharacterPreview {
       // Reset rotation on a class swap so every new character greets the player
       // FACE-ON (the classic character-screen pose); dragging still spins freely.
       this.characterGroup.rotation.y = 0;
+      this.updateFallbackImage();
+      this.frameCurrentVisual();
     } catch (err) {
       console.error(`Failed to load preview character visual for ${visualKey}:`, err);
     }
@@ -183,6 +192,8 @@ export class CharacterPreview {
     this.appearanceSig = null;
     this.currentSkin = skinIndex;
     this.currentVisual?.setSkin(skinIndex);
+    this.updateFallbackImage();
+    requestAnimationFrame(() => this.frameCurrentVisual());
   }
 
   /** Dynamically shift the canvas to a new container */
@@ -193,6 +204,7 @@ export class CharacterPreview {
       this.resizeObserver = null;
     }
     this.container = container;
+    if (this.fallbackImg) this.container.appendChild(this.fallbackImg);
     this.container.appendChild(this.canvas);
 
     this.syncSize();
@@ -204,8 +216,7 @@ export class CharacterPreview {
   /** Force the renderer to match the current visible container size. */
   syncSize(): void {
     if (this.destroyed) return;
-    const width = this.container.clientWidth;
-    const height = this.container.clientHeight;
+    const { width, height } = this.containerSize();
     if (width > 0 && height > 0) {
       this.renderer.setSize(width, height, false);
       this.camera.aspect = width / height;
@@ -214,6 +225,91 @@ export class CharacterPreview {
     }
   }
 
+  private containerSize(): { width: number; height: number } {
+    const rect = this.container.getBoundingClientRect();
+    return {
+      width: Math.round(this.container.clientWidth || rect.width),
+      height: Math.round(this.container.clientHeight || rect.height),
+    };
+  }
+
+  private frameCurrentVisual(): void {
+    const visual = this.currentVisual;
+    if (!visual) return;
+    visual.root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(visual.root);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    if (!Number.isFinite(size.y) || size.y <= 0.01) {
+      center.set(0, 1.25, 0);
+      size.set(1.8, 2.4, 1.2);
+    }
+
+    const sizePx = this.containerSize();
+    const width = Math.max(1, sizePx.width);
+    const height = Math.max(1, sizePx.height);
+    this.renderer.setSize(width, height, false);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+
+    const fov = THREE.MathUtils.degToRad(this.camera.fov);
+    const verticalFit = size.y / (2 * Math.tan(fov / 2));
+    const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * this.camera.aspect);
+    const horizontalFit = Math.max(size.x, size.z * 0.65) / (2 * Math.tan(horizontalFov / 2));
+    const distance = Math.max(3.2, verticalFit, horizontalFit) * 1.45;
+    const lookAt = new THREE.Vector3(center.x, center.y + size.y * 0.06, center.z);
+    this.camera.position.set(center.x - size.x * 0.08, lookAt.y + size.y * 0.02, center.z + distance);
+    this.camera.lookAt(lookAt);
+    this.camera.updateProjectionMatrix();
+    this.renderer.render(this.scene, this.camera);
+    this.updateFallbackVisibility();
+  }
+
+  private updateFallbackImage(): void {
+    const cls = this.currentVisualKey.startsWith('player_')
+      ? (this.currentVisualKey.slice('player_'.length) as PlayerClass)
+      : null;
+    const url = cls && CLASSES[cls] ? playerPortraitDataUrl(cls, this.currentSkin) : '';
+    if (!url) {
+      if (this.fallbackImg) this.fallbackImg.hidden = true;
+      return;
+    }
+    if (!this.fallbackImg) {
+      this.fallbackImg = document.createElement('img');
+      this.fallbackImg.className = 'char-preview-fallback';
+      this.fallbackImg.alt = '';
+      this.container.insertBefore(this.fallbackImg, this.canvas);
+    }
+    if (this.fallbackImg.src !== url) this.fallbackImg.src = url;
+    this.fallbackImg.hidden = false;
+  }
+
+  private updateFallbackVisibility(): void {
+    const img = this.fallbackImg;
+    if (!img) return;
+    const gl = this.renderer.getContext();
+    const w = gl.drawingBufferWidth;
+    const h = gl.drawingBufferHeight;
+    if (w <= 0 || h <= 0) {
+      img.hidden = false;
+      return;
+    }
+    const pixels = new Uint8Array(4);
+    const xs = [0.32, 0.5, 0.68];
+    const ys = [0.28, 0.5, 0.72];
+    for (const x of xs) {
+      for (const y of ys) {
+        gl.readPixels(Math.floor(w * x), Math.floor(h * y), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+        if (pixels[3] > 8) {
+          img.hidden = true;
+          return;
+        }
+      }
+    }
+    img.hidden = false;
+  }
   private setupDragControls(): void {
     const onMouseDown = (e: MouseEvent) => {
       this.isDragging = true;
@@ -389,6 +485,8 @@ export class CharacterPreview {
       /* context may already be lost */
     }
     this.renderer.dispose();
+    this.fallbackImg?.remove();
+    this.fallbackImg = null;
     this.canvas.remove();
   }
 }

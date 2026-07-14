@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { DEMON_HUNTER_LIFESTEAL_NAME, DEMON_HUNTER_LIFESTEAL_PCT } from '../class_passives';
 import { computeTalentModifiers } from '../content/talents';
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -417,6 +418,24 @@ export function dealDamage(
     ...attackAnimation,
   });
 
+  if (
+    amount > 0 &&
+    sourcePlayer &&
+    sourcePlayer.templateId === 'demon_hunter' &&
+    !sourcePlayer.dead &&
+    sourcePlayer.hp < sourcePlayer.maxHp
+  ) {
+    const heal = Math.max(1, Math.round(amount * DEMON_HUNTER_LIFESTEAL_PCT));
+    sourcePlayer.hp = Math.min(sourcePlayer.maxHp, sourcePlayer.hp + heal);
+    ctx.emit({
+      type: 'heal',
+      targetId: sourcePlayer.id,
+      amount: heal,
+      sourceId: sourcePlayer.id,
+      ability: DEMON_HUNTER_LIFESTEAL_NAME,
+    });
+  }
+
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
       target.damageIdleDespawnTimer = DAMAGE_IDLE_DESPAWN_SECONDS;
@@ -706,6 +725,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.sitting = false;
     e.chargeTargetId = null;
     e.chargePath = [];
+    e.abilityDashRemaining = 0;
+    e.abilityDashSpeed = 0;
+    e.abilityDashX = 0;
+    e.abilityDashZ = 0;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {

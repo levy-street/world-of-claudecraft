@@ -13,13 +13,14 @@
 //   - attackspeed: value multiplies the swing interval (m *= value); > 1 = slower.
 //   - buff_speed: value is an ABSOLUTE movement multiplier floored to 1.0.
 //   - buff_haste: value divides the swing/cast interval (m /= value); > 1 = faster.
+//   - buff_lifesteal: value is the 0..1 damage-to-healing fraction.
 //   - tongues: value multiplies casting time (m = max(m, value)); > 1 = slower casts.
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
 import type { AuraKind } from '../sim/types';
 import { FAERIE_FIRE_ARMOR_PCT, SUNDER_ARMOR_PCT_PER_STACK } from '../sim/types';
 
-export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature' | 'chaos';
 
 // Structural subset of Aura the descriptor needs; keeps this module decoupled from
 // the full sim Aura shape so a Vitest can drive it with plain literals.
@@ -90,6 +91,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'buff_haste':
       // value divides the swing/cast interval: > 1 faster.
       return { key: `${KEY}.haste`, nums: { pct: pctFromMult(a.value) } };
+    case 'buff_lifesteal':
+      return { key: `${KEY}.lifesteal`, nums: { pct: pctFromFrac(a.value) } };
     case 'tongues':
       return { key: `${KEY}.tongues`, nums: { pct: pctFromMult(a.value) } };
 

@@ -25,6 +25,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Magiker',
       warlock: 'Heksemester',
       druid: 'Druide',
+      demon_hunter: 'Demon Hunter',
     },
   },
   id_ID: {
@@ -48,6 +49,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Penyihir',
       warlock: 'Penyihir Iblis',
       druid: 'Druid',
+      demon_hunter: 'Demon Hunter',
     },
   },
   nl_NL: {
@@ -70,6 +72,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Magiër',
       warlock: 'Heksenmeester',
       druid: 'Druïde',
+      demon_hunter: 'Demon Hunter',
     },
   },
   pl_PL: {
@@ -92,6 +95,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Mag',
       warlock: 'Czarnoksiężnik',
       druid: 'Druid',
+      demon_hunter: 'Demon Hunter',
     },
   },
   sv_SE: {
@@ -114,6 +118,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Magiker',
       warlock: 'Häxmästare',
       druid: 'Druid',
+      demon_hunter: 'Demon Hunter',
     },
   },
   tr_TR: {
@@ -136,6 +141,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Büyücü',
       warlock: 'Karabüyücü',
       druid: 'Druid',
+      demon_hunter: 'Demon Hunter',
     },
   },
   vi_VN: {
@@ -159,6 +165,7 @@ export const PLAYERCARD_NEW: Record<
       mage: 'Pháp Sư',
       warlock: 'Thuật Sĩ Hắc Ám',
       druid: 'Druid',
+      demon_hunter: 'Demon Hunter',
     },
   },
 };

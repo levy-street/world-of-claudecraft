@@ -1428,6 +1428,7 @@ export const hudChromeStrings = {
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    lifesteal: 'Heals for {pct}% of damage dealt',
     tongues: 'Increases casting time by {pct}%',
     increase: {
       ap: 'Increases attack power by {value}',

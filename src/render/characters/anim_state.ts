@@ -15,6 +15,8 @@ export interface AnimState {
   casting: boolean;
   swimming: boolean;
   sitting: boolean;
+  /** 0..1 procedural backward somersault phase layered over airborne pose. */
+  retreatFlip: number;
 }
 
 export type BaseState = 'idle' | 'walk' | 'walkBack' | 'run' | 'cast' | 'swim' | 'sit' | 'jump';

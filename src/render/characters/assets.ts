@@ -522,6 +522,7 @@ function resolvedGltf(url: string): GLTF {
 // ---------------------------------------------------------------------------
 
 const optimizedSceneCache = new Map<string, THREE.Object3D>();
+const preservedSceneCache = new Map<string, THREE.Object3D>();
 
 function optimizedScene(url: string): THREE.Object3D {
   const hit = optimizedSceneCache.get(url);
@@ -532,6 +533,16 @@ function optimizedScene(url: string): THREE.Object3D {
   return root;
 }
 
+function sourceSceneFor(def: VisualDef): THREE.Object3D {
+  if (!def.preserveParts) return optimizedScene(def.url);
+  const key = assetUrl(def.url);
+  const hit = preservedSceneCache.get(key);
+  if (hit) return hit;
+  const root = cloneSkinned(resolvedGltf(def.url).scene);
+  preservedSceneCache.set(key, root);
+  return root;
+}
+
 // ---------------------------------------------------------------------------
 // Clone assembly: accessory visibility + weapon attachments
 // ---------------------------------------------------------------------------
@@ -539,7 +550,7 @@ function optimizedScene(url: string): THREE.Object3D {
 /** Fresh SkeletonUtils clone of a manifest entry with its kit applied.
  *  Pure model space — normalization (scale/yaw/feet offset) happens upstream. */
 export function assembleModel(def: VisualDef, weaponItemId?: string | null): THREE.Object3D {
-  const root = cloneSkinned(optimizedScene(def.url));
+  const root = cloneSkinned(sourceSceneFor(def));
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below
   root.traverse((o) => {
@@ -652,6 +663,11 @@ const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
 type MaterialRole = 'body' | 'weapon';
+interface SkinPartTint {
+  color: number;
+  strength: number;
+  flat?: boolean;
+}
 
 function applyLowReadabilityLift(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
@@ -685,8 +701,9 @@ export function tintedMaterial(
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
+  partTint: SkinPartTint | null = null,
 ): THREE.Material {
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${partTint ? `${partTint.color}:${partTint.strength}:${partTint.flat ? 'f' : 'm'}` : 'n'}`;
   const cached = matCache.get(key);
   if (cached) return cached;
 
@@ -710,11 +727,13 @@ export function tintedMaterial(
     }
   }
   if (tint !== null) {
-    // subtle pull toward the template color — hard multiplies turn the
+    // subtle pull toward the template color - hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
   }
+  if (partTint) mat.color.lerp(tintScratch.set(partTint.color), partTint.strength);
   if (skinTex) mat.map = skinTex; // alternate body atlas, same UVs as the default
+  if (partTint?.flat) mat.map = null;
   // Emissive glow map (mech epics): standard tier only - Lambert/Basic don't
   // glow, and adding a map where none existed needs a shader recompile.
   if (emisTex && GFX.standardMaterials) {
@@ -735,6 +754,13 @@ function tintFor(def: VisualDef, entityColor: number): number | null {
   return def.tint === 'entity' ? entityColor : def.tint;
 }
 
+function skinPartTintFor(def: VisualDef, skinIndex: number, meshName: string): SkinPartTint | null {
+  const tints = def.skinPartTints?.[skinIndex];
+  if (!tints) return null;
+  const hit = tints.find((entry) => meshName.includes(entry.mesh));
+  return hit ? { color: hit.color, strength: hit.strength ?? 1, flat: hit.flat } : null;
+}
+
 /** Swap every mesh material in an assembled clone for the shared tinted
  *  (and tier-appropriate) variant. Returns nothing — mutates the clone. */
 export function applyMaterials(
@@ -743,6 +769,7 @@ export function applyMaterials(
   entityColor: number,
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  skinIndex = 0,
 ): void {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
@@ -764,10 +791,13 @@ export function applyMaterials(
     // skin/emissive override only touches the character's own atlas meshes, not weapons
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
+    const partTint = role === 'body' ? skinPartTintFor(def, skinIndex, mesh.name) : null;
     if (Array.isArray(source)) {
-      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
+      mesh.material = source.map((m) =>
+        tintedMaterial(m, materialTint, strength, sk, em, role, partTint),
+      );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, partTint);
     }
   });
 }

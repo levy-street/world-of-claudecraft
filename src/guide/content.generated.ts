@@ -5,7 +5,7 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'fury';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -1272,6 +1272,113 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_druid",
     "still": "/guide-stills/player_druid.webp"
+  },
+  {
+    "id": "demon_hunter",
+    "color": "#a330c9",
+    "resource": "fury",
+    "roles": [
+      "tank",
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "devastation",
+        "name": "Riftbound",
+        "role": "dps",
+        "signature": "chaos_strike"
+      },
+      {
+        "id": "vengeance",
+        "name": "Oathguard",
+        "role": "tank",
+        "signature": "metamorphosis"
+      },
+      {
+        "id": "metamorphosis",
+        "name": "Abyssal Covenant",
+        "role": "dps",
+        "signature": "eye_beam"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "demon_bite",
+        "name": "Soul Bite"
+      },
+      {
+        "id": "chaos_strike",
+        "name": "Rift Strike"
+      },
+      {
+        "id": "vengeful_retreat",
+        "name": "Reaver's Recoil"
+      },
+      {
+        "id": "throw_glaive",
+        "name": "Crescent Toss"
+      },
+      {
+        "id": "felblade",
+        "name": "Fel Lunge"
+      },
+      {
+        "id": "fel_rush",
+        "name": "Felsurge"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "demon_bite",
+        "name": "Soul Bite"
+      },
+      {
+        "id": "chaos_strike",
+        "name": "Rift Strike"
+      },
+      {
+        "id": "vengeful_retreat",
+        "name": "Reaver's Recoil"
+      },
+      {
+        "id": "throw_glaive",
+        "name": "Crescent Toss"
+      },
+      {
+        "id": "felblade",
+        "name": "Fel Lunge"
+      },
+      {
+        "id": "fel_rush",
+        "name": "Felsurge"
+      },
+      {
+        "id": "immolation_aura",
+        "name": "Burning Brand"
+      },
+      {
+        "id": "blur",
+        "name": "Shimmerstep"
+      },
+      {
+        "id": "blade_dance",
+        "name": "Razor Cyclone"
+      },
+      {
+        "id": "sigil_of_flame",
+        "name": "Flame Rune"
+      },
+      {
+        "id": "eye_beam",
+        "name": "Gaze of Ruin"
+      },
+      {
+        "id": "demon_ascendance",
+        "name": "Demon Ascendance"
+      }
+    ],
+    "model": "player_demon_hunter",
+    "still": "/guide-stills/player_demon_hunter.webp"
   }
 ];
 
@@ -3488,6 +3595,25 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
+      }
+    ]
+  },
+  "player_demon_hunter": {
+    "url": "models/chars/players/rogue_hooded.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [
+      "Rogue_Hood",
+      "Rogue_Cape"
+    ],
+    "attach": [
+      {
+        "url": "models/weapons/sword_g.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/sword_g.glb",
+        "bone": "handslot.l"
       }
     ]
   },

@@ -1321,6 +1321,7 @@ export const zh_TW: EnTranslations = {
       "attackSpeedSlow": "攻擊速度減慢 {pct}%",
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "施法時間增加 {pct}%",
       "increase": {
         "ap": "攻擊強度提高 {value}",
@@ -2395,7 +2396,8 @@ export const zh_TW: EnTranslations = {
     "resourceName": {
       "rage": "怒氣",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "所有職業",
@@ -2499,7 +2501,19 @@ export const zh_TW: EnTranslations = {
       "mark_of_the_wild": "戰鬥前替自己或友方施加的持久祝福。",
       "moonfire": "瞬間命中並讓目標持續燃燒，移動時也很好用。",
       "rejuvenation": "瞬發施放，持續為友方回復生命，讓你能繼續行動。",
-      "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。"
+      "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。",
+      "demon_bite": "惡魔獵人技巧。",
+      "chaos_strike": "惡魔獵人技巧。",
+      "vengeful_retreat": "惡魔獵人技巧。",
+      "throw_glaive": "惡魔獵人技巧。",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "惡魔獵人技巧。",
+      "immolation_aura": "惡魔獵人技巧。",
+      "blur": "惡魔獵人技巧。",
+      "blade_dance": "惡魔獵人技巧。",
+      "sigil_of_flame": "惡魔獵人技巧。",
+      "eye_beam": "惡魔獵人技巧。",
+      "demon_ascendance": "惡魔獵人技巧。"
     },
     "petHook": {
       "emberkin": "一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。",
@@ -3852,6 +3866,7 @@ export const zh_TW: EnTranslations = {
     "mage": "法師",
     "warlock": "術士",
     "druid": "德魯伊",
+    "demon_hunter": "惡魔獵人",
     "warriorAria": "戰士職業",
     "paladinAria": "聖騎士職業",
     "hunterAria": "獵人職業",
@@ -3860,7 +3875,8 @@ export const zh_TW: EnTranslations = {
     "shamanAria": "薩滿職業",
     "mageAria": "法師職業",
     "warlockAria": "術士職業",
-    "druidAria": "德魯伊職業"
+    "druidAria": "德魯伊職業",
+    "demon_hunterAria": "惡魔獵人職業"
   },
   "controls": {
     "title": "操作指南",
@@ -4617,7 +4633,8 @@ export const zh_TW: EnTranslations = {
     "resources": {
       "mana": "法力",
       "energy": "能量",
-      "rage": "怒氣"
+      "rage": "怒氣",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "坦克 / 近戰 DPS",
@@ -4628,7 +4645,8 @@ export const zh_TW: EnTranslations = {
       "shaman": "治療 / 近戰或遠程 DPS",
       "mage": "遠程 DPS",
       "warlock": "遠程 DPS",
-      "druid": "坦克 / 治療 / 近戰或遠程 DPS"
+      "druid": "坦克 / 治療 / 近戰或遠程 DPS",
+      "demon_hunter": "惡魔獵人"
     },
     "armor": {
       "chainLeatherCloth": "鎖甲、皮甲、布甲",
@@ -4652,7 +4670,8 @@ export const zh_TW: EnTranslations = {
       "shaman": "薩滿掌控元素，強化武器，以閃電震擊敵人並恢復盟友。",
       "mage": "法師操縱火焰、冰霜與祕法之力來毀滅敵人，召喚清水並凍結威脅。",
       "warlock": "術士召喚惡魔，施放詛咒與持續傷害魔法，並從敵人身上汲取生命來支撐自己。",
-      "druid": "德魯伊引導自然之力，治療傷口、纏繞敵人，並變形成動物來防禦或輸出。"
+      "druid": "德魯伊引導自然之力，治療傷口、纏繞敵人，並變形成動物來防禦或輸出。",
+      "demon_hunter": "惡魔獵人技能。"
     },
     "aria": "{className} 職業詳情：職責 {role}。初始屬性：力量 {str}，敏捷 {agi}，耐力 {sta}，智力 {int}，精神 {spi}。",
     "statBarAria": "{stat}：{value}/25"
@@ -4993,6 +5012,7 @@ export const zh_TW: EnTranslations = {
       "abilityNotReady": "該技能尚未準備好。",
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
+      "notEnoughFury": "怒能不足！",
       "notEnoughMana": "法力不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
@@ -5292,7 +5312,8 @@ export const zh_TW: EnTranslations = {
     "resources": {
       "mana": "法力",
       "rage": "怒氣",
-      "energy": "能量"
+      "energy": "能量",
+      "fury": "怒能"
     },
     "forms": {
       "bear": "熊",
@@ -6203,6 +6224,54 @@ export const zh_TW: EnTranslations = {
       "rip": {
         "name": "割裂",
         "description": "終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。"
+      },
+      "demon_bite": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "chaos_strike": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "vengeful_retreat": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。"
+      },
+      "throw_glaive": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "immolation_aura": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "blur": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。"
+      },
+      "blade_dance": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "sigil_of_flame": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "eye_beam": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。 {damage}"
+      },
+      "demon_ascendance": {
+        "name": "惡魔獵人",
+        "description": "惡魔獵人技能。"
       },
       "mortal_strike": {
         "name": "致殘打擊",

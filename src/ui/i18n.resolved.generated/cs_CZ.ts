@@ -1321,6 +1321,7 @@ export const cs_CZ: EnTranslations = {
       "attackSpeedSlow": "Zpomaluje rychlost útoku o {pct} %",
       "attackSpeedFast": "Zvyšuje rychlost útoku o {pct} %",
       "haste": "Zvyšuje rychlost útoku a sesílání o {pct} %",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
@@ -2395,7 +2396,8 @@ export const cs_CZ: EnTranslations = {
     "resourceName": {
       "rage": "Vztek",
       "mana": "Mana",
-      "energy": "Energie"
+      "energy": "Energie",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Všechny třídy",
@@ -2499,7 +2501,19 @@ export const cs_CZ: EnTranslations = {
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
       "moonfire": "Zasáhne okamžitě a nechá cíl hořet, dobré během pohybu.",
       "rejuvenation": "Sesílá se okamžitě a léčí spojence v čase, takže můžeš dál jednat.",
-      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah."
+      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah.",
+      "demon_bite": "Your reliable builder: bite in with twin blades and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard unstable melee strike.",
+      "vengeful_retreat": "Flip back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target with a crescent blade and slow it long enough to catch up.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Surge across open ground and land with a burst of Chaos damage.",
+      "immolation_aura": "Brand nearby enemies with green fire while your attacks hit harder.",
+      "blur": "A defensive shimmer for dodging through danger.",
+      "blade_dance": "Spend Fury to blink around enemies with rapid slashes.",
+      "sigil_of_flame": "Place a burning rune to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused green beam into your target.",
+      "demon_ascendance": "Turn a fight with a short demon-form power window."
     },
     "petHook": {
       "emberkin": "Démon s ohnivou střelou na dálku, který ukrajuje nepřátele z bezpečné vzdálenosti.",
@@ -3852,6 +3866,7 @@ export const cs_CZ: EnTranslations = {
     "mage": "Mág",
     "warlock": "Černokněžník",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Třída válečník",
     "paladinAria": "Třída paladin",
     "hunterAria": "Třída lovec",
@@ -3860,7 +3875,8 @@ export const cs_CZ: EnTranslations = {
     "shamanAria": "Třída šaman",
     "mageAria": "Třída mág",
     "warlockAria": "Třída černokněžník",
-    "druidAria": "Třída druid"
+    "druidAria": "Třída druid",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Průvodce ovládáním",
@@ -4617,7 +4633,8 @@ export const cs_CZ: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energie",
-      "rage": "Vztek"
+      "rage": "Vztek",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / DPS na blízko",
@@ -4628,7 +4645,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Léčitel / DPS na blízko nebo na dálku",
       "mage": "DPS na dálku",
       "warlock": "DPS na dálku",
-      "druid": "Tank / léčitel / DPS na blízko nebo na dálku"
+      "druid": "Tank / léčitel / DPS na blízko nebo na dálku",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Kroužková zbroj, kůže, látka",
@@ -4652,7 +4670,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Šamani ovládají živly, naplňují zbraně silou, zasahují nepřátele blesky a obnovují spojence.",
       "mage": "Mágové ohýbají oheň, mráz a arkánní sílu, aby ničili nepřátele, vyvolávali vodu a zmrazovali hrozby na místě.",
       "warlock": "Černokněžníci vyvolávají démony, sesílají kletby a průběžné poškození a vysávají život z nepřátel, aby vydrželi.",
-      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození."
+      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Detaily třídy {className}: role {role}. Počáteční statistiky: Síla {str}, Obratnost {agi}, Výdrž {sta}, Intelekt {int}, Duch {spi}.",
     "statBarAria": "{stat}: {value} z 25"
@@ -4993,6 +5012,7 @@ export const cs_CZ: EnTranslations = {
       "abilityNotReady": "Tato schopnost ještě není připravená.",
       "notEnoughRage": "Nedostatek vzteku!",
       "notEnoughEnergy": "Nedostatek energie!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Nedostatek many!",
       "notEnoughResource": "Nedostatek zdroje: {resource}!",
       "notEnoughHealth": "Nedostatek zdraví.",
@@ -5292,7 +5312,8 @@ export const cs_CZ: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Vztek",
-      "energy": "Energie"
+      "energy": "Energie",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Medvěd",
@@ -6203,6 +6224,54 @@ export const cs_CZ: EnTranslations = {
       "rip": {
         "name": "Roztržení",
         "description": "Dokončovací útok, který způsobí {damage} krvácivého poškození během 12 s. Spotřebuje combo body. Pouze ve vlčí podobě."
+      },
+      "demon_bite": {
+        "name": "Soul Bite",
+        "description": "Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury."
+      },
+      "chaos_strike": {
+        "name": "Rift Strike",
+        "description": "Cut through the target with unstable energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Reaver's Recoil",
+        "description": "Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Crescent Toss",
+        "description": "Hurl a crescent blade for {damage} Chaos damage and a brief snare."
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Felsurge",
+        "description": "Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Burning Brand",
+        "description": "Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Shimmerstep",
+        "description": "Shimmer through danger, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Razor Cyclone",
+        "description": "Blink through a razor-edged cyclone for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Flame Rune",
+        "description": "Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Gaze of Ruin",
+        "description": "Channel a ruinous green beam, dealing {damage} Chaos damage each pulse."
+      },
+      "demon_ascendance": {
+        "name": "Demon Ascendance",
+        "description": "Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Mrzačící úder",

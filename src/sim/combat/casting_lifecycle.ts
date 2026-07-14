@@ -660,7 +660,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     sourceId: p.id,
     targetId: target.id,
     school: res.def.school,
-    fx: 'projectile',
+    fx: res.def.id === 'eye_beam' ? 'beam' : 'projectile',
   });
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
@@ -822,7 +822,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   // opts in with projectile:true. Without this a physical shot deals its damage
   // instantly while the arrow is still visibly in flight (health drops, or the mob
   // dies, before it arrives).
-  const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
+  const firesProjectile = ability.projectile !== false && (ability.school !== 'physical' || ability.projectile === true);
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(p, res);

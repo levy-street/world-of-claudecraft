@@ -314,6 +314,7 @@ const RESOURCE_KEYS = {
   mana: 'classDetails.resources.mana',
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
+  fury: 'classDetails.resources.fury',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {
@@ -3166,6 +3167,7 @@ const RESET_TOKEN = (() => {
 let activeTransitionTimeout: number | null = null;
 let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
+let pendingPreviewPanelId: string | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
@@ -3283,7 +3285,11 @@ function refreshOnlineSkins(cls: PlayerClass): void {
 }
 
 function updatePreviewContainer(panelId: string): void {
-  if (!characterPreview) return;
+  if (!characterPreview) {
+    pendingPreviewPanelId = panelId;
+    return;
+  }
+  pendingPreviewPanelId = null;
   const containerId =
     panelId === '#charselect-panel'
       ? '#online-preview-container'
@@ -3302,8 +3308,8 @@ function updatePreviewContainer(panelId: string): void {
     } else {
       const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
       const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
-      characterPreview.setClass(cls);
       characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
+      characterPreview.setClass(cls);
     }
     syncPreviewAfterPanelLayout();
     return;
@@ -3316,6 +3322,7 @@ function updatePreviewContainer(panelId: string): void {
   const selEl = document.querySelector(selSelector) as HTMLElement | null;
   if (selEl) {
     const cls = selEl.dataset.class as PlayerClass;
+    characterPreview.setSkin(0);
     characterPreview.setClass(cls);
     if (panelId === '#charcreate-panel') refreshOnlineSkins(cls);
     else refreshOfflineSkins(cls);
@@ -4622,13 +4629,15 @@ function renderClassDetails(
   // offline pickers pass none and rebuild the class body only when the class changes.
   if (characterPreview) {
     if (preview) characterPreview.setAppearance(preview);
-    else if (currentlyRenderedClass[panelId] !== className) characterPreview.setClass(className);
+    else if (currentlyRenderedClass[panelId] !== className) {
+      characterPreview.setSkin(0);
+      characterPreview.setClass(className);
+    }
   }
 
   // Redundant render check (class details panel content only)
   if (currentlyRenderedClass[panelId] === className) return;
   currentlyRenderedClass[panelId] = className;
-
   // Clear any active transitions for this panel to prevent stacked out-of-order renders
   if (
     activeClassDetailsTimeouts[panelId] !== undefined &&
@@ -4727,6 +4736,7 @@ function renderClassDetails(
           eff.type === 'heal' ||
           eff.type === 'weaponDamage' ||
           eff.type === 'weaponStrike' ||
+          eff.type === 'weaponHit' ||
           eff.type === 'aoeDamage' ||
           eff.type === 'aoeRoot' ||
           eff.type === 'finisherDamage' ||
@@ -4741,7 +4751,7 @@ function renderClassDetails(
           primaryEffect.type === 'drainTick'
         ) {
           dmgText = classDetailAmountRange(primaryEffect.min, primaryEffect.max);
-        } else if (primaryEffect.type === 'weaponDamage' || primaryEffect.type === 'weaponStrike') {
+        } else if (primaryEffect.type === 'weaponDamage' || primaryEffect.type === 'weaponStrike' || primaryEffect.type === 'weaponHit') {
           dmgText = formatClassDetailNumber(primaryEffect.bonus);
         } else if (primaryEffect.type === 'finisherDamage') {
           dmgText = t('abilityUi.tooltip.finisherDamage', {
@@ -6862,30 +6872,45 @@ function applyLandingBackdrop(highContrast: boolean): void {
     return;
   }
 
-  // Video path: attach the source lazily and play. The trailer is held hidden
-  // (opacity 0) until it is genuinely playing, so the static poster never flashes
-  // before the video. trailer-ready reveals the layer; trailer-playing adds the
-  // drift, and only on real playback.
-  const src = video.dataset.trailerSrc;
-  if (src && !video.src) {
+  const revealPoster = () => backdrop.classList.add('trailer-ready');
+  const revealPlaying = () => {
+    backdrop.classList.add('trailer-ready', 'trailer-playing');
+  };
+
+  if (!landingTrailerWired) {
+    landingTrailerWired = true;
+    video.addEventListener('loadeddata', revealPoster);
+    video.addEventListener('canplay', revealPoster);
+    video.addEventListener('playing', revealPlaying);
+    // Failure fallback: a trailer that cannot decode/load still reveals the
+    // static poster (trailer-ready, no drift) instead of leaving a black void.
+    video.addEventListener('error', revealPoster);
+  }
+
+  // Video path: attach the source lazily and play. Older markup may still carry
+  // a <source> child, so also read that when data-trailer-src is absent.
+  const src =
+    video.dataset.trailerSrc ||
+    video.querySelector('source')?.getAttribute('src') ||
+    video.currentSrc ||
+    video.src;
+  if (src && !video.src && !video.currentSrc) {
     video.src = src;
-    if (!landingTrailerWired) {
-      landingTrailerWired = true;
-      video.addEventListener('playing', () => {
-        backdrop.classList.add('trailer-ready', 'trailer-playing');
-      });
-      // Failure fallback: a trailer that cannot decode/load still reveals the
-      // static poster (trailer-ready, no drift) instead of leaving a black void.
-      video.addEventListener('error', () => {
-        backdrop.classList.add('trailer-ready');
-      });
-    }
     video.load();
   }
-  video.play().catch(() => {
-    // autoplay blocked: reveal the static poster (no drift), not a black backdrop.
-    backdrop.classList.add('trailer-ready');
-  });
+
+  if (video.readyState >= 2) {
+    revealPoster();
+    if (!video.paused && !video.ended) revealPlaying();
+  }
+
+  video
+    .play()
+    .then(() => revealPlaying())
+    .catch(() => {
+      // autoplay blocked: reveal the static poster (no drift), not a black backdrop.
+      revealPoster();
+    });
 }
 
 function wireStartScreens(): void {
@@ -8411,34 +8436,32 @@ function wireStartScreens(): void {
     syncLandingGraphicsSelect();
   });
 
-  // Initialize 3D character preview once assets are ready
+  // Initialize 3D character preview once assets are ready. Panel changes can happen
+  // before preload settles, so honor the latest requested/visible character panel.
   assetsReady().then(() => {
     // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-    const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
+    const visiblePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find((id) => {
       const panel = $(id) as HTMLElement | null;
       return panel !== null && !panel.hasAttribute('hidden');
     });
+    const initialPanelId = pendingPreviewPanelId ?? visiblePanelId;
     const containerId =
-      activePanelId === '#offline-select'
+      initialPanelId === '#offline-select'
         ? '#offline-preview-container'
-        : '#online-preview-container';
+        : initialPanelId === '#charcreate-panel'
+          ? '#charcreate-preview-container'
+          : '#online-preview-container';
     const container = $(containerId);
     const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
     if (container && canvas) {
       characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
+      if (initialPanelId) {
+        updatePreviewContainer(initialPanelId);
+      } else if (charselectSelected) {
         characterPreview.setAppearance(charselectAppearance(charselectSelected));
       } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+        characterPreview.setSkin(0);
+        characterPreview.setClass('warrior');
       }
     }
     decorateClassChips();

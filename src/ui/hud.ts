@@ -689,6 +689,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
+  fury: 'abilityUi.resources.fury',
 };
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
@@ -3649,7 +3650,7 @@ export class Hud {
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
     renderTooltip: (name, remaining, effectHtml) =>
-      `<div class="tt-title">${esc(name)}</div>${effectHtml}<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`,
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}${Number.isFinite(remaining) ? `<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>` : ''}`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
@@ -5137,6 +5138,36 @@ export class Hud {
     }
   }
 
+  private classBarSeededKey(): string {
+    return `${this.slotMapKey('normal')}_class_seeded_v2`;
+  }
+
+  private markClassBarSeeded(): void {
+    try {
+      localStorage.setItem(this.classBarSeededKey(), '1');
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  private seedClassBarIfNeeded(stored: boolean, parsed: HotbarAction[]): boolean {
+    if (this.sim.cfg.playerClass !== 'demon_hunter' || this.activeHotbarForm !== 'normal') return false;
+    if (!stored || parsed.some((action) => action !== null)) return false;
+    try {
+      if (localStorage.getItem(this.classBarSeededKey()) === '1') return false;
+    } catch {
+      /* storage unavailable */
+    }
+    const kit = this.formKitAbilityIds('normal');
+    if (kit.length === 0) return false;
+    this.hotbarActions = buildDefaultFormBar(kit, Hud.BAR_ABILITY_SLOTS);
+    this.loadedSlotMapFromStorage = false;
+    this.knownAbilityIdsAtLastSlotSync = null;
+    this.markClassBarSeeded();
+    this.saveSlotMap();
+    return true;
+  }
+
   // Versioned separately from the druid form-kit migration. The first blank-page
   // rollout also clears a byte-identical parent clone created by the previous
   // behavior, while leaving every customized stealth layout untouched.
@@ -5243,6 +5274,7 @@ export class Hud {
       (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
       (id) => this.isHotbarItemId(id),
     );
+    if (this.seedClassBarIfNeeded(stored, parsed)) return;
     // The Vale Cup sport bar seeds from the sport kit (buildDefaultFormBar over
     // the current known list, which IS the role kit during a match, so Kick /
     // the role moves / Second Wind land in slots 1-4). It must NEVER inherit
@@ -5354,6 +5386,11 @@ export class Hud {
   // empty slot. Item shortcuts stay assigned even when their count reaches 0.
   private syncSlotMap(): void {
     const knownAbilityIds = this.sim.known.map((k) => k.def.id);
+    const initialClassSeed =
+      this.sim.cfg.playerClass === 'demon_hunter' &&
+      this.activeHotbarForm === 'normal' &&
+      this.knownAbilityIdsAtLastSlotSync === null &&
+      !this.loadedSlotMapFromStorage;
     const autoPlaceAbilityIds = new Set<string>();
     // Only auto-place abilities that belong on the active form's bar, so newly
     // learned form abilities land on their form bar and not the caster bar.
@@ -5374,6 +5411,7 @@ export class Hud {
     const synced = syncHotbarActions(this.hotbarActions, knownAbilityIds, autoPlaceAbilityIds);
     this.hotbarActions = synced.actions;
     if (synced.changed) this.saveSlotMap();
+    if (initialClassSeed) this.markClassBarSeeded();
     this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
     this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
@@ -7287,12 +7325,6 @@ export class Hud {
     // once at spawn, so there is no per-frame reposition); an empty pool (no recent combat)
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
-
-    // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
-    // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
-    // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // small non-blocking prompt appears only when in reach of its corpse or a Spirit
-    // Healer, carrying just the relevant button. The server re-checks both ranges.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
     document.body.classList.toggle('spirit-mode', ghost);
@@ -9077,6 +9109,17 @@ export class Hud {
             });
             if (healed && shape)
               this.fctPainter.spawn({ ...shape, text: `+${ev.amount}`, target: healed }, now);
+            if (healed && ev.sourceId === sim.playerId && ev.ability) {
+              const selfTarget = ev.targetId === sim.playerId;
+              this.combatLog(
+                t(selfTarget ? 'hud.combat.healSelf' : 'hud.combat.healOther', {
+                  ability: abilityDisplayNameFromSource(ev.ability),
+                  target: entityDisplayName(healed),
+                  amount: ev.amount,
+                }),
+                '#7fdc4f',
+              );
+            }
           }
           break;
         }
@@ -10355,6 +10398,7 @@ export class Hud {
       'That ability is not ready yet.': 'hud.errors.abilityNotReady',
       'Not enough rage!': 'hud.errors.notEnoughRage',
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
+      'Not enough Fury!': 'hud.errors.notEnoughFury',
       'Not enough mana!': 'hud.errors.notEnoughMana',
       'Not enough health.': 'hud.errors.notEnoughHealth',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
@@ -15449,12 +15493,12 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
   };
   // The pickers live in ability_damage.ts so the consistency guard test shares
   // them; this function only formats the picked effect.
-  const primary = abilityPrimaryEffect(res);
-  if (primary) {
+  const primary = abilityPrimaryEffect(res);  if (primary) {
     switch (primary.type) {
       case 'directDamage':
       case 'heal':
       case 'aoeDamage':
+      case 'selfAoeDot':
       case 'aoeHeal':
       case 'aoeRoot':
       case 'groundAoE':
@@ -15470,6 +15514,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
         return '';
       case 'weaponDamage':
       case 'weaponStrike':
+      case 'weaponHit':
         return formatAbilityNumber(primary.bonus);
       case 'sunder':
         return formatAbilityNumber(

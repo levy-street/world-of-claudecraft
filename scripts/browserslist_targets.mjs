@@ -32,10 +32,7 @@ const BROWSER_IDS = {
 // '#' starts a comment.
 export function parseBrowserslistFloors(text) {
   const floors = [];
-  // Split on CRLF or LF so a Windows (autocrlf) checkout's trailing '\r' does not
-  // survive on each line: '\r' is not matched by '.' in the '#' comment strip
-  // below, which would leave a comment line intact and throw as a bogus floor.
-  for (const physicalLine of text.split(/\r?\n/)) {
+  for (const physicalLine of text.replace(/\r\n?/g, '\n').split('\n')) {
     // Strip a '#' comment FIRST, so a comment that happens to contain a comma is
     // not split into a bogus floor entry by the comma handling below.
     const code = physicalLine.replace(/#.*$/, '');

@@ -119,7 +119,7 @@ World of Claudecraft is a browser-playable, classic-style micro-MMO with online 
 </div>
 \` + section('Featured portals', bullets([
   link('Zones') + ' — Eastbrook Vale, Mirefen Marsh, Thornpeak Heights.',
-  link('Classes') + ' — all nine playable class kits.',
+  link('Classes') + ' — all ten playable class kits.',
   link('Quests') + ' — the full source-defined quest chain.',
   link('Dungeons') + ' — Hollow Crypt, Sunken Bastion, and Gravewyrm Sanctum.',
   link('Community Lore') + ' — launch-week player culture from Discord, Reddit, and X.',

@@ -14,6 +14,7 @@ import {
   TALENT_BUILD_VERSION,
   TALENTS,
   type TalentAllocation,
+  type TalentEffect,
   talentPointsAtLevel,
   talentsFor,
   validateAllocation,
@@ -92,7 +93,7 @@ describe('talent tree validation (load-time)', () => {
   });
 
   it('derives painted icons for the release v0.7 class talent trees', () => {
-    const affected = ['shaman', 'hunter', 'druid', 'paladin', 'rogue', 'mage', 'warlock'] as const;
+    const affected = ['shaman', 'hunter', 'druid', 'paladin', 'rogue', 'mage', 'warlock', 'demon_hunter'] as const;
     for (const cls of affected) {
       const ct = talentsFor(cls)!;
       for (const node of ct.nodes) {
@@ -351,6 +352,191 @@ describe('precomputed modifiers', () => {
     ).find((k) => k.def.id === 'seal_of_righteousness')!;
     expect(effOf(seal)).toMatchObject({ bonus: 18, judgeMin: 48, judgeMax: 70 });
     // 2 talent ranks plus 20% retribution spell mastery.
+  });
+});
+describe('Demon Hunter talent audit', () => {
+  const dh = talentsFor('demon_hunter')!;
+  const reservedWowDemonHunterNames = new Set([
+    'A Fire Inside',
+    'Aldrachi Reaver',
+    'Annihilator',
+    'Anticipation',
+    'Ardent Defender',
+    'Bane',
+    'Blade Dance',
+    'Blind Fury',
+    'Blur',
+    'Burn It Out',
+    'Cataclysm',
+    'Chaos Strike',
+    'Cold Blood',
+    'Critical Mass',
+    'Cruelty',
+    'Cycle of Binding',
+    'Cycle of Hatred',
+    'Dark Arts',
+    'Darkness',
+    'Deflection',
+    'Demon Blades',
+    'Demon Bite',
+    'Demon Hunter',
+    'Demonic',
+    'Demonic Appetite',
+    'Demonic Origins',
+    'Demonic Resilience',
+    'Demonic Tactics',
+    'Demonic Wards',
+    'Devastation',
+    'Dire Bear',
+    'Essence Break',
+    'Eye Beam',
+    'Fel Barrage',
+    'Fel Eruption',
+    'Fel Mastery',
+    'Fel Rush',
+    'Fel Stamina',
+    'Felblade',
+    'Felfire Haste',
+    'Fel-Scarred',
+    'Final Breath',
+    'Focused Ire',
+    'Havoc',
+    'Immolation Aura',
+    'Inertia',
+    'Last Resort',
+    'Live by the Glaive',
+    'Metamorphosis',
+    'Painbringer',
+    'Pitch Black',
+    'Pursuit',
+    'Ragefire',
+    'Relentless Onslaught',
+    'Shattered Destiny',
+    'Sigil of Chains',
+    'Soul Barrier',
+    'Soul Carver',
+    'Soul Cleanse',
+    'Soul Rending',
+    'Tactical Retreat',
+    'Throw Glaive',
+    'Toughness',
+    'Vengeance',
+    'Wings of Wrath',
+  ]);
+
+  const statKeys = [
+    'str',
+    'agi',
+    'sta',
+    'int',
+    'spi',
+    'armor',
+    'ap',
+    'crit',
+    'dodge',
+    'apPct',
+    'staPct',
+    'armorPct',
+    'maxHpPct',
+    'strPct',
+    'agiPct',
+    'intPct',
+    'spiPct',
+  ] as const;
+  const globalKeys = ['meleeDmgPct', 'spellDmgPct', 'healPct', 'threatPct', 'critVsRooted'] as const;
+  const abilityKeys = ['dmgPct', 'flatDmg', 'costPct', 'cooldownPct', 'castPct', 'buffPct'] as const;
+
+  function assertEffectDelta(
+    effect: TalentEffect | undefined,
+    before: ReturnType<typeof computeTalentModifiers>,
+    after: ReturnType<typeof computeTalentModifiers>,
+    mult: number,
+    label: string,
+  ) {
+    expect(effect, label).toBeDefined();
+    for (const key of statKeys) {
+      const expected = ((effect?.stats as any)?.[key] ?? 0) * mult;
+      if (expected !== 0) expect(after.stats[key] - before.stats[key], `${label}.stats.${key}`).toBeCloseTo(expected);
+    }
+    for (const key of globalKeys) {
+      const expected = ((effect?.global as any)?.[key] ?? 0) * mult;
+      if (expected !== 0) expect(after.global[key] - before.global[key], `${label}.global.${key}`).toBeCloseTo(expected);
+    }
+    for (const ability of effect?.ability ?? []) {
+      const beforeAbility = before.abilities[ability.ability] ?? {
+        dmgPct: 0,
+        flatDmg: 0,
+        costPct: 0,
+        cooldownPct: 0,
+        castPct: 0,
+        buffPct: 0,
+        castWhileMoving: false,
+        addEffects: [],
+      };
+      const afterAbility = after.abilities[ability.ability];
+      expect(afterAbility, `${label}.abilities.${ability.ability}`).toBeDefined();
+      for (const key of abilityKeys) {
+        const expected = ((ability as any)[key] ?? 0) * mult;
+        if (expected !== 0)
+          expect(afterAbility[key] - beforeAbility[key], `${label}.abilities.${ability.ability}.${key}`).toBeCloseTo(expected);
+      }
+      if (ability.castWhileMoving) expect(afterAbility.castWhileMoving).toBe(true);
+      if (ability.addEffects?.length)
+        expect(afterAbility.addEffects.length - beforeAbility.addEffects.length).toBe(ability.addEffects.length);
+    }
+    if (effect?.grant) {
+      expect(after.grants).toContainEqual({ ability: effect.grant.ability, rank: effect.grant.rank ?? 1 });
+    }
+  }
+
+  it('uses Claudecraft-specific names instead of WoW Demon Hunter talent names', () => {
+    const names = new Set<string>();
+    for (const spec of dh.specs) {
+      names.add(spec.name);
+      names.add(spec.mastery.name);
+    }
+    for (const node of dh.nodes) {
+      names.add(node.name);
+      for (const choice of node.choices ?? []) names.add(choice.name);
+    }
+    const collisions = [...names].filter((name) => reservedWowDemonHunterNames.has(name)).sort();
+    expect(collisions).toEqual([]);
+  });
+
+  it('bakes every Demon Hunter node, choice, and mastery effect into TalentModifiers', () => {
+    for (const spec of dh.specs) {
+      const base = computeTalentModifiers('demon_hunter', alloc());
+      const specced = computeTalentModifiers('demon_hunter', alloc({ spec: spec.id }));
+      expect(specced.grants).toContainEqual({ ability: spec.signature, rank: 1 });
+      assertEffectDelta(spec.mastery.effect, base, specced, 1, `${spec.id}.mastery`);
+    }
+
+    for (const node of dh.nodes) {
+      const baseAlloc = alloc({ spec: node.tree === 'spec' ? node.specId! : null });
+      const base = computeTalentModifiers('demon_hunter', baseAlloc);
+      if (node.kind === 'choice') {
+        for (const choice of node.choices ?? []) {
+          const chosen = computeTalentModifiers(
+            'demon_hunter',
+            alloc({
+              spec: node.tree === 'spec' ? node.specId! : null,
+              ranks: { [node.id]: 1 },
+              choices: { [node.id]: choice.id },
+            }),
+          );
+          assertEffectDelta(choice.effect, base, chosen, 1, `${node.id}.${choice.id}`);
+        }
+      } else {
+        const ranked = computeTalentModifiers(
+          'demon_hunter',
+          alloc({
+            spec: node.tree === 'spec' ? node.specId! : null,
+            ranks: { [node.id]: node.maxRank },
+          }),
+        );
+        assertEffectDelta(node.effect, base, ranked, node.maxRank, node.id);
+      }
+    }
   });
 });
 

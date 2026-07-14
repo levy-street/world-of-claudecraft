@@ -48,6 +48,13 @@ describe('auraEffectDescriptor', () => {
     );
   });
 
+  it('describes lifesteal as a damage-to-healing percent', () => {
+    expect(desc({ kind: 'buff_lifesteal', value: 0.07 })).toEqual({
+      key: 'hudChrome.auraEffect.lifesteal',
+      nums: { pct: 7 },
+    });
+  });
+
   it('routes a positive stat buff to increase and a negative one to reduce', () => {
     expect(desc({ kind: 'buff_ap', value: 50 })).toEqual({
       key: 'hudChrome.auraEffect.increase.ap',

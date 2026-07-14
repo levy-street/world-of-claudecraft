@@ -1321,6 +1321,7 @@ export const ja_JP: EnTranslations = {
       "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "詠唱時間を{pct}%増加させる",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
@@ -2395,7 +2396,8 @@ export const ja_JP: EnTranslations = {
     "resourceName": {
       "rage": "レイジ",
       "mana": "マナ",
-      "energy": "エナジー"
+      "energy": "エナジー",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "すべてのクラス",
@@ -2499,7 +2501,19 @@ export const ja_JP: EnTranslations = {
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
-      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
+      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。",
+      "demon_bite": "デーモンハンターの技巧。",
+      "chaos_strike": "デーモンハンターの技巧。",
+      "vengeful_retreat": "デーモンハンターの技巧。",
+      "throw_glaive": "デーモンハンターの技巧。",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "デーモンハンターの技巧。",
+      "immolation_aura": "デーモンハンターの技巧。",
+      "blur": "デーモンハンターの技巧。",
+      "blade_dance": "デーモンハンターの技巧。",
+      "sigil_of_flame": "デーモンハンターの技巧。",
+      "eye_beam": "デーモンハンターの技巧。",
+      "demon_ascendance": "デーモンハンターの技巧。"
     },
     "petHook": {
       "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
@@ -3852,6 +3866,7 @@ export const ja_JP: EnTranslations = {
     "mage": "メイジ",
     "warlock": "ウォーロック",
     "druid": "ドルイド",
+    "demon_hunter": "デーモンハンター",
     "warriorAria": "戦士クラス",
     "paladinAria": "パラディンクラス",
     "hunterAria": "ハンタークラス",
@@ -3860,7 +3875,8 @@ export const ja_JP: EnTranslations = {
     "shamanAria": "シャーマンクラス",
     "mageAria": "メイジクラス",
     "warlockAria": "ウォーロッククラス",
-    "druidAria": "ドルイドクラス"
+    "druidAria": "ドルイドクラス",
+    "demon_hunterAria": "デーモンハンター職"
   },
   "controls": {
     "title": "操作ガイド",
@@ -4617,7 +4633,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "energy": "エネルギー",
-      "rage": "怒り"
+      "rage": "怒り",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "タンク / 近接DPS",
@@ -4628,7 +4645,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "ヒーラー / 近接または遠隔DPS",
       "mage": "遠隔DPS",
       "warlock": "遠隔DPS",
-      "druid": "タンク / ヒーラー / 近接または遠隔DPS"
+      "druid": "タンク / ヒーラー / 近接または遠隔DPS",
+      "demon_hunter": "デーモンハンター"
     },
     "armor": {
       "chainLeatherCloth": "鎖、革、布",
@@ -4652,7 +4670,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "シャーマンは元素を操り、武器に力を宿し、稲妻で敵を打ち、味方を回復します。",
       "mage": "メイジは火炎、氷霜、秘術の力で敵を破壊し、水を召喚し、脅威をその場で凍りつかせます。",
       "warlock": "ウォーロックは悪魔を召喚し、呪いと継続ダメージ魔法をかけ、敵から生命力を吸収して耐えます。",
-      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。"
+      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。",
+      "demon_hunter": "デーモンハンターの技。"
     },
     "aria": "{className}のクラス詳細: 役割 {role}。開始ステータス: 筋力 {str}、敏捷性 {agi}、スタミナ {sta}、知力 {int}、精神力 {spi}。",
     "statBarAria": "{stat}: {value}/25"
@@ -4993,6 +5012,7 @@ export const ja_JP: EnTranslations = {
       "abilityNotReady": "その能力はまだ準備できていません。",
       "notEnoughRage": "怒りが足りません！",
       "notEnoughEnergy": "エネルギーが足りません！",
+      "notEnoughFury": "憤怒が足りません！",
       "notEnoughMana": "マナが足りません！",
       "notEnoughResource": "{resource}が足りません！",
       "notEnoughHealth": "体力が足りません。",
@@ -5292,7 +5312,8 @@ export const ja_JP: EnTranslations = {
     "resources": {
       "mana": "マナ",
       "rage": "怒り",
-      "energy": "エネルギー"
+      "energy": "エネルギー",
+      "fury": "憤怒"
     },
     "forms": {
       "bear": "熊",
@@ -6203,6 +6224,54 @@ export const ja_JP: EnTranslations = {
       "rip": {
         "name": "リップ",
         "description": "12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。"
+      },
+      "demon_bite": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "chaos_strike": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "vengeful_retreat": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。"
+      },
+      "throw_glaive": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "immolation_aura": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "blur": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。"
+      },
+      "blade_dance": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "sigil_of_flame": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "eye_beam": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。 {damage}"
+      },
+      "demon_ascendance": {
+        "name": "デーモンハンター",
+        "description": "デーモンハンターの技。"
       },
       "mortal_strike": {
         "name": "重傷の一撃",

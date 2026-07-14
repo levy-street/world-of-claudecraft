@@ -33,6 +33,7 @@ const PORTRAIT_ANIM_STATE = {
   casting: false,
   swimming: false,
   sitting: false,
+  retreatFlip: 0,
 };
 
 // Models stand at the origin facing +Z, but their rigs differ in

@@ -2054,6 +2054,32 @@ describe('client HTML shell', () => {
     expect(hudTs).not.toContain('fallbackForm');
   });
 
+  it('seeds a stale empty Demon Hunter bar once from the class kit', () => {
+    expect(hudTs).toContain("this.sim.cfg.playerClass !== 'demon_hunter'");
+    expect(hudTs).toContain('seedClassBarIfNeeded(stored, parsed)');
+    expect(hudTs).toContain("_class_seeded_v2");
+    expect(hudTs).toContain("this.formKitAbilityIds('normal')");
+  });
+
+  it('logs sourced passive heal events in the combat log', () => {
+    expect(hudTs).toContain("case 'heal'");
+    expect(hudTs).toContain('ev.sourceId === sim.playerId && ev.ability');
+    expect(hudTs).toContain("t(selfTarget ? 'hud.combat.healSelf' : 'hud.combat.healOther'");
+  });
+
+  it('does not ship the temporary level-20 Demon Hunter QA shortcut', () => {
+    const startOfflineBody = mainTs.slice(
+      mainTs.indexOf('async function startOffline'),
+      mainTs.indexOf('// ---------------------------------------------------------------------------', mainTs.indexOf('async function startOffline')),
+    );
+    expect(startOfflineBody).not.toContain("playerClass === 'demon_hunter'");
+    expect(startOfflineBody).not.toContain('setPlayerLevel(20)');
+  });
+
+  it('keeps Release Spirit as a command-only UI action', () => {
+    expect(hudTs).not.toContain('this.sim.player.dead = true');
+    expect(hudTs).toContain("this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');");
+  });
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
     expect(hudTs).toContain('_seeded');
     expect(hudTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');

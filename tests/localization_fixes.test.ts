@@ -546,6 +546,11 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('resolves the Demon Hunter passive name through the aura matcher', () => {
+    setLanguage('en');
+    expect(localizeSimAuraName('Soul Leech')).toBe('Soul Leech');
+  });
+
   it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
     // These five template fields all push a named, player-visible aura (a channel
     // line, a player debuff, or a target-frame buff). A name with no matcher row

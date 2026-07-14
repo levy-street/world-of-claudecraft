@@ -1321,6 +1321,7 @@ export const vi_VN: EnTranslations = {
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
@@ -2395,7 +2396,8 @@ export const vi_VN: EnTranslations = {
     "resourceName": {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",
@@ -2499,7 +2501,19 @@ export const vi_VN: EnTranslations = {
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
-      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
+      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn.",
+      "demon_bite": "Your reliable builder: bite in with twin blades and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard unstable melee strike.",
+      "vengeful_retreat": "Flip back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target with a crescent blade and slow it long enough to catch up.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Surge across open ground and land with a burst of Chaos damage.",
+      "immolation_aura": "Brand nearby enemies with green fire while your attacks hit harder.",
+      "blur": "A defensive shimmer for dodging through danger.",
+      "blade_dance": "Spend Fury to blink around enemies with rapid slashes.",
+      "sigil_of_flame": "Place a burning rune to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused green beam into your target.",
+      "demon_ascendance": "Turn a fight with a short demon-form power window."
     },
     "petHook": {
       "emberkin": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
@@ -3852,6 +3866,7 @@ export const vi_VN: EnTranslations = {
     "mage": "Pháp Sư",
     "warlock": "Thuật Sĩ Hắc Ám",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Lớp nhân vật Chiến Binh",
     "paladinAria": "Lớp nhân vật Thánh Kỵ Sĩ",
     "hunterAria": "Lớp nhân vật Thợ Săn",
@@ -3860,7 +3875,8 @@ export const vi_VN: EnTranslations = {
     "shamanAria": "Lớp nhân vật Shaman",
     "mageAria": "Lớp nhân vật Pháp Sư",
     "warlockAria": "Lớp nhân vật Thuật Sĩ Hắc Ám",
-    "druidAria": "Lớp nhân vật Druid"
+    "druidAria": "Lớp nhân vật Druid",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Hướng Dẫn Điều Khiển",
@@ -4617,7 +4633,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Năng Lượng",
-      "rage": "Nộ Khí"
+      "rage": "Nộ Khí",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -4628,7 +4645,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
       "mage": "DPS Tầm Xa",
       "warlock": "DPS Tầm Xa",
-      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa"
+      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Giáp Xích, Giáp Da, Giáp Vải",
@@ -4652,7 +4670,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Shaman điều khiển các nguyên tố, ban sức mạnh cho vũ khí, gây choáng kẻ thù bằng sấm sét, và hồi phục cho đồng minh.",
       "mage": "Pháp Sư điều khiển sức mạnh Hỏa, Băng và uy lực bí thuật để tiêu diệt kẻ thù, triệu hồi nước, và đóng băng các mối đe dọa tại chỗ.",
       "warlock": "Thuật Sĩ Hắc Ám triệu hồi quỷ dữ, gieo lời nguyền và ma thuật sát thương theo thời gian, và hút sinh lực từ kẻ thù để trường tồn.",
-      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương."
+      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Chi tiết lớp {className}: vai trò {role}. Chỉ số khởi đầu: Sức Mạnh {str}, Nhanh Nhẹn {agi}, Sức Bền {sta}, Trí Tuệ {int}, Tinh Thần {spi}.",
     "statBarAria": "{stat}: {value} trên 25"
@@ -4993,6 +5012,7 @@ export const vi_VN: EnTranslations = {
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Không đủ mana!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
@@ -5292,7 +5312,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Nộ Khí",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Gấu",
@@ -6203,6 +6224,54 @@ export const vi_VN: EnTranslations = {
       "rip": {
         "name": "Xé Rách",
         "description": "Đòn kết liễu gây {damage} sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+      },
+      "demon_bite": {
+        "name": "Soul Bite",
+        "description": "Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury."
+      },
+      "chaos_strike": {
+        "name": "Rift Strike",
+        "description": "Cut through the target with unstable energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Reaver's Recoil",
+        "description": "Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Crescent Toss",
+        "description": "Hurl a crescent blade for {damage} Chaos damage and a brief snare."
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Felsurge",
+        "description": "Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Burning Brand",
+        "description": "Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Shimmerstep",
+        "description": "Shimmer through danger, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Razor Cyclone",
+        "description": "Blink through a razor-edged cyclone for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Flame Rune",
+        "description": "Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Gaze of Ruin",
+        "description": "Channel a ruinous green beam, dealing {damage} Chaos damage each pulse."
+      },
+      "demon_ascendance": {
+        "name": "Demon Ascendance",
+        "description": "Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",

@@ -46,6 +46,7 @@ const IDLE_STATE = {
   casting: false,
   swimming: false,
   sitting: false,
+  retreatFlip: 0,
 };
 
 const DEFAULT_BLOOM = { strength: 0.38, radius: 0.5, threshold: 0.85 };

@@ -156,6 +156,7 @@ export const SCHOOL_COLORS: Record<string, number> = {
   shadow: 0x9a5df0,
   holy: 0xffe9a0,
   nature: 0x86e86a,
+  chaos: 0x7dff4a,
   // warm steel-spark — near-white crossed the bloom threshold colorlessly and
   // melee hits read as faint white noise
   physical: 0xffd28a,
@@ -178,9 +179,9 @@ interface Projectile {
 
 // fire reads as flame tongues; everything else as sparkling magic
 function projectileSprites(school: string): { core: number; trail: number } {
-  return school === 'fire'
-    ? { core: SPR.firePuff, trail: SPR.flame }
-    : { core: SPR.glowCore, trail: SPR.sparkle };
+  if (school === 'fire') return { core: SPR.firePuff, trail: SPR.flame };
+  if (school === 'chaos') return { core: SPR.magicRune, trail: SPR.flame };
+  return { core: SPR.glowCore, trail: SPR.sparkle };
 }
 
 export type EntityAnchor = (id: number, heightFrac: number) => THREE.Vector3 | null;
@@ -410,24 +411,66 @@ export class Vfx {
   }
 
   beam(sourceId: number, targetId: number, school: string): void {
-    const from = this.anchor(sourceId, 0.62);
+    const from = this.anchor(sourceId, 0.82);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
-    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const base = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    const core = base.clone().multiplyScalar(hdr(3.2));
+    const glow = base.clone().lerp(new THREE.Color(0xb5ff8f), 0.35).multiplyScalar(hdr(1.85));
+    const spark = new THREE.Color(0xd6ffae).multiplyScalar(hdr(2.4));
     const dir = to.clone().sub(from);
     const len = dir.length();
     if (len <= 0.001) return;
     dir.multiplyScalar(1 / len);
-    const steps = Math.min(30, Math.max(8, Math.ceil(len / 1.25)));
+    const side = new THREE.Vector3(-dir.z, 0, dir.x);
+    if (side.lengthSq() < 0.001) side.set(1, 0, 0);
+    side.normalize();
+    const steps = Math.min(72, Math.max(18, Math.ceil(len / 0.42)));
     for (let i = 0; i <= steps; i++) {
       const f = i / steps;
-      const jitter = (Math.random() - 0.5) * 0.18;
-      const x = from.x + (to.x - from.x) * f + (Math.random() - 0.5) * 0.12;
-      const y = from.y + (to.y - from.y) * f + jitter;
-      const z = from.z + (to.z - from.z) * f + (Math.random() - 0.5) * 0.12;
-      this.spawn(x, y, z, -dir.x * 0.8, 0.08, -dir.z * 0.8, color, 0.34, 0.18, 0, SPR.glowCore);
+      const pulse = 0.75 + 0.25 * Math.sin((f * 8 + Math.random() * 0.35) * Math.PI * 2);
+      const wobble = Math.sin((f * 5 + Math.random() * 0.2) * Math.PI * 2) * 0.035;
+      const x = from.x + (to.x - from.x) * f + side.x * wobble;
+      const y = from.y + (to.y - from.y) * f + (Math.random() - 0.5) * 0.035;
+      const z = from.z + (to.z - from.z) * f + side.z * wobble;
+      this.spawn(x, y, z, 0, 0.03, 0, glow, 0.82 * pulse, 0.5, 0, SPR.glowSoft);
+      this.spawn(x, y, z, 0, 0.02, 0, core, 0.3 * pulse, 0.42, 0, SPR.glowCore);
+      if (i % 3 === 0) {
+        const offset = (Math.random() - 0.5) * 0.34;
+        this.spawn(
+          x + side.x * offset,
+          y + (Math.random() - 0.5) * 0.22,
+          z + side.z * offset,
+          -dir.x * 1.5 + side.x * offset,
+          0.15 + Math.random() * 0.25,
+          -dir.z * 1.5 + side.z * offset,
+          spark,
+          0.22 + Math.random() * 0.16,
+          0.36,
+          0,
+          SPR.sparkle,
+        );
+      }
     }
-    this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
+    this.spawn(from.x, from.y, from.z, -dir.x * 0.15, 0.2, -dir.z * 0.15, core, 0.85, 0.35, 0, SPR.flash);
+    this.spawn(to.x, to.y, to.z, 0, 0.25, 0, core, 1.1, 0.5, 0, SPR.magicRune);
+    for (let i = 0; i < this.scaledCount(10); i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.5 + Math.random() * 2.5;
+      this.spawn(
+        to.x,
+        to.y,
+        to.z,
+        Math.sin(a) * sp,
+        0.45 + Math.random() * 0.8,
+        Math.cos(a) * sp,
+        spark,
+        0.2 + Math.random() * 0.18,
+        0.38,
+        1.5,
+        i % 2 === 0 ? SPR.star : SPR.sparkBurst,
+      );
+    }
   }
 
   // A "bolt-shaped" traveling projectile: fires a homing bolt with the SAME
@@ -623,6 +666,22 @@ export class Vfx {
         SPR.magicWisp,
       );
     }
+  }
+
+  bladeDance(targetId: number, school: string): void {
+    const at = this.anchor(targetId, 0.48);
+    if (!at) return;
+    const c = new THREE.Color(SCHOOL_COLORS[school] ?? SCHOOL_COLORS.physical).multiplyScalar(hdr(2.0));
+    const count = this.scaledCount(7);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
+      const r = 0.5 + (i % 3) * 0.28;
+      const x = at.x + Math.sin(a) * r;
+      const z = at.z + Math.cos(a) * r;
+      this.spawn(x, at.y + 0.12 + (i % 2) * 0.2, z, 0, 0.45, 0, c, 1.05, 0.2, 0, SPR.slash, -a);
+      this.spawn(x, at.y + 0.2, z, Math.sin(a) * 2.8, 0.8, Math.cos(a) * 2.8, c, 0.34, 0.35, 1.5, SPR.sparkBurst);
+    }
+    this.burst(at, school, 16, 0.9);
   }
 
   meleeSpark(targetId: number, crit: boolean): void {
