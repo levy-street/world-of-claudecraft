@@ -53,11 +53,7 @@ describe('mobileBagItemActions', () => {
     expect(ids({ kind: 'armor', noDiscard: true })).toEqual(['equip', 'linkToChat']);
     // Soulbinding prevents transfer, not local destruction. The sim accepts
     // discarding these items, so the mobile menu must keep the same affordance.
-    expect(ids({ kind: 'armor', soulbound: true })).toEqual([
-      'equip',
-      'linkToChat',
-      'destroy',
-    ]);
+    expect(ids({ kind: 'armor', soulbound: true })).toEqual(['equip', 'linkToChat', 'destroy']);
   });
 
   it.each([

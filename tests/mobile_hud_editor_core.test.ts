@@ -502,9 +502,7 @@ describe('one canonical mobile HUD context validator', () => {
   it('allows positions outside the safe area while preserving scale and target validation', () => {
     const scaled = validate(['action.a1'], { 'action.a1': at(100, 100, 0.45) });
     const outside = validate(['action.a1'], { 'action.a1': at(-45, 100) });
-    expect(scaled.map((failure) => failure.reason)).toEqual([
-      'scale-out-of-range',
-    ]);
+    expect(scaled.map((failure) => failure.reason)).toEqual(['scale-out-of-range']);
     expect(outside).toEqual([]);
   });
 

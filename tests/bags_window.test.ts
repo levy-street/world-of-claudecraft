@@ -296,11 +296,11 @@ describe('bags_window: touch peek + bank-cluster close', () => {
   });
 
   it('the left-click and non-shift right-click handlers share one dispatch (runBagItemAction)', () => {
-    expect(painter).toContain('const action = mobileView.directAction ?? bagItemAction(item, mode);');
-    expect(painter).toContain('this.runBagItemAction(s, action, ev);');
     expect(painter).toContain(
-      'this.runBagItemAction(s, bagItemAction(item, this.bagMode()), ev);',
+      'const action = mobileView.directAction ?? bagItemAction(item, mode);',
     );
+    expect(painter).toContain('this.runBagItemAction(s, action, ev);');
+    expect(painter).toContain('this.runBagItemAction(s, bagItemAction(item, this.bagMode()), ev);');
     expect(painter).toContain(
       'private runBagItemAction(s: InvSlot, action: BagAction, ev: MouseEvent): void {',
     );

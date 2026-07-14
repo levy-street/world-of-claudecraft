@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
-  assignAbilityToMobileSlot,
   applyLoadoutBar,
+  assignAbilityToMobileSlot,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,

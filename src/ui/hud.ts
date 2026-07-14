@@ -297,8 +297,8 @@ import {
   holderTierForBalance,
 } from './holder_tier';
 import {
-  assignAbilityToMobileSlot,
   applyLoadoutBar as applyLoadoutBarActions,
+  assignAbilityToMobileSlot,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
