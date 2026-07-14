@@ -166,6 +166,14 @@ describe('Settings', () => {
     expect(b.get('mobileCameraJoystick')).toBe(true);
   });
 
+  it('defaults the own nameplate on for a fresh player and preserves an existing off choice', () => {
+    const fresh = new Settings();
+    expect(fresh.get('showOwnNameplate')).toBe(true);
+
+    fresh.set('showOwnNameplate', false);
+    expect(new Settings().get('showOwnNameplate')).toBe(false);
+  });
+
   it('defaults footstep sounds off and persists re-enabling across instances', () => {
     const a = new Settings();
     expect(a.get('footstepSfx')).toBe(false);

@@ -234,6 +234,7 @@ function tickBlackwaterMarkCast(
     text: `${boss.name} marks ${target.name} with Blackwater!`,
     color: '#6af',
     entityId: boss.id,
+    telegraph: true,
   });
   ctx.emit({
     type: 'spellfx',
@@ -292,6 +293,7 @@ function tickFinalBell(
     type: 'log',
     text: `${boss.name} unleashes Final Bell!`,
     color: '#ff9933',
+    telegraph: true,
     entityId: boss.id,
   });
   ctx.spawnBossAdds(

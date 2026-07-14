@@ -4451,4 +4451,32 @@
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
   }
+  @keyframes fct-xp-pop-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.2;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 56px);
+      scale: 1;
+    }
+  }
+  /* Same treatment as .fct.crit above: the mobile .fct-xp/.fct-rested-xp selectors
+     are more specific than the desktop hud.css ones (body.mobile-touch adds a
+     selector), so they must be re-declared here or the desktop pop/size is lost
+     on touch. */
+  body.mobile-touch .fct-xp,
+  body.mobile-touch .fct-rested-xp {
+    font-size: calc(17px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct-xp,
+  :root[data-fx-level="low"] body.mobile-touch .fct-rested-xp {
+    animation-name: fct-rise-mobile;
+  }
 }

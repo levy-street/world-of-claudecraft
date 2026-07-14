@@ -10,19 +10,23 @@
 // document.head and reads the route + the i18n runtime; no app state.
 
 import {
-  getLanguage, languageTag, t, formatNumber, supportedLanguages,
+  formatNumber,
+  getLanguage,
+  languageTag,
+  supportedLanguages,
   type TranslationKey,
+  t,
 } from '../ui/i18n';
-import { hrefFor, type GuideRoute } from './routes';
-import { GLOSSARY_TERMS } from './pages/glossary';
 import { GUIDE_CLASSES } from './content.generated';
 import { LEVEL_CAP } from './data';
+import { GLOSSARY_TERMS } from './pages/glossary';
+import { type GuideRoute, hrefFor } from './routes';
 
 // The site origin. Matches index.html's canonical/og:url host exactly.
 const ORIGIN = 'https://worldofclaudecraft.com';
 const LOGO = `${ORIGIN}/woc_logo_square.webp`;
 const GITHUB_URL = 'https://github.com/levy-street/world-of-claudecraft';
-const DISCORD_URL = 'https://discord.gg/GjhnUsBtw';
+const DISCORD_URL = 'https://discord.com/invite/worldofclaudecraft';
 
 // The newcomer FAQ on /guide/faq, kept in lockstep with pages/faq.ts so the FAQPage
 // JSON-LD answers the same questions the visible page does. cap rows splice the level
@@ -104,8 +108,8 @@ export function applyRouteHead(input: RouteHeadInput): void {
   // Only the classes route has real detail pages. A trailing param on any other route (or
   // an unknown class id) is a junk deep path, so canonicalize it back to the section rather
   // than self-canonicalizing onto the junk URL, and drop the junk breadcrumb leaf.
-  const isClassDetail = route?.id === 'classes' && detailId != null
-    && GUIDE_CLASSES.some((c) => c.id === detailId);
+  const isClassDetail =
+    route?.id === 'classes' && detailId != null && GUIDE_CLASSES.some((c) => c.id === detailId);
   const effectiveDetailId = isClassDetail ? detailId : null;
   const canonSub = route ? (isClassDetail ? `${route.sub}/${detailId}` : route.sub) : sub;
   const url = guideUrl(canonSub);
@@ -123,7 +127,9 @@ export function applyRouteHead(input: RouteHeadInput): void {
   setMetaName('twitter:title', socialTitle);
   setMetaName('twitter:description', description);
   applyAlternates(canonSub);
-  setStructuredData(buildStructuredData(route, canonSub, url, description, inLanguage, effectiveDetailId));
+  setStructuredData(
+    buildStructuredData(route, canonSub, url, description, inLanguage, effectiveDetailId),
+  );
 }
 
 // ----- head node helpers (query-or-create, then update in place) -----
@@ -229,7 +235,11 @@ function videoGameNode(description: string, inLanguage: string): Record<string, 
 
 // The visible breadcrumb is Guide / Group / Page (+ leaf on a detail page). The group has
 // no page of its own, so it is a name-only list item; the rest carry their absolute URL.
-function breadcrumbNode(route: GuideRoute, sub: string, detailId: string | null): Record<string, unknown> {
+function breadcrumbNode(
+  route: GuideRoute,
+  sub: string,
+  detailId: string | null,
+): Record<string, unknown> {
   const items: Record<string, unknown>[] = [];
   let position = 1;
   items.push(crumb(position++, t('guide.breadcrumb.home'), guideUrl('')));
@@ -241,9 +251,10 @@ function breadcrumbNode(route: GuideRoute, sub: string, detailId: string | null)
   // to the section and the leaf is the detail title.
   items.push(crumb(position++, t(route.navKey), guideUrl(route.sub)));
   if (isDetail) {
-    const leaf = route.id === 'classes' && GUIDE_CLASSES.some((c) => c.id === detailId)
-      ? className(detailId)
-      : detailId;
+    const leaf =
+      route.id === 'classes' && GUIDE_CLASSES.some((c) => c.id === detailId)
+        ? className(detailId)
+        : detailId;
     items.push(crumb(position++, leaf, guideUrl(sub)));
   }
   return { '@type': 'BreadcrumbList', itemListElement: items };
