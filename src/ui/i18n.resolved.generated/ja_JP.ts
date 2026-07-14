@@ -969,9 +969,9 @@ export const ja_JP: EnTranslations = {
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
-        "frontierKill": "Frontier kill",
-        "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierKill": "辺境の討伐",
+        "frontierRare": "フロストリーチの珍しい敵",
+        "frontierDaily": "辺境デイリー"
       }
     },
     "statInfo": {
@@ -7909,6 +7909,12 @@ export const ja_JP: EnTranslations = {
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"
+      },
+      "rimefang_stalker": {
+        "name": "霜牙の追跡者"
+      },
+      "frostbound_revenant": {
+        "name": "霜縛の亡霊"
       },
       "deeprock_kobold": {
         "name": "ディープロックの坑夫"

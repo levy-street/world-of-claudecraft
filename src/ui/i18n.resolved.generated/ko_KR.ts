@@ -969,9 +969,9 @@ export const ko_KR: EnTranslations = {
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
-        "frontierKill": "Frontier kill",
-        "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierKill": "변경 처치",
+        "frontierRare": "서리손길 희귀",
+        "frontierDaily": "변경 일일"
       }
     },
     "statInfo": {
@@ -7909,6 +7909,12 @@ export const ko_KR: EnTranslations = {
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"
+      },
+      "rimefang_stalker": {
+        "name": "서리엄니 추적자"
+      },
+      "frostbound_revenant": {
+        "name": "서리결계 망령"
       },
       "deeprock_kobold": {
         "name": "깊은바위 굴꾼"

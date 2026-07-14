@@ -7910,6 +7910,12 @@ export const sv_SE: EnTranslations = {
       "ridge_stalker": {
         "name": "Åssmygare"
       },
+      "rimefang_stalker": {
+        "name": "Rimefang Stalker"
+      },
+      "frostbound_revenant": {
+        "name": "Frostbound Revenant"
+      },
       "deeprock_kobold": {
         "name": "Djupbergsgrävare"
       },

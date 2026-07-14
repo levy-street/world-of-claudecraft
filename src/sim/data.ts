@@ -36,6 +36,7 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { FRONTIER_MOBS } from './content/frontier';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
@@ -177,6 +178,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
+  ...FRONTIER_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...TEMPLE_MOBS,

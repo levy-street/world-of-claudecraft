@@ -7910,6 +7910,12 @@ export const en_XA: EnTranslations = {
       "ridge_stalker": {
         "name": "[Ŕíðĝé Šţáļķéŕ]"
       },
+      "rimefang_stalker": {
+        "name": "[Ŕíɱéƒáñĝ Šţáļķéŕ]"
+      },
+      "frostbound_revenant": {
+        "name": "[Ƒŕóšţƀóúñð Ŕéʋéñáñţ]"
+      },
       "deeprock_kobold": {
         "name": "[Ðééþŕóçķ Ţúññéļéŕ]"
       },

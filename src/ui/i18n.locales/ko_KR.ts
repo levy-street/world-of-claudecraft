@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  "hudChrome.warfare.reasons.frontierKill": "변경 처치",
+  "hudChrome.warfare.reasons.frontierRare": "서리손길 희귀",
+  "hudChrome.warfare.reasons.frontierDaily": "변경 일일",
+  "entities.mobs.rimefang_stalker.name": "서리엄니 추적자",
+  "entities.mobs.frostbound_revenant.name": "서리결계 망령",
   'hudChrome.wocStore.title': 'WOC 상점',
   'hudChrome.wocStore.close': 'WOC 상점 닫기',
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',

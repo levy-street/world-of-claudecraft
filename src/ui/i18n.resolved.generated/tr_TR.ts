@@ -7910,6 +7910,12 @@ export const tr_TR: EnTranslations = {
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
       },
+      "rimefang_stalker": {
+        "name": "Rimefang Stalker"
+      },
+      "frostbound_revenant": {
+        "name": "Frostbound Revenant"
+      },
       "deeprock_kobold": {
         "name": "Deeprock Tunelcisi"
       },

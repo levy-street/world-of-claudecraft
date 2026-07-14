@@ -41,6 +41,8 @@ const MOB_IDS = [
   'deacon_voss',
   'training_dummy',
   'ridge_stalker',
+  'rimefang_stalker',
+  'frostbound_revenant',
   'deeprock_kobold',
   'thornpeak_ogre',
   'ogre_crusher',

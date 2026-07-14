@@ -7910,6 +7910,12 @@ export const vi_VN: EnTranslations = {
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
       },
+      "rimefang_stalker": {
+        "name": "Rimefang Stalker"
+      },
+      "frostbound_revenant": {
+        "name": "Frostbound Revenant"
+      },
       "deeprock_kobold": {
         "name": "Kẻ Đào Hầm Deeprock"
       },

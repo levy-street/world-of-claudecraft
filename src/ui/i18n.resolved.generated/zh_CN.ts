@@ -969,9 +969,9 @@ export const zh_CN: EnTranslations = {
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利",
-        "frontierKill": "Frontier kill",
-        "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierKill": "边境击杀",
+        "frontierRare": "霜达稀有精英",
+        "frontierDaily": "边境每日任务"
       }
     },
     "statInfo": {
@@ -7909,6 +7909,12 @@ export const zh_CN: EnTranslations = {
       },
       "ridge_stalker": {
         "name": "山脊潜猎者"
+      },
+      "rimefang_stalker": {
+        "name": "霜牙潜袭者"
+      },
+      "frostbound_revenant": {
+        "name": "霜缚亡魂"
       },
       "deeprock_kobold": {
         "name": "深岩掘地者"

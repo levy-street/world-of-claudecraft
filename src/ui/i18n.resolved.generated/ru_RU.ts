@@ -969,9 +969,9 @@ export const ru_RU: EnTranslations = {
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
         "fiestaWin": "Победа на Фиесте",
-        "frontierKill": "Frontier kill",
-        "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierKill": "Убийство во Фронтире",
+        "frontierRare": "Редкий во Фростриче",
+        "frontierDaily": "Ежедневное во Фронтире"
       }
     },
     "statInfo": {
@@ -7909,6 +7909,12 @@ export const ru_RU: EnTranslations = {
       },
       "ridge_stalker": {
         "name": "Хребтовый охотник"
+      },
+      "rimefang_stalker": {
+        "name": "Изморозный охотник"
+      },
+      "frostbound_revenant": {
+        "name": "Мороженый ревенант"
       },
       "deeprock_kobold": {
         "name": "Глубокоскальный туннельщик"

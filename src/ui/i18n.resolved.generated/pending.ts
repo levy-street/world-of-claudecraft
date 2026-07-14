@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -34,6 +36,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "es_ES": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -58,6 +62,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "fr_FR": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -82,6 +88,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "fr_CA": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -107,6 +115,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -131,6 +141,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "de_DE": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -156,33 +168,23 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill",
-    "hudChrome.warfare.reasons.frontierDaily",
-    "hudChrome.warfare.reasons.frontierKill",
-    "hudChrome.warfare.reasons.frontierRare"
+    "hudChrome.discord.roleTag.shill"
   ],
   "zh_TW": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill",
-    "hudChrome.warfare.reasons.frontierDaily",
-    "hudChrome.warfare.reasons.frontierKill",
-    "hudChrome.warfare.reasons.frontierRare"
+    "hudChrome.discord.roleTag.shill"
   ],
   "ko_KR": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill",
-    "hudChrome.warfare.reasons.frontierDaily",
-    "hudChrome.warfare.reasons.frontierKill",
-    "hudChrome.warfare.reasons.frontierRare"
+    "hudChrome.discord.roleTag.shill"
   ],
   "ja_JP": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill",
-    "hudChrome.warfare.reasons.frontierDaily",
-    "hudChrome.warfare.reasons.frontierKill",
-    "hudChrome.warfare.reasons.frontierRare"
+    "hudChrome.discord.roleTag.shill"
   ],
   "pt_BR": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -208,12 +210,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hudChrome.discord.roleTag.legend",
-    "hudChrome.discord.roleTag.shill",
-    "hudChrome.warfare.reasons.frontierDaily",
-    "hudChrome.warfare.reasons.frontierKill",
-    "hudChrome.warfare.reasons.frontierRare"
+    "hudChrome.discord.roleTag.shill"
   ],
   "cs_CZ": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -238,6 +239,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "nl_NL": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -262,6 +265,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "pl_PL": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -286,6 +291,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "id_ID": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -310,6 +317,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "tr_TR": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -334,6 +343,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "sv_SE": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -358,6 +369,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "vi_VN": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",
@@ -382,6 +395,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.frontierRare"
   ],
   "da_DK": [
+    "entities.mobs.frostbound_revenant.name",
+    "entities.mobs.rimefang_stalker.name",
     "guide.family.reptile.desc",
     "guide.family.reptile.name",
     "hudChrome.bags.rightClickDestroy",

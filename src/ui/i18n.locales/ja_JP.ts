@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  "hudChrome.warfare.reasons.frontierKill": "辺境の討伐",
+  "hudChrome.warfare.reasons.frontierRare": "フロストリーチの珍しい敵",
+  "hudChrome.warfare.reasons.frontierDaily": "辺境デイリー",
+  "entities.mobs.rimefang_stalker.name": "霜牙の追跡者",
+  "entities.mobs.frostbound_revenant.name": "霜縛の亡霊",
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',

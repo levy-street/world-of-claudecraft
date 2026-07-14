@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  "hudChrome.warfare.reasons.frontierKill": "邊境擊殺",
+  "hudChrome.warfare.reasons.frontierRare": "霜達稀有精英",
+  "hudChrome.warfare.reasons.frontierDaily": "邊境每日任務",
+  "entities.mobs.rimefang_stalker.name": "霜牙潛襲者",
+  "entities.mobs.frostbound_revenant.name": "霜縛亡魂",
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '關閉 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',

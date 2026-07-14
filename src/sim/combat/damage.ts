@@ -28,7 +28,7 @@ import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
-import { pvpDamageMultiplier } from '../pvp';
+import { awardFrontierRareKill, pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -775,6 +775,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // clearThreat below, exactly like worldBossContribs.
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
+    // A frost rare slain inside the Frostreach Frontier drops honor + hero points
+    // to every contributor (the Season 1 PvP-zone reward loop). Draws no rng.
+    awardFrontierRareKill(ctx, e, rareContribs);
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;

@@ -7910,6 +7910,12 @@ export const id_ID: EnTranslations = {
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
       },
+      "rimefang_stalker": {
+        "name": "Rimefang Stalker"
+      },
+      "frostbound_revenant": {
+        "name": "Frostbound Revenant"
+      },
       "deeprock_kobold": {
         "name": "Penggali Terowongan Deeprock"
       },
