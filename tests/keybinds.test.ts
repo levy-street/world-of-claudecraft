@@ -487,6 +487,16 @@ describe('per-character scope', () => {
     expect(kb.edgeActionForCombo('Shift+KeyH')).toBe('meters');
   });
 
+  it('gives sheathe and deeds the two layers of KeyZ instead of colliding', () => {
+    const kb = new Keybinds();
+    expect(kb.codeAt('sheathe', 0)).toBe('KeyZ');
+    expect(kb.codeAt('deeds', 0)).toBe('Shift+KeyZ');
+    // Production edge dispatch matches the FULL chord, so the shifted layer never
+    // sheathes and the bare key never opens the Book of Deeds.
+    expect(kb.edgeActionForCombo('KeyZ')).toBe('sheathe');
+    expect(kb.edgeActionForCombo('Shift+KeyZ')).toBe('deeds');
+  });
+
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {
     localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
     // A JSON array is typeof 'object' but is not a valid profile; it must seed.

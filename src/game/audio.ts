@@ -73,15 +73,9 @@ export class GameAudio {
       this.cueMaster = this.cueCtx.createGain();
       this.cueMaster.gain.value = PROCEDURAL_BASE_GAIN * this.vol;
       this.cueMaster.connect(this.cueCtx.destination);
-      const frames = this.cueCtx.sampleRate * NOISE_BUFFER_SECONDS;
-      this.noiseBuf = this.cueCtx.createBuffer(1, frames, this.cueCtx.sampleRate);
-      const data = this.noiseBuf.getChannelData(0);
-      // Presentation-side randomness: this is not sim logic (see src/game/CLAUDE.md).
-      for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
     } catch {
       this.cueCtx = null;
       this.cueMaster = null;
-      this.noiseBuf = null;
     }
   }
 
@@ -100,6 +94,24 @@ export class GameAudio {
     oscillator.stop(start + duration + 0.05);
   }
 
+  /** The shared white-noise buffer the scrape cues sample, built on first use.
+   *  Kept OUT of initCueSynth: a context that cannot build a buffer must still
+   *  play the oscillator cues (the ready-check chime). */
+  private noiseBuffer(): AudioBuffer | null {
+    if (this.noiseBuf || !this.cueCtx) return this.noiseBuf;
+    try {
+      const frames = Math.floor(this.cueCtx.sampleRate * NOISE_BUFFER_SECONDS);
+      const buf = this.cueCtx.createBuffer(1, frames, this.cueCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      // Presentation-side randomness: this is not sim logic (see src/game/CLAUDE.md).
+      for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+      this.noiseBuf = buf;
+    } catch {
+      this.noiseBuf = null;
+    }
+    return this.noiseBuf;
+  }
+
   /** Filtered noise burst (the scrape half of the sheathe/draw cues). */
   private cueNoise(
     duration: number,
@@ -108,10 +120,11 @@ export class GameAudio {
     decay = 0.9,
     filterType: BiquadFilterType = 'lowpass',
   ): void {
-    if (!this.cueCtx || !this.cueMaster || !this.noiseBuf) return;
+    const noise = this.noiseBuffer();
+    if (!this.cueCtx || !this.cueMaster || !noise) return;
     const t = this.cueCtx.currentTime;
     const src = this.cueCtx.createBufferSource();
-    src.buffer = this.noiseBuf;
+    src.buffer = noise;
     src.playbackRate.value = 0.8 + Math.random() * 0.4;
     const filter = this.cueCtx.createBiquadFilter();
     filter.type = filterType;
